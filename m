@@ -2,62 +2,85 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6697C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F850C34031
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 703F82173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26EB024125
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:10:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AHbfLulM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 703F82173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F8+1ZJ6e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26EB024125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4BwK-0000Qw-Ms
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 18:06:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57765)
+	id 1j4C0w-0002AT-D8
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 18:10:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4BuQ-0006vr-20
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:04:09 -0500
+ (envelope-from <gshan@redhat.com>) id 1j4C07-0001bv-BN
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:10:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4BuM-0001W2-T0
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:04:05 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56955 helo=ozlabs.org)
+ (envelope-from <gshan@redhat.com>) id 1j4C04-00071D-HI
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:09:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41751
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1j4BuL-0001Cv-UU
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:04:02 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48Mby04S0Wz9sRY; Wed, 19 Feb 2020 10:03:52 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582067032;
- bh=mudEXXHOwzQ8z4243MSoL01PGHuQEDWyHFRpeqBWFB4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=AHbfLulMJ03eT9NWeYI2s9o6VhlIcbVKzRQtavYLJyMZgKS3BHPpuU5n9dDoKL9pt
- yK2NEqshlAfMKx9TwYkg4gK2VHUrhuMyf7frwdZ2VreEk9T5Obizwjw9YZuMWRwjKi
- BXz9Xdw7Iw28onXR9gDgvZyBdCX8V4K5IXJc/BMU=
-Date: Wed, 19 Feb 2020 10:00:43 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2] Avoid address_space_rw() with a constant is_write
- argument
-Message-ID: <20200218230043.GA1764@umbus.fritz.box>
-References: <20200218112457.22712-1-peter.maydell@linaro.org>
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j4C04-0006rx-Ak
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:09:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582067395;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sM3QoGqNTjmuG9QGlqh7NY7lACW/YD79UbkFbqdXlIA=;
+ b=F8+1ZJ6eZf+5/5f2Hb1DZwtOWgNkFRv2Eck7batWvvt13mKZ13hqeRoh/l2O7aks4/xDh0
+ i7pziQNRLexWJrXu/2htBLX/VKYKD03tZDdI+bG+Di2F48z0No69cF+9mZ8k8N+Nxst46C
+ PONg/cy3QcZorgLlMWl5NU8IVM1wmwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-VGp9eeWOPVWqe2QKknckEw-1; Tue, 18 Feb 2020 18:09:53 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F16C613E4;
+ Tue, 18 Feb 2020 23:09:51 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-93.bne.redhat.com [10.64.54.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4092B90526;
+ Tue, 18 Feb 2020 23:09:42 +0000 (UTC)
+Subject: Re: [PATCH v4 1/3] target/arm: Support SError injection
+To: Marc Zyngier <maz@kernel.org>
+References: <20200218020416.50244-1-gshan@redhat.com>
+ <20200218020416.50244-2-gshan@redhat.com>
+ <60f0303b0c8d3f9a124c2e5c25814de3@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <459ada75-b055-b2e2-ba5b-851f76c17f62@redhat.com>
+Date: Wed, 19 Feb 2020 10:09:39 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
-Content-Disposition: inline
-In-Reply-To: <20200218112457.22712-1-peter.maydell@linaro.org>
+In-Reply-To: <60f0303b0c8d3f9a124c2e5c25814de3@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: VGp9eeWOPVWqe2QKknckEw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,771 +92,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Gavin Shan <gshan@redhat.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
+ aik@ozlabs.ru, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Marc,
 
---dDRMvlgZJXvWKvBx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 2/19/20 3:28 AM, Marc Zyngier wrote:
+> On 2020-02-18 02:04, Gavin Shan wrote:
+>> This supports SError injection, which will be used by "virt" board to
+>> simulating the behavior of NMI injection in next patch. As Peter Maydell
+>> suggested, this adds a new interrupt (ARM_CPU_SERROR), which is parallel
+>> to CPU_INTERRUPT_HARD. The backend depends on if kvm is enabled or not.
+>> kvm_vcpu_ioctl(cpu, KVM_SET_VCPU_EVENTS) is leveraged to inject SError
+>> or data abort to guest. When TCG is enabled, the behavior is simulated
+>> by injecting SError and data abort to guest.
+>=20
+> s/and/or/ (you can't inject both at the same time).
+>=20
 
-On Tue, Feb 18, 2020 at 11:24:57AM +0000, Peter Maydell wrote:
-> The address_space_rw() function allows either reads or writes
-> depending on the is_write argument passed to it; this is useful
-> when the direction of the access is determined programmatically
-> (as for instance when handling the KVM_EXIT_MMIO exit reason).
-> Under the hood it just calls either address_space_write() or
-> address_space_read_full().
->=20
-> We also use it a lot with a constant is_write argument, though,
-> which has two issues:
->  * when reading "address_space_rw(..., 1)" this is less
->    immediately clear to the reader as being a write than
->    "address_space_write(...)"
->  * calling address_space_rw() bypasses the optimization
->    in address_space_read() that fast-paths reads of a
->    fixed length
->=20
-> This commit was produced with the included Coccinelle script
-> scripts/coccinelle/as-rw-const.patch.
->=20
-> Two lines in hw/net/dp8393x.c that Coccinelle produced that
-> were over 80 characters were re-wrapped by hand.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Absolutely, will be corrected in v5, which will be hold. I hope to receive
+comments from Peter and Richard before going to do another respin :)
 
-ppc parts
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
-> I could break this down into separate patches by submaintainer,
-> but the patch is not that large and I would argue that it's
-> better for the project if we can try to avoid introducing too
-> much friction into the process of doing 'safe' tree-wide
-> minor refactorings.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>> =A0target/arm/cpu.c=A0=A0=A0=A0=A0 | 69 ++++++++++++++++++++++++++++++++=
++++--------
+>> =A0target/arm/cpu.h=A0=A0=A0=A0=A0 | 20 ++++++++-----
+>> =A0target/arm/helper.c=A0=A0 | 12 ++++++++
+>> =A0target/arm/m_helper.c |=A0 8 +++++
+>> =A0target/arm/machine.c=A0 |=A0 3 +-
+>> =A05 files changed, 91 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index de733aceeb..e5750080bc 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -78,7 +78,7 @@ static bool arm_cpu_has_work(CPUState *cs)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 && cs->interrupt_request &
+>> =A0=A0=A0=A0=A0=A0=A0=A0 (CPU_INTERRUPT_FIQ | CPU_INTERRUPT_HARD
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 | CPU_INTERRUPT_VFIQ | CPU_INTERRUPT_VIRQ
+>> -=A0=A0=A0=A0=A0=A0=A0=A0 | CPU_INTERRUPT_EXITTB);
+>> +=A0=A0=A0=A0=A0=A0=A0=A0 | CPU_INTERRUPT_SERROR | CPU_INTERRUPT_EXITTB)=
+;
+>> =A0}
+>>
+>> =A0void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHookFn *=
+hook,
+>> @@ -449,6 +449,9 @@ static inline bool arm_excp_unmasked(CPUState *cs,
+>> unsigned int excp_idx,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return false;
+>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0=A0=A0=A0=A0 return !(env->daif & PSTATE_I);
+>> +=A0=A0=A0 case EXCP_SERROR:
+>> +=A0=A0=A0=A0=A0=A0 pstate_unmasked =3D !(env->daif & PSTATE_A);
+>> +=A0=A0=A0=A0=A0=A0 break;
 >=20
-> v1->v2: put the coccinelle script in scripts/coccinelle rather
-> than just in the commit message.
-> ---
->  accel/kvm/kvm-all.c                  |  6 +--
->  dma-helpers.c                        |  4 +-
->  exec.c                               |  4 +-
->  hw/dma/xlnx-zdma.c                   | 11 ++---
->  hw/net/dp8393x.c                     | 68 ++++++++++++++--------------
->  hw/net/i82596.c                      | 25 +++++-----
->  hw/net/lasi_i82596.c                 |  5 +-
->  hw/ppc/pnv_lpc.c                     |  8 ++--
->  hw/s390x/css.c                       | 12 ++---
->  qtest.c                              | 52 ++++++++++-----------
->  target/i386/hvf/x86_mmu.c            | 12 ++---
->  scripts/coccinelle/as_rw_const.cocci | 30 ++++++++++++
->  12 files changed, 133 insertions(+), 104 deletions(-)
->  create mode 100644 scripts/coccinelle/as_rw_const.cocci
+> nit: Consider keeping the physical interrupts together, as they are close=
+ly
+> related.
 >=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index c111312dfdd..0cfe6fd8ded 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2178,9 +2178,9 @@ void kvm_flush_coalesced_mmio_buffer(void)
->              ent =3D &ring->coalesced_mmio[ring->first];
-> =20
->              if (ent->pio =3D=3D 1) {
-> -                address_space_rw(&address_space_io, ent->phys_addr,
-> -                                 MEMTXATTRS_UNSPECIFIED, ent->data,
-> -                                 ent->len, true);
-> +                address_space_write(&address_space_io, ent->phys_addr,
-> +                                    MEMTXATTRS_UNSPECIFIED, ent->data,
-> +                                    ent->len);
->              } else {
->                  cpu_physical_memory_write(ent->phys_addr, ent->data, ent=
-->len);
->              }
-> diff --git a/dma-helpers.c b/dma-helpers.c
-> index d3871dc61ea..e8a26e81e16 100644
-> --- a/dma-helpers.c
-> +++ b/dma-helpers.c
-> @@ -28,8 +28,8 @@ int dma_memory_set(AddressSpace *as, dma_addr_t addr, u=
-int8_t c, dma_addr_t len)
->      memset(fillbuf, c, FILLBUF_SIZE);
->      while (len > 0) {
->          l =3D len < FILLBUF_SIZE ? len : FILLBUF_SIZE;
-> -        error |=3D address_space_rw(as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                                  fillbuf, l, true);
-> +        error |=3D address_space_write(as, addr, MEMTXATTRS_UNSPECIFIED,
-> +                                     fillbuf, l);
->          len -=3D l;
->          addr +=3D l;
->      }
-> diff --git a/exec.c b/exec.c
-> index 8e9cc3b47cf..baefe582393 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -3810,8 +3810,8 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong=
- addr,
->              address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr,
->                                      attrs, buf, l);
->          } else {
-> -            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
-> -                             attrs, buf, l, 0);
-> +            address_space_read(cpu->cpu_ases[asidx].as, phys_addr, attrs=
-, buf,
-> +                               l);
->          }
->          len -=3D l;
->          buf +=3D l;
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 8fb83f5b078..31936061e21 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -311,8 +311,7 @@ static bool zdma_load_descriptor(XlnxZDMA *s, uint64_=
-t addr, void *buf)
->          return false;
->      }
-> =20
-> -    address_space_rw(s->dma_as, addr, s->attr,
-> -                     buf, sizeof(XlnxZDMADescr), false);
-> +    address_space_read(s->dma_as, addr, s->attr, buf, sizeof(XlnxZDMADes=
-cr));
->      return true;
->  }
-> =20
-> @@ -364,7 +363,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s, b=
-ool type,
->      } else {
->          addr =3D zdma_get_regaddr64(s, basereg);
->          addr +=3D sizeof(s->dsc_dst);
-> -        address_space_rw(s->dma_as, addr, s->attr, (void *) &next, 8, fa=
-lse);
-> +        address_space_read(s->dma_as, addr, s->attr, (void *)&next, 8);
->          zdma_put_regaddr64(s, basereg, next);
->      }
->      return next;
-> @@ -416,8 +415,7 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf,=
- uint32_t len)
->              }
->          }
-> =20
-> -        address_space_rw(s->dma_as, s->dsc_dst.addr, s->attr, buf, dlen,
-> -                         true);
-> +        address_space_write(s->dma_as, s->dsc_dst.addr, s->attr, buf, dl=
-en);
->          if (burst_type =3D=3D AXI_BURST_INCR) {
->              s->dsc_dst.addr +=3D dlen;
->          }
-> @@ -493,8 +491,7 @@ static void zdma_process_descr(XlnxZDMA *s)
->                  len =3D s->cfg.bus_width / 8;
->              }
->          } else {
-> -            address_space_rw(s->dma_as, src_addr, s->attr, s->buf, len,
-> -                             false);
-> +            address_space_read(s->dma_as, src_addr, s->attr, s->buf, len=
+
+Sorry, I didn't get the point. Maybe you're suggesting something like below=
+?
+If yes, I'm not sure if it's necessary.
+
+     pstate_unmasked =3D !(env->daif & (PSTATE_A | PSTATE_I));
+
+I think PSTATE_A is enough to mask out SError according to ARMv8 architectu=
+re
+reference manual (D1.7), as below:
+
+    A, I, F Asynchronous exception mask bits:
+    A
+       SError interrupt mask bit.
+    I
+       IRQ interrupt mask bit.
+    F
+       FIQ interrupt mask bit.
+
+>> =A0=A0=A0=A0 default:
+>> =A0=A0=A0=A0=A0=A0=A0=A0 g_assert_not_reached();
+>> =A0=A0=A0=A0 }
+>> @@ -538,6 +541,15 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int
+>> interrupt_request)
+>>
+>> =A0=A0=A0=A0 /* The prioritization of interrupts is IMPLEMENTATION DEFIN=
+ED. */
+>>
+>> +=A0=A0=A0 if (interrupt_request & CPU_INTERRUPT_SERROR) {
+>> +=A0=A0=A0=A0=A0=A0=A0 excp_idx =3D EXCP_SERROR;
+>> +=A0=A0=A0=A0=A0=A0=A0 target_el =3D arm_phys_excp_target_el(cs, excp_id=
+x, cur_el, secure);
+>> +=A0=A0=A0=A0=A0=A0=A0 if (arm_excp_unmasked(cs, excp_idx, target_el,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 cur_el, secure, hcr_el2)) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto found;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0 if (interrupt_request & CPU_INTERRUPT_FIQ) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0 excp_idx =3D EXCP_FIQ;
+>> =A0=A0=A0=A0=A0=A0=A0=A0 target_el =3D arm_phys_excp_target_el(cs, excp_=
+idx, cur_el, secure);
+>> @@ -570,6 +582,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int
+>> interrupt_request)
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto found;
+>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0 return false;
+>>
+>> =A0 found:
+>> @@ -585,7 +598,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState
+>> *cs, int interrupt_request)
+>> =A0=A0=A0=A0 CPUClass *cc =3D CPU_GET_CLASS(cs);
+>> =A0=A0=A0=A0 ARMCPU *cpu =3D ARM_CPU(cs);
+>> =A0=A0=A0=A0 CPUARMState *env =3D &cpu->env;
+>> -=A0=A0=A0 bool ret =3D false;
+>> +=A0=A0=A0 uint32_t excp_idx;
+>>
+>> =A0=A0=A0=A0 /* ARMv7-M interrupt masking works differently than -A or -=
+R.
+>> =A0=A0=A0=A0=A0 * There is no FIQ/IRQ distinction. Instead of I and F bi=
+ts
+>> @@ -594,13 +607,26 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState
+>> *cs, int interrupt_request)
+>> =A0=A0=A0=A0=A0 * (which depends on state like BASEPRI, FAULTMASK and th=
+e
+>> =A0=A0=A0=A0=A0 * currently active exception).
+>> =A0=A0=A0=A0=A0 */
+>> -=A0=A0=A0 if (interrupt_request & CPU_INTERRUPT_HARD
+>> -=A0=A0=A0=A0=A0=A0=A0 && (armv7m_nvic_can_take_pending_exception(env->n=
+vic))) {
+>> -=A0=A0=A0=A0=A0=A0=A0 cs->exception_index =3D EXCP_IRQ;
+>> -=A0=A0=A0=A0=A0=A0=A0 cc->do_interrupt(cs);
+>> -=A0=A0=A0=A0=A0=A0=A0 ret =3D true;
+>> +=A0=A0=A0 if (!armv7m_nvic_can_take_pending_exception(env->nvic)) {
+>> +=A0=A0=A0=A0=A0=A0=A0 return false;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (interrupt_request & CPU_INTERRUPT_SERROR) {
+>> +=A0=A0=A0=A0=A0=A0=A0 excp_idx =3D EXCP_SERROR;
+>> +=A0=A0=A0=A0=A0=A0=A0 goto found;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (interrupt_request & CPU_INTERRUPT_HARD) {
+>> +=A0=A0=A0=A0=A0=A0=A0 excp_idx =3D EXCP_IRQ;
+>> +=A0=A0=A0=A0=A0=A0=A0 goto found;
+>> =A0=A0=A0=A0 }
+>> -=A0=A0=A0 return ret;
+>> +
+>> +=A0=A0=A0 return false;
+>> +
+>> +found:
+>> +=A0=A0=A0 cs->exception_index =3D excp_idx;
+>> +=A0=A0=A0 cc->do_interrupt(cs);
+>> +=A0=A0=A0 return true;
+>> =A0}
+>> =A0#endif
+>>
+>> @@ -656,7 +682,8 @@ static void arm_cpu_set_irq(void *opaque, int irq,
+>> int level)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_FIQ] =3D CPU_INTERRUPT_FIQ,
+>> =A0=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VIRQ] =3D CPU_INTERRUPT_VIRQ,
+>> -=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ
+>> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_VFIQ] =3D CPU_INTERRUPT_VFIQ,
+>> +=A0=A0=A0=A0=A0=A0=A0 [ARM_CPU_SERROR] =3D CPU_INTERRUPT_SERROR,
+>> =A0=A0=A0=A0 };
+>>
+>> =A0=A0=A0=A0 if (level) {
+>> @@ -676,6 +703,7 @@ static void arm_cpu_set_irq(void *opaque, int irq,
+>> int level)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>> =A0=A0=A0=A0 case ARM_CPU_IRQ:
+>> =A0=A0=A0=A0 case ARM_CPU_FIQ:
+>> +=A0=A0=A0 case ARM_CPU_SERROR:
+>> =A0=A0=A0=A0=A0=A0=A0=A0 if (level) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpu_interrupt(cs, mask[irq]);
+>> =A0=A0=A0=A0=A0=A0=A0=A0 } else {
+>> @@ -693,8 +721,10 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
+>> irq, int level)
+>> =A0=A0=A0=A0 ARMCPU *cpu =3D opaque;
+>> =A0=A0=A0=A0 CPUARMState *env =3D &cpu->env;
+>> =A0=A0=A0=A0 CPUState *cs =3D CPU(cpu);
+>> +=A0=A0=A0 struct kvm_vcpu_events events;
+>> =A0=A0=A0=A0 uint32_t linestate_bit;
+>> =A0=A0=A0=A0 int irq_id;
+>> +=A0=A0=A0 bool inject_irq =3D true;
+>>
+>> =A0=A0=A0=A0 switch (irq) {
+>> =A0=A0=A0=A0 case ARM_CPU_IRQ:
+>> @@ -705,6 +735,14 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
+>> irq, int level)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 irq_id =3D KVM_ARM_IRQ_CPU_FIQ;
+>> =A0=A0=A0=A0=A0=A0=A0=A0 linestate_bit =3D CPU_INTERRUPT_FIQ;
+>> =A0=A0=A0=A0=A0=A0=A0=A0 break;
+>> +=A0=A0=A0 case ARM_CPU_SERROR:
+>> +=A0=A0=A0=A0=A0=A0=A0 if (!kvm_has_vcpu_events()) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 inject_irq =3D false;
+>> +=A0=A0=A0=A0=A0=A0=A0 linestate_bit =3D CPU_INTERRUPT_SERROR;
+>> +=A0=A0=A0=A0=A0=A0=A0 break;
+>> =A0=A0=A0=A0 default:
+>> =A0=A0=A0=A0=A0=A0=A0=A0 g_assert_not_reached();
+>> =A0=A0=A0=A0 }
+>> @@ -714,7 +752,14 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
+>> irq, int level)
+>> =A0=A0=A0=A0 } else {
+>> =A0=A0=A0=A0=A0=A0=A0=A0 env->irq_line_state &=3D ~linestate_bit;
+>> =A0=A0=A0=A0 }
+>> -=A0=A0=A0 kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_CPU, irq_id, =
+!!level);
+>> +
+>> +=A0=A0=A0 if (inject_irq) {
+>=20
+> You could just have (linestate_bit !=3D CPU_INTERRUPT_SERROR) here, and n=
+ot have
+> inject_irq at all.
+>=20
+
+Sure, will be improved in v5.
+
+>> +=A0=A0=A0=A0=A0=A0=A0 kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_C=
+PU, irq_id, !!level);
+>> +=A0=A0=A0 } else if (level) {
+>=20
+> Is there any case where you'd call this function with a SError and level =
+=3D=3D 0?
+> And even if it happens, you could exit early in the above switch statemen=
+t.
+>=20
+
+The combination of SError and level =3D=3D 0 isn't existing for now, meanin=
+g the
+SError is always coming with level =3D=3D 1. We can't exit early in above s=
+witch
+statement because env->irq_line_state needs to be updated accordingly.
+
+>> +=A0=A0=A0=A0=A0=A0=A0 memset(&events, 0, sizeof(events));
+>> +=A0=A0=A0=A0=A0=A0=A0 events.exception.serror_pending =3D 1;
+>> +=A0=A0=A0=A0=A0=A0=A0 kvm_vcpu_ioctl(cs, KVM_SET_VCPU_EVENTS, &events);
+>> +=A0=A0=A0 }
+>> =A0#endif
+>> =A0}
+>>
+>> @@ -1064,9 +1109,9 @@ static void arm_cpu_initfn(Object *obj)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 /* VIRQ and VFIQ are unused with KVM but we add=
+ them to maintain
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 * the same interface as non-KVM CPUs.
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 */
+>> -=A0=A0=A0=A0=A0=A0=A0 qdev_init_gpio_in(DEVICE(cpu), arm_cpu_kvm_set_ir=
+q, 4);
+>> +=A0=A0=A0=A0=A0=A0=A0 qdev_init_gpio_in(DEVICE(cpu), arm_cpu_kvm_set_ir=
+q, ARM_CPU_NUM_IRQ);
+>> =A0=A0=A0=A0 } else {
+>> -=A0=A0=A0=A0=A0=A0=A0 qdev_init_gpio_in(DEVICE(cpu), arm_cpu_set_irq, 4=
 );
->              if (burst_type =3D=3D AXI_BURST_INCR) {
->                  src_addr +=3D len;
->              }
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index a134d431ae3..f5f1c669e80 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -275,8 +275,8 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-> =20
->      while (s->regs[SONIC_CDC] & 0x1f) {
->          /* Fill current entry */
-> -        address_space_rw(&s->as, dp8393x_cdp(s),
-> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +        address_space_read(&s->as, dp8393x_cdp(s), MEMTXATTRS_UNSPECIFIE=
-D,
-> +                           (uint8_t *)s->data, size);
->          s->cam[index][0] =3D dp8393x_get(s, width, 1) & 0xff;
->          s->cam[index][1] =3D dp8393x_get(s, width, 1) >> 8;
->          s->cam[index][2] =3D dp8393x_get(s, width, 2) & 0xff;
-> @@ -293,8 +293,8 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->      }
-> =20
->      /* Read CAM enable */
-> -    address_space_rw(&s->as, dp8393x_cdp(s),
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +    address_space_read(&s->as, dp8393x_cdp(s), MEMTXATTRS_UNSPECIFIED,
-> +                       (uint8_t *)s->data, size);
->      s->regs[SONIC_CE] =3D dp8393x_get(s, width, 0);
->      DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]=
-);
-> =20
-> @@ -311,8 +311,8 @@ static void dp8393x_do_read_rra(dp8393xState *s)
->      /* Read memory */
->      width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
->      size =3D sizeof(uint16_t) * 4 * width;
-> -    address_space_rw(&s->as, dp8393x_rrp(s),
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +    address_space_read(&s->as, dp8393x_rrp(s), MEMTXATTRS_UNSPECIFIED,
-> +                       (uint8_t *)s->data, size);
-> =20
->      /* Update SONIC registers */
->      s->regs[SONIC_CRBA0] =3D dp8393x_get(s, width, 0);
-> @@ -426,8 +426,8 @@ static void dp8393x_do_transmit_packets(dp8393xState =
-*s)
->          size =3D sizeof(uint16_t) * 6 * width;
->          s->regs[SONIC_TTDA] =3D s->regs[SONIC_CTDA];
->          DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
-> -        address_space_rw(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) * wi=
-dth,
-> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +        address_space_read(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) * =
-width,
-> +                           MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, s=
-ize);
->          tx_len =3D 0;
-> =20
->          /* Update registers */
-> @@ -451,17 +451,19 @@ static void dp8393x_do_transmit_packets(dp8393xStat=
-e *s)
->              if (tx_len + len > sizeof(s->tx_buffer)) {
->                  len =3D sizeof(s->tx_buffer) - tx_len;
->              }
-> -            address_space_rw(&s->as, dp8393x_tsa(s),
-> -                MEMTXATTRS_UNSPECIFIED, &s->tx_buffer[tx_len], len, 0);
-> +            address_space_read(&s->as, dp8393x_tsa(s), MEMTXATTRS_UNSPEC=
-IFIED,
-> +                               &s->tx_buffer[tx_len], len);
->              tx_len +=3D len;
-> =20
->              i++;
->              if (i !=3D s->regs[SONIC_TFC]) {
->                  /* Read next fragment details */
->                  size =3D sizeof(uint16_t) * 3 * width;
-> -                address_space_rw(&s->as,
-> -                    dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * w=
-idth,
-> -                    MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +                address_space_read(&s->as,
-> +                                   dp8393x_ttda(s)
-> +                                   + sizeof(uint16_t) * (4 + 3 * i) * wi=
-dth,
-> +                                   MEMTXATTRS_UNSPECIFIED, (uint8_t *)s-=
->data,
-> +                                   size);
->                  s->regs[SONIC_TSA0] =3D dp8393x_get(s, width, 0);
->                  s->regs[SONIC_TSA1] =3D dp8393x_get(s, width, 1);
->                  s->regs[SONIC_TFS] =3D dp8393x_get(s, width, 2);
-> @@ -494,18 +496,18 @@ static void dp8393x_do_transmit_packets(dp8393xStat=
-e *s)
->          dp8393x_put(s, width, 0,
->                      s->regs[SONIC_TCR] & 0x0fff); /* status */
->          size =3D sizeof(uint16_t) * width;
-> -        address_space_rw(&s->as,
-> -            dp8393x_ttda(s),
-> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
-> +        address_space_write(&s->as, dp8393x_ttda(s), MEMTXATTRS_UNSPECIF=
-IED,
-> +                            (uint8_t *)s->data, size);
-> =20
->          if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
->              /* Read footer of packet */
->              size =3D sizeof(uint16_t) * width;
-> -            address_space_rw(&s->as,
-> -                dp8393x_ttda(s) +
-> -                             sizeof(uint16_t) *
-> -                             (4 + 3 * s->regs[SONIC_TFC]) * width,
-> -                MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +            address_space_read(&s->as,
-> +                               dp8393x_ttda(s)
-> +                               + sizeof(uint16_t) * (4 + 3 * s->regs[SON=
-IC_TFC])
-> +                               * width,
-> +                               MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->dat=
-a,
-> +                               size);
->              s->regs[SONIC_CTDA] =3D dp8393x_get(s, width, 0) & ~0x1;
->              if (dp8393x_get(s, width, 0) & 0x1) {
->                  /* EOL detected */
-> @@ -767,8 +769,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
->          /* Are we still in resource exhaustion? */
->          size =3D sizeof(uint16_t) * 1 * width;
->          address =3D dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-> -        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-> -                         (uint8_t *)s->data, size, 0);
-> +        address_space_read(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-> +                           (uint8_t *)s->data, size);
->          if (dp8393x_get(s, width, 0) & 0x1) {
->              /* Still EOL ; stop reception */
->              return -1;
-> @@ -787,11 +789,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
-const uint8_t * buf,
->      /* Put packet into RBA */
->      DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
->      address =3D dp8393x_crba(s);
-> -    address_space_rw(&s->as, address,
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
-> +    address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-> +                        (uint8_t *)buf, rx_len);
->      address +=3D rx_len;
-> -    address_space_rw(&s->as, address,
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
-> +    address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-> +                        (uint8_t *)&checksum, 4);
->      rx_len +=3D 4;
->      s->regs[SONIC_CRBA1] =3D address >> 16;
->      s->regs[SONIC_CRBA0] =3D address & 0xffff;
-> @@ -819,13 +821,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
-const uint8_t * buf,
->      dp8393x_put(s, width, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
->      dp8393x_put(s, width, 4, s->regs[SONIC_RSC]); /* seq_no */
->      size =3D sizeof(uint16_t) * 5 * width;
-> -    address_space_rw(&s->as, dp8393x_crda(s),
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
-> +    address_space_write(&s->as, dp8393x_crda(s), MEMTXATTRS_UNSPECIFIED,
-> +                        (uint8_t *)s->data, size);
-> =20
->      /* Move to next descriptor */
->      size =3D sizeof(uint16_t) * width;
-> -    address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * wi=
-dth,
-> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-> +    address_space_read(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * =
-width,
-> +                       MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size);
->      s->regs[SONIC_LLFA] =3D dp8393x_get(s, width, 0);
->      if (s->regs[SONIC_LLFA] & 0x1) {
->          /* EOL detected */
-> @@ -838,8 +840,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
->              offset +=3D sizeof(uint16_t);
->          }
->          s->data[0] =3D 0;
-> -        address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
-> -                         (uint8_t *)s->data, sizeof(uint16_t), 1);
-> +        address_space_write(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
-> +                            (uint8_t *)s->data, sizeof(uint16_t));
->          s->regs[SONIC_CRDA] =3D s->regs[SONIC_LLFA];
->          s->regs[SONIC_ISR] |=3D SONIC_ISR_PKTRX;
->          s->regs[SONIC_RSC] =3D (s->regs[SONIC_RSC] & 0xff00) | (((s->reg=
-s[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-> diff --git a/hw/net/i82596.c b/hw/net/i82596.c
-> index 3a0e1ec4c05..6a80c24af23 100644
-> --- a/hw/net/i82596.c
-> +++ b/hw/net/i82596.c
-> @@ -148,8 +148,8 @@ static void i82596_transmit(I82596State *s, uint32_t =
-addr)
-> =20
->          if (s->nic && len) {
->              assert(len <=3D sizeof(s->tx_buffer));
-> -            address_space_rw(&address_space_memory, tba,
-> -                MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len, 0);
-> +            address_space_read(&address_space_memory, tba,
-> +                               MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len=
-);
->              DBG(PRINT_PKTHDR("Send", &s->tx_buffer));
->              DBG(printf("Sending %d bytes\n", len));
->              qemu_send_packet(qemu_get_queue(s->nic), s->tx_buffer, len);
-> @@ -172,8 +172,8 @@ static void set_individual_address(I82596State *s, ui=
-nt32_t addr)
-> =20
->      nc =3D qemu_get_queue(s->nic);
->      m =3D s->conf.macaddr.a;
-> -    address_space_rw(&address_space_memory, addr + 8,
-> -        MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN, 0);
-> +    address_space_read(&address_space_memory, addr + 8,
-> +                       MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN);
->      qemu_format_nic_info_str(nc, m);
->      trace_i82596_new_mac(nc->info_str);
->  }
-> @@ -190,9 +190,8 @@ static void set_multicast_list(I82596State *s, uint32=
-_t addr)
->      }
->      for (i =3D 0; i < mc_count; i++) {
->          uint8_t multicast_addr[ETH_ALEN];
-> -        address_space_rw(&address_space_memory,
-> -            addr + i * ETH_ALEN, MEMTXATTRS_UNSPECIFIED,
-> -            multicast_addr, ETH_ALEN, 0);
-> +        address_space_read(&address_space_memory, addr + i * ETH_ALEN,
-> +                           MEMTXATTRS_UNSPECIFIED, multicast_addr, ETH_A=
-LEN);
->          DBG(printf("Add multicast entry " MAC_FMT "\n",
->                      MAC_ARG(multicast_addr)));
->          unsigned mcast_idx =3D (net_crc32(multicast_addr, ETH_ALEN) &
-> @@ -260,8 +259,8 @@ static void command_loop(I82596State *s)
->              byte_cnt =3D MAX(byte_cnt, 4);
->              byte_cnt =3D MIN(byte_cnt, sizeof(s->config));
->              /* copy byte_cnt max. */
-> -            address_space_rw(&address_space_memory, s->cmd_p + 8,
-> -                MEMTXATTRS_UNSPECIFIED, s->config, byte_cnt, 0);
-> +            address_space_read(&address_space_memory, s->cmd_p + 8,
-> +                               MEMTXATTRS_UNSPECIFIED, s->config, byte_c=
-nt);
->              /* config byte according to page 35ff */
->              s->config[2] &=3D 0x82; /* mask valid bits */
->              s->config[2] |=3D 0x40;
-> @@ -640,14 +639,14 @@ ssize_t i82596_receive(NetClientState *nc, const ui=
-nt8_t *buf, size_t sz)
->              }
->              rba =3D get_uint32(rbd + 8);
->              /* printf("rba is 0x%x\n", rba); */
-> -            address_space_rw(&address_space_memory, rba,
-> -                MEMTXATTRS_UNSPECIFIED, (void *)buf, num, 1);
-> +            address_space_write(&address_space_memory, rba,
-> +                                MEMTXATTRS_UNSPECIFIED, (void *)buf, num=
-);
->              rba +=3D num;
->              buf +=3D num;
->              len -=3D num;
->              if (len =3D=3D 0) { /* copy crc */
-> -                address_space_rw(&address_space_memory, rba - 4,
-> -                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4, 1);
-> +                address_space_write(&address_space_memory, rba - 4,
-> +                                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4);
->              }
-> =20
->              num |=3D 0x4000; /* set F BIT */
-> diff --git a/hw/net/lasi_i82596.c b/hw/net/lasi_i82596.c
-> index 427b3fbf701..52637a562d8 100644
-> --- a/hw/net/lasi_i82596.c
-> +++ b/hw/net/lasi_i82596.c
-> @@ -55,8 +55,9 @@ static void lasi_82596_mem_write(void *opaque, hwaddr a=
-ddr,
->           * Provided for SeaBIOS only. Write MAC of Network card to addr =
-@val.
->           * Needed for the PDC_LAN_STATION_ID_READ PDC call.
->           */
-> -        address_space_rw(&address_space_memory, val,
-> -            MEMTXATTRS_UNSPECIFIED, d->state.conf.macaddr.a, ETH_ALEN, 1=
-);
-> +        address_space_write(&address_space_memory, val,
-> +                            MEMTXATTRS_UNSPECIFIED, d->state.conf.macadd=
-r.a,
-> +                            ETH_ALEN);
->          break;
->      }
->  }
-> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-> index 5989d723c50..f150deca340 100644
-> --- a/hw/ppc/pnv_lpc.c
-> +++ b/hw/ppc/pnv_lpc.c
-> @@ -238,16 +238,16 @@ static bool opb_read(PnvLpcController *lpc, uint32_=
-t addr, uint8_t *data,
->                       int sz)
->  {
->      /* XXX Handle access size limits and FW read caching here */
-> -    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             data, sz, false);
-> +    return !address_space_read(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIE=
-D,
-> +                               data, sz);
->  }
-> =20
->  static bool opb_write(PnvLpcController *lpc, uint32_t addr, uint8_t *dat=
-a,
->                        int sz)
->  {
->      /* XXX Handle access size limits here */
-> -    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             data, sz, true);
-> +    return !address_space_write(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFI=
-ED,
-> +                                data, sz);
->  }
-> =20
->  #define ECCB_CTL_READ           PPC_BIT(15)
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 844caab4082..0e0fccd050e 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -874,18 +874,18 @@ static inline int ida_read_next_idaw(CcwDataStream =
-*cds)
->          if (idaw_addr & 0x07 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1=
-)) {
->              return -EINVAL; /* channel program check */
->          }
-> -        ret =3D address_space_rw(&address_space_memory, idaw_addr,
-> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fm=
-t2,
-> -                               sizeof(idaw.fmt2), false);
-> +        ret =3D address_space_read(&address_space_memory, idaw_addr,
-> +                                 MEMTXATTRS_UNSPECIFIED, (void *)&idaw.f=
-mt2,
-> +                                 sizeof(idaw.fmt2));
->          cds->cda =3D be64_to_cpu(idaw.fmt2);
->      } else {
->          idaw_addr =3D cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
->          if (idaw_addr & 0x03 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1=
-)) {
->              return -EINVAL; /* channel program check */
->          }
-> -        ret =3D address_space_rw(&address_space_memory, idaw_addr,
-> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fm=
-t1,
-> -                               sizeof(idaw.fmt1), false);
-> +        ret =3D address_space_read(&address_space_memory, idaw_addr,
-> +                                 MEMTXATTRS_UNSPECIFIED, (void *)&idaw.f=
-mt1,
-> +                                 sizeof(idaw.fmt1));
->          cds->cda =3D be64_to_cpu(idaw.fmt1);
->          if (cds->cda & 0x80000000) {
->              return -EINVAL; /* channel program check */
-> diff --git a/qtest.c b/qtest.c
-> index 12432f99cf4..328d674bcc8 100644
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -429,23 +429,23 @@ static void qtest_process_command(CharBackend *chr,=
- gchar **words)
-> =20
->          if (words[0][5] =3D=3D 'b') {
->              uint8_t data =3D value;
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             &data, 1, true);
-> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIF=
-IED,
-> +                                &data, 1);
->          } else if (words[0][5] =3D=3D 'w') {
->              uint16_t data =3D value;
->              tswap16s(&data);
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &data, 2, true);
-> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIF=
-IED,
-> +                                (uint8_t *)&data, 2);
->          } else if (words[0][5] =3D=3D 'l') {
->              uint32_t data =3D value;
->              tswap32s(&data);
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &data, 4, true);
-> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIF=
-IED,
-> +                                (uint8_t *)&data, 4);
->          } else if (words[0][5] =3D=3D 'q') {
->              uint64_t data =3D value;
->              tswap64s(&data);
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &data, 8, true);
-> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIF=
-IED,
-> +                                (uint8_t *)&data, 8);
->          }
->          qtest_send_prefix(chr);
->          qtest_send(chr, "OK\n");
-> @@ -463,22 +463,22 @@ static void qtest_process_command(CharBackend *chr,=
- gchar **words)
-> =20
->          if (words[0][4] =3D=3D 'b') {
->              uint8_t data;
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             &data, 1, false);
-> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
-ED,
-> +                               &data, 1);
->              value =3D data;
->          } else if (words[0][4] =3D=3D 'w') {
->              uint16_t data;
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &data, 2, false);
-> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
-ED,
-> +                               (uint8_t *)&data, 2);
->              value =3D tswap16(data);
->          } else if (words[0][4] =3D=3D 'l') {
->              uint32_t data;
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &data, 4, false);
-> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
-ED,
-> +                               (uint8_t *)&data, 4);
->              value =3D tswap32(data);
->          } else if (words[0][4] =3D=3D 'q') {
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             (uint8_t *) &value, 8, false);
-> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
-ED,
-> +                               (uint8_t *)&value, 8);
->              tswap64s(&value);
->          }
->          qtest_send_prefix(chr);
-> @@ -498,8 +498,8 @@ static void qtest_process_command(CharBackend *chr, g=
-char **words)
->          g_assert(len);
-> =20
->          data =3D g_malloc(len);
-> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                         data, len, false);
-> +        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED, =
-data,
-> +                           len);
-> =20
->          enc =3D g_malloc(2 * len + 1);
->          for (i =3D 0; i < len; i++) {
-> @@ -524,8 +524,8 @@ static void qtest_process_command(CharBackend *chr, g=
-char **words)
->          g_assert(ret =3D=3D 0);
-> =20
->          data =3D g_malloc(len);
-> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                         data, len, false);
-> +        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED, =
-data,
-> +                           len);
->          b64_data =3D g_base64_encode(data, len);
->          qtest_send_prefix(chr);
->          qtest_sendf(chr, "OK %s\n", b64_data);
-> @@ -559,8 +559,8 @@ static void qtest_process_command(CharBackend *chr, g=
-char **words)
->                  data[i] =3D 0;
->              }
->          }
-> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                         data, len, true);
-> +        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,=
- data,
-> +                            len);
->          g_free(data);
-> =20
->          qtest_send_prefix(chr);
-> @@ -582,8 +582,8 @@ static void qtest_process_command(CharBackend *chr, g=
-char **words)
->          if (len) {
->              data =3D g_malloc(len);
->              memset(data, pattern, len);
-> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                             data, len, true);
-> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIF=
-IED,
-> +                                data, len);
->              g_free(data);
->          }
-> =20
-> @@ -616,8 +616,8 @@ static void qtest_process_command(CharBackend *chr, g=
-char **words)
->              out_len =3D MIN(out_len, len);
->          }
-> =20
-> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
-> -                         data, len, true);
-> +        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,=
- data,
-> +                            len);
-> =20
->          qtest_send_prefix(chr);
->          qtest_send(chr, "OK\n");
-> diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
-> index d5a0efe7188..ff016fc0145 100644
-> --- a/target/i386/hvf/x86_mmu.c
-> +++ b/target/i386/hvf/x86_mmu.c
-> @@ -88,8 +88,8 @@ static bool get_pt_entry(struct CPUState *cpu, struct g=
-pt_translation *pt,
->      }
-> =20
->      index =3D gpt_entry(pt->gva, level, pae);
-> -    address_space_rw(&address_space_memory, gpa + index * pte_size(pae),
-> -                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)&pte, pte_size(p=
-ae), 0);
-> +    address_space_read(&address_space_memory, gpa + index * pte_size(pae=
-),
-> +                       MEMTXATTRS_UNSPECIFIED, (uint8_t *)&pte, pte_size=
-(pae));
-> =20
->      pt->pte[level - 1] =3D pte;
-> =20
-> @@ -238,8 +238,8 @@ void vmx_write_mem(struct CPUState *cpu, target_ulong=
- gva, void *data, int bytes
->          if (!mmu_gva_to_gpa(cpu, gva, &gpa)) {
->              VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, gv=
-a);
->          } else {
-> -            address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UNSP=
-ECIFIED,
-> -                             data, copy, 1);
-> +            address_space_write(&address_space_memory, gpa,
-> +                                MEMTXATTRS_UNSPECIFIED, data, copy);
->          }
-> =20
->          bytes -=3D copy;
-> @@ -259,8 +259,8 @@ void vmx_read_mem(struct CPUState *cpu, void *data, t=
-arget_ulong gva, int bytes)
->          if (!mmu_gva_to_gpa(cpu, gva, &gpa)) {
->              VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, gv=
-a);
->          }
-> -        address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UNSPECIF=
-IED,
-> -                         data, copy, 0);
-> +        address_space_read(&address_space_memory, gpa, MEMTXATTRS_UNSPEC=
-IFIED,
-> +                           data, copy);
-> =20
->          bytes -=3D copy;
->          gva +=3D copy;
-> diff --git a/scripts/coccinelle/as_rw_const.cocci b/scripts/coccinelle/as=
-_rw_const.cocci
-> new file mode 100644
-> index 00000000000..30da707701b
-> --- /dev/null
-> +++ b/scripts/coccinelle/as_rw_const.cocci
-> @@ -0,0 +1,30 @@
-> +// Avoid uses of address_space_rw() with a constant is_write argument.
-> +// Usage:
-> +//  spatch --sp-file as-rw-const.spatch --dir . --in-place
-> +
-> +@@
-> +expression E1, E2, E3, E4, E5;
-> +symbol false;
-> +@@
-> +
-> +- address_space_rw(E1, E2, E3, E4, E5, false)
-> ++ address_space_read(E1, E2, E3, E4, E5)
-> +@@
-> +expression E1, E2, E3, E4, E5;
-> +@@
-> +
-> +- address_space_rw(E1, E2, E3, E4, E5, 0)
-> ++ address_space_read(E1, E2, E3, E4, E5)
-> +@@
-> +expression E1, E2, E3, E4, E5;
-> +symbol true;
-> +@@
-> +
-> +- address_space_rw(E1, E2, E3, E4, E5, true)
-> ++ address_space_write(E1, E2, E3, E4, E5)
-> +@@
-> +expression E1, E2, E3, E4, E5;
-> +@@
-> +
-> +- address_space_rw(E1, E2, E3, E4, E5, 1)
-> ++ address_space_write(E1, E2, E3, E4, E5)
+>> +=A0=A0=A0=A0=A0=A0=A0 qdev_init_gpio_in(DEVICE(cpu), arm_cpu_set_irq, A=
+RM_CPU_NUM_IRQ);
+>> =A0=A0=A0=A0 }
+>>
+>> =A0=A0=A0=A0 qdev_init_gpio_out(DEVICE(cpu), cpu->gt_timer_outputs,
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index e943ffe8a9..23e9f7ee2d 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -49,6 +49,7 @@
+>> =A0#define EXCP_LAZYFP=A0=A0=A0=A0=A0=A0=A0=A0 20=A0=A0 /* v7M fault dur=
+ing lazy FP stacking */
+>> =A0#define EXCP_LSERR=A0=A0=A0=A0=A0=A0=A0=A0=A0 21=A0=A0 /* v8M LSERR S=
+ecureFault */
+>> =A0#define EXCP_UNALIGNED=A0=A0=A0=A0=A0 22=A0=A0 /* v7M UNALIGNED Usage=
+Fault */
+>> +#define EXCP_SERROR=A0=A0=A0=A0=A0=A0=A0=A0 23=A0=A0 /* SError Interrup=
+t */
+>> =A0/* NB: add new EXCP_ defines to the array in arm_log_exception() too =
+*/
+>>
+>> =A0#define ARMV7M_EXCP_RESET=A0=A0 1
+>> @@ -79,9 +80,10 @@ enum {
+>> =A0};
+>>
+>> =A0/* ARM-specific interrupt pending bits.=A0 */
+>> -#define CPU_INTERRUPT_FIQ=A0=A0 CPU_INTERRUPT_TGT_EXT_1
+>> -#define CPU_INTERRUPT_VIRQ=A0 CPU_INTERRUPT_TGT_EXT_2
+>> -#define CPU_INTERRUPT_VFIQ=A0 CPU_INTERRUPT_TGT_EXT_3
+>> +#define CPU_INTERRUPT_FIQ=A0=A0=A0=A0 CPU_INTERRUPT_TGT_EXT_1
+>> +#define CPU_INTERRUPT_VIRQ=A0=A0=A0 CPU_INTERRUPT_TGT_EXT_2
+>> +#define CPU_INTERRUPT_VFIQ=A0=A0=A0 CPU_INTERRUPT_TGT_EXT_3
+>> +#define CPU_INTERRUPT_SERROR=A0 CPU_INTERRUPT_TGT_EXT_4
+>>
+>> =A0/* The usual mapping for an AArch64 system register to its AArch32
+>> =A0 * counterpart is for the 32 bit world to have access to the lower
+>> @@ -97,11 +99,13 @@ enum {
+>> =A0#define offsetofhigh32(S, M) (offsetof(S, M) + sizeof(uint32_t))
+>> =A0#endif
+>>
+>> -/* Meanings of the ARMCPU object's four inbound GPIO lines */
+>> -#define ARM_CPU_IRQ 0
+>> -#define ARM_CPU_FIQ 1
+>> -#define ARM_CPU_VIRQ 2
+>> -#define ARM_CPU_VFIQ 3
+>> +/* ARMCPU object's inbound GPIO lines */
+>> +#define ARM_CPU_IRQ=A0=A0=A0=A0 0
+>> +#define ARM_CPU_FIQ=A0=A0=A0=A0 1
+>> +#define ARM_CPU_VIRQ=A0=A0=A0 2
+>> +#define ARM_CPU_VFIQ=A0=A0=A0 3
+>> +#define ARM_CPU_SERROR=A0 4
+>> +#define ARM_CPU_NUM_IRQ 5
+>=20
+> This probably should be turned into an enum, given that it is going to
+> grow again on the following patch.
+>=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Nice idea, will do in v5.
 
---dDRMvlgZJXvWKvBx
-Content-Type: application/pgp-signature; name="signature.asc"
+>>
+>> =A0/* ARM-specific extra insn start words:
+>> =A0 * 1: Conditional execution bits
+>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>> index 366dbcf460..3f00af4c41 100644
+>> --- a/target/arm/helper.c
+>> +++ b/target/arm/helper.c
+>> @@ -1969,6 +1969,12 @@ static uint64_t isr_read(CPUARMState *env,
+>> const ARMCPRegInfo *ri)
+>> =A0=A0=A0=A0=A0=A0=A0=A0 }
+>> =A0=A0=A0=A0 }
+>>
+>> +=A0=A0=A0 if (!allow_virt || !(hcr_el2 & HCR_AMO)) {
+>=20
+> nit: It would be nicer to write this as
+>=20
+>  =A0=A0=A0=A0=A0=A0 if (!(allow_virt && (hcr_el2 & HCR_AMO)))
+>=20
+> which fits the current code better, and makes a slightly less ugly
+> rewrite in the following patch.
+>=20
 
------BEGIN PGP SIGNATURE-----
+Yeah, I had code as suggested, but changed to the code as-is.
+Anyway, will change accordingly in v5.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5MbJgACgkQbDjKyiDZ
-s5Imog//R1T/PkQHVpZwyniQu66RgSTlbV+hpPJek7TF3Ibi2nrzuT4PAsGruXce
-TLrIi6zISOv/ckUQ6++UsX9p1AJRxKTnFz++Wttbps1w+uJjocVWdcyBE1+KjWGL
-zICPnHm7FgIVVhxx2ytdQsL25LdayEAiOrKe92cGqZmOPn5voBeZsUPKww975Q25
-JfEPkYI5SPnmp93Psi2QfcvSQoKWtgB7/wk9XjI+ed58VSYkPIFfkMlIRQwuRxrF
-O8QBVdLLf3p0mshtjc0vy77g6VBkYPybdFhqU1E9tcPdH6EOTd8S7xQbavOF5HNt
-ocbQNXOANR3JWzL08iBJb9/joGih3IM+wLafxmiC1LvZ9/corbrKXK0ganOXyKB/
-PVUhRCoMIkQqH0gGqqeYHyML7tjfRPbZty4TcfqU3/g7p4Ejs3oTlJJr+wEW5BtU
-QFbBuLXgBZ8bGqDDQ+vs1BBV79txCLwVkmyiacuXvrmaJzVMZsOlZ6ULN8LWyA0O
-CQp36YohxTm8/Y1050u2i4j+NCpmhQMNO2vnF7DvQLBOP8IFM1g0u7rW37cAxaD7
-N2TfqHuQgkO2ALKIIVyI7YNCpS2dJJARhamL1PM8oCjbkDFdF01JfhkxqXmOzI8S
-Hm+Cn5/gVLeyhb2bOXv1tQuSIHVpf270xy0+imc7BUmFtpnBX9Q=
-=jlD4
------END PGP SIGNATURE-----
+>> +=A0=A0=A0=A0=A0=A0=A0 if (cs->interrupt_request & CPU_INTERRUPT_SERROR)=
+ {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret |=3D CPSR_A;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0 /* External aborts are not possible in QEMU so A bit is alw=
+ays clear */
+>=20
+> nit: this comment seems obsolete now.
+>=20
 
---dDRMvlgZJXvWKvBx--
+Yep, will be corrected in v5.
+
+Thanks,
+Gavin
+
 
