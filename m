@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F959C34035
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256B0C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FB632173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E63F72173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKmIDU9w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB632173E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U3rVkjco"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E63F72173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j40GW-00076C-BC
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:38:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51993)
+	id 1j40Gu-000844-0I
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:38:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j40De-00010I-G9
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:11 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j40Dn-0001Hm-RJ
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j40Dd-0007KA-B5
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:10 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43528
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1j40Dm-0007Ny-CF
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41527
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j40Dd-0007K1-7m
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:09 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j40Dm-0007Nf-72
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582022108;
+ s=mimecast20190719; t=1582022117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RAzEvMdOaOBLUZB8+8SgwVF8nHkQ8p1euy5J91x21UA=;
- b=dKmIDU9wZTCtnrdnMw2kheoLY3tUsQB0dIBgc1ajJVq2VtS9THh4/1wE8D+l5lERuwVHtz
- ELdNBpP52j02cygqQBS+YjbeizUoTHnGK6rLYx4psOldqw1vIrrW6y1CeO+zJOxqGdfXUi
- YVUn7ZxNXxDneaA5FXHxa1NmzwNRNzk=
+ bh=RDmr9dxLhKqzcnPEfIoo4QRCiihKM20kv8WdUr/XucY=;
+ b=U3rVkjcozYRDwPMrc0vEnLeUR/GyWYhtkNWyVECBU/KiqQX4wvwffEMEgV1xuNxHRs0ppX
+ dKLKyKWAJFL0zdTaBwGbi/KgivuWdypoYIGTz0v5OhezvgPbpETZem5nkbbSzPd4gFHaVJ
+ T700YH5dscPgVwRAeQIpvX0gddf4Xns=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-IUb4n4BpPUaxkZ8fDhXflQ-1; Tue, 18 Feb 2020 05:35:05 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-338--STIPRxVONGfUREyvsYY_Q-1; Tue, 18 Feb 2020 05:35:16 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B7E613F8;
- Tue, 18 Feb 2020 10:35:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E8E0800D48;
+ Tue, 18 Feb 2020 10:35:15 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9EC790F6E;
- Tue, 18 Feb 2020 10:35:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 814428CCC5;
+ Tue, 18 Feb 2020 10:35:14 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v4 02/19] blockdev: Allow resizing everywhere
-Date: Tue, 18 Feb 2020 11:34:37 +0100
-Message-Id: <20200218103454.296704-3-mreitz@redhat.com>
+Subject: [PATCH v4 06/19] block: Add bdrv_recurse_can_replace()
+Date: Tue, 18 Feb 2020 11:34:41 +0100
+Message-Id: <20200218103454.296704-7-mreitz@redhat.com>
 In-Reply-To: <20200218103454.296704-1-mreitz@redhat.com>
 References: <20200218103454.296704-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: IUb4n4BpPUaxkZ8fDhXflQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: -STIPRxVONGfUREyvsYY_Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,34 +91,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Block nodes that do not allow resizing should not share BLK_PERM_RESIZE.
-It does not matter whether they are the first non-filter in their chain
-or not.
+After a couple of follow-up patches, this function will replace
+bdrv_recurse_is_first_non_filter() in check_to_replace_node().
+
+bdrv_recurse_is_first_non_filter() is both not sufficiently specific for
+check_to_replace_node() (it allows cases that should not be allowed,
+like replacing child nodes of quorum with dissenting data that have more
+parents than just quorum), and it is too restrictive (it is perfectly
+fine to replace filters).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- blockdev.c | 5 -----
- 1 file changed, 5 deletions(-)
+ block.c                   | 38 ++++++++++++++++++++++++++++++++++++++
+ include/block/block_int.h | 10 ++++++++++
+ 2 files changed, 48 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index 1745d740ec..011dcfec27 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3331,11 +3331,6 @@ void qmp_block_resize(bool has_device, const char *d=
-evice,
-     aio_context =3D bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
+diff --git a/block.c b/block.c
+index f6731fa9be..553ccff216 100644
+--- a/block.c
++++ b/block.c
+@@ -6235,6 +6235,44 @@ bool bdrv_recurse_is_first_non_filter(BlockDriverSta=
+te *bs,
+     return false;
+ }
 =20
--    if (!bdrv_is_first_non_filter(bs)) {
--        error_setg(errp, QERR_FEATURE_DISABLED, "resize");
--        goto out;
--    }
--
-     if (size < 0) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 size"=
-);
-         goto out;
++/*
++ * This function checks whether the given @to_replace is allowed to be
++ * replaced by a node that always shows the same data as @bs.  This is
++ * used for example to verify whether the mirror job can replace
++ * @to_replace by the target mirrored from @bs.
++ * To be replaceable, @bs and @to_replace may either be guaranteed to
++ * always show the same data (because they are only connected through
++ * filters), or some driver may allow replacing one of its children
++ * because it can guarantee that this child's data is not visible at
++ * all (for example, for dissenting quorum children that have no other
++ * parents).
++ */
++bool bdrv_recurse_can_replace(BlockDriverState *bs,
++                              BlockDriverState *to_replace)
++{
++    if (!bs || !bs->drv) {
++        return false;
++    }
++
++    if (bs =3D=3D to_replace) {
++        return true;
++    }
++
++    /* See what the driver can do */
++    if (bs->drv->bdrv_recurse_can_replace) {
++        return bs->drv->bdrv_recurse_can_replace(bs, to_replace);
++    }
++
++    /* For filters without an own implementation, we can recurse on our ow=
+n */
++    if (bs->drv->is_filter) {
++        BdrvChild *child =3D bs->file ?: bs->backing;
++        return bdrv_recurse_can_replace(child->bs, to_replace);
++    }
++
++    /* Safe default */
++    return false;
++}
++
+ BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,
+                                         const char *node_name, Error **err=
+p)
+ {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 640fb82c78..eaefac210e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -102,6 +102,13 @@ struct BlockDriver {
+      */
+     bool (*bdrv_recurse_is_first_non_filter)(BlockDriverState *bs,
+                                              BlockDriverState *candidate);
++    /*
++     * Return true if @to_replace can be replaced by a BDS with the
++     * same data as @bs without it affecting @bs's behavior (that is,
++     * without it being visible to @bs's parents).
++     */
++    bool (*bdrv_recurse_can_replace)(BlockDriverState *bs,
++                                     BlockDriverState *to_replace);
+=20
+     int (*bdrv_probe)(const uint8_t *buf, int buf_size, const char *filena=
+me);
+     int (*bdrv_probe_device)(const char *filename);
+@@ -1263,6 +1270,9 @@ void bdrv_format_default_perms(BlockDriverState *bs, =
+BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared);
+=20
++bool bdrv_recurse_can_replace(BlockDriverState *bs,
++                              BlockDriverState *to_replace);
++
+ /*
+  * Default implementation for drivers to pass bdrv_co_block_status() to
+  * their file.
 --=20
 2.24.1
 
