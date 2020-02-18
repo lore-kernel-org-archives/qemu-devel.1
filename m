@@ -2,88 +2,73 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E231C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED106C34031
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 123652070B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 20:58:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gifMTf7r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 123652070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C694F2176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 21:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C694F2176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j49x3-0002iB-7a
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 15:58:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39227)
+	id 1j4A9X-0006ig-04
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 16:11:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j49wM-00027v-OZ
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:57:59 -0500
+ (envelope-from <bounces@canonical.com>) id 1j4A8m-00068V-5b
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j49wL-0005B0-S8
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:57:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31196
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j49wL-00059G-OV
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 15:57:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582059477;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HlXzXWv58exGZJ76r44XaB/TqiXJ0rWbgdWThNIQ5Ws=;
- b=gifMTf7rpUqzWVyxFFLZE8evldNQccnVXxAtXt+h6+tPSR+AwquEjeliwkXTXjSe1nA2dc
- DhGratAEwMYcatfHuJcy17CxHTb1xsBH4bXAX6iN42iABOGFbyTr1+y5vb9YNJpxIQjjsK
- hoS4uvOlhyPARwAkqV/gbcQ81EPXrMA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-fmPxAmTxPqyqxzP5qdPAGA-1; Tue, 18 Feb 2020 15:57:53 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790E91137869;
- Tue, 18 Feb 2020 20:57:51 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E02A35C219;
- Tue, 18 Feb 2020 20:57:47 +0000 (UTC)
-Subject: Re: [PATCH v2 00/22] Fix error handling during bitmap postcopy
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
- <33fa0ba7-714f-c78d-8ca5-1e15dcef5ac4@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <f44bfdb9-0ddc-3b1a-0279-7e9ebd9f399f@redhat.com>
-Date: Tue, 18 Feb 2020 14:57:47 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <bounces@canonical.com>) id 1j4A8k-0007Dj-Qe
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:10:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40682)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j4A8k-00079b-Kb
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 16:10:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j4A8i-0007WD-TV
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 21:10:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D54732E80C3
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 21:10:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <33fa0ba7-714f-c78d-8ca5-1e15dcef5ac4@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: fmPxAmTxPqyqxzP5qdPAGA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Feb 2020 21:03:23 -0000
+From: Julien Freche <1863685@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rth@twiddle.net; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jfreche rth
+X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
+References: <158198492915.29307.8701397558481624318.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158205980386.24262.5437114912343578134.malone@gac.canonical.com>
+Subject: [Bug 1863685] Re: ARM: HCR.TSW traps are not implemented
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: aa4149fdc45434ef6e5d83e63af7592ae9fb40be
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,25 +77,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- quintela@redhat.com, qemu-stable@nongnu.org, dgilbert@redhat.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Reply-To: Bug 1863685 <1863685@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/18/20 2:02 PM, Andrey Shinkevich wrote:
-> qemu-iotests:$ ./check -qcow2
-> PASSED
-> (except always failed 261 and 272)
+Makes sense. Debugging is on me then :) Both patches behave as expected,
+thanks!
 
-Have you reported those failures on the threads that introduced those tests?
+-- =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863685
 
+Title:
+  ARM: HCR.TSW traps are not implemented
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  On 32-bit and 64-bit ARM platforms, setting HCR.TSW is supposed to
+  "Trap data or unified cache maintenance instructions that operate by
+  Set/Way." Quoting the ARM manual:
+
+  If EL1 is using AArch64 state, accesses to DC ISW, DC CSW, DC CISW are tr=
+apped to EL2, reported using EC syndrome value 0x18.
+  If EL1 is using AArch32 state, accesses to DCISW, DCCSW, DCCISW are trapp=
+ed to EL2, reported using EC syndrome value 0x03.
+
+  However, QEMU does not trap those instructions/registers. This was
+  tested on the branch master of the git repo.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863685/+subscriptions
 
