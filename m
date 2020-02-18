@@ -2,96 +2,70 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA86C34026
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE182C34034
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:53:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35E8520659
+	by mail.kernel.org (Postfix) with ESMTPS id C21E520659
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:53:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="attFcFDn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E8520659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C21E520659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3zZT-0000v9-F6
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:53:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43557)
+	id 1j3zZU-0000xh-0H
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:53:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j3zQa-0001nn-Tk
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:29 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j3zSV-0005TH-Ps
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j3zQZ-00062F-Uv
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:28 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45678
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j3zSU-0006mA-9b
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:46:27 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2445 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j3zQY-0005zr-R6
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:44:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582019066;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XCQCf8OR1kY+/p5b4mHJ3QG09v3lGeftuZ/e10MXqmo=;
- b=attFcFDn/PAl2t/iz7ta77weDRVagqe/M8+3yrDaHrGxFeoFgl/XPisz3nVZOVJzAUWlUP
- 3ptYFuNlw4NJMHpx0Wmckps4VYen+l1sAiA7bYbBLNIWwLIa3UBrkR4erN6MMz9AqIyxtM
- yoAgsyAe87ihVzG2kWp1CLGc1jO2sbA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-7vf33f-kNcuHsWr5FpMYiA-1; Tue, 18 Feb 2020 04:44:17 -0500
-Received: by mail-wr1-f72.google.com with SMTP id o9so10555374wrw.14
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 01:44:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=JTAYCeyl+pNe1lk0kNlsj14Fj0ev9DGEUp2oxJFg1Hs=;
- b=NkV9mmGgx+3UNrPbBAl6LDhikyBmJIZgIwR3eubvHJnTAhOWYApIPtKxJBFCSwqTVO
- FcWGqTNFY4Dc7ha9cHjLNyRRhTpkQkNzLXoEzNmUsPGX8qGaK61q6Zngdk/k2pDjzd6c
- 5Y0DmrOWu0NUYsrSiu8gT4vmmcN8/VToq5w4M1bpEakSVvcuZl3DaK55Sej23xeq8ypE
- ITIiUejtRpE/17WRpOJ4t1W7WL/bQ6RbKM3vbx6BhwEvTppRy/nzvb5H3f7Pz2iS7sju
- r3wguA1ucUm5gh2dugLfRWhYCqbXtMiqlDSHGYw+bvZdgs/Jg043uToqM2iZSSFxAz1S
- xzvg==
-X-Gm-Message-State: APjAAAV9imC/539dXpd31k00gBaTE85SlpyQwHCWOyhzkqndYm8be4yt
- k9Plu3cOL8KT73sm/RQqIMWOluGHZxhFaZVjVgSfKZmJrkbiUlH4jPUsQ/6MCENZyGPxMbrjCjD
- NFEnD2MFSOKY3YxE=
-X-Received: by 2002:adf:de86:: with SMTP id w6mr29018416wrl.115.1582019055798; 
- Tue, 18 Feb 2020 01:44:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxzD3WAqCTdNNHxCg7SaFclNwM4okabSxUgrIr/k78N7Ojb2sIYWq5/FjLXEWQXGej3Q7K1WA==
-X-Received: by 2002:adf:de86:: with SMTP id w6mr29018383wrl.115.1582019055600; 
- Tue, 18 Feb 2020 01:44:15 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id z10sm2735588wmk.31.2020.02.18.01.44.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Feb 2020 01:44:15 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND 05/13] hw/arm/xlnx-versal: Remove superfluous semicolon
-Date: Tue, 18 Feb 2020 10:43:54 +0100
-Message-Id: <20200218094402.26625-6-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200218094402.26625-1-philmd@redhat.com>
-References: <20200218094402.26625-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j3zST-0006kK-VE; Tue, 18 Feb 2020 04:46:26 -0500
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id A3E3917E15AFEF0B8EC3;
+ Tue, 18 Feb 2020 17:46:19 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 18 Feb 2020 17:46:19 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.165]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
+ Tue, 18 Feb 2020 17:46:09 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org"
+ <qemu-ppc@nongnu.org>, "jcmvbkbc@gmail.com" <jcmvbkbc@gmail.com>,
+ "crwulff@gmail.com" <crwulff@gmail.com>, "marex@denx.de" <marex@denx.de>,
+ "edgar.iglesias@gmail.com" <edgar.iglesias@gmail.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Subject: RE: [PATCH 0/3]hw: Fixs memleak of fdevice tree blob
+Thread-Topic: [PATCH 0/3]hw: Fixs memleak of fdevice tree blob
+Thread-Index: AQHV5jvGomOGww3FYUqlb9mV7XuhSKggsH8g
+Date: Tue, 18 Feb 2020 09:46:09 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B64D2E5@dggemm531-mbx.china.huawei.com>
+References: <20200218091154.21696-1-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200218091154.21696-1-kuhn.chenqun@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-MC-Unique: 7vf33f-kNcuHsWr5FpMYiA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,46 +77,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Pannengyuan <pannengyuan@huawei.com>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixes: 6f16da53ffe
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/arm/xlnx-versal-virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 462493c467..0d2e3bdda1 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -350,7 +350,7 @@ static void create_virtio_regions(VersalVirt *s)
-     int i;
-=20
-     for (i =3D 0; i < NUM_VIRTIO_TRANSPORT; i++) {
--        char *name =3D g_strdup_printf("virtio%d", i);;
-+        char *name =3D g_strdup_printf("virtio%d", i);
-         hwaddr base =3D MM_TOP_RSVD + i * virtio_mmio_size;
-         int irq =3D VERSAL_RSVD_IRQ_FIRST + i;
-         MemoryRegion *mr;
---=20
-2.21.1
-
+DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IENoZW5xdW4gKGt1aG4pDQo+
+U2VudDogVHVlc2RheSwgRmVicnVhcnkgMTgsIDIwMjAgNToxMiBQTQ0KPlRvOiBxZW11LWRldmVs
+QG5vbmdudS5vcmc7IHFlbXUtcHBjQG5vbmdudS5vcmc7IGpjbXZia2JjQGdtYWlsLmNvbTsNCj5j
+cnd1bGZmQGdtYWlsLmNvbTsgbWFyZXhAZGVueC5kZTsgZWRnYXIuaWdsZXNpYXNAZ21haWwuY29t
+Ow0KPmRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdQ0KPkNjOiBaaGFuZ2hhaWxpYW5nIDx6aGFu
+Zy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBxZW11LQ0KPnRyaXZpYWxAbm9uZ251Lm9yZzsg
+cGJvbnppbmlAcmVkaGF0LmNvbTsgUGFubmVuZ3l1YW4NCj48cGFubmVuZ3l1YW5AaHVhd2VpLmNv
+bT47IENoZW5xdW4gKGt1aG4pDQo+PGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPlN1YmplY3Q6
+IFtQQVRDSCAwLzNdaHc6IEZpeHMgbWVtbGVhayBvZiBmZGV2aWNlIHRyZWUgYmxvYg0KPg0KPkZy
+b206IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4NCkhpIGFsbCwgYWZ0ZXIg
+cmV2aWV3aW5nIHZhcmlvdXMgcGF0Y2hlcyBmcm9tIFBhbiBOZW5neXVhbiBmaXggcHBjLWU1MDAN
+CmZkdCBtZW1sZWFrcywgSSBzZWFyY2ggZm9yIHJlbGF0ZWQgY29udGVudCBhbmQgZm91bmQgUGFv
+bG8gQm9uemluaSdzDQpzaW1pbGFybHkgcGF0Y2hzLiAoc29ycnksIHRoaXMgZGVzY3JpcHRpb24g
+aXMgbWlzc2luZyBoZXJlIGJlY2F1c2Ugb2YgdGhpcyBwYXRjaCBmb3JtYXQuKQ0KDQo+VGhlIGRl
+dmljZSB0cmVlIGJsb2IgcmV0dXJuZWQgYnkgbG9hZF9kZXZpY2VfdHJlZSBpcyBtYWxsb2NlZC4N
+Cj5XZSBzaG91bGQgZnJlZSBpdCBhZnRlciBjcHVfcGh5c2ljYWxfbWVtb3J5X3dyaXRlKCkuT3Ro
+ZXJ3aXNlLA0KPmlmIHdlIHJlcGVhdGVkbHkgY2FsbCAnc3lzdGVtX3Jlc2V0JyxpdCB3aWxsIHJl
+cGVhdGVkbHkgbG9hZCBmZHQsIHNvIHRoZXJlIGFyZQ0KPm1hbnkgbWVtbGVha3MuDQo+DQo+UGFv
+bG8gQm9uemluaSA6DQo+aHR0cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRl
+dmVsLzIwMTktMTAvbXNnMDAxMjkuaHRtbA0KPg0KPlBhbiBOZW5neXVhbjoNCj5odHRwczovL2xp
+c3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAyMC0wMi9tc2cwMzU5NC5odG1s
+DQo+DQo+QWZ0ZXIgc2VhcmNoaW5nIHRoZSBkZXZpY2UgY29kZSwgSSBmb3VuZCB0aHJlZSBzaW1p
+bGFyIGlzc3Vlcy4NCj5UaGlzIHNlcmllcyBmaXhlcyB0aGUgbGFzdCB0aHJlZS4NCj4NCj5DaGVu
+IFF1biAoMyk6DQo+ICBody9uaW9zMjpmaXggbGVhayBvZiBmZGV2aWNlIHRyZWUgYmxvYg0KPiAg
+aHcvcHBjL3ZpcnRleF9tbDUwNzpmaXggbGVhayBvZiBmZGV2aWNlIHRyZWUgYmxvYg0KPiAgaHcv
+eHRlbnNhL3h0ZnBnYTpmaXggbGVhayBvZiBmZGV2aWNlIHRyZWUgYmxvYg0KPg0KPiBody9uaW9z
+Mi9ib290LmMgICAgICAgfCAxICsNCj4gaHcvcHBjL3ZpcnRleF9tbDUwNy5jIHwgMSArDQo+IGh3
+L3h0ZW5zYS94dGZwZ2EuYyAgICB8IDEgKw0KPiAzIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9u
+cygrKQ0KPg0KPi0tDQo+Mi4yMy4wDQo+DQoNCg==
 
