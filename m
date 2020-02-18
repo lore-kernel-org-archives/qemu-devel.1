@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC3DC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7AD1C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:11:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0A6421D56
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9443F21D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 14:11:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V/hXx/gx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A6421D56
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H0HUKxZj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9443F21D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j43aV-0004Rl-VZ
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 09:11:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
+	id 1j43ac-0004lf-P3
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 09:11:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j43Xi-0006s5-7Z
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:08:07 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j43Xi-0006s9-8k
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j43Xg-0001QZ-Vv
+ (envelope-from <kwolf@redhat.com>) id 1j43Xh-0001Qj-2R
  for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:08:06 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57985
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45485
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j43Xg-0001Pq-Sv
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:08:04 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j43Xg-0001Q8-UC
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 09:08:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582034883;
+ s=mimecast20190719; t=1582034884;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nkOXPRIsDTQhN6JSN/pT5QywP8scoyncfNOfkExAeFM=;
- b=V/hXx/gxEvbLyroflYsh5Kd6aLNkIlMO4dtHf1BY6Lr63/1f/Iq7EwXOr33ftq+nuFOtu6
- nmt5Uh11LwY2m3eP5DgAtNRwhC5knkAriG0ntTn26hG8SZzyoEgeRxYO6YZBwa68uejE/d
- MKQnvsbkMpYsk2pGOtbi4QBBDvPaGwM=
+ bh=vIDUTk9KHLVtiPqrbiBrAB8rWaD4h3Txg7iB+zN3HpQ=;
+ b=H0HUKxZjI3A8EDF6ve1QR3CfFF+WTmBOFdc3jCJVRbjYnGWoKqyqsAucctc8ywhH3u2V5v
+ Tm0dib0OycPKWrIqMtT5shsQ7Uq4Dh62KBm2twgOSPhdUe9gjFs7tAxrLGNA4JpB3eJyJV
+ 5vew/FyowOqYENMdqhr9BR6iJ+bg3og=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-EXUvw9HlOOWoSm1aVrbcsQ-1; Tue, 18 Feb 2020 09:07:58 -0500
+ us-mta-426-YmKNp4VSMjer_HUrjhHprA-1; Tue, 18 Feb 2020 09:08:02 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E88561005516;
- Tue, 18 Feb 2020 14:07:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4176F8010E8;
+ Tue, 18 Feb 2020 14:08:01 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-181.ams2.redhat.com
  [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E5AA28B563;
- Tue, 18 Feb 2020 14:07:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A8A18B549;
+ Tue, 18 Feb 2020 14:08:00 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 03/36] qcow2: Fix alignment checks in encrypted images
-Date: Tue, 18 Feb 2020 15:06:49 +0100
-Message-Id: <20200218140722.23876-4-kwolf@redhat.com>
+Subject: [PULL 07/36] iotests: Test copy offloading with external data file
+Date: Tue, 18 Feb 2020 15:06:53 +0100
+Message-Id: <20200218140722.23876-8-kwolf@redhat.com>
 In-Reply-To: <20200218140722.23876-1-kwolf@redhat.com>
 References: <20200218140722.23876-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: EXUvw9HlOOWoSm1aVrbcsQ-1
+X-MC-Unique: YmKNp4VSMjer_HUrjhHprA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,76 +91,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alberto Garcia <berto@igalia.com>
+This adds a test for 'qemu-img convert' with copy offloading where the
+target image has an external data file. If the test hosts supports it,
+it tests both the case where copy offloading is supported and the case
+where it isn't (otherwise we just test unsupported twice).
 
-I/O requests to encrypted media should be aligned to the sector size
-used by the underlying encryption method, not to BDRV_SECTOR_SIZE.
-Fortunately this doesn't break anything at the moment because
-both existing QCRYPTO_BLOCK_*_SECTOR_SIZE have the same value as
-BDRV_SECTOR_SIZE.
+More specifically, the case with unsupported copy offloading tests
+qcow2_alloc_cluster_abort() with external data files.
 
-The checks in qcow2_co_preadv_encrypted() are also unnecessary because
-they are repeated immediately afterwards in qcow2_co_encdec().
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-Id: <20200213171646.15876-1-berto@igalia.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200211094900.17315-4-kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2-threads.c | 12 ++++++++----
- block/qcow2.c         |  2 --
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ tests/qemu-iotests/244     | 14 ++++++++++++++
+ tests/qemu-iotests/244.out |  6 ++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 8f5a0d1ebe..77bb578cdf 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -246,12 +246,15 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t host_o=
-ffset,
-         .len =3D len,
-         .func =3D func,
-     };
-+    uint64_t sector_size;
+diff --git a/tests/qemu-iotests/244 b/tests/qemu-iotests/244
+index 0d1efee6ef..2ec1815e6f 100755
+--- a/tests/qemu-iotests/244
++++ b/tests/qemu-iotests/244
+@@ -197,6 +197,20 @@ $QEMU_IO -c 'read -P 0x11 0 1M' -f $IMGFMT "$TEST_IMG"=
+ | _filter_qemu_io
+ $QEMU_IMG map --output=3Dhuman "$TEST_IMG" | _filter_testdir
+ $QEMU_IMG map --output=3Djson "$TEST_IMG"
 =20
--    assert(QEMU_IS_ALIGNED(guest_offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(host_offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(len, BDRV_SECTOR_SIZE));
-     assert(s->crypto);
-=20
-+    sector_size =3D qcrypto_block_get_sector_size(s->crypto);
-+    assert(QEMU_IS_ALIGNED(guest_offset, sector_size));
-+    assert(QEMU_IS_ALIGNED(host_offset, sector_size));
-+    assert(QEMU_IS_ALIGNED(len, sector_size));
++echo
++echo "=3D=3D=3D Copy offloading =3D=3D=3D"
++echo
 +
-     return len =3D=3D 0 ? 0 : qcow2_co_process(bs, qcow2_encdec_pool_func,=
- &arg);
- }
-=20
-@@ -270,7 +273,8 @@ qcow2_co_encdec(BlockDriverState *bs, uint64_t host_off=
-set,
-  *        will be written to the underlying storage device at
-  *        @host_offset
-  *
-- * @len - length of the buffer (must be a BDRV_SECTOR_SIZE multiple)
-+ * @len - length of the buffer (must be a multiple of the encryption
-+ *        sector size)
-  *
-  * Depending on the encryption method, @host_offset and/or @guest_offset
-  * may be used for generating the initialization vector for
-diff --git a/block/qcow2.c b/block/qcow2.c
-index ef96606f8d..8dcee5efec 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2068,8 +2068,6 @@ qcow2_co_preadv_encrypted(BlockDriverState *bs,
-         goto fail;
-     }
-=20
--    assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
--    assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE));
-     if (qcow2_co_decrypt(bs,
-                          file_cluster_offset + offset_into_cluster(s, offs=
-et),
-                          offset, buf, bytes) < 0)
++# Make use of copy offloading if the test host can provide it
++_make_test_img -o "data_file=3D$TEST_IMG.data" 64M
++$QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n -C "$TEST_IMG.src" "$TEST_IMG"
++$QEMU_IMG compare -f $IMGFMT -F $IMGFMT "$TEST_IMG.src" "$TEST_IMG"
++
++# blkdebug doesn't support copy offloading, so this tests the error path
++$QEMU_IMG amend -f $IMGFMT -o "data_file=3Dblkdebug::$TEST_IMG.data" "$TES=
+T_IMG"
++$QEMU_IMG convert -f $IMGFMT -O $IMGFMT -n -C "$TEST_IMG.src" "$TEST_IMG"
++$QEMU_IMG compare -f $IMGFMT -F $IMGFMT "$TEST_IMG.src" "$TEST_IMG"
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/244.out b/tests/qemu-iotests/244.out
+index 6a3d0067cc..e6f4dc7993 100644
+--- a/tests/qemu-iotests/244.out
++++ b/tests/qemu-iotests/244.out
+@@ -122,4 +122,10 @@ Offset          Length          Mapped to       File
+ 0               0x100000        0               TEST_DIR/t.qcow2.data
+ [{ "start": 0, "length": 1048576, "depth": 0, "zero": false, "data": true,=
+ "offset": 0},
+ { "start": 1048576, "length": 66060288, "depth": 0, "zero": true, "data": =
+false}]
++
++=3D=3D=3D Copy offloading =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 data_file=3DT=
+EST_DIR/t.IMGFMT.data
++Images are identical.
++Images are identical.
+ *** done
 --=20
 2.20.1
 
