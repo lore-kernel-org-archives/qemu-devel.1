@@ -2,83 +2,77 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5FDC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272DDC34036
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BFF821D56
+	by mail.kernel.org (Postfix) with ESMTPS id EA69521D56
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 10:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SssgOMzd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BFF821D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X3Tq+UJd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA69521D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j40F1-0003WT-BC
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:36:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51321)
+	id 1j40F2-0003Ws-3g
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 05:36:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j40At-0004pF-Ps
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:32:20 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j40Dk-00019z-3R
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j40As-0006VW-TP
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:32:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58204
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1j40Di-0007M6-OH
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:15 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21980
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j40As-0006V2-PW
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:32:18 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j40Di-0007Lr-KM
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 05:35:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582021938;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1582022114;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OBqKKwiYOpQVxnpf7l1Q5k89hpg3u4gvO+NH/dOpbnE=;
- b=SssgOMzd3TJ48zMHNJeiAUIxQ8YxSA5N/I6NUIlaGgl6qjtqxUDO88ZHF5LCRPPTPlTKpA
- JyvMq3vI16v+KGBcOVMNngpWnfcXCwIbr5Q6VDZomwWhHt155ITuuxw4Rfz3dWezc4l0gO
- bcmDMEWCB3vf7JIcTxjFx305TU/lKcQ=
+ bh=yvBWi2s6/tJLBi+ftR5NPxjefGGwG5hSWq/ZKgtM+YU=;
+ b=X3Tq+UJdZkk9h6C3KM2fV3aDM5H+gqVSZPzQK4MIwU/YffmlsQWkYaW2dOI6V8fLnWuEpS
+ nNfyWvZLknYzIErbVLe7ngXW1ThM1mSQphCU52fkTXQLfqrVeypiD5IsdhF185buCsQrrn
+ qmtlnFNCe0IWwYKq1ebjpYLRIoCloZI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-6PFsKkRqMlCAWQWKBjkHMQ-1; Tue, 18 Feb 2020 05:32:16 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-44-qbxdX0FsOdCmAzmznA_8ug-1; Tue, 18 Feb 2020 05:35:10 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4035FDB6E;
- Tue, 18 Feb 2020 10:32:14 +0000 (UTC)
-Received: from redhat.com (ovpn-116-49.ams2.redhat.com [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F0EAE19481;
- Tue, 18 Feb 2020 10:32:01 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH RESEND 09/13] migration/multifd: Remove superfluous
- semicolon
-In-Reply-To: <20200218094402.26625-10-philmd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue, 18 Feb 2020 10:43:58
- +0100")
-References: <20200218094402.26625-1-philmd@redhat.com>
- <20200218094402.26625-10-philmd@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 18 Feb 2020 11:31:58 +0100
-Message-ID: <87sgj8mbj5.fsf@secure.laptop>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AF8D18A6EC3;
+ Tue, 18 Feb 2020 10:35:09 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2CBE5D9E2;
+ Tue, 18 Feb 2020 10:35:08 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v4 04/19] iotests: Let 041 use -blockdev for quorum children
+Date: Tue, 18 Feb 2020 11:34:39 +0100
+Message-Id: <20200218103454.296704-5-mreitz@redhat.com>
+In-Reply-To: <20200218103454.296704-1-mreitz@redhat.com>
+References: <20200218103454.296704-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 6PFsKkRqMlCAWQWKBjkHMQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: qbxdX0FsOdCmAzmznA_8ug-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Michael Tokarev <mjt@tls.msk.ru>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, "Edgar
- E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Julia Suvorova <jusual@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> Fixes: d32ca5ad798
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Using -drive with default options means that a virtio-blk drive will be
+created that has write access to the to-be quorum children.  Quorum
+should have exclusive write access to them, so we should use -blockdev
+instead.
 
-I forgot, queued on migration branch.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/041 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index 43556b9727..aa7d54d968 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -885,7 +885,10 @@ class TestRepairQuorum(iotests.QMPTestCase):
+             # Assign a node name to each quorum image in order to manipula=
+te
+             # them
+             opts =3D "node-name=3Dimg%i" % self.IMAGES.index(i)
+-            self.vm =3D self.vm.add_drive(i, opts)
++            opts +=3D ',driver=3D%s' % iotests.imgfmt
++            opts +=3D ',file.driver=3Dfile'
++            opts +=3D ',file.filename=3D%s' % i
++            self.vm =3D self.vm.add_blockdev(opts)
+=20
+         self.vm.launch()
+=20
+--=20
+2.24.1
 
 
