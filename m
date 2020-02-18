@@ -2,81 +2,79 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB52C34044
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C93C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:42:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCD7D208C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9BE208C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 16:42:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGOJyEDs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCD7D208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C6MWBOPS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9BE208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38143 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j45rn-0006Ms-0Z
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 11:36:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46422)
+	id 1j45wv-0002E7-TJ
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 11:42:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcmvbkbc@gmail.com>) id 1j45r2-0005d1-9I
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:36:13 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j45wD-0001iJ-V0
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:41:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcmvbkbc@gmail.com>) id 1j45r1-0000VO-55
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:36:12 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45771)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>)
- id 1j45r0-0000U9-Tp; Tue, 18 Feb 2020 11:36:11 -0500
-Received: by mail-pl1-x643.google.com with SMTP id b22so8278229pls.12;
- Tue, 18 Feb 2020 08:36:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nRuzn8UKnTQ2cmdcyxv/wn2ocH2dZ8wVICl5F0i38wM=;
- b=FGOJyEDsRuiAt41/y0u01ygmLRCPE6mDOVZBTNJeYe1eZfTI3RULsmnDlAHJePgfOn
- JYkY6ZkcLg1r95J4TJnW5sx00EPaCkrJ4fqfSYu8I36eofJwsQcjXmk7vY3l6Whq2i4S
- oV2ap2M7OhWF29sGWsdNJ4KmMpxJAtFwGyw7s8u631YOK+Hi9jMQ0KFWGgH7dq3/ZVia
- gKHbjG3jwJEIJEzJDBQL1/3tyMVEPbKnsxViKFgTntd6Jrh5eHWcEjedhMH/Y2DgRwgF
- kxkhI7mlvHwuKPc1+2cu3Vu2Iu5xhSt8xV1p7oCTA2tThhlPLZJyUePiL7wj5VOAYriz
- bjYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nRuzn8UKnTQ2cmdcyxv/wn2ocH2dZ8wVICl5F0i38wM=;
- b=TNzVdLuzE/nJzehPlDkyDeNkAkTNK2MGZV+O3orYtsZmSgGUfQHZopJzr7IZUYK5Br
- H8ARHRg8IlrZ+VzqTVdrxB4hVVjX6DKpABwLtWTIt7P8O3LKLlYiG0ba/dDS7G3dqhtL
- gewxiYMtjadhkj2lqEdOH4ITNdwgf432JrXh27GZgUcST0Hjus0L2H5P9j/Aeb/rWnDS
- zFV5vi8BR6ZLmfuVW3AhUek7KoP2mPl69iXb/J9gqg4HbKq/R8/La1CeSybRGcIuyhE5
- cUHsdvuz1gkKmIsIZ23g06nleYeZLvAfGoPe11vJ1GwUulz8NjjWfk+gGiPeU8HRt48c
- KJAg==
-X-Gm-Message-State: APjAAAVYLjRom4NeMe0Ur644ttESOIv8fn2VzWcdi3gQXyZ/G5Q/O4/F
- gZgii/hrwCEq79+5gEadge/5xAri6AwpoEPEfak=
-X-Google-Smtp-Source: APXvYqx+7gf9qXpxdpkBWNplw/D0Bs1+zafiZ0iBKU526ksLFZFMcMuvlYpSyUOVqGDHtd7h8g7/nzB0kPfiEBIeJ84=
-X-Received: by 2002:a17:90a:db0f:: with SMTP id
- g15mr3518389pjv.40.1582043769392; 
- Tue, 18 Feb 2020 08:36:09 -0800 (PST)
+ (envelope-from <imammedo@redhat.com>) id 1j45wB-0004LR-V6
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:41:33 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25239
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j45wB-0004Ki-Ky
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 11:41:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582044090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S1MPo1vlUNeZKYdRkcefcAbXIT63k7sy+8PGGMjGCWo=;
+ b=C6MWBOPSMvaEcDt8mQnT5ARk1liiBxFhERXMu1JYo8JRjtDhcfXYXXy5FWXCvO8TiCKtfk
+ c8PgS5FQOi9g4r791UxCAYuM1RfVpjxn6OoEWtE48w4Vj9q2QJBBw+eucH/mU2ebtPhvhc
+ rF6qbi/XN7RsBYYRLxpcboyqQfOkNNM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-uf6qgfINM6uHj9010X31gw-1; Tue, 18 Feb 2020 11:41:25 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C647CDB61;
+ Tue, 18 Feb 2020 16:41:23 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 20E7D5C13C;
+ Tue, 18 Feb 2020 16:41:19 +0000 (UTC)
+Date: Tue, 18 Feb 2020 17:41:17 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 17/79] arm/integratorcp: use memdev for RAM
+Message-ID: <20200218174117.1dab2b41@redhat.com>
+In-Reply-To: <5e21adc1-a197-9d37-133c-ea510b9b9926@redhat.com>
+References: <20200217173452.15243-1-imammedo@redhat.com>
+ <20200217173452.15243-18-imammedo@redhat.com>
+ <5e21adc1-a197-9d37-133c-ea510b9b9926@redhat.com>
 MIME-Version: 1.0
-References: <20200218091154.21696-1-kuhn.chenqun@huawei.com>
- <20200218091154.21696-4-kuhn.chenqun@huawei.com>
-In-Reply-To: <20200218091154.21696-4-kuhn.chenqun@huawei.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 18 Feb 2020 08:35:58 -0800
-Message-ID: <CAMo8BfJ1Jc2_+wMcKK9PZPXidczbQJ04N+3kMx7zV=KpDK__sQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] hw/xtensa/xtfpga:fix leak of fdevice tree blob
-To: kuhn.chenqun@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: uf6qgfINM6uHj9010X31gw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,32 +86,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, zhang.zhanghailiang@huawei.com,
- QEMU Trivial <qemu-trivial@nongnu.org>, Chris Wulff <crwulff@gmail.com>,
- pannengyuan@huawei.com, qemu-devel <qemu-devel@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ peter.chubb@nicta.com.au, qemu-devel@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 18, 2020 at 1:14 AM <kuhn.chenqun@huawei.com> wrote:
->
-> From: Chen Qun <kuhn.chenqun@huawei.com>
->
-> The device tree blob returned by load_device_tree is malloced.
-> We should free it after cpu_physical_memory_write().
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
->  hw/xtensa/xtfpga.c | 1 +
->  1 file changed, 1 insertion(+)
+On Tue, 18 Feb 2020 07:55:14 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+> On 2/17/20 6:33 PM, Igor Mammedov wrote:
+> > memory_region_allocate_system_memory() API is going away, so
+> > replace it with memdev allocated MemoryRegion. The later is
+> > initialized by generic code, so board only needs to opt in
+> > to memdev scheme by providing
+> >    MachineClass::default_ram_id
+> > and using MachineState::ram instead of manually initializing
+> > RAM memory region.
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> > CC: peter.chubb@nicta.com.au
+> > ---
+> >   hw/arm/integratorcp.c | 9 ++++-----
+> >   1 file changed, 4 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+> > index 0cd94d9f09..cc845b8534 100644
+> > --- a/hw/arm/integratorcp.c
+> > +++ b/hw/arm/integratorcp.c
+> > @@ -585,7 +585,6 @@ static void integratorcp_init(MachineState *machine=
+)
+> >       Object *cpuobj;
+> >       ARMCPU *cpu;
+> >       MemoryRegion *address_space_mem =3D get_system_memory();
+> > -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> >       MemoryRegion *ram_alias =3D g_new(MemoryRegion, 1);
+> >       qemu_irq pic[32];
+> >       DeviceState *dev, *sic, *icp;
+> > @@ -605,14 +604,13 @@ static void integratorcp_init(MachineState *machi=
+ne)
+> >  =20
+> >       cpu =3D ARM_CPU(cpuobj);
+> >  =20
+> > -    memory_region_allocate_system_memory(ram, NULL, "integrator.ram",
+> > -                                         ram_size);
+> >       /* ??? On a real system the first 1Mb is mapped as SSRAM or boot =
+flash.  */
+> >       /* ??? RAM should repeat to fill physical memory space.  */
+> >       /* SDRAM at address zero*/
+> > -    memory_region_add_subregion(address_space_mem, 0, ram);
+> > +    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+> >       /* And again at address 0x80000000 */
+> > -    memory_region_init_alias(ram_alias, NULL, "ram.alias", ram, 0, ram=
+_size);
+> > +    memory_region_init_alias(ram_alias, NULL, "ram.alias", machine->ra=
+m,
+> > +                             0, ram_size);
+> >       memory_region_add_subregion(address_space_mem, 0x80000000, ram_al=
+ias);
+> >  =20
+> >       dev =3D qdev_create(NULL, TYPE_INTEGRATOR_CM);
+> > @@ -660,6 +658,7 @@ static void integratorcp_machine_init(MachineClass =
+*mc)
+> >       mc->init =3D integratorcp_init;
+> >       mc->ignore_memory_transaction_failures =3D true;
+> >       mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("arm926");
+> > +    mc->default_ram_id =3D "integrator.ram";
+> >   }
+> >  =20
+> >   DEFINE_MACHINE("integratorcp", integratorcp_machine_init)
+> >  =20
+>=20
+> Looking at integratorcm_realize() this machine seems to handle at most=20
+> 512MiB.
 
--- 
-Thanks.
--- Max
+According to=20
+http://infocenter.arm.com/help/index.jsp?topic=3D/com.arm.doc.dui0159b/Cege=
+adbj.html
+
+it supports "optionally, 16 to 256MB of SDRAM plugged into the DIMM socket"
+so I'm not sure that realize is valid reference here.
+(well I don't know anything about arm boards, but it probably should be
+double checked by maintainer).
+
+PS:
+It should not hold this series (as check wasn't there to begin with),
+I'll post a patch on top to add check once we decide to what limit it
+should be set.
+
 
