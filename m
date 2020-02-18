@@ -2,103 +2,84 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4245EC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2143BC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11C1E20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E37042464E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 17:49:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqXUopJ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C1E20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNFi/H76"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37042464E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j46zl-0003Np-5W
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:49:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56134)
+	id 1j46zs-0003YS-HP
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 12:49:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j46yM-0001cQ-LX
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:51 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j46xb-0000wt-Vd
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j46yK-0004FX-Pe
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46965
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j46yI-0004Di-Sr
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582048066;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5kjKBIhoTTidU+FupA78S2evj3eCjsBh8yUTE4Js91o=;
- b=WqXUopJ9Vi8CyaRgJWzMnDI4RWdzK7n/pk40EsSv92+dgEgK7lD4q3Rp0hraQRL/eUoRWR
- cvpYZtf+C20Fnfw+TnsTPHyNoLRBW0cIGNOQ/2cbCx7M+g11AfupdKMNxCJZSj5tNcnyP7
- BMOYd2JO4dJQvcnuMWGNbeoGfPYtf04=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-yfTxhLvmPSuxoXtLFPzjjg-1; Tue, 18 Feb 2020 12:47:44 -0500
-Received: by mail-wm1-f70.google.com with SMTP id o24so390201wmh.0
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 09:47:44 -0800 (PST)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j46xY-0003eM-S4
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 12:47:03 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34441)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j46xY-0003cQ-7V; Tue, 18 Feb 2020 12:47:00 -0500
+Received: by mail-ot1-x343.google.com with SMTP id j16so20379823otl.1;
+ Tue, 18 Feb 2020 09:46:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=0mXLe6I2bVnunk/uud2CeZS3TcbI3dbo+2XkkUSvjGo=;
+ b=lNFi/H76z4NOX9wdE0ieKxNUTruIQdqkKb/f/P/DhmSoyfLvCSr9LbHXrYThOxx+Hq
+ k5N0hTYaLu0V+9YR/ZjkRuIMT0/rzjtsbhGpjBLu80gjAPV1y45aGDhzS0OJmCeeWciv
+ zHKho76bWFstNTSmGoTCRkK0Yp9T77l4u4ZO0fySCJli0jdBsUHotnshfe63guSS3LXp
+ WESK5yU3Q80JHNk1W7tSjM95r+J0vMnxEGpEfpEf+gBf57/noUb1fF7pK6z+eDIqw7CN
+ /CD4wGKb/ysYBS1bfyBRfRUGBuuRyGfjexLXPSiwWQQ2xgLA/BADFoEWEr2XZEehJQbR
+ JTLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5kjKBIhoTTidU+FupA78S2evj3eCjsBh8yUTE4Js91o=;
- b=FdXH7uqzJbOkkTFUa3xYQwJm5TzmU7VLHuFscWsiIC/jVf9gRYX5ljaDO/ZkhK8Pc3
- TH69naE73Y7V3h1F3yBkxPO2gt2zdj8GUb6hhwWkuAAoqi9bS9CaVdv93vIoP+K3Fdwv
- CwEDANPxbjrB+KAlnuHcCE464+HzZuM4BXtLfAwWAfjSa7RaaVDhXIdGCs3wBKVSrnMA
- OxcuVuSDpwuZYQS97U2OLdRRRfD+7NiVd0/i3JwhDM3t6IoM1YQYAoFrAd4oK95rvSMo
- P6763exilRMhr14j3ecG7ICv0OiaqN3JE3KdiU3NvOXAIrssro21TwphFs5KDwnUYfsI
- HIdg==
-X-Gm-Message-State: APjAAAVANZ8aO6DLgildnczxdQIgm4+fbMzAAkooqBY/glSrlcfbHTqi
- 2NTXvK6ND/KFULEXHocZR0mYS/O7FNpkkz8RZYUO+RYQ6rfSNFltUeoRoE3OxHk03rhe1CddG8p
- aPGqgukjpChRNRZM=
-X-Received: by 2002:a05:600c:2104:: with SMTP id
- u4mr4367470wml.93.1582048063265; 
- Tue, 18 Feb 2020 09:47:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzgPoCPNWqdRWxxxlv5m5qb2kca+QONzuSaxHOJTlTzKHB2ZOY2ORJdnCv42m80J8gLowgW1Q==
-X-Received: by 2002:a05:600c:2104:: with SMTP id
- u4mr4367454wml.93.1582048063019; 
- Tue, 18 Feb 2020 09:47:43 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
- ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
- by smtp.gmail.com with ESMTPSA id t128sm4511467wmf.28.2020.02.18.09.47.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Feb 2020 09:47:42 -0800 (PST)
-Subject: Re: [PATCH RFC] target/i386: filter out VMX_PIN_BASED_POSTED_INTR
- when enabling SynIC
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20200218144415.94722-1-vkuznets@redhat.com>
- <9b4b46c2-e2cf-a3d5-70e4-c8772bf6734f@redhat.com>
- <87k14j962l.fsf@vitty.brq.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d5a3159d-4cab-ef94-bbfc-e9120324cd3e@redhat.com>
-Date: Tue, 18 Feb 2020 18:47:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=0mXLe6I2bVnunk/uud2CeZS3TcbI3dbo+2XkkUSvjGo=;
+ b=ASaQjef/UEBhzxsfSHclRfzPC3iCUV1x/DxHxRP2V0XkgZUnNMQb56spA/UOjjq0ZU
+ l8gLUD6khCkRMJWg2rQwxEZ1wEfmxDFmv1HGRWHO7EMrxNkI9J6Wap4jayuYF7665l7e
+ jcXR2zS9e00cSOpI+UPd+IhWjgxkpbVW4xp9H+2Sw7oeBXTlVXrR6KoAbiVgHmjs1U+J
+ js1C0SEPnXm1Myx5toCIS/Z1J9PaScliLBKWWFoKAbS1iGyj/UEjYDNtsP4lqHdhKLlJ
+ AsLwHcgdTtA1sMV+d1EYnjSQh+NnINsYzBkohZc0HI7BnQTHrpf/i+6EArVGqnGpJkL+
+ XqsQ==
+X-Gm-Message-State: APjAAAXyCMjWcFX/Nupd8CJ88N5+krjYVfDdl6KrTN7E7bnEESSDQvyJ
+ 3fCwRpK4JHA5ArBLcJDsoE8vCCjJZDYJgEjBOi0=
+X-Google-Smtp-Source: APXvYqz+xo49MkaqvztF7sV3VfuMUP0b5pYc6lDR/VHD5mZ0LrRpGzCUlt+eJjpr7AyV18d2JrExWsaQQqmVGfVheWA=
+X-Received: by 2002:a05:6830:1e76:: with SMTP id
+ m22mr11555434otr.295.1582048015458; 
+ Tue, 18 Feb 2020 09:46:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87k14j962l.fsf@vitty.brq.redhat.com>
-Content-Language: en-US
-X-MC-Unique: yfTxhLvmPSuxoXtLFPzjjg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Tue, 18 Feb 2020 09:46:54 -0800 (PST)
+In-Reply-To: <20200218181551.6dff3ec2.cohuck@redhat.com>
+References: <20200217223558.863199-1-laurent@vivier.eu>
+ <20200218152748.63d608af.cohuck@redhat.com>
+ <0769c184-dc34-c022-1986-698c6650bac1@vivier.eu>
+ <20200218181551.6dff3ec2.cohuck@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 18 Feb 2020 18:46:54 +0100
+Message-ID: <CAL1e-=hSSeOi9+sHofSpqPyBU_o2O0GHjBbc91eZRyBGSg==mA@mail.gmail.com>
+Subject: Re: [PATCH 00/22] linux-user: generate syscall_nr.sh
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000faa487059edd41bd"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,64 +91,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Marcelo Tosatti <mtosatti@redhat.com>, Liran Alon <liran.alon@oracle.com>,
- Roman Kagan <rkagan@virtuozzo.com>, Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/02/20 18:08, Vitaly Kuznetsov wrote:
-> Paolo Bonzini <pbonzini@redhat.com> writes:
-> 
->> On 18/02/20 15:44, Vitaly Kuznetsov wrote:
->>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->>> ---
->>> RFC: This is somewhat similar to eVMCS breakage and it is likely possible
->>> to fix this in KVM. I decided to try QEMU first as this is a single
->>> control and unlike eVMCS we don't need to keep a list of things to disable.
->>
->> I think you should disable "virtual-interrupt delivery" instead (which
->> in turn requires "process posted interrupts" to be zero).  That is the
->> one that is incompatible with AutoEOI interrupts.
-> 
-> I'm fighting the symptoms, not the cause :-) My understanding is that
-> when SynIC is enabled for CPU0 KVM does
-> 
-> kvm_vcpu_update_apicv()
-> 	vmx_refresh_apicv_exec_ctrl()
-> 		pin_controls_set()
-> 
-> for *all* vCPUs (KVM_REQ_APICV_UPDATE). I'm not sure why
-> SECONDARY_EXEC_APIC_REGISTER_VIRT/SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY
-> are not causing problems and only PIN_BASED_POSTED_INTR does as we clear
-> them all (not very important atm).
+--000000000000faa487059edd41bd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Let's take a step back, what is the symptom, i.e. how does it fail?
-Because thinking more about it, since we have separate VMCS we can set
-PIN_BASED_POSTED_INTR and SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY just fine
-in the vmcs02.  The important part is to unconditionally call
-vmx_deliver_nested_posted_interrupt.
+On Tuesday, February 18, 2020, Cornelia Huck <cohuck@redhat.com> wrote:
 
-Something like
+> On Tue, 18 Feb 2020 16:19:21 +0100
+> Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> > Le 18/02/2020 =C3=A0 15:27, Cornelia Huck a =C3=A9crit :
+> > > On Mon, 17 Feb 2020 23:35:36 +0100
+> > > Laurent Vivier <laurent@vivier.eu> wrote:
+> > >
+> > >> This series copies the files syscall.tbl from linux v5.5 and generat=
+es
+> > >> the file syscall_nr.h from them.
+> > >>
+> > >> This is done for all the QEMU targets that have a syscall.tbl
+> > >> in the linux source tree: mips, mips64, i386, x86_64, sparc, s390x,
+> > >> ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.
+> > >>
+> > >> tilegx and cris are depecrated in linux (tilegx has no maintainer in
+> QEMU)
+> > >>
+> > >> aarch64, nios2, openrisc and riscv have no syscall.tbl in linux.
+> > >>
+> > >> It seems there is a bug in QEMU that forces to disable manually
+> arch_prctl
+> > >> with i386 target: do_arch_prctl() is only defined with TARGET_ABI32
+> but
+> > >> TARGET_ABI32 is never defined with TARGET_I386 (nor TARGET_X86_64).
+> > >>
+> > >> I have also removed all syscalls in s390x/syscall_nr.h defined for
+> > >> !defined(TARGET_S390X).
+> > >>
+> > >> I have added a script to copy all these files from linux and updated
+> > >> them at the end of the series with their latest version for today.
+> > >>
+> > >> The two last patches manage the special case for mips O32 that needs
+> > >> to know the number of arguments. We find them in strace sources.
+> > >
+> > > I like the idea of generating those files, but I wonder if that shoul=
+d
+> > > interact with linux-headers updates.
+> > >
+> > > I plan to do a linux-headers update to 5.6-rc?, and I noticed that th=
+is
+> > > will drag in two new syscalls (openat2 and pidfd_getfd). Now, just
+> > > having the new #defines in the headers doesn't do anything, but shoul=
+d
+> > > it be a trigger to update the syscall.tbl files as well? Or does that
+> > > need manual inspection/updating?
+> >
+> > I think it's a good idea to update the syscall.tbl when we update
+> > linux-headers, and there will be no change at linux-user level while we
+> > don't implement the syscall translation in syscall.c:do_syscall1().
+>
+> Nod.
+>
+> >
+> > But I think we should also check manually the difference between new an=
+d
+> > old generated syscall_nr.h to be sure there is nothing broken in what w=
+e
+> > introduce.
+> >
+> > I always run a Linux Test Project testsuite for all architectures with =
+a
+> > debian distro when I do a pull request so I can detect regression.
+> >
+> > In the end, updating linux-headers should trigger syscall.tbl update bu=
+t
+> > it needs manual inspection.
+>
+> I think we should make sure that updating syscall.tbl does not get
+> forgotten if we do a headers update... have the update script print out
+> a message? I'm not sure if we want to automate updating the syscall
+> table, as we want manual inspection for it.
+>
+> Maybe have the update script moan about syscall.tbl if unistd.h is
+> changed? Should be a good enough heuristic.
+>
+> That said, I'll probably queue a headers update on the s390-next branch
+> right now (against current Linus master),
 
-	if (kvm_x86_ops->deliver_posted_interrupt(vcpu, vector)) {
-                kvm_lapic_set_irr(vector, apic);
-                kvm_make_request(KVM_REQ_EVENT, vcpu);
-                kvm_vcpu_kick(vcpu);
-        }
 
-and in vmx_deliver_posted_interrupt
+>
+Hi, Cornelia,
 
-        r = vmx_deliver_nested_posted_interrupt(vcpu, vector);
-        if (!r)
-                return 0;
+I am not stopping you from updating headers from Linus' master, however, I
+think a better practice would be to do regular updates from each stable
+kernel release (the last one is 5.5), rather than from an arbitrary
+kernel-du-jour, which may be the subject of change (including reverts) wrt
+headers between two stable releases.
 
-	if (!vcpu->arch.apicv_active)
-                return -1;
-        ...
-        return 0;
+Regards,
+Aleksandar
 
-Paolo
 
+
+>
+> unless someone complains --
+> maybe take the syscall.tbl from that state of the kernel tree as well?
+>
+>
+>
+
+--000000000000faa487059edd41bd
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, February 18, 2020, Cornelia Huck &lt;<a href=3D"mailto:=
+cohuck@redhat.com">cohuck@redhat.com</a>&gt; wrote:<br><blockquote class=3D=
+"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding=
+-left:1ex">On Tue, 18 Feb 2020 16:19:21 +0100<br>
+Laurent Vivier &lt;<a href=3D"mailto:laurent@vivier.eu">laurent@vivier.eu</=
+a>&gt; wrote:<br>
+<br>
+&gt; Le 18/02/2020 =C3=A0 15:27, Cornelia Huck a =C3=A9crit=C2=A0:<br>
+&gt; &gt; On Mon, 17 Feb 2020 23:35:36 +0100<br>
+&gt; &gt; Laurent Vivier &lt;<a href=3D"mailto:laurent@vivier.eu">laurent@v=
+ivier.eu</a>&gt; wrote:<br>
+&gt; &gt;=C2=A0 =C2=A0<br>
+&gt; &gt;&gt; This series copies the files syscall.tbl from linux v5.5 and =
+generates<br>
+&gt; &gt;&gt; the file syscall_nr.h from them.<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; This is done for all the QEMU targets that have a syscall.tbl=
+<br>
+&gt; &gt;&gt; in the linux source tree: mips, mips64, i386, x86_64, sparc, =
+s390x,<br>
+&gt; &gt;&gt; ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; tilegx and cris are depecrated in linux (tilegx has no mainta=
+iner in QEMU)<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; aarch64, nios2, openrisc and riscv have no syscall.tbl in lin=
+ux.<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; It seems there is a bug in QEMU that forces to disable manual=
+ly arch_prctl<br>
+&gt; &gt;&gt; with i386 target: do_arch_prctl() is only defined with TARGET=
+_ABI32 but<br>
+&gt; &gt;&gt; TARGET_ABI32 is never defined with TARGET_I386 (nor TARGET_X8=
+6_64).<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; I have also removed all syscalls in s390x/syscall_nr.h define=
+d for<br>
+&gt; &gt;&gt; !defined(TARGET_S390X).<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; I have added a script to copy all these files from linux and =
+updated<br>
+&gt; &gt;&gt; them at the end of the series with their latest version for t=
+oday.<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; The two last patches manage the special case for mips O32 tha=
+t needs<br>
+&gt; &gt;&gt; to know the number of arguments. We find them in strace sourc=
+es.=C2=A0 <br>
+&gt; &gt; <br>
+&gt; &gt; I like the idea of generating those files, but I wonder if that s=
+hould<br>
+&gt; &gt; interact with linux-headers updates.<br>
+&gt; &gt; <br>
+&gt; &gt; I plan to do a linux-headers update to 5.6-rc?, and I noticed tha=
+t this<br>
+&gt; &gt; will drag in two new syscalls (openat2 and pidfd_getfd). Now, jus=
+t<br>
+&gt; &gt; having the new #defines in the headers doesn&#39;t do anything, b=
+ut should<br>
+&gt; &gt; it be a trigger to update the syscall.tbl files as well? Or does =
+that<br>
+&gt; &gt; need manual inspection/updating?=C2=A0 <br>
+&gt; <br>
+&gt; I think it&#39;s a good idea to update the syscall.tbl when we update<=
+br>
+&gt; linux-headers, and there will be no change at linux-user level while w=
+e<br>
+&gt; don&#39;t implement the syscall translation in syscall.c:do_syscall1()=
+.<br>
+<br>
+Nod.<br>
+<br>
+&gt; <br>
+&gt; But I think we should also check manually the difference between new a=
+nd<br>
+&gt; old generated syscall_nr.h to be sure there is nothing broken in what =
+we<br>
+&gt; introduce.<br>
+&gt; <br>
+&gt; I always run a Linux Test Project testsuite for all architectures with=
+ a<br>
+&gt; debian distro when I do a pull request so I can detect regression.<br>
+&gt; <br>
+&gt; In the end, updating linux-headers should trigger syscall.tbl update b=
+ut<br>
+&gt; it needs manual inspection.<br>
+<br>
+I think we should make sure that updating syscall.tbl does not get<br>
+forgotten if we do a headers update... have the update script print out<br>
+a message? I&#39;m not sure if we want to automate updating the syscall<br>
+table, as we want manual inspection for it.<br>
+<br>
+Maybe have the update script moan about syscall.tbl if unistd.h is<br>
+changed? Should be a good enough heuristic.<br>
+<br>
+That said, I&#39;ll probably queue a headers update on the s390-next branch=
+<br>
+right now (against current Linus master),=C2=A0</blockquote><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
+dding-left:1ex"><br></blockquote><div><br></div><div>Hi, Cornelia,</div><di=
+v><br></div><div>I am not stopping you from updating headers from Linus&#39=
+; master, however, I think a better practice would be to do regular updates=
+ from each stable kernel release (the last one is 5.5), rather than from an=
+ arbitrary kernel-du-jour, which may be the subject of change (including re=
+verts) wrt headers between two stable releases.</div><div><br></div><div>Re=
+gards,</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
+id;padding-left:1ex"><br></blockquote><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">unless=
+ someone complains --<br>
+maybe take the syscall.tbl from that state of the kernel tree as well?<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000faa487059edd41bd--
 
