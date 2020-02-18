@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE9EC3403B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6782C3403A
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:56:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E5AA20659
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7619A2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:56:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjmhOgSS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5AA20659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbrh8GlF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7619A2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42Ol-0007AT-CF
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:54:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39185)
+	id 1j42QG-0001RC-L4
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:56:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j42Dy-0005Dq-Lo
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:43:39 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j42EU-0006Sj-J3
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j42Dx-0001Pz-J1
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:43:38 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25093
+ (envelope-from <mreitz@redhat.com>) id 1j42ET-0001ik-4U
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:10 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35904
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j42Dx-0001Pa-Ex
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:43:37 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j42ET-0001iG-0G
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582029816;
+ s=mimecast20190719; t=1582029848;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LfVKdqV835QiWGlotzClIHLXhou0szKpLXr41gud1rg=;
- b=UjmhOgSSC8qNp2fm2MTul1sdbfod0OhcTQ6zCFqm8owOgVJjWoR5VTiYakc+fCq3/u9dDr
- u5+/tpsWDvpu04vfzI63dakPe0x2148kYkDhTKpcqtGvCbRXlfTqE/gCJImJwNerC5mM4N
- EV/W80/IypSajzSWnRm/TCAN/L35UvM=
+ bh=p7sit8l2Ncd92nNS9DBTcJjUaipuRLXI3sHVoyodYYQ=;
+ b=cbrh8GlFSis5tq1qubHv+S8loEaPLxerIw4kwCONWTA9lAsBCLi6tyQuDl4sFXKOCFGqq4
+ Lm0oKNJHEzPiCw7q1TKGp+FVzCqj4uIqcB0uGKti2PFLx/54nWQlnTvonetHsrt/4mq9Kz
+ xGR9FzhZABw/HLQs1IdrYNWNPSHt7A8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-klkNwiDcOvq8oCtfbHM4ig-1; Tue, 18 Feb 2020 07:43:35 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-346-rYf_29ooOZiM_t5OYKVeLw-1; Tue, 18 Feb 2020 07:44:07 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6008D800D50;
- Tue, 18 Feb 2020 12:43:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2650A1005514;
+ Tue, 18 Feb 2020 12:44:06 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D317D5C1B2;
- Tue, 18 Feb 2020 12:43:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 923445DA60;
+ Tue, 18 Feb 2020 12:44:05 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 15/33] block: Pull out bdrv_default_perms_for_backing()
-Date: Tue, 18 Feb 2020 13:42:24 +0100
-Message-Id: <20200218124242.584644-16-mreitz@redhat.com>
+Subject: [PATCH v3 25/33] block: Make filter drivers use child_of_bds
+Date: Tue, 18 Feb 2020 13:42:34 +0100
+Message-Id: <20200218124242.584644-26-mreitz@redhat.com>
 In-Reply-To: <20200218124242.584644-1-mreitz@redhat.com>
 References: <20200218124242.584644-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: klkNwiDcOvq8oCtfbHM4ig-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rYf_29ooOZiM_t5OYKVeLw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -90,106 +90,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Right now, bdrv_format_default_perms() is used by format parents
-(generally). We want to switch to a model where most parents use a
-single BdrvChildClass, which then decides the permissions based on the
-child role. To do so, we have to split bdrv_format_default_perms() into
-separate functions for each such role.
+Note that some filters have secondary children, namely blkverify (the
+image to be verified) and blklogwrites (the log).  This patch does not
+touch those children.
+
+Note that for blkverify, the filtered child should not be format-probed.
+While there is nothing enforcing this here, in practice, it will not be:
+blkverify implements .bdrv_file_open.  The block layer ensures (and in
+fact, asserts) that BDRV_O_PROTOCOL is set for every BDS whose driver
+implements .bdrv_file_open.  This flag will then be bequeathed to
+blkverify's children, and they will thus (by default) not be probed
+either.
+
+("By default" refers to the fact that blkverify's other child (the
+non-filtered one) will have BDRV_O_PROTOCOL force-unset, because that is
+what happens for all non-filtered children of non-format drivers.)
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c | 62 +++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 40 insertions(+), 22 deletions(-)
+ block/blkdebug.c        | 4 +++-
+ block/blklogwrites.c    | 3 ++-
+ block/blkverify.c       | 4 +++-
+ block/copy-on-read.c    | 5 +++--
+ block/filter-compress.c | 5 +++--
+ block/replication.c     | 3 ++-
+ block/throttle.c        | 5 +++--
+ 7 files changed, 19 insertions(+), 10 deletions(-)
 
-diff --git a/block.c b/block.c
-index 982785b15a..8b97412cbc 100644
---- a/block.c
-+++ b/block.c
-@@ -2302,6 +2302,44 @@ void bdrv_filter_default_perms(BlockDriverState *bs,=
- BdrvChild *c,
-     *nshared =3D (shared & DEFAULT_PERM_PASSTHROUGH) | DEFAULT_PERM_UNCHAN=
-GED;
- }
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 8dd8ed6055..b31fa40b0e 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -497,7 +497,9 @@ static int blkdebug_open(BlockDriverState *bs, QDict *o=
+ptions, int flags,
 =20
-+static void bdrv_default_perms_for_backing(BlockDriverState *bs, BdrvChild=
- *c,
-+                                           const BdrvChildClass *child_cla=
-ss,
-+                                           BdrvChildRole role,
-+                                           BlockReopenQueue *reopen_queue,
-+                                           uint64_t perm, uint64_t shared,
-+                                           uint64_t *nperm, uint64_t *nsha=
-red)
-+{
-+    assert(child_class =3D=3D &child_backing ||
-+           (child_class =3D=3D &child_of_bds && (role & BDRV_CHILD_COW)));
-+
-+    /*
-+     * We want consistent read from backing files if the parent needs it.
-+     * No other operations are performed on backing files.
-+     */
-+    perm &=3D BLK_PERM_CONSISTENT_READ;
-+
-+    /*
-+     * If the parent can deal with changing data, we're okay with a
-+     * writable and resizable backing file.
-+     * TODO Require !(perm & BLK_PERM_CONSISTENT_READ), too?
-+     */
-+    if (shared & BLK_PERM_WRITE) {
-+        shared =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    } else {
-+        shared =3D 0;
-+    }
-+
-+    shared |=3D BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
-+              BLK_PERM_WRITE_UNCHANGED;
-+
-+    if (bs->open_flags & BDRV_O_INACTIVE) {
-+        shared |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
-+    }
-+
-+    *nperm =3D perm;
-+    *nshared =3D shared;
-+}
-+
- void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                const BdrvChildClass *child_class,
-                                BdrvChildRole role,
-@@ -2339,28 +2377,8 @@ void bdrv_format_default_perms(BlockDriverState *bs,=
- BdrvChild *c,
-         *nperm =3D perm;
-         *nshared =3D shared;
-     } else {
--        /* We want consistent read from backing files if the parent needs =
-it.
--         * No other operations are performed on backing files. */
--        perm &=3D BLK_PERM_CONSISTENT_READ;
--
--        /* If the parent can deal with changing data, we're okay with a
--         * writable and resizable backing file. */
--        /* TODO Require !(perm & BLK_PERM_CONSISTENT_READ), too? */
--        if (shared & BLK_PERM_WRITE) {
--            shared =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
--        } else {
--            shared =3D 0;
--        }
--
--        shared |=3D BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
--                  BLK_PERM_WRITE_UNCHANGED;
--
--        if (bs->open_flags & BDRV_O_INACTIVE) {
--            shared |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
--        }
--
--        *nperm =3D perm;
--        *nshared =3D shared;
-+        bdrv_default_perms_for_backing(bs, c, child_class, role, reopen_qu=
-eue,
-+                                       perm, shared, nperm, nshared);
+     /* Open the image file */
+     bs->file =3D bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "=
+image",
+-                               bs, &child_file, 0, false, &local_err);
++                               bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
++                               false, &local_err);
+     if (local_err) {
+         ret =3D -EINVAL;
+         error_propagate(errp, local_err);
+diff --git a/block/blklogwrites.c b/block/blklogwrites.c
+index 4faf912ef1..78b0c49460 100644
+--- a/block/blklogwrites.c
++++ b/block/blklogwrites.c
+@@ -157,7 +157,8 @@ static int blk_log_writes_open(BlockDriverState *bs, QD=
+ict *options, int flags,
      }
- }
 =20
+     /* Open the file */
+-    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file, 0=
+, false,
++    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY, f=
+alse,
+                                &local_err);
+     if (local_err) {
+         ret =3D -EINVAL;
+diff --git a/block/blkverify.c b/block/blkverify.c
+index 1684b7aa2e..5c3b29244a 100644
+--- a/block/blkverify.c
++++ b/block/blkverify.c
+@@ -125,7 +125,9 @@ static int blkverify_open(BlockDriverState *bs, QDict *=
+options, int flags,
+=20
+     /* Open the raw file */
+     bs->file =3D bdrv_open_child(qemu_opt_get(opts, "x-raw"), options, "ra=
+w",
+-                               bs, &child_file, 0, false, &local_err);
++                               bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
++                               false, &local_err);
+     if (local_err) {
+         ret =3D -EINVAL;
+         error_propagate(errp, local_err);
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index a2d92ac394..c857ea0da7 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -28,8 +28,9 @@
+ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+                     Error **errp)
+ {
+-    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file, 0=
+, false,
+-                               errp);
++    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
++                               false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+     }
+diff --git a/block/filter-compress.c b/block/filter-compress.c
+index 4dc5f9fb8c..9edd937645 100644
+--- a/block/filter-compress.c
++++ b/block/filter-compress.c
+@@ -30,8 +30,9 @@
+ static int compress_open(BlockDriverState *bs, QDict *options, int flags,
+                          Error **errp)
+ {
+-    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file, 0=
+, false,
+-                               errp);
++    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
++                               false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+     }
+diff --git a/block/replication.c b/block/replication.c
+index 9ca5c9368e..ec512ae1c3 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -90,7 +90,8 @@ static int replication_open(BlockDriverState *bs, QDict *=
+options,
+     const char *mode;
+     const char *top_id;
+=20
+-    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file, 0=
+,
++    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
+                                false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+diff --git a/block/throttle.c b/block/throttle.c
+index 2dea913be7..47b0a3522d 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -81,8 +81,9 @@ static int throttle_open(BlockDriverState *bs, QDict *opt=
+ions,
+     char *group;
+     int ret;
+=20
+-    bs->file =3D bdrv_open_child(NULL, options, "file", bs,
+-                               &child_file, 0, false, errp);
++    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
++                               BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
++                               false, errp);
+     if (!bs->file) {
+         return -EINVAL;
+     }
 --=20
 2.24.1
 
