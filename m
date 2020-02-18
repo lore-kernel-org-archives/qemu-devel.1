@@ -2,79 +2,86 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E00C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 08:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F15C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:03:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFA6A21D7D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 08:59:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DF9024649
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 09:03:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KIYhWRHz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA6A21D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="EXjV7cgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF9024649
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j3yjQ-0004ja-54
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 03:59:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37052)
+	id 1j3ymc-0006iT-P5
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 04:03:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j3yir-00042n-KK
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 03:59:18 -0500
+ (envelope-from <luc.michel@greensocs.com>) id 1j3yjw-0005KD-5E
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:00:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j3yip-0002hp-Uw
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 03:59:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44436
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <luc.michel@greensocs.com>) id 1j3yju-00036f-Sb
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 04:00:24 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:33516)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j3yip-0002ha-QE
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 03:59:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582016354;
+ (Exim 4.71) (envelope-from <luc.michel@greensocs.com>)
+ id 1j3yjs-00035s-Br; Tue, 18 Feb 2020 04:00:20 -0500
+Received: from [172.16.11.100] (tiramisu.bar.greensocs.com [172.16.11.100])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 377DC96EF0;
+ Tue, 18 Feb 2020 09:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582016419;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bkuvbGPsm0p9HklCITqbjs2qLysEp8O35xGXvejr2vc=;
- b=KIYhWRHzvNDYw98cGFBOJMSbQkyynzQmnlxYYA3OF3aMQy1fLlVgKK9DMe/ZGyQ0Ops3F0
- bl2Vy3I5fEOhtix0LQA21VY04Re87hZmMRnVWqxPY6iQZdc9LuqcTG6fIlu5wDrrJyq+OR
- 1bU+k2GbuuzoJuJ1p5UTp/elb7VTdl4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-nuHjMBHyMCOW8GdAx6IoqQ-1; Tue, 18 Feb 2020 03:59:10 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8F5B107ACC4;
- Tue, 18 Feb 2020 08:59:09 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6794C87058;
- Tue, 18 Feb 2020 08:59:07 +0000 (UTC)
-Date: Tue, 18 Feb 2020 09:59:05 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v5 24/79] arm/musicpal: use memdev for RAM
-Message-ID: <20200218095905.1890f768@redhat.com>
-In-Reply-To: <a0a461ef-b4b3-fe1a-dba3-c1672a33670a@linaro.org>
-References: <20200217173452.15243-1-imammedo@redhat.com>
- <20200217173452.15243-25-imammedo@redhat.com>
- <a0a461ef-b4b3-fe1a-dba3-c1672a33670a@linaro.org>
+ bh=izkMufESYPVKSCriGMjh5aq5ASE7rx1jv3wC35Y6KOE=;
+ b=EXjV7cgXMQeSG7eW70pBOd/8PMXW5f2vrTKFwVAHiLDW/HysV+Vx97e+hCyQWbtB44vxxz
+ vnMIHpsGzL/STgx+KP5PsZ6Cd0JIDe9pOC4cHrJ+QtDKSM2b1THW809YnnDWQsKwOj5ADg
+ gLgIlkerqGWF5FXkSNik6AMk8ZJa6nc=
+Subject: Re: [PATCH v2 08/13] hw/arm/bcm2836: Introduce
+ BCM283XClass::core_count
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200217114533.17779-1-f4bug@amsat.org>
+ <20200217114533.17779-9-f4bug@amsat.org>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <57bf830e-1456-8881-7ad3-b6bc0bdb781e@greensocs.com>
+Date: Tue, 18 Feb 2020 10:00:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: nuHjMBHyMCOW8GdAx6IoqQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200217114533.17779-9-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-PH
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582016419;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=izkMufESYPVKSCriGMjh5aq5ASE7rx1jv3wC35Y6KOE=;
+ b=hVFsGSx55OZAisqeQXCFqFgWgdqHzuClg4476eJPwgDE44vlKEPuScDVk1994moLeT7pgY
+ IrIC0R0CJAacS9T5PpldfuG3C+RaFbB0ABrwFWdGh04JdGu0jPX3Iga/CeOEgjgzMU/En2
+ NDUDdIoq/BbCzzrO8Cls7PuPE364Fp4=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582016419; a=rsa-sha256; cv=none;
+ b=ovVx9cYq4COg3VB4pR8QAM0RIifvso69c4q8+uraYzIkyPfx3drCENbi+i+H4e8qtGYjzE
+ xDriLck/EpII0+HddnX2V9dAS99BQ4jf1/xC6vGYKGOa71bHqYqVBzqWNpm7hRH4WIXeIe
+ Anj2YWtSB56IHvIWxTRCHmViIeosAk8=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,82 +93,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, jan.kiszka@web.de,
- qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Feb 2020 11:11:29 -0800
-Richard Henderson <richard.henderson@linaro.org> wrote:
+On 2/17/20 12:45 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> The BCM2835 has only one core. Introduce the core_count field to
+> be able to use values different than BCM283X_NCPUS (4).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> On 2/17/20 9:33 AM, Igor Mammedov wrote:
-> > memory_region_allocate_system_memory() API is going away, so
-> > replace it with memdev allocated MemoryRegion. The later is
-> > initialized by generic code, so board only needs to opt in
-> > to memdev scheme by providing
-> >   MachineClass::default_ram_id
-> > and using MachineState::ram instead of manually initializing
-> > RAM memory region.
-> > 
-> > PS:
-> >  while at it add check for user supplied RAM size and error
-> >  out if it mismatches board expected value.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > ---  
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Thanks!
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-> 
-> > @@ -1589,16 +1590,21 @@ static void musicpal_init(MachineState *machine)
-> >      int i;
-> >      unsigned long flash_size;
-> >      DriveInfo *dinfo;
-> > +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> >      MemoryRegion *address_space_mem = get_system_memory();
-> > -    MemoryRegion *ram = g_new(MemoryRegion, 1);
-> >      MemoryRegion *sram = g_new(MemoryRegion, 1);
-> >  
-> > +    /* For now we use a fixed - the original - RAM size */
-> > +    if (machine->ram_size != mc->default_ram_size) {
-> > +        char *sz = size_to_str(mc->default_ram_size);
-> > +        error_report("Invalid RAM size, should be %s", sz);
-> > +        g_free(sz);
-> > +        exit(EXIT_FAILURE);
-> > +    }  
-> 
-> If for some reason you need to re-spin this series again, and considering my
-> comment re arm/imx25_pdk, I think it would be worthwhile to create a common
-> helper for this:
-> 
-
-This check is temporary, I plan to replace it with a similar
-check in generic machine code and clean it up. The reason it
-is not done in this series is that generalizing it is not
-related to this series. Hence I'd prefer to keep current
-approach in this series to avoid touching already reviewed
-patches and generalize it later.
-
-
-> void machine_memory_check_fixed_size(MachineState *machine)
-> {
->     MachineClass *mc = MACHINE_GET_CLASS(machine);
-> 
->     if (machine->ram_size != mc->default_ram_size) {
->         char *sz = size_to_str(mc->default_ram_size);
->         error_report("Invalid RAM size, should be %s", sz);
->         g_free(sz);
->         exit(EXIT_FAILURE);
->     }
-> }
-> 
-> That would keep the language consistent across the boards.
-> 
-> 
-> r~
-> 
-
+> ---
+>  hw/arm/bcm2836.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+> index 683d04d6ea..3b95ad11e9 100644
+> --- a/hw/arm/bcm2836.c
+> +++ b/hw/arm/bcm2836.c
+> @@ -21,6 +21,7 @@ typedef struct BCM283XClass {
+>      DeviceClass parent_class;
+>      /*< public >*/
+>      const char *cpu_type;
+> +    int core_count;
+>      hwaddr peri_base; /* Peripheral base address seen by the CPU */
+>      hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
+>      int clusterid;
+> @@ -37,7 +38,7 @@ static void bcm2836_init(Object *obj)
+>      BCM283XClass *bc =3D BCM283X_GET_CLASS(obj);
+>      int n;
+> =20
+> -    for (n =3D 0; n < BCM283X_NCPUS; n++) {
+> +    for (n =3D 0; n < bc->core_count; n++) {
+>          object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
+>                                  sizeof(s->cpu[n].core), bc->cpu_type,
+>                                  &error_abort, NULL);
+> @@ -107,7 +108,7 @@ static void bcm2836_realize(DeviceState *dev, Error=
+ **errp)
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
+>          qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-fiq", 0));
+> =20
+> -    for (n =3D 0; n < BCM283X_NCPUS; n++) {
+> +    for (n =3D 0; n < bc->core_count; n++) {
+>          /* TODO: this should be converted to a property of ARM_CPU */
+>          s->cpu[n].core.mp_affinity =3D (bc->clusterid << 8) | n;
+> =20
+> @@ -173,6 +174,7 @@ static void bcm2836_class_init(ObjectClass *oc, voi=
+d *data)
+>      BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> =20
+>      bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
+> +    bc->core_count =3D BCM283X_NCPUS;
+>      bc->peri_base =3D 0x3f000000;
+>      bc->ctrl_base =3D 0x40000000;
+>      bc->clusterid =3D 0xf;
+> @@ -187,6 +189,7 @@ static void bcm2837_class_init(ObjectClass *oc, voi=
+d *data)
+>      BCM283XClass *bc =3D BCM283X_CLASS(oc);
+> =20
+>      bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
+> +    bc->core_count =3D BCM283X_NCPUS;
+>      bc->peri_base =3D 0x3f000000;
+>      bc->ctrl_base =3D 0x40000000;
+>      bc->clusterid =3D 0x0;
+>=20
 
