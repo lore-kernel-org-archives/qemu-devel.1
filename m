@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D75C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B04EC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:45:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA5EC22B48
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:44:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187CE21D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:45:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z5PZcdM3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA5EC22B48
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p+nUt1NZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187CE21D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48nA-0002aC-1b
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:44:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55208)
+	id 1j48oP-0004FI-BB
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:45:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j48ic-0003hz-8G
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:43 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j48if-0003r4-RU
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j48ib-0004Qo-7J
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:42 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:35795)
+ (envelope-from <richard.henderson@linaro.org>) id 1j48ie-0004Xz-Rq
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:45 -0500
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:46356)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j48ib-0004PT-1R
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:41 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id g6so8487794plt.2
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:39:40 -0800 (PST)
+ id 1j48ie-0004WR-Kb
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:39:44 -0500
+Received: by mail-pf1-x42e.google.com with SMTP id k29so11140217pfp.13
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:39:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=oZO5RKA9Grp6ITlGi7FVOEFNRvhDdW0o8hVNMgXHdmY=;
- b=z5PZcdM3GwfshQMTb+zkOYVWQxLMe8XtkmZqYkJdrc92e/r8MZUVqGsfVy9QAbBAAf
- /yvajMui0bQH9bVNuH539y0Ce8CedmHmiO5zmiwosDHjFfxOqb/TPpYXAQr1IXfc4FIQ
- OKCyCbXJ77pbWZ+6UsbXdKOFGPJL1heXOmi+xovIztzXx9+2aXKvQlsA/oQhOGV92prL
- /FHNURWpHnW28ywc7QsXzNquhaXqt0Vz7bSkyy4Qmzwh8jwy6h47/5Fw5ZutD6rky9ZS
- YI7JVVnG6Smm25aaNJfyDYfI4gmXsZnLFv/J1IkYAiZfxKSbEHT46Xbr791zWNFdxf7E
- 0Zrw==
+ bh=QSNJImV6Sv3hjKepfQ333kr7g+hkYoplwMWy8vc32R4=;
+ b=p+nUt1NZPZDuAmJfkVnK457U7ab00RT3CzSfwMmbu1JFbVFfr0bYGKMDks1xhEa+jR
+ jlwfmZYxHrnCmHI9src3LkTtA9CG5Jomo5lfLSz1IJs5EKnrN+MOcOdNovthW1OiFdjz
+ ujCqSU3gKPIhzrddlFxDQTyNCWHONDeuFWP8h/3Zp2ci1SBMCDq+ZzzxrbC0j9SwpDLq
+ QhVFTr5FErXWnyoN0O+bLOCnwX96wCMwD1qKFt/jxfaWVXuRZHYbzLIMNzWN/rrSghPu
+ o4bp660AsTREEi46fPICnti0+M9SImkYe3Xv29zFj6nes/gTqoLHUo4awtmv2w2Bf1JY
+ 1Z6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oZO5RKA9Grp6ITlGi7FVOEFNRvhDdW0o8hVNMgXHdmY=;
- b=azVHyeTk2uI5MwCXkfBKv3ZT3j6KkiyCsTk0L9f2y6dvWrXYIea2J2tbN972c6Den3
- K9xYu3EAoiybl24IbOh/lUKX4XrC+EOYRFguHprGKn5NEED2oM0rw7ebPQtRso1GAl+4
- FSqR3DxWUiqDrMUgVcJUY2XrbZf6AJNtcZqPiuJMTOjDJj4R6M5NmEz11d/7TknKqvz8
- odPAfgdvz71GOBjmh3mo15voNGS8eyFGCeMg7D7wWkCy/e5eD0aje7ju6ZnRZmJBZrvi
- gqU0cGerTNLuh+IJ3DfQAKLirEvzD6yv5W6O4snCfw8bgJB7cb3zeWapfo+28+8UeaXZ
- sbYA==
-X-Gm-Message-State: APjAAAWgmPRIA83lXY+SvYNcQC6oOfPRKGS0voCqE4KA/iEglK0OwJji
- H2VtXoyUl+Ir3g9FpuVQDuoTwcA0WU8=
-X-Google-Smtp-Source: APXvYqxlpeMl5Vr3NbRjwzUh7EVnLc0egj8jw7aF5cye/pcUh5850dJGtrBvmOowzSmvkzFJ47rtrw==
-X-Received: by 2002:a17:90a:db0b:: with SMTP id
- g11mr4395370pjv.140.1582054779627; 
- Tue, 18 Feb 2020 11:39:39 -0800 (PST)
+ bh=QSNJImV6Sv3hjKepfQ333kr7g+hkYoplwMWy8vc32R4=;
+ b=RXz2oHnZGVqyidS+6PSD/IiiyspTzkpobHC1wI+L1z1WEVcKrPiQVGGwkAzgIagQiH
+ sVkq0t+Qwcf7FgloAeMnKsvDuW2I5ynUi3lI3HGR41JJbi2ans4tgUTRm4aK0vOrN+Kw
+ gLI/1nNdSeRToAvZRYr9uryqMIaGwYt9JLQTIRWnIoDQ+4/sq3eT+OaHMBdw0gDGrXpX
+ yH6iAnG94ulg4iOlqvq4k2+x1XFsOkfx8rakQ3/RWYeYPP7ZoK3WAI8Hquc9cFmYomJr
+ IM6+8AiEz5Eu6HlcurnI1fWzQedbc/mSvrOTa5+xSEGF8ZWMEsr0VEoQjQgzalE3iYAx
+ v5Hw==
+X-Gm-Message-State: APjAAAX5tAfadVKDoz1GATq1GE9/2z3JIi/2KshS7vmHHKbDz/O9XwJz
+ xJJ2JlNZHQcFW4AgW6IFPdVEcC0bquE=
+X-Google-Smtp-Source: APXvYqz9xNWTqL3tgfuf8ghhq9A7rWrU9IEpJTWL1MMfFU/zPYRkEaoDEBcVwiIVYf+qVMJbSYc1LQ==
+X-Received: by 2002:a63:5f4e:: with SMTP id t75mr23941327pgb.7.1582054783296; 
+ Tue, 18 Feb 2020 11:39:43 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id y15sm424395pgj.78.2020.02.18.11.39.38
+ by smtp.gmail.com with ESMTPSA id y15sm424395pgj.78.2020.02.18.11.39.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Feb 2020 11:39:38 -0800 (PST)
+ Tue, 18 Feb 2020 11:39:42 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 6/9] hw/hppa/dino: Add comments with register name
-Date: Tue, 18 Feb 2020 11:39:26 -0800
-Message-Id: <20200218193929.11404-7-richard.henderson@linaro.org>
+Subject: [PULL 9/9] hw/hppa/dino: Do not accept accesses to registers 0x818
+ and 0x82c
+Date: Tue, 18 Feb 2020 11:39:29 -0800
+Message-Id: <20200218193929.11404-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200218193929.11404-1-richard.henderson@linaro.org>
 References: <20200218193929.11404-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::62a
+X-Received-From: 2607:f8b0:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,51 +103,32 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Add a comment with the name of each register in the 0x800-0x8ff range.
+Register 0x818 is documented as 'undefined', and register
+0x82c is not documented. Refuse their access.
 
 Acked-by: Helge Deller <deller@gmx.de>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200218063355.18577-2-f4bug@amsat.org>
+Message-Id: <20200218063355.18577-5-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/hppa/dino.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ hw/hppa/dino.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 9797a7f0d9..c237ad3b1b 100644
+index be799aad43..2b1b38c58a 100644
 --- a/hw/hppa/dino.c
 +++ b/hw/hppa/dino.c
-@@ -85,18 +85,18 @@
- 
- #define DINO800_REGS ((DINO_TLTIM - DINO_GMASK) / 4)
- static const uint32_t reg800_keep_bits[DINO800_REGS] = {
--            MAKE_64BIT_MASK(0, 1),
--            MAKE_64BIT_MASK(0, 7),
--            MAKE_64BIT_MASK(0, 7),
--            MAKE_64BIT_MASK(0, 8),
--            MAKE_64BIT_MASK(0, 7),
--            MAKE_64BIT_MASK(0, 9),
--            MAKE_64BIT_MASK(0, 32),
--            MAKE_64BIT_MASK(0, 8),
--            MAKE_64BIT_MASK(0, 30),
--            MAKE_64BIT_MASK(0, 25),
--            MAKE_64BIT_MASK(0, 22),
--            MAKE_64BIT_MASK(0, 9),
-+    MAKE_64BIT_MASK(0, 1),  /* GMASK */
-+    MAKE_64BIT_MASK(0, 7),  /* PAMR */
-+    MAKE_64BIT_MASK(0, 7),  /* PAPR */
-+    MAKE_64BIT_MASK(0, 8),  /* DAMODE */
-+    MAKE_64BIT_MASK(0, 7),  /* PCICMD */
-+    MAKE_64BIT_MASK(0, 9),  /* PCISTS */
-+    MAKE_64BIT_MASK(0, 32), /* Undefined */
-+    MAKE_64BIT_MASK(0, 8),  /* MLTIM */
-+    MAKE_64BIT_MASK(0, 30), /* BRDG_FEAT */
-+    MAKE_64BIT_MASK(0, 25), /* PCIROR */
-+    MAKE_64BIT_MASK(0, 22), /* PCIWOR */
-+    MAKE_64BIT_MASK(0, 9),  /* TLTIM */
- };
- 
- typedef struct DinoState {
+@@ -181,7 +181,9 @@ static bool dino_chip_mem_valid(void *opaque, hwaddr addr,
+     case DINO_IO_ADDR_EN:
+     case DINO_PCI_IO_DATA:
+     case DINO_TOC_ADDR:
+-    case DINO_GMASK ... DINO_TLTIM:
++    case DINO_GMASK ... DINO_PCISTS:
++    case DINO_MLTIM ... DINO_PCIWOR:
++    case DINO_TLTIM:
+         ret = true;
+         break;
+     case DINO_PCI_IO_DATA + 2:
 -- 
 2.20.1
 
