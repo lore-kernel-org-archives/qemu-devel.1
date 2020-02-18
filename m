@@ -7,74 +7,93 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2427FC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1CEC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:42:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37CE206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 639022173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 12:42:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OF6xoDeS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37CE206F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1AhVJQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 639022173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j429i-0001H0-2j
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:39:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38212)
+	id 1j42CU-0003Ge-HR
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 07:42:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j4296-0000e2-53
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:38:37 -0500
+ (envelope-from <philmd@redhat.com>) id 1j42Bm-0002kX-Em
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j4294-0007Bx-LS
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:38:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45899
+ (envelope-from <philmd@redhat.com>) id 1j42Bl-0000Fl-1W
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28680
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j4294-0007BT-HU
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:38:34 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j42Bk-0000FF-PF
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:41:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582029513;
+ s=mimecast20190719; t=1582029680;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=F1FKo9mYOSiFcQ4sNOs0P0U4UFNYW2/4fafzSI2lt/M=;
- b=OF6xoDeS9HYvmzDhHZ0ALaBQVxJMhls2/Ad7T7joUazbsdVDn7wKTXEb0FEqipw+3cjR1Z
- cWGy5DlgX7ztDKDVzTmmT28TVsk9/EAVY/AsLymCnOPBI6ft8rTMIKQBCqfZZiKX/Sxlgl
- uFZ2bJJWQIS/ltGiqHMKLgGokpH+Q8s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-VWeRu1dOPcWZmoFEqOXLAA-1; Tue, 18 Feb 2020 07:38:31 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5660713E4;
- Tue, 18 Feb 2020 12:38:30 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-181.ams2.redhat.com [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25C2A5C1B2;
- Tue, 18 Feb 2020 12:38:28 +0000 (UTC)
-Date: Tue, 18 Feb 2020 13:38:27 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v4 18/19] iotests: Add tests for invalid Quorum @replaces
-Message-ID: <20200218123827.GC6157@linux.fritz.box>
-References: <20200218103454.296704-1-mreitz@redhat.com>
- <20200218103454.296704-19-mreitz@redhat.com>
+ bh=zW4NSoi5gjgysU1oQwv6LsHcZfbRywwyVGL7muJFvBM=;
+ b=Z1AhVJQAmyB5Qy7kdMUobhpUC2y6wTobab3P3aTU/3ignsWgoS6n/U7/jNKhU6cyDYlVtT
+ 4rYq+jB7+Yc2ur/OguPcZuid5iYkN0ztKiPmyW25nmHJG0K/3tyt0V7UV7j9/PEQCYfUiA
+ eQHWr3TarjWfj2LvJKnnZaaCbU4XrCA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-dhDdJl1QMuiiRl-x4yo0WA-1; Tue, 18 Feb 2020 07:41:16 -0500
+Received: by mail-wm1-f71.google.com with SMTP id f66so1052905wmf.9
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 04:41:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G8QacokMAz6qPJRkMBDLXByiVc2NNbN3hP4O35y+c6o=;
+ b=j43v0lxT33aTmd4XVMpjGIqYcCXzdK+iJqb5KjLWxU5CfBCsc2qNlhn2DBb3D+uWc0
+ TIrJvuDkWGN6WTlRgTd6Fzs4pR/SD4X6vUyFw0obch4wwhq8skd1dV2AqvS5b0YJ3Qvc
+ MAHphjmYztv5uf0lEOTRGbKeOvKCEqpzAKky0bkousI1qby3vQMMDtCZMbZmYUbqHnmm
+ TZpHntf3KPrWgN7KyEkHb4zEEkbyzdtBbyt2L+lmcUGtNh0DwYWGaVHOSWZwKgJRqABq
+ oCbtG1yWyRyCZK8CpqJp+qfv1zldYo30GgEa61uhTnyF18Q9zX6u5Hy2WzXaVO1MQU/G
+ +9YQ==
+X-Gm-Message-State: APjAAAXPfQnvp/z3zukoUnhG19hKKN+Nn9ObQsAmcjEUpOaPXVsMsfmv
+ FwpwYdluX0yUQLPg9KX2YCvkrRMeJkGREY9efHnecJUcv9prWaJLH8o/Qm7LYEv2j+YGxpDEqNk
+ ivBw3ruYMDzylsWM=
+X-Received: by 2002:a05:6000:188:: with SMTP id
+ p8mr28392215wrx.336.1582029674947; 
+ Tue, 18 Feb 2020 04:41:14 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz0hm8SAgkLQ02oCHKeTRCRTmtKRjlRz9ycIQsBzjKfwws9srN3lwMsMW9rg6bqhWazbnYgDg==
+X-Received: by 2002:a05:6000:188:: with SMTP id
+ p8mr28392200wrx.336.1582029674706; 
+ Tue, 18 Feb 2020 04:41:14 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id x11sm3277281wmg.46.2020.02.18.04.41.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Feb 2020 04:41:13 -0800 (PST)
+Subject: Re: [PATCH] migration/block: rename BLOCK_SIZE macro
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200218110209.800294-1-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <69b0672d-7bf1-e2ba-24a4-575a61dd5937@redhat.com>
+Date: Tue, 18 Feb 2020 13:41:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200218103454.296704-19-mreitz@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: VWeRu1dOPcWZmoFEqOXLAA-1
+In-Reply-To: <20200218110209.800294-1-stefanha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: dhDdJl1QMuiiRl-x4yo0WA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -89,159 +108,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.02.2020 um 11:34 hat Max Reitz geschrieben:
-> Add two tests to see that you cannot replace a Quorum child with the
-> mirror job while the child is in use by a different parent.
+On 2/18/20 12:02 PM, Stefan Hajnoczi wrote:
+> Both <linux/fs.h> and <sys/mount.h> define BLOCK_SIZE macros.  Avoiding
+> using that name in block/migration.c.
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> I noticed this when including <liburing.h> (Linux io_uring) from
+> "block/aio.h" and compilation failed.  Although patches adding that
+> include haven't been sent yet, it makes sense to rename the macro now in
+> case someone else stumbles on it in the meantime.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tests/qemu-iotests/041     | 70 +++++++++++++++++++++++++++++++++++++-
->  tests/qemu-iotests/041.out |  4 +--
->  2 files changed, 71 insertions(+), 3 deletions(-)
+>   migration/block.c | 39 ++++++++++++++++++++-------------------
+>   1 file changed, 20 insertions(+), 19 deletions(-)
 >=20
-> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-> index 1d9e64ff6d..53c8671969 100755
-> --- a/tests/qemu-iotests/041
-> +++ b/tests/qemu-iotests/041
-> @@ -20,6 +20,7 @@
-> =20
->  import time
->  import os
-> +import re
->  import iotests
->  from iotests import qemu_img, qemu_io
-> =20
-> @@ -34,6 +35,8 @@ quorum_img3 =3D os.path.join(iotests.test_dir, 'quorum3=
-.img')
->  quorum_repair_img =3D os.path.join(iotests.test_dir, 'quorum_repair.img'=
+> diff --git a/migration/block.c b/migration/block.c
+> index c90288ed29..737b6499f9 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -27,8 +27,8 @@
+>   #include "migration/vmstate.h"
+>   #include "sysemu/block-backend.h"
+>  =20
+> -#define BLOCK_SIZE                       (1 << 20)
+> -#define BDRV_SECTORS_PER_DIRTY_CHUNK     (BLOCK_SIZE >> BDRV_SECTOR_BITS=
 )
->  quorum_snapshot_file =3D os.path.join(iotests.test_dir, 'quorum_snapshot=
-.img')
-> =20
-> +nbd_sock_path =3D os.path.join(iotests.test_dir, 'nbd.sock')
-> +
->  class TestSingleDrive(iotests.QMPTestCase):
->      image_len =3D 1 * 1024 * 1024 # MB
->      qmp_cmd =3D 'drive-mirror'
-> @@ -892,7 +895,8 @@ class TestRepairQuorum(iotests.QMPTestCase):
-> =20
->      def tearDown(self):
->          self.vm.shutdown()
-> -        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_file=
- ]:
-> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_file=
+> +#define BLK_MIG_BLOCK_SIZE           (1 << 20)
+> +#define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_=
+BITS)
+>  =20
+>   #define BLK_MIG_FLAG_DEVICE_BLOCK       0x01
+>   #define BLK_MIG_FLAG_EOS                0x02
+> @@ -133,7 +133,7 @@ static void blk_send(QEMUFile *f, BlkMigBlock * blk)
+>       uint64_t flags =3D BLK_MIG_FLAG_DEVICE_BLOCK;
+>  =20
+>       if (block_mig_state.zero_blocks &&
+> -        buffer_is_zero(blk->buf, BLOCK_SIZE)) {
+> +        buffer_is_zero(blk->buf, BLK_MIG_BLOCK_SIZE)) {
+>           flags |=3D BLK_MIG_FLAG_ZERO_BLOCK;
+>       }
+>  =20
+> @@ -154,7 +154,7 @@ static void blk_send(QEMUFile *f, BlkMigBlock * blk)
+>           return;
+>       }
+>  =20
+> -    qemu_put_buffer(f, blk->buf, BLOCK_SIZE);
+> +    qemu_put_buffer(f, blk->buf, BLK_MIG_BLOCK_SIZE);
+>   }
+>  =20
+>   int blk_mig_active(void)
+> @@ -309,7 +309,7 @@ static int mig_save_device_bulk(QEMUFile *f, BlkMigDe=
+vState *bmds)
+>       }
+>  =20
+>       blk =3D g_new(BlkMigBlock, 1);
+> -    blk->buf =3D g_malloc(BLOCK_SIZE);
+> +    blk->buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
+>       blk->bmds =3D bmds;
+>       blk->sector =3D cur_sector;
+>       blk->nr_sectors =3D nr_sectors;
+> @@ -350,7 +350,8 @@ static int set_dirty_tracking(void)
+>  =20
+>       QSIMPLEQ_FOREACH(bmds, &block_mig_state.bmds_list, entry) {
+>           bmds->dirty_bitmap =3D bdrv_create_dirty_bitmap(blk_bs(bmds->bl=
+k),
+> -                                                      BLOCK_SIZE, NULL, =
+NULL);
+> +                                                      BLK_MIG_BLOCK_SIZE=
 ,
-> +                                 nbd_sock_path ]:
->              # Do a try/except because the test may have deleted some ima=
-ges
->              try:
->                  os.remove(i)
-> @@ -1032,6 +1036,70 @@ class TestRepairQuorum(iotests.QMPTestCase):
->          self.assert_has_block_node("repair0", quorum_repair_img)
->          self.vm.assert_block_path('quorum0', '/children.1', 'repair0')
-> =20
-> +    def test_with_other_parent(self):
-> +        """
-> +        Check that we cannot replace a Quorum child when it has other
-> +        parents.
-> +        """
-> +        result =3D self.vm.qmp('nbd-server-start',
-> +                             addr=3D{
-> +                                 'type': 'unix',
-> +                                 'data': {'path': nbd_sock_path}
-> +                             })
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', device=
-=3D'quorum0',
-> +                             sync=3D'full', node_name=3D'repair0', repla=
-ces=3D'img1',
-> +                             target=3Dquorum_repair_img, format=3Diotest=
-s.imgfmt)
-> +        self.assert_qmp(result, 'error/desc',
-> +                        "Cannot replace 'img1' by a node mirrored from "
-> +                        "'quorum0', because it cannot be guaranteed that=
- doing "
-> +                        "so would not lead to an abrupt change of visibl=
-e data")
-> +
-> +    def test_with_other_parents_after_mirror_start(self):
-> +        """
-> +        The same as test_with_other_parent(), but add the NBD server
-> +        only when the mirror job is already running.
-> +        """
-> +        result =3D self.vm.qmp('nbd-server-start',
-> +                             addr=3D{
-> +                                 'type': 'unix',
-> +                                 'data': {'path': nbd_sock_path}
-> +                             })
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', device=
-=3D'quorum0',
-> +                             sync=3D'full', node_name=3D'repair0', repla=
-ces=3D'img1',
-> +                             target=3Dquorum_repair_img, format=3Diotest=
-s.imgfmt)
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
-> +        self.assert_qmp(result, 'return', {})
-> +
-> +        # The full error message goes to stderr, we will check it later
-> +        self.complete_and_wait('mirror',
-> +                               completion_error=3D'Operation not permitt=
-ed')
-> +
-> +        # Should not have been replaced
-> +        self.vm.assert_block_path('quorum0', '/children.1', 'img1')
-> +
-> +        # Check the full error message now
-> +        self.vm.shutdown()
-> +        log =3D self.vm.get_log()
-> +        log =3D re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
-> +        log =3D re.sub(r'^Formatting.*\n', '', log)
-> +        log =3D re.sub(r'\n\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
-> +        log =3D re.sub(r'^qemu-system-[^:]*: ', '', log)
+> +                                                      NULL, NULL);
+>           if (!bmds->dirty_bitmap) {
+>               ret =3D -errno;
+>               goto fail;
+> @@ -548,7 +549,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigD=
+evState *bmds,
+>               bdrv_dirty_bitmap_unlock(bmds->dirty_bitmap);
+>  =20
+>               blk =3D g_new(BlkMigBlock, 1);
+> -            blk->buf =3D g_malloc(BLOCK_SIZE);
+> +            blk->buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
+>               blk->bmds =3D bmds;
+>               blk->sector =3D sector;
+>               blk->nr_sectors =3D nr_sectors;
+> @@ -770,7 +771,7 @@ static int block_save_iterate(QEMUFile *f, void *opaq=
+ue)
+>  =20
+>       /* control the rate of transfer */
+>       blk_mig_lock();
+> -    while (block_mig_state.read_done * BLOCK_SIZE <
+> +    while (block_mig_state.read_done * BLK_MIG_BLOCK_SIZE <
+>              qemu_file_get_rate_limit(f) &&
+>              block_mig_state.submitted < MAX_PARALLEL_IO &&
+>              (block_mig_state.submitted + block_mig_state.read_done) <
+> @@ -874,13 +875,13 @@ static void block_save_pending(QEMUFile *f, void *o=
+paque, uint64_t max_size,
+>       qemu_mutex_unlock_iothread();
+>  =20
+>       blk_mig_lock();
+> -    pending +=3D block_mig_state.submitted * BLOCK_SIZE +
+> -               block_mig_state.read_done * BLOCK_SIZE;
+> +    pending +=3D block_mig_state.submitted * BLK_MIG_BLOCK_SIZE +
+> +               block_mig_state.read_done * BLK_MIG_BLOCK_SIZE;
+>       blk_mig_unlock();
+>  =20
+>       /* Report at least one block pending during bulk phase */
+>       if (pending <=3D max_size && !block_mig_state.bulk_completed) {
+> -        pending =3D max_size + BLOCK_SIZE;
+> +        pending =3D max_size + BLK_MIG_BLOCK_SIZE;
+>       }
+>  =20
+>       DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
+> @@ -901,7 +902,7 @@ static int block_load(QEMUFile *f, void *opaque, int =
+version_id)
+>       int nr_sectors;
+>       int ret;
+>       BlockDriverInfo bdi;
+> -    int cluster_size =3D BLOCK_SIZE;
+> +    int cluster_size =3D BLK_MIG_BLOCK_SIZE;
+>  =20
+>       do {
+>           addr =3D qemu_get_be64(f);
+> @@ -939,11 +940,11 @@ static int block_load(QEMUFile *f, void *opaque, in=
+t version_id)
+>  =20
+>                   ret =3D bdrv_get_info(blk_bs(blk), &bdi);
+>                   if (ret =3D=3D 0 && bdi.cluster_size > 0 &&
+> -                    bdi.cluster_size <=3D BLOCK_SIZE &&
+> -                    BLOCK_SIZE % bdi.cluster_size =3D=3D 0) {
+> +                    bdi.cluster_size <=3D BLK_MIG_BLOCK_SIZE &&
+> +                    BLK_MIG_BLOCK_SIZE % bdi.cluster_size =3D=3D 0) {
+>                       cluster_size =3D bdi.cluster_size;
+>                   } else {
+> -                    cluster_size =3D BLOCK_SIZE;
+> +                    cluster_size =3D BLK_MIG_BLOCK_SIZE;
+>                   }
+>               }
+>  =20
+> @@ -962,14 +963,14 @@ static int block_load(QEMUFile *f, void *opaque, in=
+t version_id)
+>                   int64_t cur_addr;
+>                   uint8_t *cur_buf;
+>  =20
+> -                buf =3D g_malloc(BLOCK_SIZE);
+> -                qemu_get_buffer(f, buf, BLOCK_SIZE);
+> -                for (i =3D 0; i < BLOCK_SIZE / cluster_size; i++) {
+> +                buf =3D g_malloc(BLK_MIG_BLOCK_SIZE);
+> +                qemu_get_buffer(f, buf, BLK_MIG_BLOCK_SIZE);
+> +                for (i =3D 0; i < BLK_MIG_BLOCK_SIZE / cluster_size; i++=
+) {
+>                       cur_addr =3D addr * BDRV_SECTOR_SIZE + i * cluster_=
+size;
+>                       cur_buf =3D buf + i * cluster_size;
+>  =20
+>                       if ((!block_mig_state.zero_blocks ||
+> -                        cluster_size < BLOCK_SIZE) &&
+> +                        cluster_size < BLK_MIG_BLOCK_SIZE) &&
+>                           buffer_is_zero(cur_buf, cluster_size)) {
+>                           ret =3D blk_pwrite_zeroes(blk, cur_addr,
+>                                                   cluster_size,
+>=20
 
-I would have applied the series, but:
-
-+.........................F................................................=
-....................
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+FAIL: test_with_other_parents_after_mirror_start (__main__.TestRepairQuoru=
-m)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1099, in test_with_other_parents_after_mirror_start
-+    "it can no longer be guaranteed that doing so would " +
-+AssertionError: "qemu: Can no longer replace 'img1' by 're[107 chars]data"=
- !=3D "Can no longer replace 'img1' by 'repair0'[101 chars]data"
-+- qemu: Can no longer replace 'img1' by 'repair0', because it can no longe=
-r be guaranteed that doing so would not lead to an abrupt change of visible=
- data
-+? ------
-++ Can no longer replace 'img1' by 'repair0', because it can no longer be g=
-uaranteed that doing so would not lead to an abrupt change of visible data
-+
-+
-
-If you agree, I can just change this line while applying into:
-
-    log =3D re.sub(r'^qemu[^:]*: ', '', log)
-
-Kevin
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
