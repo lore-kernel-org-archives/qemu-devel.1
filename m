@@ -2,69 +2,87 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0B5C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B99B7C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBF6224125
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:11:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBF6224125
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8625724125
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:11:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ap0lFfBa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8625724125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48Gx-0005Z5-4y
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:11:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45132)
+	id 1j48Hm-00070A-Kv
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:11:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1j48FK-0003zG-TU
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:09:27 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j48G1-000500-B6
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1j48FJ-0000Ll-Ra
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:09:26 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:42477)
+ (envelope-from <richard.henderson@linaro.org>) id 1j48Fz-0001uj-T4
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:10:09 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:50641)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1j48FI-0000JT-Q8
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:09:24 -0500
-Received: by mail-oi1-f193.google.com with SMTP id j132so21223705oih.9
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:09:24 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j48Fz-0001s4-M4
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:10:07 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id r67so1447093pjb.0
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:10:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=macsUf7RwNXBE0fmKKCjQlSCUWHuv/3Gu30XsvyGcpY=;
+ b=ap0lFfBawvYsao7AIava1O4L4J8JPIPlsgvKjLKk/m5K5/K6dRHpWbzlRkGL52Tr1l
+ jYY/jCvZR2BGfEwmRv1iecNjZ19mAJA7O0zP5UdSsdv3yvWZQilzWwqSM+NcE/dss3y9
+ RPjuQ8zG6DiR4KK6YDpdFD6qnBY8uwkwnIhJsLVVvlGcCAW0TNwsmjeGXUA0E8gly8li
+ XnNfswl1eAgkgWM0AqbkaWhtK2Xh0kfA5GLG/utz9bvhge95lWk9Q+ZHf/DjqASJsq9o
+ Pclnq9mSd2dcKuGTuajCSJqo2mNjY6h5QMES8U4ylqvI/OT0ihUVCy31I+ufZdYtSJd+
+ DbGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4zbrnNvTNHgXxwjMJnfhT5sGHXVeYA3py+fC4nnQX1g=;
- b=jrOW6pUToU6TNrcDWyxhy0nsi3i9l+JLlr9P6ROo4FPwUF9TPJcO5w//QSxf038rAi
- 1R3uVahUXA9hPFt05jN+Und5Ynt+aw1PXWBNKu8a8X1+lmI6ZKCcP61vRsjF1bH3na6J
- 0xU/fipLEW8o5My6NBrMwqAtZLDHu0qZZkzAfl7p33L4WSS+EYNEhW3lq2y0ywiMGOf4
- 8Z8ttVQULbed19UzXfK7F7rUB1row4JtQgFWSvIurvgUBf4g6nTX1ac/OvLyk68gbcUk
- wkdt4OIeUOsOgMt13eJM/ytQVlNhci7ZEoZvh4s5HUUDbr3rZuFMcLw2W9JNuLIpcT/W
- kc4g==
-X-Gm-Message-State: APjAAAUblcjYrwXXA8uuA4o+gg71DtY4g1vDQb4TSKHRRocCqGupz6fg
- aTFdrNiPvtl2fFyAzleCLMCQ5BcKGngWIbl3jIM=
-X-Google-Smtp-Source: APXvYqwnKTCIB9GTLLpEL5W7g+LauaFKN7iZKQPh2++RZaJoaT+SssBYOvEoCXI/Jb080pGI7GySD9qCX6q6Z+PF39M=
-X-Received: by 2002:aca:48cd:: with SMTP id v196mr2308514oia.102.1582052963942; 
- Tue, 18 Feb 2020 11:09:23 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=macsUf7RwNXBE0fmKKCjQlSCUWHuv/3Gu30XsvyGcpY=;
+ b=Yo0pi1GITZLwDGvVTLWUgLDbwEQvc1KPot6RQd3Ci59lnvwoKpV8+k9QFBn1T+H/4q
+ nu0LzHj/qSD0hW4Kz18ZhEBRxHZqSTaKFh71Uxpv6CFAx9s6bAF5k2MVQso1Sk9KbieF
+ 7arooNuSqIw26TYSOAhkGc8RkqTyNb4Fumc7LrC6lOFjl6ODHjqDU3eIGISSORRHEPZn
+ FWLanuYWAQZFcFGmStemxi+axFAUIeY1UzrhGGfvT9DjwbHsrY+UjZZ7pPr3UBW2dK7o
+ uJcpt4EzxFdIObG6fCjMlHdbGuegEZZ84snv54FssK6l4rGd8BTN8lUdAmNydZ0YXAlG
+ fX0w==
+X-Gm-Message-State: APjAAAVtr1r57L0oXHKJDtWonaeFQw0oj3lbniPJrr7aLgMgv7WFlYni
+ l4FYlpkm7DrkrmAzHLhkrVBL1ZYpAZc=
+X-Google-Smtp-Source: APXvYqzH8k4Ah+pjVnB7hJ6NAis1rFo0mgIAAOzKA+kivGUT4336d3QE8iYPFKFftdUAwcPx2xo5xA==
+X-Received: by 2002:a17:90a:5285:: with SMTP id
+ w5mr4470243pjh.77.1582053006040; 
+ Tue, 18 Feb 2020 11:10:06 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id i68sm5139399pfe.173.2020.02.18.11.10.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Feb 2020 11:10:05 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 4/7] target/arm: Honor the HCR_EL2.TACR bit
+Date: Tue, 18 Feb 2020 11:09:55 -0800
+Message-Id: <20200218190958.745-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200218190958.745-1-richard.henderson@linaro.org>
+References: <20200218190958.745-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200218151812.7816-1-geert+renesas@glider.be>
- <20200218151812.7816-5-geert+renesas@glider.be>
- <e2530fff-a17c-ae90-ba92-360b828582da@infradead.org>
-In-Reply-To: <e2530fff-a17c-ae90-ba92-360b828582da@infradead.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 18 Feb 2020 20:09:12 +0100
-Message-ID: <CAMuHMdU9=vgO6ohoYTQMGjoFzhRy=4hYGjVyRsTK2uoNsU08XQ@mail.gmail.com>
-Subject: Re: [PATCH v5 4/5] docs: gpio: Add GPIO Aggregator documentation
-To: Randy Dunlap <rdunlap@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.193
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,73 +94,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Randy,
+This bit traps EL1 access to the auxiliary control registers.
 
-On Tue, Feb 18, 2020 at 7:30 PM Randy Dunlap <rdunlap@infradead.org> wrote:
-> On 2/18/20 7:18 AM, Geert Uytterhoeven wrote:
-> > Document the GPIO Aggregator, and the two typical use-cases.
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-> > --- /dev/null
-> > +++ b/Documentation/admin-guide/gpio/gpio-aggregator.rst
-> > @@ -0,0 +1,102 @@
-> > +.. SPDX-License-Identifier: GPL-2.0-only
-> > +
-> > +GPIO Aggregator
-> > +===============
-> > +
-> > +The GPIO Aggregator allows to aggregate GPIOs, and expose them as a new
->
-> "allows" really wants an object following the verb [although the kernel sources
-> and docs have many cases of it not having an object].  Something like
->
->                        allows {you, one, someone, users, a user} to aggregate
-
-Thanks for the hint!
-
-> > +             Example: Instantiate a new GPIO aggregator by aggregating GPIO
-> > +             19 of "e6052000.gpio" and GPIOs 20-21 of "gpiochip2" into a new
-> > +             gpio_chip:
-> > +
-> > +             .. code-block:: bash
-> > +
-> > +                 echo 'e6052000.gpio 19 gpiochip2 20-21' > new_device
-> > +
->
-> Does the above command tell the user that the new device is named
-> "gpio-aggregator.0", as used below?
-
-Yes, it will be printed through the kernel log, cfr. the sample session in
-the cover letter.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index dc99ee5d18..52b6e68659 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -553,6 +553,16 @@ static CPAccessResult access_tsw(CPUARMState *env, const ARMCPRegInfo *ri,
+     return CP_ACCESS_OK;
+ }
+ 
++/* Check for traps from EL1 due to HCR_EL2.TACR.  */
++static CPAccessResult access_tacr(CPUARMState *env, const ARMCPRegInfo *ri,
++                                  bool isread)
++{
++    if (arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_TACR)) {
++        return CP_ACCESS_TRAP_EL2;
++    }
++    return CP_ACCESS_OK;
++}
++
+ static void dacr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -6911,8 +6921,8 @@ static const ARMCPRegInfo ats1cp_reginfo[] = {
+ static const ARMCPRegInfo actlr2_hactlr2_reginfo[] = {
+     { .name = "ACTLR2", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 3,
+-      .access = PL1_RW, .type = ARM_CP_CONST,
+-      .resetvalue = 0 },
++      .access = PL1_RW, .accessfn = access_tacr,
++      .type = ARM_CP_CONST, .resetvalue = 0 },
+     { .name = "HACTLR2", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 3,
+       .access = PL2_RW, .type = ARM_CP_CONST,
+@@ -7668,8 +7678,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         ARMCPRegInfo auxcr_reginfo[] = {
+             { .name = "ACTLR_EL1", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 0, .crn = 1, .crm = 0, .opc2 = 1,
+-              .access = PL1_RW, .type = ARM_CP_CONST,
+-              .resetvalue = cpu->reset_auxcr },
++              .access = PL1_RW, .accessfn = access_tacr,
++              .type = ARM_CP_CONST, .resetvalue = cpu->reset_auxcr },
+             { .name = "ACTLR_EL2", .state = ARM_CP_STATE_BOTH,
+               .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 0, .opc2 = 1,
+               .access = PL2_RW, .type = ARM_CP_CONST,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.20.1
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
