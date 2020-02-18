@@ -2,78 +2,71 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E749C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 744D5C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:11:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF0C222B48
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:10:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzy3yl2K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0C222B48
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B6F5206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:11:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6F5206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42de-0007ap-3m
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:10:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39695)
+	id 1j42em-0000rW-EY
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:11:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j42Eq-0007HK-OY
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:33 -0500
+ (envelope-from <clg@kaod.org>) id 1j42Tp-0000v3-20
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:00:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j42Ep-0001w8-OI
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39774
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1j42Tn-00005a-Or
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:00:00 -0500
+Received: from 3.mo7.mail-out.ovh.net ([46.105.34.113]:48362)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j42Ep-0001vu-KJ
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:44:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582029871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tEuTkgk8Im2JBBDdfMyL3Qhb/Rte2TyVItcIYV3lz8A=;
- b=bzy3yl2K/e6tf/m5lGC2cWchV7ZrAv3UtZDfNUuegPW3PBoYwItvMQ9JwyX7jKVMA56pCP
- Dfx4eTA4JmF41RccSsq6VT8mMkoOCx4g1/+HHXWOw+Raf8XexW9YNZbvRWXhT7ILdD1wV5
- PaWvmAJIYVu+QzqpoA8zgYbSAHXWNB0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-iceRAwNAPnC2FbrhpTzGdQ-1; Tue, 18 Feb 2020 07:44:29 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4674713E4;
- Tue, 18 Feb 2020 12:44:28 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B689760C80;
- Tue, 18 Feb 2020 12:44:27 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 32/33] block: Pass BdrvChildRole in remaining cases
-Date: Tue, 18 Feb 2020 13:42:41 +0100
-Message-Id: <20200218124242.584644-33-mreitz@redhat.com>
-In-Reply-To: <20200218124242.584644-1-mreitz@redhat.com>
-References: <20200218124242.584644-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1j42Tn-00004s-I0
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 07:59:59 -0500
+Received: from player714.ha.ovh.net (unknown [10.108.54.119])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 18402152E86
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 13:59:57 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id 0B254F6D760F;
+ Tue, 18 Feb 2020 12:59:44 +0000 (UTC)
+Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200217021217.95766-1-aik@ozlabs.ru>
+ <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
+ <44499677-3099-56c6-7249-afa8eccc7668@ozlabs.ru>
+ <bdfb7d07-c5fd-c21e-f812-4a0a747b02c3@kaod.org>
+ <0c21bb33-e6c0-c117-c9e7-dda16d3b13a5@ozlabs.ru>
+ <4a8261b3-3842-869c-0997-b997229ff3f6@ozlabs.ru>
+ <20649920-f867-7193-e86e-89b42ec6ae97@kaod.org>
+ <474f7204-fcee-ae4b-eb9a-d5d0a987c4a2@kaod.org>
+Message-ID: <74ccc95e-d4bb-e540-5d63-ab057c504806@kaod.org>
+Date: Tue, 18 Feb 2020 13:59:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: iceRAwNAPnC2FbrhpTzGdQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <474f7204-fcee-ae4b-eb9a-d5d0a987c4a2@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 16126264368615295808
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrjeekgdegjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuhffvfhfkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedugedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.34.113
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,81 +78,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These calls have no real use for the child role yet, but it will not
-harm to give one.
+On 2/18/20 1:48 PM, C=C3=A9dric Le Goater wrote:
+> On 2/18/20 10:40 AM, C=C3=A9dric Le Goater wrote:
+>> On 2/18/20 10:10 AM, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 18/02/2020 20:05, Alexey Kardashevskiy wrote:
+>>>>
+>>>>
+>>>> On 18/02/2020 18:12, C=C3=A9dric Le Goater wrote:
+>>>>> On 2/18/20 1:30 AM, Alexey Kardashevskiy wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 17/02/2020 20:48, C=C3=A9dric Le Goater wrote:
+>>>>>>> On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
+>>>>>>>> The following changes since commit 05943fb4ca41f626078014c032778=
+1815c6584c5:
+>>>>>>>>
+>>>>>>>>   ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +=
+1100)
+>>>>>>>>
+>>>>>>>> are available in the Git repository at:
+>>>>>>>>
+>>>>>>>>   git@github.com:aik/qemu.git tags/qemu-slof-20200217
+>>>>>>>>
+>>>>>>>> for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d0=
+298aac2:
+>>>>>>>>
+>>>>>>>>   pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100=
+)
+>>>>>>>>
+>>>>>>>> ----------------------------------------------------------------
+>>>>>>>> Alexey Kardashevskiy (1):
+>>>>>>>>       pseries: Update SLOF firmware image
+>>>>>>>>
+>>>>>>>>  pc-bios/README   |   2 +-
+>>>>>>>>  pc-bios/slof.bin | Bin 931032 -> 968560 bytes
+>>>>>>>>  roms/SLOF        |   2 +-
+>>>>>>>>  3 files changed, 2 insertions(+), 2 deletions(-)
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> *** Note: this is not for master, this is for pseries
+>>>>>>>>
+>>>>>>>
+>>>>>>> Hello Alexey,
+>>>>>>>
+>>>>>>> QEMU fails to boot from disk. See below.
+>>>>>>
+>>>>>>
+>>>>>> It does boot mine (fedora 30, ubuntu 18.04), see below. I believe =
+I
+>>>>>> could have broken something but I need more detail. Thanks,
+>>>>>
+>>>>> fedora31 boots but not ubuntu 19.10. Could it be GRUB version 2.04 =
+?=20
+>>>>
+>>>>
+>>>> No, not that either:
+>>>
+>>>
+>>> but it might be because of power9 - I only tried power8, rsyncing the
+>>> image to a p9 machine now...
+>>
+>> Here is the disk :=20
+>>
+>> Disk /dev/sda: 50 GiB, 53687091200 bytes, 104857600 sectors
+>> Disk model: QEMU HARDDISK  =20
+>> Units: sectors of 1 * 512 =3D 512 bytes
+>> Sector size (logical/physical): 512 bytes / 512 bytes
+>> I/O size (minimum/optimal): 512 bytes / 512 bytes
+>> Disklabel type: gpt
+>> Disk identifier: 27DCE458-231A-4981-9FF1-983F87C2902D
+>>
+>> Device         Start       End   Sectors Size Type
+>> /dev/sda1       2048     16383     14336   7M PowerPC PReP boot
+>> /dev/sda2      16384 100679679 100663296  48G Linux filesystem
+>> /dev/sda3  100679680 104857566   4177887   2G Linux swap
+>>
+>>
+>> GPT ?=20
+>=20
+> For the failure, I bisected up to :
+>=20
+> f12149908705 ("ext2: Read all 64bit of inode number")
 
-Notably, the bdrv_root_attach_child() call in blockjob.c is left
-unmodified because there is not much the generic BlockJob object wants
-from its children.
+Here is a possible fix for it. I did some RPN on my hp28s in the past=20
+but I am not forth fluent.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+"slash not found" is still there though.=20
+
+Cheers,
+
+C.
+
+
+From 92dc9f6dc7c6434419306d5a382adb42169b712a Mon Sep 17 00:00:00 2001
+From: =3D?UTF-8?q?C=3DC3=3DA9dric=3D20Le=3D20Goater?=3D <clg@kaod.org>
+Date: Tue, 18 Feb 2020 13:54:54 +0100
+Subject: [PATCH] ext2: Fix 64bit inode number
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes: f12149908705 ("ext2: Read all 64bit of inode number")
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- block/block-backend.c | 11 +++++++----
- block/vvfat.c         |  2 +-
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ slof/fs/packages/ext2-files.fs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 9e0078bfb5..e655e15675 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -401,8 +401,9 @@ BlockBackend *blk_new_open(const char *filename, const =
-char *reference,
-         return NULL;
-     }
-=20
--    blk->root =3D bdrv_root_attach_child(bs, "root", &child_root, 0, blk->=
-ctx,
--                                       perm, BLK_PERM_ALL, blk, errp);
-+    blk->root =3D bdrv_root_attach_child(bs, "root", &child_root,
-+                                       BDRV_CHILD_FILTERED | BDRV_CHILD_PR=
-IMARY,
-+                                       blk->ctx, perm, BLK_PERM_ALL, blk, =
-errp);
-     if (!blk->root) {
-         blk_unref(blk);
-         return NULL;
-@@ -812,8 +813,10 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState =
-*bs, Error **errp)
- {
-     ThrottleGroupMember *tgm =3D &blk->public.throttle_group_member;
-     bdrv_ref(bs);
--    blk->root =3D bdrv_root_attach_child(bs, "root", &child_root, 0, blk->=
-ctx,
--                                       blk->perm, blk->shared_perm, blk, e=
-rrp);
-+    blk->root =3D bdrv_root_attach_child(bs, "root", &child_root,
-+                                       BDRV_CHILD_FILTERED | BDRV_CHILD_PR=
-IMARY,
-+                                       blk->ctx, blk->perm, blk->shared_pe=
-rm,
-+                                       blk, errp);
-     if (blk->root =3D=3D NULL) {
-         return -EPERM;
-     }
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 8f4ff5a97e..d4f4218924 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3186,7 +3186,7 @@ static int enable_write_target(BlockDriverState *bs, =
-Error **errp)
-     options =3D qdict_new();
-     qdict_put_str(options, "write-target.driver", "qcow");
-     s->qcow =3D bdrv_open_child(s->qcow_filename, options, "write-target",=
- bs,
--                              &child_vvfat_qcow, 0, false, errp);
-+                              &child_vvfat_qcow, BDRV_CHILD_DATA, false, e=
-rrp);
-     qobject_unref(options);
-     if (!s->qcow) {
-         ret =3D -EINVAL;
+diff --git a/slof/fs/packages/ext2-files.fs b/slof/fs/packages/ext2-files=
+.fs
+index b6a7880bd88e..f1d9fdfd67e2 100644
+--- a/slof/fs/packages/ext2-files.fs
++++ b/slof/fs/packages/ext2-files.fs
+@@ -152,7 +152,7 @@ CONSTANT /ext4-ee
+   dup
+   8 + l@-le               \ reads bg_inode_table_lo
+   swap 28 + l@-le         \ reads bg_inode_table_hi
+-  32 lshift or
++  32 rshift or
+   block-size @ *          \ # in group, inode table
+   swap inode-size @ * + xlsplit seek drop  inode @ inode-size @ read dro=
+p
+ ;
 --=20
-2.24.1
+2.21.1
+
+
+
 
 
