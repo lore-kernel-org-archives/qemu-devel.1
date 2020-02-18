@@ -2,83 +2,63 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB74C34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F062C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E14C8206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:14:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6VjcoC9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E14C8206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E721206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E721206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42hS-0005ZM-44
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:14:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43007)
+	id 1j42iZ-0008IJ-DD
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:15:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44918)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j42Zc-0001Eq-11
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:06:04 -0500
+ (envelope-from <jianjay.zhou@huawei.com>) id 1j42hZ-0006Ep-54
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:14:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j42Za-0003XO-Pe
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:05:59 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30623
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jianjay.zhou@huawei.com>) id 1j42hX-0006qG-KA
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:14:12 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2498 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j42Za-0003Wi-LO
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:05:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582031157;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LVMPRxtMzmEDKU7cW6BwX/HohxlnHYsLMq8UCFg2seg=;
- b=d6VjcoC9TdIvTQaKfH38qGVBjA8Lzm+KdWtAr8+rKWsEuQxEfbfEaalomL6dvF/D3xw+QY
- OKazkyTUQ4RIUxRdgi+2oMatY0n59HodZfPO2dRPDqjFAcONSDgYOj/TOO5yeSYSAcfCTe
- OU2ZhzGv8i9XDTy3H9VCfjM+BwJqJrQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-vuT8RaWIPJenZ4HTdV1c7A-1; Tue, 18 Feb 2020 08:05:09 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39AB0800D48;
- Tue, 18 Feb 2020 13:05:08 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DAC1226571;
- Tue, 18 Feb 2020 13:05:07 +0000 (UTC)
-Subject: Re: [PATCH v3 03/33] block: Add BdrvChildRole and BdrvChildRoleBits
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20200218124242.584644-1-mreitz@redhat.com>
- <20200218124242.584644-4-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <676389c2-6ff4-97c6-506a-20aa2d2bbfe4@redhat.com>
-Date: Tue, 18 Feb 2020 07:05:07 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+ id 1j42hX-0006mI-3u
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:14:11 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 763E98507C88AB9936DF;
+ Tue, 18 Feb 2020 21:13:58 +0800 (CST)
+Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
+ DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0439.000;
+ Tue, 18 Feb 2020 21:13:47 +0800
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVkw==
+Date: Tue, 18 Feb 2020 13:13:47 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20200218124242.584644-4-mreitz@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: vuT8RaWIPJenZ4HTdV1c7A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 45.249.212.188
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,36 +70,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "Liujinsong \(Paul\)" <liu.jinsong@huawei.com>,
+ "linfeng \(M\)" <linfeng23@huawei.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "Zhoujian \(jay\)" <jianjay.zhou@huawei.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Huangweidong \(C\)" <weidong.huang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/18/20 6:42 AM, Max Reitz wrote:
-> This mask will supplement BdrvChildClass when it comes to what role (or
-> combination of roles) a child takes for its parent.  It consists of
-> BdrvChildRoleBits values (which is an enum).
-> 
-> Because empty enums are not allowed, let us just start with it filled.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   include/block/block.h | 38 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 38 insertions(+)
+Hi all,
 
-> +
-> +/* Mask of BdrvChildRoleBits values */
-> +typedef unsigned int BdrvChildRole;
-> +
+We found that the guest will be soft-lockup occasionally when live migratin=
+g a 60 vCPU,
+512GiB huge page and memory sensitive VM. The reason is clear, almost all o=
+f the vCPUs
+are waiting for the KVM MMU spin-lock to create 4K SPTEs when the huge page=
+s are
+write protected. This phenomenon is also described in this patch set:
+https://patchwork.kernel.org/cover/11163459/
+which aims to handle page faults in parallel more efficiently.
 
-I like how it turned out (both the additional comments earlier on, and 
-the typedef for documentation purposes).
+Our idea is to use the migration thread to touch all of the guest memory in=
+ the
+granularity of 4K before enabling dirty logging. To be more specific, we sp=
+lit all the
+PDPE_LEVEL SPTEs into DIRECTORY_LEVEL SPTEs as the first step, and then spl=
+it all
+the DIRECTORY_LEVEL SPTEs into PAGE_TABLE_LEVEL SPTEs as the following step=
+.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+However, there is a side effect. It takes more time to clear the D-bits of =
+the last level
+SPTEs when enabling dirty logging, which is held the QEMU BQL and KVM mmu-l=
+ock
+simultaneously. To solve this issue, the idea of dirty logging gradually in=
+ small chunks
+is proposed too, here is the link for v1:
+https://patchwork.kernel.org/patch/11388227/
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Under the Intel(R) Xeon(R) Gold 6161 CPU @ 2.20GHz environment, some tests =
+has
+been done with a 60U256G VM which enables numa balancing using the demo we
+written. We start a process which has 60 threads to randomly touch most of =
+the
+memory in VM, meanwhile count the function execution time in VM when live
+migration. The change_prot_numa() is chosen since it will not release the C=
+PU
+unless its work has finished. Here is the number:
 
+                    Original                 The demo we written
+[1]                  > 9s (most of the time)     ~5ms
+Hypervisor cost       > 90%                   ~3%
+
+[1]: execution time of the change_prot_numa() function
+
+If the time in [1] bigger than 20s, it will be result in soft-lockup.
+
+I know it is a little hacking to do so, but my question is: is this worth t=
+rying to split
+EPT huge pages in advance of dirty logging?
+
+Any advice will be appreciated, thanks.
+
+Regards,
+Jay Zhou
 
