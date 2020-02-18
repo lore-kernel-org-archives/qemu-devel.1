@@ -2,80 +2,79 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FEBC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CB9C34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1E1E208C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44FD624654
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 18:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IMOEfXBW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E1E208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5MQW8n7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44FD624654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j47RY-0001gt-4d
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:18:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40651)
+	id 1j47Tm-00031q-9w
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 13:20:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j47Qk-00018y-ME
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:17:11 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j47T2-0002Zs-L4
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:19:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j47Qj-0002Rf-CW
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:17:10 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35217)
+ (envelope-from <alistair23@gmail.com>) id 1j47T0-0006JF-8v
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:19:32 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:36327)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j47Qj-0002Pg-7K
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 13:17:09 -0500
-Received: by mail-ot1-x343.google.com with SMTP id r16so20487338otd.2
- for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 10:17:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j47Sw-0006A5-Ae; Tue, 18 Feb 2020 13:19:30 -0500
+Received: by mail-lj1-x243.google.com with SMTP id r19so24099355ljg.3;
+ Tue, 18 Feb 2020 10:19:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1IU1z/lDGDjqG+SqTPFK48+J0dlcBWNFWyaGTdTIn+Y=;
- b=IMOEfXBW1/AymufZSCU0E1TJjvP0pdJN27cX/ER8cmeSJ+CYBHawcV4vzfJoSfZcq+
- aFurAGQETH0gKjeRXc8/B0d/DDRFTLu/kgEbTamL9RqmdasgGmRyf6rLyc48wx/TtBV9
- 8Ungr/8xETk8h+YAiJYKP24ie4x7hiPsQsGHDQVs1HhU1kL1KM5aSB7L77bShp8alAsh
- 4Quxkq3gZfYElzk2H6eklOCcLWOoKt9uNY9ifqUWr0tyAOLApEqkFRUHU98+WqHoCjsy
- /Bs/mOzeKK9dUxnKsZ32yj2zxQUyr8QHi3UDqbq8WzNnQCmjMi5DbCP6yWeJSpH+ISmP
- Tb/A==
+ :cc; bh=VP3qnJmQRqV+XQYAGT9k1cSnf5/86KHVV4eznGb3P8E=;
+ b=O5MQW8n73unvJHEuhQWuNG2Jo1RE9XYZSPoPEqd9Q7ghRlGaUbaNX/ojn8prrT2yia
+ /n8w9jaeeYIBwqjGzNrB2mjYS/TeEMiC8NKyaPcNrNCtX5WuVypmssIGnmSc36c79z5Y
+ PU8EKfs0IwpQX1ZTbZaSdgfoofWkiYs/JclNsEJS5BJ3hHa0YNJfZ3D7XYWGVaDuK1G2
+ vMt8ORDAKFJLEsqY8aI8G0jN2hK0/0qxc3JlvR+2xYloFmdMmCzraK/ocUCKH9cruXIq
+ xsnWItDyFPpmx06gPT8YRvWrfMLqUKvEr10XG9w8014Y5k/hY2ekStMIvMfQ7clxNw5N
+ M2GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=1IU1z/lDGDjqG+SqTPFK48+J0dlcBWNFWyaGTdTIn+Y=;
- b=otLI1nFtqtLP2UULFknc95xehQB4qrIYlhzLuE54K8NHu1PVkSqsH5OFntoy7HXRWq
- vDLuDxF7ALl7uJWu6v8j7Cf4x1soIdhWhV94UWnMwq61/wBKnPBS+WLCblEVGD2UUG46
- UY4keVd2bV+HqMBf9+vbZ1lBFpjA575VZLW3AZIehm96tjR8obh3gJQVP0uR959KJT8O
- 1dMIfBTZXOcLCxgqiZSJYMQqfodvNnNvVMzHQ+FjDjCZWWDzJTV2zjaSO+MZgD0azHsv
- YyU6A70DiXtOLAH/1F6HIeSHog8U+zPRGqQ1ZCnN03GG6OiDhDUqQpegEBCEj4yFBEdc
- RPCw==
-X-Gm-Message-State: APjAAAWkzt3bc3EcKuAoGlOQVBuwr3TR7ZDlnjGuE79ujd92gu9p/71c
- GJG16n0bZ3P1pw0Ev08DArq6q40shMfoy7WFohmbyQ==
-X-Google-Smtp-Source: APXvYqwN+7gcb4hF6o+vj70HXaJHSBDOAd4/1oz5m3JpbgLNnTRP7OIxP6jy8Z6QVP+fJehLWKrPofZ4kk+X3ElmBOs=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr15946114otq.221.1582049827603; 
- Tue, 18 Feb 2020 10:17:07 -0800 (PST)
+ bh=VP3qnJmQRqV+XQYAGT9k1cSnf5/86KHVV4eznGb3P8E=;
+ b=LlfRXbffN3IEOFczzLBMqbPew4mAcCDyLkGDTMMWfODnzizqWVFGYJdYLjhBkajoPH
+ CquvZv/+7CYEXt6LJBfVL3HfpYQXUunvRDpGqJ6Lv6sEPQ8Isg1yKf52hdg3ujDKSfxf
+ rf3+isoqkj5gT2QnzD9GHUOuTQ38LHP43iUU6JjFK+AmSfSuFquQ7QMahq1oO3uBh0uK
+ qkXaK+dzC+zT3yZLgM0O4e2xKigVUEvHkXs0A2WPs1ogpC6xhU54d/xvrkp2/EUbi3oT
+ NGyUyXhjzr2dGCNUYBHcvLFUHR7TXX+njvCIHwShZ/8T8Rxb30I+ZrbnfqbMJ9nrLuQE
+ fOsA==
+X-Gm-Message-State: APjAAAWAQeF2ENivqEz4Qtl5NYRdLwbIVxGc1ey/daZvjryoypL2j53N
+ qGmL/Dg82XFyXBN3tkUGtoCJf5M6AnUalbOA1vtH53Qs
+X-Google-Smtp-Source: APXvYqzvd6QZETwRBm/rKkax1qKeMy7myxpoWAPWR0prjq7IkMf0c3mSddKZU411exqYhSZFXyvf+5jpp5aTLO7uO4E=
+X-Received: by 2002:a2e:7818:: with SMTP id t24mr13277548ljc.195.1582049964544; 
+ Tue, 18 Feb 2020 10:19:24 -0800 (PST)
 MIME-Version: 1.0
-References: <1581686212-9625-1-git-send-email-sai.pavan.boddu@xilinx.com>
- <1581686212-9625-3-git-send-email-sai.pavan.boddu@xilinx.com>
-In-Reply-To: <1581686212-9625-3-git-send-email-sai.pavan.boddu@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Feb 2020 18:16:56 +0000
-Message-ID: <CAFEAcA9Bs9VuZNstbpF6Q2=MhVDN_HHMnUdwfOJSf7Qm9to2nw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] cpu/a9mpcore: Add num priority bits property
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+References: <cover.1580518859.git.alistair.francis@wdc.com>
+ <mhng-e63de11d-bdf1-4863-86df-b9beb15ad68b@palmerdabbelt-glaptop1>
+In-Reply-To: <mhng-e63de11d-bdf1-4863-86df-b9beb15ad68b@palmerdabbelt-glaptop1>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 18 Feb 2020 10:11:59 -0800
+Message-ID: <CAKmqyKOmnai6+_B+e0X1S0xvQN_GGwCgTn_6KZDWnJrPRN0B8Q@mail.gmail.com>
+Subject: Re: [PATCH v2 00/35] Add RISC-V Hypervisor Extension v0.5
+To: Palmer Dabbelt <palmerdabbelt@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,59 +86,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Anthony Liguori <anthony@codemonkey.ws>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 13:21, Sai Pavan Boddu
-<sai.pavan.boddu@xilinx.com> wrote:
+On Mon, Feb 17, 2020 at 11:11 AM Palmer Dabbelt
+<palmerdabbelt@google.com> wrote:
 >
-> Set number of priority bits property of gic as guided by machine
-> configuration.
+> On Fri, 31 Jan 2020 17:01:35 PST (-0800), Alistair Francis wrote:
+> > This patch series adds the RISC-V Hypervisor extension v0.5. This is the
+> > latest draft spec of the Hypervisor extension.
+> >
+> > The Hypervisor extension is disabled by default, so this series should
+> > result in no changes to anyone using QEMU unless they enable the
+> > extension. The extention can be enabled with the -cpu property (see
+> > below).
+> >
+> > Testing of this implementation has been done by using the baremetal
+> > Xvisor Hypervisor. We are able to run two Linux guests (that's all I
+> > have tried) as guests in 64-bit. In 32-bit so far I can only run
+> > baremetal guests, but I think this is a baremetal boot loader issue and
+> > not an issue in QEMU.
+> >
+> > The RISC-V KVM implementation was also written using these patches. The
+> > KVM implementation is currently under review.
+> >
+> > At the moment this spec is in a draft state and is subject to change. As
+> > QEMU is extreamly useful in early bring up I think it makes sense for
+> > QEMU to support non-frozen extensions.
+> >
+> > Thanks to Anup for doing the initial port of Xvisor. The port is avaliable here:
+> > https://github.com/avpatel/xvisor-next and will run on QEMU.
+> >
+> > Also thanks to Atish for implementing the SBI call support in Xvisor and
+> > for lots of help debugging.
+> >
+> > To run this yourself:
+> >  1. Apply this patch series to QEMU. The latest branch can be found here:
+> >       https://github.com/alistair23/qemu/tree/mainline/alistair/riscv-hyp-ext-v0.5.next
+> >  2. Get the version of OpenSBI that supports the H extension. This can
+> >     be found here:
+> >       https://github.com/avpatel/opensbi/tree/riscv_hyp_ext_0_5_v1
+> >  3. Build the next release of Xvisor. It is available here:
+> >       https://github.com/avpatel/xvisor-next
+> >  4. Make sure you build the Xvisor tests, see here for details:
+> >       https://github.com/avpatel/xvisor-next/tree/master/tests/riscv/virt64/linux
+> >  5. Run QEMU:
+> >      ./riscv64-softmmu/qemu-system-riscv64 -nographic \
+> >        -machine virt -cpu rv64,x-h=true \
+> >        -serial mon:stdio -serial null -m 4G \
+> >        -device loader,file=vmm.bin,addr=0x80200000 \
+> >        -kernel fw_jump.elf \
+> >        -initrd vmm-disk-linux.img \
+> >        -append "vmm.console=uart@10000000 vmm.bootcmd=\"vfs mount initrd /;vfs run /boot.xscript;vfs cat /system/banner.txt\""
+> >
+> >    Once you get to the prompt you can start the geust by running:
+> >      guest kick guest0
+> >    You can then bind to the serial port using:
+> >      vserial bind guest0/uart0
+> >    Then you can start Linux using:
+> >      autoexec
+> >
+> >  This was all tested with the mainline 5.2/5.3 kernels.
+> >
+> > There is very early work on a Xen port as well which is avaliable here:
+> > https://github.com/alistair23/xen/tree/alistair/riscv-port
+> >
+> > ToDo/Issues
+> >  - Get 32-bit fully working
+> >
+> > v2:
+> >  - Don't use riscv_cpu_set_force_hs_excep() for 2nd stage MMU fauls as
+> >    the v0.5 spec has a specific fault
+> >  - Address review comments
+> >  - Rebase on master
+> >  - Remove pointers for mstatus
+> >
+> > Alistair Francis (35):
+> >   target/riscv: Convert MIP CSR to target_ulong
+> >   target/riscv: Add the Hypervisor extension
+> >   target/riscv: Add the Hypervisor CSRs to CPUState
+> >   target/riscv: Add support for the new execption numbers
+> >   target/riscv: Rename the H irqs to VS irqs
+> >   target/riscv: Add the virtulisation mode
+> >   target/riscv: Add the force HS exception mode
+> >   target/riscv: Fix CSR perm checking for HS mode
+> >   target/riscv: Print priv and virt in disas log
+> >   target/riscv: Dump Hypervisor registers if enabled
+> >   target/riscv: Add Hypervisor CSR access functions
+> >   target/riscv: Add Hypervisor virtual CSRs accesses
+> >   target/riscv: Add Hypervisor machine CSRs accesses
+> >   target/riscv: Add virtual register swapping function
+> >   target/riscv: Set VS bits in mideleg for Hyp extension
+> >   target/riscv: Extend the MIE CSR to support virtulisation
+> >   target/riscv: Extend the SIP CSR to support virtulisation
+> >   target/riscv: Add support for virtual interrupt setting
+> >   target/ricsv: Flush the TLB on virtulisation mode changes
+> >   target/riscv: Generate illegal instruction on WFI when V=1
+> >   target/riscv: Add hypvervisor trap support
+> >   target/riscv: Add Hypervisor trap return support
+> >   target/riscv: Add hfence instructions
+> >   target/riscv: Remove the hret instruction
+> >   target/riscv: Only set TB flags with FP status if enabled
+> >   target/riscv: Disable guest FP support based on virtual status
+> >   target/riscv: Mark both sstatus and msstatus_hs as dirty
+> >   target/riscv: Respect MPRV and SPRV for floating point ops
+> >   target/riscv: Allow specifying MMU stage
+> >   target/riscv: Implement second stage MMU
+> >   target/riscv: Raise the new execptions when 2nd stage translation
+> >     fails
+> >   target/riscv: Set htval and mtval2 on execptions
+> >   target/riscv: Add support for the 32-bit MSTATUSH CSR
+> >   target/riscv: Add the MSTATUS_MPV_ISSET helper macro
+> >   target/riscv: Allow enabling the Hypervisor extension
+> >
+> >  target/riscv/cpu.c                            |  57 ++-
+> >  target/riscv/cpu.h                            |  58 ++-
+> >  target/riscv/cpu_bits.h                       | 111 ++--
+> >  target/riscv/cpu_helper.c                     | 481 ++++++++++++++++--
+> >  target/riscv/csr.c                            | 369 +++++++++++++-
+> >  target/riscv/gdbstub.c                        |  11 +-
+> >  target/riscv/insn32.decode                    |  22 +-
+> >  .../riscv/insn_trans/trans_privileged.inc.c   |  45 +-
+> >  target/riscv/op_helper.c                      |  71 ++-
+> >  target/riscv/translate.c                      |  34 ++
+> >  10 files changed, 1130 insertions(+), 129 deletions(-)
 >
-> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-> ---
->  hw/cpu/a9mpcore.c         | 2 ++
->  include/hw/cpu/a9mpcore.h | 1 +
->  2 files changed, 3 insertions(+)
+> OK, so everything should be reviewed and on for-master now.  I'll include it as
+> part of my next PR.
+
+Woo! Thanks
+
+Alistair
+
 >
-> diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-> index 1f8bc8a..eb1e752 100644
-> --- a/hw/cpu/a9mpcore.c
-> +++ b/hw/cpu/a9mpcore.c
-> @@ -68,6 +68,7 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
->      gicdev = DEVICE(&s->gic);
->      qdev_prop_set_uint32(gicdev, "num-cpu", s->num_cpu);
->      qdev_prop_set_uint32(gicdev, "num-irq", s->num_irq);
-> +    qdev_prop_set_uint32(gicdev, "num-prio-bits", s->n_prio_bits);
->
->      /* Make the GIC's TZ support match the CPUs. We assume that
->       * either all the CPUs have TZ, or none do.
-> @@ -167,6 +168,7 @@ static Property a9mp_priv_properties[] = {
->       * Other boards may differ and should set this property appropriately.
->       */
->      DEFINE_PROP_UINT32("num-irq", A9MPPrivState, num_irq, 96),
-> +    DEFINE_PROP_UINT32("num-priority-bits", A9MPPrivState, n_prio_bits, 8),
->      DEFINE_PROP_END_OF_LIST(),
-
-You should be able to just directly pass through the property
-from the GIC object by calling
-    object_property_add_alias(obj, "num-priority-bits", OBJECT(&s->gic),
-                              "num-priority-bits", &error_abort);
-at the end of a9mp_priv_initfn().
-
-Then you don't need to have a DEFINE_PROP* for it, or a field in
-the state struct, or manually pass the value on in realize.
-
-(We don't do this for the existing num-irq and num-cpu properties
-because in those cases this device itself needs to know the
-values, as well as passing them on to other devices under it.)
-
-thanks
--- PMM
+> Thanks!
 
