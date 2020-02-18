@@ -2,115 +2,117 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E30FC34049
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46429C34047
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:27:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE6B821D56
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:24:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE6B821D56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 15F8221D56
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 19:27:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n9oAsOhC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15F8221D56
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j48Tg-0005i2-0k
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:24:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58427)
+	id 1j48WR-0007TL-9h
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 14:27:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j48Lm-0005cc-Bn
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:16:07 -0500
+ (envelope-from <rth7680@gmail.com>) id 1j48VU-0006s5-Mw
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:26:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j48Lh-0003Zy-CG
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:16:05 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:38981)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j48Lb-0003R5-JB; Tue, 18 Feb 2020 14:15:55 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N3bjH-1jVWaH3RR5-010fw9; Tue, 18 Feb 2020 20:15:47 +0100
-Subject: Re: [PATCH 2/3] hw/display/qxl: Remove unneeded variable assignment
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200215161557.4077-1-philmd@redhat.com>
- <20200215161557.4077-3-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b23eaa2a-6400-cf36-484b-230ac502f64d@vivier.eu>
-Date: Tue, 18 Feb 2020 20:15:45 +0100
+ (envelope-from <rth7680@gmail.com>) id 1j48VT-0004e5-R8
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:26:08 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46207)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1j48VT-0004aF-KY
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 14:26:07 -0500
+Received: by mail-pg1-x542.google.com with SMTP id o18so594935pgg.13
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 11:26:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SQogmsxVF+uJ+yvOrYKJ0A80zYYVEQw102BGb2VCZBY=;
+ b=n9oAsOhCEUiO+HbydwB/c+tyTUEiBos4wOOqT1gHQ4VDk7kB9BMHdJ9ZH3D0jEjC/U
+ IWfmRPcD8v8No/1aCjRnvipwShoOHkmw7yeNt3qiRDhzzN5MAkGD7Jml94pX7YoW30Jy
+ d15BYqKX90dhAQDwCFlRIQYu8CbuiRdP5lGcRfpm6RMXrw4e3x20pyEaI2MqRwvQ1hm/
+ AhHjfGHWKTzlxE88hGHBZsTb6+elqn4v0G8ONynevcvoDDoXxPhKesqRbfH4SfCQKdAz
+ rQ8mHJAo+BaM1uOqHvNBKIcs910O+6qwJWFp/f0sbWRMxec1AYlQNWukz+8lL0ItYSIR
+ uK/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=SQogmsxVF+uJ+yvOrYKJ0A80zYYVEQw102BGb2VCZBY=;
+ b=amANh4vMzMwjlMzQI/Fvd8M09oVFr1NQ3kWmFONNZNXsU3K2UvXqAfhyGW6LzsqBAd
+ wjzKo9j8PYhgeTDnbjyAXwdYilPEGSbDscH2lQ7Dsoxpccr/n2a+CuLTIDaC5GNIL4A7
+ oevDsNpxuZZusNAYmSp2seiFicfNmy+/o6/GOZGDvfuTm+13ayNp6FNvlZUYOZT+2UVX
+ T+UIc3NbwtL11PHA41cPmgmNPToXcyzIdIIgSgPlbVO3ZTDZFSQcyV7aajg1evchfic6
+ YV6zAcTNTJsYbEPuIpffjz9xqHAhist6BpVGsrHkRjM8FvMQPHasVsWgyAHpccrk7gHg
+ V4rw==
+X-Gm-Message-State: APjAAAWrhu3EQw7twgfU+Fl8BnK9y7FWWUTpPrys1XuAKiK7qPj8JBpT
+ FD/nZUZIAk46nvjUW9o0K/4=
+X-Google-Smtp-Source: APXvYqyoMGnM/hTffBBsqCbhIVaKB1QqRQ3UkFWaOgkNMFFkbjGlclFOy7VjPZp+L4rYkBtB86ypGQ==
+X-Received: by 2002:a63:ba05:: with SMTP id k5mr23782474pgf.158.1582053964794; 
+ Tue, 18 Feb 2020 11:26:04 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.googlemail.com with ESMTPSA id
+ 7sm5189901pfc.21.2020.02.18.11.26.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Feb 2020 11:26:03 -0800 (PST)
+Subject: Re: [PATCH v2 0/4] hw/hppa/dino: Fix Coverity 1419387 / 1419393 /
+ 1419394
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ Sven Schnelle <svens@stackframe.org>
+References: <20200218063355.18577-1-f4bug@amsat.org>
+From: Richard Henderson <rth@twiddle.net>
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+ mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+ n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+ rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+ Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+ n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+ AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFYBBMBAgBCAhsDBgsJ
+ CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAIZARYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweUY
+ BQkP1h/pAAoJEK0ScMxN0CebqDsH/0YyfnXk+Dc++H37VCEKgRet2i1ATFzxRnifkvmdxha0
+ V+PVptQ2fwSe+w3KxoFecD8W75nysmUjrU/FicW9yU5YRlGONPZjruG02/KzmhA5PzWJdYO3
+ i/t0qRayvWIcX2qA/flsXEbmb/BbAFM05LQIdcOu74eiBFe5CBCOWBDJeneE1urIE0hSYxoh
+ nCcG60ULrNj13ohZ4zAEluoY32qIo7/OPWmtR88cPrEbZT8k+RqgZbsotzaPT1/RlL74fL8k
+ ofYfTgKAFH7eEy6fF2nzDp2GThVn+3sA62xtpSXUf/X1m75B40KOcq1EQbHypNTmBc1wt13e
+ ibhPNEVX2am5AQ0EUa4sLwEIALITHfH3gciRNfQIe7awDTDvn6H3C6gDyCAnv5LiuLTLZiyK
+ NZp3lNO3rPowyKrGT2RIDlumlqPgdeHzqEEX91YK0yk2vdFvwU04rJ4D+qRgdUPoeICLD1zo
+ PwOv2FaY6Tf8dKYas1RHF5QU5yQNey8j7IYYoE2yGPn2PtBmvtmK4iLataUEvx0U385Zr+jf
+ HscqwTiToryeDC8Io/9BsMvAssE5Yf5URS2nJ7LFOvc4njsQJPF1i9egBXaIloqv7p2hVCKJ
+ Hl5UWIxitQ9QQIl6iU4LCpz8mVYTXwv48IAVpbUf7+ak9V9Kk3jCeQnlxCJBUHjUhoIzinbS
+ JHPHtkkAEQEAAYkBPAQYAQIAJgIbDBYhBJyxjdr46EmtKvwWpK0ScMxN0CebBQJdweVIBQkP
+ 1iAZAAoJEK0ScMxN0CebGHUH/RtouOlWl6To97tQsTJUq/2YwmRpFOsvV0/zCX4fKBGAbeZi
+ VaELSt2+3UEErA+n8HwbQmjJ6IrdhA9GustOpOyCcbLVSMwql/OlAwBtDzCcC8dTU4zcuY2a
+ rGG2A8i5krU85G9r1wowVcWZBsdmW7/dKiNoadLQiig4bHNiSaV4ograas5efyEjqTxiY+yG
+ hzPw5DK2kbp2co8iDF1vW0LWPeLFBinCgItcI9LvgHWaB3rwjOfvNpMn5m64SoQYHB8wbnid
+ erAjOzkBzmqnfS1tAUr8mtESStEwrEmNv0ZoA6S0Wt+c9pyTr+BpG4OFlhj7ZI+Eh7zOrr33
+ q9OBIdA=
+Message-ID: <103311e3-b7c0-9486-672d-4f53660f41df@twiddle.net>
+Date: Tue, 18 Feb 2020 11:26:01 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200215161557.4077-3-philmd@redhat.com>
+In-Reply-To: <20200218063355.18577-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:TBdtUz+1MSKiCBFTCdmdtqkzFrlQ6J36Ol9im0NOlKNdYHnjtKR
- m7HQhBRjniSIIrJV58ABEABvNtU1HaPqL1Y6JFs8aLfEEFHVoY59CDDDrOOSVgW7ksPxZSS
- UnLwOGj2i2Fxy6YG72kw23o+xTSaxxzOVKKtTi+mNwGz2FeXprhYlRuBS54t4nKyc/uQSgf
- DdKcu1BRWaGej6I0m6q1w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5zqEhyqnyqc=:qzBBzpVSLJ611GyQKf+6mp
- QO7By5BaZirhTkbZwvysd6MyYf2B5B046L5yrjlCVbow/8gsPTKqFF2MAPHT0v5D3SYRoOzov
- sIe9trw2iEU6jd9vN06t9eZyY/IQmcDrZMMFUpBgkDADeQMxJmixQvg8tQhRlXoSTnETM4HK3
- msX8+RZ2Ot4tVPzCoSyiVm3c9BQH5UnA8VVjKTf/dJAWkrAwEoyVK8BMHu426JNGtisXPgRTk
- Z8jEEzwcoLBEGFuHJXlwJVbuwz/ijzyKdi6qJaf8o1t42555I3gvfVfDzewIKJxMThlqkGf9g
- rN8Ll5d4BTs5RJSc8gvHL4wzBodn0hyPGHsXmCTvHlgY9WoOGL76aN6Lk0o5Ay3x0iE5ZPPjT
- GfxrZa+KOxc5PwHTz1NfJ75poNOoumk1B06PpTNvKGb/R+j4OcSNPgszLwQdfCRR1PGglXFUQ
- pYBMg2VxpkER+RxQaI1HsM0QFMln6Mtc32aoUaIMARpsLvNKV5uu9TzMNKJN6/ApHEVDprJgO
- OsrhtP6N2nHXQ5CaaJNDqA5gkdqzURNuBXdYYHuZXktUA9u0wzIwQU0rNICeD5a300GETckbU
- 6x8BLa25Ag6r5ZNE5/KZntZWRLfcxAxU5rELCgZlldbe5M5Nw9dsKUV5CTm2RdZl9h1qg7Hu5
- ft/MRMXRNTLsMvAFLa8GY0ceUxAC2LXazYsKJWl9vYPGoydgCZ/mrWrFZvVvNS/BxEd5x6Yy6
- YClfVTP1kNVjcVYCydXV9B4jjBHeBYiwDX8WoBAumWayXyHnSlH5ovTRU7IREcm66Fj7BfJbz
- ZqPLfPb3QwrLN+zDr+TIIU5uO6UGheCtw721b4u1WGQTi6d8UqodWADBmnn43h7P4+vciDT
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,44 +124,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 15/02/2020 à 17:15, Philippe Mathieu-Daudé a écrit :
-> Fix warning reported by Clang static code analyzer:
+On 2/17/20 10:33 PM, Philippe Mathieu-Daudé wrote:
+> Easy fix for the overrun reported by Coverity.
 > 
->   hw/display/qxl.c:1634:14: warning: Value stored to 'orig_io_port' during its initialization is never read
->       uint32_t orig_io_port = io_port;
->                ^~~~~~~~~~~~   ~~~~~~~
+> Since v1:
+> - Fixed description to cover CID 1419387 (reported by Peter)
+>   (no code change)
 > 
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/display/qxl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
-> index 64884da708..21a43a1d5e 100644
-> --- a/hw/display/qxl.c
-> +++ b/hw/display/qxl.c
-> @@ -1631,7 +1631,7 @@ static void ioport_write(void *opaque, hwaddr addr,
->      PCIQXLDevice *d = opaque;
->      uint32_t io_port = addr;
->      qxl_async_io async = QXL_SYNC;
-> -    uint32_t orig_io_port = io_port;
-> +    uint32_t orig_io_port;
->  
->      if (d->guest_bug && io_port != QXL_IO_RESET) {
->          return;
-> 
+> Supersedes: <20200213234148.8434-1-f4bug@amsat.org>
 
-Applied to my trivial-patches branch.
+Replaced your previous patches in my queue.
 
-Thanks,
-Laurent
+
+r~
 
