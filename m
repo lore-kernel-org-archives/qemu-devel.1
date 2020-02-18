@@ -2,82 +2,63 @@ Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E07BC34026
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A0BCC34026
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:31:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC96206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:30:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkUjFP4s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC96206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5DF7820722
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 13:31:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF7820722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j42xI-0007Bc-Du
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:30:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46961)
+	id 1j42yI-00088b-Cq
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 08:31:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j42wa-0006HP-Cg
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:45 -0500
+ (envelope-from <clg@kaod.org>) id 1j42xV-0007TG-23
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j42wZ-0003mT-1m
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44898
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1j42xR-0004Ck-49
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:30:40 -0500
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:53372)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j42wY-0003lg-Sp
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:29:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582032582;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=louIaOHDbvh9EzTQgj7vvaxYt+wJwlQE0P6WfTsuq4k=;
- b=TkUjFP4sNnHOwqFjfDuJ82rkhHpqI3Ojqk79EDothSVOlNSLuqyC2tMQT5NmRB5PtQuVDE
- Fqg7he2Pphb0exn+WY2H5KLQ5Vxu40gJfk9alV/tKMtUYCMnVhjlS+5pzMiOB0m//e//8r
- PJz+vnX2KHjbqbbRbeZh8/mGez5dnO0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-YP6wPajRMfqaYCeCDNk6Pw-1; Tue, 18 Feb 2020 08:29:40 -0500
-X-MC-Unique: YP6wPajRMfqaYCeCDNk6Pw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AB76107B26F;
- Tue, 18 Feb 2020 13:29:39 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-181.ams2.redhat.com [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F3AA81BC6D;
- Tue, 18 Feb 2020 13:29:37 +0000 (UTC)
-Date: Tue, 18 Feb 2020 14:29:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v4 18/19] iotests: Add tests for invalid Quorum @replaces
-Message-ID: <20200218132936.GD6157@linux.fritz.box>
-References: <20200218103454.296704-1-mreitz@redhat.com>
- <20200218103454.296704-19-mreitz@redhat.com>
- <20200218123827.GC6157@linux.fritz.box>
- <49c02a45-dc13-078a-fb16-4ef57feb04e1@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1j42xP-00049z-Qi
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 08:30:37 -0500
+Received: from player779.ha.ovh.net (unknown [10.110.171.148])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id AEAD51C68F0
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 14:30:33 +0100 (CET)
+Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
+ (Authenticated sender: clg@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id 22515F77EB8D;
+ Tue, 18 Feb 2020 13:30:11 +0000 (UTC)
+Subject: Re: [PATCH v2] Avoid address_space_rw() with a constant is_write
+ argument
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200218112457.22712-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <7caf6246-06bc-245c-6c93-f2233e6eb4aa@kaod.org>
+Date: Tue, 18 Feb 2020 14:30:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <49c02a45-dc13-078a-fb16-4ef57feb04e1@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
-Content-Disposition: inline
+In-Reply-To: <20200218112457.22712-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 16643333899580509014
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrjeekgdehgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrieegrddvhedtrddujedtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.58.226
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,203 +70,763 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---RnlQjJ0d97Da+TV1
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 18.02.2020 um 13:49 hat Max Reitz geschrieben:
-> On 18.02.20 13:38, Kevin Wolf wrote:
-> > Am 18.02.2020 um 11:34 hat Max Reitz geschrieben:
-> >> Add two tests to see that you cannot replace a Quorum child with the
-> >> mirror job while the child is in use by a different parent.
-> >>
-> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> ---
-> >>  tests/qemu-iotests/041     | 70 +++++++++++++++++++++++++++++++++++++=
--
-> >>  tests/qemu-iotests/041.out |  4 +--
-> >>  2 files changed, 71 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-> >> index 1d9e64ff6d..53c8671969 100755
-> >> --- a/tests/qemu-iotests/041
-> >> +++ b/tests/qemu-iotests/041
-> >> @@ -20,6 +20,7 @@
-> >> =20
-> >>  import time
-> >>  import os
-> >> +import re
-> >>  import iotests
-> >>  from iotests import qemu_img, qemu_io
-> >> =20
-> >> @@ -34,6 +35,8 @@ quorum_img3 =3D os.path.join(iotests.test_dir, 'quor=
-um3.img')
-> >>  quorum_repair_img =3D os.path.join(iotests.test_dir, 'quorum_repair.i=
-mg')
-> >>  quorum_snapshot_file =3D os.path.join(iotests.test_dir, 'quorum_snaps=
-hot.img')
-> >> =20
-> >> +nbd_sock_path =3D os.path.join(iotests.test_dir, 'nbd.sock')
-> >> +
-> >>  class TestSingleDrive(iotests.QMPTestCase):
-> >>      image_len =3D 1 * 1024 * 1024 # MB
-> >>      qmp_cmd =3D 'drive-mirror'
-> >> @@ -892,7 +895,8 @@ class TestRepairQuorum(iotests.QMPTestCase):
-> >> =20
-> >>      def tearDown(self):
-> >>          self.vm.shutdown()
-> >> -        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
-ile ]:
-> >> +        for i in self.IMAGES + [ quorum_repair_img, quorum_snapshot_f=
-ile,
-> >> +                                 nbd_sock_path ]:
-> >>              # Do a try/except because the test may have deleted some =
-images
-> >>              try:
-> >>                  os.remove(i)
-> >> @@ -1032,6 +1036,70 @@ class TestRepairQuorum(iotests.QMPTestCase):
-> >>          self.assert_has_block_node("repair0", quorum_repair_img)
-> >>          self.vm.assert_block_path('quorum0', '/children.1', 'repair0'=
-)
-> >> =20
-> >> +    def test_with_other_parent(self):
-> >> +        """
-> >> +        Check that we cannot replace a Quorum child when it has other
-> >> +        parents.
-> >> +        """
-> >> +        result =3D self.vm.qmp('nbd-server-start',
-> >> +                             addr=3D{
-> >> +                                 'type': 'unix',
-> >> +                                 'data': {'path': nbd_sock_path}
-> >> +                             })
-> >> +        self.assert_qmp(result, 'return', {})
-> >> +
-> >> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
-> >> +        self.assert_qmp(result, 'return', {})
-> >> +
-> >> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
-ice=3D'quorum0',
-> >> +                             sync=3D'full', node_name=3D'repair0', re=
-places=3D'img1',
-> >> +                             target=3Dquorum_repair_img, format=3Diot=
-ests.imgfmt)
-> >> +        self.assert_qmp(result, 'error/desc',
-> >> +                        "Cannot replace 'img1' by a node mirrored fro=
-m "
-> >> +                        "'quorum0', because it cannot be guaranteed t=
-hat doing "
-> >> +                        "so would not lead to an abrupt change of vis=
-ible data")
-> >> +
-> >> +    def test_with_other_parents_after_mirror_start(self):
-> >> +        """
-> >> +        The same as test_with_other_parent(), but add the NBD server
-> >> +        only when the mirror job is already running.
-> >> +        """
-> >> +        result =3D self.vm.qmp('nbd-server-start',
-> >> +                             addr=3D{
-> >> +                                 'type': 'unix',
-> >> +                                 'data': {'path': nbd_sock_path}
-> >> +                             })
-> >> +        self.assert_qmp(result, 'return', {})
-> >> +
-> >> +        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', dev=
-ice=3D'quorum0',
-> >> +                             sync=3D'full', node_name=3D'repair0', re=
-places=3D'img1',
-> >> +                             target=3Dquorum_repair_img, format=3Diot=
-ests.imgfmt)
-> >> +        self.assert_qmp(result, 'return', {})
-> >> +
-> >> +        result =3D self.vm.qmp('nbd-server-add', device=3D'img1')
-> >> +        self.assert_qmp(result, 'return', {})
-> >> +
-> >> +        # The full error message goes to stderr, we will check it lat=
-er
-> >> +        self.complete_and_wait('mirror',
-> >> +                               completion_error=3D'Operation not perm=
-itted')
-> >> +
-> >> +        # Should not have been replaced
-> >> +        self.vm.assert_block_path('quorum0', '/children.1', 'img1')
-> >> +
-> >> +        # Check the full error message now
-> >> +        self.vm.shutdown()
-> >> +        log =3D self.vm.get_log()
-> >> +        log =3D re.sub(r'^\[I \d+\.\d+\] OPENED\n', '', log)
-> >> +        log =3D re.sub(r'^Formatting.*\n', '', log)
-> >> +        log =3D re.sub(r'\n\[I \+\d+\.\d+\] CLOSED\n?$', '', log)
-> >> +        log =3D re.sub(r'^qemu-system-[^:]*: ', '', log)
-> >=20
-> > I would have applied the series, but:
-> >=20
-> > +.........................F............................................=
-........................
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +FAIL: test_with_other_parents_after_mirror_start (__main__.TestRepairQ=
-uorum)
-> > +----------------------------------------------------------------------
-> > +Traceback (most recent call last):
-> > +  File "041", line 1099, in test_with_other_parents_after_mirror_start
-> > +    "it can no longer be guaranteed that doing so would " +
-> > +AssertionError: "qemu: Can no longer replace 'img1' by 're[107 chars]d=
-ata" !=3D "Can no longer replace 'img1' by 'repair0'[101 chars]data"
-> > +- qemu: Can no longer replace 'img1' by 'repair0', because it can no l=
-onger be guaranteed that doing so would not lead to an abrupt change of vis=
-ible data
-> > +? ------
-> > ++ Can no longer replace 'img1' by 'repair0', because it can no longer =
-be guaranteed that doing so would not lead to an abrupt change of visible d=
-ata
-> > +
-> > +
-> >=20
-> > If you agree, I can just change this line while applying into:
-> >=20
-> >     log =3D re.sub(r'^qemu[^:]*: ', '', log)
+On 2/18/20 12:24 PM, Peter Maydell wrote:
+> The address_space_rw() function allows either reads or writes
+> depending on the is_write argument passed to it; this is useful
+> when the direction of the access is determined programmatically
+> (as for instance when handling the KVM_EXIT_MMIO exit reason).
+> Under the hood it just calls either address_space_write() or
+> address_space_read_full().
 >=20
-> Sure, thanks!  I just hope noone uses the QEMU environment variable to
-> point to something that isn=E2=80=99t prefixed by =E2=80=9Cqemu=E2=80=9D.=
-..
+> We also use it a lot with a constant is_write argument, though,
+> which has two issues:
+>  * when reading "address_space_rw(..., 1)" this is less
+>    immediately clear to the reader as being a write than
+>    "address_space_write(...)"
+>  * calling address_space_rw() bypasses the optimization
+>    in address_space_read() that fast-paths reads of a
+>    fixed length
+>=20
+> This commit was produced with the included Coccinelle script
+> scripts/coccinelle/as-rw-const.patch.
+>=20
+> Two lines in hw/net/dp8393x.c that Coccinelle produced that
+> were over 80 characters were re-wrapped by hand.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Ok, I'll use this instead:
 
-+        log =3D re.sub(r'^%s[^:]*: ' % os.path.basename(iotests.qemu_prog)=
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+
+> ---
+> I could break this down into separate patches by submaintainer,
+> but the patch is not that large and I would argue that it's
+> better for the project if we can try to avoid introducing too
+> much friction into the process of doing 'safe' tree-wide
+> minor refactorings.
+>=20
+> v1->v2: put the coccinelle script in scripts/coccinelle rather
+> than just in the commit message.
+> ---
+>  accel/kvm/kvm-all.c                  |  6 +--
+>  dma-helpers.c                        |  4 +-
+>  exec.c                               |  4 +-
+>  hw/dma/xlnx-zdma.c                   | 11 ++---
+>  hw/net/dp8393x.c                     | 68 ++++++++++++++--------------
+>  hw/net/i82596.c                      | 25 +++++-----
+>  hw/net/lasi_i82596.c                 |  5 +-
+>  hw/ppc/pnv_lpc.c                     |  8 ++--
+>  hw/s390x/css.c                       | 12 ++---
+>  qtest.c                              | 52 ++++++++++-----------
+>  target/i386/hvf/x86_mmu.c            | 12 ++---
+>  scripts/coccinelle/as_rw_const.cocci | 30 ++++++++++++
+>  12 files changed, 133 insertions(+), 104 deletions(-)
+>  create mode 100644 scripts/coccinelle/as_rw_const.cocci
+>=20
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index c111312dfdd..0cfe6fd8ded 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2178,9 +2178,9 @@ void kvm_flush_coalesced_mmio_buffer(void)
+>              ent =3D &ring->coalesced_mmio[ring->first];
+> =20
+>              if (ent->pio =3D=3D 1) {
+> -                address_space_rw(&address_space_io, ent->phys_addr,
+> -                                 MEMTXATTRS_UNSPECIFIED, ent->data,
+> -                                 ent->len, true);
+> +                address_space_write(&address_space_io, ent->phys_addr,
+> +                                    MEMTXATTRS_UNSPECIFIED, ent->data,
+> +                                    ent->len);
+>              } else {
+>                  cpu_physical_memory_write(ent->phys_addr, ent->data, e=
+nt->len);
+>              }
+> diff --git a/dma-helpers.c b/dma-helpers.c
+> index d3871dc61ea..e8a26e81e16 100644
+> --- a/dma-helpers.c
+> +++ b/dma-helpers.c
+> @@ -28,8 +28,8 @@ int dma_memory_set(AddressSpace *as, dma_addr_t addr,=
+ uint8_t c, dma_addr_t len)
+>      memset(fillbuf, c, FILLBUF_SIZE);
+>      while (len > 0) {
+>          l =3D len < FILLBUF_SIZE ? len : FILLBUF_SIZE;
+> -        error |=3D address_space_rw(as, addr, MEMTXATTRS_UNSPECIFIED,
+> -                                  fillbuf, l, true);
+> +        error |=3D address_space_write(as, addr, MEMTXATTRS_UNSPECIFIE=
+D,
+> +                                     fillbuf, l);
+>          len -=3D l;
+>          addr +=3D l;
+>      }
+> diff --git a/exec.c b/exec.c
+> index 8e9cc3b47cf..baefe582393 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3810,8 +3810,8 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulo=
+ng addr,
+>              address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr=
 ,
-+                     '', log)
-
-Kevin
-
---RnlQjJ0d97Da+TV1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJeS+bAAAoJEH8JsnLIjy/WyvYQAIsxwBNRFlaUklkyRgvIQrdB
-LWPk33XzfgkuNy1NPeVbp/B/T/c/k3PEG3lmxPEvj+yqWY/B1E15TDz5ahNwFI1j
-wiSFFrVUTZYwOxF8Ep30Jzj+tTApMCLQ4tl7bgofT3KTo05IQ20Zqi6WtaqrwaHv
-DdPwEpZsUjLBHikFnfRCjpI9b8o1sfOvjnB5emiiDdrYR578yUIOmXELMj93l+BH
-2M4qiYfZ8juZtxcIeB/U8v0mV3hOLvAeW7ne9D+0OQroba7A6BvUCjgm3lCpwABX
-pAj0mrBas0qRCPl1RCIitRBfaQ2bi+E5sqY3T2gOoDwHwefmyAVyoqFupxUScV9W
-A+LQUi4rSSd1LX5cuk6Q+AogBbW8SaojRm/KkEwW5u4wxDEzcA4NVMMuX4bFtxFR
-soZkdGJG4FpOJ1vas6pS6drZM4Gi2p0E/yjbrbXu2087/t2NNk4qbmnKEghLGJ3H
-nwiFlNFwCyuK2jMknhWKCSzCnCeJAuGXc1GCkRG6wPFjo4D/HctZim53p/Qr+21y
-RrxSDpdBVJtoEayW7l+FBBLJc3u6jdEYBIZb/TkXmUrNoZSadbEgBoMEz2ICX74P
-omeMXEeINT9oK2BWlm3BzCgcFum6xrMtF7izQgBArjBgq0AM7jrBGKcy0Ae2ld+e
-+2cks2j5IT2B4dTuedB0
-=Cxwr
------END PGP SIGNATURE-----
-
---RnlQjJ0d97Da+TV1--
+>                                      attrs, buf, l);
+>          } else {
+> -            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
+> -                             attrs, buf, l, 0);
+> +            address_space_read(cpu->cpu_ases[asidx].as, phys_addr, att=
+rs, buf,
+> +                               l);
+>          }
+>          len -=3D l;
+>          buf +=3D l;
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 8fb83f5b078..31936061e21 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -311,8 +311,7 @@ static bool zdma_load_descriptor(XlnxZDMA *s, uint6=
+4_t addr, void *buf)
+>          return false;
+>      }
+> =20
+> -    address_space_rw(s->dma_as, addr, s->attr,
+> -                     buf, sizeof(XlnxZDMADescr), false);
+> +    address_space_read(s->dma_as, addr, s->attr, buf, sizeof(XlnxZDMAD=
+escr));
+>      return true;
+>  }
+> =20
+> @@ -364,7 +363,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s,=
+ bool type,
+>      } else {
+>          addr =3D zdma_get_regaddr64(s, basereg);
+>          addr +=3D sizeof(s->dsc_dst);
+> -        address_space_rw(s->dma_as, addr, s->attr, (void *) &next, 8, =
+false);
+> +        address_space_read(s->dma_as, addr, s->attr, (void *)&next, 8)=
+;
+>          zdma_put_regaddr64(s, basereg, next);
+>      }
+>      return next;
+> @@ -416,8 +415,7 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *bu=
+f, uint32_t len)
+>              }
+>          }
+> =20
+> -        address_space_rw(s->dma_as, s->dsc_dst.addr, s->attr, buf, dle=
+n,
+> -                         true);
+> +        address_space_write(s->dma_as, s->dsc_dst.addr, s->attr, buf, =
+dlen);
+>          if (burst_type =3D=3D AXI_BURST_INCR) {
+>              s->dsc_dst.addr +=3D dlen;
+>          }
+> @@ -493,8 +491,7 @@ static void zdma_process_descr(XlnxZDMA *s)
+>                  len =3D s->cfg.bus_width / 8;
+>              }
+>          } else {
+> -            address_space_rw(s->dma_as, src_addr, s->attr, s->buf, len=
+,
+> -                             false);
+> +            address_space_read(s->dma_as, src_addr, s->attr, s->buf, l=
+en);
+>              if (burst_type =3D=3D AXI_BURST_INCR) {
+>                  src_addr +=3D len;
+>              }
+> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> index a134d431ae3..f5f1c669e80 100644
+> --- a/hw/net/dp8393x.c
+> +++ b/hw/net/dp8393x.c
+> @@ -275,8 +275,8 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+> =20
+>      while (s->regs[SONIC_CDC] & 0x1f) {
+>          /* Fill current entry */
+> -        address_space_rw(&s->as, dp8393x_cdp(s),
+> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +        address_space_read(&s->as, dp8393x_cdp(s), MEMTXATTRS_UNSPECIF=
+IED,
+> +                           (uint8_t *)s->data, size);
+>          s->cam[index][0] =3D dp8393x_get(s, width, 1) & 0xff;
+>          s->cam[index][1] =3D dp8393x_get(s, width, 1) >> 8;
+>          s->cam[index][2] =3D dp8393x_get(s, width, 2) & 0xff;
+> @@ -293,8 +293,8 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+>      }
+> =20
+>      /* Read CAM enable */
+> -    address_space_rw(&s->as, dp8393x_cdp(s),
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +    address_space_read(&s->as, dp8393x_cdp(s), MEMTXATTRS_UNSPECIFIED,
+> +                       (uint8_t *)s->data, size);
+>      s->regs[SONIC_CE] =3D dp8393x_get(s, width, 0);
+>      DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_C=
+E]);
+> =20
+> @@ -311,8 +311,8 @@ static void dp8393x_do_read_rra(dp8393xState *s)
+>      /* Read memory */
+>      width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+>      size =3D sizeof(uint16_t) * 4 * width;
+> -    address_space_rw(&s->as, dp8393x_rrp(s),
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +    address_space_read(&s->as, dp8393x_rrp(s), MEMTXATTRS_UNSPECIFIED,
+> +                       (uint8_t *)s->data, size);
+> =20
+>      /* Update SONIC registers */
+>      s->regs[SONIC_CRBA0] =3D dp8393x_get(s, width, 0);
+> @@ -426,8 +426,8 @@ static void dp8393x_do_transmit_packets(dp8393xStat=
+e *s)
+>          size =3D sizeof(uint16_t) * 6 * width;
+>          s->regs[SONIC_TTDA] =3D s->regs[SONIC_CTDA];
+>          DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
+> -        address_space_rw(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) * =
+width,
+> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +        address_space_read(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) =
+* width,
+> +                           MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data,=
+ size);
+>          tx_len =3D 0;
+> =20
+>          /* Update registers */
+> @@ -451,17 +451,19 @@ static void dp8393x_do_transmit_packets(dp8393xSt=
+ate *s)
+>              if (tx_len + len > sizeof(s->tx_buffer)) {
+>                  len =3D sizeof(s->tx_buffer) - tx_len;
+>              }
+> -            address_space_rw(&s->as, dp8393x_tsa(s),
+> -                MEMTXATTRS_UNSPECIFIED, &s->tx_buffer[tx_len], len, 0)=
+;
+> +            address_space_read(&s->as, dp8393x_tsa(s), MEMTXATTRS_UNSP=
+ECIFIED,
+> +                               &s->tx_buffer[tx_len], len);
+>              tx_len +=3D len;
+> =20
+>              i++;
+>              if (i !=3D s->regs[SONIC_TFC]) {
+>                  /* Read next fragment details */
+>                  size =3D sizeof(uint16_t) * 3 * width;
+> -                address_space_rw(&s->as,
+> -                    dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) *=
+ width,
+> -                    MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, =
+0);
+> +                address_space_read(&s->as,
+> +                                   dp8393x_ttda(s)
+> +                                   + sizeof(uint16_t) * (4 + 3 * i) * =
+width,
+> +                                   MEMTXATTRS_UNSPECIFIED, (uint8_t *)=
+s->data,
+> +                                   size);
+>                  s->regs[SONIC_TSA0] =3D dp8393x_get(s, width, 0);
+>                  s->regs[SONIC_TSA1] =3D dp8393x_get(s, width, 1);
+>                  s->regs[SONIC_TFS] =3D dp8393x_get(s, width, 2);
+> @@ -494,18 +496,18 @@ static void dp8393x_do_transmit_packets(dp8393xSt=
+ate *s)
+>          dp8393x_put(s, width, 0,
+>                      s->regs[SONIC_TCR] & 0x0fff); /* status */
+>          size =3D sizeof(uint16_t) * width;
+> -        address_space_rw(&s->as,
+> -            dp8393x_ttda(s),
+> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
+> +        address_space_write(&s->as, dp8393x_ttda(s), MEMTXATTRS_UNSPEC=
+IFIED,
+> +                            (uint8_t *)s->data, size);
+> =20
+>          if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
+>              /* Read footer of packet */
+>              size =3D sizeof(uint16_t) * width;
+> -            address_space_rw(&s->as,
+> -                dp8393x_ttda(s) +
+> -                             sizeof(uint16_t) *
+> -                             (4 + 3 * s->regs[SONIC_TFC]) * width,
+> -                MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +            address_space_read(&s->as,
+> +                               dp8393x_ttda(s)
+> +                               + sizeof(uint16_t) * (4 + 3 * s->regs[S=
+ONIC_TFC])
+> +                               * width,
+> +                               MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->d=
+ata,
+> +                               size);
+>              s->regs[SONIC_CTDA] =3D dp8393x_get(s, width, 0) & ~0x1;
+>              if (dp8393x_get(s, width, 0) & 0x1) {
+>                  /* EOL detected */
+> @@ -767,8 +769,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
+const uint8_t * buf,
+>          /* Are we still in resource exhaustion? */
+>          size =3D sizeof(uint16_t) * 1 * width;
+>          address =3D dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
+> -        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+> -                         (uint8_t *)s->data, size, 0);
+> +        address_space_read(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+> +                           (uint8_t *)s->data, size);
+>          if (dp8393x_get(s, width, 0) & 0x1) {
+>              /* Still EOL ; stop reception */
+>              return -1;
+> @@ -787,11 +789,11 @@ static ssize_t dp8393x_receive(NetClientState *nc=
+, const uint8_t * buf,
+>      /* Put packet into RBA */
+>      DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
+>      address =3D dp8393x_crba(s);
+> -    address_space_rw(&s->as, address,
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
+> +    address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+> +                        (uint8_t *)buf, rx_len);
+>      address +=3D rx_len;
+> -    address_space_rw(&s->as, address,
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)&checksum, 4, 1);
+> +    address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+> +                        (uint8_t *)&checksum, 4);
+>      rx_len +=3D 4;
+>      s->regs[SONIC_CRBA1] =3D address >> 16;
+>      s->regs[SONIC_CRBA0] =3D address & 0xffff;
+> @@ -819,13 +821,13 @@ static ssize_t dp8393x_receive(NetClientState *nc=
+, const uint8_t * buf,
+>      dp8393x_put(s, width, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
+>      dp8393x_put(s, width, 4, s->regs[SONIC_RSC]); /* seq_no */
+>      size =3D sizeof(uint16_t) * 5 * width;
+> -    address_space_rw(&s->as, dp8393x_crda(s),
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
+> +    address_space_write(&s->as, dp8393x_crda(s), MEMTXATTRS_UNSPECIFIE=
+D,
+> +                        (uint8_t *)s->data, size);
+> =20
+>      /* Move to next descriptor */
+>      size =3D sizeof(uint16_t) * width;
+> -    address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * =
+width,
+> -        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+> +    address_space_read(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 =
+* width,
+> +                       MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, siz=
+e);
+>      s->regs[SONIC_LLFA] =3D dp8393x_get(s, width, 0);
+>      if (s->regs[SONIC_LLFA] & 0x1) {
+>          /* EOL detected */
+> @@ -838,8 +840,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
+const uint8_t * buf,
+>              offset +=3D sizeof(uint16_t);
+>          }
+>          s->data[0] =3D 0;
+> -        address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
+> -                         (uint8_t *)s->data, sizeof(uint16_t), 1);
+> +        address_space_write(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
+> +                            (uint8_t *)s->data, sizeof(uint16_t));
+>          s->regs[SONIC_CRDA] =3D s->regs[SONIC_LLFA];
+>          s->regs[SONIC_ISR] |=3D SONIC_ISR_PKTRX;
+>          s->regs[SONIC_RSC] =3D (s->regs[SONIC_RSC] & 0xff00) | (((s->r=
+egs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
+> diff --git a/hw/net/i82596.c b/hw/net/i82596.c
+> index 3a0e1ec4c05..6a80c24af23 100644
+> --- a/hw/net/i82596.c
+> +++ b/hw/net/i82596.c
+> @@ -148,8 +148,8 @@ static void i82596_transmit(I82596State *s, uint32_=
+t addr)
+> =20
+>          if (s->nic && len) {
+>              assert(len <=3D sizeof(s->tx_buffer));
+> -            address_space_rw(&address_space_memory, tba,
+> -                MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len, 0);
+> +            address_space_read(&address_space_memory, tba,
+> +                               MEMTXATTRS_UNSPECIFIED, s->tx_buffer, l=
+en);
+>              DBG(PRINT_PKTHDR("Send", &s->tx_buffer));
+>              DBG(printf("Sending %d bytes\n", len));
+>              qemu_send_packet(qemu_get_queue(s->nic), s->tx_buffer, len=
+);
+> @@ -172,8 +172,8 @@ static void set_individual_address(I82596State *s, =
+uint32_t addr)
+> =20
+>      nc =3D qemu_get_queue(s->nic);
+>      m =3D s->conf.macaddr.a;
+> -    address_space_rw(&address_space_memory, addr + 8,
+> -        MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN, 0);
+> +    address_space_read(&address_space_memory, addr + 8,
+> +                       MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN);
+>      qemu_format_nic_info_str(nc, m);
+>      trace_i82596_new_mac(nc->info_str);
+>  }
+> @@ -190,9 +190,8 @@ static void set_multicast_list(I82596State *s, uint=
+32_t addr)
+>      }
+>      for (i =3D 0; i < mc_count; i++) {
+>          uint8_t multicast_addr[ETH_ALEN];
+> -        address_space_rw(&address_space_memory,
+> -            addr + i * ETH_ALEN, MEMTXATTRS_UNSPECIFIED,
+> -            multicast_addr, ETH_ALEN, 0);
+> +        address_space_read(&address_space_memory, addr + i * ETH_ALEN,
+> +                           MEMTXATTRS_UNSPECIFIED, multicast_addr, ETH=
+_ALEN);
+>          DBG(printf("Add multicast entry " MAC_FMT "\n",
+>                      MAC_ARG(multicast_addr)));
+>          unsigned mcast_idx =3D (net_crc32(multicast_addr, ETH_ALEN) &
+> @@ -260,8 +259,8 @@ static void command_loop(I82596State *s)
+>              byte_cnt =3D MAX(byte_cnt, 4);
+>              byte_cnt =3D MIN(byte_cnt, sizeof(s->config));
+>              /* copy byte_cnt max. */
+> -            address_space_rw(&address_space_memory, s->cmd_p + 8,
+> -                MEMTXATTRS_UNSPECIFIED, s->config, byte_cnt, 0);
+> +            address_space_read(&address_space_memory, s->cmd_p + 8,
+> +                               MEMTXATTRS_UNSPECIFIED, s->config, byte=
+_cnt);
+>              /* config byte according to page 35ff */
+>              s->config[2] &=3D 0x82; /* mask valid bits */
+>              s->config[2] |=3D 0x40;
+> @@ -640,14 +639,14 @@ ssize_t i82596_receive(NetClientState *nc, const =
+uint8_t *buf, size_t sz)
+>              }
+>              rba =3D get_uint32(rbd + 8);
+>              /* printf("rba is 0x%x\n", rba); */
+> -            address_space_rw(&address_space_memory, rba,
+> -                MEMTXATTRS_UNSPECIFIED, (void *)buf, num, 1);
+> +            address_space_write(&address_space_memory, rba,
+> +                                MEMTXATTRS_UNSPECIFIED, (void *)buf, n=
+um);
+>              rba +=3D num;
+>              buf +=3D num;
+>              len -=3D num;
+>              if (len =3D=3D 0) { /* copy crc */
+> -                address_space_rw(&address_space_memory, rba - 4,
+> -                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4, 1);
+> +                address_space_write(&address_space_memory, rba - 4,
+> +                                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4=
+);
+>              }
+> =20
+>              num |=3D 0x4000; /* set F BIT */
+> diff --git a/hw/net/lasi_i82596.c b/hw/net/lasi_i82596.c
+> index 427b3fbf701..52637a562d8 100644
+> --- a/hw/net/lasi_i82596.c
+> +++ b/hw/net/lasi_i82596.c
+> @@ -55,8 +55,9 @@ static void lasi_82596_mem_write(void *opaque, hwaddr=
+ addr,
+>           * Provided for SeaBIOS only. Write MAC of Network card to add=
+r @val.
+>           * Needed for the PDC_LAN_STATION_ID_READ PDC call.
+>           */
+> -        address_space_rw(&address_space_memory, val,
+> -            MEMTXATTRS_UNSPECIFIED, d->state.conf.macaddr.a, ETH_ALEN,=
+ 1);
+> +        address_space_write(&address_space_memory, val,
+> +                            MEMTXATTRS_UNSPECIFIED, d->state.conf.maca=
+ddr.a,
+> +                            ETH_ALEN);
+>          break;
+>      }
+>  }
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index 5989d723c50..f150deca340 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -238,16 +238,16 @@ static bool opb_read(PnvLpcController *lpc, uint3=
+2_t addr, uint8_t *data,
+>                       int sz)
+>  {
+>      /* XXX Handle access size limits and FW read caching here */
+> -    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIE=
+D,
+> -                             data, sz, false);
+> +    return !address_space_read(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIF=
+IED,
+> +                               data, sz);
+>  }
+> =20
+>  static bool opb_write(PnvLpcController *lpc, uint32_t addr, uint8_t *d=
+ata,
+>                        int sz)
+>  {
+>      /* XXX Handle access size limits here */
+> -    return !address_space_rw(&lpc->opb_as, addr, MEMTXATTRS_UNSPECIFIE=
+D,
+> -                             data, sz, true);
+> +    return !address_space_write(&lpc->opb_as, addr, MEMTXATTRS_UNSPECI=
+FIED,
+> +                                data, sz);
+>  }
+> =20
+>  #define ECCB_CTL_READ           PPC_BIT(15)
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 844caab4082..0e0fccd050e 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -874,18 +874,18 @@ static inline int ida_read_next_idaw(CcwDataStrea=
+m *cds)
+>          if (idaw_addr & 0x07 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fm=
+t1)) {
+>              return -EINVAL; /* channel program check */
+>          }
+> -        ret =3D address_space_rw(&address_space_memory, idaw_addr,
+> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.=
+fmt2,
+> -                               sizeof(idaw.fmt2), false);
+> +        ret =3D address_space_read(&address_space_memory, idaw_addr,
+> +                                 MEMTXATTRS_UNSPECIFIED, (void *)&idaw=
+.fmt2,
+> +                                 sizeof(idaw.fmt2));
+>          cds->cda =3D be64_to_cpu(idaw.fmt2);
+>      } else {
+>          idaw_addr =3D cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw=
+;
+>          if (idaw_addr & 0x03 || !cds_ccw_addrs_ok(idaw_addr, 0, ccw_fm=
+t1)) {
+>              return -EINVAL; /* channel program check */
+>          }
+> -        ret =3D address_space_rw(&address_space_memory, idaw_addr,
+> -                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.=
+fmt1,
+> -                               sizeof(idaw.fmt1), false);
+> +        ret =3D address_space_read(&address_space_memory, idaw_addr,
+> +                                 MEMTXATTRS_UNSPECIFIED, (void *)&idaw=
+.fmt1,
+> +                                 sizeof(idaw.fmt1));
+>          cds->cda =3D be64_to_cpu(idaw.fmt1);
+>          if (cds->cda & 0x80000000) {
+>              return -EINVAL; /* channel program check */
+> diff --git a/qtest.c b/qtest.c
+> index 12432f99cf4..328d674bcc8 100644
+> --- a/qtest.c
+> +++ b/qtest.c
+> @@ -429,23 +429,23 @@ static void qtest_process_command(CharBackend *ch=
+r, gchar **words)
+> =20
+>          if (words[0][5] =3D=3D 'b') {
+>              uint8_t data =3D value;
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             &data, 1, true);
+> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPEC=
+IFIED,
+> +                                &data, 1);
+>          } else if (words[0][5] =3D=3D 'w') {
+>              uint16_t data =3D value;
+>              tswap16s(&data);
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &data, 2, true);
+> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPEC=
+IFIED,
+> +                                (uint8_t *)&data, 2);
+>          } else if (words[0][5] =3D=3D 'l') {
+>              uint32_t data =3D value;
+>              tswap32s(&data);
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &data, 4, true);
+> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPEC=
+IFIED,
+> +                                (uint8_t *)&data, 4);
+>          } else if (words[0][5] =3D=3D 'q') {
+>              uint64_t data =3D value;
+>              tswap64s(&data);
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &data, 8, true);
+> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPEC=
+IFIED,
+> +                                (uint8_t *)&data, 8);
+>          }
+>          qtest_send_prefix(chr);
+>          qtest_send(chr, "OK\n");
+> @@ -463,22 +463,22 @@ static void qtest_process_command(CharBackend *ch=
+r, gchar **words)
+> =20
+>          if (words[0][4] =3D=3D 'b') {
+>              uint8_t data;
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             &data, 1, false);
+> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECI=
+FIED,
+> +                               &data, 1);
+>              value =3D data;
+>          } else if (words[0][4] =3D=3D 'w') {
+>              uint16_t data;
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &data, 2, false);
+> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECI=
+FIED,
+> +                               (uint8_t *)&data, 2);
+>              value =3D tswap16(data);
+>          } else if (words[0][4] =3D=3D 'l') {
+>              uint32_t data;
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &data, 4, false);
+> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECI=
+FIED,
+> +                               (uint8_t *)&data, 4);
+>              value =3D tswap32(data);
+>          } else if (words[0][4] =3D=3D 'q') {
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             (uint8_t *) &value, 8, false);
+> +            address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECI=
+FIED,
+> +                               (uint8_t *)&value, 8);
+>              tswap64s(&value);
+>          }
+>          qtest_send_prefix(chr);
+> @@ -498,8 +498,8 @@ static void qtest_process_command(CharBackend *chr,=
+ gchar **words)
+>          g_assert(len);
+> =20
+>          data =3D g_malloc(len);
+> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> -                         data, len, false);
+> +        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED=
+, data,
+> +                           len);
+> =20
+>          enc =3D g_malloc(2 * len + 1);
+>          for (i =3D 0; i < len; i++) {
+> @@ -524,8 +524,8 @@ static void qtest_process_command(CharBackend *chr,=
+ gchar **words)
+>          g_assert(ret =3D=3D 0);
+> =20
+>          data =3D g_malloc(len);
+> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> -                         data, len, false);
+> +        address_space_read(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED=
+, data,
+> +                           len);
+>          b64_data =3D g_base64_encode(data, len);
+>          qtest_send_prefix(chr);
+>          qtest_sendf(chr, "OK %s\n", b64_data);
+> @@ -559,8 +559,8 @@ static void qtest_process_command(CharBackend *chr,=
+ gchar **words)
+>                  data[i] =3D 0;
+>              }
+>          }
+> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> -                         data, len, true);
+> +        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIE=
+D, data,
+> +                            len);
+>          g_free(data);
+> =20
+>          qtest_send_prefix(chr);
+> @@ -582,8 +582,8 @@ static void qtest_process_command(CharBackend *chr,=
+ gchar **words)
+>          if (len) {
+>              data =3D g_malloc(len);
+>              memset(data, pattern, len);
+> -            address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFI=
+ED,
+> -                             data, len, true);
+> +            address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPEC=
+IFIED,
+> +                                data, len);
+>              g_free(data);
+>          }
+> =20
+> @@ -616,8 +616,8 @@ static void qtest_process_command(CharBackend *chr,=
+ gchar **words)
+>              out_len =3D MIN(out_len, len);
+>          }
+> =20
+> -        address_space_rw(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIED,
+> -                         data, len, true);
+> +        address_space_write(first_cpu->as, addr, MEMTXATTRS_UNSPECIFIE=
+D, data,
+> +                            len);
+> =20
+>          qtest_send_prefix(chr);
+>          qtest_send(chr, "OK\n");
+> diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
+> index d5a0efe7188..ff016fc0145 100644
+> --- a/target/i386/hvf/x86_mmu.c
+> +++ b/target/i386/hvf/x86_mmu.c
+> @@ -88,8 +88,8 @@ static bool get_pt_entry(struct CPUState *cpu, struct=
+ gpt_translation *pt,
+>      }
+> =20
+>      index =3D gpt_entry(pt->gva, level, pae);
+> -    address_space_rw(&address_space_memory, gpa + index * pte_size(pae=
+),
+> -                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)&pte, pte_size=
+(pae), 0);
+> +    address_space_read(&address_space_memory, gpa + index * pte_size(p=
+ae),
+> +                       MEMTXATTRS_UNSPECIFIED, (uint8_t *)&pte, pte_si=
+ze(pae));
+> =20
+>      pt->pte[level - 1] =3D pte;
+> =20
+> @@ -238,8 +238,8 @@ void vmx_write_mem(struct CPUState *cpu, target_ulo=
+ng gva, void *data, int bytes
+>          if (!mmu_gva_to_gpa(cpu, gva, &gpa)) {
+>              VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, =
+gva);
+>          } else {
+> -            address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UN=
+SPECIFIED,
+> -                             data, copy, 1);
+> +            address_space_write(&address_space_memory, gpa,
+> +                                MEMTXATTRS_UNSPECIFIED, data, copy);
+>          }
+> =20
+>          bytes -=3D copy;
+> @@ -259,8 +259,8 @@ void vmx_read_mem(struct CPUState *cpu, void *data,=
+ target_ulong gva, int bytes)
+>          if (!mmu_gva_to_gpa(cpu, gva, &gpa)) {
+>              VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, =
+gva);
+>          }
+> -        address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UNSPEC=
+IFIED,
+> -                         data, copy, 0);
+> +        address_space_read(&address_space_memory, gpa, MEMTXATTRS_UNSP=
+ECIFIED,
+> +                           data, copy);
+> =20
+>          bytes -=3D copy;
+>          gva +=3D copy;
+> diff --git a/scripts/coccinelle/as_rw_const.cocci b/scripts/coccinelle/=
+as_rw_const.cocci
+> new file mode 100644
+> index 00000000000..30da707701b
+> --- /dev/null
+> +++ b/scripts/coccinelle/as_rw_const.cocci
+> @@ -0,0 +1,30 @@
+> +// Avoid uses of address_space_rw() with a constant is_write argument.
+> +// Usage:
+> +//  spatch --sp-file as-rw-const.spatch --dir . --in-place
+> +
+> +@@
+> +expression E1, E2, E3, E4, E5;
+> +symbol false;
+> +@@
+> +
+> +- address_space_rw(E1, E2, E3, E4, E5, false)
+> ++ address_space_read(E1, E2, E3, E4, E5)
+> +@@
+> +expression E1, E2, E3, E4, E5;
+> +@@
+> +
+> +- address_space_rw(E1, E2, E3, E4, E5, 0)
+> ++ address_space_read(E1, E2, E3, E4, E5)
+> +@@
+> +expression E1, E2, E3, E4, E5;
+> +symbol true;
+> +@@
+> +
+> +- address_space_rw(E1, E2, E3, E4, E5, true)
+> ++ address_space_write(E1, E2, E3, E4, E5)
+> +@@
+> +expression E1, E2, E3, E4, E5;
+> +@@
+> +
+> +- address_space_rw(E1, E2, E3, E4, E5, 1)
+> ++ address_space_write(E1, E2, E3, E4, E5)
+>=20
 
 
