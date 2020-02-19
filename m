@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72831C3404D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D0CC3404D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CB902464E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:24:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CB902464E
+	by mail.kernel.org (Postfix) with ESMTPS id 7D53C24658
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:25:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D53C24658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4MWh-0001Ub-G4
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:24:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53413)
+	id 1j4MYC-0004A0-N1
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:25:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53543)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4MPn-0003e2-8P
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:15 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j4MPu-0003i1-L4
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4MPl-0005I5-Vj
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:10 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:51497)
+ (envelope-from <laurent@vivier.eu>) id 1j4MPt-0005VD-B8
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:18 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:47379)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j4MPl-0005Db-HH; Wed, 19 Feb 2020 05:17:09 -0500
+ id 1j4MPk-0005Cd-Fh; Wed, 19 Feb 2020 05:17:08 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N9d91-1jY2sr2w4b-015aL4; Wed, 19 Feb 2020 11:16:36 +0100
+ id 1MeTD8-1jcbIM37AK-00aUpn; Wed, 19 Feb 2020 11:16:35 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/17] ui/input-barrier: Remove superfluous semicolon
-Date: Wed, 19 Feb 2020 11:16:04 +0100
-Message-Id: <20200219101612.1033925-10-laurent@vivier.eu>
+Subject: [PULL 08/17] hw/vfio/display: Remove superfluous semicolon
+Date: Wed, 19 Feb 2020 11:16:03 +0100
+Message-Id: <20200219101612.1033925-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200219101612.1033925-1-laurent@vivier.eu>
 References: <20200219101612.1033925-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:dCKqb1vUoCcOnVsEoFGgPBNlgZjVP79jxRfrS4mjxXL8SqMpwsI
- xWH2CzHFJQI6TATjV2J9uuYb9DdLUKoroR/PRigg65uVjxB0cJSaGRbypHneZZA/TJ2pYAf
- vZShdwYCffI27wnIZlrCx4u2+YDWgbBzfDLZMxhScfvb//RMH2Wv8HMumhCEsoEMqcn8yko
- wg5P2CAofkgcrmsCVc3Xw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KmzcAQTGE2k=:DKepF76/00oaWArlojOmNU
- 2mIgrgJrQZSaCDaFoNR8PDhyXXHgDahlgFrx34k5tt//WHFQYkHbbqiU2j+MQpPWMD4QSNwDx
- LPXFm3f2h4FTzIX2O8bKNyhQG1y+2eIleY/qocx7SYN4uctXAQXPRXLBBjJHQzLadpK5z5imd
- REarmrPP3SFwbCrwL0YNO/MloEY7K7fuvEBispu4Nm+CuieGu/p4Y/gVnjWnjP+zA4PxD23ba
- M2T0dJMOutyfunu7ZqCyPfTUHhdhgZSh6ZuXO5gE73xyyRCPLoy9duyv0L17m2IUL+Z65uLo6
- kEgeuwiyfSu3tJGx3HGrQ49pofLhK7ktgDQPBYpLowY9v3LPpq345dB8pz3twxTF8/iFr3Bfg
- XVC2LDRnsx2Sa3B+MBIyxJXmZHEJFPf4llGBB4xoP88N0pG8Zt4F/1RqnBO81YABFxXdtXfTt
- 0nJlzgrxKaMAzQZQbHvcsziPfZHyNVnamkKgzXvrEFUzfuuDcz2PobfY1owaatVwmTjWj7kKP
- V/pm+Qmoc5K3OZiYdrqZPS2TSItfCemdgA8L9i/5czkUQxA78aneLTZr5QsrihVYYQ55IfyVH
- fX35Sb831XqPYgRZA6z/10q627ILrs4Aikai2IDnj4395v8r2lwMY/Op+bWKHNBYQ5qdNZ7it
- Wb19erUBBquQNHfphDU9Zbz5AQUM6zaQTARtMpfO78gd4D2/HHTxV1xnn/+grn0GIfPxxl7mr
- +kLUvGMfYayQYmNS0Ku2c++5T7XhnbEZ75WlqvB+7nR41szzCE3uG2H2fArDxJow+8PY2yqdz
- afDc+1mp3BNAQ4h9RfjFF6H9YqMT30PTZ+LdoKgjWQ7daMTmBIjnsZZAOwbBVskDY2IvWTm
+X-Provags-ID: V03:K1:zTkAU/Y8DhwEahyBf+WI8UH2+PM9/HQTnyCeb+8pYDSKsPZVc8R
+ UdeMGG5+v8QDNdoLf8CpwFv7IWZPpPW437QYyWwINbsgHsv/vzz7OQQFxbkmgpySroP32k5
+ tTIb57Kebi2NxYeHdZXn/Pgq7YOxe3lbvfNKd/Rk/vdZSwJX70BZBvZvVHEb/dQYktbC/LO
+ EQoYavwKZwfRddx39/FUQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CMWDfnhlzHo=:Fk6+tD8YC2b79OdA3FSIAY
+ Qr9u7JHF/1bwjF4205hQIME/Kv1eSl1wTsDsPprrhvzmsYT5QLCQuNjR/gYNj/s8dl+Gggf6y
+ gYJxb/iR0BDR2gObls55LSi3NGnHXpXX+GFwvczFvqtJrc6zjTTjcKivk+D+Ul65PhDBqxDFe
+ K1pPT7Q95IFuvbL2X0zwiA0KOAAoprPdktxYPalrbuJ9XMhLjrJFvswQt6AbPVBjQgyaPc+qb
+ tMUidHOVAyGqmA8nxjQqAn11RNlnoFhBEjDTjkqVKkFYXAqZWMz5pLZlMxVzZiKHUhlb7hBON
+ j9mTS+Hdqdg3tAfAJxYj6+v+kEu2ijAJJHJZe/ZJIjS2ZRkpFqwr8IIZszUcB46Mqhz6ryGsZ
+ xsZBuSQPui+iIF6pcWESPZRDAuWHROE0kpKoVryX1+s5jIBJ7X/nRMZRizP5xt83EhSATRy4V
+ u8YKu28FC0zRUmkhCT1MeU8+BQhO1kWnC7N8SgSTKKkGlRknNfZC/DWs3PjLfx6oymwMtkzwp
+ fa4VNj5zGIqvhnGcIkB11deuu8ggOOyLiTpvz2IX376ZCyKps3EHQgSkGRJeuftB/z3Drz2rV
+ O33qqdZLtdhFZEfJP8NDCFwN+ykNbysnM4G8p42R/Cc+RdUnhdAlWd5+cyUBL/0jnGHcPFJnM
+ MbziFqHCsvsUvpC6ZW3eXV1yZSaj72UF5CZa6Mgwc6bkgBrYK+G3fQcNAnDyflzoa3VlrS9Fg
+ PPyq38I0xtNbA4QDIVNtEyzm0xBTd02LDTsxUt4Y1uejXw8oUTlFMg1TJ8yyeyu6jC2RmdMSy
+ 3UrePCuTW9EvMlR/yo9enR/J5PLAGytjfO6P3L03rfVhtRYPEou/OdBrbWUu5sLx2Hx981P
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,30 +99,30 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Fixes: 6105683da35
+Fixes: 8b818e059bf
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20200218094402.26625-11-philmd@redhat.com>
+Message-Id: <20200218094402.26625-9-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- ui/input-barrier.c | 2 +-
+ hw/vfio/display.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-index fe35049b83a2..527c75e130ee 100644
---- a/ui/input-barrier.c
-+++ b/ui/input-barrier.c
-@@ -455,7 +455,7 @@ static gboolean writecmd(InputBarrier *ib, struct barrierMsg *msg)
-         break;
-     default:
-         write_cmd(p, barrierCmdEUnknown, avail);
--        break;;
-+        break;
-     }
+diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+index a5a608c5b226..f4977c66e1b5 100644
+--- a/hw/vfio/display.c
++++ b/hw/vfio/display.c
+@@ -287,7 +287,7 @@ static void vfio_display_dmabuf_update(void *opaque)
+     VFIOPCIDevice *vdev = opaque;
+     VFIODisplay *dpy = vdev->dpy;
+     VFIODMABuf *primary, *cursor;
+-    bool free_bufs = false, new_cursor = false;;
++    bool free_bufs = false, new_cursor = false;
  
-     len = MAX_HELLO_LENGTH - avail - sizeof(int);
+     primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
+     if (primary == NULL) {
 -- 
 2.24.1
 
