@@ -2,80 +2,79 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD254C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EB0C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9A324656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:19:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 108512464E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C52wGUB+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9A324656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fI2JHD2i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108512464E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4S43-0001Ui-PK
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:19:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37218)
+	id 1j4S4e-0002ky-2W
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:19:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvg-0002m0-Kw
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:29 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvk-0002w4-83
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvf-0000ea-7p
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46662
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvi-0000iC-TG
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44073
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvf-0000eJ-3m
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:27 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvi-0000hk-Nl
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128626;
+ s=mimecast20190719; t=1582128630;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=z8oEDREQU+NKiuKFkduCLRcQfeb/eVAbSy+8cstM9OI=;
- b=C52wGUB+cZ0LYVB9eCzLo2B0bJQ6g8GmQebOJfko1fPVWZx+wT8mOKiQ5RNcV8kOZsQEz/
- A1Y4lFHXmeSkgGj4k0npYD9+OQ1tkNsRY9zWF84AsZrwac5GYPWMIYchPyVtxRJNOrJLmy
- 9m+5UfKUr4I2uICpe5SCPfu/Z1SCPrA=
+ bh=OZ1Ut+2IzzFMg67R88/6dDtzgLaoZfRNYhL5i0SqlZk=;
+ b=fI2JHD2iKoVperOv7MTKIg6t1NqGb3VExdOlp4Kuv/bUOf3UPSO22jGLK60O8BsRt6sIj4
+ xS75ZS1xngXQAqea/zkjypjizaZE00CxmuydnmS5htX/KOizzrKwcacY4Eltzgnmjui0I1
+ CV9dytbASvtzc5CUyDiHgxOrimSFAgw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-qhkFgH8kOtadwDt8R4VgnQ-1; Wed, 19 Feb 2020 11:10:23 -0500
+ us-mta-38-1IaaTfRcMxCah3EZyVISOg-1; Wed, 19 Feb 2020 11:10:27 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F3D4802C81
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8C09A0B50
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:26 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF05F6E3EE;
- Wed, 19 Feb 2020 16:10:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 435C848;
+ Wed, 19 Feb 2020 16:10:26 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 22/79] arm/mps2-tz: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:08:56 -0500
-Message-Id: <20200219160953.13771-23-imammedo@redhat.com>
+Subject: [PATCH v6 26/79] arm/omap_sx1: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:00 -0500
+Message-Id: <20200219160953.13771-27-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: qhkFgH8kOtadwDt8R4VgnQ-1
+X-MC-Unique: 1IaaTfRcMxCah3EZyVISOg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,36 +111,37 @@ Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 v2:
   * fix format string causing build failure on 32-bit host
     (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
-v4:
-  * move default_ram_size to mps2tz_class_init()
-    (Andrew Jones <drjones@redhat.com>)
 ---
- hw/arm/mps2-tz.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/arm/omap_sx1.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index f8b620bcc6..a8dea7dde1 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -39,6 +39,7 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu/units.h"
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index be245714db..2bebab4171 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/qtest.h"
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
 +#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/arm/boot.h"
-@@ -79,7 +80,6 @@ typedef struct {
-     MachineState parent;
 =20
-     ARMSSE iotkit;
--    MemoryRegion psram;
-     MemoryRegion ssram[3];
-     MemoryRegion ssram1_m;
-     MPS2SCC scc;
-@@ -388,6 +388,13 @@ static void mps2tz_common_init(MachineState *machine)
-         exit(1);
-     }
+ /*************************************************************************=
+****/
+ /* Siemens SX1 Cellphone V1 */
+@@ -102,8 +103,8 @@ static struct arm_boot_info sx1_binfo =3D {
+ static void sx1_init(MachineState *machine, const int version)
+ {
+     struct omap_mpu_state_s *mpu;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     MemoryRegion *address_space =3D get_system_memory();
+-    MemoryRegion *dram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *flash =3D g_new(MemoryRegion, 1);
+     MemoryRegion *cs =3D g_new(MemoryRegion, 4);
+     static uint32_t cs0val =3D 0x00213090;
+@@ -115,15 +116,20 @@ static void sx1_init(MachineState *machine, const int=
+ version)
+     uint32_t flash_size =3D flash0_size;
+     int be;
 =20
 +    if (machine->ram_size !=3D mc->default_ram_size) {
 +        char *sz =3D size_to_str(mc->default_ram_size);
@@ -150,30 +150,41 @@ index f8b620bcc6..a8dea7dde1 100644
 +        exit(EXIT_FAILURE);
 +    }
 +
-     sysbus_init_child_obj(OBJECT(machine), "iotkit", &mms->iotkit,
-                           sizeof(mms->iotkit), mmc->armsse_type);
-     iotkitdev =3D DEVICE(&mms->iotkit);
-@@ -458,9 +465,7 @@ static void mps2tz_common_init(MachineState *machine)
-      * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
-      * call the 16MB our "system memory", as it's the largest lump.
-      */
--    memory_region_allocate_system_memory(&mms->psram,
--                                         NULL, "mps.ram", 16 * MiB);
--    memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
-+    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
+     if (version =3D=3D 2) {
+         flash_size =3D flash2_size;
+     }
 =20
-     /* The overflow IRQs for all UARTs are ORed together.
-      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
-@@ -642,6 +647,8 @@ static void mps2tz_class_init(ObjectClass *oc, void *da=
-ta)
+-    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
+-                                         sx1_binfo.ram_size);
+-    memory_region_add_subregion(address_space, OMAP_EMIFF_BASE, dram);
++    memory_region_add_subregion(address_space, OMAP_EMIFF_BASE, machine->r=
+am);
 =20
-     mc->init =3D mps2tz_common_init;
-     iic->check =3D mps2_tz_idau_check;
-+    mc->default_ram_size =3D 16 * MiB;
-+    mc->default_ram_id =3D "mps.ram";
+-    mpu =3D omap310_mpu_init(dram, machine->cpu_type);
++    mpu =3D omap310_mpu_init(machine->ram, machine->cpu_type);
+=20
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
+@@ -223,6 +229,8 @@ static void sx1_machine_v2_class_init(ObjectClass *oc, =
+void *data)
+     mc->init =3D sx1_init_v2;
+     mc->ignore_memory_transaction_failures =3D true;
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("ti925t");
++    mc->default_ram_size =3D sdram_size;
++    mc->default_ram_id =3D "omap1.dram";
  }
 =20
- static void mps2tz_an505_class_init(ObjectClass *oc, void *data)
+ static const TypeInfo sx1_machine_v2_type =3D {
+@@ -239,6 +247,8 @@ static void sx1_machine_v1_class_init(ObjectClass *oc, =
+void *data)
+     mc->init =3D sx1_init_v1;
+     mc->ignore_memory_transaction_failures =3D true;
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("ti925t");
++    mc->default_ram_size =3D sdram_size;
++    mc->default_ram_id =3D "omap1.dram";
+ }
+=20
+ static const TypeInfo sx1_machine_v1_type =3D {
 --=20
 2.18.1
 
