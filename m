@@ -2,121 +2,57 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF3CC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8C3C34052
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:36:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4599B208C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:36:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="J6IWMWC5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4599B208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8E696208C4
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:36:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E696208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4ROo-0002Sn-E0
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 10:36:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60395)
+	id 1j4ROs-0002bq-QN
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 10:36:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j4RNd-0001Zm-1Z
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:35:39 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j4RNq-0001cu-6c
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j4RNS-0004Qr-Ue
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:35:16 -0500
-Received: from mail-eopbgr140121.outbound.protection.outlook.com
- ([40.107.14.121]:62530 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j4RMr-0003o0-4c; Wed, 19 Feb 2020 10:34:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OOTYFFZ/EfQw5LO+XmQ8ZPmrshnvEuEhvFWQAsek9JH08xgG3B2vDZ69ClidSsg7BUepM6N/FKDUCHBvHhD40IqXhVjHX2mlR6hZAOlESwVTYlluz7Hukob/E8u71KaelPvAWT6G4oIyPV5lYoOmXtwnEBgsLlFdBwaeAzXBmoBiKy96dnrRwejvf9G6mNAvLWI/hr3DSYq6wjebDhN/DeijziujNUY7XvLHfkBl4Sp+vlCDLOuxMH8qMnybcwGAwsH3wuqQ11HdfRQuOrtjgX+LRzYaZTVilsIkan5vPkM6ri+eL67SyKkjqWoLF97VRb0QTgHLdaGV0rCSMDViSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F2IrXxMr2ZxYfwlUDAAcHPAsqP4KeWlbrnKce8/+370=;
- b=mwM1ugOZ6YIg4AgKMymHG+d8u91YIEcK7lD+JHbOda+8OK0vwIhfVuADsPZYGwFUncGPWS92NaSWbUjjKVwAR0aYOfm/JPiWw19MmimbdZzNsvom7L1RI7SVRhkaOTANnhOlrN382jWCZoIdD88T31Rav359ytTOD4O7PSfD+Jvxbv45OuuUNR2Bpc/Ua7au/f70xmicKcjHXKM4e9+spgYRrULLBFyFAdrqLsnm2DCug/tGNBMLyQE9LwV5tm4ibgjMrgg5VsmMH68h1fPgZEYNydK9Yk9puKQOAtpWMK4JU8izYuH7xOJ3y7ek7nqHkpZkbkEpi3ARYdeISzmBWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F2IrXxMr2ZxYfwlUDAAcHPAsqP4KeWlbrnKce8/+370=;
- b=J6IWMWC5yPUZ7GQdnJiSI154KdmxdtYWHK0lAv92ancrviJNLfGvyGPAdi+Oi3ghsFGl8iF8ITZlpLEU4OxpwqdZc0N0XDkb3d2HFM1XWFJ/iZvQQ6VXNrPNPFiz8/R4uXbNguV/zjAwWcPghMLcH4grfpTgt9RuXCn92DooBYE=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3445.eurprd08.prod.outlook.com (20.177.112.213) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.29; Wed, 19 Feb 2020 15:34:26 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.016; Wed, 19 Feb 2020
- 15:34:26 +0000
-Subject: Re: [PATCH v2 09/22] migration/block-dirty-bitmap: relax error
- handling in incoming part
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
- <20200217150246.29180-10-vsementsov@virtuozzo.com>
- <9a2bb54f-108b-a4bd-37e2-8382112c84ee@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200219183424112
-Message-ID: <3f7d5627-7ec6-d287-989c-60d3b96ef5ec@virtuozzo.com>
-Date: Wed, 19 Feb 2020 18:34:24 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <9a2bb54f-108b-a4bd-37e2-8382112c84ee@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR0202CA0020.eurprd02.prod.outlook.com
- (2603:10a6:3:8c::30) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <balaton@eik.bme.hu>) id 1j4RNX-0004Vo-GQ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:35:29 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:55088)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j4RNV-0004SN-UC; Wed, 19 Feb 2020 10:35:11 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 04025747E01;
+ Wed, 19 Feb 2020 16:35:08 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id BC01D747DFF; Wed, 19 Feb 2020 16:35:07 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id B9E38747DFA;
+ Wed, 19 Feb 2020 16:35:07 +0100 (CET)
+Date: Wed, 19 Feb 2020 16:35:07 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Programmingkid <programmingkidx@gmail.com>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-Reply-To: <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0202CA0020.eurprd02.prod.outlook.com (2603:10a6:3:8c::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.17 via Frontend Transport; Wed, 19 Feb 2020 15:34:25 +0000
-X-Tagtoolbar-Keys: D20200219183424112
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 295b3114-f20c-44b0-e51a-08d7b55133a8
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3445:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB34458658D889E520978FD058C1100@AM6PR08MB3445.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:295;
-X-Forefront-PRVS: 0318501FAE
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(39850400004)(376002)(346002)(199004)(189003)(2616005)(8936002)(66556008)(16576012)(52116002)(956004)(6486002)(316002)(54906003)(66476007)(31696002)(5660300002)(186003)(2906002)(81156014)(31686004)(16526019)(81166006)(8676002)(478600001)(86362001)(4326008)(26005)(53546011)(36756003)(66946007)(14143004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3445;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gHNgKe3nfy3uAPFpH4xQkBYHkoK2G2FB/gE0ivORDBCK77BDgECgwD0qmwFfep1Yb19pGQoMBgJYrKzFxUokKyc8VG2lPPMN7laXR7VRG0eJICy3s+dIRsxApL+0cQFdXBLRALVDKhgemkjo66wPdOcomi/A9xtXBbqEPTR442ab+3WWkGKnJ75Bg095aa2FJeqZgJul7Mh9onGYds9TxdI/yJQ6xbS0sg6emqC4Tnw4JyppxTNYGUiYN0jWomX24t2gC0+JkOuIX+wPe/v29rtV5IqTIsRSjjRF0OpVsEl8Cyh8ed1CsUvy/MPaQSez80G5Mb1Sd2x/E5j1VNASduynAoYrQ/5lxnkUzMZn5Wakp/0V3HmfCpYA8zxnKQrU+j5nh6PtxvvNCsjCGGArfXYJGRK5SlVISPccsN01bN17qkz+xil84KUaiywsK9E6tgKIKQBGNb/zW5r3MYeyFUuhYJdaQ9OZ3zyC/kgNKa0=
-X-MS-Exchange-AntiSpam-MessageData: SJJnG28Doge4cpeIwsSBPC7sb75y7RsGcXpsDknMZfFgGNch7UX5b99Mf/3poTLcWAM5tTT7u3gZHwIkaPiZrNoSTRWap/BNRySwtoSocs/285QpDQnvFhw6/vyT1GlzAQGtiH2i7fspymW88dlhiQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 295b3114-f20c-44b0-e51a-08d7b55133a8
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 15:34:26.1298 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nQV3pddpMhwtArifMEhUnATOA6+k6xybUPRtMMtG705EHi108+zJAMvDlyjx0m3ZMKSqgYPK1ovkxZ06aMGCEMqDhqX6FvQyfRF1Xd+/7a8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3445
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.14.121
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,402 +64,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-block@nongnu.org, quintela@redhat.com,
- dgilbert@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Paul Clarke <pc@us.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-18.02.2020 21:54, Andrey Shinkevich wrote:
->=20
->=20
-> On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
->> Bitmaps data is not critical, and we should not fail the migration (or
->> use postcopy recovering) because of dirty-bitmaps migration failure.
->> Instead we should just lose unfinished bitmaps.
+Hello,
+
+On Tue, 18 Feb 2020, Programmingkid wrote:
+>> On Feb 18, 2020, at 12:10 PM, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> While other targets take advantage of using host FPU to do floating
+>> point computations, this was disabled for PPC target because always
+>> clearing exception flags before every FP op made it slightly slower
+>> than emulating everyting with softfloat. To emulate some FPSCR bits,
+>> clearing of fp_status may be necessary (unless these could be handled
+>> e.g. using FP exceptions on host but there's no API for that in QEMU
+>> yet) but preserving at least the inexact flag makes hardfloat usable
+>> and faster than softfloat. Since most clients don't actually care
+>> about this flag, we can gain some speed trading some emulation
+>> accuracy.
 >>
->> Still we have to report io stream violation errors, as they affect the
->> whole migration stream.
+>> This patch implements a simple way to keep the inexact flag set for
+>> hardfloat while still allowing to revert to softfloat for workloads
+>> that need more accurate albeit slower emulation. (Set hardfloat
+>> property of CPU, i.e. -cpu name,hardfloat=false for that.) There may
+>> still be room for further improvement but this seems to increase
+>> floating point performance. Unfortunately the softfloat case is slower
+>> than before this patch so this patch only makes sense if the default
+>> is also set to enable hardfloat.
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Because of the above this patch at the moment is mainly for testing
+>> different workloads to evaluate how viable would this be in practice.
+>> Thus, RFC and not ready for merge yet.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 >> ---
->> =C2=A0 migration/block-dirty-bitmap.c | 148 +++++++++++++++++++++++++---=
------
->> =C2=A0 1 file changed, 113 insertions(+), 35 deletions(-)
->>
->> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitm=
-ap.c
->> index 1329db8d7d..aea5326804 100644
->> --- a/migration/block-dirty-bitmap.c
->> +++ b/migration/block-dirty-bitmap.c
->> @@ -145,6 +145,15 @@ typedef struct DBMLoadState {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool before_vm_start_handled; /* set in d=
-irty_bitmap_mig_before_vm_start */
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * cancelled
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Incoming migration is cancelled for some rea=
-son. That means that we
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * still should read our chunks from migration =
-stream, to not affect other
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * migration objects (like RAM), but just ignor=
-e them and do not touch any
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * bitmaps or nodes.
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +=C2=A0=C2=A0=C2=A0 bool cancelled;
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 GSList *bitmaps;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QemuMutex lock; /* protect bitmaps */
->> =C2=A0 } DBMLoadState;
->> @@ -545,13 +554,47 @@ void dirty_bitmap_mig_before_vm_start(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock(&s->lock);
->> =C2=A0 }
->> +static void cancel_incoming_locked(DBMLoadState *s)
->> +{
->> +=C2=A0=C2=A0=C2=A0 GSList *item;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 s->cancelled =3D true;
->> +=C2=A0=C2=A0=C2=A0 s->bs =3D NULL;
->> +=C2=A0=C2=A0=C2=A0 s->bitmap =3D NULL;
->> +
->> +=C2=A0=C2=A0=C2=A0 /* Drop all unfinished bitmaps */
->> +=C2=A0=C2=A0=C2=A0 for (item =3D s->bitmaps; item; item =3D g_slist_nex=
-t(item)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 LoadBitmapState *b =3D item-=
->data;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Bitmap must be unfin=
-ished, as finished bitmaps should already be
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * removed from the lis=
-t.
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!s->before_vm_start_h=
-andled || !b->migrated);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_has_su=
-ccessor(b->bitmap)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv=
-_reclaim_dirty_bitmap(b->bitmap, &error_abort);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_release_dirty_bitmap(b-=
->bitmap);
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 g_slist_free_full(s->bitmaps, g_free);
->> +=C2=A0=C2=A0=C2=A0 s->bitmaps =3D NULL;
->> +}
->> +
->> =C2=A0 static void dirty_bitmap_load_complete(QEMUFile *f, DBMLoadState =
-*s)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 GSList *item;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_dirty_bitmap_load_complete();
->> -=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
->> -=C2=A0=C2=A0=C2=A0 qemu_mutex_lock(&s->lock);
->=20
-> Why is it safe to remove the critical section?
+>> v2: use different approach to avoid needing if () in
+>> helper_reset_fpstatus() but this does not seem to change overhead
+>> much, also make it a single patch as adding the hardfloat option is
+>> only a few lines; with this we can use same value at other places where
+>> float_status is reset and maybe enable hardfloat for a few more places
+>> for a little more performance but not too much. With this I got:
+>
+> <snip>
+>
+> Thank you for working on this. It is about time we have a better FPU.
 
-It's not removed, it becomes wider in this patch.
+Thank you for testing it. I think it would be great if we could come up 
+with some viable approach to improve this before the next freeze.
 
->=20
->> +=C2=A0=C2=A0=C2=A0 if (s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_deserialize_finish(s->bitmap);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_has_successor(s->bi=
-tmap)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_reclaim_dirt=
-y_bitmap(s->bitmap, &error_abort);
->> @@ -569,8 +612,6 @@ static void dirty_bitmap_load_complete(QEMUFile *f, =
-DBMLoadState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 break;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -
->> -=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock(&s->lock);
->> =C2=A0 }
->> =C2=A0 static int dirty_bitmap_load_bits(QEMUFile *f, DBMLoadState *s)
->> @@ -582,15 +623,32 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBM=
-LoadState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->flags & DIRTY_BITMAP_MIG_FLAG_ZERO=
-ES) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_dirty_bitma=
-p_load_bits_zeroes();
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_deserializ=
-e_zeroes(s->bitmap, first_byte, nr_bytes,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv=
-_dirty_bitmap_deserialize_zeroes(s->bitmap, first_byte,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nr_by=
-tes, false);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *buf;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t buf_size=
- =3D qemu_get_be64(f);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t needed_size =3D
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv=
-_dirty_bitmap_serialization_size(s->bitmap,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 first=
-_byte, nr_bytes);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t needed_size;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 buf =3D g_malloc(buf_size);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qemu_get_buffer(f, b=
-uf, buf_size);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=3D buf_size) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
-r_report("Failed to read bitmap bits");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_fr=
-ee(buf);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -EIO;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_fr=
-ee(buf);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn 0;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 needed_size =3D bdrv_dirty_b=
-itmap_serialization_size(s->bitmap,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 first_byte,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nr_bytes);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (needed_size >=
- buf_size ||
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 buf_size > QEMU_ALIGN_UP(needed_size, 4 * sizeof(long))
->> @@ -599,15 +657,8 @@ static int dirty_bitmap_load_bits(QEMUFile *f, DBML=
-oadState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 error_report("Migrated bitmap granularity doesn't "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 "match the destination bitmap '%s' granularity",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 bdrv_dirty_bitmap_name(s->bitmap));
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -EINVAL;
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 buf =3D g_malloc(buf_size);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qemu_get_buffer(f, b=
-uf, buf_size);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=3D buf_size) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
-r_report("Failed to read bitmap bits");
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_fr=
-ee(buf);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -EIO;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 canc=
-el_incoming_locked(s);
->=20
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 /* Continue the VM migration as bitmaps data are not critical =
-*/
+> I applied your patch over David Gibson's ppc-for-5.0 branch. It applied cleanly and compiled easily.
 
-Hmm yes it what this patch does.. But I don't think we should add comment t=
-o each call of cancel_..()
+I've heard some preliminary results from others that there's also a 
+difference between v1 and v2 of the patch in performance where v1 may be 
+faster for same cases so if you (or someone else) want and have time you 
+could experiment with different versions and combinations as well to find 
+the one that's best on all CPUs. Basically we have these parts:
 
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn 0;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap=
-_deserialize_part(s->bitmap, buf, first_byte, nr_bytes,
->> @@ -632,14 +683,16 @@ static int dirty_bitmap_load_header(QEMUFile *f, D=
-BMLoadState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 error_report("Unable to read node name string");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return -EINVAL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->bs =3D bdrv_lookup_bs(s->=
-node_name, s->node_name, &local_err);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s->bs) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
-r_report_err(local_err);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -EINVAL;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->b=
-s =3D bdrv_lookup_bs(s->node_name, s->node_name, &local_err);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
-!s->bs) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report_err(local_err);
->=20
-> The error message may be supplemented with a report about the canceled bi=
-tmap migration. Also down there at cancel_incoming_locked(s).
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 cancel_incoming_locked(s);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 } else if (!s->bs && !nothing) {
->> +=C2=A0=C2=A0=C2=A0 } else if (!s->bs && !nothing && !s->cancelled) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Err=
-or: block device name is not set");
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_incoming_locked(s);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITM=
-AP_NAME) {
->> @@ -647,24 +700,38 @@ static int dirty_bitmap_load_header(QEMUFile *f, D=
-BMLoadState *s)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 error_report("Unable to read bitmap name string");
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return -EINVAL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->bitmap =3D bdrv_find_dirt=
-y_bitmap(s->bs, s->bitmap_name);
->> -
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* bitmap may be NULL here, =
-it wouldn't be an error if it is the
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * first occurrence of =
-the bitmap */
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s->bitmap && !(s->flags=
- & DIRTY_BITMAP_MIG_FLAG_START)) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 erro=
-r_report("Error: unknown dirty bitmap "
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- "'%s' for block device '%s'",
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- s->bitmap_name, s->node_name);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -EINVAL;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!s->cancelled) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->b=
-itmap =3D bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * bitmap may be NULL here, it wouldn't be an error if it is the
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 * first occurrence of the bitmap
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
-!s->bitmap && !(s->flags & DIRTY_BITMAP_MIG_FLAG_START)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_report("Error: unknown dirty bitmap "
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 "'%s' for block device '%s'",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 s->bitmap_name, s->node_name);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 cancel_incoming_locked(s);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 } else if (!s->bitmap && !nothing) {
->> +=C2=A0=C2=A0=C2=A0 } else if (!s->bitmap && !nothing && !s->cancelled) =
-{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Err=
-or: block device name is not set");
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_incoming_locked(s);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> =C2=A0 }
->> +/*
->> + * dirty_bitmap_load
->> + *
->> + * Load sequence of dirty bitmap chunks. Return error only on fatal io =
-stream
->> + * violations. On other errors just cancel bitmaps incoming migration a=
-nd return
->> + * 0.
->> + *
->> + * Note, than when incoming bitmap migration is canceled, we still must=
- read all
-> "than (that)" may be omitted
->=20
->> + * our chunks (and just ignore them), to not affect other migration obj=
-ects.
->> + */
->> =C2=A0 static int dirty_bitmap_load(QEMUFile *f, void *opaque, int versi=
-on_id)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DBMLoadState *s =3D &((DBMState *)opaque)=
-->load;
->> @@ -673,12 +740,19 @@ static int dirty_bitmap_load(QEMUFile *f, void *op=
-aque, int version_id)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_dirty_bitmap_load_enter();
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (version_id !=3D 1) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_mutex_lock(&s->lock);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cancel_incoming_locked(s);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock(&s->lock);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_mutex_lock(&s->lock);
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D dirty_bit=
-map_load_header(f, s);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 canc=
-el_incoming_locked(s);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu=
-_mutex_unlock(&s->lock);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> @@ -695,8 +769,12 @@ static int dirty_bitmap_load(QEMUFile *f, void *opa=
-que, int version_id)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 canc=
-el_incoming_locked(s);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu=
-_mutex_unlock(&s->lock);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_mutex_unlock(&s->lock);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } while (!(s->flags & DIRTY_BITMAP_MIG_FL=
-AG_EOS));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_dirty_bitmap_load_success();
->>
->=20
-> Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+1. Change target/ppc/fpu_helper.c::helper_reset_fpstatus() to force 
+float_flag_inexact on in case hadfloat is enabled, I've tried two 
+approaches for this:
 
+a. In v1 added an if () in the function
+b. In v2 used a variable from env set earlier (I've hoped this may be 
+faster but maybe it's not, testing and explanation is welcome)
 
---=20
-Best regards,
-Vladimir
+2. Also change places where env->fp_status is copied to a local tstat and 
+then reset (I think this is done to accumulate flags from multiple FP ops 
+that would individually reset env->fp_status or some other reason, maybe 
+this could be avoided if we reset fp_status less often but that would need 
+more understanding of the FP emulation that I don't have so I did not 
+try to clean that up yet).
+
+If v2 is really slower than v1 then I'm not sure is it because also 
+changing places with tstat or because of the different approach in 
+helper_reset_fpstatus() so you could try combinations of these as well.
+
+> Tests were done on a Mac OS 10.4.3 VM. The CPU was set to G3.
+
+What was the host CPU and OS this was tested on? Please always share CPU 
+info and host OS when sharing bechmark results so they are somewhat 
+comparable. It also depends on CPU features for vector instrucions at 
+least so without CPU info the results could not be understood.
+
+I think G3 does not have AltiVec/VMX so maybe testing with G4 would be 
+better to also test those ops unless there's a reason to only test G3. 
+I've tested with G4 both FPU only and FPU+VMX code on Linux host with 
+i7-9700K CPU @ 3.60GHz as was noted in the original cover letter but may 
+be I'va also forgotten some details so I list it here again.
+
+> I did several tests and here are my results:
+>
+> With hard float:
+> - The USB audio device does not produce any sound.
+
+I've heard this could also be due to some other problem not directly 
+related to FPU, maybe there's a problem with USB/OHCI emulation as well 
+because problems with that were reported but it's interesting why you get 
+different results changing FPU related stuff. I think OSX uses float 
+samples so probably does use FPU for processing sound and may rely on some 
+pecularity of the hardware as it was probably optimised for Apple 
+hardware. It would be interesting to find out how FPU stuff is related to 
+this but since it's broken anyway probably not a show stopper at the 
+moment.
+
+> - Converting a MIDI file to AAC in iTunes happens at 0.4x (faster than soft float :) ).
+
+Does resulting file match? As a simple test I've verified md5sum of the 
+resulting mp3 with the lame benchmark I've tried just to find any big 
+errors. Even if it does not prove that nothing broke, it shuold detect if 
+something breaks badly. However that was WAV->MP3 where results were same, 
+although the VMX build did produce different result than FPU only but did 
+so consistently for multiple runs. With MIDI there might be slight timing 
+difference that could cause different audio results so you should first 
+verify if doing the conversion multiple times does produce the same result 
+at all without any patch first.
+
+> For my FPSCR test program, 21 tests failed. The high number is because 
+> the inexact exception is being set for situations it should not be set 
+> for.
+
+Since we force the inexact flag to be set to enable hardfloat this is 
+expected. More interesting is if apart from this are there any difference 
+in the results compared to the soffloat case (that may also be host CPU 
+dependent I think). Do you have more detailed info on the errors and 
+differences found?
+
+Some of the problems with inexact may be fixed by not always forcing the 
+flag on but just not clearing it. As I undersood other targets do that so 
+it starts with softfloat but the first time the inexact flag is set it 
+will start using hardfloat as long as the guest does not clear this flag. 
+Probably this is done to automatically detect code that needs the flag and 
+assume it's not used when it's not touched. Since PPC also has an inexact 
+flag just for previous FP op (the FI bit) apart from the usual cumulative 
+flag, the client could read that instead of clearing the cumulative flag 
+so we can't detect guest usage this way, teherefore we might as well break 
+inexact completely to always use hardfloat and need to manually enable it 
+for guests that we know need it. I'm not sure however if forcing the 
+inexact flag would lead to unwanted FP exceptions as well so this may also 
+need to be made conditional on the enabled/disabled status of inexact FP 
+exceptions. Does anyone have more info on this?
+
+> With soft float: - Some sound can be heard from the USB audio device. It 
+> isn't good sounding. I had to force quit Quicktime player because it 
+> stopped working.
+> - Converting a MIDI file to AAC in iTunes happens at 0.3x (slower than hard float).
+> - 13 tests failed with my FPSCR test program.
+>
+> This patch is a good start. I'm not worried about the Floating Point 
+> Status and Control Register flags being wrong since hardly any software 
+> bothers to check them. I think more optimizations can happen by
+
+I don't know if guest code checks fpscr and what flags it cares about. 
+Also don't know if it's a fact that these are not used but maybe if we 
+test with more guest codes we can find out. That's why I'd like to at 
+least have an option to test with hardfloat. Unfortunately enabling 
+hardfloat without also making it default would make it slower so if we go 
+this way we should make sure we can also enable hardfloat as default.
+
+> simplifying the FPU. As it is now it makes a lot of calls per operation.
+
+Question is if those calls are really needed to emulate PPC FPU or if not 
+why would they be there? If the FPU is really that much different so all 
+these calls are needed then there's not much to simplify (but maybe there 
+could be some optimisations possible). This would need someone to 
+understand the current code in full first that probably we don't currently 
+(ar least I don't for sure so can't really make changes either). Another 
+more viable approach is to pick a small part and follow through with that 
+and try to clean up and optimise that small part only. The exception and 
+fpscr handling is one such part, another could be round_canonical() that 
+seems to be high on profiles I've taken. Maybe this could be done by 
+reading and understading docs only on the small part picked that may be 
+easier than getting everything first. I wonder if such smaller tasks could 
+be defined and given out as GSoC or other volunteer projects?
+
+Regards,
+BALATON Zoltan
 
