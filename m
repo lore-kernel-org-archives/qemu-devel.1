@@ -2,77 +2,117 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CB2C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A64C34051
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:57:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72C98207FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:57:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 109CB207FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:57:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lh2KY9iL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72C98207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DcKojouR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109CB207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4QnJ-0002BY-LO
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 09:57:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53940)
+	id 1j4QnL-0002DK-2j
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 09:57:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jusual@redhat.com>) id 1j4Qls-0000fk-PA
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:56:19 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jusual@redhat.com>) id 1j4Qlr-0004r7-2O
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4Qlr-0000dx-2U
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:56:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60896
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jusual@redhat.com>) id 1j4Qlq-0004qI-Uw
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4Qlp-0004qE-Rg
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:56:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582124173;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=HR2XT7gC89iPyG5V6Y+EvgjwK8TZ/ZRNtm7LW3nGxk8=;
- b=Lh2KY9iLlBoSTdNJXlvUwbaN07xp+1o3tTcD81VT9+tKJbqAQIIyTGn9ob76x7fBaK1Ozi
- wJARIHt2Cr0Slthwbi357Ov49aYvvYZSiCkFl4DgQGFRC+oW3UXeD/n07q80Nq7EpyES7+
- c9nf5cF9ZbPMxWzSVqyQru2fOeQVQV8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-RHDzYcc2PHSdbyBh7SFJ5Q-1; Wed, 19 Feb 2020 09:56:08 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E65C4DB63
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 14:56:06 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-205-220.brq.redhat.com
- [10.40.205.220])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 56DA562660;
- Wed, 19 Feb 2020 14:55:55 +0000 (UTC)
-From: Julia Suvorova <jusual@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] pcie_root_port: Add enable_hotplug option
-Date: Wed, 19 Feb 2020 15:55:40 +0100
-Message-Id: <20200219145540.648365-1-jusual@redhat.com>
+Received: from mail-eopbgr10135.outbound.protection.outlook.com
+ ([40.107.1.135]:27520 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1j4Qll-0004mI-Nx; Wed, 19 Feb 2020 09:56:10 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GXjGn+wr0zJXh+SJXS1jU8m9krbmYBEYhNhywBb6x/7628cBFdN+vqwVKoA42N9FKl2dmUO92GzZi0xKXki4FL1asTNh1A/Kwl/1GuM9/Lni5dCeleNpUz0Zd+gT7AyG59S5F6PCGnmXEykq+xk+2inAXMZj3QwVf72GZQDvKZvhjIkiZJ4qzFcFYjHlPKjif5s0Wj19CQ5SNXDHSujPYbMwF5DRNYdCIG/JNpD6P9guvtXDuTJ6gHVbPN59bXUM42mvD2mdVzlAS6r3/A8QLUgQLnOpMbEHc7DvCSdDd6FoC4hP73j1W3U3L5tLSQ1agHYdC8tF/7ttO6P1DhdC4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yeOSw8KjeqqWCZgOl1H9GRngSu4GUwzKz9lYtNsf3LY=;
+ b=Lj/5827gmTppEVxOsnbwLLZP7XcEXsFP1vCjYrIA0Zw6GrPaQyo9PoHgxC+toUCkYqI+6IoXZU01tA/m4mN5B2q+D0/sToPlf7kyXKb3VzAXOecxL4T0izO4AUBYsUGAS/9GFzUsynSZ9Tw7xJpklLFBqInzi3k7Gg+MHevfS/8vCfhTFvfuh+IrqTuYLxpjCa3yMuVDrZWQcDtmD/uQXKSo00ixUqvaIvW1y4dA34D/mE+/E/Mkb39hgy/pKlG9iUcPDd9L5x1Mu0DsPshJ6bXAfl1EVu56KDLs2bTX1OXy9Vd0Gi3+g43cc/0GvbBNFdOlDdd+tdzj63fXj1Te7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yeOSw8KjeqqWCZgOl1H9GRngSu4GUwzKz9lYtNsf3LY=;
+ b=DcKojouRjdBK18/MHkJxFIsxcPO24RNqQfhvXcith4r2E5e/VlUlIgoait3AQFTF9+/m57FT5SRLkqHT10BGv3L5cpAtKIGVdXaVljU7BAx5EDKe8KywM23sUPaqWIhUYLaJb+HGvmRUp5ZrEuPNE1dEENLbgR35LrGiyJxWdO4=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB4023.eurprd08.prod.outlook.com (20.179.1.75) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.22; Wed, 19 Feb 2020 14:56:06 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
+ 14:56:06 +0000
+Subject: Re: [PATCH v2 17/22] qemu-iotests/199: increase postcopy period
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
+ <20200217150246.29180-18-vsementsov@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Organization: Virtuozzo
+Message-ID: <e7202794-aebf-36d1-7855-8bebcdb43f92@virtuozzo.com>
+Date: Wed, 19 Feb 2020 17:56:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200217150246.29180-18-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR05CA0324.eurprd05.prod.outlook.com
+ (2603:10a6:7:92::19) To AM6PR08MB5048.eurprd08.prod.outlook.com
+ (2603:10a6:20b:ee::31)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: RHDzYcc2PHSdbyBh7SFJ5Q-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Received: from [172.16.24.225] (185.231.240.5) by
+ HE1PR05CA0324.eurprd05.prod.outlook.com (2603:10a6:7:92::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.22 via Frontend Transport; Wed, 19 Feb 2020 14:56:05 +0000
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 20591bd2-8999-4847-f902-08d7b54bd8ce
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4023:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB40238F590F8705615DEAE757F4100@AM6PR08MB4023.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1107;
+X-Forefront-PRVS: 0318501FAE
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(396003)(39850400004)(366004)(346002)(199004)(189003)(66556008)(16576012)(316002)(31696002)(956004)(36916002)(86362001)(2616005)(6486002)(52116002)(36756003)(26005)(54906003)(66476007)(4326008)(81156014)(5660300002)(44832011)(478600001)(2906002)(31686004)(8676002)(66946007)(8936002)(53546011)(81166006)(186003)(16526019);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4023;
+ H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q4O/QgCylQpYmwKilfwzrNdmuojGmECS6Dm/U0MZ47llcqfx1p+J6trMRaS8KDS806x5RY0XtoKcHEUuzxn10Y2vZhdGEdgLDEQRTVLY2PvlLWK0Bp7rFejm0BVKMeu92sfggIeUnEvyLOHkuznGetBRWgsXJiRufB/6yqjr/9RHN+uSwIB/jNdBUM9B6zwWseRpXZO8a0gmFuGwzQLLme2j3X06alNiiT3xqCXGkWSukxam9eniVdZhjod/e4GJkmztKX3SIUEU660qetKNcIITP8SJW5TmbZuuots7otyVgLzXlKDrPvP3VMWDCzoNyDrYudTcrhlkzQym0HgE3HKxKf7Hp6M5C6uKuyBMSJhr+4m1IV3nn0vQOpZNSOzsr/cUQnoXz/gS1jTOswlZnQiP2TsT45BI91UFjToFfLnDN7nLOpBpN/SJCE8fYbyU
+X-MS-Exchange-AntiSpam-MessageData: 6TNjcr2J7r0sOV63Pvd6W2TVCLqtcwvkqXyB06QJ/P0aru46x2rCNw3+6/t1JdNzqVdhv59kuBLiZq4XUfu9abQBp6nVAgWPAXyocyyS+qXim0Ax5wB9FKTyCKmkMcGW7/MvkugYBFj8RG9wo/R7RA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20591bd2-8999-4847-f902-08d7b54bd8ce
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 14:56:06.2930 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qph2sXBVbpQTwEXY05acpRsuLZCLXaFnF3WEr6pVHTIKACerryUGxUXw/A0Zde5KV5lSDPoymqdmSklqcuK5KUNvYEdi5CZDqBg0pSxqbhM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4023
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,153 +124,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?J=C3=A1n=20Tomko?= <jtomko@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ dgilbert@redhat.com, qemu-block@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
-manage it and restrict unplug for the whole machine. This is going to
-prevent user-initiated unplug in guests (Windows mostly).
-Hotplug is enabled by default.
-Usage:
-    -device pcie-root-port,enable-hotplug=3Dfalse,...
+On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
+> Test wants force bitmap postcopy. Still, resulting postcopy period is
+> very small. Let's increase it by adding more bitmaps to migrate. Also,
+> test disabled bitmaps migration.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/199 | 58 ++++++++++++++++++++++++++++--------------
+>   1 file changed, 39 insertions(+), 19 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+> index 7914fd0b2b..9a6e8dcb9d 100755
+> --- a/tests/qemu-iotests/199
+> +++ b/tests/qemu-iotests/199
+> @@ -103,29 +103,45 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+>   
+>       def test_postcopy(self):
+>           granularity = 512
+> +        nb_bitmaps = 15
+>   
+> -        result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
+> -                               name='bitmap', granularity=granularity)
+> -        self.assert_qmp(result, 'return', {})
+> +        for i in range(nb_bitmaps):
+> +            result = self.vm_a.qmp('block-dirty-bitmap-add', node='drive0',
+> +                                   name='bitmap{}'.format(i),
+> +                                   granularity=granularity)
+> +            self.assert_qmp(result, 'return', {})
+>   
+>           result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+> -                               node='drive0', name='bitmap')
+> +                               node='drive0', name='bitmap0')
+>           empty_sha256 = result['return']['sha256']
+>   
+> -        apply_discards(self.vm_a, discards1 + discards2)
+> +        apply_discards(self.vm_a, discards1)
+>   
+>           result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+> -                               node='drive0', name='bitmap')
+> -        sha256 = result['return']['sha256']
+> +                               node='drive0', name='bitmap0')
+> +        discards1_sha256 = result['return']['sha256']
+>   
+>           # Check, that updating the bitmap by discards works
+> -        assert sha256 != empty_sha256
+> +        assert discards1_sha256 != empty_sha256
+>   
+> -        result = self.vm_a.qmp('block-dirty-bitmap-clear', node='drive0',
+> -                               name='bitmap')
+> -        self.assert_qmp(result, 'return', {})
+> +        # We want to calculate resulting sha256. Do it in bitmap0, so, disable
+> +        # other bitmaps
+> +        for i in range(1, nb_bitmaps):
+> +            result = self.vm_a.qmp('block-dirty-bitmap-disable', node='drive0',
+> +                                   name='bitmap{}'.format(i))
+> +            self.assert_qmp(result, 'return', {})
+>   
+> -        apply_discards(self.vm_a, discards1)
+> +        apply_discards(self.vm_a, discards2)
+> +
+> +        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                               node='drive0', name='bitmap0')
+> +        all_discards_sha256 = result['return']['sha256']
+> +
+> +        # Now, enable some bitmaps, to be updated during migration
+> +        for i in range(2, nb_bitmaps, 2):
+> +            result = self.vm_a.qmp('block-dirty-bitmap-enable', node='drive0',
+> +                                   name='bitmap{}'.format(i))
+> +            self.assert_qmp(result, 'return', {})
+>   
+>           caps = [{'capability': 'dirty-bitmaps', 'state': True},
+>                   {'capability': 'events', 'state': True}]
+> @@ -145,6 +161,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+>           e_resume = self.vm_b.event_wait('RESUME')
+>           self.vm_b_events.append(e_resume)
+>   
+> +        # enabled bitmaps should be updated
+>           apply_discards(self.vm_b, discards2)
+>   
+>           match = {'data': {'status': 'completed'}}
+> @@ -158,7 +175,7 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+>           downtime = event_dist(e_stop, e_resume)
+>           postcopy_time = event_dist(e_resume, e_complete)
+>   
+> -        # TODO: assert downtime * 10 < postcopy_time
+> +        assert downtime * 10 < postcopy_time
+>           if debug:
+>               print('downtime:', downtime)
+>               print('postcopy_time:', postcopy_time)
+> @@ -166,12 +183,15 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+>           # Assert that bitmap migration is finished (check that successor bitmap
+>           # is removed)
+>           result = self.vm_b.qmp('query-block')
+> -        assert len(result['return'][0]['dirty-bitmaps']) == 1
+> -
+> -        # Check content of migrated (and updated by new writes) bitmap
+> -        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
+> -                               node='drive0', name='bitmap')
+> -        self.assert_qmp(result, 'return/sha256', sha256)
+> +        assert len(result['return'][0]['dirty-bitmaps']) == nb_bitmaps
+> +
+> +        # Check content of migrated bitmaps. Still, don't waste time checking
+> +        # every bitmap
+> +        for i in range(0, nb_bitmaps, 5):
+> +            result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
+> +                                   node='drive0', name='bitmap{}'.format(i))
+> +            sha256 = discards1_sha256 if i % 2 else all_discards_sha256
+> +            self.assert_qmp(result, 'return/sha256', sha256)
+>   
+>   
+>   if __name__ == '__main__':
+> 
 
-If you want to disable hot-unplug on some downstream ports of one
-switch, disable hot-unplug on PCIe Root Port connected to the upstream
-port as well as on the selected downstream ports.
+The updated test passed.
 
-Discussion related:
-    https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00530.html
-
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
----
-v1: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04868.html
-
-v2:
-    * change name of the option to 'enable-hotplug' [Laine]
-    * change order of enabling capability bits [Igor]
-    * enable HPS bit [Igor]
-    * add option to xio3130_downstream [J=C3=A1n]
-
- hw/pci-bridge/pcie_root_port.c     |  3 ++-
- hw/pci-bridge/xio3130_downstream.c |  3 ++-
- hw/pci/pcie.c                      | 11 +++++++----
- include/hw/pci/pcie.h              |  2 +-
- include/hw/pci/pcie_port.h         |  1 +
- 5 files changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.=
-c
-index 0ba4e4dea4..6eb2bc4564 100644
---- a/hw/pci-bridge/pcie_root_port.c
-+++ b/hw/pci-bridge/pcie_root_port.c
-@@ -94,7 +94,7 @@ static void rp_realize(PCIDevice *d, Error **errp)
-=20
-     pcie_cap_arifwd_init(d);
-     pcie_cap_deverr_init(d);
--    pcie_cap_slot_init(d, s->slot);
-+    pcie_cap_slot_init(d, s);
-     pcie_cap_root_init(d);
-=20
-     pcie_chassis_create(s->chassis);
-@@ -147,6 +147,7 @@ static Property rp_props[] =3D {
-     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-     DEFINE_PROP_BOOL("disable-acs", PCIESlot, disable_acs, false),
-+    DEFINE_PROP_BOOL("enable-hotplug", PCIESlot, enable_hotplug, true),
-     DEFINE_PROP_END_OF_LIST()
- };
-=20
-diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_dow=
-nstream.c
-index 153a4acad2..e8c388c547 100644
---- a/hw/pci-bridge/xio3130_downstream.c
-+++ b/hw/pci-bridge/xio3130_downstream.c
-@@ -94,7 +94,7 @@ static void xio3130_downstream_realize(PCIDevice *d, Erro=
-r **errp)
-     }
-     pcie_cap_flr_init(d);
-     pcie_cap_deverr_init(d);
--    pcie_cap_slot_init(d, s->slot);
-+    pcie_cap_slot_init(d, s);
-     pcie_cap_arifwd_init(d);
-=20
-     pcie_chassis_create(s->chassis);
-@@ -136,6 +136,7 @@ static void xio3130_downstream_exitfn(PCIDevice *d)
- static Property xio3130_downstream_props[] =3D {
-     DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
-                     QEMU_PCIE_SLTCAP_PCP_BITNR, true),
-+    DEFINE_PROP_BOOL("enable-hotplug", PCIESlot, enable_hotplug, true),
-     DEFINE_PROP_END_OF_LIST()
- };
-=20
-diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-index 08718188bb..a963c0f82e 100644
---- a/hw/pci/pcie.c
-+++ b/hw/pci/pcie.c
-@@ -495,7 +495,7 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *ho=
-tplug_dev,
-=20
- /* pci express slot for pci express root/downstream port
-    PCI express capability slot registers */
--void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot)
-+void pcie_cap_slot_init(PCIDevice *dev, PCIESlot *s)
- {
-     uint32_t pos =3D dev->exp.exp_cap;
-=20
-@@ -505,13 +505,16 @@ void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot=
-)
-     pci_long_test_and_clear_mask(dev->config + pos + PCI_EXP_SLTCAP,
-                                  ~PCI_EXP_SLTCAP_PSN);
-     pci_long_test_and_set_mask(dev->config + pos + PCI_EXP_SLTCAP,
--                               (slot << PCI_EXP_SLTCAP_PSN_SHIFT) |
-+                               (s->slot << PCI_EXP_SLTCAP_PSN_SHIFT) |
-                                PCI_EXP_SLTCAP_EIP |
--                               PCI_EXP_SLTCAP_HPS |
--                               PCI_EXP_SLTCAP_HPC |
-                                PCI_EXP_SLTCAP_PIP |
-                                PCI_EXP_SLTCAP_AIP |
-                                PCI_EXP_SLTCAP_ABP);
-+    if (s->enable_hotplug) {
-+        pci_long_test_and_set_mask(dev->config + pos + PCI_EXP_SLTCAP,
-+                                   PCI_EXP_SLTCAP_HPS |
-+                                   PCI_EXP_SLTCAP_HPC);
-+    }
-=20
-     if (dev->cap_present & QEMU_PCIE_SLTCAP_PCP) {
-         pci_long_test_and_set_mask(dev->config + pos + PCI_EXP_SLTCAP,
-diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-index 7064875835..14c58ebdb6 100644
---- a/include/hw/pci/pcie.h
-+++ b/include/hw/pci/pcie.h
-@@ -104,7 +104,7 @@ void pcie_cap_deverr_reset(PCIDevice *dev);
- void pcie_cap_lnkctl_init(PCIDevice *dev);
- void pcie_cap_lnkctl_reset(PCIDevice *dev);
-=20
--void pcie_cap_slot_init(PCIDevice *dev, uint16_t slot);
-+void pcie_cap_slot_init(PCIDevice *dev, PCIESlot *s);
- void pcie_cap_slot_reset(PCIDevice *dev);
- void pcie_cap_slot_get(PCIDevice *dev, uint16_t *slt_ctl, uint16_t *slt_st=
-a);
- void pcie_cap_slot_write_config(PCIDevice *dev,
-diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
-index 4b3d254b08..71be598dda 100644
---- a/include/hw/pci/pcie_port.h
-+++ b/include/hw/pci/pcie_port.h
-@@ -55,6 +55,7 @@ struct PCIESlot {
-=20
-     /* Disable ACS (really for a pcie_root_port) */
-     bool        disable_acs;
-+    bool        enable_hotplug;
-     QLIST_ENTRY(PCIESlot) next;
- };
-=20
---=20
-2.24.1
-
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+-- 
+With the best regards,
+Andrey Shinkevich
 
