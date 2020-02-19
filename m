@@ -2,79 +2,87 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A6DC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DBCC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8249520578
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CEF620578
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7Cfcqet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8249520578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gCkN7ke8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEF620578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SW4-0003Xn-Ll
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:48:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37782)
+	id 1j4SWn-0004tz-93
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:48:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4RwV-0004iT-MI
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:21 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1j4SOD-0002xK-Kw
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4RwU-0001Ov-FK
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47462
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RwU-0001OI-Am
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128677;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3tY/FN3zW+PMga61oMdiDkt6pkqxSjv/nQ+M0t/RaKw=;
- b=W7CfcqetmuwDzzxmWJqDBQXD4r2Uox+RQZj1axX/FlarGH1PoC8OgdQqhViwmanKrKbin1
- Smnvf+NLhX1BdkjfM60wXbM2ciVhlhKw1ypMzCdELRmQ5SBlNYDaCI4i4Jqtxfsln5yrHn
- keMXMyMjRlKbwAeugAO54x44bBu/4IU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-Euk2F8YVOEiMHUzBAQo8eQ-1; Wed, 19 Feb 2020 11:11:15 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6D09802591
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:14 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 215688ECF3;
- Wed, 19 Feb 2020 16:11:13 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ (envelope-from <robert.foley@linaro.org>) id 1j4SOB-00081R-W6
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:57 -0500
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:43959)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1j4SOB-00080y-OC
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:55 -0500
+Received: by mail-pf1-x431.google.com with SMTP id s1so313524pfh.10
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 08:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ebGq32l0nFHilBZHXJSmVFGGc6KeoYEINrsNMAqI2qk=;
+ b=gCkN7ke8S9LuLDuubL2fV4vxQC2ve0J+uVGkTjMCy2x45hMnq2zNxVPNsR9Er8t2OE
+ e7RrpNdKEUSLvF6g2uGFC97KeMNKQAt5G/Sc0k/0tvu5SqvMdhlEA34quhpqD+1sl0PN
+ AJ1gTzcZ2QEsn+VtfJwtKMN+ovcwqcHzsKOrTuZIPgkpR6ezAcSFJ11HP6kCuzc6kt6f
+ ZuS92caSN/JNchV0vhhWMi4rtOCeiDIuCaAdJV9BgxcjOAMeU9BjL9cflZPAVpHzY3u0
+ KC7PN3YpJAY8VbxDNoyiW2eo0ni3/e2+7jfkmMIPdwHgqRRq4iwBNSBmRm56nHMvQY9D
+ RqsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ebGq32l0nFHilBZHXJSmVFGGc6KeoYEINrsNMAqI2qk=;
+ b=gYp+F5ywygxzdQNFuDFPsSEPEShq8BOs8t4Lx3Ca7tHm4A07mPY1xPxnRPI0WT2YOQ
+ LLSQSy2hKagLW2fwZd6HYa+WRzaA4TWe4dSipW0DTR8uTdhCDEo7niwdIltNxBAkWuJ1
+ bRvuJvGG+HopKdaTlES/mSYW/xCxr62DsNHCOzPgMZoxi/mbps6vB0jiQKXi9GQpRfts
+ dLIdDKtnYb/4EQdbx2tWym/RRxMYkL0sbqFZe1tlLb6ngoJ+RDZm7gbtZ4Okcc6Q+y5c
+ Lzmdbxl07PCQLePtMuk0A9evGi6MGP+HChIWagH0b/L+ph3LMJ8nG+gwIXQ6kE2Rc1Yj
+ 5uJQ==
+X-Gm-Message-State: APjAAAX05x7X0zZT7MtEij9OL+U9j7N6cg4mL1yQmlpxP21oue63IT1y
+ El5fwgqZfXj9tpFIsANTRdBBi5EUyNE=
+X-Google-Smtp-Source: APXvYqz1M2QtFpW+KYR68gLmFhTl5o1yKAtGdzXMM7ImKgTmZKBgbG06+a+wWLpm40126SvUxCbb4A==
+X-Received: by 2002:a65:4d0d:: with SMTP id i13mr28300362pgt.346.1582130394277; 
+ Wed, 19 Feb 2020 08:39:54 -0800 (PST)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:3cc2:5eb7:e248:ad23])
+ by smtp.gmail.com with ESMTPSA id a69sm112362pfa.129.2020.02.19.08.39.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 19 Feb 2020 08:39:53 -0800 (PST)
+From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 68/79] ppc/virtex_ml507: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:42 -0500
-Message-Id: <20200219160953.13771-69-imammedo@redhat.com>
-In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
-References: <20200219160953.13771-1-imammedo@redhat.com>
+Subject: [PATCH v2 05/14] tests/vm: Added gen_cloud_init_iso() to basevm.py
+Date: Wed, 19 Feb 2020 11:35:28 -0500
+Message-Id: <20200219163537.22098-6-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200219163537.22098-1-robert.foley@linaro.org>
+References: <20200219163537.22098-1-robert.foley@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Euk2F8YVOEiMHUzBAQo8eQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,95 +94,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+This method was located in both centos and ubuntu.i386.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
 ---
- hw/ppc/virtex_ml507.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ tests/vm/basevm.py   | 40 ++++++++++++++++++++++++++++++++++++++++
+ tests/vm/centos      | 33 +--------------------------------
+ tests/vm/ubuntu.i386 | 37 +------------------------------------
+ 3 files changed, 42 insertions(+), 68 deletions(-)
 
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index 91dd00ee91..b6f4507dcf 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -193,7 +193,6 @@ static int xilinx_load_device_tree(hwaddr addr,
-=20
- static void virtex_init(MachineState *machine)
- {
--    ram_addr_t ram_size =3D machine->ram_size;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     hwaddr initrd_base =3D 0;
-@@ -204,7 +203,6 @@ static void virtex_init(MachineState *machine)
-     CPUPPCState *env;
-     hwaddr ram_base =3D 0;
-     DriveInfo *dinfo;
--    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
-     qemu_irq irq[32], *cpu_irq;
-     int kernel_size;
-     int i;
-@@ -221,8 +219,7 @@ static void virtex_init(MachineState *machine)
-=20
-     qemu_register_reset(main_cpu_reset, cpu);
-=20
--    memory_region_allocate_system_memory(phys_ram, NULL, "ram", ram_size);
--    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
-+    memory_region_add_subregion(address_space_mem, ram_base, machine->ram)=
-;
-=20
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     pflash_cfi01_register(PFLASH_BASEADDR, "virtex.flash", FLASH_SIZE,
-@@ -265,7 +262,7 @@ static void virtex_init(MachineState *machine)
-             /* If we failed loading ELF's try a raw image.  */
-             kernel_size =3D load_image_targphys(kernel_filename,
-                                               boot_offset,
--                                              ram_size);
-+                                              machine->ram_size);
-             boot_info.bootstrap_pc =3D boot_offset;
-             high =3D boot_info.bootstrap_pc + kernel_size + 8192;
-         }
-@@ -276,7 +273,7 @@ static void virtex_init(MachineState *machine)
-         if (machine->initrd_filename) {
-             initrd_base =3D high =3D ROUND_UP(high, 4);
-             initrd_size =3D load_image_targphys(machine->initrd_filename,
--                                              high, ram_size - high);
-+                                              high, machine->ram_size - hi=
-gh);
-=20
-             if (initrd_size < 0) {
-                 error_report("couldn't load ram disk '%s'",
-@@ -290,7 +287,7 @@ static void virtex_init(MachineState *machine)
-         boot_info.fdt =3D high + (8192 * 2);
-         boot_info.fdt &=3D ~8191;
-=20
--        xilinx_load_device_tree(boot_info.fdt, ram_size,
-+        xilinx_load_device_tree(boot_info.fdt, machine->ram_size,
-                                 initrd_base, initrd_size,
-                                 kernel_cmdline);
-     }
-@@ -302,6 +299,7 @@ static void virtex_machine_init(MachineClass *mc)
-     mc->desc =3D "Xilinx Virtex ML507 reference design";
-     mc->init =3D virtex_init;
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440-xilinx");
-+    mc->default_ram_id =3D "ram";
- }
-=20
- DEFINE_MACHINE("virtex-ml507", virtex_machine_init)
---=20
-2.18.1
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 7f26892268..8400b0e07f 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -345,6 +345,46 @@ class BaseVM(object):
+     def qmp(self, *args, **kwargs):
+         return self._guest.qmp(*args, **kwargs)
+ 
++    def gen_cloud_init_iso(self):
++        cidir = self._tmpdir
++        mdata = open(os.path.join(cidir, "meta-data"), "w")
++        name = self.name.replace(".","-")
++        mdata.writelines(["instance-id: {}-vm-0\n".format(name),
++                          "local-hostname: {}-guest\n".format(name)])
++        mdata.close()
++        udata = open(os.path.join(cidir, "user-data"), "w")
++        print("guest user:pw {}:{}".format(self._config['guest_user'],
++                                           self._config['guest_pass']))
++        udata.writelines(["#cloud-config\n",
++                          "chpasswd:\n",
++                          "  list: |\n",
++                          "    root:%s\n" % self._config['root_pass'],
++                          "    %s:%s\n" % (self._config['guest_user'],
++                                           self._config['guest_pass']),
++                          "  expire: False\n",
++                          "users:\n",
++                          "  - name: %s\n" % self._config['guest_user'],
++                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
++                          "    ssh-authorized-keys:\n",
++                          "    - %s\n" % self._config['ssh_pub_key'],
++                          "  - name: root\n",
++                          "    ssh-authorized-keys:\n",
++                          "    - %s\n" % self._config['ssh_pub_key'],
++                          "locale: en_US.UTF-8\n"])
++        proxy = os.environ.get("http_proxy")
++        if not proxy is None:
++            udata.writelines(["apt:\n",
++                              "  proxy: %s" % proxy])
++        udata.close()
++        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
++                               "-volid", "cidata", "-joliet", "-rock",
++                               "user-data", "meta-data"],
++                               cwd=cidir,
++                               stdin=self._devnull, stdout=self._stdout,
++                               stderr=self._stdout)
++
++        return os.path.join(cidir, "cloud-init.iso")
++
+ def parse_args(vmcls):
+ 
+     def get_default_jobs():
+diff --git a/tests/vm/centos b/tests/vm/centos
+index a41ff109eb..0ad4ecf419 100755
+--- a/tests/vm/centos
++++ b/tests/vm/centos
+@@ -31,37 +31,6 @@ class CentosVM(basevm.BaseVM):
+         make docker-test-mingw@fedora  {verbose} J={jobs} NETWORK=1;
+     """
+ 
+-    def _gen_cloud_init_iso(self):
+-        cidir = self._tmpdir
+-        mdata = open(os.path.join(cidir, "meta-data"), "w")
+-        mdata.writelines(["instance-id: centos-vm-0\n",
+-                          "local-hostname: centos-guest\n"])
+-        mdata.close()
+-        udata = open(os.path.join(cidir, "user-data"), "w")
+-        udata.writelines(["#cloud-config\n",
+-                          "chpasswd:\n",
+-                          "  list: |\n",
+-                          "    root:%s\n" % self.ROOT_PASS,
+-                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
+-                          "  expire: False\n",
+-                          "users:\n",
+-                          "  - name: %s\n" % self.GUEST_USER,
+-                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
+-                          "    ssh-authorized-keys:\n",
+-                          "    - %s\n" % basevm.SSH_PUB_KEY,
+-                          "  - name: root\n",
+-                          "    ssh-authorized-keys:\n",
+-                          "    - %s\n" % basevm.SSH_PUB_KEY,
+-                          "locale: en_US.UTF-8\n"])
+-        udata.close()
+-        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
+-                               "-volid", "cidata", "-joliet", "-rock",
+-                               "user-data", "meta-data"],
+-                               cwd=cidir,
+-                               stdin=self._devnull, stdout=self._stdout,
+-                               stderr=self._stdout)
+-        return os.path.join(cidir, "cloud-init.iso")
+-
+     def build_image(self, img):
+         cimg = self._download_with_cache("https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
+         img_tmp = img + ".tmp"
+@@ -69,7 +38,7 @@ class CentosVM(basevm.BaseVM):
+         subprocess.check_call(["ln", "-f", cimg, img_tmp + ".xz"])
+         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp + ".xz"])
+         self.exec_qemu_img("resize", img_tmp, "50G")
+-        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
++        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
+         self.wait_ssh()
+         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+         self.ssh_root_check("yum update -y")
+diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+index 48e9cb1ad3..3266038fbd 100755
+--- a/tests/vm/ubuntu.i386
++++ b/tests/vm/ubuntu.i386
+@@ -29,41 +29,6 @@ class UbuntuX86VM(basevm.BaseVM):
+         make --output-sync {target} -j{jobs} {verbose};
+     """
+ 
+-    def _gen_cloud_init_iso(self):
+-        cidir = self._tmpdir
+-        mdata = open(os.path.join(cidir, "meta-data"), "w")
+-        mdata.writelines(["instance-id: ubuntu-vm-0\n",
+-                          "local-hostname: ubuntu-guest\n"])
+-        mdata.close()
+-        udata = open(os.path.join(cidir, "user-data"), "w")
+-        udata.writelines(["#cloud-config\n",
+-                          "chpasswd:\n",
+-                          "  list: |\n",
+-                          "    root:%s\n" % self.ROOT_PASS,
+-                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
+-                          "  expire: False\n",
+-                          "users:\n",
+-                          "  - name: %s\n" % self.GUEST_USER,
+-                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
+-                          "    ssh-authorized-keys:\n",
+-                          "    - %s\n" % basevm.SSH_PUB_KEY,
+-                          "  - name: root\n",
+-                          "    ssh-authorized-keys:\n",
+-                          "    - %s\n" % basevm.SSH_PUB_KEY,
+-                          "locale: en_US.UTF-8\n"])
+-        proxy = os.environ.get("http_proxy")
+-        if not proxy is None:
+-            udata.writelines(["apt:\n",
+-                              "  proxy: %s" % proxy])
+-        udata.close()
+-        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
+-                               "-volid", "cidata", "-joliet", "-rock",
+-                               "user-data", "meta-data"],
+-                               cwd=cidir,
+-                               stdin=self._devnull, stdout=self._stdout,
+-                               stderr=self._stdout)
+-        return os.path.join(cidir, "cloud-init.iso")
+-
+     def build_image(self, img):
+         cimg = self._download_with_cache(
+             "https://cloud-images.ubuntu.com/releases/bionic/release-20191114/ubuntu-18.04-server-cloudimg-i386.img",
+@@ -71,7 +36,7 @@ class UbuntuX86VM(basevm.BaseVM):
+         img_tmp = img + ".tmp"
+         subprocess.check_call(["cp", "-f", cimg, img_tmp])
+         self.exec_qemu_img("resize", img_tmp, "50G")
+-        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
++        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
+         self.wait_ssh()
+         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+         self.ssh_root_check("apt-get update")
+-- 
+2.17.1
 
 
