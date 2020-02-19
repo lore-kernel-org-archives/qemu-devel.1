@@ -2,102 +2,76 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B034BC34050
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F251C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:32:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80E2420801
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:31:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BE00208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:32:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ar29tGDw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80E2420801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h47VUvSX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BE00208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4MdC-0002oD-M8
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:31:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56518)
+	id 1j4MeX-00041K-Dv
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:32:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56725)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j4McH-00021K-Ug
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:30:10 -0500
+ (envelope-from <slp@redhat.com>) id 1j4MdD-00036M-VT
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j4McH-0006Vi-19
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:30:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56651
+ (envelope-from <slp@redhat.com>) id 1j4MdD-0007G8-2w
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:31:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49604
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4McG-0006VO-SJ
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:30:04 -0500
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1j4MdC-0007FV-TQ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:31:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582108204;
+ s=mimecast20190719; t=1582108262;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=I2yDfeKcEPCkuDatLCsUd0zxjHcD/Nm835TAo3Kbex8=;
- b=Ar29tGDweRB/zja8WXhhK2Tsxxjo7/reSiGLbcnyCKuafg/XxaftEgjz48BAz06/L0E8bM
- zWPcZsge3xSIatWHLzinKW6WZ5IziEKdJUfO55d+D2Ekd+yrxUMGqfQgvj8BlloO3brZ0/
- wfgFc26QQr8V9Mu5ojYhAObbSrgBE/o=
+ in-reply-to:in-reply-to:references:references;
+ bh=/aVEMm2Y3i5RYg+9XbTigRp/TfUMNCbN9z9a77ExvpM=;
+ b=h47VUvSXGzctyc0Z0muOEpZzk52SxeB31mHtXuxMVhSTtEJBVB87E5+4ikUJdoPWVTmd71
+ ya8r2aFzQf9smYsrvQqEGq9rBEIFvuxoY00Vf+ooqJGqbBYRcZ85625wb/QmhGxsdZOeGu
+ ke+Uc5oIdzhBr6uo8Ub9fwAVf7So5s8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-KMYSH2GCNVKVNXaSJkxppg-1; Wed, 19 Feb 2020 05:30:01 -0500
-X-MC-Unique: KMYSH2GCNVKVNXaSJkxppg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-402-andU1Wo3O-yayPpQAJBt0w-1; Wed, 19 Feb 2020 05:30:57 -0500
+X-MC-Unique: andU1Wo3O-yayPpQAJBt0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E2888010EF;
- Wed, 19 Feb 2020 10:30:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-152.ams2.redhat.com
- [10.36.116.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CDD5619756;
- Wed, 19 Feb 2020 10:29:58 +0000 (UTC)
-Subject: Re: [PATCH] iotests/279: Fix for non-qcow2 formats
-To: qemu-block@nongnu.org
-References: <20191219144243.1763246-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9910c074-d9ba-9759-4544-12ac35bf47ee@redhat.com>
-Date: Wed, 19 Feb 2020 11:29:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49CC58018A3;
+ Wed, 19 Feb 2020 10:30:56 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DC245DA76;
+ Wed, 19 Feb 2020 10:30:50 +0000 (UTC)
+Date: Wed, 19 Feb 2020 11:30:49 +0100
+From: Sergio Lopez <slp@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 3/5] qemu/queue.h: add QLIST_SAFE_REMOVE()
+Message-ID: <20200219103049.ik6aje5uvb64cret@dritchie>
+References: <20200214171712.541358-1-stefanha@redhat.com>
+ <20200214171712.541358-4-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191219144243.1763246-1-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200214171712.541358-4-stefanha@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nVVnrmU59y5k5ti0spljjB9MRyvmzGwvZ"
+ protocol="application/pgp-signature"; boundary="uklq2jv2jhszyl52"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,59 +85,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nVVnrmU59y5k5ti0spljjB9MRyvmzGwvZ
-Content-Type: multipart/mixed; boundary="7wqnEeItg8swSIMMxdKNq9x9WJFvagAfR"
-
---7wqnEeItg8swSIMMxdKNq9x9WJFvagAfR
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--uklq2jv2jhszyl52
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 19.12.19 15:42, Max Reitz wrote:
-> First, driver=3Dqcow2 will not work so well with non-qcow2 formats (and
-> this test claims to support qcow, qed, and vmdk).
+On Fri, Feb 14, 2020 at 05:17:10PM +0000, Stefan Hajnoczi wrote:
+> QLIST_REMOVE() assumes the element is in a list.  It also leaves the
+> element's linked list pointers dangling.
 >=20
-> Second, vmdk will always report the backing file format to be vmdk.
-> Filter that out so the output looks like for all other formats.
+> Introduce a safe version of QLIST_REMOVE() and convert open-coded
+> instances of this pattern.
 >=20
-> Third, the flat vmdk subformats do not support backing files, so they
-> will not work with this test.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  tests/qemu-iotests/279 | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  block.c              |  5 +----
+>  chardev/spice.c      |  4 +---
+>  include/qemu/queue.h | 14 ++++++++++++++
+>  3 files changed, 16 insertions(+), 7 deletions(-)
 
-Applied to my block branch.
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 
-Max
-
-
---7wqnEeItg8swSIMMxdKNq9x9WJFvagAfR--
-
---nVVnrmU59y5k5ti0spljjB9MRyvmzGwvZ
+--uklq2jv2jhszyl52
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5NDiQACgkQ9AfbAGHV
-z0AKEwgAtfP/Y1jhM35rRw9uPzryUq/vkI1UtYj2pexPOobaHZz6+5s7RKnh9Bws
-ixRfcYQIB6hgcR6tb0LNmxKghMLykJDniEourlsGgiz+C+xDEAn1CmOH5TQZKiGl
-yabzcRproObazKj4RNoOmb5qzkrZnIUE7N4MPNAeywdel4nt0qLvhbDUQBWIYjbh
-tFSs4yGGx+bj4EByv7tqZnRdecqHsIHXxvc3CcegrfDcwUx1R77VLOAcPLwsYPDu
-dKQ/SOMjMa0Stz5TnoavcKHgIcpnmUJE2pPXbIFmC/P6X4y6t6ZDLG/4ErbWc5HV
-n6wXArFEVuGq5GbtBO85y2RJQbsUsQ==
-=hmPO
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl5NDlgACgkQ9GknjS8M
+AjW4SA/+O6GMX2i3IG0GIcjvPL0qOOmKYT9Zuukvf2FE5UP44Tk5QjdN6Q8QmV2n
+KcEXJNK0YKnX3kOUZPNt47hB1WcFFPqw1x2gpG8J9tGjijD1x144PY6Zx+zNc10u
++fMzOEendLu1QYElKuvygkK50Qyh2wBCLoFmdUU5J9aXLJk6DzjjnbT5tNsWUfRU
+RY5SbxHiP7wzxKLwF8ck1YWL7jY2CsDuye2om2KfaCRGjViT9ZleBqSZKrJTqtic
+F24iS4wZ+gA3mfftCLjx44OtLnuWNCQHiPhnopVei0MC9tqG2gNkVd7DLVWGDmR1
+Jr6rZVur9L4pdF2nIDUuh5xdrKOLLfPGr4xH6TqCZhc+sQoJ3dXYp8/F11nXqPKk
+6NpGH2JS1v3v2JdjBx1pjxP18aAXChOAiTQvWKfIQEYK50vQY/ytc/5Bmyd/PN/R
+H7f5QW6bgzI3Mnn967vhcz2PMJqOTS7zaLN1RDd4aXc1r5UT8snJmGRfO3yNzhzz
++x+EvULOzrlDuGNSJa8FbCdWAViBK4msMib2MuE0L2ptDLPXUQlNQo7FHNFkE0Kg
+veruo6Wgk2ZuPcYt7jsojmNyjv7RVOoPnJqitZAh4T0lpAiOx4RNNQpw4GFoK96i
+XhmFQ2yvVJz2c7/iBAiqySANPhCUR55KvDlkFJeySWXSU4hPOP0=
+=YlQ7
 -----END PGP SIGNATURE-----
 
---nVVnrmU59y5k5ti0spljjB9MRyvmzGwvZ--
+--uklq2jv2jhszyl52--
 
 
