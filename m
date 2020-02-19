@@ -2,81 +2,105 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38335C34022
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65AC4C34051
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:06:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0E1821D56
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34BBA24670
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:06:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="LSmT5uO1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E1821D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihNvwFNr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34BBA24670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4KLV-0004UQ-5W
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:04:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54870)
+	id 1j4KNb-0006Gx-Dn
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:06:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1j4KKW-0003a0-VS
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:03:38 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j4KMq-0005fm-JV
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:06:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1j4KKV-0004GD-6V
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:03:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37006)
+ (envelope-from <pbonzini@redhat.com>) id 1j4KMo-0005lx-PZ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:05:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49291
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>)
- id 1j4KKR-0004Cz-4K; Wed, 19 Feb 2020 03:03:31 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id A407621D56;
- Wed, 19 Feb 2020 08:03:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1582099409;
- bh=XKvbxnqDqqgvnETocVfhNBfhZu4quZNZYHFCf1GaV5M=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=LSmT5uO12PELk4nf7D77qtk0gbfe2ugUofQrtDm/70DnKFt/rNRNKfgkdIWJvBejU
- Sr3UqQWPVun1bgZ3YHMx7QrIgqxRCYM2HQsgOZ7z2pn3JS5KxMSmIv0Rf5yJhCsRwM
- pQPL9IRsjNg1VPhFSnMEYBAHKkz1kFe313dfeom8=
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why) by disco-boy.misterjones.org with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j4KKN-006S6Z-VQ; Wed, 19 Feb 2020 08:03:28 +0000
-Date: Wed, 19 Feb 2020 08:03:26 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/3] target/arm: Support SError injection
-Message-ID: <20200219080326.05d552ef@why>
-In-Reply-To: <459ada75-b055-b2e2-ba5b-851f76c17f62@redhat.com>
-References: <20200218020416.50244-1-gshan@redhat.com>
- <20200218020416.50244-2-gshan@redhat.com>
- <60f0303b0c8d3f9a124c2e5c25814de3@kernel.org>
- <459ada75-b055-b2e2-ba5b-851f76c17f62@redhat.com>
-Organization: Approximate
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j4KMo-0005l4-D7
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:05:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582099557;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=goXlGZ4hkwseuR5dIayjfLYnKcL273cWTEm9ZMhi8SY=;
+ b=ihNvwFNrk8Zyk4nHt5lf7wjBk7YHpZ265GyLf4wMZ0XxLatzHm05RsVe+Zne5MFVWFDnzB
+ Cl7ytvq58NTLoJUzVWPJUZs9E0RM4DHKQmBBWaz6+TjLpFI4MBsLehFwnDcAw76D+1+cjM
+ q01Cs9r7tmDzvfHgrR+n61l4LwFy3SY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-gKjAZgyMPuu60_NmbTPBtQ-1; Wed, 19 Feb 2020 03:05:53 -0500
+X-MC-Unique: gKjAZgyMPuu60_NmbTPBtQ-1
+Received: by mail-wr1-f72.google.com with SMTP id d7so1799659wrx.9
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 00:05:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=UOYQDmNAANxyInzj44boMeqVUHtGhRO7pYhvY/W+/iY=;
+ b=cZ4P3mWeWiflSxCQueDknwoXDTS6aWuVSjvmtVlCODXIzqfi+ZfET9FNJRZwyRYQ0F
+ 9ytvm8h2imexJcAWX9nkhzjZ3OORZ93q3oojRUzKl2OoqlT0G58TDGzING6dza00A1w+
+ AwxF1FRC2ZsbPIdTDh0iwMDmgKG51hCOs2BY7IDcIAvTTuOXonhAA6I/5wA2CQEkg/cv
+ YtGl2Ab0QbT2Eklm1EYxJjrJAobT0Jp6YzIgiXCWV3UXnX3HSc6S2SVKpV1LCRh1kkFD
+ WOWDrbeG6Z/KBrL5qgfONr83h5zoUlDTWKevCB/HG72C/azUiw7Fc8wZNwdkmsPJX7tG
+ urMg==
+X-Gm-Message-State: APjAAAW/jI2NGK9J7QBDN6rv7L3ZJi3bdrhnw85ygAxpPZe/MkuVvVRN
+ /4URzS1sxxlQv4VP2F8vLlnzeE520POYXNjGWtgAJrmfcS/j2meprYBppmSD/E+eq0S9SUATM15
+ xrbYqMZCoWEw+6x8=
+X-Received: by 2002:adf:cd91:: with SMTP id q17mr34760131wrj.306.1582099552026; 
+ Wed, 19 Feb 2020 00:05:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz6/kROJRsRNnetsGhSGnfV/+unI1ELTjGHZ1whuDWlVc0yu7EgDf7JlHpB2jSPxTKLtSg8eg==
+X-Received: by 2002:adf:cd91:: with SMTP id q17mr34760096wrj.306.1582099551719; 
+ Wed, 19 Feb 2020 00:05:51 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:59c7:c3ee:2dec:d2b4?
+ ([2001:b07:6468:f312:59c7:c3ee:2dec:d2b4])
+ by smtp.gmail.com with ESMTPSA id 133sm2138853wmd.5.2020.02.19.00.05.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 19 Feb 2020 00:05:50 -0800 (PST)
+Subject: Re: [PATCH v2] hw/i386: disable smbus migration for xenfv
+To: Olaf Hering <olaf@aepfle.de>
+References: <20200113174521.3336-1-olaf@aepfle.de>
+ <20200116180321.24968-1-olaf@aepfle.de>
+ <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
+ <20200117102244.22edd8a6.olaf@aepfle.de>
+ <ea3a65c3-bd69-7815-6893-cb1cd8b9cfd6@redhat.com>
+ <20200117140616.18cb8c45.olaf@aepfle.de>
+ <CACCGGhCO_OqPq__t+V9RrFMYhXCJ5N4PPkq9CASJULV2rTkT-g@mail.gmail.com>
+ <20200127100951.0803d167.olaf@aepfle.de>
+ <20200218182728.4b7f17b7.olaf@aepfle.de>
+ <b1313071-0eae-0465-4b3f-85c49c77a256@redhat.com>
+ <20200218204405.17047092.olaf@aepfle.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <49a2f35d-cc78-762b-39c3-0340bbebcf84@redhat.com>
+Date: Wed, 19 Feb 2020 09:05:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: gshan@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- peter.maydell@linaro.org, richard.henderson@linaro.org, pbonzini@redhat.com,
- aik@ozlabs.ru, drjones@redhat.com, eric.auger@redhat.com, jthierry@redhat.com,
- shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+In-Reply-To: <20200218204405.17047092.olaf@aepfle.de>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="6wRqWXcjlNNAyQsDW8AxlDVYEPF3GRCWP"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,316 +112,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, jthierry@redhat.com,
- aik@ozlabs.ru, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- eric.auger@redhat.com, qemu-arm@nongnu.org, shan.gavin@gmail.com,
- pbonzini@redhat.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Paul Durrant <pdurrant@gmail.com>, Anthony Perard <anthony.perard@citrix.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Feb 2020 10:09:39 +1100
-Gavin Shan <gshan@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6wRqWXcjlNNAyQsDW8AxlDVYEPF3GRCWP
+Content-Type: multipart/mixed; boundary="L6EdwuEgPRmOF1IB4DB1sRoEDwBgqdd8B"
 
-> Hi Marc,
->=20
-> On 2/19/20 3:28 AM, Marc Zyngier wrote:
-> > On 2020-02-18 02:04, Gavin Shan wrote: =20
-> >> This supports SError injection, which will be used by "virt" board to
-> >> simulating the behavior of NMI injection in next patch. As Peter Mayde=
-ll
-> >> suggested, this adds a new interrupt (ARM_CPU_SERROR), which is parall=
-el
-> >> to CPU_INTERRUPT_HARD. The backend depends on if kvm is enabled or not.
-> >> kvm_vcpu_ioctl(cpu, KVM_SET_VCPU_EVENTS) is leveraged to inject SError
-> >> or data abort to guest. When TCG is enabled, the behavior is simulated
-> >> by injecting SError and data abort to guest. =20
-> >=20
-> > s/and/or/ (you can't inject both at the same time).
-> >  =20
->=20
-> Absolutely, will be corrected in v5, which will be hold. I hope to receive
-> comments from Peter and Richard before going to do another respin :)
+--L6EdwuEgPRmOF1IB4DB1sRoEDwBgqdd8B
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Sure, there is no hurry at all.
+On 18/02/20 20:44, Olaf Hering wrote:
+> Am Tue, 18 Feb 2020 18:37:09 +0100
+> schrieb Paolo Bonzini <pbonzini@redhat.com>:
+>=20
+>> On 18/02/20 18:27, Olaf Hering wrote:
+>>> The approach below (making 'xenfv' an alias of 'pc') does not work:
+>>> xen_enabled() is false when pc_i440fx_3_1_machine_options runs. =20
+>> Don't use an alias, copy the 3.1 code into the xenfv machine type and/or
+>> call the 3.1 functions from the xenfv machine type.
+>=20
+> In the end it may look like this.
+>=20
+> Let me know about any preferences regarding the naming of configure optio=
+ns and variables.
+
+Has any version of Xen been released with a QEMU version above 3.1?
+
+Paolo
 
 >=20
-> >>
-> >> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> >> ---
-> >> =C2=A0target/arm/cpu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 69 ++++++++++++=
-++++++++++++++++++++ =20
-> +++--------
-> >> =C2=A0target/arm/cpu.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 20 ++++++++-----
-> >> =C2=A0target/arm/helper.c=C2=A0=C2=A0 | 12 ++++++++
-> >> =C2=A0target/arm/m_helper.c |=C2=A0 8 +++++
-> >> =C2=A0target/arm/machine.c=C2=A0 |=C2=A0 3 +-
-> >> =C2=A05 files changed, 91 insertions(+), 21 deletions(-)
-> >>
-> >> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> >> index de733aceeb..e5750080bc 100644
-> >> --- a/target/arm/cpu.c
-> >> +++ b/target/arm/cpu.c
-> >> @@ -78,7 +78,7 @@ static bool arm_cpu_has_work(CPUState *cs)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 && cs->interrupt_requ=
-est &
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (CPU_INTERRUPT_FIQ | =
-CPU_INTERRUPT_HARD
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | CPU_INTERRUPT=
-_VFIQ | CPU_INTERRUPT_VIRQ
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | CPU_INTERRUPT_EXIT=
-TB);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | CPU_INTERRUPT_SERR=
-OR | CPU_INTERRUPT_EXITTB) =20
-> ;
-> >> =C2=A0}
-> >>
-> >> =C2=A0void arm_register_pre_el_change_hook(ARMCPU *cpu, ARMELChangeHoo=
-kFn * =20
-> hook,
-> >> @@ -449,6 +449,9 @@ static inline bool arm_excp_unmasked(CPUState *cs,
-> >> unsigned int excp_idx,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 return false;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return !(env->daif & =
-PSTATE_I);
-> >> +=C2=A0=C2=A0=C2=A0 case EXCP_SERROR:
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pstate_unmasked =3D !(env->daif =
-& PSTATE_A);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break; =20
-> >=20
-> > nit: Consider keeping the physical interrupts together, as they are clo=
-se =20
-> ly
-> > related.
-> >  =20
+> Olaf
 >=20
-> Sorry, I didn't get the point. Maybe you're suggesting something like bel=
-ow
-> ?
-> If yes, I'm not sure if it's necessary.
+> diff --git a/configure b/configure
+> index 6f5d850949..65ca345fd6 100755
+> --- a/configure
+> +++ b/configure
+> @@ -368,6 +368,7 @@ vnc_jpeg=3D""
+>  vnc_png=3D""
+>  xkbcommon=3D""
+>  xen=3D""
+> +xen_hvm_pc_i440fx_version_3_1=3D""
+>  xen_ctrl_version=3D""
+>  xen_pci_passthrough=3D""
+>  linux_aio=3D""
+> @@ -1162,6 +1163,10 @@ for opt do
+>    ;;
+>    --enable-xen-pci-passthrough) xen_pci_passthrough=3D"yes"
+>    ;;
+> +  --disable-xenfv-i440fx-version-3_1) xen_hvm_pc_i440fx_version_3_1=3D"n=
+o"
+> +  ;;
+> +  --enable-xenfv-i440fx-version-3_1) xen_hvm_pc_i440fx_version_3_1=3D"ye=
+s"
+> +  ;;
+>    --disable-brlapi) brlapi=3D"no"
+>    ;;
+>    --enable-brlapi) brlapi=3D"yes"
+> @@ -7836,6 +7841,9 @@ if supported_xen_target $target; then
+>      if test "$xen_pci_passthrough" =3D yes; then
+>          echo "CONFIG_XEN_PCI_PASSTHROUGH=3Dy" >> "$config_target_mak"
+>      fi
+> +    if test "$xen_hvm_pc_i440fx_version_3_1" =3D yes; then
+> +        echo "CONFIG_XEN_HVM_PC_I440FX_VERSION_3_1=3Dy" >> "$config_targ=
+et_mak"
+> +    fi
+>  else
+>      echo "$target/config-devices.mak: CONFIG_XEN=3Dn" >> $config_host_ma=
+k
+>  fi
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index fa12203079..83d1fcc0ba 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -949,6 +949,11 @@ DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
+>  #ifdef CONFIG_XEN
+>  static void xenfv_machine_options(MachineClass *m)
+>  {
+> +#ifdef CONFIG_XEN_HVM_PC_I440FX_VERSION_3_1
+> +    pc_i440fx_3_1_machine_options(m);
+> +#else
+> +    pc_i440fx_4_2_machine_options(m);
+> +#endif
+>      m->desc =3D "Xen Fully-virtualized PC";
+>      m->max_cpus =3D HVM_MAX_VCPUS;
+>      m->default_machine_opts =3D "accel=3Dxen";
 >=20
->      pstate_unmasked =3D !(env->daif & (PSTATE_A | PSTATE_I));
->=20
-> I think PSTATE_A is enough to mask out SError according to ARMv8 architec=
-tu
-> re
-> reference manual (D1.7), as below:
->=20
->     A, I, F Asynchronous exception mask bits:
->     A
->        SError interrupt mask bit.
->     I
->        IRQ interrupt mask bit.
->     F
->        FIQ interrupt mask bit.
 
-No, all I'm suggesting is that you keep the cases for IRQ, FIQ and
-SError close together in the switch statement, instead of placing
-SError after the virtual interrupts. Given that they use the same code
-pattern, it makes sense to order them this way. But as I said, this is
-a nit, and not something that affects the outcome of this code.
 
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 default:
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert_not_reached(=
-);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> @@ -538,6 +541,15 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int
-> >> interrupt_request)
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 /* The prioritization of interrupts is IMPLEM=
-ENTATION DEFIN =20
-> ED. */
-> >>
-> >> +=C2=A0=C2=A0=C2=A0 if (interrupt_request & CPU_INTERRUPT_SERROR) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 excp_idx =3D EXCP_SERROR;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 target_el =3D arm_phys_exc=
-p_target_el(cs, excp_id =20
-> x, cur_el, secure);
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (arm_excp_unmasked(cs, =
-excp_idx, target_el,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cur_el, secure, hcr_el2)) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 go=
-to found;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> +=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 if (interrupt_request & CPU_INTERRUPT_FIQ) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 excp_idx =3D EXCP_FIQ;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 target_el =3D arm_phy=
-s_excp_target_el(cs, excp_ =20
-> idx, cur_el, secure);
-> >> @@ -570,6 +582,7 @@ bool arm_cpu_exec_interrupt(CPUState *cs, int
-> >> interrupt_request)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 goto found;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 return false;
-> >>
-> >> =C2=A0 found:
-> >> @@ -585,7 +598,7 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState
-> >> *cs, int interrupt_request)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 CPUClass *cc =3D CPU_GET_CLASS(cs);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 ARMCPU *cpu =3D ARM_CPU(cs);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 CPUARMState *env =3D &cpu->env;
-> >> -=C2=A0=C2=A0=C2=A0 bool ret =3D false;
-> >> +=C2=A0=C2=A0=C2=A0 uint32_t excp_idx;
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 /* ARMv7-M interrupt masking works differentl=
-y than -A or - =20
-> R.
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * There is no FIQ/IRQ distinction. Inst=
-ead of I and F bi =20
-> ts
-> >> @@ -594,13 +607,26 @@ static bool arm_v7m_cpu_exec_interrupt(CPUState
-> >> *cs, int interrupt_request)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * (which depends on state like BASEPRI,=
- FAULTMASK and th =20
-> e
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * currently active exception).
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> >> -=C2=A0=C2=A0=C2=A0 if (interrupt_request & CPU_INTERRUPT_HARD
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 && (armv7m_nvic_can_take_p=
-ending_exception(env->n =20
-> vic))) {
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cs->exception_index =3D EX=
-CP_IRQ;
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cc->do_interrupt(cs);
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D true;
-> >> +=C2=A0=C2=A0=C2=A0 if (!armv7m_nvic_can_take_pending_exception(env->n=
-vic)) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
-> >> +=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 if (interrupt_request & CPU_INTERRUPT_SERROR) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 excp_idx =3D EXCP_SERROR;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto found;
-> >> +=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 if (interrupt_request & CPU_INTERRUPT_HARD) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 excp_idx =3D EXCP_IRQ;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto found;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> -=C2=A0=C2=A0=C2=A0 return ret;
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 return false;
-> >> +
-> >> +found:
-> >> +=C2=A0=C2=A0=C2=A0 cs->exception_index =3D excp_idx;
-> >> +=C2=A0=C2=A0=C2=A0 cc->do_interrupt(cs);
-> >> +=C2=A0=C2=A0=C2=A0 return true;
-> >> =C2=A0}
-> >> =C2=A0#endif
-> >>
-> >> @@ -656,7 +682,8 @@ static void arm_cpu_set_irq(void *opaque, int irq,
-> >> int level)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_IRQ] =3D CPU=
-_INTERRUPT_HARD,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_FIQ] =3D CPU=
-_INTERRUPT_FIQ,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_VIRQ] =3D CP=
-U_INTERRUPT_VIRQ,
-> >> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_VFIQ] =3D CPU_INT=
-ERRUPT_VFIQ
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_VFIQ] =3D CPU_INT=
-ERRUPT_VFIQ,
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [ARM_CPU_SERROR] =3D CPU_I=
-NTERRUPT_SERROR,
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 };
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 if (level) {
-> >> @@ -676,6 +703,7 @@ static void arm_cpu_set_irq(void *opaque, int irq,
-> >> int level)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 case ARM_CPU_IRQ:
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 case ARM_CPU_FIQ:
-> >> +=C2=A0=C2=A0=C2=A0 case ARM_CPU_SERROR:
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (level) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 cpu_interrupt(cs, mask[irq]);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
-> >> @@ -693,8 +721,10 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
-> >> irq, int level)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 ARMCPU *cpu =3D opaque;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 CPUARMState *env =3D &cpu->env;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 CPUState *cs =3D CPU(cpu);
-> >> +=C2=A0=C2=A0=C2=A0 struct kvm_vcpu_events events;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 uint32_t linestate_bit;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 int irq_id;
-> >> +=C2=A0=C2=A0=C2=A0 bool inject_irq =3D true;
-> >>
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 switch (irq) {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 case ARM_CPU_IRQ:
-> >> @@ -705,6 +735,14 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
-> >> irq, int level)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 irq_id =3D KVM_ARM_IR=
-Q_CPU_FIQ;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 linestate_bit =3D CPU=
-_INTERRUPT_FIQ;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
-> >> +=C2=A0=C2=A0=C2=A0 case ARM_CPU_SERROR:
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!kvm_has_vcpu_events()=
-) {
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-turn;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 inject_irq =3D false;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 linestate_bit =3D CPU_INTE=
-RRUPT_SERROR;
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 default:
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_assert_not_reached(=
-);
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> @@ -714,7 +752,14 @@ static void arm_cpu_kvm_set_irq(void *opaque, int
-> >> irq, int level)
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 } else {
-> >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 env->irq_line_state &=
-=3D ~linestate_bit;
-> >> =C2=A0=C2=A0=C2=A0=C2=A0 }
-> >> -=C2=A0=C2=A0=C2=A0 kvm_arm_set_irq(cs->cpu_index, KVM_ARM_IRQ_TYPE_CP=
-U, irq_id, !!level);
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 if (inject_irq) { =20
-> >=20
-> > You could just have (linestate_bit !=3D CPU_INTERRUPT_SERROR) here, and=
- n =20
-> ot have
-> > inject_irq at all.
-> >  =20
->=20
-> Sure, will be improved in v5.
->=20
-> >> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_arm_set_irq(cs->cpu_in=
-dex, KVM_ARM_IRQ_TYPE_C =20
-> PU, irq_id, !!level);
-> >> +=C2=A0=C2=A0=C2=A0 } else if (level) { =20
-> >=20
-> > Is there any case where you'd call this function with a SError and leve=
-l =3D=3D 0?
-> > And even if it happens, you could exit early in the above switch statem=
-en =20
-> t.
-> >  =20
->=20
-> The combination of SError and level =3D=3D 0 isn't existing for now,
-> meaning the SError is always coming with level =3D=3D 1. We can't exit
-> early in above s witch statement because env->irq_line_state needs to
-> be updated accordingly.
 
-I'm not sure level=3D=3D0 makes much sense. A common implementation of
-SError is as an edge interrupt (it is consumed by being handled, and
-you can't "retire" it). I'm not familiar enough with QEMU's interrupt
-delivery mechanism, but I'd expect SError to differ significantly from
-IRQ/FIQ in that respect.
+--L6EdwuEgPRmOF1IB4DB1sRoEDwBgqdd8B--
 
-	M.
---=20
-Jazz is not dead. It just smells funny...
+--6wRqWXcjlNNAyQsDW8AxlDVYEPF3GRCWP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl5M7F0ACgkQv/vSX3jH
+roPb4Af9FoLcfxjrZkhtwtFMOu59wFHd0UxpuOifEs7lvIfn4VoaleD+kBwzRlUm
+id+a4M151kFH+8BpnJiahZyq2VcU3UKRzIQMxhZB3OzjRpUV6VbIWUIkL/5f6yOu
+QSxzelyOi/V/PE7zYnv47d+6xgS5hKbImTk6buOe6Iin36afIZvYErqgtdA/bXJF
+CO9NwEX2akmeLOyQQYfLsYbl5QuVB5XuRAUkUP1wBTv8TAqQ1T3GurSkQYcEMC1u
+CCphEQ29wdGupXyYdwtGRS4O2X8HjPNaLz18+/QblrGW0xhLAKMOVCj9XezEmyTr
+OFaVouesU3N8n+SuRm8shu7UhYXfmA==
+=Nlox
+-----END PGP SIGNATURE-----
+
+--6wRqWXcjlNNAyQsDW8AxlDVYEPF3GRCWP--
+
 
