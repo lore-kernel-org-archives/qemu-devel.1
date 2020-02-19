@@ -2,69 +2,80 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 745A6C34031
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9F0C34031
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:55:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49DC6207FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:22:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49DC6207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8557924655
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:55:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOx6eOZ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8557924655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4E4j-0000kz-Gi
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 20:22:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50142)
+	id 1j4EaI-0007YU-Tp
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 20:55:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j4E41-0000DJ-A5
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:22:10 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j4EZW-0006wQ-Ls
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j4E3w-0006Qb-P4
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:22:08 -0500
-Resent-Date: Tue, 18 Feb 2020 20:22:06 -0500
-Resent-Message-Id: <E1j4E3w-0006Qb-P4@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21184)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j4E3w-0006Q8-HY; Tue, 18 Feb 2020 20:22:04 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582075301; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ChtSpJuARbs/fvLnktmd5Mqnr2i2PXF6aEvTPJaoUd1rUbTPZik5W4ACXJz4BNkeUZR7qne3Rr4GtKPEeGOc1GTe1dctW0RU0lfw/ho7N1Gu9HDb8nKY6NcJ2kEcUv7LqNdJqGHXqVpz4aI24aPQdOeZ+sZdyCCag9ICxH0KMEo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582075301;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=K+znV4GKNEhyu1hEHfuK88l3MPxPcfQ39eO3PfuHO3o=; 
- b=XF3W9el3bxet7VVYHMQYkT2jhoY41qT1LoaAAKOBjBNoEqAXOCqEnCogBm5gJ9H+p6QlSiISkaFtftie60JQlsx4QzawNqVnZ0SsCYtkfJDpJfD70zkkwqOgPHwLtkjQuTwQtuZ6wu0o/AanqYnLmziHQmERl29TVJ5dlRwfA98=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582075297824307.2309368113548;
- Tue, 18 Feb 2020 17:21:37 -0800 (PST)
-In-Reply-To: <20200219005414.15635-1-david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v3 00/12] target/ppc: Correct some errors with real mode
- handling
-Message-ID: <158207529589.20350.13094839224352717874@a1bbccc8075a>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j4EZU-0004WK-NO
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:54:42 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34010)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j4EZU-0004VZ-Hk; Tue, 18 Feb 2020 20:54:40 -0500
+Received: by mail-ot1-x343.google.com with SMTP id j16so21640630otl.1;
+ Tue, 18 Feb 2020 17:54:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DpgtMQbXX5PpF9YhJmOuyqk/epg/8bO61B8WaHMIMUU=;
+ b=KOx6eOZ5KXIEFlf7min1K7KsXq1TT0CiVWzm2HuFiIdyy3evTLCvXskv225PEjR2he
+ D4HHDay3znjmCdmy6ozm9PWdPmL/FuNbsTghgXK5ndn1Sh3/tess7g/t6ppCXTH6aLaR
+ 6eZdR7nwy0foaw6FulG8E02RePnEeEjkB5k+zUS7Kodq3ZPJkAw4yZGeErgrrhWkKBz3
+ 8FWxAlW7KODPbeMSJ4enIbWt1t8r+qAo3EBpol3skYEtz9TB82QSgd1kJaL4BpKkxrjy
+ DkmAke2jXGNc+VVxvp2OWfCAtkUCa4WXWENM7B65uFbWfrrLfY1mqwbsczY5RA/2seEd
+ Km+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DpgtMQbXX5PpF9YhJmOuyqk/epg/8bO61B8WaHMIMUU=;
+ b=bOKnPXlRyand88gNvIbevdXwhhLMd05ZuAP7OJ2DIo43IBOUxFQbhlzHnO57Twfkmk
+ pylleXL88VNRZEXTGorDLPAs0ka+sXoSs1ODs3ONQFgHF8fqKq8lmNxBb7MC12Xy7uzq
+ Em1iL9HbvZG1L9/6SCPdFHdhpXwQ8n4D50Bq9eDU6UZOdGDWZHRviBkHjlpDaFwrDRE9
+ datDwGFdgWHY30A2JWUqYFKQj6KSbNv81u1sxP5yamg1qmLy/bTD5ZhLdGe9wKOuUbhe
+ PfL2sjFx07ULb7a07CoHWP2TZy7PrXvMfybYwiw8oEeWL5G5P7ahpxvjjHfw5k64RGsM
+ YCTQ==
+X-Gm-Message-State: APjAAAXlkuiUR9xT2hWYk2//Sw/93KlKLvfrEwabyiT3kP7l1rcScYa3
+ AHb1GUe6XcwqKgoZE7iKlRd/48F5KfQfKtPRSU0=
+X-Google-Smtp-Source: APXvYqxJq59wBKijpKoH6dVCnrasiGZr8QJNGXz8MkTHWLxR3QER9T600NRCTd7wJ30ghk9gOf7MK1U0ihTUDn9AgLk=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr17110649otk.64.1582077279552; 
+ Tue, 18 Feb 2020 17:54:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@gibson.dropbear.id.au
-Date: Tue, 18 Feb 2020 17:21:37 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <cover.1580290069.git.fthain@telegraphics.com.au>
+ <CAL1e-=iOQ52y0vbXAYaYDKqoepD09xO2=3d55WM32=9TFwFzAg@mail.gmail.com>
+ <alpine.LNX.2.22.394.2002191150440.8@nippy.intranet>
+In-Reply-To: <alpine.LNX.2.22.394.2002191150440.8@nippy.intranet>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 19 Feb 2020 02:54:17 +0100
+Message-ID: <CAL1e-=gaVz5K=JMg+iN53weESLORKEuXRJvq-SFqU7FERojP8Q@mail.gmail.com>
+Subject: Re: [PATCH v4 00/14] Fixes for DP8393X SONIC device emulation
+To: Finn Thain <fthain@telegraphics.com.au>
+Content-Type: multipart/alternative; boundary="00000000000041498b059ee41252"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,89 +87,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, aik@ozlabs.ru, mark.cave-ayland@ilande.co.uk,
- groug@kaod.org, qemu-devel@nongnu.org, paulus@samba.org, clg@kaod.org,
- qemu-ppc@nongnu.org, philmd@redhat.com, david@gibson.dropbear.id.au
+Cc: Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxOTAwNTQxNC4xNTYz
-NS0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzIDAwLzEyXSB0YXJnZXQvcHBj
-OiBDb3JyZWN0IHNvbWUgZXJyb3JzIHdpdGggcmVhbCBtb2RlIGhhbmRsaW5nCk1lc3NhZ2UtaWQ6
-IDIwMjAwMjE5MDA1NDE0LjE1NjM1LTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1ClR5cGU6
-IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBh
-cnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
-dGNoZXcvMjAyMDAyMTkwMDU0MTQuMTU2MzUtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUg
-LT4gcGF0Y2hldy8yMDIwMDIxOTAwNTQxNC4xNTYzNS0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5p
-ZC5hdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjI3NWRiMmYgdGFyZ2V0L3BwYzog
-RG9uJ3Qgc3RvcmUgVlJNQSBTTEJFIHBlcnNpc3RlbnRseQo4ZjRlZjc4IHRhcmdldC9wcGM6IFN0
-cmVhbWxpbmUgY29uc3RydWN0aW9uIG9mIFZSTUEgU0xCIGVudHJ5CjUzMjlmM2IgdGFyZ2V0L3Bw
-YzogT25seSBjYWxjdWxhdGUgUk1MUyBkZXJpdmVkIFJNQSBsaW1pdCBvbiBkZW1hbmQKNjU2YTM3
-MiB0YXJnZXQvcHBjOiBDb3JyZWN0IFJNTFMgdGFibGUKNjQzMmU3ZiB0YXJnZXQvcHBjOiBTdHJl
-YW1saW5lIGNhbGN1bGF0aW9uIG9mIFJNQSBsaW1pdCBmcm9tIExQQ1JbUk1MU10KMDBmNzhjZCB0
-YXJnZXQvcHBjOiBVc2UgY2xhc3MgZmllbGRzIHRvIHNpbXBsaWZ5IExQQ1IgbWFza2luZwpjNmY2
-Y2VhIHRhcmdldC9wcGM6IFJlbW92ZSBSTU9SIHJlZ2lzdGVyIGZyb20gUE9XRVI5ICYgUE9XRVIx
-MApjNmRhYWU2IHNwYXByLCBwcGM6IFJlbW92ZSBWUE0wL1JNTFMgaGFja3MgZm9yIFBPV0VSOQoz
-Mzc0MTk3IHRhcmdldC9wcGM6IEludHJvZHVjZSBwcGNfaGFzaDY0X3VzZV92cm1hKCkgaGVscGVy
-CjdlMTRlOTcgdGFyZ2V0L3BwYzogQ29ycmVjdCBoYW5kbGluZyBvZiByZWFsIG1vZGUgYWNjZXNz
-ZXMgd2l0aCB2aHlwIG9uIGhhc2ggTU1VCjdjMjk4Y2IgcHBjOiBSZW1vdmUgc3R1YiBvZiBQUEM5
-NzAgSElENCBpbXBsZW1lbnRhdGlvbgo0NTI1ODc5IHBwYzogUmVtb3ZlIHN0dWIgc3VwcG9ydCBm
-b3IgMzItYml0IGh5cGVydmlzb3IgbW9kZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVj
-a2luZyBjb21taXQgNDUyNTg3OWU2ZmFlIChwcGM6IFJlbW92ZSBzdHViIHN1cHBvcnQgZm9yIDMy
-LWJpdCBoeXBlcnZpc29yIG1vZGUpCjIvMTIgQ2hlY2tpbmcgY29tbWl0IDdjMjk4Y2I1ODgyMSAo
-cHBjOiBSZW1vdmUgc3R1YiBvZiBQUEM5NzAgSElENCBpbXBsZW1lbnRhdGlvbikKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzk4OiBG
-SUxFOiB0YXJnZXQvcHBjL3RyYW5zbGF0ZV9pbml0LmluYy5jOjc5MDQ6CisgICAgLyogUFBDOTcw
-OiBISUQ0IGNvdmVycyB0aGluZ3MgbGF0ZXIgY29udHJvbGxlZCBieSB0aGUgTFBDUiBhbmQKCldB
-Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGlu
-ZQojMTAyOiBGSUxFOiB0YXJnZXQvcHBjL3RyYW5zbGF0ZV9pbml0LmluYy5jOjc5MDg6CisgICAg
-ICogaWdub3JlIGl0ICovCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDcxIGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDIvMTIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xMiBDaGVja2lu
-ZyBjb21taXQgN2UxNGU5N2ZhNzI1ICh0YXJnZXQvcHBjOiBDb3JyZWN0IGhhbmRsaW5nIG9mIHJl
-YWwgbW9kZSBhY2Nlc3NlcyB3aXRoIHZoeXAgb24gaGFzaCBNTVUpCjQvMTIgQ2hlY2tpbmcgY29t
-bWl0IDMzNzQxOTczOWVlOCAodGFyZ2V0L3BwYzogSW50cm9kdWNlIHBwY19oYXNoNjRfdXNlX3Zy
-bWEoKSBoZWxwZXIpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24g
-YSBzZXBhcmF0ZSBsaW5lCiM0MTogRklMRTogdGFyZ2V0L3BwYy9tbXUtaGFzaDY0LmM6Njc1Ogor
-ICAgICAgICAvKiBJU0F2My4wIChQT1dFUjkpIGFsd2F5cyB1c2VzIFZSTUEsIHRoZSBWUE0wIGZp
-ZWxkIGFuZCBSTU9SCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBv
-biBhIHNlcGFyYXRlIGxpbmUKIzQyOiBGSUxFOiB0YXJnZXQvcHBjL21tdS1oYXNoNjQuYzo2NzY6
-CisgICAgICAgICAqIHJlZ2lzdGVyIG5vIGxvbmdlciBleGlzdCAqLwoKdG90YWw6IDAgZXJyb3Jz
-LCAyIHdhcm5pbmdzLCA4MyBsaW5lcyBjaGVja2VkCgpQYXRjaCA0LzEyIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjUvMTIgQ2hlY2tpbmcgY29tbWl0IGM2ZGFhZTZlOWIwNiAoc3BhcHIsIHBw
-YzogUmVtb3ZlIFZQTTAvUk1MUyBoYWNrcyBmb3IgUE9XRVI5KQo2LzEyIENoZWNraW5nIGNvbW1p
-dCBjNmY2Y2VhYTQzZmMgKHRhcmdldC9wcGM6IFJlbW92ZSBSTU9SIHJlZ2lzdGVyIGZyb20gUE9X
-RVI5ICYgUE9XRVIxMCkKNy8xMiBDaGVja2luZyBjb21taXQgMDBmNzhjZGZlYmJkICh0YXJnZXQv
-cHBjOiBVc2UgY2xhc3MgZmllbGRzIHRvIHNpbXBsaWZ5IExQQ1IgbWFza2luZykKOC8xMiBDaGVj
-a2luZyBjb21taXQgNjQzMmU3ZmU4NjRmICh0YXJnZXQvcHBjOiBTdHJlYW1saW5lIGNhbGN1bGF0
-aW9uIG9mIFJNQSBsaW1pdCBmcm9tIExQQ1JbUk1MU10pCjkvMTIgQ2hlY2tpbmcgY29tbWl0IDY1
-NmEzNzJmNjc3YyAodGFyZ2V0L3BwYzogQ29ycmVjdCBSTUxTIHRhYmxlKQoxMC8xMiBDaGVja2lu
-ZyBjb21taXQgNTMyOWYzYjA3ZmJhICh0YXJnZXQvcHBjOiBPbmx5IGNhbGN1bGF0ZSBSTUxTIGRl
-cml2ZWQgUk1BIGxpbWl0IG9uIGRlbWFuZCkKMTEvMTIgQ2hlY2tpbmcgY29tbWl0IDhmNGVmNzhh
-NGFmMyAodGFyZ2V0L3BwYzogU3RyZWFtbGluZSBjb25zdHJ1Y3Rpb24gb2YgVlJNQSBTTEIgZW50
-cnkpCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnQKIzgwOiBGSUxFOiB0YXJnZXQvcHBjL21tdS1oYXNoNjQuYzoxMDg0OgorICAgICAg
-ICBpZiAoYnVpbGRfdnJtYV9zbGJlKGNwdSwgc2xiKSA9PSAwKQpbLi4uXQoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCA5NyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xMiBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKMTIvMTIgQ2hlY2tpbmcgY29tbWl0IDI3NWRiMmZlMmE4NCAodGFy
-Z2V0L3BwYzogRG9uJ3Qgc3RvcmUgVlJNQSBTTEJFIHBlcnNpc3RlbnRseSkKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAyMTkwMDU0MTQuMTU2
-MzUtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+--00000000000041498b059ee41252
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+2:06 AM Sre, 19.02.2020. Finn Thain <fthain@telegraphics.com.au> =D1=98=D0=
+=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> On Tue, 18 Feb 2020, Aleksandar Markovic wrote:
+>
+> > On Wednesday, January 29, 2020, Finn Thain <fthain@telegraphics.com.au>
+> > wrote:
+> >
+> > > Hi All,
+> > >
+> > > There are bugs in the emulated dp8393x device that can stop packet
+> > > reception in a Linux/m68k guest (q800 machine).
+> > >
+> > > With a Linux/m68k v5.5 guest (q800), it's possible to remotely trigge=
+r
+> > > an Oops by sending ping floods.
+> > >
+> > > With a Linux/mips guest (magnum machine), the driver fails to probe
+> > > the dp8393x device.
+> > >
+> > > With a NetBSD/arc 5.1 guest (magnum), the bugs in the device can be
+> > > fatal to the guest kernel.
+> > >
+> > > Whilst debugging the device, I found that the receiver algorithm
+> > > differs from the one described in the National Semiconductor
+> > > datasheet.
+> > >
+> > > This patch series resolves these bugs.
+> > >
+> > > AFAIK, all bugs in the Linux sonic driver were fixed in Linux v5.5.
+> > > ---
+> >
+> >
+> > Herve,
+> >
+> > Do your Jazz tests pass with these changes?
+> >
+>
+> AFAIK those tests did not expose the NetBSD panic that is caused by
+> mainline QEMU (mentioned above).
+>
+> I have actually run the tests you requested (Herv=C3=A9 described them in=
+ an
+> earlier thread). There was no regression. Quite the reverse -- it's no
+> longer possible to remotely crash the NetBSD kernel.
+>
+> Apparently my testing was also the first time that the jazzsonic driver
+> (from the Linux/mips Magnum port) was tested successfully with QEMU. It
+> doesn't work in mainline QEMU.
+>
+
+Well, I appologize if I missed all these facts. I just did not notice them,
+at least not in this form. And, yes, some "Tested-by:" by Herve would be
+desirable and nice.
+
+Yours,
+Aleksandae
+
+> Anyway, more testing is always nice, and I'd certainly welcome an
+> 'acked-by' or 'tested-by' if Herv=C3=A9 would like to send one.
+>
+> Please consider backporting this series of bug fixes to QEMU stable
+> branch(es).
+>
+> Regards,
+> Finn
+>
+> > Regards,
+> > Aleksandar
+> >
+> >
+> >
+> > > Changed since v1:
+> > >  - Minor revisions as described beneath commit logs.
+> > >  - Dropped patches 4/10 and 7/10.
+> > >  - Added 5 new patches.
+> > >
+> > > Changed since v2:
+> > >  - Minor revisions as described beneath commit logs.
+> > >  - Dropped patch 13/13.
+> > >  - Added 2 new patches.
+> > >
+> > > Changed since v3:
+> > >  - Replaced patch 13/14 with patch suggested by Philippe
+Mathieu-Daud=C3=A9.
+> > >
+> > >
+> > > Finn Thain (14):
+> > >   dp8393x: Mask EOL bit from descriptor addresses
+> > >   dp8393x: Always use 32-bit accesses
+> > >   dp8393x: Clean up endianness hacks
+> > >   dp8393x: Have dp8393x_receive() return the packet size
+> > >   dp8393x: Update LLFA and CRDA registers from rx descriptor
+> > >   dp8393x: Clear RRRA command register bit only when appropriate
+> > >   dp8393x: Implement packet size limit and RBAE interrupt
+> > >   dp8393x: Don't clobber packet checksum
+> > >   dp8393x: Use long-word-aligned RRA pointers in 32-bit mode
+> > >   dp8393x: Pad frames to word or long word boundary
+> > >   dp8393x: Clear descriptor in_use field to release packet
+> > >   dp8393x: Always update RRA pointers and sequence numbers
+> > >   dp8393x: Don't reset Silicon Revision register
+> > >   dp8393x: Don't stop reception upon RBE interrupt assertion
+> > >
+> > >  hw/net/dp8393x.c | 202
++++++++++++++++++++++++++++++++----------------
+> > >  1 file changed, 134 insertions(+), 68 deletions(-)
+> > >
+> > > --
+> > > 2.24.1
+> > >
+> > >
+> > >
+> >
+
+--00000000000041498b059ee41252
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">2:06 AM Sre, 19.02.2020. Finn Thain &lt;<a href=3D"mailto:ft=
+hain@telegraphics.com.au">fthain@telegraphics.com.au</a>&gt; =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; On Tue, 18 Feb 2020, Aleksandar Markovic wrote:<br>
+&gt;<br>
+&gt; &gt; On Wednesday, January 29, 2020, Finn Thain &lt;<a href=3D"mailto:=
+fthain@telegraphics.com.au">fthain@telegraphics.com.au</a>&gt;<br>
+&gt; &gt; wrote:<br>
+&gt; &gt; <br>
+&gt; &gt; &gt; Hi All,<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; There are bugs in the emulated dp8393x device that can stop =
+packet<br>
+&gt; &gt; &gt; reception in a Linux/m68k guest (q800 machine).<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; With a Linux/m68k v5.5 guest (q800), it&#39;s possible to re=
+motely trigger<br>
+&gt; &gt; &gt; an Oops by sending ping floods.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; With a Linux/mips guest (magnum machine), the driver fails t=
+o probe<br>
+&gt; &gt; &gt; the dp8393x device.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; With a NetBSD/arc 5.1 guest (magnum), the bugs in the device=
+ can be<br>
+&gt; &gt; &gt; fatal to the guest kernel.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; Whilst debugging the device, I found that the receiver algor=
+ithm<br>
+&gt; &gt; &gt; differs from the one described in the National Semiconductor=
+<br>
+&gt; &gt; &gt; datasheet.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; This patch series resolves these bugs.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; AFAIK, all bugs in the Linux sonic driver were fixed in Linu=
+x v5.5.<br>
+&gt; &gt; &gt; ---<br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; Herve,<br>
+&gt; &gt; <br>
+&gt; &gt; Do your Jazz tests pass with these changes?<br>
+&gt; &gt; <br>
+&gt;<br>
+&gt; AFAIK those tests did not expose the NetBSD panic that is caused by <b=
+r>
+&gt; mainline QEMU (mentioned above).<br>
+&gt;<br>
+&gt; I have actually run the tests you requested (Herv=C3=A9 described them=
+ in an <br>
+&gt; earlier thread). There was no regression. Quite the reverse -- it&#39;=
+s no <br>
+&gt; longer possible to remotely crash the NetBSD kernel.<br>
+&gt;<br>
+&gt; Apparently my testing was also the first time that the jazzsonic drive=
+r <br>
+&gt; (from the Linux/mips Magnum port) was tested successfully with QEMU. I=
+t <br>
+&gt; doesn&#39;t work in mainline QEMU.<br>
+&gt;</p>
+<p dir=3D"ltr">Well, I appologize if I missed all these facts. I just did n=
+ot notice them, at least not in this form. And, yes, some &quot;Tested-by:&=
+quot; by Herve would be desirable and nice.</p>
+<p dir=3D"ltr">Yours,<br>
+Aleksandae<br></p>
+<p dir=3D"ltr">&gt; Anyway, more testing is always nice, and I&#39;d certai=
+nly welcome an <br>
+&gt; &#39;acked-by&#39; or &#39;tested-by&#39; if Herv=C3=A9 would like to =
+send one.<br>
+&gt;<br>
+&gt; Please consider backporting this series of bug fixes to QEMU stable <b=
+r>
+&gt; branch(es).<br>
+&gt;<br>
+&gt; Regards,<br>
+&gt; Finn<br>
+&gt;<br>
+&gt; &gt; Regards,<br>
+&gt; &gt; Aleksandar<br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; <br>
+&gt; &gt; &gt; Changed since v1:<br>
+&gt; &gt; &gt;=C2=A0 - Minor revisions as described beneath commit logs.<br=
+>
+&gt; &gt; &gt;=C2=A0 - Dropped patches 4/10 and 7/10.<br>
+&gt; &gt; &gt;=C2=A0 - Added 5 new patches.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; Changed since v2:<br>
+&gt; &gt; &gt;=C2=A0 - Minor revisions as described beneath commit logs.<br=
+>
+&gt; &gt; &gt;=C2=A0 - Dropped patch 13/13.<br>
+&gt; &gt; &gt;=C2=A0 - Added 2 new patches.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; Changed since v3:<br>
+&gt; &gt; &gt;=C2=A0 - Replaced patch 13/14 with patch suggested by Philipp=
+e Mathieu-Daud=C3=A9.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; Finn Thain (14):<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Mask EOL bit from descriptor addresses<=
+br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Always use 32-bit accesses<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Clean up endianness hacks<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Have dp8393x_receive() return the packe=
+t size<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Update LLFA and CRDA registers from rx =
+descriptor<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Clear RRRA command register bit only wh=
+en appropriate<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Implement packet size limit and RBAE in=
+terrupt<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Don&#39;t clobber packet checksum<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Use long-word-aligned RRA pointers in 3=
+2-bit mode<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Pad frames to word or long word boundar=
+y<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Clear descriptor in_use field to releas=
+e packet<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Always update RRA pointers and sequence=
+ numbers<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Don&#39;t reset Silicon Revision regist=
+er<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0dp8393x: Don&#39;t stop reception upon RBE inter=
+rupt assertion<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;=C2=A0 hw/net/dp8393x.c | 202 +++++++++++++++++++++++++++++++=
+----------------<br>
+&gt; &gt; &gt;=C2=A0 1 file changed, 134 insertions(+), 68 deletions(-)<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; --<br>
+&gt; &gt; &gt; 2.24.1<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;<br>
+&gt; &gt;</p>
+
+--00000000000041498b059ee41252--
 
