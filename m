@@ -2,119 +2,79 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URG_BIZ,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA86C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E9CC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 795832464E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C66E924671
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uRXksHMl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795832464E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/seNnon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66E924671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SeE-0005jS-Jd
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:56:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43141)
+	id 1j4Seb-0006Y6-TT
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:56:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4SWW-0004kJ-CW
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:48:33 -0500
+ (envelope-from <david@redhat.com>) id 1j4S3p-0001rL-I7
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4SWV-0005rx-7s
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:48:32 -0500
-Received: from mail-am6eur05on2093.outbound.protection.outlook.com
- ([40.107.22.93]:57825 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1j4SWR-0005nD-TA; Wed, 19 Feb 2020 11:48:28 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S5rJOseiwV2FfTXeBFCC9Vv6mOk4VW/y/xFXn63rYM1XSwCvt4/+T/vshFenCippXvyiXjH8/f0nh7MiJMM1zd72HAAAouOPZaT/21ZE7vXFlkqfEmTh40IuA7IDRU87hbEVYZiUl4LncUpDa+YpNiyIzWMDR1QLU1zBCD3quNDOxsu1jyaokODx4ybgZeXkA7ydKVBjp3fPqwiNrIqjhIVdy6rKjlJNUm5ul9OMRpwmQXsApjOYkVRLBVgUmqDkS7vQLb+Axf7tJmjLVmAC9saQaPyuJDCXbr2X4EcLsjhSZr1olGxfIINQzYDwI1YjQjfim0zoy6GxJmTC7//YCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5R6El8z85CKpe0ftvZOz3v9TAv6GuInOVRy2GBe+UUA=;
- b=e4CC+xSmo/7bf7pgbjIUMUgMaKv0QfmmRp3/C2/9bGq45IsJ8AfoX1B6Z4YiamjHrImfRWzxNKIZ8mZG+JwACvxd/T9tp6ETr+m6UPto2I8oSgSjKSg/ye1OdsWLbmmE4WwIois8y0TdRCgOkOTz/sLRat+KZ46FlNEPKOXdzZdp6TvhFA2hWF48UvZ9zCIDGOvcI9sfNlwsOwytqXSdiG4C3C4BYDE1lfO8bl2YsKOdulgLXrxCadMkehaBZuuh5TjbAxd81ln97L2QXEjA8XfktZMDhFlx0dOUChxC87w+7jduxpqcrmuFyGNyl5aPhJMNnL7lJlS5JXUhu0FcZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5R6El8z85CKpe0ftvZOz3v9TAv6GuInOVRy2GBe+UUA=;
- b=uRXksHMlWKC/U1XTF2Yr6OZmwEIADjxCpPutyfCVzNkvO6TBVtNEr8Dgd8Z66Rs/ZfM3EyOi7B+xX7G7TvmIzrScyuSlmrizZ1OZoXhDI8UH5CU1vsQp3cBnWzea4b+Ti4ou6DkZu4LZo80G/GSPJd1Kh0nb6lmCzdtl36BsKKo=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
- AM6PR08MB5128.eurprd08.prod.outlook.com (10.255.120.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.22; Wed, 19 Feb 2020 16:48:25 +0000
-Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
- ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
- 16:48:25 +0000
-Subject: Re: [PATCH v2 21/22] qemu-iotests/199: add early shutdown case to
- bitmaps postcopy
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
- <20200217150246.29180-22-vsementsov@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Organization: Virtuozzo
-Message-ID: <9e2f41dd-2ef9-262c-117b-9a63169f0304@virtuozzo.com>
-Date: Wed, 19 Feb 2020 19:48:22 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200217150246.29180-22-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P192CA0014.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::24)
- To AM6PR08MB5048.eurprd08.prod.outlook.com
- (2603:10a6:20b:ee::31)
+ (envelope-from <david@redhat.com>) id 1j4S3o-0004U1-0L
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21585
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4S3n-0004Tq-So
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582129131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TkVlqJ137hH9T9d4N1kD0zieB/CiWcqq2eKaC7sYXkY=;
+ b=X/seNnonnI2fYe90+g+NE0XqRk9FEv8Qo29k2Fdg5z+IADjB01nCKucMbAxp1i0gswWpzM
+ SmMyjoEOii3piG3VqvjQKb/MaTSSgZdNEzps+BxWZusaFqblnQ4rfBujgH6JmphywfziQu
+ Pkbixp6mw2ZeA50YJSGZ+DfWe9Hpm5A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-133-azv23k9XO3maZZJ0OQFY2A-1; Wed, 19 Feb 2020 11:18:47 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E27687181C;
+ Wed, 19 Feb 2020 16:18:46 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-116-151.ams2.redhat.com [10.36.116.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7814D8AC45;
+ Wed, 19 Feb 2020 16:18:43 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 05/13] migrate/ram: Handle RAM block resizes during precopy
+Date: Wed, 19 Feb 2020 17:17:17 +0100
+Message-Id: <20200219161725.115218-6-david@redhat.com>
+In-Reply-To: <20200219161725.115218-1-david@redhat.com>
+References: <20200219161725.115218-1-david@redhat.com>
 MIME-Version: 1.0
-Received: from [172.16.24.225] (185.231.240.5) by
- HE1P192CA0014.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.24 via Frontend Transport; Wed, 19 Feb 2020 16:48:24 +0000
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3759927e-43f2-4575-6d86-08d7b55b8996
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5128:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB51289D49A5CC7FE25DB50EEBF4100@AM6PR08MB5128.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
-X-Forefront-PRVS: 0318501FAE
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(39850400004)(346002)(396003)(136003)(189003)(199004)(31696002)(6486002)(52116002)(36756003)(2906002)(478600001)(36916002)(86362001)(16526019)(66556008)(54906003)(4326008)(31686004)(8676002)(956004)(66476007)(8936002)(44832011)(16576012)(2616005)(186003)(66946007)(26005)(81166006)(316002)(81156014)(53546011)(5660300002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5128;
- H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: os2CxvsJObRK6CkCezF8BQ5Nfl5DG5Qq36jSEwDIzQP3LGzXrmIdSf2m2hfzUwdu5/50aCER7ky3oVG9nDJjIoBmgM9CLmnEq3TSOBC748lCKXZWBQyjcDo5a584cBxHRYg/EH/PdARrgBlwxSCNmzOs4FvmASoN5m+56oRs0skW4bKGF3M+hE53J+q7qqcDQIDkV+/IhsHbBIEWtxqiaaLZ9OhcVfpDh2OSWjJJdCeOn6eWHdUwlr7XW9hE6LfLSWRmdA13WYX6liylG6/IhAv/cietqAAyvztCztGA8jSZw/1epZp7t9xf6THtMYRnUbFUxp9/XVUhza4ygbK4FwykI7fA6Z7fGNyNsA5IVE8YGaViUb6QSeFpb0RlMoBh7EbpvX9Il26ri+f9+8Ozxby8+5KTbS3dRhN/tbD/t7GJ4axBMF1o31igKS//Pek/
-X-MS-Exchange-AntiSpam-MessageData: dhWtGLw4OKsRBLoCgNq/5cKlYK/6/+DXmPFkuaDbopx800D3QXzVh7QBSeU20tzyPVmh2vZ/VMC8gpyZSOiw4GHWAihOfYy4v7xomJmF74hjZU45YShqefO2hsnPdpsi0Gm1yRxWGK0jBJgRIlHLJQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3759927e-43f2-4575-6d86-08d7b55b8996
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 16:48:25.2682 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iue/uATOA92OU0bTgtQobEgFmChXKmjGw2SaejkRije7rQqvdd6MgVyqAk9mwWjhHJOOj8QSJP3nyCOVcyN4oGNZnxufEDBJblYg3FmazTM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5128
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: azv23k9XO3maZZJ0OQFY2A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.22.93
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,71 +86,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- dgilbert@redhat.com, qemu-block@nongnu.org, quintela@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Resizing while migrating is dangerous and does not work as expected.
+The whole migration code works on the usable_length of ram blocks and does
+not expect this to change at random points in time.
 
+In the case of precopy, the ram block size must not change on the source,
+after syncing the RAM block list in ram_save_setup(), so as long as the
+guest is still running on the source.
 
-On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
-> Previous patches fixed two crashes which may occur on shutdown prior to
-> bitmaps postcopy finished. Check that it works now.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/199     | 18 ++++++++++++++++++
->   tests/qemu-iotests/199.out |  4 ++--
->   2 files changed, 20 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
-> index 8baa078151..0d12e6b1ae 100755
-> --- a/tests/qemu-iotests/199
-> +++ b/tests/qemu-iotests/199
-> @@ -217,6 +217,24 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
->               sha = self.discards1_sha256 if i % 2 else self.all_discards_sha256
->               self.assert_qmp(result, 'return/sha256', sha)
->   
-> +    def test_early_shutdown_destination(self):
-> +        self.start_postcopy()
-> +
-> +        self.vm_b_events += self.vm_b.get_qmp_events()
-> +        self.vm_b.shutdown()
-> +        # recreate vm_b, so there is no incoming option, which prevents
-> +        # loading bitmaps from disk
-> +        self.vm_b = iotests.VM(path_suffix='b').add_drive(disk_b)
-> +        self.vm_b.launch()
-> +        check_bitmaps(self.vm_b, 0)
-> +
-> +        result = self.vm_a.qmp('query-status')
-> +        assert not result['return']['running']
-> +        self.vm_a_events += self.vm_a.get_qmp_events()
-> +        self.vm_a.shutdown()
-> +        self.vm_a.launch()
-> +        check_bitmaps(self.vm_a, 0)
-> +
->   
->   if __name__ == '__main__':
->       iotests.main(supported_fmts=['qcow2'])
-> diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/199.out
-> index ae1213e6f8..fbc63e62f8 100644
-> --- a/tests/qemu-iotests/199.out
-> +++ b/tests/qemu-iotests/199.out
-> @@ -1,5 +1,5 @@
-> -.
-> +..
->   ----------------------------------------------------------------------
-> -Ran 1 tests
-> +Ran 2 tests
->   
->   OK
-> 
+Resizing can be trigger *after* (but not during) a reset in
+ACPI code by the guest
+- hw/arm/virt-acpi-build.c:acpi_ram_update()
+- hw/i386/acpi-build.c:acpi_ram_update()
 
-The updated test passed.
+Use the ram block notifier to get notified about resizes. Let's simply
+cancel migration and indicate the reason. We'll continue running on the
+source. No harm done.
 
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
--- 
-With the best regards,
-Andrey Shinkevich
+Update the documentation. Postcopy will be handled separately.
+
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ exec.c                |  5 +++--
+ include/exec/memory.h | 10 ++++++----
+ migration/migration.c |  9 +++++++--
+ migration/migration.h |  1 +
+ migration/ram.c       | 41 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 58 insertions(+), 8 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index b75250e773..8b015821d6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2120,8 +2120,9 @@ static int memory_try_enable_merging(void *addr, size=
+_t len)
+     return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
+ }
+=20
+-/* Only legal before guest might have detected the memory size: e.g. on
+- * incoming migration, or right after reset.
++/*
++ * Resizing RAM while migrating can result in the migration being canceled=
+.
++ * Care has to be taken if the guest might have already detected the memor=
+y.
+  *
+  * As memory core doesn't know how is memory accessed, it is up to
+  * resize callback to update device state and/or add assertions to detect
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e85b7de99a..de111347e8 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -113,7 +113,7 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+ #define RAM_SHARED     (1 << 1)
+=20
+ /* Only a portion of RAM (used_length) is actually used, and migrated.
+- * This used_length size can change across reboots.
++ * Resizing RAM while migrating can result in the migration being canceled=
+.
+  */
+ #define RAM_RESIZEABLE (1 << 2)
+=20
+@@ -843,7 +843,9 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegi=
+on *mr,
+  *                                     RAM.  Accesses into the region will
+  *                                     modify memory directly.  Only an in=
+itial
+  *                                     portion of this RAM is actually use=
+d.
+- *                                     The used size can change across reb=
+oots.
++ *                                     Changing the size while migrating
++ *                                     can result in the migration being
++ *                                     canceled.
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+@@ -1464,8 +1466,8 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
+=20
+ /* memory_region_ram_resize: Resize a RAM region.
+  *
+- * Only legal before guest might have detected the memory size: e.g. on
+- * incoming migration, or right after reset.
++ * Resizing RAM while migrating can result in the migration being canceled=
+.
++ * Care has to be taken if the guest might have already detected the memor=
+y.
+  *
+  * @mr: a memory region created with @memory_region_init_resizeable_ram.
+  * @newsize: the new size the region
+diff --git a/migration/migration.c b/migration/migration.c
+index 8fb68795dc..ac9751dbe5 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -175,13 +175,18 @@ void migration_object_init(void)
+     }
+ }
+=20
++void migration_cancel(void)
++{
++    migrate_fd_cancel(current_migration);
++}
++
+ void migration_shutdown(void)
+ {
+     /*
+      * Cancel the current migration - that will (eventually)
+      * stop the migration using this structure
+      */
+-    migrate_fd_cancel(current_migration);
++    migration_cancel();
+     object_unref(OBJECT(current_migration));
+ }
+=20
+@@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool =
+blk,
+=20
+ void qmp_migrate_cancel(Error **errp)
+ {
+-    migrate_fd_cancel(migrate_get_current());
++    migration_cancel();
+ }
+=20
+ void qmp_migrate_continue(MigrationStatus state, Error **errp)
+diff --git a/migration/migration.h b/migration/migration.h
+index 8473ddfc88..79fd74afa5 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func, vo=
+id *opaque);
+ void migration_make_urgent_request(void);
+ void migration_consume_urgent_request(void);
+ bool migration_rate_limit(void);
++void migration_cancel(void);
+=20
+ #endif
+diff --git a/migration/ram.c b/migration/ram.c
+index ed23ed1c7c..57f32011a3 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -52,6 +52,7 @@
+ #include "migration/colo.h"
+ #include "block.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/runstate.h"
+ #include "savevm.h"
+ #include "qemu/iov.h"
+ #include "multifd.h"
+@@ -3710,8 +3711,48 @@ static SaveVMHandlers savevm_ram_handlers =3D {
+     .resume_prepare =3D ram_resume_prepare,
+ };
+=20
++static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
++                                      size_t old_size, size_t new_size)
++{
++    ram_addr_t offset;
++    Error *err =3D NULL;
++    RAMBlock *rb =3D qemu_ram_block_from_host(host, false, &offset);
++
++    if (ramblock_is_ignored(rb)) {
++        return;
++    }
++
++    /*
++     * Some resizes are triggered on the migration target by precopy code,
++     * when synchronizing RAM block sizes. In these cases, the VM is not
++     * running and migration is not idle. We have to ignore these resizes,
++     * as we only care about resizes during precopy on the migration sourc=
+e.
++     * This handler is always registered, so ignore when migration is idle=
+.
++     */
++    if (migration_is_idle() || !runstate_is_running() ||
++        postcopy_is_running()) {
++        return;
++    }
++
++    /*
++     * Precopy code cannot deal with the size of ram blocks changing at
++     * random points in time. We're still running on the source, abort
++     * the migration and continue running here. Make sure to wait until
++     * migration was canceled.
++     */
++    error_setg(&err, "RAM block '%s' resized during precopy.", rb->idstr);
++    migrate_set_error(migrate_get_current(), err);
++    error_free(err);
++    migration_cancel();
++}
++
++static RAMBlockNotifier ram_mig_ram_notifier =3D {
++    .ram_block_resized =3D ram_mig_ram_block_resized,
++};
++
+ void ram_mig_init(void)
+ {
+     qemu_mutex_init(&XBZRLE.lock);
+     register_savevm_live("ram", 0, 4, &savevm_ram_handlers, &ram_state);
++    ram_block_notifier_add(&ram_mig_ram_notifier);
+ }
+--=20
+2.24.1
+
 
