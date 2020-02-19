@@ -2,77 +2,84 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DD3C34050
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C331C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:23:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2119824671
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:17:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9FC524654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 15:23:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9sIvTcB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2119824671
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCywnxvc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9FC524654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4R65-0002l8-CD
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 10:17:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58075)
+	id 1j4RBz-0004sP-1b
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 10:23:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1j4R5M-0002Hu-5V
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:16:25 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j4RBM-0004Sd-8O
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:22:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1j4R5K-000490-K3
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:16:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29325
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kchamart@redhat.com>) id 1j4RBK-00016H-Uu
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:22:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43713
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1j4R5K-00045f-BJ
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:16:22 -0500
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j4RBK-00015o-Qz
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 10:22:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582125380;
+ s=mimecast20190719; t=1582125754;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6QDF/BGK4BnK9ToY8uSAqT50pIMA2PFZvvccA+WN6uQ=;
- b=O9sIvTcBIfjQQRQ+9WnkzCsmCI+IBoNfvpLYCOAPwbfnbxUj2ahtHspKsnXE7NfF9wIm3T
- YFBcMefwRfzPH0cvaXscA4jnH6HYWW0TmmQ/fNlMDI2BL1MAZ/hx/FaL1mGxbfwEPI/ZXo
- 8rNlZ2vGCS6Pb+ueVRuQAgm+VuUk4NU=
+ bh=K3g2INvuraOlJf+qcBYwxXmpxi0/dsld5tty0zGYYEA=;
+ b=BCywnxvc+AZeB/n5ZEBKuPd5AWs/9f9QwSg6dNWPl5XlPBgIOG3vENuMDHzrNz1/wY6pk8
+ a+MijlepehuMR0Z1rHNk/fvqbvDWx5jnwXQcvXhQGDYV2JUj04+HUHpU2W69OqVQrATEDr
+ uEsRIN0N6n3EQ+SNp2hCFjNdg9wn8gU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-XYx3MObBPrO9xiMBrhvHsg-1; Wed, 19 Feb 2020 10:16:12 -0500
-X-MC-Unique: XYx3MObBPrO9xiMBrhvHsg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-349-JEXswl2AOE2OBJrj4AMWVg-1; Wed, 19 Feb 2020 10:22:30 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15BED107B273
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 15:16:12 +0000 (UTC)
-Received: from lpt (ovpn-200-50.brq.redhat.com [10.40.200.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F226484779;
- Wed, 19 Feb 2020 15:16:02 +0000 (UTC)
-Date: Wed, 19 Feb 2020 16:15:59 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Julia Suvorova <jusual@redhat.com>
-Subject: Re: [PATCH v2] pcie_root_port: Add enable_hotplug option
-Message-ID: <20200219151559.GE3992@lpt>
-References: <20200219145540.648365-1-jusual@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 595E313EA;
+ Wed, 19 Feb 2020 15:22:29 +0000 (UTC)
+Received: from paraplu.localdomain (ovpn-116-111.ams2.redhat.com
+ [10.36.116.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D17319756;
+ Wed, 19 Feb 2020 15:22:28 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 0E4963E04B8; Wed, 19 Feb 2020 16:22:26 +0100 (CET)
+Date: Wed, 19 Feb 2020 16:22:25 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 1/2] docs: Convert qemu-cpu-models.texi to rST
+Message-ID: <20200219152225.GB24572@paraplu>
+References: <20200219114607.1855-1-kchamart@redhat.com>
+ <20200219114607.1855-2-kchamart@redhat.com>
+ <CAFEAcA94A3doGQthOTrPuMadOfqrSLBadUbi+3BpHr1MGp_w1A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200219145540.648365-1-jusual@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAFEAcA94A3doGQthOTrPuMadOfqrSLBadUbi+3BpHr1MGp_w1A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: JEXswl2AOE2OBJrj4AMWVg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,71 +91,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---/2994txjAzEdQwm5
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 19, 2020 at 01:16:11PM +0000, Peter Maydell wrote:
+> On Wed, 19 Feb 2020 at 11:46, Kashyap Chamarthy <kchamart@redhat.com> wro=
+te:
 
-On Wed, Feb 19, 2020 at 03:55:40PM +0100, Julia Suvorova wrote:
->Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
->manage it and restrict unplug for the whole machine. This is going to
->prevent user-initiated unplug in guests (Windows mostly).
->Hotplug is enabled by default.
->Usage:
->    -device pcie-root-port,enable-hotplug=3Dfalse,...
->
->If you want to disable hot-unplug on some downstream ports of one
->switch, disable hot-unplug on PCIe Root Port connected to the upstream
->port as well as on the selected downstream ports.
->
->Discussion related:
->    https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00530.html
->
->Signed-off-by: Julia Suvorova <jusual@redhat.com>
->---
->v1: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04868.html
->
->v2:
->    * change name of the option to 'enable-hotplug' [Laine]
->    * change order of enabling capability bits [Igor]
->    * enable HPS bit [Igor]
->    * add option to xio3130_downstream [J=E1n]
->
-> hw/pci-bridge/pcie_root_port.c     |  3 ++-
-> hw/pci-bridge/xio3130_downstream.c |  3 ++-
-> hw/pci/pcie.c                      | 11 +++++++----
-> include/hw/pci/pcie.h              |  2 +-
-> include/hw/pci/pcie_port.h         |  1 +
-> 5 files changed, 13 insertions(+), 7 deletions(-)
->
+[...]
 
-Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
+> >  docs/qemu-cpu-models.texi       | 677 --------------------------------
+> >  docs/system/index.rst           |   1 +
+> >  docs/system/qemu-cpu-models.rst | 496 +++++++++++++++++++++++
+> >  3 files changed, 497 insertions(+), 677 deletions(-)
+> >  delete mode 100644 docs/qemu-cpu-models.texi
+> >  create mode 100644 docs/system/qemu-cpu-models.rst
+>=20
+> Hi; I haven't looked in detail at the actual conversion
+> parts, but from the diffstat you're missing some parts:
 
-Jano
+Hi, Peter.
 
---/2994txjAzEdQwm5
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks for the helpfully detailed response.  I realized some of the
+missing bits due to the Patchew failure and as I look closer into your
+patch for qemu-block-drivers.rst.
 
------BEGIN PGP SIGNATURE-----
+> 1) qemu-doc.texi has an "@include docs/qemu-cpu-models.texi"
+> that needs to be removed. That then means that the
+> "CPU models" section in qemu-doc.texi is empty, so we
+> can just delete it (the @node and @section directives,
+> and the reference to it in the earlier @menu)
+> (I'm surprised this didn't cause 'make' to fail with
+> an error trying to build the texi docs.)
+>=20
+> 2) The bit of Makefile which lists the dependencies of
+> qemu-doc.html needs to be updated to remove
+> docs/qemu-cpu-models.texi.
+>=20
+> 3) we create a qemu-cpu-models.7 manpage, so the parts
+> of Makefile that currently handle creating it from the
+> texi need to be changed to do it from the rST instead.
+> You can look at how we handle qemu-block-drivers.7
+> for an example. Don't forget that you'll need to add
+> a line to docs/system/conf.py to get Sphinx to build
+> the manpage, as well as the makefile changes.
+> You can check how the manpage renders with
+> 'man -l /path/to/builddir/docs/interop/qemu-cpu-models.7'
+>=20
+> 4) The qemu-cpu-models.texi uses a substitution
+> "@set qemu_system_x86 qemu-system-x86-64" so that
+> downstream RedHat can easily update the examples text
+> to refer to whatever they rename the binary to. The
+> equivalent of this in rST you can see in qemu-block-drivers.rst:
+> at the top of the file we have
+> =EF=BB=BF=EF=BB=BF
+> .. |qemu_system| replace:: qemu-system-x86_64
+>=20
+> and then an example block using it is like:
+>=20
+> .. parsed-literal::
+>=20
+>   |qemu_system| linux.img -hdb fat:/my_directory
+>=20
+> (you have to use a parsed-literal block and not the
+> usual :: so that the expansion is done.)
 
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl5NUSwACgkQ+YPwO/Ma
-t50hugf/ZoQORTRH/O7XocU4fyNJlzDvM6tHVpsMgvpyONhUqzq2uS0c7AMIL47g
-kdYY/VeaGOtx4NMKl1Q4VKKN0Zvd27IEcFYuUtNxbjBK8N9zuO3EMmfNoDDlb7nX
-GdWYVdR8tfSwJuArSjBaL8C2l08pRZwSyChVrJhQrMx9hAmPXNIziHncI+jDXDQE
-JsL8IgjdcuhUi5vq3vEbSeksWdnWoX0lPxxglyPB971OEBwgvpXFL//MuWsJGJ7c
-lYKYIVOAt49VMWCnUrVWs3lptwpyHFh1EnyNcS79xJPySYhR+3wExxT20J3vRZ7p
-JwvKRdhK/wYzTKbXv/QAtemWSRaQpA==
-=oHTt
------END PGP SIGNATURE-----
+Ah, noted.  I used the regular :: out of habit from elsewhere, and
+didn't even look at the details of qemu-block-drivers.rst.
 
---/2994txjAzEdQwm5--
+I'm addressing them as we speak; v2 upcoming.
+
+Thanks, again.
+
+--=20
+/kashyap
 
 
