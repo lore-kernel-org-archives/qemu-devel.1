@@ -2,73 +2,72 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382DEC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CA3C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E73D320578
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 122CE20578
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9ioRU75"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E73D320578
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxqYorT2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 122CE20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SRn-0002gC-0e
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:43:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38006)
+	id 1j4SRs-0002zO-7i
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:43:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwq-0005Dx-L6
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rwd-00051T-N2
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwo-0001dz-KI
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21988
+ (envelope-from <imammedo@redhat.com>) id 1j4Rwa-0001XW-UI
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28460
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rwm-0001as-Gw
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:38 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rwa-0001XN-P4
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128690;
+ s=mimecast20190719; t=1582128684;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6/NXe3JPSlqAR4NMBD65VMmv2XKlodkIVj9Cj3EHGXg=;
- b=F9ioRU75U7DJBsOtUQWv04vT37JcCyWmTW+oIQMmY1f1Zw2P5DxUC4e9SdhIFpoxe/GHkM
- qHBc3ThHeOLBfgQHuhKDaLxrShs1R87xGyrZ4Q5K9DtMntFrhgAHjQQJFZiLSGA8xai11t
- xk4n1/8OZ5g4/ag7FHA0hssxYCDbevM=
+ bh=KcDp4S3QMCt4n9sRn116WhY04vPSpxf2qi0MRuOVyXc=;
+ b=QxqYorT2vZ9vq4BhcZTG5N6xBP5cn05Q70a8Z6fZfoIdK62dvRUlTV8ZWsSTJxU0saRHrX
+ hKVbBdV+Badi+5km+AmXxuzOjQr9nZCFf9V8l+23Wr8vLE3i6/IfE+YMkjGY1yem3EmC/1
+ 6ASf1TkfMvYb/0zSXpbV1aAS4GHHpEI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-KCIyo9qiP0K-5yYhXdBjAA-1; Wed, 19 Feb 2020 11:11:28 -0500
+ us-mta-302-t7HPp7IJPOWzFo66iQ5uGQ-1; Wed, 19 Feb 2020 11:11:18 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89F0E1318D7
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 510358A2463;
+ Wed, 19 Feb 2020 16:11:17 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D871A48;
- Wed, 19 Feb 2020 16:11:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1898748;
+ Wed, 19 Feb 2020 16:11:15 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 78/79] tests/numa-test: make top level args dynamic and
- g_autofree(cli) cleanups
-Date: Wed, 19 Feb 2020 11:09:52 -0500
-Message-Id: <20200219160953.13771-79-imammedo@redhat.com>
+Subject: [PATCH v6 70/79] sparc/sun4m: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:44 -0500
+Message-Id: <20200219160953.13771-71-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: KCIyo9qiP0K-5yYhXdBjAA-1
+X-MC-Unique: t7HPp7IJPOWzFo66iQ5uGQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -86,305 +85,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use GString to pass argument to make_cli() so that it would be easy
-to dynamically change test case arguments from main(). The follow up
-patch will use it to change RAM size options depending on target.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-While at it cleanup 'cli' freeing, using g_autofree annotation.
+Patch moves ram size check into sun4m_hw_init() and drops
+ram_init() moving remainder to sun4m_hw_init() as well,
+as it was the only place that called it.
+
+Also it rewrites impl. of RamDevice a little bit, which
+could serve as an example of frontend device for RAM backend.
+(Caveats are:
+  1. it doesn't check for memdev backend being mapped
+     since it's been  usurped by generic machine to handle
+     majority of machines which don't have RAM frontend device
+  2. it still lacks 'addr' property and still has hardcoded
+     sysbus_mmio_map() in board init. If done right, board should
+     set 'addr' property and bus/machine plug handler should map
+     it during device realize time.
+)
+Further improvements were left as exercise for the future,
+since frontends are out scope of RAM conversion to memdev.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
-v3:
-  * s/strcmp/g_str_equal/
-    (Thomas Huth <thuth@redhat.com>)
-  * use pair make_cli/qtest_init instead of qtest_initf
-PS:
-  made as a separate patch so it won't clutter followup testcase changes.
 v4:
-  * use g_string_new(NULL) instead of g_string_new("")
-    (Thomas Huth <thuth@redhat.com>)
----
- tests/qtest/numa-test.c | 108 ++++++++++++++++++++--------------------
- 1 file changed, 54 insertions(+), 54 deletions(-)
+  * 'machine: introduce memory-backend property' patch changed
+    'memory-backend' property from link to backend id to allow for
+    delayed initialization. Take that in account and add resolving
+    machine->ram_memdev_id into backend pointer before setting link
+    on RamDevice.
 
-diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-index 17dd807d2a..35999ea28f 100644
---- a/tests/qtest/numa-test.c
-+++ b/tests/qtest/numa-test.c
-@@ -14,16 +14,16 @@
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
+CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+CC: atar4qemu@gmail.com
+---
+ hw/sparc/sun4m.c | 74 ++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 37 deletions(-)
+
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 25e96db5ca..f5bf95fc9f 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -777,63 +777,42 @@ static const TypeInfo prom_info =3D {
 =20
--static char *make_cli(const char *generic_cli, const char *test_cli)
-+static char *make_cli(const GString *generic_cli, const char *test_cli)
+ typedef struct RamDevice {
+     SysBusDevice parent_obj;
+-
+-    MemoryRegion ram;
+-    uint64_t size;
++    HostMemoryBackend *memdev;
+ } RamDevice;
+=20
+ /* System RAM */
+ static void ram_realize(DeviceState *dev, Error **errp)
  {
--    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_c=
-li);
-+    return g_strdup_printf("%s %s", generic_cli->str, test_cli);
+     RamDevice *d =3D SUN4M_RAM(dev);
+-    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    MemoryRegion *ram =3D host_memory_backend_get_memory(d->memdev);
+=20
+-    memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram",
+-                                         d->size);
+-    sysbus_init_mmio(sbd, &d->ram);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), ram);
  }
 =20
- static void test_mon_explicit(const void *data)
+-static void ram_init(hwaddr addr, ram_addr_t RAM_size,
+-                     uint64_t max_mem)
++static void ram_initfn(Object *obj)
  {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 "
-                    "-numa node,nodeid=3D0,cpus=3D0-3 "
-@@ -33,17 +33,15 @@ static void test_mon_explicit(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
-     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
+-    DeviceState *dev;
+-    SysBusDevice *s;
+-    RamDevice *d;
+-
+-    /* allocate RAM */
+-    if ((uint64_t)RAM_size > max_mem) {
+-        error_report("Too much memory for this machine: %" PRId64 ","
+-                     " maximum %" PRId64,
+-                     RAM_size / MiB, max_mem / MiB);
+-        exit(1);
+-    }
+-    dev =3D qdev_create(NULL, "memory");
+-    s =3D SYS_BUS_DEVICE(dev);
+-
+-    d =3D SUN4M_RAM(dev);
+-    d->size =3D RAM_size;
+-    qdev_init_nofail(dev);
+-
+-    sysbus_mmio_map(s, 0, addr);
++    RamDevice *d =3D SUN4M_RAM(obj);
++    object_property_add_link(obj, "memdev", TYPE_MEMORY_BACKEND,
++                             (Object **)&d->memdev,
++                             object_property_allow_set_link,
++                             OBJ_PROP_LINK_STRONG, &error_abort);
++    object_property_set_description(obj, "memdev", "Set RAM backend"
++                                    "Valid value is ID of a hostmem backen=
+d",
++                                     &error_abort);
  }
 =20
- static void test_mon_default(const void *data)
+-static Property ram_properties[] =3D {
+-    DEFINE_PROP_UINT64("size", RamDevice, size, 0),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void ram_class_init(ObjectClass *klass, void *data)
  {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
 =20
-     cli =3D make_cli(data, "-smp 8 -numa node -numa node");
-     qts =3D qtest_init(cli);
-@@ -51,17 +49,15 @@ static void test_mon_default(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
-     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
+     dc->realize =3D ram_realize;
+-    device_class_set_props(dc, ram_properties);
  }
 =20
- static void test_mon_partial(const void *data)
- {
--    char *s;
--    char *cli;
-     QTestState *qts;
-+    g_autofree char *s =3D NULL;
-+    g_autofree char *cli =3D NULL;
+ static const TypeInfo ram_info =3D {
+     .name          =3D TYPE_SUN4M_MEMORY,
+     .parent        =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size =3D sizeof(RamDevice),
++    .instance_init =3D ram_initfn,
+     .class_init    =3D ram_class_init,
+ };
 =20
-     cli =3D make_cli(data, "-smp 8 "
-                    "-numa node,nodeid=3D0,cpus=3D0-1 "
-@@ -71,10 +67,8 @@ static void test_mon_partial(const void *data)
-     s =3D qtest_hmp(qts, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
-     g_assert(strstr(s, "node 1 cpus: 4 5"));
--    g_free(s);
-=20
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static QList *get_cpus(QTestState *qts, QDict **resp)
-@@ -87,11 +81,11 @@ static QList *get_cpus(QTestState *qts, QDict **resp)
-=20
- static void test_query_cpus(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
-=3D4-7");
-     qts =3D qtest_init(cli);
-@@ -120,16 +114,15 @@ static void test_query_cpus(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void pc_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
-ads=3D2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -174,16 +167,15 @@ static void pc_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void spapr_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 4,cores=3D4 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -220,16 +212,15 @@ static void spapr_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void aarch64_numa_cpu(const void *data)
- {
--    char *cli;
-     QDict *resp;
-     QList *cpus;
-     QObject *e;
-     QTestState *qts;
-+    g_autofree char *cli =3D NULL;
-=20
-     cli =3D make_cli(data, "-smp 2 "
-         "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
-@@ -264,7 +255,6 @@ static void aarch64_numa_cpu(const void *data)
-=20
-     qobject_unref(resp);
-     qtest_quit(qts);
--    g_free(cli);
- }
-=20
- static void pc_dynamic_cpu_cfg(const void *data)
-@@ -273,9 +263,10 @@ static void pc_dynamic_cpu_cfg(const void *data)
-     QDict *resp;
-     QList *cpus;
-     QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-=20
--    qs =3D qtest_initf("%s -nodefaults --preconfig -smp 2",
--                     data ? (char *)data : "");
-+    cli =3D make_cli(data, "-nodefaults --preconfig -smp 2");
-+    qs =3D qtest_init(cli);
-=20
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-@@ -329,16 +320,19 @@ static void pc_dynamic_cpu_cfg(const void *data)
-=20
- static void pc_hmat_build_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
-at=3Don "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0 "
--                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D1",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
+@@ -879,6 +858,15 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
+def,
+     SysBusDevice *s;
+     unsigned int smp_cpus =3D machine->smp.cpus;
+     unsigned int max_cpus =3D machine->smp.max_cpus;
++    Object *ram_memdev =3D object_resolve_path_type(machine->ram_memdev_id=
+,
++                                                  TYPE_MEMORY_BACKEND, NUL=
+L);
 +
-+    cli =3D make_cli(data, "-nodefaults --preconfig -machine hmat=3Don "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0 "
-+                         "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 =
-"
-+                         "-numa cpu,node-id=3D0,socket-id=3D0 "
-+                         "-numa cpu,node-id=3D0,socket-id=3D1");
-+    qs =3D qtest_init(cli);
++    if (machine->ram_size > hwdef->max_mem) {
++        error_report("Too much memory for this machine: %" PRId64 ","
++                     " maximum %" PRId64,
++                     machine->ram_size / MiB, hwdef->max_mem / MiB);
++        exit(1);
++    }
 =20
-     /* Fail: Initiator should be less than the number of nodes */
-     g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
-e',"
-@@ -455,13 +449,16 @@ static void pc_hmat_build_cfg(const void *data)
+     /* init CPUs */
+     for(i =3D 0; i < smp_cpus; i++) {
+@@ -888,9 +876,12 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
+def,
+     for (i =3D smp_cpus; i < MAX_CPUS; i++)
+         cpu_irqs[i] =3D qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_PI=
+LS);
 =20
- static void pc_hmat_off_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-+
-+    cli =3D make_cli(data, "-nodefaults --preconfig "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0");
-+    qs =3D qtest_init(cli);
++    /* Create and map RAM frontend */
++    dev =3D qdev_create(NULL, "memory");
++    object_property_set_link(OBJECT(dev), ram_memdev, "memdev", &error_fat=
+al);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0);
 =20
-     /*
-      * Fail: Enable HMAT with -machine hmat=3Don
-@@ -491,16 +488,19 @@ static void pc_hmat_off_cfg(const void *data)
+-    /* set up devices */
+-    ram_init(0, machine->ram_size, hwdef->max_mem);
+     /* models without ECC don't trap when missing ram is accessed */
+     if (!hwdef->ecc_base) {
+         empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_s=
+ize);
+@@ -1078,7 +1069,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
+wdef,
 =20
- static void pc_hmat_erange_cfg(const void *data)
- {
--    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
-at=3Don "
--                     "-smp 2,sockets=3D2 "
--                     "-m 128M,slots=3D2,maxmem=3D1G "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
--                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
--                     "-numa node,nodeid=3D0,memdev=3Dm0 "
--                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D0 "
--                     "-numa cpu,node-id=3D0,socket-id=3D1",
--                     data ? (char *)data : "");
-+    QTestState *qs;
-+    g_autofree char *cli =3D NULL;
-+
-+    cli =3D make_cli(data, "-nodefaults --preconfig -machine hmat=3Don "
-+                         "-smp 2,sockets=3D2 "
-+                         "-m 128M,slots=3D2,maxmem=3D1G "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm0 "
-+                         "-object memory-backend-ram,size=3D64M,id=3Dm1 "
-+                         "-numa node,nodeid=3D0,memdev=3Dm0 "
-+                         "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 =
-"
-+                         "-numa cpu,node-id=3D0,socket-id=3D0 "
-+                         "-numa cpu,node-id=3D0,socket-id=3D1");
-+    qs =3D qtest_init(cli);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
+-    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
++    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_DEPTH, graphic_depth);
+     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_WIDTH, graphic_width);
+@@ -1415,6 +1406,7 @@ static void ss5_class_init(ObjectClass *oc, void *dat=
+a)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
 =20
-     /* Can't store the compressed latency */
-     g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
-de',"
-@@ -539,11 +539,11 @@ static void pc_hmat_erange_cfg(const void *data)
+ static const TypeInfo ss5_type =3D {
+@@ -1434,6 +1426,7 @@ static void ss10_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
 =20
- int main(int argc, char **argv)
- {
--    const char *args =3D NULL;
-+    g_autoptr(GString) args =3D g_string_new(NULL);
-     const char *arch =3D qtest_get_arch();
+ static const TypeInfo ss10_type =3D {
+@@ -1453,6 +1446,7 @@ static void ss600mp_class_init(ObjectClass *oc, void =
+*data)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
 =20
--    if (strcmp(arch, "aarch64") =3D=3D 0) {
--        args =3D "-machine virt";
-+    if (g_str_equal(arch, "aarch64")) {
-+        g_string_append(args, " -machine virt");
-     }
+ static const TypeInfo ss600mp_type =3D {
+@@ -1472,6 +1466,7 @@ static void ss20_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
 =20
-     g_test_init(&argc, &argv, NULL);
+ static const TypeInfo ss20_type =3D {
+@@ -1490,6 +1485,7 @@ static void voyager_class_init(ObjectClass *oc, void =
+*data)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo voyager_type =3D {
+@@ -1508,6 +1504,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *d=
+ata)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss_lx_type =3D {
+@@ -1526,6 +1523,7 @@ static void ss4_class_init(ObjectClass *oc, void *dat=
+a)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo ss4_type =3D {
+@@ -1544,6 +1542,7 @@ static void scls_class_init(ObjectClass *oc, void *da=
+ta)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo scls_type =3D {
+@@ -1562,6 +1561,7 @@ static void sbook_class_init(ObjectClass *oc, void *d=
+ata)
+     mc->default_boot_order =3D "c";
+     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
+     mc->default_display =3D "tcx";
++    mc->default_ram_id =3D "sun4m.ram";
+ }
+=20
+ static const TypeInfo sbook_type =3D {
 --=20
 2.18.1
 
