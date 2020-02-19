@@ -2,74 +2,76 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F149C34050
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F9EC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2947024654
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DDB424654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFC6jbJ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2947024654
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8+7B4Lw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DDB424654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SM2-0005lJ-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:37:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38005)
+	id 1j4SMG-0006XQ-6A
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:37:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwq-0005Dr-Ic
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4RwH-0004FV-KE
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwo-0001eQ-QA
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46351
+ (envelope-from <imammedo@redhat.com>) id 1j4RwG-00016k-FP
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41524
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rwo-0001by-Jw
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:38 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RwG-00016Z-Ay
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128693;
+ s=mimecast20190719; t=1582128664;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=u3WBhgws+9q12DLm3vWAGIUjNMO7VThSDD1VZwcJLcQ=;
- b=jFC6jbJ8Zq64wMPBQc2ntVYMGWe7KxTbngsHGQYCUEj0m1Z54pUtvK+Z07zXrUsaIx2vwX
- Ynpz2WwLfSYf1PuFeBVp47wv8CPzvCLqug1drMUXGhcJaXtLYiuBdUSi/9aMNp+fzG6MuL
- B6rnLNIEoHaQKr8SIgPMThER0x/l+Ww=
+ bh=5qDRPQ4TK/v2bK7LIJWDnFv1STpVoUJSi1h4wp28qlU=;
+ b=R8+7B4Lw/diLbBlpXBUtC+1Y/D777OEiVryd3eHgm0H9Fy1lCM3kBUIvou1chh6fzaXSI2
+ 0QB8QCWYHawjdP1vIqt5UTFGEKEovqDSBykLDc81Nd1NWhZLOjpFrlS093vfIWhQyDQP2Z
+ KEF8fYgpLkPpQTcHbbCnaIiFhWBR30Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-pXnIb45tMPGNLVzgaIEBPg-1; Wed, 19 Feb 2020 11:11:27 -0500
+ us-mta-429-_V1GKCXgOIqOLxFaYHcBQQ-1; Wed, 19 Feb 2020 11:11:02 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E3518018AA;
- Wed, 19 Feb 2020 16:11:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7736C8EDE47
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:01 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6530C8ED00;
- Wed, 19 Feb 2020 16:11:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 92FD68ED00;
+ Wed, 19 Feb 2020 16:11:00 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 77/79] hostmem: fix strict bind policy
-Date: Wed, 19 Feb 2020 11:09:51 -0500
-Message-Id: <20200219160953.13771-78-imammedo@redhat.com>
+Subject: [PATCH v6 55/79] mips/mips_malta: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:29 -0500
+Message-Id: <20200219160953.13771-56-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: pXnIb45tMPGNLVzgaIEBPg-1
+X-MC-Unique: _V1GKCXgOIqOLxFaYHcBQQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -85,216 +87,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, Paolo Bonzini <pbonzini@redhat.com>,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When option -mem-prealloc is used with one or more memory-backend
-objects, created backends may not obey configured bind policy or
-creation may fail after kernel attempts to move pages according
-to bind policy.
-Reason is in file_ram_alloc(), which will pre-allocate
-any descriptor based RAM if global mem_prealloc !=3D 0 and that
-happens way before bind policy is applied to memory range.
-
-One way to fix it would be to extend memory_region_foo() API
-and add more invariants that could broken later due implicit
-dependencies that's hard to track.
-
-Another approach is to drop adhoc main RAM allocation and
-consolidate it around memory-backend. That allows to have
-single place that allocates guest RAM (main and memdev)
-in the same way and then global mem_prealloc could be
-replaced by backend's property[s] that will affect created
-memory-backend objects but only in correct order this time.
-
-With main RAM now converted to hostmem backends, there is no
-point in keeping global mem_prealloc around, so alias
- -mem-prealloc to "memory-backend.prealloc=3Don"
-machine compat[*] property and make mem_prealloc a local
-variable to only stir registration of compat property.
-
-*) currently user accessible -global works only with DEVICE
-   based objects and extra work is needed to make it work
-   with hostmem backends. But that is convenience option
-   and out of scope of this already huge refactoring.
-   Hence machine compat properties were used.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v3:
-  - use object_register_sugar_prop() instead of directly hacking
-        compat_props (Paolo Bonzini <pbonzini@redhat.com>)
+ hw/mips/mips_malta.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
-CC: rth@twiddle.net
-CC: pasic@linux.ibm.com
----
- include/sysemu/hostmem.h |  2 +-
- include/sysemu/sysemu.h  |  1 -
- backends/hostmem-file.c  |  1 -
- backends/hostmem-memfd.c |  1 -
- backends/hostmem.c       | 12 +-----------
- exec.c                   | 11 -----------
- vl.c                     |  3 ++-
- 7 files changed, 4 insertions(+), 27 deletions(-)
-
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index bdf86665ab..8276e53683 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -70,7 +70,7 @@ struct HostMemoryBackend {
-     /* protected */
-     uint64_t size;
-     bool merge, dump, use_canonical_path;
--    bool prealloc, force_prealloc, is_mapped, share;
-+    bool prealloc, is_mapped, share;
-     uint32_t prealloc_threads;
-     DECLARE_BITMAP(host_nodes, MAX_NODES + 1);
-     HostMemPolicy policy;
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ae78b2a122..55bdd57a9b 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -50,7 +50,6 @@ extern uint8_t *boot_splash_filedata;
- extern bool enable_mlock;
- extern bool enable_cpu_pm;
- extern QEMUClockType rtc_clock;
--extern int mem_prealloc;
-=20
- #define MAX_OPTION_ROMS 16
- typedef struct QEMUOptionRom {
-diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-index cb319a9157..c8c355f5aa 100644
---- a/backends/hostmem-file.c
-+++ b/backends/hostmem-file.c
-@@ -51,7 +51,6 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Err=
-or **errp)
-         return;
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 34b76bb6a1..6e7ba9235d 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1224,7 +1224,6 @@ void mips_malta_init(MachineState *machine)
+     char *filename;
+     PFlashCFI01 *fl;
+     MemoryRegion *system_memory =3D get_system_memory();
+-    MemoryRegion *ram_high =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_preio =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_postio;
+     MemoryRegion *bios, *bios_copy =3D g_new(MemoryRegion, 1);
+@@ -1262,13 +1261,11 @@ void mips_malta_init(MachineState *machine)
      }
 =20
--    backend->force_prealloc =3D mem_prealloc;
-     name =3D host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-                                      name,
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 26070b425e..74ba9879c4 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -45,7 +45,6 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Er=
-ror **errp)
-         return;
-     }
+     /* register RAM at high address where it is undisturbed by IO */
+-    memory_region_allocate_system_memory(ram_high, NULL, "mips_malta.ram",
+-                                         ram_size);
+-    memory_region_add_subregion(system_memory, 0x80000000, ram_high);
++    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
 =20
--    backend->force_prealloc =3D mem_prealloc;
-     fd =3D qemu_memfd_create(TYPE_MEMORY_BACKEND_MEMFD, backend->size,
-                            m->hugetlb, m->hugetlbsize, m->seal ?
-                            F_SEAL_GROW | F_SEAL_SHRINK | F_SEAL_SEAL : 0,
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 0988986016..a70867b255 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -215,7 +215,7 @@ static bool host_memory_backend_get_prealloc(Object *ob=
-j, Error **errp)
- {
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
+     /* alias for pre IO hole access */
+     memory_region_init_alias(ram_low_preio, NULL, "mips_malta_low_preio.ra=
+m",
+-                             ram_high, 0, MIN(ram_size, 256 * MiB));
++                             machine->ram, 0, MIN(ram_size, 256 * MiB));
+     memory_region_add_subregion(system_memory, 0, ram_low_preio);
 =20
--    return backend->prealloc || backend->force_prealloc;
-+    return backend->prealloc;
+     /* alias for post IO hole access, if there is enough RAM */
+@@ -1276,7 +1273,7 @@ void mips_malta_init(MachineState *machine)
+         ram_low_postio =3D g_new(MemoryRegion, 1);
+         memory_region_init_alias(ram_low_postio, NULL,
+                                  "mips_malta_low_postio.ram",
+-                                 ram_high, 512 * MiB,
++                                 machine->ram, 512 * MiB,
+                                  ram_size - 512 * MiB);
+         memory_region_add_subregion(system_memory, 512 * MiB,
+                                     ram_low_postio);
+@@ -1448,6 +1445,7 @@ static void mips_malta_machine_init(MachineClass *mc)
+ #else
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
++    mc->default_ram_id =3D "mips_malta.ram";
  }
 =20
- static void host_memory_backend_set_prealloc(Object *obj, bool value,
-@@ -224,14 +224,6 @@ static void host_memory_backend_set_prealloc(Object *o=
-bj, bool value,
-     Error *local_err =3D NULL;
-     HostMemoryBackend *backend =3D MEMORY_BACKEND(obj);
-=20
--    if (backend->force_prealloc) {
--        if (value) {
--            error_setg(errp,
--                       "remove -mem-prealloc to use the prealloc property"=
-);
--            return;
--        }
--    }
--
-     if (!host_memory_backend_mr_inited(backend)) {
-         backend->prealloc =3D value;
-         return;
-@@ -288,8 +280,6 @@ static void host_memory_backend_init(Object *obj)
-     /* TODO: convert access to globals to compat properties */
-     backend->merge =3D machine_mem_merge(machine);
-     backend->dump =3D machine_dump_guest_core(machine);
--    backend->prealloc =3D mem_prealloc;
--    backend->prealloc_threads =3D 1;
- }
-=20
- static void host_memory_backend_post_init(Object *obj)
-diff --git a/exec.c b/exec.c
-index 6ebff8bd3a..8c0258a7ae 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1801,8 +1801,6 @@ static void *file_ram_alloc(RAMBlock *block,
-                             bool truncate,
-                             Error **errp)
- {
--    Error *err =3D NULL;
--    MachineState *ms =3D MACHINE(qdev_get_machine());
-     void *area;
-=20
-     block->page_size =3D qemu_fd_getpagesize(fd);
-@@ -1858,15 +1856,6 @@ static void *file_ram_alloc(RAMBlock *block,
-         return NULL;
-     }
-=20
--    if (mem_prealloc) {
--        os_mem_prealloc(fd, area, memory, ms->smp.cpus, &err);
--        if (err) {
--            error_propagate(errp, err);
--            qemu_ram_munmap(fd, area, memory);
--            return NULL;
--        }
--    }
--
-     block->fd =3D fd;
-     return area;
- }
-diff --git a/vl.c b/vl.c
-index afc682e168..54857f7afa 100644
---- a/vl.c
-+++ b/vl.c
-@@ -140,7 +140,6 @@ enum vga_retrace_method vga_retrace_method =3D VGA_RETR=
-ACE_DUMB;
- int display_opengl;
- const char* keyboard_layout =3D NULL;
- ram_addr_t ram_size;
--int mem_prealloc =3D 0; /* force preallocation of physical target memory *=
-/
- bool enable_mlock =3D false;
- bool enable_cpu_pm =3D false;
- int nb_nics;
-@@ -2883,6 +2882,7 @@ int main(int argc, char **argv, char **envp)
-     const char *mem_path =3D NULL;
-     BlockdevOptionsQueue bdo_queue =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue=
-);
-     QemuPluginList plugin_list =3D QTAILQ_HEAD_INITIALIZER(plugin_list);
-+    int mem_prealloc =3D 0; /* force preallocation of physical target memo=
-ry */
-=20
-     os_set_line_buffering();
-=20
-@@ -3984,6 +3984,7 @@ int main(int argc, char **argv, char **envp)
-         val =3D g_strdup_printf("%d", current_machine->smp.cpus);
-         object_register_sugar_prop("memory-backend", "prealloc-threads", v=
-al);
-         g_free(val);
-+        object_register_sugar_prop("memory-backend", "prealloc", "on");
-     }
-=20
-     /*
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
 --=20
 2.18.1
 
