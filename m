@@ -2,82 +2,97 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB726C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6439C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:35:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A89FD20801
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9445E20801
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:35:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ld4MlqPr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A89FD20801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PerqAXUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9445E20801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4TAY-0003ke-Sl
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 12:29:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49970)
+	id 1j4TFT-0006D9-R9
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 12:34:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4T9f-0002yo-VV
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:29:01 -0500
+ (envelope-from <peterx@redhat.com>) id 1j4TEj-0005lL-Lf
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4T9b-0007rA-4z
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:28:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56469
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1j4TEi-0005Qd-5b
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:34:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26751
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4T9b-0007pN-1Z
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:28:55 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j4TEi-0005Q5-1B
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:34:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582133334;
+ s=mimecast20190719; t=1582133651;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rTG8ruVU7tabXZi8VGNaYjEx46GO6jNCKq6JXI/lN/E=;
- b=Ld4MlqPrqdTQvxY2McFWJu6jqUFMGXOgyuJtq4gs5wE+ISc2xugdh8txGgpqvgK8THVEta
- QsEXtYipJxsMM31F3ytLq2X6zPrO+VwMVWKiYVRnc+B6txEfaxZxKni2h9LZ6PiRU1sKUt
- 0d/7BF6IIbg2PP1zSaz4M1OtaRkc2n0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-4PjexRUoOySKvT-O3p6BSw-1; Wed, 19 Feb 2020 12:28:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9E7BDB60;
- Wed, 19 Feb 2020 17:28:48 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E75CB5C13C;
- Wed, 19 Feb 2020 17:28:46 +0000 (UTC)
-Date: Wed, 19 Feb 2020 18:28:45 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 07/13] hw/arm/bcm2836: QOM'ify more by adding
- class_init() to each SoC type
-Message-ID: <20200219182845.4541db2e@redhat.com>
-In-Reply-To: <effdb318-dff9-e861-7bc6-8db65f15ad00@redhat.com>
-References: <20200217114533.17779-1-f4bug@amsat.org>
- <20200217114533.17779-8-f4bug@amsat.org>
- <20200218180426.008080b4@redhat.com>
- <effdb318-dff9-e861-7bc6-8db65f15ad00@redhat.com>
+ bh=xVBQC95Vtlqllm+O2m5fTeAcVqhFSKFjA4eN6gL2wMQ=;
+ b=PerqAXUolwSTqiwja2nBoFeqLA0nIe50S2HnW0vc9Y5dMzAlurge2FuFA0JJUOLDHEErqT
+ AvJPi7oQ5yZRbRdTi5k0K9BKdOm2R6WrCYaJNinh/Uwpf2qP10hywHc+xe4bEN7AtEyl6G
+ XWv+PxsvmWGeU1XglrT1ocFDIINv3Pc=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-JQ4kZf1mNmm0c_hdL8S04Q-1; Wed, 19 Feb 2020 12:34:09 -0500
+Received: by mail-qk1-f199.google.com with SMTP id t17so745143qkg.16
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 09:34:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Gb9XZIg+nMVIrINUAFL4uCF6pFd6pCh0ClCNEL8xXnQ=;
+ b=NqEYsgV0/TneEV3lpBUSDxlZ/Qc0/150ioZoBgm+qHWAWwAcRTkmRqkSwFssLMTBT0
+ 8gi1c9EGWLbybJEhcslH5h4KQDWHCgHONqhcN6Rs4vH58dJMNbA/yekelU7Iv8OuATD4
+ jEg+dl7Qdu3MWqvb7rhHnFiQB4t45YUnsUeE3qotCHZzG407V2c27A5DdTdbKU4TO43W
+ QZcaLmjtTf3GNK9JeAJXhmvg/U9EGm0kd/m9trTvQquMifHdffF89/kkuoXriEvlkRHa
+ ELk/doabQsV1zRGn0jNXU3YUEHmammKp8sC1QI14TlCECPPW7jVMSzh0K9TEhTFqv10G
+ 0chw==
+X-Gm-Message-State: APjAAAVg+8pwWQyKmR+jBiKQqxljDGj4KOpWIdaP8AsLffX7Xx2bppJ9
+ em79/ch5/Lb7HBv0qyFZkvk/FGIWzyjCc5R9LBNjBvygHsElBNalym+RG7VXSdBjU4zjtxsgJAs
+ x7LDXp8trAvwZN0s=
+X-Received: by 2002:a0c:fe8e:: with SMTP id d14mr22117427qvs.106.1582133649162; 
+ Wed, 19 Feb 2020 09:34:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxP3NZywaH2iy4b78nNrDeVcduVG9h7BuAnvagjNPOlOszifBzRlLglriB0yiCtQeqYHz3B6g==
+X-Received: by 2002:a0c:fe8e:: with SMTP id d14mr22117404qvs.106.1582133648879; 
+ Wed, 19 Feb 2020 09:34:08 -0800 (PST)
+Received: from xz-x1 ([104.156.64.75])
+ by smtp.gmail.com with ESMTPSA id c45sm343589qtd.43.2020.02.19.09.34.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 19 Feb 2020 09:34:08 -0800 (PST)
+Date: Wed, 19 Feb 2020 12:34:06 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 fixed 01/16] util: vfio-helpers: Factor out and fix
+ processing of existing ram blocks
+Message-ID: <20200219173406.GB34517@xz-x1>
+References: <20200212134254.11073-1-david@redhat.com>
+ <20200212134254.11073-2-david@redhat.com>
+ <20200218220001.GE7090@xz-x1>
+ <88dcdda3-e9a9-ca46-3e53-ab5b8d2d0936@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 4PjexRUoOySKvT-O3p6BSw-1
+In-Reply-To: <88dcdda3-e9a9-ca46-3e53-ab5b8d2d0936@redhat.com>
+X-MC-Unique: JQ4kZf1mNmm0c_hdL8S04Q-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,254 +104,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Luc Michel <luc.michel@greensocs.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Feb 2020 18:39:49 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-
-> On 2/18/20 6:04 PM, Igor Mammedov wrote:
-> > On Mon, 17 Feb 2020 12:45:27 +0100
-> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
-> >  =20
-> >> Remove usage of TypeInfo::class_data. Instead fill the fields in
-> >> the corresponding class_init().
+On Wed, Feb 19, 2020 at 09:43:02AM +0100, David Hildenbrand wrote:
+> On 18.02.20 23:00, Peter Xu wrote:
+> > On Wed, Feb 12, 2020 at 02:42:39PM +0100, David Hildenbrand wrote:
+> >> Factor it out into common code when a new notifier is registered, just
+> >> as done with the memory region notifier. This allows us to have the
+> >> logic about how to process existing ram blocks at a central place (whi=
+ch
+> >> will be extended soon).
 > >>
-> >> Cc: Igor Mammedov <imammedo@redhat.com>
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> >> ---
-> >>   hw/arm/bcm2836.c | 109 ++++++++++++++++++++++-----------------------=
---
-> >>   1 file changed, 51 insertions(+), 58 deletions(-)
+> >> Just like when adding a new ram block, we have to register the max_len=
+gth
+> >> for now. We don't have a way to get notified about resizes yet, and so=
+me
+> >> memory would not be mapped when growing the ram block.
 > >>
-> >> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> >> index 24109fef1d..683d04d6ea 100644
-> >> --- a/hw/arm/bcm2836.c
-> >> +++ b/hw/arm/bcm2836.c
-> >> @@ -16,57 +16,30 @@
-> >>   #include "hw/arm/raspi_platform.h"
-> >>   #include "hw/sysbus.h"
-> >>  =20
-> >> -typedef struct BCM283XInfo BCM283XInfo;
-> >> -
-> >>   typedef struct BCM283XClass {
-> >>       /*< private >*/
-> >>       DeviceClass parent_class;
-> >>       /*< public >*/
-> >> -    const BCM283XInfo *info;
-> >> -} BCM283XClass;
-> >> -
-> >> -struct BCM283XInfo {
-> >> -    const char *name; =20
-> >  =20
-> >>       const char *cpu_type; =20
-> >=20
-> > probably could be cleaned up by using machine->cpu_type/machine_class->=
-default_cpu_type
-> > (no need to change this patch as it's separate issue) =20
+> >> Note: Currently, ram blocks are only "fake resized". All memory
+> >> (max_length) is accessible.
+> >>
+> >> We can get rid of a bunch of functions in stubs/ram-block.c . Print th=
+e
+> >> warning from inside qemu_vfio_ram_block_added().
 >=20
-> Hmm the core_type is tied to the SoC, not to the machine. The machine=20
-> only selects a SoC and gets the cpu cores that come with it. The problem=
-=20
-> is QEMU does not provide interface to select SoC from cmdline, only CPU.
+> [...]
 >=20
-> >=20
-> >  =20
-> >>       hwaddr peri_base; /* Peripheral base address seen by the CPU */
-> >>       hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
-> >>       int clusterid;
-> >> -};
-> >> +} BCM283XClass;
-> >>  =20
-> >>   #define BCM283X_CLASS(klass) \
-> >>       OBJECT_CLASS_CHECK(BCM283XClass, (klass), TYPE_BCM283X)
-> >>   #define BCM283X_GET_CLASS(obj) \
-> >>       OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
-> >>  =20
-> >> -static const BCM283XInfo bcm283x_socs[] =3D {
-> >> -    {
-> >> -        .name =3D TYPE_BCM2836,
-> >> -        .cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7"),
-> >> -        .peri_base =3D 0x3f000000,
-> >> -        .ctrl_base =3D 0x40000000,
-> >> -        .clusterid =3D 0xf,
-> >> -    },
-> >> -#ifdef TARGET_AARCH64
-> >> -    {
-> >> -        .name =3D TYPE_BCM2837,
-> >> -        .cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53"),
-> >> -        .peri_base =3D 0x3f000000,
-> >> -        .ctrl_base =3D 0x40000000,
-> >> -        .clusterid =3D 0x0,
-> >> -    },
-> >> -#endif
-> >> -};
-> >> -
-> >>   static void bcm2836_init(Object *obj)
-> >>   {
-> >>       BCM283XState *s =3D BCM283X(obj);
-> >>       BCM283XClass *bc =3D BCM283X_GET_CLASS(obj);
-> >> -    const BCM283XInfo *info =3D bc->info;
-> >>       int n;
-> >>  =20
-> >>       for (n =3D 0; n < BCM283X_NCPUS; n++) {
-> >>           object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
-> >> -                                sizeof(s->cpu[n].core), info->cpu_typ=
-e,
-> >> +                                sizeof(s->cpu[n].core), bc->cpu_type,
-> >>                                   &error_abort, NULL);
-> >>       }
-> >>  =20
-> >> @@ -85,7 +58,6 @@ static void bcm2836_realize(DeviceState *dev, Error =
-**errp)
-> >>   {
-> >>       BCM283XState *s =3D BCM283X(dev);
-> >>       BCM283XClass *bc =3D BCM283X_GET_CLASS(dev);
-> >> -    const BCM283XInfo *info =3D bc->info;
-> >>       Object *obj;
-> >>       Error *err =3D NULL;
-> >>       int n;
-> >> @@ -119,7 +91,7 @@ static void bcm2836_realize(DeviceState *dev, Error=
- **errp)
-> >>       }
-> >>  =20
-> >>       sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
-> >> -                            info->peri_base, 1);
-> >> +                            bc->peri_base, 1);
-> >>  =20
-> >>       /* bcm2836 interrupt controller (and mailboxes, etc.) */
-> >>       object_property_set_bool(OBJECT(&s->control), true, "realized", =
-&err);
-> >> @@ -128,7 +100,7 @@ static void bcm2836_realize(DeviceState *dev, Erro=
-r **errp)
-> >>           return;
-> >>       }
-> >>  =20
-> >> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, info->ctrl_base);
-> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->control), 0, bc->ctrl_base);
-> >>  =20
-> >>       sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
-> >>           qdev_get_gpio_in_named(DEVICE(&s->control), "gpu-irq", 0));
-> >> @@ -137,11 +109,11 @@ static void bcm2836_realize(DeviceState *dev, Er=
-ror **errp)
-> >>  =20
-> >>       for (n =3D 0; n < BCM283X_NCPUS; n++) {
-> >>           /* TODO: this should be converted to a property of ARM_CPU *=
-/
-> >> -        s->cpu[n].core.mp_affinity =3D (info->clusterid << 8) | n;
-> >> +        s->cpu[n].core.mp_affinity =3D (bc->clusterid << 8) | n;
-> >>  =20
-> >>           /* set periphbase/CBAR value for CPU-local registers */
-> >>           object_property_set_int(OBJECT(&s->cpu[n].core),
-> >> -                                info->peri_base,
-> >> +                                bc->peri_base,
-> >>                                   "reset-cbar", &err);
-> >>           if (err) {
-> >>               error_propagate(errp, err);
-> >> @@ -190,38 +162,59 @@ static Property bcm2836_props[] =3D {
-> >>   static void bcm283x_class_init(ObjectClass *oc, void *data)
-> >>   {
-> >>       DeviceClass *dc =3D DEVICE_CLASS(oc);
-> >> -    BCM283XClass *bc =3D BCM283X_CLASS(oc);
-> >>  =20
-> >> -    bc->info =3D data;
-> >> -    dc->realize =3D bcm2836_realize;
-> >> -    device_class_set_props(dc, bcm2836_props);
-> >>       /* Reason: Must be wired up in code (see raspi_init() function) =
-*/
-> >>       dc->user_creatable =3D false;
-> >>   }
-> >>  =20
-> >> -static const TypeInfo bcm283x_type_info =3D {
-> >> -    .name =3D TYPE_BCM283X,
-> >> -    .parent =3D TYPE_DEVICE,
-> >> -    .instance_size =3D sizeof(BCM283XState),
-> >> -    .instance_init =3D bcm2836_init,
-> >> -    .class_size =3D sizeof(BCM283XClass),
-> >> -    .abstract =3D true,
-> >> +static void bcm2836_class_init(ObjectClass *oc, void *data)
-> >> +{
-> >> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> >> +    BCM283XClass *bc =3D BCM283X_CLASS(oc);
-> >> +
-> >> +    bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
-> >> +    bc->peri_base =3D 0x3f000000;
-> >> +    bc->ctrl_base =3D 0x40000000;
-> >> +    bc->clusterid =3D 0xf;
-> >> +    dc->realize =3D bcm2836_realize;
-> >> +    device_class_set_props(dc, bcm2836_props);
-> >>   };
-> >>  =20
-> >> -static void bcm2836_register_types(void)
-> >> +#ifdef TARGET_AARCH64
-> >> +static void bcm2837_class_init(ObjectClass *oc, void *data)
-> >>   {
-> >> -    int i;
-> >> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> >> +    BCM283XClass *bc =3D BCM283X_CLASS(oc);
-> >>  =20
-> >> -    type_register_static(&bcm283x_type_info);
-> >> -    for (i =3D 0; i < ARRAY_SIZE(bcm283x_socs); i++) {
-> >> -        TypeInfo ti =3D {
-> >> -            .name =3D bcm283x_socs[i].name,
-> >> -            .parent =3D TYPE_BCM283X,
-> >> -            .class_init =3D bcm283x_class_init,
-> >> -            .class_data =3D (void *) &bcm283x_socs[i],
-> >> -        };
-> >> -        type_register(&ti);
-> >> +    bc->cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a53");
-> >> +    bc->peri_base =3D 0x3f000000;
-> >> +    bc->ctrl_base =3D 0x40000000;
-> >> +    bc->clusterid =3D 0x0;
-> >> +    dc->realize =3D bcm2836_realize;
-> >> +    device_class_set_props(dc, bcm2836_props); =20
-> > both children do use the same values for almost all fields.
-> > I'd set in children class_init()s only cpu_type/clusterid
-> > and keep common bits in base class. =20
->=20
-> Yes so far, but then the BCM2711/BCM2838 for raspi4 changes all fields.
-
-I this case, maybe add this as justification to commit message.
-
-With that change
-  Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
->=20
-> >  =20
-> >> +};
-> >> +#endif
-> >> +
-> >> +static const TypeInfo bcm283x_types[] =3D {
-> >> +    {
-> >> +        .name           =3D TYPE_BCM2836,
-> >> +        .parent         =3D TYPE_BCM283X,
-> >> +        .class_init     =3D bcm2836_class_init,
-> >> +#ifdef TARGET_AARCH64
-> >> +    }, {
-> >> +        .name           =3D TYPE_BCM2837,
-> >> +        .parent         =3D TYPE_BCM283X,
-> >> +        .class_init     =3D bcm2837_class_init,
-> >> +#endif
-> >> +    }, {
-> >> +        .name           =3D TYPE_BCM283X,
-> >> +        .parent         =3D TYPE_DEVICE,
-> >> +        .instance_size  =3D sizeof(BCM283XState),
-> >> +        .instance_init  =3D bcm2836_init,
-> >> +        .class_size     =3D sizeof(BCM283XClass),
-> >> +        .class_init     =3D bcm283x_class_init,
-> >> +        .abstract       =3D true,
-> >>       }
+> >>  #include "exec/ramlist.h"
+> >>  #include "exec/cpu-common.h"
+> >> =20
+> >> -void *qemu_ram_get_host_addr(RAMBlock *rb)
+> >> -{
+> >> -    return 0;
 > >> -}
-> >> +};
-> >>  =20
-> >> -type_init(bcm2836_register_types)
-> >> +DEFINE_TYPES(bcm283x_types) =20
-> >  =20
+> >> -
+> >> -ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
+> >> -{
+> >> -    return 0;
+> >> -}
+> >> -
+> >> -ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+> >> -{
+> >> -    return 0;
+> >> -}
+> >=20
+> > Maybe put into another patch?
+> >=20
+> > Actually I'm thinking whether it would worth to do...  They're still
+> > declared in include/exec/cpu-common.h, so logically who includes the
+> > header but linked against stubs can still call this function.  So
+> > keeping them there still make sense to me.
 >=20
+> Why keep dead code around? If you look closely, the stubs really only
+> contain what's strictly necessary to make current code compile, not any
+> available ramblock related function.
+
+Seems correct.  Then it's fine.
+
+>=20
+> I don't see a good reason for a separate patch either (after all, we're
+> removing the last users in this patch), but if more people agree, I can
+> move it to a separate patch.
+> [...]
+>=20
+> >> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> >> index 813f7ec564..71e02e7f35 100644
+> >> --- a/util/vfio-helpers.c
+> >> +++ b/util/vfio-helpers.c
+> >> @@ -376,8 +376,13 @@ static void qemu_vfio_ram_block_added(RAMBlockNot=
+ifier *n,
+> >>                                        void *host, size_t size)
+> >>  {
+> >>      QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier)=
+;
+> >> +    int ret;
+> >> +
+> >>      trace_qemu_vfio_ram_block_added(s, host, size);
+> >> -    qemu_vfio_dma_map(s, host, size, false, NULL);
+> >> +    ret =3D qemu_vfio_dma_map(s, host, size, false, NULL);
+> >> +    if (ret) {
+> >> +        error_report("qemu_vfio_dma_map(%p, %zu) failed: %d", host, s=
+ize, ret);
+> >> +    }
+> >=20
+> > Irrelevant change (another patch)?
+>=20
+> This is the error that was printed in qemu_vfio_init_ramblock(). Not
+> moving it in this patch would mean we would stop printing the error.
+> [...]
+>=20
+> >> -
+> >>  static void qemu_vfio_open_common(QEMUVFIOState *s)
+> >>  {
+> >>      qemu_mutex_init(&s->lock);
+> >>      s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
+> >>      s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed=
+;
+> >> -    ram_block_notifier_add(&s->ram_notifier);
+> >>      s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
+> >>      s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
+> >> -    qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
+> >> +    ram_block_notifier_add(&s->ram_notifier);
+> >=20
+> > Pure question: this looks like a good improvement, however do you know
+> > why HAX and SEV do not need to init ramblock?
+>=20
+> They register very early (e.g., at accel init time), before any ram
+> blocks are added.
+
+That's what I thought but I did feel like it's tricky (not anything
+about this patch, though).  Say, I don't see how that's guaranteed
+that accel init will always happen before creating any ramblocks.
+
+Anyway, your patch looks good from that point of view. :)
+
+Thanks,
+
+--=20
+Peter Xu
 
 
