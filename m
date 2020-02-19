@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 790B1C34054
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E240C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 480F220675
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD18C20675
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:16:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gz8249bZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 480F220675
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dwi+XoCi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD18C20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4S1q-0006E5-Ei
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:16:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37097)
+	id 1j4S1w-0006R2-1Q
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:16:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4RvV-0002Ep-3d
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:18 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvb-0002Y4-OP
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4RvQ-0000Wm-2o
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59545
+ (envelope-from <imammedo@redhat.com>) id 1j4Rva-0000cJ-HT
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49262
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RvP-0000WY-V6
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:12 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rva-0000c1-Bz
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128611;
+ s=mimecast20190719; t=1582128621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RklPPp5KtMHy/v3+xNFfxqCJeuP+kWDeYo1/PaIFLtI=;
- b=gz8249bZ79YpnXrhq9A1Mv7u52aS6obJ6WbhghXnav9fcQRAHu4cvoX1YrTeMZDYd9ggMz
- xKpoY6VrJdii/UFajXHDLAZXEA9Ga+j38AgrLWOgw04eWqFeLw35g5BVj4SfOvwrabbKt7
- U9mFpBDEt40m/pWgRUtOn5v5xrHgPDc=
+ bh=wPJbwtsOsZJ0VNJepE8MCyC3QguRyuxPinpkDKfB2Pg=;
+ b=Dwi+XoCipPekmMF9RLQaCd0A3jepblDW81+7cv62CdbSdOVvDq12oTbAg5IVKog14pWzmq
+ tM17hFv5HLsUggVj3BAAOWsfAJbsB/4wwOtxQ3zHGURtXJ4gsTJhP/8sglDGfjyVsrCXiq
+ orqDU5CCPQpmc4WPgetNmj0JlvEyF/g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-AUnIMYr2NtWXOt8s5pCeUQ-1; Wed, 19 Feb 2020 11:10:09 -0500
+ us-mta-294-AZMyc6vXO4W42C2Qnj5wmQ-1; Wed, 19 Feb 2020 11:10:20 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE7DD18C8B85
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 600C68F0459
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:19 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 269B48ECF3;
- Wed, 19 Feb 2020 16:10:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD9E448;
+ Wed, 19 Feb 2020 16:10:18 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 10/79] arm/aspeed: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:08:44 -0500
-Message-Id: <20200219160953.13771-11-imammedo@redhat.com>
+Subject: [PATCH v6 19/79] arm/kzm: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:08:53 -0500
+Message-Id: <20200219160953.13771-20-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: AUnIMYr2NtWXOt8s5pCeUQ-1
+X-MC-Unique: AZMyc6vXO4W42C2Qnj5wmQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,53 +101,57 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Acked-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Peter Chubb <peter.chubb@data61.csiro.au>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/arm/aspeed.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/arm/kzm.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 805bebd0d0..a6a2102a93 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -35,7 +35,6 @@ static struct arm_boot_info aspeed_board_binfo =3D {
- struct AspeedBoardState {
-     AspeedSoCState soc;
-     MemoryRegion ram_container;
+diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
+index 94cbac11de..34f6bcb491 100644
+--- a/hw/arm/kzm.c
++++ b/hw/arm/kzm.c
+@@ -52,7 +52,6 @@
+=20
+ typedef struct IMX31KZM {
+     FslIMX31State soc;
 -    MemoryRegion ram;
-     MemoryRegion max_ram;
- };
+     MemoryRegion ram_alias;
+ } IMX31KZM;
 =20
-@@ -197,6 +196,7 @@ static void aspeed_machine_init(MachineState *machine)
+@@ -85,10 +84,8 @@ static void kzm_init(MachineState *machine)
+         exit(EXIT_FAILURE);
+     }
 =20
-     memory_region_init(&bmc->ram_container, NULL, "aspeed-ram-container",
-                        UINT32_MAX);
-+    memory_region_add_subregion(&bmc->ram_container, 0, machine->ram);
+-    memory_region_allocate_system_memory(&s->ram, NULL, "kzm.ram",
+-                                         machine->ram_size);
+     memory_region_add_subregion(get_system_memory(), FSL_IMX31_SDRAM0_ADDR=
+,
+-                                &s->ram);
++                                machine->ram);
 =20
-     object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
-                             (sizeof(bmc->soc)), amc->soc_name, &error_abor=
-t,
-@@ -232,8 +232,6 @@ static void aspeed_machine_init(MachineState *machine)
-     object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
-                              &error_abort);
+     /* initialize the alias memory if any */
+     for (i =3D 0, ram_size =3D machine->ram_size, alias_offset =3D 0;
+@@ -108,7 +105,8 @@ static void kzm_init(MachineState *machine)
 =20
--    memory_region_allocate_system_memory(&bmc->ram, NULL, "ram", ram_size)=
+         if (size < ram[i].size) {
+             memory_region_init_alias(&s->ram_alias, NULL, "ram.alias",
+-                                     &s->ram, alias_offset, ram[i].size - =
+size);
++                                     machine->ram,
++                                     alias_offset, ram[i].size - size);
+             memory_region_add_subregion(get_system_memory(),
+                                         ram[i].addr + size, &s->ram_alias)=
 ;
--    memory_region_add_subregion(&bmc->ram_container, 0, &bmc->ram);
-     memory_region_add_subregion(get_system_memory(),
-                                 sc->memmap[ASPEED_SDRAM],
-                                 &bmc->ram_container);
-@@ -436,6 +434,7 @@ static void aspeed_machine_class_init(ObjectClass *oc, =
-void *data)
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
-+    mc->default_ram_id =3D "ram";
-=20
-     aspeed_machine_class_props_init(oc);
+         }
+@@ -140,6 +138,7 @@ static void kzm_machine_init(MachineClass *mc)
+     mc->desc =3D "ARM KZM Emulation Baseboard (ARM1136)";
+     mc->init =3D kzm_init;
+     mc->ignore_memory_transaction_failures =3D true;
++    mc->default_ram_id =3D "kzm.ram";
  }
+=20
+ DEFINE_MACHINE("kzm", kzm_machine_init)
 --=20
 2.18.1
 
