@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CF1C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3464EC34050
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:27:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 197EA24658
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 197EA24658
+	by mail.kernel.org (Postfix) with ESMTPS id 0F6BF2464E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 10:27:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F6BF2464E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4MYm-0004o2-7o
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:26:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53542)
+	id 1j4MZb-0006C2-8R
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 05:27:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53761)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4MPu-0003hz-KV
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:20 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j4MQ1-0003pA-6P
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4MPt-0005Uw-Aa
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:18 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:42177)
+ (envelope-from <laurent@vivier.eu>) id 1j4MQ0-0005gA-5d
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 05:17:25 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:37233)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j4MPl-0005E5-Hi; Wed, 19 Feb 2020 05:17:09 -0500
+ id 1j4MPr-0005QD-OV; Wed, 19 Feb 2020 05:17:17 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mg6qO-1jfMBg2Api-00hce9; Wed, 19 Feb 2020 11:16:42 +0100
+ id 1Ma1D8-1iyzBS13pM-00VyXT; Wed, 19 Feb 2020 11:16:46 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/17] contrib/rdmacm-mux: Remove superfluous semicolon
-Date: Wed, 19 Feb 2020 11:16:07 +0100
-Message-Id: <20200219101612.1033925-13-laurent@vivier.eu>
+Subject: [PULL 14/17] hw/block/pflash_cfi02: Remove unneeded variable
+ assignment
+Date: Wed, 19 Feb 2020 11:16:09 +0100
+Message-Id: <20200219101612.1033925-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200219101612.1033925-1-laurent@vivier.eu>
 References: <20200219101612.1033925-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tJgVAAVMMn3+c37OfdxkHmZOyXt9X6EcTglyXr1fuQBoEdhAVfv
- sSAEFbkmOLKx1MnWQuebAB/3B/0J1g0b3XB+l8Hky2y8nK91SwawqTEPLuaCK+KSF7YPdmP
- A23tOegJ5ZIBBgxNy15tTrCt2Ajt7w3rlgj3AB6RcfFNWVsLeZFZx68tuWElhhwQH5PPgCY
- V1RLYHRHd6aCYzkxo2LTA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+QcXR4QTgtk=:U6b93kl51Kv7yde5H/nmOK
- LI3W02JsmyYCzCE5C/Wv6oSfKt+ph00XatFeyBNZ9azvK1z1qgQtyMAPj6Mz8hlDB0UBLRtz2
- YpygeQWm/mvyaL5YCLSE4dQMPphlgJCTo8jQ3EXqghKbn4lX6p+HSjyMT78PxgXXTAmZmQsGE
- RZz1ai2Ge0cm+clsaC5Qk1Q3nN3r3kLHaHxhXEXDSl9IcIvJyG0m6wASsTAsAAQrFhDR50cr6
- lQ7Zmvv2KeUApCX23RoAePtD0xXZEdtrC6+VasDNKio7yWW0zMLygYhvHsA796Tncf+r9svtm
- oPBg4Z0DwJD5Rn7lhCDmByHzvjUI7JaOncoaeUMDg5Rhg7x+8w0bPV2dGXH9yf21xJVMt8tfC
- XMuZh/t+IsRrQ8B9bZzluPKGrqlVaMQtOM9vb+qm/lg+b1gPbFMlRgPdVk4W75fEAG2hiQaLj
- A2zeSAtyk1FBZ2QhAxiyC+e5h0vKJhxbAuu6XP1mU6usilBl27BdIrl9vEmg6yL0S78nzEvT/
- XMwfWNzwHpIIWTHXb+/4QJFiqW3H0gd4sY96DPslyCp+l7ehy/4q7vk1X3OgknRT0SET8zll9
- JOK/eW8knT6dmSVY2PLtXBehJGTGp5YXSXbFRuhekrXrGuOYNYzj1Cv+syUv0s0v8kKDxQufH
- 2QcARE2HXtwKFn2pJBf2ekjWTdAyyP+3Ip4zH0LeoPSXxl6DudW9BAA6vxfLp1hVmNYZFpb3d
- hTmMkJC7F0Get90/vxWIa/SFpJllSfo1x0EKxtz8rMBXjG0edb/vY1bH9sAmmF4xgdMMpAVwK
- STqjqGmInJXjII8NbF31OvxjnxE+ADJxCaQKNUP3u5QFJYn3dkoXK2kxPlp6BWwWRm2ejLm
+X-Provags-ID: V03:K1:Dxie9fE4aO1Ap0NisYSSBxy1S8tUWdf5yk3MyaM9JfKjnFxYqoq
+ 2hD7PVg0NFuZgkpFhsQ9yGop0OcjPSh799HgFs4FOxnuh0lSPSJreYzn6ekmaS0kbqjljfp
+ zZh6jYCAP8ux/OM0pZ0rXy3/PzwOTJmRdz8QQZvyyfaGXgK7RhUnUovQX2suG4JQjIx8eIt
+ yHeNWFbU3BHEJAXoCNrUw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:B3IAv8Co/H8=:HPzUeOqRPMojhWZUq0apTr
+ YQj3hqnC0QXlquy3P7xVyk+XN2A81PY+iAL1ItvyyccFCa2sy+WQzd6RV83py4i42HNdGEWxv
+ WudIrRWKMgrHsEEe8K3Gyi5UIxypp9eNZ5vkeKqpTjJsjzPScH6jQG/tDKHID/dmWYIkIZjTw
+ Og3dtMHQ2xjjvBhZ/REFQ2vgWg/AX/28uurrrQjl4lQopYyDOhdOgIKtmPCq7hvNeTod0YOJj
+ CyxRg0Qr95YUmgGSnO10N4zFe0Ixp4vkykIDZYip/HrAcpMgGTN2V/MOnFd1qYQeDWyX9/af4
+ 2d4GO/G1TCSspasET1Q3sKYDHSntz7Rc4t7x0pwEDkp1VWbeW7wN5qCJatoX54w6Q85CwCqWe
+ M2M208JGIs364I25O2fqlY37ytmg7alT4r7M3s/yAOn4e1j3IqfpUI2xbSmHifZ8uc+n6d7ez
+ Eq+ynJaMJ963Xz/3kL3k50NRiu5GGCgSNqy90+LrmOhFOddXhNM8hicyK5fMMoxUXz/Qfd7jT
+ NeDOdZGtCGSNcS7FKPfxUUo3cgPBPiDEwh+GAMSxqm/sTduM6l0ZV5n26xphaSCXXxvlcody3
+ aQSmicRXnnf1vAM1LwiSdqcZaTY3coZ/1cQoVvJVLbu9ccAYsG5/l4vp4iSiS2rnITiG5mtIr
+ T7EDFWvbG+dWclZF4o8me0fL4sILFLmYHCf3EerGMdhGdpvmlNXJaruLxpIIUEZjMl7qftILS
+ Z8xpX6fhLSOH2r01xG//IEcDWHqIRT2WfjkFWd9cxFy/bwM7h0QVK7T8+75RRRgC0JSvOEz7c
+ bdAIhZSJ4G7Xkxo9SBOuzsE7XySRoPxkmNJUeJTRdHX5kMpf7KvTiWTb0ck1KxwUzC+HMbt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,13 +82,12 @@ Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  Yuval Shaia <yuval.shaia.ml@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>,
  Gerd Hoffmann <kraxel@redhat.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- qemu-trivial@nongnu.org,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Jiri Pirko <jiri@resnulli.us>, Eduardo Habkost <ehabkost@redhat.com>,
  Alistair Francis <alistair@alistair23.me>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
  Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
  Thomas Huth <huth@tuxfamily.org>, Chris Wulff <crwulff@gmail.com>,
@@ -99,30 +99,34 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Fixes: a5d2f6f8773
+Fix warning reported by Clang static code analyzer:
+
+    CC      hw/block/pflash_cfi02.o
+  hw/block/pflash_cfi02.c:311:5: warning: Value stored to 'ret' is never read
+      ret = -1;
+      ^     ~~
+
+Reported-by: Clang Static Analyzer
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20200218094402.26625-14-philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200215161557.4077-4-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- contrib/rdmacm-mux/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/block/pflash_cfi02.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/contrib/rdmacm-mux/main.c b/contrib/rdmacm-mux/main.c
-index de53048f0619..bd82abbad35e 100644
---- a/contrib/rdmacm-mux/main.c
-+++ b/contrib/rdmacm-mux/main.c
-@@ -490,7 +490,7 @@ static int read_and_process(int fd)
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 7c4744c020c1..12f18d401a85 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -308,7 +308,6 @@ static uint64_t pflash_read(void *opaque, hwaddr offset, unsigned int width)
+     hwaddr boff;
+     uint64_t ret;
  
- static int accept_all(void)
- {
--    int fd, rc = 0;;
-+    int fd, rc = 0;
- 
-     pthread_rwlock_wrlock(&server.lock);
- 
+-    ret = -1;
+     /* Lazy reset to ROMD mode after a certain amount of read accesses */
+     if (!pfl->rom_mode && pfl->wcycle == 0 &&
+         ++pfl->read_counter > PFLASH_LAZY_ROMD_THRESHOLD) {
 -- 
 2.24.1
 
