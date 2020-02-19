@@ -6,77 +6,75 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C02BC3405F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 275EDC34056
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:59:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E96924656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E779D24656
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 17:59:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F/j7tVq1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E96924656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GtUhCyqC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E779D24656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Tbu-00051e-BM
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 12:58:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53987)
+	id 1j4TdA-00070N-5s
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 12:59:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54182)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4TbF-0004S3-D4
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:57:30 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j4Tc6-0005YG-5s
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4TbE-0000f0-Bx
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:57:29 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:41878)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4TbE-0000dP-7O
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:57:28 -0500
-Received: by mail-oi1-x244.google.com with SMTP id i1so24642440oie.8
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 09:57:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=179mJDX+ROuLeeYryL3XXiDQwgJ/Ycc+79IUaFBk2Rw=;
- b=F/j7tVq1O9/NkUp8WcbX5WzZ4poGZowMCJp6Jzmh9PkyYNRqMQjvHmWNI3XPbL2alq
- vp3Fbk3/gzovOQmTui60ypKTj+VOuczL/M9lp5YK+zNYQEe3DPTpgv4llshdfvtr8WB6
- qcsan2YFHMVowLh6i9nJCEhjDSPbxPyt8o/ng3rYATqopdnpbxiyzYFKA7FgKbud0pSn
- pR2b4xZSvWNiLk2Y9fzE9QGoeSYYaCGi6vPrsCuMcg2IKOwXceJ5DzDEcdGagOcyCUS9
- aBuJfzLt33fcu0hDeu27BxvBNHWwUbMDa1nLrNHBj65y4EnkQLAH/pdtCmM3IpEk9RGi
- jXkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=179mJDX+ROuLeeYryL3XXiDQwgJ/Ycc+79IUaFBk2Rw=;
- b=MTDce2H2vLv2Jq9puy/mzRZUVdGhdPI9j6dM4LqJFB/e/1N2alnyAODMAFcL9q0gcF
- tIWIvpKGP2eX/11rZVXPupKulXZvaJYr1bXxJnE4sL55v7WFCfeFOcbs0l7KbrvlU3BO
- wQJZy6W0BvU0ycE5ES5D7sOvzYk28nPBAnpEXZtnihd0QupKYLDQSe4M/Q+56B5aePxF
- QzncxKxXv/tTbOXZBwZPoQIF0DhP8chTXtwxI2fOuc8F2nfMfd55cEaf5dGkLSqy+wzl
- Tgw2opTD38Rd/ASkHzvWm5jwHqNelm4q8QNzKcGppI+WnVPMt2POx58L+xJi9rcPBJOn
- K99A==
-X-Gm-Message-State: APjAAAVkC7XySctV3iVARzckCmEW92j25Dyw4IsQc4s878FtKjp8/dEV
- 5eS7qer4jmjBxG7OBbxEhWmKFfhQRQZTZIvaaOZsKQ==
-X-Google-Smtp-Source: APXvYqyWV+rthEPbCbfkLE7vANntea/xfS9xcbm6NNnJEdv3xYoTZjdWMewbtJXhtiphAJS1YpjJoLDjzHVIh2P00Do=
-X-Received: by 2002:aca:b2c5:: with SMTP id b188mr5478143oif.163.1582135047182; 
- Wed, 19 Feb 2020 09:57:27 -0800 (PST)
+ (envelope-from <stefanha@redhat.com>) id 1j4Tc5-00011n-0y
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:22 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27135
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j4Tc4-00011X-Ts
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582135100;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mu8dDkybuf2T+R1N1p6pN4YYhyHyt5cpP3dEJdBPbk4=;
+ b=GtUhCyqCJD5hSXoX5EyuYu5IWTUqP1yaACMaSbB5+QKF/OtTCzzkanbFgSIuNMur+lqZOW
+ kPoSFYA2z7uaNyuAccb3LFaP6nZoulga2jhUM51Sb3MfFBtBwSwiKAcGPiLvIlptzdyBEm
+ G83oVqxn6wxQeHwRxQ0eCmJVf9rzld0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-zl7HuAHENJekxVdW5BqJzA-1; Wed, 19 Feb 2020 12:58:16 -0500
+X-MC-Unique: zl7HuAHENJekxVdW5BqJzA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDCA7801E74;
+ Wed, 19 Feb 2020 17:58:14 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FA8990761;
+ Wed, 19 Feb 2020 17:58:14 +0000 (UTC)
+Date: Wed, 19 Feb 2020 16:54:25 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] util/async: make bh_aio_poll() O(1)
+Message-ID: <20200219165425.GB1089598@stefanha-x1.localdomain>
+References: <20200219100045.1074381-1-stefanha@redhat.com>
+ <ad80faf5-7e77-739e-36d7-8d88101b9d59@redhat.com>
 MIME-Version: 1.0
-References: <20200219114607.1855-1-kchamart@redhat.com>
- <20200219114607.1855-2-kchamart@redhat.com>
- <CAFEAcA94A3doGQthOTrPuMadOfqrSLBadUbi+3BpHr1MGp_w1A@mail.gmail.com>
- <20200219164007.GC24572@paraplu>
-In-Reply-To: <20200219164007.GC24572@paraplu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 19 Feb 2020 17:57:16 +0000
-Message-ID: <CAFEAcA_M3s7U_Brx4iZcWKbrNesn5z33C2Cz+jr1PxCNGTvaXg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] docs: Convert qemu-cpu-models.texi to rST
-To: Kashyap Chamarthy <kchamart@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <ad80faf5-7e77-739e-36d7-8d88101b9d59@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="oC1+HKm2/end4ao3"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,20 +86,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Feb 2020 at 16:40, Kashyap Chamarthy <kchamart@redhat.com> wrote:
-> Peter, how are you able to generate those *.7 `nroff` man pages?  When I
-> do 'make sphinxbuild' from my build dir ($HOME/buld/qemu), I only see:
+--oC1+HKm2/end4ao3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Just run 'make'. As with the existing texinfo manpages, there
-is no specific makefile target for "build the manpages and
-nothing else".
+On Wed, Feb 19, 2020 at 12:09:48PM +0100, Paolo Bonzini wrote:
+> Really a great idea, though I have some remarks on the implementation bel=
+ow.
+>=20
+> On 19/02/20 11:00, Stefan Hajnoczi wrote:
+> > + * Each aio_bh_poll() call carves off a slice of the BH list.  This wa=
+y newly
+> > + * scheduled BHs are not processed until the next aio_bh_poll() call. =
+ This
+> > + * concept extends to nested aio_bh_poll() calls because slices are ch=
+ained
+> > + * together.
+>=20
+> This is the tricky part so I would expand a bit on why it's needed:
+>=20
+> /*
+>  * Each aio_bh_poll() call carves off a slice of the BH list, so that
+>  * newly scheduled BHs are not processed until the next aio_bh_poll()
+>  * call.  All active aio_bh_poll() calls chained their slices together
+>  * in a list, so that nested aio_bh_poll() calls process all scheduled
+>  * bottom halves.
+>  */
 
-thanks
--- PMM
+Thanks, will fix in v2.
+
+> > +struct BHListSlice {
+> > +    QEMUBH *first_bh;
+> > +    BHListSlice *next;
+> > +};
+> > +
+>=20
+> Using QLIST and QSLIST removes the need to create your own lists, since
+> you can use QSLIST_MOVE_ATOMIC and QSLIST_INSERT_HEAD_ATOMIC.  For exampl=
+e:
+>=20
+> struct BHListSlice {
+>     QSLIST_HEAD(, QEMUBH) first_bh;
+>     QLIST_ENTRY(BHListSlice) next;
+> };
+>=20
+> ...
+>=20
+>     QSLIST_HEAD(, QEMUBH) active_bh;
+>     QLIST_HEAD(, BHListSlice) bh_list;
+
+I thought about this but chose the explicit tail pointer approach
+because it lets aio_compute_timeout() and aio_ctx_check() iterate over
+both the active BH list and slices in a single for loop :).  But
+thinking about it more, maybe it can still be done by replacing
+active_bh with a permanently present first BHListSlice element.
+
+>=20
+> Related to this, in the aio_bh_poll() loop:
+>=20
+>     for (s =3D ctx->bh_list.next; s; s =3D s->next) {
+>     }
+>=20
+> You can actually do the removal inside the loop.  This is slightly more
+> efficient since you can remove slices early from the nested
+> aio_bh_poll().  Not that it's relevant for performance, but I think the
+> FIFO order for slices is also more intuitive than LIFO.
+>=20
+> Putting this idea together with the QLIST one, you would get:
+>=20
+>     /*
+>      * If a bottom half causes a recursive call, this slice will be
+>      * removed by the nested aio_bh_poll().
+>      */
+>     QSLIST_MOVE_ATOMIC(&slice.first_bh, ctx->active_bh);
+>     QLIST_INSERT_TAIL(&ctx->bh_list, slice);
+>     while ((s =3D QLIST_FIRST(&ctx->bh_list)) {
+>         while ((bh =3D aio_bh_dequeue(&s, &flags))) {
+>         }
+>         QLIST_REMOVE_HEAD(s, next);
+>     }
+
+Cool, reusing "queue.h" is nice.
+
+>=20
+> >  /* Multiple occurrences of aio_bh_poll cannot be called concurrently.
+> >   * The count in ctx->list_lock is incremented before the call, and is
+> >   * not affected by the call.
+>=20
+> The second sentence is now stale.
+
+Thanks, will fix in v2.
+
+Stefan
+
+--oC1+HKm2/end4ao3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5NaEEACgkQnKSrs4Gr
+c8hgVwgAmXimS3GZsCIqTlzXhi7Xu5bmF2wdJ/AH7xiil92p9v88IzXlQUT+Rgam
+ywEvBPxXZSk8F0ouSqHK/s/EWJrFFUZLMtapaCMtLa44oS27vfc+5KI2TmRtcU9e
+c3zW8xTT0EN8Eg+st8JjslWXuzVDhrDYfLvS3Gz8BMPaU5t/luYXp4UyVYTJQUd/
+zbbe6J8AdJrfXDt5AAs2LNI/82rpBrkBlIYOQZMwz7teZ7Eivr6OPEILArID8h5H
+mHZf5rW7eoRryZJOiqDGdo6PkuVQakocikx4yLDJO8sgwBO+N3TTwoWMAgEvvbyc
+eDpJmXpB0RIUOmb8RmA6Ivrev2aHpQ==
+=ozi2
+-----END PGP SIGNATURE-----
+
+--oC1+HKm2/end4ao3--
+
 
