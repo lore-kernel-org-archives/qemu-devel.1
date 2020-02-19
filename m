@@ -2,79 +2,87 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URG_BIZ,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E9CC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63194C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:57:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C66E924671
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:56:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 304EB24671
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:57:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/seNnon"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66E924671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GaYQurh2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304EB24671
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Seb-0006Y6-TT
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:56:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39149)
+	id 1j4Ser-00073K-Bi
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:57:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j4S3p-0001rL-I7
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:57 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1j4SO7-0002eW-A9
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j4S3o-0004U1-0L
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21585
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4S3n-0004Tq-So
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582129131;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TkVlqJ137hH9T9d4N1kD0zieB/CiWcqq2eKaC7sYXkY=;
- b=X/seNnonnI2fYe90+g+NE0XqRk9FEv8Qo29k2Fdg5z+IADjB01nCKucMbAxp1i0gswWpzM
- SmMyjoEOii3piG3VqvjQKb/MaTSSgZdNEzps+BxWZusaFqblnQ4rfBujgH6JmphywfziQu
- Pkbixp6mw2ZeA50YJSGZ+DfWe9Hpm5A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-azv23k9XO3maZZJ0OQFY2A-1; Wed, 19 Feb 2020 11:18:47 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E27687181C;
- Wed, 19 Feb 2020 16:18:46 +0000 (UTC)
-Received: from t480s.redhat.com (ovpn-116-151.ams2.redhat.com [10.36.116.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7814D8AC45;
- Wed, 19 Feb 2020 16:18:43 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+ (envelope-from <robert.foley@linaro.org>) id 1j4SO6-0007xG-BN
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:51 -0500
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:37067)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1j4SO6-0007wc-5c
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:50 -0500
+Received: by mail-pf1-x432.google.com with SMTP id p14so329535pfn.4
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 08:39:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=65Z4dVpY1gcxOALaGKWcd1F123zs7S6VnJl6E5T0NNc=;
+ b=GaYQurh2Pbai5CmUe8nJnrigPOexEmspPBW9Vvhv/61ZKiAtSs1NFM/UrgjVVEnULP
+ JjA550fgVdtnZXr1M+iug2JpLmj30Q6/9TX42IoUz1CHeENELRhgDdfG6rKSeV38YJCB
+ S/0ztD8PuNRkexDJTcg5/N79p/TtIihjFZPIVMhM0XFfJ4Z/6AbkQKYrqPnSlHDsxklw
+ mc0nyAmkWBa/FPdr/avrShGiBzSA8pq/tVDT9O58OuZeWswTEduJ8tG2dHT0Fw0T0LaI
+ Y2fJcgbbIw08VAY77PfRSvYUBOneXIiQsdUGn/BseZ19jlBdevutjBhuu4VL5H27uVug
+ gDyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=65Z4dVpY1gcxOALaGKWcd1F123zs7S6VnJl6E5T0NNc=;
+ b=pvsJaeh/eIm8em2KLZOR1eyPC1MA9jv3ftoNHa7phUXbVe1kkE0D3kLdC2B/9UlnUZ
+ A/mogS0FjpYlcikju+yNMuH2GgDth63PVk2WII2y4xJYs4GXYyrwidh8C4JccbKE3c8N
+ ytGgWIX839FYat2oL6rHCeS7ZNqF7OccR2rUmQx+wTp2+Xsp+96ZvTvvnybzcK0EmOiu
+ ve3tzJJy5WG+Sa1lh/j1uQWTUFtgv23XMPhBU4uY5vPBAmj/HplbY+QL7lWYHLCndmAE
+ 73nLocI1icfWpIjNzJPwS5DnWzoydd9vSNY9nAzIwWekg48m8N4t4CDGevI/qGabyeyk
+ iOMw==
+X-Gm-Message-State: APjAAAUYdkJMtSHARLvDT5spd4xzO93WlW3WVeGnNz/pPOmoYKpN2c+j
+ fQNvqtTLOFzKRhdkten0mjt2Z7V/bgI=
+X-Google-Smtp-Source: APXvYqzv1TqfqMfATAwC6Pua0a0ePXkOhxT94Fzr67DVh8DsK/7N/hBOLMkw0Bxk3DvUL/p/94n50w==
+X-Received: by 2002:a63:9251:: with SMTP id s17mr28329581pgn.127.1582130388959; 
+ Wed, 19 Feb 2020 08:39:48 -0800 (PST)
+Received: from Rfoley-MA01.hsd1.ma.comcast.net
+ ([2601:199:4480:60c0:3cc2:5eb7:e248:ad23])
+ by smtp.gmail.com with ESMTPSA id a69sm112362pfa.129.2020.02.19.08.39.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 19 Feb 2020 08:39:48 -0800 (PST)
+From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 05/13] migrate/ram: Handle RAM block resizes during precopy
-Date: Wed, 19 Feb 2020 17:17:17 +0100
-Message-Id: <20200219161725.115218-6-david@redhat.com>
-In-Reply-To: <20200219161725.115218-1-david@redhat.com>
-References: <20200219161725.115218-1-david@redhat.com>
+Subject: [PATCH v2 02/14] tests/vm: Debug mode shows ssh output.
+Date: Wed, 19 Feb 2020 11:35:25 -0500
+Message-Id: <20200219163537.22098-3-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200219163537.22098-1-robert.foley@linaro.org>
+References: <20200219163537.22098-1-robert.foley@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: azv23k9XO3maZZJ0OQFY2A-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,227 +94,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- David Hildenbrand <david@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
+ peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Resizing while migrating is dangerous and does not work as expected.
-The whole migration code works on the usable_length of ram blocks and does
-not expect this to change at random points in time.
+Add changes to tests/vm/basevm.py so that during debug mode we show ssh output.
 
-In the case of precopy, the ram block size must not change on the source,
-after syncing the RAM block list in ram_save_setup(), so as long as the
-guest is still running on the source.
-
-Resizing can be trigger *after* (but not during) a reset in
-ACPI code by the guest
-- hw/arm/virt-acpi-build.c:acpi_ram_update()
-- hw/i386/acpi-build.c:acpi_ram_update()
-
-Use the ram block notifier to get notified about resizes. Let's simply
-cancel migration and indicate the reason. We'll continue running on the
-source. No harm done.
-
-Update the documentation. Postcopy will be handled separately.
-
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Cc: Peter Xu <peterx@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- exec.c                |  5 +++--
- include/exec/memory.h | 10 ++++++----
- migration/migration.c |  9 +++++++--
- migration/migration.h |  1 +
- migration/ram.c       | 41 +++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 58 insertions(+), 8 deletions(-)
+ tests/vm/basevm.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index b75250e773..8b015821d6 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2120,8 +2120,9 @@ static int memory_try_enable_merging(void *addr, size=
-_t len)
-     return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
- }
-=20
--/* Only legal before guest might have detected the memory size: e.g. on
-- * incoming migration, or right after reset.
-+/*
-+ * Resizing RAM while migrating can result in the migration being canceled=
-.
-+ * Care has to be taken if the guest might have already detected the memor=
-y.
-  *
-  * As memory core doesn't know how is memory accessed, it is up to
-  * resize callback to update device state and/or add assertions to detect
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index e85b7de99a..de111347e8 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -113,7 +113,7 @@ typedef struct IOMMUNotifier IOMMUNotifier;
- #define RAM_SHARED     (1 << 1)
-=20
- /* Only a portion of RAM (used_length) is actually used, and migrated.
-- * This used_length size can change across reboots.
-+ * Resizing RAM while migrating can result in the migration being canceled=
-.
-  */
- #define RAM_RESIZEABLE (1 << 2)
-=20
-@@ -843,7 +843,9 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegi=
-on *mr,
-  *                                     RAM.  Accesses into the region will
-  *                                     modify memory directly.  Only an in=
-itial
-  *                                     portion of this RAM is actually use=
-d.
-- *                                     The used size can change across reb=
-oots.
-+ *                                     Changing the size while migrating
-+ *                                     can result in the migration being
-+ *                                     canceled.
-  *
-  * @mr: the #MemoryRegion to be initialized.
-  * @owner: the object that tracks the region's reference count
-@@ -1464,8 +1466,8 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
-=20
- /* memory_region_ram_resize: Resize a RAM region.
-  *
-- * Only legal before guest might have detected the memory size: e.g. on
-- * incoming migration, or right after reset.
-+ * Resizing RAM while migrating can result in the migration being canceled=
-.
-+ * Care has to be taken if the guest might have already detected the memor=
-y.
-  *
-  * @mr: a memory region created with @memory_region_init_resizeable_ram.
-  * @newsize: the new size the region
-diff --git a/migration/migration.c b/migration/migration.c
-index 8fb68795dc..ac9751dbe5 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -175,13 +175,18 @@ void migration_object_init(void)
-     }
- }
-=20
-+void migration_cancel(void)
-+{
-+    migrate_fd_cancel(current_migration);
-+}
-+
- void migration_shutdown(void)
- {
-     /*
-      * Cancel the current migration - that will (eventually)
-      * stop the migration using this structure
-      */
--    migrate_fd_cancel(current_migration);
-+    migration_cancel();
-     object_unref(OBJECT(current_migration));
- }
-=20
-@@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool =
-blk,
-=20
- void qmp_migrate_cancel(Error **errp)
- {
--    migrate_fd_cancel(migrate_get_current());
-+    migration_cancel();
- }
-=20
- void qmp_migrate_continue(MigrationStatus state, Error **errp)
-diff --git a/migration/migration.h b/migration/migration.h
-index 8473ddfc88..79fd74afa5 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func, vo=
-id *opaque);
- void migration_make_urgent_request(void);
- void migration_consume_urgent_request(void);
- bool migration_rate_limit(void);
-+void migration_cancel(void);
-=20
- #endif
-diff --git a/migration/ram.c b/migration/ram.c
-index ed23ed1c7c..57f32011a3 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -52,6 +52,7 @@
- #include "migration/colo.h"
- #include "block.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/runstate.h"
- #include "savevm.h"
- #include "qemu/iov.h"
- #include "multifd.h"
-@@ -3710,8 +3711,48 @@ static SaveVMHandlers savevm_ram_handlers =3D {
-     .resume_prepare =3D ram_resume_prepare,
- };
-=20
-+static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
-+                                      size_t old_size, size_t new_size)
-+{
-+    ram_addr_t offset;
-+    Error *err =3D NULL;
-+    RAMBlock *rb =3D qemu_ram_block_from_host(host, false, &offset);
-+
-+    if (ramblock_is_ignored(rb)) {
-+        return;
-+    }
-+
-+    /*
-+     * Some resizes are triggered on the migration target by precopy code,
-+     * when synchronizing RAM block sizes. In these cases, the VM is not
-+     * running and migration is not idle. We have to ignore these resizes,
-+     * as we only care about resizes during precopy on the migration sourc=
-e.
-+     * This handler is always registered, so ignore when migration is idle=
-.
-+     */
-+    if (migration_is_idle() || !runstate_is_running() ||
-+        postcopy_is_running()) {
-+        return;
-+    }
-+
-+    /*
-+     * Precopy code cannot deal with the size of ram blocks changing at
-+     * random points in time. We're still running on the source, abort
-+     * the migration and continue running here. Make sure to wait until
-+     * migration was canceled.
-+     */
-+    error_setg(&err, "RAM block '%s' resized during precopy.", rb->idstr);
-+    migrate_set_error(migrate_get_current(), err);
-+    error_free(err);
-+    migration_cancel();
-+}
-+
-+static RAMBlockNotifier ram_mig_ram_notifier =3D {
-+    .ram_block_resized =3D ram_mig_ram_block_resized,
-+};
-+
- void ram_mig_init(void)
- {
-     qemu_mutex_init(&XBZRLE.lock);
-     register_savevm_live("ram", 0, 4, &savevm_ram_handlers, &ram_state);
-+    ram_block_notifier_add(&ram_mig_ram_notifier);
- }
---=20
-2.24.1
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 4dee6647e6..c99725b8c0 100644
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -120,11 +120,16 @@ class BaseVM(object):
+         return fname
+ 
+     def _ssh_do(self, user, cmd, check):
+-        ssh_cmd = ["ssh", "-q", "-t",
++        ssh_cmd = ["ssh",
++                   "-t",
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+                    "-p", self.ssh_port, "-i", self._ssh_key_file]
++        # If not in debug mode, set ssh to quiet mode to
++        # avoid printing the results of commands.
++        if not self.debug:
++            ssh_cmd.append("-q")
+         for var in self.envvars:
+             ssh_cmd += ['-o', "SendEnv=%s" % var ]
+         assert not isinstance(cmd, str)
+-- 
+2.17.1
 
 
