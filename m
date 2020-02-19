@@ -2,78 +2,79 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F754C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6222AC34055
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:35:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE43324671
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 310FB206E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:35:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EO4+Dusv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE43324671
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M4jULzJw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 310FB206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SJB-0008Uw-1v
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:34:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37572)
+	id 1j4SJb-00016M-Bb
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:35:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rw9-0003sK-H6
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:58 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4RwC-00041F-Io
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rw8-00011N-49
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46778
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1j4Rw9-00011x-0Q
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:00 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55214
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rw8-00010w-04
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rw8-00011c-Se
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128655;
+ s=mimecast20190719; t=1582128656;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fbHtck9bYWOh2h5DliBXfKyRPrkxlnngFXq7M0JiOnU=;
- b=EO4+Dusv15HrVsTOkmul1RFR0XHf0vy5B4RjJEBg89J19DzoA9Oj8HFusQGo14bDQ4kEo5
- GT0jGVax24OCRqaem1p0LBbPPhRygkMUPMJMYS/hDELILoQA6T6eG3r0yyU4fKGHZv3uaM
- nHT+lErJ1ISynodCBfnUsMwmZFZGYSg=
+ bh=z//QpzTQCOC5SMA/0cilewHk7hrp6uKkSGm7/CFDye4=;
+ b=M4jULzJw8Zt+STSWcXpMldXEgBJTli+FQZ49DIfC0wceJFhWaq/D54MhhZ4Rk/19xdcwlt
+ th84SQDvrf5MfOrH5M6OoyyHvR9w6eldksNCHv2UUwmTpgdOONb3QXL35BwfcX3XG0yNvJ
+ 9+TnSytjDAu6qzJoQ2IqarruutOPc5Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-CHJild6xOiy65rkZt8DK4A-1; Wed, 19 Feb 2020 11:10:44 -0500
+ us-mta-366-ONxiC4cLMuSLsi6RuN99Lg-1; Wed, 19 Feb 2020 11:10:54 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA886B0DF1;
- Wed, 19 Feb 2020 16:10:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54874801A0D
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:53 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A96A848;
- Wed, 19 Feb 2020 16:10:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A483C8ECF3;
+ Wed, 19 Feb 2020 16:10:52 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 41/79] hppa: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:15 -0500
-Message-Id: <20200219160953.13771-42-imammedo@redhat.com>
+Subject: [PATCH v6 49/79] m68k/next-cube: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:23 -0500
+Message-Id: <20200219160953.13771-50-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: CHJild6xOiy65rkZt8DK4A-1
+X-MC-Unique: ONxiC4cLMuSLsi6RuN99Lg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,7 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, deller@gmx.de, rth@twiddle.net
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -99,55 +100,44 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-CC: rth@twiddle.net
-CC: deller@gmx.de
----
- hw/hppa/machine.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ hw/m68k/next-cube.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index d8755ec422..67181e75ba 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -71,14 +71,11 @@ static void machine_hppa_init(MachineState *machine)
-     uint64_t kernel_entry =3D 0, kernel_low, kernel_high;
-     MemoryRegion *addr_space =3D get_system_memory();
-     MemoryRegion *rom_region;
--    MemoryRegion *ram_region;
-     MemoryRegion *cpu_region;
-     long i;
-     unsigned int smp_cpus =3D machine->smp.cpus;
-     SysBusDevice *s;
+diff --git a/hw/m68k/next-cube.c b/hw/m68k/next-cube.c
+index e5343348d0..cd93d9e367 100644
+--- a/hw/m68k/next-cube.c
++++ b/hw/m68k/next-cube.c
+@@ -860,7 +860,6 @@ static void next_cube_init(MachineState *machine)
+ {
+     M68kCPU *cpu;
+     CPUM68KState *env;
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *rom =3D g_new(MemoryRegion, 1);
+     MemoryRegion *mmiomem =3D g_new(MemoryRegion, 1);
+     MemoryRegion *scrmem =3D g_new(MemoryRegion, 1);
+@@ -893,8 +892,7 @@ static void next_cube_init(MachineState *machine)
+     memcpy(ns->rtc.ram, rtc_ram2, 32);
 =20
--    ram_size =3D machine->ram_size;
--
-     /* Create CPUs.  */
-     for (i =3D 0; i < smp_cpus; i++) {
-         char *name =3D g_strdup_printf("cpu%ld-io-eir", i);
-@@ -97,10 +94,8 @@ static void machine_hppa_init(MachineState *machine)
-         error_report("RAM size is currently restricted to 3GB");
-         exit(EXIT_FAILURE);
-     }
--    ram_region =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram_region, OBJECT(machine),
--                                         "ram", ram_size);
--    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1);
-+    memory_region_add_subregion_overlap(addr_space, 0, machine->ram, -1);
-+
+     /* 64MB RAM starting at 0x04000000  */
+-    memory_region_allocate_system_memory(ram, NULL, "next.ram", ram_size);
+-    memory_region_add_subregion(sysmem, 0x04000000, ram);
++    memory_region_add_subregion(sysmem, 0x04000000, machine->ram);
 =20
-     /* Init Lasi chip */
-     lasi_init(addr_space);
-@@ -298,6 +293,7 @@ static void machine_hppa_machine_init(MachineClass *mc)
-     mc->is_default =3D 1;
-     mc->default_ram_size =3D 512 * MiB;
-     mc->default_boot_order =3D "cd";
-+    mc->default_ram_id =3D "ram";
+     /* Framebuffer */
+     dev =3D qdev_create(NULL, TYPE_NEXTFB);
+@@ -967,6 +965,7 @@ static void next_machine_class_init(ObjectClass *oc, vo=
+id *data)
+     mc->desc =3D "NeXT Cube";
+     mc->init =3D next_cube_init;
+     mc->default_ram_size =3D RAM_SIZE;
++    mc->default_ram_id =3D "next.ram";
+     mc->default_cpu_type =3D M68K_CPU_TYPE_NAME("m68040");
  }
 =20
- DEFINE_MACHINE("hppa", machine_hppa_machine_init)
 --=20
 2.18.1
 
