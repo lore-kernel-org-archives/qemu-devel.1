@@ -2,98 +2,75 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD361C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D82C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:41:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 803BA24670
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:35:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 803BA24670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4540124670
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 14:41:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="freBB3zG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4540124670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4QS4-0002Jg-On
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 09:35:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50533)
+	id 1j4QXz-0004T9-G4
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 09:41:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farosas@linux.ibm.com>) id 1j4QRE-0001NK-UG
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:34:58 -0500
+ (envelope-from <eblake@redhat.com>) id 1j4QXK-0003qr-5d
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1j4QRC-0007GZ-Px
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:34:56 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46240)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1j4QRC-0007Dr-He; Wed, 19 Feb 2020 09:34:54 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01JEYcwG088180; Wed, 19 Feb 2020 09:34:47 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ub9yk4p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 19 Feb 2020 09:34:46 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01JEYkTh089001;
- Wed, 19 Feb 2020 09:34:46 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ub9yjw8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 19 Feb 2020 09:34:45 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01JEW2KD018866;
- Wed, 19 Feb 2020 14:34:26 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma02dal.us.ibm.com with ESMTP id 2y6896vsve-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 19 Feb 2020 14:34:26 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01JEYPOY56754452
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Feb 2020 14:34:25 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1648EC605D;
- Wed, 19 Feb 2020 14:34:25 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 55F4DC6057;
- Wed, 19 Feb 2020 14:34:24 +0000 (GMT)
-Received: from localhost (unknown [9.86.26.230])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Wed, 19 Feb 2020 14:34:24 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org,
- philmd@redhat.com, qemu-devel@nongnu.org, clg@kaod.org
-Subject: Re: [PATCH v3 11/12] target/ppc: Streamline construction of VRMA SLB
- entry
-In-Reply-To: <20200219005414.15635-12-david@gibson.dropbear.id.au>
-References: <20200219005414.15635-1-david@gibson.dropbear.id.au>
- <20200219005414.15635-12-david@gibson.dropbear.id.au>
-Date: Wed, 19 Feb 2020 11:34:22 -0300
-Message-ID: <875zg2d4sx.fsf@linux.ibm.com>
+ (envelope-from <eblake@redhat.com>) id 1j4QXJ-0004sC-5h
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:41:14 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23575
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j4QXJ-0004oG-1s
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 09:41:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582123271;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TNZGMq3v5Sfpze0h3lmh7dsr8i5R1MRQMTFOSQ6ZVi0=;
+ b=freBB3zGPvrWjJ+PBEjBIk5KnVrVeCJAWVznxqtZCQ8CGMIKwZG68dvyVuMFkCKXurRE8L
+ bflnXA5S1O0WhuNk6lDdi+reKLsj+X9uwSdmMqFgOPCOAsm+UwGyG0UB3uhH0tB69PD67Z
+ VDMeSmw9TBWYP1uQudfnO+ZIgJ1IPRc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-maQGhvMLPd-xKWrrTBRPbQ-1; Wed, 19 Feb 2020 09:41:07 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C046C1088386;
+ Wed, 19 Feb 2020 14:41:05 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 27FDF60C84;
+ Wed, 19 Feb 2020 14:41:05 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] iotests: Fix nonportable use of od --endian
+Date: Wed, 19 Feb 2020 08:41:03 -0600
+Message-Id: <20200219144103.2919292-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-19_03:2020-02-19,
- 2020-02-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=1
- mlxlogscore=999 impostorscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002190113
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: maQGhvMLPd-xKWrrTBRPbQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,57 +82,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-ppc@nongnu.org, paulus@samba.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, andrey.shinkevich@virtuozzo.com,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Tests 261 and 272 fail on RHEL 7 with coreutils 8.22, since od
+--endian was not added until coreutils 8.23.  Fix this by manually
+constructing the final value one byte at a time.
 
+Fixes: fc8ba423
+Reported-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ tests/qemu-iotests/common.rc | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-Hi, just a nitpick, feel free to ignore.
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 8a6366c09daf..b77ef3d22cd1 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -56,6 +56,12 @@ poke_file()
+ # peek_file_le 'test.img' 512 2 =3D> 65534
+ peek_file_le()
+ {
+-    # Wrap in echo $() to strip spaces
+-    echo $(od -j"$2" -N"$3" --endian=3Dlittle -An -vtu"$3" "$1")
++    local val=3D0 shift=3D0 i
++
++    # coreutils' od --endian is not portable, so manually assemble bytes.
++    for i in $(od -j"$2" -N"$3" -An -v -tu1 "$1"); do
++        val=3D$(( val | (i << shift) ))
++        shift=3D$((shift + 8))
++    done
++    echo $val
+ }
 
-> When in VRMA mode (i.e. a guest thinks it has the MMU off, but the
-> hypervisor is still applying translation) we use a special SLB entry,
-> rather than looking up an SLBE by address as we do when guest translation
-> is on.
->
-> We build that special entry in ppc_hash64_update_vrma() along with some
-> logic for handling some non-VRMA cases.  Split the actual build of the
-> VRMA SLBE into a separate helper and streamline it a bit.
->
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/mmu-hash64.c | 79 ++++++++++++++++++++---------------------
->  1 file changed, 38 insertions(+), 41 deletions(-)
->
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 170a78bd2e..06cfff9860 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -789,6 +789,39 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
->      }
->  }
->  
-> +static int build_vrma_slbe(PowerPCCPU *cpu, ppc_slb_t *slb)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    target_ulong lpcr = env->spr[SPR_LPCR];
-> +    uint32_t vrmasd = (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-> +    target_ulong vsid = SLB_VSID_VRMA | ((vrmasd << 4) & SLB_VSID_LLP_MASK);
-> +    int i;
-> +
-> +    /*
-> +     * Make one up. Mostly ignore the ESID which will not be needed
-> +     * for translation
-> +     */
+ # peek_file_be 'test.img' 512 2 =3D> 65279
+ peek_file_be()
+ {
+-    # Wrap in echo $() to strip spaces
+-    echo $(od -j"$2" -N"$3" --endian=3Dbig -An -vtu"$3" "$1")
++    local val=3D0 i
++
++    # coreutils' od --endian is not portable, so manually assemble bytes.
++    for i in $(od -j"$2" -N"$3" -An -v -tu1 "$1"); do
++        val=3D$(( (val << 8) | i ))
++    done
++    echo $val
+ }
 
-I find this comment a bit vague. I suggest we either leave it behind or
-make it more precise. The ISA says:
-
-"translation of effective addresses to virtual addresses use the SLBE
-values in Figure 18 instead of the entry in the SLB corresponding to the
-ESID"
+-# peek_file_raw 'test.img' 512 2 =3D> '\xff\xfe'
++# peek_file_raw 'test.img' 512 2 =3D> '\xff\xfe'. Do not use if the raw da=
+ta
++# is likely to contain \0 or trailing \n.
+ peek_file_raw()
+ {
+     dd if=3D"$1" bs=3D1 skip=3D"$2" count=3D"$3" status=3Dnone
+--=20
+2.24.1
 
 
