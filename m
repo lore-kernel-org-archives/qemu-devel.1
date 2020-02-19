@@ -2,64 +2,88 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A4CC34022
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00DAC34022
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 09:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD3782176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:58:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3782176D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7BB3A2464E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 09:04:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+uyY8U5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB3A2464E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4LBp-0005s7-1P
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:58:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39348)
+	id 1j4LHn-0001Ln-Ma
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 04:04:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j4LB4-0004w8-6v
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:57:56 -0500
+ (envelope-from <armbru@redhat.com>) id 1j4LGw-0000uH-Dd
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 04:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1j4LB1-0000oq-JF
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:57:53 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:51920)
+ (envelope-from <armbru@redhat.com>) id 1j4LGu-00041r-14
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 04:03:58 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26953
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1j4LB0-0000j4-RV; Wed, 19 Feb 2020 03:57:51 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.156279-0.0175105-0.82621;
- DS=CONTINUE|ham_regular_dialog|0.0025126-0.000487853-0.997;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=8; RT=8; SR=0; TI=SMTPD_---.GpeGyvm_1582102663; 
-Received: from 30.39.130.137(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GpeGyvm_1582102663)
- by smtp.aliyun-inc.com(10.147.40.200);
- Wed, 19 Feb 2020 16:57:44 +0800
-Subject: Re: [PATCH v3 1/5] target/riscv: add vector unit stride load and
- store instructions
-To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200210074256.11412-1-zhiwei_liu@c-sky.com>
- <20200210074256.11412-2-zhiwei_liu@c-sky.com>
- <9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <a76824fb-3608-2b30-fe8f-ac705b73e42a@c-sky.com>
-Date: Wed, 19 Feb 2020 16:57:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j4LGt-00041h-TG
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 04:03:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582103035;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=h94enNz7TKmW4rzNoCBXZQM3gcKGlJjJTKt9ZzCTQH8=;
+ b=F+uyY8U5+SXYBu7ET7EcT2gCvZp5NDLYkO5sj73EwpgG5P7WCMRsLPhKGyxWkcw6NODiFj
+ RC0sgA5yqeYIoulDFRvpLGfkZw38hV3K7vstFjaL9DHNxJZppEDxYIjvDFYCOjKr1kw4zM
+ aSg1/0JjCrsiQnOxzWbA2LUObvQ8pkc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-RmlCTU7uOUGa6GLcJ-9eDw-1; Wed, 19 Feb 2020 04:03:51 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68F80189F760;
+ Wed, 19 Feb 2020 09:03:50 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39B2C1001920;
+ Wed, 19 Feb 2020 09:03:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AA34711385C9; Wed, 19 Feb 2020 10:03:45 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v4 3/4] qmp: Move dispatcher to a coroutine
+References: <20200121181122.15941-1-kwolf@redhat.com>
+ <20200121181122.15941-4-kwolf@redhat.com>
+ <87lfp1sc8d.fsf@dusky.pond.sub.org>
+ <20200217123454.GF6309@linux.fritz.box>
+ <87r1ysc7d4.fsf@dusky.pond.sub.org>
+ <20200218152931.GG6157@linux.fritz.box>
+Date: Wed, 19 Feb 2020 10:03:45 +0100
+In-Reply-To: <20200218152931.GG6157@linux.fritz.box> (Kevin Wolf's message of
+ "Tue, 18 Feb 2020 16:29:31 +0100")
+Message-ID: <87tv3nt0cu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org>
-Content-Type: multipart/alternative;
- boundary="------------BDA17EA78D28803C57DE9B44"
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: RmlCTU7uOUGa6GLcJ-9eDw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,596 +95,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com
+Cc: stefanha@redhat.com, marcandre.lureau@gmail.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------BDA17EA78D28803C57DE9B44
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Hi, Richard
-Thanks for your informative comments. I'm addressing these comments.
-And a little confused in some comments.
-On 2020/2/12 14:38, Richard Henderson wrote:
-> On 2/9/20 11:42 PM, LIU Zhiwei wrote:
->> +/*
->> + * As simd_desc supports at most 256 bytes, and in this implementation,
->> + * the max vector group length is 2048 bytes. So split it into two parts.
->> + *
->> + * The first part is floor(maxsz, 64), encoded in maxsz of simd_desc.
->> + * The second part is (maxsz % 64) >> 3, encoded in data of simd_desc.
->> + */
->> +static uint32_t maxsz_part1(uint32_t maxsz)
->> +{
->> +    return ((maxsz & ~(0x3f)) >> 3) + 0x8; /* add offset 8 to avoid return 0 */
->> +}
->> +
->> +static uint32_t maxsz_part2(uint32_t maxsz)
->> +{
->> +    return (maxsz & 0x3f) >> 3;
->> +}
-> I would much rather adjust simd_desc to support 2048 bytes.
+> Am 18.02.2020 um 15:12 hat Markus Armbruster geschrieben:
+>> >> Regarding calling monitor_qmp_requests_pop_any_with_lock(): it needs
+>> >> @monitor_lock and @mon_list to be valid.  We just initialized
+>> >> @monitor_lock, and @mon_list is empty.
+>> >> monitor_qmp_requests_pop_any_with_lock() should be safe and return nu=
+ll.
+>> >> monitor_qmp_dispatcher_co() should also be safe and yield without doi=
+ng
+>> >> work.
+>> >>=20
+>> >> Can we exploit that to make things a bit simpler?  Separate patch wou=
+ld
+>> >> be fine with me.
+>> >
+>> > If this is true, we could replace this line:
+>> >
+>> >     aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
+>> >
+>> > with the following one:
+>> >
+>> >     qemu_aio_coroutine_enter(iohandler_get_aio_context(), qmp_dispatch=
+er_co);
+>> >
+>> > I'm not sure that this is any simpler.
+>>=20
+>> Naive question: what's the difference between "scheduling", "entering",
+>> and "waking up" a coroutine?
+>>=20
+>> qemu_coroutine_enter() and qemu_aio_coroutine_enter() are in
+>> coroutine.h.
 >
-> I've just posted a patch set that removes an assert in target/arm that would
-> trigger if SIMD_DATA_SHIFT was increased to make room for a larger oprsz.
+> These are the low-level functions that just enter the coroutine (i.e. do
+> a stack switch and jump to coroutine code) immediately when they are
+> called. They must be called in the right thread with the right
+> AioContext locks held. (What "right" means depends on the code run in
+> the coroutine.)
+
+I see; low level building blocks.
+
+>> aio_co_schedule(), aio_co_wake() and aio_co_enter() are in aio.h.
 >
-> Or, since we're not going through tcg_gen_gvec_* for ldst, don't bother with
-> simd_desc at all, and just pass vlen, unencoded.
+> aio_co_schedule() never enters the coroutine directly. It only adds it
+> to the list of scheduled coroutines and schedules a BH in the target
+> AioContext. This BH in turn will actually enter the coroutine.
+
+Makes sense.
+
+> aio_co_enter() enters the coroutine immediately if it's being called
+> outside of coroutine context and in the right thread for the given
+> AioContext. If it's in the right thread, but in coroutine context then
+> it will queue the given coroutine so that it runs whenever the current
+> coroutine yields. If it's in the wrong thread, it uses aio_co_schedule()
+> to get it run in the right thread.
+
+Uff, sounds complicated.  Lots of magic.
+
+> aio_co_wake() takes just the coroutine as a parameter and calls
+> aio_co_enter() with the context in which the coroutine was last run.
+
+Complicated by extension.
+
+> All of these functions make sure that the AioContext lock is taken when
+> the coroutine is entered and that they run in the right thread.
 >
->> +/* define check conditions data structure */
->> +struct vext_check_ctx {
->> +
->> +    struct vext_reg {
->> +        uint8_t reg;
->> +        bool widen;
->> +        bool need_check;
->> +    } check_reg[6];
->> +
->> +    struct vext_overlap_mask {
->> +        uint8_t reg;
->> +        uint8_t vm;
->> +        bool need_check;
->> +    } check_overlap_mask;
->> +
->> +    struct vext_nf {
->> +        uint8_t nf;
->> +        bool need_check;
->> +    } check_nf;
->> +    target_ulong check_misa;
->> +
->> +} vchkctx;
-> You cannot use a global variable.  The data must be thread-safe.
+>> qemu_coroutine_enter() calls qemu_aio_coroutine_enter().
+>>=20
+>> aio_co_wake() calls aio_co_enter() calls qemu_aio_coroutine_enter().
+>>=20
+>> aio_co_enter() seems to be independent.
 >
-> If we're going to do the checks this way, with a structure, it needs to be on
-> the stack or within DisasContext.
+> It's not. It calls either aio_co_schedule() or
+> qemu_aio_coroutine_enter(), or inserts the coroutine ina queue that is
+> processed in qemu_aio_coroutine_enter().
+
+I was blind.
+
+>> aio.h seems to be layered on top of coroutine.h.  Should I prefer using
+>> aio.h to coroutine.h?
 >
->> +#define GEN_VEXT_LD_US_TRANS(NAME, DO_OP, SEQ)                            \
->> +static bool trans_##NAME(DisasContext *s, arg_r2nfvm* a)                  \
->> +{                                                                         \
->> +    vchkctx.check_misa = RVV;                                             \
->> +    vchkctx.check_overlap_mask.need_check = true;                         \
->> +    vchkctx.check_overlap_mask.reg = a->rd;                               \
->> +    vchkctx.check_overlap_mask.vm = a->vm;                                \
->> +    vchkctx.check_reg[0].need_check = true;                               \
->> +    vchkctx.check_reg[0].reg = a->rd;                                     \
->> +    vchkctx.check_reg[0].widen = false;                                   \
->> +    vchkctx.check_nf.need_check = true;                                   \
->> +    vchkctx.check_nf.nf = a->nf;                                          \
->> +                                                                          \
->> +    if (!vext_check(s)) {                                                 \
->> +        return false;                                                     \
->> +    }                                                                     \
->> +    return DO_OP(s, a, SEQ);                                              \
->> +}
-> I don't see the improvement from a pointer.  Something like
+> In the common case, using the aio.h functions is preferable because they
+> just do "the right thing" without requiring as much thinking as the
+> low-level functions.
+
+Got it.
+
+>> >> >  }
+>> >> > =20
+>> >> >  QemuOptsList qemu_mon_opts =3D {
+>> >> > diff --git a/monitor/qmp.c b/monitor/qmp.c
+>> >> > index 54c06ba824..9444de9fcf 100644
+>> >> > --- a/monitor/qmp.c
+>> >> > +++ b/monitor/qmp.c
+>> >> > @@ -133,6 +133,10 @@ static void monitor_qmp_respond(MonitorQMP *mo=
+n, QDict *rsp)
+>> >> >      }
+>> >> >  }
+>> >> > =20
+>> >> > +/*
+>> >> > + * Runs outside of coroutine context for OOB commands, but in coro=
+utine context
+>> >> > + * for everything else.
+>> >> > + */
+>> >>=20
+>> >> Nitpick: wrap around column 70, please.
+>> >>=20
+>> >> Note to self: the precondition is asserted in do_qmp_dispatch() below=
+.
+>> >> Asserting here is impractical, because we don't know whether this is =
+an
+>> >> OOB command.
+>> >>=20
+>> >> >  static void monitor_qmp_dispatch(MonitorQMP *mon, QObject *req)
+>> >> >  {
+>> >> >      Monitor *old_mon;
+>> >> > @@ -211,43 +215,87 @@ static QMPRequest *monitor_qmp_requests_pop_a=
+ny_with_lock(void)
+>> >> >      return req_obj;
+>> >> >  }
+>> >> > =20
+>> >> > -void monitor_qmp_bh_dispatcher(void *data)
+>> >> > +void coroutine_fn monitor_qmp_dispatcher_co(void *data)
+>> >> >  {
+>> >> > -    QMPRequest *req_obj =3D monitor_qmp_requests_pop_any_with_lock=
+();
+>> >> > +    QMPRequest *req_obj =3D NULL;
+>> >> >      QDict *rsp;
+>> >> >      bool need_resume;
+>> >> >      MonitorQMP *mon;
+>> >> > =20
+>> >> > -    if (!req_obj) {
+>> >> > -        return;
+>> >> > -    }
+>> >> > +    while (true) {
+>> >> > +        assert(atomic_mb_read(&qmp_dispatcher_co_busy) =3D=3D true=
+);
+>> >>=20
+>> >> Read and assert, then ...
+>> >>=20
+>> >> > +
+>> >> > +        /* Mark the dispatcher as not busy already here so that we=
+ don't miss
+>> >> > +         * any new requests coming in the middle of our processing=
+. */
+>> >> > +        atomic_mb_set(&qmp_dispatcher_co_busy, false);
+>> >>=20
+>> >> ... set.  Would exchange, then assert be cleaner?
+>> >
+>> > Then you would ask me why the exchange has to be atomic. :-)
+>>=20
+>> Possibly :)
+>>=20
+>> > More practically, I would need a temporary variable so that I don't ge=
+t
+>> > code with side effects in assert() (which may be compiled out with
+>> > NDEBUG). The temporary variable would never be read outside the assert
+>> > and would be unused with NDEBUG.
+>> >
+>> > So possible, yes, cleaner I'm not sure.
+>>=20
+>> I asked because the patch made me wonder whether qmp_dispatcher_co could
+>> change between the read and the set.
 >
->      if (vext_check_isa_ill(s) &&
->          vext_check_overlap(s, a->rd, a->rm) &&
->          vext_check_reg(s, a->rd, false) &&
->          vext_check_nf(s, a->nf)) {
->          return DO_OP(s, a, SEQ);
->      }
->      return false;
+> Ah. No, this function is the only one that does a transition from true
+> to false. Everyone else only transitions from false to true (or leaves
+> the value unchanged as true).
+
+True, but it's non-local argument.  Anyway, not a big deal.
+
+>> >>   @@ -246,8 +287,15 @@ void monitor_qmp_bh_dispatcher(void *data)
+>> >>            }
+>> >>            qmp_request_free(req_obj);
+>> >>=20
+>> >>   -    /* Reschedule instead of looping so the main loop stays respon=
+sive */
+>> >>   -    qemu_bh_schedule(qmp_dispatcher_bh);
+>> >>   +        /*
+>> >>   +         * Yield and reschedule so the main loop stays responsive.
+>> >>   +         *
+>> >>   +         * Move back to iohandler_ctx so that nested event loops f=
+or
+>> >>   +         * qemu_aio_context don't start new monitor commands.
+>> >>=20
+>> >> Can you explain this sentence for dummies?
+>> >
+>> > Nested event loops (i.e. AIO_WAIT_WHILE) poll qemu_aio_context, so if =
+we
+>> > are scheduled there, the next iteration of the monitor dispatcher loop
+>> > could start from a nested event loop. If we are scheduled in
+>> > iohandler_ctx, then only the actual main loop will reenter the corouti=
+ne
+>> > and nested event loops ignore it.
+>> >
+>> > I'm not sure if or why this is actually important, but this matches
+>> > scheduling the dispatcher BH in iohandler_ctx in the code before this
+>> > patch.
+>> >
+>> > If we didn't do this, we could end up starting monitor requests in mor=
+e
+>> > places than before, and who knows what that would mean.
+>>=20
+>> Let me say it in my own words, to make sure I got it.  I'm going to
+>> ignore special cases like "not using I/O thread" and exec-oob.
+>>=20
+>> QMP monitor I/O happens in mon_iothread, in iohandler_ctx (I think).
+>> This pushes requests onto the monitor's qmp_requests queue.
 >
-> seems just as clear without the extra data.
+> mon_iothread (like all iothreads) has a separate AioContext, which
+> doesn't have a name, but can be accessed with
+> iothread_get_aio_context(mon_iothread).
+
+Got it.
+
+@iohandler_ctx and @qemu_aio_context both belong to the main loop.
+
+@qemu_aio_context is for general "run in the main loop" use.  It is
+polled both in the actual main loop and event loops nested in it.  I
+figure "both" to keep things responsive.
+
+@iohandler_ctx is for "I/O handlers" (whatever those are).  It is polled
+only in the actual main loop.  I figure this means "I/O handlers" may
+get delayed while a nested event loop runs.  But better starve a bit
+than run in unexpected places.
+
+>> Before this patch, the dispatcher runs in a bottom half in the main
+>> thread, in qemu_aio_context.
 >
->> +#ifdef CONFIG_USER_ONLY
->> +#define MO_SB 0
->> +#define MO_LESW 0
->> +#define MO_LESL 0
->> +#define MO_LEQ 0
->> +#define MO_UB 0
->> +#define MO_LEUW 0
->> +#define MO_LEUL 0
->> +#endif
-> What is this for?  We already define these unconditionally.
+> The dispatcher BH is what is scheduled in iohandler_ctx. This means that
+> the BH is run from the main loop, but not from nested event loops.
+
+Got it.
+
+>> The patch moves it to a coroutine running in the main thread.  It runs
+>> in iohandler_ctx, but switches to qemu_aio_context for executing command
+>> handlers.
+>>=20
+>> We want to keep command handlers running in qemu_aio_context, as before
+>> this patch.
 >
+> "Running in AioContext X" is kind of a sloppy term, and I'm afraid it
+> might be more confusing than helpful here. What this means is that the
+> code is run while holding the lock of the AioContext, and it registers
+> its BHs, callbacks etc. in that AioContext so it will be called from the
+> event loop of the respective thread.
 >
->> +static inline int vext_elem_mask(void *v0, int mlen, int index)
->> +{
->> +    int idx = (index * mlen) / 8;
->> +    int pos = (index * mlen) % 8;
->> +
->> +    return (*((uint8_t *)v0 + idx) >> pos) & 0x1;
->> +}
-> This is a little-endian indexing of the mask.  Just above we talk about using a
-> host-endian ordering of uint64_t.
+> Before this patch, command handlers can't really use callbacks without a
+> nested event loop because they are synchronous.
+
+I figure an example for such a nested event loop is BDRV_POLL_WHILE() in
+bdrv_truncate(), which runs in the command handler for block_resize.
+True?
+
+>                                                 The BQL is held, which
+> is equivalent to holding the qemu_aio_context lock.
+
+Why is it equivalent?  Are they always taken together?
+
+>                                                     But other than that,
+> all of the definition of "running in an AioContext" doesn't really apply.
 >
-> Thus this must be based on uint64_t instead of uint8_t.
+> Now with coroutines, you assign them an AioContext, which is the context
+> in which BHs reentering the coroutine will be scheduled, e.g. from
+> explicit aio_co_schedule(), after qemu_co_sleep_ns() or after waiting
+> for a lock like a CoMutex.
 >
->> +/*
->> + * This function checks watchpoint before really load operation.
->> + *
->> + * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
->> + * In user mode, there is no watchpoint support now.
->> + *
->> + * It will triggle an exception if there is no mapping in TLB
->> + * and page table walk can't fill the TLB entry. Then the guest
->> + * software can return here after process the exception or never return.
->> + */
->> +static void probe_read_access(CPURISCVState *env, target_ulong addr,
->> +        target_ulong len, uintptr_t ra)
->> +{
->> +    while (len) {
->> +        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
->> +        const target_ulong curlen = MIN(pagelen, len);
->> +
->> +        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
-> The return value here is non-null when we can read directly from host memory.
-> It would be a shame to throw that work away.
+> qemu_aio_context is what most (if not all) of the existing QMP handlers
+> use when they run a nested event loop,
+
+bdrv_truncate() appears to use bdrv_get_aio_context(), which is the
+BlockDriverState's AioContext if set, else @qemu_aio_context.
+
+>                                        so running the coroutine in this
+> context while calling the handlers will make the transition the easiest.
+
+In the case of block_resize: running it in a coroutine makes
+bdrv_truncate() use that coroutine instead of creating one together with
+a nested event loop.  "That coroutine" uses @qemu_aio_context.  So does
+the nested event loop, *except* when the BlockDriverState has an
+AioContext.
+
+I have no idea when a BlockDriverState has an AioContext.  Can you help?
+
+>> We want to run the rest in iohandler_ctx to ensure dispatching happens
+>> only in the main loop, as before this patch.
+>>=20
+>> Correct?
 >
->
->> +/* data structure and common functions for load and store */
->> +typedef void vext_ld_elem_fn(CPURISCVState *env, target_ulong addr,
->> +        uint32_t idx, void *vd, uintptr_t retaddr);
->> +typedef void vext_st_elem_fn(CPURISCVState *env, target_ulong addr,
->> +        uint32_t idx, void *vd, uintptr_t retaddr);
->> +typedef target_ulong vext_get_index_addr(target_ulong base,
->> +        uint32_t idx, void *vs2);
->> +typedef void vext_ld_clear_elem(void *vd, uint32_t idx,
->> +        uint32_t cnt, uint32_t tot);
->> +
->> +struct vext_ldst_ctx {
->> +    struct vext_common_ctx vcc;
->> +    uint32_t nf;
->> +    target_ulong base;
->> +    target_ulong stride;
->> +    int mmuidx;
->> +
->> +    vext_ld_elem_fn *ld_elem;
->> +    vext_st_elem_fn *st_elem;
->> +    vext_get_index_addr *get_index_addr;
->> +    vext_ld_clear_elem *clear_elem;
->> +};
-> I think you should pass these elements directly, as needed, rather than putting
-> them all in a struct.
->
-> This would allow the main helper function to be inlined, which in turn allows
-> the mini helper functions to be inlined.
-1. What's the main helper function? What's is the mini helper functions 
-here?
+> This part is correct.
 
-I guess main helper function is such code like:
+Alright, let me try again, so you can point out the next level of my
+ignorance :)
 
-    #define GEN_VEXT_LD_UNIT_STRIDE(NAME, MTYPE, ETYPE)                \
-    void HELPER(NAME##_mask)(void *vd, target_ulong base, void *v0, \
-             CPURISCVState *env, uint32_t
-    desc)                                              \
-    { \
-         static struct vext_ldst_ctx ctx;                                \
-         vext_common_ctx_init(&ctx.vcc, sizeof(ETYPE),                 
-                    \
-             sizeof(MTYPE), env->vl, desc);                               \
-         ctx.nf = vext_nf(desc);                                  \
-         ctx.base = base;                                     \
-         ctx.ld_elem = vext_##NAME##_ld_elem;                  \
-         ctx.clear_elem = vext_##NAME##_clear_elem;               \
-       \
-         vext_ld_unit_stride_mask(vd, v0, env, &ctx, GETPC());          
-                 \
-    } \
+QMP monitor I/O happens in I/O thread @mon_iothread, in the I/O thread's
+AioContext.  The I/O thread's event loop polls monitor I/O.  The read
+handler pushes requests onto the monitor's qmp_requests queue.
 
-And the mini helper function is such code like:
+The dispatcher pops requests off these queues, and runs command
+handlers for them.
 
-    static void vext_ld_unit_stride_mask(void *vd, void *v0,
-    CPURISCVState *env,
-             struct vext_ldst_ctx *ctx, uintptr_t ra)
-    {
-         uint32_t i, k;
-         struct vext_common_ctx *s = &ctx->vcc;
+Before this patch, the dispatcher runs in a bottom half in the main
+thread with the BQL[*] held, in @iohandler_ctx context.  The latter
+ensures dispatch happens only from the main loop, not nested event
+loops.
 
-         if (s->vl == 0) {
-             return;
-         }
-         /* probe every access*/
-         for (i = 0; i < s->vl; i++) {
-             if (!s->vm && !vext_elem_mask(v0, s->mlen, i)) {
-                 continue;
-             }
-             probe_read_access(env, ctx->base + ctx->nf * i * s->msz,
-                     ctx->nf * s->msz, ra);
-         }
-         /* load bytes from guest memory */
-         for (i = 0; i < s->vl; i++) {
-             k = 0;
-             if (!s->vm && !vext_elem_mask(v0, s->mlen, i)) {
-                 continue;
-             }
-             while (k < ctx->nf) {
-                 target_ulong addr = ctx->base + (i * ctx->nf + k) * s->msz;
-                 ctx->ld_elem(env, addr, i + k * s->vlmax, vd, ra);
-                 k++;
-             }
-         }
-         /* clear tail elements */
-         for (k = 0; k < ctx->nf; k++) {
-             ctx->clear_elem(vd, s->vl + k * s->vlmax, s->vl * s->esz,
-                     s->vlmax * s->esz);
-         }
-    }
+The command handlers don't care for the AioContext; they're synchronous.
+If they need AIO internally, they have to set up a nested event loop.
+When they do, they pick the AioContext explicitly, so they still don't
+rely on the current context.
 
-Is it right?
-2.  The number of  parameters grows a lot when pass directly to mini 
-helper functions.
+The patch moves the dispatcher to a coroutine running in the main
+thread.  It runs in iohandler_ctx, but switches to qemu_aio_context for
+executing command handlers.
 
-For example, the number of parameters increases from 5 to 11.
+The dispatcher keeps running in @iohandler_ctx.  Good.
 
-    static void vext_ld_unit_stride(void *vd, target_ulong base, void *v0,
-             CPURISCVState *env,  vext_ld_elem_fn *ld_elem,
-             vext_ld_clear_elem *clear_elem，uint32_t vlmax,
-             uint32_t nf, uint32_t esz, uint32_t msz, uintptr_t ra)
+The command handlers now run in @qemu_aio_context.  Doesn't matter
+because "command handlers don't care for the AioContext".  Except when a
+command handler has a fast path like bdrv_truncate() has.  For those,
+@iohandler_ctx is generally not what we want.  @qemu_aio_context is.
+"Generally", since every one needs to be inspected for AioContext
+shenanigans.
 
 
-As vlmax and nf can be extracted  from desc, another form of mini helper
-will increases the number of parameters from 5 to 10.
+[*] @qemu_global_mutex, a.k.a. "iothread mutex"; pity anyone who needs
+to figure this out from the source code by himself
 
-Is it OK?
-
-BTW: In this patchset, I use a lot macros to generate code.  Is it OK?
-
-Best Regards,
-Zhiwei
->
-> r~
-
-
---------------BDA17EA78D28803C57DE9B44
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    Hi, Richard<br>
-    Thanks for your informative comments. I'm addressing these comments.
-    <br>
-    And a little confused in some comments.<br>
-    <div class="moz-cite-prefix">On 2020/2/12 14:38, Richard Henderson
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org">
-      <pre class="moz-quote-pre" wrap="">On 2/9/20 11:42 PM, LIU Zhiwei wrote:
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+/*
-+ * As simd_desc supports at most 256 bytes, and in this implementation,
-+ * the max vector group length is 2048 bytes. So split it into two parts.
-+ *
-+ * The first part is floor(maxsz, 64), encoded in maxsz of simd_desc.
-+ * The second part is (maxsz % 64) &gt;&gt; 3, encoded in data of simd_desc.
-+ */
-+static uint32_t maxsz_part1(uint32_t maxsz)
-+{
-+    return ((maxsz &amp; ~(0x3f)) &gt;&gt; 3) + 0x8; /* add offset 8 to avoid return 0 */
-+}
-+
-+static uint32_t maxsz_part2(uint32_t maxsz)
-+{
-+    return (maxsz &amp; 0x3f) &gt;&gt; 3;
-+}
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-I would much rather adjust simd_desc to support 2048 bytes.
-
-I've just posted a patch set that removes an assert in target/arm that would
-trigger if SIMD_DATA_SHIFT was increased to make room for a larger oprsz.
-
-Or, since we're not going through tcg_gen_gvec_* for ldst, don't bother with
-simd_desc at all, and just pass vlen, unencoded.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+/* define check conditions data structure */
-+struct vext_check_ctx {
-+
-+    struct vext_reg {
-+        uint8_t reg;
-+        bool widen;
-+        bool need_check;
-+    } check_reg[6];
-+
-+    struct vext_overlap_mask {
-+        uint8_t reg;
-+        uint8_t vm;
-+        bool need_check;
-+    } check_overlap_mask;
-+
-+    struct vext_nf {
-+        uint8_t nf;
-+        bool need_check;
-+    } check_nf;
-+    target_ulong check_misa;
-+
-+} vchkctx;
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-You cannot use a global variable.  The data must be thread-safe.
-
-If we're going to do the checks this way, with a structure, it needs to be on
-the stack or within DisasContext.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+#define GEN_VEXT_LD_US_TRANS(NAME, DO_OP, SEQ)                            \
-+static bool trans_##NAME(DisasContext *s, arg_r2nfvm* a)                  \
-+{                                                                         \
-+    vchkctx.check_misa = RVV;                                             \
-+    vchkctx.check_overlap_mask.need_check = true;                         \
-+    vchkctx.check_overlap_mask.reg = a-&gt;rd;                               \
-+    vchkctx.check_overlap_mask.vm = a-&gt;vm;                                \
-+    vchkctx.check_reg[0].need_check = true;                               \
-+    vchkctx.check_reg[0].reg = a-&gt;rd;                                     \
-+    vchkctx.check_reg[0].widen = false;                                   \
-+    vchkctx.check_nf.need_check = true;                                   \
-+    vchkctx.check_nf.nf = a-&gt;nf;                                          \
-+                                                                          \
-+    if (!vext_check(s)) {                                                 \
-+        return false;                                                     \
-+    }                                                                     \
-+    return DO_OP(s, a, SEQ);                                              \
-+}
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-I don't see the improvement from a pointer.  Something like
-
-    if (vext_check_isa_ill(s) &amp;&amp;
-        vext_check_overlap(s, a-&gt;rd, a-&gt;rm) &amp;&amp;
-        vext_check_reg(s, a-&gt;rd, false) &amp;&amp;
-        vext_check_nf(s, a-&gt;nf)) {
-        return DO_OP(s, a, SEQ);
-    }
-    return false;
-
-seems just as clear without the extra data.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+#ifdef CONFIG_USER_ONLY
-+#define MO_SB 0
-+#define MO_LESW 0
-+#define MO_LESL 0
-+#define MO_LEQ 0
-+#define MO_UB 0
-+#define MO_LEUW 0
-+#define MO_LEUL 0
-+#endif
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-What is this for?  We already define these unconditionally.
-
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+static inline int vext_elem_mask(void *v0, int mlen, int index)
-+{
-+    int idx = (index * mlen) / 8;
-+    int pos = (index * mlen) % 8;
-+
-+    return (*((uint8_t *)v0 + idx) &gt;&gt; pos) &amp; 0x1;
-+}
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-This is a little-endian indexing of the mask.  Just above we talk about using a
-host-endian ordering of uint64_t.
-
-Thus this must be based on uint64_t instead of uint8_t.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+/*
-+ * This function checks watchpoint before really load operation.
-+ *
-+ * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
-+ * In user mode, there is no watchpoint support now.
-+ *
-+ * It will triggle an exception if there is no mapping in TLB
-+ * and page table walk can't fill the TLB entry. Then the guest
-+ * software can return here after process the exception or never return.
-+ */
-+static void probe_read_access(CPURISCVState *env, target_ulong addr,
-+        target_ulong len, uintptr_t ra)
-+{
-+    while (len) {
-+        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
-+        const target_ulong curlen = MIN(pagelen, len);
-+
-+        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-The return value here is non-null when we can read directly from host memory.
-It would be a shame to throw that work away.
-
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+/* data structure and common functions for load and store */
-+typedef void vext_ld_elem_fn(CPURISCVState *env, target_ulong addr,
-+        uint32_t idx, void *vd, uintptr_t retaddr);
-+typedef void vext_st_elem_fn(CPURISCVState *env, target_ulong addr,
-+        uint32_t idx, void *vd, uintptr_t retaddr);
-+typedef target_ulong vext_get_index_addr(target_ulong base,
-+        uint32_t idx, void *vs2);
-+typedef void vext_ld_clear_elem(void *vd, uint32_t idx,
-+        uint32_t cnt, uint32_t tot);
-+
-+struct vext_ldst_ctx {
-+    struct vext_common_ctx vcc;
-+    uint32_t nf;
-+    target_ulong base;
-+    target_ulong stride;
-+    int mmuidx;
-+
-+    vext_ld_elem_fn *ld_elem;
-+    vext_st_elem_fn *st_elem;
-+    vext_get_index_addr *get_index_addr;
-+    vext_ld_clear_elem *clear_elem;
-+};
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-I think you should pass these elements directly, as needed, rather than putting
-them all in a struct.
-
-This would allow the main helper function to be inlined, which in turn allows
-the mini helper functions to be inlined.
-</pre>
-    </blockquote>
-    1. What's the main helper function? What's is the mini helper
-    functions here?<br>
-    <br>
-    I guess main helper function is such code like:<br>
-    <br>
-    <blockquote>#define GEN_VEXT_LD_UNIT_STRIDE(NAME, MTYPE,
-      ETYPE)                \<br>
-      void HELPER(NAME##_mask)(void *vd, target_ulong base, void *v0,  
-      \<br>
-              CPURISCVState *env, uint32_t
-      desc)                                              \<br>
-{                                                                                                             
-      \<br>
-          static struct vext_ldst_ctx ctx;                             
-                                     \<br>
-          vext_common_ctx_init(&amp;ctx.vcc,
-      sizeof(ETYPE),                                 \<br>
-              sizeof(MTYPE), env-&gt;vl, desc);                        
-                                    \<br>
-          ctx.nf = vext_nf(desc);                                      
-                                       \<br>
-          ctx.base = base;                                             
-                                          \<br>
-          ctx.ld_elem = vext_##NAME##_ld_elem;                         
-                       \<br>
-          ctx.clear_elem = vext_##NAME##_clear_elem;                   
-                    \<br>
-                                                                                                            
-        \<br>
-          vext_ld_unit_stride_mask(vd, v0, env, &amp;ctx,
-      GETPC());                       \<br>
-}                                                                                                             
-      \<br>
-    </blockquote>
-    And the mini helper function is such code like:<br>
-    <blockquote>static void vext_ld_unit_stride_mask(void *vd, void *v0,
-      CPURISCVState *env,<br>
-              struct vext_ldst_ctx *ctx, uintptr_t ra)<br>
-      {<br>
-          uint32_t i, k;<br>
-          struct vext_common_ctx *s = &amp;ctx-&gt;vcc;<br>
-      <br>
-          if (s-&gt;vl == 0) {<br>
-              return;<br>
-          }<br>
-          /* probe every access*/<br>
-          for (i = 0; i &lt; s-&gt;vl; i++) {<br>
-              if (!s-&gt;vm &amp;&amp; !vext_elem_mask(v0, s-&gt;mlen,
-      i)) {<br>
-                  continue;<br>
-              }<br>
-              probe_read_access(env, ctx-&gt;base + ctx-&gt;nf * i *
-      s-&gt;msz,<br>
-                      ctx-&gt;nf * s-&gt;msz, ra);<br>
-          }<br>
-          /* load bytes from guest memory */<br>
-          for (i = 0; i &lt; s-&gt;vl; i++) {<br>
-              k = 0;<br>
-              if (!s-&gt;vm &amp;&amp; !vext_elem_mask(v0, s-&gt;mlen,
-      i)) {<br>
-                  continue;<br>
-              }<br>
-              while (k &lt; ctx-&gt;nf) {<br>
-                  target_ulong addr = ctx-&gt;base + (i * ctx-&gt;nf +
-      k) * s-&gt;msz;<br>
-                  ctx-&gt;ld_elem(env, addr, i + k * s-&gt;vlmax, vd,
-      ra);<br>
-                  k++;<br>
-              }<br>
-          }<br>
-          /* clear tail elements */<br>
-          for (k = 0; k &lt; ctx-&gt;nf; k++) {<br>
-              ctx-&gt;clear_elem(vd, s-&gt;vl + k * s-&gt;vlmax,
-      s-&gt;vl * s-&gt;esz,<br>
-                      s-&gt;vlmax * s-&gt;esz);<br>
-          }<br>
-      }<br>
-    </blockquote>
-    Is it right?<br>
-    2.  The number of  parameters grows a lot when pass directly to mini
-    helper functions.<br>
-    <br>
-    For example, the number of parameters increases from 5 to 11. <br>
-    <br>
-    <blockquote>static void vext_ld_unit_stride(void *vd, target_ulong
-      base, void *v0,<br>
-              CPURISCVState *env,  vext_ld_elem_fn *ld_elem, <br>
-              vext_ld_clear_elem *clear_elem，uint32_t vlmax,<br>
-              uint32_t nf, uint32_t esz, uint32_t msz, uintptr_t ra)<br>
-    </blockquote>
-    <br>
-    As vlmax and nf can be extracted  from desc, another form of mini
-    helper <br>
-    will increases the number of parameters from 5 to 10.<br>
-    <br>
-    Is it OK?<br>
-    <br>
-    BTW: In this patchset, I use a lot macros to generate code.  Is it
-    OK?<br>
-    <span style="color: rgb(51, 51, 51); font-family: arial; font-size:
-      13px; font-style: normal; font-variant-ligatures: normal;
-      font-variant-caps: normal; font-weight: 400; letter-spacing:
-      normal; orphans: 2; text-align: start; text-indent: 0px;
-      text-transform: none; white-space: normal; widows: 2;
-      word-spacing: 0px; -webkit-text-stroke-width: 0px;
-      background-color: rgb(255, 255, 255); text-decoration-style:
-      initial; text-decoration-color: initial; display: inline
-      !important; float: none;">
-    </span>
-    <div class="moz-cite-prefix"><br>
-      Best Regards,<br>
-      Zhiwei<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-
-r~
-</pre>
-    </blockquote>
-    <br>
-  </body>
-</html>
-
---------------BDA17EA78D28803C57DE9B44--
 
