@@ -2,69 +2,82 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B7AC34056
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 513F3C34056
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59789206DB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:03:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59789206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0DF9E24670
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:25:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhtbVRGE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF9E24670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Tgq-0003ts-CL
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 13:03:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55159)
+	id 1j4U2F-0002EM-9r
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 13:25:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j4Tg0-00031R-Hn
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:02:25 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j4U1Q-0001W4-1J
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:24:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j4Tfy-0003q4-St
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:02:24 -0500
-Resent-Date: Wed, 19 Feb 2020 13:02:24 -0500
-Resent-Message-Id: <E1j4Tfy-0003q4-St@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21108)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j4Tfy-0003pH-Ko
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:02:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582135333; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hQMnYrJ6G5CmwKdCjun3UCq/zIoSkUWQWNlSutDNL4rH1jw6lMTEqyfS4pkuICBXm2Otbc36/zR8INSjmEzvz/3Xgrtq9uxcyACmoxZTfXht20SwiXZg4JOgKy6w9qhrfqwqsuvYouVz93q8J5OanxiTNnVLyFzEZtPMP3Ay8Xs=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582135333;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=JQ1JfB0Om7ofr2ArRlkQwjLkTX4PPTzlISpKAVsJhJs=; 
- b=fIYNg2+0ySxP0jAjMZwl4Hb80I59QmxtUyfawz+XQuO2hA9uYlUDXdjrnaP12bw4+NgaHYqi3xzHIBb3ZQB4AlctxEfwG3TZQTE/PeRrx0ob/bneM1Ll095dkdAtKkGjgMFnb+36t7dVzqNoqJajVauoIfFxYXaojtJKF6Updng=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582135327706187.90681942995582;
- Wed, 19 Feb 2020 10:02:07 -0800 (PST)
-In-Reply-To: <20200219163344.27651-1-ovoshcha@redhat.com>
-Subject: Re: [PATCH 0/3] Migration mechanism with FD
-Message-ID: <158213532650.22488.7697789526383842004@a1bbccc8075a>
+ (envelope-from <dgilbert@redhat.com>) id 1j4U1N-0002bW-Pa
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:24:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39881
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j4U1N-0002ZG-Ii
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 13:24:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582136667;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7a4DHjon3IBuCcmEqpWG0A5zuXNScNhEt7asp8XKFww=;
+ b=dhtbVRGEVGQ+ASLJMSixMoLo3nGOZVoo6zrpqV+4VKREIffT/H8Ker4EH1u3vAWvdQycfg
+ Lz2aKSn0jU2+gzipxywg6ablRY1hw+EJ7riMkPdGUmZZ+GOtkwvySUS1dlhfuYJk8jqBS/
+ 0XKYB8F3+3xfBZLgScQetOFc0LzSkHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-NN_uZ_xkMtqr702xu49Yjw-1; Wed, 19 Feb 2020 13:24:24 -0500
+X-MC-Unique: NN_uZ_xkMtqr702xu49Yjw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26BD28017CC;
+ Wed, 19 Feb 2020 18:24:23 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F4AC5C1B0;
+ Wed, 19 Feb 2020 18:24:21 +0000 (UTC)
+Date: Wed, 19 Feb 2020 18:24:18 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Subject: Re: [PATCH 1/3] migration/colo: wrap incoming checkpoint process
+ into new helper
+Message-ID: <20200219182418.GI3089@work-vm>
+References: <20200217012049.22988-1-zhang.zhanghailiang@huawei.com>
+ <20200217012049.22988-2-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ovoshcha@redhat.com
-Date: Wed, 19 Feb 2020 10:02:07 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200217012049.22988-2-zhang.zhanghailiang@huawei.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,77 +89,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: crosa@redhat.com, philmd@redhat.com, qemu-devel@nongnu.org,
- wainersm@redhat.com, ehabkost@redhat.com
+Cc: danielcho@qnap.com, chen.zhang@intel.com, qemu-devel@nongnu.org,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIxOTE2MzM0NC4yNzY1
-MS0xLW92b3NoY2hhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzNdIE1pZ3JhdGlvbiBtZWNoYW5pc20gd2l0
-aCBGRApNZXNzYWdlLWlkOiAyMDIwMDIxOTE2MzM0NC4yNzY1MS0xLW92b3NoY2hhQHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU0MjljMGEgQWNjZXB0YW5jZSB0ZXN0OiBGRCBtaWdyYXRp
-b24KZjQxNWM0YyBVcGRhdGVzIHNlbmRfZmRfc2NtIGZ1bmN0aW9uCjgxMGMxM2EgQWRkaW5nIGZ1
-bmN0aW9ucyBfc2VuZF9mZHMgYW5kIF9yZWN2X2ZkcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8z
-IENoZWNraW5nIGNvbW1pdCA4MTBjMTNhNTIzNTYgKEFkZGluZyBmdW5jdGlvbnMgX3NlbmRfZmRz
-IGFuZCBfcmVjdl9mZHMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMzogRklM
-RTogcHl0aG9uL3FlbXUvbWFjaGluZS5weToxNjE6CisgICAgICAgIEZ1bmN0aW9uIGZyb20gaHR0
-cHM6Ly9kb2NzLnB5dGhvbi5vcmcvMy9saWJyYXJ5L3NvY2tldC5odG1sI3NvY2tldC5zb2NrZXQu
-cmVjdm1zZwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogcHl0aG9u
-L3FlbXUvbWFjaGluZS5weToxNjQ6CisgICAgICAgIG1zZywgYW5jZGF0YSwgZmxhZ3MsIGFkZHIg
-PSBzb2NrLnJlY3Ztc2cobXNnbGVuLCBzb2NrZXQuQ01TR19MRU4obWF4ZmRzICogZmRzLml0ZW1z
-aXplKSkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzODogRklMRTogcHl0aG9u
-L3FlbXUvbWFjaGluZS5weToxNjY6CisgICAgICAgICAgICBpZiBjbXNnX2xldmVsID09IHNvY2tl
-dC5TT0xfU09DS0VUIGFuZCBjbXNnX3R5cGUgPT0gc29ja2V0LlNDTV9SSUdIVFM6CgpFUlJPUjog
-bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzM5OiBGSUxFOiBweXRob24vcWVtdS9tYWNoaW5lLnB5
-OjE2NzoKKyAgICAgICAgICAgICAgICBmZHMuZnJvbWJ5dGVzKGNtc2dfZGF0YVs6bGVuKGNtc2df
-ZGF0YSkgLSAobGVuKGNtc2dfZGF0YSkgJSBmZHMuaXRlbXNpemUpXSkKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiM0NDogRklMRTogcHl0aG9uL3FlbXUvbWFjaGluZS5weToxNzI6
-CisgICAgICAgIEZ1bmN0aW9uIGZyb20gaHR0cHM6Ly9kb2NzLnB5dGhvbi5vcmcvMy9saWJyYXJ5
-L3NvY2tldC5odG1sI3NvY2tldC5zb2NrZXQuc2VuZG1zZwoKRVJST1I6IGxpbmUgb3ZlciA5MCBj
-aGFyYWN0ZXJzCiM0NjogRklMRTogcHl0aG9uL3FlbXUvbWFjaGluZS5weToxNzQ6CisgICAgICAg
-IHJldHVybiBzb2NrLnNlbmRtc2coW21zZ10sIFsoc29ja2V0LlNPTF9TT0NLRVQsIHNvY2tldC5T
-Q01fUklHSFRTLCBhcnJheS5hcnJheSgiaSIsIGZkcykpXSkKCnRvdGFsOiAzIGVycm9ycywgMyB3
-YXJuaW5ncywgMzAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8zIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgoyLzMgQ2hlY2tpbmcgY29tbWl0IGY0MTVjNGMyYmQ2YSAoVXBkYXRlcyBzZW5kX2Zk
-X3NjbSBmdW5jdGlvbikKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMyOiBGSUxF
-OiBweXRob24vcWVtdS9tYWNoaW5lLnB5OjE4MjoKKyAgICAgICAgRXhhY3RseSBvbmUgb2YgZmQg
-YW5kIGZpbGVfcGF0aCBtdXN0IGJlIGdpdmVuIHRvIHRoZSBjYXNlIG9mIHNvY2tldF9zY21faGVs
-cGVyCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ1OiBGSUxFOiBweXRob24vcWVt
-dS9tYWNoaW5lLnB5OjE5MToKKyAgICAgICAgICAgICAgICByYWlzZSBRRU1VTWFjaGluZUVycm9y
-KCJObyBwYXRoIHRvIHNvY2tldF9zY21faGVscGVyIHNldCBvciBkYXRhIG5vdCBwcm92aWRlZCIp
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNjg6IEZJTEU6IHB5dGhvbi9xZW11
-L21hY2hpbmUucHk6MjE0OgorICAgICAgICAgICAgcHJvYyA9IHN1YnByb2Nlc3MuUG9wZW4oZmRf
-cGFyYW0sIHN0ZGluPWRldm51bGwsIHN0ZG91dD1zdWJwcm9jZXNzLlBJUEUsCgpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzkxOiBGSUxFOiBweXRob24vcWVtdS9tYWNoaW5lLnB5OjIy
-MzoKKyAgICAgICAgICAgIHNvY2tfZmQgPSBzb2NrZXQuZnJvbWZkKHNlbGYuX3FtcC5nZXRfc29j
-a19mZCgpLCBzb2NrZXQuQUZfVU5JWCwgc29ja2V0LlNPQ0tfU1RSRUFNKQoKdG90YWw6IDIgZXJy
-b3JzLCAyIHdhcm5pbmdzLCA3OCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzMgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjMvMyBDaGVja2luZyBjb21taXQgNTQyOWMwYWZkYzIxIChBY2NlcHRh
-bmNlIHRlc3Q6IEZEIG1pZ3JhdGlvbikKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMz
-NDogRklMRTogdGVzdHMvYWNjZXB0YW5jZS9taWdyYXRpb24ucHk6ODQ6CisgICAgICAgIGRhdGFf
-dG9fc2VuZCA9IGIie1wiZXhlY3V0ZVwiOiBcImdldGZkXCIsICBcImFyZ3VtZW50c1wiOiB7XCJm
-ZG5hbWVcIjogXCJmZC1taWdyYXRpb25cIn19IgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAzMCBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAw
-MjE5MTYzMzQ0LjI3NjUxLTEtb3Zvc2hjaGFAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+* Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+> Split checkpoint incoming process into a helper.
+>=20
+> Signed-off-by: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/colo.c | 260 ++++++++++++++++++++++++-----------------------
+>  1 file changed, 133 insertions(+), 127 deletions(-)
+>=20
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 2c88aa57a2..93c5a452fb 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -664,13 +664,138 @@ void migrate_start_colo_process(MigrationState *s)
+>      qemu_mutex_lock_iothread();
+>  }
+> =20
+> -static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_reques=
+t,
+> -                                     Error **errp)
+> +static void colo_incoming_process_checkpoint(MigrationIncomingState *mis=
+,
+> +                      QEMUFile *fb, QIOChannelBuffer *bioc, Error **errp=
+)
+> +{
+> +    uint64_t total_size;
+> +    uint64_t value;
+> +    Error *local_err =3D NULL;
+> +    int ret;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    vm_stop_force_state(RUN_STATE_COLO);
+> +    trace_colo_vm_state_change("run", "stop");
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    /* FIXME: This is unnecessary for periodic checkpoint mode */
+> +    colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
+> +                 &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    colo_receive_check_message(mis->from_src_file,
+> +                       COLO_MESSAGE_VMSTATE_SEND, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    qemu_mutex_lock_iothread();
+> +    cpu_synchronize_all_pre_loadvm();
+> +    ret =3D qemu_loadvm_state_main(mis->from_src_file, mis);
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    if (ret < 0) {
+> +        error_setg(errp, "Load VM's live state (ram) error");
+> +        return;
+> +    }
+> +
+> +    value =3D colo_receive_message_value(mis->from_src_file,
+> +                             COLO_MESSAGE_VMSTATE_SIZE, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Read VM device state data into channel buffer,
+> +     * It's better to re-use the memory allocated.
+> +     * Here we need to handle the channel buffer directly.
+> +     */
+> +    if (value > bioc->capacity) {
+> +        bioc->capacity =3D value;
+> +        bioc->data =3D g_realloc(bioc->data, bioc->capacity);
+> +    }
+> +    total_size =3D qemu_get_buffer(mis->from_src_file, bioc->data, value=
+);
+> +    if (total_size !=3D value) {
+> +        error_setg(errp, "Got %" PRIu64 " VMState data, less than expect=
+ed"
+> +                    " %" PRIu64, total_size, value);
+> +        return;
+> +    }
+> +    bioc->usage =3D total_size;
+> +    qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
+> +
+> +    colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_RECEIVED,
+> +                 &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    qemu_mutex_lock_iothread();
+> +    vmstate_loading =3D true;
+> +    ret =3D qemu_load_device_state(fb);
+> +    if (ret < 0) {
+> +        error_setg(errp, "COLO: load device state failed");
+> +        qemu_mutex_unlock_iothread();
+> +        return;
+> +    }
+> +
+> +#ifdef CONFIG_REPLICATION
+> +    replication_get_error_all(&local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        qemu_mutex_unlock_iothread();
+> +        return;
+> +    }
+> +
+> +    /* discard colo disk buffer */
+> +    replication_do_checkpoint_all(&local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        qemu_mutex_unlock_iothread();
+> +        return;
+> +    }
+> +#else
+> +    abort();
+> +#endif
+> +    /* Notify all filters of all NIC to do checkpoint */
+> +    colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        qemu_mutex_unlock_iothread();
+> +        return;
+> +    }
+> +
+> +    vmstate_loading =3D false;
+> +    vm_start();
+> +    trace_colo_vm_state_change("stop", "run");
+> +    qemu_mutex_unlock_iothread();
+> +
+> +    if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
+> +        failover_set_state(FAILOVER_STATUS_RELAUNCH,
+> +                        FAILOVER_STATUS_NONE);
+> +        failover_request_active(NULL);
+> +        return;
+> +    }
+> +
+> +    colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_LOADED,
+> +                 &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +    }
+> +}
+> +
+> +static void colo_wait_handle_message(MigrationIncomingState *mis,
+> +                QEMUFile *fb, QIOChannelBuffer *bioc, Error **errp)
+>  {
+>      COLOMessage msg;
+>      Error *local_err =3D NULL;
+> =20
+> -    msg =3D colo_receive_message(f, &local_err);
+> +    msg =3D colo_receive_message(mis->from_src_file, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+> @@ -678,10 +803,9 @@ static void colo_wait_handle_message(QEMUFile *f, in=
+t *checkpoint_request,
+> =20
+>      switch (msg) {
+>      case COLO_MESSAGE_CHECKPOINT_REQUEST:
+> -        *checkpoint_request =3D 1;
+> +        colo_incoming_process_checkpoint(mis, fb, bioc, errp);
+>          break;
+>      default:
+> -        *checkpoint_request =3D 0;
+>          error_setg(errp, "Got unknown COLO message: %d", msg);
+>          break;
+>      }
+> @@ -692,10 +816,7 @@ void *colo_process_incoming_thread(void *opaque)
+>      MigrationIncomingState *mis =3D opaque;
+>      QEMUFile *fb =3D NULL;
+>      QIOChannelBuffer *bioc =3D NULL; /* Cache incoming device state */
+> -    uint64_t total_size;
+> -    uint64_t value;
+>      Error *local_err =3D NULL;
+> -    int ret;
+> =20
+>      rcu_register_thread();
+>      qemu_sem_init(&mis->colo_incoming_sem, 0);
+> @@ -749,134 +870,19 @@ void *colo_process_incoming_thread(void *opaque)
+>      }
+> =20
+>      while (mis->state =3D=3D MIGRATION_STATUS_COLO) {
+> -        int request =3D 0;
+> -
+> -        colo_wait_handle_message(mis->from_src_file, &request, &local_er=
+r);
+> +        colo_wait_handle_message(mis, fb, bioc, &local_err);
+>          if (local_err) {
+> -            goto out;
+> +            error_report_err(local_err);
+> +            break;
+>          }
+> -        assert(request);
+>          if (failover_get_state() !=3D FAILOVER_STATUS_NONE) {
+>              error_report("failover request");
+> -            goto out;
+> -        }
+> -
+> -        qemu_mutex_lock_iothread();
+> -        vm_stop_force_state(RUN_STATE_COLO);
+> -        trace_colo_vm_state_change("run", "stop");
+> -        qemu_mutex_unlock_iothread();
+> -
+> -        /* FIXME: This is unnecessary for periodic checkpoint mode */
+> -        colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPL=
+Y,
+> -                     &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -
+> -        colo_receive_check_message(mis->from_src_file,
+> -                           COLO_MESSAGE_VMSTATE_SEND, &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -
+> -        qemu_mutex_lock_iothread();
+> -        cpu_synchronize_all_pre_loadvm();
+> -        ret =3D qemu_loadvm_state_main(mis->from_src_file, mis);
+> -        qemu_mutex_unlock_iothread();
+> -
+> -        if (ret < 0) {
+> -            error_report("Load VM's live state (ram) error");
+> -            goto out;
+> -        }
+> -
+> -        value =3D colo_receive_message_value(mis->from_src_file,
+> -                                 COLO_MESSAGE_VMSTATE_SIZE, &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -
+> -        /*
+> -         * Read VM device state data into channel buffer,
+> -         * It's better to re-use the memory allocated.
+> -         * Here we need to handle the channel buffer directly.
+> -         */
+> -        if (value > bioc->capacity) {
+> -            bioc->capacity =3D value;
+> -            bioc->data =3D g_realloc(bioc->data, bioc->capacity);
+> -        }
+> -        total_size =3D qemu_get_buffer(mis->from_src_file, bioc->data, v=
+alue);
+> -        if (total_size !=3D value) {
+> -            error_report("Got %" PRIu64 " VMState data, less than expect=
+ed"
+> -                        " %" PRIu64, total_size, value);
+> -            goto out;
+> -        }
+> -        bioc->usage =3D total_size;
+> -        qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
+> -
+> -        colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_RECEIVE=
+D,
+> -                     &local_err);
+> -        if (local_err) {
+> -            goto out;
+> -        }
+> -
+> -        qemu_mutex_lock_iothread();
+> -        vmstate_loading =3D true;
+> -        ret =3D qemu_load_device_state(fb);
+> -        if (ret < 0) {
+> -            error_report("COLO: load device state failed");
+> -            qemu_mutex_unlock_iothread();
+> -            goto out;
+> -        }
+> -
+> -#ifdef CONFIG_REPLICATION
+> -        replication_get_error_all(&local_err);
+> -        if (local_err) {
+> -            qemu_mutex_unlock_iothread();
+> -            goto out;
+> -        }
+> -
+> -        /* discard colo disk buffer */
+> -        replication_do_checkpoint_all(&local_err);
+> -        if (local_err) {
+> -            qemu_mutex_unlock_iothread();
+> -            goto out;
+> -        }
+> -#else
+> -        abort();
+> -#endif
+> -        /* Notify all filters of all NIC to do checkpoint */
+> -        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+> -
+> -        if (local_err) {
+> -            qemu_mutex_unlock_iothread();
+> -            goto out;
+> -        }
+> -
+> -        vmstate_loading =3D false;
+> -        vm_start();
+> -        trace_colo_vm_state_change("stop", "run");
+> -        qemu_mutex_unlock_iothread();
+> -
+> -        if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
+> -            failover_set_state(FAILOVER_STATUS_RELAUNCH,
+> -                            FAILOVER_STATUS_NONE);
+> -            failover_request_active(NULL);
+> -            goto out;
+> -        }
+> -
+> -        colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_LOADED,
+> -                     &local_err);
+> -        if (local_err) {
+> -            goto out;
+> +            break;
+>          }
+>      }
+> =20
+>  out:
+>      vmstate_loading =3D false;
+> -    /* Throw the unreported error message after exited from loop */
+> -    if (local_err) {
+> -        error_report_err(local_err);
+> -    }
+> =20
+>      /*
+>       * There are only two reasons we can get here, some error happened
+> --=20
+> 2.21.0
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
