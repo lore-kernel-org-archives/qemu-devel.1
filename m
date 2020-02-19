@@ -2,83 +2,80 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C86C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA04C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E566924656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A55C2464E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fpF6qa9n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E566924656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2BWdF+U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A55C2464E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SbT-0007ND-2P
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:53:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42068)
+	id 1j4Sbl-0008Fs-Lf
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:53:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1j4SOQ-0003Ut-R1
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:40:12 -0500
+ (envelope-from <david@redhat.com>) id 1j4S3B-0000F4-FW
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1j4SOO-0008BY-Mw
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:40:10 -0500
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:35901)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1j4SOO-0008B7-Dr
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:40:08 -0500
-Received: by mail-pf1-x42a.google.com with SMTP id 185so332156pfv.3
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 08:40:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=NX9h8pD+23hYiUkVbRsk8kJJ4NVy28DePqm6/XUwIAo=;
- b=fpF6qa9neTsqXj8bEMartarTfACRvdZyqKUH26PtlvUrvgL/npoSKrsOcPt7Gtm3Tz
- EGNdn4nUScf7ahCtVNvsVeVH3RPdLYEZY91VmcojOuGzYwbfjtE0zSqPByTuqk0qbklF
- 6x4aPJa4TaytZ3c3fy0IaiLUv5j1IF6LqBbzFXHoaxBq06IN1VPo2p/Q7BNVJbgmOhxA
- UzXe9PsdBqJfdgx4yocwdbLRvk8ZCLnFBQiONfpMr2hOkFyg7CBmOLeTESx6OdJOeWSO
- F5nFQJDQndZnHznVfOYLZ0Z5yZRD7VVlddVz4YKkgTAyl+ObWLZuevj7zF5xZAkKTwD7
- BVgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=NX9h8pD+23hYiUkVbRsk8kJJ4NVy28DePqm6/XUwIAo=;
- b=FJa0p0SMHtP0drwpj0Y93LMXgALFkgG6jwt1SPqDcYZfOdPJnod93ffQBSPhU3/Q1g
- FbdcddoIkWDgB8vPusiC5KZ2Yr93s1mbpr+29sqHC4YPfMUCNUHWBOSgdZBEDYy5LfSl
- EHoH55Wuz+6aLtL0YxfWEwb2jH8wBXLnA+tXodwGCqMzuFnS/LOM60/LWU/Q8EgwJvUc
- +DJWcnrvc09mfZOZmOALgL2QZkbDIARSXBX8v63p3+2my5btpFFp1ZLtqttj+8mnTwoy
- l0cX60FvjVYud4uVppKPemXm3CITp0mGBsGNeIxfsxGOeVJegLRylrHUFYOcZomv2rnb
- MGMg==
-X-Gm-Message-State: APjAAAWhSRs39ClYEEHzix5Xy8fyuXrANI/ubb3G8h3HEU1mR3TlYwyF
- z0BJ+1E2G1Z1vaaLc9KKvvQuSSPX9nI=
-X-Google-Smtp-Source: APXvYqyCw2LWtfckRKv8ZVgMs/qhm0Ia96KXNsJEQgf7TQmU47nQQe3S0m8PqcrSerNuNaftgwPeaQ==
-X-Received: by 2002:a63:7453:: with SMTP id e19mr1078954pgn.50.1582130406869; 
- Wed, 19 Feb 2020 08:40:06 -0800 (PST)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:3cc2:5eb7:e248:ad23])
- by smtp.gmail.com with ESMTPSA id a69sm112362pfa.129.2020.02.19.08.40.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Feb 2020 08:40:06 -0800 (PST)
-From: Robert Foley <robert.foley@linaro.org>
+ (envelope-from <david@redhat.com>) id 1j4S3A-00045I-2f
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:13 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60462
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4S39-000458-UZ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:18:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582129091;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QEj9mJF11DhrqbQX0YVXX3cnOZeSLuB42yARQjagHeY=;
+ b=R2BWdF+UOPjGj+DeOYKi1vvCTgEA8sFxxZf3EAxddFxyNzdIp7hOLuhx5/4TVw0/VkNGWf
+ 2DkDLMiuO336Y7SPjDkCYbbjzJlM1pzxmlq6ZzvFXESCb3MsAkEb2LxFuzscIDaW11c4Ru
+ OFtJqeHVGEIZImpVR5vjwYkLLNqWdWQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-p8SZ9pRHO6a0FvpOonbEMQ-1; Wed, 19 Feb 2020 11:18:07 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8DD78010EB;
+ Wed, 19 Feb 2020 16:18:06 +0000 (UTC)
+Received: from t480s.redhat.com (ovpn-116-151.ams2.redhat.com [10.36.116.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 283418B577;
+ Wed, 19 Feb 2020 16:17:42 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/14] tests/vm: Added a new script for ubuntu.aarch64.
-Date: Wed, 19 Feb 2020 11:35:35 -0500
-Message-Id: <20200219163537.22098-13-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200219163537.22098-1-robert.foley@linaro.org>
-References: <20200219163537.22098-1-robert.foley@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::42a
+Subject: [PATCH v1 01/13] util: vfio-helpers: Factor out and fix processing of
+ existing ram blocks
+Date: Wed, 19 Feb 2020 17:17:13 +0100
+Message-Id: <20200219161725.115218-2-david@redhat.com>
+In-Reply-To: <20200219161725.115218-1-david@redhat.com>
+References: <20200219161725.115218-1-david@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: p8SZ9pRHO6a0FvpOonbEMQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,297 +87,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
- peter.puhov@linaro.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ubuntu.aarch64 provides a script to create an Ubuntu 18.04 VM.
-Another new file is also added aarch64vm.py, which is a module with
-common methods used by aarch64 VMs, such as how to create the
-flash images.
+Factor it out into common code when a new notifier is registered, just
+as done with the memory region notifier. This allows us to have the
+logic about how to process existing ram blocks at a central place (which
+will be extended soon).
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Just like when adding a new ram block, we have to register the max_length
+for now. We don't have a way to get notified about resizes yet, and some
+memory would not be mapped when growing the ram block.
+
+Note: Currently, ram blocks are only "fake resized". All memory
+(max_length) is accessible.
+
+We can get rid of a bunch of functions in stubs/ram-block.c . Print the
+warning from inside qemu_vfio_ram_block_added().
+
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- tests/vm/Makefile.include |   3 +-
- tests/vm/aarch64vm.py     | 100 ++++++++++++++++++++++++++++++++
- tests/vm/basevm.py        |   8 +++
- tests/vm/ubuntu.aarch64   | 117 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 227 insertions(+), 1 deletion(-)
- create mode 100644 tests/vm/aarch64vm.py
- create mode 100755 tests/vm/ubuntu.aarch64
+ exec.c                    |  5 +++++
+ hw/core/numa.c            | 14 ++++++++++++++
+ include/exec/cpu-common.h |  1 +
+ util/vfio-helpers.c       | 28 +++++++---------------------
+ 4 files changed, 27 insertions(+), 21 deletions(-)
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 7557c154a1..9dfa517936 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -2,7 +2,7 @@
- 
- .PHONY: vm-build-all vm-clean-all
- 
--IMAGES := ubuntu.i386 freebsd netbsd openbsd centos fedora
-+IMAGES := ubuntu.i386 freebsd netbsd openbsd centos fedora ubuntu.aarch64
- IMAGES_DIR := $(HOME)/.cache/qemu-vm/images
- IMAGE_FILES := $(patsubst %, $(IMAGES_DIR)/%.img, $(IMAGES))
- 
-@@ -18,6 +18,7 @@ vm-help vm-test:
- 	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
- 	@echo "  vm-build-centos                 - Build QEMU in CentOS VM, with Docker"
- 	@echo "  vm-build-fedora                 - Build QEMU in Fedora VM"
-+	@echo "  vm-build-ubuntu.aarch64         - Build QEMU in ubuntu aarch64 VM"
- 	@echo ""
- 	@echo "  vm-build-all                    - Build QEMU in all VMs"
- 	@echo "  vm-clean-all                    - Clean up VM images"
-diff --git a/tests/vm/aarch64vm.py b/tests/vm/aarch64vm.py
-new file mode 100644
-index 0000000000..fd48735b3a
---- /dev/null
-+++ b/tests/vm/aarch64vm.py
-@@ -0,0 +1,100 @@
-+#!/usr/bin/env python3
-+#
-+# VM testing aarch64 library
-+#
-+# Copyright 2020 Linaro
-+#
-+# Authors:
-+#  Robert Foley <robert.foley@linaro.org>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
-+import os
-+import sys
-+import subprocess
-+import basevm
-+from qemu.accel import kvm_available
-+
-+# This is the config needed for current version of QEMU.
-+# This works for both kvm and tcg.
-+CURRENT_CONFIG = {
-+    'cpu'          : "max",
-+    'machine'      : "virt,gic-version=max",
+diff --git a/exec.c b/exec.c
+index 8e9cc3b47c..dfd43d27c6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2016,6 +2016,11 @@ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+     return rb->used_length;
+ }
+=20
++ram_addr_t qemu_ram_get_max_length(RAMBlock *rb)
++{
++    return rb->max_length;
 +}
 +
-+# The minimum minor version of QEMU we will support with aarch64 VMs is 3.
-+# QEMU versions less than 3 have various issues running these VMs.
-+QEMU_AARCH64_MIN_VERSION = 3
+ bool qemu_ram_is_shared(RAMBlock *rb)
+ {
+     return rb->flags & RAM_SHARED;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 0d1b4be76a..6599c69e05 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -899,9 +899,23 @@ void query_numa_node_mem(NumaNodeMem node_mem[], Machi=
+neState *ms)
+     }
+ }
+=20
++static int ram_block_notify_add_single(RAMBlock *rb, void *opaque)
++{
++    const ram_addr_t max_size =3D qemu_ram_get_max_length(rb);
++    void *host =3D qemu_ram_get_host_addr(rb);
++    RAMBlockNotifier *notifier =3D opaque;
 +
-+# The DEFAULT_CONFIG will default to a version of
-+# parameters that works for backwards compatibility.
-+DEFAULT_CONFIG = {'kvm' : {'cpu'          : "host",
-+                           'machine'      : "virt,gic-version=host"},
-+                  'tcg' : {'cpu'          : "cortex-a57",
-+                           'machine'      : "virt"},
++    if (host) {
++        notifier->ram_block_added(notifier, host, max_size);
++    }
++    return 0;
 +}
 +
-+def get_config_defaults(vmcls, default_config):
-+    """Fetch the configuration defaults for this VM,
-+       taking into consideration the defaults for
-+       aarch64 first, followed by the defaults for this VM."""
-+    config = default_config
-+    config.update(aarch_get_config_defaults(vmcls))
-+    return config
+ void ram_block_notifier_add(RAMBlockNotifier *n)
+ {
+     QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
++    /* Notify about all existing ram blocks. */
++    qemu_ram_foreach_block(ram_block_notify_add_single, n);
+ }
+=20
+ void ram_block_notifier_remove(RAMBlockNotifier *n)
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 81753bbb34..9760ac9068 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -59,6 +59,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+ void *qemu_ram_get_host_addr(RAMBlock *rb);
+ ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
+ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
++ram_addr_t qemu_ram_get_max_length(RAMBlock *rb);
+ bool qemu_ram_is_shared(RAMBlock *rb);
+ bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+ void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index 813f7ec564..71e02e7f35 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -376,8 +376,13 @@ static void qemu_vfio_ram_block_added(RAMBlockNotifier=
+ *n,
+                                       void *host, size_t size)
+ {
+     QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
++    int ret;
 +
-+def aarch_get_config_defaults(vmcls):
-+    # Set the defaults for current version of QEMU.
-+    config = CURRENT_CONFIG
-+    args, argv = basevm.parse_args(vmcls)
-+    qemu_path = basevm.get_qemu_path(vmcls.arch, args.build_path)
-+    qemu_version = basevm.get_qemu_version(qemu_path)
-+    if qemu_version < QEMU_AARCH64_MIN_VERSION:
-+        error = "\nThis major version of QEMU {} is to old for aarch64 VMs.\n"\
-+                "The major version must be at least {}.\n"\
-+                "To continue with the current build of QEMU, "\
-+                "please restart with QEMU_LOCAL=1 .\n"
-+        print(error.format(qemu_version, QEMU_AARCH64_MIN_VERSION))
-+        exit(1)
-+    if qemu_version == QEMU_AARCH64_MIN_VERSION:
-+        # We have an older version of QEMU,
-+        # set the config values for backwards compatibility.
-+        if kvm_available('aarch64'):
-+            config.update(DEFAULT_CONFIG['kvm'])
-+        else:
-+            config.update(DEFAULT_CONFIG['tcg'])
-+    return config
-+
-+def create_flash_images(flash_dir="./"):
-+    """Creates the appropriate pflash files
-+       for an aarch64 VM."""
-+    flash0_path = get_flash_path(flash_dir, "flash0")
-+    flash1_path = get_flash_path(flash_dir, "flash1")
-+    subprocess.check_call(["dd", "if=/dev/zero", "of={}".format(flash0_path),
-+                           "bs=1M", "count=64"])
-+    # A reliable way to get the QEMU EFI image is via an installed package.
-+    efi_img = "/usr/share/qemu-efi-aarch64/QEMU_EFI.fd"
-+    if not os.path.exists(efi_img):
-+        sys.stderr.write("*** {} is missing\n".format(efi_img))
-+        sys.stderr.write("*** please install qemu-efi-aarch64 package\n")
-+        exit(3)
-+    subprocess.check_call(["dd", "if={}".format(efi_img),
-+                           "of={}".format(flash0_path),
-+                           "conv=notrunc"])
-+    subprocess.check_call(["dd", "if=/dev/zero",
-+                           "of={}".format(flash1_path),
-+                           "bs=1M", "count=64"])
-+
-+def get_pflash_args(flash_dir="./"):
-+    """Returns a string that can be used to
-+       boot qemu using the appropriate pflash files
-+       for aarch64."""
-+    flash0_path = get_flash_path(flash_dir, "flash0")
-+    flash1_path = get_flash_path(flash_dir, "flash1")
-+    pflash_args_str = "-drive file={},format=raw,if=pflash "\
-+                      "-drive file={},format=raw,if=pflash"
-+    pflash_args = pflash_args_str.format(flash0_path, flash1_path)
-+    return pflash_args.split(" ")
-+
-+def get_flash_path(flash_dir, name):
-+    return os.path.join(flash_dir, "{}.img".format(name))
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 792e4a3fb2..6ed04a2a4b 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -495,6 +495,14 @@ def get_qemu_path(arch, build_path=None):
-         qemu_path = "qemu-system-" + arch
-     return qemu_path
- 
-+def get_qemu_version(qemu_path):
-+    """Get the version number from the current QEMU,
-+       and return the major number."""
-+    output = subprocess.check_output([qemu_path, '--version'])
-+    version_line = output.decode("utf-8")
-+    version_num = re.split(' |\(', version_line)[3].split('.')[0]
-+    return int(version_num)
-+
- def parse_config(config, args):
-     """ Parse yaml config and populate our config structure.
-         The yaml config allows the user to override the
-diff --git a/tests/vm/ubuntu.aarch64 b/tests/vm/ubuntu.aarch64
-new file mode 100755
-index 0000000000..0413971d33
---- /dev/null
-+++ b/tests/vm/ubuntu.aarch64
-@@ -0,0 +1,117 @@
-+#!/usr/bin/env python3
-+#
-+# Ubuntu aarch64 image
-+#
-+# Copyright 2020 Linaro
-+#
-+# Authors:
-+#  Robert Foley <robert.foley@linaro.org>
-+#  Originally based on ubuntu.i386 Fam Zheng <famz@redhat.com>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
-+
-+import os
-+import sys
-+import subprocess
-+import basevm
-+from qemu.accel import kvm_available
-+import time
-+import aarch64vm
-+
-+DEFAULT_CONFIG = {
-+    'cpu'          : "cortex-a57",
-+    'machine'      : "virt,gic-version=3",
-+    'install_cmds' : "apt-get update,"\
-+                     "apt-get build-dep -y qemu,"\
-+                     "apt-get install -y libfdt-dev flex bison",
-+    # We increase beyond the default time since during boot
-+    # it can take some time (many seconds) to log into the VM
-+    # especially using softmmu.
-+    'ssh_timeout'  : 60,
-+}
-+
-+class UbuntuAarch64VM(basevm.BaseVM):
-+    name = "ubuntu.aarch64"
-+    arch = "aarch64"
-+    image_name = "ubuntu-18.04-server-cloudimg-arm64.img"
-+    image_link = "https://cloud-images.ubuntu.com/releases/18.04/release/" + image_name
-+    login_prompt = "ubuntu-aarch64-guest login:"
-+    BUILD_SCRIPT = """
-+        set -e;
-+        cd $(mktemp -d);
-+        sudo chmod a+r /dev/vdb;
-+        tar --checkpoint=.10 -xf /dev/vdb;
-+        ./configure {configure_opts};
-+        make --output-sync {target} -j{jobs} {verbose};
-+    """
-+    def boot(self, img, extra_args=None):
-+        aarch64vm.create_flash_images(self._tmpdir)
-+        default_args = aarch64vm.get_pflash_args(self._tmpdir)
-+        if extra_args:
-+            extra_args.extend(default_args)
-+        else:
-+            extra_args = default_args
-+        # We always add these performance tweaks
-+        # because without them, we boot so slowly that we
-+        # can time out finding the boot efi device.
-+        if '-smp' not in extra_args and \
-+           '-smp' not in self._config['extra_args'] and \
-+           '-smp' not in self._args:
-+            # Only add if not already there to give caller option to change it.
-+            extra_args.extend(["-smp", "8"])
-+
-+        # We have overridden boot() since aarch64 has additional parameters.
-+        # Call down to the base class method.
-+        super(UbuntuAarch64VM, self).boot(img, extra_args=extra_args)
-+
-+    def build_image(self, img):
-+        os_img = self._download_with_cache(self.image_link)
-+        img_tmp = img + ".tmp"
-+        subprocess.check_call(["cp", "-f", os_img, img_tmp])
-+        subprocess.check_call(["qemu-img", "resize", img_tmp, "+50G"])
-+        ci_img = self.gen_cloud_init_iso()
-+
-+        self.boot(img_tmp, extra_args = ["-cdrom", ci_img])
-+        if self._boot_console:
-+            self.wait_boot()
-+        # First command we issue is fix for slow ssh login.
-+        self.wait_ssh(wait_root=True,
-+                      cmd="chmod -x /etc/update-motd.d/*")
-+        # Wait for cloud init to finish
-+        self.wait_ssh(wait_root=True,
-+                      cmd="ls /var/lib/cloud/instance/boot-finished")
-+        self.ssh_root("touch /etc/cloud/cloud-init.disabled")
-+        # Disable auto upgrades.
-+        # We want to keep the VM system state stable.
-+        self.ssh_root('sed -ie \'s/"1"/"0"/g\' /etc/apt/apt.conf.d/20auto-upgrades')
-+        # If the user chooses *not* to do the second phase,
-+        # then we will jump right to the graceful shutdown
-+        if self._config['install_cmds'] != "":
-+            self.ssh_root("sync")
-+            # Shutdown and then boot it again.
-+            # Allows us to know for sure it is booting (not shutting down)
-+            # before we call wait_ssh().
-+            self.graceful_shutdown()
-+            self.boot(img_tmp)
-+            if self._boot_console:
-+                self.wait_boot()
-+            self.wait_ssh(wait_root=True)
-+            self.wait_ssh(wait_root=True, cmd="locale")
-+            # The previous update sometimes doesn't survive a reboot, so do it again
-+            self.ssh_root("sed -ie s/^#\ deb-src/deb-src/g /etc/apt/sources.list")
-+
-+            # Issue the install commands.
-+            # This can be overriden by the user in the config .yml.
-+            install_cmds = self._config['install_cmds'].split(',')
-+            for cmd in install_cmds:
-+                self.ssh_root(cmd)
-+        self.graceful_shutdown()
-+        self.wait()
-+        os.rename(img_tmp, img)
-+        return 0
-+
-+if __name__ == "__main__":
-+    defaults = aarch64vm.get_config_defaults(UbuntuAarch64VM, DEFAULT_CONFIG)
-+    sys.exit(basevm.main(UbuntuAarch64VM, defaults))
--- 
-2.17.1
+     trace_qemu_vfio_ram_block_added(s, host, size);
+-    qemu_vfio_dma_map(s, host, size, false, NULL);
++    ret =3D qemu_vfio_dma_map(s, host, size, false, NULL);
++    if (ret) {
++        error_report("qemu_vfio_dma_map(%p, %zu) failed: %d", host, size, =
+ret);
++    }
+ }
+=20
+ static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
+@@ -390,33 +395,14 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotif=
+ier *n,
+     }
+ }
+=20
+-static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
+-{
+-    void *host_addr =3D qemu_ram_get_host_addr(rb);
+-    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+-    int ret;
+-    QEMUVFIOState *s =3D opaque;
+-
+-    if (!host_addr) {
+-        return 0;
+-    }
+-    ret =3D qemu_vfio_dma_map(s, host_addr, length, false, NULL);
+-    if (ret) {
+-        fprintf(stderr, "qemu_vfio_init_ramblock: failed %p %" PRId64 "\n"=
+,
+-                host_addr, (uint64_t)length);
+-    }
+-    return 0;
+-}
+-
+ static void qemu_vfio_open_common(QEMUVFIOState *s)
+ {
+     qemu_mutex_init(&s->lock);
+     s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
+     s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed;
+-    ram_block_notifier_add(&s->ram_notifier);
+     s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
+     s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
+-    qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
++    ram_block_notifier_add(&s->ram_notifier);
+ }
+=20
+ /**
+--=20
+2.24.1
 
 
