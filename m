@@ -2,71 +2,99 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F625C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AED9C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:37:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B88C24654
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:36:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5630324654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:37:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="K4yTKVC/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B88C24654
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbyaG588"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5630324654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Neg-0007BW-4q
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 06:36:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40704)
+	id 1j4NfA-000844-Iu
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 06:37:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40813)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olaf@aepfle.de>) id 1j4Ndl-0006hj-Vc
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:35:43 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j4NeG-00072W-3k
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:36:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olaf@aepfle.de>) id 1j4Ndk-0006ac-QP
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:35:41 -0500
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::11]:16467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1j4Ndk-0006X5-3W
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:35:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1582112137;
- s=strato-dkim-0002; d=aepfle.de;
- h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
- X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
- bh=WGdI8I6Uos/rom+dJCvaGJiG0CIinRsTshzGtpXwpe0=;
- b=K4yTKVC/OCdEdb8OEk1w21T5PHYv7V5o6646JnzWStv9XycQxFQ7uMl1DJsj9zuuon
- QbmL2+NjxYxg2xN0PgF5CJoIFJgwWMoxIfg58nWAqKKB6VThqnQX5vLABp4C1qEaTwsr
- xsUV7WAB3SEGzekq7K1OeM3VpTkx23n+A/mrn7mlMnwjIkqtuhnQPDU0SWVoj2xuin4q
- VYseE+vRcNEconjba9hSZ+tyC+7Z11qVl8LyxXl/MLMSF/279DHJezznDrT+FWkqSBSQ
- +gb4D9g81kzIBanrYG20X4mFdDidEVHuHx9rYKyYzexEZiYXXU7Ft44wnAwLRj61Q3XM
- 8DXw==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4AUztn93FPS2dyuYMlkjQ=="
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 46.1.12 SBL|AUTH)
- with ESMTPSA id 605caew1JBZaHcZ
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
- (Client did not present a certificate);
- Wed, 19 Feb 2020 12:35:36 +0100 (CET)
-Date: Wed, 19 Feb 2020 12:35:30 +0100
-From: Olaf Hering <olaf@aepfle.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] hw/i386: disable smbus migration for xenfv
-Message-ID: <20200219123530.11064fc5.olaf@aepfle.de>
-In-Reply-To: <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
-References: <20200113174521.3336-1-olaf@aepfle.de>
- <20200116180321.24968-1-olaf@aepfle.de>
- <0335edd2-3d33-88f8-2ab4-4791f7289885@redhat.com>
-X-Mailer: Claws Mail 2019.12.31 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+ (envelope-from <pbonzini@redhat.com>) id 1j4NeE-0006ms-KJ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:36:11 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45881
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j4NeD-0006lc-Ek
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:36:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582112168;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WWFDFfzmmwysyaneg4k+XLoc+mXPQ4jn2ZEvAF9ziTI=;
+ b=KbyaG588IoHuLEwZWrHe4g/gUcmlxi3um4Y9amihUVzUwaJzAM482e8RN6WbfX16KHXHsj
+ 6XOJsRlifqZl6iB1rynzt321yghp9l1yF6tKwHetqxOgtMp3dBZDhrf9vraTf9nqTA3HNR
+ l4b/habcLqnxUGleSUbvuZU7yf/e5U0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-IrQRU_C2PNGfRYgGwoyAYQ-1; Wed, 19 Feb 2020 06:36:06 -0500
+Received: by mail-wm1-f71.google.com with SMTP id p26so63071wmg.5
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 03:36:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WWFDFfzmmwysyaneg4k+XLoc+mXPQ4jn2ZEvAF9ziTI=;
+ b=KtRKhQuBl7v0WfyFf/3+n4wvPJ2jbCeGqgOSy+Z4uC6azPiYenvv308riacTIOAxMm
+ k8I+qKsuAF9rRzPfO1hC5zBuNE0cL1FTB5cgkWU6TW+rHOsHCvlNupudDZOagzIJKA9B
+ 8nAA7foWaoGGOnU9YyNSxOJBsb7PH0TupAN5yqEo0Y414Yk56Mgj95PtQGZ8h1FmP4PU
+ 1Q6WnLUsMaxYPGlolwRfkGJfTlxOcK1x2qCjwqeclZmXXZHrpGuPUlGO2+gArdpj0z3h
+ E0xdxXxoJybJmS5Tl7g/9ivLG9ApnMiQLQq/KJHU7bOgsIrtQiGV+iO+fYqfCbFYvOyC
+ Nwdg==
+X-Gm-Message-State: APjAAAU3rxJHOvoeXbHQhMOxPOOs9eU+ulo0SBEdcxKJ85B7SpHd3N9x
+ IkgEy9LfdhZEcS8rn0li268WSoYfX/AOx4LHj7z7mIatWvbrskUzJ4h5iseumJj2R0pU5D5Dmf9
+ Euu0ws6Ss3u7nD/Q=
+X-Received: by 2002:a1c:3b09:: with SMTP id i9mr9449018wma.31.1582112165215;
+ Wed, 19 Feb 2020 03:36:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyLXWYdgOZS5A1AKTSKYaYfWGjHbce4cDsetoyRdaCu0wg40SNo8WX7OY+rFpQ5DvRwMN5qQ==
+X-Received: by 2002:a1c:3b09:: with SMTP id i9mr9448971wma.31.1582112164862;
+ Wed, 19 Feb 2020 03:36:04 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:ec41:5e57:ff4d:8e51?
+ ([2001:b07:6468:f312:ec41:5e57:ff4d:8e51])
+ by smtp.gmail.com with ESMTPSA id b17sm2650423wrp.49.2020.02.19.03.36.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 19 Feb 2020 03:36:04 -0800 (PST)
+Subject: Re: [PATCH] memory: batch allocate ioeventfds[] in
+ address_space_update_ioeventfds()
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200218182226.913977-1-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <90eee6ef-73ad-f577-8bc1-813e12219cd2@redhat.com>
+Date: Wed, 19 Feb 2020 12:36:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/4RTwmXpjc1lcdKDJREWIMXv"; protocol="application/pgp-signature"
+In-Reply-To: <20200218182226.913977-1-stefanha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: IrQRU_C2PNGfRYgGwoyAYQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::11
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,70 +106,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/4RTwmXpjc1lcdKDJREWIMXv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 18/02/20 19:22, Stefan Hajnoczi wrote:
+> +     * It is likely that the number of ioeventfds hasn't changed much, so use
+> +     * the previous size as the starting value.
+> +     */
+> +    ioeventfd_max = as->ioeventfd_nb;
+> +    ioeventfds = g_new(MemoryRegionIoeventfd, ioeventfd_max);
 
-Am Thu, 16 Jan 2020 19:26:39 +0100
-schrieb Paolo Bonzini <pbonzini@redhat.com>:
+This would be a bit space-inefficient if we are adding just one ioeventfd,
+because it would waste 64 entries right below.  I would like to squash this
+if it's okay with you:
 
-> On 16/01/20 19:03, Olaf Hering wrote:
->  [...] =20
->=20
-> This patch is wrong; xenfv does not support cross-version migration
-> compatibility.  Even if the migration stream does not change, the
-> hardware exposed to the guest will.
->=20
-> My understanding is that Xen is able to use "-M
-> pc-i440fx-VERSION,accel=3Dxen".  The presence of the version in the
-> machine type guarantees that the migration stream is compatible and that
-> the hardware exposed to the guest is the same on the source and destinati=
-on.
+diff --git a/memory.c b/memory.c
+index 2d6f931f8c..09be40edd2 100644
+--- a/memory.c
++++ b/memory.c
+@@ -801,9 +801,10 @@ static void address_space_update_ioeventfds(AddressSpace *as)
+ 
+     /*
+      * It is likely that the number of ioeventfds hasn't changed much, so use
+-     * the previous size as the starting value.
++     * the previous size as the starting value, with some headroom to avoid
++     * gratuitous reallocations.
+      */
+-    ioeventfd_max = as->ioeventfd_nb;
++    ioeventfd_max = QEMU_ALIGN_UP(as->ioeventfd_nb, 4);
+     ioeventfds = g_new(MemoryRegionIoeventfd, ioeventfd_max);
+ 
+     view = address_space_get_flatview(as);
+@@ -815,7 +816,7 @@ static void address_space_update_ioeventfds(AddressSpace *as)
+             if (addrrange_intersects(fr->addr, tmp)) {
+                 ++ioeventfd_nb;
+                 if (ioeventfd_nb > ioeventfd_max) {
+-                    ioeventfd_max += 64;
++                    ioeventfd_max = MAX(ioeventfd_max * 2, 4);
+                     ioeventfds = g_realloc(ioeventfds,
+                             ioeventfd_max * sizeof(*ioeventfds));
+                 }
 
-The current idea is to make 'xenfv' a copy of 'pc-i440fx-3.1'.
-But is this actually the desired behavior?
+Thanks,
 
-Lets assume xenfv_machine_options calls pc_i440fx_5_0_machine_options.
-What impact that that have on the result of pc_init1()?
-Is any of the things done by pc_i440fx_5_0_machine_options and
-pc_i440fx_machine_options a desired, or even breaking, change for the
-current result of pc_xen_hvm_init?
+Paolo
 
-Also, do the calls to compat_props_add have negative impact on compatibility
-for running domUs?
+>      view = address_space_get_flatview(as);
+>      FOR_EACH_FLAT_RANGE(fr, view) {
+>          for (i = 0; i < fr->mr->ioeventfd_nb; ++i) {
+> @@ -806,8 +814,11 @@ static void address_space_update_ioeventfds(AddressSpace *as)
+>                                               int128_make64(fr->offset_in_region)));
+>              if (addrrange_intersects(fr->addr, tmp)) {
+>                  ++ioeventfd_nb;
+> -                ioeventfds = g_realloc(ioeventfds,
+> -                                          ioeventfd_nb * sizeof(*ioeventfds));
+> +                if (ioeventfd_nb > ioeventfd_max) {
+> +                    ioeventfd_max += 64;
+> +                    ioeventfds = g_realloc(ioeventfds,
+> +                            ioeventfd_max * sizeof(*ioeventfds));
+> +                }
 
-Olaf
-
---Sig_/4RTwmXpjc1lcdKDJREWIMXv
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE97o7Um30LT3B+5b/86SN7mm1DoAFAl5NHYIACgkQ86SN7mm1
-DoDclBAAm3Pe2dW2GbiN4lunCx0//5Kol04JQv9LugdEnVcr3KuqsYjfqA0X9Lqf
-iGOunf1BM1uiwuaNmFJmtQAM3HSDQm6FfRXgeONQaBdO3Mrx0FJl4PDQycL7y1PG
-b5cCaLJ8VkZXZP3IWydhAcs4JQeP/sxrmr/MLx0hJtY6HQhx1Xf5UQ3wy13+UMjk
-ZkdpXYLd0NAeQdM3UrU7r3MDlTBU4jASB1mOwU9SN5ctJ+NM37yTkZcRBU4yVvBF
-ZO6SjNdoOZ9pIOvZgO0xbCDoxdlpGgKgYsk4Z/prPHDXlti8gpzpr70KAlwuPCca
-nHA1GEDpvMSmRtWccdC8WMFemkeDGn/d48TBf2WfrJvo1NqLLfGLxOm777s3FgVQ
-GMQHX7IM3SW6gz5RHdPwJgdMuPs3otoQDzz3ZAgaOHufE4t6Uo2myWAvbyxVZcOR
-L79BnCNJuWYJUU30bW9KOcAKaw9dLayWRbyXNWtvMFyfpNKaR7lVYzoHKmc4SaGa
-zcyjKhkwU1kHCGZUrAYgf/l8DaDcK4+Tm8KJZoMJOXXksc570n7UAAiImnb0opE3
-dv9hvwde/y3LeUe8a7tjVXrBu8xeM+O6Dzr+XQ+U7FVnv/7wlFvvngdMmnc/Y6km
-CZA/3Bw2r7O2U6KGgObKJTQ6KEqkJiqad89Z6GzDs9FT4g8frHM=
-=rYPp
------END PGP SIGNATURE-----
-
---Sig_/4RTwmXpjc1lcdKDJREWIMXv--
 
