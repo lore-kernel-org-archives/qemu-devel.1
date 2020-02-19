@@ -2,79 +2,78 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E966FC34056
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44168C34056
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:01:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B956224656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:00:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13F9D24656
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 18:01:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TRgqxlQ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B956224656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MHLOwl0Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F9D24656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Te5-0000GT-VP
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 13:00:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54146)
+	id 1j4Teq-0001Ra-6f
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 13:01:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j4Tc2-0005SS-6t
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:19 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j4Tbx-0005M4-5n
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j4Tc1-0000ze-B8
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22797
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1j4Tbw-0000xB-1t
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32780
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j4Tc1-0000zQ-78
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:17 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j4Tbv-0000wi-U2
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 12:58:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582135096;
+ s=mimecast20190719; t=1582135091;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=pprUbUGqxaraWCBYQ2zBJZvBEN69OaNe7mnkw+OxYsk=;
- b=TRgqxlQ1x+24k7I+jTRBnYwZD8nYb4JZVAaP3FlEO9YqcNZHG4YbYCYf1AR8UuEmYEnOvj
- hlBRhOSmMY81Bpsd/wsGg0w1DExFYRmtAOX12VulMybJS7S7CsquXVAnX2io6oDO4LwWc2
- RRXkHM04UGMzsx2dgBNVm5mrT29O+TQ=
+ bh=q8sIlNeIhXs2O4OtetmVJXEzSdHi6yxtkJxTJPiqVb4=;
+ b=MHLOwl0QlkO/0AJYSOY6bM6dtzCXfG95xNxvw5EZ9DPEjmMBk+J1uFj/yTqO220ffbF89t
+ jsIGeWCmJ/xdO1edXO/b67OukI+67YJLTZx1xfOZmO8Ce8s69NgP/ZNjaAa1RRpCtqxrWk
+ k5Sby1i3jRJbR+5Y5B13qa+/k5oDU/U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-130-Rqw13ylCPcGn2ZntC4EcoQ-1; Wed, 19 Feb 2020 12:58:14 -0500
-X-MC-Unique: Rqw13ylCPcGn2ZntC4EcoQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-152-YlyDOv2wM8WJMwUDFJuBag-1; Wed, 19 Feb 2020 12:58:08 -0500
+X-MC-Unique: YlyDOv2wM8WJMwUDFJuBag-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C8A2107BAA5
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 17:58:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74E51DBB7;
+ Wed, 19 Feb 2020 17:58:07 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.184])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 07B1977920;
- Wed, 19 Feb 2020 17:58:12 +0000 (UTC)
-Date: Wed, 19 Feb 2020 16:45:22 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1657A48;
+ Wed, 19 Feb 2020 17:58:06 +0000 (UTC)
+Date: Wed, 19 Feb 2020 16:33:53 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] memory: batch allocate ioeventfds[] in
- address_space_update_ioeventfds()
-Message-ID: <20200219164522.GA1089598@stefanha-x1.localdomain>
-References: <20200218182226.913977-1-stefanha@redhat.com>
- <90eee6ef-73ad-f577-8bc1-813e12219cd2@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [PATCH v4 1/5] extend libvhost to support IOThread and coroutine
+Message-ID: <20200219163353.GC1085125@stefanha-x1.localdomain>
+References: <20200218050711.8133-1-coiby.xu@gmail.com>
+ <20200218050711.8133-2-coiby.xu@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <90eee6ef-73ad-f577-8bc1-813e12219cd2@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200218050711.8133-2-coiby.xu@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
+ protocol="application/pgp-signature"; boundary="NU0Ex4SbNnrxsi6C"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,50 +85,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---TB36FDmn/VVEgNH/
+--NU0Ex4SbNnrxsi6C
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 19, 2020 at 12:36:04PM +0100, Paolo Bonzini wrote:
-> On 18/02/20 19:22, Stefan Hajnoczi wrote:
-> > +     * It is likely that the number of ioeventfds hasn't changed much,=
- so use
-> > +     * the previous size as the starting value.
-> > +     */
-> > +    ioeventfd_max =3D as->ioeventfd_nb;
-> > +    ioeventfds =3D g_new(MemoryRegionIoeventfd, ioeventfd_max);
->=20
-> This would be a bit space-inefficient if we are adding just one ioeventfd=
-,
-> because it would waste 64 entries right below.  I would like to squash th=
-is
-> if it's okay with you:
+On Tue, Feb 18, 2020 at 01:07:07PM +0800, Coiby Xu wrote:
+> +static bool vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+> +{
+> +    vu_read_msg_cb read_msg;
+> +    if (dev->co_iface) {
+> +        read_msg =3D dev->co_iface->read_msg;
+> +    } else {
+> +        read_msg =3D vu_message_read_;
+> +    }
+> +    return read_msg(dev, conn_fd, vmsg);
+> +}
 
-Yes, please feel free to squash it:
+libvhost-user is already partially asynchronous (->set/remove_watch()
+are used for eventfds).
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Can you make the vhost-user socket I/O asynchronous too?
 
---TB36FDmn/VVEgNH/
+> +
+>  static bool
+>  vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+>  {
+> @@ -1075,9 +1084,14 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *v=
+msg)
+>      }
+> =20
+>      if (dev->vq[index].kick_fd !=3D -1 && dev->vq[index].handler) {
+> +        if (dev->set_watch_packed_data) {
+> +            dev->set_watch_packed_data(dev, dev->vq[index].kick_fd, VU_W=
+ATCH_IN,
+> +                                       dev->co_iface->kick_callback,
+> +                                       (void *)(long)index);
+> +        } else {
+>          dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
+>                         vu_kick_cb, (void *)(long)index);
+
+Why is it necessary to replace vu_kick_cb()?
+
+The user can set a custom vq->handler() function with
+vu_set_queue_handler().
+
+Coroutines aren't needed for this part since eventfd_read() always
+returns right away.
+
+> @@ -1627,6 +1647,12 @@ vu_deinit(VuDev *dev)
+>          }
+> =20
+>          if (vq->kick_fd !=3D -1) {
+> +            /* remove watch for kick_fd
+> +             * When client process is running in gdb and
+> +             * quit command is run in gdb, QEMU will still dispatch the =
+event
+> +             * which will cause segment fault in the callback function
+> +             */
+
+Code and comments in libvhost-user should not refer to QEMU specifics.
+Removing the watch is a good idea regardless of the application or event
+loop implementation.  No comment is needed here.
+
+> +            dev->remove_watch(dev, vq->kick_fd);
+>              close(vq->kick_fd);
+>              vq->kick_fd =3D -1;
+>          }
+> @@ -1682,7 +1708,7 @@ vu_init(VuDev *dev,
+> =20
+>      assert(max_queues > 0);
+>      assert(socket >=3D 0);
+> -    assert(set_watch);
+> +    /* assert(set_watch); */
+
+?
+
+> @@ -372,7 +389,8 @@ struct VuDev {
+>      /* @set_watch: add or update the given fd to the watch set,
+>       * call cb when condition is met */
+>      vu_set_watch_cb set_watch;
+> -
+> +    /* AIO dispatch will only one data pointer to callback function */
+
+I don't understand what this comment is saying.
+
+--NU0Ex4SbNnrxsi6C
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5NZiIACgkQnKSrs4Gr
-c8jUcggAw59sO0X1guqqn9rpeyg11v0ARmnNVA6ssP5ApmY+5KG1JfrJndGRuso2
-0kkunmUmRnMt5YSnhNsCpFKMfMiIToLBOQBioWis2gkQuxE6vlbvl3Dw83FpI5Lf
-0afSlYgbweW7wPwO2JVU7DLnoPxSJ9vGt4Lelgj3ov0sLuSIhNL43GXKk2316V3w
-9zWTzL6KRMainHELFAiVCIYOhUPC+ZbUfjJ2BfTaz1EVP1sYV2fciny1xsvCAS4W
-S486pAFFNI7hHoGtykLD4vgm2lNvhoYWL8o8WBiZWpUqGDKTwd2xj4jKCRZ6TTXW
-0MOg01i3Zbe/1roZaqUetPqdfQkowQ==
-=ENnX
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5NY3AACgkQnKSrs4Gr
+c8grmgf/XG0pSn/B8QqaT7uycrsWiH9FA/dGsGiNnKg7d8txvyPNJgpvpdidr0yp
+ijUodJpVgwPA8liGRpkNrnVVARe/jZzzEtForVBJS6dWJTB0RvE58PLafTmfRuj5
+6TjT/Lvu5aM7BNcLYfoqTpKnQZT4zoqFA3NKS8ORH6CqlV2Wh67KmPJtHY5eGQdZ
+BaOoPxB+8N1kIUyADxXEwBNXmav25HcRnUeEmBHdR/OBf6K11vxqVJXAdsS4IRB7
+kaRDs0x5Qgy8H9xoDEnmTCbJHt4VYCM1Aq8QS5RhwA4imEGsJVwynrJwJQY079mv
+KiYN64v/ELvJ/gItRR0RT3bVxX6GNQ==
+=1huJ
 -----END PGP SIGNATURE-----
 
---TB36FDmn/VVEgNH/--
+--NU0Ex4SbNnrxsi6C--
 
 
