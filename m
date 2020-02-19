@@ -2,73 +2,73 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE721C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1FCC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAE5224654
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED18824654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:37:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FeLEAfRj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAE5224654
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+fulLvj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED18824654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SKr-0003V9-P4
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:36:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37620)
+	id 1j4SLQ-0004cY-3l
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:37:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4RwF-00049T-BY
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:04 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4RwL-0004Kb-UU
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4RwE-00014r-9w
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39604
+ (envelope-from <imammedo@redhat.com>) id 1j4RwK-0001By-LL
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20173
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RwE-00014X-5X
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:02 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RwK-0001Ar-HV
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128661;
+ s=mimecast20190719; t=1582128667;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8zRXquUspfaMKxjK/ZwxOgmeva/U7Ez41JClop5CoXQ=;
- b=FeLEAfRjJwzhBQORh7tr06FNgX5mg9YfhhC8A3sz2UfvHBV1S/DQ11t8nN9TSpJFpFObYs
- jx5y+zw1Szb6BHF1GEOeLg9/e3Z53u4QoCyyS5cLNb2Ky+6hjl0sCHoUbbcGZUYbHRoPVt
- INxIGyNFpx1+bnV315EhWPITXxp7a0Y=
+ bh=wWOxBdwwJS+axvTwSu8q2fvEDjTV9+XPuVhs3w54fcM=;
+ b=X+fulLvjh/u10KBdllC7V76eW/RY3wZenW/G3cR1AFXWbKx8F1SUYmsFa2dOHakv7O8IYv
+ jLE67z4sEXh3T+Gn1KJcANbwrnEbIej/hkbEukHYG53mYjWXMrg8dseOqc4Q3sPUTU32KE
+ cH2uJG0N4v8wmC5S1oX9ifod/ytopMk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-42SX2uZIMlay9Xw4a-SrTg-1; Wed, 19 Feb 2020 11:11:00 -0500
+ us-mta-37-UX75a831PwCIFWwqhFi5Fw-1; Wed, 19 Feb 2020 11:11:05 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ED9A101E44B
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDB318B9FEB
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:04 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E7CD48;
- Wed, 19 Feb 2020 16:10:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA6DC8ECF3;
+ Wed, 19 Feb 2020 16:11:03 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 53/79] mips/mips_jazz: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:27 -0500
-Message-Id: <20200219160953.13771-54-imammedo@redhat.com>
+Subject: [PATCH v6 58/79] ppc/e500: drop RAM size fixup
+Date: Wed, 19 Feb 2020 11:09:32 -0500
+Message-Id: <20200219160953.13771-59-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 42SX2uZIMlay9Xw4a-SrTg-1
+X-MC-Unique: UX75a831PwCIFWwqhFi5Fw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -92,61 +92,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+If user provided non-sense RAM size, board will complain and
+continue running with max RAM size supported.
+Also RAM is going to be allocated by generic code, so it won't be
+possible for board to fix things up for user.
+
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
+
+While at it, replace usage of global ram_size with
+machine->ram_size
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/mips/mips_jazz.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+v2:
+ * fix format string cousing build failure on 32-bit host
+   (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+---
+ hw/ppc/e500.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 66fd4d867d..85d49cf155 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -159,7 +159,6 @@ static void mips_jazz_init(MachineState *machine,
-     ISABus *isa_bus;
-     ISADevice *pit;
-     DriveInfo *fds[MAX_FD];
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios2 =3D g_new(MemoryRegion, 1);
-     SysBusESPState *sysbus_esp;
-@@ -191,9 +190,7 @@ static void mips_jazz_init(MachineState *machine,
-     cc->do_transaction_failed =3D mips_jazz_do_transaction_failed;
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 886442e54f..960024b611 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -906,12 +906,14 @@ void ppce500_init(MachineState *machine)
 =20
-     /* allocate RAM */
--    memory_region_allocate_system_memory(ram, NULL, "mips_jazz.ram",
--                                         machine->ram_size);
--    memory_region_add_subregion(address_space, 0, ram);
-+    memory_region_add_subregion(address_space, 0, machine->ram);
+     env =3D firstenv;
 =20
-     memory_region_init_ram(bios, NULL, "mips_jazz.bios", MAGNUM_BIOS_SIZE,
-                            &error_fatal);
-@@ -393,6 +390,7 @@ static void mips_magnum_class_init(ObjectClass *oc, voi=
-d *data)
-     mc->init =3D mips_magnum_init;
-     mc->block_default_type =3D IF_SCSI;
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
-+    mc->default_ram_id =3D "mips_jazz.ram";
- }
+-    /* Fixup Memory size on a alignment boundary */
+-    ram_size &=3D ~(RAM_SIZES_ALIGN - 1);
+-    machine->ram_size =3D ram_size;
++    if (!QEMU_IS_ALIGNED(machine->ram_size, RAM_SIZES_ALIGN)) {
++        error_report("RAM size must be multiple of %" PRIu64, RAM_SIZES_AL=
+IGN);
++        exit(EXIT_FAILURE);
++    }
 =20
- static const TypeInfo mips_magnum_type =3D {
-@@ -409,6 +407,7 @@ static void mips_pica61_class_init(ObjectClass *oc, voi=
-d *data)
-     mc->init =3D mips_pica61_init;
-     mc->block_default_type =3D IF_SCSI;
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("R4000");
-+    mc->default_ram_id =3D "mips_jazz.ram";
- }
+     /* Register Memory */
+-    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram", ram_s=
+ize);
++    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram",
++                                         machine->ram_size);
+     memory_region_add_subregion(address_space_mem, 0, ram);
 =20
- static const TypeInfo mips_pica61_type =3D {
+     dev =3D qdev_create(NULL, "e500-ccsr");
+@@ -1083,7 +1085,7 @@ void ppce500_init(MachineState *machine)
+         kernel_base =3D cur_base;
+         kernel_size =3D load_image_targphys(machine->kernel_filename,
+                                           cur_base,
+-                                          ram_size - cur_base);
++                                          machine->ram_size - cur_base);
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'",
+                          machine->kernel_filename);
+@@ -1097,7 +1099,7 @@ void ppce500_init(MachineState *machine)
+     if (machine->initrd_filename) {
+         initrd_base =3D (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+         initrd_size =3D load_image_targphys(machine->initrd_filename, init=
+rd_base,
+-                                          ram_size - initrd_base);
++                                          machine->ram_size - initrd_base)=
+;
+=20
+         if (initrd_size < 0) {
+             error_report("could not load initial ram disk '%s'",
+@@ -1115,7 +1117,7 @@ void ppce500_init(MachineState *machine)
+      * ensures enough space between kernel and initrd.
+      */
+     dt_base =3D (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+-    if (dt_base + DTB_MAX_SIZE > ram_size) {
++    if (dt_base + DTB_MAX_SIZE > machine->ram_size) {
+             error_report("not enough memory for device tree");
+             exit(1);
+     }
 --=20
 2.18.1
 
