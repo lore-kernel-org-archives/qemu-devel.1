@@ -2,99 +2,84 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB033C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DFAC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B81B12465D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:29:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C086624654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wmZ60gmx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81B12465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5y7UMjy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C086624654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4PPc-0008DG-Tr
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 08:29:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38992)
+	id 1j4PTH-0002ap-UP
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 08:32:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david.edmondson@oracle.com>) id 1j4POZ-0006Yh-Hk
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:28:08 -0500
+ (envelope-from <eblake@redhat.com>) id 1j4PRj-0001Df-EE
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david.edmondson@oracle.com>) id 1j4POY-0004wB-Ff
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:28:07 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:48354)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
- id 1j4POS-0004ou-IA; Wed, 19 Feb 2020 08:28:00 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01JDJE2h097137;
- Wed, 19 Feb 2020 13:27:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=5ocdY08IEE1IEW6dKvI5l6OPdlNgoONwqxta5oLdrSQ=;
- b=wmZ60gmx1TZ/J2mV0bnc4pdtA0QWQDIQNJo4mcBkEz8IkyBfm4PqusXFcrThusHIBCts
- yr6ArVF5xtWWS7+a7YcCT4Zzky+263tLkYAgUN4qLDKrazzmUymQ9cngiBeRXlCmMs1Q
- st+wgipeD1t5LZWzD0SAi2SHxG8J9h79dQEI2Tq90xzN2r9/o6Jql+0RS8PRj1hK/+9i
- IJa7mdJj4bbzi9uVw1TfhBMggq7D53IqMGizgNKxZOSYnHyfBihYJHG9JzeA0ywCkibx
- CQbu3+wpqnp599YRocTpD6e4CS8QqkLpE/eYWA8LzoR/JyO8iSxCNr8rQgfkNVuvA1Du Pg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2y8udkaxp2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Feb 2020 13:27:51 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01JDIp0Z113257;
- Wed, 19 Feb 2020 13:27:50 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2y8udageyw-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 19 Feb 2020 13:27:50 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01JDRoQK005652;
- Wed, 19 Feb 2020 13:27:50 GMT
-Received: from disaster-area.hh.sledj.net (/81.149.164.25)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 19 Feb 2020 05:27:49 -0800
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 44951f96;
- Wed, 19 Feb 2020 13:27:45 +0000 (UTC)
-From: David Edmondson <david.edmondson@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] block/curl: HTTP header field names are case insensitive
-Date: Wed, 19 Feb 2020 13:27:44 +0000
-Message-Id: <20200219132745.315381-3-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200219132745.315381-1-david.edmondson@oracle.com>
-References: <20200219132745.315381-1-david.edmondson@oracle.com>
+ (envelope-from <eblake@redhat.com>) id 1j4PRh-0006aX-In
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:31:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23471
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j4PRh-0006ZT-An
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:31:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582119080;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ILmUHEW6soqnqSDSbCXN9T5GP/0M4VgjRZchziPQ3nM=;
+ b=E5y7UMjy071lvWBgZdetly9PgdOUyB3THQj6L4edfFFko3ieqdd3Dak0qurrJ0Pz6gX2Qd
+ szJeNrJDQxdHV4JHb3bj4m1V7+LGcR9EXTsxO+Jz4rBjEoN4iEg57OHwKhGzJFS3bQxnHF
+ bGDHpPC+w5b3fjBamDOhB8edHFEMvrI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-A0F-WgKyMyG43vwQ_qtzpQ-1; Wed, 19 Feb 2020 08:31:12 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 674D518A8C91;
+ Wed, 19 Feb 2020 13:31:11 +0000 (UTC)
+Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 02335171D6;
+ Wed, 19 Feb 2020 13:31:08 +0000 (UTC)
+Subject: Re: [PATCH v2 0/2] finish qemu-nbd --partition deprecation
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200123164650.1741798-1-eblake@redhat.com>
+ <b3fe3a5b-0692-fb35-55ec-281fc2699e98@redhat.com>
+ <2bc36642-3ba6-b44b-c89d-959e04795d20@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <e6eab244-bc56-051b-20bf-24e217903805@redhat.com>
+Date: Wed, 19 Feb 2020 07:31:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9535
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- mlxscore=0 adultscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 suspectscore=1 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002190102
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9535
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 suspectscore=1
- spamscore=0 priorityscore=1501 adultscore=0 mlxscore=0 clxscore=1011
- malwarescore=0 mlxlogscore=999 phishscore=0 impostorscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002190102
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+In-Reply-To: <2bc36642-3ba6-b44b-c89d-959e04795d20@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: A0F-WgKyMyG43vwQ_qtzpQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,39 +91,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, David Edmondson <david.edmondson@oracle.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org,
+ "libvirt-list@redhat.com" <libvirt-list@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RFC 7230 section 3.2 indicates that HTTP header field names are case
-insensitive.
+On 2/19/20 4:53 AM, Max Reitz wrote:
+> On 31.01.20 18:11, Eric Blake wrote:
+>> ping
+>=20
+> Do you want further review or is J=C3=A1n=E2=80=99s sufficient for you?
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- block/curl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Commit 0bc16997 has already landed, so no further review will show in=20
+git history. But you're always welcome to raise issues that might result=20
+in follow-up patches.
 
-diff --git a/block/curl.c b/block/curl.c
-index 0cf99a4b31b8..4256659cd85b 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -216,11 +216,11 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-     size_t realsize = size * nmemb;
-     const char *header = (char *)ptr;
-     const char *end = header + realsize;
--    const char *accept_ranges = "Accept-Ranges:";
-+    const char *accept_ranges = "accept-ranges:";
-     const char *bytes = "bytes";
- 
-     if (realsize >= strlen(accept_ranges)
--        && strncmp(header, accept_ranges, strlen(accept_ranges)) == 0) {
-+        && strncasecmp(header, accept_ranges, strlen(accept_ranges)) == 0) {
- 
-         char *p = strchr(header, ':') + 1;
- 
--- 
-2.24.1
+>=20
+> Also, I wonder whether it would make a good GSoC/Outreachy/... project
+> to add partition reading support to the raw block driver, or whether
+> that=E2=80=99s a bad idea. O:-)
+
+Personally, I think that since nbdkit already provides a good partition=20
+filter [1], any other implementation of a partition filter is duplicated=20
+effort.  The only reason to teach qemu how to access an arbitrary=20
+partition is if it makes serving that arbitrary partition to a guest=20
+more efficient than what is currently possible by pointing qemu at an=20
+NBD server run by nbdkit with its partition filter.  But in general, you=20
+are more likely to want qemu to serve an entire disk image file to the=20
+guest (and let the guest interpret partitions embedded within that file)=20
+than to have qemu serve a single partition to a guest (and have the=20
+guest treat that partition as a bare disk), so I don't see it as=20
+something that would be frequently used or needed in qemu.
+
+[1] http://libguestfs.org/nbdkit-partition-filter.1.html
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
