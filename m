@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AEBC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F6F3C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEE762465D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E4362465D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHWSxalr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE762465D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLoyP4kS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E4362465D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SA7-0006tV-1M
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:25:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37390)
+	id 1j4SAK-0007WN-HK
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:25:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvt-0003EM-HU
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvx-0003Mu-4T
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvs-0000rq-AE
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48993
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvv-0000tw-VQ
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:45 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40376
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvs-0000rM-6P
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:40 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvv-0000tW-RC
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128639;
+ s=mimecast20190719; t=1582128643;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KGejokG02i0EpYtErcRjLCjPmOr6BaeU8pMY73O70h8=;
- b=AHWSxalrnHOWs5ItoFLrG+HJr9tHTTElpVuvGLFHTnF6wRcGIcCzqRAsjkrLKJgIEBV6rR
- 1zdxEnMrqWbIagzzDkjxgSIFbquYp1U6cM967WIH+xYx7e/P4gigDUUsywnMaVsUnxw8LB
- zFJmHxArTJGYPMNurH8mve05nmIkzEU=
+ bh=WYYB93Ncg3s9FGfu+M5M6/kCMxg0tXo1aPdpEt4OP0o=;
+ b=HLoyP4kSozb+eNKab7aqTB3KzmID7K3zq4Y4PW35JQ3qO5fcGNsaPPkAaeGXJTQIFbgOay
+ XDekkjHNEhb/1HV0Z73FCb+ez5UVOr95dRQkH+xrLyXP2hrnup/bvROenyF7v7v50gLH8V
+ pr/5lnSRG2K3/tarW/bgdMUYit8eUE0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-q-KunDr_OoOwM5r8RPX_4w-1; Wed, 19 Feb 2020 11:10:34 -0500
+ us-mta-117-1sPzvz9nOpKUnlTBpDnfMw-1; Wed, 19 Feb 2020 11:10:33 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F32709A7B3
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B95B8024CF;
+ Wed, 19 Feb 2020 16:10:32 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4EDD9909EC;
- Wed, 19 Feb 2020 16:10:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 08BFA48;
+ Wed, 19 Feb 2020 16:10:30 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 32/79] arm/vexpress: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:06 -0500
-Message-Id: <20200219160953.13771-33-imammedo@redhat.com>
+Subject: [PATCH v6 30/79] arm/sbsa-ref: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:04 -0500
+Message-Id: <20200219160953.13771-31-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: q-KunDr_OoOwM5r8RPX_4w-1
+X-MC-Unique: 1sPzvz9nOpKUnlTBpDnfMw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,11 +87,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, radoslaw.biernacki@linaro.org,
+ leif.lindholm@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+memory_region_allocate_system_memory() API is going away, so
 replace it with memdev allocated MemoryRegion. The later is
 initialized by generic code, so board only needs to opt in
 to memdev scheme by providing
@@ -102,80 +105,46 @@ Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/arm/vexpress.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+CC: radoslaw.biernacki@linaro.org
+CC: leif.lindholm@linaro.org
+---
+ hw/arm/sbsa-ref.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index 4673a88a8d..ed683eeea5 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -273,7 +273,6 @@ static void a9_daughterboard_init(const VexpressMachine=
-State *vms,
- {
-     MachineState *machine =3D MACHINE(vms);
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 9b5bcb5634..1cba9fc302 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -593,7 +593,6 @@ static void sbsa_ref_init(MachineState *machine)
+     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
      MemoryRegion *sysmem =3D get_system_memory();
+     MemoryRegion *secure_sysmem =3D g_new(MemoryRegion, 1);
 -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *lowram =3D g_new(MemoryRegion, 1);
-     ram_addr_t low_ram_size;
-=20
-@@ -283,8 +282,6 @@ static void a9_daughterboard_init(const VexpressMachine=
-State *vms,
-         exit(1);
+     bool firmware_loaded;
+     const CPUArchIdList *possible_cpus;
+     int n, sbsa_max_cpus;
+@@ -685,9 +684,8 @@ static void sbsa_ref_init(MachineState *machine)
+         object_unref(cpuobj);
      }
 =20
--    memory_region_allocate_system_memory(ram, NULL, "vexpress.highmem",
--                                         ram_size);
-     low_ram_size =3D ram_size;
-     if (low_ram_size > 0x4000000) {
-         low_ram_size =3D 0x4000000;
-@@ -293,9 +290,10 @@ static void a9_daughterboard_init(const VexpressMachin=
-eState *vms,
-      * address space should in theory be remappable to various
-      * things including ROM or RAM; we always map the RAM there.
-      */
--    memory_region_init_alias(lowram, NULL, "vexpress.lowmem", ram, 0, low_=
-ram_size);
-+    memory_region_init_alias(lowram, NULL, "vexpress.lowmem", machine->ram=
-,
-+                             0, low_ram_size);
-     memory_region_add_subregion(sysmem, 0x0, lowram);
--    memory_region_add_subregion(sysmem, 0x60000000, ram);
-+    memory_region_add_subregion(sysmem, 0x60000000, machine->ram);
+-    memory_region_allocate_system_memory(ram, NULL, "sbsa-ref.ram",
+-                                         machine->ram_size);
+-    memory_region_add_subregion(sysmem, sbsa_ref_memmap[SBSA_MEM].base, ra=
+m);
++    memory_region_add_subregion(sysmem, sbsa_ref_memmap[SBSA_MEM].base,
++                                machine->ram);
 =20
-     /* 0x1e000000 A9MPCore (SCU) private memory region */
-     init_cpus(machine, cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic,
-@@ -360,7 +358,6 @@ static void a15_daughterboard_init(const VexpressMachin=
-eState *vms,
- {
-     MachineState *machine =3D MACHINE(vms);
-     MemoryRegion *sysmem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *sram =3D g_new(MemoryRegion, 1);
+     create_fdt(sms);
 =20
-     {
-@@ -375,10 +372,8 @@ static void a15_daughterboard_init(const VexpressMachi=
-neState *vms,
-         }
-     }
-=20
--    memory_region_allocate_system_memory(ram, NULL, "vexpress.highmem",
--                                         ram_size);
-     /* RAM is from 0x80000000 upwards; there is no low-memory alias for it=
-. */
--    memory_region_add_subregion(sysmem, 0x80000000, ram);
-+    memory_region_add_subregion(sysmem, 0x80000000, machine->ram);
-=20
-     /* 0x2c000000 A15MPCore private memory region (GIC) */
-     init_cpus(machine, cpu_type, TYPE_A15MPCORE_PRIV,
-@@ -795,6 +790,7 @@ static void vexpress_class_init(ObjectClass *oc, void *=
+@@ -785,6 +783,7 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *=
 data)
-     mc->init =3D vexpress_common_init;
-     mc->max_cpus =3D 4;
-     mc->ignore_memory_transaction_failures =3D true;
-+    mc->default_ram_id =3D "vexpress.highmem";
- }
-=20
- static void vexpress_a9_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type =3D IF_IDE;
+     mc->no_cdrom =3D 1;
+     mc->default_ram_size =3D 1 * GiB;
++    mc->default_ram_id =3D "sbsa-ref.ram";
+     mc->default_cpus =3D 4;
+     mc->possible_cpu_arch_ids =3D sbsa_ref_possible_cpu_arch_ids;
+     mc->cpu_index_to_instance_props =3D sbsa_ref_cpu_index_to_props;
 --=20
 2.18.1
 
