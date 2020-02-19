@@ -2,118 +2,117 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F24FC34022
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 07:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6139BC34022
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48D562464E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 07:56:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D562464E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2675721D56
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:03:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CC/0LeAj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2675721D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4KDi-00015L-Eh
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 02:56:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52931)
+	id 1j4KKd-0003VI-9p
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:03:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54694)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4KCt-0000Fe-8j
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 02:55:44 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4KJv-0002yz-42
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:02:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4KCs-00042B-22
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 02:55:43 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:52957)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j4KCp-0003ze-Gh; Wed, 19 Feb 2020 02:55:39 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MHoZS-1jGxmY2VWA-00Ex9P; Wed, 19 Feb 2020 08:55:20 +0100
-Subject: Re: [PATCH v4 00/14] Fixes for DP8393X SONIC device emulation
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Finn Thain <fthain@telegraphics.com.au>
-References: <cover.1580290069.git.fthain@telegraphics.com.au>
- <CAL1e-=iOQ52y0vbXAYaYDKqoepD09xO2=3d55WM32=9TFwFzAg@mail.gmail.com>
- <alpine.LNX.2.22.394.2002191150440.8@nippy.intranet>
- <CAL1e-=gaVz5K=JMg+iN53weESLORKEuXRJvq-SFqU7FERojP8Q@mail.gmail.com>
- <CAL1e-=iUHwE2_h0dxOE6vN_FoyRWyYA6LbL++T9BSB9X8heEcA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <67b0565e-9f2c-7ef0-aca6-01cba798fad4@vivier.eu>
-Date: Wed, 19 Feb 2020 08:55:19 +0100
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4KJu-0003rE-6L
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:02:59 -0500
+Received: from mail-eopbgr30108.outbound.protection.outlook.com
+ ([40.107.3.108]:60807 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1j4KJq-0003np-9m; Wed, 19 Feb 2020 03:02:55 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eaBR08ySd0JmHFLaK5EyUcbZDK+Dzt/+0TQm6T7mP+CV1sZnx1HMiRhCmwAa/ZeRFmoxUoyKvfMKw2er2Nd4g6KItKTyk+EX+9v8h34/8Gg5bq/w1Ek97D8mPEsvyWM6sUywy37OZSnXC9I8KAomk3kcTgcB7e2VRow0UHlAIM/zqUp50mgNTfgRMHcHunj+1njMT2YcPl9cyRZpBrD0f9nyzYQBirX3KDg01KVXpaVdS2J4KZkhhg3cAVcvlKc+VBhVbxq/FRmg2jSeai24rT7fwiPVQ5JuO/IRnsw44iQgdGgHm9RZ6WrBYBklSYjDGY9akdZjn9Gj6/aAYQe4Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pG9zouVvMyw8aBNJ+04vFfjU0om6EM9ZEsjUCO+H0gc=;
+ b=OIBVqeccXL1qXXXhZnMtbeWAEZM/dPqrKal/8v2XfcC2TpXzwWtzxptgvoSdbiYp6JnDaoLEQBvdkxpKol892xJJfp3viyjNLwfWI2X//ZJ0zxzeXvyb1HnJyleDnCKQh0/NeJfbUyQ40OvIysucEx1saZt+fk4gQeU/MI11uqkY42QR/6+9j43UnM/ETbklGvNAjJQEWCNFV2C1r5ee3R1Ancnx6L6If0gufQ/HzcFNskE+K55N3Z1YsRj2sl6I9XMm8hn76tceGmgVdEOH/tzX8Z+RW5GPlhNitdutrmpvIzAL+Qlz3Lt0wSqkNz51ZuT5BTNEyJKDrCYyMO0ckw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pG9zouVvMyw8aBNJ+04vFfjU0om6EM9ZEsjUCO+H0gc=;
+ b=CC/0LeAjBNiHfn4sWDzDma+QHDFgSjeEh5YCo5+1BJN67EAe8PUYUktrPwsO6DXLY5JZjmsNJqU2XPjN93L/4pDsjncqEZ0pl0POiZcsJQHxUyDfOrT6Nx5fRlttpXbWcSF3B6vH8HKEvnnMCOZWye59Igqdh/aC4YK5XxeJAHs=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB4771.eurprd08.prod.outlook.com (10.255.97.202) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.27; Wed, 19 Feb 2020 08:02:52 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
+ 08:02:51 +0000
+Subject: Re: [PATCH v2 13/22] qemu-iotests/199: drop extra constraints
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
+ <20200217150246.29180-14-vsementsov@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Organization: Virtuozzo
+Message-ID: <f876d98d-15e0-ff73-7477-1e47ff991e16@virtuozzo.com>
+Date: Wed, 19 Feb 2020 11:02:49 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
+In-Reply-To: <20200217150246.29180-14-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR05CA0190.eurprd05.prod.outlook.com
+ (2603:10a6:3:f9::14) To AM6PR08MB5048.eurprd08.prod.outlook.com
+ (2603:10a6:20b:ee::31)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=iUHwE2_h0dxOE6vN_FoyRWyYA6LbL++T9BSB9X8heEcA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZD/GiUg0BH/9Dq8TCSXqTa6rglBQ+4szjyNP3rshA+TAVIoMHW9
- a0GKt8K63mg2Ff4Dl4DT0WK73mxseKZDRrG4lX9oDhFi1seLBAbZ1yKnpAbyH6x0T2FSUdK
- 4a3o9T3IQiQtQJrO+9Eph1pba+fNc6RZEob2vG0vQGILfH6O0JQxuwip2woKIO56hjjO+BO
- 87+0EOeIj555t8AbQD2Cw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2dR13jlj+Lk=:rd1PdtN+r1yXgaQkNzZ6wn
- 3oXePNfCZC1KMBZUS4M3zwrTyLhrkym9X+mF+5Q2ZRen/v5KUfx0vuPMlku/Uecs2aA1nUTmO
- v0L3BM/CshoFSrBaG064eFquuyreM0kiRnuxBBpwVeoVN2ITuR8RaU3KXVQpt5firPn7Orjd5
- Zcl2ybohKMfoc9pzKqNZPEYiRMfqDD+s11Qe/pspsjLPssUWEMcw+LZ1MSvzzRKGNrMlHdyUS
- aDYcmBClgdUyf+eh6jh1xr00dXsQw0e5RmNaMXP3hMK5iiIVajX8z43QlAmdeoqjwYxDg/I97
- w5/5LYO+meXE2VEuAoujiiXpDo8odOEtnY8y4jFSfPAQdUMGUUzMgvppe4KRnpoaP09dXzQA0
- Gz4OrM8Up295rq480bmoqjhU9IJL/D2oJQWWuea6CAUw6r4yq2pbj1m9VAexIFWcrZtnSew2x
- +0fljl10rGaVu+/X0k1dVdnGmHnaH1rODZfkqmhNTDDR/IJ1BDKwaCOPVoCrG8/A5jyAd4gbD
- Nh38uWe9smuxsN0avsRnm9YTvKGMGt+bDgSLHT26GRaz/JB5ZT+b/rOrueiy3EhapSXsiHJA3
- iPZzlrK3PIwIEVatJ6nk7g/RqDNV15aHR1ZSGzkX0JrEFQHCB0JJgsAeOCh/VSALke/tfxzJ5
- n9FWFJWt2DgzSm8iHdlpGXUZBN9RC8SS5mVhDXRIDb2/hIsktcG0nBUz+CbnQ8lJqFjeCFAWM
- juv+P0e+2uTAkm/Sf+imdo9viBAVD/lu7Rs9AlECp2MlqCirBmm6Tr9YuzFEGj6B8uma5+rZ4
- kJNzHuS30UaPj9x5US9a9izSYvpYE5+io0Qlo5YTiTt2KWz6NH1ji25OW74v3Z/dfyOWM3D
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
+Received: from [172.16.24.225] (185.231.240.5) by
+ HE1PR05CA0190.eurprd05.prod.outlook.com (2603:10a6:3:f9::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.18 via Frontend Transport; Wed, 19 Feb 2020 08:02:51 +0000
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 579a6a27-7fa8-422f-8d31-08d7b5121e3f
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4771:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB477187D5D14002E82AA5B094F4100@AM6PR08MB4771.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Forefront-PRVS: 0318501FAE
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(366004)(39850400004)(136003)(396003)(199004)(189003)(31686004)(81166006)(8676002)(6486002)(81156014)(8936002)(2906002)(956004)(2616005)(4326008)(4744005)(54906003)(5660300002)(66946007)(16576012)(316002)(66476007)(66556008)(36756003)(478600001)(53546011)(186003)(16526019)(52116002)(36916002)(44832011)(86362001)(31696002)(26005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4771;
+ H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /02IoaFxmYwrtjPvxStvO4CKt+zIwZY4DkBfxgmyGLopM9FZVa/30mM42AmCId92SgCY62Yw+IeF0pbR1T9aORnBCA3HnruUPj3PZwUUroq+RyUMVJK2+2+XZ7sc8gnqwVWIbTNq8wKe2Kw+wBFpMaODDoYXIisHIgqz2DPngHizLCZXlvrsffTa0ni4AKCqLSgad9pO4Wkk/wXOL1H2tM26NnPhai5bEn0yTYelt8waVSUu0LkEkW7541sq8X5cmZQKaww6iGQ3FfJM3Ir8Cv65m/GuP88kxQRT3Dztsvqax9aXv3BSXKKC4R2AzsFHqKFPtYXjus4ud6WXvPGSYcDwsOsogXP1x3YDA9MZmUDZo9ORBM443GggmJrdlv2KZ7Ci7/kRm+KOqA/ZJlHAdTYl+GeeG0/dcmo8luFIBrAH1pEtXEBtRNDCEIcp5Rzz
+X-MS-Exchange-AntiSpam-MessageData: miHn3ui1P2Ta5sR5lvQEl8E701PUjjvJc8jGaQ23mtKP0XxesUBUPYXWuXobTcolz3fyvryogWZFTb48luESpCjht4UktTdXbVStQwkROIcjHPVdK5yyncsf3tiCJ5EwkiIptAHh/OrWuEWHgd/wtA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 579a6a27-7fa8-422f-8d31-08d7b5121e3f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 08:02:51.9503 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9Oc7mYob1o52vpLDARpdGo7ny9p+oiRTY0slzJS5CatdiHdJ/48gjSh02rS4DvX/GTwcsfqbhmLAWp4NHClgpQd9IGGumGd2NjV0YIzhjpA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4771
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.108
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,84 +124,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ dgilbert@redhat.com, qemu-block@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/02/2020 à 02:57, Aleksandar Markovic a écrit :
-> 2:54 AM Sre, 19.02.2020. Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>> је
-> написао/ла:
->>
->> 2:06 AM Sre, 19.02.2020. Finn Thain <fthain@telegraphics.com.au
-> <mailto:fthain@telegraphics.com.au>> је написао/ла:
->> >
->> > On Tue, 18 Feb 2020, Aleksandar Markovic wrote:
->> >
->> > > On Wednesday, January 29, 2020, Finn Thain
-> <fthain@telegraphics.com.au <mailto:fthain@telegraphics.com.au>>
->> > > wrote:
->> > >
->> > > > Hi All,
->> > > >
->> > > > There are bugs in the emulated dp8393x device that can stop packet
->> > > > reception in a Linux/m68k guest (q800 machine).
->> > > >
->> > > > With a Linux/m68k v5.5 guest (q800), it's possible to remotely
-> trigger
->> > > > an Oops by sending ping floods.
->> > > >
->> > > > With a Linux/mips guest (magnum machine), the driver fails to probe
->> > > > the dp8393x device.
->> > > >
->> > > > With a NetBSD/arc 5.1 guest (magnum), the bugs in the device can be
->> > > > fatal to the guest kernel.
->> > > >
->> > > > Whilst debugging the device, I found that the receiver algorithm
->> > > > differs from the one described in the National Semiconductor
->> > > > datasheet.
->> > > >
->> > > > This patch series resolves these bugs.
->> > > >
->> > > > AFAIK, all bugs in the Linux sonic driver were fixed in Linux v5.5.
->> > > > ---
->> > >
->> > >
->> > > Herve,
->> > >
->> > > Do your Jazz tests pass with these changes?
->> > >
->> >
->> > AFAIK those tests did not expose the NetBSD panic that is caused by
->> > mainline QEMU (mentioned above).
->> >
->> > I have actually run the tests you requested (Hervé described them in an
->> > earlier thread). There was no regression. Quite the reverse -- it's no
->> > longer possible to remotely crash the NetBSD kernel.
->> >
->> > Apparently my testing was also the first time that the jazzsonic driver
->> > (from the Linux/mips Magnum port) was tested successfully with QEMU. It
->> > doesn't work in mainline QEMU.
->> >
->>
->> Well, I appologize if I missed all these facts. I just did not notice
-> them, at least not in this form. And, yes, some "Tested-by:" by Herve
-> would be desirable and nice.
->>
+
+
+On 17/02/2020 18:02, Vladimir Sementsov-Ogievskiy wrote:
+> We don't need any specific format constraints here. Still keep qcow2
+> for two reasons:
+> 1. No extra calls of format-unrelated test
+> 2. Add some check around persistent bitmap in future (require qcow2)
 > 
-> Or, perhaps, even "Reviewed-by:".
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   tests/qemu-iotests/199 | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
+> index de9ba8d94c..dda918450a 100755
+> --- a/tests/qemu-iotests/199
+> +++ b/tests/qemu-iotests/199
+> @@ -116,5 +116,4 @@ class TestDirtyBitmapPostcopyMigration(iotests.QMPTestCase):
+>   
+>   
+>   if __name__ == '__main__':
+> -    iotests.main(supported_fmts=['qcow2'], supported_cache_modes=['none'],
+> -                 supported_protocols=['file'])
+> +    iotests.main(supported_fmts=['qcow2'])
 > 
 
-It would be nice to have this merged before next release because q800
-machine networking is not reliable without them.
-
-And thank you to Finn for all his hard work on this device emulation.
-
-Laurent
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+-- 
+With the best regards,
+Andrey Shinkevich
 
