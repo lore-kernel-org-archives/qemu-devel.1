@@ -2,100 +2,73 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD19C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8386AC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:48:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5873124654
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4770A24654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 11:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zvg7ftKq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5873124654
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emf0Cjk+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4770A24654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4NgF-0000vm-Iu
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 06:38:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42000)
+	id 1j4Npg-0007A0-DM
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 06:48:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47478)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j4NfE-0008S8-9T
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:37:13 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j4No6-0006H6-5A
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j4NfD-0007dX-8R
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:37:12 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48971
+ (envelope-from <kchamart@redhat.com>) id 1j4No4-0004W9-1N
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:46:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32013
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j4NfD-0007cj-1B
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:37:11 -0500
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j4No3-0004TO-T6
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 06:46:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582112230;
+ s=mimecast20190719; t=1582112777;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y8N9LrRkOPv2CV1LsD3E7E0MVOuDRwOA8YIo/oABPlQ=;
- b=Zvg7ftKqHCDKvLvdSrrnFezuFMAJ9F/GA38a6semf0iu27XKmmR+QTM23FFDXvBrrkKY+x
- 2kRXZ51LpND34W3d2HClxu29Y6Gw5vMdm+V4Uf+zvWwxbu4MaVDEre0xil7rLlq0VgbQf4
- vA2W8TU/2bWgrpocq9eZpCBWTRHsO9M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-Toi7FtZBNS2G870y48U6nA-1; Wed, 19 Feb 2020 06:37:09 -0500
-Received: by mail-wr1-f70.google.com with SMTP id m15so12348218wrs.22
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 03:37:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Y8N9LrRkOPv2CV1LsD3E7E0MVOuDRwOA8YIo/oABPlQ=;
- b=sazhKYmTyaMwq4qZfsgD4CSuVitHdD7zaa6Vp+ER/Joe5kXA8iMQVpUvJ13NOfU8qX
- /rtyuL1vj7XrDY1YXR9mW2TMYbmt1We86eNTaZ+fYfCP3iqYxbs45stLkl56SydSkrd/
- sksoa3cOJM27HhdK3c/LHF/T7teQ5bhGL4Q+QmZtVt82g/ibXu55MUWVFFDiNOy504Pn
- yrtPk09pMaXIjgFzBqcJpNtH2fprbm0MNPrbfaN2D06RGBsgzbMSKZ63TC00Rbo3fKTh
- UcQKINB5htGXySQFUT0KyzKmK2+IpWIGPjf1RvRLQikuVuayt28N2AaYRLswZgUMdnCB
- IKQQ==
-X-Gm-Message-State: APjAAAWOxK36sXUI0K9BQ1OHGMIhLLza6UE9hnzO19mYDw7GFazy593w
- Kv3982FTX8G43Ur1U7CTYBs4B8zrbCdz4+x2J8PtxmIJkVuNggJO++rbHJemj71+HXcZ5y6omBB
- 8P2A4TaFrmNuem1s=
-X-Received: by 2002:a05:600c:21da:: with SMTP id
- x26mr7762573wmj.114.1582112227952; 
- Wed, 19 Feb 2020 03:37:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwmACpZyPsRgr89mMRwn8avijJ8sF4rPbUkW3VMsHoovXFyv61WAdbvvOKN6Ou4Uc5nzPcomg==
-X-Received: by 2002:a05:600c:21da:: with SMTP id
- x26mr7762551wmj.114.1582112227697; 
- Wed, 19 Feb 2020 03:37:07 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:ec41:5e57:ff4d:8e51?
- ([2001:b07:6468:f312:ec41:5e57:ff4d:8e51])
- by smtp.gmail.com with ESMTPSA id p15sm2557354wma.40.2020.02.19.03.37.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 19 Feb 2020 03:37:07 -0800 (PST)
-Subject: Re: [PATCH] memory: batch allocate ioeventfds[] in
- address_space_update_ioeventfds()
-To: Stefan Hajnoczi <stefanha@gmail.com>, Peter Xu <peterx@redhat.com>
-References: <20200218182226.913977-1-stefanha@redhat.com>
- <20200218214932.GD7090@xz-x1>
- <CAJSP0QV2+w0SNq+FtuYUfpAp_xcqg1rP8zdsYhfNxW49M3ANQg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cc41b046-9f03-50fe-de90-cbb2fbf88000@redhat.com>
-Date: Wed, 19 Feb 2020 12:37:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ZVwKvRck43Df2gjgiviIbsOqvEuTTrgh9Fx1mXelqGQ=;
+ b=emf0Cjk+nMC8EVjTLZAgoVjHU2n+LV1Q5RU67Ec1Jce6XeXBU/QbIgwjQxo034lNaafUsE
+ +/CbJBlFR4Q8fW95Mlm2q8sqb6rqAVIZg5vRuxJIqlWSpbA0B9fnISWuR5VwEbbkoiLy0G
+ cV05rgWn6LZN8na1zSuhyz1uIUEtTrQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-vI9b2uhFOxS6vh9rICapdw-1; Wed, 19 Feb 2020 06:46:11 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE1FF1005512;
+ Wed, 19 Feb 2020 11:46:10 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 873318AC45;
+ Wed, 19 Feb 2020 11:46:09 +0000 (UTC)
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: kchamart@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] This small series does two things:
+Date: Wed, 19 Feb 2020 12:46:05 +0100
+Message-Id: <20200219114607.1855-1-kchamart@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QV2+w0SNq+FtuYUfpAp_xcqg1rP8zdsYhfNxW49M3ANQg@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: Toi7FtZBNS2G870y48U6nA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: vI9b2uhFOxS6vh9rICapdw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -110,18 +83,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/02/20 10:18, Stefan Hajnoczi wrote:
->> ... do exponential increase here (max*=2) instead so still easy to
->> converge?
-> I'm happy to tweak the policy.  Let's see what Paolo thinks.
+(1) Convert the original qemu-cpu-models.texi to rST
 
-I included Peter's suggestion in my own tweak.  Thanks to both of you!
+(2) In a separate patch, incorporate the additional new content from
+    this:
+    https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg06455.html
+    ([PATCH v3] qemu-cpu-models: Document -noTSX, mds-no, taa-no, and
+    tsx-ctrl)
 
-Paolo
+A Sphinx rendering of the converted doc is here:
+
+    https://kashyapc.fedorapeople.org/qemu_v4.2.0-1300-g5da20ed7e3_docs/sys=
+tem/qemu-cpu-models.html
+
+Kashyap Chamarthy (2):
+  docs: Convert qemu-cpu-models.texi to rST
+  qemu-cpu-models.rst: Document -noTSX, mds-no, taa-no, and tsx-ctrl
+
+ docs/qemu-cpu-models.texi       | 677 --------------------------------
+ docs/system/index.rst           |   1 +
+ docs/system/qemu-cpu-models.rst | 547 ++++++++++++++++++++++++++
+ 3 files changed, 548 insertions(+), 677 deletions(-)
+ delete mode 100644 docs/qemu-cpu-models.texi
+ create mode 100644 docs/system/qemu-cpu-models.rst
+
+--=20
+2.21.0
 
 
