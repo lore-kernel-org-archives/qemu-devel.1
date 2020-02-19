@@ -1,67 +1,65 @@
-Return-Path: <SRS0=v1sw=4G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D728C34031
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E734DC34031
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 00:47:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3FA522B48
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Feb 2020 23:23:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TBraVIiw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FA522B48
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B7DFC24654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 00:47:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DFC24654
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4CDD-0007JY-44
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 18:23:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51034)
+	id 1j4DWK-0007Zc-Vd
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 19:47:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4CB8-0004ms-A1
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:21:24 -0500
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j4DVh-0007A0-LC
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 19:46:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4CB6-0006t7-ST
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 18:21:22 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:50329)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j4DVf-0000iW-0I
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 19:46:41 -0500
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:48236)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4CB6-0006lh-Gd; Tue, 18 Feb 2020 18:21:20 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48McL36wJ6z9sRY; Wed, 19 Feb 2020 10:21:15 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582068075;
- bh=PlBsuRlPJXb+VZKiGh+ENvid6UuF8n/xBEGC9RcpX3E=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=TBraVIiwgnLbeoHs3ofOwdKkJpde+jPpOJzBfNrsGAxk753zPqITjxDH23i0UrJia
- JknK++v8bYSHbDlpruZZqaqlyJ0Pa9lKaP9b9JOKTMOrl2r8Bl2qSYrZ26+IHdabqt
- 8/ajG8iRI+Lm7mHeuheBKHxEZ+hC0/Bqd64X0yN8=
-Date: Wed, 19 Feb 2020 10:09:19 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
-Message-ID: <20200218230919.GD1764@umbus.fritz.box>
-References: <20200217021217.95766-1-aik@ozlabs.ru>
- <60c5712e-beb7-e536-1252-642dcf88beec@redhat.com>
- <0beab4e0-da3d-48fb-062a-de7a6c244c3f@redhat.com>
- <20200217224647.GA26464@umbus.fritz.box>
- <38cfa5c3-2563-7aaa-b1db-c7dd2f053d3c@redhat.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1j4DVe-0000ez-F6; Tue, 18 Feb 2020 19:46:38 -0500
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436292|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.348929-0.0276323-0.623439;
+ DS=CONTINUE|ham_system_inform|0.536313-0.000101925-0.463585;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03297; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.GpVazkk_1582073190; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GpVazkk_1582073190)
+ by smtp.aliyun-inc.com(10.147.41.121);
+ Wed, 19 Feb 2020 08:46:31 +0800
+Subject: Re: [PATCH v4 2/4] target/riscv: configure and turn on vector
+ extension from command line
+To: Alistair Francis <alistair23@gmail.com>
+References: <20200210081240.11481-1-zhiwei_liu@c-sky.com>
+ <20200210081240.11481-3-zhiwei_liu@c-sky.com>
+ <CAKmqyKORm9dfkgSOe0WR1aDBzJyMq9YP9+bBPwkeX2J2jYmLAg@mail.gmail.com>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <0eb6836a-b133-b3b1-6ef6-74dd341b1dd5@c-sky.com>
+Date: Wed, 19 Feb 2020 08:46:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Km1U/tdNT/EmXiR1"
-Content-Disposition: inline
-In-Reply-To: <38cfa5c3-2563-7aaa-b1db-c7dd2f053d3c@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <CAKmqyKORm9dfkgSOe0WR1aDBzJyMq9YP9+bBPwkeX2J2jYmLAg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,95 +71,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
+ wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Alistair
 
---Km1U/tdNT/EmXiR1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 2020/2/19 6:34, Alistair Francis wrote:
+> On Mon, Feb 10, 2020 at 12:12 AM LIU Zhiwei <zhiwei_liu@c-sky.com> wrote:
+>> Vector extension is default on only for "any" cpu. It can be turned
+>> on by command line "-cpu rv64,v=true,vlen=128,elen=64,vext_spec=v0.7.1".
+>>
+>> vlen is the vector register length, default value is 128 bit.
+>> elen is the max operator size in bits, default value is 64 bit.
+>> vext_spec is the vector specification version, default value is v0.7.1.
+>> Thest properties and cpu can be specified with other values.
+>>
+>> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+> This looks fine to me. Shouldn't this be the last patch though?
+Yes， it should be the last patch.
+> As in
+> once the vector extension has been added to QEMU you can turn it on
+> from the command line. Right now this turns it on but it isn't
+> implemented.
+Maybe I should just add fields in RISCVCPU structure. And never open the
+vector extension on or add configure properties until the implementation 
+is ready.
 
-On Tue, Feb 18, 2020 at 06:48:43AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/17/20 11:46 PM, David Gibson wrote:
-> > On Mon, Feb 17, 2020 at 11:24:11AM +0100, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > > On 2/17/20 10:26 AM, Philippe Mathieu-Daud=E9 wrote:
-> > > > Hi Alexey,
-> > > >=20
-> > > > On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
-> > > > > The following changes since commit
-> > > > > 05943fb4ca41f626078014c0327781815c6584c5:
-> > > > >=20
-> > > > >  =A0=A0 ppc: free 'fdt' after reset the machine (2020-02-17 11:27=
-:23 +1100)
-> > > > >=20
-> > > > > are available in the Git repository at:
-> > > > >=20
-> > > > >  =A0=A0 git@github.com:aik/qemu.git tags/qemu-slof-20200217
-> > > > >=20
-> > > > > for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d02=
-98aac2:
-> > > > >=20
-> > > > >  =A0=A0 pseries: Update SLOF firmware image (2020-02-17 13:08:59 =
-+1100)
-> > > > >=20
-> > > > > ----------------------------------------------------------------
-> > > > > Alexey Kardashevskiy (1):
-> > > > >  =A0=A0=A0=A0=A0=A0 pseries: Update SLOF firmware image
-> > > > >=20
-> > > > >  =A0 pc-bios/README=A0=A0 |=A0=A0 2 +-
-> > > > >  =A0 pc-bios/slof.bin | Bin 931032 -> 968560 bytes
-> > > > >  =A0 roms/SLOF=A0=A0=A0=A0=A0=A0=A0 |=A0=A0 2 +-
-> > > > >  =A0 3 files changed, 2 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > I only received the cover, not the patch, have you posted it?
-> > >=20
-> > > OK I see the SLOF binary is almost 1MB. Maybe this got blocked by spam
-> > > filter. FYI you can use 'git-format-patch --no-binary' to emit the pa=
-tch
-> > > with the commit description but without the content.
-> >=20
-> > Generally Alexey sends SLOF updates to me just as pull requests
-> > without patches in full, because a huge slab of base64 encoded
-> > firmware isn't particularly illuminating.
->=20
-> I understand, this is why I later suggested Alexey to use 'git-format-pat=
-ch
-> --no-binary', because Laszlo uses it for EDK2 submodule, this allow to
-> quickly review the change on the list (without posting the base64), see:
+It's still a little awkward as the reviewers will not be able to test 
+the patch until the
+last patch.
 
-Hm.  What's to review?  The only change apart from the binary blob and
-the submodule tag is the version numbers in pc-bios/README.
+> Alistair
+>
+>> ---
+>>   target/riscv/cpu.c | 48 ++++++++++++++++++++++++++++++++++++++++++++--
+>>   target/riscv/cpu.h |  8 ++++++++
+>>   2 files changed, 54 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> index 8c86ebc109..95fdb6261e 100644
+>> --- a/target/riscv/cpu.c
+>> +++ b/target/riscv/cpu.c
+>> @@ -98,6 +98,11 @@ static void set_priv_version(CPURISCVState *env, int priv_ver)
+>>       env->priv_ver = priv_ver;
+>>   }
+>>
+>> +static void set_vext_version(CPURISCVState *env, int vext_ver)
+>> +{
+>> +    env->vext_ver = vext_ver;
+>> +}
+>> +
+>>   static void set_feature(CPURISCVState *env, int feature)
+>>   {
+>>       env->features |= (1ULL << feature);
+>> @@ -113,7 +118,7 @@ static void set_resetvec(CPURISCVState *env, int resetvec)
+>>   static void riscv_any_cpu_init(Object *obj)
+>>   {
+>>       CPURISCVState *env = &RISCV_CPU(obj)->env;
+>> -    set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+>> +    set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU | RVV);
+>>       set_priv_version(env, PRIV_VERSION_1_11_0);
+>>       set_resetvec(env, DEFAULT_RSTVEC);
+>>   }
+>> @@ -320,6 +325,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>>       CPURISCVState *env = &cpu->env;
+>>       RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+>>       int priv_version = PRIV_VERSION_1_11_0;
+>> +    int vext_version = VEXT_VERSION_0_07_1;
+>>       target_ulong target_misa = 0;
+>>       Error *local_err = NULL;
+>>
+>> @@ -343,8 +349,18 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>>               return;
+>>           }
+>>       }
+>> -
+>> +    if (cpu->cfg.vext_spec) {
+>> +        if (!g_strcmp0(cpu->cfg.vext_spec, "v0.7.1")) {
+>> +            vext_version = VEXT_VERSION_0_07_1;
+>> +        } else {
+>> +            error_setg(errp,
+>> +                       "Unsupported vector spec version '%s'",
+>> +                       cpu->cfg.vext_spec);
+>> +            return;
+>> +        }
+>> +    }
+>>       set_priv_version(env, priv_version);
+>> +    set_vext_version(env, vext_version);
+>>       set_resetvec(env, DEFAULT_RSTVEC);
+>>
+>>       if (cpu->cfg.mmu) {
+>> @@ -409,6 +425,30 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>>           if (cpu->cfg.ext_u) {
+>>               target_misa |= RVU;
+>>           }
+>> +        if (cpu->cfg.ext_v) {
+>> +            target_misa |= RVV;
+>> +            if (!is_power_of_2(cpu->cfg.vlen)) {
+>> +                error_setg(errp,
+>> +                       "Vector extension VLEN must be power of 2");
+>> +                return;
+>> +            }
+>> +            if (cpu->cfg.vlen > RV_VLEN_MAX || cpu->cfg.vlen < 128) {
+>> +                error_setg(errp,
+>> +                       "Vector extension implementation only supports VLEN "
+>> +                       "in the range [128, %d]", RV_VLEN_MAX);
+>> +                return;
+>> +            }
+>> +            if (!is_power_of_2(cpu->cfg.elen)) {
+>> +                error_setg(errp,
+>> +                       "Vector extension ELEN must be power of 2");
+>> +                return;
+>> +            }
+>> +            if (cpu->cfg.elen > 64) {
+>> +                error_setg(errp,
+>> +                       "Vector extension ELEN must <= 64");
+>> +                return;
+>> +            }
+>> +        }
+>>
+>>           set_misa(env, RVXLEN | target_misa);
+>>       }
+>> @@ -444,10 +484,14 @@ static Property riscv_cpu_properties[] = {
+>>       DEFINE_PROP_BOOL("c", RISCVCPU, cfg.ext_c, true),
+>>       DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+>>       DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>> +    DEFINE_PROP_BOOL("v", RISCVCPU, cfg.ext_v, false),
+>>       DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+>>       DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+>>       DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+>>       DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>> +    DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
+>> +    DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
+>> +    DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
+>>       DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>>       DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+>>       DEFINE_PROP_END_OF_LIST(),
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index 07e63016a7..bf2b4b55af 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -64,6 +64,7 @@
+>>   #define RVA RV('A')
+>>   #define RVF RV('F')
+>>   #define RVD RV('D')
+>> +#define RVV RV('V')
+>>   #define RVC RV('C')
+>>   #define RVS RV('S')
+>>   #define RVU RV('U')
+>> @@ -82,6 +83,8 @@ enum {
+>>   #define PRIV_VERSION_1_10_0 0x00011000
+>>   #define PRIV_VERSION_1_11_0 0x00011100
+>>
+>> +#define VEXT_VERSION_0_07_1 0x00000701
+>> +
+>>   #define TRANSLATE_PMP_FAIL 2
+>>   #define TRANSLATE_FAIL 1
+>>   #define TRANSLATE_SUCCESS 0
+>> @@ -118,6 +121,7 @@ struct CPURISCVState {
+>>       target_ulong badaddr;
+>>
+>>       target_ulong priv_ver;
+>> +    target_ulong vext_ver;
+>>       target_ulong misa;
+>>       target_ulong misa_mask;
+>>
+>> @@ -226,12 +230,16 @@ typedef struct RISCVCPU {
+>>           bool ext_c;
+>>           bool ext_s;
+>>           bool ext_u;
+>> +        bool ext_v;
+>>           bool ext_counters;
+>>           bool ext_ifencei;
+>>           bool ext_icsr;
+>>
+>>           char *priv_spec;
+>>           char *user_spec;
+>> +        char *vext_spec;
+>> +        uint16_t vlen;
+>> +        uint16_t elen;
+>>           bool mmu;
+>>           bool pmp;
+>>       } cfg;
+>> --
+>> 2.23.0
+>>
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Km1U/tdNT/EmXiR1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5Mbp8ACgkQbDjKyiDZ
-s5IQFBAAo71MDokHGSEXfs3WsberDJJyNCDPh/OeDohRBiN0sNgK0QW3sQIXw/Pe
-hj9kumiwxpVpIFtGIVQElh+Pvdrkn6BkFizApXKdTL5Prup0+8l2Jki/p3OgdY+3
-HnsX8iINnD19QSCbrVDjfbgjmTit15QvTNToW6Tc1FNKbEe7MdRiXnLViszaOhOp
-uIFK6IqfRFKLKFecGSzTJ4ywIN6adA4LWIzp4sM0QBVndGQyKyqo1A8UJWXOSM77
-GvHpS2VL5odlH5iRf3rqTVH1t9zmaiVh4RGiOdDyC3m14mZ/0QP+um4ihcaQG5jD
-57LuG0Q++8welFKnyyQicSKJtNGVaQgCo7gUfzXbvBA4DMx5bEv2t/c4bmrQ8qPT
-kbyKn353p/TkEYMdHTjVLhAkRmpNUFi0ylQnqp50lK1yBj5gDAgC4qLGOgw8y9XS
-u5YWjvVgRrku8HexeINq7EAzPXF1VXDOLPXpj6N5Uc+MoVfWz+PkPvigkRCInEF3
-Sx8nCk33OwER0bzX1C3J2hzRHqtAji9P+4k9uTILWo3uRFzVZjGQz19gotDQulOX
-PeLhO+SgUOp5v+tvDtUv1PXwQ1uHUqvczqNMnZTv1ex8ke4a39zM5YtBtcsa4C1c
-e0tGKn6F+uL6yU8Fsb+9i6DK3kqefhlZo6rEpQdo+Pw7WS+Sk9o=
-=sPnh
------END PGP SIGNATURE-----
-
---Km1U/tdNT/EmXiR1--
 
