@@ -2,87 +2,79 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DBCC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A47C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:49:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CEF620578
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:48:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C80D20578
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:49:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gCkN7ke8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEF620578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIEnSL6+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C80D20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SWn-0004tz-93
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:48:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41945)
+	id 1j4SX4-0005cD-L0
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:49:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1j4SOD-0002xK-Kw
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:59 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rwq-0005DR-Cp
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1j4SOB-00081R-W6
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:57 -0500
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:43959)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1j4SOB-00080y-OC
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:39:55 -0500
-Received: by mail-pf1-x431.google.com with SMTP id s1so313524pfh.10
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 08:39:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ebGq32l0nFHilBZHXJSmVFGGc6KeoYEINrsNMAqI2qk=;
- b=gCkN7ke8S9LuLDuubL2fV4vxQC2ve0J+uVGkTjMCy2x45hMnq2zNxVPNsR9Er8t2OE
- e7RrpNdKEUSLvF6g2uGFC97KeMNKQAt5G/Sc0k/0tvu5SqvMdhlEA34quhpqD+1sl0PN
- AJ1gTzcZ2QEsn+VtfJwtKMN+ovcwqcHzsKOrTuZIPgkpR6ezAcSFJ11HP6kCuzc6kt6f
- ZuS92caSN/JNchV0vhhWMi4rtOCeiDIuCaAdJV9BgxcjOAMeU9BjL9cflZPAVpHzY3u0
- KC7PN3YpJAY8VbxDNoyiW2eo0ni3/e2+7jfkmMIPdwHgqRRq4iwBNSBmRm56nHMvQY9D
- RqsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ebGq32l0nFHilBZHXJSmVFGGc6KeoYEINrsNMAqI2qk=;
- b=gYp+F5ywygxzdQNFuDFPsSEPEShq8BOs8t4Lx3Ca7tHm4A07mPY1xPxnRPI0WT2YOQ
- LLSQSy2hKagLW2fwZd6HYa+WRzaA4TWe4dSipW0DTR8uTdhCDEo7niwdIltNxBAkWuJ1
- bRvuJvGG+HopKdaTlES/mSYW/xCxr62DsNHCOzPgMZoxi/mbps6vB0jiQKXi9GQpRfts
- dLIdDKtnYb/4EQdbx2tWym/RRxMYkL0sbqFZe1tlLb6ngoJ+RDZm7gbtZ4Okcc6Q+y5c
- Lzmdbxl07PCQLePtMuk0A9evGi6MGP+HChIWagH0b/L+ph3LMJ8nG+gwIXQ6kE2Rc1Yj
- 5uJQ==
-X-Gm-Message-State: APjAAAX05x7X0zZT7MtEij9OL+U9j7N6cg4mL1yQmlpxP21oue63IT1y
- El5fwgqZfXj9tpFIsANTRdBBi5EUyNE=
-X-Google-Smtp-Source: APXvYqz1M2QtFpW+KYR68gLmFhTl5o1yKAtGdzXMM7ImKgTmZKBgbG06+a+wWLpm40126SvUxCbb4A==
-X-Received: by 2002:a65:4d0d:: with SMTP id i13mr28300362pgt.346.1582130394277; 
- Wed, 19 Feb 2020 08:39:54 -0800 (PST)
-Received: from Rfoley-MA01.hsd1.ma.comcast.net
- ([2601:199:4480:60c0:3cc2:5eb7:e248:ad23])
- by smtp.gmail.com with ESMTPSA id a69sm112362pfa.129.2020.02.19.08.39.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Feb 2020 08:39:53 -0800 (PST)
-From: Robert Foley <robert.foley@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1j4Rwo-0001eD-PP
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38839
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rwo-0001dS-8O
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582128697;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bzAatiQ3b3JR/TApnjrBgR6Kzzm00bm5+ey2PEus7Xs=;
+ b=aIEnSL6+cLntAQwjx/ZTAkctym1L0WRJ2RF4iT7Nzghv5a7plrO7GmPNigBud52RpMiXyC
+ XTsXlrhrSx2V2cSqEJEiMVzrmtieoZCGlDRH/diy58p46L2y/0RwCJNO+hkPrj8Z2aMn4o
+ LQ+OrTCprtE3ymNEJm0l0G8vRjunuN8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-lOejzPj1PL2sLJN_CYDe3A-1; Wed, 19 Feb 2020 11:11:29 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D831A8A2498
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:28 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D34F68ECF3;
+ Wed, 19 Feb 2020 16:11:27 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 05/14] tests/vm: Added gen_cloud_init_iso() to basevm.py
-Date: Wed, 19 Feb 2020 11:35:28 -0500
-Message-Id: <20200219163537.22098-6-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200219163537.22098-1-robert.foley@linaro.org>
-References: <20200219163537.22098-1-robert.foley@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::431
+Subject: [PATCH v6 79/79] tests:numa-test: use explicit memdev to specify node
+ RAM
+Date: Wed, 19 Feb 2020 11:09:53 -0500
+Message-Id: <20200219160953.13771-80-imammedo@redhat.com>
+In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
+References: <20200219160953.13771-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: lOejzPj1PL2sLJN_CYDe3A-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,181 +86,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, alex.bennee@linaro.org, robert.foley@linaro.org,
- peter.puhov@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This method was located in both centos and ubuntu.i386.
+Considering that legacy "mem" option is deprecated, use memdev
+in tests and add an additional test for legacy "mem" option
+on old machine type, to make sure it won't regress in the future.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/vm/basevm.py   | 40 ++++++++++++++++++++++++++++++++++++++++
- tests/vm/centos      | 33 +--------------------------------
- tests/vm/ubuntu.i386 | 37 +------------------------------------
- 3 files changed, 42 insertions(+), 68 deletions(-)
+v6:
+  * ammend commit message to no mention 'follow up patches' that
+    were delayed till next release so phrase won't confuse anyone
+v3:
+   * s/strcmp/g_str_equal/
+   * put -object lines before -m
+     (Thomas Huth <thuth@redhat.com>)
+   * drop new test_pc_legacy_mem(), due to dropping
+      "numa: forbid '-numa node,mem' for 5.0 and newer machine types"
+     it will be posted later, when libvirt side is prepared for
+     disabled '-numa node,mem' (hopefully 5.1)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 7f26892268..8400b0e07f 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -345,6 +345,46 @@ class BaseVM(object):
-     def qmp(self, *args, **kwargs):
-         return self._guest.qmp(*args, **kwargs)
- 
-+    def gen_cloud_init_iso(self):
-+        cidir = self._tmpdir
-+        mdata = open(os.path.join(cidir, "meta-data"), "w")
-+        name = self.name.replace(".","-")
-+        mdata.writelines(["instance-id: {}-vm-0\n".format(name),
-+                          "local-hostname: {}-guest\n".format(name)])
-+        mdata.close()
-+        udata = open(os.path.join(cidir, "user-data"), "w")
-+        print("guest user:pw {}:{}".format(self._config['guest_user'],
-+                                           self._config['guest_pass']))
-+        udata.writelines(["#cloud-config\n",
-+                          "chpasswd:\n",
-+                          "  list: |\n",
-+                          "    root:%s\n" % self._config['root_pass'],
-+                          "    %s:%s\n" % (self._config['guest_user'],
-+                                           self._config['guest_pass']),
-+                          "  expire: False\n",
-+                          "users:\n",
-+                          "  - name: %s\n" % self._config['guest_user'],
-+                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-+                          "  - name: root\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % self._config['ssh_pub_key'],
-+                          "locale: en_US.UTF-8\n"])
-+        proxy = os.environ.get("http_proxy")
-+        if not proxy is None:
-+            udata.writelines(["apt:\n",
-+                              "  proxy: %s" % proxy])
-+        udata.close()
-+        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
-+                               "-volid", "cidata", "-joliet", "-rock",
-+                               "user-data", "meta-data"],
-+                               cwd=cidir,
-+                               stdin=self._devnull, stdout=self._stdout,
-+                               stderr=self._stdout)
+CC: thuth@redhat.com
+CC: philmd@redhat.com
+---
+ tests/qtest/numa-test.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
+
+diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+index 35999ea28f..2f9b7f663a 100644
+--- a/tests/qtest/numa-test.c
++++ b/tests/qtest/numa-test.c
+@@ -25,9 +25,8 @@ static void test_mon_explicit(const void *data)
+     g_autofree char *s =3D NULL;
+     g_autofree char *cli =3D NULL;
+=20
+-    cli =3D make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=3D0,cpus=3D0-3 "
+-                   "-numa node,nodeid=3D1,cpus=3D4-7 ");
++    cli =3D make_cli(data, "-smp 8 -numa node,nodeid=3D0,memdev=3Dram,cpus=
+=3D0-3 "
++                         "-numa node,nodeid=3D1,cpus=3D4-7");
+     qts =3D qtest_init(cli);
+=20
+     s =3D qtest_hmp(qts, "info numa");
+@@ -37,13 +36,13 @@ static void test_mon_explicit(const void *data)
+     qtest_quit(qts);
+ }
+=20
+-static void test_mon_default(const void *data)
++static void test_def_cpu_split(const void *data)
+ {
+     QTestState *qts;
+     g_autofree char *s =3D NULL;
+     g_autofree char *cli =3D NULL;
+=20
+-    cli =3D make_cli(data, "-smp 8 -numa node -numa node");
++    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram -numa node");
+     qts =3D qtest_init(cli);
+=20
+     s =3D qtest_hmp(qts, "info numa");
+@@ -60,7 +59,7 @@ static void test_mon_partial(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 8 "
+-                   "-numa node,nodeid=3D0,cpus=3D0-1 "
++                   "-numa node,nodeid=3D0,memdev=3Dram,cpus=3D0-1 "
+                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
+     qts =3D qtest_init(cli);
+=20
+@@ -87,7 +86,8 @@ static void test_query_cpus(const void *data)
+     QTestState *qts;
+     g_autofree char *cli =3D NULL;
+=20
+-    cli =3D make_cli(data, "-smp 8 -numa node,cpus=3D0-3 -numa node,cpus=
+=3D4-7");
++    cli =3D make_cli(data, "-smp 8 -numa node,memdev=3Dram,cpus=3D0-3 "
++                         "-numa node,cpus=3D4-7");
+     qts =3D qtest_init(cli);
+     cpus =3D get_cpus(qts, &resp);
+     g_assert(cpus);
+@@ -125,7 +125,7 @@ static void pc_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-cpu pentium -smp 8,sockets=3D2,cores=3D2,thre=
+ads=3D2 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D1,socket-id=3D0 "
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D0 "
+         "-numa cpu,node-id=3D0,socket-id=3D1,core-id=3D1,thread-id=3D0 "
+@@ -178,7 +178,7 @@ static void spapr_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 4,cores=3D4 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D0,core-id=3D0 "
+         "-numa cpu,node-id=3D0,core-id=3D1 "
+         "-numa cpu,node-id=3D0,core-id=3D2 "
+@@ -223,7 +223,7 @@ static void aarch64_numa_cpu(const void *data)
+     g_autofree char *cli =3D NULL;
+=20
+     cli =3D make_cli(data, "-smp 2 "
+-        "-numa node,nodeid=3D0 -numa node,nodeid=3D1 "
++        "-numa node,nodeid=3D0,memdev=3Dram -numa node,nodeid=3D1 "
+         "-numa cpu,node-id=3D1,thread-id=3D0 "
+         "-numa cpu,node-id=3D0,thread-id=3D1");
+     qts =3D qtest_init(cli);
+@@ -270,7 +270,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
+=20
+     /* create 2 numa nodes */
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+-        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
++        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'ram' } }"=
+)));
+     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+         " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
+=20
+@@ -542,13 +542,19 @@ int main(int argc, char **argv)
+     g_autoptr(GString) args =3D g_string_new(NULL);
+     const char *arch =3D qtest_get_arch();
+=20
++    if (g_str_equal(arch, "ppc64")) {
++        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
+=3D512M");
++    } else {
++        g_string_append(args, " -object memory-backend-ram,id=3Dram,size=
+=3D128M");
++    }
 +
-+        return os.path.join(cidir, "cloud-init.iso")
-+
- def parse_args(vmcls):
- 
-     def get_default_jobs():
-diff --git a/tests/vm/centos b/tests/vm/centos
-index a41ff109eb..0ad4ecf419 100755
---- a/tests/vm/centos
-+++ b/tests/vm/centos
-@@ -31,37 +31,6 @@ class CentosVM(basevm.BaseVM):
-         make docker-test-mingw@fedora  {verbose} J={jobs} NETWORK=1;
-     """
- 
--    def _gen_cloud_init_iso(self):
--        cidir = self._tmpdir
--        mdata = open(os.path.join(cidir, "meta-data"), "w")
--        mdata.writelines(["instance-id: centos-vm-0\n",
--                          "local-hostname: centos-guest\n"])
--        mdata.close()
--        udata = open(os.path.join(cidir, "user-data"), "w")
--        udata.writelines(["#cloud-config\n",
--                          "chpasswd:\n",
--                          "  list: |\n",
--                          "    root:%s\n" % self.ROOT_PASS,
--                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
--                          "  expire: False\n",
--                          "users:\n",
--                          "  - name: %s\n" % self.GUEST_USER,
--                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "  - name: root\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "locale: en_US.UTF-8\n"])
--        udata.close()
--        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
--                               "-volid", "cidata", "-joliet", "-rock",
--                               "user-data", "meta-data"],
--                               cwd=cidir,
--                               stdin=self._devnull, stdout=self._stdout,
--                               stderr=self._stdout)
--        return os.path.join(cidir, "cloud-init.iso")
--
-     def build_image(self, img):
-         cimg = self._download_with_cache("https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1802.qcow2.xz")
-         img_tmp = img + ".tmp"
-@@ -69,7 +38,7 @@ class CentosVM(basevm.BaseVM):
-         subprocess.check_call(["ln", "-f", cimg, img_tmp + ".xz"])
-         subprocess.check_call(["xz", "--keep", "-dvf", img_tmp + ".xz"])
-         self.exec_qemu_img("resize", img_tmp, "50G")
--        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
-+        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
-         self.wait_ssh()
-         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-         self.ssh_root_check("yum update -y")
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index 48e9cb1ad3..3266038fbd 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -29,41 +29,6 @@ class UbuntuX86VM(basevm.BaseVM):
-         make --output-sync {target} -j{jobs} {verbose};
-     """
- 
--    def _gen_cloud_init_iso(self):
--        cidir = self._tmpdir
--        mdata = open(os.path.join(cidir, "meta-data"), "w")
--        mdata.writelines(["instance-id: ubuntu-vm-0\n",
--                          "local-hostname: ubuntu-guest\n"])
--        mdata.close()
--        udata = open(os.path.join(cidir, "user-data"), "w")
--        udata.writelines(["#cloud-config\n",
--                          "chpasswd:\n",
--                          "  list: |\n",
--                          "    root:%s\n" % self.ROOT_PASS,
--                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
--                          "  expire: False\n",
--                          "users:\n",
--                          "  - name: %s\n" % self.GUEST_USER,
--                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "  - name: root\n",
--                          "    ssh-authorized-keys:\n",
--                          "    - %s\n" % basevm.SSH_PUB_KEY,
--                          "locale: en_US.UTF-8\n"])
--        proxy = os.environ.get("http_proxy")
--        if not proxy is None:
--            udata.writelines(["apt:\n",
--                              "  proxy: %s" % proxy])
--        udata.close()
--        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
--                               "-volid", "cidata", "-joliet", "-rock",
--                               "user-data", "meta-data"],
--                               cwd=cidir,
--                               stdin=self._devnull, stdout=self._stdout,
--                               stderr=self._stdout)
--        return os.path.join(cidir, "cloud-init.iso")
--
-     def build_image(self, img):
-         cimg = self._download_with_cache(
-             "https://cloud-images.ubuntu.com/releases/bionic/release-20191114/ubuntu-18.04-server-cloudimg-i386.img",
-@@ -71,7 +36,7 @@ class UbuntuX86VM(basevm.BaseVM):
-         img_tmp = img + ".tmp"
-         subprocess.check_call(["cp", "-f", cimg, img_tmp])
-         self.exec_qemu_img("resize", img_tmp, "50G")
--        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
-+        self.boot(img_tmp, extra_args = ["-cdrom", self.gen_cloud_init_iso()])
-         self.wait_ssh()
-         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-         self.ssh_root_check("apt-get update")
--- 
-2.17.1
+     if (g_str_equal(arch, "aarch64")) {
+         g_string_append(args, " -machine virt");
+     }
+=20
+     g_test_init(&argc, &argv, NULL);
+=20
+-    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
++    qtest_add_data_func("/numa/mon/cpus/default", args, test_def_cpu_split=
+);
+     qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit=
+);
+     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
+     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus=
+);
+--=20
+2.18.1
 
 
