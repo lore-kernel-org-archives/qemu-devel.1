@@ -2,127 +2,64 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC77C34050
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A4CC34022
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:58:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD134208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:50:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GocjlIdG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD134208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD3782176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 08:58:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3782176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4L3a-00028l-0P
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:50:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38269)
+	id 1j4LBp-0005s7-1P
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 03:58:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j4L2t-0001iI-K5
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:49:28 -0500
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j4LB4-0004w8-6v
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:57:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j4L2s-0005N3-I5
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:49:27 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27763
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j4LB1-0000oq-JF
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:57:53 -0500
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:51920)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4L2s-0005Mh-EY
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 03:49:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582102165;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=6BhqUosXheQNDlmi6sTesgO/JCbWXf5uCYOusdS5Neg=;
- b=GocjlIdGcl4xYrqcySy0jKD7YJxkG9Aw4FGKUKO5iWFjx1Y9C2zK3gQD4ak9tou41d4xPa
- L1zBL3Io5MDZf/y017zh4G48kjfB8hc62B0sW+Kb9G40c/om7Pg0M1DWeQ1yFjHIrQjTNR
- YTvcZmzg5SVOYAZGGhW4tpqs71Iq8PU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-l5QxO0DpOdSoojMW-e7xkg-1; Wed, 19 Feb 2020 03:49:24 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E811E100550E;
- Wed, 19 Feb 2020 08:49:22 +0000 (UTC)
-Received: from [10.36.116.151] (ovpn-116-151.ams2.redhat.com [10.36.116.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D37C262660;
- Wed, 19 Feb 2020 08:49:10 +0000 (UTC)
-Subject: Re: [PATCH v2 fixed 03/16] util: vfio-helpers: Remove Error parameter
- from qemu_vfio_undo_mapping()
-To: Peter Xu <peterx@redhat.com>
-References: <20200212134254.11073-1-david@redhat.com>
- <20200212134254.11073-4-david@redhat.com> <20200218220746.GG7090@xz-x1>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <9d46cdd5-12c2-cc3c-31e3-994a9afe8244@redhat.com>
-Date: Wed, 19 Feb 2020 09:49:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1j4LB0-0000j4-RV; Wed, 19 Feb 2020 03:57:51 -0500
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.156279-0.0175105-0.82621;
+ DS=CONTINUE|ham_regular_dialog|0.0025126-0.000487853-0.997;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16370; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=8; RT=8; SR=0; TI=SMTPD_---.GpeGyvm_1582102663; 
+Received: from 30.39.130.137(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GpeGyvm_1582102663)
+ by smtp.aliyun-inc.com(10.147.40.200);
+ Wed, 19 Feb 2020 16:57:44 +0800
+Subject: Re: [PATCH v3 1/5] target/riscv: add vector unit stride load and
+ store instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200210074256.11412-1-zhiwei_liu@c-sky.com>
+ <20200210074256.11412-2-zhiwei_liu@c-sky.com>
+ <9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <a76824fb-3608-2b30-fe8f-ac705b73e42a@c-sky.com>
+Date: Wed, 19 Feb 2020 16:57:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200218220746.GG7090@xz-x1>
+In-Reply-To: <9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org>
+Content-Type: multipart/alternative;
+ boundary="------------BDA17EA78D28803C57DE9B44"
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: l5QxO0DpOdSoojMW-e7xkg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,62 +71,596 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18.02.20 23:07, Peter Xu wrote:
-> On Wed, Feb 12, 2020 at 02:42:41PM +0100, David Hildenbrand wrote:
->> Everybody discards the error. Let's error_report() instead so this error
->> doesn't get lost.
->>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->=20
-> IMHO error_setg() should be preferred comparing to error_report()
-> because it has a context to be delivered to the caller, so the error
-> has a better chance to be used in a better way (e.g., QMP only
-> supports error_setg()).
+This is a multi-part message in MIME format.
+--------------BDA17EA78D28803C57DE9B44
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Please note that I decided to go for error_report() because that's also
-what's being done in the matching opposite way: qemu_vfio_do_mapping().
+Hi, Richard
+Thanks for your informative comments. I'm addressing these comments.
+And a little confused in some comments.
+On 2020/2/12 14:38, Richard Henderson wrote:
+> On 2/9/20 11:42 PM, LIU Zhiwei wrote:
+>> +/*
+>> + * As simd_desc supports at most 256 bytes, and in this implementation,
+>> + * the max vector group length is 2048 bytes. So split it into two parts.
+>> + *
+>> + * The first part is floor(maxsz, 64), encoded in maxsz of simd_desc.
+>> + * The second part is (maxsz % 64) >> 3, encoded in data of simd_desc.
+>> + */
+>> +static uint32_t maxsz_part1(uint32_t maxsz)
+>> +{
+>> +    return ((maxsz & ~(0x3f)) >> 3) + 0x8; /* add offset 8 to avoid return 0 */
+>> +}
+>> +
+>> +static uint32_t maxsz_part2(uint32_t maxsz)
+>> +{
+>> +    return (maxsz & 0x3f) >> 3;
+>> +}
+> I would much rather adjust simd_desc to support 2048 bytes.
+>
+> I've just posted a patch set that removes an assert in target/arm that would
+> trigger if SIMD_DATA_SHIFT was increased to make room for a larger oprsz.
+>
+> Or, since we're not going through tcg_gen_gvec_* for ldst, don't bother with
+> simd_desc at all, and just pass vlen, unencoded.
+>
+>> +/* define check conditions data structure */
+>> +struct vext_check_ctx {
+>> +
+>> +    struct vext_reg {
+>> +        uint8_t reg;
+>> +        bool widen;
+>> +        bool need_check;
+>> +    } check_reg[6];
+>> +
+>> +    struct vext_overlap_mask {
+>> +        uint8_t reg;
+>> +        uint8_t vm;
+>> +        bool need_check;
+>> +    } check_overlap_mask;
+>> +
+>> +    struct vext_nf {
+>> +        uint8_t nf;
+>> +        bool need_check;
+>> +    } check_nf;
+>> +    target_ulong check_misa;
+>> +
+>> +} vchkctx;
+> You cannot use a global variable.  The data must be thread-safe.
+>
+> If we're going to do the checks this way, with a structure, it needs to be on
+> the stack or within DisasContext.
+>
+>> +#define GEN_VEXT_LD_US_TRANS(NAME, DO_OP, SEQ)                            \
+>> +static bool trans_##NAME(DisasContext *s, arg_r2nfvm* a)                  \
+>> +{                                                                         \
+>> +    vchkctx.check_misa = RVV;                                             \
+>> +    vchkctx.check_overlap_mask.need_check = true;                         \
+>> +    vchkctx.check_overlap_mask.reg = a->rd;                               \
+>> +    vchkctx.check_overlap_mask.vm = a->vm;                                \
+>> +    vchkctx.check_reg[0].need_check = true;                               \
+>> +    vchkctx.check_reg[0].reg = a->rd;                                     \
+>> +    vchkctx.check_reg[0].widen = false;                                   \
+>> +    vchkctx.check_nf.need_check = true;                                   \
+>> +    vchkctx.check_nf.nf = a->nf;                                          \
+>> +                                                                          \
+>> +    if (!vext_check(s)) {                                                 \
+>> +        return false;                                                     \
+>> +    }                                                                     \
+>> +    return DO_OP(s, a, SEQ);                                              \
+>> +}
+> I don't see the improvement from a pointer.  Something like
+>
+>      if (vext_check_isa_ill(s) &&
+>          vext_check_overlap(s, a->rd, a->rm) &&
+>          vext_check_reg(s, a->rd, false) &&
+>          vext_check_nf(s, a->nf)) {
+>          return DO_OP(s, a, SEQ);
+>      }
+>      return false;
+>
+> seems just as clear without the extra data.
+>
+>> +#ifdef CONFIG_USER_ONLY
+>> +#define MO_SB 0
+>> +#define MO_LESW 0
+>> +#define MO_LESL 0
+>> +#define MO_LEQ 0
+>> +#define MO_UB 0
+>> +#define MO_LEUW 0
+>> +#define MO_LEUL 0
+>> +#endif
+> What is this for?  We already define these unconditionally.
+>
+>
+>> +static inline int vext_elem_mask(void *v0, int mlen, int index)
+>> +{
+>> +    int idx = (index * mlen) / 8;
+>> +    int pos = (index * mlen) % 8;
+>> +
+>> +    return (*((uint8_t *)v0 + idx) >> pos) & 0x1;
+>> +}
+> This is a little-endian indexing of the mask.  Just above we talk about using a
+> host-endian ordering of uint64_t.
+>
+> Thus this must be based on uint64_t instead of uint8_t.
+>
+>> +/*
+>> + * This function checks watchpoint before really load operation.
+>> + *
+>> + * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
+>> + * In user mode, there is no watchpoint support now.
+>> + *
+>> + * It will triggle an exception if there is no mapping in TLB
+>> + * and page table walk can't fill the TLB entry. Then the guest
+>> + * software can return here after process the exception or never return.
+>> + */
+>> +static void probe_read_access(CPURISCVState *env, target_ulong addr,
+>> +        target_ulong len, uintptr_t ra)
+>> +{
+>> +    while (len) {
+>> +        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
+>> +        const target_ulong curlen = MIN(pagelen, len);
+>> +
+>> +        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
+> The return value here is non-null when we can read directly from host memory.
+> It would be a shame to throw that work away.
+>
+>
+>> +/* data structure and common functions for load and store */
+>> +typedef void vext_ld_elem_fn(CPURISCVState *env, target_ulong addr,
+>> +        uint32_t idx, void *vd, uintptr_t retaddr);
+>> +typedef void vext_st_elem_fn(CPURISCVState *env, target_ulong addr,
+>> +        uint32_t idx, void *vd, uintptr_t retaddr);
+>> +typedef target_ulong vext_get_index_addr(target_ulong base,
+>> +        uint32_t idx, void *vs2);
+>> +typedef void vext_ld_clear_elem(void *vd, uint32_t idx,
+>> +        uint32_t cnt, uint32_t tot);
+>> +
+>> +struct vext_ldst_ctx {
+>> +    struct vext_common_ctx vcc;
+>> +    uint32_t nf;
+>> +    target_ulong base;
+>> +    target_ulong stride;
+>> +    int mmuidx;
+>> +
+>> +    vext_ld_elem_fn *ld_elem;
+>> +    vext_st_elem_fn *st_elem;
+>> +    vext_get_index_addr *get_index_addr;
+>> +    vext_ld_clear_elem *clear_elem;
+>> +};
+> I think you should pass these elements directly, as needed, rather than putting
+> them all in a struct.
+>
+> This would allow the main helper function to be inlined, which in turn allows
+> the mini helper functions to be inlined.
+1. What's the main helper function? What's is the mini helper functions 
+here?
 
->=20
-> A better solution is that we deliver the error upper.  For example,
-> qemu_vfio_dma_map() is one caller of qemu_vfio_undo_mapping, if you
-> see the callers of qemu_vfio_dma_map() you'll notice most of them has
-> Error** defined (e.g., nvme_init_queue).  Then we can link all of them
-> up.
+I guess main helper function is such code like:
 
-Propagating errors is helpful if the caller can actually do something
-with the error. If it's a function that's supposed to never fail (which
-is the case here obviously), then there is not much benefit in doing so.
+    #define GEN_VEXT_LD_UNIT_STRIDE(NAME, MTYPE, ETYPE)                \
+    void HELPER(NAME##_mask)(void *vd, target_ulong base, void *v0, \
+             CPURISCVState *env, uint32_t
+    desc)                                              \
+    { \
+         static struct vext_ldst_ctx ctx;                                \
+         vext_common_ctx_init(&ctx.vcc, sizeof(ETYPE),                 
+                    \
+             sizeof(MTYPE), env->vl, desc);                               \
+         ctx.nf = vext_nf(desc);                                  \
+         ctx.base = base;                                     \
+         ctx.ld_elem = vext_##NAME##_ld_elem;                  \
+         ctx.clear_elem = vext_##NAME##_clear_elem;               \
+       \
+         vext_ld_unit_stride_mask(vd, v0, env, &ctx, GETPC());          
+                 \
+    } \
 
->=20
-> Another lazy solution (and especially if vfio-helpers are still mostly
-> used only by advanced users) is we can simply pass in &error_abort for
-> the three callers then they won't be missed...
+And the mini helper function is such code like:
 
-I prefer this variant, as it matches qemu_vfio_do_mapping() - except
-that we don't report -errno - which is fine, because the function is
-expected to not fail in any sane use case.
+    static void vext_ld_unit_stride_mask(void *vd, void *v0,
+    CPURISCVState *env,
+             struct vext_ldst_ctx *ctx, uintptr_t ra)
+    {
+         uint32_t i, k;
+         struct vext_common_ctx *s = &ctx->vcc;
 
-Thanks!
+         if (s->vl == 0) {
+             return;
+         }
+         /* probe every access*/
+         for (i = 0; i < s->vl; i++) {
+             if (!s->vm && !vext_elem_mask(v0, s->mlen, i)) {
+                 continue;
+             }
+             probe_read_access(env, ctx->base + ctx->nf * i * s->msz,
+                     ctx->nf * s->msz, ra);
+         }
+         /* load bytes from guest memory */
+         for (i = 0; i < s->vl; i++) {
+             k = 0;
+             if (!s->vm && !vext_elem_mask(v0, s->mlen, i)) {
+                 continue;
+             }
+             while (k < ctx->nf) {
+                 target_ulong addr = ctx->base + (i * ctx->nf + k) * s->msz;
+                 ctx->ld_elem(env, addr, i + k * s->vlmax, vd, ra);
+                 k++;
+             }
+         }
+         /* clear tail elements */
+         for (k = 0; k < ctx->nf; k++) {
+             ctx->clear_elem(vd, s->vl + k * s->vlmax, s->vl * s->esz,
+                     s->vlmax * s->esz);
+         }
+    }
 
---=20
-Thanks,
+Is it right?
+2.  The number of  parameters grows a lot when pass directly to mini 
+helper functions.
 
-David / dhildenb
+For example, the number of parameters increases from 5 to 11.
 
+    static void vext_ld_unit_stride(void *vd, target_ulong base, void *v0,
+             CPURISCVState *env,  vext_ld_elem_fn *ld_elem,
+             vext_ld_clear_elem *clear_elem，uint32_t vlmax,
+             uint32_t nf, uint32_t esz, uint32_t msz, uintptr_t ra)
+
+
+As vlmax and nf can be extracted  from desc, another form of mini helper
+will increases the number of parameters from 5 to 10.
+
+Is it OK?
+
+BTW: In this patchset, I use a lot macros to generate code.  Is it OK?
+
+Best Regards,
+Zhiwei
+>
+> r~
+
+
+--------------BDA17EA78D28803C57DE9B44
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    Hi, Richard<br>
+    Thanks for your informative comments. I'm addressing these comments.
+    <br>
+    And a little confused in some comments.<br>
+    <div class="moz-cite-prefix">On 2020/2/12 14:38, Richard Henderson
+      wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org">
+      <pre class="moz-quote-pre" wrap="">On 2/9/20 11:42 PM, LIU Zhiwei wrote:
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/*
++ * As simd_desc supports at most 256 bytes, and in this implementation,
++ * the max vector group length is 2048 bytes. So split it into two parts.
++ *
++ * The first part is floor(maxsz, 64), encoded in maxsz of simd_desc.
++ * The second part is (maxsz % 64) &gt;&gt; 3, encoded in data of simd_desc.
++ */
++static uint32_t maxsz_part1(uint32_t maxsz)
++{
++    return ((maxsz &amp; ~(0x3f)) &gt;&gt; 3) + 0x8; /* add offset 8 to avoid return 0 */
++}
++
++static uint32_t maxsz_part2(uint32_t maxsz)
++{
++    return (maxsz &amp; 0x3f) &gt;&gt; 3;
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I would much rather adjust simd_desc to support 2048 bytes.
+
+I've just posted a patch set that removes an assert in target/arm that would
+trigger if SIMD_DATA_SHIFT was increased to make room for a larger oprsz.
+
+Or, since we're not going through tcg_gen_gvec_* for ldst, don't bother with
+simd_desc at all, and just pass vlen, unencoded.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/* define check conditions data structure */
++struct vext_check_ctx {
++
++    struct vext_reg {
++        uint8_t reg;
++        bool widen;
++        bool need_check;
++    } check_reg[6];
++
++    struct vext_overlap_mask {
++        uint8_t reg;
++        uint8_t vm;
++        bool need_check;
++    } check_overlap_mask;
++
++    struct vext_nf {
++        uint8_t nf;
++        bool need_check;
++    } check_nf;
++    target_ulong check_misa;
++
++} vchkctx;
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+You cannot use a global variable.  The data must be thread-safe.
+
+If we're going to do the checks this way, with a structure, it needs to be on
+the stack or within DisasContext.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+#define GEN_VEXT_LD_US_TRANS(NAME, DO_OP, SEQ)                            \
++static bool trans_##NAME(DisasContext *s, arg_r2nfvm* a)                  \
++{                                                                         \
++    vchkctx.check_misa = RVV;                                             \
++    vchkctx.check_overlap_mask.need_check = true;                         \
++    vchkctx.check_overlap_mask.reg = a-&gt;rd;                               \
++    vchkctx.check_overlap_mask.vm = a-&gt;vm;                                \
++    vchkctx.check_reg[0].need_check = true;                               \
++    vchkctx.check_reg[0].reg = a-&gt;rd;                                     \
++    vchkctx.check_reg[0].widen = false;                                   \
++    vchkctx.check_nf.need_check = true;                                   \
++    vchkctx.check_nf.nf = a-&gt;nf;                                          \
++                                                                          \
++    if (!vext_check(s)) {                                                 \
++        return false;                                                     \
++    }                                                                     \
++    return DO_OP(s, a, SEQ);                                              \
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I don't see the improvement from a pointer.  Something like
+
+    if (vext_check_isa_ill(s) &amp;&amp;
+        vext_check_overlap(s, a-&gt;rd, a-&gt;rm) &amp;&amp;
+        vext_check_reg(s, a-&gt;rd, false) &amp;&amp;
+        vext_check_nf(s, a-&gt;nf)) {
+        return DO_OP(s, a, SEQ);
+    }
+    return false;
+
+seems just as clear without the extra data.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+#ifdef CONFIG_USER_ONLY
++#define MO_SB 0
++#define MO_LESW 0
++#define MO_LESL 0
++#define MO_LEQ 0
++#define MO_UB 0
++#define MO_LEUW 0
++#define MO_LEUL 0
++#endif
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+What is this for?  We already define these unconditionally.
+
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static inline int vext_elem_mask(void *v0, int mlen, int index)
++{
++    int idx = (index * mlen) / 8;
++    int pos = (index * mlen) % 8;
++
++    return (*((uint8_t *)v0 + idx) &gt;&gt; pos) &amp; 0x1;
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+This is a little-endian indexing of the mask.  Just above we talk about using a
+host-endian ordering of uint64_t.
+
+Thus this must be based on uint64_t instead of uint8_t.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/*
++ * This function checks watchpoint before really load operation.
++ *
++ * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
++ * In user mode, there is no watchpoint support now.
++ *
++ * It will triggle an exception if there is no mapping in TLB
++ * and page table walk can't fill the TLB entry. Then the guest
++ * software can return here after process the exception or never return.
++ */
++static void probe_read_access(CPURISCVState *env, target_ulong addr,
++        target_ulong len, uintptr_t ra)
++{
++    while (len) {
++        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
++        const target_ulong curlen = MIN(pagelen, len);
++
++        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+The return value here is non-null when we can read directly from host memory.
+It would be a shame to throw that work away.
+
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/* data structure and common functions for load and store */
++typedef void vext_ld_elem_fn(CPURISCVState *env, target_ulong addr,
++        uint32_t idx, void *vd, uintptr_t retaddr);
++typedef void vext_st_elem_fn(CPURISCVState *env, target_ulong addr,
++        uint32_t idx, void *vd, uintptr_t retaddr);
++typedef target_ulong vext_get_index_addr(target_ulong base,
++        uint32_t idx, void *vs2);
++typedef void vext_ld_clear_elem(void *vd, uint32_t idx,
++        uint32_t cnt, uint32_t tot);
++
++struct vext_ldst_ctx {
++    struct vext_common_ctx vcc;
++    uint32_t nf;
++    target_ulong base;
++    target_ulong stride;
++    int mmuidx;
++
++    vext_ld_elem_fn *ld_elem;
++    vext_st_elem_fn *st_elem;
++    vext_get_index_addr *get_index_addr;
++    vext_ld_clear_elem *clear_elem;
++};
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I think you should pass these elements directly, as needed, rather than putting
+them all in a struct.
+
+This would allow the main helper function to be inlined, which in turn allows
+the mini helper functions to be inlined.
+</pre>
+    </blockquote>
+    1. What's the main helper function? What's is the mini helper
+    functions here?<br>
+    <br>
+    I guess main helper function is such code like:<br>
+    <br>
+    <blockquote>#define GEN_VEXT_LD_UNIT_STRIDE(NAME, MTYPE,
+      ETYPE)                \<br>
+      void HELPER(NAME##_mask)(void *vd, target_ulong base, void *v0,  
+      \<br>
+              CPURISCVState *env, uint32_t
+      desc)                                              \<br>
+{                                                                                                             
+      \<br>
+          static struct vext_ldst_ctx ctx;                             
+                                     \<br>
+          vext_common_ctx_init(&amp;ctx.vcc,
+      sizeof(ETYPE),                                 \<br>
+              sizeof(MTYPE), env-&gt;vl, desc);                        
+                                    \<br>
+          ctx.nf = vext_nf(desc);                                      
+                                       \<br>
+          ctx.base = base;                                             
+                                          \<br>
+          ctx.ld_elem = vext_##NAME##_ld_elem;                         
+                       \<br>
+          ctx.clear_elem = vext_##NAME##_clear_elem;                   
+                    \<br>
+                                                                                                            
+        \<br>
+          vext_ld_unit_stride_mask(vd, v0, env, &amp;ctx,
+      GETPC());                       \<br>
+}                                                                                                             
+      \<br>
+    </blockquote>
+    And the mini helper function is such code like:<br>
+    <blockquote>static void vext_ld_unit_stride_mask(void *vd, void *v0,
+      CPURISCVState *env,<br>
+              struct vext_ldst_ctx *ctx, uintptr_t ra)<br>
+      {<br>
+          uint32_t i, k;<br>
+          struct vext_common_ctx *s = &amp;ctx-&gt;vcc;<br>
+      <br>
+          if (s-&gt;vl == 0) {<br>
+              return;<br>
+          }<br>
+          /* probe every access*/<br>
+          for (i = 0; i &lt; s-&gt;vl; i++) {<br>
+              if (!s-&gt;vm &amp;&amp; !vext_elem_mask(v0, s-&gt;mlen,
+      i)) {<br>
+                  continue;<br>
+              }<br>
+              probe_read_access(env, ctx-&gt;base + ctx-&gt;nf * i *
+      s-&gt;msz,<br>
+                      ctx-&gt;nf * s-&gt;msz, ra);<br>
+          }<br>
+          /* load bytes from guest memory */<br>
+          for (i = 0; i &lt; s-&gt;vl; i++) {<br>
+              k = 0;<br>
+              if (!s-&gt;vm &amp;&amp; !vext_elem_mask(v0, s-&gt;mlen,
+      i)) {<br>
+                  continue;<br>
+              }<br>
+              while (k &lt; ctx-&gt;nf) {<br>
+                  target_ulong addr = ctx-&gt;base + (i * ctx-&gt;nf +
+      k) * s-&gt;msz;<br>
+                  ctx-&gt;ld_elem(env, addr, i + k * s-&gt;vlmax, vd,
+      ra);<br>
+                  k++;<br>
+              }<br>
+          }<br>
+          /* clear tail elements */<br>
+          for (k = 0; k &lt; ctx-&gt;nf; k++) {<br>
+              ctx-&gt;clear_elem(vd, s-&gt;vl + k * s-&gt;vlmax,
+      s-&gt;vl * s-&gt;esz,<br>
+                      s-&gt;vlmax * s-&gt;esz);<br>
+          }<br>
+      }<br>
+    </blockquote>
+    Is it right?<br>
+    2.  The number of  parameters grows a lot when pass directly to mini
+    helper functions.<br>
+    <br>
+    For example, the number of parameters increases from 5 to 11. <br>
+    <br>
+    <blockquote>static void vext_ld_unit_stride(void *vd, target_ulong
+      base, void *v0,<br>
+              CPURISCVState *env,  vext_ld_elem_fn *ld_elem, <br>
+              vext_ld_clear_elem *clear_elem，uint32_t vlmax,<br>
+              uint32_t nf, uint32_t esz, uint32_t msz, uintptr_t ra)<br>
+    </blockquote>
+    <br>
+    As vlmax and nf can be extracted  from desc, another form of mini
+    helper <br>
+    will increases the number of parameters from 5 to 10.<br>
+    <br>
+    Is it OK?<br>
+    <br>
+    BTW: In this patchset, I use a lot macros to generate code.  Is it
+    OK?<br>
+    <span style="color: rgb(51, 51, 51); font-family: arial; font-size:
+      13px; font-style: normal; font-variant-ligatures: normal;
+      font-variant-caps: normal; font-weight: 400; letter-spacing:
+      normal; orphans: 2; text-align: start; text-indent: 0px;
+      text-transform: none; white-space: normal; widows: 2;
+      word-spacing: 0px; -webkit-text-stroke-width: 0px;
+      background-color: rgb(255, 255, 255); text-decoration-style:
+      initial; text-decoration-color: initial; display: inline
+      !important; float: none;">
+    </span>
+    <div class="moz-cite-prefix"><br>
+      Best Regards,<br>
+      Zhiwei<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:9054a6fb-adee-4dcc-d7c6-9a974a83668a@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+
+r~
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
+
+--------------BDA17EA78D28803C57DE9B44--
 
