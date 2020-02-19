@@ -2,78 +2,80 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 112B0C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D089BC34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:11:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEEFE24654
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:11:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D78924654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:11:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTwKxOVR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEFE24654
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgvPGXiw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D78924654
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4RwM-0003mb-0A
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:11:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
+	id 1j4RwT-00043z-PG
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:11:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4RvJ-0001us-S3
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:06 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4RvP-00020F-2P
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4RvI-0000TA-N9
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:05 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44947)
+ (envelope-from <imammedo@redhat.com>) id 1j4RvN-0000VZ-R0
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:11 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36634
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RvI-0000St-JI
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:04 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RvN-0000V5-Ne
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128604;
+ s=mimecast20190719; t=1582128609;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DjIYVNrpDNIdl2OX1WAgyvwZjRDXaHnc7xSMfjy5YiU=;
- b=FTwKxOVRz1WTDlZMMkDRpLDs2k1yAPVPLQgWMBwx7pZwoq9I8ijiusHHpDPaNu4IXD51XV
- nhC1J1VaODtIDFHRijHvFXJFimaP052j/xiYHkCTTaNWTHpVjEA26mr47ATK5DaFwIuR9i
- AXR1oRr/Imwu4X6tHGFeZktyi3yW4Pg=
+ bh=ZTDdiBw534Kgpsai00TQOGKgVGGgSTWt8zL34TYXzhQ=;
+ b=MgvPGXiwrlaFtmniE2zDO/9eldbKk30gGoJlnkQb9NoETkrXlD2VDYFepnbxE0l33DPnFu
+ BDoMl6SlseyNV9tjNjSn8BZ1YCNi5X5sPXNoqDK7X7LrvXoYXuAIfXNfdTFybNsJaFG3cp
+ uZVYe0Xd5K4c6MQuP9oZW3ssX8yP5S8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-RusQsXHJPSm9VVfBUeDC7w-1; Wed, 19 Feb 2020 11:10:00 -0500
+ us-mta-331-HR8NVMs9NFCPTo6Z6nBCQw-1; Wed, 19 Feb 2020 11:10:07 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E66D28E131E;
- Wed, 19 Feb 2020 16:09:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5CFBA7613
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:06 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E72EF48;
- Wed, 19 Feb 2020 16:09:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F17B90782;
+ Wed, 19 Feb 2020 16:10:06 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 02/79] machine: introduce memory-backend property
-Date: Wed, 19 Feb 2020 11:08:36 -0500
-Message-Id: <20200219160953.13771-3-imammedo@redhat.com>
+Subject: [PATCH v6 08/79] alpha/dp264: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:08:42 -0500
+Message-Id: <20200219160953.13771-9-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: RusQsXHJPSm9VVfBUeDC7w-1
+X-MC-Unique: HR8NVMs9NFCPTo6Z6nBCQw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,105 +87,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, Paolo Bonzini <pbonzini@redhat.com>,
- ehabkost@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Property will contain link to memory backend that will be
-used for backing initial RAM.
-Follow up commit will alias -mem-path and -mem-prealloc
-CLI options into memory backend options to make memory
-handling consistent (using only hostmem backend family
-for guest RAM allocation).
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v4:
- * make property a string, instead of a link.
-   Fixes -M memory-backend=3Dfoo: foo not found error
-   since foo creation is delayed well beyond point
-   where machine's properties are set
-v3:
- * rename property name from ram-memdev to memory-backend
-   (Paolo Bonzini <pbonzini@redhat.com>)
+ hw/alpha/alpha_sys.h | 2 +-
+ hw/alpha/dp264.c     | 3 ++-
+ hw/alpha/typhoon.c   | 8 ++------
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
-CC: ehabkost@redhat.com
-CC: pbonzini@redhat.com
-CC: pasic@linux.ibm.com
----
- include/hw/boards.h |  2 ++
- hw/core/machine.c   | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
-
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index fb1b43d5b9..7b4b6b79d7 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -4,6 +4,7 @@
- #define HW_BOARDS_H
+diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
+index 95033d7f0b..bc0a286226 100644
+--- a/hw/alpha/alpha_sys.h
++++ b/hw/alpha/alpha_sys.h
+@@ -11,7 +11,7 @@
+ #include "hw/intc/i8259.h"
 =20
- #include "exec/memory.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/accel.h"
- #include "qapi/qapi-types-machine.h"
-@@ -285,6 +286,7 @@ struct MachineState {
-     bool enforce_config_section;
-     bool enable_graphics;
-     char *memory_encryption;
-+    char *ram_memdev_id;
-     DeviceMemoryState *device_memory;
 =20
-     ram_addr_t ram_size;
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 84812a1d1c..1a6e485c87 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -508,6 +508,22 @@ static void validate_sysbus_device(SysBusDevice *sbdev=
-, void *opaque)
-     }
+-PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
++PCIBus *typhoon_init(MemoryRegion *, ISABus **, qemu_irq *, AlphaCPU *[4],
+                      pci_map_irq_fn);
+=20
+ /* alpha_pci.c.  */
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index a8f9a89cc4..8d71a30617 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -75,7 +75,7 @@ static void clipper_init(MachineState *machine)
+     cpus[0]->env.trap_arg2 =3D smp_cpus;
+=20
+     /* Init the chipset.  */
+-    pci_bus =3D typhoon_init(ram_size, &isa_bus, &rtc_irq, cpus,
++    pci_bus =3D typhoon_init(machine->ram, &isa_bus, &rtc_irq, cpus,
+                            clipper_pci_map_irq);
+=20
+     /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
+@@ -183,6 +183,7 @@ static void clipper_machine_init(MachineClass *mc)
+     mc->max_cpus =3D 4;
+     mc->is_default =3D 1;
+     mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
++    mc->default_ram_id =3D "ram";
  }
 =20
-+static char *machine_get_memdev(Object *obj, Error **errp)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    return g_strdup(ms->ram_memdev_id);
-+}
-+
-+static void machine_set_memdev(Object *obj, const char *value, Error **err=
-p)
-+{
-+    MachineState *ms =3D MACHINE(obj);
-+
-+    g_free(ms->ram_memdev_id);
-+    ms->ram_memdev_id =3D g_strdup(value);
-+}
-+
-+
- static void machine_init_notify(Notifier *notifier, void *data)
- {
-     MachineState *machine =3D MACHINE(qdev_get_machine());
-@@ -889,6 +905,14 @@ static void machine_initfn(Object *obj)
-                                         "Table (HMAT)", NULL);
-     }
+ DEFINE_MACHINE("clipper", clipper_machine_init)
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index 179e1f7658..1795e2f29d 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -58,7 +58,6 @@ typedef struct TyphoonState {
+     TyphoonCchip cchip;
+     TyphoonPchip pchip;
+     MemoryRegion dchip_region;
+-    MemoryRegion ram_region;
+ } TyphoonState;
 =20
-+    object_property_add_str(obj, "memory-backend",
-+                            machine_get_memdev, machine_set_memdev,
-+                            &error_abort);
-+    object_property_set_description(obj, "memory-backend",
-+                                    "Set RAM backend"
-+                                    "Valid value is ID of hostmem based ba=
-ckend",
-+                                     &error_abort);
-+
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify =3D machine_init_notify;
-     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
+ /* Called when one of DRIR or DIM changes.  */
+@@ -817,8 +816,7 @@ static void typhoon_alarm_timer(void *opaque)
+     cpu_interrupt(CPU(s->cchip.cpu[cpu]), CPU_INTERRUPT_TIMER);
+ }
+=20
+-PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+-                     qemu_irq *p_rtc_irq,
++PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rtc_=
+irq,
+                      AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
+ {
+     MemoryRegion *addr_space =3D get_system_memory();
+@@ -851,9 +849,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_=
+bus,
+=20
+     /* Main memory region, 0x00.0000.0000.  Real hardware supports 32GB,
+        but the address space hole reserved at this point is 8TB.  */
+-    memory_region_allocate_system_memory(&s->ram_region, OBJECT(s), "ram",
+-                                         ram_size);
+-    memory_region_add_subregion(addr_space, 0, &s->ram_region);
++    memory_region_add_subregion(addr_space, 0, ram);
+=20
+     /* TIGbus, 0x801.0000.0000, 1GB.  */
+     /* ??? The TIGbus is used for delivering interrupts, and access to
 --=20
 2.18.1
 
