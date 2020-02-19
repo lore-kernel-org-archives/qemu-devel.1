@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C643FC34050
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 702B2C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 945F824671
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C2632465D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:27:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSv+fVTC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945F824671
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gu/UUlQS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C2632465D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SB3-0000T2-OY
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:26:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37393)
+	id 1j4SBy-0002Fd-Cl
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:27:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvt-0003FH-TA
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:43 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvy-0003OI-HE
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rvs-0000s9-Og
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:41 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58107
+ (envelope-from <imammedo@redhat.com>) id 1j4Rvw-0000uG-Dy
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:45 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48176
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvs-0000rn-JJ
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:40 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rvw-0000u0-9i
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:10:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128640;
+ s=mimecast20190719; t=1582128643;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y/G/CBjxKd4ihoUEAR+deQzXOyBrQJlzs8zdylC8FZo=;
- b=fSv+fVTCvnI5/p8JIFGKrdBJM6PiaUTd6OYLbWbmvTMuTz4qVKi8eyyRz0lL/ScLRHk+Xi
- WA2EsMnSSX6hIME+y/ebMoEyRWqns1VoB1IWMnKKM0ik38zp2Tq/nc0gy4yABbd9JuqP3h
- 66OeSdXMkjtPj3KjloErfqucAhE0eIM=
+ bh=ReBY8U178xkzXvJqk8y0GAqOdbm312oeVmdVRVGX7kc=;
+ b=gu/UUlQSLBuYtB1CsXS1OkG/4siEMFEmZ6y/bmQzBfZDEXEPQOQ8CkBu8bW9gsQ+Zms8/r
+ 4Ossfh4stOzsO47fEeCQ9P7eWE/bkx76tOOErDIh25Ie7dZXAXJJDtJ/RbMTNrgNS9oshp
+ 3wzLr5+Nt2G9yHY5eMlB4wkmKSEWCEE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-bCG5QCqwM2SlFt6sUpNzWA-1; Wed, 19 Feb 2020 11:10:38 -0500
+ us-mta-121-nbWkORBXM5K-hArJrU9TJQ-1; Wed, 19 Feb 2020 11:10:42 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E2DD8048E3
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EF68B0DF1
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:10:41 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F4A76E3EE;
- Wed, 19 Feb 2020 16:10:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A4606E3EE;
+ Wed, 19 Feb 2020 16:10:40 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 35/79] arm/xilinx_zynq: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:09 -0500
-Message-Id: <20200219160953.13771-36-imammedo@redhat.com>
+Subject: [PATCH v6 39/79] null-machine: use memdev for RAM
+Date: Wed, 19 Feb 2020 11:09:13 -0500
+Message-Id: <20200219160953.13771-40-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: bCG5QCqwM2SlFt6sUpNzWA-1
+X-MC-Unique: nbWkORBXM5K-hArJrU9TJQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
@@ -102,43 +102,38 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/arm/xilinx_zynq.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/core/null-machine.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index f548c44fbd..3d439a45d5 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -160,7 +160,6 @@ static void zynq_init(MachineState *machine)
- {
-     ARMCPU *cpu;
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram =3D g_new(MemoryRegion, 1);
-     DeviceState *dev;
-     SysBusDevice *busdev;
-@@ -190,9 +189,7 @@ static void zynq_init(MachineState *machine)
-     object_property_set_bool(OBJECT(cpu), true, "realized", &error_fatal);
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index 1aa0a9a01a..cb47d9d4f8 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -32,11 +32,8 @@ static void machine_none_init(MachineState *mch)
+     }
 =20
-     /* DDR remapped to address zero.  */
--    memory_region_allocate_system_memory(ext_ram, NULL, "zynq.ext_ram",
--                                         machine->ram_size);
--    memory_region_add_subregion(address_space_mem, 0, ext_ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+     /* RAM at address zero */
+-    if (mch->ram_size) {
+-        MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+-
+-        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_si=
+ze);
+-        memory_region_add_subregion(get_system_memory(), 0, ram);
++    if (mch->ram) {
++        memory_region_add_subregion(get_system_memory(), 0, mch->ram);
+     }
 =20
-     /* 256K of on-chip memory */
-     memory_region_init_ram(ocm_ram, NULL, "zynq.ocm_ram", 256 * KiB,
-@@ -318,6 +315,7 @@ static void zynq_machine_init(MachineClass *mc)
-     mc->no_sdcard =3D 1;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a9");
-+    mc->default_ram_id =3D "zynq.ext_ram";
+     if (mch->kernel_filename) {
+@@ -52,6 +49,7 @@ static void machine_none_machine_init(MachineClass *mc)
+     mc->init =3D machine_none_init;
+     mc->max_cpus =3D 1;
+     mc->default_ram_size =3D 0;
++    mc->default_ram_id =3D "ram";
  }
 =20
- DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+ DEFINE_MACHINE("none", machine_none_machine_init)
 --=20
 2.18.1
 
