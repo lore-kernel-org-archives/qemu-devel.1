@@ -2,65 +2,119 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 268FCC34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB12C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7DBB21D56
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:20:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7DBB21D56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 889E624654
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 13:26:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nlBf13ot"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 889E624654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4PGz-0000QA-5E
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 08:20:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37294)
+	id 1j4PNQ-0005gl-Os
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 08:26:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jianjay.zhou@huawei.com>) id 1j4PGC-0007y4-8d
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:19:29 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4PMW-00053m-1T
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:26:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jianjay.zhou@huawei.com>) id 1j4PG9-00009G-Hp
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:19:27 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2067 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
- id 1j4PG9-0008T0-7Z
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:19:25 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id 07EE585EAA1D8F302C6B;
- Wed, 19 Feb 2020 21:19:14 +0800 (CST)
-Received: from DGGEMM528-MBX.china.huawei.com ([169.254.8.16]) by
- DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0439.000;
- Wed, 19 Feb 2020 21:19:08 +0800
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yA=
-Date: Wed, 19 Feb 2020 13:19:08 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
-References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
- <20200218174311.GE1408806@xz-x1>
-In-Reply-To: <20200218174311.GE1408806@xz-x1>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1j4PMV-0003T7-1B
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 08:25:59 -0500
+Received: from mail-db8eur05on2107.outbound.protection.outlook.com
+ ([40.107.20.107]:28641 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1j4PMQ-0003PI-06; Wed, 19 Feb 2020 08:25:54 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TMjdNJVKmNFuS6eOcCxI5GKa5Gz66xg+Vx4AyEZw5LJTZVcBE6/IbmjMD/L0xC0UgK2r2vlwGjNh/Q8MLBjmgG9xEG/tERhlx15dE9M4Us31eTQxvN14qPoWUri7aKTR8pztQSgPN+UDkl5pX9qejCeUj4l8fuKqE9rT66YXZkR7ZHDU9LOFuD8VhLI2VNPvINOsiGulakJvBin5O2z8wpChg8XvVmwXyQpkulQYw1zz0eQ8Njo2+ZUN8p748MK9BTPMmJKbdiYOT7LxsDdAZHa4JJ5MGEmrZ/ugSZ0tNQ0/whJYhK589lfoBs5KX2B7bKpWtqedJG7rU+sbhyGLjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i5wb2soI0sqaTRygbqg/Sh4FfzaztRSPrXkZM5iciAk=;
+ b=lwYUiFDsb6U4rct8S+KAf1glWXPTH2zpfTqIqp4bOGBw6lvb7zdfu4a4EpzXnNpxAOuo1ryHeI1jksCUwXZkQtGnlSKSGHDgK/6cizGxmnzOPQLwIS0D11Twd6cMT8ehhmKooX843FKsWj0EafH4JUI3K+Cz7ad3IGS7KQ71zVm5kaqmIyYhtYACkY/5CbCyad6CQPOomslpn19V5x2m0snZUwiGfLck1WIgQuuOT0a8w0GPgAmiqSFPf51GtYpeTalsZoq4cFIppiRsJZLYAwDNlyveznMfiDbKpP/jwlPZDerNYShI9zhzVs5Ir/PvjRMs5E2dAj7aonIU6mmmuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i5wb2soI0sqaTRygbqg/Sh4FfzaztRSPrXkZM5iciAk=;
+ b=nlBf13otf7Pjg3FVriub0lLgEVBc61W44ZtLjONzB/eOIq/TlfDtGDMWoNEf7BEMFiMCWEe3xwyfwg0ymXFOP5AcxYdJDvQVRWFTSTUJjTEUxFXLtKVDn7hLOPQPF4ZnMp5mEc/jl/HZqtJUz4g2Tk+KMH5jvcEgVWKZWZXl7EQ=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB3141.eurprd08.prod.outlook.com (52.135.166.31) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.24; Wed, 19 Feb 2020 13:25:51 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::1883:da16:865a:139d%5]) with mapi id 15.20.2729.032; Wed, 19 Feb 2020
+ 13:25:51 +0000
+Subject: Re: [PATCH v2 00/22] Fix error handling during bitmap postcopy
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20200217150246.29180-1-vsementsov@virtuozzo.com>
+ <33fa0ba7-714f-c78d-8ca5-1e15dcef5ac4@virtuozzo.com>
+ <f44bfdb9-0ddc-3b1a-0279-7e9ebd9f399f@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Organization: Virtuozzo
+Message-ID: <b0e67ac9-987b-811e-f0ac-7a9c92a2771a@virtuozzo.com>
+Date: Wed, 19 Feb 2020 16:25:49 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <f44bfdb9-0ddc-3b1a-0279-7e9ebd9f399f@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1P192CA0006.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::16)
+ To AM6PR08MB5048.eurprd08.prod.outlook.com
+ (2603:10a6:20b:ee::31)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.189
+Received: from [172.16.24.225] (185.231.240.5) by
+ HE1P192CA0006.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.17 via Frontend Transport; Wed, 19 Feb 2020 13:25:50 +0000
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7ffe2870-36ed-43e2-fc7b-08d7b53f3d3b
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3141:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB314131494F99528FC29B6F3FF4100@AM6PR08MB3141.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-Forefront-PRVS: 0318501FAE
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(396003)(136003)(376002)(346002)(366004)(39850400004)(189003)(199004)(66476007)(66946007)(8676002)(66556008)(2906002)(31696002)(5660300002)(478600001)(86362001)(7416002)(8936002)(81156014)(81166006)(4744005)(4326008)(31686004)(26005)(36756003)(110136005)(6486002)(316002)(54906003)(44832011)(186003)(36916002)(16526019)(956004)(2616005)(16576012)(53546011)(52116002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3141;
+ H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pJzHnKM2ARR0NKfjfyaN6KJ8vARGXDRj0eMTtP2aok8H6Bhkgq3chAoGY2pc/bO0jFA8uJ5KLXX6w5XZIiHVI1Hk2AabAlnjwJclGVLDERU5Q+JqW4FcXzLC6glKeFGWLAr3C79YSc3ElR0Ew+J1KpZNbE8xgH90iULTBO+14mo64Fo/3AuTSNIvul+0Vtnv6RMmUkDf5LMUa4DCIHajP3OdYDY4NgeVIezkEmUHzFHpFD+EAlqBWxgCV97Nm1Q4GHRD8eeJUB/5vYOsfKD6cnLvNMfj+/pQewcBZaAUPzURre67xsbIr0aEsG7dV11EmkQRmYP+yo989/ANIsHoIOaL+WZ11E54eynmFIaD88RReEZ/+1u8PNS7Yk4dBHKn6+b46XZejlm5rwSdtzmMGnioTcrcWczIjqTyZJyD+6gomBvtvXil2H6ZBLL119XF
+X-MS-Exchange-AntiSpam-MessageData: tPBgSe9U0e14SD3tWVPu3QkD0Z0HyVpMTFB3V51Nn+Xf0PuUZQoDBmScdJ4m1fs2Oskg/Iyk+pb+ojIoPAb7BpDph6wkZmePYllpfx73CEJpTC6SDqVG1y50ZIEd/Us+eFIeE877mctPGIaF7U6h8g==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ffe2870-36ed-43e2-fc7b-08d7b53f3d3b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 13:25:51.2982 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5AhdWu33Wzn1rqkdlWu5JdRBWZYpznk3IpUG8M0oJdIngv7/ULdrsVlBPBJU9Y4rfff6y58xiibN0PUYQjl/fUUxh9PxZXAKND098GDg6vA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3141
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.20.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,94 +126,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Liujinsong \(Paul\)" <liu.jinsong@huawei.com>,
- "linfeng \(M\)" <linfeng23@huawei.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ quintela@redhat.com, qemu-stable@nongnu.org, dgilbert@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgUGV0ZXIsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIg
-WHUgW21haWx0bzpwZXRlcnhAcmVkaGF0LmNvbV0NCj4gU2VudDogV2VkbmVzZGF5LCBGZWJydWFy
-eSAxOSwgMjAyMCAxOjQzIEFNDQo+IFRvOiBaaG91amlhbiAoamF5KSA8amlhbmpheS56aG91QGh1
-YXdlaS5jb20+DQo+IENjOiBrdm1Admdlci5rZXJuZWwub3JnOyBxZW11LWRldmVsQG5vbmdudS5v
-cmc7IHBib256aW5pQHJlZGhhdC5jb207DQo+IGRnaWxiZXJ0QHJlZGhhdC5jb207IHF1aW50ZWxh
-QHJlZGhhdC5jb207IExpdWppbnNvbmcgKFBhdWwpDQo+IDxsaXUuamluc29uZ0BodWF3ZWkuY29t
-PjsgbGluZmVuZyAoTSkgPGxpbmZlbmcyM0BodWF3ZWkuY29tPjsgd2FuZ3hpbiAoVSkNCj4gPHdh
-bmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsgSHVhbmd3ZWlkb25nIChDKQ0KPiA8d2VpZG9uZy5o
-dWFuZ0BodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogUkZDOiBTcGxpdCBFUFQgaHVnZSBwYWdl
-cyBpbiBhZHZhbmNlIG9mIGRpcnR5IGxvZ2dpbmcNCj4gDQo+IE9uIFR1ZSwgRmViIDE4LCAyMDIw
-IGF0IDAxOjEzOjQ3UE0gKzAwMDAsIFpob3VqaWFuIChqYXkpIHdyb3RlOg0KPiA+IEhpIGFsbCwN
-Cj4gPg0KPiA+IFdlIGZvdW5kIHRoYXQgdGhlIGd1ZXN0IHdpbGwgYmUgc29mdC1sb2NrdXAgb2Nj
-YXNpb25hbGx5IHdoZW4gbGl2ZQ0KPiA+IG1pZ3JhdGluZyBhIDYwIHZDUFUsIDUxMkdpQiBodWdl
-IHBhZ2UgYW5kIG1lbW9yeSBzZW5zaXRpdmUgVk0uIFRoZQ0KPiA+IHJlYXNvbiBpcyBjbGVhciwg
-YWxtb3N0IGFsbCBvZiB0aGUgdkNQVXMgYXJlIHdhaXRpbmcgZm9yIHRoZSBLVk0gTU1VDQo+ID4g
-c3Bpbi1sb2NrIHRvIGNyZWF0ZSA0SyBTUFRFcyB3aGVuIHRoZSBodWdlIHBhZ2VzIGFyZSB3cml0
-ZSBwcm90ZWN0ZWQuIFRoaXMNCj4gcGhlbm9tZW5vbiBpcyBhbHNvIGRlc2NyaWJlZCBpbiB0aGlz
-IHBhdGNoIHNldDoNCj4gPiBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL2NvdmVyLzExMTYz
-NDU5Lw0KPiA+IHdoaWNoIGFpbXMgdG8gaGFuZGxlIHBhZ2UgZmF1bHRzIGluIHBhcmFsbGVsIG1v
-cmUgZWZmaWNpZW50bHkuDQo+ID4NCj4gPiBPdXIgaWRlYSBpcyB0byB1c2UgdGhlIG1pZ3JhdGlv
-biB0aHJlYWQgdG8gdG91Y2ggYWxsIG9mIHRoZSBndWVzdA0KPiA+IG1lbW9yeSBpbiB0aGUgZ3Jh
-bnVsYXJpdHkgb2YgNEsgYmVmb3JlIGVuYWJsaW5nIGRpcnR5IGxvZ2dpbmcuIFRvIGJlDQo+ID4g
-bW9yZSBzcGVjaWZpYywgd2Ugc3BsaXQgYWxsIHRoZSBQRFBFX0xFVkVMIFNQVEVzIGludG8gRElS
-RUNUT1JZX0xFVkVMDQo+ID4gU1BURXMgYXMgdGhlIGZpcnN0IHN0ZXAsIGFuZCB0aGVuIHNwbGl0
-IGFsbCB0aGUgRElSRUNUT1JZX0xFVkVMIFNQVEVzIGludG8NCj4gUEFHRV9UQUJMRV9MRVZFTCBT
-UFRFcyBhcyB0aGUgZm9sbG93aW5nIHN0ZXAuDQo+IA0KPiBJSVVDLCBRRU1VIHdpbGwgcHJlZmVy
-IHRvIHVzZSBodWdlIHBhZ2VzIGZvciBhbGwgdGhlIGFub255bW91cyByYW1ibG9ja3MNCj4gKHBs
-ZWFzZSByZWZlciB0byByYW1fYmxvY2tfYWRkKToNCj4gDQo+ICAgICAgICAgcWVtdV9tYWR2aXNl
-KG5ld19ibG9jay0+aG9zdCwgbmV3X2Jsb2NrLT5tYXhfbGVuZ3RoLA0KPiBRRU1VX01BRFZfSFVH
-RVBBR0UpOw0KDQpZZXMsIHlvdSdyZSByaWdodA0KDQo+IA0KPiBBbm90aGVyIGFsdGVybmF0aXZl
-IEkgY2FuIHRoaW5rIG9mIGlzIHRvIGFkZCBhbiBleHRyYSBwYXJhbWV0ZXIgdG8gUUVNVSB0bw0K
-PiBleHBsaWNpdGx5IGRpc2FibGUgaHVnZSBwYWdlcyAoc28gdGhhdCBjYW4gZXZlbiBiZSBNQURW
-X05PSFVHRVBBR0UNCj4gaW5zdGVhZCBvZiBNQURWX0hVR0VQQUdFKS4gIEhvd2V2ZXIgdGhhdCBz
-aG91bGQgYWxzbyBkcmFnIGRvd24gdGhlDQo+IHBlcmZvcm1hbmNlIGZvciB0aGUgd2hvbGUgbGlm
-ZWN5Y2xlIG9mIHRoZSBWTS4gIA0KDQpGcm9tIHRoZSBwZXJmb3JtYW5jZSBwb2ludCBvZiB2aWV3
-LCBpdCBpcyBiZXR0ZXIgdG8ga2VlcCB0aGUgaHVnZSBwYWdlcw0Kd2hlbiB0aGUgVk0gaXMgbm90
-IGluIHRoZSBsaXZlIG1pZ3JhdGlvbiBzdGF0ZS4NCg0KPiBBIDNyZCBvcHRpb24gaXMgdG8gbWFr
-ZSBhIFFNUA0KPiBjb21tYW5kIHRvIGR5bmFtaWNhbGx5IHR1cm4gaHVnZSBwYWdlcyBvbi9vZmYg
-Zm9yIHJhbWJsb2NrcyBnbG9iYWxseS4NCg0KV2UncmUgc2VhcmNoaW5nIGEgZHluYW1pYyBtZXRo
-b2QgdG9vLg0KV2UgcGxhbiB0byBhZGQgdHdvIG5ldyBmbGFncyBmb3IgZWFjaCBtZW1vcnkgc2xv
-dCwgc2F5DQpLVk1fTUVNX0ZPUkNFX1BUX0RJUkVDVE9SWV9QQUdFUyBhbmQNCktWTV9NRU1fRk9S
-Q0VfUFRfUEFHRV9UQUJMRV9QQUdFUy4gVGhlc2UgZmxhZ3MgY2FuIGJlIHNldA0KdGhyb3VnaCBL
-Vk1fU0VUX1VTRVJfTUVNT1JZX1JFR0lPTiBpb2N0bC4NCg0KVGhlIG1hcHBpbmdfbGV2ZWwgd2hp
-Y2ggaXMgY2FsbGVkIGJ5IHRkcF9wYWdlX2ZhdWx0IGluIHRoZSBrZXJuZWwgc2lkZQ0Kd2lsbCBy
-ZXR1cm4gUFRfRElSRUNUT1JZX0xFVkVMIGlmIHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9ESVJFQ1RP
-UllfUEFHRVMgZmxhZyBvZiB0aGUgbWVtb3J5IHNsb3QgaXMNCnNldCwgYW5kIHJldHVybiBQVF9Q
-QUdFX1RBQkxFX0xFVkVMIGlmIHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BBR0VT
-IGZsYWcgaXMgc2V0Lg0KIA0KVGhlIGtleSBzdGVwcyB0byBzcGxpdCB0aGUgaHVnZSBwYWdlcyBp
-biBhZHZhbmNlIG9mIGVuYWJsaW5nIGRpcnR5IGxvZyBpcw0KYXMgZm9sbG93czoNCjEuIFRoZSBt
-aWdyYXRpb24gdGhyZWFkIGluIHVzZXIgc3BhY2UgdXNlcw0KS1ZNX1NFVF9VU0VSX01FTU9SWV9S
-RUdJT04gaW9jdGwgdG8gc2V0IHRoZQ0KS1ZNX01FTV9GT1JDRV9QVF9ESVJFQ1RPUllfUEFHRVMg
-ZmxhZyBmb3IgZWFjaCBtZW1vcnkgc2xvdC4NCjIuIFRoZSBtaWdyYXRpb24gdGhyZWFkIGNvbnRp
-bnVlcyB0byB1c2UgdGhlIEtWTV9TUExJVF9IVUdFX1BBR0VTDQppb2N0bCAod2hpY2ggaXMgbmV3
-bHkgYWRkZWQpIHRvIGRvIHRoZSBzcGxpdHRpbmcgb2YgbGFyZ2UgcGFnZXMgaW4gdGhlDQprZXJu
-ZWwgc2lkZS4NCjMuIEEgbmV3IHZDUFUgaXMgY3JlYXRlZCB0ZW1wb3JhbGx5KGRvIHNvbWUgaW5p
-dGlhbGl6YXRpb24gYnV0IHdpbGwgbm90DQpydW4pIHRvIGhlbHAgdG8gZG8gdGhlIHdvcmssIGku
-ZS4gYXMgdGhlIHBhcmFtZXRlciBvZiB0aGUgdGRwX3BhZ2VfZmF1bHQuDQo0LiBDb2xsZWN0IHRo
-ZSBHUEEgcmFuZ2VzIG9mIGFsbCB0aGUgbWVtb3J5IHNsb3RzIHdpdGggdGhlDQpLVk1fTUVNX0ZP
-UkNFX1BUX0RJUkVDVE9SWV9QQUdFUyBmbGFnIHNldC4NCjUuIFNwbGl0IHRoZSAxRyBodWdlIHBh
-Z2VzKGNvbGxlY3RlZCBpbiBzdGVwIDQpIGludG8gMk0gYnkgY2FsbGluZw0KdGRwX3BhZ2VfZmF1
-bHQsIHNpbmNlIHRoZSBtYXBwaW5nX2xldmVsIHdpbGwgcmV0dXJuDQpQVF9ESVJFQ1RPUllfTEVW
-RUwuIEhlcmUgaXMgdGhlIG1haW4gZGlmZmVyZW5jZSBmcm9tIHRoZSB1c3VhbA0KcGF0aCB3aGlj
-aCBpcyBjYXVzZWQgYnkgdGhlIEd1ZXN0IHNpZGUoRVBUIHZpb2xhdGlvbi9taXNjb25maWcgZXRj
-KSwNCndlIGNhbGwgaXQgZGlyZWN0bHkgaW4gdGhlIGh5cGVydmlzb3Igc2lkZS4NCjYuIERvIHNv
-bWUgY2xlYW51cHMsIGkuZS4gZnJlZSB0aGUgdkNQVSByZWxhdGVkIHJlc291cmNlcw0KNy4gVGhl
-IEtWTV9TUExJVF9IVUdFX1BBR0VTIGlvY3RsIHJldHVybmVkIHRvIHRoZSB1c2VyIHNwYWNlIHNp
-ZGUuDQo4LiBVc2luZyBLVk1fTUVNX0ZPUkNFX1BUX1BBR0VfVEFCTEVfUEFHRVMgaW5zdHJlYWQg
-b2YNCktWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BBR0VTIHRvIHJlcGVhdCBzdGVwIDEgfiBz
-dGVwIDcsDQppbiBzdGVwIDUgdGhlIDJNIGh1Z2UgcGFnZXMgd2lsbCBiZSBzcGxpdHRlZCBpbnRv
-IDRLIHBhZ2VzLg0KOS4gQ2xlYXIgdGhlIEtWTV9NRU1fRk9SQ0VfUFRfRElSRUNUT1JZX1BBR0VT
-IGFuZA0KS1ZNX01FTV9GT1JDRV9QVF9QQUdFX1RBQkxFX1BBR0VTIGZsYWdzIGZvciBlYWNoIG1l
-bW9yeSBzbG90Lg0KMTAuIFRoZW4gdGhlIG1pZ3JhdGlvbiB0aHJlYWQgY2FsbHMgdGhlIGxvZ19z
-dGFydCBpb2N0bCB0byBlbmFibGUgdGhlIGRpcnR5DQpsb2dnaW5nLCBhbmQgdGhlIHJlbWFpbmlu
-ZyB0aGluZyBpcyB0aGUgc2FtZS4NCg0KV2hhdCdzIHlvdXIgdGFrZSBvbiB0aGlzLCB0aGFua3Mu
-DQoNClJlZ2FyZHMsDQpKYXkgWmhvdQ0KDQo+IEhhdmVuJ3QgdGhvdWdodCBkZWVwIGludG8gYW55
-IG9mIHRoZW0sIGJ1dCBzZWVtcyBkb2FibGUuDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAtLQ0KPiBQ
-ZXRlciBYdQ0KDQo=
+
+
+On 18/02/2020 23:57, Eric Blake wrote:
+> On 2/18/20 2:02 PM, Andrey Shinkevich wrote:
+>> qemu-iotests:$ ./check -qcow2
+>> PASSED
+>> (except always failed 261 and 272)
+> 
+> Have you reported those failures on the threads that introduced those 
+> tests?
+> 
+
+Not yet unfortunately. I have not investigated the case.
+"$ ./check -qcow2 261" dumps
+
++od: unrecognized option '--endian=big'
++Try 'od --help' for more information.
++od: invalid -N argument '--endian=big'
++qemu-img: Could not open 'TEST_DIR/t.IMGFMT': IMGFMT header exceeds 
+cluster size
+
+and "$ ./check -qcow2 272" dumps
+
++od: unrecognized option '--endian=big'
++Try 'od --help' for more information.
++od: invalid -N argument '--endian=big'
++qemu-io: can't open device .../qemu/tests/qemu-iotests/scratch/t.qcow2: 
+Image is not in qcow2 format
+
+-- 
+With the best regards,
+Andrey Shinkevich
 
