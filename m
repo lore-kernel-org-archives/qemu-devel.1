@@ -2,131 +2,172 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EE4C3404C
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0202AC34031
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:21:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D195624656
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADC4324655
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 01:21:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="KvHLPfF+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D195624656
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="uJHFplKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC4324655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Dvo-0004yU-0F
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 20:13:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45204)
+	id 1j4E3B-00086U-SX
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 20:21:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar@xilinx.com>) id 1j4Duj-00046L-4S
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:12:34 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j4E2N-0007UX-3d
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:20:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar@xilinx.com>) id 1j4Duh-0001hi-Rd
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:12:32 -0500
-Received: from mail-dm6nam11on2067.outbound.protection.outlook.com
- ([40.107.223.67]:6062 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <edgar@xilinx.com>) id 1j4Duh-0001hA-IC
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:12:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RUlOSbuKlW7jrVzR4bmQKO+O6AecH0hy5hHpxp4jHJHEHAA5Wx6ZZSPi8vyldmACjgZyN8Nel2Il4KfUYyfmdQYyTAR5JYSto2plMewckjIOtlIYs4Uo7HG9X50FQJlNzOnWagTcx53RjgRizL69v0m+fkP2LtuENu/b4tzflXVZyqUHIvy3xhECVW34tNU0IqEPm5xVcwgPLi/IvcZQIgBgePEgOUIIMjXWDpmzC4TbSeBJ5f59xuMy9BVzQvMO1SF/X0xvi4Q0akAtk802/VRhY/41YSBgVfUwJgEiQmLUt21iF8KIz77G3ozFUH5u5CgYuJa9DRnY+fOAOnFnPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lV/X8nRcH7T+OYkCnKgAqAvTrQuBkHttgT7hz1O+xRE=;
- b=G0R2fn9nhX9tDHRDsTRKQ2ROWc5IgZSAvAd/Ek5Gh+CHBghkqXQx2lSzoKsCyFzKJ9DPDZe8Sc/RV0rlbdChMywWBmRCijT4Gztd4l/pkPeG370Wvn0Q1DkZ696qmn/rPS7OCBSOd713V9pG/N4p1nRmb+7DdIND2ST/2pfvLnNUPB14Sk3L2Wbi6Ladx3Ti67lRVWO+a0WlJDd5mzCqZ6cl/eAL1HKN47eDaCsn/GsfUS31LLL9tDQi+9HqNJizyt8XAeBznIk7WSfSDMyMn9jBM5Io44v88uh5BBAUuuC4YSxe0+uir4xX9boUAHqpLs+9mXl5UqHbPv6CcneBjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
+ (envelope-from <aik@ozlabs.ru>) id 1j4E2L-0004aS-Ce
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:20:26 -0500
+Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:37274)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j4E2K-0004YX-St
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 20:20:25 -0500
+Received: by mail-pj1-x1036.google.com with SMTP id m13so1803729pjb.2
+ for <qemu-devel@nongnu.org>; Tue, 18 Feb 2020 17:20:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lV/X8nRcH7T+OYkCnKgAqAvTrQuBkHttgT7hz1O+xRE=;
- b=KvHLPfF+U5bwNGF27WiKlqhcNkg4veNrtMvCAunaiDBnVyP4SkEegH0f0Oi7D0SIeZD/TNq05ikSXGUlptW1tDNmFRcQ+JZ9xGqRBAt8kkRlBH70yyr28o7/2srlGM4hA2LFLNaX4Ppv7H6ubRX1VdoUP4r7z+qmBJIplTDX0eg=
-Received: from CH2PR02CA0020.namprd02.prod.outlook.com (2603:10b6:610:4e::30)
- by DM6PR02MB5164.namprd02.prod.outlook.com (2603:10b6:5:50::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.25; Wed, 19 Feb
- 2020 01:12:28 +0000
-Received: from SN1NAM02FT047.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e44::207) by CH2PR02CA0020.outlook.office365.com
- (2603:10b6:610:4e::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.25 via Frontend
- Transport; Wed, 19 Feb 2020 01:12:28 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT047.mail.protection.outlook.com (10.152.72.201) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2729.22
- via Frontend Transport; Wed, 19 Feb 2020 01:12:28 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1j4Dud-0000Rp-Pc; Tue, 18 Feb 2020 17:12:27 -0800
-Received: from [127.0.0.1] (helo=localhost)
- by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1j4DuY-0003Kd-Md; Tue, 18 Feb 2020 17:12:22 -0800
-Received: from [10.23.117.67] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1j4DuV-0003KS-MS; Tue, 18 Feb 2020 17:12:19 -0800
-Date: Sun, 16 Feb 2020 17:04:13 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-Subject: Re: [PATCH] xilinx_spips: Correct the number of dummy cycles for the
- FAST_READ_4 cmd
-Message-ID: <20200216160413.GF22292@toto>
-References: <20200218113350.6090-1-frasse.iglesias@gmail.com>
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=QmiqjwjFGwHcedh2FkOeCypy+bC3vuGC1KwQlMXtae4=;
+ b=uJHFplKkspFdX8qIZtXJYkDYSX17aAO5pxoytUmLU4tR2CUbhn1f5OmRon9SOXeZkD
+ B7r1VBd259rAgSXRnqmvKfNvzz6I/PxZ0BNyPU4xtLtn8hqTPhkYiV1gMmXGkhJ89CJ1
+ 2elewcFin9YNunr/SfOLD+dxURPHqoYMhsA5dzlA+xLBeixQgIjVSaecJIdK5SE49AU4
+ TkkYE3jGd8I5iCxViqLzVKVcu3gsWUSbPWxVTXmuvftGa2qX6FZlYjkJ5y9OEB4kyjM1
+ 2+Tvh4dUM80k/2ircC4cFb+Viv5hJ6wMRDq4ghHvPny0+M0X3BahopJnXRF4Q3j9Gvsp
+ qHpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=QmiqjwjFGwHcedh2FkOeCypy+bC3vuGC1KwQlMXtae4=;
+ b=LYKgWGFLWaTyK6I+AERhJ2naoV50lIDZAC4E2ky4WgWFRQCnwfI7ATxIjBx7ZuHHtL
+ WPfqNJ22rPhzNSRW8q3xyFyJuEvCgPCkg4szJ1ncrJeTpg14u5Afrqv6GSiIDfm8IpIR
+ krOR/aDNv8XvOLQrOa3VWJsTNQmQjoM2mSYfdmgEVYz4SmsnbmHa7hdbk/rigQI1iXJd
+ CJP9B7e4lMRqF08djaZj5XUketXFIGtjoi77bm3OdJKMC4SYY/SYqrr/d8jR/u/0gIVs
+ M1+YnEZmpdvPu3s6HMVyzM1HsIll/2rjBAVKFVwR4qlxSj3ucGCwbhs2Jr/UYKGZQG8o
+ f5pQ==
+X-Gm-Message-State: APjAAAX7POMjhPGqrKnWwktK84hHg8lipo5N7/3ZulNqqFvaYDUd7Kt1
+ VlWyOYxQ+048KwAPCcqN09HHbHPlepk=
+X-Google-Smtp-Source: APXvYqyif5x+38tJ0rjVFQwmEcJcuV1mCidOvCz3XGoG3Ls+o6GZ7pBrM7QFYBUT3zC3dNVMxa9JIQ==
+X-Received: by 2002:a17:902:264:: with SMTP id
+ 91mr24123947plc.335.1582075222529; 
+ Tue, 18 Feb 2020 17:20:22 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id u7sm231181pfh.128.2020.02.18.17.20.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Feb 2020 17:20:21 -0800 (PST)
+Subject: Re: [PULL SUBSYSTEM qemu-pseries] pseries: Update SLOF firmware image
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20200217021217.95766-1-aik@ozlabs.ru>
+ <8e67117e-e74a-fb5c-226b-78e62ac26291@kaod.org>
+ <44499677-3099-56c6-7249-afa8eccc7668@ozlabs.ru>
+ <bdfb7d07-c5fd-c21e-f812-4a0a747b02c3@kaod.org>
+ <0c21bb33-e6c0-c117-c9e7-dda16d3b13a5@ozlabs.ru>
+ <4a8261b3-3842-869c-0997-b997229ff3f6@ozlabs.ru>
+ <20649920-f867-7193-e86e-89b42ec6ae97@kaod.org>
+ <474f7204-fcee-ae4b-eb9a-d5d0a987c4a2@kaod.org>
+ <74ccc95e-d4bb-e540-5d63-ab057c504806@kaod.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <4914aaf9-18e9-54e7-c71c-d2aeb9b573f4@ozlabs.ru>
+Date: Wed, 19 Feb 2020 12:20:18 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20200218113350.6090-1-frasse.iglesias@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(7916004)(4636009)(189003)(199004)(33716001)(33656002)(70206006)(9686003)(186003)(70586007)(26005)(9786002)(8676002)(4326008)(356004)(1076003)(2906002)(8936002)(5660300002)(6666004)(81166006)(81156014)(498600001)(6916009)(66574012)(336012)(426003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR02MB5164; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 02a66fe3-d411-47e1-e2a3-08d7b4d8c981
-X-MS-TrafficTypeDiagnostic: DM6PR02MB5164:
-X-Microsoft-Antispam-PRVS: <DM6PR02MB516471C9487D29247435D467C2100@DM6PR02MB5164.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0318501FAE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iIUX6X7M9TgUXfG27vmTeA/wBwkYCQhsTWt7f9FVjbU/aNEjyFx+TCCVp+DoTcb35NvSRLEtuX7A4112i8xPOmum/PoH6LXygen0iJduUyoRwy2quPh3joq7xXpyum/HpcPe4/35CNX+ePlGoNiv/m3jMYPF15qI6ZOFHrnyZdPiwk1Gwn5qcRZYrXkkW8hA1ECBYDurPrn8elxZvyU1IPvfpaFVY7wttAIxJKrhliwdYrqQXjDYtZ9auTNcKhVuH9VJL5+R6TWV0YuUoDwRqPIXqYsEwshcN5GZKPFs7j0ktk2hjxeMeTTkPQhByhOhGwtH18Ks257xE5B5z6PPIUFix5/2TY6fhXjEtmjTouDzGwAZCdESQ8UYEqlF+hJac0V8p1YZSX9T21H+NfnUxQWdjjXyQKgJYrZ2Og9LCvX0CO0SqrkiT1rh/SsqJGwM
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2020 01:12:28.1761 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02a66fe3-d411-47e1-e2a3-08d7b4d8c981
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB5164
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.223.67
+In-Reply-To: <74ccc95e-d4bb-e540-5d63-ab057c504806@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1036
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -138,52 +179,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sai.pavan.boddu@xilinx.com,
- alistair@alistair23.me, qemu-devel@nongnu.org, edgari@xilinx.com, clg@kaod.org,
- alistair23@gmail.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 18, 2020 at 12:33:50PM +0100, Francisco Iglesias wrote:
-> From: Francisco Iglesias <francisco.iglesias@xilinx.com>
->=20
-> Correct the number of dummy cycles required by the FAST_READ_4 command (t=
-o
-> be eight, one dummy byte).
->=20
-> Fixes: ef06ca3946 ("xilinx_spips: Add support for RX discard and RX drain=
-")
-> Suggested-by: C=E9dric Le Goater <clg@kaod.org>
-> Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
+On 18/02/2020 23:59, Cédric Le Goater wrote:
+> On 2/18/20 1:48 PM, Cédric Le Goater wrote:
+>> On 2/18/20 10:40 AM, Cédric Le Goater wrote:
+>>> On 2/18/20 10:10 AM, Alexey Kardashevskiy wrote:
+>>>>
+>>>>
+>>>> On 18/02/2020 20:05, Alexey Kardashevskiy wrote:
+>>>>>
+>>>>>
+>>>>> On 18/02/2020 18:12, Cédric Le Goater wrote:
+>>>>>> On 2/18/20 1:30 AM, Alexey Kardashevskiy wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 17/02/2020 20:48, Cédric Le Goater wrote:
+>>>>>>>> On 2/17/20 3:12 AM, Alexey Kardashevskiy wrote:
+>>>>>>>>> The following changes since commit 05943fb4ca41f626078014c0327781815c6584c5:
+>>>>>>>>>
+>>>>>>>>>   ppc: free 'fdt' after reset the machine (2020-02-17 11:27:23 +1100)
+>>>>>>>>>
+>>>>>>>>> are available in the Git repository at:
+>>>>>>>>>
+>>>>>>>>>   git@github.com:aik/qemu.git tags/qemu-slof-20200217
+>>>>>>>>>
+>>>>>>>>> for you to fetch changes up to ea9a03e5aa023c5391bab5259898475d0298aac2:
+>>>>>>>>>
+>>>>>>>>>   pseries: Update SLOF firmware image (2020-02-17 13:08:59 +1100)
+>>>>>>>>>
+>>>>>>>>> ----------------------------------------------------------------
+>>>>>>>>> Alexey Kardashevskiy (1):
+>>>>>>>>>       pseries: Update SLOF firmware image
+>>>>>>>>>
+>>>>>>>>>  pc-bios/README   |   2 +-
+>>>>>>>>>  pc-bios/slof.bin | Bin 931032 -> 968560 bytes
+>>>>>>>>>  roms/SLOF        |   2 +-
+>>>>>>>>>  3 files changed, 2 insertions(+), 2 deletions(-)
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> *** Note: this is not for master, this is for pseries
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Hello Alexey,
+>>>>>>>>
+>>>>>>>> QEMU fails to boot from disk. See below.
+>>>>>>>
+>>>>>>>
+>>>>>>> It does boot mine (fedora 30, ubuntu 18.04), see below. I believe I
+>>>>>>> could have broken something but I need more detail. Thanks,
+>>>>>>
+>>>>>> fedora31 boots but not ubuntu 19.10. Could it be GRUB version 2.04 ? 
+>>>>>
+>>>>>
+>>>>> No, not that either:
+>>>>
+>>>>
+>>>> but it might be because of power9 - I only tried power8, rsyncing the
+>>>> image to a p9 machine now...
+>>>
+>>> Here is the disk : 
+>>>
+>>> Disk /dev/sda: 50 GiB, 53687091200 bytes, 104857600 sectors
+>>> Disk model: QEMU HARDDISK   
+>>> Units: sectors of 1 * 512 = 512 bytes
+>>> Sector size (logical/physical): 512 bytes / 512 bytes
+>>> I/O size (minimum/optimal): 512 bytes / 512 bytes
+>>> Disklabel type: gpt
+>>> Disk identifier: 27DCE458-231A-4981-9FF1-983F87C2902D
+>>>
+>>> Device         Start       End   Sectors Size Type
+>>> /dev/sda1       2048     16383     14336   7M PowerPC PReP boot
+>>> /dev/sda2      16384 100679679 100663296  48G Linux filesystem
+>>> /dev/sda3  100679680 104857566   4177887   2G Linux swap
+>>>
+>>>
+>>> GPT ? 
+>>
+>> For the failure, I bisected up to :
+>>
+>> f12149908705 ("ext2: Read all 64bit of inode number")
+> 
+> Here is a possible fix for it. I did some RPN on my hp28s in the past 
+> but I am not forth fluent.
 
+
+you basically zeroed the top bits by shifting them too far right :)
+
+The proper fix I think is:
+
+-  32 lshift or
++  20 lshift or
+
+I keep forgetting it is all in hex. Can you please give it a try? My
+128GB disk does not expose this problem somehow. Thanks,
+
+
+> 
+> "slash not found" is still there though. 
+> 
+> Cheers,
+> 
+> C.
+> 
+> 
+> From 92dc9f6dc7c6434419306d5a382adb42169b712a Mon Sep 17 00:00:00 2001
+> From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+> Date: Tue, 18 Feb 2020 13:54:54 +0100
+> Subject: [PATCH] ext2: Fix 64bit inode number
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=UTF-8
+> Content-Transfer-Encoding: 8bit
+> 
+> Fixes: f12149908705 ("ext2: Read all 64bit of inode number")
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
 > ---
->  hw/ssi/xilinx_spips.c | 2 +-
+>  slof/fs/packages/ext2-files.fs | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 6c9ef59779..c57850a505 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -576,11 +576,11 @@ static int xilinx_spips_num_dummies(XilinxQSPIPS *q=
-s, uint8_t command)
->      case FAST_READ:
->      case DOR:
->      case QOR:
-> +    case FAST_READ_4:
->      case DOR_4:
->      case QOR_4:
->          return 1;
->      case DIOR:
-> -    case FAST_READ_4:
->      case DIOR_4:
->          return 2;
->      case QIOR:
-> --=20
-> 2.11.0
->=20
+> 
+> diff --git a/slof/fs/packages/ext2-files.fs b/slof/fs/packages/ext2-files.fs
+> index b6a7880bd88e..f1d9fdfd67e2 100644
+> --- a/slof/fs/packages/ext2-files.fs
+> +++ b/slof/fs/packages/ext2-files.fs
+> @@ -152,7 +152,7 @@ CONSTANT /ext4-ee
+>    dup
+>    8 + l@-le               \ reads bg_inode_table_lo
+>    swap 28 + l@-le         \ reads bg_inode_table_hi
+> -  32 lshift or
+> +  32 rshift or
+>    block-size @ *          \ # in group, inode table
+>    swap inode-size @ * + xlsplit seek drop  inode @ inode-size @ read drop
+>  ;
+> 
+
+-- 
+Alexey
 
