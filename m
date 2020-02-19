@@ -2,75 +2,77 @@ Return-Path: <SRS0=HiY9=4H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CA3C34047
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7042C34047
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:44:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 122CE20578
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A82120578
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 16:44:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxqYorT2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 122CE20578
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxWd7GXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A82120578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4SRs-0002zO-7i
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:43:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37891)
+	id 1j4SSl-0004hm-8i
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 11:44:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwd-00051T-N2
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:29 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j4RwT-0004bt-5q
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4Rwa-0001XW-UI
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28460
+ (envelope-from <imammedo@redhat.com>) id 1j4RwR-0001MN-Nn
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50584
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4Rwa-0001XN-P4
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:24 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4RwR-0001M3-JC
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 11:11:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582128684;
+ s=mimecast20190719; t=1582128675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KcDp4S3QMCt4n9sRn116WhY04vPSpxf2qi0MRuOVyXc=;
- b=QxqYorT2vZ9vq4BhcZTG5N6xBP5cn05Q70a8Z6fZfoIdK62dvRUlTV8ZWsSTJxU0saRHrX
- hKVbBdV+Badi+5km+AmXxuzOjQr9nZCFf9V8l+23Wr8vLE3i6/IfE+YMkjGY1yem3EmC/1
- 6ASf1TkfMvYb/0zSXpbV1aAS4GHHpEI=
+ bh=7j1ZdeXTZC2HT7RhMlC+KQtGsCs/myjVSvJQGGbJblY=;
+ b=SxWd7GXTAm/4wB9clA8rfqdzbVANpclyqBSPB8iaW2wZfAJsp0z6J5ree0NB5EsWDxvqEH
+ WU5wlv5+aiydoIeJtV8hjktfcMsuuUfZ3we8eNoqdOdVdMV4A4LBGJcp/gM5JbK89MyY23
+ SC/4Jf4+rRWRo+WHDeKnHiL+4GpSocM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-t7HPp7IJPOWzFo66iQ5uGQ-1; Wed, 19 Feb 2020 11:11:18 -0500
+ us-mta-190-ebcgsxANOASjoWb0ydMgnA-1; Wed, 19 Feb 2020 11:11:10 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 510358A2463;
- Wed, 19 Feb 2020 16:11:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3200410B01C7
+ for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 16:11:09 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1898748;
- Wed, 19 Feb 2020 16:11:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3B1090526;
+ Wed, 19 Feb 2020 16:11:08 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 70/79] sparc/sun4m: use memdev for RAM
-Date: Wed, 19 Feb 2020 11:09:44 -0500
-Message-Id: <20200219160953.13771-71-imammedo@redhat.com>
+Subject: [PATCH v6 63/79] ppc/ppc405_boards: add RAM size checks
+Date: Wed, 19 Feb 2020 11:09:37 -0500
+Message-Id: <20200219160953.13771-64-imammedo@redhat.com>
 In-Reply-To: <20200219160953.13771-1-imammedo@redhat.com>
 References: <20200219160953.13771-1-imammedo@redhat.com>
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: t7HPp7IJPOWzFo66iQ5uGQ-1
+X-MC-Unique: ebcgsxANOASjoWb0ydMgnA-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -85,264 +87,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, atar4qemu@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+If user provided non-sense RAM size, board will ignore it
+and continue running with fixed RAM size.
 
-Patch moves ram size check into sun4m_hw_init() and drops
-ram_init() moving remainder to sun4m_hw_init() as well,
-as it was the only place that called it.
+Also RAM is going to be allocated by generic code, so it
+won't be possible for board to fix CLI.
 
-Also it rewrites impl. of RamDevice a little bit, which
-could serve as an example of frontend device for RAM backend.
-(Caveats are:
-  1. it doesn't check for memdev backend being mapped
-     since it's been  usurped by generic machine to handle
-     majority of machines which don't have RAM frontend device
-  2. it still lacks 'addr' property and still has hardcoded
-     sysbus_mmio_map() in board init. If done right, board should
-     set 'addr' property and bus/machine plug handler should map
-     it during device realize time.
-)
-Further improvements were left as exercise for the future,
-since frontends are out scope of RAM conversion to memdev.
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
+
+PS:
+move fixed RAM size into mc->default_ram_size, so that
+generic code will know how much to allocate.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v4:
-  * 'machine: introduce memory-backend property' patch changed
-    'memory-backend' property from link to backend id to allow for
-    delayed initialization. Take that in account and add resolving
-    machine->ram_memdev_id into backend pointer before setting link
-    on RamDevice.
-
-CC: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-CC: atar4qemu@gmail.com
+v2:
+  * fix format string causing build failure on 32-bit host
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>)
+v3:
+  * use size_to_str() to pretty print size in MiB
+    (Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>/
+     BALATON Zoltan <balaton@eik.bme.hu>)
 ---
- hw/sparc/sun4m.c | 74 ++++++++++++++++++++++++------------------------
- 1 file changed, 37 insertions(+), 37 deletions(-)
+ hw/ppc/ppc405_boards.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 25e96db5ca..f5bf95fc9f 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -777,63 +777,42 @@ static const TypeInfo prom_info =3D {
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 1f721feed6..057882a5d2 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -40,6 +40,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
++#include "qemu/cutils.h"
 =20
- typedef struct RamDevice {
-     SysBusDevice parent_obj;
--
--    MemoryRegion ram;
--    uint64_t size;
-+    HostMemoryBackend *memdev;
- } RamDevice;
+ #define BIOS_FILENAME "ppc405_rom.bin"
+ #define BIOS_SIZE (2 * MiB)
+@@ -137,7 +138,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, ui=
+nt32_t base)
 =20
- /* System RAM */
- static void ram_realize(DeviceState *dev, Error **errp)
+ static void ref405ep_init(MachineState *machine)
  {
-     RamDevice *d =3D SUN4M_RAM(dev);
--    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-+    MemoryRegion *ram =3D host_memory_backend_get_memory(d->memdev);
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+@@ -161,15 +162,21 @@ static void ref405ep_init(MachineState *machine)
+     DriveInfo *dinfo;
+     MemoryRegion *sysmem =3D get_system_memory();
 =20
--    memory_region_allocate_system_memory(&d->ram, OBJECT(d), "sun4m.ram",
--                                         d->size);
--    sysbus_init_mmio(sbd, &d->ram);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), ram);
- }
-=20
--static void ram_init(hwaddr addr, ram_addr_t RAM_size,
--                     uint64_t max_mem)
-+static void ram_initfn(Object *obj)
- {
--    DeviceState *dev;
--    SysBusDevice *s;
--    RamDevice *d;
--
--    /* allocate RAM */
--    if ((uint64_t)RAM_size > max_mem) {
--        error_report("Too much memory for this machine: %" PRId64 ","
--                     " maximum %" PRId64,
--                     RAM_size / MiB, max_mem / MiB);
--        exit(1);
--    }
--    dev =3D qdev_create(NULL, "memory");
--    s =3D SYS_BUS_DEVICE(dev);
--
--    d =3D SUN4M_RAM(dev);
--    d->size =3D RAM_size;
--    qdev_init_nofail(dev);
--
--    sysbus_mmio_map(s, 0, addr);
-+    RamDevice *d =3D SUN4M_RAM(obj);
-+    object_property_add_link(obj, "memdev", TYPE_MEMORY_BACKEND,
-+                             (Object **)&d->memdev,
-+                             object_property_allow_set_link,
-+                             OBJ_PROP_LINK_STRONG, &error_abort);
-+    object_property_set_description(obj, "memdev", "Set RAM backend"
-+                                    "Valid value is ID of a hostmem backen=
-d",
-+                                     &error_abort);
- }
-=20
--static Property ram_properties[] =3D {
--    DEFINE_PROP_UINT64("size", RamDevice, size, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void ram_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
-     dc->realize =3D ram_realize;
--    device_class_set_props(dc, ram_properties);
- }
-=20
- static const TypeInfo ram_info =3D {
-     .name          =3D TYPE_SUN4M_MEMORY,
-     .parent        =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(RamDevice),
-+    .instance_init =3D ram_initfn,
-     .class_init    =3D ram_class_init,
- };
-=20
-@@ -879,6 +858,15 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
-def,
-     SysBusDevice *s;
-     unsigned int smp_cpus =3D machine->smp.cpus;
-     unsigned int max_cpus =3D machine->smp.max_cpus;
-+    Object *ram_memdev =3D object_resolve_path_type(machine->ram_memdev_id=
-,
-+                                                  TYPE_MEMORY_BACKEND, NUL=
-L);
-+
-+    if (machine->ram_size > hwdef->max_mem) {
-+        error_report("Too much memory for this machine: %" PRId64 ","
-+                     " maximum %" PRId64,
-+                     machine->ram_size / MiB, hwdef->max_mem / MiB);
-+        exit(1);
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
 +    }
++
+     /* XXX: fix this */
+     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.=
+ram",
+-                                         0x08000000);
++                                         machine->ram_size);
+     ram_bases[0] =3D 0;
+-    ram_sizes[0] =3D 0x08000000;
++    ram_sizes[0] =3D machine->ram_size;
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+     ram_bases[1] =3D 0x00000000;
+     ram_sizes[1] =3D 0x00000000;
+-    ram_size =3D 128 * MiB;
+     env =3D ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                         33333333, &pic, kernel_filename =3D=3D NULL ? 0 : =
+1);
+     /* allocate SRAM */
+@@ -227,7 +234,7 @@ static void ref405ep_init(MachineState *machine)
+     if (linux_boot) {
+         memset(&bd, 0, sizeof(bd));
+         bd.bi_memstart =3D 0x00000000;
+-        bd.bi_memsize =3D ram_size;
++        bd.bi_memsize =3D machine->ram_size;
+         bd.bi_flashstart =3D -bios_size;
+         bd.bi_flashsize =3D -bios_size;
+         bd.bi_flashoffset =3D 0;
+@@ -255,7 +262,7 @@ static void ref405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -266,7 +273,7 @@ static void ref405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -304,6 +311,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *=
+data)
 =20
-     /* init CPUs */
-     for(i =3D 0; i < smp_cpus; i++) {
-@@ -888,9 +876,12 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hw=
-def,
-     for (i =3D smp_cpus; i < MAX_CPUS; i++)
-         cpu_irqs[i] =3D qemu_allocate_irqs(dummy_cpu_set_irq, NULL, MAX_PI=
-LS);
+     mc->desc =3D "ref405ep";
+     mc->init =3D ref405ep_init;
++    mc->default_ram_size =3D 0x08000000;
+ }
 =20
-+    /* Create and map RAM frontend */
-+    dev =3D qdev_create(NULL, "memory");
-+    object_property_set_link(OBJECT(dev), ram_memdev, "memdev", &error_fat=
-al);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0);
+ static const TypeInfo ref405ep_type =3D {
+@@ -408,7 +416,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uint3=
+2_t base)
 =20
--    /* set up devices */
--    ram_init(0, machine->ram_size, hwdef->max_mem);
-     /* models without ECC don't trap when missing ram is accessed */
-     if (!hwdef->ecc_base) {
-         empty_slot_init(machine->ram_size, hwdef->max_mem - machine->ram_s=
-ize);
-@@ -1078,7 +1069,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *h=
-wdef,
+ static void taihu_405ep_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *initrd_filename =3D machine->initrd_filename;
+     char *filename;
+@@ -425,10 +433,14 @@ static void taihu_405ep_init(MachineState *machine)
+     int fl_idx;
+     DriveInfo *dinfo;
 =20
-     fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
--    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-+    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, hwdef->machine_id);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_DEPTH, graphic_depth);
-     fw_cfg_add_i16(fw_cfg, FW_CFG_SUN4M_WIDTH, graphic_width);
-@@ -1415,6 +1406,7 @@ static void ss5_class_init(ObjectClass *oc, void *dat=
+-    /* RAM is soldered to the board so the size cannot be changed */
+-    ram_size =3D 0x08000000;
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        char *sz =3D size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
+     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+-                                         ram_size);
++                                         machine->ram_size);
+=20
+     ram_bases[0] =3D 0;
+     ram_sizes[0] =3D 0x04000000;
+@@ -500,7 +512,7 @@ static void taihu_405ep_init(MachineState *machine)
+         kernel_base =3D KERNEL_LOAD_ADDR;
+         /* now we can load the kernel */
+         kernel_size =3D load_image_targphys(kernel_filename, kernel_base,
+-                                          ram_size - kernel_base);
++                                          machine->ram_size - kernel_base)=
+;
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'", kernel_filename);
+             exit(1);
+@@ -509,7 +521,7 @@ static void taihu_405ep_init(MachineState *machine)
+         if (initrd_filename) {
+             initrd_base =3D INITRD_LOAD_ADDR;
+             initrd_size =3D load_image_targphys(initrd_filename, initrd_ba=
+se,
+-                                              ram_size - initrd_base);
++                                              machine->ram_size - initrd_b=
+ase);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+                              initrd_filename);
+@@ -533,6 +545,7 @@ static void taihu_class_init(ObjectClass *oc, void *dat=
 a)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
+=20
+     mc->desc =3D "taihu";
+     mc->init =3D taihu_405ep_init;
++    mc->default_ram_size =3D 0x08000000;
  }
 =20
- static const TypeInfo ss5_type =3D {
-@@ -1434,6 +1426,7 @@ static void ss10_class_init(ObjectClass *oc, void *da=
-ta)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo ss10_type =3D {
-@@ -1453,6 +1446,7 @@ static void ss600mp_class_init(ObjectClass *oc, void =
-*data)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo ss600mp_type =3D {
-@@ -1472,6 +1466,7 @@ static void ss20_class_init(ObjectClass *oc, void *da=
-ta)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-SuperSparc-II");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo ss20_type =3D {
-@@ -1490,6 +1485,7 @@ static void voyager_class_init(ObjectClass *oc, void =
-*data)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo voyager_type =3D {
-@@ -1508,6 +1504,7 @@ static void ss_lx_class_init(ObjectClass *oc, void *d=
-ata)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo ss_lx_type =3D {
-@@ -1526,6 +1523,7 @@ static void ss4_class_init(ObjectClass *oc, void *dat=
-a)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("Fujitsu-MB86904");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo ss4_type =3D {
-@@ -1544,6 +1542,7 @@ static void scls_class_init(ObjectClass *oc, void *da=
-ta)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo scls_type =3D {
-@@ -1562,6 +1561,7 @@ static void sbook_class_init(ObjectClass *oc, void *d=
-ata)
-     mc->default_boot_order =3D "c";
-     mc->default_cpu_type =3D SPARC_CPU_TYPE_NAME("TI-MicroSparc-I");
-     mc->default_display =3D "tcx";
-+    mc->default_ram_id =3D "sun4m.ram";
- }
-=20
- static const TypeInfo sbook_type =3D {
+ static const TypeInfo taihu_type =3D {
 --=20
 2.18.1
 
