@@ -6,79 +6,78 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE19C34031
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 03:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87B1C34022
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 03:14:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270FC22B48
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 03:03:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82ADF2176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Feb 2020 03:14:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K394O9gk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270FC22B48
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AXxBArf0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82ADF2176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4Fdr-0004J9-9U
-	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 22:03:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56774)
+	id 1j4Foy-0007Kn-Od
+	for qemu-devel@archiver.kernel.org; Tue, 18 Feb 2020 22:14:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33611)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laine@redhat.com>) id 1j4FdF-0003nj-HG
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:02:38 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j4FoG-0006U0-Rw
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laine@redhat.com>) id 1j4FdD-00019c-Rh
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:02:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40970
+ (envelope-from <jasowang@redhat.com>) id 1j4FoF-0006lo-Ba
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:14:00 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38516
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laine@redhat.com>) id 1j4FdD-00016J-Lk
- for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:02:35 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j4FoF-0006lC-7b
+ for qemu-devel@nongnu.org; Tue, 18 Feb 2020 22:13:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582081354;
+ s=mimecast20190719; t=1582082038;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l4ZIpewIRJ8wnM01zZGbxaKtYylb08NNxAPHUWOMTPQ=;
- b=K394O9gkPhN2y3baCgR3MePOjzi1LXPQbi3FmzRcJDDNGTFBYDzHq6FImdmHYaV4kSrcPk
- ilbHJPq/TBv2RA7/nr2XYJpyRr/vR0pT1mziqorqfRBfRILsj/0MoHJHZIwqVmJMY+ZnhZ
- BEyuAa452+aoIQVQv01pvGQqRc6qQsw=
+ bh=K68bzRWkjMQ8X9981AvaO8qqmYygws9IJtyzfw/yNUY=;
+ b=AXxBArf0OGPNdcUK7w9UqwE114b6jYOgdqtnx+wQC9Z9KO3v//kefDSgPJOslYF0i0xDzA
+ ThFbdsa43Fb95x+cbeFmgtLPGDB9+xJiXqiYCJsZDL/KEw0qOk03/y21iKM8zYI4zK3Psh
+ bPuZ0giNlg586HT8Qc9jiHQV5pnEUTc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-Txn-Vgh2NlGeaDX4cioJKA-1; Tue, 18 Feb 2020 22:02:30 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-18-UCoh7dAZPkWPGhlaJBfsbQ-1; Tue, 18 Feb 2020 22:13:55 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBABAA0CC0
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 03:02:29 +0000 (UTC)
-Received: from [10.10.125.146] (ovpn-125-146.rdu2.redhat.com [10.10.125.146])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11B9A90533;
- Wed, 19 Feb 2020 03:02:21 +0000 (UTC)
-Subject: Re: [PATCH] pcie_root_port: Add disable_hotplug option
-To: QEMU Developers <qemu-devel@nongnu.org>
-References: <20200218161717.386723-1-jusual@redhat.com>
- <d872dcc7-9275-1354-ce6a-7dd52ac33929@redhat.com>
- <CAMDeoFVQis-UXKpGZNJkD9NqyozwUxW+nn_h6iv+f-EgkLeRKw@mail.gmail.com>
-From: Laine Stump <laine@redhat.com>
-Message-ID: <9ea6a6b9-778d-78a8-1909-dce1ed98a24d@redhat.com>
-Date: Tue, 18 Feb 2020 22:02:19 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A36F1107ACC7;
+ Wed, 19 Feb 2020 03:13:53 +0000 (UTC)
+Received: from [10.72.13.212] (ovpn-13-212.pek2.redhat.com [10.72.13.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F4BE196AE;
+ Wed, 19 Feb 2020 03:13:45 +0000 (UTC)
+Subject: Re: [PATCH v4 00/14] Fixes for DP8393X SONIC device emulation
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <cover.1580290069.git.fthain@telegraphics.com.au>
+ <1b1e6027-b59b-939d-c0ad-791be60f18ae@redhat.com>
+ <CAL1e-=iCY9FaPdDHB4ms37dckQp+YKoWniA22jQ7eOq__jobpA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <a9647bed-2bfa-9215-e70f-f6cf04ec46cc@redhat.com>
+Date: Wed, 19 Feb 2020 11:13:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAMDeoFVQis-UXKpGZNJkD9NqyozwUxW+nn_h6iv+f-EgkLeRKw@mail.gmail.com>
+In-Reply-To: <CAL1e-=iCY9FaPdDHB4ms37dckQp+YKoWniA22jQ7eOq__jobpA@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Txn-Vgh2NlGeaDX4cioJKA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: UCoh7dAZPkWPGhlaJBfsbQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,44 +89,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Finn Thain <fthain@telegraphics.com.au>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/18/20 1:40 PM, Julia Suvorova wrote:
-> On Tue, Feb 18, 2020 at 6:18 PM Laine Stump <laine@redhat.com> wrote:
->>
->> On 2/18/20 11:17 AM, Julia Suvorova wrote:
->>> Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
->>> to manage it and restrict unplug for the entire machine. This is going
->>> to prevent user-initiated unplug in guests (Windows mostly).
->>> Usage:
->>>       -device pcie-root-port,disable-hotplug=true,...
->>
->> Double negatives (e.g. "disable-hotplug=false") tend to confuse simple
->> minds like mine. Would it be any more difficult to make the name of the
->> option positive instead (e.g. "enable-hotplug") with the default set to
->> "true"?
-> 
-> disable-hotplug=false will not be used, because it's default. And it
-> follows previous naming (''disable-acs').
 
-Yeah, I don't like the name of that one either (or of "disable-modern" 
-or "disable-legacy") but I don't follow qemu-devel closely so I didn't 
-see them when their patches went by. But now is my chance to complain :-)
+On 2020/2/19 =E4=B8=8A=E5=8D=882:30, Aleksandar Markovic wrote:
+>
+>
+> On Tuesday, February 4, 2020, Jason Wang <jasowang@redhat.com=20
+> <mailto:jasowang@redhat.com>> wrote:
+>
+>
+>     On 2020/1/29 =E4=B8=8B=E5=8D=885:27, Finn Thain wrote:
+>
+>         Hi All,
+>
+>         There are bugs in the emulated dp8393x device that can stop packe=
+t
+>         reception in a Linux/m68k guest (q800 machine).
+>
+>         With a Linux/m68k v5.5 guest (q800), it's possible to remotely
+>         trigger
+>         an Oops by sending ping floods.
+>
+>         With a Linux/mips guest (magnum machine), the driver fails to
+>         probe
+>         the dp8393x device.
+>
+>         With a NetBSD/arc 5.1 guest (magnum), the bugs in the device
+>         can be
+>         fatal to the guest kernel.
+>
+>         Whilst debugging the device, I found that the receiver algorithm
+>         differs from the one described in the National Semiconductor
+>         datasheet.
+>
+>         This patch series resolves these bugs.
+>
+>         AFAIK, all bugs in the Linux sonic driver were fixed in Linux
+>         v5.5.
+>         ---
+>         Changed since v1:
+>         =C2=A0 - Minor revisions as described beneath commit logs.
+>         =C2=A0 - Dropped patches 4/10 and 7/10.
+>         =C2=A0 - Added 5 new patches.
+>
+>         Changed since v2:
+>         =C2=A0 - Minor revisions as described beneath commit logs.
+>         =C2=A0 - Dropped patch 13/13.
+>         =C2=A0 - Added 2 new patches.
+>
+>         Changed since v3:
+>         =C2=A0 - Replaced patch 13/14 with patch suggested by Philippe
+>         Mathieu-Daud=C3=A9.
+>
+>
+>         Finn Thain (14):
+>         =C2=A0 =C2=A0dp8393x: Mask EOL bit from descriptor addresses
+>         =C2=A0 =C2=A0dp8393x: Always use 32-bit accesses
+>         =C2=A0 =C2=A0dp8393x: Clean up endianness hacks
+>         =C2=A0 =C2=A0dp8393x: Have dp8393x_receive() return the packet si=
+ze
+>         =C2=A0 =C2=A0dp8393x: Update LLFA and CRDA registers from rx desc=
+riptor
+>         =C2=A0 =C2=A0dp8393x: Clear RRRA command register bit only when a=
+ppropriate
+>         =C2=A0 =C2=A0dp8393x: Implement packet size limit and RBAE interr=
+upt
+>         =C2=A0 =C2=A0dp8393x: Don't clobber packet checksum
+>         =C2=A0 =C2=A0dp8393x: Use long-word-aligned RRA pointers in 32-bi=
+t mode
+>         =C2=A0 =C2=A0dp8393x: Pad frames to word or long word boundary
+>         =C2=A0 =C2=A0dp8393x: Clear descriptor in_use field to release pa=
+cket
+>         =C2=A0 =C2=A0dp8393x: Always update RRA pointers and sequence num=
+bers
+>         =C2=A0 =C2=A0dp8393x: Don't reset Silicon Revision register
+>         =C2=A0 =C2=A0dp8393x: Don't stop reception upon RBE interrupt ass=
+ertion
+>
+>         =C2=A0 hw/net/dp8393x.c | 202
+>         +++++++++++++++++++++++++++++++----------------
+>         =C2=A0 1 file changed, 134 insertions(+), 68 deletions(-)
+>
+>
+>
+>     Applied.
+>
+>
+> Hi, Jason,
+>
+> I generally have some reservations towards patches that did not=20
+> receive any R-bs. I think we should hear from Herve in this case, to=20
+> confirm that this change doesn't cause other problems while solving=20
+> the original ones.
 
-I can live with it either way, but still think it's much better to not 
-have "negative" option names. Feel free to ignore, and I'll just be 
-happy that I didn't accept it silently.
 
-Also, is there a rhyme/reason for some options having true/false, and 
-some being off/on? disable-acs seems to be true/false, but 
-disable-modern is on/off. Doesn't make any difference to me in the end, 
-but just thought I'd bring it up in case there might be a reason to use 
-on/off instead of true/false for this one.
+That's fine but if it's agreed that we should hear from somebody for a=20
+specific part of the code, it's better to have the one as=20
+maintainer/reviewer in MAINTAINERS.
+
+Thanks
+
+
+>
+> I hope this is not the case.
+>
+> Regards,
+> Aleksandar
+>
+>
 
 
