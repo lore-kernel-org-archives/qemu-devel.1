@@ -2,75 +2,103 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40595C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F033C11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:22:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A657207FD
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A7DB206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:22:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeNFbwra"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A657207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qa0T3b2I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7DB206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4oZt-0007yx-7L
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 11:21:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55493)
+	id 1j4ob6-00014b-G2
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 11:22:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j4oS9-0003yh-5i
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:13:31 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j4oUA-0007OL-U1
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:15:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j4oS8-0007dN-3W
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:13:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42998
+ (envelope-from <mreitz@redhat.com>) id 1j4oU9-000832-TD
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:15:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30930
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4oS7-0007c0-Up
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:13:28 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4oU9-00082r-OK
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:15:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582215207;
+ s=mimecast20190719; t=1582215333;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GZxh2QIKv+rwCE1aHIlFEa2Fw2OaGQEvH1Pxdw3tUPM=;
- b=EeNFbwraEP4zTMRzMa3g6/0cfP29rSFNpcLcSj+aI8U7eLDPX3hAO7ZXlvCk7hrImsYVNp
- 01yeGX0vrygVD/z3OUeVkCAe5oi1U+Q4H+ZJSKm46+eHaaq4YNYi3zPuOMmQmRuNouDGGR
- WnelVKot1wSSwMJTkRztT+gNxGvQ6PE=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=U2FwcoQKBMHTaQKpN84zEckAUwZTDF32vXFSQFtFSv8=;
+ b=Qa0T3b2Inie22/Oq6RrYWDCk6rg6/ZFHpszMXUb5s2EQW9me480HjHt6A6SwOZSQUeWZLM
+ +NFWDM4KTcNJgbRdeTibhV6RL62IG0zt5BxYjqXt+vf464kO+P/EZYM5YQmpUB5khYuBIn
+ nIhDWkxbuJPvx3EW9RGBxTlzTQezq9I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-4zZhL8nNNhm0a3zR39MXbg-1; Thu, 20 Feb 2020 11:13:22 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-7-IjmbBwCyM3KkL2Hp3kRYWA-1; Thu, 20 Feb 2020 11:15:28 -0500
+X-MC-Unique: IjmbBwCyM3KkL2Hp3kRYWA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B7A4DB60;
- Thu, 20 Feb 2020 16:13:21 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B9C919756;
- Thu, 20 Feb 2020 16:13:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A2D4800D53;
+ Thu, 20 Feb 2020 16:15:23 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C52FA10001AE;
+ Thu, 20 Feb 2020 16:15:19 +0000 (UTC)
+Subject: Re: [RFC PATCH v3 07/27] qcow2: Add subcluster-related fields to
+ BDRVQcow2State
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1577014346.git.berto@igalia.com>
+ <b04e7e26cea16892a7f209b37d931c489ef17bd9.1577014346.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 15/18] qemu-img: Fix convert -n -B for backing-less targets
-Date: Thu, 20 Feb 2020 17:07:07 +0100
-Message-Id: <20200220160710.533297-16-mreitz@redhat.com>
-In-Reply-To: <20200220160710.533297-1-mreitz@redhat.com>
-References: <20200220160710.533297-1-mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8b53e7d5-0b08-e85a-8717-b44a32be0ba3@redhat.com>
+Date: Thu, 20 Feb 2020 17:15:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 4zZhL8nNNhm0a3zR39MXbg-1
+In-Reply-To: <b04e7e26cea16892a7f209b37d931c489ef17bd9.1577014346.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FmF76ah0FKn6TbEYVUolKkwyjXQZNuGMU"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -85,54 +113,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-s.target_has_backing does not reflect whether the target BDS has a
-backing file; it only tells whether we should use a backing file during
-conversion (specified by -B).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FmF76ah0FKn6TbEYVUolKkwyjXQZNuGMU
+Content-Type: multipart/mixed; boundary="0acINBkF85fSrEqsygn0QP0crynhO01T0"
 
-As such, if you use convert -n, the target does not necessarily actually
-have a backing file, and then dereferencing out_bs->backing fails here.
+--0acINBkF85fSrEqsygn0QP0crynhO01T0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-When converting to an existing file, we should set
-target_backing_sectors to a negative value, because first, as the
-comment explains, this value is only used for optimization, so it is
-always fine to do that.
+On 22.12.19 12:36, Alberto Garcia wrote:
+> This patch adds the following new fields to BDRVQcow2State:
+>=20
+> - subclusters_per_cluster: Number of subclusters in a cluster
+> - subcluster_size: The size of each subcluster, in bytes
+> - subcluster_bits: No. of bits so 1 << subcluster_bits =3D subcluster_siz=
+e
+>=20
+> Images without subclusters are treated as if they had exactly one,
+> with subcluster_size =3D cluster_size.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2.c | 5 +++++
+>  block/qcow2.h | 5 +++++
+>  2 files changed, 10 insertions(+)
 
-Second, we use this value to determine where the target must be
-initialized to zeroes (overlays are initialized to zero after the end of
-their backing file).  When converting to an existing file, we cannot
-assume that to be true.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Cc: qemu-stable@nongnu.org
-Fixes: 351c8efff9ad809c822d55620df54d575d536f68
-       ("qemu-img: Special post-backing convert handling")
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200121155915.98232-2-mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- qemu-img.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 0faf2cd2f5..804630a368 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2523,7 +2523,7 @@ static int img_convert(int argc, char **argv)
-         }
-     }
-=20
--    if (s.target_has_backing) {
-+    if (s.target_has_backing && s.target_is_new) {
-         /* Errors are treated as "backing length unknown" (which means
-          * s.target_backing_sectors has to be negative, which it will
-          * be automatically).  The backing file length is used only
---=20
-2.24.1
+--0acINBkF85fSrEqsygn0QP0crynhO01T0--
+
+--FmF76ah0FKn6TbEYVUolKkwyjXQZNuGMU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5OsJEACgkQ9AfbAGHV
+z0AFrgf9FlEa84OmJ//ByGF4ijq3D4zE78Z8Vouz5qHJ6bbliNuSYyuiFNMVl/i8
+dYu+/JIfT2rX2Y+BnGhPjKnDkC7ayrIq7fDG1S2DXf4cv0zkC+3C7CkI4mV7GHBs
+mwWWpsdiTbSg322ts2EERWBvcwCubkRvPcMgLj04SDV6IH/OsjdfZOM+MEI1SgXM
+pogt69kB+8PbuzdAy/V10fe/KlQoP7ObRb/zze+qaU6B/O7FRdq8YsDuGteff3IY
+y3bNtvoRad2wGpO1XAvsb+hGpCNcUxzN/n0JUA1eWqLSfoRUvZB37qunnervO+8m
+kBQjczMxJj6FeYi/CUi7JnJ55vCB6A==
+=YYZb
+-----END PGP SIGNATURE-----
+
+--FmF76ah0FKn6TbEYVUolKkwyjXQZNuGMU--
 
 
