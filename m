@@ -2,63 +2,67 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4003C5ACC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 01:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E52C11D41
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 01:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CEC921D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 01:01:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NnZ+yQvH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CEC921D56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B0FA121D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 01:39:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FA121D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4aDr-0000vT-L0
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 20:01:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55493)
+	id 1j4aoZ-0006j3-Sn
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 20:39:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4aD6-0000Nh-Oo
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 20:01:02 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1j4ans-0006D8-5x
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 20:39:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4aD4-0001bE-P4
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 20:01:00 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45861 helo=ozlabs.org)
+ (envelope-from <chen.zhang@intel.com>) id 1j4anq-0005W0-Qo
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 20:39:00 -0500
+Received: from mga14.intel.com ([192.55.52.115]:30456)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4aD3-0000KD-Fj; Wed, 19 Feb 2020 20:00:58 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NGVQ64zGz9sRs; Thu, 20 Feb 2020 12:00:46 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582160446;
- bh=uQSYvMR9+vv1L+ayE+jTPJEHEhskcy0Mxf3Tt0vc578=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=NnZ+yQvHjJlvRI7vi/QOePUtuh+tE0edFOzqiSfutvuZLMrNNNU+Ao7JgFRUtOz5b
- WLL5+9ko60eDuXrDlGLLOoAZDUEhVGIJuVVIqiQWigmHxWipHe7QTYGw6NK6mC2gYg
- ghmLu9MGMriaujEBJBXninDlmL15L+vvSIg+aM7s=
-Date: Thu, 20 Feb 2020 11:36:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH v3 02/12] ppc: Remove stub of PPC970 HID4 implementation
-Message-ID: <20200220003615.GK1764@umbus.fritz.box>
-References: <20200219005414.15635-1-david@gibson.dropbear.id.au>
- <20200219005414.15635-3-david@gibson.dropbear.id.au>
- <alpine.BSF.2.22.395.2002191214090.74530@zero.eik.bme.hu>
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1j4ann-0005RZ-Mk; Wed, 19 Feb 2020 20:38:55 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Feb 2020 17:38:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,462,1574150400"; d="scan'208";a="224693885"
+Received: from chenzh5-mobl2.ccr.corp.intel.com (HELO [10.255.31.29])
+ ([10.255.31.29])
+ by orsmga007.jf.intel.com with ESMTP; 19 Feb 2020 17:38:44 -0800
+Subject: Re: [PATCH v7 0/4] colo: Add support for continuous replication
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
+ qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+ <20191113173559.0713c27d@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D7806309C8C@shsmsx102.ccr.corp.intel.com>
+ <049fdd65-c654-f619-4de1-5a3fe0a2ad5b@redhat.com>
+ <9CFF81C0F6B98A43A459C9EDAD400D780630AB3E@shsmsx102.ccr.corp.intel.com>
+Message-ID: <f105e19b-6f1d-a539-459d-076a031b86b8@intel.com>
+Date: Thu, 20 Feb 2020 09:38:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zYjDATHXTWnytHRU"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.22.395.2002191214090.74530@zero.eik.bme.hu>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D780630AB3E@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,175 +74,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, groug@kaod.org, qemu-devel@nongnu.org, paulus@samba.org,
- clg@kaod.org, qemu-ppc@nongnu.org, philmd@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Jason,
 
---zYjDATHXTWnytHRU
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 19, 2020 at 12:18:34PM +0100, BALATON Zoltan wrote:
-> On Wed, 19 Feb 2020, David Gibson wrote:
-> > The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capabil=
-ity.
-> > However, it can be (and often was) strapped into "Apple mode", where the
-> > hypervisor capabilities were disabled (essentially putting it always in
-> > hypervisor mode).
-> >=20
-> > That's actually the only mode of the 970 we support in qemu, and we're
-> > unlikely to change that any time soon.  However, we do have a partial
-> > implementation of the 970's HID4 register which affects things only
-> > relevant for hypervisor mode.
-> >=20
-> > That stub is also really ugly, since it attempts to duplicate the effec=
-ts
-> > of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
-> > in a really confusing way.
-> >=20
-> > Just get rid of it.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > target/ppc/mmu-hash64.c         | 28 +---------------------------
-> > target/ppc/translate_init.inc.c | 17 ++++++-----------
-> > 2 files changed, 7 insertions(+), 38 deletions(-)
-> >=20
-> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > index da8966ccf5..a881876647 100644
-> > --- a/target/ppc/mmu-hash64.c
-> > +++ b/target/ppc/mmu-hash64.c
-> > @@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulon=
-g val)
-> >=20
-> >     /* Filter out bits */
-> >     switch (env->mmu_model) {
-> > -    case POWERPC_MMU_64B: /* 970 */
-> > -        if (val & 0x40) {
-> > -            lpcr |=3D LPCR_LPES0;
-> > -        }
-> > -        if (val & 0x8000000000000000ull) {
-> > -            lpcr |=3D LPCR_LPES1;
-> > -        }
-> > -        if (val & 0x20) {
-> > -            lpcr |=3D (0x4ull << LPCR_RMLS_SHIFT);
-> > -        }
-> > -        if (val & 0x4000000000000000ull) {
-> > -            lpcr |=3D (0x2ull << LPCR_RMLS_SHIFT);
-> > -        }
-> > -        if (val & 0x2000000000000000ull) {
-> > -            lpcr |=3D (0x1ull << LPCR_RMLS_SHIFT);
-> > -        }
-> > -        env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
-> > -
-> > -        /*
-> > -         * XXX We could also write LPID from HID4 here
-> > -         * but since we don't tag any translation on it
-> > -         * it doesn't actually matter
-> > -         *
-> > -         * XXX For proper emulation of 970 we also need
-> > -         * to dig HRMOR out of HID5
-> > -         */
-> > -        break;
-> >     case POWERPC_MMU_2_03: /* P5p */
-> >         lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
-> >                       LPCR_LPES0 | LPCR_LPES1 |
-> > @@ -1154,6 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong=
- val)
-> >         }
-> >         break;
-> >     default:
-> > +        g_assert_not_reached();
-> >         ;
->=20
-> Is this empty statement (lone semicolon) still needed now that you've add=
-ed
-> something to this case? Thought it was only there to be able to add a lab=
-el
-> to it so it could be removed now. (Does this count as a double ; that a
-> recent patch was trying to fix?)
-
-The ; is redundant, but given this whole chunk of code is removed
-later in the series, I don't think it's worth messing with.
-
->=20
-> Regards,
-> BALATON Zoltan
->=20
-> >     }
-> >     env->spr[SPR_LPCR] =3D lpcr;
-> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> > index a0d0eaabf2..d7d4f012b8 100644
-> > --- a/target/ppc/translate_init.inc.c
-> > +++ b/target/ppc/translate_init.inc.c
-> > @@ -7895,25 +7895,20 @@ static void spr_write_lpcr(DisasContext *ctx, i=
-nt sprn, int gprn)
-> > {
-> >     gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
-> > }
-> > -
-> > -static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
-> > -{
-> > -#if defined(TARGET_PPC64)
-> > -    spr_write_generic(ctx, sprn, gprn);
-> > -    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
-> > -#endif
-> > -}
-> > -
-> > #endif /* !defined(CONFIG_USER_ONLY) */
-> >=20
-> > static void gen_spr_970_lpar(CPUPPCState *env)
-> > {
-> > #if !defined(CONFIG_USER_ONLY)
-> >     /* Logical partitionning */
-> > -    /* PPC970: HID4 is effectively the LPCR */
-> > +    /* PPC970: HID4 covers things later controlled by the LPCR and
-> > +     * RMOR in later CPUs, but with a different encoding.  We only
-> > +     * support the 970 in "Apple mode" which has all hypervisor
-> > +     * facilities disabled by strapping, so we can basically just
-> > +     * ignore it */
-> >     spr_register(env, SPR_970_HID4, "HID4",
-> >                  SPR_NOACCESS, SPR_NOACCESS,
-> > -                 &spr_read_generic, &spr_write_970_hid4,
-> > +                 &spr_read_generic, &spr_write_generic,
-> >                  0x00000000);
-> > #endif
-> > }
-> >=20
+I noticed this series can't be merged or queued, do you met some problem 
+about it?
 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks
 
---zYjDATHXTWnytHRU
-Content-Type: application/pgp-signature; name="signature.asc"
+Zhang Chen
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5N1HwACgkQbDjKyiDZ
-s5J8jw/8DT0oE3zDuC8tjwF0fBjG4CYNvpvoxlK3IK6uUDmZMWmMmw6/BDxHP9GY
-Zo/4FFvsP3RVnLn1dPcK1YNZBIcgdQlKQQXVhPGG6ary+6UJCSKRhnw4KDeUaghy
-Qnm0kxTvbvyp7pAl7PA2NzN4tMp8pM84rPjrOXpK++3+8GW6VhgKi73Csl3uNIjm
-GH2rFJGSawCzxLkumguWJZuln+Q0XtI6McDJHkToRP8hinr9vNILkn7aTw5Gk3lc
-cBB60AdosIhV2a1ctCkPfExifaW6Rj5XRcFvjohkR0OXGFBkBn7GO6Q71CwRjtJ5
-YiZT6R4jcfXV1C9yvfqTzfLyVDrelhMsokFedJimdGS8ZH6hwH3dGy++94Jp7836
-ZVbF8Vud74r2AOBoAveM7grNyHzZouAfPlQHNLbcHUWtWl3Z7u3ciXIxcvscPQXL
-LJjfUAyuEpZwnGJ245TEZ8iPF6PHj0spztKZETMZZolCUZ29poXTIe0siGiEPkhl
-cwZc71V4XdUlbi4H/+L4ACxRn9WADmsk+SkTPJleE3CunQ1kIN5N8XePyhpwQh5Y
-H5dOvnf26hLNzx4i+qLq/5+JoATGqPGM17okgaQO0sshKDikpPBayAnRHqDcpyRF
-pPosi5dAYWjxF1noOb3igMniM+caFIMKBecOKIbqXHP7OhaQlio=
-=5BLB
------END PGP SIGNATURE-----
-
---zYjDATHXTWnytHRU--
+>>>> Max Reitz <mreitz@redhat.com>; qemu-block <qemu-block@nongnu.org>
+>>>> Subject: Re: [PATCH v7 0/4] colo: Add support for continuous
+>>>> replication
+>>>>
+>>>> On Fri, 25 Oct 2019 19:06:31 +0200
+>>>> Lukas Straub <lukasstraub2@web.de> wrote:
+>>>>
+>>>>> Hello Everyone,
+>>>>> These Patches add support for continuous replication to colo. This
+>>>>> means that after the Primary fails and the Secondary did a failover,
+>>>>> the Secondary can then become Primary and resume replication to a
+>>>>> new
+>>>> Secondary.
+>>>>> Regards,
+>>>>> Lukas Straub
+>>>>>
+>>>>> v7:
+>>>>>    - clarify meaning of ip's in documentation and note that active and
+>> hidden
+>>>>>      images just need to be created once
+>>>>>    - reverted removal of bdrv_is_root_node(top_bs) in replication and
+>>>> adjusted
+>>>>>      the top-id= parameter in documentation acordingly
+>>>>>
+>>>>> v6:
+>>>>>    - documented the position= and insert= options
+>>>>>    - renamed replication test
+>>>>>    - clarified documentation by using different ip's for primary and
+>>>>> secondary
+>>>>>    - added Reviewed-by tags
+>>>>>
+>>>>> v5:
+>>>>>    - change syntax for the position= parameter
+>>>>>    - fix spelling mistake
+>>>>>
+>>>>> v4:
+>>>>>    - fix checkpatch.pl warnings
+>>>>>
+>>>>> v3:
+>>>>>    - add test for replication changes
+>>>>>    - check if the filter to be inserted before/behind belongs to the
+>>>>> same interface
+>>>>>    - fix the error message for the position= parameter
+>>>>>    - rename term "after" -> "behind" and variable "insert_before" ->
+>>>> "insert_before_flag"
+>>>>>    - document the quorum node on the secondary side
+>>>>>    - simplify quorum parameters in documentation
+>>>>>    - remove trailing spaces in documentation
+>>>>>    - clarify the testing procedure in documentation
+>>>>>
+>>>>> v2:
+>>>>>    - fix email formating
+>>>>>    - fix checkpatch.pl warnings
+>>>>>    - fix patchew error
+>>>>>    - clearer commit messages
+>>>>>
+>>>>>
+>>>>> Lukas Straub (4):
+>>>>>     block/replication.c: Ignore requests after failover
+>>>>>     tests/test-replication.c: Add test for for secondary node continuing
+>>>>>       replication
+>>>>>     net/filter.c: Add Options to insert filters anywhere in the filter
+>>>>>       list
+>>>>>     colo: Update Documentation for continuous replication
+>>>>>
+>>>>>    block/replication.c        |  35 +++++-
+>>>>>    docs/COLO-FT.txt           | 224 +++++++++++++++++++++++++++---------
+>> -
+>>>>>    docs/block-replication.txt |  28 +++--
+>>>>>    include/net/filter.h       |   2 +
+>>>>>    net/filter.c               |  92 ++++++++++++++-
+>>>>>    qemu-options.hx            |  31 ++++-
+>>>>>    tests/test-replication.c   |  52 +++++++++
+>>>>>    7 files changed, 389 insertions(+), 75 deletions(-)
+>>>>>
+>>>> Hello Everyone,
+>>>> So I guess this is ready for merging or will that have to wait until
+>>>> the 4.2 release is done?
+>>> Due to Qemu 4.2 release schedule, after soft feature freeze(Oct29) the
+>> master branch does not accept feature changes.
+>>> But I don't know if sub-maintainer(block or net) can queue this series first
+>> then merge it after 4.2 release?
+>>> Thanks
+>>> Zhang Chen
+>>
+>> Will try to queue this series.
+> Thank you Jason~
+>
+> Thanks
+> Zhang Chen
+>
+>> Thanks
+>>
+>>
+>>>> Regards,
+>>>> Lukas Straub
 
