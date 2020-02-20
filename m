@@ -2,83 +2,87 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6638BC11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF90AC11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:43:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32DC0208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8636A2068F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:43:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="by+DcOBI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32DC0208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drUwT/is"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8636A2068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4mv0-0002kV-BH
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 09:35:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42323)
+	id 1j4n37-00079i-FH
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 09:43:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j4mtz-0002CA-Fd
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:34:08 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1j4n2O-0006IA-Bp
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j4mty-00050A-01
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:34:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30979
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j4mtx-0004zK-SW
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:34:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582209245;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MgGN5ietvGg6gQm01uFkWo2pGnU8FZyJJRZHG43wmdA=;
- b=by+DcOBIWjMh/5hFAB/ZTB+wsN0u8QSf6fy2E26rV/0Eb0PAU0Sjlwu6Be5dzs+DCe/VHS
- OPf6az4V4ENFyjYfrijUycrQzSpmMPf9YUldzIUpzeZFc9AtIaZujRhTHGzbSMozopLH4c
- 0Ounu8lpbY7mMVTpmYZ3TaAOjlls12g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-jKQK2t90Pt6Vr87bnqV60g-1; Thu, 20 Feb 2020 09:34:00 -0500
-X-MC-Unique: jKQK2t90Pt6Vr87bnqV60g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C694107ACCC;
- Thu, 20 Feb 2020 14:33:58 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F2E75C553;
- Thu, 20 Feb 2020 14:33:57 +0000 (UTC)
-Subject: Re: [RFC PATCH v3 05/27] qcow2: Document the Extended L2 Entries
- feature
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1577014346.git.berto@igalia.com>
- <0b884ddcd0ac3a3c0b8cdd9d09c74566ac107c9a.1577014346.git.berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e559107b-b0c1-a2be-4fc2-29f050cced34@redhat.com>
-Date: Thu, 20 Feb 2020 08:33:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <0b884ddcd0ac3a3c0b8cdd9d09c74566ac107c9a.1577014346.git.berto@igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <bmeng.cn@gmail.com>) id 1j4n2N-0004C5-BW
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:42:48 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33502)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1j4n2N-0004BJ-6m; Thu, 20 Feb 2020 09:42:47 -0500
+Received: by mail-pg1-x544.google.com with SMTP id 6so2059071pgk.0;
+ Thu, 20 Feb 2020 06:42:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:in-reply-to:references;
+ bh=r6loH1PyKYFmFT1PyHXkle7Gr60M16j3Lz2hlEr7IGI=;
+ b=drUwT/isZRTc82AE05qbvlzN7+kh0TJp9W+rZIyIivG/G7UtkpDitytNJqCY9+ULju
+ BnODFiz36auh7a4PcLcQt8JRzHYcpl5YciB0jiEgUiPh+bvEx2nBbKZjJiDGw/5EH9SL
+ BEtaXBGKurwi4ZBn2XVE5uTcIkalIitXCRuFYGdWGkwVZAzdejGRnjf/nSTzJbzW3TZd
+ IfdeJgJi5wgbNnuGfLz9/8GEK17RiZl17L+nKu4eHW3f5K74WVQO1725NRKsGKhMAZZN
+ 90j3h05L7Lw62wQtxBhLtoYsZkrp68Y8ZWL1GoVUqaCClDCXVnz2k7OumNtJbAGaufV+
+ fEDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references;
+ bh=r6loH1PyKYFmFT1PyHXkle7Gr60M16j3Lz2hlEr7IGI=;
+ b=izKfMKB55/f6dxhT7NrJktcWZETfxFEFb8bS57qCQdFA7KM2zNDBZzyJSFtaA3VWfF
+ bTrPt+PWJeme0aWgLrZ6WYdgv3BOdFYj4MbHQutp8RhISlmRnmJ+rvFjDvOIKLAnhtKI
+ olBpnjyMfyPHQ4Z/KAPrMCDw8zYvwaFl2ilVaY9dArqbDbuB1UUVjwfa78hHAiUyjIIV
+ rWmhTykR54WeZmg3gb22cyg7Bwn3xlqDc9TrRZuB5E2am8EOTkOQq5iI750p4znI1/ve
+ mYekV33XUrJOlxNTJtnL6W7dF4+mWs1hsrQ8yAtRKf+9W1/TF/AxszHD55Bu1cqaZoU/
+ z6eg==
+X-Gm-Message-State: APjAAAWjEbqVmnE0UagpnMYzXPaHy1VEB1PZc5WOLOaNPRI7pfmp6eW2
+ FAz/bF6eVHwZ/02QM0FvL2Y=
+X-Google-Smtp-Source: APXvYqzbX+FwUWSVQVndxIpoaJNZxZRvpPQknhSS5dIX3zNyNa4qPJAnOjTPU9HyPeu2gZr/YHBZVA==
+X-Received: by 2002:a62:19d1:: with SMTP id 200mr31038643pfz.26.1582209765834; 
+ Thu, 20 Feb 2020 06:42:45 -0800 (PST)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id v9sm3837140pja.26.2020.02.20.06.42.45
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Thu, 20 Feb 2020 06:42:45 -0800 (PST)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH 2/2] riscv: sifive_u: Update BIOS_FILENAME for 32-bit
+Date: Thu, 20 Feb 2020 06:42:38 -0800
+Message-Id: <1582209758-2996-2-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1582209758-2996-1-git-send-email-bmeng.cn@gmail.com>
+References: <1582209758-2996-1-git-send-email-bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,54 +94,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/22/19 5:36 AM, Alberto Garcia wrote:
-> Subcluster allocation in qcow2 is implemented by extending the
-> existing L2 table entries and adding additional information to
-> indicate the allocation status of each subcluster.
-> 
-> This patch documents the changes to the qcow2 format and how they
-> affect the calculation of the L2 cache size.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
+Update BIOS_FILENAME to consider 32-bit bios image file name.
 
-> @@ -437,7 +445,7 @@ cannot be relaxed without an incompatible layout change).
->   Given an offset into the virtual disk, the offset into the image file can be
->   obtained as follows:
->   
-> -    l2_entries = (cluster_size / sizeof(uint64_t))
-> +    l2_entries = (cluster_size / sizeof(uint64_t))        [*]
->   
->       l2_index = (offset / cluster_size) % l2_entries
->       l1_index = (offset / cluster_size) / l2_entries
-> @@ -447,6 +455,8 @@ obtained as follows:
->   
->       return cluster_offset + (offset % cluster_size)
->   
-> +    [*] this changes if Extended L2 Entries are enabled, see next section
+Tested booting Linux v5.5 32-bit image (built from rv32_defconfig
+plus CONFIG_SOC_SIFIVE) with the default 32-bit bios image.
 
-> +The size of an extended L2 entry is 128 bits so the number of entries per table
-> +is calculated using this formula:
-> +
-> +    l2_entries = (cluster_size / (2 * sizeof(uint64_t)))
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
 
-Is it worth unifying these statements by writing:
+ hw/riscv/sifive_u.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-l2_entries = (cluster_size / ((1 + extended_l2) * sizeof(uint64_t)))
-
-or is that too confusing?
-
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ca561d3..371133e 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -57,7 +57,11 @@
+ 
+ #include <libfdt.h>
+ 
+-#define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
++#if defined(TARGET_RISCV32)
++# define BIOS_FILENAME "opensbi-riscv32-sifive_u-fw_jump.bin"
++#else
++# define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
++#endif
+ 
+ static const struct MemmapEntry {
+     hwaddr base;
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.7.4
 
 
