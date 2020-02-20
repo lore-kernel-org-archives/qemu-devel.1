@@ -2,78 +2,80 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5D0C11D0C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 19:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CA3C11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 20:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D693B206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 19:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3D5F20722
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 20:13:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkyS8/xp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D693B206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHoV5KJa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D5F20722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4rtL-0004qA-19
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 14:53:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37600)
+	id 1j4sCH-00054W-Ta
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 15:13:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1j4rse-000482-1l
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 14:53:05 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j4sB8-0003jo-01
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 15:12:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1j4rsb-0006YO-P4
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 14:53:03 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29891
+ (envelope-from <dgilbert@redhat.com>) id 1j4sB4-000727-Pr
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 15:12:09 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43674
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1j4rsb-0006Xn-IT
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 14:53:01 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j4sB4-00071r-GM
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 15:12:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582228379;
+ s=mimecast20190719; t=1582229525;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JkuBRkLESFQZs8D8htw11pdaZEirNZsVNsN7xtQWTxM=;
- b=DkyS8/xpkgQkqxomFrdSrbbss+Of0oNucIoufSlnFLzFcIBzpDCKN/dbBodO8HadiLfQ7c
- 7MGi9JwaHS/03+mFPALtelsPAwbtqDUd4vRqW7IuA+jnRJknxxrvMYvQL0j4t+WYqvpQ3U
- 3fIkym20+LUKvzbqvY4VWNhavDgB4zc=
+ bh=H5ieoWgbqoEu3nVW2KvPGZquCuIsfpB31o3TY0o/gnc=;
+ b=SHoV5KJaH7/LHrOV63pTNITB1CPgQr5sNmgVAYk+3jrwK0iQpLYrf5PIJJi6uadp9UsWlu
+ wGHidXjmoUAXiOKHfbKKjfC3KjpB7wF6w942Ug196LHuWpExp+VrWXY2zDHw/VAKwcQ+1j
+ OvqYFuEkSHMxd5N2XwfdFSk9FGphSNU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-YnsFgNJLNUKPLMh_lgr87w-1; Thu, 20 Feb 2020 14:52:52 -0500
-X-MC-Unique: YnsFgNJLNUKPLMh_lgr87w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-176-OEKz89jlMdSkhiZDVi8J9g-1; Thu, 20 Feb 2020 15:12:03 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C9C5925A0;
- Thu, 20 Feb 2020 19:52:51 +0000 (UTC)
-Received: from dhcp-17-202.bos.redhat.com (dhcp-17-202.bos.redhat.com
- [10.18.17.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 03DB290F73;
- Thu, 20 Feb 2020 19:52:47 +0000 (UTC)
-Date: Thu, 20 Feb 2020 14:52:45 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Drew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v9 2/3] Acceptance test: add "boot_linux" tests
-Message-ID: <20200220195245.GA14444@dhcp-17-202.bos.redhat.com>
-References: <20200220020652.16276-1-crosa@redhat.com>
- <20200220020652.16276-3-crosa@redhat.com>
- <4fe4f011-1d4a-aaea-2536-223194dacd8c@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F4EE1B18BC0;
+ Thu, 20 Feb 2020 20:12:02 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F418F388;
+ Thu, 20 Feb 2020 20:11:57 +0000 (UTC)
+Date: Thu, 20 Feb 2020 20:11:55 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+Message-ID: <20200220201155.GJ2836@work-vm>
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <4fe4f011-1d4a-aaea-2536-223194dacd8c@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87blptckoi.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: OEKz89jlMdSkhiZDVi8J9g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ikeVEW9yuYc//A+q"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
@@ -88,270 +90,514 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Willian Rampazzo <wrampazz@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ikeVEW9yuYc//A+q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Markus Armbruster (armbru@redhat.com) wrote:
+> Cc: David for questions regarding the HMP core.  David, please look for
+> "Is HMP blocking the main loop a problem?"
+>=20
+> Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> writes:
+>=20
+> > Hi
+> >
+> > On Thu, Feb 20, 2020 at 8:49 AM Markus Armbruster <armbru@redhat.com> w=
+rote:
+> >>
+> >> Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com> writes:
+> >>
+> >> > Thanks to the QMP coroutine support, the screendump handler can
+> >> > trigger a graphic_hw_update(), yield and let the main loop run until
+> >> > update is done. Then the handler is resumed, and the ppm_save() will
+> >> > write the screen image to disk in the coroutine context (thus
+> >> > non-blocking).
+> >> >
+> >> > For now, HMP doesn't have coroutine support, so it remains potential=
+ly
+> >> > outdated or glitched.
+> >> >
+> >> > Fixes:
+> >> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
+> >> >
+> >> > Based-on: <20200109183545.27452-2-kwolf@redhat.com>
+> >> >
+> >> > Cc: Kevin Wolf <kwolf@redhat.com>
+> >> > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >> > ---
+> >> >  qapi/ui.json    |  3 ++-
+> >> >  ui/console.c    | 35 +++++++++++++++++++++++++++--------
+> >> >  ui/trace-events |  2 +-
+> >> >  3 files changed, 30 insertions(+), 10 deletions(-)
+> >> >
+> >> > diff --git a/qapi/ui.json b/qapi/ui.json
+> >> > index e04525d8b4..d941202f34 100644
+> >> > --- a/qapi/ui.json
+> >> > +++ b/qapi/ui.json
+> >> > @@ -96,7 +96,8 @@
+> >> >  #
+> >> >  ##
+> >> >  { 'command': 'screendump',
+> >> > -  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
+> >> > +  'data': {'filename': 'str', '*device': 'str', '*head': 'int'},
+> >> > +  'coroutine': true }
+> >> >
+> >> >  ##
+> >> >  # =3D=3D Spice
+> >> > diff --git a/ui/console.c b/ui/console.c
+> >> > index ac79d679f5..db184b473f 100644
+> >> > --- a/ui/console.c
+> >> > +++ b/ui/console.c
+> >> > @@ -167,6 +167,7 @@ struct QemuConsole {
+> >> >      QEMUFIFO out_fifo;
+> >> >      uint8_t out_fifo_buf[16];
+> >> >      QEMUTimer *kbd_timer;
+> >> > +    Coroutine *screendump_co;
+> >> >
+> >> >      QTAILQ_ENTRY(QemuConsole) next;
+> >> >  };
+> >> > @@ -194,7 +195,6 @@ static void dpy_refresh(DisplayState *s);
+> >> >  static DisplayState *get_alloc_displaystate(void);
+> >> >  static void text_console_update_cursor_timer(void);
+> >> >  static void text_console_update_cursor(void *opaque);
+> >> > -static bool ppm_save(int fd, DisplaySurface *ds, Error **errp);
+> >> >
+> >> >  static void gui_update(void *opaque)
+> >> >  {
+> >> > @@ -263,6 +263,9 @@ static void gui_setup_refresh(DisplayState *ds)
+> >> >
+> >> >  void graphic_hw_update_done(QemuConsole *con)
+> >> >  {
+> >> > +    if (con && con->screendump_co) {
+> >>
+> >> How can !con happen?
+> >
+> > I don't think it can happen anymore (the patch evolved over several
+> > years, this is probably a left-over). In any case, it doesn't hurt.
+>=20
+> I hate such dead checks, because they make me assume they can actually
+> happen.  Incorrect assumptions breed bugs.
+>=20
+> But I'm willing to defer to the maintainer here.  Gerd?
+>=20
+> >> > +        aio_co_wake(con->screendump_co);
+> >> > +    }
+> >> >  }
+> >> >
+> >> >  void graphic_hw_update(QemuConsole *con)
+> >> > @@ -310,16 +313,16 @@ void graphic_hw_invalidate(QemuConsole *con)
+> >> >      }
+> >> >  }
+> >> >
+> >> > -static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+> >> > +static bool ppm_save(int fd, pixman_image_t *image, Error **errp)
+> >> >  {
+> >> > -    int width =3D pixman_image_get_width(ds->image);
+> >> > -    int height =3D pixman_image_get_height(ds->image);
+> >> > +    int width =3D pixman_image_get_width(image);
+> >> > +    int height =3D pixman_image_get_height(image);
+> >> >      g_autoptr(Object) ioc =3D OBJECT(qio_channel_file_new_fd(fd));
+> >> >      g_autofree char *header =3D NULL;
+> >> >      g_autoptr(pixman_image_t) linebuf =3D NULL;
+> >> >      int y;
+> >> >
+> >> > -    trace_ppm_save(fd, ds);
+> >> > +    trace_ppm_save(fd, image);
+> >> >
+> >> >      header =3D g_strdup_printf("P6\n%d %d\n%d\n", width, height, 25=
+5);
+> >> >      if (qio_channel_write_all(QIO_CHANNEL(ioc),
+> >> > @@ -329,7 +332,7 @@ static bool ppm_save(int fd, DisplaySurface *ds,=
+ Error **errp)
+> >> >
+> >> >      linebuf =3D qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, width)=
+;
+> >> >      for (y =3D 0; y < height; y++) {
+> >> > -        qemu_pixman_linebuf_fill(linebuf, ds->image, width, 0, y);
+> >> > +        qemu_pixman_linebuf_fill(linebuf, image, width, 0, y);
+> >> >          if (qio_channel_write_all(QIO_CHANNEL(ioc),
+> >> >                                    (char *)pixman_image_get_data(lin=
+ebuf),
+> >> >                                    pixman_image_get_stride(linebuf),=
+ errp) < 0) {
+> >>
+> >> Looks like an unrelated optimization / simplification.  If I was
+> >> maintainer, I'd ask for a separate patch.
+> >
+> > I can be split, but it's related. We should pass a reference to
+> > pixman_image_t, rather than a pointer to DisplaySurface, as the
+> > underlying image may change over time, and would result in corrupted
+> > coroutine save or worse.
+>=20
+> Work that into your commit message, please.  Might be easier if you
+> split, but that's between you and the maintainer :)
+>=20
+> >> > @@ -340,11 +343,18 @@ static bool ppm_save(int fd, DisplaySurface *d=
+s, Error **errp)
+> >> >      return true;
+> >> >  }
+> >> >
+> >> > +static void graphic_hw_update_bh(void *con)
+> >> > +{
+> >> > +    graphic_hw_update(con);
+> >> > +}
+> >> > +
+> >> > +/* may be called in coroutine context or not */
+> >>
+> >> Hmm.
+> >>
+> >> Even though the QMP core always calls in coroutine context, the commen=
+t
+> >> is correct: hmp_screendump() calls it outside coroutine context.
+> >> Because of that...
+> >>
+> >> >  void qmp_screendump(const char *filename, bool has_device, const ch=
+ar *device,
+> >> >                      bool has_head, int64_t head, Error **errp)
+> >> >  {
+> >> >      QemuConsole *con;
+> >> >      DisplaySurface *surface;
+> >> > +    g_autoptr(pixman_image_t) image =3D NULL;
+> >> >      int fd;
+> >> >
+> >> >      if (has_device) {
+> >> > @@ -365,7 +375,15 @@ void qmp_screendump(const char *filename, bool =
+has_device, const char *device,
+> >> >          }
+> >> >      }
+> >> >
+> >> > -    graphic_hw_update(con);
+> >> > +    if (qemu_in_coroutine()) {
+> >> > +        assert(!con->screendump_co);
+> >>
+> >> What if multiple QMP monitors simultaneously screendump?  Hmm, it work=
+s
+> >> because all execute one after another in the same coroutine
+> >> qmp_dispatcher_co.  Implicit mutual exclusion.
+> >>
+> >> Executing them one after another is bad, because it lets an ill-behave=
+d
+> >> QMP command starve *all* QMP monitors.  We do it only out of
+> >> (reasonable!) fear of implicit mutual exclusion requirements like the
+> >> one you add.
+> >>
+> >> Let's not add more if we can help it.
+> >
+> > The situation is not worse than the current blocking handling.
+>=20
+> Really?
+>=20
+> What makes executing multiple qmp_screendump() concurrently (in separate
+> threads) or interleaved (in separate coroutines in the same thread)
+> unsafe before this patch?
+>=20
+> >> Your screendump_co is per QemuConsole instead of per QMP monitor only
+> >> because you need to find the coroutine in graphic_hw_update_done().  C=
+an
+> >> we somehow pass it via function arguments?
+> >
+> > I think it could be done later, so I suggest a TODO.
+>=20
+> We should avoid making our dependence on implicit mutual exclusion
+> worse.  When we do it anyway, a big, fat, ugly comment is definitely
+> called for.
+>=20
+> >> In case avoiding the mutual exclusion is impractical: please explain i=
+t
+> >> in a comment to make it somewhat less implicit.
+>=20
+> It is anything but: see appended patch.
+>=20
+> >> > +        con->screendump_co =3D qemu_coroutine_self();
+> >> > +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> >> > +                                graphic_hw_update_bh, con);
+> >> > +        qemu_coroutine_yield();
+> >> > +        con->screendump_co =3D NULL;
+> >> > +    }
+> >> > +
+> >>
+> >> ... the command handler needs extra code to cope with either.  Is this
+> >> really what we want for coroutine QMP command handlers?  We'll acquire
+> >> more of them, and I'd hate to make each one run both in and outside
+> >> coroutine context.  Shouldn't we let the HMP core take care of this?  =
+Or
+> >> at least have some common infrastructure these handlers can use?
+> >
+> > We have several functions that have this dual support, for ex QIO.
+> >
+> > Changing both QMP & HMP commands to run in coroutine is likely
+> > additional work that we may not care at this point.
+>=20
+> If it wasn't for non-QMP calls (typically HMP, but also CLI), then
+> handlers for QMP commands with 'coroutine': true could be coroutine_fn.
+>=20
+> So far, coroutine_fn is merely documentation.  Perhaps it can guide a
+> checker for "do coroutine stuff only in coroutines" some day.  Would be
+> nice, because the coroutine calls are often buried deep, and far away
+> from the code that ensures they run in a coroutine.
+>=20
+> My point is: marking functions coroutine_fn is good.  We should do it
+> more.  We should try to avoid stuff that hinders doing it more.
+>=20
+> > I propose to leave a TODO, once we have several similar QMP & HMP mix
+> > cases we can try to find a common HMP solution to make the code
+> > simpler in QMP handler.
+>=20
+> Collecting several users before building infrastructure makes sense when
+> the design of the infrastructure isn't obvious, or when the need for it
+> is in doubt.
+>=20
+> Neither is the case for running QMP handlers in a coroutine: QMP
+> commands blocking the main loop is without doubt a problem we need to
+> solve, and the way to solve it was obvious enough for Kevin to do it
+> with one user: block_resize.  A second one quickly followed: screendump.
+>=20
+> The only part that's different for HMP, I think, is "need".
+>=20
+> Is HMP blocking the main loop a problem?
+>=20
+> If yes, is it serious enough to justify solving it?
 
-On Thu, Feb 20, 2020 at 01:49:40PM -0300, Wainer dos Santos Moschetta wrote=
-:
-> On 2/19/20 11:06 PM, Cleber Rosa wrote:
-> > +
-> > +    def test_virt_tcg(self):
-> > +        """
-> > +        :avocado: tags=3Daccel:tcg
-> > +        :avocado: tags=3Dcpu:cortex-a53
-> > +        """
-> > +        if not tcg_available(self.qemu_bin):
-> > +            self.cancel(TCG_NOT_AVAILABLE)
-> > +        self.vm.add_args("-accel", "tcg")
-> > +        self.vm.add_args('-cpu', 'cortex-a53')
-> > +        self.add_common_args()
-> > +        self.launch_and_wait()
-> > +
-> > +    def test_virt_kvm(self):
-> > +        """
-> > +        :avocado: tags=3Daccel:kvm
-> > +        :avocado: tags=3Dcpu:host
-> > +        """
-> > +        if not kvm_available(self.arch, self.qemu_bin):
-> > +            self.cancel(KVM_NOT_AVAILABLE)
-> > +        self.vm.add_args("-accel", "kvm")
-> > +        self.vm.add_args("-cpu", "host")
-> > +        self.add_common_args()
-> > +        self.launch_and_wait()
+I don't mind if HMP blocks for a small time while doing something, but
+not if it can hang if the guest (or something else like it) misbehaves.
+Not if it's something you might need to issue another command to recover
+from.
+
+Dave
+
+> If yes, then putting workarounds into QMP handlers now so we can put off
+> solving it some more is taking on technical debt.
+>=20
+> > I don't know if this is going to be a common pattern, we may end up
+> > with conversions that can run both without explicit handling (like the
+> > ppm_save() function, thanks to QIO).
+>=20
+> Yes, such handlers may exist.  Running them out of coroutine context
+> would throw away their capability not to block the event loop, though,
+> wouldn't it?
+>=20
+> >> Why is it okay not to call graphic_hw_update() anymore when
+> >> !qemu_in_coroutine()?
+> >
+> > You could call it, but then you should wait for completion by
+> > reentering the main loop (that was the point of my earlier qapi-async
+> > series)
+>=20
+> Possibly stupid question: why is it necessary before this patch
+> (assuming it is, since we call it), and why is it no longer necessary
+> after?
+>=20
+> Oh, see below.
+>=20
+> >>
+> >> If qemu_in_coroutine(), we now run graphic_hw_update() in a bottom hal=
+f,
+> >> then yield until the update completes (see graphic_hw_update_done()
+> >> above).  Can you explain the need for the bottom half?
+> >
+> > At least spice rendering is done in a separate thread, completion is as=
+ync.
+>=20
+> When I ask a stupid question like this one, I'm really after the "for
+> dummies" explanation.  I may be able to figure it out myself with some
+> effort, but having to put that kind of effort into patch review makes me
+> grumpy, and once I'm sufficiently grumpy, I don't want to review patches
+> anymore, let alone merge them.
+>=20
+> Oh well, let me try.  We're in the main loop.  We want to trigger a
+> "graphics update" (whatever that is, doesn't matter) and wait for it to
+> complete without blocking the main loop.
+>=20
+> "Without blocking the main loop" means the QMP coroutine yields.  I'd
+> naively expect
+>=20
+>     QMP coroutine: schedule the job; yield
+>     whatever gets scheduled: complete the job; wake up QMP coroutine
+>=20
+> Now let's examine the "graphics update" interface.
+>=20
+> GraphicHwOps callback gfx_update() comes in two flavours:
+>=20
+> * synchronous: complete the job, return
+>=20
+> * asynchronous: start the job, return immediately,
+>   graphic_hw_update_done() will get called on job completion
+>=20
+> graphic_hw_update() partly hides the difference:
+>=20
+> * synchronous: complete the job, call graphic_hw_update_done()
+>=20
+> * asynchronous: start the job, return immediately,
+>   graphic_hw_update_done() will get called on job completion
+>=20
+> This lets you treat the synchronous case more like the asynchronous
+> case.
+>=20
+> You use graphic_hw_update_done() to wake up the QMP coroutine.
+>=20
+> I think I can now answer my question "why is it okay not to call
+> graphic_hw_update() anymore when !qemu_in_coroutine()?"
+>=20
+> Before the patch, both QMP and HMP:
+>=20
+> * with synchronous gfx_update(): we update before we write out the
+>   screendump.  The screendump is up-to-date.  Both update and write out
+>   block the main loop.
+>=20
+> * with asynchronous gfx_update(): we start updating, but don't wait for
+>   it to complete before we write out.  This is wrong.  Write out blocks
+>   the main loop, but update does not.
+>=20
+> After the patch:
+>=20
+> * QMP with either gfx_update(): we update before we write out the
+>   screendump.  The screendump is up-to-date.  Neither update nor write
+>   out block the main loop.  Improvement.
+>=20
+> * HMP with either gfx_update(): we don't update before we write out.
+>   Similarly wrong for asynchronous gfx_update(), regression for
+>   synchronous gfx_update().  Write out blocks the main loop as before.
+>=20
+> Why is the regression okay?
+>=20
+> Back to the bottom half.  The way graphic_hw_update() works, the QMP
+> coroutine can't schedule then yield.  It *has* to yield before
+> graphic_hw_update() runs.  That means we need a bottom half.
+>=20
+> Alright, I'm officially grumpy now.
+>=20
+> Please explain the need for a bottom half in a comment.
+>=20
+> >> >      surface =3D qemu_console_surface(con);
+> >> >      if (!surface) {
+> >> >          error_setg(errp, "no surface");
+> >> > @@ -379,7 +397,8 @@ void qmp_screendump(const char *filename, bool h=
+as_device, const char *device,
+> >> >          return;
+> >> >      }
+> >> >
+> >> > -    if (!ppm_save(fd, surface, errp)) {
+> >> > +    image =3D pixman_image_ref(surface->image);
+> >> > +    if (!ppm_save(fd, image, errp)) {
+> >> >          qemu_unlink(filename);
+> >> >      }
+> >> >  }
+> >> > diff --git a/ui/trace-events b/ui/trace-events
+> >> > index 0dcda393c1..e8726fc969 100644
+> >> > --- a/ui/trace-events
+> >> > +++ b/ui/trace-events
+> >> > @@ -15,7 +15,7 @@ displaysurface_create_pixman(void *display_surface=
+) "surface=3D%p"
+> >> >  displaysurface_free(void *display_surface) "surface=3D%p"
+> >> >  displaychangelistener_register(void *dcl, const char *name) "%p [ %=
+s ]"
+> >> >  displaychangelistener_unregister(void *dcl, const char *name) "%p [=
+ %s ]"
+> >> > -ppm_save(int fd, void *display_surface) "fd=3D%d surface=3D%p"
+> >> > +ppm_save(int fd, void *image) "fd=3D%d image=3D%p"
+> >> >
+> >> >  # gtk.c
+> >> >  # gtk-gl-area.c
 >=20
 >=20
-> For aarch64 tests it seems '-cpu max' is the best choice. See in
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg672755.html
->=20
->
-
-+drew
-
-Thanks for pointing that out.  There's one thing, though, which I can
-not agree on.  And I know that Drew is an expert on the matter, which
-makes it harder to disagree on... but, I've got results which clearly
-indicate that *not using* the gic-version machine parameter still gets
-me KVM:
-
-./tests/venv/bin/avocado run tests/acceptance/boot_linux.py:BootLinuxAarch6=
-4.test_virt_kvm
-JOB ID     : 21a394b884b474ceee0a045b3e74f98da0aee023
-JOB LOG    : /home/cleber/avocado/job-results/job-2020-02-20T14.28-21a394b/=
-job.log
- (1/1) tests/acceptance/boot_linux.py:BootLinuxAarch64.test_virt_kvm: PASS =
-(35.10 s)
-RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CA=
-NCEL 0
-JOB TIME   : 35.87 s
-
-VM launch command:
-   aarch64-softmmu/qemu-system-aarch64
-   -display none
-   -vga none
-   -chardev socket,id=3Dmon,path=3D/var/tmp/tmpntz_r_h7/qemu-18331-monitor.=
-sock
-   -mon chardev=3Dmon,mode=3Dcontrol
-   -machine virt
-   -chardev socket,id=3Dconsole,path=3D/var/tmp/tmpntz_r_h7/qemu-18331-cons=
-ole.sock,server,nowait
-   -serial chardev:console
-   -smp 2
-   -m 1024
-   -drive file=3D/var/tmp/avocado_u9jm04di/avocado_job_28oth9kk/1-tests_acc=
-eptance_boot_linux.py_BootLinuxAarch64.test_virt_kvm/Fedora-Cloud-Base-31-1=
-.9.aarch64-05265df5.qcow2 -drive file=3D/var/tmp/avocado_u9jm04di/avocado_j=
-ob_28oth9kk/1-tests_acceptance_boot_linux.py_BootLinuxAarch64.test_virt_kvm=
-/cloudinit.iso,format=3Draw
-   -accel kvm
-   -cpu host
-   -bios /home/cleber/build/qemu/pc-bios/edk2-aarch64-code.fd
-   -device virtio-rng-pci,rng=3Drng0
-   -object rng-random,id=3Drng0,filename=3D/dev/urandom
-
-Guest boot messages shows:
-[    1.538955] systemd[1]: Detected virtualization kvm.
-[    1.539828] systemd[1]: Detected architecture arm64.
-
-This is in contrast with:
-
-./tests/venv/bin/avocado run tests/acceptance/boot_linux.py:BootLinuxAarch6=
-4.test_virt_tcg=20
-JOB ID     : 90b9412f700e52428b59e97719496c30b4f54435
-JOB LOG    : /home/cleber/avocado/job-results/job-2020-02-20T14.32-90b9412/=
-job.log
- (1/1) tests/acceptance/boot_linux.py:BootLinuxAarch64.test_virt_tcg: PASS =
-(581.14 s)
-RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CA=
-NCEL 0
-JOB TIME   : 581.93 s
-
-VM launch command:
-   aarch64-softmmu/qemu-system-aarch64
-   -display none
-   -vga none
-   -chardev socket,id=3Dmon,path=3D/var/tmp/tmpa6i4livg/qemu-18498-monitor.=
-sock
-   -mon chardev=3Dmon,mode=3Dcontrol
-   -machine virt
-   -chardev socket,id=3Dconsole,path=3D/var/tmp/tmpa6i4livg/qemu-18498-cons=
-ole.sock,server,nowait
-   -serial chardev:console
-   -smp 2
-   -m 1024
-   -drive file=3D/var/tmp/avocado_slcj2x9e/avocado_job_x5u__309/1-tests_acc=
-eptance_boot_linux.py_BootLinuxAarch64.test_virt_tcg/Fedora-Cloud-Base-31-1=
-.9.aarch64-5b006a2f.qcow2 -drive file=3D/var/tmp/avocado_slcj2x9e/avocado_j=
-ob_x5u__309/1-tests_acceptance_boot_linux.py_BootLinuxAarch64.test_virt_tcg=
-/cloudinit.iso,format=3Draw
-   -accel tcg
-   -cpu cortex-a53
-   -bios /home/cleber/build/qemu/pc-bios/edk2-aarch64-code.fd
-   -device virtio-rng-pci,rng=3Drng0
-   -object rng-random,id=3Drng0,filename=3D/dev/urandom'
-
-Guest boot messages shows:
-[   28.606310] systemd[1]: Detected virtualization qemu.
-[   28.607861] systemd[1]: Detected architecture arm64.
-
-And with regards to the CPU type, IIRC, "max" will fallback to the
-best CPU on TCG mode.  As a general best practice in testing, I'd
-rather not have this dynamic aspect where we can avoid it.  Looks like
-with TCG we can set it to one CPU and validate that the guests work on
-that configuration.
-
-IIUC, by using either "-cpu host" or "-cpu max" for KVM, we may end up
-having the same test PASS or FAIL because of the (dynamic) host CPU.
-That's not ideal for testing purposes, but given it's outside of our
-control, do best we can do is keep track of the host CPU (via Avocado's
-sysinfo collection).
-
-Also, I've used the same CPU model that has been used on
-boot_linux_console.py:BootLinuxConsole.test_aarch64_virt, which may be
-a plus.
-
-> > +
-> > +
-> > +class BootLinuxPPC64(BootLinux):
-> > +    """
-> > +    :avocado: tags=3Darch:ppc64
-> > +    """
-> > +
-> > +    chksum =3D '7c3528b85a3df4b2306e892199a9e1e43f991c506f2cc390dc4efa=
-2026ad2f58'
-> > +
-> > +    def test_pseries_tcg(self):
-> > +        """
-> > +        :avocado: tags=3Dmachine:pseries
-> > +        :avocado: tags=3Daccel:tcg
-> > +        """
-> > +        if not tcg_available(self.qemu_bin):
-> > +            self.cancel(TCG_NOT_AVAILABLE)
-> > +        self.vm.add_args("-accel", "tcg")
-> > +        self.launch_and_wait()
-> > +
-> > +
-> > +class BootLinuxS390X(BootLinux):
-> > +    """
-> > +    :avocado: tags=3Darch:s390x
-> > +    """
-> > +
-> > +    chksum =3D '4caaab5a434fd4d1079149a072fdc7891e354f834d355069ca982f=
-dcaf5a122d'
-> > +
-> > +    def test_s390_ccw_virtio_tcg(self):
-> > +        """
-> > +        :avocado: tags=3Dmachine:s390-ccw-virtio
-> > +        :avocado: tags=3Daccel:tcg
-> > +        """
-> > +        if not tcg_available(self.qemu_bin):
-> > +            self.cancel(TCG_NOT_AVAILABLE)
-> > +        self.vm.add_args("-accel", "tcg")
-> > +        self.launch_and_wait()
-> > diff --git a/tests/requirements.txt b/tests/requirements.txt
-> > index a2a587223a..a3b5fe4159 100644
-> > --- a/tests/requirements.txt
-> > +++ b/tests/requirements.txt
-> > @@ -1,4 +1,5 @@
-> >   # Add Python module requirements, one per line, to be installed
-> >   # in the tests/venv Python virtual environment. For more info,
-> >   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> > -avocado-framework=3D=3D72.0
-> > +avocado-framework=3D=3D74.0
-> > +pycdlib=3D=3D1.9.0
->=20
->=20
-> Tested on x86_64 machine, the tests behave correctly with following
-> configurations:
->=20
-> 1. ---target-list=3Dx86_64-softmmu --disable-tcg
->=20
-> 2. ---target-list=3Dx86_64-softmmu --disable-kvm
->=20
-> 3. --target-list=3Dx86_64-softmmu,aarch64-softmmu,ppc64-softmmu,s390x-sof=
-tmmu
->=20
-> But failed if:
->=20
-> 3. ---target-list=3Dx86_64-softmmu --disable-tools.
->=20
-> And the error message is:
->=20
-> (01/32) tests/acceptance/boot_linux.py:BootLinuxX8664.test_pc_i440fx_tcg:
-> ERROR: Command 'qemu-img' could not be found in any of the PATH dirs:
-> ['/usr/bin', '/usr/sbin', '/usr/lib64/ccache', '/bin', '/root/bin', '/sbi=
-n',
-> '/usr/local/sbin', '/usr/local/bin', '/usr/libexec'] (1.58 s)
-
-This is what I call comprehensive testing! Thanks!
-
-It looks like I was not paying that much attention to what happens during
-the "self.boot.path" attribute access, and had left it "unprotected" in
-the QEMU command line arguments assignment.  But there's where a lazy
-snapshot image creation is attempted.
-
-I've adjusted the code and will have that on a v10.
-
->=20
-> Thanks!
->=20
-> - Wainer
->=20
->=20
-
-Thanks a lot for the review!
-- Cleber.
-
---ikeVEW9yuYc//A+q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5O44kACgkQZX6NM6Xy
-CfO1dw/7BYkh8oQ+TnRvluyn5RS/hk9TBNG13uC3bRlSCjeyuhV2UZ/tzXn1AsOF
-bfUvlEhbsN5E7TRHR+tUFfyC/Z/+WcXNrOHTNopSFi6j5sPC1nPKrpVpSdVUCS6o
-ENSDuc/7WKqInxlGNL3NncaNh/OvlfaZgNHjtBzbphaTGNqAWjS2IwXN1VtYs2/i
-8IPIUZyAOQaLPOMqyH7HFqvb9fxKWcy2UXJxq+rdXRO3TgjCcg4lkN51RHx7hCRH
-1BYAPB6d2r5rQ74GPp6zAg5E/KQClGUyQCjmzoDCk71GIOUWNZhSYQ6gOnmU/Cq+
-p8COrZiuCCFB5AUu+tYTiFHrVvLvoCi/n2ed1Jz6WQd6uUDDORJwcwPR62qdNR4u
-B0HCebYobIsmZdbQRMkqzvQ0KCOknmVe4qnTSbjDssM/eZzyZMZspgRzRGv+MVQG
-dPrt3f5qXWQc5D8QvPamJlVI09WUlDhqWqGSpUcz+H2lV/jF3TQ/sttCxtcymXKS
-obbrswNgOK18o2OrphvZG6RhIPDTPgn4lKw1QkxOEGoBq0g0xCezZJMBmzc+4QEy
-abhk9H+mFw+DR4USuoS9kJueKn+YqKios/mnsFM5x3+NDqr3Xwrcj/4uqhQKKBhT
-KvIDlf8IxrFOy+5AMRJVy6aZW2Ecc1mE3QSF12VKas/2OOTTPyU=
-=ylE2
------END PGP SIGNATURE-----
-
---ikeVEW9yuYc//A+q--
+> diff --git a/ui/console.c b/ui/console.c
+> index 57df3a5439..c5aabf5a5f 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -167,7 +167,6 @@ struct QemuConsole {
+>      QEMUFIFO out_fifo;
+>      uint8_t out_fifo_buf[16];
+>      QEMUTimer *kbd_timer;
+> -    Coroutine *screendump_co;
+> =20
+>      QTAILQ_ENTRY(QemuConsole) next;
+>  };
+> @@ -261,14 +260,20 @@ static void gui_setup_refresh(DisplayState *ds)
+>      ds->have_text =3D have_text;
+>  }
+> =20
+> -void graphic_hw_update_done(QemuConsole *con)
+> +static void graphic_hw_update_done_with_kick(QemuConsole *con,
+> +                                             Coroutine *kick_me)
+>  {
+> -    if (con && con->screendump_co) {
+> -        aio_co_wake(con->screendump_co);
+> +    if (kick_me) {
+> +        aio_co_wake(kick_me);
+>      }
+>  }
+> =20
+> -void graphic_hw_update(QemuConsole *con)
+> +void graphic_hw_update_done(QemuConsole *con)
+> +{
+> +    graphic_hw_update_done_with_kick(con, NULL);
+> +}
+> +
+> +static void graphic_hw_update_with_kick(QemuConsole *con, Coroutine *kic=
+k_me)
+>  {
+>      bool async =3D false;
+>      if (!con) {
+> @@ -279,10 +284,15 @@ void graphic_hw_update(QemuConsole *con)
+>          async =3D con->hw_ops->gfx_update_async;
+>      }
+>      if (!async) {
+> -        graphic_hw_update_done(con);
+> +        graphic_hw_update_done_with_kick(con, kick_me);
+>      }
+>  }
+> =20
+> +void graphic_hw_update(QemuConsole *con)
+> +{
+> +    graphic_hw_update_with_kick(con, NULL);
+> +}
+> +
+>  void graphic_hw_gl_block(QemuConsole *con, bool block)
+>  {
+>      assert(con !=3D NULL);
+> @@ -343,9 +353,16 @@ static bool ppm_save(int fd, pixman_image_t *image, =
+Error **errp)
+>      return true;
+>  }
+> =20
+> -static void graphic_hw_update_bh(void *con)
+> +typedef struct {
+> +    QemuConsole *con;
+> +    Coroutine *kick_me;
+> +} UpdateBHargs;
+> +
+> +static void graphic_hw_update_bh(void *p)
+>  {
+> -    graphic_hw_update(con);
+> +    UpdateBHargs *args =3D p;
+> +
+> +    graphic_hw_update_with_kick(args->con, args->kick_me);
+>  }
+> =20
+>  /* may be called in coroutine context or not */
+> @@ -376,12 +393,13 @@ void qmp_screendump(const char *filename, bool has_=
+device, const char *device,
+>      }
+> =20
+>      if (qemu_in_coroutine()) {
+> -        assert(!con->screendump_co);
+> -        con->screendump_co =3D qemu_coroutine_self();
+> +        UpdateBHargs args =3D {
+> +            .con =3D con,
+> +            .kick_me =3D qemu_coroutine_self(),
+> +        };
+>          aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> -                                graphic_hw_update_bh, con);
+> +                                graphic_hw_update_bh, &args);
+>          qemu_coroutine_yield();
+> -        con->screendump_co =3D NULL;
+>      }
+> =20
+>      surface =3D qemu_console_surface(con);
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
