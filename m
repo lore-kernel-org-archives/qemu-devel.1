@@ -7,56 +7,54 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32F7C7619D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E654C5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E3622465D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEEDD208C4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NQqanpmE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3622465D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KlwVbPdA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEDD208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35403 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4can-0005SS-NK
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:33:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41400)
+	id 1j4cc0-0007Y4-2f
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:34:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cRA-0004hA-02
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cRA-0004iA-Hs
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR6-0008Lo-Ml
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:39 -0500
-Received: from ozlabs.org ([203.11.71.1]:49191)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR8-0008OZ-T6
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:40 -0500
+Received: from ozlabs.org ([203.11.71.1]:48641)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4cR6-0008IB-AM; Wed, 19 Feb 2020 22:23:36 -0500
+ id 1j4cR8-0008Lz-FZ; Wed, 19 Feb 2020 22:23:38 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NKg03ztqz9sSQ; Thu, 20 Feb 2020 14:23:24 +1100 (AEDT)
+ id 48NKg20t9Hz9sSd; Thu, 20 Feb 2020 14:23:25 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582169004;
- bh=GpG7JIVsiHpMpesoVJsSFbR7MFKVdTtNyC10o80HfXM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582169006;
+ bh=5vj5hZheaPC8JaSv3aSxTYhdCA9hs4iVnlvVk/qgUQc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NQqanpmEFWysOwRm2YLPYflYVs/ZQMaqreoK7+H1+hmM5p79DCEHWlw3k9ViENuKu
- ECTxqLLb6zrrcSO7jewHBZqBgoeLzbAXxi18A6XII005HzVJooG/NAzG4U0iyQFF5I
- tfQjPZW1jELUdPfEGzpF+xiBKfijNWMwjMy3mnks=
+ b=KlwVbPdAniOO+nlxBGibIneDQ3m00QAERwWxPSjtdhgRAZfRx8mok+o+s15nCHi2H
+ ohW4lTAIcTRKWYNZEz/dSd24iHEYjI8PZYKPfHOrJw8CJ4IjoQUvRim1LBHe3h/8pf
+ hb4qxH9fVfyBIoF+cxDzim3iZvN+zCSu4ScCGHpQ=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	groug@kaod.org,
 	clg@kaod.org
-Subject: [PATCH v5 03/18] target/ppc: Correct handling of real mode accesses
- with vhyp on hash MMU
-Date: Thu, 20 Feb 2020 14:23:01 +1100
-Message-Id: <20200220032317.96884-4-david@gibson.dropbear.id.au>
+Subject: [PATCH v5 16/18] spapr: Don't clamp RMA to 16GiB on new machine types
+Date: Thu, 20 Feb 2020 14:23:14 +1100
+Message-Id: <20200220032317.96884-17-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 References: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -84,139 +82,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
-only model the non-hypervisor-privileged parts of the cpu.  Essentially w=
-e
-model the hypervisor's behaviour from the point of view of a guest OS, bu=
-t
-we don't model the hypervisor's execution.
+In spapr_machine_init() we clamp the size of the RMA to 16GiB and the
+comment saying why doesn't make a whole lot of sense.  In fact, this was
+done because the real mode handling code elsewhere limited the RMA in TCG
+mode to the maximum value configurable in LPCR[RMLS], 16GiB.
 
-In particular, in this mode, qemu's notion of target physical address is
-a guest physical address from the vcpu's point of view.  So accesses in
-guest real mode don't require translation.  If we were modelling the
-hypervisor mode, we'd need to translate the guest physical address into
-a host physical address.
+But,
+ * Actually LPCR[RMLS] has been able to encode a 256GiB size for a very
+   long time, we just didn't implement it properly in the softmmu
+ * LPCR[RMLS] shouldn't really be relevant anyway, it only was because we
+   used to abuse the RMOR based translation mode in order to handle the
+   fact that we're not modelling the hypervisor parts of the cpu
 
-Currently, we handle this sloppily: we rely on setting up the virtual LPC=
-R
-and RMOR registers so that GPAs are simply HPAs plus an offset, which we
-set to zero.  This is already conceptually dubious, since the LPCR and RM=
-OR
-registers don't exist in the non-hypervisor portion of the CPU.  It gets
-worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
+We've now removed those limitations in the modelling so the 16GiB clamp n=
+o
+longer serves a function.  However, we can't just remove the limit
+universally: that would break migration to earlier qemu versions, where
+the 16GiB RMLS limit still applies, no matter how bad the reasons for it
+are.
 
-Clean this up by explicitly handling the vhyp case.  While we're there,
-remove some unnecessary nesting of if statements that made the logic to
-select the correct real mode behaviour a bit less clear than it could be.
+So, we replace the 16GiB clamp, with a clamp to a limit defined in the
+machine type class.  We set it to 16 GiB for machine types 4.2 and earlie=
+r,
+but set it to 0 meaning unlimited for the new 5.0 machine type.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 25 deletions(-)
+ hw/ppc/spapr.c         | 13 ++++++++-----
+ include/hw/ppc/spapr.h |  1 +
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 3e0be4d55f..392f90e0ae 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
-          */
-         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 4dab489931..6e9f15f64d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2702,12 +2702,14 @@ static void spapr_machine_init(MachineState *mach=
+ine)
 =20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if (msr_hv || !env->has_hv_mode) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+        } else if (msr_hv || !env->has_hv_mode) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             if (!(eaddr >> 63)) {
-                 raddr |=3D env->spr[SPR_HRMOR];
-             }
--        } else {
--            /* Otherwise, check VPM for RMA vs VRMA */
--            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
--                slb =3D &env->vrma_slb;
--                if (slb->sps) {
--                    goto skip_slb_search;
--                }
--                /* Not much else to do here */
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-+            slb =3D &env->vrma_slb;
-+            if (!slb->sps) {
-+                /* Invalid VRMA setup, machine check */
-                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
-                 env->error_code =3D 0;
-                 return 1;
--            } else if (raddr < env->rmls) {
--                /* RMA. Check bounds in RMLS */
--                raddr |=3D env->spr[SPR_RMOR];
--            } else {
--                /* The access failed, generate the approriate interrupt =
-*/
-+            }
-+
-+            goto skip_slb_search;
-+        } else {
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-                 if (rwx =3D=3D 2) {
-                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-@@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-                 }
-                 return 1;
-             }
-+
-+            raddr |=3D env->spr[SPR_RMOR];
-         }
-         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
-ASK,
-                      PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
-@@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
-         /* In real mode the top 4 effective address bits are ignored */
-         raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
+     spapr->rma_size =3D node0_size;
 =20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+            return raddr;
-+        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             return raddr | env->spr[SPR_HRMOR];
--        }
--
--        /* Otherwise, check VPM for RMA vs VRMA */
--        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-             slb =3D &env->vrma_slb;
-             if (!slb->sps) {
-                 return -1;
-             }
--        } else if (raddr < env->rmls) {
--            /* RMA. Check bounds in RMLS */
--            return raddr | env->spr[SPR_RMOR];
-         } else {
--            return -1;
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-+                return -1;
-+            }
-+            return raddr | env->spr[SPR_RMOR];
-         }
-     } else {
-         slb =3D slb_lookup(cpu, addr);
+-    /* Actually we don't support unbounded RMA anymore since we added
+-     * proper emulation of HV mode. The max we can get is 16G which
+-     * also happens to be what we configure for PAPR mode so make sure
+-     * we don't do anything bigger than that
++    /*
++     * Clamp the RMA size based on machine type.  This is for
++     * migration compatibility with older qemu versions, which limited
++     * the RMA size for complicated and mostly bad reasons.
+      */
+-    spapr->rma_size =3D MIN(spapr->rma_size, 0x400000000ull);
++    if (smc->rma_limit) {
++        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
++    }
+=20
+     if (spapr->rma_size > node0_size) {
+         error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx"=
+)",
+@@ -4600,6 +4602,7 @@ static void spapr_machine_4_2_class_options(Machine=
+Class *mc)
+     compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len)=
+;
+     smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
+     smc->default_caps.caps[SPAPR_CAP_FWNMI_MCE] =3D SPAPR_CAP_OFF;
++    smc->rma_limit =3D 16 * GiB;
+     mc->nvdimm_supported =3D false;
+ }
+=20
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index fc49c1a710..8a44a1f488 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -126,6 +126,7 @@ struct SpaprMachineClass {
+     bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
+     bool linux_pci_probe;
+     bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
++    hwaddr rma_limit;          /* clamp the RMA to this size */
+=20
+     void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+                           uint64_t *buid, hwaddr *pio,=20
 --=20
 2.24.1
 
