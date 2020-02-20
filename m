@@ -2,92 +2,120 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B50C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68579C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A899820722
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:01:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A899820722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3118F207FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:11:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="I1kIRnzI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3118F207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4kVq-0006KO-Qw
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 07:01:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45456)
+	id 1j4kg1-0001Qp-8V
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 07:11:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmorel@linux.ibm.com>) id 1j4kUT-0004ss-3Z
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:59:38 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j4kfO-0000rE-D8
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:10:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmorel@linux.ibm.com>) id 1j4kUR-0003OI-HO
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:59:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47450)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j4kfN-0003ln-6A
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:10:54 -0500
+Received: from mail-db8eur05on2115.outbound.protection.outlook.com
+ ([40.107.20.115]:37985 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
- id 1j4kUR-0003Np-CR
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:59:35 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01KBvv7T083569
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:59:34 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y92xeafsq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:59:33 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
- Thu, 20 Feb 2020 11:59:29 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 20 Feb 2020 11:59:27 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01KBxQp522348024
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 20 Feb 2020 11:59:26 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 52F6B42047;
- Thu, 20 Feb 2020 11:59:26 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 078FB4204D;
- Thu, 20 Feb 2020 11:59:26 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.41])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 20 Feb 2020 11:59:25 +0000 (GMT)
-From: Pierre Morel <pmorel@linux.ibm.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH v3 1/1] s390x: css: pong, channel subsystem test device
-Date: Thu, 20 Feb 2020 12:59:25 +0100
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1582199965-21584-1-git-send-email-pmorel@linux.ibm.com>
-References: <1582199965-21584-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 20022011-0020-0000-0000-000003ABE7B9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022011-0021-0000-0000-00002203ECEE
-Message-Id: <1582199965-21584-2-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-20_03:2020-02-19,
- 2020-02-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 adultscore=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 bulkscore=0 spamscore=0
- suspectscore=3 malwarescore=0 priorityscore=1501 impostorscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002200090
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j4kfM-0003kI-Jf; Thu, 20 Feb 2020 07:10:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LJwK9ZRgTY5Xfrn3/ebRihg3h+2Qc/YyGQy/l9rWVJFd0JDKHYOKzst9ocbeTfCXXPj79fZTJlJFxCsMJjWItmuvHMSw++HVK2+9HSsIRS+ijfVUwCyQJ4fJjwfZG8WGwu6zhHelC9R/E9m8XQcnGYjx9WZnZef9drdDiKs4x1tlqAXuqewTgWXaZ86HPOX+m0ooMX4YXQusCLgD/scgqwf6W+Wsx2MjO+TumXownySMfvde0IBcbIe8kSRQ/K5vINK0wAqQZPjvBBopm7OxpozrQkBeoxPV3fodvb1260JBM7FnsrM9XZB9mG3ErAePvm/gBXYF8qD1kuviYxyKpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hHcxBBIU3mHbQD8tJsBEPxGlMNPJkljJFZoJg/mFeoM=;
+ b=CgpvjsIMv84SCRX2//H1wMjbr5fBZEKb11bXqs82jM2D0mn8X7G/q6+3Y3ck8KhAkzTbHvxUZb4cEonGYeZ/atEtxZJIxjnfuwx3fI1AmEYY9vc2zOj7RQzyt0Fn5Nvn/VC0CaWJ2c3Pg9PBkEJvZr8WWDZkWGrRtE3mlrI/l9QKBD/2aErKweMsrnSW0lV0Yz7SG0Y6UX763A6lYBNdq+ErnwBeWfzJDhtDHQyEjj0yqmCCDnYR6+wWooopH5Pbp/HtuoPFIL2QIT9RTRQ3n4Ip1SPuVqYbdoAkhp2JUZkYsuJf7LfWDlC19i0PEyUxKNBzszbTffqzqsGK9U1KhQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hHcxBBIU3mHbQD8tJsBEPxGlMNPJkljJFZoJg/mFeoM=;
+ b=I1kIRnzIIUstmilLvWxiWeBmTEFVFB+y5HwiA7ueNeggJoAgM1kOPSsEFUaCxkux+fYXR7KNiO4Mt2sHb1W00RrKvlLt5/CjZpvZVt2iHzYqdKD8qWayMZx+zHko/MaLtKrSIhvvIPnSG1rmFUUP61Yk01KQeyrBee9mH5TSfrk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3653.eurprd08.prod.outlook.com (20.177.115.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.17; Thu, 20 Feb 2020 12:10:49 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.016; Thu, 20 Feb 2020
+ 12:10:49 +0000
+Subject: Re: [PATCH v3 0/3] Dump QCOW2 metadata
+To: Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1578990137-308222-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <fb4eb1a7-25f7-86ce-4c27-06bca430e97a@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200220151047430
+Message-ID: <18dea012-49ff-fda5-7450-964c37a9ed1d@virtuozzo.com>
+Date: Thu, 20 Feb 2020 15:10:47 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <fb4eb1a7-25f7-86ce-4c27-06bca430e97a@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1PR09CA0050.eurprd09.prod.outlook.com
+ (2603:10a6:7:3c::18) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR09CA0050.eurprd09.prod.outlook.com (2603:10a6:7:3c::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.18 via Frontend Transport; Thu, 20 Feb 2020 12:10:49 +0000
+X-Tagtoolbar-Keys: D20200220151047430
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4e908c8d-8b8a-4d2f-e19b-08d7b5fdec93
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3653:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB36536DA229C42CE7F1E6854AC1130@AM6PR08MB3653.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 031996B7EF
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(366004)(346002)(376002)(396003)(136003)(39850400004)(199004)(189003)(26005)(186003)(6486002)(107886003)(4326008)(8676002)(8936002)(956004)(31686004)(5660300002)(2616005)(81166006)(81156014)(16526019)(52116002)(31696002)(16576012)(316002)(110136005)(66946007)(66476007)(36756003)(86362001)(2906002)(53546011)(478600001)(66556008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3653;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LRPKtoopDRWvtKGFBoB+z4edv4CDVON4pGpSeuPvTEfPTFkeUEKRSCVlHqZG0R6DJuZY3+rsbRRUQPca6R43fWkiq/ktPCPJmYaACvl3XB60zjju7qwmQGmfmoM+ADqujqwnozJzVcorXlZTvEgmVpmHTGmwHt+n95YWT4PQwuDoySMCJv/TVoMaaXIoavwR6kiL+4HzqMAz1799HULfyLrmtwLCN/aThR0TrPMiYqpPFNvemB5H7YsaLk6LyTh6ef+xzjMNBvaXWyMZwW/bHt+RRTCIL6ZSS38OkJ4XWkghuhaEhnCfRSI8tZvb5Ixji9CaQ2gh4GLE5feRHnutxzobDXqOxhlylCtISW4+aRXR08Ms0CJvjsHxrGHMEipXn3ptB8aBGTKVuBlZ+mtDB/pT+Kfen5C8fujpOw/x3xtqYjDUnlgYRAYErHER33YF
+X-MS-Exchange-AntiSpam-MessageData: AOkdHh1C7Z7mzu3nbdCHPG0JrjaPbGaMSFvpI+uXR8ibpPowpltGd9n2Ibt9Ix1n4ZF/uE9OOte1/6IteGARlcc4Nyj7reE1usYfYLxUr1nPfwGYSCH8eBVyfNv0qXhk0Owrw2XD6FSzKWGCoIKzQQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e908c8d-8b8a-4d2f-e19b-08d7b5fdec93
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2020 12:10:49.7711 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X7Lbn9AZPTX3SBV5unK+/S+Y22+b178c/nZ7BlMR8bAEbPXtOB5QRhyfY6cGQs87xsGPTPzophvqdJk0yyIhO7kJg8dn3I6kMP1Pp/V/oqM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3653
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.20.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,272 +127,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a test device for channel subsystem.
-Most of the CSS instructions are handled by the common code.
+20.02.2020 14:58, Max Reitz wrote:
+> On 14.01.20 09:22, Andrey Shinkevich wrote:
+>> The information about QCOW2 metadata allocations in an image ELF-file is
+>> helpful for finding issues with the image data integrity.
+>=20
+> Sorry that I=92m replying only so late =96 but I don=92t know why we need=
+ this
+> in qemu, and this cover letter doesn=92t provide a justification.  I mean=
+,
+> it isn=92t too complex (from the diffstat), but wouldn=92t it be better t=
+o
+> just have a script for this?
+>=20
+> I suppose one reason to put it in qemu/qemu-img is that a script
+> wouldn=92t be packaged by distributions.  So if a user has a corrupted
+> image, with this series we could tell them to run qemu-img check -M and
+> put the output somewhere.  With a script, we=92d first have to tell them
+> to download the script.  But then again, downloading a script (that
+> should be part of the qemu repository) doesn=92t seem too much trouble to
+> me either.
+>=20
+> So I=92m curious as to whether you had a specific reason in mind when you
+> decided to implement this as part of qemu itself?
+>=20
+> (I suppose the additional complexity is fully limited to the check
+> infrastructure, so it wouldn=92t interfere with the rest of the qcow2
+> driver.  Hm.  Fair enough.)
+>=20
 
-The PONG_READ and PONG_WRITE CCW commands allow to test the
-SSCH instruction with both read and write commands.
+Just not to parse qcow2 from scratch. Qemu already can read qcow2, and
+it looks through all its structures during check, why not
+to add an ability to represent these structures as a qobject?
 
-It is also possible to define the Control Unit type
-with the cu_type property.
-Currently only the kvm-unit-test css test uses the PONG device.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- default-configs/s390x-softmmu.mak |   1 +
- hw/s390x/Kconfig                  |   3 +
- hw/s390x/Makefile.objs            |   1 +
- hw/s390x/ccw-pong.c               | 140 ++++++++++++++++++++++++++++++
- include/hw/s390x/pong.h           |  54 ++++++++++++
- 5 files changed, 199 insertions(+)
- create mode 100644 hw/s390x/ccw-pong.c
- create mode 100644 include/hw/s390x/pong.h
-
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index f2287a133f..72711912cd 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -7,6 +7,7 @@
- #CONFIG_VFIO_CCW=n
- #CONFIG_VIRTIO_PCI=n
- #CONFIG_WDT_DIAG288=n
-+#CONFIG_CCW_TESTDEV=n
- 
- # Boards:
- #
-diff --git a/hw/s390x/Kconfig b/hw/s390x/Kconfig
-index 5e7d8a2bae..041ede333e 100644
---- a/hw/s390x/Kconfig
-+++ b/hw/s390x/Kconfig
-@@ -10,3 +10,6 @@ config S390_CCW_VIRTIO
-     select SCLPCONSOLE
-     select VIRTIO_CCW
-     select MSI_NONBROKEN
-+
-+config CCW_TESTDEV
-+    default y if TEST_DEVICES
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index e02ed80b68..e74d0efd9d 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -34,3 +34,4 @@ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
- obj-y += s390-ccw.o
- obj-y += ap-device.o
- obj-y += ap-bridge.o
-+obj-y += ccw-pong.o
-diff --git a/hw/s390x/ccw-pong.c b/hw/s390x/ccw-pong.c
-new file mode 100644
-index 0000000000..28177eddae
---- /dev/null
-+++ b/hw/s390x/ccw-pong.c
-@@ -0,0 +1,140 @@
-+/*
-+ * CCW PING-PONG
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+#include "cpu.h"
-+#include "exec/address-spaces.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/css-bridge.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/s390x/pong.h"
-+
-+#define PONG_BUF_SIZE 0x1000
-+static char buf[PONG_BUF_SIZE];
-+
-+static int pong_ccw_cb(SubchDev *sch, CCW1 ccw)
-+{
-+    int rc = 0;
-+    static int value;
-+    int len;
-+
-+    len = (ccw.count > PONG_BUF_SIZE) ? PONG_BUF_SIZE : ccw.count;
-+    switch (ccw.cmd_code) {
-+    case PONG_WRITE:
-+        rc = ccw_dstream_read_buf(&sch->cds, buf, len);
-+        value = atol(buf);
-+        break;
-+    case PONG_READ:
-+        sprintf(buf, "%08x", value + 1);
-+        rc = ccw_dstream_write_buf(&sch->cds, buf, len);
-+        break;
-+    default:
-+        rc = -ENOSYS;
-+        break;
-+    }
-+
-+    sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
-+
-+    if (rc == -EIO) {
-+        /* I/O error, specific devices generate specific conditions */
-+        SCHIB *schib = &sch->curr_status;
-+
-+        sch->curr_status.scsw.dstat = SCSW_DSTAT_UNIT_CHECK;
-+        sch->sense_data[0] = 0x40;    /* intervention-req */
-+        schib->scsw.ctrl &= ~SCSW_ACTL_START_PEND;
-+        schib->scsw.ctrl &= ~SCSW_CTRL_MASK_STCTL;
-+        schib->scsw.ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-+                   SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-+    }
-+    return rc;
-+}
-+
-+static void pong_ccw_realize(DeviceState *ds, Error **errp)
-+{
-+    uint16_t chpid;
-+    CcwPONGDevice *dev = CCW_PONG(ds);
-+    CcwDevice *cdev = CCW_DEVICE(ds);
-+    CCWDeviceClass *cdk = CCW_DEVICE_GET_CLASS(cdev);
-+    SubchDev *sch;
-+    Error *err = NULL;
-+
-+    sch = css_create_sch(cdev->devno, errp);
-+    if (!sch) {
-+        return;
-+    }
-+
-+    sch->driver_data = dev;
-+    cdev->sch = sch;
-+    chpid = css_find_free_chpid(sch->cssid);
-+
-+    if (chpid > MAX_CHPID) {
-+        error_setg(&err, "No available chpid to use.");
-+        goto out_err;
-+    }
-+
-+    sch->id.reserved = 0xff;
-+    sch->id.cu_type = dev->cu_type;
-+    sch->id.cu_model = dev->cu_model;
-+    sch->id.dev_type = dev->dev_type;
-+    sch->id.dev_model = dev->dev_model;
-+    css_sch_build_virtual_schib(sch, (uint8_t)chpid, CCW_PONG_CHPID_TYPE);
-+    sch->do_subchannel_work = do_subchannel_work_virtual;
-+    sch->ccw_cb = pong_ccw_cb;
-+
-+    cdk->realize(cdev, &err);
-+    if (err) {
-+        goto out_err;
-+    }
-+
-+    css_reset_sch(sch);
-+    return;
-+
-+out_err:
-+    error_propagate(errp, err);
-+    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-+    cdev->sch = NULL;
-+    g_free(sch);
-+}
-+
-+static Property pong_ccw_properties[] = {
-+    DEFINE_PROP_UINT16("cu_type", CcwPONGDevice, cu_type, CCW_PONG_CU_TYPE),
-+    DEFINE_PROP_UINT8("cu_model", CcwPONGDevice, cu_model, CCW_PONG_CU_MODEL),
-+    DEFINE_PROP_UINT16("dev_type", CcwPONGDevice, dev_type, CCW_PONG_DEV_TYPE),
-+    DEFINE_PROP_UINT8("dev_model", CcwPONGDevice, dev_model, CCW_PONG_DEV_MODEL),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void pong_ccw_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    device_class_set_props(dc, pong_ccw_properties);
-+    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
-+    dc->realize = pong_ccw_realize;
-+    dc->hotpluggable = false;
-+}
-+
-+static const TypeInfo pong_ccw_info = {
-+    .name = TYPE_CCW_PONG,
-+    .parent = TYPE_CCW_DEVICE,
-+    .instance_size = sizeof(CcwPONGDevice),
-+    .class_init = pong_ccw_class_init,
-+    .class_size = sizeof(CcwPONGClass),
-+};
-+
-+static void pong_ccw_register(void)
-+{
-+    type_register_static(&pong_ccw_info);
-+}
-+
-+type_init(pong_ccw_register)
-diff --git a/include/hw/s390x/pong.h b/include/hw/s390x/pong.h
-new file mode 100644
-index 0000000000..1e60aef24e
---- /dev/null
-+++ b/include/hw/s390x/pong.h
-@@ -0,0 +1,54 @@
-+/*
-+ *  ccw-attached PONG definitions
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_S390X_PONG_CCW_H
-+#define HW_S390X_PONG_CCW_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/ccw-device.h"
-+
-+#define CCW_PONG_CU_TYPE    0xc0ca
-+#define CCW_PONG_CU_MODEL   0xa7
-+#define CCW_PONG_DEV_TYPE   0xcafe
-+#define CCW_PONG_DEV_MODEL  0xe5
-+#define CCW_PONG_CHPID_TYPE 0xd0
-+
-+#define TYPE_CCW_PONG "ccw-pong"
-+
-+/* Local Channel Commands */
-+#define PONG_WRITE 0x21         /* Write */
-+#define PONG_READ  0x22         /* Read buffer */
-+
-+#define CCW_PONG(obj) \
-+     OBJECT_CHECK(CcwPONGDevice, (obj), TYPE_CCW_PONG)
-+#define CCW_PONG_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(CcwPONGClass, (klass), TYPE_CCW_PONG)
-+#define CCW_PONG_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(CcwPONGClass, (obj), TYPE_CCW_PONG)
-+
-+typedef struct CcwPONGDevice {
-+    CcwDevice parent_obj;
-+    uint16_t cu_type;
-+    uint8_t cu_model;
-+    uint16_t dev_type;
-+    uint8_t dev_model;
-+} CcwPONGDevice;
-+
-+typedef struct CcwPONGClass {
-+    CCWDeviceClass parent_class;
-+
-+    void (*init)(CcwPONGDevice *, Error **);
-+    int (*read_payload)(CcwPONGDevice *);
-+    int (*write_payload)(CcwPONGDevice *, uint8_t);
-+} CcwPONGClass;
-+
-+#endif
--- 
-2.17.0
-
+--=20
+Best regards,
+Vladimir
 
