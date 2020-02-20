@@ -2,80 +2,81 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1130DC11D0C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B885C11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:17:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D05D7206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C836324672
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:17:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AMMxFOdu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D05D7206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uqef5LO1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C836324672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4pJP-0005EQ-Vy
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:08:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37253)
+	id 1j4pSE-000172-Tr
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:17:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1j4pI4-0004Dj-Gi
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:07:09 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pRD-0000cf-4B
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1j4pI2-000824-RS
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:07:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25566
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1j4pI2-0007z8-Le
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:07:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582218424;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SGiDBCdkjagbe6Y5oV6ELHb+gMT13LWeobOzHQXZy/4=;
- b=AMMxFOduhtPbBDkxLiWzJLVtQByb0qT9VwfFv8F1KtOaaVxxIAIcwAkuk6aKJPVOB3CR7A
- 3ZfoE5F7mpGbbc1+QYwtoH8MJgLcPuw3yKkB7apscFrb3MEHbeW1aqjlxBr6hE0LCGzday
- bTpcE2o/ZDbKFy23nK/FHVcGgZk1CLY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-s2nUKkMcMWmE1lxFMt-slw-1; Thu, 20 Feb 2020 12:06:58 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6907DB2F;
- Thu, 20 Feb 2020 17:06:57 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7497119756;
- Thu, 20 Feb 2020 17:06:53 +0000 (UTC)
-Message-ID: <8e47f2027cd371cdf0dd15972ede7841b40302f5.camel@redhat.com>
-Subject: Re: [PATCH v4 00/11] RFC: [for 5.0]: HMP monitor handlers refactoring
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date: Thu, 20 Feb 2020 19:06:52 +0200
-In-Reply-To: <20200207182835.GQ3302@work-vm>
-References: <20200130123448.21093-1-mlevitsk@redhat.com>
- <20200203195758.GQ2822@work-vm>
- <94ba85dcc5213d386a55706a7bdbb507cfe64d8f.camel@redhat.com>
- <20200207182835.GQ3302@work-vm>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: s2nUKkMcMWmE1lxFMt-slw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pRB-0007jF-MF
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:34 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43449)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j4pRB-0007j7-Fe
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:33 -0500
+Received: by mail-ot1-x341.google.com with SMTP id p8so4338565oth.10
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:16:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tR9pmiMInWv4mSnrTrDQVOYD9HUI1quRu5s8TXAhCXk=;
+ b=Uqef5LO1vq9uJdYsNnx1b41JJM+J4q0q5gk4UEZOJ1GfICrWGLcbIamXBI6ZnPE456
+ Cgxr62qEk+6zZUA7GVQ1Ei7xUdlklGwJB30Aq7k/2JYG8VtOXkNGbd6CKk9lBJOaJerj
+ UpR8A2+IMmm9KzE3LXSGKZOmbkWAsKDgdic6Wwf3UGwR8TpqDlcvIAjlaKxh0VpzAJQN
+ RF/LogA/BBhKieLzxf4Kg9DJmMY8qoPYoBs50wTnof8ueVr2CVIizchcwt0VS6GQ8J1+
+ J1vcWOecvzKoeab5DapLO3CrN8p02hEMNi7xRvEKVDk+aSym5LxhqvjQVWPxlG0aPR0W
+ pJfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tR9pmiMInWv4mSnrTrDQVOYD9HUI1quRu5s8TXAhCXk=;
+ b=btEZ2gywB3le3bRzOqhMC6jWB9XOhpTzmebjn55hW9FsnFK/Zw2FRcU+EjgrWwoBat
+ ssI2S+6vweEaQG1KMyQVQnbSF9zaN3ojMYSsyk9iysG8q80BHNdAgSoWgLXh6/YWwv9R
+ M7Jd/k/SQns0kacRlHx3IxtKBjTv6tOX7OvDDZ7amZiPXrnBTsNPNwZDwYmj2GfBMJo+
+ 6es5CEx2U7ousyo8nAOHUYtSyu/0Me4/YhHaXC7iwHTF3bv2AxwmbMqoBGwp+4FCxBHJ
+ +3eN1FXkxpISnGRRt6XMIIMkaAY50BRim1yCTdAhqn6YOf27g7LFPUvo5FaSPxwfpUnL
+ cZrQ==
+X-Gm-Message-State: APjAAAUOR9i0GzYVLljxbqtBfqhwOOw9uaGxpOuleWSrq3rB7jtX1HZ7
+ HMJSC8TLMIl3agEfHZ/oi0AH+iOjauqNeKl2xp9UDw==
+X-Google-Smtp-Source: APXvYqziV+oKUXQWObYmwneDTLD+qs4Sb2XJv3Tl9ucusKeqLj8KfHbDxdRLvOyXC+Q580A5FgMY36G9K0EZz3BGYVY=
+X-Received: by 2002:a9d:68d9:: with SMTP id i25mr12352116oto.135.1582218992492; 
+ Thu, 20 Feb 2020 09:16:32 -0800 (PST)
+MIME-Version: 1.0
+References: <20200214181547.21408-1-richard.henderson@linaro.org>
+ <20200214181547.21408-15-richard.henderson@linaro.org>
+In-Reply-To: <20200214181547.21408-15-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Feb 2020 17:16:21 +0000
+Message-ID: <CAFEAcA9OMmVoULYPKvj4T-6w7ZL5t8L+HT2XjV_Zo2jXvZXKUw@mail.gmail.com>
+Subject: Re: [PATCH 14/19] target/arm: Move the vfp decodetree calls next to
+ the base isa
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,133 +88,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 2020-02-07 at 18:28 +0000, Dr. David Alan Gilbert wrote:
-> * Maxim Levitsky (mlevitsk@redhat.com) wrote:
-> > On Mon, 2020-02-03 at 19:57 +0000, Dr. David Alan Gilbert wrote:
-> > > * Maxim Levitsky (mlevitsk@redhat.com) wrote:
-> > > > This patch series is bunch of cleanups to the hmp monitor code.
-> > > > It mostly moves the blockdev related hmp handlers to its own file,
-> > > > and does some minor refactoring.
-> > > > 
-> > > > No functional changes expected.
-> > > 
-> > > You've still got the title marked as RFC - are you actually ready for
-> > > this log?
-> > 
-> > I forgot to update this to be honest, I don't consider this an RFC,
-> > especially since I dropped for now the patches that might cause
-> > issues. This is now just a nice refactoring.
-> 
-> OK, so if we can get some block people to say they're happy, then
-> I'd be happy to take this through HMP or they can take it through block.
+On Fri, 14 Feb 2020 at 18:16, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Have the calls adjacent as an intermediate step toward
+> actually merging the decodes.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 80 +++++++++++++-----------------------------
+>  1 file changed, 24 insertions(+), 56 deletions(-)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index b2641b4262..5cabe6b2e9 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -2646,31 +2646,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
+>      tcg_temp_free_i32(tmp);
+>  }
+>
+> -/*
+> - * Disassemble a VFP instruction.  Returns nonzero if an error occurred
+> - * (ie. an undefined instruction).
+> - */
+> -static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+> -{
+> -    /*
+> -     * If the decodetree decoder handles this insn it will always
+> -     * emit code to either execute the insn or generate an appropriate
+> -     * exception; so we don't need to ever return non-zero to tell
+> -     * the calling code to emit an UNDEF exception.
+> -     */
+> -    if (extract32(insn, 28, 4) == 0xf) {
+> -        if (disas_vfp_uncond(s, insn)) {
+> -            return 0;
+> -        }
+> -    } else {
+> -        if (disas_vfp(s, insn)) {
+> -            return 0;
+> -        }
+> -    }
+> -    /* If the decodetree decoder didn't handle this insn, it must be UNDEF */
+> -    return 1;
+> -}
+
+Before this change, if this was a cp10/11 insn and
+neither disas_vfp_uncond() nor disas_vfp() returned true,
+we would UNDEF it.
+
+> -
+>  static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
+>  {
+>  #ifndef CONFIG_USER_ONLY
+> @@ -10524,7 +10499,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>          ARCH(5);
+>
+>          /* Unconditional instructions.  */
+> -        if (disas_a32_uncond(s, insn)) {
+> +        /* TODO: Perhaps merge these into one decodetree output file.  */
+> +        if (disas_a32_uncond(s, insn) ||
+> +            disas_vfp_uncond(s, insn)) {
+>              return;
+>          }
+>          /* fall back to legacy decoder */
+> @@ -10551,13 +10528,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>              }
+>              return;
+>          }
+> -        if ((insn & 0x0f000e10) == 0x0e000a00) {
+> -            /* VFP.  */
+> -            if (disas_vfp_insn(s, insn)) {
+> -                goto illegal_op;
+> -            }
+> -            return;
+> -        }
+>          if ((insn & 0x0e000f00) == 0x0c000100) {
+>              if (arm_dc_feature(s, ARM_FEATURE_IWMMXT)) {
+>                  /* iWMMXt register transfer.  */
+> @@ -10588,7 +10558,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>          arm_skip_unless(s, cond);
+>      }
+>
+> -    if (disas_a32(s, insn)) {
+> +    /* TODO: Perhaps merge these into one decodetree output file.  */
+> +    if (disas_a32(s, insn) ||
+> +        disas_vfp(s, insn)) {
+>          return;
+>      }
+>      /* fall back to legacy decoder */
+> @@ -10597,12 +10569,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+>      case 0xc:
+>      case 0xd:
+>      case 0xe:
+> -        if (((insn >> 8) & 0xe) == 10) {
+> -            /* VFP.  */
+> -            if (disas_vfp_insn(s, insn)) {
+> -                goto illegal_op;
+> -            }
+> -        } else if (disas_coproc_insn(s, insn)) {
+> +        if (((insn >> 8) & 0xe) != 10 && disas_coproc_insn(s, insn)) {
+>              /* Coprocessor.  */
+>              goto illegal_op;
+>          }
+
+But now if the VFP decodetree doesn't handle the insn,
+we'll fall into this case here, I think, the
+"(((insn >> 8) & 0xe) != 10" part of the condition will
+be false, and we'll end up at a 'break' statement, which
+I think means we'll end up doing a NOP rather than an UNDEF.
 
 
-Any update?
 
-Best regards,
-	Maxim Levitsky
+> @@ -10691,7 +10658,14 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>          ARCH(6T2);
+>      }
+>
+> -    if (disas_t32(s, insn)) {
+> +    /*
+> +     * TODO: Perhaps merge these into one decodetree output file.
+> +     * Note disas_vfp is written for a32 with cond field in the
+> +     * top nibble.  The t32 encoding requires 0xe in the top nibble.
+> +     */
+> +    if (disas_t32(s, insn) ||
+> +        disas_vfp_uncond(s, insn) ||
+> +        ((insn >> 28) == 0xe && disas_vfp(s, insn))) {
+>          return;
+>      }
+>      /* fall back to legacy decoder */
+> @@ -10708,17 +10682,15 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>                  goto illegal_op; /* op0 = 0b11 : unallocated */
+>              }
+>
+> -            if (disas_vfp_insn(s, insn)) {
+> -                if (((insn >> 8) & 0xe) == 10 &&
+> -                    dc_isar_feature(aa32_fpsp_v2, s)) {
+> -                    /* FP, and the CPU supports it */
+> -                    goto illegal_op;
+> -                } else {
+> -                    /* All other insns: NOCP */
+> -                    gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
+> -                                       syn_uncategorized(),
+> -                                       default_exception_el(s));
+> -                }
+> +            if (((insn >> 8) & 0xe) == 10 &&
+> +                dc_isar_feature(aa32_fpsp_v2, s)) {
+> +                /* FP, and the CPU supports it */
+> +                goto illegal_op;
+> +            } else {
+> +                /* All other insns: NOCP */
+> +                gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
+> +                                   syn_uncategorized(),
+> +                                   default_exception_el(s));
+>              }
+>              break;
+>          }
+> @@ -10740,10 +10712,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>              if (disas_neon_data_insn(s, insn)) {
+>                  goto illegal_op;
+>              }
+> -        } else if (((insn >> 8) & 0xe) == 10) {
+> -            if (disas_vfp_insn(s, insn)) {
+> -                goto illegal_op;
+> -            }
+>          } else {
+>              if (insn & (1 << 28))
+>                  goto illegal_op;
 
-> 
-> Dave
-> 
-> > Best regards,
-> > 	Maxim Levitsky
-> > 
-> > > 
-> > > Dave
-> > > 
-> > > > 
-> > > > Changes from V1:
-> > > >    * move the handlers to block/monitor/block-hmp-cmds.c
-> > > >    * tiny cleanup for the commit messages
-> > > > 
-> > > > Changes from V2:
-> > > >    * Moved all the function prototypes to new header (blockdev-hmp-cmds.h)
-> > > >    * Set the license of blockdev-hmp-cmds.c to GPLv2+
-> > > >    * Moved hmp_snapshot_* functions to blockdev-hmp-cmds.c
-> > > >    * Moved hmp_drive_add_node to blockdev-hmp-cmds.c
-> > > >      (this change needed some new exports, thus in separate new patch)
-> > > >    * Moved hmp_qemu_io and hmp_eject to blockdev-hmp-cmds.c
-> > > >    * Added 'error:' prefix to vreport, and updated the iotests
-> > > >      This is invasive change, but really feels like the right one
-> > > >    * Added minor refactoring patch that drops an unused #include
-> > > > 
-> > > > Changes from V3:
-> > > >    * Dropped the error prefix patches for now due to fact that it seems
-> > > >      that libvirt doesn't need that after all. Oh well...
-> > > >      I'll send them in a separate series.
-> > > > 
-> > > >    * Hopefully correctly merged the copyright info the new files
-> > > >      Both files are GPLv2 now (due to code from hmp.h/hmp-cmds.c)
-> > > > 
-> > > >    * Addressed review feedback
-> > > >    * Renamed the added header to block-hmp-cmds.h
-> > > > 
-> > > >    * Got rid of checkpatch.pl warnings in the moved code
-> > > >      (cosmetic code changes only)
-> > > > 
-> > > >    * I kept the reviewed-by tags, since the changes I did are minor.
-> > > >      I hope that this is right thing to do.
-> > > > 
-> > > > Best regards,
-> > > > 	Maxim Levitsky
-> > > > 
-> > > > Maxim Levitsky (11):
-> > > >   usb/dev-storage: remove unused include
-> > > >   monitor/hmp: uninline add_init_drive
-> > > >   monitor/hmp: rename device-hotplug.c to block/monitor/block-hmp-cmds.c
-> > > >   monitor/hmp: move hmp_drive_del and hmp_commit to block-hmp-cmds.c
-> > > >   monitor/hmp: move hmp_drive_mirror and hmp_drive_backup to
-> > > >     block-hmp-cmds.c Moved code was added after 2012-01-13, thus under
-> > > >     GPLv2+
-> > > >   monitor/hmp: move hmp_block_job* to block-hmp-cmds.c
-> > > >   monitor/hmp: move hmp_snapshot_* to block-hmp-cmds.c
-> > > >     hmp_snapshot_blkdev is from GPLv2 version of the hmp-cmds.c thus
-> > > >     have to change the licence to GPLv2
-> > > >   monitor/hmp: move hmp_nbd_server* to block-hmp-cmds.c
-> > > >   monitor/hmp: move remaining hmp_block* functions to block-hmp-cmds.c
-> > > >   monitor/hmp: move hmp_info_block* to block-hmp-cmds.c
-> > > >   monitor/hmp: Move hmp_drive_add_node to block-hmp-cmds.c
-> > > > 
-> > > >  MAINTAINERS                    |    1 +
-> > > >  Makefile.objs                  |    2 +-
-> > > >  block/Makefile.objs            |    1 +
-> > > >  block/monitor/Makefile.objs    |    1 +
-> > > >  block/monitor/block-hmp-cmds.c | 1002 ++++++++++++++++++++++++++++++++
-> > > >  blockdev.c                     |  137 +----
-> > > >  device-hotplug.c               |   91 ---
-> > > >  hw/usb/dev-storage.c           |    1 -
-> > > >  include/block/block-hmp-cmds.h |   54 ++
-> > > >  include/block/block_int.h      |    5 +-
-> > > >  include/monitor/hmp.h          |   24 -
-> > > >  include/sysemu/blockdev.h      |    4 -
-> > > >  include/sysemu/sysemu.h        |    3 -
-> > > >  monitor/hmp-cmds.c             |  769 ------------------------
-> > > >  monitor/misc.c                 |    1 +
-> > > >  15 files changed, 1072 insertions(+), 1024 deletions(-)
-> > > >  create mode 100644 block/monitor/Makefile.objs
-> > > >  create mode 100644 block/monitor/block-hmp-cmds.c
-> > > >  delete mode 100644 device-hotplug.c
-> > > >  create mode 100644 include/block/block-hmp-cmds.h
-> > > > 
-> > > > -- 
-> > > > 2.17.2
-> > > > 
-> > > 
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
-> > 
-> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Here in the thumb decoder there's a similar issue I think:
+now for insns which are in the VFP space but don't exist
+(ie where the decodetree has returned false) we'll end up
+now falling through into disas_coproc_insn() rather than
+just UNDEFing them.
 
-
+thanks
+-- PMM
 
