@@ -2,60 +2,61 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D508C5ACC4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D8BC7619D
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:24:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 436B821D56
+	by mail.kernel.org (Postfix) with ESMTPS id 6864924658
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:24:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iU0LwKGW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 436B821D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QgiXPc0b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6864924658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4cS0-0006I7-Bx
+	id 1j4cS0-0006LO-I2
 	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:24:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41171)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR3-0004af-QN
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR3-0004ag-QM
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR2-0008Hn-Gr
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR2-0008HX-Cr
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:33 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:38355)
+Received: from ozlabs.org ([2401:3900:2:1::2]:50637)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4cR1-0008Di-NJ; Wed, 19 Feb 2020 22:23:32 -0500
+ id 1j4cR1-0008Dh-Oy; Wed, 19 Feb 2020 22:23:32 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NKg02RwLz9sSK; Thu, 20 Feb 2020 14:23:24 +1100 (AEDT)
+ id 48NKg00jgfz9sSH; Thu, 20 Feb 2020 14:23:23 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1582169004;
- bh=XfjqatoySBeh8fCxko51poY2tUcpJr05c4AB3WcSL8E=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=iU0LwKGWANHBJGlyk06SBgvsUwCEsjLeXu28ndqODzs/mKpj0XMjFXQvxZYgSPW6L
- zLh4lmlU5deFAwqSeOXFDbrbcxaCoq/I+igRwl2Xfu0IVAkXc3Tf2k0NWqRYCM+UT7
- ptPmF9k8iDHmlQY6/zo1WMspom7cucbNE37M9Yak=
+ bh=0XtAOj+IPH/LQ0YgUYFF29i4CjYf+GIk9oJOXyBM6Mg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=QgiXPc0b84gdiJQz/sKvEyfB7ma50mtKcuuDjKqfVZLGX0Gp/ICmlXKTfDPUf5OqT
+ LG6ARof5T/IKrfBzh88C/IZQHo1JPDH6khGvfvVWqRPoNTd5zJKKBfLd12z12xts5v
+ vljAzlEIzlYH+xlLvvxxKe6fW33gwTWC3G1F3iXE=
+Date: Thu, 20 Feb 2020 14:13:26 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-ppc@nongnu.org,
-	groug@kaod.org,
-	clg@kaod.org
-Subject: [PATCH v5 01/18] ppc: Remove stub support for 32-bit hypervisor mode
-Date: Thu, 20 Feb 2020 14:22:59 +1100
-Message-Id: <20200220032317.96884-2-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200220032317.96884-1-david@gibson.dropbear.id.au>
-References: <20200220032317.96884-1-david@gibson.dropbear.id.au>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH v3 11/12] target/ppc: Streamline construction of VRMA SLB
+ entry
+Message-ID: <20200220031326.GN1764@umbus.fritz.box>
+References: <20200219005414.15635-1-david@gibson.dropbear.id.au>
+ <20200219005414.15635-12-david@gibson.dropbear.id.au>
+ <875zg2d4sx.fsf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mkHYMT4O8DyWoHkb"
+Content-Disposition: inline
+In-Reply-To: <875zg2d4sx.fsf@linux.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
@@ -70,145 +71,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru,
- Fabiano Rosas <farosas@linux.ibm.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, paulus@samba.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, groug@kaod.org, qemu-devel@nongnu.org, paulus@samba.org,
+ clg@kaod.org, qemu-ppc@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-a4f30719a8cd, way back in 2007 noted that "PowerPC hypervisor mode is not
-fundamentally available only for PowerPC 64" and added a 32-bit version
-of the MSR[HV] bit.
 
-But nothing was ever really done with that; there is no meaningful suppor=
-t
-for 32-bit hypervisor mode 13 years later.  Let's stop pretending and jus=
-t
-remove the stubs.
+--mkHYMT4O8DyWoHkb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/cpu.h                | 21 +++++++--------------
- target/ppc/translate_init.inc.c |  6 +++---
- 2 files changed, 10 insertions(+), 17 deletions(-)
+On Wed, Feb 19, 2020 at 11:34:22AM -0300, Fabiano Rosas wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+>=20
+> Hi, just a nitpick, feel free to ignore.
+>=20
+> > When in VRMA mode (i.e. a guest thinks it has the MMU off, but the
+> > hypervisor is still applying translation) we use a special SLB entry,
+> > rather than looking up an SLBE by address as we do when guest translati=
+on
+> > is on.
+> >
+> > We build that special entry in ppc_hash64_update_vrma() along with some
+> > logic for handling some non-VRMA cases.  Split the actual build of the
+> > VRMA SLBE into a separate helper and streamline it a bit.
+> >
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  target/ppc/mmu-hash64.c | 79 ++++++++++++++++++++---------------------
+> >  1 file changed, 38 insertions(+), 41 deletions(-)
+> >
+> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > index 170a78bd2e..06cfff9860 100644
+> > --- a/target/ppc/mmu-hash64.c
+> > +++ b/target/ppc/mmu-hash64.c
+> > @@ -789,6 +789,39 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+> >      }
+> >  }
+> > =20
+> > +static int build_vrma_slbe(PowerPCCPU *cpu, ppc_slb_t *slb)
+> > +{
+> > +    CPUPPCState *env =3D &cpu->env;
+> > +    target_ulong lpcr =3D env->spr[SPR_LPCR];
+> > +    uint32_t vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
+> > +    target_ulong vsid =3D SLB_VSID_VRMA | ((vrmasd << 4) & SLB_VSID_LL=
+P_MASK);
+> > +    int i;
+> > +
+> > +    /*
+> > +     * Make one up. Mostly ignore the ESID which will not be needed
+> > +     * for translation
+> > +     */
+>=20
+> I find this comment a bit vague. I suggest we either leave it behind or
+> make it more precise. The ISA says:
+>=20
+> "translation of effective addresses to virtual addresses use the SLBE
+> values in Figure 18 instead of the entry in the SLB corresponding to the
+> ESID"
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b283042515..8077fdb068 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -24,8 +24,6 @@
- #include "exec/cpu-defs.h"
- #include "cpu-qom.h"
-=20
--/* #define PPC_EMULATE_32BITS_HYPV */
--
- #define TCG_GUEST_DEFAULT_MO 0
-=20
- #define TARGET_PAGE_BITS_64K 16
-@@ -300,13 +298,12 @@ typedef struct ppc_v3_pate_t {
- #define MSR_SF   63 /* Sixty-four-bit mode                            hf=
-lags */
- #define MSR_TAG  62 /* Tag-active mode (POWERx ?)                       =
-     */
- #define MSR_ISF  61 /* Sixty-four-bit interrupt mode on 630             =
-     */
--#define MSR_SHV  60 /* hypervisor state                               hf=
-lags */
-+#define MSR_HV   60 /* hypervisor state                               hf=
-lags */
- #define MSR_TS0  34 /* Transactional state, 2 bits (Book3s)             =
-     */
- #define MSR_TS1  33
- #define MSR_TM   32 /* Transactional Memory Available (Book3s)          =
-     */
- #define MSR_CM   31 /* Computation mode for BookE                     hf=
-lags */
- #define MSR_ICM  30 /* Interrupt computation mode for BookE             =
-     */
--#define MSR_THV  29 /* hypervisor state for 32 bits PowerPC           hf=
-lags */
- #define MSR_GS   28 /* guest state for BookE                            =
-     */
- #define MSR_UCLE 26 /* User-mode cache lock enable for BookE            =
-     */
- #define MSR_VR   25 /* altivec available                            x hf=
-lags */
-@@ -401,10 +398,13 @@ typedef struct ppc_v3_pate_t {
-=20
- #define msr_sf   ((env->msr >> MSR_SF)   & 1)
- #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
--#define msr_shv  ((env->msr >> MSR_SHV)  & 1)
-+#if defined(TARGET_PPC64)
-+#define msr_hv   ((env->msr >> MSR_HV)   & 1)
-+#else
-+#define msr_hv   (0)
-+#endif
- #define msr_cm   ((env->msr >> MSR_CM)   & 1)
- #define msr_icm  ((env->msr >> MSR_ICM)  & 1)
--#define msr_thv  ((env->msr >> MSR_THV)  & 1)
- #define msr_gs   ((env->msr >> MSR_GS)   & 1)
- #define msr_ucle ((env->msr >> MSR_UCLE) & 1)
- #define msr_vr   ((env->msr >> MSR_VR)   & 1)
-@@ -449,16 +449,9 @@ typedef struct ppc_v3_pate_t {
-=20
- /* Hypervisor bit is more specific */
- #if defined(TARGET_PPC64)
--#define MSR_HVB (1ULL << MSR_SHV)
--#define msr_hv  msr_shv
--#else
--#if defined(PPC_EMULATE_32BITS_HYPV)
--#define MSR_HVB (1ULL << MSR_THV)
--#define msr_hv  msr_thv
-+#define MSR_HVB (1ULL << MSR_HV)
- #else
- #define MSR_HVB (0ULL)
--#define msr_hv  (0)
--#endif
- #endif
-=20
- /* DSISR */
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 53995f62ea..a0d0eaabf2 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8804,7 +8804,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_PM_ISA206;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
-@@ -9017,7 +9017,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
-@@ -9228,7 +9228,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
-)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
+Yeah, it wasn't very helpful in its initial location, and it's even
+less helpful here.  I've dropped it.
+
 --=20
-2.24.1
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--mkHYMT4O8DyWoHkb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5N+VYACgkQbDjKyiDZ
+s5InRQ//QX1vIePut03v3ID0pZe50WKC6yET8toa9D4SBqQPGvUsMLr1b4b1aqAC
+rR741dovzZX2/aEtqIwA1z6+a+3JDd0wwE3kG7dtmG5Du3Jw+YCGCFIu1FNmU3il
+IukuzgrKlABfp9O2mqHRcgOZ4f/JgX8Z2sfZYH18FzvOXy18mThIzqnfJ0ponG2a
+oRC2k5b1usjh/IlwzQVrbvZPfUQKcFTDH504GRSwbw2hlrR7EQbzO330YMqqyMUr
+OW765eRtrTgqVG5/gF351IGTxAPPfrnaaEQVKxxDzuE3FGSQEoY+obGF1HUYfUxx
+0vSZfKLjM9IXvAwViIWANt8NK8yM0E/tGUFe4CMQigTwMwLP8sJj0xM6KhA6MBMm
+3YtYIqydA73z6+tu52EIQhTQx3Qt5W3VcHVcY+hktfQqErNj3N+D5i2b8tYIHExh
+pWzul67901Ivu5f4llJm+sVfwj9RlpyNuHQSMU24zuDLDI2dqdvRCnPc8Q9a5TVz
+C0rlIhxOinMT2Pf674wnj3q2SVGa3V3P5rJTUkVY4FwWBtE9YK8gOeiuJ4sN7Nog
+KRW7TXa8MDQOVnrWbrac8BGIF3WHimmmHfnYP15jAF+lDAtom2+FqsT1AGa3DDyz
+5icwyBR8Aws3TCF1S+tTavkDJaFKoSxMjclpm70JqnrqrUnUq1M=
+=3UqX
+-----END PGP SIGNATURE-----
+
+--mkHYMT4O8DyWoHkb--
 
