@@ -2,79 +2,100 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 061FAC11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A97C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C91F62071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:41:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8EA792071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQbroIvQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C91F62071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QyVSnhsW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA792071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4jGP-0004zW-1V
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 05:41:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34614)
+	id 1j4jHE-00066Z-Qh
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 05:41:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j4jFU-0003dF-Nf
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:40:06 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j4jGN-00056J-Io
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j4jFS-0002oC-Gf
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:40:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56640
+ (envelope-from <pbonzini@redhat.com>) id 1j4jGL-00030w-Jj
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:40:59 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40399
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j4jFS-0002nr-9G
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:40:02 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j4jGL-00030g-FZ
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:40:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582195201;
+ s=mimecast20190719; t=1582195256;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WRimwKLhXZgPHrHHU2A9cojRagc3JboVE1WPoUIv/oI=;
- b=bQbroIvQwQIJKC9a9AV0RRCT7q4QUTb9DRoJ80FAWaQNwpiZCtFcsg16oNAbNqOmSdce2n
- Yz1ZAoBvBcm9V0xoOV062iy+a/M96jow8HZCfPfgow8O7H6NZMRfraE3Rlb7FnbjMKh5kO
- uiNtinz6mBCkcj5EkREdg/j9xCrOk3A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-GBKCCS_KOLSAnuTr-mtK-w-1; Thu, 20 Feb 2020 05:39:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA8E518FF672;
- Thu, 20 Feb 2020 10:39:58 +0000 (UTC)
-Received: from gondolin (ovpn-205-37.brq.redhat.com [10.40.205.37])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E7B35DA7B;
- Thu, 20 Feb 2020 10:39:54 +0000 (UTC)
-Date: Thu, 20 Feb 2020 11:39:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 05/17] s390x: protvirt: Support unpack facility
-Message-ID: <20200220113950.015984bf.cohuck@redhat.com>
-In-Reply-To: <20200214151636.8764-6-frankja@linux.ibm.com>
-References: <20200214151636.8764-1-frankja@linux.ibm.com>
- <20200214151636.8764-6-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ bh=ex5xG3r+RATyrtbsQYvZtFlrAOFlNYfAQwXvRHGu74I=;
+ b=QyVSnhsWENqXSq0kd9E1mNw3ezfHIYc6ctX75pUTc2g3fMXsDiyDgs5lQ+vVFIhq0ZE0VL
+ FkfgIKAtRHwCUzW+yX6K0jXHIqYxJM29Iw/vdQYJskUGI6l9d481cNnc8mdBcH+lkd/Ft2
+ GIg8VQQyHwbADgPQ9HWxikjRsuGC2cs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-euQh7FA5NUyYKbnxsuUu5g-1; Thu, 20 Feb 2020 05:40:51 -0500
+Received: by mail-wr1-f69.google.com with SMTP id o9so1554768wrw.14
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 02:40:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ex5xG3r+RATyrtbsQYvZtFlrAOFlNYfAQwXvRHGu74I=;
+ b=UJSLi2eKE7MNCLiDWwxzI+FR/oJY+OBJQGEz9hKbJBBfeliivptQ21xuymaOV2VeZl
+ FadSR/pc9sIR82xrBra3ObKNeEdcAq6+xYi6s4NZ1JluCA3YkVcEmH4oY5uiJnkzj4TA
+ 79fllm/Hcu22aEHLxJR6Z4eChhDoP9jbGoxgSSy6Pj1wsJ3jMOXzn+yWrLQWd4Jm8QSA
+ jp2/xVfClDaUwalbNZLGQZRr3oK+ls6eFtxsvkriK/D0x31pJmEti7OK4i3Lg+AdwmCZ
+ D56WY4PYB5cNj/1kh+aADap16mQpcDgp9qdRxjlvmmpE6BL/qsnKyYw2QzQz+kVznN4I
+ oD1Q==
+X-Gm-Message-State: APjAAAWr4VMnFiae8Gfz2ZUiPWxWDoFeStPRrD3+w/XU+VO1fg6FbtlV
+ ju68FsV2/TKADswNMgs2BSdcZct/t5bfRFCxCXcr/IYaJe8iZiJ9auCf3OmeY8vdGo/XLELNxeM
+ HPR2UY5tguvZX/So=
+X-Received: by 2002:a05:600c:2042:: with SMTP id
+ p2mr3798191wmg.79.1582195249867; 
+ Thu, 20 Feb 2020 02:40:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwiDcMd/D/NV+kJwhqfCjpYpPFThyeLSeyUdDR7ecmxyMDMSZtP/TgP883oUrNSQMR8LNVU6A==
+X-Received: by 2002:a05:600c:2042:: with SMTP id
+ p2mr3798137wmg.79.1582195249237; 
+ Thu, 20 Feb 2020 02:40:49 -0800 (PST)
+Received: from [10.201.49.12] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id a16sm3702755wrx.87.2020.02.20.02.40.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Feb 2020 02:40:48 -0800 (PST)
+Subject: Re: [PATCH v2] util/async: make bh_aio_poll() O(1)
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20200219175348.1161536-1-stefanha@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aa6b2d81-c654-2a2c-12a8-8bc300fc1dd6@redhat.com>
+Date: Thu, 20 Feb 2020 11:40:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: GBKCCS_KOLSAnuTr-mtK-w-1
+In-Reply-To: <20200219175348.1161536-1-stefanha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: euQh7FA5NUyYKbnxsuUu5g-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,296 +107,468 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 10:16:24 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> When a guest has saved a ipib of type 5 and call diagnose308 with
-
-s/call/calls/
-
-> subcode 10, we have to setup the protected processing environment via
-> Ultravisor calls. The calls are done by KVM and are exposed via an API.
+On 19/02/20 18:53, Stefan Hajnoczi wrote:
+> The ctx->first_bh list contains all created BHs, including those that
+> are not scheduled.  The list is iterated by the event loop and therefore
+> has O(n) time complexity with respected to the number of created BHs.
 > 
-> The following steps are necessary:
-> 1. Create a VM (register it with the Ultravisor)
-> 2. Create secure CPUs for all of our current cpus
-> 3. Forward the secure header to the Ultravisor (has all information on
-> how to decrypt the image and VM information)
-> 4. Protect image pages from the host and decrypt them
-> 5. Verify the image integrity
+> Rewrite BHs so that only scheduled or deleted BHs are enqueued.
+> Only BHs that actually require action will be iterated.
 > 
-> Only after step 5 a protected VM is allowed to run.
+> One semantic change is required: qemu_bh_delete() enqueues the BH and
+> therefore invokes aio_notify().  The
+> tests/test-aio.c:test_source_bh_delete_from_cb() test case assumed that
+> g_main_context_iteration(NULL, false) returns false after
+> qemu_bh_delete() but it now returns true for one iteration.  Fix up the
+> test case.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com> [Changes
-> to machine]
+> This patch makes aio_compute_timeout() and aio_bh_poll() drop from a CPU
+> profile reported by perf-top(1).  Previously they combined to 9% CPU
+> utilization when AioContext polling is commented out and the guest has 2
+> virtio-blk,num-queues=1 and 99 virtio-blk,num-queues=32 devices.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  hw/s390x/Makefile.objs              |   1 +
->  hw/s390x/ipl.c                      |  32 ++++++
->  hw/s390x/ipl.h                      |   2 +
->  hw/s390x/pv.c                       | 154 ++++++++++++++++++++++++++++
->  hw/s390x/pv.h                       |  38 +++++++
->  hw/s390x/s390-virtio-ccw.c          |  79 ++++++++++++++
->  include/hw/s390x/s390-virtio-ccw.h  |   1 +
->  target/s390x/cpu.c                  |   4 +
->  target/s390x/cpu.h                  |   1 +
->  target/s390x/cpu_features_def.inc.h |   1 +
->  10 files changed, 313 insertions(+)
->  create mode 100644 hw/s390x/pv.c
->  create mode 100644 hw/s390x/pv.h
+> v2:
+>  * Use QSLIST for BHs and QSIMPLEQ for BHListSlices [Paolo]
+>    (Note that I replaced bh = atomic_rcu_read(&first_bh) with
+>     QSLIST_FOREACH(&bh_list) so there is no memory ordering but I think
+>     this is safe.)
 
-(...)
+I have sent an implementation of QSLIST_FOREACH_RCU.  I doubt you'd see
+any problem in practice, since RCU accesses only need a compiler
+barrier, but it's cleaner.
 
-> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
-> new file mode 100644
-> index 0000000000..5b6a26cba9
-> --- /dev/null
-> +++ b/hw/s390x/pv.c
-> @@ -0,0 +1,154 @@
-> +/*
-> + * Secure execution functions
-> + *
-> + * Copyright IBM Corp. 2019
+With that changed,
 
-Update the year?
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> + * Author(s):
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
+Any further optimization of aio_compute_timeout() and aio_ctx_check()
+can be done on top.
 
-(...)
+Paolo
 
-> +void s390_pv_vm_destroy(void)
-> +{
-> +     s390_pv_cmd_exit(KVM_PV_VM_DESTROY, NULL);
-
-Why does this exit()? Should Never Happen?
-
-> +}
-> +
-> +int s390_pv_vcpu_create(CPUState *cs)
-> +{
-> +    int rc;
-> +
-> +    rc = s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_CREATE, NULL);
-> +    if (!rc) {
-> +        S390_CPU(cs)->env.pv = true;
-> +    }
-> +
-> +    return rc;
-> +}
-> +
-> +void s390_pv_vcpu_destroy(CPUState *cs)
-> +{
-> +    s390_pv_cmd_vcpu_exit(cs, KVM_PV_VCPU_DESTROY, NULL);
-
-dito
-
-> +    S390_CPU(cs)->env.pv = false;
-> +}
-
-(...)
-
-> +void s390_pv_perf_clear_reset(void)
-> +{
-> +    s390_pv_cmd_exit(KVM_PV_VM_PREP_RESET, NULL);
-
-And here. Or is that because the machine should not be left around in
-an undefined state?
-
-> +}
-> +
-> +int s390_pv_verify(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_VERIFY, NULL);
-> +}
-> +
-> +void s390_pv_unshare(void)
-> +{
-> +    s390_pv_cmd_exit(KVM_PV_VM_UNSHARE_ALL, NULL);
-> +}
-> diff --git a/hw/s390x/pv.h b/hw/s390x/pv.h
-> new file mode 100644
-> index 0000000000..7d20bdd12e
-> --- /dev/null
-> +++ b/hw/s390x/pv.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + * Protected Virtualization header
-> + *
-> + * Copyright IBM Corp. 2019
-
-Year++
-
-> + * Author(s):
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_S390_PV_H
-> +#define HW_S390_PV_H
-> +
-> +#ifdef CONFIG_KVM
-> +int s390_pv_vm_create(void);
-> +void s390_pv_vm_destroy(void);
-> +void s390_pv_vcpu_destroy(CPUState *cs);
-> +int s390_pv_vcpu_create(CPUState *cs);
-> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
-> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
-> +void s390_pv_perf_clear_reset(void);
-> +int s390_pv_verify(void);
-> +void s390_pv_unshare(void);
-> +#else
-> +int s390_pv_vm_create(void) { return 0; }
-
-I'm wondering why you return 0 here (and below). These function should
-not be called for !KVM, but just to help catch logic error, use -EINVAL
-or so?
-
-> +void s390_pv_vm_destroy(void) {}
-> +void s390_pv_vcpu_destroy(CPUState *cs) {}
-> +int s390_pv_vcpu_create(CPUState *cs) { return 0; }
-> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length) { return 0; }
-> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) { return 0: }
-> +void s390_pv_perf_clear_reset(void) {}
-> +int s390_pv_verify(void) { return 0; }
-> +void s390_pv_unshare(void) {}
-> +#endif
-> +
-> +#endif /* HW_S390_PV_H */
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index e759eb5f83..5fa4372083 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -41,6 +41,7 @@
->  #include "hw/qdev-properties.h"
->  #include "hw/s390x/tod.h"
->  #include "sysemu/sysemu.h"
-> +#include "hw/s390x/pv.h"
+> ---
+>  include/block/aio.h |  20 +++-
+>  tests/test-aio.c    |   3 +-
+>  util/async.c        | 236 +++++++++++++++++++++++++-------------------
+>  3 files changed, 157 insertions(+), 102 deletions(-)
+> 
+> diff --git a/include/block/aio.h b/include/block/aio.h
+> index 7ba9bd7874..1a2ce9ca26 100644
+> --- a/include/block/aio.h
+> +++ b/include/block/aio.h
+> @@ -51,6 +51,19 @@ struct ThreadPool;
+>  struct LinuxAioState;
+>  struct LuringState;
 >  
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -240,9 +241,11 @@ static void s390_create_sclpconsole(const char *type, Chardev *chardev)
->  static void ccw_init(MachineState *machine)
->  {
->      int ret;
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
->      VirtualCssBus *css_bus;
->      DeviceState *dev;
+> +/*
+> + * Each aio_bh_poll() call carves off a slice of the BH list, so that newly
+> + * scheduled BHs are not processed until the next aio_bh_poll() call.  All
+> + * active aio_bh_poll() calls chain their slices together in a list, so that
+> + * nested aio_bh_poll() calls process all scheduled bottom halves.
+> + */
+> +typedef QSLIST_HEAD(, QEMUBH) BHList;
+> +typedef struct BHListSlice BHListSlice;
+> +struct BHListSlice {
+> +    BHList bh_list;
+> +    QSIMPLEQ_ENTRY(BHListSlice) next;
+> +};
+> +
+>  struct AioContext {
+>      GSource source;
 >  
-> +    ms->pv = false;
-
-I'm wondering why you need to init this to false - isn't it already
-zeroed out?
-
->      s390_sclp_init();
->      /* init memory + setup max page size. Required for the CPU model */
->      s390_memory_init(machine->ram_size);
-> @@ -318,10 +321,58 @@ static inline void s390_do_cpu_ipl(CPUState *cs, run_on_cpu_data arg)
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+> @@ -91,8 +104,11 @@ struct AioContext {
+>       */
+>      QemuLockCnt list_lock;
+>  
+> -    /* Anchor of the list of Bottom Halves belonging to the context */
+> -    struct QEMUBH *first_bh;
+> +    /* Bottom Halves pending aio_bh_poll() processing */
+> +    BHList bh_list;
+> +
+> +    /* Chained BH list slices for each nested aio_bh_poll() call */
+> +    QSIMPLEQ_HEAD(, BHListSlice) bh_slice_list;
+>  
+>      /* Used by aio_notify.
+>       *
+> diff --git a/tests/test-aio.c b/tests/test-aio.c
+> index 86fb73b3d5..8a46078463 100644
+> --- a/tests/test-aio.c
+> +++ b/tests/test-aio.c
+> @@ -615,7 +615,8 @@ static void test_source_bh_delete_from_cb(void)
+>      g_assert_cmpint(data1.n, ==, data1.max);
+>      g_assert(data1.bh == NULL);
+>  
+> -    g_assert(!g_main_context_iteration(NULL, false));
+> +    assert(g_main_context_iteration(NULL, false));
+> +    assert(!g_main_context_iteration(NULL, false));
 >  }
 >  
-> +static int s390_machine_pv_secure(S390CcwMachineState *ms)
-> +{
-> +    CPUState *t;
-> +    int rc;
+>  static void test_source_bh_delete_from_cb_many(void)
+> diff --git a/util/async.c b/util/async.c
+> index c192a24a61..2c8499cc29 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -36,16 +36,76 @@
+>  /***********************************************************/
+>  /* bottom halves (can be seen as timers which expire ASAP) */
+>  
+> +/* QEMUBH::flags values */
+> +enum {
+> +    /* Already enqueued and waiting for aio_bh_poll() */
+> +    BH_PENDING   = (1 << 0),
 > +
-> +    /* Create SE VM */
-> +    rc = s390_pv_vm_create();
-> +    if (rc) {
-> +        return rc;
+> +    /* Invoke the callback */
+> +    BH_SCHEDULED = (1 << 1),
+> +
+> +    /* Delete without invoking callback */
+> +    BH_DELETED   = (1 << 2),
+> +
+> +    /* Delete after invoking callback */
+> +    BH_ONESHOT   = (1 << 3),
+> +
+> +    /* Schedule periodically when the event loop is idle */
+> +    BH_IDLE      = (1 << 4),
+> +};
+> +
+>  struct QEMUBH {
+>      AioContext *ctx;
+>      QEMUBHFunc *cb;
+>      void *opaque;
+> -    QEMUBH *next;
+> -    bool scheduled;
+> -    bool idle;
+> -    bool deleted;
+> +    QSLIST_ENTRY(QEMUBH) next;
+> +    unsigned flags;
+>  };
+>  
+> +/* Called concurrently from any thread */
+> +static void aio_bh_enqueue(QEMUBH *bh, unsigned new_flags)
+> +{
+> +    AioContext *ctx = bh->ctx;
+> +    unsigned old_flags;
+> +
+> +    /*
+> +     * The memory barrier implicit in atomic_fetch_or makes sure that:
+> +     * 1. idle & any writes needed by the callback are done before the
+> +     *    locations are read in the aio_bh_poll.
+> +     * 2. ctx is loaded before the callback has a chance to execute and bh
+> +     *    could be freed.
+> +     */
+> +    old_flags = atomic_fetch_or(&bh->flags, BH_PENDING | new_flags);
+> +    if (!(old_flags & BH_PENDING)) {
+> +        QSLIST_INSERT_HEAD_ATOMIC(&ctx->bh_list, bh, next);
 > +    }
 > +
-> +    CPU_FOREACH(t) {
-> +        rc = s390_pv_vcpu_create(t);
-> +        if (rc) {
-> +            return rc;
-
-No need to undo something on error?
-
+> +    aio_notify(ctx);
+> +}
+> +
+> +/* Only called from aio_bh_poll() and aio_ctx_finalize() */
+> +static QEMUBH *aio_bh_dequeue(BHList *head, unsigned *flags)
+> +{
+> +    QEMUBH *bh = QSLIST_FIRST(head);
+> +
+> +    if (!bh) {
+> +        return NULL;
+> +    }
+> +
+> +    QSLIST_REMOVE_HEAD(head, next);
+> +
+> +    /*
+> +     * The atomic_and is paired with aio_bh_enqueue().  The implicit memory
+> +     * barrier ensures that the callback sees all writes done by the scheduling
+> +     * thread.  It also ensures that the scheduling thread sees the cleared
+> +     * flag before bh->cb has run, and thus will call aio_notify again if
+> +     * necessary.
+> +     */
+> +    *flags = atomic_fetch_and(&bh->flags,
+> +                              ~(BH_PENDING | BH_SCHEDULED | BH_IDLE));
+> +    return bh;
+> +}
+> +
+>  void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+>  {
+>      QEMUBH *bh;
+> @@ -55,15 +115,7 @@ void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+>          .cb = cb,
+>          .opaque = opaque,
+>      };
+> -    qemu_lockcnt_lock(&ctx->list_lock);
+> -    bh->next = ctx->first_bh;
+> -    bh->scheduled = 1;
+> -    bh->deleted = 1;
+> -    /* Make sure that the members are ready before putting bh into list */
+> -    smp_wmb();
+> -    ctx->first_bh = bh;
+> -    qemu_lockcnt_unlock(&ctx->list_lock);
+> -    aio_notify(ctx);
+> +    aio_bh_enqueue(bh, BH_SCHEDULED | BH_ONESHOT);
+>  }
+>  
+>  QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+> @@ -75,12 +127,6 @@ QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+>          .cb = cb,
+>          .opaque = opaque,
+>      };
+> -    qemu_lockcnt_lock(&ctx->list_lock);
+> -    bh->next = ctx->first_bh;
+> -    /* Make sure that the members are ready before putting bh into list */
+> -    smp_wmb();
+> -    ctx->first_bh = bh;
+> -    qemu_lockcnt_unlock(&ctx->list_lock);
+>      return bh;
+>  }
+>  
+> @@ -89,91 +135,56 @@ void aio_bh_call(QEMUBH *bh)
+>      bh->cb(bh->opaque);
+>  }
+>  
+> -/* Multiple occurrences of aio_bh_poll cannot be called concurrently.
+> - * The count in ctx->list_lock is incremented before the call, and is
+> - * not affected by the call.
+> - */
+> +/* Multiple occurrences of aio_bh_poll cannot be called concurrently. */
+>  int aio_bh_poll(AioContext *ctx)
+>  {
+> -    QEMUBH *bh, **bhp, *next;
+> -    int ret;
+> -    bool deleted = false;
+> -
+> -    ret = 0;
+> -    for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
+> -        next = atomic_rcu_read(&bh->next);
+> -        /* The atomic_xchg is paired with the one in qemu_bh_schedule.  The
+> -         * implicit memory barrier ensures that the callback sees all writes
+> -         * done by the scheduling thread.  It also ensures that the scheduling
+> -         * thread sees the zero before bh->cb has run, and thus will call
+> -         * aio_notify again if necessary.
+> -         */
+> -        if (atomic_xchg(&bh->scheduled, 0)) {
+> +    BHListSlice slice;
+> +    BHListSlice *s;
+> +    int ret = 0;
+> +
+> +    QSLIST_MOVE_ATOMIC(&slice.bh_list, &ctx->bh_list);
+> +    QSIMPLEQ_INSERT_TAIL(&ctx->bh_slice_list, &slice, next);
+> +
+> +    while ((s = QSIMPLEQ_FIRST(&ctx->bh_slice_list))) {
+> +        QEMUBH *bh;
+> +        unsigned flags;
+> +
+> +        bh = aio_bh_dequeue(&s->bh_list, &flags);
+> +        if (!bh) {
+> +            QSIMPLEQ_REMOVE_HEAD(&ctx->bh_slice_list, next);
+> +            continue;
+> +        }
+> +
+> +        if ((flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
+>              /* Idle BHs don't count as progress */
+> -            if (!bh->idle) {
+> +            if (!(flags & BH_IDLE)) {
+>                  ret = 1;
+>              }
+> -            bh->idle = 0;
+>              aio_bh_call(bh);
+>          }
+> -        if (bh->deleted) {
+> -            deleted = true;
+> +        if (flags & (BH_DELETED | BH_ONESHOT)) {
+> +            g_free(bh);
+>          }
+>      }
+>  
+> -    /* remove deleted bhs */
+> -    if (!deleted) {
+> -        return ret;
+> -    }
+> -
+> -    if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
+> -        bhp = &ctx->first_bh;
+> -        while (*bhp) {
+> -            bh = *bhp;
+> -            if (bh->deleted && !bh->scheduled) {
+> -                *bhp = bh->next;
+> -                g_free(bh);
+> -            } else {
+> -                bhp = &bh->next;
+> -            }
+> -        }
+> -        qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
+> -    }
+>      return ret;
+>  }
+>  
+>  void qemu_bh_schedule_idle(QEMUBH *bh)
+>  {
+> -    bh->idle = 1;
+> -    /* Make sure that idle & any writes needed by the callback are done
+> -     * before the locations are read in the aio_bh_poll.
+> -     */
+> -    atomic_mb_set(&bh->scheduled, 1);
+> +    aio_bh_enqueue(bh, BH_SCHEDULED | BH_IDLE);
+>  }
+>  
+>  void qemu_bh_schedule(QEMUBH *bh)
+>  {
+> -    AioContext *ctx;
+> -
+> -    ctx = bh->ctx;
+> -    bh->idle = 0;
+> -    /* The memory barrier implicit in atomic_xchg makes sure that:
+> -     * 1. idle & any writes needed by the callback are done before the
+> -     *    locations are read in the aio_bh_poll.
+> -     * 2. ctx is loaded before scheduled is set and the callback has a chance
+> -     *    to execute.
+> -     */
+> -    if (atomic_xchg(&bh->scheduled, 1) == 0) {
+> -        aio_notify(ctx);
+> -    }
+> +    aio_bh_enqueue(bh, BH_SCHEDULED);
+>  }
+>  
+> -
+>  /* This func is async.
+>   */
+>  void qemu_bh_cancel(QEMUBH *bh)
+>  {
+> -    atomic_mb_set(&bh->scheduled, 0);
+> +    atomic_and(&bh->flags, ~BH_SCHEDULED);
+>  }
+>  
+>  /* This func is async.The bottom half will do the delete action at the finial
+> @@ -181,21 +192,16 @@ void qemu_bh_cancel(QEMUBH *bh)
+>   */
+>  void qemu_bh_delete(QEMUBH *bh)
+>  {
+> -    bh->scheduled = 0;
+> -    bh->deleted = 1;
+> +    aio_bh_enqueue(bh, BH_DELETED);
+>  }
+>  
+> -int64_t
+> -aio_compute_timeout(AioContext *ctx)
+> +static int64_t aio_compute_bh_timeout(BHList *head, int timeout)
+>  {
+> -    int64_t deadline;
+> -    int timeout = -1;
+>      QEMUBH *bh;
+>  
+> -    for (bh = atomic_rcu_read(&ctx->first_bh); bh;
+> -         bh = atomic_rcu_read(&bh->next)) {
+> -        if (bh->scheduled) {
+> -            if (bh->idle) {
+> +    QSLIST_FOREACH(bh, head, next) {
+> +        if ((bh->flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
+> +            if (bh->flags & BH_IDLE) {
+>                  /* idle bottom halves will be polled at least
+>                   * every 10ms */
+>                  timeout = 10000000;
+> @@ -207,6 +213,28 @@ aio_compute_timeout(AioContext *ctx)
+>          }
+>      }
+>  
+> +    return timeout;
+> +}
+> +
+> +int64_t
+> +aio_compute_timeout(AioContext *ctx)
+> +{
+> +    BHListSlice *s;
+> +    int64_t deadline;
+> +    int timeout = -1;
+> +
+> +    timeout = aio_compute_bh_timeout(&ctx->bh_list, timeout);
+> +    if (timeout == 0) {
+> +        return 0;
+> +    }
+> +
+> +    QSIMPLEQ_FOREACH(s, &ctx->bh_slice_list, next) {
+> +        timeout = aio_compute_bh_timeout(&s->bh_list, timeout);
+> +        if (timeout == 0) {
+> +            return 0;
 > +        }
 > +    }
 > +
-> +    ms->pv = true;
-> +
-> +    /* Set SE header and unpack */
-> +    rc = s390_ipl_prepare_pv_header();
-> +    if (rc) {
-> +        return rc;
-
-Also here.
-
-> +    }
-> +
-> +    /* Decrypt image */
-> +    rc = s390_ipl_pv_unpack();
-> +    if (rc) {
-> +        return rc;
-
-And here.
-
-> +    }
-> +
-> +    /* Verify integrity */
-> +    rc = s390_pv_verify();
-> +    return rc;
-
-And here.
-
-> +}
-
-(...)
-
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 8da1905485..1dbd84b9d7 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -37,6 +37,8 @@
->  #include "sysemu/hw_accel.h"
->  #include "hw/qdev-properties.h"
->  #ifndef CONFIG_USER_ONLY
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/pv.h"
->  #include "hw/boards.h"
->  #include "sysemu/arch_init.h"
->  #include "sysemu/sysemu.h"
-> @@ -191,6 +193,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+>      deadline = timerlistgroup_deadline_ns(&ctx->tlg);
+>      if (deadline == 0) {
+>          return 0;
+> @@ -237,15 +265,24 @@ aio_ctx_check(GSource *source)
+>  {
+>      AioContext *ctx = (AioContext *) source;
+>      QEMUBH *bh;
+> +    BHListSlice *s;
 >  
->  #if !defined(CONFIG_USER_ONLY)
->      MachineState *ms = MACHINE(qdev_get_machine());
-> +    S390CcwMachineState *ccw = S390_CCW_MACHINE(ms);
-
-I find the variable name a bit confusing... maybe ccw_ms?
-
->      unsigned int max_cpus = ms->smp.max_cpus;
->      if (cpu->env.core_id >= max_cpus) {
->          error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
-> @@ -205,6 +208,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
->          goto out;
+>      atomic_and(&ctx->notify_me, ~1);
+>      aio_notify_accept(ctx);
+>  
+> -    for (bh = ctx->first_bh; bh; bh = bh->next) {
+> -        if (bh->scheduled) {
+> +    QSLIST_FOREACH(bh, &ctx->bh_list, next) {
+> +        if ((bh->flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
+>              return true;
+>          }
 >      }
+> +
+> +    QSIMPLEQ_FOREACH(s, &ctx->bh_slice_list, next) {
+> +        QSLIST_FOREACH(bh, &s->bh_list, next) {
+> +            if ((bh->flags & (BH_SCHEDULED | BH_DELETED)) == BH_SCHEDULED) {
+> +                return true;
+> +            }
+> +        }
+> +    }
+>      return aio_pending(ctx) || (timerlistgroup_deadline_ns(&ctx->tlg) == 0);
+>  }
 >  
-> +    cpu->env.pv = ccw->pv;
-
-So, if you add a cpu, it will inherit the pv state of the machine...
-doesn't it need any setup?
-
->      /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
->      cs->cpu_index = cpu->env.core_id;
->  #endif
-
-(...)
+> @@ -265,6 +302,8 @@ static void
+>  aio_ctx_finalize(GSource     *source)
+>  {
+>      AioContext *ctx = (AioContext *) source;
+> +    QEMUBH *bh;
+> +    unsigned flags;
+>  
+>      thread_pool_free(ctx->thread_pool);
+>  
+> @@ -287,18 +326,15 @@ aio_ctx_finalize(GSource     *source)
+>      assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
+>      qemu_bh_delete(ctx->co_schedule_bh);
+>  
+> -    qemu_lockcnt_lock(&ctx->list_lock);
+> -    assert(!qemu_lockcnt_count(&ctx->list_lock));
+> -    while (ctx->first_bh) {
+> -        QEMUBH *next = ctx->first_bh->next;
+> +    /* There must be no aio_bh_poll() calls going on */
+> +    assert(QSIMPLEQ_EMPTY(&ctx->bh_slice_list));
+>  
+> +    while ((bh = aio_bh_dequeue(&ctx->bh_list, &flags))) {
+>          /* qemu_bh_delete() must have been called on BHs in this AioContext */
+> -        assert(ctx->first_bh->deleted);
+> +        assert(flags & BH_DELETED);
+>  
+> -        g_free(ctx->first_bh);
+> -        ctx->first_bh = next;
+> +        g_free(bh);
+>      }
+> -    qemu_lockcnt_unlock(&ctx->list_lock);
+>  
+>      aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
+>      event_notifier_cleanup(&ctx->notifier);
+> @@ -445,6 +481,8 @@ AioContext *aio_context_new(Error **errp)
+>      AioContext *ctx;
+>  
+>      ctx = (AioContext *) g_source_new(&aio_source_funcs, sizeof(AioContext));
+> +    QSLIST_INIT(&ctx->bh_list);
+> +    QSIMPLEQ_INIT(&ctx->bh_slice_list);
+>      aio_context_setup(ctx);
+>  
+>      ret = event_notifier_init(&ctx->notifier, false);
+> 
 
 
