@@ -2,105 +2,85 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA44DC11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C232C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:33:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8442C206E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:29:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC9B8206E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:33:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZF09kf0S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8442C206E2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF5hJgv+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9B8206E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4ltA-0007FZ-OH
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:29:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60337)
+	id 1j4lwy-0001Iv-Vu
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:33:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j4lsZ-0006kl-BA
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:28:36 -0500
+ (envelope-from <wainersm@redhat.com>) id 1j4lvo-0000QG-OX
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:31:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j4lsX-0005XE-Fd
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:28:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36848
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <wainersm@redhat.com>) id 1j4lvn-0007Li-K7
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:31:56 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56524
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4lsW-0005Ws-KP
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:28:32 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1j4lvn-0007L9-FL
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:31:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582205312;
+ s=mimecast20190719; t=1582205514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YBTkm+h2YuFDdALnximDkjy5KDxhEwdX2ZBFm/Lvm2k=;
- b=ZF09kf0SQsTRuSNTRXxC0i1TMkB9IwzVC6phIPSgrIrmeYm1L9+YN7y96/cQWMxqoPnsTQ
- P+pZ7GOY2lpDz9pmt8szYWC0ojitMOsWePocoRtOMYjhQ7EH+c0bymv64C3SsdMEYFj7e4
- lXgGCgbmn5/HMxNqKsCTSXFyhYKiDJo=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lh/fDkAWyjLeYA6edd1OKYMIv6iDbuJfvWrL7o5UObQ=;
+ b=QF5hJgv+fKcOsz36Vv6YfwFX95xB5fubLpQQYspDBdEIHeN0tOSLq6ocRGMFt6/9sdDTzu
+ pR9G1aN+xLFtInx2w7FKTOx1P01QYDlZUmVxpob74RrIE/NON42J4REHvNTbGKNzGhdJCx
+ k2/DIKBT5AKHkvfHFIR6UR7OsiqHHA8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-rZ7LDgOCN6mwYCRy3lE-mQ-1; Thu, 20 Feb 2020 08:28:27 -0500
-X-MC-Unique: rZ7LDgOCN6mwYCRy3lE-mQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-343-Ha51yl-JNemZkiJ_xR7StQ-1; Thu, 20 Feb 2020 08:31:53 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F0BB18B5FA1;
- Thu, 20 Feb 2020 13:28:25 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 30324790CF;
- Thu, 20 Feb 2020 13:28:14 +0000 (UTC)
-Subject: Re: [RFC PATCH v3 01/27] qcow2: Add calculate_l2_meta()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1577014346.git.berto@igalia.com>
- <2d53eae8fe9b9ab262daee45b662f631c3ba3899.1577014346.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6efcba1d-1f42-2263-e717-c4cdc5af9cd4@redhat.com>
-Date: Thu, 20 Feb 2020 14:28:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 034DA19251A1;
+ Thu, 20 Feb 2020 13:31:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-92.gru2.redhat.com
+ [10.97.116.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68CD460BE1;
+ Thu, 20 Feb 2020 13:31:47 +0000 (UTC)
+Subject: Re: [PATCH v9 1/3] Acceptance tests: introduce BUILD_DIR and
+ SOURCE_DIR
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20200220020652.16276-1-crosa@redhat.com>
+ <20200220020652.16276-2-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <38105bbf-a9d2-24d9-e979-3b93bc110918@redhat.com>
+Date: Thu, 20 Feb 2020 10:31:45 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <2d53eae8fe9b9ab262daee45b662f631c3ba3899.1577014346.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200220020652.16276-2-crosa@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: Ha51yl-JNemZkiJ_xR7StQ-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9NMQTzgWx6VaRCu74rIInuDxtN9G4YE95"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,56 +92,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9NMQTzgWx6VaRCu74rIInuDxtN9G4YE95
-Content-Type: multipart/mixed; boundary="jLtInJnT9ZyMAwxcdaIoMtygq5BdL8Dxw"
 
---jLtInJnT9ZyMAwxcdaIoMtygq5BdL8Dxw
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 22.12.19 12:36, Alberto Garcia wrote:
-> handle_alloc() creates a QCowL2Meta structure in order to update the
-> image metadata and perform the necessary copy-on-write operations.
->=20
-> This patch moves that code to a separate function so it can be used
-> from other places.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
+On 2/19/20 11:06 PM, Cleber Rosa wrote:
+> Some tests may benefit from using resources from a build directory.
+> This introduces three variables that can help tests find resources in
+> those directories.
+>
+> First, a BUILD_DIR is assumed to exist, given that the primary form of
+> running the acceptance tests is from a build directory (which may or
+> may not be the same as the source tree, that is, the SOURCE_DIR).
+>
+> If the directory containing the acceptance tests happens to be a link
+> to a directory, it's assumed to it points to the source tree
+> (SOURCE_DIR), which is the behavior defined on the QEMU Makefiles.  If
+> the directory containing the acceptance tests is not a link, then a
+> in-tree build is assumed, and the BUILD_DIR and SOURCE_DIR have the
+> same value.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  block/qcow2-cluster.c | 77 +++++++++++++++++++++++++++++--------------
->  1 file changed, 53 insertions(+), 24 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+>   tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++++++++------
+>   1 file changed, 19 insertions(+), 6 deletions(-)
 
 
---jLtInJnT9ZyMAwxcdaIoMtygq5BdL8Dxw--
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
---9NMQTzgWx6VaRCu74rIInuDxtN9G4YE95
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Also tested with QEMU built outside of source dir:
 
------BEGIN PGP SIGNATURE-----
+Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5OiWMACgkQ9AfbAGHV
-z0A1QQgAgFMlE0kvIyYpNFMiI2CWrloyED9ELXHAtjaEtwzW85kK1BlXmHn67/im
-QR5ZWzBtXZPcBAzr0TNbXJgW5g6MW46k703sEsVEE+LuUt7/2FL3hVqJ62xgRW5t
-owg9KhHPT5cmmSiXApbdaiLnixPRgGvVsTlULT1e0aZOInfedK+dwjitgQvDx/pE
-8Y9eGaa27TeZrvfr+WyK3ASuNA4I4TAQOnbH19mvNFM6pBME9sl8zBNrBDyf7RhV
-rQ2rKfDx6X+NFGS1Z5WPgwOI3wtf+LaljCGAl9OxQ+2HC7tiLZ4SAkx2/rqDbYY1
-5WDhJnV+cFv5/GEXs5Qbw7S99XVLJw==
-=UTjd
------END PGP SIGNATURE-----
-
---9NMQTzgWx6VaRCu74rIInuDxtN9G4YE95--
+>
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+> index d4358eb431..59e7b4f763 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -16,8 +16,21 @@ import tempfile
+>   
+>   import avocado
+>   
+> -SRC_ROOT_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+> -sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+> +#: The QEMU build root directory.  It may also be the source directory
+> +#: if building from the source dir, but it's safer to use BUILD_DIR for
+> +#: that purpose.  Be aware that if this code is moved outside of a source
+> +#: and build tree, it will not be accurate.
+> +BUILD_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+> +
+> +if os.path.islink(os.path.dirname(os.path.dirname(__file__))):
+> +    # The link to the acceptance tests dir in the source code directory
+> +    lnk = os.path.dirname(os.path.dirname(__file__))
+> +    #: The QEMU root source directory
+> +    SOURCE_DIR = os.path.dirname(os.path.dirname(os.readlink(lnk)))
+> +else:
+> +    SOURCE_DIR = BUILD_DIR
+> +
+> +sys.path.append(os.path.join(SOURCE_DIR, 'python'))
+>   
+>   from qemu.machine import QEMUMachine
+>   
+> @@ -49,10 +62,10 @@ def pick_default_qemu_bin(arch=None):
+>       if is_readable_executable_file(qemu_bin_relative_path):
+>           return qemu_bin_relative_path
+>   
+> -    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
+> +    qemu_bin_from_bld_dir_path = os.path.join(BUILD_DIR,
+>                                                 qemu_bin_relative_path)
+> -    if is_readable_executable_file(qemu_bin_from_src_dir_path):
+> -        return qemu_bin_from_src_dir_path
+> +    if is_readable_executable_file(qemu_bin_from_bld_dir_path):
+> +        return qemu_bin_from_bld_dir_path
+>   
+>   
+>   def _console_interaction(test, success_message, failure_message,
+> @@ -153,7 +166,7 @@ class Test(avocado.Test):
+>           self.qemu_bin = self.params.get('qemu_bin',
+>                                           default=default_qemu_bin)
+>           if self.qemu_bin is None:
+> -            self.cancel("No QEMU binary defined or found in the source tree")
+> +            self.cancel("No QEMU binary defined or found in the build tree")
+>   
+>       def _new_vm(self, *args):
+>           vm = QEMUMachine(self.qemu_bin, sock_dir=tempfile.mkdtemp())
 
 
