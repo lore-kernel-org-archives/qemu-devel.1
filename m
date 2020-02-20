@@ -2,75 +2,79 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D70C5ACC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E936C5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5CBD2465D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:09:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAFBA2465D
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:10:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/nCEMAT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5CBD2465D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Adbjdm5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAFBA2465D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4bH1-00079J-1q
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 21:09:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34090)
+	id 1j4bHs-0008AA-0X
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 21:10:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1j4bF9-0004gw-9a
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:13 -0500
+ (envelope-from <crosa@redhat.com>) id 1j4bFF-0004oM-BS
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1j4bF6-0005pw-Uj
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26461
+ (envelope-from <crosa@redhat.com>) id 1j4bFD-0005tH-F4
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41326
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1j4bF6-0005pe-Pm
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:08 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1j4bFD-0005t0-BG
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:07:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582164428;
+ s=mimecast20190719; t=1582164435;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=XaQPYq/v3CXiYfgvL/YFGiyYoAdrCuYwpIFfBbZvh8I=;
- b=Y/nCEMAT/43BL/JeyfhYAV+TXGp9L/9BLx5zgtuBJzly50jI5X3TM67GjKMIasB8vjH9Fm
- iReCugpSjVDs/FblaTxf8ZqhDVhh171NsofhbWmj2O+shsHuhlCV6vaGGxysyABVEEaVM7
- +jrT3J+1kx4eBqPXwgwg27V23yRx+iI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3G2zKleLvr3u7a0loKn2y9arRlej5wOiShSubepA+RM=;
+ b=Adbjdm5Cn1qtm+JBCj2a0GLxzt3HfFfWrJ+IjUHZy2Q1I4TkGxuS6ClsmBXNNCt7FZFNiO
+ 3tZpoZk9ypaNxFKOYKET2xrECQGH7bVSyaunwOBYm0It0HJBAjccyi66w0kkx54NLdw5X/
+ HegAkqSpz4CS8sj2/oC2zKl8dFl/rPQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-487cRl_EMQ6Tz27h4w2xvg-1; Wed, 19 Feb 2020 21:07:01 -0500
+ us-mta-263-mVFL3Z2xO6Oa9izAAnv4yw-1; Wed, 19 Feb 2020 21:07:05 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0ED25189F760;
- Thu, 20 Feb 2020 02:07:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EBD9801E5C;
+ Thu, 20 Feb 2020 02:07:04 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-120-89.rdu2.redhat.com
  [10.10.120.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A36119C4F;
- Thu, 20 Feb 2020 02:06:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 36CC519C4F;
+ Thu, 20 Feb 2020 02:07:02 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 0/3] Acceptance test: Add "boot_linux" acceptance test
-Date: Wed, 19 Feb 2020 21:06:49 -0500
-Message-Id: <20200220020652.16276-1-crosa@redhat.com>
+Subject: [PATCH v9 2/3] Acceptance test: add "boot_linux" tests
+Date: Wed, 19 Feb 2020 21:06:51 -0500
+Message-Id: <20200220020652.16276-3-crosa@redhat.com>
+In-Reply-To: <20200220020652.16276-1-crosa@redhat.com>
+References: <20200220020652.16276-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 487cRl_EMQ6Tz27h4w2xvg-1
+X-MC-Unique: mVFL3Z2xO6Oa9izAAnv4yw-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,8 +98,7 @@ Sender: "Qemu-devel"
 
 This acceptance test, validates that a full blown Linux guest can
 successfully boot in QEMU.  In this specific case, the guest chosen is
-Fedora version 31.  It covers the following architectures and
-machine types:
+Fedora version 31.
 
  * x86_64, pc-i440fx and pc-q35 machine types, with TCG and KVM as
    accelerators
@@ -106,310 +109,305 @@ machine types:
 
  * s390x and s390-ccw-virtio machine type with TCG as accelerator
 
-This has been tested on x86_64, ppc64le and aarch64 hosts and has been
-running reliably (in my experience) on Travis CI.
-
-Git:
-  - URI: https://github.com/clebergnu/qemu/tree/test_boot_linux_v9
-  - Remote: https://github.com/clebergnu/qemu
-  - Branch: test_boot_linux_v9
-
-Travis CI:
-  - Build: https://travis-ci.org/clebergnu/qemu/builds/652694503
-
-Previous version:
-  - v8: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04095.html
-  - v7: https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg00220.html
-  - v6: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01202.html
-  - v5: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04652.html
-  - v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02032.html
-  - v3: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01677.html
-  - v2: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04318.html
-  - v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02530.ht=
-ml
-
-Changes from v8:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Renamed "BLD_DIR" to "BUILD_DIR", "SRC_DIR" to "SOURCE_DIR" and dropped
-  "LNK_DIR" variables on tests/acceptance/avocado_qemu/__init__.py
-
-* Changed memory allocation to 1024 MB, so that it puts less pressure on
-  the host memory, and should be compatible with 32bit hosts (I've found
-  no significant effects to the test times)
-
-* Explicitly enabled TCG and skip tests if it's not available
-
-* Added tags for when accel is TCG ("accel:tcg")
-
-* Added additional tags for "pc" alias, that is, "pc-i440fx"
-
-* Renamed tests to make the machine type and accellerator more explicit:
-  - BootLinuxX8664.test_pc =3D> BootLinuxX8664.test_pc_i440fx_tcg
-  - BootLinuxX8664.test_pc_kvm =3D> BootLinuxX8664.test_pc_i440fx_kvm
-  - BootLinuxX8664.test_q35 =3D> BootLinuxX8664.test_pc_q35_tcg
-  - BootLinuxX8664.test_kvm_q35 =3D> BootLinuxX8664.test_pc_q35_kvm
-  - BootLinuxAarch64.test_virt =3D> BootLinuxAarch64.test_virt_tcg
-  - BootLinuxAarch64.test_kvm_virt =3D> BootLinuxAarch64.test_virt_kvm
-  - BootLinuxPPC64.test_pseries =3D> BootLinuxPPC64.test_pseries_tcg
-  - BootLinuxS390X.test_s390_ccw_virtio =3D> BootLinuxS390X.test_s390_ccw_v=
-irtio_tcg
-
-* Renamed target "get-vmimage" to "get-vm-images", and added a help
-  entry under "check-help".
-
-* Bumped pycdlib version to 1.9.0, which contains an endianess bug that
-  was seen on s390x hosts.
-
-Changes from v7:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-This version drops a number of commits that had been already reviewed
-and have been merged:
-
- * Dropped commit "Acceptance tests: use relative location for tests",
-   already present in the latest master.
-
- * Dropped commit "Acceptance tests: use avocado tags for machine type",
-   already present in the latest master.
-
- * Dropped commit: "Acceptance tests: introduce utility method for tags
-   unique vals", already present in the latest master.
-
-With regards to the handling of the build directory, and the usage of
-a qemu-img binary from the build tree, the following changed:
-
- * Dropped commit "Acceptance tests: add the build directory to the
-   system PATH", because the qemu-img binary to be used is now
-   explicitly defined, instead of relying on the modification of the
-   PATH environment variable.
-
- * Dropped commit "Acceptance tests: depend on qemu-img", replaced by
-   explicitly setting the qemu-img binary to be used for snapshot
-   generation.  Also, the newly added "--enable-tools" configure line
-   on Travis CI makes sure that a matching qemu-img binary is
-   available on CI.
-
- * Dropped commit "Acceptance tests: keep a stable reference to the
-   QEMU build dir", replaced by a different approach that introduces
-   variables tracking the build dir, source dir and link (from build
-   to source) dir.
-
- * New commit "Acceptance tests: introduce BLD_DIR, SRC_DIR and
-   LNK_DIR".
-
- * New commit "Acceptance tests: add make targets to download images",
-   that downloads the cloud images, aka vmimages, before the test
-   execution itself.
-
- * New commit "[TO BE REMOVED] Use Avocado master branch + vmimage fix"
-   to facilitate the review/test of this version.
-
-Additionally:
-
-  * The check for the availability of kvm now makes use of the
-    strengthened qemu.accel.kvm_available() and passes the QEMU binary
-    as an argument to make sure KVM support is compiled into that
-    binary.
-
- * The timeout was increased to 900 seconds.  This is just one extra
-   step to avoid false negatives on very slow systems.  As a
-   comparison, on Travis CI, on a x86_64 host, the slowest test takes
-   around 250 seconds (boot_linux.py:BootLinuxAarch64.test_virt).  On
-   x86_64 systems with KVM enabled, my experience is that a test will
-   take around 15 seconds.
-
-Changes from v6:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Bumped Fedora to most recently released version (31).
-
- * Included new architectures (ppc64 and s390x), consolidating all
-   tests into the same commit.
-
- * New commit: "Acceptance tests: use avocado tags for machine type"
-
- * New commit: "Acceptance tests: introduce utility method for tags
-   unique vals"
-
- * New commit: "Acceptance test x86_cpu_model_versions: use default
-   vm", needed to normalize the use of the machine type tags
-
- * Added a lot of leniency to the test setup (and reliability to the
-   test/job), canceling the test if there are any failures while
-   downloading/preparing the boot images.
-
- * Made use of Avocado's data drainer a regular feature (dropped the
-   commit with RFC) and squashed it.
-
- * Bumped pycdlib version to 1.8.0
-
- * Dropped explicit "--enable-slirp=3Dgit" (added on v5) to Travis CI
-   configure line, as the default configuration on Travis CI now
-   results in user networking capabilities.
-
-Changes from v5:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Added explicit "--enable-slirp=3Dgit" to Travis CI configure line, as
-   these tests depend on "-netdev user" like networking.
-
- * Bumped Fedora to most recently released version (30).
-
- * Changed "checksum" parameter to 'sha256' and use the same hashes as
-   provided by the Fedora project (instead of using Avocado's default
-   sha1 and compute and use a different hash value).
-
- * New commit: Add "boot_linux" test for aarch64 and virt machine type
-
- * New commit: [RFC]: use Avocado data drainer for console logging
-
-Changes from v4:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * New commit "Acceptance tests: use relative location for tests"
-
- * New commit "Acceptance tests: keep a stable reference to the QEMU build =
-dir"
-
- * Pinned the Fedora 29 image by adding a checksum.  The goal is to
-   never allow more than one component to change at a time (the one
-   allowed to change is QEMU itself).  Updates to the image should be
-   manual. (Based on comments from Cornelia)
-
- * Moved the downloading of the Fedora 29 cloud image to the test
-   setUp() method, canceling the test if the image can not be
-   downloaded.
-
- * Removed the ":avocado: enable" tag, given that Avocado versions
-   68.0 and later operate on a "recursive by default" manner, that
-   is able to correctly identify this as an Avocado test.
-
-Changes from v3:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * New patch "Acceptance tests: depend on qemu-img"
-
-Known Issues on v3 (no longer applicable):
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * A recent TCG performance regression[1] affects this test in a
-   number of ways:
-   - The test execution may timeout by itself
-   - The generation of SSH host keys in the guest's first boot is also
-     affected (possibly also a timeout)
-   - The cloud-init "phone home" feature attempts to read the host keys
-     and fails, causing the test to timeout and fail
-
-   These are not observed anymore once the fix[2] is applied.
-
-[1] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00338.html
-[2] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01129.html
-
-Changes from v2:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * Updated the tag to include the "arch:" key, in a similar fashion as to
-   the tests in the "Acceptance Tests: target architecture support":
-   - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00369.html
-
- * Renamed the test method name to test_x86_64_pc, again, similarly to the
-   boot_linux_console.py tests in the series mentioned before.
-
- * Set the machine type explicitly, again similarly to the
-   boot_linux_console.py tests in the series mentioned before.
-
- * Added messages after the launch of the VM, to let test runners know
-   the test know waits for a boot confirmation from the the guest (Eduardo)=
-.
-
- * Updated commit message to reflect the fact that this version does
-   not allow for parameterization of the guest OS, version, etc.
-
- * Dropped the RFC prefix on patch "RFC: Acceptance tests: add the
-   build directory to the system PATH"
-
- * Changed the comments on "RFC: Acceptance tests: add the build
-   directory to the system PATH" to make it clear the addition of a
-   the build directory to the PATH may influence other utility code.
-
-Changes from v1:
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- * The commit message was adjusted, removing the reference to the
-   avocado.utils.vmimage encoding issue on previous Avocado versions
-   (<=3D 64.0) and the fix that would (and was) included in Avocado
-   version 65.0.
-
- * Effectively added pycdlib=3D=3D1.6.0 to the requirements.txt file,
-   added on a56931eef3, and adjusted the commit message was also
-   to reflect that.
-
- * Updated the default version of the guest OS, from Fedora 28 to 29.
-   Besides possible improvements in the (virtual) hardware coverage,
-   it brings a performance improvement in the order of 20% to the
-   test.
-
- * Removed all direct parameters usage.  Because some parameters and
-   its default values implemented in the test would prevent it from
-   running on some environments.  Example: the "accel" parameter had a
-   default value of "kvm", which would prevent this test, that boots a
-   x86_64 OS, from running on a host arch different than x86_64.  I
-   recognize that it's desirable to make tests reusable and
-   parameterized (that was the reason for the first version doing so),
-   but the mechanism to be used to define the architectures that a
-   given test should support is still an open issue, and has been
-   discussed in other threads.  I'll follow up those discussions with
-   a proposal, and until then, removing those aspects from this test
-   implementation seemed to be the best option.  A caveat: this test
-   currently adds the same tag (x86_64) and follows other assumptions
-   made on "boot_linux_console.py", that is, that a x86_64 target
-   binary will be used to run it.  If a user is in an environment that
-   does not have a x86_64 target binary, it could filter those tests
-   out with: "avocado run --filter-by-tags=3D'-x86_64' tests/acceptance".
-
- * Removed most arguments to the QEMU command line for pretty much the
-   same reasons described above, and by following the general
-   perception that I could grasp from other discussions that QEMU
-   defaults should preferrably be used.  This test, as well as others,
-   can and should be extended later to allow for different test
-   scenarios by passing well documented parameter values.  That is,
-   they should respect well-known parameters such as "accel" mentioned
-   above, so that the same test can run with KVM or TCG.
-
- * Changed the value of the memory argument to 1024, which based on
-   my experimentations and observations is the minimum amount of RAM
-   for the Fedora 29 cloud image to sucessfully boot on QEMU.  I know
-   there's no such thing as a "one size fits all", specially for QEMU,
-   but this makes me wonder wether a x86_64 machine type shouldn't
-   have its default_ram_size bumped to a number practical enough to
-   run modern operating systems.
-
- * Added a new patch "RFC: Acceptance tests: add the build directory
-   to the system PATH", which is supposed to gather feedback on how to
-   enable the use of built binaries, such as qemu-img, to code used by
-   the test code.  The specific situation here is that the vmimage,
-   part of the avocado.utils libraries, makes use of qemu-img to create
-   snapshot files.  Even though we could require qemu-img to be installed
-   as a dependency of tests, system wide, it actually goes against the
-   goal of testing all QEMU things from the source/build tree.  This
-   became aparent with tests running on environments such as Travis CI,
-   which don't necessarily have qemu-img available elsewhere.
-
-Cleber Rosa (3):
-  Acceptance tests: introduce BUILD_DIR and SOURCE_DIR
-  Acceptance test: add "boot_linux" tests
-  Acceptance tests: add make targets to download images
-
- .travis.yml                               |   2 +-
- tests/Makefile.include                    |  19 +-
- tests/acceptance/avocado_qemu/__init__.py |  25 ++-
- tests/acceptance/boot_linux.py            | 215 ++++++++++++++++++++++
- tests/requirements.txt                    |   3 +-
- 5 files changed, 254 insertions(+), 10 deletions(-)
+The Avocado vmimage utils library is used to download and cache the
+Linux guest images, and from those images a snapshot image is created
+and given to QEMU.  If a qemu-img binary is available in the build
+directory, it's used to create the snapshot image, so that matching
+qemu-system-* and qemu-img are used in the same test run.  If qemu-img
+is not available in the build tree, one is attempted to be found
+installed system-wide (in the $PATH).  If qemu-img is not found in the
+build dir or in the $PATH, the test is canceled.
+
+The method for checking the successful boot is based on "cloudinit"
+and its "phone home" feature.  The guest is given an ISO image with
+the location of the phone home server, and the information to post
+(the instance ID).  Upon receiving the correct information, from the
+guest, the test is considered to have PASSed.
+
+This test is currently limited to user mode networking only, and
+instructs the guest to connect to the "router" address that is hard
+coded in QEMU.
+
+To create the cloudinit ISO image that will be used to configure the
+guest, the pycdlib library is also required and has been added as
+requirement to the virtual environment created by "check-venv".
+
+The console output is read by a separate thread, by means of the
+Avocado datadrainer utility module.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ .travis.yml                    |   2 +-
+ tests/acceptance/boot_linux.py | 215 +++++++++++++++++++++++++++++++++
+ tests/requirements.txt         |   3 +-
+ 3 files changed, 218 insertions(+), 2 deletions(-)
  create mode 100644 tests/acceptance/boot_linux.py
 
+diff --git a/.travis.yml b/.travis.yml
+index 5887055951..0c54cdf40f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -313,7 +313,7 @@ matrix:
+     # Acceptance (Functional) tests
+     - name: "GCC check-acceptance"
+       env:
+-        - CONFIG=3D"--target-list=3Daarch64-softmmu,alpha-softmmu,arm-soft=
+mmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-sof=
+tmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86=
+_64-softmmu,xtensa-softmmu"
++        - CONFIG=3D"--enable-tools --target-list=3Daarch64-softmmu,alpha-s=
+oftmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-so=
+ftmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sp=
+arc-softmmu,x86_64-softmmu,xtensa-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       after_script:
+         - python3 -c 'import json; r =3D json.load(open("tests/results/lat=
+est/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"=
+] not in ("PASS", "SKIP")]' | xargs cat
+diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.p=
+y
+new file mode 100644
+index 0000000000..6787e79aea
+--- /dev/null
++++ b/tests/acceptance/boot_linux.py
+@@ -0,0 +1,215 @@
++# Functional test that boots a complete Linux system via a cloud image
++#
++# Copyright (c) 2018-2020 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++import os
++
++from avocado_qemu import Test, BUILD_DIR
++
++from qemu.accel import kvm_available
++from qemu.accel import tcg_available
++
++from avocado.utils import cloudinit
++from avocado.utils import network
++from avocado.utils import vmimage
++from avocado.utils import datadrainer
++
++ACCEL_NOT_AVAILABLE_FMT =3D "%s accelerator does not seem to be available"
++KVM_NOT_AVAILABLE =3D ACCEL_NOT_AVAILABLE_FMT % "KVM"
++TCG_NOT_AVAILABLE =3D ACCEL_NOT_AVAILABLE_FMT % "TCG"
++
++
++class BootLinux(Test):
++    """
++    Boots a Linux system, checking for a successful initialization
++    """
++
++    timeout =3D 900
++    chksum =3D None
++
++    def setUp(self):
++        super(BootLinux, self).setUp()
++        self.prepare_boot()
++        self.vm.add_args('-smp', '2')
++        self.vm.add_args('-m', '1024')
++        self.vm.add_args('-drive', 'file=3D%s' % self.boot.path)
++        self.prepare_cloudinit()
++
++    def prepare_boot(self):
++        self.log.info('Downloading/preparing boot image')
++        # Fedora 31 only provides ppc64le images
++        image_arch =3D self.arch
++        if image_arch =3D=3D 'ppc64':
++            image_arch =3D 'ppc64le'
++        # If qemu-img has been built, use it, otherwise the system wide on=
+e
++        # will be used.  If none is available, the test will cancel.
++        qemu_img =3D os.path.join(BUILD_DIR, 'qemu-img')
++        if os.path.exists(qemu_img):
++            vmimage.QEMU_IMG =3D qemu_img
++        try:
++            self.boot =3D vmimage.get(
++                'fedora', arch=3Dimage_arch, version=3D'31',
++                checksum=3Dself.chksum,
++                algorithm=3D'sha256',
++                cache_dir=3Dself.cache_dirs[0],
++                snapshot_dir=3Dself.workdir)
++        except:
++            self.cancel('Failed to download/prepare boot image')
++
++    def prepare_cloudinit(self):
++        self.log.info('Preparing cloudinit image')
++        try:
++            cloudinit_iso =3D os.path.join(self.workdir, 'cloudinit.iso')
++            self.phone_home_port =3D network.find_free_port()
++            cloudinit.iso(cloudinit_iso, self.name,
++                          username=3D'root',
++                          password=3D'password',
++                          # QEMU's hard coded usermode router address
++                          phone_home_host=3D'10.0.2.2',
++                          phone_home_port=3Dself.phone_home_port)
++            self.vm.add_args('-drive', 'file=3D%s,format=3Draw' % cloudini=
+t_iso)
++        except Exception:
++            self.cancel('Failed to prepared cloudinit image')
++
++    def launch_and_wait(self):
++        self.vm.set_console()
++        self.vm.launch()
++        console_drainer =3D datadrainer.LineLogger(self.vm.console_socket.=
+fileno(),
++                                                 logger=3Dself.log.getChil=
+d('console'))
++        console_drainer.start()
++        self.log.info('VM launched, waiting for boot confirmation from gue=
+st')
++        cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), s=
+elf.name)
++
++
++class BootLinuxX8664(BootLinux):
++    """
++    :avocado: tags=3Darch:x86_64
++    """
++
++    chksum =3D 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c=
+5c27a0'
++
++    def test_pc_i440fx_tcg(self):
++        """
++        :avocado: tags=3Dmachine:pc
++        :avocado: tags=3Dmachine:pc-i440fx
++        :avocado: tags=3Daccel:tcg
++        """
++        if not tcg_available(self.qemu_bin):
++            self.cancel(TCG_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "tcg")
++        self.launch_and_wait()
++
++    def test_pc_i440fx_kvm(self):
++        """
++        :avocado: tags=3Dmachine:pc
++        :avocado: tags=3Dmachine:pc-i440fx
++        :avocado: tags=3Daccel:kvm
++        """
++        if not kvm_available(self.arch, self.qemu_bin):
++            self.cancel(KVM_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "kvm")
++        self.launch_and_wait()
++
++    def test_pc_q35_tcg(self):
++        """
++        :avocado: tags=3Dmachine:pc
++        :avocado: tags=3Dmachine:pc-q35
++        :avocado: tags=3Daccel:tcg
++        """
++        if not tcg_available(self.qemu_bin):
++            self.cancel(TCG_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "tcg")
++        self.launch_and_wait()
++
++    def test_pc_q35_kvm(self):
++        """
++        :avocado: tags=3Dmachine:q35
++        :avocado: tags=3Dmachine:pc-q35
++        :avocado: tags=3Daccel:kvm
++        """
++        if not kvm_available(self.arch, self.qemu_bin):
++            self.cancel(KVM_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "kvm")
++        self.launch_and_wait()
++
++
++class BootLinuxAarch64(BootLinux):
++    """
++    :avocado: tags=3Darch:aarch64
++    :avocado: tags=3Dmachine:virt
++    """
++
++    chksum =3D '1e18d9c0cf734940c4b5d5ec592facaed2af0ad0329383d5639c997fdf=
+16fe49'
++
++    def add_common_args(self):
++        self.vm.add_args('-bios',
++                         os.path.join(BUILD_DIR, 'pc-bios',
++                                      'edk2-aarch64-code.fd'))
++        self.vm.add_args('-device', 'virtio-rng-pci,rng=3Drng0')
++        self.vm.add_args('-object', 'rng-random,id=3Drng0,filename=3D/dev/=
+urandom')
++
++    def test_virt_tcg(self):
++        """
++        :avocado: tags=3Daccel:tcg
++        :avocado: tags=3Dcpu:cortex-a53
++        """
++        if not tcg_available(self.qemu_bin):
++            self.cancel(TCG_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "tcg")
++        self.vm.add_args('-cpu', 'cortex-a53')
++        self.add_common_args()
++        self.launch_and_wait()
++
++    def test_virt_kvm(self):
++        """
++        :avocado: tags=3Daccel:kvm
++        :avocado: tags=3Dcpu:host
++        """
++        if not kvm_available(self.arch, self.qemu_bin):
++            self.cancel(KVM_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "kvm")
++        self.vm.add_args("-cpu", "host")
++        self.add_common_args()
++        self.launch_and_wait()
++
++
++class BootLinuxPPC64(BootLinux):
++    """
++    :avocado: tags=3Darch:ppc64
++    """
++
++    chksum =3D '7c3528b85a3df4b2306e892199a9e1e43f991c506f2cc390dc4efa2026=
+ad2f58'
++
++    def test_pseries_tcg(self):
++        """
++        :avocado: tags=3Dmachine:pseries
++        :avocado: tags=3Daccel:tcg
++        """
++        if not tcg_available(self.qemu_bin):
++            self.cancel(TCG_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "tcg")
++        self.launch_and_wait()
++
++
++class BootLinuxS390X(BootLinux):
++    """
++    :avocado: tags=3Darch:s390x
++    """
++
++    chksum =3D '4caaab5a434fd4d1079149a072fdc7891e354f834d355069ca982fdcaf=
+5a122d'
++
++    def test_s390_ccw_virtio_tcg(self):
++        """
++        :avocado: tags=3Dmachine:s390-ccw-virtio
++        :avocado: tags=3Daccel:tcg
++        """
++        if not tcg_available(self.qemu_bin):
++            self.cancel(TCG_NOT_AVAILABLE)
++        self.vm.add_args("-accel", "tcg")
++        self.launch_and_wait()
+diff --git a/tests/requirements.txt b/tests/requirements.txt
+index a2a587223a..a3b5fe4159 100644
+--- a/tests/requirements.txt
++++ b/tests/requirements.txt
+@@ -1,4 +1,5 @@
+ # Add Python module requirements, one per line, to be installed
+ # in the tests/venv Python virtual environment. For more info,
+ # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+-avocado-framework=3D=3D72.0
++avocado-framework=3D=3D74.0
++pycdlib=3D=3D1.9.0
 --=20
 2.21.1
 
