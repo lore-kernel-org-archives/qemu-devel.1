@@ -2,71 +2,75 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486E7C11D00
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBAC1C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:46:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E1FC20801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:32:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1FC20801
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 83041207FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:46:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83041207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4vIz-0006QW-8h
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 18:32:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58469)
+	id 1j4vWQ-0000kG-Km
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 18:46:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j4vIH-0005yb-Hr
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:31:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1j4vVk-0000KJ-6E
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j4vIF-0002xM-J3
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:31:45 -0500
-Resent-Date: Thu, 20 Feb 2020 18:31:45 -0500
-Resent-Message-Id: <E1j4vIF-0002xM-J3@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21112)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j4vIF-0002wE-Bi; Thu, 20 Feb 2020 18:31:43 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582241493; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=IBZx4vvC2CcPSCDpcoKEeD7raB91ny277podRleZjP0/CBDymKleG7HRi9hfmjrIMLh7hGAJgv38MEX+I9UKmXK55lk9k0TPtpj1WEQygDFS4ZUcjiGFVufWfi5Hc3aXx6R0V/NJjF7uT3Bs+crWZzPISJeXN06+TkTdIVdtQQw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582241493;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=DybI+LTU4t5xk9booofuIZWmeqXuhmJDgSjNIXyx85I=; 
- b=iQ3w8lJQLWZG6tRYd9JYn+cBa7ao7cohSiA8xH9wotSRnR3WMlS0jAxe9xRR5L5OfCms6egelx6DMwWT8o9j5v+/4Hqmyh6LQtYo0JCpsqGUiSkVvrR36hOeWX3/DDES68MpyeO9hM1gp3XH78vUaJXJ4KjNtPciUStwHAaAnEk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582241491341404.01756982908;
- Thu, 20 Feb 2020 15:31:31 -0800 (PST)
-In-Reply-To: <cover.1582240656.git.alistair.francis@wdc.com>
-Subject: Re: [PATCH v1 0/2]  linux-user: generate syscall_nr.sh for RISC-V
-Message-ID: <158224149003.31180.5954402657995887989@a1bbccc8075a>
+ (envelope-from <bounces@canonical.com>) id 1j4vVh-0005EG-3D
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:45:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35038)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j4vVg-0005CU-Tu
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:45:37 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j4vVf-00028z-8Y
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 23:45:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 327DD2E8058
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 23:45:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alistair.francis@wdc.com
-Date: Thu, 20 Feb 2020 15:31:31 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 20 Feb 2020 23:39:53 -0000
+From: Alex Williamson <alex.l.williamson@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: alex-l-williamson mprivozn
+X-Launchpad-Bug-Reporter: =?utf-8?q?Michal_Pr=C3=ADvozn=C3=ADk_=28mprivozn?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
+References: <158169737821.29590.14612222914203628319.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158224199312.24383.7311485349217451678.malone@gac.canonical.com>
+Subject: [Bug 1863333] Re: Assigning NVMe disk to a domain causes VFIO_MAP_DMA
+ errors
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f46f4012ff075424d0f665a50650d39211363594
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,53 +79,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu,
- alistair.francis@wdc.com, alistair23@gmail.com, palmer@dabbelt.com
+Reply-To: Bug 1863333 <1863333@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTgyMjQwNjU2Lmdp
-dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MSAwLzJdICBsaW51eC11c2VyOiBnZW5l
-cmF0ZSBzeXNjYWxsX25yLnNoIGZvciBSSVNDLVYKTWVzc2FnZS1pZDogY292ZXIuMTU4MjI0MDY1
-Ni5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
-fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
-aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
-ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
-L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy9jb3Zlci4xNTgyMjQwNjU2LmdpdC5h
-bGlzdGFpci5mcmFuY2lzQHdkYy5jb20gLT4gcGF0Y2hldy9jb3Zlci4xNTgyMjQwNjU2LmdpdC5h
-bGlzdGFpci5mcmFuY2lzQHdkYy5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwph
-OGY5NWZmIGxpbnV4LXVzZXIvcmlzY3Y6IFVwZGF0ZSB0aGUgc3lzY2FsbF9ucidzIHRvIHRoZSA1
-LjUga2VybmVsCjhmMzE5ZmUgbGludXgtdXNlcjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IDhmMzE5ZmU0MDQ0ZiAobGludXgt
-dXNlcjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3
-ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM3NTogRklMRTogbGlu
-dXgtdXNlci9zeXNjYWxsLmM6MTA4ODoKKyNpZiBkZWZpbmVkKFRBUkdFVF9OUl9nZXRybGltaXQp
-IHx8IGRlZmluZWQgKFRBUkdFVF9OUl91Z2V0cmxpbWl0KQoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAxMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IGE4Zjk1ZmY3OGQyMCAobGludXgtdXNlci9yaXNj
-djogVXBkYXRlIHRoZSBzeXNjYWxsX25yJ3MgdG8gdGhlIDUuNSBrZXJuZWwpCldBUk5JTkc6IEJs
-b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzNzc6IEZJ
-TEU6IGxpbnV4LXVzZXIvcmlzY3Yvc3lzY2FsbF9uci5oOjQ0MjoKKy8qIEFsaWFzIHNvbWUgb2Yg
-dGhlIG9sZGVyIHByZSA2NC1iaXQgdGltZV90IHN5c2NhbGxzIHRvIHRoZSA2NC1iaXQKCldBUk5J
-Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQoj
-Mzc4OiBGSUxFOiBsaW51eC11c2VyL3Jpc2N2L3N5c2NhbGxfbnIuaDo0NDM6CisgKiBvbmVzIGZv
-ciBSVjMyLiBUaGlzIGlzIGJhc2VkIG9uIHRoZSBsaXN0IHVzZWQgYnkgZ2xpYmMuICovCgp0b3Rh
-bDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDM3MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFz
-IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
-cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
-Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU4MjI0MDY1Ni5naXQuYWxpc3RhaXIuZnJhbmNpc0B3
-ZGMuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+This seems to be due to the vfio-helper code assuming it can map an
+arbitrarily large IOVA range starting at 64K base address.  x86
+processors typically have a reserved range near the top of the 32-bit
+address space which is used for MSI support which is used by the
+interrupt remapper where we cannot create an overlapping DMA mapping
+window.  Therefore once you have something approaching a 4G VM, you'll
+see the initial -EINVAL and I assume things fall apart from there.
+Changing the base IOVA address in vfio-helpers.c seems to be sufficient,
+ex:
+
+#define QEMU_VFIO_IOVA_MIN 0x100000000ULL
+
+This might be a sufficient legacy fix, but we do now expose valid IOVA
+ranges through the VFIO API which would allow this driver to dynamically
+pick IOVA ranges based on what the platform actually supports.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1863333
+
+Title:
+  Assigning NVMe disk to a domain causes VFIO_MAP_DMA errors
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm seeing some errors when assigning my NVMe disk to qemu. This is
+  the full command line:
+
+  =
+
+  /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 \
+  -name guest=3Dfedora,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-2-fedora/master-key.aes \
+  -machine pc-i440fx-4.1,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff \
+  -cpu host \
+  -m size=3D4194304k,slots=3D16,maxmem=3D1099511627776k \
+  -overcommit mem-lock=3Doff \
+  -smp 4,sockets=3D1,dies=3D1,cores=3D2,threads=3D2 \
+  -object iothread,id=3Diothread1 \
+  -object iothread,id=3Diothread2 \
+  -object iothread,id=3Diothread3 \
+  -object iothread,id=3Diothread4 \
+  -mem-prealloc \
+  -mem-path /hugepages2M/libvirt/qemu/2-fedora \
+  -numa node,nodeid=3D0,cpus=3D0,mem=3D4096 \
+  -uuid 63840878-0deb-4095-97e6-fc444d9bc9fa \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D31,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-shutdown \
+  -global PIIX4_PM.disable_s3=3D0 \
+  -global PIIX4_PM.disable_s4=3D0 \
+  -boot menu=3Don,strict=3Don \
+  -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 \
+  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.0,addr=3D0x4 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.0,addr=3D0x5 \
+  -blockdev '{"driver":"file","filename":"/var/lib/libvirt/images/fedora.qc=
+ow2","node-name":"libvirt-2-storage","auto-read-only":true,"discard":"unmap=
+"}' \
+  -blockdev '{"node-name":"libvirt-2-format","read-only":false,"discard":"u=
+nmap","driver":"qcow2","file":"libvirt-2-storage","backing":null}' \
+  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
+=3Ddrive-scsi0-0-0-0,drive=3Dlibvirt-2-format,id=3Dscsi0-0-0-0,bootindex=3D=
+1 \
+  -blockdev '{"driver":"nvme","device":"0000:02:00.0","namespace":1,"node-n=
+ame":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}' \
+  -blockdev '{"node-name":"libvirt-1-format","read-only":false,"driver":"ra=
+w","file":"libvirt-1-storage"}' \
+  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x6,drive=3Dlibvirt-=
+1-format,id=3Dvirtio-disk0 \
+  -netdev tap,fd=3D33,id=3Dhostnet0,vhost=3Don,vhostfd=3D34 \
+  -device virtio-net-pci,host_mtu=3D9000,netdev=3Dhostnet0,id=3Dnet0,mac=3D=
+52:54:00:a4:6f:91,bus=3Dpci.0,addr=3D0x3 \
+  -chardev pty,id=3Dcharserial0 \
+  -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 \
+  -chardev socket,id=3Dcharchannel0,fd=3D35,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -spice port=3D5900,addr=3D0.0.0.0,disable-ticketing,seamless-migration=3D=
+on \
+  -device virtio-vga,id=3Dvideo0,virgl=3Don,max_outputs=3D1,bus=3Dpci.0,add=
+r=3D0x2 \
+  -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x7 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+
+  And these are the errors I see:
+
+  2020-02-14T09:06:18.183167Z qemu-system-x86_64: VFIO_MAP_DMA failed: Inva=
+lid argument
+  2020-02-14T09:10:49.753767Z qemu-system-x86_64: VFIO_MAP_DMA failed: Cann=
+ot allocate memory
+  2020-02-14T09:11:04.530344Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+  2020-02-14T09:11:04.531087Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+  2020-02-14T09:11:04.531230Z qemu-system-x86_64: VFIO_MAP_DMA failed: No s=
+pace left on device
+
+  =
+
+  I'm doing nothing with the disk inside the guest, but:
+
+    # dd if=3D/dev/vda of=3D/dev/null status=3Dprogress
+
+  (the disk appears as /dev/vda in the guest). Surprisingly, I do not
+  see these errors when I use the traditional PCI assignment (-device
+  vfio-pci). My versions of kernel and qemu:
+
+  moe ~ # uname -r
+  5.4.15-gentoo
+  moe ~ # /home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64 =
+--version
+  QEMU emulator version 4.2.50 (v4.2.0-1439-g5d6542bea7-dirty)
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1863333/+subscriptions
 
