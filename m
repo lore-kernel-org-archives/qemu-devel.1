@@ -2,79 +2,93 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDB4C11D19
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A63CFC11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CBFE20722
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58A9B24673
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:56:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qkBSCu3x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CBFE20722
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dT/wo+rt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A9B24673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4q0u-0003mO-In
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:53:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44474)
+	id 1j4q40-0005r0-IQ
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:56:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44924)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4q07-0003Jx-Qi
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:52:40 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j4q3O-0005P3-Dh
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4q06-0002ny-O9
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:52:39 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43785)
+ (envelope-from <richard.henderson@linaro.org>) id 1j4q3N-0004UX-GD
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:56:02 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53329)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4q06-0002nc-IZ
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:52:38 -0500
-Received: by mail-oi1-x244.google.com with SMTP id p125so28393060oif.10
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:52:38 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j4q3N-0004U8-9F
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:56:01 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id n96so1187976pjc.3
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:56:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NTib0i3ZmZmHWf0sfEYyRftDJz7/bDCOOfO8RltpuB8=;
- b=qkBSCu3xV1qE6Ydgug4cpW3h9m/i9sIqkqLmzY10hSiYeRdrfEqPt7i0d4M3djlrCc
- mIIPRimgKcecp5JzhAIVm49v3p9qiP2BEr5/m+bihpxyN3CCqsnTB3XO7qM3g1MElSGt
- MzEnG/m0KidF5McRFA+tfW4ytXyLYKfkMD3npC0UCxVitRHR5EyJs0ganxcZLW2QK44m
- kDTlA9mfFZTzl7KY0UqfbA58Oxf3vSfXSyHAIpDPC21LEgkWqJLU/GrKDTwXm+GNAf3f
- 7xEkH7zTACr7uLi1yJMuEXgbKBfM8TFPLVAequCRooz54GEsWmqsla9FpQQ3IAe/4i5r
- gMVw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=v3LWMrwggRkUgp7OdVIwWeeFExXqHLmRK2hoSrW2VLM=;
+ b=dT/wo+rtB26lOkKMpb4/EJGQwSvT7PHIwN0dsi4U3tDcMav9L75eUQHBk9SukHVlzh
+ Dawz+e+vmrgvfS939nHfxHFER8O1gEVUxHTzAOjKCqWFvFp7Be3GDex9sOiufmkci8wW
+ CIGtsdvM02EhlHHYOphsV8guxbcv4tbjSKmDuVx47J65RyayUXwfd4czN6q1V/DhtejH
+ hWp+Q1wSOBGyVr60n9xd9CNqHjLHXlBBtiY4sNYTsReogb9AhuF4/RKStJ+2vSFIfDIa
+ N9aAfDAKVNsKi0EiKrWLV4c53KnsxuVDMwCcSwxy/A7FddeJqXf1zV0emmQ8UnnlDJHs
+ nDYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NTib0i3ZmZmHWf0sfEYyRftDJz7/bDCOOfO8RltpuB8=;
- b=lTwNK041ojgERjI53MoGBx+i9hS+zO4NOHdlvTNd1IcQIOXaqt7mf85o8Hrrd4XlE+
- 3to+MSo5CMPwgvKJqKuhygtPTj8u6HuRqQeRIe591831DqqMcES5wKojg/Wl9yBkrJZ4
- sHXS64SoiRE33fAknxQremU9aFqa0hBD8aEbnKYJCj1vlevzVq7kQYqgn8KHqdOhmXEh
- xSHflXBFsJbj+5dsh3KeaB/A2WTF3dRBTH0ZpYSp3ewvfthccU89O0hYRHUjfgcZ3ZIf
- ypxu8SPQy9IoIVvTkn7IFWzjqRz5mjb18WG9cId1+O+GV6HK6FzFQsqfcwx0vGTFajT7
- MhKg==
-X-Gm-Message-State: APjAAAVz/wH8sZla0XQrRGdh6NaGmO7PLA0JNY5ZNz7T2QgjBsqbWFi6
- FuHApj6e0/umpFEKBNMWbI5uGMvJCD37vOl1j+If7gAp
-X-Google-Smtp-Source: APXvYqztOgP3dWfKlOCNkj4Y+7/icLT9nyUeBa45jhdHCNrkz3JSWrUPO5xU3tzM/7XXhpZrPoa9wVKpHq2sVfKB0So=
-X-Received: by 2002:a05:6808:3b2:: with SMTP id
- n18mr2868214oie.146.1582221157756; 
- Thu, 20 Feb 2020 09:52:37 -0800 (PST)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=v3LWMrwggRkUgp7OdVIwWeeFExXqHLmRK2hoSrW2VLM=;
+ b=qYVVzmn7cAD2BsYmMPwBImutR56Y5hYr0I58Lropb3pJNJlQPmoGcVYoXSpC3vlHfs
+ U7Yti1nocr4KzlyPAlYmn5SEv0agPVY0vw8ZEuNcQCqoj2julEu2xCVG0Af76TfTfA01
+ +mlF3w5WtCsei1TM4jI4v2y9IylzbeCFOe+OEYSiUOEKIOj7Xvy0jnt6UPhstaNd+q58
+ PwkUADdx/V7mVaIglPdSmbmEXyIkPHcpYZyaEkQCByGXxXzMkZ/HaDmwVuQV7kcBdwLV
+ wQ5AN+jgznAa+SGoYBWbDf0/lV1oKndkXdsqxj/q/AgBOCSp/T7XxAlaZp18UT578vNQ
+ +Q5g==
+X-Gm-Message-State: APjAAAVYrnKWAFahxs2oh2fJyMX/RH7BjqCRedPM7al7sIpfVbRajs3U
+ OpwuNF1g2ktZsffpdzPdKQTUG94WFxY=
+X-Google-Smtp-Source: APXvYqyfLB7O6X5pzEhV+8YzAALe16ErN+un5l5HeHsuiry1TqylHjzxOgI1gac2PSmCtpjdv91l5Q==
+X-Received: by 2002:a17:902:b598:: with SMTP id
+ a24mr31419819pls.262.1582221358416; 
+ Thu, 20 Feb 2020 09:55:58 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ z10sm4371470pgf.35.2020.02.20.09.55.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Feb 2020 09:55:57 -0800 (PST)
+Subject: Re: [PATCH 11/19] target/arm: Replace ARM_FEATURE_VFP4 with
+ isar_feature_aa32_simdfmac
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <20200214181547.21408-1-richard.henderson@linaro.org>
-In-Reply-To: <20200214181547.21408-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Feb 2020 17:52:26 +0000
-Message-ID: <CAFEAcA_zfnpbpfuvua4e9we6C0MpxZj-vY7VuoM_25=zz9m-qg@mail.gmail.com>
-Subject: Re: [PATCH 00/19] target/arm: vfp feature and decodetree cleanup
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ <20200214181547.21408-12-richard.henderson@linaro.org>
+ <CAFEAcA-fDx8HAFcgx57FhnpHPY6GnC1PxRRW=sLRY=5dDysfiQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <42f05c86-a6a5-2a3f-e40a-da5152e171b6@linaro.org>
+Date: Thu, 20 Feb 2020 09:55:55 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-fDx8HAFcgx57FhnpHPY6GnC1PxRRW=sLRY=5dDysfiQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,52 +105,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 18:15, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The main goal of the patchset is to move the ARM_FEATURE_VFP
-> test from outside of the disas_vfp_insn() to inside each of
-> the trans_* functions, so that we get the proper ISA check
-> for each case.
->
-> At the end of that, it is easy to eliminate all of the remaining
-> tests vs ARM_FEATURE_VFP* in favor of the preferred ISAR tests.
->
-> Finally, there are a couple of cleanups to vfp.decode to make
-> things a bit more legible.
->
->
-> r~
->
->
-> Richard Henderson (19):
->   target/arm: Fix field extract from MVFR[0-2]
->   target/arm: Rename isar_feature_aa32_simd_r32
->   target/arm: Use isar_feature_aa32_simd_r32 more places
->   target/arm: Set MVFR0.FPSP for ARMv5 cpus
->   target/arm: Add isar_feature_aa32_simd_r16
->   target/arm: Rename isar_feature_aa32_fpdp_v2
->   target/arm: Add isar_feature_aa32_{fpsp_v2,fpsp_v3,fpdp_v3}
->   target/arm: Perform fpdp_v2 check first
->   target/arm: Replace ARM_FEATURE_VFP3 checks with fp{sp,dp}_v3
->   target/arm: Add missing checks for fpsp_v2
->   target/arm: Replace ARM_FEATURE_VFP4 with isar_feature_aa32_simdfmac
->   target/arm: Remove ARM_FEATURE_VFP check from disas_vfp_insn
->   target/arm: Move VLLDM and VLSTM to vfp.decode
->   target/arm: Move the vfp decodetree calls next to the base isa
->   linux-user/arm: Replace ARM_FEATURE_VFP* tests for HWCAP
->   target/arm: Remove ARM_FEATURE_VFP*
->   target/arm: Add formats for some vfp 2 and 3-register insns
->   target/arm: Split VFM decode
->   target/arm: Split VMINMAXNM decode
+On 2/20/20 8:37 AM, Peter Maydell wrote:
+> This is tricky, because the SIMDFMAC register
+> field indicates "do we have fused-multiply-accumulate
+> for either VFP or Neon", so in a VFP-no-Neon core or
+> a Neon-no-VFP core it will be 1 but can't be used on its
+> own as a gate on "should this insn be present".
+> 
+> Currently in the part of arm_cpu_realize() which handles
+> the user having selected vfp=off and/or neon=off we
+> do allow (for AArch32 cores) both of those combinations.
+> 
+> trans_VFM_dp already tests aa32_fpdp_v2, so I think the
+> main thing we need to do is add a test on aa32_fpsp_v2 to
+> trans_VFM_sp.
+> 
+> We clear the SIMDFMAC field to 0 in the !has_neon condition,
+> and I think that should actually be in the !neon && !vfp part.
+> 
+> I propose to squash in the following and beef up the commit message:
 
-Hi; patch 1 here already has a version in my PMU patchset.
-I've applied patches 2-10 to target-arm.next, with one or
-two minor fixups for things like the checkpatch long-line
-warning and a typo here or there in commit message or comment
-(expect a pullreq either today or tomorrow). Patches 11-19
-I've sent reviewed-by tags or comments on.
+Good catch.  Makes sense.
 
-thanks
--- PMM
+
+r~
 
