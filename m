@@ -2,104 +2,78 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57F9C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61681C11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 921CB2071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F30962071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOSigPzq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921CB2071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzF4tN7e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30962071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4nw7-0003lk-J1
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:40:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50299)
+	id 1j4nzd-0007Mf-2d
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:44:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j4nvM-0002qw-L3
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:39:37 -0500
+ (envelope-from <crosa@redhat.com>) id 1j4nz1-0006v1-R6
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j4nvL-00012G-JX
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:39:36 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20801
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <crosa@redhat.com>) id 1j4nz0-0002Z4-Ix
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57255
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4nvL-000125-FT
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:39:35 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1j4nz0-0002YG-Dq
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582213174;
+ s=mimecast20190719; t=1582213401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=73nZ6iAuI4yn+H+oeSOZr1P3hIaTUj0fA50vi2lg4GE=;
- b=FOSigPzqu1JQs7+gTYjvwtjrd/syvgvUs3yNbewKDgn6aQLFnUT319eVAr3+G71Nogxu+H
- U+2FzFT4Ie8DYRPmlA3sTRE+tdArCGk7dPJnVa06nInRxoMeAbGSdIjLQaaRet7/wSbQAJ
- BGsijuLWA/ZVFqniLNf8d3JA3kg8skc=
+ in-reply-to:in-reply-to:references:references;
+ bh=hRy6+GDKEj/DWNPJ8TGV956O3cBbUc6YtWUspyeF56Q=;
+ b=BzF4tN7esbalakv/WAEeCRWG3fMhatpVYkjIly3OA6laGKMvBlSWVx05dy5r+h00M8NIUK
+ knqCYserxPcguAuJY9xoUrSM9HotHTi29P/YdTVcqx2kv4wssiKDxlSjmB8cSbQ6jj5d35
+ xTr+iQ/ow5BsUDjGgHhf5ry62Ui+S6A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-h-UJgK_DNfi2O4Og5QcY9Q-1; Thu, 20 Feb 2020 10:39:30 -0500
-X-MC-Unique: h-UJgK_DNfi2O4Og5QcY9Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-380-xp6zZo8oNiahh7a09abiDg-1; Thu, 20 Feb 2020 10:43:17 -0500
+X-MC-Unique: xp6zZo8oNiahh7a09abiDg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B64F1005510;
- Thu, 20 Feb 2020 15:39:29 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C06A60C63;
- Thu, 20 Feb 2020 15:39:21 +0000 (UTC)
-Subject: Re: [RFC PATCH v3 04/27] qcow2: Add get_l2_entry() and set_l2_entry()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1577014346.git.berto@igalia.com>
- <a1be1f4311da643b439cb5e1924b0ddfb052f338.1577014346.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <43263b9c-d6f6-1d4a-963c-ef86fc5b8929@redhat.com>
-Date: Thu, 20 Feb 2020 16:39:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 439E01B18BC8;
+ Thu, 20 Feb 2020 15:43:16 +0000 (UTC)
+Received: from dhcp-17-202.bos.redhat.com (dhcp-17-202.bos.redhat.com
+ [10.18.17.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D34419756;
+ Thu, 20 Feb 2020 15:43:10 +0000 (UTC)
+Date: Thu, 20 Feb 2020 10:43:08 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v9 0/3] Acceptance test: Add "boot_linux" acceptance test
+Message-ID: <20200220154308.GA6678@dhcp-17-202.bos.redhat.com>
+References: <20200220020652.16276-1-crosa@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a1be1f4311da643b439cb5e1924b0ddfb052f338.1577014346.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200220020652.16276-1-crosa@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Ba3fTxBE1QMEyfWVTfviiMQb6ZXSRIuVq"
+ protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,60 +85,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ba3fTxBE1QMEyfWVTfviiMQb6ZXSRIuVq
-Content-Type: multipart/mixed; boundary="nQXlt8BeVKsdrpe4IXMe9UMTiRcl0vQiz"
-
---nQXlt8BeVKsdrpe4IXMe9UMTiRcl0vQiz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--MGYHOYXEY6WxJCY8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 22.12.19 12:36, Alberto Garcia wrote:
-> The size of an L2 entry is 64 bits, but if we want to have subclusters
-> we need extended L2 entries. This means that we have to access L2
-> tables and slices differently depending on whether an image has
-> extended L2 entries or not.
+On Wed, Feb 19, 2020 at 09:06:49PM -0500, Cleber Rosa wrote:
 >=20
-> This patch replaces all l2_slice[] accesses with calls to
-> get_l2_entry() and set_l2_entry().
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c  | 65 ++++++++++++++++++++++--------------------
->  block/qcow2-refcount.c | 17 +++++------
->  block/qcow2.h          | 12 ++++++++
->  3 files changed, 55 insertions(+), 39 deletions(-)
+> Changes from v8:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+...
 
+> * Bumped pycdlib version to 1.9.0, which contains an endianess bug that
+>   was seen on s390x hosts.
 
---nQXlt8BeVKsdrpe4IXMe9UMTiRcl0vQiz--
+I meant, "which contains a bug *fix*". Hopefully not introducing bugs on
+purpose! :)
 
---Ba3fTxBE1QMEyfWVTfviiMQb6ZXSRIuVq
+- Cleber.
+
+--MGYHOYXEY6WxJCY8
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5OqBsACgkQ9AfbAGHV
-z0CtUwf+J7Im+5+sPMdjmda44OvKYHvIuJt7Buv1MqtKyfMth3lbTgrxaQKleSOu
-ioL5ml4lx7BdNINLGrLg7FhrIoH7EJd0IPdcLSYI2ORnTP8700OiWZZKbJF2a18X
-jORyPUwS01oReOZeCIwDw8R+MW94gMSf7AMENBezZKNwprmG3mbnRBBrrJdrk0dR
-OF2ujYCVXSk3U1NRU1PnBJYARqTfAfKKlX1dY9/9/RqBLZcuHi092ljcKOGGDk4j
-Laug9GnP/JktAnd1Fsqzi3/9djldu0naFTzDSK/LtqhsT6PddTscGtS0v42hrEbn
-HouCGI+eb8sA/Mrc107kqyZX1dsqlQ==
-=etvX
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5OqQkACgkQZX6NM6Xy
+CfP82hAAjz0KPzUFq+ZlDUyIMrnql9YTN70bwxSbGHtRRjjr2RRPcPEdgo2TDBBr
+Ohflg2qQA9TqrL+OTcY7fRdFZe23v15W7S6ERNNiiRoYoB1hE5R8atLblUYOMagE
+wWZ/t8Q18bAmzVedWNLzMujQ8YgMuETq0goanwVVyW79PdfW8XNrNQh22JSFxkO+
+V556tF8fOhep+Kg39oHQA5g0s8aITaeq0ocfxmZdeOKp2vdiyVS6AKG+SDduYH9l
+9mRGaPBZS8gyqEmW8kB12w6fEyfYX2ZOyOaT11bpd7GUHEFaW/OkSlnVDKXLXSxn
+PB1pvx9Y/qH2rcOMp8VkPZDPKXpVYzBqHymdd/v0n9ep6SO/Wgzpu3KyCGsZ2TCx
+6j02og3vs2hTadIcgAs9jo33dqbGzWMx5u1ScQ2Az+IX19KwiI5WUj7bLAaSn1mS
+GaVSEZhCrNX9coxgqNGzFmM0QfIziBjS14zugLtM2aYmLBqesR1IORajHqDVxEve
+nuKuAuTlL50IsqfkmXFGkc5QLiWbywECl5UKsASDhOpni767KD3AyPaxwKzK/MD/
+iBbPgZKsorHWcZZQgMSXpqTbDaT4u1XA9zL0pM9XHKd7NCR4WudzxCRTwZUkemsp
+N7ce9FxDD2f/TNwbt8PaPgh56BFCIbuWSI9IdSGj1glUUXL/sUw=
+=GOzx
 -----END PGP SIGNATURE-----
 
---Ba3fTxBE1QMEyfWVTfviiMQb6ZXSRIuVq--
+--MGYHOYXEY6WxJCY8--
 
 
