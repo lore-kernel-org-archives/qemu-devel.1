@@ -2,83 +2,78 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4C5C11D0D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72672C11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:06:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38FD6206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F8D02071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:06:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O7k0rRNB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FD6206F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p0hK/2mF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F8D02071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4nML-0005l1-Fc
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:03:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45713)
+	id 1j4nP0-0007ek-1R
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:06:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46089)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4nLk-0005Jq-WB
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:02:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4nO5-0006Xn-Uc
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:05:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4nLj-0001p4-Uf
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:02:48 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40965)
+ (envelope-from <peter.maydell@linaro.org>) id 1j4nO4-0002tA-Re
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:05:13 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35365)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4nLj-0001o6-Oj
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:02:47 -0500
-Received: by mail-oi1-x243.google.com with SMTP id i1so27784538oie.8
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 07:02:47 -0800 (PST)
+ id 1j4nO4-0002se-Lb
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:05:12 -0500
+Received: by mail-oi1-x242.google.com with SMTP id b18so27860686oie.2
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 07:05:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=wUhH9nHFE9TWS2AdMFHpUMe/aTzanCMzASm4MxSxrQU=;
- b=O7k0rRNBOHYDfh182sjYDB4Rr9fDPP4O1b/jhI4IJG5u+IB3ae8jHo36Ap1KRr6SVu
- jSE/QQEYMVeOjNSB/fLGf5jFC9crKq5LiublzMmrUTuci9uSzfyuFgP2xziw1WnVeH7+
- TTYSeOp3uKCNJMEasbsJi7xestvogIX0CZ2A/+qiteC1VMYOoHTt8Hql0lq3bFoC+ehe
- fQ9mXSYVS+UaoPEK+iXiqzHydPr2XP+nGjidIn4bitglqcuquOslemJzNCvVG1u5O2jp
- 79sSomyemopq8WXXF01OG76pKVeOZenAeVyH/FS2Fciw+rPrivliXx+bfFdi/oQHqnKp
- TSKg==
+ :cc; bh=Ha7WNp34FymPkhMtZXsI3NKdYl16Zvgi/+5I5PPeEq8=;
+ b=p0hK/2mFOUGwjvy8WVTEvKpNn8dP1JiIbfxdhoSU71vtH0+3M/S89rLv2rMKquO4JD
+ B9sz8UX5o7ZroSjG60TKGXphm6uLNbQ1ennHZht73WDFt8Hd0jPfV4NoG3G5XyAeYMQ8
+ pMeOzG2k8a1kkFUXUPVPOfimLCpiFqjdgr+snhjJ1g2ScWd1N05Y5TH79FJiJqi7/sOp
+ AkU7CalO5jHMIC8Utr85QGlRJZsbKrbq3KjSCECK2mMEmSYJpx0slHZieRFOn9A+XF86
+ dMlhVKkDbQUKW0G0VSMOoAaRYIAmLixmUp7OCASeK9n8a5se2ykeSvGAYwr31W0bqqhB
+ R9CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wUhH9nHFE9TWS2AdMFHpUMe/aTzanCMzASm4MxSxrQU=;
- b=GKdGucaabrWRVaK/xNGtbTPjuWj/bERKtJ5gqGilTSeEyPBdz/HLB9v5J+YjFoIOGZ
- MsOBDbfYtzytiKVqBmHUPgYS4zhHFBVY7Fybe9TEe5ZuI53w5UEOGSmlhV4iUIvdjwxO
- q0kmkbg+ulHo/tCv4f+9hA1t35Snt7dlYS4OUlz0t6pYyLg85czgRTNkgGsBEYxZNGBd
- ULSTb9Td2JxC8ixuyRhao+EtS9Q0Q3gjhLy9c+oSN8PBoMzSvq+OAoVrtvyAOXTs0FEl
- j6g8gxaVjJ/f6RFJVNA4lqN5J+fXMlGRnL/GXYDaXZig+XG4c4ySqyCP1vmPMBNMRrqQ
- IkSQ==
-X-Gm-Message-State: APjAAAWius2EjNvhyCuQMz6pLFmi/gSdDhSGlTBvX5EHXR/m9ZtnfEtz
- RQxIhoFX0XTt4pVt09msOsTO0Dmm7xP0Wj2/T4lhsw==
-X-Google-Smtp-Source: APXvYqyBw/xbsXQcbg6ejk2lqsBwpdOYEVPwRJMu1ySe0oNO+NQmi4+922gdDahaS8HhsOzIJrlqY2itdiX0RG65CcE=
-X-Received: by 2002:a05:6808:3b2:: with SMTP id
- n18mr2277314oie.146.1582210966466; 
- Thu, 20 Feb 2020 07:02:46 -0800 (PST)
+ :message-id:subject:to:cc;
+ bh=Ha7WNp34FymPkhMtZXsI3NKdYl16Zvgi/+5I5PPeEq8=;
+ b=EhpC29F5/ow2eBLKrUuujYVchnsICBiEPEVgFjoh55oTKtFDXvWwAvLLJtgFxSdi7H
+ vq52Jn4AXbOTEEUeCCxm6aMb0db28NYz6LfWxlk9K67vwPumNpkqZQLrFOF2Lz8ScCuu
+ 3QpMhsiagI++p3zXV27oLt+xURy6Gxlfzcw3NR4D0bPR0wU3pHzBFPgPiTjJj6CnEYDE
+ 9/gSf1Hhkw4JpjuyUJJi427cGE2R8w5B7vKxyF8swRqZtZKyZ3dgNazh/CsPDSQC2aHf
+ Td4xJytszo0wf+LMbW/YKoh5SUkwtdiM/yr665LlagOrDESj20YrM/DAF4EyQj4UDK1Q
+ XteA==
+X-Gm-Message-State: APjAAAXwd90JCQPyLWMmm8+wcYGmff0NHwSnZVirel+L7nEj+W1KE0Rn
+ zA1S7S8Ac8hYV20wb/I+AiwLkIlDjETw4UpdZBI4aA==
+X-Google-Smtp-Source: APXvYqxmnuXV06Qc8l0P49WFFtJyiVEJ7ui7Wb/sIQI3KmyL0CB+4A6t8JDoNgWFqGHKKACzLCymLEIWU7fQ/W2J8lk=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr2432193oiy.170.1582211111909; 
+ Thu, 20 Feb 2020 07:05:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20200218113350.6090-1-frasse.iglesias@gmail.com>
- <20200216160413.GF22292@toto>
-In-Reply-To: <20200216160413.GF22292@toto>
+References: <20200215122354.13706-1-linux@roeck-us.net>
+In-Reply-To: <20200215122354.13706-1-linux@roeck-us.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Feb 2020 15:02:35 +0000
-Message-ID: <CAFEAcA-oHPq97w_eaBnU_L+fa1VvhUPLtKhmbd9rSGifoognWA@mail.gmail.com>
-Subject: Re: [PATCH] xilinx_spips: Correct the number of dummy cycles for the
- FAST_READ_4 cmd
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Date: Thu, 20 Feb 2020 15:05:00 +0000
+Message-ID: <CAFEAcA-u=j3MYu-Ck0UbMzXXEoB41dx6UbGw15QBEnqBBX988g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] hw/arm/xilinx_zynq: Fix USB port instantiation
+To: Guenter Roeck <linux@roeck-us.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,36 +85,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Alistair Francis <alistair23@gmail.com>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Feb 2020 at 01:12, Edgar E. Iglesias
-<edgar.iglesias@xilinx.com> wrote:
+On Sat, 15 Feb 2020 at 12:23, Guenter Roeck <linux@roeck-us.net> wrote:
 >
-> On Tue, Feb 18, 2020 at 12:33:50PM +0100, Francisco Iglesias wrote:
-> > From: Francisco Iglesias <francisco.iglesias@xilinx.com>
-> >
-> > Correct the number of dummy cycles required by the FAST_READ_4 command =
-(to
-> > be eight, one dummy byte).
-> >
-> > Fixes: ef06ca3946 ("xilinx_spips: Add support for RX discard and RX dra=
-in")
-> > Suggested-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> USB ports on Xilinx Zync must be instantiated as TYPE_CHIPIDEA to work.
+> Linux expects and checks various chipidea registers, which do not exist
+> with the basic ehci emulation. This patch series fixes the problem.
 >
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> The first patch in the series fixes the actual problem.
+>
+> The second patch removes the now obsolete explicit Xilinx
+> support from the EHCI code.
+>
+> v2: Introduced summary
+>
+> ----------------------------------------------------------------
+> Guenter Roeck (2):
+>       hw/arm/xilinx_zynq: Fix USB port instantiation
+>       hw/usb/hcd-ehci-sysbus: Remove obsolete xlnx,ps7-usb class
 
+Xilinx folks -- could you provide a reviewed-by or acked-by
+for this series, please?
 
-
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
 
