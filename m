@@ -2,95 +2,69 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F4AC11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C91C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10D4F20801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL2MyiDw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10D4F20801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BF73A20801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF73A20801
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4i5P-0002nI-5H
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:25:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52210)
+	id 1j4i5g-0003cD-S5
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:25:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j4i4P-00017u-7Y
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:34 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j4i1X-00049k-QW
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j4i4J-000102-CB
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42991
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4i4J-0000zX-22
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582190665;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ryCUbgIe8KsZ1D8uUWBYI1LF9vZcPPEDDkxnFAX4H7A=;
- b=gL2MyiDwZRZm6Spo7a6vvUjezVSoskO5OZnFNRyxm3mMWk3+xmJQWI4bnkOf31hL+OiMPG
- 6unfaaCAFrtKgqGjVrRTCe1drhhUVtHiXO9qcFdIs5cxuAgZl8Hf2uN9jt3RUehmwXyM3M
- OEoAUZ1nyhs9CFdCIuJFctJsGweVXBc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-x0fypKa-POyPfpWfcZE3kg-1; Thu, 20 Feb 2020 04:24:24 -0500
-Received: by mail-wr1-f72.google.com with SMTP id o6so1466366wrp.8
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 01:24:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:content-transfer-encoding:from:mime-version
- :subject:date:message-id:references:cc:in-reply-to:to;
- bh=20J2xNJndwD0uRSo76vE5fqmNGT6NiOBpd0H4BNpJXs=;
- b=ca3Xp4EEeWg4qZmxEQB1DHpUlbyowOG7NNWAwWn1Ct9CF6oYm9qQM+6pgVNyFHaWsq
- ROD0YEfg0O7JaYq6h4QtHXT5BEHtcyeHVWrFhPLRt+zuN0T0Gub2HYgjiHFz1ltwEA2l
- avGhAqB//15V59/+80AdD1ZBsiSfVr7eZ5UpvEV/TB0zjkYfIQKUwG58zuql2TrKeOSy
- 4+c/VnXNRuNfyWjFViLsHMpigZld5avcikI6tgb8ql3P6J3cchnrnJ2WmOzmV1k2RPnV
- bYx41sZpOfz+D7b99bKRWQAO+PYqQgmRlGrvhZGmrwTQUBpqx+hMolGFIoYQRkAoSqlR
- WpPQ==
-X-Gm-Message-State: APjAAAVuoQo2ps77G54t9KorcnhyE4aog98HSJtaqRKbpLK2SZA8cQ5z
- ZCntybynzLgXw7OCEtxEi95X4/A2Tja65iengjmqXzjRcClM7De32qRraZ3qfG44tbQWEB4aFOs
- UBk8dG4+Zi9tDrlQ=
-X-Received: by 2002:a1c:6408:: with SMTP id y8mr3294327wmb.130.1582190663235; 
- Thu, 20 Feb 2020 01:24:23 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxErA+v6CThtewt0oOBLJXzaudgsibdEYgcKQcqWTtHx1g3/BUEkzmEv9QAC87+tIcz8drbbQ==
-X-Received: by 2002:a1c:6408:: with SMTP id y8mr3294291wmb.130.1582190662896; 
- Thu, 20 Feb 2020 01:24:22 -0800 (PST)
-Received: from [131.159.204.89] (w204-2h-v4.eduroam.dynamic.rbg.tum.de.
- [131.159.204.89])
- by smtp.gmail.com with ESMTPSA id t131sm3863346wmb.13.2020.02.20.01.24.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 20 Feb 2020 01:24:22 -0800 (PST)
-From: David Hildenbrand <david@redhat.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v1 07/13] migrate/ram: Get rid of "place_source" in
- ram_load_postcopy()
-Date: Thu, 20 Feb 2020 10:24:19 +0100
-Message-Id: <5DD859C1-9FF5-4488-8928-43B83D8AD677@redhat.com>
-References: <20200219204730.GB37550@xz-x1>
-In-Reply-To: <20200219204730.GB37550@xz-x1>
-To: Peter Xu <peterx@redhat.com>
-X-Mailer: iPhone Mail (17D50)
-X-MC-Unique: x0fypKa-POyPfpWfcZE3kg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <laurent@vivier.eu>) id 1j4i1W-00089H-Ql
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:35 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:48947)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4i1W-00088h-Ho
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:34 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1M7KKA-1j5oTF2Oqq-007o8U; Thu, 20 Feb 2020 10:20:57 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 02/13] linux-user: implement getsockopt SO_RCVTIMEO and
+ SO_SNDTIMEO
+Date: Thu, 20 Feb 2020 10:20:42 +0100
+Message-Id: <20200220092053.1510215-3-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200220092053.1510215-1-laurent@vivier.eu>
+References: <20200220092053.1510215-1-laurent@vivier.eu>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:piuR98raXOCQseHB9gJlYbGRMo6LpwDMndEJ/p23L8vng4uA3Cs
+ iXwZaTtEQFdAH3WMFENYmv5hkQBMFtI867KilwQYwURNkvaHI1NSmwqOk3rC4GdFMKgbubI
+ ixGllbIHsNhxY1cfqb6N0NLf4JIG5ke++lHnx7LBE+btLnkw0NzqGYsbZ4tRlYiSrm3Lug/
+ 1W8r1BB3EysUwSeRGE6zA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cAtAgkIHimU=:GAHb8SLqGq8CA8ucX02zTy
+ H0wDVa7W9CbB24XnNRjzWHJIE2SgYXS2Ps9jFuYuQVjF2Z728do5TOojywz1glbu62YpYkepi
+ f3XNNPeqlvFfn/bkBT9IBkdNeJFEcIVg54VNTGbIhqtltCr2bbxLa2FSswOMFP9j8CMUNQOCi
+ 3eRNu2QC20qyRcm0MaO5McNZ4hBnQU1Ri1zbIxGYr514CE4S+gf1TECvgR6Xku0c9xZG2MKt9
+ 3l3zT3o/+HpcE7Qo7vFEwU+UOSSVNmER5DqxjNoF0sU30zT9aL2yKXdMkawD9UCT5vsHa3c9w
+ 9mDIFRYBBUBHGDsHH5jsS4Mbaebm2Ll3UjLaKz3oQwlUYedyD1uNMpkBblm+EdgXliPlPag29
+ MEGMuCM44uS0TylO2ZHadTY54cZk90s5QEoYI2NrEcjimNVoXuxLBAdssmjdIJwQZUTnZ/AdG
+ Jsebd4ukpym+EB1hlkuAlsIxtVxP1ZcSZd38avnxd9Hu4f6ILj3NdwzqO+PyXL4xCBgo4sczA
+ rTMqP/sRlEEU+DCcaS1PTGRXGsTpupk7NqswtheHKXRrlejTamXIB4ES4ldexv1cGojZ8iLJk
+ 9oe/VS7BtvSUSUaSIF0DN6B98tVQUeZRZuOdY8RyNLiItAtkxmopkzpHsAzEwqoGvUzMP7ntG
+ NM1+E1OtUHqrl6OsiaLpc08eUQcbexiDXhaX4XIwKiVJ6VmmK3y1QHKEJIyYscD2ApZVS0stz
+ /LAVYAzobkqoYykSA11yoPJtGdx+9E8YB9mnI5kGRc0iC/dr+/SMydN3OkMQxFRWJLYtHNAaz
+ zjd8yAospFudzlZNpQ9bddoj5fMvq32kTyVve3MpQYZS7BIhI24Um6iIZ0LR/nMpMxXBOdr
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,76 +76,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Andreas Schwab <schwab@suse.de>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Andreas Schwab <schwab@suse.de>
 
+Signed-off-by: Andreas Schwab <schwab@suse.de>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <mvmlfzaoh9p.fsf@suse.de>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
 
-> Am 19.02.2020 um 21:47 schrieb Peter Xu <peterx@redhat.com>:
->=20
-> =EF=BB=BFOn Wed, Feb 19, 2020 at 05:17:19PM +0100, David Hildenbrand wrot=
-e:
->> It's always the same value.
->=20
-> I guess not, because...
->=20
->>=20
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Cc: Juan Quintela <quintela@redhat.com>
->> Cc: Peter Xu <peterx@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->> migration/ram.c | 8 +++-----
->> 1 file changed, 3 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/migration/ram.c b/migration/ram.c
->> index cbd54947fb..75014717f6 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -3119,7 +3119,6 @@ static int ram_load_postcopy(QEMUFile *f)
->>         ram_addr_t addr;
->>         void *host =3D NULL;
->>         void *page_buffer =3D NULL;
->> -        void *place_source =3D NULL;
->>         RAMBlock *block =3D NULL;
->>         uint8_t ch;
->>         int len;
->> @@ -3188,7 +3187,6 @@ static int ram_load_postcopy(QEMUFile *f)
->>                 place_needed =3D true;
->>                 target_pages =3D 0;
->>             }
->> -            place_source =3D postcopy_host_page;
->>         }
->>=20
->>         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
->> @@ -3220,7 +3218,7 @@ static int ram_load_postcopy(QEMUFile *f)
->>                  * buffer to make sure the buffer is valid when
->>                  * placing the page.
->>                  */
->> -                qemu_get_buffer_in_place(f, (uint8_t **)&place_source,
->=20
-> ... it can be modified inside the call.
-
-Very right, will drop this patch! Thanks!
-
->=20
-> I feel like this patch could even fail the QEMU unit test.  It would
-> be good to mention what tests have been carried out in the cover
-> letter or with RFC tag if no test is done yet.
-
-I test all code I share. This survives =E2=80=9Emake check=E2=80=9C. I assu=
-me all tests send small pages where =E2=80=9Ematches_target_page_size=3D=3D=
-true=E2=80=9C, so the tests did not catch this.
-
-I even spent the last day getting avocado-vt to work and ran multiple (obvi=
-ously not all) migration tests, including postcopy, so your suggestions hav=
-e already been considered ...
-
-Could have mentioned that in the cover letter, yes.
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7aaa9d96397c..9fa722f2388d 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -2310,10 +2310,42 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
+         level = SOL_SOCKET;
+         switch (optname) {
+         /* These don't just return a single integer */
+-        case TARGET_SO_RCVTIMEO:
+-        case TARGET_SO_SNDTIMEO:
+         case TARGET_SO_PEERNAME:
+             goto unimplemented;
++        case TARGET_SO_RCVTIMEO: {
++            struct timeval tv;
++            socklen_t tvlen;
++
++            optname = SO_RCVTIMEO;
++
++get_timeout:
++            if (get_user_u32(len, optlen)) {
++                return -TARGET_EFAULT;
++            }
++            if (len < 0) {
++                return -TARGET_EINVAL;
++            }
++
++            tvlen = sizeof(tv);
++            ret = get_errno(getsockopt(sockfd, level, optname,
++                                       &tv, &tvlen));
++            if (ret < 0) {
++                return ret;
++            }
++            if (len > sizeof(struct target_timeval)) {
++                len = sizeof(struct target_timeval);
++            }
++            if (copy_to_user_timeval(optval_addr, &tv)) {
++                return -TARGET_EFAULT;
++            }
++            if (put_user_u32(len, optlen)) {
++                return -TARGET_EFAULT;
++            }
++            break;
++        }
++        case TARGET_SO_SNDTIMEO:
++            optname = SO_SNDTIMEO;
++            goto get_timeout;
+         case TARGET_SO_PEERCRED: {
+             struct ucred cr;
+             socklen_t crlen;
+-- 
+2.24.1
 
 
