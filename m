@@ -2,65 +2,65 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,TVD_SUBJ_WIPE_DEBT,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0AF7C761A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2164CC5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFF3221D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E148424658
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:29:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SCOA0Fdn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF3221D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VsGGg13E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E148424658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4cVe-0005ZW-RI
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:28:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41329)
+	id 1j4cWz-0007iv-4r
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:29:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR8-0004dS-GO
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:39 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR6-0008LT-In
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR7-0004bU-Hi
  for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:38 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44713 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR6-0008Kx-8K
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:37 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52931 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4cR6-0008IZ-8Z; Wed, 19 Feb 2020 22:23:36 -0500
+ id 1j4cR5-0008ID-TE; Wed, 19 Feb 2020 22:23:36 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NKg10cTLz9sSW; Thu, 20 Feb 2020 14:23:25 +1100 (AEDT)
+ id 48NKg04VZHz9sSL; Thu, 20 Feb 2020 14:23:24 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582169005;
- bh=pvwsDEYE4Sh8lhF4sfzNlBn6swIslRJZWqjlh3D2SbM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582169004;
+ bh=+8n08mVffDMTcd5vOcig56fSB0Fl8e0bs0SvTi5PJhE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=SCOA0Fdnjz7fP0Jcqy6RdfPF1AXX45I069o3JgaJXq4f56luCbOBJQ7Nr8VpkrFq9
- yfx2+iYk+V45UE1phiEy/9TJdb9R83yM1U1qDyrDZidsY/V6yBYzq5+THoSmdvQcx4
- jy1nO404KrSICQ/0fUxxlhekveEDCp9JoIrlrv6c=
+ b=VsGGg13EcPIgkM1N3o2sEiAHfD+qlgNIGoQbDJxr/cf/fwp9BhhT9Fma/MAiWvuWT
+ KNyVLrN2ByMphMRjFmCCdCfdQGmeneJoT5xN+VjVXuW6WtBbvDOMUQNYCntV2ZzYu+
+ HmOqs0i3G5+lkBNOwDEDuQXQx4GG+4+kbWjO9pJo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	groug@kaod.org,
 	clg@kaod.org
-Subject: [PATCH v5 10/18] target/ppc: Only calculate RMLS derived RMA limit on
- demand
-Date: Thu, 20 Feb 2020 14:23:08 +1100
-Message-Id: <20200220032317.96884-11-david@gibson.dropbear.id.au>
+Subject: [PATCH v5 06/18] target/ppc: Remove RMOR register from POWER9 &
+ POWER10
+Date: Thu, 20 Feb 2020 14:23:04 +1100
+Message-Id: <20200220032317.96884-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 References: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,76 +84,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the LPCR is written, we update the env->rmls field with the RMA limi=
-t
-it implies.  Simplify things by just calculating the value directly from
-the LPCR value when we need it.
+Currently we create the Real Mode Offset Register (RMOR) on all Book3S cp=
+us
+from POWER7 onwards.  However the translation mode which the RMOR control=
+s
+is no longer supported in POWER9, and so the register has been removed fr=
+om
+the architecture.
 
-It's possible this is a little slower, but it's unlikely to be significan=
-t,
-since this is only for real mode accesses in a translation configuration
-that's not used very often, and the whole thing is behind the qemu TLB
-anyway.  Therefore, keeping the number of state variables down and not
-having to worry about making sure it's always in sync seems the better
-option.
+Remove it from our model on POWER9 and POWER10.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/cpu.h        | 1 -
- target/ppc/mmu-hash64.c | 8 +++++---
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ target/ppc/translate_init.inc.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 8077fdb068..f9871b1233 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1046,7 +1046,6 @@ struct CPUPPCState {
-     uint64_t insns_flags2;
- #if defined(TARGET_PPC64)
-     ppc_slb_t vrma_slb;
--    target_ulong rmls;
- #endif
-=20
-     int error_code;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 46690bc79b..203a41cca1 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -844,8 +844,10 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vad=
-dr eaddr,
-=20
-             goto skip_slb_search;
-         } else {
-+            target_ulong limit =3D rmls_limit(cpu);
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index ab79975fec..925bc31ca5 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8015,12 +8015,16 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+-    spr_register_hv(env, SPR_RMOR, "RMOR",
++    spr_register_hv(env, SPR_HRMOR, "HRMOR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+-    spr_register_hv(env, SPR_HRMOR, "HRMOR",
++}
 +
-             /* Emulated old-style RMO mode, bounds check against RMLS */
--            if (raddr >=3D env->rmls) {
-+            if (raddr >=3D limit) {
-                 if (rwx =3D=3D 2) {
-                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-@@ -1007,8 +1009,9 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
-                 return -1;
-             }
-         } else {
-+            target_ulong limit =3D rmls_limit(cpu);
-             /* Emulated old-style RMO mode, bounds check against RMLS */
--            if (raddr >=3D env->rmls) {
-+            if (raddr >=3D limit) {
-                 return -1;
-             }
-             return raddr | env->spr[SPR_RMOR];
-@@ -1098,7 +1101,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
-al)
-     CPUPPCState *env =3D &cpu->env;
++static void gen_spr_rmor(CPUPPCState *env)
++{
++    spr_register_hv(env, SPR_RMOR, "RMOR",
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  SPR_NOACCESS, SPR_NOACCESS,
+                  &spr_read_generic, &spr_write_generic,
+@@ -8535,6 +8539,7 @@ static void init_proc_POWER7(CPUPPCState *env)
 =20
-     env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
--    env->rmls =3D rmls_limit(cpu);
-     ppc_hash64_update_vrma(cpu);
- }
+     /* POWER7 Specific Registers */
+     gen_spr_book3s_ids(env);
++    gen_spr_rmor(env);
+     gen_spr_amr(env);
+     gen_spr_book3s_purr(env);
+     gen_spr_power5p_common(env);
+@@ -8676,6 +8681,7 @@ static void init_proc_POWER8(CPUPPCState *env)
 =20
+     /* POWER8 Specific Registers */
+     gen_spr_book3s_ids(env);
++    gen_spr_rmor(env);
+     gen_spr_amr(env);
+     gen_spr_iamr(env);
+     gen_spr_book3s_purr(env);
 --=20
 2.24.1
 
