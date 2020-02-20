@@ -6,81 +6,80 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F5CC11D20
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 21:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E32C11D20
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 21:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7608520801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 21:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43F0920801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 21:27:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icZVYdgG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7608520801
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="0G0UsF0J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F0920801
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4tLt-0000Ul-LB
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 16:27:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48093)
+	id 1j4tM6-0000DE-8B
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 16:27:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47673)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1j4tL5-0008Ny-4G
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:26:31 -0500
+ (envelope-from <luc.michel@greensocs.com>) id 1j4tJK-0007WN-G4
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:24:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1j4tL4-0004K8-3C
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:26:30 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36782)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1j4tL3-0004It-Tm
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:26:30 -0500
-Received: by mail-pf1-x444.google.com with SMTP id 185so25101pfv.3
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 13:26:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=XHYjda1qqzD+em9jadsDM4RHxztHgSy9LnYuZd2wKQ0=;
- b=icZVYdgGH2DTqOkimWqVUIwrmF1vqMQyyFIvhXyLLj2vz+AUJdpQAOwiqnQvNTygGw
- 85/qInQljfceoHoeSj45OuWlky+9OND5vJZFq63PaNHfMWZB6Yxo+CqSf+wrHoWwnahI
- Omk5gSky5yOQWCfgl44VbbGCKJQWZXsod1axBLvL5IDue1hnlhUozWbVazeCfR1NWeP7
- D0fmmCx4kIUMS13glg3/xN2/yXDI6urc1t9BfV/6kDZWDTo6jd7aBtAFhQkACk4kRoNF
- Vpic6cIzktAOkAGcNB/o6JJunMHscRzEPkdjsxNuqd1gun+ZcYVhL8uE2ftuIzVzHBS9
- 0kbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=XHYjda1qqzD+em9jadsDM4RHxztHgSy9LnYuZd2wKQ0=;
- b=ptEKBJfb1hJaC2qBiow8AmYaWNFcXP8am30MzN8pM048uukW3FAEqxs7gvUKq6FURh
- rRrcIaf406V2JBRKOFNWNuweCWFQAwsvHmnqUhacRfmf0cohvXF3RouIvUBe9rtoJ9GK
- ubxqNdkwJ13sPOK3uuQpEz99OTJltIAwhKoA6tpvJI8jP1ebrgk7FNjYC3L3knaGQarP
- E55yWpPhBQHeowbS3OCKWTQUcgdJQXYLPHrgBZOrxGYQXXYTqH6FFW3ZcA2MuRZArOzW
- GxMNo5KRhgqmw7Z8op6qJnYPuyxY8mdN91kE/Uz4xFGT85U8LHHSRtHOOecgM86bWP4D
- sjQQ==
-X-Gm-Message-State: APjAAAX1rLjB/r2j6VmZoesdQ3rvdu/gG+uCVqOOfxc8XZDls19GXlI0
- HU9PV+8HaKpqq/tYBUPhhLo=
-X-Google-Smtp-Source: APXvYqzK5cNSvH1NY18+KK8Mep3EL6M2Z/OyAWFkwWGRWXIid7AKM6vtbpG/EhmpJgM+dMJ+Yz1g7A==
-X-Received: by 2002:aa7:8191:: with SMTP id g17mr34961887pfi.25.1582233988657; 
- Thu, 20 Feb 2020 13:26:28 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id g72sm545798pfb.11.2020.02.20.13.26.27
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 20 Feb 2020 13:26:28 -0800 (PST)
-Date: Thu, 20 Feb 2020 13:26:27 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2] sh4: Fix PCI ISA IO memory subregion
-Message-ID: <20200220212627.GB26054@roeck-us.net>
-References: <20200218201050.15273-1-linux@roeck-us.net>
- <CAFEAcA8ocGcGHwzdY2ao73WQcfoUbYTy2udUP5w+ZV5NOMeGLA@mail.gmail.com>
+ (envelope-from <luc.michel@greensocs.com>) id 1j4tJJ-0003bv-8I
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:24:42 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:53820)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <luc.michel@greensocs.com>)
+ id 1j4tJI-0003at-Oy
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 16:24:41 -0500
+Received: from [172.17.10.10] (unknown [172.17.10.10])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 2FAC096EF0;
+ Thu, 20 Feb 2020 21:24:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582233878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E2+GvqGgc0KF8tC4g5IqXNm00U4cG1gjzvVSOGO/rJk=;
+ b=0G0UsF0J3UFloF2ZvQnpv+Acqfg4TQ7XJ4GWBL5nSXn/w56fG7KccBBpOn+b0VTipwMGb5
+ 4nSaQ+OUHTZVPVh+cfTtobFV+NhlXmgu+zgRXbLKyl1PcAhXOI9ZbvY1waMwKn1nzTWS3x
+ pqTtzfZYQbgllYRYU8EjjogU8OhiNA8=
+Subject: Re: [PATCH] tcg: gdbstub: Fix single-step issue on arm target
+To: Changbin Du <changbin.du@gmail.com>, alex.bennee@linaro.org,
+ philmd@redhat.com
+References: <20200220155834.21905-1-changbin.du@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <ddc8b36f-da30-faac-cab2-fad882841159@greensocs.com>
+Date: Thu, 20 Feb 2020 22:24:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8ocGcGHwzdY2ao73WQcfoUbYTy2udUP5w+ZV5NOMeGLA@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+In-Reply-To: <20200220155834.21905-1-changbin.du@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-PH
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582233878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E2+GvqGgc0KF8tC4g5IqXNm00U4cG1gjzvVSOGO/rJk=;
+ b=ZcbEvze2stqntpqjfLubrXJoSeWgfmah2NYJVZoka1OTycf7kLKVV7Fu5nahcXK6zMQo/5
+ PtNb92rpELgUMD5MoA5MRE253cNUhSM1gAJzesHveXYRnycJhjnmcYFbd3vvu9HNiivUOq
+ Q8WDNsvd0paGNlZM5cRQRuQC9vlr5/w=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582233878; a=rsa-sha256; cv=none;
+ b=HEL4p1dejSyLnFQJqigSto0KlHvWcqqpWAJHOfK47oj+DDN+oL3VXVS7+aW/Pe8xjO3xj4
+ RYtQybQQWTb1s9VtZZn5neCBB9lOsVrRzAYUvgNszp55VcTfWGK3bXw+jOnMnNYHruaWyn
+ tcYx+6MhUOttkx7kQ9EgSBjmMimeEDc=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,23 +91,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+Hi,
 
-On Thu, Feb 20, 2020 at 03:06:05PM +0000, Peter Maydell wrote:
-> On Tue, 18 Feb 2020 at 20:10, Guenter Roeck <linux@roeck-us.net> wrote:
-> 
-> I'll put this in via target-arm.next, since we don't really
-> have a more active sh4-specific tree to send it via.
-> 
+On 2/20/20 4:58 PM, Changbin Du wrote:
+> Recently when debugging an arm32 system on qemu, I found sometimes the
+> single-step command (stepi) is not working. This can be reproduced by
+> below steps:
+>  1) start qemu-system-arm -s -S .. and wait for gdb connection.
+>  2) start gdb and connect to qemu. In my case, gdb gets a wrong value
+>     (0x60) for PC.
+>  3) After connected, type 'stepi' and expect it will stop at next ins.
+>=20
+> But, it has never stopped. This because:
+>  1) We doesn't report =E2=80=98vContSupported=E2=80=99 feature to gdb e=
+xplicitly and gdb
+>     think we do not support it. In this case, gdb use a software breakp=
+oint
+>     to emulate single-step.
+>  2) Since gdb gets a wrong initial value of PC, then gdb inserts a
+>     breakpoint to wrong place (PC+4).
+>=20
+> Since we do support =E2=80=98vContSupported=E2=80=99 query command, so =
+let's tell gdb that
+> we support it.
+>=20
+> Before this change, gdb send below 'Z0' packet to implement single-step=
+:
+> gdb_handle_packet: Z0,4,4
+>=20
+> After this change, gdb send "vCont;s.." which is expected:
+> gdb_handle_packet: vCont?
+> put_packet: vCont;c;C;s;S
+> gdb_handle_packet: vCont;s:p1.1;c:p1.-1
+I'm curious, I never experienced this behaviour from GDB. What GDB and
+QEMU versions are you using?
 
-Thanks for picking up all my patches, and even more thanks for
-your patient reviews and for correcting all my errors.
+On my side (GDB 9.1), even without 'vContSupported+' in the 'qSupported'
+answer, GDB sends a 'vCont?' packet on the first stepi:
 
-Guenter
+0x00000000 in ?? ()
+(gdb) si
+Sending packet: $m0,4#fd...Ack
+Packet received: 00000000
+Sending packet: $vCont?#49...Ack
+Packet received: vCont;c;C;s;S
+Packet vCont (verbose-resume) is supported
+Sending packet: $vCont;s:p1.1;c:p1.-1#f7...Ack
+Packet received: T05thread:p01.01;
+
+Your second issue (wrong PC value) should be investigated though. Does
+it happen on QEMU vanilla? Do you have a way to reproduce this bug?
+
+Anyway after re-reading the GDB remote protocol documentation, I think
+your patch is right, the feature should be advertised.
+
+However I think your commit message needs some modifications. This fix
+is not specific to ARM or TCG, but to the gdbstub itself. You also
+mention this bug you have with PC, which is not related to the bug you
+are fixing here. Could you rewrite it in a more generic way? You simply
+need to emphasis the effect of advertising the 'vContSupported+' feature
+on GDB.
+
+Thanks.
+
+--=20
+Luc
 
