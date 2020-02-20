@@ -2,77 +2,107 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB796C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4A1C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B456124654
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDB8124654
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WiO9w2jb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B456124654
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="el6WZQLG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB8124654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4hrG-0000Qu-TU
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:10:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
+	id 1j4hry-0001Nu-7e
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:11:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1j4hqc-0008Hq-DN
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:10:19 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j4hrJ-0000cU-2r
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:11:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1j4hqb-0001q9-Ao
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:10:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57702)
+ (envelope-from <mreitz@redhat.com>) id 1j4hrI-000294-2T
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:11:01 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25387
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>)
- id 1j4hqY-0001of-TF; Thu, 20 Feb 2020 04:10:15 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j4hrH-00028q-Un
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:11:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582189859;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=EWpMUXTtg+cfAcdlYqXmRGGNnAtse9lf3m51CRzd5Ww=;
+ b=el6WZQLG03sK1Nvo/aoKommTd084izQ6LtmJUiusgkvlUdqSt9SDnPh1fpYCclR1bqwKJ9
+ xySUabtZIsVEcyK8w4zDN7myjyZFoZ2l1lV4ALmqmVt9mrDHzjVxT2eo6oAasta/bkkx7m
+ +tmIh81yf2AoKKfzX5fUKypjGzWmdHU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-tw5uUou-PlmFppKf3ILa-Q-1; Thu, 20 Feb 2020 04:10:55 -0500
+X-MC-Unique: tw5uUou-PlmFppKf3ILa-Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 06CE424654;
- Thu, 20 Feb 2020 09:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1582189813;
- bh=S4xwGPUGD3p5Ihpe7YUXIIMFa3a+ojBjLfvLPwI8ePQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=WiO9w2jbrkEaHAQv1auP60n5GoiNg9hUKWrMKPy8kIDdXUO2WslanW/cYM/c6AZAl
- fnED3pBCHyrqmZwF0sjhw+uzfBpF5RCdc2/9PHJ+PynzOQ0/s+H4zdXblN/RvYOKQU
- 0jTqWRK1YzOw3W0XHhpMIjIdxWwo6+Obvaj0R/sM=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1j4hqV-006gwK-3O; Thu, 20 Feb 2020 09:10:11 +0000
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7180E107ACC4;
+ Thu, 20 Feb 2020 09:10:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3A2619C4F;
+ Thu, 20 Feb 2020 09:10:52 +0000 (UTC)
+Subject: Re: [PATCH v2 6/7] block/block-copy: reduce intersecting request lock
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191127180840.11937-1-vsementsov@virtuozzo.com>
+ <20191127180840.11937-7-vsementsov@virtuozzo.com>
+ <1ae71183-4732-fbe6-62d5-58252f01d2d6@redhat.com>
+ <d1f5f953-8dfe-2f27-c00a-9e0d7070a13e@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <76ce73f2-fef9-27e6-4552-29e846fa313f@redhat.com>
+Date: Thu, 20 Feb 2020 10:10:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 20 Feb 2020 09:10:11 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] hw/char/pl011: Output characters using best-effort mode
-In-Reply-To: <20200220060108.143668-1-gshan@redhat.com>
-References: <20200220060108.143668-1-gshan@redhat.com>
-Message-ID: <f3c8adba729d050ba2144cc9c834fe82@kernel.org>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/1.3.10
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gshan@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- peter.maydell@linaro.org, shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+In-Reply-To: <d1f5f953-8dfe-2f27-c00a-9e0d7070a13e@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="t7U1zxQuxPWBtRnQpEvtfpd4683k5WZHB"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,63 +114,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- shan.gavin@gmail.com
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-02-20 06:01, Gavin Shan wrote:
-> Currently, PL011 is used by ARM virt board by default. It's possible to
-> block the system from booting. With below parameters in command line, 
-> the
-> backend could run into endless attempts of transmitting packets, which
-> can't succeed because of running out of sending buffer. The socket 
-> might
-> be not accepted n server side. It's not correct because disconnected
-> serial port shouldn't stop the system from booting.
-> 
->    -machine virt,gic-version=3 -cpu max -m 4096
->    -monitor none -serial tcp:127.0.0.1:50900
-> 
-> The issue can be reproduced by starting a program which listens on TCP
-> port 50900 and then sleep without accepting any incoming connections. 
-> On
-> the other hand, a VM is started with above parameters and modified qemu
-> where the PL011 is flooded with 5000K data after it's created. 
-> Eventually,
-> the flooding won't proceed and stops after transmitting 2574K data. 
-> It's
-> basically to simulate tons of output from EDK-II and demonstrates how 
-> the
-> tons of output can block the system from booting.
-> 
-> This fixes the issue by using newly added API 
-> qemu_chr_fe_try_write_all(),
-> which provides another type of service (best-effort). It's different 
-> from
-> qemu_chr_fe_write_all() as the data will be dropped if the backend has
-> been running into so-called broken state or 50 attempts of 
-> transmissions.
-> The broken state is cleared if the data is transmitted at once.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--t7U1zxQuxPWBtRnQpEvtfpd4683k5WZHB
+Content-Type: multipart/mixed; boundary="hmQlgePSpul5e8Q43gPgFCEWwoXbOLcd0"
 
-I don't think dropping the serial port output is an acceptable outcome.
+--hmQlgePSpul5e8Q43gPgFCEWwoXbOLcd0
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-If someone decides to log their console with something that is very slow
-(because they decide to carve every bit of it into stone), it shouldn't
-be QEMU's decision to just give up on it. Specially if the console is
-over TCP, which garantees no loss of data. Someone wanting to have the
-behaviour you describe would probably use UDP as the transport protocol
-and deal with the consequences.
+On 20.02.20 08:21, Vladimir Sementsov-Ogievskiy wrote:
+> 17.02.2020 16:38, Max Reitz wrote:
+>> On 27.11.19 19:08, Vladimir Sementsov-Ogievskiy wrote:
 
-Similarly, QEMU doesn't drop data on the floor when a write to a disk
-image that results in a block allocation fails because the host 
-filesystem
-is full.
+[...]
 
-Thanks,
+>>> +=A0=A0=A0=A0=A0=A0=A0 if (!block_copy_wait_one(s, start, bytes)) {
+>>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* No dirty bits and nothing to wait=
+: the whole request
+>>> is done */
+>>
+>> Wouldn=92t it make more sense to keep block_copy_wait_one() a loop (i.e.=
+,
+>> keep it as block_copy_wait_inflight_reqs()) that returns whether it
+>> waited or not?=A0 Because I suppose if we had to wait for anything, we
+>> might as well wait for everything in the range.
+>=20
+> No, we don't need to wait all. If some dirty bits appeared we may start
+> copy them
+> immediately, not waiting for others.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+OK, especially considering you=92re aiming for block_copy(0, disk_size)
+eventually.
+
+Max
+
+
+--hmQlgePSpul5e8Q43gPgFCEWwoXbOLcd0--
+
+--t7U1zxQuxPWBtRnQpEvtfpd4683k5WZHB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5OTRoACgkQ9AfbAGHV
+z0CTHwgAnqzetZhrJMis3HOJIvyMmrb7pm0Yp6dUrnFCuSyFHveOH6Gqnf7IPeuV
+Y+YpHJS4ZxOXMiIO0cqocZlsXjgbKgtBdzBoYI+3MyTQXcvqBOojFtylhu7F2iiF
+MP3sOD1krQXJ3bDGwPwwFQXmPGiwejmXy9GGO10IZKaeHF89lQsw87SDzr8mYdmN
+aGqgzFvUnKw1mQ00u5fY09l1ATFrHB2h1d9aCW+m3MdXcvahN50PY7mbxgsHv489
+tfReB7gP92zzg/UFX2DV6j4hy8qOxPRy+FKmkMKqgDsqQWEZ1PIe3IVJJX+UC6LF
+2Z/3SfmisH5INgGHB9AO62eW0lwLzg==
+=KvSY
+-----END PGP SIGNATURE-----
+
+--t7U1zxQuxPWBtRnQpEvtfpd4683k5WZHB--
+
 
