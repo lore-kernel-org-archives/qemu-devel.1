@@ -2,86 +2,81 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9174C11D0C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB91C11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:50:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8506A20801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 191CC207FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 16:50:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9AaO51L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8506A20801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nxQyZ+6o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191CC207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4p0n-0002st-MC
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 11:49:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33653)
+	id 1j4p1q-0004Eo-7g
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 11:50:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j4p08-0002PT-KB
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:48:37 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4p0y-0003Cg-3N
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:49:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j4p07-0001i5-Cp
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:48:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60166
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j4p07-0001hq-9E
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:48:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582217313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SAnZAr0WigsBJL5TcioMjE9SddAUeB4U6gqtxuiJk8g=;
- b=T9AaO51L4NujppJygSdrPJLizVYmBUsliN7FeFTlK9K48FXgK4G8vu0R+rMv2R8A/pdn3u
- VQRi2+eCDdbvx2tWFZG98KfTqWWhpbK3NZsdJwB9ENKgBjRkyMkCfNL+OAPKhIA6KkAt99
- LkMPJBVaPiX8hJHLCbY0IsZj4ls88Lo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-BHX9Y56MPW6LKPRUQBBQgw-1; Thu, 20 Feb 2020 11:48:29 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A69E1005516;
- Thu, 20 Feb 2020 16:48:27 +0000 (UTC)
-Received: from [10.3.116.180] (ovpn-116-180.phx2.redhat.com [10.3.116.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7778489F28;
- Thu, 20 Feb 2020 16:48:26 +0000 (UTC)
-Subject: Re: [RFC PATCH v3 07/27] qcow2: Add subcluster-related fields to
- BDRVQcow2State
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1577014346.git.berto@igalia.com>
- <b04e7e26cea16892a7f209b37d931c489ef17bd9.1577014346.git.berto@igalia.com>
- <bc469fab-244c-6b26-c5b4-55cc42a7d8cc@redhat.com>
- <w51blptb4lc.fsf@maestria.local.igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <1471f80d-b289-713b-2525-29832720087b@redhat.com>
-Date: Thu, 20 Feb 2020 10:48:25 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j4p0w-0001mf-Tc
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:49:28 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40478)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j4p0w-0001mN-Nk
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 11:49:26 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a142so28181707oii.7
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 08:49:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UBJTtmaVHjCje4IQAZRXqmLtw7W5gnalWAcuadbspgE=;
+ b=nxQyZ+6o/qPkh+vuDtD8NaRxXc/gbxMiU6R6pL1HT7AfKLTlxtChbfgkepof5tv9rI
+ UmqPu/ZjTphruIQ2tDvuU3uiGh4Hv6H+kFCMvsgu67kcHem5NLHQIwXZR3/piaYCqy2H
+ FpitLqpopfCDhn5uTJXYNEMQiMBiSz3ZnIWaSu14d9uE74+r/K/prwYNmX3cjeih6ov9
+ ttnrP1O3yl6Va9mIoVHKnV3HMoeLe0HbcqDAsflZeFEM7S4YkPobiDTiZDG00yGJ6jJJ
+ H0HFvDkUE9oQw03lpPoZ+DQpwNQchNE3YWP1uf1lmFJlDvRF/bDuO9bXAttIVqlaNTpf
+ yIjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UBJTtmaVHjCje4IQAZRXqmLtw7W5gnalWAcuadbspgE=;
+ b=Izu+suVGMOx01x/jIYubR2Ud6O0GqJrek5UG4PJrRYLVDfXIVl2YRGxdpZvjkAgEkI
+ Ko3bOzYsa1HgviHNE+WX2wG/u0NmmqWSoh1c6+bZNtxegQ5c9UzbVzCtfhu2oIA5kHRW
+ 7Nhci/+2oyVgrYSD8F+Bu7zN3gxSZ8fvFcQcSunOthk2spnqZeX6nViR0vhpCRc8bJTY
+ MxH/WU4YH7luBaiRRW85hYWZXJU0DTXHvC5sCzs8I7oqdqrPLpRlANInOhpOSZZ/+oLU
+ BDDFVy50i9KNQ9AlYirl1hG70ZvNqZ7rb86PPXSw2mlwQFJx+jk4eq9V0vuAX69XkafG
+ ptkw==
+X-Gm-Message-State: APjAAAVeLVveC70L1+vUpsOHbh1Unf1ig6VZbi+cPPiJ58/HsQ3SWGxa
+ a0dwFpkhccz9tCc+FD4sMVYpBW/VhFVIMV40erJ3kA==
+X-Google-Smtp-Source: APXvYqx/c28778GDAQIPLSvqbq4eaqm/pjNlenHHAgyfU/AhirM7dHAWbHOFDu6iEc3ASPGsAocA0rEeJfTJkeUhBv8=
+X-Received: by 2002:a05:6808:3b2:: with SMTP id
+ n18mr2664948oie.146.1582217365873; 
+ Thu, 20 Feb 2020 08:49:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <w51blptb4lc.fsf@maestria.local.igalia.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: BHX9Y56MPW6LKPRUQBBQgw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200217032127.46508-1-pannengyuan@huawei.com>
+ <20200217032127.46508-2-pannengyuan@huawei.com>
+ <20200220165950.3a5ec74a.cohuck@redhat.com>
+In-Reply-To: <20200220165950.3a5ec74a.cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Feb 2020 16:49:14 +0000
+Message-ID: <CAFEAcA8ZcCEWn0xKiRQ8n3_sQQ2r12fwi_5Qrj0POUfW_70V+w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] s390x: fix memleaks in cpu_finalize
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,41 +88,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Pan Nengyuan <pannengyuan@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ mav2-rk.cave-ayland@ilande.co.uk, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Euler Robot <euler.robot@huawei.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/20/20 10:34 AM, Alberto Garcia wrote:
-> On Thu 20 Feb 2020 04:28:07 PM CET, Eric Blake wrote:
->>> Images without subclusters are treated as if they had exactly one,
->>> with subcluster_size = cluster_size.
->>
->> The qcow2 spec changes earlier in the series made it sound like your
->> choices are exactly 1 or 32,
-> 
->>> +#define QCOW_MAX_SUBCLUSTERS_PER_CLUSTER 32
->>> +
->>
->> ...but this name sounds like other values (2, 4, 8, 16) might be
->> possible?
-> 
-> I guess I didn't want to call it QCOW_SUBCLUSTERS_PER_CLUSTER because
-> there's already BDRVQcow2State.subclusters_per_cluster. And that one can
-> have two possible values (1 and 32) so 32 would be the maximum.
-> 
-> I get your point, however, and I'm open to suggestions.
+On Thu, 20 Feb 2020 at 16:01, Cornelia Huck <cohuck@redhat.com> wrote:
+> I may be missing something, but what cleans up the timers if we fail
+> further down in this function? I don't think the unrealize callback is
+> invoked by the core in case of error?
 
-Maybe QCOW_EXTL2_SUBCLUSTERS_PER_CLUSTER
+FWIW I sent a mail to one of these threads a few days ago
+where I claimed we did call unrealize if realize fails,
+but looking again at the device_set_realized() code I think
+I was misreading it. If the device's own 'realize' method
+fails, we go to the 'fail' label, which just reports back the
+error and doesn't call unrealize. It's only if the device's
+'realize' method succeeds and we get a failure in some later
+thing like calling 'realize' on the child bus objects that we
+will call the device unrealize as part of cleanup.
 
-since it is a hard-coded property of the EXTL2 feature.
+Apologies for any confusion caused.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+thanks
+-- PMM
 
