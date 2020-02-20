@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B885C11D0C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF40C11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:20:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C836324672
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2CF24672
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:20:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uqef5LO1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C836324672
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wYlTtuwd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2CF24672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4pSE-000172-Tr
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:17:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39349)
+	id 1j4pVP-0002Wb-6G
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:20:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4pRD-0000cf-4B
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:36 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pUI-0001su-ML
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4pRB-0007jF-MF
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:34 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43449)
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pUG-0001Sl-Gi
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:19:46 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46206)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4pRB-0007j7-Fe
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:16:33 -0500
-Received: by mail-ot1-x341.google.com with SMTP id p8so4338565oth.10
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:16:33 -0800 (PST)
+ id 1j4pUF-0001Rg-Cs
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:19:44 -0500
+Received: by mail-ot1-x344.google.com with SMTP id g64so4350485otb.13
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:19:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tR9pmiMInWv4mSnrTrDQVOYD9HUI1quRu5s8TXAhCXk=;
- b=Uqef5LO1vq9uJdYsNnx1b41JJM+J4q0q5gk4UEZOJ1GfICrWGLcbIamXBI6ZnPE456
- Cgxr62qEk+6zZUA7GVQ1Ei7xUdlklGwJB30Aq7k/2JYG8VtOXkNGbd6CKk9lBJOaJerj
- UpR8A2+IMmm9KzE3LXSGKZOmbkWAsKDgdic6Wwf3UGwR8TpqDlcvIAjlaKxh0VpzAJQN
- RF/LogA/BBhKieLzxf4Kg9DJmMY8qoPYoBs50wTnof8ueVr2CVIizchcwt0VS6GQ8J1+
- J1vcWOecvzKoeab5DapLO3CrN8p02hEMNi7xRvEKVDk+aSym5LxhqvjQVWPxlG0aPR0W
- pJfA==
+ :cc; bh=2FeaUImFnWe+ta+AJLPXRCtqLH94AGyAzEfuypqN7OE=;
+ b=wYlTtuwdXqXUc8nebPAi9P0g+ZLpKBX2N+A0FxGVlOcI9pz2dkLaJQ3i+u8o1oEmY0
+ KW4WtlWIecNHySyrGPWoLyLW24EAn0JMSrKfa+/DiKZZBTF0INjXQ6u9eimF8RnLiXls
+ 32i3F4bWVBcIxoZvew6lyPNIwL8RIk3FHcuZAYXl3Rp7cxJCzU9NeKymameTRoXcqZUb
+ PRRH5KHqHJuNNmsk1Wq+QUbWhZN+eoLe40gfndR+bFftxaQfCzwmBoX3jrXdv5d2kjhP
+ gpI/0yvMkubWcticBj3CvPHMzFO0PSXJHNbEHBNoqXH1FW5Lh8YOq13CqU6UG0Z9mFd8
+ qtig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=tR9pmiMInWv4mSnrTrDQVOYD9HUI1quRu5s8TXAhCXk=;
- b=btEZ2gywB3le3bRzOqhMC6jWB9XOhpTzmebjn55hW9FsnFK/Zw2FRcU+EjgrWwoBat
- ssI2S+6vweEaQG1KMyQVQnbSF9zaN3ojMYSsyk9iysG8q80BHNdAgSoWgLXh6/YWwv9R
- M7Jd/k/SQns0kacRlHx3IxtKBjTv6tOX7OvDDZ7amZiPXrnBTsNPNwZDwYmj2GfBMJo+
- 6es5CEx2U7ousyo8nAOHUYtSyu/0Me4/YhHaXC7iwHTF3bv2AxwmbMqoBGwp+4FCxBHJ
- +3eN1FXkxpISnGRRt6XMIIMkaAY50BRim1yCTdAhqn6YOf27g7LFPUvo5FaSPxwfpUnL
- cZrQ==
-X-Gm-Message-State: APjAAAUOR9i0GzYVLljxbqtBfqhwOOw9uaGxpOuleWSrq3rB7jtX1HZ7
- HMJSC8TLMIl3agEfHZ/oi0AH+iOjauqNeKl2xp9UDw==
-X-Google-Smtp-Source: APXvYqziV+oKUXQWObYmwneDTLD+qs4Sb2XJv3Tl9ucusKeqLj8KfHbDxdRLvOyXC+Q580A5FgMY36G9K0EZz3BGYVY=
-X-Received: by 2002:a9d:68d9:: with SMTP id i25mr12352116oto.135.1582218992492; 
- Thu, 20 Feb 2020 09:16:32 -0800 (PST)
+ bh=2FeaUImFnWe+ta+AJLPXRCtqLH94AGyAzEfuypqN7OE=;
+ b=FP1TOE3mB6rqjQU5SAVAZh/HSoadHDZRb1OLBeRLui9YwAGjJZG9IlSYPcjwPMqeoZ
+ wGyNK4dfkK9VV3g50C6FnB1kz5XSzw+VDzxv6A2dlft1VEjw14syMIZb4xZTJOpSUQhf
+ RIvzFSOfD1ClkU6Rm5ovu0oPIbNEMAULlJJEwQVDXLRSaVgQa1W6MloaJzjLoESsnSxY
+ bkrducBJgyXCoy3KtOPBg1mHRiW1eK1PSUbc0UWsAqsvc63pSpC43SykRfVChiNwvUy4
+ 4mes4Kv4aT/gfRxNsj7i1aiKvXBgLQQPo5GecTiGRgYm2S4qN+01zunZLd7Rv35Zf/AW
+ KpVw==
+X-Gm-Message-State: APjAAAVkWmPVSqoPOF5dB27tjvkbD6qdKozyE8FE7847tEBNWrb7IAjh
+ C1nmjOxxkAJx40VKglmBZzGZY2iBIyPOqW1AdJ6teA==
+X-Google-Smtp-Source: APXvYqwu6MYQI32qf6xDbY8JhaYF4JzZSQvo/lQ0iahpVAR1ZaS6VGYIMQgv//+Xpg7B2D3doCvb6dM1TQTYuoEEMYU=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr24700298otd.91.1582219179130; 
+ Thu, 20 Feb 2020 09:19:39 -0800 (PST)
 MIME-Version: 1.0
 References: <20200214181547.21408-1-richard.henderson@linaro.org>
- <20200214181547.21408-15-richard.henderson@linaro.org>
-In-Reply-To: <20200214181547.21408-15-richard.henderson@linaro.org>
+ <20200214181547.21408-13-richard.henderson@linaro.org>
+In-Reply-To: <20200214181547.21408-13-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Feb 2020 17:16:21 +0000
-Message-ID: <CAFEAcA9OMmVoULYPKvj4T-6w7ZL5t8L+HT2XjV_Zo2jXvZXKUw@mail.gmail.com>
-Subject: Re: [PATCH 14/19] target/arm: Move the vfp decodetree calls next to
- the base isa
+Date: Thu, 20 Feb 2020 17:19:28 +0000
+Message-ID: <CAFEAcA8Up6CGPB9jWCdtGKfqSzbnXrzfoq_dQ94aBC8sV9mWmA@mail.gmail.com>
+Subject: Re: [PATCH 12/19] target/arm: Remove ARM_FEATURE_VFP check from
+ disas_vfp_insn
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,174 +97,32 @@ Sender: "Qemu-devel"
 On Fri, 14 Feb 2020 at 18:16, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Have the calls adjacent as an intermediate step toward
-> actually merging the decodes.
+> We now have proper ISA checks within each trans_* function.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/translate.c | 80 +++++++++++++-----------------------------
->  1 file changed, 24 insertions(+), 56 deletions(-)
+>  target/arm/translate.c | 4 ----
+>  1 file changed, 4 deletions(-)
 >
 > diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index b2641b4262..5cabe6b2e9 100644
+> index 0da780102c..e8c3d4f26f 100644
 > --- a/target/arm/translate.c
 > +++ b/target/arm/translate.c
-> @@ -2646,31 +2646,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
->      tcg_temp_free_i32(tmp);
->  }
->
-> -/*
-> - * Disassemble a VFP instruction.  Returns nonzero if an error occurred
-> - * (ie. an undefined instruction).
-> - */
-> -static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-> -{
-> -    /*
-> -     * If the decodetree decoder handles this insn it will always
-> -     * emit code to either execute the insn or generate an appropriate
-> -     * exception; so we don't need to ever return non-zero to tell
-> -     * the calling code to emit an UNDEF exception.
-> -     */
-> -    if (extract32(insn, 28, 4) == 0xf) {
-> -        if (disas_vfp_uncond(s, insn)) {
-> -            return 0;
-> -        }
-> -    } else {
-> -        if (disas_vfp(s, insn)) {
-> -            return 0;
-> -        }
-> -    }
-> -    /* If the decodetree decoder didn't handle this insn, it must be UNDEF */
-> -    return 1;
-> -}
-
-Before this change, if this was a cp10/11 insn and
-neither disas_vfp_uncond() nor disas_vfp() returned true,
-we would UNDEF it.
-
-> -
->  static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
+> @@ -2652,10 +2652,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
+>   */
+>  static int disas_vfp_insn(DisasContext *s, uint32_t insn)
 >  {
->  #ifndef CONFIG_USER_ONLY
-> @@ -10524,7 +10499,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->          ARCH(5);
->
->          /* Unconditional instructions.  */
-> -        if (disas_a32_uncond(s, insn)) {
-> +        /* TODO: Perhaps merge these into one decodetree output file.  */
-> +        if (disas_a32_uncond(s, insn) ||
-> +            disas_vfp_uncond(s, insn)) {
->              return;
->          }
->          /* fall back to legacy decoder */
-> @@ -10551,13 +10528,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->              }
->              return;
->          }
-> -        if ((insn & 0x0f000e10) == 0x0e000a00) {
-> -            /* VFP.  */
-> -            if (disas_vfp_insn(s, insn)) {
-> -                goto illegal_op;
-> -            }
-> -            return;
-> -        }
->          if ((insn & 0x0e000f00) == 0x0c000100) {
->              if (arm_dc_feature(s, ARM_FEATURE_IWMMXT)) {
->                  /* iWMMXt register transfer.  */
-> @@ -10588,7 +10558,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->          arm_skip_unless(s, cond);
->      }
->
-> -    if (disas_a32(s, insn)) {
-> +    /* TODO: Perhaps merge these into one decodetree output file.  */
-> +    if (disas_a32(s, insn) ||
-> +        disas_vfp(s, insn)) {
->          return;
->      }
->      /* fall back to legacy decoder */
-> @@ -10597,12 +10569,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->      case 0xc:
->      case 0xd:
->      case 0xe:
-> -        if (((insn >> 8) & 0xe) == 10) {
-> -            /* VFP.  */
-> -            if (disas_vfp_insn(s, insn)) {
-> -                goto illegal_op;
-> -            }
-> -        } else if (disas_coproc_insn(s, insn)) {
-> +        if (((insn >> 8) & 0xe) != 10 && disas_coproc_insn(s, insn)) {
->              /* Coprocessor.  */
->              goto illegal_op;
->          }
+> -    if (!arm_dc_feature(s, ARM_FEATURE_VFP)) {
+> -        return 1;
+> -    }
+> -
+>      /*
+>       * If the decodetree decoder handles this insn it will always
+>       * emit code to either execute the insn or generate an appropriate
+> --
+> 2.20.1
 
-But now if the VFP decodetree doesn't handle the insn,
-we'll fall into this case here, I think, the
-"(((insn >> 8) & 0xe) != 10" part of the condition will
-be false, and we'll end up at a 'break' statement, which
-I think means we'll end up doing a NOP rather than an UNDEF.
-
-
-
-> @@ -10691,7 +10658,14 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->          ARCH(6T2);
->      }
->
-> -    if (disas_t32(s, insn)) {
-> +    /*
-> +     * TODO: Perhaps merge these into one decodetree output file.
-> +     * Note disas_vfp is written for a32 with cond field in the
-> +     * top nibble.  The t32 encoding requires 0xe in the top nibble.
-> +     */
-> +    if (disas_t32(s, insn) ||
-> +        disas_vfp_uncond(s, insn) ||
-> +        ((insn >> 28) == 0xe && disas_vfp(s, insn))) {
->          return;
->      }
->      /* fall back to legacy decoder */
-> @@ -10708,17 +10682,15 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->                  goto illegal_op; /* op0 = 0b11 : unallocated */
->              }
->
-> -            if (disas_vfp_insn(s, insn)) {
-> -                if (((insn >> 8) & 0xe) == 10 &&
-> -                    dc_isar_feature(aa32_fpsp_v2, s)) {
-> -                    /* FP, and the CPU supports it */
-> -                    goto illegal_op;
-> -                } else {
-> -                    /* All other insns: NOCP */
-> -                    gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
-> -                                       syn_uncategorized(),
-> -                                       default_exception_el(s));
-> -                }
-> +            if (((insn >> 8) & 0xe) == 10 &&
-> +                dc_isar_feature(aa32_fpsp_v2, s)) {
-> +                /* FP, and the CPU supports it */
-> +                goto illegal_op;
-> +            } else {
-> +                /* All other insns: NOCP */
-> +                gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
-> +                                   syn_uncategorized(),
-> +                                   default_exception_el(s));
->              }
->              break;
->          }
-> @@ -10740,10 +10712,6 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->              if (disas_neon_data_insn(s, insn)) {
->                  goto illegal_op;
->              }
-> -        } else if (((insn >> 8) & 0xe) == 10) {
-> -            if (disas_vfp_insn(s, insn)) {
-> -                goto illegal_op;
-> -            }
->          } else {
->              if (insn & (1 << 28))
->                  goto illegal_op;
-
-Here in the thumb decoder there's a similar issue I think:
-now for insns which are in the VFP space but don't exist
-(ie where the decodetree has returned false) we'll end up
-now falling through into disas_coproc_insn() rather than
-just UNDEFing them.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
