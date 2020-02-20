@@ -2,68 +2,69 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93704C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A429C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:23:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6741720801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6741720801
+	by mail.kernel.org (Postfix) with ESMTPS id 6FA5E20801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:23:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA5E20801
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4i2h-0005wO-IL
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:22:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51851)
+	id 1j4i2v-0006Pt-Js
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:23:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4i1a-0004CP-4a
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:39 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4i1Z-0008BE-2u
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:38 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:56091)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4i1Y-0008AK-PE
+ (envelope-from <laurent@vivier.eu>) id 1j4i1Y-0004Al-Mj
  for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:37 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <laurent@vivier.eu>) id 1j4i1X-00089t-JK
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:36 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:52351)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4i1X-000898-AZ
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:35 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N1PLB-1jSiw719z9-012mF7; Thu, 20 Feb 2020 10:20:56 +0100
+ id 1MowbA-1jnQkG1JQk-00qSYm; Thu, 20 Feb 2020 10:20:58 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/13] Linux user for 5.0 patches
-Date: Thu, 20 Feb 2020 10:20:40 +0100
-Message-Id: <20200220092053.1510215-1-laurent@vivier.eu>
+Subject: [PULL 03/13] configure: linux-user doesn't need neither fdt nor slirp
+Date: Thu, 20 Feb 2020 10:20:43 +0100
+Message-Id: <20200220092053.1510215-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200220092053.1510215-1-laurent@vivier.eu>
+References: <20200220092053.1510215-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:08T70wEGxAgWTX2bD7kTnBFkT/wr0NtjfiuWvGRT+akwKkqrzh3
- r7N0bs4+pGujl+KJ3ouvVS4R6WiWk+ZqSZLlddMSe7k9Fl/aTp0qbBLuSZWQ9gyVD666wqt
- HRbqkEU1dAlspG4HFyb+zYCW7NUuCXdM5hw+h33Ol2YRd27vRiG6FBVn6KcVIty1diFKw37
- m4pX4TQr5KTgDCDoMCEBw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qyxhE3iSE2E=:oB+MHEdEkR16mzweyS5gI4
- u5OGz2FUNte1/BDI0pOkDmFxfqrrvFZqEoW6t7fBBrRqm103gBvdvF/2iE0tXiCpdPaSkjCMe
- 6UjQULLan1vd/sjkCpSQUpIoaOdo50+6hUK931yyIHckYnc/tqq567jFMlOdt7CzMTX12nSaD
- 8Ig2sMNlfqqtz6L1Xqy2YsnOog74eCkYke8aq3oL+j1bIOTC9P5TYi0ZOZBdbQJCiTvZZqLSe
- 8fvKHDI5dp2DpRsuXTCwLmBz5AmIME/EGITIjFSFGBk+4HFVmpLYTyn56WWX4WFgKLW0Edyp7
- W5nKxzfcSFoXIo3Dr7s77oYDCLLwaKsQ+IzQ3ECjwGuWH9N9WyD0o3Pme3ajK5fMizY2YjRAu
- p+7+iQWIqKK0Ynx1C6L1KRJPKVrsQSotO9AFrgl40bj0LN2T9aj3c0FmPrwMX4KEMxe6yOrZo
- XmyQY77Vew/waTgp6551tF+spnbhVZSeDcREW71aw0ReF+b9iRfml54pCTLSVSmkA7akW2pQr
- JWuW0kp5hToX/lrhHUIh7CkVRRRNew6+QedsTr/XF/pUb1W0HkvVQxaOgrG4hXHX69dNvTnDi
- 8A3NvZmaJ1LrsP09yEC4A21v76LPDIBhLmqFrgbvCs/kXDlWvcRWQJ1vNPBKmoO61caGkUs4D
- sw6L26NAxoUJB2XA8/7MixyoeTWW4HzRVkHW2EcmkbgmNFoSEpfm4tSwcVZyQNKyqxnBStVad
- sySjAqUxe5uT3PNefBSp/hsNWl+oBs3V+/SbZQvJQmanprvUy4esP972FVUhDgHs4uB06YEWj
- 32lPWaDF6knP/rHauJFAeLtTD7CKLKp+R+UpDjlET4P+wSA4lpU/O19QDwMZFyCMPt+qzRa
+X-Provags-ID: V03:K1:g7jr1Oo7TNJ4RBbjS0H77mSIjtitZ5qtY+rdDJQQz/1VooACeUV
+ Hb7CNL73FXPMYgxA3QQgpSljXFG78xCZvUnsC6nV+OvQTEeeCq+/Kh+bTcQ5k9FtV/anZ6J
+ kfB0nOgd7y5pPX/mQJwyb9jIQ/g4D1KOZKi++XMq5LCotfxSmN3XGkIYEED8wsYE76HNWyI
+ jE3T/QjdKn2QXMABa6ZaA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:95K06Bnstkc=:AX8wqXNtMP1PuZKv1YWtgP
+ hIAOgZM8TMyJXSlfY3h44g4AFS0ss4MglauqoKrxOEwDU/iYcaKnMiWuwUlaQpS7Kr43GJ1MU
+ S5C0CSUMz5NLjJ+DilyAEnCFb3T5a+D8/lY3KPeaIns68R8vbQWx+0YbWgtyvRNu6lOfdG1zo
+ rd2dMKhiKWLNsRm88rNzT4cdbEIC7lz4EL2kebx97SCScLnuOBLpVPaWIPDtKxkexTZeM0he9
+ tf/DfNPxAISr+969pD+8QudK2M3LP5iZ0dN8cb9g5RgezTjnz8WbH2X+rXieIZIT7Hl86j8U4
+ 251oGTOigM00OD9KmbteSe0tAYHtIjcqa7aP38x2tdNyDPgRpstcKD8XsQNO155+WSdFdHyCS
+ 4C5eMDAZWWYjPEssiY0x9S9smL3ewV6Ov1UaApAihFRqvuOtkBvmEHiTpfFK6aoU0ciJt1HiL
+ a1nGXRfB4o4KEeh6ldPuOeniJH6RYgjQfZvUftGwBw24OFn/mM07SsF8T2W4umD5b5RUwu7Yj
+ 5yi1mWxXXDnl4k2qYl/GCSYUvYjsIyZrd66xqGJh/Y2Uvrwz51gZ0mlx+hsoy3dPcPbQcfW+p
+ kFejWVKbT0CXTn6EsnsXTxq9pmstBYJWvqe2cO9/sKdI6fGyDeFH3OtIYMLK/UQf/xrvrg5Sm
+ pEmHcBopqdYe6Cr6AuPCht+yeDwcAvWfOUDrFFYXl4qE7JidV8pvy7/r4NIr1hRKvovMnoHQD
+ E4nKOeVAw/xerAE/G/iTWEAP79hjh0FSKzfKzSJh/7NbcnIbDtODTsNkDn9l7l2f1khpUTzsl
+ NpE1MKNXa4ZfhZKbGIeyDsVkuNOtP0XtMfpR3mkttHzNLBqgTcrJDBYenAoCoHl+MO7EqKK
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,79 +76,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 6c599282f8ab382fe59f03a6cae755b89561a7b3:
+From: Laurent Vivier <lvivier@redhat.com>
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-monitor-2020-02-15-v2' into staging (2020-02-17 13:32:25 +0000)
+if softmmu is not enabled, we disable by default fdt and
+slirp as they are only used by -softmmu targets.
 
-are available in the Git repository at:
+A side effect is the git submodules are not cloned
+if they are not needed.
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.0-pull-request
+Clone and build can be forced with --enable-fdt and
+--enable-slirp.
 
-for you to fetch changes up to 045823a98c30fbcafa6d6b61a28b284de7038f07:
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190621130544.18860-1-lvivier@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ configure | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-  linux-user: Add support for selected alsa timer instructions using ioctls (2020-02-19 11:17:40 +0100)
-
-----------------------------------------------------------------
-Implement membarrier, SO_RCVTIMEO and SO_SNDTIMEO
-Disable by default build of fdt, slirp and tools with linux-user
-Improve strace and use qemu_log to send trace to a file
-Add partial ALSA ioctl supports
-
-----------------------------------------------------------------
-
-Andreas Schwab (2):
-  linux-user: Implement membarrier syscall
-  linux-user: implement getsockopt SO_RCVTIMEO and SO_SNDTIMEO
-
-Filip Bozuta (5):
-  linux-user: Add support for getting alsa timer version and id
-  linux-user: Add support for getting/setting specified alsa timer
-    parameters using ioctls
-  linux-user: Add support for selecting alsa timer using ioctl
-  linux-user: Add support for getting/setting selected alsa timer
-    parameters using ioctls
-  linux-user: Add support for selected alsa timer instructions using
-    ioctls
-
-Helge Deller (1):
-  linux-user/strace: Improve output of various syscalls
-
-Josh Kunz (3):
-  linux-user: Use `qemu_log' for non-strace logging
-  linux-user: Use `qemu_log' for strace
-  linux-user: remove gemu_log from the linux-user tree
-
-Laurent Vivier (1):
-  configure: linux-user doesn't need neither fdt nor slirp
-
-Philippe Mathieu-Daudé (1):
-  configure: Avoid compiling system tools on user build by default
-
- configure                  |  22 +-
- include/qemu/log.h         |   2 +
- linux-user/arm/cpu_loop.c  |   5 +-
- linux-user/fd-trans.c      |  55 +++--
- linux-user/ioctls.h        |  21 ++
- linux-user/main.c          |  39 +--
- linux-user/qemu.h          |   2 -
- linux-user/signal.c        |   2 +-
- linux-user/strace.c        | 479 +++++++++++++++++++------------------
- linux-user/strace.list     |  52 ++--
- linux-user/syscall.c       |  92 +++++--
- linux-user/syscall_defs.h  |  84 +++++++
- linux-user/syscall_types.h |  66 +++++
- linux-user/vm86.c          |   3 +-
- util/log.c                 |   2 +
- 15 files changed, 600 insertions(+), 326 deletions(-)
-
+diff --git a/configure b/configure
+index 6f5d85094965..5f5f4befb9f6 100755
+--- a/configure
++++ b/configure
+@@ -4135,6 +4135,11 @@ elif test "$fdt" != "yes" ; then
+   fdt=no
+ fi
+ 
++# fdt is only required when building softmmu targets
++if test -z "$fdt" -a "$softmmu" != "yes" ; then
++    fdt="no"
++fi
++
+ if test "$fdt" != "no" ; then
+   fdt_libs="-lfdt"
+   # explicitly check for libfdt_env.h as it is missing in some stable installs
+@@ -6078,6 +6083,11 @@ fi
+ ##########################################
+ # check for slirp
+ 
++# slirp is only required when building softmmu targets
++if test -z "$slirp" -a "$softmmu" != "yes" ; then
++    slirp="no"
++fi
++
+ case "$slirp" in
+   "" | yes)
+     if $pkg_config slirp; then
 -- 
 2.24.1
 
