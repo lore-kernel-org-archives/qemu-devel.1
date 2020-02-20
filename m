@@ -2,69 +2,81 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18026C11D00
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:29:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63747C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:32:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C035B20801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:29:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C035B20801
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 003D52465D
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:32:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r/BoJVO9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 003D52465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4i9C-0002Fj-0f
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:29:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51954)
+	id 1j4iBq-0003u9-5f
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:32:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4i1m-0004aX-EY
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:54 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1j4iAV-000352-Q9
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4i1i-0008Fe-5i
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:50 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:34301)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4i1h-0008FH-Kh
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:46 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MKc0o-1ijjDV1Ebc-00KxIc; Thu, 20 Feb 2020 10:21:02 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/13] linux-user: Use `qemu_log' for strace
-Date: Thu, 20 Feb 2020 10:20:47 +0100
-Message-Id: <20200220092053.1510215-8-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200220092053.1510215-1-laurent@vivier.eu>
-References: <20200220092053.1510215-1-laurent@vivier.eu>
+ (envelope-from <coiby.xu@gmail.com>) id 1j4iAO-00041t-KY
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:30:51 -0500
+Received: from mail-lf1-x12c.google.com ([2a00:1450:4864:20::12c]:46087)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1j4iAN-00041J-TQ
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:30:44 -0500
+Received: by mail-lf1-x12c.google.com with SMTP id z26so2483185lfg.13
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 01:30:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=JGyidXbb0POVD6aPvFpMd5tybxKbqK1m+ZgYBeWfd6Q=;
+ b=r/BoJVO9t43/igmNHQwlGUmYlyb8zMg0kvCzxtPLqRZWMes5+BuOn9/fAgRM0Zbqjf
+ B976fmNk8whVib1n4qaqYTRRvyb/Xy+cLnKGywU38ctHe6ixX/QtE/iPKCLlBmw9c5UE
+ sMSlzbHpPSG5ITxGlqY8N6QPrVW/6P12blijFKE14VcEws1KLpbYA8W5eHuJKh8X6fwt
+ LSupVP2qO1JkliDkjdu6H0y6ndirOdCwIQ3/Jxrf0JiS3q7CGZ9IxczMRQV39k+Z179e
+ wqJJI/YDzfN5SP6oFOyVSxSP4dp/Vllbs/I9lzE2QMeCK/4ck8gBmT6RpsILuM0LkD6n
+ /tFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=JGyidXbb0POVD6aPvFpMd5tybxKbqK1m+ZgYBeWfd6Q=;
+ b=rbMYScNWGSpxb+W+RGIRR1yPBiF9l1SizMTNw1s2YUQzwwhx5ANbk+7vHsZhmJwovN
+ 3kRzn6LDj81w8wfPERQ/ELrSH5dkueJztohkDcbpgaH8XkHuohgwUhhB7DZ4peIQzPCf
+ f6Am8SahIXUX4qAk3SEk1ICKBVCflDcS5Ba9rsObyda9AU+K/qkwcbm0UR3ltSHL0fCN
+ YGCuOnkZJZ5Z7+vLmR7rbfhMZot0Lz49FxS8Vr9XnoF6LhtNc2xCag79qsxg7SfCosjD
+ AH9dvbqPKvdXUX3ZsFwPIuqRMFrzcOOeOn5gHrCwMiMVbvVCC/zUzqtF/u/WgaE4kxFQ
+ Czsw==
+X-Gm-Message-State: APjAAAW4i5ancXVZXNMVynFE18OuygsHejWi9yylX3yaHf/ovURadFt6
+ zlsPQvEaavbiuWp+OaG5ezGB8v/VuaifQ+LgGCc=
+X-Google-Smtp-Source: APXvYqy+9rsg1Wxs+IW3u1Vz4XOJIY19wXhMV3SX38aI/ZSxZFAJzkDd2uu1Tc1Yf9RuR9Qw3n0H083zh/JbUC52GDs=
+X-Received: by 2002:a19:4855:: with SMTP id v82mr15328326lfa.197.1582191041675; 
+ Thu, 20 Feb 2020 01:30:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:GjdLgy9xvAWLXmZ7yrH6A6VL3e3+sM5D5Z3ko4lQsgGAOTV0W7o
- ImysjbsmNx/hsTQxnjj41C6+xjV+TjRpZsMKqThdptivFnFWPaE4zwi3SWc2ObzgPXFPtrJ
- M8uDQDVP78pNDAo/KOtkaL3H5tDwFvZpe3eY6/lFqnhQWiQ4DdTV4+TPmHee9enhbmnzDEI
- EX5qRTaBabqb1VkNhxE9w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:vDhH1Ymz0rM=:sBrhzgRi6L1+lpNyxayWvZ
- iccV9qK+IlYmJ25zAJLVWiZnsyb9QHLYpzZO2HtRJUxM6g4W7JpRgtMmv5lk3TpGnZ1gTokWw
- tmB0txz2PVeIc4WAPoTTyD2B9OkDWFmhRRmWebuhwIHxkYlArrJX2nx3Bd3yQHBjWXVyJiT9a
- PDSUhdw4CZsKFqzRfo6aswe1USW54jU2jiUB4DhfctZF+tHTeU7mpMKGVSH8ydv3PRMBsuA4u
- /oC6njBA+4KUKRqDs5wg8O0zfVAL+0NgbzE4UGenR6WNkiISpql8RZy3a4duhxj1yH+9QMeU6
- gntMKqsFDXwQmJwxFl3RM4ljI/dknKZ9QxTBlR3lWeM0nIBwO0Z+W3yf/4hKcgDkIv/Yolqc8
- X/QD5pE9UejiRIyIrbxymtmzWZmgIYj0SKCtAZeakooDS8WenrIySKpFX5lCpNYwx/LfN1Lnw
- 16bt/6DMYQX5rRcHRRmgntlPyBSU3RRVdQ4lh9yPKaX6q3C37/xFNDfDLcBVhLuyrkZrb0pjl
- n2ZheXehHexYRhNjYvIBfUiIb+FE0mtisy0gW0SncxswPGTumsV5JgnTueJL3XGZ/C1nR8Ci3
- s3PYD1krpZ0EwxtgC1hCCVbdb0pPJXLLYjMEYGoszFKqWJQQko5+nZbFrcJUeyzIp5L8Z9Xt3
- QKWNnIZaki0kCDh/DidJwoUDJeR+cn/rMCExv18AURJs/gYw97hLf+Gi1XrrM7Da0f/SG1PBk
- fkU89g7DRWZbqfFitx8o4fF5O9e5pKCHgodlhu6By1FuH+uK6pW12VSj++Q0cPZkCNv15JOGk
- 4CioSVOhgLUlxmo/A8j7/XefrWS9egJANRB+xzd2fkEvMfH0TESNDgKM7jrFiQ+ynBbyK9A
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+References: <20200114140620.10385-1-coiby.xu@gmail.com>
+ <20200114140620.10385-2-coiby.xu@gmail.com>
+ <20200116135609.GD9470@linux.fritz.box>
+In-Reply-To: <20200116135609.GD9470@linux.fritz.box>
+From: Coiby Xu <coiby.xu@gmail.com>
+Date: Thu, 20 Feb 2020 17:30:04 +0800
+Message-ID: <CAJAkqrXffq+rvZvioQG7y_o9jgryP0VoQT2LQL62j8xcnqu9Tw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] vhost-user block device backend
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000001863c059efe8fc3"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::12c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,1511 +88,2762 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Josh Kunz <jkz@google.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Josh Kunz <jkz@google.com>
+--00000000000001863c059efe8fc3
+Content-Type: text/plain; charset="UTF-8"
 
-This change switches linux-user strace logging to use the newer `qemu_log`
-logging subsystem rather than the older `gemu_log` (notice the "g")
-logger. `qemu_log` has several advantages, namely that it allows logging
-to a file, and provides a more unified interface for configuration
-of logging (via the QEMU_LOG environment variable or options).
+> > +    vmsg->fd_num = 0;
+> > +    for (cmsg = CMSG_FIRSTHDR(&msg);
+> > +         cmsg != NULL;
+> > +         cmsg = CMSG_NXTHDR(&msg, cmsg))
+> > +    {
+> > +        if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type ==
+SCM_RIGHTS) {
+> > +            fd_size = cmsg->cmsg_len - CMSG_LEN(0);
+> > +            vmsg->fd_num = fd_size / sizeof(int);
+> > +            memcpy(vmsg->fds, CMSG_DATA(cmsg), fd_size);
+> > +            break;
+> > +        }
+> > +    }
 
-This change introduces a new log mask: `LOG_STRACE` which is used for
-logging of user-mode strace messages.
+> I think the fd passing part becomes easier when you use the proper
+> qio_channel_readv_full() function. Its implementation is also a bit more
+> careful than yours. For example, you forgot checking fd_size against
+> VHOST_MEMORY_MAX_NREGIONS, allowing a buffer overflow in the memcpy(),
+> and you don't adjust fd flags for the new file descriptors.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Josh Kunz <jkz@google.com>
-Message-Id: <20200204025416.111409-3-jkz@google.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/qemu/log.h   |   2 +
- linux-user/main.c    |  30 ++-
- linux-user/qemu.h    |   1 -
- linux-user/signal.c  |   2 +-
- linux-user/strace.c  | 479 ++++++++++++++++++++++---------------------
- linux-user/syscall.c |  13 +-
- util/log.c           |   2 +
- 7 files changed, 278 insertions(+), 251 deletions(-)
+Oh, I used qio_channel_readv_full in v3&v4. But I still forgot checking
+fd_size against  VHOST_MEMORY_MAX_NREGIONS. I'll fix this buffer overflow
+issue in v5.
 
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index e0f4e4062838..f4724f733011 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -62,6 +62,8 @@ static inline bool qemu_log_separate(void)
- #define CPU_LOG_TB_OP_IND  (1 << 16)
- #define CPU_LOG_TB_FPU     (1 << 17)
- #define CPU_LOG_PLUGIN     (1 << 18)
-+/* LOG_STRACE is used for user-mode strace logging. */
-+#define LOG_STRACE         (1 << 19)
- 
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/linux-user/main.c b/linux-user/main.c
-index fba833aac918..8f1d07cdd6a7 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -60,6 +60,19 @@ unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
- 
-+/*
-+ * Used to implement backwards-compatibility for the `-strace`, and
-+ * QEMU_STRACE options. Without this, the QEMU_LOG can be overwritten by
-+ * -strace, or vice versa.
-+ */
-+static bool enable_strace;
-+
-+/*
-+ * The last log mask given by the user in an environment variable or argument.
-+ * Used to support command line arguments overriding environment variables.
-+ */
-+static int last_log_mask;
-+
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-  * guest address space into a contiguous chunk of virtual host memory.
-@@ -223,15 +236,11 @@ static void handle_arg_help(const char *arg)
- 
- static void handle_arg_log(const char *arg)
- {
--    int mask;
--
--    mask = qemu_str_to_log_mask(arg);
--    if (!mask) {
-+    last_log_mask = qemu_str_to_log_mask(arg);
-+    if (!last_log_mask) {
-         qemu_print_log_usage(stdout);
-         exit(EXIT_FAILURE);
-     }
--    qemu_log_needs_buffers();
--    qemu_set_log(mask);
- }
- 
- static void handle_arg_dfilter(const char *arg)
-@@ -375,7 +384,7 @@ static void handle_arg_singlestep(const char *arg)
- 
- static void handle_arg_strace(const char *arg)
- {
--    do_strace = 1;
-+    enable_strace = true;
- }
- 
- static void handle_arg_version(const char *arg)
-@@ -629,6 +638,7 @@ int main(int argc, char **argv, char **envp)
-     int i;
-     int ret;
-     int execfd;
-+    int log_mask;
-     unsigned long max_reserved_va;
- 
-     error_init(argv[0]);
-@@ -661,6 +671,12 @@ int main(int argc, char **argv, char **envp)
- 
-     optind = parse_args(argc, argv);
- 
-+    log_mask = last_log_mask | (enable_strace ? LOG_STRACE : 0);
-+    if (log_mask) {
-+        qemu_log_needs_buffers();
-+        qemu_set_log(log_mask);
-+    }
-+
-     if (!trace_init_backends()) {
-         exit(1);
-     }
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 560a68090e14..2421dc7afd7a 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -386,7 +386,6 @@ void print_syscall_ret(int num, abi_long arg1);
-  * --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL, si_addr=0} ---
-  */
- void print_taken_signal(int target_signum, const target_siginfo_t *tinfo);
--extern int do_strace;
- 
- /* signal.c */
- void process_pending_signals(CPUArchState *cpu_env);
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 94259dd07064..8cf51ffecde6 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -934,7 +934,7 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-         handler = sa->_sa_handler;
-     }
- 
--    if (do_strace) {
-+    if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
-         print_taken_signal(sig, &k->info);
-     }
- 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 3d4d6844500e..4f7130b2ff63 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -12,8 +12,6 @@
- #include <sched.h>
- #include "qemu.h"
- 
--int do_strace=0;
--
- struct syscallname {
-     int nr;
-     const char *name;
-@@ -80,7 +78,7 @@ print_ipc_cmd(int cmd)
- {
- #define output_cmd(val) \
- if( cmd == val ) { \
--    gemu_log(#val); \
-+    qemu_log(#val); \
-     return; \
- }
- 
-@@ -120,7 +118,7 @@ if( cmd == val ) { \
-     output_cmd( IPC_RMID );
- 
-     /* Some value we don't recognize */
--    gemu_log("%d",cmd);
-+    qemu_log("%d", cmd);
- }
- 
- static void
-@@ -151,7 +149,7 @@ print_signal(abi_ulong arg, int last)
-         print_raw_param("%ld", arg, last);
-         return;
-     }
--    gemu_log("%s%s", signal_name, get_comma(last));
-+    qemu_log("%s%s", signal_name, get_comma(last));
- }
- 
- static void print_si_code(int arg)
-@@ -184,10 +182,10 @@ static void print_si_code(int arg)
-         codename = "SI_TKILL";
-         break;
-     default:
--        gemu_log("%d", arg);
-+        qemu_log("%d", arg);
-         return;
-     }
--    gemu_log("%s", codename);
-+    qemu_log("%s", codename);
- }
- 
- static void get_target_siginfo(target_siginfo_t *tinfo,
-@@ -288,33 +286,33 @@ static void print_siginfo(const target_siginfo_t *tinfo)
-     int si_type = extract32(tinfo->si_code, 16, 16);
-     int si_code = sextract32(tinfo->si_code, 0, 16);
- 
--    gemu_log("{si_signo=");
-+    qemu_log("{si_signo=");
-     print_signal(tinfo->si_signo, 1);
--    gemu_log(", si_code=");
-+    qemu_log(", si_code=");
-     print_si_code(si_code);
- 
-     switch (si_type) {
-     case QEMU_SI_KILL:
--        gemu_log(", si_pid=%u, si_uid=%u",
-+        qemu_log(", si_pid=%u, si_uid=%u",
-                  (unsigned int)tinfo->_sifields._kill._pid,
-                  (unsigned int)tinfo->_sifields._kill._uid);
-         break;
-     case QEMU_SI_TIMER:
--        gemu_log(", si_timer1=%u, si_timer2=%u",
-+        qemu_log(", si_timer1=%u, si_timer2=%u",
-                  tinfo->_sifields._timer._timer1,
-                  tinfo->_sifields._timer._timer2);
-         break;
-     case QEMU_SI_POLL:
--        gemu_log(", si_band=%d, si_fd=%d",
-+        qemu_log(", si_band=%d, si_fd=%d",
-                  tinfo->_sifields._sigpoll._band,
-                  tinfo->_sifields._sigpoll._fd);
-         break;
-     case QEMU_SI_FAULT:
--        gemu_log(", si_addr=");
-+        qemu_log(", si_addr=");
-         print_pointer(tinfo->_sifields._sigfault._addr, 1);
-         break;
-     case QEMU_SI_CHLD:
--        gemu_log(", si_pid=%u, si_uid=%u, si_status=%d"
-+        qemu_log(", si_pid=%u, si_uid=%u, si_status=%d"
-                  ", si_utime=" TARGET_ABI_FMT_ld
-                  ", si_stime=" TARGET_ABI_FMT_ld,
-                  (unsigned int)(tinfo->_sifields._sigchld._pid),
-@@ -324,7 +322,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
-                  tinfo->_sifields._sigchld._stime);
-         break;
-     case QEMU_SI_RT:
--        gemu_log(", si_pid=%u, si_uid=%u, si_sigval=" TARGET_ABI_FMT_ld,
-+        qemu_log(", si_pid=%u, si_uid=%u, si_sigval=" TARGET_ABI_FMT_ld,
-                  (unsigned int)tinfo->_sifields._rt._pid,
-                  (unsigned int)tinfo->_sifields._rt._uid,
-                  tinfo->_sifields._rt._sigval.sival_ptr);
-@@ -332,7 +330,7 @@ static void print_siginfo(const target_siginfo_t *tinfo)
-     default:
-         g_assert_not_reached();
-     }
--    gemu_log("}");
-+    qemu_log("}");
- }
- 
- static void
-@@ -349,76 +347,76 @@ print_sockaddr(abi_ulong addr, abi_long addrlen, int last)
-         case AF_UNIX: {
-             struct target_sockaddr_un *un = (struct target_sockaddr_un *)sa;
-             int i;
--            gemu_log("{sun_family=AF_UNIX,sun_path=\"");
-+            qemu_log("{sun_family=AF_UNIX,sun_path=\"");
-             for (i = 0; i < addrlen -
-                             offsetof(struct target_sockaddr_un, sun_path) &&
-                  un->sun_path[i]; i++) {
--                gemu_log("%c", un->sun_path[i]);
-+                qemu_log("%c", un->sun_path[i]);
-             }
--            gemu_log("\"}");
-+            qemu_log("\"}");
-             break;
-         }
-         case AF_INET: {
-             struct target_sockaddr_in *in = (struct target_sockaddr_in *)sa;
-             uint8_t *c = (uint8_t *)&in->sin_addr.s_addr;
--            gemu_log("{sin_family=AF_INET,sin_port=htons(%d),",
-+            qemu_log("{sin_family=AF_INET,sin_port=htons(%d),",
-                      ntohs(in->sin_port));
--            gemu_log("sin_addr=inet_addr(\"%d.%d.%d.%d\")",
-+            qemu_log("sin_addr=inet_addr(\"%d.%d.%d.%d\")",
-                      c[0], c[1], c[2], c[3]);
--            gemu_log("}");
-+            qemu_log("}");
-             break;
-         }
-         case AF_PACKET: {
-             struct target_sockaddr_ll *ll = (struct target_sockaddr_ll *)sa;
-             uint8_t *c = (uint8_t *)&ll->sll_addr;
--            gemu_log("{sll_family=AF_PACKET,"
-+            qemu_log("{sll_family=AF_PACKET,"
-                      "sll_protocol=htons(0x%04x),if%d,pkttype=",
-                      ntohs(ll->sll_protocol), ll->sll_ifindex);
-             switch (ll->sll_pkttype) {
-             case PACKET_HOST:
--                gemu_log("PACKET_HOST");
-+                qemu_log("PACKET_HOST");
-                 break;
-             case PACKET_BROADCAST:
--                gemu_log("PACKET_BROADCAST");
-+                qemu_log("PACKET_BROADCAST");
-                 break;
-             case PACKET_MULTICAST:
--                gemu_log("PACKET_MULTICAST");
-+                qemu_log("PACKET_MULTICAST");
-                 break;
-             case PACKET_OTHERHOST:
--                gemu_log("PACKET_OTHERHOST");
-+                qemu_log("PACKET_OTHERHOST");
-                 break;
-             case PACKET_OUTGOING:
--                gemu_log("PACKET_OUTGOING");
-+                qemu_log("PACKET_OUTGOING");
-                 break;
-             default:
--                gemu_log("%d", ll->sll_pkttype);
-+                qemu_log("%d", ll->sll_pkttype);
-                 break;
-             }
--            gemu_log(",sll_addr=%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-+            qemu_log(",sll_addr=%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-                      c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7]);
--            gemu_log("}");
-+            qemu_log("}");
-             break;
-         }
-         case AF_NETLINK: {
-             struct target_sockaddr_nl *nl = (struct target_sockaddr_nl *)sa;
--            gemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
-+            qemu_log("{nl_family=AF_NETLINK,nl_pid=%u,nl_groups=%u}",
-                      tswap32(nl->nl_pid), tswap32(nl->nl_groups));
-             break;
-         }
-         default:
--            gemu_log("{sa_family=%d, sa_data={", sa->sa_family);
-+            qemu_log("{sa_family=%d, sa_data={", sa->sa_family);
-             for (i = 0; i < 13; i++) {
--                gemu_log("%02x, ", sa->sa_data[i]);
-+                qemu_log("%02x, ", sa->sa_data[i]);
-             }
--            gemu_log("%02x}", sa->sa_data[i]);
--            gemu_log("}");
-+            qemu_log("%02x}", sa->sa_data[i]);
-+            qemu_log("}");
-             break;
-         }
-         unlock_user(sa, addr, 0);
-     } else {
-         print_raw_param("0x"TARGET_ABI_FMT_lx, addr, 0);
-     }
--    gemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
-+    qemu_log(", "TARGET_ABI_FMT_ld"%s", addrlen, get_comma(last));
- }
- 
- static void
-@@ -426,19 +424,19 @@ print_socket_domain(int domain)
- {
-     switch (domain) {
-     case PF_UNIX:
--        gemu_log("PF_UNIX");
-+        qemu_log("PF_UNIX");
-         break;
-     case PF_INET:
--        gemu_log("PF_INET");
-+        qemu_log("PF_INET");
-         break;
-     case PF_NETLINK:
--        gemu_log("PF_NETLINK");
-+        qemu_log("PF_NETLINK");
-         break;
-     case PF_PACKET:
--        gemu_log("PF_PACKET");
-+        qemu_log("PF_PACKET");
-         break;
-     default:
--        gemu_log("%d", domain);
-+        qemu_log("%d", domain);
-         break;
-     }
- }
-@@ -448,22 +446,22 @@ print_socket_type(int type)
- {
-     switch (type) {
-     case TARGET_SOCK_DGRAM:
--        gemu_log("SOCK_DGRAM");
-+        qemu_log("SOCK_DGRAM");
-         break;
-     case TARGET_SOCK_STREAM:
--        gemu_log("SOCK_STREAM");
-+        qemu_log("SOCK_STREAM");
-         break;
-     case TARGET_SOCK_RAW:
--        gemu_log("SOCK_RAW");
-+        qemu_log("SOCK_RAW");
-         break;
-     case TARGET_SOCK_RDM:
--        gemu_log("SOCK_RDM");
-+        qemu_log("SOCK_RDM");
-         break;
-     case TARGET_SOCK_SEQPACKET:
--        gemu_log("SOCK_SEQPACKET");
-+        qemu_log("SOCK_SEQPACKET");
-         break;
-     case TARGET_SOCK_PACKET:
--        gemu_log("SOCK_PACKET");
-+        qemu_log("SOCK_PACKET");
-         break;
-     }
- }
-@@ -475,10 +473,10 @@ print_socket_protocol(int domain, int type, int protocol)
-         (domain == AF_INET && type == TARGET_SOCK_PACKET)) {
-         switch (protocol) {
-         case 0x0003:
--            gemu_log("ETH_P_ALL");
-+            qemu_log("ETH_P_ALL");
-             break;
-         default:
--            gemu_log("%d", protocol);
-+            qemu_log("%d", protocol);
-         }
-         return;
-     }
-@@ -486,25 +484,25 @@ print_socket_protocol(int domain, int type, int protocol)
-     if (domain == PF_NETLINK) {
-         switch (protocol) {
-         case NETLINK_ROUTE:
--            gemu_log("NETLINK_ROUTE");
-+            qemu_log("NETLINK_ROUTE");
-             break;
-         case NETLINK_AUDIT:
--            gemu_log("NETLINK_AUDIT");
-+            qemu_log("NETLINK_AUDIT");
-             break;
-         case NETLINK_NETFILTER:
--            gemu_log("NETLINK_NETFILTER");
-+            qemu_log("NETLINK_NETFILTER");
-             break;
-         case NETLINK_KOBJECT_UEVENT:
--            gemu_log("NETLINK_KOBJECT_UEVENT");
-+            qemu_log("NETLINK_KOBJECT_UEVENT");
-             break;
-         case NETLINK_RDMA:
--            gemu_log("NETLINK_RDMA");
-+            qemu_log("NETLINK_RDMA");
-             break;
-         case NETLINK_CRYPTO:
--            gemu_log("NETLINK_CRYPTO");
-+            qemu_log("NETLINK_CRYPTO");
-             break;
-         default:
--            gemu_log("%d", protocol);
-+            qemu_log("%d", protocol);
-             break;
-         }
-         return;
-@@ -512,19 +510,19 @@ print_socket_protocol(int domain, int type, int protocol)
- 
-     switch (protocol) {
-     case IPPROTO_IP:
--        gemu_log("IPPROTO_IP");
-+        qemu_log("IPPROTO_IP");
-         break;
-     case IPPROTO_TCP:
--        gemu_log("IPPROTO_TCP");
-+        qemu_log("IPPROTO_TCP");
-         break;
-     case IPPROTO_UDP:
--        gemu_log("IPPROTO_UDP");
-+        qemu_log("IPPROTO_UDP");
-         break;
-     case IPPROTO_RAW:
--        gemu_log("IPPROTO_RAW");
-+        qemu_log("IPPROTO_RAW");
-         break;
-     default:
--        gemu_log("%d", protocol);
-+        qemu_log("%d", protocol);
-         break;
-     }
- }
-@@ -536,7 +534,7 @@ print_fdset(int n, abi_ulong target_fds_addr)
- {
-     int i;
- 
--    gemu_log("[");
-+    qemu_log("[");
-     if( target_fds_addr ) {
-         abi_long *target_fds;
- 
-@@ -550,11 +548,11 @@ print_fdset(int n, abi_ulong target_fds_addr)
- 
-         for (i=n; i>=0; i--) {
-             if ((tswapal(target_fds[i / TARGET_ABI_BITS]) >> (i & (TARGET_ABI_BITS - 1))) & 1)
--                gemu_log("%d,", i );
-+                qemu_log("%d,", i);
-             }
-         unlock_user(target_fds, target_fds_addr, 0);
-     }
--    gemu_log("]");
-+    qemu_log("]");
- }
- #endif
- 
-@@ -578,46 +576,46 @@ print_clockid(int clockid, int last)
- {
-     switch (clockid) {
-     case TARGET_CLOCK_REALTIME:
--        gemu_log("CLOCK_REALTIME");
-+        qemu_log("CLOCK_REALTIME");
-         break;
-     case TARGET_CLOCK_MONOTONIC:
--        gemu_log("CLOCK_MONOTONIC");
-+        qemu_log("CLOCK_MONOTONIC");
-         break;
-     case TARGET_CLOCK_PROCESS_CPUTIME_ID:
--        gemu_log("CLOCK_PROCESS_CPUTIME_ID");
-+        qemu_log("CLOCK_PROCESS_CPUTIME_ID");
-         break;
-     case TARGET_CLOCK_THREAD_CPUTIME_ID:
--        gemu_log("CLOCK_THREAD_CPUTIME_ID");
-+        qemu_log("CLOCK_THREAD_CPUTIME_ID");
-         break;
-     case TARGET_CLOCK_MONOTONIC_RAW:
--        gemu_log("CLOCK_MONOTONIC_RAW");
-+        qemu_log("CLOCK_MONOTONIC_RAW");
-         break;
-     case TARGET_CLOCK_REALTIME_COARSE:
--        gemu_log("CLOCK_REALTIME_COARSE");
-+        qemu_log("CLOCK_REALTIME_COARSE");
-         break;
-     case TARGET_CLOCK_MONOTONIC_COARSE:
--        gemu_log("CLOCK_MONOTONIC_COARSE");
-+        qemu_log("CLOCK_MONOTONIC_COARSE");
-         break;
-     case TARGET_CLOCK_BOOTTIME:
--        gemu_log("CLOCK_BOOTTIME");
-+        qemu_log("CLOCK_BOOTTIME");
-         break;
-     case TARGET_CLOCK_REALTIME_ALARM:
--        gemu_log("CLOCK_REALTIME_ALARM");
-+        qemu_log("CLOCK_REALTIME_ALARM");
-         break;
-     case TARGET_CLOCK_BOOTTIME_ALARM:
--        gemu_log("CLOCK_BOOTTIME_ALARM");
-+        qemu_log("CLOCK_BOOTTIME_ALARM");
-         break;
-     case TARGET_CLOCK_SGI_CYCLE:
--        gemu_log("CLOCK_SGI_CYCLE");
-+        qemu_log("CLOCK_SGI_CYCLE");
-         break;
-     case TARGET_CLOCK_TAI:
--        gemu_log("CLOCK_TAI");
-+        qemu_log("CLOCK_TAI");
-         break;
-     default:
--        gemu_log("%d", clockid);
-+        qemu_log("%d", clockid);
-         break;
-     }
--    gemu_log("%s", get_comma(last));
-+    qemu_log("%s", get_comma(last));
- }
- #endif
- 
-@@ -638,15 +636,15 @@ print_newselect(const struct syscallname *name,
-                 abi_long arg1, abi_long arg2, abi_long arg3,
-                 abi_long arg4, abi_long arg5, abi_long arg6)
- {
--    gemu_log("%s(" TARGET_ABI_FMT_ld ",", name->name, arg1);
-+    qemu_log("%s(" TARGET_ABI_FMT_ld ",", name->name, arg1);
-     print_fdset(arg1, arg2);
--    gemu_log(",");
-+    qemu_log(",");
-     print_fdset(arg1, arg3);
--    gemu_log(",");
-+    qemu_log(",");
-     print_fdset(arg1, arg4);
--    gemu_log(",");
-+    qemu_log(",");
-     print_timeval(arg5, 1);
--    gemu_log(")");
-+    qemu_log(")");
- 
-     /* save for use in the return output function below */
-     newselect_arg1=arg1;
-@@ -663,9 +661,10 @@ print_semctl(const struct syscallname *name,
-              abi_long arg1, abi_long arg2, abi_long arg3,
-              abi_long arg4, abi_long arg5, abi_long arg6)
- {
--    gemu_log("%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ",", name->name, arg1, arg2);
-+    qemu_log("%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ",",
-+             name->name, arg1, arg2);
-     print_ipc_cmd(arg3);
--    gemu_log(",0x" TARGET_ABI_FMT_lx ")", arg4);
-+    qemu_log(",0x" TARGET_ABI_FMT_lx ")", arg4);
- }
- #endif
- 
-@@ -679,7 +678,7 @@ print_execve(const struct syscallname *name,
- 
-     if (!(s = lock_user_string(arg1)))
-         return;
--    gemu_log("%s(\"%s\",{", name->name, s);
-+    qemu_log("%s(\"%s\",{", name->name, s);
-     unlock_user(s, arg1, 0);
- 
-     for (arg_ptr_addr = arg2; ; arg_ptr_addr += sizeof(abi_ulong)) {
-@@ -693,12 +692,12 @@ print_execve(const struct syscallname *name,
-         if (!arg_addr)
-             break;
-         if ((s = lock_user_string(arg_addr))) {
--            gemu_log("\"%s\",", s);
-+            qemu_log("\"%s\",", s);
-             unlock_user(s, arg_addr, 0);
-         }
-     }
- 
--    gemu_log("NULL})");
-+    qemu_log("NULL})");
- }
- 
- #ifdef TARGET_NR_ipc
-@@ -709,12 +708,18 @@ print_ipc(const struct syscallname *name,
- {
-     switch(arg1) {
-     case IPCOP_semctl:
--        gemu_log("semctl(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ",", arg1, arg2);
-+        qemu_log("semctl(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ",",
-+                 arg1, arg2);
-         print_ipc_cmd(arg3);
--        gemu_log(",0x" TARGET_ABI_FMT_lx ")", arg4);
-+        qemu_log(",0x" TARGET_ABI_FMT_lx ")", arg4);
-         break;
-     default:
--        gemu_log("%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ")",
-+        qemu_log(("%s("
-+                  TARGET_ABI_FMT_ld ","
-+                  TARGET_ABI_FMT_ld ","
-+                  TARGET_ABI_FMT_ld ","
-+                  TARGET_ABI_FMT_ld
-+                  ")"),
-                  name->name, arg1, arg2, arg3, arg4);
-     }
- }
-@@ -733,9 +738,9 @@ print_syscall_ret_addr(const struct syscallname *name, abi_long ret)
-         errstr = target_strerror(-ret);
-     }
-     if (errstr) {
--        gemu_log(" = -1 errno=%d (%s)\n", (int)-ret, errstr);
-+        qemu_log(" = -1 errno=%d (%s)\n", (int)-ret, errstr);
-     } else {
--        gemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
-+        qemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
-     }
- }
- 
-@@ -743,7 +748,7 @@ print_syscall_ret_addr(const struct syscallname *name, abi_long ret)
- static void
- print_syscall_ret_raw(struct syscallname *name, abi_long ret)
- {
--        gemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
-+        qemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
- }
- #endif
- 
-@@ -751,15 +756,15 @@ print_syscall_ret_raw(struct syscallname *name, abi_long ret)
- static void
- print_syscall_ret_newselect(const struct syscallname *name, abi_long ret)
- {
--    gemu_log(" = 0x" TARGET_ABI_FMT_lx " (", ret);
-+    qemu_log(" = 0x" TARGET_ABI_FMT_lx " (", ret);
-     print_fdset(newselect_arg1,newselect_arg2);
--    gemu_log(",");
-+    qemu_log(",");
-     print_fdset(newselect_arg1,newselect_arg3);
--    gemu_log(",");
-+    qemu_log(",");
-     print_fdset(newselect_arg1,newselect_arg4);
--    gemu_log(",");
-+    qemu_log(",");
-     print_timeval(newselect_arg5, 1);
--    gemu_log(")\n");
-+    qemu_log(")\n");
- }
- #endif
- 
-@@ -775,38 +780,38 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
- {
-     const char *errstr = NULL;
- 
--    gemu_log(" = ");
-+    qemu_log(" = ");
-     if (ret < 0) {
--        gemu_log("-1 errno=%d", errno);
-+        qemu_log("-1 errno=%d", errno);
-         errstr = target_strerror(-ret);
-         if (errstr) {
--            gemu_log(" (%s)", errstr);
-+            qemu_log(" (%s)", errstr);
-         }
-     } else {
--        gemu_log(TARGET_ABI_FMT_ld, ret);
-+        qemu_log(TARGET_ABI_FMT_ld, ret);
-         switch (ret) {
-         case TARGET_TIME_OK:
--            gemu_log(" TIME_OK (clock synchronized, no leap second)");
-+            qemu_log(" TIME_OK (clock synchronized, no leap second)");
-             break;
-         case TARGET_TIME_INS:
--            gemu_log(" TIME_INS (insert leap second)");
-+            qemu_log(" TIME_INS (insert leap second)");
-             break;
-         case TARGET_TIME_DEL:
--            gemu_log(" TIME_DEL (delete leap second)");
-+            qemu_log(" TIME_DEL (delete leap second)");
-             break;
-         case TARGET_TIME_OOP:
--            gemu_log(" TIME_OOP (leap second in progress)");
-+            qemu_log(" TIME_OOP (leap second in progress)");
-             break;
-         case TARGET_TIME_WAIT:
--            gemu_log(" TIME_WAIT (leap second has occurred)");
-+            qemu_log(" TIME_WAIT (leap second has occurred)");
-             break;
-         case TARGET_TIME_ERROR:
--            gemu_log(" TIME_ERROR (clock not synchronized)");
-+            qemu_log(" TIME_ERROR (clock not synchronized)");
-             break;
-         }
-     }
- 
--    gemu_log("\n");
-+    qemu_log("\n");
- }
- 
- UNUSED static struct flags access_flags[] = {
-@@ -1104,12 +1109,12 @@ print_flags(const struct flags *f, abi_long flags, int last)
-     int n;
- 
-     if ((flags == 0) && (f->f_value == 0)) {
--        gemu_log("%s%s", f->f_string, get_comma(last));
-+        qemu_log("%s%s", f->f_string, get_comma(last));
-         return;
-     }
-     for (n = 0; f->f_string != NULL; f++) {
-         if ((f->f_value != 0) && ((flags & f->f_value) == f->f_value)) {
--            gemu_log("%s%s", sep, f->f_string);
-+            qemu_log("%s%s", sep, f->f_string);
-             flags &= ~f->f_value;
-             sep = "|";
-             n++;
-@@ -1119,13 +1124,13 @@ print_flags(const struct flags *f, abi_long flags, int last)
-     if (n > 0) {
-         /* print rest of the flags as numeric */
-         if (flags != 0) {
--            gemu_log("%s%#x%s", sep, (unsigned int)flags, get_comma(last));
-+            qemu_log("%s%#x%s", sep, (unsigned int)flags, get_comma(last));
-         } else {
--            gemu_log("%s", get_comma(last));
-+            qemu_log("%s", get_comma(last));
-         }
-     } else {
-         /* no string version of flags found, print them in hex then */
--        gemu_log("%#x%s", (unsigned int)flags, get_comma(last));
-+        qemu_log("%#x%s", (unsigned int)flags, get_comma(last));
-     }
- }
- 
-@@ -1134,11 +1139,11 @@ print_at_dirfd(abi_long dirfd, int last)
- {
- #ifdef AT_FDCWD
-     if (dirfd == AT_FDCWD) {
--        gemu_log("AT_FDCWD%s", get_comma(last));
-+        qemu_log("AT_FDCWD%s", get_comma(last));
-         return;
-     }
- #endif
--    gemu_log("%d%s", (int)dirfd, get_comma(last));
-+    qemu_log("%d%s", (int)dirfd, get_comma(last));
- }
- 
- static void
-@@ -1149,7 +1154,7 @@ print_file_mode(abi_long mode, int last)
- 
-     for (m = &mode_flags[0]; m->f_string != NULL; m++) {
-         if ((m->f_value & mode) == m->f_value) {
--            gemu_log("%s%s", m->f_string, sep);
-+            qemu_log("%s%s", m->f_string, sep);
-             sep = "|";
-             mode &= ~m->f_value;
-             break;
-@@ -1159,9 +1164,9 @@ print_file_mode(abi_long mode, int last)
-     mode &= ~S_IFMT;
-     /* print rest of the mode as octal */
-     if (mode != 0)
--        gemu_log("%s%#o", sep, (unsigned int)mode);
-+        qemu_log("%s%#o", sep, (unsigned int)mode);
- 
--    gemu_log("%s", get_comma(last));
-+    qemu_log("%s", get_comma(last));
- }
- 
- static void
-@@ -1170,17 +1175,17 @@ print_open_flags(abi_long flags, int last)
-     print_flags(open_access_flags, flags & TARGET_O_ACCMODE, 1);
-     flags &= ~TARGET_O_ACCMODE;
-     if (flags == 0) {
--        gemu_log("%s", get_comma(last));
-+        qemu_log("%s", get_comma(last));
-         return;
-     }
--    gemu_log("|");
-+    qemu_log("|");
-     print_flags(open_flags, flags, last);
- }
- 
- static void
- print_syscall_prologue(const struct syscallname *sc)
- {
--    gemu_log("%s(", sc->name);
-+    qemu_log("%s(", sc->name);
- }
- 
- /*ARGSUSED*/
-@@ -1188,7 +1193,7 @@ static void
- print_syscall_epilogue(const struct syscallname *sc)
- {
-     (void)sc;
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void
-@@ -1197,7 +1202,7 @@ print_string(abi_long addr, int last)
-     char *s;
- 
-     if ((s = lock_user_string(addr)) != NULL) {
--        gemu_log("\"%s\"%s", s, get_comma(last));
-+        qemu_log("\"%s\"%s", s, get_comma(last));
-         unlock_user(s, addr, 0);
-     } else {
-         /* can't get string out of it, so print it as pointer */
-@@ -1214,20 +1219,20 @@ print_buf(abi_long addr, abi_long len, int last)
- 
-     s = lock_user(VERIFY_READ, addr, len, 1);
-     if (s) {
--        gemu_log("\"");
-+        qemu_log("\"");
-         for (i = 0; i < MAX_PRINT_BUF && i < len; i++) {
-             if (isprint(s[i])) {
--                gemu_log("%c", s[i]);
-+                qemu_log("%c", s[i]);
-             } else {
--                gemu_log("\\%o", s[i]);
-+                qemu_log("\\%o", s[i]);
-             }
-         }
--        gemu_log("\"");
-+        qemu_log("\"");
-         if (i != len) {
--            gemu_log("...");
-+            qemu_log("...");
-         }
-         if (!last) {
--            gemu_log(",");
-+            qemu_log(",");
-         }
-         unlock_user(s, addr, 0);
-     } else {
-@@ -1245,16 +1250,16 @@ print_raw_param(const char *fmt, abi_long param, int last)
-     char format[64];
- 
-     (void) snprintf(format, sizeof (format), "%s%s", fmt, get_comma(last));
--    gemu_log(format, param);
-+    qemu_log(format, param);
- }
- 
- static void
- print_pointer(abi_long p, int last)
- {
-     if (p == 0)
--        gemu_log("NULL%s", get_comma(last));
-+        qemu_log("NULL%s", get_comma(last));
-     else
--        gemu_log("0x" TARGET_ABI_FMT_lx "%s", p, get_comma(last));
-+        qemu_log("0x" TARGET_ABI_FMT_lx "%s", p, get_comma(last));
- }
- 
- /*
-@@ -1265,12 +1270,12 @@ static void
- print_number(abi_long addr, int last)
- {
-     if (addr == 0) {
--        gemu_log("NULL%s", get_comma(last));
-+        qemu_log("NULL%s", get_comma(last));
-     } else {
-         int num;
- 
-         get_user_s32(num, addr);
--        gemu_log("[%d]%s", num, get_comma(last));
-+        qemu_log("[%d]%s", num, get_comma(last));
-     }
- }
- 
-@@ -1285,11 +1290,11 @@ print_timeval(abi_ulong tv_addr, int last)
-             print_pointer(tv_addr, last);
-             return;
-         }
--        gemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
-+        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
-             tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
-         unlock_user(tv, tv_addr, 0);
-     } else
--        gemu_log("NULL%s", get_comma(last));
-+        qemu_log("NULL%s", get_comma(last));
- }
- 
- static void
-@@ -1303,11 +1308,11 @@ print_timezone(abi_ulong tz_addr, int last)
-             print_pointer(tz_addr, last);
-             return;
-         }
--        gemu_log("{%d,%d}%s", tswap32(tz->tz_minuteswest),
-+        qemu_log("{%d,%d}%s", tswap32(tz->tz_minuteswest),
-                  tswap32(tz->tz_dsttime), get_comma(last));
-         unlock_user(tz, tz_addr, 0);
-     } else {
--        gemu_log("NULL%s", get_comma(last));
-+        qemu_log("NULL%s", get_comma(last));
-     }
- }
- 
-@@ -1515,83 +1520,83 @@ print_fcntl(const struct syscallname *name,
-     print_raw_param("%d", arg0, 0);
-     switch(arg1) {
-     case TARGET_F_DUPFD:
--        gemu_log("F_DUPFD,");
-+        qemu_log("F_DUPFD,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
-         break;
-     case TARGET_F_GETFD:
--        gemu_log("F_GETFD");
-+        qemu_log("F_GETFD");
-         break;
-     case TARGET_F_SETFD:
--        gemu_log("F_SETFD,");
-+        qemu_log("F_SETFD,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
-         break;
-     case TARGET_F_GETFL:
--        gemu_log("F_GETFL");
-+        qemu_log("F_GETFL");
-         break;
-     case TARGET_F_SETFL:
--        gemu_log("F_SETFL,");
-+        qemu_log("F_SETFL,");
-         print_open_flags(arg2, 1);
-         break;
-     case TARGET_F_GETLK:
--        gemu_log("F_GETLK,");
-+        qemu_log("F_GETLK,");
-         print_pointer(arg2, 1);
-         break;
-     case TARGET_F_SETLK:
--        gemu_log("F_SETLK,");
-+        qemu_log("F_SETLK,");
-         print_pointer(arg2, 1);
-         break;
-     case TARGET_F_SETLKW:
--        gemu_log("F_SETLKW,");
-+        qemu_log("F_SETLKW,");
-         print_pointer(arg2, 1);
-         break;
-     case TARGET_F_GETOWN:
--        gemu_log("F_GETOWN");
-+        qemu_log("F_GETOWN");
-         break;
-     case TARGET_F_SETOWN:
--        gemu_log("F_SETOWN,");
-+        qemu_log("F_SETOWN,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-         break;
-     case TARGET_F_GETSIG:
--        gemu_log("F_GETSIG");
-+        qemu_log("F_GETSIG");
-         break;
-     case TARGET_F_SETSIG:
--        gemu_log("F_SETSIG,");
-+        qemu_log("F_SETSIG,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-         break;
- #if TARGET_ABI_BITS == 32
-     case TARGET_F_GETLK64:
--        gemu_log("F_GETLK64,");
-+        qemu_log("F_GETLK64,");
-         print_pointer(arg2, 1);
-         break;
-     case TARGET_F_SETLK64:
--        gemu_log("F_SETLK64,");
-+        qemu_log("F_SETLK64,");
-         print_pointer(arg2, 1);
-         break;
-     case TARGET_F_SETLKW64:
--        gemu_log("F_SETLKW64,");
-+        qemu_log("F_SETLKW64,");
-         print_pointer(arg2, 1);
-         break;
- #endif
-     case TARGET_F_SETLEASE:
--        gemu_log("F_SETLEASE,");
-+        qemu_log("F_SETLEASE,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-         break;
-     case TARGET_F_GETLEASE:
--        gemu_log("F_GETLEASE");
-+        qemu_log("F_GETLEASE");
-         break;
-     case TARGET_F_SETPIPE_SZ:
--        gemu_log("F_SETPIPE_SZ,");
-+        qemu_log("F_SETPIPE_SZ,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
-         break;
-     case TARGET_F_GETPIPE_SZ:
--        gemu_log("F_GETPIPE_SZ");
-+        qemu_log("F_GETPIPE_SZ");
-         break;
-     case TARGET_F_DUPFD_CLOEXEC:
--        gemu_log("F_DUPFD_CLOEXEC,");
-+        qemu_log("F_DUPFD_CLOEXEC,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 1);
-         break;
-     case TARGET_F_NOTIFY:
--        gemu_log("F_NOTIFY,");
-+        qemu_log("F_NOTIFY,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
-         break;
-     default:
-@@ -1679,7 +1684,7 @@ print__llseek(const struct syscallname *name,
-     case SEEK_CUR: whence = "SEEK_CUR"; break;
-     case SEEK_END: whence = "SEEK_END"; break;
-     }
--    gemu_log("%s",whence);
-+    qemu_log("%s", whence);
-     print_syscall_epilogue(name);
- }
- #endif
-@@ -1694,9 +1699,9 @@ print_socket(const struct syscallname *name,
- 
-     print_syscall_prologue(name);
-     print_socket_domain(domain);
--    gemu_log(",");
-+    qemu_log(",");
-     print_socket_type(type);
--    gemu_log(",");
-+    qemu_log(",");
-     if (domain == AF_PACKET ||
-         (domain == AF_INET && type == TARGET_SOCK_PACKET)) {
-         protocol = tswap16(protocol);
-@@ -1728,17 +1733,17 @@ static void do_print_socket(const char *name, abi_long arg1)
-     get_user_ualx(domain, arg1, 0);
-     get_user_ualx(type, arg1, 1);
-     get_user_ualx(protocol, arg1, 2);
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_socket_domain(domain);
--    gemu_log(",");
-+    qemu_log(",");
-     print_socket_type(type);
--    gemu_log(",");
-+    qemu_log(",");
-     if (domain == AF_PACKET ||
-         (domain == AF_INET && type == TARGET_SOCK_PACKET)) {
-         protocol = tswap16(protocol);
-     }
-     print_socket_protocol(domain, type, protocol);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_sockaddr(const char *name, abi_long arg1)
-@@ -1749,10 +1754,10 @@ static void do_print_sockaddr(const char *name, abi_long arg1)
-     get_user_ualx(addr, arg1, 1);
-     get_user_ualx(addrlen, arg1, 2);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     print_sockaddr(addr, addrlen, 0);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_listen(const char *name, abi_long arg1)
-@@ -1762,10 +1767,10 @@ static void do_print_listen(const char *name, abi_long arg1)
-     get_user_ualx(sockfd, arg1, 0);
-     get_user_ualx(backlog, arg1, 1);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     print_raw_param(TARGET_ABI_FMT_ld, backlog, 1);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_socketpair(const char *name, abi_long arg1)
-@@ -1777,15 +1782,15 @@ static void do_print_socketpair(const char *name, abi_long arg1)
-     get_user_ualx(protocol, arg1, 2);
-     get_user_ualx(tab, arg1, 3);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_socket_domain(domain);
--    gemu_log(",");
-+    qemu_log(",");
-     print_socket_type(type);
--    gemu_log(",");
-+    qemu_log(",");
-     print_socket_protocol(domain, type, protocol);
--    gemu_log(",");
-+    qemu_log(",");
-     print_raw_param(TARGET_ABI_FMT_lx, tab, 1);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_sendrecv(const char *name, abi_long arg1)
-@@ -1797,12 +1802,12 @@ static void do_print_sendrecv(const char *name, abi_long arg1)
-     get_user_ualx(len, arg1, 2);
-     get_user_ualx(flags, arg1, 3);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     print_buf(msg, len, 0);
-     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
-     print_flags(msg_flags, flags, 1);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_msgaddr(const char *name, abi_long arg1)
-@@ -1816,13 +1821,13 @@ static void do_print_msgaddr(const char *name, abi_long arg1)
-     get_user_ualx(addr, arg1, 4);
-     get_user_ualx(addrlen, arg1, 5);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     print_buf(msg, len, 0);
-     print_raw_param(TARGET_ABI_FMT_ld, len, 0);
-     print_flags(msg_flags, flags, 0);
-     print_sockaddr(addr, addrlen, 0);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_shutdown(const char *name, abi_long arg1)
-@@ -1832,23 +1837,23 @@ static void do_print_shutdown(const char *name, abi_long arg1)
-     get_user_ualx(sockfd, arg1, 0);
-     get_user_ualx(how, arg1, 1);
- 
--    gemu_log("shutdown(");
-+    qemu_log("shutdown(");
-     print_sockfd(sockfd, 0);
-     switch (how) {
-     case SHUT_RD:
--        gemu_log("SHUT_RD");
-+        qemu_log("SHUT_RD");
-         break;
-     case SHUT_WR:
--        gemu_log("SHUT_WR");
-+        qemu_log("SHUT_WR");
-         break;
-     case SHUT_RDWR:
--        gemu_log("SHUT_RDWR");
-+        qemu_log("SHUT_RDWR");
-         break;
-     default:
-         print_raw_param(TARGET_ABI_FMT_ld, how, 1);
-         break;
-     }
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_msg(const char *name, abi_long arg1)
-@@ -1859,11 +1864,11 @@ static void do_print_msg(const char *name, abi_long arg1)
-     get_user_ualx(msg, arg1, 1);
-     get_user_ualx(flags, arg1, 2);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     print_pointer(msg, 0);
-     print_flags(msg_flags, flags, 1);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- static void do_print_sockopt(const char *name, abi_long arg1)
-@@ -1876,113 +1881,113 @@ static void do_print_sockopt(const char *name, abi_long arg1)
-     get_user_ualx(optval, arg1, 3);
-     get_user_ualx(optlen, arg1, 4);
- 
--    gemu_log("%s(", name);
-+    qemu_log("%s(", name);
-     print_sockfd(sockfd, 0);
-     switch (level) {
-     case SOL_TCP:
--        gemu_log("SOL_TCP,");
-+        qemu_log("SOL_TCP,");
-         print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
-         print_pointer(optval, 0);
-         break;
-     case SOL_IP:
--        gemu_log("SOL_IP,");
-+        qemu_log("SOL_IP,");
-         print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
-         print_pointer(optval, 0);
-         break;
-     case SOL_RAW:
--        gemu_log("SOL_RAW,");
-+        qemu_log("SOL_RAW,");
-         print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
-         print_pointer(optval, 0);
-         break;
-     case TARGET_SOL_SOCKET:
--        gemu_log("SOL_SOCKET,");
-+        qemu_log("SOL_SOCKET,");
-         switch (optname) {
-         case TARGET_SO_DEBUG:
--            gemu_log("SO_DEBUG,");
-+            qemu_log("SO_DEBUG,");
- print_optint:
-             print_number(optval, 0);
-             break;
-         case TARGET_SO_REUSEADDR:
--            gemu_log("SO_REUSEADDR,");
-+            qemu_log("SO_REUSEADDR,");
-             goto print_optint;
-         case TARGET_SO_REUSEPORT:
--            gemu_log("SO_REUSEPORT,");
-+            qemu_log("SO_REUSEPORT,");
-             goto print_optint;
-         case TARGET_SO_TYPE:
--            gemu_log("SO_TYPE,");
-+            qemu_log("SO_TYPE,");
-             goto print_optint;
-         case TARGET_SO_ERROR:
--            gemu_log("SO_ERROR,");
-+            qemu_log("SO_ERROR,");
-             goto print_optint;
-         case TARGET_SO_DONTROUTE:
--            gemu_log("SO_DONTROUTE,");
-+            qemu_log("SO_DONTROUTE,");
-             goto print_optint;
-         case TARGET_SO_BROADCAST:
--            gemu_log("SO_BROADCAST,");
-+            qemu_log("SO_BROADCAST,");
-             goto print_optint;
-         case TARGET_SO_SNDBUF:
--            gemu_log("SO_SNDBUF,");
-+            qemu_log("SO_SNDBUF,");
-             goto print_optint;
-         case TARGET_SO_RCVBUF:
--            gemu_log("SO_RCVBUF,");
-+            qemu_log("SO_RCVBUF,");
-             goto print_optint;
-         case TARGET_SO_KEEPALIVE:
--            gemu_log("SO_KEEPALIVE,");
-+            qemu_log("SO_KEEPALIVE,");
-             goto print_optint;
-         case TARGET_SO_OOBINLINE:
--            gemu_log("SO_OOBINLINE,");
-+            qemu_log("SO_OOBINLINE,");
-             goto print_optint;
-         case TARGET_SO_NO_CHECK:
--            gemu_log("SO_NO_CHECK,");
-+            qemu_log("SO_NO_CHECK,");
-             goto print_optint;
-         case TARGET_SO_PRIORITY:
--            gemu_log("SO_PRIORITY,");
-+            qemu_log("SO_PRIORITY,");
-             goto print_optint;
-         case TARGET_SO_BSDCOMPAT:
--            gemu_log("SO_BSDCOMPAT,");
-+            qemu_log("SO_BSDCOMPAT,");
-             goto print_optint;
-         case TARGET_SO_PASSCRED:
--            gemu_log("SO_PASSCRED,");
-+            qemu_log("SO_PASSCRED,");
-             goto print_optint;
-         case TARGET_SO_TIMESTAMP:
--            gemu_log("SO_TIMESTAMP,");
-+            qemu_log("SO_TIMESTAMP,");
-             goto print_optint;
-         case TARGET_SO_RCVLOWAT:
--            gemu_log("SO_RCVLOWAT,");
-+            qemu_log("SO_RCVLOWAT,");
-             goto print_optint;
-         case TARGET_SO_RCVTIMEO:
--            gemu_log("SO_RCVTIMEO,");
-+            qemu_log("SO_RCVTIMEO,");
-             print_timeval(optval, 0);
-             break;
-         case TARGET_SO_SNDTIMEO:
--            gemu_log("SO_SNDTIMEO,");
-+            qemu_log("SO_SNDTIMEO,");
-             print_timeval(optval, 0);
-             break;
-         case TARGET_SO_ATTACH_FILTER: {
-             struct target_sock_fprog *fprog;
- 
--            gemu_log("SO_ATTACH_FILTER,");
-+            qemu_log("SO_ATTACH_FILTER,");
- 
-             if (lock_user_struct(VERIFY_READ, fprog, optval,  0)) {
-                 struct target_sock_filter *filter;
--                gemu_log("{");
-+                qemu_log("{");
-                 if (lock_user_struct(VERIFY_READ, filter,
-                                      tswapal(fprog->filter),  0)) {
-                     int i;
-                     for (i = 0; i < tswap16(fprog->len) - 1; i++) {
--                        gemu_log("[%d]{0x%x,%d,%d,0x%x},",
-+                        qemu_log("[%d]{0x%x,%d,%d,0x%x},",
-                                  i, tswap16(filter[i].code),
-                                  filter[i].jt, filter[i].jf,
-                                  tswap32(filter[i].k));
-                     }
--                    gemu_log("[%d]{0x%x,%d,%d,0x%x}",
-+                    qemu_log("[%d]{0x%x,%d,%d,0x%x}",
-                              i, tswap16(filter[i].code),
-                              filter[i].jt, filter[i].jf,
-                              tswap32(filter[i].k));
-                 } else {
--                    gemu_log(TARGET_ABI_FMT_lx, tswapal(fprog->filter));
-+                    qemu_log(TARGET_ABI_FMT_lx, tswapal(fprog->filter));
-                 }
--                gemu_log(",%d},", tswap16(fprog->len));
-+                qemu_log(",%d},", tswap16(fprog->len));
-                 unlock_user(fprog, optval, 0);
-             } else {
-                 print_pointer(optval, 0);
-@@ -2002,7 +2007,7 @@ print_optint:
-         break;
-     }
-     print_raw_param(TARGET_ABI_FMT_ld, optlen, 1);
--    gemu_log(")");
-+    qemu_log(")");
- }
- 
- #define PRINT_SOCKOP(name, func) \
-@@ -2164,7 +2169,7 @@ print_rt_sigprocmask(const struct syscallname *name,
-     case TARGET_SIG_UNBLOCK: how = "SIG_UNBLOCK"; break;
-     case TARGET_SIG_SETMASK: how = "SIG_SETMASK"; break;
-     }
--    gemu_log("%s,",how);
-+    qemu_log("%s,", how);
-     print_pointer(arg1, 0);
-     print_pointer(arg2, 1);
-     print_syscall_epilogue(name);
-@@ -2278,7 +2283,7 @@ print_syslog_action(abi_ulong arg, int last)
-             return;
-         }
-     }
--    gemu_log("%s%s", type, get_comma(last));
-+    qemu_log("%s%s", type, get_comma(last));
- }
- 
- static void
-@@ -2683,20 +2688,20 @@ static void print_futex_op(abi_long tflag, int last)
- {
- #define print_op(val) \
- if( cmd == val ) { \
--    gemu_log(#val); \
-+    qemu_log(#val); \
-     return; \
- }
- 
-     int cmd = (int)tflag;
- #ifdef FUTEX_PRIVATE_FLAG
-     if (cmd & FUTEX_PRIVATE_FLAG) {
--        gemu_log("FUTEX_PRIVATE_FLAG|");
-+        qemu_log("FUTEX_PRIVATE_FLAG|");
-         cmd &= ~FUTEX_PRIVATE_FLAG;
-     }
- #endif
- #ifdef FUTEX_CLOCK_REALTIME
-     if (cmd & FUTEX_CLOCK_REALTIME) {
--        gemu_log("FUTEX_CLOCK_REALTIME|");
-+        qemu_log("FUTEX_CLOCK_REALTIME|");
-         cmd &= ~FUTEX_CLOCK_REALTIME;
-     }
- #endif
-@@ -2716,7 +2721,7 @@ if( cmd == val ) { \
-     print_op(FUTEX_WAKE_BITSET)
- #endif
-     /* unknown values */
--    gemu_log("%d",cmd);
-+    qemu_log("%d", cmd);
- }
- 
- static void
-@@ -2812,22 +2817,24 @@ print_syscall(int num,
-     int i;
-     const char *format="%s(" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld ")";
- 
--    gemu_log("%d ", getpid() );
-+    qemu_log("%d ", getpid());
- 
-     for(i=0;i<nsyscalls;i++)
-         if( scnames[i].nr == num ) {
-             if( scnames[i].call != NULL ) {
--                scnames[i].call(&scnames[i],arg1,arg2,arg3,arg4,arg5,arg6);
-+                scnames[i].call(
-+                    &scnames[i], arg1, arg2, arg3, arg4, arg5, arg6);
-             } else {
-                 /* XXX: this format system is broken because it uses
-                    host types and host pointers for strings */
-                 if( scnames[i].format != NULL )
-                     format = scnames[i].format;
--                gemu_log(format,scnames[i].name, arg1,arg2,arg3,arg4,arg5,arg6);
-+                qemu_log(format,
-+                         scnames[i].name, arg1, arg2, arg3, arg4, arg5, arg6);
-             }
-             return;
-         }
--    gemu_log("Unknown syscall %d\n", num);
-+    qemu_log("Unknown syscall %d\n", num);
- }
- 
- 
-@@ -2840,16 +2847,16 @@ print_syscall_ret(int num, abi_long ret)
-     for(i=0;i<nsyscalls;i++)
-         if( scnames[i].nr == num ) {
-             if( scnames[i].result != NULL ) {
--                scnames[i].result(&scnames[i],ret);
-+                scnames[i].result(&scnames[i], ret);
-             } else {
-                 if (ret < 0) {
-                     errstr = target_strerror(-ret);
-                 }
-                 if (errstr) {
--                    gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
-+                    qemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
-                              -ret, errstr);
-                 } else {
--                    gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
-+                    qemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
-                 }
-             }
-             break;
-@@ -2861,9 +2868,9 @@ void print_taken_signal(int target_signum, const target_siginfo_t *tinfo)
-     /* Print the strace output for a signal being taken:
-      * --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL, si_addr=0} ---
-      */
--    gemu_log("--- ");
-+    qemu_log("--- ");
-     print_signal(target_signum, 1);
--    gemu_log(" ");
-+    qemu_log(" ");
-     print_siginfo(tinfo);
--    gemu_log(" ---\n");
-+    qemu_log(" ---\n");
- }
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 16d98c1ff5ff..274e10e0ee6b 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -12171,14 +12171,15 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     record_syscall_start(cpu, num, arg1,
-                          arg2, arg3, arg4, arg5, arg6, arg7, arg8);
- 
--    if (unlikely(do_strace)) {
-+    if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
-         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
-+    }
-+
-+    ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-+                      arg5, arg6, arg7, arg8);
-+
-+    if (unlikely(qemu_loglevel_mask(LOG_STRACE))) {
-         print_syscall_ret(num, ret);
--    } else {
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
-     }
- 
-     record_syscall_return(cpu, num, ret);
-diff --git a/util/log.c b/util/log.c
-index 47f2827397b6..2da6cb31dcfa 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -332,6 +332,8 @@ const QEMULogItem qemu_log_items[] = {
- #ifdef CONFIG_PLUGIN
-     { CPU_LOG_PLUGIN, "plugin", "output from TCG plugins\n"},
- #endif
-+    { LOG_STRACE, "strace",
-+      "log every user-mode syscall, its input, and its result" },
-     { 0, NULL, NULL },
- };
- 
+On Thu, Jan 16, 2020 at 9:56 PM Kevin Wolf <kwolf@redhat.com> wrote:
+
+> Hi,
+>
+> I'm only doing a quick first review pointing out the more obvious
+> things while I familiarise myself with your code. I intend to review it
+> in more detail later (either in a second pass for this series, or when
+> you post v3).
+>
+> Am 14.01.2020 um 15:06 hat Coiby Xu geschrieben:
+> > By making use of libvhost, multiple block device drives can be exported
+> and each drive can serve multiple clients simultaneously. Since
+> vhost-user-server needs a block drive to be created first, delay the
+> creation of this object.
+> >
+> > Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+>
+> Please wrap the commit message at 72 characters.
+>
+> >  blockdev-vu.c              | 1008 ++++++++++++++++++++++++++++++++++++
+> >  include/block/vhost-user.h |   46 ++
+> >  vl.c                       |    4 +
+> >  3 files changed, 1058 insertions(+)
+> >  create mode 100644 blockdev-vu.c
+> >  create mode 100644 include/block/vhost-user.h
+>
+> This adds a single, relatively big source file. I see at least two
+> parts: The generic vhost-user infrastructure with connection handling
+> etc. and the implementation of the specific vhost-user-blk device.
+> Separating these into two files is probably a good idea.
+>
+> I would also suggest to put the files in a new subdirectory
+> block/export/ and call them vhost-user.c/vhost-user-blk.c. The new
+> header file can be in the same directory as it shouldn't be used by
+> anyone else.
+>
+> > diff --git a/blockdev-vu.c b/blockdev-vu.c
+> > new file mode 100644
+> > index 0000000000..45f0bb43a7
+> > --- /dev/null
+> > +++ b/blockdev-vu.c
+> > @@ -0,0 +1,1008 @@
+>
+> The LICENSE file clarifies that files without a license header are
+> GPLv2+, so it's not strictly a problem, but I think it is good style to
+> include a license header that explicitly tells so.
+>
+> > +#include "qemu/osdep.h"
+> > +#include "block/vhost-user.h"
+> > +#include "qapi/error.h"
+> > +#include "qapi/qapi-types-sockets.h"
+> > +#include "qapi/qapi-commands-block.h"
+> > +
+> > +#include "sysemu/block-backend.h"
+> > +#include "qemu/main-loop.h"
+> > +
+> > +#include "qemu/units.h"
+> > +
+> > +#include "block/block.h"
+> > +
+> > +#include "qom/object_interfaces.h"
+> > +
+> > +#include <sys/eventfd.h>
+> > +
+> > +#include "hw/qdev-properties.h"
+>
+> Does the order of includes and the empty lines between them signify
+> anything? If not, I suggest just sorting them alphabetically (and maybe
+> using empty lines between different subdirectories if you like this
+> better than a single large block).
+>
+> According to CODING_STYLE.rst, system headers like <sys/eventfd.h> come
+> before all QEMU headers (except qemu/osdep.h, which always must come
+> first).
+>
+> > +enum {
+> > +    VHOST_USER_BLK_MAX_QUEUES = 8,
+> > +};
+> > +
+> > +struct virtio_blk_inhdr {
+> > +    unsigned char status;
+> > +};
+> > +
+> > +
+> > +static QTAILQ_HEAD(, VubDev) vub_devs =
+> QTAILQ_HEAD_INITIALIZER(vub_devs);
+> > +
+> > +
+> > +typedef struct VubReq {
+> > +    VuVirtqElement *elem;
+>
+> Maybe worth a comment that this was allocated with plain malloc(), so
+> you must use free() rather than g_free() (which would be the default in
+> QEMU)?
+>
+> > +    int64_t sector_num;
+> > +    size_t size;
+> > +    struct virtio_blk_inhdr *in;
+> > +    struct virtio_blk_outhdr out;
+> > +    VuClient *client;
+> > +    struct VuVirtq *vq;
+> > +} VubReq;
+>
+> I'm not completely sure yet, but I think I would prefer VuBlock to Vub
+> in the type names. Some may even prefer VhostUserBlock, but I can see
+> that this would be quite lengthy.
+>
+> > +static void
+> > +remove_watch(VuDev *vu_dev, int fd)
+> > +{
+> > +    VuClient *client;
+> > +
+> > +    g_assert(vu_dev);
+> > +    g_assert(fd >= 0);
+> > +
+> > +    client = container_of(vu_dev, VuClient, parent);
+> > +    aio_set_fd_handler(client->blk->ctx, fd, false, NULL, NULL, NULL,
+> NULL);
+> > +}
+> > +
+> > +static void close_client(VuClient *client)
+> > +{
+> > +    vu_deinit(&client->parent);
+> > +    /** g_source_destroy(vub_device->parent.src); */
+>
+> Leftover from conversion?
+>
+> > +    client->sioc = NULL;
+> > +    object_unref(OBJECT(client->ioc));
+> > +    client->closed = true;
+> > +
+> > +}
+> > +
+> > +static void vub_panic_cb(VuDev *vu_dev, const char *buf)
+>
+> You use a lot of sprintf() before calling this function. Would it be
+> worth taking a printf-like format parameter instead of buf and using a
+> variable argument list?
+>
+> > +{
+> > +    if (buf) {
+> > +        g_warning("vu_panic: %s", buf);
+>
+> I think QEMU proper doesn't use g_warning() anywhere. This could be
+> error_report() or warn_report(). (Or if you use a format string
+> error_vreport() and warn_vreport().)
+>
+> > +    }
+> > +
+> > +    VuClient *client = container_of(vu_dev, VuClient, parent);
+> > +    if (client->blk->exit_panic) {
+> > +        client->blk->close = true;
+> > +    }
+> > +    if (!client->closed) {
+> > +        close_client(client);
+> > +    }
+> > +}
+> > +
+> > +
+> > +static void vub_req_complete(VubReq *req)
+> > +{
+> > +    VuDev *vu_dev = &req->client->parent;
+> > +
+> > +    /* IO size with 1 extra status byte */
+> > +    vu_queue_push(vu_dev, req->vq, req->elem,
+> > +                  req->size + 1);
+>
+> I think this fits in a single line.
+>
+> > +    vu_queue_notify(vu_dev, req->vq);
+> > +
+> > +    if (req->elem) {
+> > +        free(req->elem);
+> > +    }
+> > +
+> > +    g_free(req);
+> > +}
+> > +
+> > +
+> > +
+> > +static int
+> > +vub_discard_write_zeroes(VubReq *req, struct iovec *iov, uint32_t
+> iovcnt,
+> > +                         uint32_t type)
+> > +{
+> > +    struct virtio_blk_discard_write_zeroes *desc;
+> > +    ssize_t size;
+> > +    void *buf;
+> > +
+> > +    size = iov_size(iov, iovcnt);
+> > +    if (size != sizeof(*desc)) {
+> > +        fprintf(stderr, "Invalid size %ld, expect %ld\n", size,
+> sizeof(*desc));
+> > +        return -1;
+>
+> This would be error_report(), too. (More cases below, I'll ignore them
+> now.)
+>
+> I would prefer consistent use of -errno instead of -1 for error cases if
+> you don't mind. I guess this would be -EINVAL here. I won't mention it
+> for all the other cases; if you want to make the change, you need to
+> make it everywhere, obviously.
+>
+> > +    }
+> > +    buf = g_new0(char, size);
+> > +
+> > +    iov_to_buf_full(iov, iovcnt, 0, buf, size);
+>
+> I think uint8_t describes better than char what we want here: A buffer
+> of bytes.
+>
+> The empty line would make more sense to me above the g_new0() line than
+> after it because it starts a new section that deals with the buffer. In
+> general, the use of empty lines feels a bit inconsistent in this patch.
+> You may want to go over them again.
+>
+> > +
+> > +    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
+>
+> Preprocessor directives should be unindented.
+>
+> However, I don't think any of this code actually depends on Linux,
+> BLKDISCARD or BLKZEROOUT. You can just call blk_pdiscard() and
+> blk_pwrite_zeroes() and they will do whatever is necessary to perform
+> the operation on the backend (which might not be a Linux block device,
+> but could be a regular file or even using a network protocol like NBD).
+>
+> > +    VubDev *vdev_blk;
+> > +    VuClient *client = container_of(dev, VuClient, parent);
+> > +    vdev_blk = client->blk;
+> > +    desc = (struct virtio_blk_discard_write_zeroes *)buf;
+> > +    uint64_t range[2] = { le64toh(desc->sector) << 9,
+> > +                          le32toh(desc->num_sectors) << 9 };
+> > +    if (type == VIRTIO_BLK_T_DISCARD) {
+> > +        if (blk_pdiscard(vdev_blk->blk, range[0], range[1]) == 0) {
+> > +            g_free(buf);
+> > +            return 0;
+> > +        }
+> > +    } else if (type == VIRTIO_BLK_T_WRITE_ZEROES) {
+> > +        if (blk_pwrite_zeroes(vdev_blk->blk, range[0], range[1]) == 0) {
+> > +            g_free(buf);
+> > +            return 0;
+> > +        }
+>
+> blk_pdiscard() and blk_pwrite_zeroes() are synchronous functions. In
+> other words, the guest will be blocked until the I/O is complete. We
+> cannot do this.
+>
+> I think you should let vub_virtio_process_req() run in a coroutine so
+> that you can call blk_co_pdiscard() and blk_co_pwrite_zeroes() here.
+>
+> > +    }
+> > +    #endif
+> > +
+> > +    g_free(buf);
+> > +    return -1;
+> > +}
+> > +
+> > +
+> > +static void
+> > +vub_flush(VubReq *req)
+> > +{
+> > +    VuClient *client = req->client;
+> > +    blk_co_flush(client->blk->backend);
+>
+> You can't call blk_co_flush() from outside coroutine context. This code
+> will be right after you move vub_virtio_process_req() to a coroutine,
+> though (which will make this function a coroutine_fn).
+>
+> > +}
+> > +
+> > +
+> > +#define NOT_DONE 0x7fffffff /* used while emulated sync operation in
+> progress */
+> > +typedef struct BlkRwCo {
+> > +    BlockBackend *blk;
+> > +    int64_t offset;
+> > +    void *iobuf;
+> > +    int ret;
+> > +    BdrvRequestFlags flags;
+> > +} BlkRwCo;
+> > +
+> > +static void blk_read_entry(void *opaque)
+> > +{
+> > +    BlkRwCo *rwco = opaque;
+> > +    QEMUIOVector *qiov = rwco->iobuf;
+> > +
+> > +    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
+> > +                              qiov, rwco->flags);
+> > +    aio_wait_kick();
+> > +}
+> > +
+> > +
+> > +static void blk_write_entry(void *opaque)
+> > +{
+> > +    BlkRwCo *rwco = opaque;
+> > +    QEMUIOVector *qiov = rwco->iobuf;
+> > +
+> > +    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
+> > +                              qiov, rwco->flags);
+> > +    aio_wait_kick();
+> > +}
+> > +
+> > +
+> > +static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t
+> offset,
+> > +                   CoroutineEntry co_entry, BdrvRequestFlags flags)
+> > +{
+> > +
+> > +    BlkRwCo rwco = {
+> > +        .blk    = blk,
+> > +        .offset = offset,
+> > +        .iobuf  = qiov,
+> > +        .flags  = flags,
+> > +        .ret    = NOT_DONE,
+> > +    };
+> > +
+> > +    if (qemu_in_coroutine()) {
+> > +        /* Fast-path if already in coroutine context */
+> > +        co_entry(&rwco);
+> > +    } else {
+> > +        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
+> > +        bdrv_coroutine_enter(blk_bs(blk), co);
+> > +        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
+> > +    }
+> > +
+> > +    return rwco.ret;
+> > +}
+>
+> This is copy&paste from block-backend.c. We should certainly not do
+> this. I think it will automatically go away when you can use
+> blk_co_preadv() and blk_co_pwritev() directly.
+>
+> Note that the BDRV_POLL_WHILE() means that like above, we would be
+> waiting for the request to complete. This would block the guest and
+> would also not allow parallel requests, killing the I/O performance of
+> our vhost-user export.
+>
+> > +
+> > +static ssize_t
+> > +vub_rwv(VubReq *req, struct iovec *iov,
+> > +        uint32_t iovcnt,
+> > +        CoroutineEntry co_entry)
+>
+> I don't understand the line wrapping here. :-)
+>
+> > +{
+> > +    VuClient *client = req->client;
+> > +    ssize_t rc;
+> > +
+> > +    if (!iovcnt) {
+> > +        fprintf(stderr, "Invalid Read/Write IOV count\n");
+> > +        return -1;
+> > +    }
+> > +
+> > +    int64_t offset = req->sector_num * 512;
+> > +    QEMUIOVector *qiov = g_new0(QEMUIOVector, 1);
+> > +    qemu_iovec_init_external(qiov, iov, iovcnt);
+> > +    rc = blk_prw(client->blk->backend, qiov, offset, co_entry, 0);
+> > +
+> > +    req->size = iov_size(iov, iovcnt);
+>
+> You can use qiov->size instead of duplicating this information into a
+> separate VubReq field.
+>
+> > +    if (rc < 0) {
+> > +        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with
+> %s\n",
+> > +                client->blk->name, req->sector_num, req->size,
+> > +                strerror(errno));
+> > +        return -1;
+> > +    }
+> > +
+> > +    return rc;
+> > +}
+> > +
+> > +static int vub_virtio_process_req(VuClient *client,
+> > +                                     VuVirtq *vq)
+>
+> Indentation is off. This could be a single line anyway.
+>
+> > +{
+> > +    VuDev *vu_dev = &client->parent;
+> > +    VuVirtqElement *elem;
+> > +    uint32_t type;
+> > +    VubReq *req;
+> > +
+> > +    elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) +
+> sizeof(VubReq));
+> > +    if (!elem) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    struct iovec *in_iov = elem->in_sg;
+> > +    struct iovec *out_iov = elem->out_sg;
+> > +    unsigned in_num = elem->in_num;
+> > +    unsigned out_num = elem->out_num;
+> > +    /* refer to hw/block/virtio_blk.c */
+> > +    if (elem->out_num < 1 || elem->in_num < 1) {
+> > +        fprintf(stderr, "virtio-blk request missing headers\n");
+> > +        free(elem);
+> > +        return -1;
+> > +    }
+> > +
+> > +    req = g_new0(VubReq, 1);
+> > +    req->client = client;
+> > +    req->vq = vq;
+> > +    req->elem = elem;
+> > +
+> > +    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
+> > +                            sizeof(req->out)) != sizeof(req->out))) {
+> > +        fprintf(stderr, "virtio-blk request outhdr too short");
+> > +        goto err;
+> > +    }
+> > +
+> > +    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
+> > +
+> > +    if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
+> > +        fprintf(stderr, "virtio-blk request inhdr too short");
+> > +        goto err;
+> > +    }
+> > +
+> > +    /* We always touch the last byte, so just see how big in_iov is.  */
+> > +    req->in = (void *)in_iov[in_num - 1].iov_base
+> > +              + in_iov[in_num - 1].iov_len
+> > +              - sizeof(struct virtio_blk_inhdr);
+> > +    iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
+> > +
+> > +
+> > +    type = le32toh(req->out.type);
+> > +    switch (type & ~VIRTIO_BLK_T_BARRIER) {
+> > +    case VIRTIO_BLK_T_IN:
+> > +    case VIRTIO_BLK_T_OUT: {
+> > +        ssize_t ret = 0;
+> > +        bool is_write = type & VIRTIO_BLK_T_OUT;
+> > +        req->sector_num = le64toh(req->out.sector);
+> > +        if (is_write) {
+> > +            ret = vub_rwv(req, out_iov, out_num, blk_write_entry);
+> > +        } else {
+> > +            ret = vub_rwv(req, in_iov, in_num, blk_read_entry);
+> > +        }
+> > +        if (ret >= 0) {
+> > +            req->in->status = VIRTIO_BLK_S_OK;
+> > +        } else {
+> > +            req->in->status = VIRTIO_BLK_S_IOERR;
+> > +        }
+> > +        vub_req_complete(req);
+> > +        break;
+> > +    }
+> > +    case VIRTIO_BLK_T_FLUSH:
+> > +        vub_flush(req);
+> > +        req->in->status = VIRTIO_BLK_S_OK;
+> > +        vub_req_complete(req);
+> > +        break;
+> > +    case VIRTIO_BLK_T_GET_ID: {
+> > +        size_t size = MIN(iov_size(&elem->in_sg[0], in_num),
+> > +                          VIRTIO_BLK_ID_BYTES);
+> > +        snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
+> > +        req->in->status = VIRTIO_BLK_S_OK;
+> > +        req->size = elem->in_sg[0].iov_len;
+> > +        vub_req_complete(req);
+> > +        break;
+> > +    }
+> > +    case VIRTIO_BLK_T_DISCARD:
+> > +    case VIRTIO_BLK_T_WRITE_ZEROES: {
+> > +        int rc;
+> > +        rc = vub_discard_write_zeroes(req, &elem->out_sg[1], out_num,
+> type);
+> > +        if (rc == 0) {
+> > +            req->in->status = VIRTIO_BLK_S_OK;
+> > +        } else {
+> > +            req->in->status = VIRTIO_BLK_S_IOERR;
+> > +        }
+> > +        vub_req_complete(req);
+> > +        break;
+> > +    }
+> > +    default:
+> > +        req->in->status = VIRTIO_BLK_S_UNSUPP;
+> > +        vub_req_complete(req);
+> > +        break;
+> > +    }
+> > +
+> > +    return 0;
+> > +
+> > +err:
+> > +    free(elem);
+> > +    g_free(req);
+> > +    return -1;
+> > +}
+> > +
+> > +
+> > +static void vub_process_vq(VuDev *vu_dev, int idx)
+> > +{
+> > +    VuClient *client;
+> > +    VuVirtq *vq;
+> > +    int ret;
+> > +
+> > +    client = container_of(vu_dev, VuClient, parent);
+> > +    assert(client);
+> > +
+> > +    vq = vu_get_queue(vu_dev, idx);
+> > +    assert(vq);
+> > +
+> > +    while (1) {
+> > +        ret = vub_virtio_process_req(client, vq);
+> > +        if (ret) {
+> > +            break;
+> > +        }
+> > +    }
+> > +}
+>
+> I mentioned above moving vub_virtio_process_req() into a coroutine. Just
+> creating a coroutine here and entering it wouldn't work, though.
+>
+> The best design is probably to get requests from the virtqueue in this
+> function (what is currently the first half of vub_virtio_process_req())
+> and then spawn a coroutine per request to actually execute them (roughly
+> the switch in vub_virtio_process_req()).
+>
+> This way you'll get parallel requests and won't have to think about
+> synchronising accesses to the virtqueue from multiple coroutines.
+>
+> > +
+> > +static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
+> > +{
+> > +    VuVirtq *vq;
+> > +
+> > +    assert(vu_dev);
+> > +
+> > +    vq = vu_get_queue(vu_dev, idx);
+> > +    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
+> > +}
+> > +
+> > +static uint64_t
+> > +vub_get_features(VuDev *dev)
+> > +{
+> > +    uint64_t features;
+> > +    VubDev *vdev_blk;
+> > +
+> > +    VuClient *client = container_of(dev, VuClient, parent);
+> > +    vdev_blk = client->blk;
+> > +
+> > +    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
+> > +               1ull << VIRTIO_BLK_F_SEG_MAX |
+> > +               1ull << VIRTIO_BLK_F_TOPOLOGY |
+> > +               1ull << VIRTIO_BLK_F_BLK_SIZE |
+> > +               1ull << VIRTIO_BLK_F_FLUSH |
+> > +               #if defined(__linux__) && defined(BLKDISCARD) &&
+> defined(BLKZEROOUT)
+> > +               1ull << VIRTIO_BLK_F_DISCARD |
+> > +               1ull << VIRTIO_BLK_F_WRITE_ZEROES |
+> > +               #endif
+> > +               1ull << VIRTIO_BLK_F_CONFIG_WCE |
+> > +               1ull << VIRTIO_F_VERSION_1 |
+> > +               1ull << VIRTIO_RING_F_INDIRECT_DESC |
+> > +               1ull << VIRTIO_RING_F_EVENT_IDX |
+> > +               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
+> > +
+> > +    if (!vdev_blk->writable) {
+> > +        features |= 1ull << VIRTIO_BLK_F_RO;
+> > +    }
+> > +
+> > +    return features;
+> > +}
+> > +
+> > +static uint64_t
+> > +vub_get_protocol_features(VuDev *dev)
+> > +{
+> > +    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
+> > +           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
+> > +}
+> > +
+> > +static int
+> > +vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
+> > +{
+> > +    VubDev *vdev_blk;
+> > +
+> > +    VuClient *client = container_of(vu_dev, VuClient, parent);
+> > +    vdev_blk = client->blk;
+> > +    memcpy(config, &vdev_blk->blkcfg, len);
+> > +
+> > +    return 0;
+> > +}
+> > +
+> > +static int
+> > +vub_set_config(VuDev *vu_dev, const uint8_t *data,
+> > +               uint32_t offset, uint32_t size, uint32_t flags)
+> > +{
+> > +    VubDev *vdev_blk;
+> > +
+> > +    VuClient *client = container_of(vu_dev, VuClient, parent);
+> > +    vdev_blk = client->blk;
+> > +    uint8_t wce;
+> > +
+> > +    /* don't support live migration */
+> > +    if (flags != VHOST_SET_CONFIG_TYPE_MASTER) {
+> > +        return -1;
+> > +    }
+> > +
+> > +
+> > +    if (offset != offsetof(struct virtio_blk_config, wce) ||
+> > +        size != 1) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    wce = *data;
+> > +    if (wce == vdev_blk->blkcfg.wce) {
+> > +        /* Do nothing as same with old configuration */
+> > +        return 0;
+> > +    }
+> > +
+> > +    vdev_blk->blkcfg.wce = wce;
+> > +    blk_set_enable_write_cache(vdev_blk->backend, true);
+> > +    return 0;
+> > +}
+> > +
+> > +
+> > +/*
+> > + * When the client disconnects, it send a VHOST_USER_NONE request
+>
+> s/send/sends/
+>
+> > + * and vu_process_message will simple call exit which cause the VM
+> > + * to exit abruptly.
+> > + * To avoid this issue,  process VHOST_USER_NONE request ahead
+> > + * of vu_process_message.
+> > + *
+> > + */
+> > +static int vub_process_msg(VuDev *dev, VhostUserMsg *vmsg, int
+> *do_reply)
+> > +{
+> > +    if (vmsg->request == VHOST_USER_NONE) {
+> > +        dev->panic(dev, "disconnect");
+> > +        return true;
+> > +    }
+> > +    return false;
+> > +}
+> > +
+> > +static void
+> > +vmsg_close_fds(VhostUserMsg *vmsg)
+> > +{
+> > +    int i;
+> > +    for (i = 0; i < vmsg->fd_num; i++) {
+> > +        close(vmsg->fds[i]);
+> > +    }
+> > +}
+> > +
+> > +static bool
+> > +vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
+> > +{
+> > +    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] =
+> { };
+> > +    struct iovec iov = {
+> > +        .iov_base = (char *)vmsg,
+> > +        .iov_len = VHOST_USER_HDR_SIZE,
+> > +    };
+> > +    struct msghdr msg = {
+> > +        .msg_iov = &iov,
+> > +        .msg_iovlen = 1,
+> > +        .msg_control = control,
+> > +        .msg_controllen = sizeof(control),
+> > +    };
+> > +    size_t fd_size;
+> > +    struct cmsghdr *cmsg;
+> > +    int rc;
+> > +    char buffer[100];
+> > +    VuClient *client = container_of(vu_dev, VuClient, parent);
+> > +    QIOChannel *ioc = client->ioc;
+> > +    do {
+> > +        rc = recvmsg(conn_fd, &msg, 0);
+>
+> This should certainly use qio_channel_readv_full() rather than working
+> directly with a socket fd?
+>
+> > +        if (rc < 0) {
+> > +            if (errno == EAGAIN) {
+> > +                if (qemu_in_coroutine()) {
+> > +                    qio_channel_yield(ioc, G_IO_IN);
+> > +                } else {
+> > +                    qio_channel_wait(ioc, G_IO_IN);
+> > +                }
+> > +                continue;
+> > +            } else if (errno == EINTR) {
+> > +                continue;
+> > +            }
+> > +        }
+> > +        break;
+> > +    } while (true);
+> > +
+> > +    if (rc < 0) {
+> > +        sprintf(buffer, "Error while recvmsg: %s", strerror(errno));
+> > +        vub_panic_cb(vu_dev, buffer);
+> > +        return false;
+> > +    }
+> > +
+> > +    assert(rc == VHOST_USER_HDR_SIZE || rc == 0);
+>
+> Why do you think that there can't be short reads?
+>
+> > +    vmsg->fd_num = 0;
+> > +    for (cmsg = CMSG_FIRSTHDR(&msg);
+> > +         cmsg != NULL;
+> > +         cmsg = CMSG_NXTHDR(&msg, cmsg))
+> > +    {
+> > +        if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type ==
+> SCM_RIGHTS) {
+> > +            fd_size = cmsg->cmsg_len - CMSG_LEN(0);
+> > +            vmsg->fd_num = fd_size / sizeof(int);
+> > +            memcpy(vmsg->fds, CMSG_DATA(cmsg), fd_size);
+> > +            break;
+> > +        }
+> > +    }
+>
+> I think the fd passing part becomes easier when you use the proper
+> qio_channel_readv_full() function. Its implementation is also a bit more
+> careful than yours. For example, you forgot checking fd_size against
+> VHOST_MEMORY_MAX_NREGIONS, allowing a buffer overflow in the memcpy(),
+> and you don't adjust fd flags for the new file descriptors.
+>
+> > +    if (vmsg->size > sizeof(vmsg->payload)) {
+> > +        sprintf(buffer,
+> > +                "Error: too big message request: %d, size: vmsg->size:
+> %u, "
+> > +                "while sizeof(vmsg->payload) = %zu\n",
+> > +                vmsg->request, vmsg->size, sizeof(vmsg->payload));
+> > +        vub_panic_cb(vu_dev, buffer);
+> > +        goto fail;
+> > +    }
+> > +
+> > +    if (vmsg->size) {
+> > +        do {
+> > +            rc = read(conn_fd, &vmsg->payload, vmsg->size);
+>
+> qio_channel_readv_all_eof() already implements this whole loop and
+> correctly handles short reads, too.
+>
+> > +            if (rc < 0) {
+> > +                if (errno == EAGAIN) {
+> > +                    if (qemu_in_coroutine()) {
+> > +                        qio_channel_yield(ioc, G_IO_IN);
+> > +                    } else {
+> > +                        qio_channel_wait(ioc, G_IO_IN);
+> > +                    }
+> > +                    continue;
+> > +                } else if (errno == EINTR) {
+> > +                    continue;
+> > +                }
+> > +            }
+> > +            break;
+> > +        } while (true);
+> > +
+> > +        if (rc <= 0) {
+> > +            sprintf(buffer, "Error while reading: %s", strerror(errno));
+> > +            vub_panic_cb(vu_dev, buffer);
+> > +            goto fail;
+> > +        }
+> > +
+> > +        assert(rc == vmsg->size);
+> > +    }
+> > +
+> > +    return true;
+> > +
+> > +fail:
+> > +    vmsg_close_fds(vmsg);
+> > +
+> > +    return false;
+> > +}
+> > +
+> > +static void vub_kick_cb(void *opaque)
+> > +{
+> > +    vu_watch_cb_data *data = (vu_watch_cb_data *) opaque;
+> > +    int index = data->index;
+> > +    VuDev *dev = data->vu_dev;
+> > +    VuVirtq *vq = &dev->vq[index];
+> > +    int sock = vq->kick_fd;
+> > +    eventfd_t kick_data;
+> > +    ssize_t rc;
+> > +
+> > +    rc = eventfd_read(sock, &kick_data);
+> > +    if (rc == -1) {
+> > +        char buffer[100];
+> > +        sprintf(buffer, "kick eventfd_read(): %s", strerror(errno));
+> > +        vub_panic_cb(dev, buffer);
+> > +        g_free(data);
+> > +        dev->remove_watch(dev, dev->vq[index].kick_fd);
+> > +    } else {
+> > +        if (vq->handler) {
+> > +            vq->handler(dev, index);
+> > +        }
+> > +    }
+> > +}
+> > +
+> > +static const VuDevIface vub_iface = {
+> > +    .get_features = vub_get_features,
+> > +    .queue_set_started = vub_queue_set_started,
+> > +    .get_protocol_features = vub_get_protocol_features,
+> > +    .get_config = vub_get_config,
+> > +    .set_config = vub_set_config,
+> > +    .process_msg = vub_process_msg,
+> > +    .read_msg = vu_message_read_co,
+> > +    .kick_callback = vub_kick_cb,
+> > +};
+>
+> I would prefer the = signs to be aligned to the same column.
+>
+> > +
+> > +void vub_free(VubDev *vub_dev, bool called_by_QOM)
+> > +{
+> > +    if (!vub_dev) {
+> > +        return;
+> > +    }
+> > +
+> > +    blk_unref(vub_dev->backend);
+> > +    g_free(vub_dev->name);
+> > +    g_free(vub_dev->unix_socket);
+> > +
+> > +    if (vub_dev->next.tqe_circ.tql_prev) {
+> > +        /*
+> > +         * if vub_dev->next.tqe_circ.tql_prev = null,
+> > +         * vub_dev hasn't been inserted into the queue and
+> > +         * vub_free is called by obj->instance_finalize.
+> > +         */
+> > +        QTAILQ_REMOVE(&vub_devs, vub_dev, next);
+> > +    }
+> > +    /*
+> > +     * Needn't to free vub_dev if called by QOM
+> > +     * because QOM will do the clean-up work.
+> > +     */
+> > +    if (!called_by_QOM) {
+> > +        g_free(vub_dev);
+> > +    }
+> > +}
+> > +
+> > +static coroutine_fn void vu_client_trip(void *opaque)
+> > +{
+> > +    VuClient *client = opaque;
+> > +
+> > +    while (!client->closed) {
+> > +        vu_dispatch(&client->parent);
+> > +    }
+> > +
+> > +    QTAILQ_REMOVE(&client->blk->clients, client, next);
+> > +
+>
+> Extra empty line.
+>
+> > +}
+> > +
+> > +static void vu_client_start(VuClient *client)
+> > +{
+> > +    Coroutine *co = qemu_coroutine_create(vu_client_trip, client);
+> > +    qemu_coroutine_enter(co);
+> > +}
+> > +
+> > +
+> > +G_STATIC_ASSERT((int)G_IO_IN == (int)VU_WATCH_IN);
+> > +G_STATIC_ASSERT((int)G_IO_OUT == (int)VU_WATCH_OUT);
+> > +G_STATIC_ASSERT((int)G_IO_PRI == (int)VU_WATCH_PRI);
+> > +G_STATIC_ASSERT((int)G_IO_ERR == (int)VU_WATCH_ERR);
+> > +G_STATIC_ASSERT((int)G_IO_HUP == (int)VU_WATCH_HUP);
+> > +
+> > +static void
+> > +set_watch(VuDev *vu_dev, int fd, int vu_evt,
+> > +          vu_watch_cb_packed_data cb, void *pvt)
+> > +{
+> > +    /*
+> > +     * since aio_dispatch can only pass one user data pointer to the
+> > +     * callback function, pack VuDev, pvt into a struct
+> > +     */
+> > +    VuClient *client;
+> > +
+> > +    g_assert(vu_dev);
+> > +    g_assert(fd >= 0);
+> > +    g_assert(cb);
+> > +    client = container_of(vu_dev, VuClient, parent);
+> > +    vu_watch_cb_data *cb_data = g_new0(vu_watch_cb_data, 1);
+> > +    cb_data->index = (intptr_t) pvt;
+> > +    cb_data->vu_dev = vu_dev;
+> > +    aio_set_fd_handler(client->blk->ctx, fd, false, (void *) cb,
+> > +                       NULL, NULL, cb_data);
+> > +}
+> > +
+> > +
+> > +void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
+> > +                gpointer opaque)
+> > +{
+> > +    VuClient *client;
+> > +    VubDev *vub_device = opaque;
+> > +    client = g_new0(VuClient, 1);
+> > +
+> > +    if (!vu_init_packed_data(&client->parent, VHOST_USER_BLK_MAX_QUEUES,
+> > +                             sioc->fd, vub_panic_cb, set_watch,
+> > +                             remove_watch, &vub_iface)) {
+> > +        fprintf(stderr, "Failed to initialized libvhost-user\n");
+> > +        g_free(client);
+> > +        return;
+> > +    }
+> > +
+> > +    client->blk = vub_device;
+> > +    client->refcount = 1;
+> > +    client->sioc = sioc;
+> > +    /*
+> > +     * increase the object reference, so cioc will not freed by
+> > +     * qio_net_listener_channel_func which will call
+> object_unref(OBJECT(sioc))
+> > +     */
+> > +    object_ref(OBJECT(client->sioc));
+> > +    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-user client");
+> > +    client->ioc = QIO_CHANNEL(sioc);
+> > +    object_ref(OBJECT(client->ioc));
+> > +    object_ref(OBJECT(sioc));
+> > +
+> > +    qio_channel_set_blocking(QIO_CHANNEL(client->sioc), false, NULL);
+> > +    client->closed = false;
+> > +    QTAILQ_INSERT_TAIL(&client->blk->clients, client, next);
+> > +    vu_client_start(client);
+> > +}
+> > +
+> > +
+> > +void
+> > +vub_initialize_config(BlockDriverState *bs, struct virtio_blk_config
+> *config)
+> > +{
+> > +    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
+> > +    config->blk_size = BDRV_SECTOR_SIZE;
+> > +    config->size_max = 65536;
+> > +    config->seg_max = 128 - 2;
+> > +    config->min_io_size = 1;
+> > +    config->opt_io_size = 1;
+> > +    config->num_queues = 1;
+> > +    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
+> > +    config->max_discard_sectors = 32768;
+> > +    config->max_discard_seg = 1;
+> > +    config->discard_sector_alignment = config->blk_size >> 9;
+> > +    config->max_write_zeroes_sectors = 32768;
+> > +    config->max_write_zeroes_seg = 1;
+> > +    #endif
+> > +}
+> > +
+> > +
+> > +static VubDev *vub_new(VubDev *vub_device, const char *name,
+> > +                       const char *unix_socket, bool writable, Error
+> **errp)
+> > +{
+> > +
+> > +    BlockBackend *blk;
+> > +
+> > +    /*
+> > +     * Don't allow resize while the vhost user server is running,
+> > +     * otherwise we don't care what happens with the node.
+> > +     */
+> > +    uint64_t perm = BLK_PERM_CONSISTENT_READ;
+> > +    int ret;
+> > +
+> > +    AioContext *ctx;
+> > +
+> > +    BlockDriverState *bs = bdrv_lookup_bs(name,
+> > +                                          name,
+> > +                                          errp);
+>
+> This fits in a single line.
+>
+> > +
+> > +    if (!bs) {
+> > +        error_setg(errp,
+> > +                   "No drive with name '%s'."
+> > +                   " Please find the list of names with "
+> > +                   "'info block'", name);
+>
+> This can probably be two lines instead of four.
+>
+> > +        return NULL;
+> > +    }
+> > +
+> > +    if (bdrv_is_read_only(bs)) {
+> > +        writable = false;
+> > +    }
+> > +
+> > +    if (writable) {
+> > +        perm |= BLK_PERM_WRITE;
+> > +    }
+> > +
+> > +    ctx = bdrv_get_aio_context(bs);
+> > +    aio_context_acquire(ctx);
+> > +    bdrv_invalidate_cache(bs, NULL);
+> > +    aio_context_release(ctx);
+> > +
+> > +    blk = blk_new(bdrv_get_aio_context(bs), perm,
+> > +                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+> > +                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
+> > +    ret = blk_insert_bs(blk, bs, errp);
+> > +
+> > +    if (ret < 0) {
+> > +        goto fail;
+> > +    }
+> > +
+> > +
+> > +    blk_set_enable_write_cache(blk, false);
+> > +
+> > +    blk_set_allow_aio_context_change(blk, true);
+> > +
+> > +
+> > +    vub_device->name = g_strdup(name);
+> > +    vub_device->unix_socket = g_strdup(unix_socket);
+> > +    vub_device->writable = writable;
+> > +    vub_device->blkcfg.wce = 0;
+> > +    vub_device->backend = blk;
+> > +    vub_device->ctx = ctx;
+> > +    vub_initialize_config(bs, &vub_device->blkcfg);
+> > +    return vub_device;
+> > +
+> > +fail:
+> > +    blk_unref(blk);
+> > +    return NULL;
+> > +}
+> > +
+> > +void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM)
+> > +{
+> > +    if (!vub_device) {
+> > +        return;
+> > +    }
+> > +
+> > +    VuClient *client, *next;
+> > +    QTAILQ_FOREACH_SAFE(client, &vub_device->clients, next, next) {
+> > +        if (!client->closed) {
+> > +            close_client(client);
+> > +        }
+> > +    }
+> > +
+> > +    if (vub_device->listener) {
+> > +        qio_net_listener_disconnect(vub_device->listener);
+> > +        object_unref(OBJECT(vub_device->listener));
+> > +    }
+> > +    vub_free(vub_device, called_by_QOM);
+> > +
+> > +}
+> > +
+> > +
+> > +VubDev *vub_dev_find(const char *name)
+> > +{
+> > +    VubDev *vub_device;
+> > +    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
+> > +        if (strcmp(name, vub_device->name) == 0) {
+> > +            return vub_device;
+> > +        }
+> > +    }
+> > +
+> > +    return NULL;
+> > +}
+> > +
+> > +
+> > +static VubDev *vub_dev_find_by_unix_socket(const char *unix_socket)
+> > +{
+> > +    VubDev *vub_device;
+> > +    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
+> > +        if (strcmp(unix_socket, vub_device->unix_socket) == 0) {
+> > +            return vub_device;
+> > +        }
+> > +    }
+> > +
+> > +    return NULL;
+> > +}
+> > +
+> > +static void vhost_user_server_start(VubDev *vub_device, const char
+> *unix_socket,
+> > +                                    const char *name, bool writable,
+> > +                                    Error **errp)
+> > +{
+> > +
+> > +    if (vub_dev_find(name) || vub_dev_find_by_unix_socket(unix_socket))
+> {
+> > +        error_setg(errp, "Vhost user server with name '%s' or "
+> > +                "with socket_path '%s' has already been started",
+> > +                name, unix_socket);
+> > +        return;
+> > +    }
+> > +
+> > +
+> > +    if (!vub_new(vub_device, name, unix_socket, writable, errp)) {
+> > +        return;
+> > +    }
+> > +
+> > +
+> > +    vub_device->listener = qio_net_listener_new();
+> > +
+> > +    qio_net_listener_set_name(vub_device->listener,
+> > +                              "vhost-user-backend-listener");
+> > +
+> > +    SocketAddress *addr = g_new0(SocketAddress, 1);
+> > +    addr->u.q_unix.path = (char *) unix_socket;
+> > +    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
+> > +    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp)
+> < 0) {
+> > +        goto error;
+> > +    }
+> > +
+> > +
+> > +    QTAILQ_INSERT_TAIL(&vub_devs, vub_device, next);
+> > +    QTAILQ_INIT(&vub_device->clients);
+> > +
+> > +    qio_net_listener_set_client_func(vub_device->listener,
+> > +                                     vub_accept,
+> > +                                     vub_device,
+> > +                                     NULL);
+> > +
+> > +    return;
+> > +
+> > + error:
+> > +    vub_free(vub_device, false);
+> > +}
+> > +
+> > +static void vu_set_block_name(Object *obj, const char *value,
+> > +                                           Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);;
+> > +
+> > +    if (vus->name) {
+> > +        error_setg(errp, "evdev property already set");
+> > +        return;
+> > +    }
+> > +
+> > +    vus->name = g_strdup(value);
+> > +}
+> > +
+> > +static char *vu_get_block_name(Object *obj, Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);
+> > +    return g_strdup(vus->name);
+> > +}
+> > +
+> > +
+> > +static void vu_set_unix_socket(Object *obj, const char *value,
+> > +                                            Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);;
+> > +
+> > +    if (vus->unix_socket) {
+> > +        error_setg(errp, "unix_socket property already set");
+> > +        return;
+> > +    }
+> > +
+> > +    vus->unix_socket = g_strdup(value);
+> > +    vhost_user_server_start(vus, value, vus->name,
+> > +                            vus->writable, errp);
+> > +}
+>
+> This makes the unix-socket property magic in that it starts the server
+> with the properties specified at this point. This means that this
+> property must always be specified last.
+>
+> Maybe it would be better to use a boolean property (similar to qdev's
+> "realized") that explicitly start and possibly stops the export.
+>
+> Writing to other properties should probably result in an error while the
+> server is already running because these property changes won't take
+> effect any more then.
+>
+> > +static char *vu_get_unix_socket(Object *obj, Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);;
+> > +    return g_strdup(vus->unix_socket);
+> > +}
+> > +
+> > +static bool vu_get_block_writable(Object *obj, Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);;
+> > +    return vus->writable;
+> > +}
+> > +
+> > +static void vu_set_block_writable(Object *obj, bool value, Error **errp)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);
+> > +
+> > +    vus->writable = value;
+> > +}
+> > +
+> > +static void vhost_user_server_instance_init(Object *obj)
+> > +{
+> > +
+> > +    object_property_add_bool(obj, "writable",
+> > +                            vu_get_block_writable,
+> > +                            vu_set_block_writable, NULL);
+> > +
+> > +    object_property_add_str(obj, "name",
+> > +                            vu_get_block_name,
+> > +                            vu_set_block_name, NULL);
+> > +
+> > +    object_property_add_str(obj, "unix_socket",
+> > +                            vu_get_unix_socket,
+> > +                            vu_set_unix_socket, NULL);
+>
+> These should probably be object_class_property_add_*() and be called in
+> .class_init rather than .instance_init.
+>
+> "name" suggests that it's the name of the export rather than the block
+> device to be exported. I would suggest "node-name" (and then actually
+> only pass it as node-name to bdrv_lookup_bs()).
+>
+> I expect that in the long run, we'll want to accept a full SocketAddress
+> rather than just a filename like in "unix_socket".
+>
+> > +}
+> > +
+> > +static void vhost_user_server_instance_finalize(Object *obj)
+> > +{
+> > +    VubDev *vus = VHOST_USER_SERVER(obj);
+> > +    vhost_user_server_free(vus, true);
+> > +    /* object_del shouldn't free this object struct */
+> > +    obj->free = NULL;
+> > +}
+> > +
+> > +static const TypeInfo vhost_user_server_info = {
+> > +    .name = TYPE_VHOST_USER_SERVER,
+> > +    .parent = TYPE_OBJECT,
+> > +    .instance_size = sizeof(VuDev),
+> > +    .instance_init = vhost_user_server_instance_init,
+> > +    .instance_finalize = vhost_user_server_instance_finalize,
+> > +    .interfaces = (InterfaceInfo[]) {
+> > +        {TYPE_USER_CREATABLE},
+> > +        {}
+> > +    },
+> > +};
+> > +
+> > +static void vhost_user_server_register_types(void)
+> > +{
+> > +    type_register_static(&vhost_user_server_info);
+> > +}
+> > +
+> > +type_init(vhost_user_server_register_types)
+> > +
+>
+> Extra empty line at the file end.
+>
+> In summary, I can see this going in the right direction, though in
+> detail some more work will be needed.
+>
+> Kevin
+>
+>
+
 -- 
-2.24.1
+*Best regards,*
+*Coiby*
 
+--00000000000001863c059efe8fc3
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">&gt; &gt; + =C2=A0 =C2=A0vmsg-&gt;fd_num =3D 0;<br>&gt; &g=
+t; + =C2=A0 =C2=A0for (cmsg =3D CMSG_FIRSTHDR(&amp;msg);<br>&gt; &gt; + =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 cmsg !=3D NULL;<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 cmsg =3D CMSG_NXTHDR(&amp;msg, cmsg))<br>&gt; &gt; + =C2=A0 =C2=
+=A0{<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0if (cmsg-&gt;cmsg_level =3D=
+=3D SOL_SOCKET &amp;&amp; cmsg-&gt;cmsg_type =3D=3D SCM_RIGHTS) {<br>&gt; &=
+gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0fd_size =3D cmsg-&gt;cmsg_le=
+n - CMSG_LEN(0);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vm=
+sg-&gt;fd_num =3D fd_size / sizeof(int);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0memcpy(vmsg-&gt;fds, CMSG_DATA(cmsg), fd_size);<br>=
+&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>&gt; &gt; + =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>&gt; &gt; + =C2=A0 =C2=A0}<br><br>&gt; I th=
+ink the fd passing part becomes easier when you use the proper<br>&gt; qio_=
+channel_readv_full() function. Its implementation is also a bit more<br>&gt=
+; careful than yours. For example, you forgot checking fd_size against<br>&=
+gt; VHOST_MEMORY_MAX_NREGIONS, allowing a buffer overflow in the memcpy(),<=
+br>&gt; and you don&#39;t adjust fd flags for the new file descriptors.<br>=
+<div><br></div><div>Oh, I used=C2=A0qio_channel_readv_full in v3&amp;v4. Bu=
+t I still forgot checking fd_size against=C2=A0 VHOST_MEMORY_MAX_NREGIONS. =
+I&#39;ll fix this buffer overflow issue in v5.</div><br><div class=3D"gmail=
+_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jan 16, 2020 at 9:56 =
+PM Kevin Wolf &lt;<a href=3D"mailto:kwolf@redhat.com" target=3D"_blank">kwo=
+lf@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
+ng-left:1ex">Hi,<br>
+<br>
+I&#39;m only doing a quick first review pointing out the more obvious<br>
+things while I familiarise myself with your code. I intend to review it<br>
+in more detail later (either in a second pass for this series, or when<br>
+you post v3).<br>
+<br>
+Am 14.01.2020 um 15:06 hat Coiby Xu geschrieben:<br>
+&gt; By making use of libvhost, multiple block device drives can be exporte=
+d and each drive can serve multiple clients simultaneously. Since vhost-use=
+r-server needs a block drive to be created first, delay the creation of thi=
+s object.<br>
+&gt; <br>
+&gt; Signed-off-by: Coiby Xu &lt;<a href=3D"mailto:coiby.xu@gmail.com" targ=
+et=3D"_blank">coiby.xu@gmail.com</a>&gt;<br>
+<br>
+Please wrap the commit message at 72 characters.<br>
+<br>
+&gt;=C2=A0 blockdev-vu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =
+1008 ++++++++++++++++++++++++++++++++++++<br>
+&gt;=C2=A0 include/block/vhost-user.h |=C2=A0 =C2=A046 ++<br>
+&gt;=C2=A0 vl.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 4 +<br>
+&gt;=C2=A0 3 files changed, 1058 insertions(+)<br>
+&gt;=C2=A0 create mode 100644 blockdev-vu.c<br>
+&gt;=C2=A0 create mode 100644 include/block/vhost-user.h<br>
+<br>
+This adds a single, relatively big source file. I see at least two<br>
+parts: The generic vhost-user infrastructure with connection handling<br>
+etc. and the implementation of the specific vhost-user-blk device.<br>
+Separating these into two files is probably a good idea.<br>
+<br>
+I would also suggest to put the files in a new subdirectory<br>
+block/export/ and call them vhost-user.c/vhost-user-blk.c. The new<br>
+header file can be in the same directory as it shouldn&#39;t be used by<br>
+anyone else.<br>
+<br>
+&gt; diff --git a/blockdev-vu.c b/blockdev-vu.c<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000000..45f0bb43a7<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/blockdev-vu.c<br>
+&gt; @@ -0,0 +1,1008 @@<br>
+<br>
+The LICENSE file clarifies that files without a license header are<br>
+GPLv2+, so it&#39;s not strictly a problem, but I think it is good style to=
+<br>
+include a license header that explicitly tells so.<br>
+<br>
+&gt; +#include &quot;qemu/osdep.h&quot;<br>
+&gt; +#include &quot;block/vhost-user.h&quot;<br>
+&gt; +#include &quot;qapi/error.h&quot;<br>
+&gt; +#include &quot;qapi/qapi-types-sockets.h&quot;<br>
+&gt; +#include &quot;qapi/qapi-commands-block.h&quot;<br>
+&gt; +<br>
+&gt; +#include &quot;sysemu/block-backend.h&quot;<br>
+&gt; +#include &quot;qemu/main-loop.h&quot;<br>
+&gt; +<br>
+&gt; +#include &quot;qemu/units.h&quot;<br>
+&gt; +<br>
+&gt; +#include &quot;block/block.h&quot;<br>
+&gt; +<br>
+&gt; +#include &quot;qom/object_interfaces.h&quot;<br>
+&gt; +<br>
+&gt; +#include &lt;sys/eventfd.h&gt;<br>
+&gt; +<br>
+&gt; +#include &quot;hw/qdev-properties.h&quot;<br>
+<br>
+Does the order of includes and the empty lines between them signify<br>
+anything? If not, I suggest just sorting them alphabetically (and maybe<br>
+using empty lines between different subdirectories if you like this<br>
+better than a single large block).<br>
+<br>
+According to CODING_STYLE.rst, system headers like &lt;sys/eventfd.h&gt; co=
+me<br>
+before all QEMU headers (except qemu/osdep.h, which always must come<br>
+first).<br>
+<br>
+&gt; +enum {<br>
+&gt; +=C2=A0 =C2=A0 VHOST_USER_BLK_MAX_QUEUES =3D 8,<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +struct virtio_blk_inhdr {<br>
+&gt; +=C2=A0 =C2=A0 unsigned char status;<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static QTAILQ_HEAD(, VubDev) vub_devs =3D QTAILQ_HEAD_INITIALIZER(vub=
+_devs);<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +typedef struct VubReq {<br>
+&gt; +=C2=A0 =C2=A0 VuVirtqElement *elem;<br>
+<br>
+Maybe worth a comment that this was allocated with plain malloc(), so<br>
+you must use free() rather than g_free() (which would be the default in<br>
+QEMU)?<br>
+<br>
+&gt; +=C2=A0 =C2=A0 int64_t sector_num;<br>
+&gt; +=C2=A0 =C2=A0 size_t size;<br>
+&gt; +=C2=A0 =C2=A0 struct virtio_blk_inhdr *in;<br>
+&gt; +=C2=A0 =C2=A0 struct virtio_blk_outhdr out;<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client;<br>
+&gt; +=C2=A0 =C2=A0 struct VuVirtq *vq;<br>
+&gt; +} VubReq;<br>
+<br>
+I&#39;m not completely sure yet, but I think I would prefer VuBlock to Vub<=
+br>
+in the type names. Some may even prefer VhostUserBlock, but I can see<br>
+that this would be quite lengthy.<br>
+<br>
+&gt; +static void<br>
+&gt; +remove_watch(VuDev *vu_dev, int fd)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 g_assert(vu_dev);<br>
+&gt; +=C2=A0 =C2=A0 g_assert(fd &gt;=3D 0);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 client =3D container_of(vu_dev, VuClient, parent);<br>
+&gt; +=C2=A0 =C2=A0 aio_set_fd_handler(client-&gt;blk-&gt;ctx, fd, false, N=
+ULL, NULL, NULL, NULL);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void close_client(VuClient *client)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 vu_deinit(&amp;client-&gt;parent);<br>
+&gt; +=C2=A0 =C2=A0 /** g_source_destroy(vub_device-&gt;parent.src); */<br>
+<br>
+Leftover from conversion?<br>
+<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;sioc =3D NULL;<br>
+&gt; +=C2=A0 =C2=A0 object_unref(OBJECT(client-&gt;ioc));<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;closed =3D true;<br>
+&gt; +<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vub_panic_cb(VuDev *vu_dev, const char *buf)<br>
+<br>
+You use a lot of sprintf() before calling this function. Would it be<br>
+worth taking a printf-like format parameter instead of buf and using a<br>
+variable argument list?<br>
+<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 if (buf) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_warning(&quot;vu_panic: %s&quot;, buf);=
+<br>
+<br>
+I think QEMU proper doesn&#39;t use g_warning() anywhere. This could be<br>
+error_report() or warn_report(). (Or if you use a format string<br>
+error_vreport() and warn_vreport().)<br>
+<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(vu_dev, VuClient, par=
+ent);<br>
+&gt; +=C2=A0 =C2=A0 if (client-&gt;blk-&gt;exit_panic) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt;blk-&gt;close =3D true;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 if (!client-&gt;closed) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 close_client(client);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static void vub_req_complete(VubReq *req)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuDev *vu_dev =3D &amp;req-&gt;client-&gt;parent;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* IO size with 1 extra status byte */<br>
+&gt; +=C2=A0 =C2=A0 vu_queue_push(vu_dev, req-&gt;vq, req-&gt;elem,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&g=
+t;size + 1);<br>
+<br>
+I think this fits in a single line.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 vu_queue_notify(vu_dev, req-&gt;vq);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (req-&gt;elem) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 free(req-&gt;elem);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 g_free(req);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static int<br>
+&gt; +vub_discard_write_zeroes(VubReq *req, struct iovec *iov, uint32_t iov=
+cnt,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0uint32_t type)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 struct virtio_blk_discard_write_zeroes *desc;<br>
+&gt; +=C2=A0 =C2=A0 ssize_t size;<br>
+&gt; +=C2=A0 =C2=A0 void *buf;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 size =3D iov_size(iov, iovcnt);<br>
+&gt; +=C2=A0 =C2=A0 if (size !=3D sizeof(*desc)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Invalid size %ld, e=
+xpect %ld\n&quot;, size, sizeof(*desc));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+<br>
+This would be error_report(), too. (More cases below, I&#39;ll ignore them<=
+br>
+now.)<br>
+<br>
+I would prefer consistent use of -errno instead of -1 for error cases if<br=
+>
+you don&#39;t mind. I guess this would be -EINVAL here. I won&#39;t mention=
+ it<br>
+for all the other cases; if you want to make the change, you need to<br>
+make it everywhere, obviously.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 buf =3D g_new0(char, size);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 iov_to_buf_full(iov, iovcnt, 0, buf, size);<br>
+<br>
+I think uint8_t describes better than char what we want here: A buffer<br>
+of bytes.<br>
+<br>
+The empty line would make more sense to me above the g_new0() line than<br>
+after it because it starts a new section that deals with the buffer. In<br>
+general, the use of empty lines feels a bit inconsistent in this patch.<br>
+You may want to go over them again.<br>
+<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 #if defined(__linux__) &amp;&amp; defined(BLKDISCARD) &=
+amp;&amp; defined(BLKZEROOUT)<br>
+<br>
+Preprocessor directives should be unindented.<br>
+<br>
+However, I don&#39;t think any of this code actually depends on Linux,<br>
+BLKDISCARD or BLKZEROOUT. You can just call blk_pdiscard() and<br>
+blk_pwrite_zeroes() and they will do whatever is necessary to perform<br>
+the operation on the backend (which might not be a Linux block device,<br>
+but could be a regular file or even using a network protocol like NBD).<br>
+<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vdev_blk;<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(dev, VuClient, parent=
+);<br>
+&gt; +=C2=A0 =C2=A0 vdev_blk =3D client-&gt;blk;<br>
+&gt; +=C2=A0 =C2=A0 desc =3D (struct virtio_blk_discard_write_zeroes *)buf;=
+<br>
+&gt; +=C2=A0 =C2=A0 uint64_t range[2] =3D { le64toh(desc-&gt;sector) &lt;&l=
+t; 9,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 le32toh(desc-&gt;num_sectors) &lt;&lt; 9 };<br>
+&gt; +=C2=A0 =C2=A0 if (type =3D=3D VIRTIO_BLK_T_DISCARD) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (blk_pdiscard(vdev_blk-&gt;blk, range[=
+0], range[1]) =3D=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(buf);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 } else if (type =3D=3D VIRTIO_BLK_T_WRITE_ZEROES) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (blk_pwrite_zeroes(vdev_blk-&gt;blk, r=
+ange[0], range[1]) =3D=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(buf);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+<br>
+blk_pdiscard() and blk_pwrite_zeroes() are synchronous functions. In<br>
+other words, the guest will be blocked until the I/O is complete. We<br>
+cannot do this.<br>
+<br>
+I think you should let vub_virtio_process_req() run in a coroutine so<br>
+that you can call blk_co_pdiscard() and blk_co_pwrite_zeroes() here.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 #endif<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 g_free(buf);<br>
+&gt; +=C2=A0 =C2=A0 return -1;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static void<br>
+&gt; +vub_flush(VubReq *req)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D req-&gt;client;<br>
+&gt; +=C2=A0 =C2=A0 blk_co_flush(client-&gt;blk-&gt;backend);<br>
+<br>
+You can&#39;t call blk_co_flush() from outside coroutine context. This code=
+<br>
+will be right after you move vub_virtio_process_req() to a coroutine,<br>
+though (which will make this function a coroutine_fn).<br>
+<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +#define NOT_DONE 0x7fffffff /* used while emulated sync operation in =
+progress */<br>
+&gt; +typedef struct BlkRwCo {<br>
+&gt; +=C2=A0 =C2=A0 BlockBackend *blk;<br>
+&gt; +=C2=A0 =C2=A0 int64_t offset;<br>
+&gt; +=C2=A0 =C2=A0 void *iobuf;<br>
+&gt; +=C2=A0 =C2=A0 int ret;<br>
+&gt; +=C2=A0 =C2=A0 BdrvRequestFlags flags;<br>
+&gt; +} BlkRwCo;<br>
+&gt; +<br>
+&gt; +static void blk_read_entry(void *opaque)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 BlkRwCo *rwco =3D opaque;<br>
+&gt; +=C2=A0 =C2=A0 QEMUIOVector *qiov =3D rwco-&gt;iobuf;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 rwco-&gt;ret =3D blk_co_preadv(rwco-&gt;blk, rwco-&gt;o=
+ffset, qiov-&gt;size,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qiov, rwco-&gt;flags);<br>
+&gt; +=C2=A0 =C2=A0 aio_wait_kick();<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static void blk_write_entry(void *opaque)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 BlkRwCo *rwco =3D opaque;<br>
+&gt; +=C2=A0 =C2=A0 QEMUIOVector *qiov =3D rwco-&gt;iobuf;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 rwco-&gt;ret =3D blk_co_pwritev(rwco-&gt;blk, rwco-&gt;=
+offset, qiov-&gt;size,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qiov, rwco-&gt;flags);<br>
+&gt; +=C2=A0 =C2=A0 aio_wait_kick();<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t off=
+set,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+CoroutineEntry co_entry, BdrvRequestFlags flags)<br>
+&gt; +{<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 BlkRwCo rwco =3D {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .blk=C2=A0 =C2=A0 =3D blk,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .offset =3D offset,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .iobuf=C2=A0 =3D qiov,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .flags=C2=A0 =3D flags,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ret=C2=A0 =C2=A0 =3D NOT_DONE,<br>
+&gt; +=C2=A0 =C2=A0 };<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (qemu_in_coroutine()) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Fast-path if already in coroutine cont=
+ext */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 co_entry(&amp;rwco);<br>
+&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 Coroutine *co =3D qemu_coroutine_create(c=
+o_entry, &amp;rwco);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 bdrv_coroutine_enter(blk_bs(blk), co);<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 BDRV_POLL_WHILE(blk_bs(blk), rwco.ret =3D=
+=3D NOT_DONE);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return rwco.ret;<br>
+&gt; +}<br>
+<br>
+This is copy&amp;paste from block-backend.c. We should certainly not do<br>
+this. I think it will automatically go away when you can use<br>
+blk_co_preadv() and blk_co_pwritev() directly.<br>
+<br>
+Note that the BDRV_POLL_WHILE() means that like above, we would be<br>
+waiting for the request to complete. This would block the guest and<br>
+would also not allow parallel requests, killing the I/O performance of<br>
+our vhost-user export.<br>
+<br>
+&gt; +<br>
+&gt; +static ssize_t<br>
+&gt; +vub_rwv(VubReq *req, struct iovec *iov,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t iovcnt,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 CoroutineEntry co_entry)<br>
+<br>
+I don&#39;t understand the line wrapping here. :-)<br>
+<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D req-&gt;client;<br>
+&gt; +=C2=A0 =C2=A0 ssize_t rc;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!iovcnt) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Invalid Read/Write =
+IOV count\n&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 int64_t offset =3D req-&gt;sector_num * 512;<br>
+&gt; +=C2=A0 =C2=A0 QEMUIOVector *qiov =3D g_new0(QEMUIOVector, 1);<br>
+&gt; +=C2=A0 =C2=A0 qemu_iovec_init_external(qiov, iov, iovcnt);<br>
+&gt; +=C2=A0 =C2=A0 rc =3D blk_prw(client-&gt;blk-&gt;backend, qiov, offset=
+, co_entry, 0);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 req-&gt;size =3D iov_size(iov, iovcnt);<br>
+<br>
+You can use qiov-&gt;size instead of duplicating this information into a<br=
+>
+separate VubReq field.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 if (rc &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;%s, Sector %&quot;P=
+RIu64&quot;, Size %lu failed with %s\n&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt;bl=
+k-&gt;name, req-&gt;sector_num, req-&gt;size,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 strerror(errn=
+o));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return rc;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static int vub_virtio_process_req(VuClient *client,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0VuVirtq *vq)=
+<br>
+<br>
+Indentation is off. This could be a single line anyway.<br>
+<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuDev *vu_dev =3D &amp;client-&gt;parent;<br>
+&gt; +=C2=A0 =C2=A0 VuVirtqElement *elem;<br>
+&gt; +=C2=A0 =C2=A0 uint32_t type;<br>
+&gt; +=C2=A0 =C2=A0 VubReq *req;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 elem =3D vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement=
+) + sizeof(VubReq));<br>
+&gt; +=C2=A0 =C2=A0 if (!elem) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 struct iovec *in_iov =3D elem-&gt;in_sg;<br>
+&gt; +=C2=A0 =C2=A0 struct iovec *out_iov =3D elem-&gt;out_sg;<br>
+&gt; +=C2=A0 =C2=A0 unsigned in_num =3D elem-&gt;in_num;<br>
+&gt; +=C2=A0 =C2=A0 unsigned out_num =3D elem-&gt;out_num;<br>
+&gt; +=C2=A0 =C2=A0 /* refer to hw/block/virtio_blk.c */<br>
+&gt; +=C2=A0 =C2=A0 if (elem-&gt;out_num &lt; 1 || elem-&gt;in_num &lt; 1) =
+{<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;virtio-blk request =
+missing headers\n&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 free(elem);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 req =3D g_new0(VubReq, 1);<br>
+&gt; +=C2=A0 =C2=A0 req-&gt;client =3D client;<br>
+&gt; +=C2=A0 =C2=A0 req-&gt;vq =3D vq;<br>
+&gt; +=C2=A0 =C2=A0 req-&gt;elem =3D elem;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (unlikely(iov_to_buf(out_iov, out_num, 0, &amp;req-&=
+gt;out,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(req-&gt;out)) !=3D sizeof(req-&gt;out))=
+) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;virtio-blk request =
+outhdr too short&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 iov_discard_front(&amp;out_iov, &amp;out_num, sizeof(re=
+q-&gt;out));<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (in_iov[in_num - 1].iov_len &lt; sizeof(struct virti=
+o_blk_inhdr)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;virtio-blk request =
+inhdr too short&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* We always touch the last byte, so just see how big i=
+n_iov is.=C2=A0 */<br>
+&gt; +=C2=A0 =C2=A0 req-&gt;in =3D (void *)in_iov[in_num - 1].iov_base<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 + in_iov[in_num - 1]=
+.iov_len<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 - sizeof(struct virt=
+io_blk_inhdr);<br>
+&gt; +=C2=A0 =C2=A0 iov_discard_back(in_iov, &amp;in_num, sizeof(struct vir=
+tio_blk_inhdr));<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 type =3D le32toh(req-&gt;out.type);<br>
+&gt; +=C2=A0 =C2=A0 switch (type &amp; ~VIRTIO_BLK_T_BARRIER) {<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_IN:<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_OUT: {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ssize_t ret =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 bool is_write =3D type &amp; VIRTIO_BLK_T=
+_OUT;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;sector_num =3D le64toh(req-&gt;ou=
+t.sector);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (is_write) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D vub_rwv(req, out_io=
+v, out_num, blk_write_entry);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D vub_rwv(req, in_iov=
+, in_num, blk_read_entry);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret &gt;=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D V=
+IRTIO_BLK_S_OK;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D V=
+IRTIO_BLK_S_IOERR;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_req_complete(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_FLUSH:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_flush(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D VIRTIO_BLK_S_OK=
+;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_req_complete(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_GET_ID: {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t size =3D MIN(iov_size(&amp;elem-&g=
+t;in_sg[0], in_num),<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 VIRTIO_BLK_ID_BYTES);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 snprintf(elem-&gt;in_sg[0].iov_base, size=
+, &quot;%s&quot;, &quot;vhost_user_blk&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D VIRTIO_BLK_S_OK=
+;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;size =3D elem-&gt;in_sg[0].iov_le=
+n;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_req_complete(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_DISCARD:<br>
+&gt; +=C2=A0 =C2=A0 case VIRTIO_BLK_T_WRITE_ZEROES: {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 int rc;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D vub_discard_write_zeroes(req, &amp=
+;elem-&gt;out_sg[1], out_num, type);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc =3D=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D V=
+IRTIO_BLK_S_OK;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D V=
+IRTIO_BLK_S_IOERR;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_req_complete(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 default:<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 req-&gt;in-&gt;status =3D VIRTIO_BLK_S_UN=
+SUPP;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_req_complete(req);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +<br>
+&gt; +err:<br>
+&gt; +=C2=A0 =C2=A0 free(elem);<br>
+&gt; +=C2=A0 =C2=A0 g_free(req);<br>
+&gt; +=C2=A0 =C2=A0 return -1;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static void vub_process_vq(VuDev *vu_dev, int idx)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client;<br>
+&gt; +=C2=A0 =C2=A0 VuVirtq *vq;<br>
+&gt; +=C2=A0 =C2=A0 int ret;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 client =3D container_of(vu_dev, VuClient, parent);<br>
+&gt; +=C2=A0 =C2=A0 assert(client);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vq =3D vu_get_queue(vu_dev, idx);<br>
+&gt; +=C2=A0 =C2=A0 assert(vq);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 while (1) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D vub_virtio_process_req(client, vq=
+);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ret) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+<br>
+I mentioned above moving vub_virtio_process_req() into a coroutine. Just<br=
+>
+creating a coroutine here and entering it wouldn&#39;t work, though.<br>
+<br>
+The best design is probably to get requests from the virtqueue in this<br>
+function (what is currently the first half of vub_virtio_process_req())<br>
+and then spawn a coroutine per request to actually execute them (roughly<br=
+>
+the switch in vub_virtio_process_req()).<br>
+<br>
+This way you&#39;ll get parallel requests and won&#39;t have to think about=
+<br>
+synchronising accesses to the virtqueue from multiple coroutines.<br>
+<br>
+&gt; +<br>
+&gt; +static void vub_queue_set_started(VuDev *vu_dev, int idx, bool starte=
+d)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuVirtq *vq;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 assert(vu_dev);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vq =3D vu_get_queue(vu_dev, idx);<br>
+&gt; +=C2=A0 =C2=A0 vu_set_queue_handler(vu_dev, vq, started ? vub_process_=
+vq : NULL);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static uint64_t<br>
+&gt; +vub_get_features(VuDev *dev)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 uint64_t features;<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vdev_blk;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(dev, VuClient, parent=
+);<br>
+&gt; +=C2=A0 =C2=A0 vdev_blk =3D client-&gt;blk;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 features =3D 1ull &lt;&lt; VIRTIO_BLK_F_SIZE_MAX |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_SEG_MAX |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_TOPOLOGY |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_BLK_SIZE |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_FLUSH |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0#if defined(__=
+linux__) &amp;&amp; defined(BLKDISCARD) &amp;&amp; defined(BLKZEROOUT)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_DISCARD |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_WRITE_ZEROES |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0#endif<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_BLK_F_CONFIG_WCE |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_F_VERSION_1 |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_RING_F_INDIRECT_DESC |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VIRTIO_RING_F_EVENT_IDX |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; =
+VHOST_USER_F_PROTOCOL_FEATURES;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!vdev_blk-&gt;writable) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 features |=3D 1ull &lt;&lt; VIRTIO_BLK_F_=
+RO;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return features;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static uint64_t<br>
+&gt; +vub_get_protocol_features(VuDev *dev)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 return 1ull &lt;&lt; VHOST_USER_PROTOCOL_F_CONFIG |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01ull &lt;&lt; VHOST_USER_PRO=
+TOCOL_F_INFLIGHT_SHMFD;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static int<br>
+&gt; +vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vdev_blk;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(vu_dev, VuClient, par=
+ent);<br>
+&gt; +=C2=A0 =C2=A0 vdev_blk =3D client-&gt;blk;<br>
+&gt; +=C2=A0 =C2=A0 memcpy(config, &amp;vdev_blk-&gt;blkcfg, len);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static int<br>
+&gt; +vub_set_config(VuDev *vu_dev, const uint8_t *data,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint32_t offse=
+t, uint32_t size, uint32_t flags)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vdev_blk;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(vu_dev, VuClient, par=
+ent);<br>
+&gt; +=C2=A0 =C2=A0 vdev_blk =3D client-&gt;blk;<br>
+&gt; +=C2=A0 =C2=A0 uint8_t wce;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /* don&#39;t support live migration */<br>
+&gt; +=C2=A0 =C2=A0 if (flags !=3D VHOST_SET_CONFIG_TYPE_MASTER) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (offset !=3D offsetof(struct virtio_blk_config, wce)=
+ ||<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 size !=3D 1) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 wce =3D *data;<br>
+&gt; +=C2=A0 =C2=A0 if (wce =3D=3D vdev_blk-&gt;blkcfg.wce) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Do nothing as same with old configurat=
+ion */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vdev_blk-&gt;blkcfg.wce =3D wce;<br>
+&gt; +=C2=A0 =C2=A0 blk_set_enable_write_cache(vdev_blk-&gt;backend, true);=
+<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +/*<br>
+&gt; + * When the client disconnects, it send a VHOST_USER_NONE request<br>
+<br>
+s/send/sends/<br>
+<br>
+&gt; + * and vu_process_message will simple call exit which cause the VM<br=
+>
+&gt; + * to exit abruptly.<br>
+&gt; + * To avoid this issue,=C2=A0 process VHOST_USER_NONE request ahead<b=
+r>
+&gt; + * of vu_process_message.<br>
+&gt; + *<br>
+&gt; + */<br>
+&gt; +static int vub_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_re=
+ply)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 if (vmsg-&gt;request =3D=3D VHOST_USER_NONE) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 dev-&gt;panic(dev, &quot;disconnect&quot;=
+);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 return false;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void<br>
+&gt; +vmsg_close_fds(VhostUserMsg *vmsg)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 int i;<br>
+&gt; +=C2=A0 =C2=A0 for (i =3D 0; i &lt; vmsg-&gt;fd_num; i++) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 close(vmsg-&gt;fds[i]);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static bool<br>
+&gt; +vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)<br=
+>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * siz=
+eof(int))] =3D { };<br>
+&gt; +=C2=A0 =C2=A0 struct iovec iov =3D {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .iov_base =3D (char *)vmsg,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .iov_len =3D VHOST_USER_HDR_SIZE,<br>
+&gt; +=C2=A0 =C2=A0 };<br>
+&gt; +=C2=A0 =C2=A0 struct msghdr msg =3D {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .msg_iov =3D &amp;iov,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .msg_iovlen =3D 1,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .msg_control =3D control,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .msg_controllen =3D sizeof(control),<br>
+&gt; +=C2=A0 =C2=A0 };<br>
+&gt; +=C2=A0 =C2=A0 size_t fd_size;<br>
+&gt; +=C2=A0 =C2=A0 struct cmsghdr *cmsg;<br>
+&gt; +=C2=A0 =C2=A0 int rc;<br>
+&gt; +=C2=A0 =C2=A0 char buffer[100];<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D container_of(vu_dev, VuClient, par=
+ent);<br>
+&gt; +=C2=A0 =C2=A0 QIOChannel *ioc =3D client-&gt;ioc;<br>
+&gt; +=C2=A0 =C2=A0 do {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D recvmsg(conn_fd, &amp;msg, 0);<br>
+<br>
+This should certainly use qio_channel_readv_full() rather than working<br>
+directly with a socket fd?<br>
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (errno =3D=3D EAGAIN) {<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (qemu_in_c=
+oroutine()) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ qio_channel_yield(ioc, G_IO_IN);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ qio_channel_wait(ioc, G_IO_IN);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (errno =3D=3D EIN=
+TR) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 } while (true);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (rc &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 sprintf(buffer, &quot;Error while recvmsg=
+: %s&quot;, strerror(errno));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_panic_cb(vu_dev, buffer);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 assert(rc =3D=3D VHOST_USER_HDR_SIZE || rc =3D=3D 0);<b=
+r>
+<br>
+Why do you think that there can&#39;t be short reads?<br>
+<br>
+&gt; +=C2=A0 =C2=A0 vmsg-&gt;fd_num =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 for (cmsg =3D CMSG_FIRSTHDR(&amp;msg);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cmsg !=3D NULL;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cmsg =3D CMSG_NXTHDR(&amp;msg, cmsg=
+))<br>
+&gt; +=C2=A0 =C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (cmsg-&gt;cmsg_level =3D=3D SOL_SOCKET=
+ &amp;&amp; cmsg-&gt;cmsg_type =3D=3D SCM_RIGHTS) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fd_size =3D cmsg-&gt;cmsg_l=
+en - CMSG_LEN(0);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmsg-&gt;fd_num =3D fd_size=
+ / sizeof(int);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 memcpy(vmsg-&gt;fds, CMSG_D=
+ATA(cmsg), fd_size);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+<br>
+I think the fd passing part becomes easier when you use the proper<br>
+qio_channel_readv_full() function. Its implementation is also a bit more<br=
+>
+careful than yours. For example, you forgot checking fd_size against<br>
+VHOST_MEMORY_MAX_NREGIONS, allowing a buffer overflow in the memcpy(),<br>
+and you don&#39;t adjust fd flags for the new file descriptors.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 if (vmsg-&gt;size &gt; sizeof(vmsg-&gt;payload)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 sprintf(buffer,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;Error: =
+too big message request: %d, size: vmsg-&gt;size: %u, &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;while s=
+izeof(vmsg-&gt;payload) =3D %zu\n&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vmsg-&gt;requ=
+est, vmsg-&gt;size, sizeof(vmsg-&gt;payload));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_panic_cb(vu_dev, buffer);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto fail;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vmsg-&gt;size) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 do {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D read(conn_fd, &amp;v=
+msg-&gt;payload, vmsg-&gt;size);<br>
+<br>
+qio_channel_readv_all_eof() already implements this whole loop and<br>
+correctly handles short reads, too.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (errno =3D=
+=3D EAGAIN) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ if (qemu_in_coroutine()) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 qio_channel_yield(ioc, G_IO_IN);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 qio_channel_wait(ioc, G_IO_IN);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ continue;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (er=
+rno =3D=3D EINTR) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ continue;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } while (true);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc &lt;=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sprintf(buffer, &quot;Error=
+ while reading: %s&quot;, strerror(errno));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_panic_cb(vu_dev, buffer=
+);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto fail;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 assert(rc =3D=3D vmsg-&gt;size);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return true;<br>
+&gt; +<br>
+&gt; +fail:<br>
+&gt; +=C2=A0 =C2=A0 vmsg_close_fds(vmsg);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return false;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vub_kick_cb(void *opaque)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 vu_watch_cb_data *data =3D (vu_watch_cb_data *) opaque;=
+<br>
+&gt; +=C2=A0 =C2=A0 int index =3D data-&gt;index;<br>
+&gt; +=C2=A0 =C2=A0 VuDev *dev =3D data-&gt;vu_dev;<br>
+&gt; +=C2=A0 =C2=A0 VuVirtq *vq =3D &amp;dev-&gt;vq[index];<br>
+&gt; +=C2=A0 =C2=A0 int sock =3D vq-&gt;kick_fd;<br>
+&gt; +=C2=A0 =C2=A0 eventfd_t kick_data;<br>
+&gt; +=C2=A0 =C2=A0 ssize_t rc;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 rc =3D eventfd_read(sock, &amp;kick_data);<br>
+&gt; +=C2=A0 =C2=A0 if (rc =3D=3D -1) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 char buffer[100];<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 sprintf(buffer, &quot;kick eventfd_read()=
+: %s&quot;, strerror(errno));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_panic_cb(dev, buffer);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(data);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 dev-&gt;remove_watch(dev, dev-&gt;vq[inde=
+x].kick_fd);<br>
+&gt; +=C2=A0 =C2=A0 } else {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (vq-&gt;handler) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vq-&gt;handler(dev, index);=
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static const VuDevIface vub_iface =3D {<br>
+&gt; +=C2=A0 =C2=A0 .get_features =3D vub_get_features,<br>
+&gt; +=C2=A0 =C2=A0 .queue_set_started =3D vub_queue_set_started,<br>
+&gt; +=C2=A0 =C2=A0 .get_protocol_features =3D vub_get_protocol_features,<b=
+r>
+&gt; +=C2=A0 =C2=A0 .get_config =3D vub_get_config,<br>
+&gt; +=C2=A0 =C2=A0 .set_config =3D vub_set_config,<br>
+&gt; +=C2=A0 =C2=A0 .process_msg =3D vub_process_msg,<br>
+&gt; +=C2=A0 =C2=A0 .read_msg =3D vu_message_read_co,<br>
+&gt; +=C2=A0 =C2=A0 .kick_callback =3D vub_kick_cb,<br>
+&gt; +};<br>
+<br>
+I would prefer the =3D signs to be aligned to the same column.<br>
+<br>
+&gt; +<br>
+&gt; +void vub_free(VubDev *vub_dev, bool called_by_QOM)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 if (!vub_dev) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 blk_unref(vub_dev-&gt;backend);<br>
+&gt; +=C2=A0 =C2=A0 g_free(vub_dev-&gt;name);<br>
+&gt; +=C2=A0 =C2=A0 g_free(vub_dev-&gt;unix_socket);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vub_dev-&gt;next.tqe_circ.tql_prev) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* if vub_dev-&gt;next.tqe_circ.tql_=
+prev =3D null,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* vub_dev hasn&#39;t been inserted =
+into the queue and<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* vub_free is called by obj-&gt;ins=
+tance_finalize.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 QTAILQ_REMOVE(&amp;vub_devs, vub_dev, nex=
+t);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Needn&#39;t to free vub_dev if called by QOM<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0* because QOM will do the clean-up work.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 if (!called_by_QOM) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(vub_dev);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static coroutine_fn void vu_client_trip(void *opaque)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client =3D opaque;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 while (!client-&gt;closed) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_dispatch(&amp;client-&gt;parent);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_REMOVE(&amp;client-&gt;blk-&gt;clients, client, =
+next);<br>
+&gt; +<br>
+<br>
+Extra empty line.<br>
+<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vu_client_start(VuClient *client)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 Coroutine *co =3D qemu_coroutine_create(vu_client_trip,=
+ client);<br>
+&gt; +=C2=A0 =C2=A0 qemu_coroutine_enter(co);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +G_STATIC_ASSERT((int)G_IO_IN =3D=3D (int)VU_WATCH_IN);<br>
+&gt; +G_STATIC_ASSERT((int)G_IO_OUT =3D=3D (int)VU_WATCH_OUT);<br>
+&gt; +G_STATIC_ASSERT((int)G_IO_PRI =3D=3D (int)VU_WATCH_PRI);<br>
+&gt; +G_STATIC_ASSERT((int)G_IO_ERR =3D=3D (int)VU_WATCH_ERR);<br>
+&gt; +G_STATIC_ASSERT((int)G_IO_HUP =3D=3D (int)VU_WATCH_HUP);<br>
+&gt; +<br>
+&gt; +static void<br>
+&gt; +set_watch(VuDev *vu_dev, int fd, int vu_evt,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_watch_cb_packed_data cb, void *=
+pvt)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* since aio_dispatch can only pass one user data =
+pointer to the<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* callback function, pack VuDev, pvt into a struc=
+t<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 g_assert(vu_dev);<br>
+&gt; +=C2=A0 =C2=A0 g_assert(fd &gt;=3D 0);<br>
+&gt; +=C2=A0 =C2=A0 g_assert(cb);<br>
+&gt; +=C2=A0 =C2=A0 client =3D container_of(vu_dev, VuClient, parent);<br>
+&gt; +=C2=A0 =C2=A0 vu_watch_cb_data *cb_data =3D g_new0(vu_watch_cb_data, =
+1);<br>
+&gt; +=C2=A0 =C2=A0 cb_data-&gt;index =3D (intptr_t) pvt;<br>
+&gt; +=C2=A0 =C2=A0 cb_data-&gt;vu_dev =3D vu_dev;<br>
+&gt; +=C2=A0 =C2=A0 aio_set_fd_handler(client-&gt;blk-&gt;ctx, fd, false, (=
+void *) cb,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0NULL, NULL, cb_data);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gpointer opaq=
+ue)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client;<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vub_device =3D opaque;<br>
+&gt; +=C2=A0 =C2=A0 client =3D g_new0(VuClient, 1);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!vu_init_packed_data(&amp;client-&gt;parent, VHOST_=
+USER_BLK_MAX_QUEUES,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sioc-&gt;fd, vub_panic_cb, set_watch,<br=
+>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0remove_watch, &amp;vub_iface)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Failed to initializ=
+ed libvhost-user\n&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_free(client);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;blk =3D vub_device;<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;refcount =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;sioc =3D sioc;<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* increase the object reference, so cioc will not=
+ freed by<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* qio_net_listener_channel_func which will call o=
+bject_unref(OBJECT(sioc))<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 object_ref(OBJECT(client-&gt;sioc));<br>
+&gt; +=C2=A0 =C2=A0 qio_channel_set_name(QIO_CHANNEL(sioc), &quot;vhost-use=
+r client&quot;);<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;ioc =3D QIO_CHANNEL(sioc);<br>
+&gt; +=C2=A0 =C2=A0 object_ref(OBJECT(client-&gt;ioc));<br>
+&gt; +=C2=A0 =C2=A0 object_ref(OBJECT(sioc));<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qio_channel_set_blocking(QIO_CHANNEL(client-&gt;sioc), =
+false, NULL);<br>
+&gt; +=C2=A0 =C2=A0 client-&gt;closed =3D false;<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_INSERT_TAIL(&amp;client-&gt;blk-&gt;clients, cli=
+ent, next);<br>
+&gt; +=C2=A0 =C2=A0 vu_client_start(client);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +void<br>
+&gt; +vub_initialize_config(BlockDriverState *bs, struct virtio_blk_config =
+*config)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;capacity =3D bdrv_getlength(bs) &gt;&gt; BDR=
+V_SECTOR_BITS;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;blk_size =3D BDRV_SECTOR_SIZE;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;size_max =3D 65536;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;seg_max =3D 128 - 2;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;min_io_size =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;opt_io_size =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;num_queues =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 #if defined(__linux__) &amp;&amp; defined(BLKDISCARD) &=
+amp;&amp; defined(BLKZEROOUT)<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;max_discard_sectors =3D 32768;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;max_discard_seg =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;discard_sector_alignment =3D config-&gt;blk_=
+size &gt;&gt; 9;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;max_write_zeroes_sectors =3D 32768;<br>
+&gt; +=C2=A0 =C2=A0 config-&gt;max_write_zeroes_seg =3D 1;<br>
+&gt; +=C2=A0 =C2=A0 #endif<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static VubDev *vub_new(VubDev *vub_device, const char *name,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0const char *unix_socket, bool writable, Error **errp)<br>
+&gt; +{<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 BlockBackend *blk;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* Don&#39;t allow resize while the vhost user ser=
+ver is running,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* otherwise we don&#39;t care what happens with t=
+he node.<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 uint64_t perm =3D BLK_PERM_CONSISTENT_READ;<br>
+&gt; +=C2=A0 =C2=A0 int ret;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 AioContext *ctx;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 BlockDriverState *bs =3D bdrv_lookup_bs(name,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 name,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 errp);<br>
+<br>
+This fits in a single line.<br>
+<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!bs) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+&quot;No drive with name &#39;%s&#39;.&quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+&quot; Please find the list of names with &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+&quot;&#39;info block&#39;&quot;, name);<br>
+<br>
+This can probably be two lines instead of four.<br>
+<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return NULL;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (bdrv_is_read_only(bs)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 writable =3D false;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (writable) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 perm |=3D BLK_PERM_WRITE;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 ctx =3D bdrv_get_aio_context(bs);<br>
+&gt; +=C2=A0 =C2=A0 aio_context_acquire(ctx);<br>
+&gt; +=C2=A0 =C2=A0 bdrv_invalidate_cache(bs, NULL);<br>
+&gt; +=C2=A0 =C2=A0 aio_context_release(ctx);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 blk =3D blk_new(bdrv_get_aio_context(bs), perm,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 BLK_PE=
+RM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 BLK_PE=
+RM_WRITE | BLK_PERM_GRAPH_MOD);<br>
+&gt; +=C2=A0 =C2=A0 ret =3D blk_insert_bs(blk, bs, errp);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (ret &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto fail;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 blk_set_enable_write_cache(blk, false);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 blk_set_allow_aio_context_change(blk, true);<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;name =3D g_strdup(name);<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;unix_socket =3D g_strdup(unix_socket);<b=
+r>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;writable =3D writable;<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;blkcfg.wce =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;backend =3D blk;<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;ctx =3D ctx;<br>
+&gt; +=C2=A0 =C2=A0 vub_initialize_config(bs, &amp;vub_device-&gt;blkcfg);<=
+br>
+&gt; +=C2=A0 =C2=A0 return vub_device;<br>
+&gt; +<br>
+&gt; +fail:<br>
+&gt; +=C2=A0 =C2=A0 blk_unref(blk);<br>
+&gt; +=C2=A0 =C2=A0 return NULL;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM)<b=
+r>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 if (!vub_device) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 VuClient *client, *next;<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_FOREACH_SAFE(client, &amp;vub_device-&gt;clients=
+, next, next) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!client-&gt;closed) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 close_client(client);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vub_device-&gt;listener) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qio_net_listener_disconnect(vub_device-&g=
+t;listener);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 object_unref(OBJECT(vub_device-&gt;listen=
+er));<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 vub_free(vub_device, called_by_QOM);<br>
+&gt; +<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +VubDev *vub_dev_find(const char *name)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vub_device;<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_FOREACH(vub_device, &amp;vub_devs, next) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (strcmp(name, vub_device-&gt;name) =3D=
+=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return vub_device;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return NULL;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static VubDev *vub_dev_find_by_unix_socket(const char *unix_socket)<b=
+r>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vub_device;<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_FOREACH(vub_device, &amp;vub_devs, next) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (strcmp(unix_socket, vub_device-&gt;un=
+ix_socket) =3D=3D 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return vub_device;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return NULL;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vhost_user_server_start(VubDev *vub_device, const char *u=
+nix_socket,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const char *name, =
+bool writable,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Error **errp)<br>
+&gt; +{<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vub_dev_find(name) || vub_dev_find_by_unix_socket(u=
+nix_socket)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp, &quot;Vhost user server =
+with name &#39;%s&#39; or &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;with so=
+cket_path &#39;%s&#39; has already been started&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 name, unix_so=
+cket);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!vub_new(vub_device, name, unix_socket, writable, e=
+rrp)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;listener =3D qio_net_listener_new();<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qio_net_listener_set_name(vub_device-&gt;listener,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;vhost-user-backend-listener&quot;=
+);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 SocketAddress *addr =3D g_new0(SocketAddress, 1);<br>
+&gt; +=C2=A0 =C2=A0 addr-&gt;u.q_unix.path =3D (char *) unix_socket;<br>
+&gt; +=C2=A0 =C2=A0 addr-&gt;type =3D SOCKET_ADDRESS_TYPE_UNIX;<br>
+&gt; +=C2=A0 =C2=A0 if (qio_net_listener_open_sync(vub_device-&gt;listener,=
+ addr, 1, errp) &lt; 0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto error;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 QTAILQ_INSERT_TAIL(&amp;vub_devs, vub_device, next);<br=
+>
+&gt; +=C2=A0 =C2=A0 QTAILQ_INIT(&amp;vub_device-&gt;clients);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qio_net_listener_set_client_func(vub_device-&gt;listene=
+r,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vub_accept,<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vub_device,<=
+br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0NULL);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return;<br>
+&gt; +<br>
+&gt; + error:<br>
+&gt; +=C2=A0 =C2=A0 vub_free(vub_device, false);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vu_set_block_name(Object *obj, const char *value,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0Error **errp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vus-&gt;name) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp, &quot;evdev property alr=
+eady set&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vus-&gt;name =3D g_strdup(value);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static char *vu_get_block_name(Object *obj, Error **errp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);<br>
+&gt; +=C2=A0 =C2=A0 return g_strdup(vus-&gt;name);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +static void vu_set_unix_socket(Object *obj, const char *value,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 Error **errp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (vus-&gt;unix_socket) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp, &quot;unix_socket proper=
+ty already set&quot;);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vus-&gt;unix_socket =3D g_strdup(value);<br>
+&gt; +=C2=A0 =C2=A0 vhost_user_server_start(vus, value, vus-&gt;name,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vus-&gt;writable, errp);<br>
+&gt; +}<br>
+<br>
+This makes the unix-socket property magic in that it starts the server<br>
+with the properties specified at this point. This means that this<br>
+property must always be specified last.<br>
+<br>
+Maybe it would be better to use a boolean property (similar to qdev&#39;s<b=
+r>
+&quot;realized&quot;) that explicitly start and possibly stops the export.<=
+br>
+<br>
+Writing to other properties should probably result in an error while the<br=
+>
+server is already running because these property changes won&#39;t take<br>
+effect any more then.<br>
+<br>
+&gt; +static char *vu_get_unix_socket(Object *obj, Error **errp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);;<br>
+&gt; +=C2=A0 =C2=A0 return g_strdup(vus-&gt;unix_socket);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static bool vu_get_block_writable(Object *obj, Error **errp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);;<br>
+&gt; +=C2=A0 =C2=A0 return vus-&gt;writable;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vu_set_block_writable(Object *obj, bool value, Error **er=
+rp)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vus-&gt;writable =3D value;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vhost_user_server_instance_init(Object *obj)<br>
+&gt; +{<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 object_property_add_bool(obj, &quot;writable&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_get_block_writable,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_set_block_writable, NULL);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 object_property_add_str(obj, &quot;name&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_get_block_name,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_set_block_name, NULL);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 object_property_add_str(obj, &quot;unix_socket&quot;,<b=
+r>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_get_unix_socket,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 vu_set_unix_socket, NULL);<br>
+<br>
+These should probably be object_class_property_add_*() and be called in<br>
+.class_init rather than .instance_init.<br>
+<br>
+&quot;name&quot; suggests that it&#39;s the name of the export rather than =
+the block<br>
+device to be exported. I would suggest &quot;node-name&quot; (and then actu=
+ally<br>
+only pass it as node-name to bdrv_lookup_bs()).<br>
+<br>
+I expect that in the long run, we&#39;ll want to accept a full SocketAddres=
+s<br>
+rather than just a filename like in &quot;unix_socket&quot;.<br>
+<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static void vhost_user_server_instance_finalize(Object *obj)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 VubDev *vus =3D VHOST_USER_SERVER(obj);<br>
+&gt; +=C2=A0 =C2=A0 vhost_user_server_free(vus, true);<br>
+&gt; +=C2=A0 =C2=A0 /* object_del shouldn&#39;t free this object struct */<=
+br>
+&gt; +=C2=A0 =C2=A0 obj-&gt;free =3D NULL;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static const TypeInfo vhost_user_server_info =3D {<br>
+&gt; +=C2=A0 =C2=A0 .name =3D TYPE_VHOST_USER_SERVER,<br>
+&gt; +=C2=A0 =C2=A0 .parent =3D TYPE_OBJECT,<br>
+&gt; +=C2=A0 =C2=A0 .instance_size =3D sizeof(VuDev),<br>
+&gt; +=C2=A0 =C2=A0 .instance_init =3D vhost_user_server_instance_init,<br>
+&gt; +=C2=A0 =C2=A0 .instance_finalize =3D vhost_user_server_instance_final=
+ize,<br>
+&gt; +=C2=A0 =C2=A0 .interfaces =3D (InterfaceInfo[]) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 {TYPE_USER_CREATABLE},<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 {}<br>
+&gt; +=C2=A0 =C2=A0 },<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +static void vhost_user_server_register_types(void)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 type_register_static(&amp;vhost_user_server_info);<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +type_init(vhost_user_server_register_types)<br>
+&gt; +<br>
+<br>
+Extra empty line at the file end.<br>
+<br>
+In summary, I can see this going in the right direction, though in<br>
+detail some more work will be needed.<br>
+<br>
+Kevin<br>
+<br>
+</blockquote></div></div><br clear=3D"all"><div><br></div>-- <br><div dir=
+=3D"ltr"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><i>Best regards,</i></=
+div><font color=3D"#00cccc"><i>Coiby</i></font><div><font color=3D"#00cccc"=
+><br></font></div></div></div></div></div>
+
+--00000000000001863c059efe8fc3--
 
