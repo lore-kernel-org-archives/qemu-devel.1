@@ -2,101 +2,80 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F687C11D0C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8DBC11D0C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:50:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FA8620722
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2FFE20722
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 17:50:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JwpYB7Jy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA8620722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zNqB5wwZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2FFE20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47225 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4pxq-0000D8-9o
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:50:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43743)
+	id 1j4pyT-0001NY-4N
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 12:50:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44074)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j4pvC-0005Bk-Mo
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:47:35 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pxW-0008Qv-CR
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:49:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j4pvA-0007HZ-Sg
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:47:33 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22059
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j4pvA-0007HH-KS
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:47:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582220851;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5MJDJCSApmEM161Uz0Leqmc4vmBLXNSRjpHFwHYLpug=;
- b=JwpYB7JyPmEdOyLdHanm9QLj7PSu8aOmZPhedYN02UtAl6RP9I5tCo06cpdhVwPIXt6Qde
- VeyPe0Kz6zc6ryCsxJcl6MD3QD62mRpLqe6B8hltGndGeGRGSdZpcdiZPcZCpVLIe6xrqI
- PakjZqiW6uDETCfDAov9ZvqBGNc909o=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-M8m_t_3yPQiNOH2_vR3roA-1; Thu, 20 Feb 2020 12:47:29 -0500
-Received: by mail-wr1-f71.google.com with SMTP id l1so2077338wrt.4
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:47:29 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j4pxV-0000DU-8m
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:49:58 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40543)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j4pxV-0000B4-2n
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:49:57 -0500
+Received: by mail-oi1-x242.google.com with SMTP id a142so28390450oii.7
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:49:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=w909pNPxWSUnhNLXJu3bsKzp7hXuh5dlJWOv6OEzR6w=;
+ b=zNqB5wwZZklQLVkVejsNO1/yEKGHL3UkxiuYN3hE1FLrhZwsH/13qw/N0zRn79E5Jb
+ n2T4OP88aDUJTz2Vv/gEmI2LoF3tvwM+MYcdA1xNdFbPemuH3yjnBkjcCaRGdtK/194O
+ eQ11dFySnHOyzpyHXDsTIqqrYPMxw58VIUg1f2GaNBJOdnvEf4smPMAN2+BSSvlpO6xN
+ r7biNJs6lyTOhaUYVrrzuVlJ8A/QXgG+I+JB8rOxVoLncgOe/8NfR9RCeN+/1NgvPj/M
+ 4EqrrkkWhwrwvoelEz2llGuaFAicQb2oQwkFdNtzqWJ1tVN5R8p9saC8ukhKGocXcoGW
+ VU/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yjTS1c7av9pPeA3s1aAtIRF/cx9k3CMavHRSlN9+IjM=;
- b=a/30cTBysJhpv0nJefpvWY4Lcjsrbs2XRQ3rhnH5VxarnnORTYF2lJXWcHo97MoPaT
- gcmxZcfaqnl2IBVBqQ34YdnDj1ljWDOERUoRMIIS5HVOM7XuhQ9Bq628puk0hOQIK0og
- Md1bQzP6DqkBuxFPDwVDRkFUbX5WGgXV3tokjGIYAGXBfisB1nH59rlj5gsLKum972gz
- 6IKv2Pzyd5jaAUgJOKCShp8jzph9jMFPvuoevsNqZl39MQnLdroEs3b3YnMUqn8etzU4
- pIZn7Xy+Fruyx8RbHjnbqJ3iVrjSYxYPsN7GcoKMKvL1Lkax6K+B9BG5vpnDqXGqlNt9
- BIYQ==
-X-Gm-Message-State: APjAAAXoTSTyIlP5dhkFuDyxIc6g33siC1jd7GhKyEX3u+hGSih/Klau
- OSVFUwUWRLsC+3aF8aqBbXPzUZ/Bwp7n7M8ADfLxS91QdivDn+C9jMHehF5oqQ2r6ykQssX3Ql1
- R9Fl3tStgsu1TJYs=
-X-Received: by 2002:a05:600c:146:: with SMTP id
- w6mr5962084wmm.180.1582220847981; 
- Thu, 20 Feb 2020 09:47:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyQSellGpX5zqi8xBQPMYtty91AFk25Zhzu0elx6iN+HlAl0WtEy1NTQ7Fc4rYvZjMbkCFLKg==
-X-Received: by 2002:a05:600c:146:: with SMTP id
- w6mr5962070wmm.180.1582220847742; 
- Thu, 20 Feb 2020 09:47:27 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id a184sm41534wmf.29.2020.02.20.09.47.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 20 Feb 2020 09:47:27 -0800 (PST)
-Subject: Re: [PATCH] tcg: gdbstub: Fix single-step issue on arm target
-To: Changbin Du <changbin.du@gmail.com>, alex.bennee@linaro.org
-References: <20200220155834.21905-1-changbin.du@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <269f16b4-e843-1058-4c3b-f11de45b04e1@redhat.com>
-Date: Thu, 20 Feb 2020 18:47:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=w909pNPxWSUnhNLXJu3bsKzp7hXuh5dlJWOv6OEzR6w=;
+ b=OO+k3poFFd/lh9H/Y+HkYIbfyUHM4CpgyoeF3Tm+H8sPWaO12u0vMP65o0G9YLckkS
+ sXR2lyeeZ//zaFjKlaeWvY94nfWKamCAYnsizlFIdirmoWRJ72oL9RJj8zbJbe9pDoXM
+ Rv0a9Fi9mdjtH13KzwN+0SjQSX93cVZcYFwbBXWUaciJg6uuET7yseE2hvH7+J8rsbzr
+ YVR8MPHc1X+W095Rx3IWqBRJoyPlS1FllwZUE8scKW+8BiZ0Mnzv1jazq7yuOInZEDYA
+ NS1UAup3HM6aDcaJYgKYRLeL01lx6sKlIckkR0kra6qd94suIhXYd58ZZjKqLJiQ4VA+
+ RSaA==
+X-Gm-Message-State: APjAAAUcZriyzbsvRPIef9qfPdbMebA0LfrulrFxqvpm9PJB1DOsIzg3
+ 9Obl+8QyhGiO/GsqIxIiEk2kM26C/132QDx65JWd8Q==
+X-Google-Smtp-Source: APXvYqy8vwh+9W4uC9K3TqnnU13FrPcO7cwOJurnYWjVQdurKDlHwB49T3iSQC9rEnDZEX9f7F4q3bh5jK8uNdz6aD0=
+X-Received: by 2002:a05:6808:3b2:: with SMTP id
+ n18mr2861507oie.146.1582220992934; 
+ Thu, 20 Feb 2020 09:49:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200220155834.21905-1-changbin.du@gmail.com>
-Content-Language: en-US
-X-MC-Unique: M8m_t_3yPQiNOH2_vR3roA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200214181547.21408-1-richard.henderson@linaro.org>
+ <20200214181547.21408-20-richard.henderson@linaro.org>
+In-Reply-To: <20200214181547.21408-20-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Feb 2020 17:49:41 +0000
+Message-ID: <CAFEAcA8AdL118-UpXFDqPcV4h-tg3i8xoD2FMUppNw86SbtoOw@mail.gmail.com>
+Subject: Re: [PATCH 19/19] target/arm: Split VMINMAXNM decode
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,70 +87,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/20/20 4:58 PM, Changbin Du wrote:
-> Recently when debugging an arm32 system on qemu, I found sometimes the
-> single-step command (stepi) is not working. This can be reproduced by
-> below steps:
->   1) start qemu-system-arm -s -S .. and wait for gdb connection.
->   2) start gdb and connect to qemu. In my case, gdb gets a wrong value
->      (0x60) for PC.
->   3) After connected, type 'stepi' and expect it will stop at next ins.
->=20
-> But, it has never stopped. This because:
->   1) We doesn't report =E2=80=98vContSupported=E2=80=99 feature to gdb ex=
-plicitly and gdb
->      think we do not support it. In this case, gdb use a software breakpo=
-int
->      to emulate single-step.
->   2) Since gdb gets a wrong initial value of PC, then gdb inserts a
->      breakpoint to wrong place (PC+4).
->=20
-> Since we do support =E2=80=98vContSupported=E2=80=99 query command, so le=
-t's tell gdb that
-> we support it.
->=20
-> Before this change, gdb send below 'Z0' packet to implement single-step:
-> gdb_handle_packet: Z0,4,4
->=20
-> After this change, gdb send "vCont;s.." which is expected:
-> gdb_handle_packet: vCont?
-> put_packet: vCont;c;C;s;S
-> gdb_handle_packet: vCont;s:p1.1;c:p1.-1
+On Fri, 14 Feb 2020 at 18:16, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Passing the raw op field from the manual is less instructive
+> than it might be.  Do the full decode and use the existing
+> helpers to perform the expansion.
+>
+> Since these are v8 insns, VECLEN+VECSTRIDE are already RES0.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-You actually fixed this for all architectures :)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-This has been annoying me on MIPS since more than a year...
-
-I haven't checked the GDB protocol spec, but so far:
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->=20
-> Signed-off-by: Changbin Du <changbin.du@gmail.com>
-> ---
->   gdbstub.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index ce304ff482..adccd938e2 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2111,7 +2111,7 @@ static void handle_query_supported(GdbCmdContext *g=
-db_ctx, void *user_ctx)
->           gdb_ctx->s->multiprocess =3D true;
->       }
->  =20
-> -    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess+"=
-);
-> +    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";vContSupported=
-+;multiprocess+");
->       put_packet(gdb_ctx->s, gdb_ctx->str_buf);
->   }
->  =20
->=20
-
+thanks
+-- PMM
 
