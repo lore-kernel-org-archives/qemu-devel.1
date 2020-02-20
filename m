@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12034C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EB2C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB5602071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:22:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5602071E
+	by mail.kernel.org (Postfix) with ESMTPS id 780B82071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:25:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 780B82071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4juW-0004dN-Vi
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 06:22:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40291)
+	id 1j4jxX-0005uT-Ng
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 06:25:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j4jtw-0004Ee-Q0
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:21:54 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j4jwe-0005Ey-Df
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j4jtv-0004F2-5I
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:21:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59660)
+ (envelope-from <frankja@linux.ibm.com>) id 1j4jwd-0006Dr-53
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12450)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j4jtu-0004Ds-Or
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:21:51 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ id 1j4jwc-0006Cn-NU
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:39 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01KBLB4q020272
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:21:48 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ucmyjvs-1
+ 01KBObGq112401
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:24:37 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ueecr1m-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:21:47 -0500
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:24:36 -0500
 Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 20 Feb 2020 11:21:43 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Thu, 20 Feb 2020 11:24:27 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 20 Feb 2020 11:21:40 -0000
+ Thu, 20 Feb 2020 11:24:25 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01KBLdjg34013418
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 01KBOOGH45351252
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 20 Feb 2020 11:21:39 GMT
+ Thu, 20 Feb 2020 11:24:24 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A9D38A4060;
- Thu, 20 Feb 2020 11:21:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 54977A405C;
+ Thu, 20 Feb 2020 11:24:24 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 56942A405B;
- Thu, 20 Feb 2020 11:21:39 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 08857A4054;
+ Thu, 20 Feb 2020 11:24:24 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.185.143])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 20 Feb 2020 11:21:39 +0000 (GMT)
-Subject: Re: [PATCH v3 05/17] s390x: protvirt: Support unpack facility
+ Thu, 20 Feb 2020 11:24:23 +0000 (GMT)
+Subject: Re: [PATCH v3 06/17] s390x: protvirt: Add migration blocker
 To: Cornelia Huck <cohuck@redhat.com>
 References: <20200214151636.8764-1-frankja@linux.ibm.com>
- <20200214151636.8764-6-frankja@linux.ibm.com>
- <20200220113950.015984bf.cohuck@redhat.com>
+ <20200214151636.8764-7-frankja@linux.ibm.com>
+ <20200220114815.01634a4c.cohuck@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -114,27 +114,27 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 20 Feb 2020 12:21:38 +0100
+Date: Thu, 20 Feb 2020 12:24:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200220113950.015984bf.cohuck@redhat.com>
+In-Reply-To: <20200220114815.01634a4c.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Yc0DAZyvz3U8qr7p9KHpIYFbEpGchpmhS"
+ boundary="JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd"
 X-TM-AS-GCONF: 00
-x-cbid: 20022011-0012-0000-0000-000003889454
+x-cbid: 20022011-0016-0000-0000-000002E89141
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022011-0013-0000-0000-000021C52ACE
-Message-Id: <ea7b2591-e805-7fe7-e862-331c41733a98@linux.ibm.com>
+x-cbparentid: 20022011-0017-0000-0000-0000334BAD4A
+Message-Id: <fbcacbf4-75d6-55f9-2ad3-6cd47b400fce@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-02-20_03:2020-02-19,
  2020-02-20 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0
- impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 suspectscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ spamscore=0
+ priorityscore=1501 mlxscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
+ impostorscore=0 phishscore=0 mlxlogscore=999 suspectscore=2 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002200085
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
@@ -156,364 +156,125 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Yc0DAZyvz3U8qr7p9KHpIYFbEpGchpmhS
-Content-Type: multipart/mixed; boundary="1GjQUpinkyAyixWtt3fgUrez5Yu16Db03"
+--JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd
+Content-Type: multipart/mixed; boundary="HaBVZQGWZ07QODmydoEBNDC090QbbTykf"
 
---1GjQUpinkyAyixWtt3fgUrez5Yu16Db03
+--HaBVZQGWZ07QODmydoEBNDC090QbbTykf
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 2/20/20 11:39 AM, Cornelia Huck wrote:
-> On Fri, 14 Feb 2020 10:16:24 -0500
+On 2/20/20 11:48 AM, Cornelia Huck wrote:
+> On Fri, 14 Feb 2020 10:16:25 -0500
 > Janosch Frank <frankja@linux.ibm.com> wrote:
 >=20
->> When a guest has saved a ipib of type 5 and call diagnose308 with
->=20
-> s/call/calls/
->=20
->> subcode 10, we have to setup the protected processing environment via
->> Ultravisor calls. The calls are done by KVM and are exposed via an API=
-=2E
->>
->> The following steps are necessary:
->> 1. Create a VM (register it with the Ultravisor)
->> 2. Create secure CPUs for all of our current cpus
->> 3. Forward the secure header to the Ultravisor (has all information on=
-
->> how to decrypt the image and VM information)
->> 4. Protect image pages from the host and decrypt them
->> 5. Verify the image integrity
->>
->> Only after step 5 a protected VM is allowed to run.
+>> Migration is not yet supported.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com> [Changes=
-
->> to machine]
 >> ---
->>  hw/s390x/Makefile.objs              |   1 +
->>  hw/s390x/ipl.c                      |  32 ++++++
->>  hw/s390x/ipl.h                      |   2 +
->>  hw/s390x/pv.c                       | 154 +++++++++++++++++++++++++++=
-+
->>  hw/s390x/pv.h                       |  38 +++++++
->>  hw/s390x/s390-virtio-ccw.c          |  79 ++++++++++++++
->>  include/hw/s390x/s390-virtio-ccw.h  |   1 +
->>  target/s390x/cpu.c                  |   4 +
->>  target/s390x/cpu.h                  |   1 +
->>  target/s390x/cpu_features_def.inc.h |   1 +
->>  10 files changed, 313 insertions(+)
->>  create mode 100644 hw/s390x/pv.c
->>  create mode 100644 hw/s390x/pv.h
->=20
-> (...)
->=20
->> diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
->> new file mode 100644
->> index 0000000000..5b6a26cba9
->> --- /dev/null
->> +++ b/hw/s390x/pv.c
->> @@ -0,0 +1,154 @@
->> +/*
->> + * Secure execution functions
->> + *
->> + * Copyright IBM Corp. 2019
->=20
-> Update the year?
-
-ack.
-
->=20
->> + * Author(s):
->> + *  Janosch Frank <frankja@linux.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or=
- (at
->> + * your option) any later version. See the COPYING file in the top-le=
-vel
->> + * directory.
->> + */
->=20
-> (...)
->=20
->> +void s390_pv_vm_destroy(void)
->> +{
->> +     s390_pv_cmd_exit(KVM_PV_VM_DESTROY, NULL);
->=20
-> Why does this exit()? Should Never Happen?
-
-Yes, and we can't recover from this.
-
->=20
->> +}
->> +
->> +int s390_pv_vcpu_create(CPUState *cs)
->> +{
->> +    int rc;
->> +
->> +    rc =3D s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_CREATE, NULL);
->> +    if (!rc) {
->> +        S390_CPU(cs)->env.pv =3D true;
->> +    }
->> +
->> +    return rc;
->> +}
->> +
->> +void s390_pv_vcpu_destroy(CPUState *cs)
->> +{
->> +    s390_pv_cmd_vcpu_exit(cs, KVM_PV_VCPU_DESTROY, NULL);
->=20
-> dito
->=20
->> +    S390_CPU(cs)->env.pv =3D false;
->> +}
->=20
-> (...)
->=20
->> +void s390_pv_perf_clear_reset(void)
->> +{
->> +    s390_pv_cmd_exit(KVM_PV_VM_PREP_RESET, NULL);
->=20
-> And here. Or is that because the machine should not be left around in
-> an undefined state?
-
-If it failed, we could only try again, there's no fixing the problem.
-So I chose to rather exit instead of looping around something which most
-likely will never recover after the first error.
-
->=20
->> +}
->> +
->> +int s390_pv_verify(void)
->> +{
->> +    return s390_pv_cmd(KVM_PV_VM_VERIFY, NULL);
->> +}
->> +
->> +void s390_pv_unshare(void)
->> +{
->> +    s390_pv_cmd_exit(KVM_PV_VM_UNSHARE_ALL, NULL);
->> +}
->> diff --git a/hw/s390x/pv.h b/hw/s390x/pv.h
->> new file mode 100644
->> index 0000000000..7d20bdd12e
->> --- /dev/null
->> +++ b/hw/s390x/pv.h
->> @@ -0,0 +1,38 @@
->> +/*
->> + * Protected Virtualization header
->> + *
->> + * Copyright IBM Corp. 2019
->=20
-> Year++
->=20
->> + * Author(s):
->> + *  Janosch Frank <frankja@linux.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or=
- (at
->> + * your option) any later version. See the COPYING file in the top-le=
-vel
->> + * directory.
->> + */
->> +
->> +#ifndef HW_S390_PV_H
->> +#define HW_S390_PV_H
->> +
->> +#ifdef CONFIG_KVM
->> +int s390_pv_vm_create(void);
->> +void s390_pv_vm_destroy(void);
->> +void s390_pv_vcpu_destroy(CPUState *cs);
->> +int s390_pv_vcpu_create(CPUState *cs);
->> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
->> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
->> +void s390_pv_perf_clear_reset(void);
->> +int s390_pv_verify(void);
->> +void s390_pv_unshare(void);
->> +#else
->> +int s390_pv_vm_create(void) { return 0; }
->=20
-> I'm wondering why you return 0 here (and below). These function should
-> not be called for !KVM, but just to help catch logic error, use -EINVAL=
-
-> or so?
->=20
->> +void s390_pv_vm_destroy(void) {}
->> +void s390_pv_vcpu_destroy(CPUState *cs) {}
->> +int s390_pv_vcpu_create(CPUState *cs) { return 0; }
->> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length) { return =
-0; }
->> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak) { re=
-turn 0: }
->> +void s390_pv_perf_clear_reset(void) {}
->> +int s390_pv_verify(void) { return 0; }
->> +void s390_pv_unshare(void) {}
->> +#endif
->> +
->> +#endif /* HW_S390_PV_H */
+>>  hw/s390x/s390-virtio-ccw.c | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
 >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index e759eb5f83..5fa4372083 100644
+>> index 5fa4372083..d64724af91 100644
 >> --- a/hw/s390x/s390-virtio-ccw.c
 >> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -41,6 +41,7 @@
->>  #include "hw/qdev-properties.h"
+>> @@ -42,6 +42,9 @@
 >>  #include "hw/s390x/tod.h"
 >>  #include "sysemu/sysemu.h"
->> +#include "hw/s390x/pv.h"
+>>  #include "hw/s390x/pv.h"
+>> +#include "migration/blocker.h"
+>> +
+>> +static Error *pv_mig_blocker;
 >> =20
 >>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
 >>  {
->> @@ -240,9 +241,11 @@ static void s390_create_sclpconsole(const char *t=
-ype, Chardev *chardev)
->>  static void ccw_init(MachineState *machine)
->>  {
->>      int ret;
->> +    S390CcwMachineState *ms =3D S390_CCW_MACHINE(machine);
->>      VirtualCssBus *css_bus;
->>      DeviceState *dev;
+>> @@ -373,6 +376,7 @@ static void s390_machine_reset(MachineState *machi=
+ne)
+>>      CPUState *cs, *t;
+>>      S390CPU *cpu;
+>>      S390CcwMachineState *ms =3D S390_CCW_MACHINE(machine);
+>> +    static Error *local_err;
 >> =20
->> +    ms->pv =3D false;
->=20
-> I'm wondering why you need to init this to false - isn't it already
-> zeroed out?
->=20
->>      s390_sclp_init();
->>      /* init memory + setup max page size. Required for the CPU model =
-*/
->>      s390_memory_init(machine->ram_size);
->> @@ -318,10 +321,58 @@ static inline void s390_do_cpu_ipl(CPUState *cs,=
- run_on_cpu_data arg)
->>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->>  }
+>>      /* get the reset parameters, reset them once done */
+>>      s390_ipl_get_reset_request(&cs, &reset_type);
+>> @@ -422,6 +426,17 @@ static void s390_machine_reset(MachineState *mach=
+ine)
+>>          }
+>>          run_on_cpu(cs, s390_do_cpu_reset, RUN_ON_CPU_NULL);
 >> =20
->> +static int s390_machine_pv_secure(S390CcwMachineState *ms)
->> +{
->> +    CPUState *t;
->> +    int rc;
->> +
->> +    /* Create SE VM */
->> +    rc =3D s390_pv_vm_create();
->> +    if (rc) {
->> +        return rc;
->> +    }
->> +
->> +    CPU_FOREACH(t) {
->> +        rc =3D s390_pv_vcpu_create(t);
->> +        if (rc) {
->> +            return rc;
+>> +        if (!pv_mig_blocker) {
+>> +            error_setg(&pv_mig_blocker,
+>> +                       "protected VMs are currently not migrateable."=
+);
+>> +        }
+>> +        migrate_add_blocker(pv_mig_blocker, &local_err);
 >=20
-> No need to undo something on error?
+> If I'm not lost in the context, that's during PV_RESET. I'm a bit
+> confused why you'd add the blocker here?
 
-There have been changes in this area anyway, since Christian switched to
-one create/destroy instead of separate for vm and vcpu.
+Where would you want me to add it?
+It's here where we switch into secure mode and I need to block before
+switching and unblock if it fails.
 
-I'll update the error handling in the new state and send out the patches
-ssonish.
+When having the blocker in diag.c, I'd have a hard time unblocking on a
+PV switch fail.
 
+>=20
+>> +        if (local_err) {
+>> +            error_report_err(local_err);
+>> +            error_free(pv_mig_blocker);
+>> +            exit(1);
+>=20
+> Why the exit()? Can't you fail the call?
+
+Well, if that fails and we go protected, I wouldn't be protected agains
+migrations, right?
 
 >=20
 >> +        }
->> +    }
 >> +
->> +    ms->pv =3D true;
->> +
->> +    /* Set SE header and unpack */
->> +    rc =3D s390_ipl_prepare_pv_header();
->> +    if (rc) {
->> +        return rc;
->=20
-> Also here.
->=20
->> +    }
->> +
->> +    /* Decrypt image */
->> +    rc =3D s390_ipl_pv_unpack();
->> +    if (rc) {
->> +        return rc;
->=20
-> And here.
->=20
->> +    }
->> +
->> +    /* Verify integrity */
->> +    rc =3D s390_pv_verify();
->> +    return rc;
->=20
-> And here.
->=20
->> +}
->=20
-> (...)
->=20
->> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->> index 8da1905485..1dbd84b9d7 100644
->> --- a/target/s390x/cpu.c
->> +++ b/target/s390x/cpu.c
->> @@ -37,6 +37,8 @@
->>  #include "sysemu/hw_accel.h"
->>  #include "hw/qdev-properties.h"
->>  #ifndef CONFIG_USER_ONLY
->> +#include "hw/s390x/s390-virtio-ccw.h"
->> +#include "hw/s390x/pv.h"
->>  #include "hw/boards.h"
->>  #include "sysemu/arch_init.h"
->>  #include "sysemu/sysemu.h"
->> @@ -191,6 +193,7 @@ static void s390_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
+>>          if (s390_machine_pv_secure(ms)) {
+>>              CPU_FOREACH(t) {
+>>                  s390_pv_vcpu_destroy(t);
+>> @@ -430,6 +445,7 @@ static void s390_machine_reset(MachineState *machi=
+ne)
+>>              ms->pv =3D false;
 >> =20
->>  #if !defined(CONFIG_USER_ONLY)
->>      MachineState *ms =3D MACHINE(qdev_get_machine());
->> +    S390CcwMachineState *ccw =3D S390_CCW_MACHINE(ms);
+>>              s390_machine_inject_pv_error(cs);
+>> +            migrate_del_blocker(pv_mig_blocker);
+>>              s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>>              return;
+>>          }
 >=20
-> I find the variable name a bit confusing... maybe ccw_ms?
->=20
->>      unsigned int max_cpus =3D ms->smp.max_cpus;
->>      if (cpu->env.core_id >=3D max_cpus) {
->>          error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
->> @@ -205,6 +208,7 @@ static void s390_cpu_realizefn(DeviceState *dev, E=
-rror **errp)
->>          goto out;
->>      }
->> =20
->> +    cpu->env.pv =3D ccw->pv;
->=20
-> So, if you add a cpu, it will inherit the pv state of the machine...
-> doesn't it need any setup?
->=20
->>      /* sync cs->cpu_index and env->core_id. The latter is needed for =
-TCG. */
->>      cs->cpu_index =3D cpu->env.core_id;
->>  #endif
->=20
-> (...)
 >=20
 
 
 
---1GjQUpinkyAyixWtt3fgUrez5Yu16Db03--
+--HaBVZQGWZ07QODmydoEBNDC090QbbTykf--
 
---Yc0DAZyvz3U8qr7p9KHpIYFbEpGchpmhS
+--JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5Oa8IACgkQ41TmuOI4
-ufiV2g//V0e3b+oS5HukcX2Ha7QL5f4ih3vB1d9VdBhYJ3mFOKA+Xf23b8ba9Gxv
-MzxoZ2r4wd6lyy/jXs35f0A169riyxBSeRp6kO8ThZhAD8cyp24n1CtOCYUqOENP
-eq+a3tAJnppRJP7rzoFTtiy7PlCZzfYxfKPH0SbXC/OgtdNuGTH/OVqPH8gHy8v7
-d0h7P4JTCva8fmDG9hVBRE+M2qRhY8Ubpwwr26O6Pa0BJoxb0Zwj1HuR2un+NuNM
-AlY3+w4hPSaWmTnNyivQPEDI1W85cY2CYdxsmWNzvjHZ36RW6WXH2OoAI1IUzFjX
-AJDD+0VA8DZSqA7Uo+VWYZmwZOfSk2X/j+8Q4SfHc6dC5onro/tw9rxROlueZgBp
-XOafGhBFqHVr0QRlcMQbFDQ32DqUh610d9keSP2gbLAZ1/CqeTPXwfrx2noTx8fz
-nFj97uFuMic7AownFgdQQv3NJQiKljNjllHZc/duScIgtIdBsSkkz2tLYKeYaY55
-E+SORp4FCljj4Mxz572NDZGKl5dOqhFmHYB90lX/IdIEP+SDAgcz6ASLmwxb6ohE
-v9xkgZ/Ytj+Y75uMqisuW5dsVVF3AX9M5n9UqsYGyVM2PyvfAuXkO9MHEvk5Ah4s
-+4g6hppitc7phKgC1yAkMjjCR4xlzcnIwC4JhPI5jdauUJ3utvc=
-=7D4l
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5ObGcACgkQ41TmuOI4
+ufjTDA/+MvJ3OGSfPsR4+rJUEVzY5/0EVFGhQE8mKgTq+sjlPuY71OGfCaz+7txI
+cH7gIyo9S/zDgYMkq7y6E2SytjB9mm3RJDSkxBX9LUVrOiyrmbqL/TRnmrYHF5sW
+awDdV4JdsJxjMyd6264AJhGsDnhk0dJ1drEhl2qQyh367GvH3KWCeptBwg7toN4b
+KB8lv2N/Nw5P6ryrTYGzjysXytiySl+iwBfmHnstjjeoixo5+O0RrGP7D7UyaFvF
+EkenAHnOdZg168QTC2tlq8+/wGddmiFdP8oWfk5S5Bo3rjGTdd8yxF8mDTaZsMSZ
+i1S7q/Ui8Ab/TXSjIhqopuFQ+3lbsf+GNeHjR0KcswzlU9SwSLyVZssRSohh8pKK
+m/+9t8vNjAeIhJunkDPowLiXMoRJKXAFNCpnuuRwB28qwJZ7zh8muzSKdD+21zwc
+FjjsWptA6m+mvQ/hOJs9PkO4V2/0I/fFLrDuENaCYrhPnBkk0elCcIBzla6PlpFy
+HeQYVqYu1cMfxYHUPkZztj2TAbVt0fLGxRUgdLjBN5I8WbAQK5kZyj53cd9TumUl
+/MbqTUhKIPtoAp54voURzEmLmKDi4Wsk7T6KJ/rJe5PnYkJo3eL/blDINpz0T4Hu
+J/y31Qfd3KK0hIgOylKeu8+KFk7CqJQ6SojJRXTbMoo6UGVkIPg=
+=Qbkc
 -----END PGP SIGNATURE-----
 
---Yc0DAZyvz3U8qr7p9KHpIYFbEpGchpmhS--
+--JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd--
 
 
