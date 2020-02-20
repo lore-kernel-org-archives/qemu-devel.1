@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3F0C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B2BDC11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB61B208C4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:55:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC0CB208C4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:57:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="UwL23DeI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB61B208C4
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="davoqRCt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC0CB208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4mIY-0008RW-2Y
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:55:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35906)
+	id 1j4mKX-0001z4-4M
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:57:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=31285a090=pdurrant@amazon.co.uk>)
- id 1j4mHy-00081o-CX
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:54:51 -0500
+ id 1j4mJq-0001Ad-5r
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:56:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=31285a090=pdurrant@amazon.co.uk>)
- id 1j4mHx-0007kN-4d
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:54:50 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:56085)
+ id 1j4mJo-0001tf-8h
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:56:46 -0500
+Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:34895)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prvs=31285a090=pdurrant@amazon.co.uk>)
- id 1j4mHr-0007c9-TC; Thu, 20 Feb 2020 08:54:44 -0500
+ id 1j4mJh-0001kr-4o; Thu, 20 Feb 2020 08:56:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
- s=amazon201209; t=1582206884; x=1613742884;
+ s=amazon201209; t=1582206997; x=1613742997;
  h=from:to:cc:subject:date:message-id:references:
  in-reply-to:content-transfer-encoding:mime-version;
- bh=g4ijhDYuJ3ncYPOAmJGJ2XO3GIUAd9gN9Tr0CE9zfpo=;
- b=UwL23DeIBHC1OZ7SZEQOz0vic2GuIgMc0NV+gekEk/l+bL6lL86gGNY0
- KqzEkOUnY9qVhkTxNOWw8nViLLelipIzSI54TasuCOpk3zqTq78Aa7E1p
- AeRzd2TgXGtuXMWEvHrfJEJ3GHZqBTSURTKlsxXKo6Jt2v3mMk4AjCYBC M=;
-IronPort-SDR: i3n99YIbcDxWB3rJtRrCLdb70ZCl5dnSfu60gvIz1jYU0aalW/Uq6GB7epg09S20gthREigk4s
- Rq348+Ihhxtg==
-X-IronPort-AV: E=Sophos;i="5.70,464,1574121600"; d="scan'208";a="17318865"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.43.8.6])
- by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP;
- 20 Feb 2020 13:54:29 +0000
+ bh=6qRdb2tHAjpNw5HxV4uP0hoa7Zzgw6Kqa078Vn8d190=;
+ b=davoqRCtQj+7+umOarnOeRus5vpDPTCEpp/hRHFZDe5ZoDvgDZxpzNum
+ JtKlajfI9KmMhXtQZkE6qnbqcwAiac3k4kq6JfHwR/XahlEM6lkyRTfw4
+ 7+R1MyGSHyI8I3Xc5j8YN3Kg5wdneWtCaNruOxfr9ONlYO/VBJwUDX5X6 4=;
+IronPort-SDR: wo2CTn8HSGq9XguOwKHujm9WgWfPn/NXmA5jPzTfTb+B/pt4Sdg7JXx/m7QeCdVyHX4aytsS43
+ SUTF86rdYH9g==
+X-IronPort-AV: E=Sophos;i="5.70,464,1574121600"; d="scan'208";a="17947101"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
+ email-inbound-relay-1a-af6a10df.us-east-1.amazon.com) ([10.47.23.38])
+ by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP;
+ 20 Feb 2020 13:56:31 +0000
 Received: from EX13MTAUEA002.ant.amazon.com
  (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
- by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS
- id 1DF23A2DDB; Thu, 20 Feb 2020 13:54:17 +0000 (UTC)
+ by email-inbound-relay-1a-af6a10df.us-east-1.amazon.com (Postfix) with ESMTPS
+ id 13F73A1ECB; Thu, 20 Feb 2020 13:56:20 +0000 (UTC)
 Received: from EX13D32EUC004.ant.amazon.com (10.43.164.121) by
  EX13MTAUEA002.ant.amazon.com (10.43.61.77) with Microsoft SMTP Server (TLS)
- id 15.0.1236.3; Thu, 20 Feb 2020 13:54:16 +0000
+ id 15.0.1236.3; Thu, 20 Feb 2020 13:56:19 +0000
 Received: from EX13D32EUC003.ant.amazon.com (10.43.164.24) by
  EX13D32EUC004.ant.amazon.com (10.43.164.121) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 20 Feb 2020 13:54:15 +0000
+ id 15.0.1367.3; Thu, 20 Feb 2020 13:56:18 +0000
 Received: from EX13D32EUC003.ant.amazon.com ([10.43.164.24]) by
  EX13D32EUC003.ant.amazon.com ([10.43.164.24]) with mapi id 15.00.1367.000;
- Thu, 20 Feb 2020 13:54:15 +0000
+ Thu, 20 Feb 2020 13:56:18 +0000
 From: "Durrant, Paul" <pdurrant@amazon.co.uk>
 To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Peter
  Maydell" <peter.maydell@linaro.org>, "qemu-devel@nongnu.org"
@@ -93,16 +93,16 @@ CC: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
  Mitsyanko" <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
  "Michael Walle" <michael@walle.cc>, "qemu-ppc@nongnu.org"
  <qemu-ppc@nongnu.org>, "Paolo Bonzini" <pbonzini@redhat.com>
-Subject: RE: [Xen-devel] [PATCH v3 19/20] Let cpu_[physical]_memory() calls
- pass a boolean 'is_write' argument
-Thread-Topic: [Xen-devel] [PATCH v3 19/20] Let cpu_[physical]_memory() calls
- pass a boolean 'is_write' argument
-Thread-Index: AQHV5+7vcjjW/3OJHE2x9C8aUbSeQqgkGmwg
-Date: Thu, 20 Feb 2020 13:54:15 +0000
-Message-ID: <3879f3fc2c3641a28412938601327bb7@EX13D32EUC003.ant.amazon.com>
+Subject: RE: [Xen-devel] [PATCH v3 03/20] exec: Let qemu_ram_*() functions
+ take a const pointer argument
+Thread-Topic: [Xen-devel] [PATCH v3 03/20] exec: Let qemu_ram_*() functions
+ take a const pointer argument
+Thread-Index: AQHV5+62bDvzVj67r0Cu6rYKUNoaGagkGwNQ
+Date: Thu, 20 Feb 2020 13:56:18 +0000
+Message-ID: <a7c2db54d9b04909a5c733ebe5cc5bd9@EX13D32EUC003.ant.amazon.com>
 References: <20200220130548.29974-1-philmd@redhat.com>
- <20200220130548.29974-20-philmd@redhat.com>
-In-Reply-To: <20200220130548.29974-20-philmd@redhat.com>
+ <20200220130548.29974-4-philmd@redhat.com>
+In-Reply-To: <20200220130548.29974-4-philmd@redhat.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -113,8 +113,8 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Precedence: Bulk
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 52.95.49.90
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 207.171.184.25
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -159,11 +159,8 @@ b24gPGRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdT47IElnb3INCj4gTWl0c3lhbmtvIDxpLm1p
 dHN5YW5rb0BnbWFpbC5jb20+OyBDb3JuZWxpYSBIdWNrIDxjb2h1Y2tAcmVkaGF0LmNvbT47DQo+
 IE1pY2hhZWwgV2FsbGUgPG1pY2hhZWxAd2FsbGUuY2M+OyBxZW11LXBwY0Bub25nbnUub3JnOyBQ
 YW9sbyBCb256aW5pDQo+IDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBTdWJqZWN0OiBbWGVuLWRl
-dmVsXSBbUEFUQ0ggdjMgMTkvMjBdIExldCBjcHVfW3BoeXNpY2FsXV9tZW1vcnkoKSBjYWxscw0K
-PiBwYXNzIGEgYm9vbGVhbiAnaXNfd3JpdGUnIGFyZ3VtZW50DQo+IA0KPiBVc2UgYW4gZXhwbGlj
-aXQgYm9vbGVhbiB0eXBlLg0KPiANCj4gVGhpcyBjb21taXQgd2FzIHByb2R1Y2VkIHdpdGggdGhl
-IGluY2x1ZGVkIENvY2NpbmVsbGUgc2NyaXB0DQo+IHNjcmlwdHMvY29jY2luZWxsZS9leGVjX3J3
-X2NvbnN0Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBo
-aWxtZEByZWRoYXQuY29tPg0KDQpSZXZpZXdlZC1ieTogUGF1bCBEdXJyYW50IDxwYXVsQHhlbi5v
-cmc+DQo=
+dmVsXSBbUEFUQ0ggdjMgMDMvMjBdIGV4ZWM6IExldCBxZW11X3JhbV8qKCkgZnVuY3Rpb25zDQo+
+IHRha2UgYSBjb25zdCBwb2ludGVyIGFyZ3VtZW50DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBQaGls
+aXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20+DQoNClJldmlld2VkLWJ5OiBQ
+YXVsIER1cnJhbnQgPHBhdWxAeGVuLm9yZz4NCg==
 
