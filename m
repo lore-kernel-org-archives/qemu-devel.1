@@ -2,79 +2,99 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE86C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BC7C11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7FA1208C4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:51:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40AD4208C4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 14:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XvT9C2r5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FA1208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HH12a7Lk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AD4208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4nAs-0003q2-TT
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 09:51:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43986)
+	id 1j4nDq-0007kQ-Bh
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 09:54:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4n9l-0002TQ-3e
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:50:26 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j4nCE-0005nW-La
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:52:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4n9j-0000zU-U5
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:50:24 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45723)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4n9j-0000yv-NS
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:50:23 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 59so3838878otp.12
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:50:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=afYl0DVEoEhQ/EBMwBMpftX3lzsz91ArZ4Bz9hqJxoM=;
- b=XvT9C2r5f+zEmvR/bgZdkDRyZhwObYqZFMl/2N4K7JfLhbUm9R72p3VKo13fij+sma
- ++TsJOS9UnPtjKBEi5kWNs1phjZRM//LnaQx8gH6Z1GqvhatrlnncxL7kg1I9MewLRfc
- z6U6KYOOgF3FB5fHYyomtIIeMnEap42cnffRfvM0wbZgy/0Op5J8Znj0YDyirj8ymMdH
- HZIGoMeATLoAvDujTYULWAcjcKdl0m85rzMTqQvulgGDmaAEPDh1N3RH5MWMRbl2bt0l
- jtSMOzUus73QsJbkTLA9fPgWpmbrb/NHXb+/RKwTT/IxX8CEDjqXNdjDxvgoCqKR3Pjv
- 1o3w==
+ (envelope-from <pbonzini@redhat.com>) id 1j4nCC-00036Z-O3
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:52:57 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59640
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j4nCC-00035S-CO
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 09:52:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582210375;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=57Aerk872s4YludKFjNkLSM4358cbd1qLJBcsOLk5yk=;
+ b=HH12a7LkG8kSTpQDaMp27yRneQoKrD4sV3+8wUF7rMfMREOjruR/AQPH43r3gNYzS3OIbN
+ hm515k1Oo4EOoV9DCVkz/AyfdYNqGUHhYq1P4Nx95ZWZxHzA21jQ+8oht/iyd1ptqeYVlG
+ knWrm3wtsMRxjY46s/LBCOuwJgQCce4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-Fj4MtdeoM4yrVvKqpybAdw-1; Thu, 20 Feb 2020 09:52:53 -0500
+Received: by mail-wm1-f70.google.com with SMTP id u11so925332wmb.4
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:52:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=afYl0DVEoEhQ/EBMwBMpftX3lzsz91ArZ4Bz9hqJxoM=;
- b=fdGpZcUPaZFkzLhqs4mWGr7dvd5VsF+eiqsHNGzHL0b7Jd+b9NiD0nhpRHdjdicEFw
- SpTu5JOAfPwckTKQvbMMR6xVFNDv7htQZ4t2ZvCgCkgyMdbwW+lVE5zyiYBdFoJGO602
- WzOJZiZmXcSCeEbl4OLSXBDkANgyOqd6w3thoonqjf/BrEaTB1+55ewMwQu744XNzOo3
- VU0+EXkUr/NJYaQX4MddNDxQi4Z8qZUMMEPf1AV3OXRErKh3J6f2WBE6vrq0GBG9Smcs
- id8+OO4oC9fQLDbv+PYEBAxT40/X8J+t59mIq3FVqfA4WY1HBa46z7wH5wKckUQYnuZo
- U8Nw==
-X-Gm-Message-State: APjAAAX/Um/5modTQQ3fZQJDJl4QRwvuRJZBXfWRXVxM3CjQ2DHd89pE
- 7u+o2Mr/wy7f4hnVOsQZwODqif3mcjuWDoDO5YM+Vq2V
-X-Google-Smtp-Source: APXvYqxiSl0mCUqEYCIM4obIVqbNMpWrpHB7B9FQKgPLN1UKkou1UFqkO+bod/lnAATmKh+NODmO9a832fv79YpxBmM=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr24095274otd.91.1582210222568; 
- Thu, 20 Feb 2020 06:50:22 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=57Aerk872s4YludKFjNkLSM4358cbd1qLJBcsOLk5yk=;
+ b=hAvha6P2fh1mkKEeSobmlrsxc+It/jj0m1wPVXZtPSYNuPLPrP3tOaYSW9S1R5sizz
+ xK/jYG6N3oziCDUL8hx197Fa/2yC0EcBdMqy+3nci9aG3Qmo4XppmJCqVmYP2WBDBDhJ
+ X/Q57J9XZgSpJAcRy3iRI+wV2JQNc7iTjDOW9GMsbXTUXaH0AvZXHBz+NjFXSscpyCJO
+ qouzwV4w0689m2V4AJQ+07w8GC93HdlPQSbRJBllcH5yl4FIoNRb8toXgnF+yydwvmyu
+ AGdKuwO6Yjk9Lkqp38I02az+3bVP76Ol3/9ktn1WaTX06l6B6IxBXbri/Hw1ec8svH0z
+ BgEg==
+X-Gm-Message-State: APjAAAUZkE0/uPkaIOA5c8gejOIdtgQ9ge1hK0ou8hMvw5yS+FOoOGa8
+ mhYLdCzgJez8iqC70m7l/VdlPeBB6VPGX7zslgvL4HyeiSzOo7ZbPO9Fk0aFP1dAQcqAxHnpati
+ aB2DLdDHRJl9YmfQ=
+X-Received: by 2002:a1c:1984:: with SMTP id 126mr5149393wmz.78.1582210370980; 
+ Thu, 20 Feb 2020 06:52:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyjOhFwW+klCqY7CAgFZahQ2wh4rYk/aeQpfOhJQ2xl+JSRtr2OGAMHjE6elb8tKn/OUpAXPw==
+X-Received: by 2002:a1c:1984:: with SMTP id 126mr5149367wmz.78.1582210370722; 
+ Thu, 20 Feb 2020 06:52:50 -0800 (PST)
+Received: from [10.201.49.12] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id g19sm4813268wmh.36.2020.02.20.06.52.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Feb 2020 06:52:50 -0800 (PST)
+Subject: Re: [PATCH v3 2/2] qemu-cpu-models.rst: Document -noTSX, mds-no,
+ taa-no, and tsx-ctrl
+To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
+References: <20200220142001.20774-1-kchamart@redhat.com>
+ <20200220142001.20774-3-kchamart@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4c3f3d85-9499-2e48-124b-18cc0dc36c8a@redhat.com>
+Date: Thu, 20 Feb 2020 15:52:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20200217204812.9857-1-linux@roeck-us.net>
-In-Reply-To: <20200217204812.9857-1-linux@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Feb 2020 14:50:11 +0000
-Message-ID: <CAFEAcA88XmvNkombS=3-vpYPbbKBoDdKzrrEDAU_0kmYHAkKSA@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] arm: allwinner: Wire up USB ports
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20200220142001.20774-3-kchamart@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Fj4MtdeoM4yrVvKqpybAdw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +106,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, berrange@redhat.com,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Feb 2020 at 20:48, Guenter Roeck <linux@roeck-us.net> wrote:
->
-> Instantiate EHCI and OHCI controllers on Allwinner A10.
->
-> The first patch in the series moves the declaration of EHCISysBusState
-> from hcd-ohci.c to hcd-ohci.h. This lets us add the structure to
-> AwA10State. Similar, TYPE_SYSBUS_OHCI is moved to be able to use it
-> outside its driver.
->
-> The second patch introduces the ehci-sysbus property "companion-enable".
-> This lets us use object_property_set_bool() to enable companion mode.
->
-> The third patch instantiates EHCI and OHCI ports for Allwinner-A10
-> and marks the OHCI ports as companions of the respective EHCI ports.
->
-> Tested by attaching various high speed and full speed devices, and by
-> booting from USB drive.
->
-> v3: Rebased to master
-> v2: Add summary
->     Rewrite to instantiate OHCI in companion mode; add patch 2/3
->     Merge EHCI and OHCI instantiation into a single patch
->
+Two small changes...
 
+On 20/02/20 15:20, Kashyap Chamarthy wrote:
+> +  Recommended to inform the guest that it can disable the Intel TSX
+> +  (Transactional Synchronization Extensions) feature; or, if the
+> +  processor is vulnerable, use the Intel VERW instruction (a
+> +  processor-level instruction that performs checks on memory access) as
+> +  a mitigation for the TAA vulnerability.  (For details, refer to this
+> +  `Intel's deep-dive into
+> +  MDS <https://software.intel.com/security-software-guidance/insights/deep-dive-intel-analysis-microarchitectural-data-sampling>`_.)
 
+... refer to Intel's `deep dive into MDS <...>`_.
 
-Applied to target-arm.next, thanks.
+(I don't know what the trailing underscore is for.  I reaffirm my
+definition of rST as the Perl of markup formats).
 
--- PMM
+> +
+> +  Expose this to the guest OS if and only if: (a) the host has TSX
+> +  enabled; *and* (b) the guest has ``rtm`` CPU flag enabled.
+> +
+> +  By disabling TSX, KVM-based guests can avoid paying the price of
+> +  mitigting TSX-based attacks.
+
+"mitigating"
+
+Paolo
+
 
