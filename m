@@ -6,76 +6,80 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A17C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32979C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:24:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C1D420801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0049B20801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 10:24:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CCya6m+E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C1D420801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9ST2gnj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0049B20801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4inb-0007X1-Fi
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 05:11:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
+	id 1j4izw-0002go-6Y
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 05:24:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j4in1-00072D-BA
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:10:40 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j4izG-0002B9-2P
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:23:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j4in0-0006iG-1C
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:10:39 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43865)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j4imz-0006h7-RP
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:10:37 -0500
-Received: by mail-oi1-x243.google.com with SMTP id p125so26961744oif.10
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 02:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/e2aIq6+KTlWo5s9WlgNylEFifK+JmjI80oq7DNCZwA=;
- b=CCya6m+EB/JlQ2duDW9Z8Ifeu0ZdD06Ajs+gswUvUK9n9BLjP2453zpam2q+cNj8vp
- fFX1E65zttDreOXkXPkYWGNuRGgYDGTQ6eW2XVAryHf9EONBbr0N5/SNOF9KoT5K60px
- /Y5z63SbN3vCKr6u0uT2r+2M5PBm97gIhuQmysQr2jzXJ/c4RrujCDTHC4aCyNUpo6Xb
- NtE9LA8bOhAY2S5vejWCCPyYNRfrshAbkR8GMRFLa3l6PzK3KKNzZjk1lY3GfarHnqIk
- dczNLjmo5GqoCRY45i/Qjtaruy7K3L76CZOJX9cGU0CKQbsle5ud/95zkgSEZV6JUcVe
- YUzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/e2aIq6+KTlWo5s9WlgNylEFifK+JmjI80oq7DNCZwA=;
- b=mJeOeAsbMof41a9HBN/39Ktd/OLD2RkOfkr7+yHC0T+9PgWNMkbllx3346yvD62jYt
- UaWmt6x8FTfY20DvyO2n4zQXfh0nipjAdUbR6eraIYvtc7cAPw4M8p/SZFlMqeX+wYJr
- AKdHuWeFXeuMqvDQ76bSUEirzfPQxp4TSvuIMB8/s9JAUD2U6YusnLL70vZtgkvobBgf
- wH859mSeCrus3ZKRxYOvcPZE3KZ4hSSFUFm2wQhJt436nXqvtGT+yfkw+C6HFdzgYk27
- L+0iYH2FQPcv//XIuqHTYAfS5k1ga0H7ji48vDcAbiQXZUlp/3dXVsbslo05CLYNtJQI
- WqWw==
-X-Gm-Message-State: APjAAAWNPchKbHGabS/cQsdIT56h949H8L3Qryd0RngNdshCOZ9Zf6f6
- 7TNjxG4PzVlMftUXMM+yebcb8jPNjYJqGdz0JqE9u36Gvgc=
-X-Google-Smtp-Source: APXvYqxDgbsBWFlDicMAQ4/Dh1Qzwr5UAUo5x7NEAsBRm5nbhieKonXI5s1bOrqKdp3hdfUTzTWjQim+l2SCFpX2x6A=
-X-Received: by 2002:a05:6808:289:: with SMTP id
- z9mr1367097oic.48.1582193436880; 
- Thu, 20 Feb 2020 02:10:36 -0800 (PST)
+ (envelope-from <kchamart@redhat.com>) id 1j4izE-0002dz-Q6
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:23:17 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53335
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j4izE-0002dc-MB
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 05:23:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582194196;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7Wmjbx/JtQHY3Ipn4LQpP8obTqSJnMmA/1uZE2JmUnQ=;
+ b=f9ST2gnj6esj9SSEbSmrZGe0AEvOYCKwcMX90EvbIMwSEEKRTdN03wJr7gtZtZlqBIwxIj
+ tvJinnUGcf5Xd/9it882DvpaDT2bKxUADWapWPyNeszaFPQC9YJA27hUoJyvDHPxt7EvK8
+ BcRa4fG9Ms5XEsJUI02hy9kEM4rnCCE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-76-MAQePCEMNmm2Y3OdoIbhLQ-1; Thu, 20 Feb 2020 05:23:12 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8324518C35A0;
+ Thu, 20 Feb 2020 10:23:11 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 22E1E19757;
+ Thu, 20 Feb 2020 10:23:11 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 900303E04FA; Thu, 20 Feb 2020 11:23:08 +0100 (CET)
+Date: Thu, 20 Feb 2020 11:23:08 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 1/2] docs: Convert qemu-cpu-models.texi to rST
+Message-ID: <20200220102308.GE24572@paraplu>
+References: <20200219114607.1855-1-kchamart@redhat.com>
+ <20200219114607.1855-2-kchamart@redhat.com>
+ <CAFEAcA94A3doGQthOTrPuMadOfqrSLBadUbi+3BpHr1MGp_w1A@mail.gmail.com>
+ <20200219164007.GC24572@paraplu>
+ <CAFEAcA_M3s7U_Brx4iZcWKbrNesn5z33C2Cz+jr1PxCNGTvaXg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200220060108.143668-1-gshan@redhat.com>
- <f3c8adba729d050ba2144cc9c834fe82@kernel.org>
-In-Reply-To: <f3c8adba729d050ba2144cc9c834fe82@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 20 Feb 2020 10:10:25 +0000
-Message-ID: <CAFEAcA8inLO75XOcCO3bUiiJQyZT+nqmp1be+z6ZtQx2a=68+g@mail.gmail.com>
-Subject: Re: [PATCH] hw/char/pl011: Output characters using best-effort mode
-To: Marc Zyngier <maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <CAFEAcA_M3s7U_Brx4iZcWKbrNesn5z33C2Cz+jr1PxCNGTvaXg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: MAQePCEMNmm2Y3OdoIbhLQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,71 +91,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Gavin Shan <gshan@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>
+Cc: armbru@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 20 Feb 2020 at 09:10, Marc Zyngier <maz@kernel.org> wrote:
->
-> On 2020-02-20 06:01, Gavin Shan wrote:
-> > This fixes the issue by using newly added API
-> > qemu_chr_fe_try_write_all(),
-> > which provides another type of service (best-effort). It's different
-> > from
-> > qemu_chr_fe_write_all() as the data will be dropped if the backend has
-> > been running into so-called broken state or 50 attempts of
-> > transmissions.
-> > The broken state is cleared if the data is transmitted at once.
->
-> I don't think dropping the serial port output is an acceptable outcome.
+On Wed, Feb 19, 2020 at 05:57:16PM +0000, Peter Maydell wrote:
+> On Wed, 19 Feb 2020 at 16:40, Kashyap Chamarthy <kchamart@redhat.com> wro=
+te:
+> > Peter, how are you able to generate those *.7 `nroff` man pages?  When =
+I
+> > do 'make sphinxbuild' from my build dir ($HOME/buld/qemu), I only see:
+>=20
+> Just run 'make'.=20
 
-Agreed. The correct fix for this is the one cryptically described
-in the XXX comment this patch deletes:
+I did that, but I was missing the "--enable-docs" with my `configure`
+invocation (which I didn't post in full on the list, but only on IRC
+yesterday).  Thanks, Markus, for spotting that.
 
--        /* XXX this blocks entire thread. Rewrite to use
--         * qemu_chr_fe_write and background I/O callbacks */
+    $> cd ~/build/qemu
+    $> ~/src/qemu//configure --target-list=3Dx86_64-softmmu \
+        --enable-debug --enable-docs
+    $> make -j8
 
-The idea is that essentially we end up emulating the real
-hardware's transmit FIFO:
- * as data arrives from the guest we put it in the FIFO
- * we try to send the data with qemu_chr_fe_write(), which does
-   not block
- * if qemu_chr_fe_write() tells us it did not send all the data,
-   we use qemu_chr_fe_add_watch() to set up an I/O callback
-   which will get called when the output chardev has drained
-   enough that we can try again
- * we make sure all the guest visible registers and mechanisms
-   for tracking tx fifo level (status bits, interrupts, etc) are
-   correctly wired up
+That did the trick:
 
-Then we don't lose data or block QEMU if the guest sends
-faster than the chardev backend can handle, assuming the
-guest is well-behaved -- just as with a real hardware slow
-serial port, the guest will fill the tx fifo and then either poll
-or wait for an interrupt telling it that the fifo has drained
-before it tries to send more data.
+    # From the build dir
+    $> find -name \*.7
+    ./docs/interop/qemu-ga-ref.7
+    ./docs/interop/qemu-qmp-ref.7
+    ./docs/system/qemu-block-drivers.7
+    ./docs/system/qemu-cpu-models.7
 
-There is an example of this in hw/char/cadence_uart.c
-(and an example of how it works for a UART with no tx
-fifo in hw/char-cmsdk-apb-uart.c, which is basically the
-same except the 'fifo' is just one byte.)
+> As with the existing texinfo manpages, there
+> is no specific makefile target for "build the manpages and
+> nothing else".
 
-You will also find an awful lot of XXX comments like the
-above one in various UART models in hw/char, because
-converting an old-style simple blocking UART implementation
-to a non-blocking one is a bit fiddly and needs knowledge
-of the specifics of the UART behaviour.
+Yeah, noticed that from the Makefile.
 
-The other approach here would be that we could add
-options to relevant chardev backends so the user
-could say "if you couldn't connect to the tcp server I
-specified, throw away data rather than waiting", where
-we don't have suitable options already. If the user specifically
-tells us they're ok to throw away the serial data, then it's
-fine to throw away the serial data :-)
+All sorted now, thanks!
 
-thanks
--- PMM
+> thanks
+> -- PMM
+>=20
+
+--=20
+/kashyap
+
 
