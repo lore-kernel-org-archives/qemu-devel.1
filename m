@@ -6,74 +6,78 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61681C11D05
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE2AC11D05
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:46:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F30962071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45B0A2071E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 15:46:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BzF4tN7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30962071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yyt6vRdt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B0A2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4nzd-0007Mf-2d
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:44:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51006)
+	id 1j4o21-0000M0-Fu
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 10:46:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1j4nz1-0006v1-R6
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j4o10-0008EU-Ra
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:45:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1j4nz0-0002Z4-Ix
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57255
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1j4nz0-0002YG-Dq
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:43:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582213401;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=hRy6+GDKEj/DWNPJ8TGV956O3cBbUc6YtWUspyeF56Q=;
- b=BzF4tN7esbalakv/WAEeCRWG3fMhatpVYkjIly3OA6laGKMvBlSWVx05dy5r+h00M8NIUK
- knqCYserxPcguAuJY9xoUrSM9HotHTi29P/YdTVcqx2kv4wssiKDxlSjmB8cSbQ6jj5d35
- xTr+iQ/ow5BsUDjGgHhf5ry62Ui+S6A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-xp6zZo8oNiahh7a09abiDg-1; Thu, 20 Feb 2020 10:43:17 -0500
-X-MC-Unique: xp6zZo8oNiahh7a09abiDg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 439E01B18BC8;
- Thu, 20 Feb 2020 15:43:16 +0000 (UTC)
-Received: from dhcp-17-202.bos.redhat.com (dhcp-17-202.bos.redhat.com
- [10.18.17.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D34419756;
- Thu, 20 Feb 2020 15:43:10 +0000 (UTC)
-Date: Thu, 20 Feb 2020 10:43:08 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v9 0/3] Acceptance test: Add "boot_linux" acceptance test
-Message-ID: <20200220154308.GA6678@dhcp-17-202.bos.redhat.com>
-References: <20200220020652.16276-1-crosa@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j4o0z-0003Uk-Ez
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:45:26 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38877)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j4o0z-0003Uc-8a
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 10:45:25 -0500
+Received: by mail-ot1-x343.google.com with SMTP id z9so4066642oth.5
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 07:45:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mdR+N/IRKxB9ME0WApoqyFVwV7ifMuxhDHnWt63WviA=;
+ b=yyt6vRdtGsROEk+RQzDVur2wuMsIVcYmZ2yY4gqQ1Q40tYw76+iXsBv3nZll+Gu7G1
+ WzXDWZQO+bZ+v6fMDVbz9WCYd9Jwi01rE7XEZmLy6zFOA/r0H1ZUh1vGNj1Ns/xEinbD
+ oSu+ClY3BkoDMVJ29mKyAzzRNLYjPFy+NSBQtGhDKVccN9+E+TLfZ3ooBaXB4dQvau+r
+ hJXw/Px6IKenRR/tleMOHUXn4eBV4JB/bhuTGThjoczGoQdh9Q0cXdcqgm1pcOB9uutM
+ y8fFq/Uv//mVHaw5GMsCJG48BlG51+i8NLED8OZsTtyYfbpS4g20MXYUkPHHZkB35uK9
+ fYUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mdR+N/IRKxB9ME0WApoqyFVwV7ifMuxhDHnWt63WviA=;
+ b=s5Nbc18eEhiVCjE0BzCUXbwhgHPfuSVxdqtUghxKylMztxAU/EciW321cLHHEy83Tz
+ yqX69ZdFtWOkvPiYFL3Zmf4gMHMO0pbkUe4Vn6cSdLCtFOvHsozl5Bc+GS4YwQmVjp1c
+ TRGj/DhLBU0eRIsD19/XhdRBd+3iI7mKDMUDCM9GEVJk6QkOZArhj54abEHIsjKxhVtC
+ xpNsTFQnLEPc0x/hQwb/M4q41t29pNNPpiNgiByq6LKHBVYyHbkCqXJc9aFsngZpmDPQ
+ iJhBfw/MHAGs/iw49oTxpW51HqRjloohQoCAeLR9wAOv8LnxYl8Z1aZnd8QI+OBFH6Fs
+ HZxg==
+X-Gm-Message-State: APjAAAXDWIokYdFM5Euh7eph0M4mWMWTyDjM1kElKj2L4eq/YNj+SmGf
+ cXl1MlQMf3UML6Ps3Vytm6fXQg3dYQSyeaIAnF0wdA==
+X-Google-Smtp-Source: APXvYqwvTPOtGlKqQ7Opem0F3Fgf/XXiRIqW5NrsuAX3gE+LV2KIcwlY1SHYGn/I4+eWNNEYf9F+bLWCMYrAhWt+Y3E=
+X-Received: by 2002:a05:6830:1184:: with SMTP id
+ u4mr22916293otq.221.1582213523880; 
+ Thu, 20 Feb 2020 07:45:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200220020652.16276-1-crosa@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="MGYHOYXEY6WxJCY8"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200220142001.20774-1-kchamart@redhat.com>
+ <20200220142001.20774-3-kchamart@redhat.com>
+ <4c3f3d85-9499-2e48-124b-18cc0dc36c8a@redhat.com>
+In-Reply-To: <4c3f3d85-9499-2e48-124b-18cc0dc36c8a@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Feb 2020 15:45:13 +0000
+Message-ID: <CAFEAcA_C0pmCgKNhw73q=RcQDQOdaQ9KCeTnEK_usN5K3eX-pA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] qemu-cpu-models.rst: Document -noTSX, mds-no,
+ taa-no, and tsx-ctrl
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,57 +89,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Beraldo Leal <bleal@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---MGYHOYXEY6WxJCY8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 19, 2020 at 09:06:49PM -0500, Cleber Rosa wrote:
->=20
-> Changes from v8:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+On Thu, 20 Feb 2020 at 14:52, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> ... refer to Intel's `deep dive into MDS <...>`_.
 >
+> (I don't know what the trailing underscore is for.
 
-...
+It's because the external-hyperlink syntax is a complication
+of the simpler format for within-document references. Inside
+a document, you can have a simple link like this:
 
-> * Bumped pycdlib version to 1.9.0, which contains an endianess bug that
->   was seen on s390x hosts.
+  This is a link to the target_ defined below.
 
-I meant, "which contains a bug *fix*". Hopefully not introducing bugs on
-purpose! :)
+  .. _target:
 
-- Cleber.
+  This is where the link target defined above goes to.
 
---MGYHOYXEY6WxJCY8
-Content-Type: application/pgp-signature; name="signature.asc"
+So trailing underscore is for words that go to somewhere else,
+and leading underscore for words that come from somewhere else.
 
------BEGIN PGP SIGNATURE-----
+Syntax complication 1 is that instead of word_ you can
+say `some phrase with spaces`_ if you want the link to
+span more than one word. (The docutils spec calls these
+"phrase-references").
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl5OqQkACgkQZX6NM6Xy
-CfP82hAAjz0KPzUFq+ZlDUyIMrnql9YTN70bwxSbGHtRRjjr2RRPcPEdgo2TDBBr
-Ohflg2qQA9TqrL+OTcY7fRdFZe23v15W7S6ERNNiiRoYoB1hE5R8atLblUYOMagE
-wWZ/t8Q18bAmzVedWNLzMujQ8YgMuETq0goanwVVyW79PdfW8XNrNQh22JSFxkO+
-V556tF8fOhep+Kg39oHQA5g0s8aITaeq0ocfxmZdeOKp2vdiyVS6AKG+SDduYH9l
-9mRGaPBZS8gyqEmW8kB12w6fEyfYX2ZOyOaT11bpd7GUHEFaW/OkSlnVDKXLXSxn
-PB1pvx9Y/qH2rcOMp8VkPZDPKXpVYzBqHymdd/v0n9ep6SO/Wgzpu3KyCGsZ2TCx
-6j02og3vs2hTadIcgAs9jo33dqbGzWMx5u1ScQ2Az+IX19KwiI5WUj7bLAaSn1mS
-GaVSEZhCrNX9coxgqNGzFmM0QfIziBjS14zugLtM2aYmLBqesR1IORajHqDVxEve
-nuKuAuTlL50IsqfkmXFGkc5QLiWbywECl5UKsASDhOpni767KD3AyPaxwKzK/MD/
-iBbPgZKsorHWcZZQgMSXpqTbDaT4u1XA9zL0pM9XHKd7NCR4WudzxCRTwZUkemsp
-N7ce9FxDD2f/TNwbt8PaPgh56BFCIbuWSI9IdSGj1glUUXL/sUw=
-=GOzx
------END PGP SIGNATURE-----
+Syntax complication 2 is that instead of having to define
+the target of an external URL separately from the place
+you wanted to refer to it, like this:
 
---MGYHOYXEY6WxJCY8--
+  .. _target: http://somewhere-else.org/
 
+you can directly embed it inside a phrase-reference:
+
+  Go to `somewhere external <http://somewhere-else.org/>`_
+
+which is more convenient if you only wanted to use the URL once.
+But the _ is still there because it's still the markup that
+indicates "this is going be a link to go somewhere".
+
+> I reaffirm my definition of rST as the Perl of markup formats).
+
+Not going to argue with that :-)  But like Perl, there's
+usually some kind of a rationale lurking under the surface.
+
+thanks
+-- PMM
 
