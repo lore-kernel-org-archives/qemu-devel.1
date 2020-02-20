@@ -2,101 +2,136 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC00C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F415CC11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:20:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7983220722
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD76720722
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 13:20:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BprNefb0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7983220722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISG6rCEY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD76720722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4ljr-0004Ti-N1
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:19:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56355)
+	id 1j4lkT-0005LZ-U2
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 08:20:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57435)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j4lXc-00066g-5x
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:06:57 -0500
+ (envelope-from <lvivier@redhat.com>) id 1j4lbs-0006Jh-4F
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j4lXa-0005dB-8N
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:06:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34810
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1j4lbr-0008Fd-6D
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:11:20 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40393
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j4lXa-0005bL-27
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:06:54 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j4lbr-0008EN-0f
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 08:11:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582204012;
+ s=mimecast20190719; t=1582204276;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=gva/oijUn2ukqqFeWUu5GYV/ONiMfg1SXT6HuIycNbc=;
- b=BprNefb0a5nrJoeVazx4d/BDq9xFbFY1DkG0KAmdpVQNabycvrnAB2LK+F0UbDV8GfjsxA
- qAt4Db5u0ZAsSM7hmPWkgXgY+aRK7YG7NOPRw0aNU1LpavK5Hp8Ad7Oel0DaHtdnIH5uFN
- SZHy7QF4A2UdPaOSw9BAFNI4pLAtPIo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-jhGHXd59N96uovvU4eJdBQ-1; Thu, 20 Feb 2020 08:06:47 -0500
-Received: by mail-wr1-f71.google.com with SMTP id p8so1714155wrw.5
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 05:06:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=epBBiJe/BiipnhOxinjfU345ql1651dsm1KJ2Eg1l+8=;
- b=NNNXJLYFQNSx1pzcjH68Cc/mzX3aOiaZhE6zGeVv5KUAg3a2s+OvE+JXPVkknDZV8A
- ppzDjzBT4mJ7K2O9lfWlI6gT4MW5GYgRM7sv19M/8MunZHpK8uC/zDlu7k9kKkZ8E7IU
- nmgOjwxmQJgJZrm0OWAhg9wsDfaSEALBf3FiRimY/Atr/GL9BTvbpU/+PhalIBXYVv8Z
- 38nNFczikKOm3L/BVb4AS5oY4ohXnwKhERPbRXtGkZDrPn7B74jX0Afr/ffEZrfir4ql
- 5Ilg7hayjZNHnpBd0fNY3BAKRRQo5k1OQcCxWn8hIWT/OjlofNADIWQ3ldbOqIqNCWmk
- //VA==
-X-Gm-Message-State: APjAAAXo1DPOiQMrbQLId0sY92cDnuMhci5zbZ8DCYgC5crHnHF6c6t7
- qaB0rJEOrBwTC/7M6Iw64IyCEnT9CHNHlgktYMuOwl42G9iKKI44Af7hDhxj9yUuHYSF83Ei7dB
- 7o1SUhRY5fNzSKpI=
-X-Received: by 2002:a05:600c:295d:: with SMTP id
- n29mr4504805wmd.101.1582204006819; 
- Thu, 20 Feb 2020 05:06:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyzyX5Y7gdzaTOQjQ/rcWnepNEp6tk5YfOUODjdV1i7lhwV6s1r0NC2sbtsj+sn6/vQEc+xMg==
-X-Received: by 2002:a05:600c:295d:: with SMTP id
- n29mr4504765wmd.101.1582204006470; 
- Thu, 20 Feb 2020 05:06:46 -0800 (PST)
-Received: from localhost.localdomain (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id b67sm4594690wmc.38.2020.02.20.05.06.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Feb 2020 05:06:45 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v3 14/20] hw/virtio: Let vhost_memory_map() use a boolean
- 'is_write' argument
-Date: Thu, 20 Feb 2020 14:05:42 +0100
-Message-Id: <20200220130548.29974-15-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200220130548.29974-1-philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KW5zu9MB1eeAIibCV8hlhplZEUMiB9mKOVYNWhx/e58=;
+ b=ISG6rCEYln8PQlAdGpZClp98W5qxdsOF2YVUTF2JZnjksaK7Yj9gUzN+83ymyv8E66IBDZ
+ RsghAbS5pAD2yN0csqNl09d4RyAdHoS5VX5IVJcOjomFQNGQccoZ53dA6JYrp06sHqlBUC
+ ZaD9GEb5xKp3o8zZVUh2Gxr+vW/HBgo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-3hsWmVC4NMiDOBvJIyNALQ-1; Thu, 20 Feb 2020 08:11:14 -0500
+X-MC-Unique: 3hsWmVC4NMiDOBvJIyNALQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD4B6801E66;
+ Thu, 20 Feb 2020 13:11:09 +0000 (UTC)
+Received: from [10.36.116.166] (ovpn-116-166.ams2.redhat.com [10.36.116.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E591960BE1;
+ Thu, 20 Feb 2020 13:10:40 +0000 (UTC)
+Subject: Re: [PATCH v3 01/20] scripts/git.orderfile: Display Cocci scripts
+ before code modifications
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20200220130548.29974-1-philmd@redhat.com>
+ <20200220130548.29974-2-philmd@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <53dacfa3-0baf-49fc-9a6a-667b5c83467e@redhat.com>
+Date: Thu, 20 Feb 2020 14:10:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MC-Unique: jhGHXd59N96uovvU4eJdBQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+In-Reply-To: <20200220130548.29974-2-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,18 +151,16 @@ Cc: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
  Matthew Rosato <mjrosato@linux.ibm.com>, qemu-block@nongnu.org,
  David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
  Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
  Alistair Francis <alistair@alistair23.me>,
  Richard Henderson <richard.henderson@linaro.org>, Paul Durrant <paul@xen.org>,
  Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
  Igor Mitsyanko <i.mitsyanko@gmail.com>, Cornelia Huck <cohuck@redhat.com>,
  Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
  Paolo Bonzini <pbonzini@redhat.com>
@@ -135,54 +168,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'is_write' argument is either 0 or 1.
-Convert it to a boolean type.
+On 20/02/2020 14:05, Philippe Mathieu-Daud=C3=A9 wrote:
+> When we use a Coccinelle semantic script to do automatic
+> code modifications, it makes sense to look at the semantic
+> patch first.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  scripts/git.orderfile | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+> index 1f747b583a..7cf22e0bf5 100644
+> --- a/scripts/git.orderfile
+> +++ b/scripts/git.orderfile
+> @@ -22,6 +22,9 @@ Makefile*
+>  qapi/*.json
+>  qga/*.json
+> =20
+> +# semantic patches
+> +*.cocci
+> +
+>  # headers
+>  *.h
+> =20
+>=20
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/virtio/vhost.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 9edfadc81d..0d226dae10 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -294,7 +294,7 @@ static int vhost_dev_has_iommu(struct vhost_dev *dev)
- }
-=20
- static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
--                              hwaddr *plen, int is_write)
-+                              hwaddr *plen, bool is_write)
- {
-     if (!vhost_dev_has_iommu(dev)) {
-         return cpu_physical_memory_map(addr, plen, is_write);
-@@ -1012,21 +1012,21 @@ static int vhost_virtqueue_start(struct vhost_dev *=
-dev,
-=20
-     vq->desc_size =3D s =3D l =3D virtio_queue_get_desc_size(vdev, idx);
-     vq->desc_phys =3D a;
--    vq->desc =3D vhost_memory_map(dev, a, &l, 0);
-+    vq->desc =3D vhost_memory_map(dev, a, &l, false);
-     if (!vq->desc || l !=3D s) {
-         r =3D -ENOMEM;
-         goto fail_alloc_desc;
-     }
-     vq->avail_size =3D s =3D l =3D virtio_queue_get_avail_size(vdev, idx);
-     vq->avail_phys =3D a =3D virtio_queue_get_avail_addr(vdev, idx);
--    vq->avail =3D vhost_memory_map(dev, a, &l, 0);
-+    vq->avail =3D vhost_memory_map(dev, a, &l, false);
-     if (!vq->avail || l !=3D s) {
-         r =3D -ENOMEM;
-         goto fail_alloc_avail;
-     }
-     vq->used_size =3D s =3D l =3D virtio_queue_get_used_size(vdev, idx);
-     vq->used_phys =3D a =3D virtio_queue_get_used_addr(vdev, idx);
--    vq->used =3D vhost_memory_map(dev, a, &l, 1);
-+    vq->used =3D vhost_memory_map(dev, a, &l, true);
-     if (!vq->used || l !=3D s) {
-         r =3D -ENOMEM;
-         goto fail_alloc_used;
---=20
-2.21.1
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
 
