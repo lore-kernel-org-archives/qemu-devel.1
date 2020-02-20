@@ -2,69 +2,95 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05DFC11D00
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F4AC11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99A7820801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:24:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99A7820801
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 10D4F20801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 09:25:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL2MyiDw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10D4F20801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4i4F-0000WJ-Oz
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51875)
+	id 1j4i5P-0002nI-5H
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 04:25:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j4i1c-0004H3-RQ
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:42 -0500
+ (envelope-from <david@redhat.com>) id 1j4i4P-00017u-7Y
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j4i1b-0008CK-Al
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:40 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:38279)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j4i1b-0008Bk-0r
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:21:39 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M9WBG-1j81PJ2DOW-005cH8; Thu, 20 Feb 2020 10:21:05 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/13] linux-user: Add support for getting/setting selected
- alsa timer parameters using ioctls
-Date: Thu, 20 Feb 2020 10:20:52 +0100
-Message-Id: <20200220092053.1510215-13-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200220092053.1510215-1-laurent@vivier.eu>
-References: <20200220092053.1510215-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:YC7Edye/1tSifxL9BebyDM5r4Z+nReCzXjFzOuWf1X4JVxXv/Ni
- JvEc7FwZidhGlM0tb/25QTl9ZczfZNkXAfVyOw7IZCdzzxyv1W0wl2WCePTCYr6OWtGxJLj
- McEeSG744FvGdqPYCRG10qzaFLQt8bJju5WmHhYksMTs3MT0UccnLYEtRIdYbY6xh3mtcTn
- D9xvlfKpKPGDv4JfwMzrA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:r/nfo+gjX2o=:Np9yU4Upovr5odYO5fXnKt
- JJJ5XTMNIJHq1AUFeX+0J90iUpXC/4z93k++u0M/ocqysQJYOmrgefpHaueqMMZepXwcJmKRI
- DpXqvgKWfpKXU3m0Oc4HH/9/N/E2ZcwY2kC1kAcLC7PE9rGAk+vLK9TonXF/cZf69xrCzUHfo
- 6jdrOv80SNac++fiqXXDly+cT+RHWDtuilRWqgdYwwx+pzlcCzHcFDBIBbcK94Mx2WxGPlDMs
- mf5L9GX47mMiVwMOtafveDKxlYBmgw5hcl3IyXWxYlaMrcVwjIiqvtESMzgGuw04UDagFzDGO
- yUVtfbc+gTeCmhusfo590YBAsBsGA6BTcB373H57Nm1qXz1lt0i3uY5kXroiUpe55FsOEBcBG
- yqG2bdbROiGVtmFUzMF3tjTmGJuXSIE5O5+9RWrPjcLg6qNukMtDS41QNI/c6iqBGnWCPPNaf
- 92EMkSZqTwyGOs0I68KESaG5R5lu+Ie1Y33B3IHBMl6K+pKizv332Ocna20VRvALR/uXENxhs
- BdTiyBDWRmBwSZKm1oaLRavmuhBrt2gJvWiantdR+Eh4Fay410b75GscmMi5jGPcFhGpfUqrx
- 50zhphjkeOg66YJVcprkIFNVqvJnT0uhLcsPyUNeh/1kdY/UjQCGuNtEpmYi9dI9etT8gruFR
- xs0P+L3GqZiDghFUbx2/b5DNp8VldLQXnslItz6UqNkF7XuRIQ8nYozc1aF1z5V1ijZAUYoRP
- lYqyfogk2Km4EZmyDK5s7fIGqH0UCmW+Jo35pvqYa+mXqJL0W4UoeE3UO5A6t9xfiLsGy1Eyu
- GZyQpuQdPmlIUfGrLiaR3mmZqk3mYTgySjlZPJVCSsL934L9GsCarX5H/PBmcVM5FKJnG0O
+ (envelope-from <david@redhat.com>) id 1j4i4J-000102-CB
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42991
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4i4J-0000zX-22
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 04:24:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582190665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ryCUbgIe8KsZ1D8uUWBYI1LF9vZcPPEDDkxnFAX4H7A=;
+ b=gL2MyiDwZRZm6Spo7a6vvUjezVSoskO5OZnFNRyxm3mMWk3+xmJQWI4bnkOf31hL+OiMPG
+ 6unfaaCAFrtKgqGjVrRTCe1drhhUVtHiXO9qcFdIs5cxuAgZl8Hf2uN9jt3RUehmwXyM3M
+ OEoAUZ1nyhs9CFdCIuJFctJsGweVXBc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-x0fypKa-POyPfpWfcZE3kg-1; Thu, 20 Feb 2020 04:24:24 -0500
+Received: by mail-wr1-f72.google.com with SMTP id o6so1466366wrp.8
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 01:24:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:content-transfer-encoding:from:mime-version
+ :subject:date:message-id:references:cc:in-reply-to:to;
+ bh=20J2xNJndwD0uRSo76vE5fqmNGT6NiOBpd0H4BNpJXs=;
+ b=ca3Xp4EEeWg4qZmxEQB1DHpUlbyowOG7NNWAwWn1Ct9CF6oYm9qQM+6pgVNyFHaWsq
+ ROD0YEfg0O7JaYq6h4QtHXT5BEHtcyeHVWrFhPLRt+zuN0T0Gub2HYgjiHFz1ltwEA2l
+ avGhAqB//15V59/+80AdD1ZBsiSfVr7eZ5UpvEV/TB0zjkYfIQKUwG58zuql2TrKeOSy
+ 4+c/VnXNRuNfyWjFViLsHMpigZld5avcikI6tgb8ql3P6J3cchnrnJ2WmOzmV1k2RPnV
+ bYx41sZpOfz+D7b99bKRWQAO+PYqQgmRlGrvhZGmrwTQUBpqx+hMolGFIoYQRkAoSqlR
+ WpPQ==
+X-Gm-Message-State: APjAAAVuoQo2ps77G54t9KorcnhyE4aog98HSJtaqRKbpLK2SZA8cQ5z
+ ZCntybynzLgXw7OCEtxEi95X4/A2Tja65iengjmqXzjRcClM7De32qRraZ3qfG44tbQWEB4aFOs
+ UBk8dG4+Zi9tDrlQ=
+X-Received: by 2002:a1c:6408:: with SMTP id y8mr3294327wmb.130.1582190663235; 
+ Thu, 20 Feb 2020 01:24:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxErA+v6CThtewt0oOBLJXzaudgsibdEYgcKQcqWTtHx1g3/BUEkzmEv9QAC87+tIcz8drbbQ==
+X-Received: by 2002:a1c:6408:: with SMTP id y8mr3294291wmb.130.1582190662896; 
+ Thu, 20 Feb 2020 01:24:22 -0800 (PST)
+Received: from [131.159.204.89] (w204-2h-v4.eduroam.dynamic.rbg.tum.de.
+ [131.159.204.89])
+ by smtp.gmail.com with ESMTPSA id t131sm3863346wmb.13.2020.02.20.01.24.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Feb 2020 01:24:22 -0800 (PST)
+From: David Hildenbrand <david@redhat.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v1 07/13] migrate/ram: Get rid of "place_source" in
+ ram_load_postcopy()
+Date: Thu, 20 Feb 2020 10:24:19 +0100
+Message-Id: <5DD859C1-9FF5-4488-8928-43B83D8AD677@redhat.com>
+References: <20200219204730.GB37550@xz-x1>
+In-Reply-To: <20200219204730.GB37550@xz-x1>
+To: Peter Xu <peterx@redhat.com>
+X-Mailer: iPhone Mail (17D50)
+X-MC-Unique: x0fypKa-POyPfpWfcZE3kg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,204 +102,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@rt-rk.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 
-This patch implements functionalities of following ioctls:
 
-SNDRV_TIMER_IOCTL_INFO - Getting information about selected timer
+> Am 19.02.2020 um 21:47 schrieb Peter Xu <peterx@redhat.com>:
+>=20
+> =EF=BB=BFOn Wed, Feb 19, 2020 at 05:17:19PM +0100, David Hildenbrand wrot=
+e:
+>> It's always the same value.
+>=20
+> I guess not, because...
+>=20
+>>=20
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Juan Quintela <quintela@redhat.com>
+>> Cc: Peter Xu <peterx@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>> migration/ram.c | 8 +++-----
+>> 1 file changed, 3 insertions(+), 5 deletions(-)
+>>=20
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index cbd54947fb..75014717f6 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -3119,7 +3119,6 @@ static int ram_load_postcopy(QEMUFile *f)
+>>         ram_addr_t addr;
+>>         void *host =3D NULL;
+>>         void *page_buffer =3D NULL;
+>> -        void *place_source =3D NULL;
+>>         RAMBlock *block =3D NULL;
+>>         uint8_t ch;
+>>         int len;
+>> @@ -3188,7 +3187,6 @@ static int ram_load_postcopy(QEMUFile *f)
+>>                 place_needed =3D true;
+>>                 target_pages =3D 0;
+>>             }
+>> -            place_source =3D postcopy_host_page;
+>>         }
+>>=20
+>>         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+>> @@ -3220,7 +3218,7 @@ static int ram_load_postcopy(QEMUFile *f)
+>>                  * buffer to make sure the buffer is valid when
+>>                  * placing the page.
+>>                  */
+>> -                qemu_get_buffer_in_place(f, (uint8_t **)&place_source,
+>=20
+> ... it can be modified inside the call.
 
-    Read information about the selected timer. The information is returned in
-    the following structure:
+Very right, will drop this patch! Thanks!
 
-    struct snd_timer_info {
-        unsigned int flags;         /* timer flags - SNDRV_TIMER_FLG_* */
-        int card;                   /* card number */
-        unsigned char id[64];       /* timer identificator */
-        unsigned char name[80];     /* timer name */
-        unsigned long reserved0;    /* reserved for future use */
-        unsigned long resolution;   /* average period resolution in ns */
-        unsigned char reserved[64]; /* reserved for future use */
-    };
+>=20
+> I feel like this patch could even fail the QEMU unit test.  It would
+> be good to mention what tests have been carried out in the cover
+> letter or with RFC tag if no test is done yet.
 
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which information is to be obtained. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
+I test all code I share. This survives =E2=80=9Emake check=E2=80=9C. I assu=
+me all tests send small pages where =E2=80=9Ematches_target_page_size=3D=3D=
+true=E2=80=9C, so the tests did not catch this.
 
-SNDRV_TIMER_IOCTL_PARAMS - Setting parameters for selected timer
+I even spent the last day getting avocado-vt to work and ran multiple (obvi=
+ously not all) migration tests, including postcopy, so your suggestions hav=
+e already been considered ...
 
-    Sets parameters for the selected timer. The paramaters are set in the
-    following structure:
-
-    struct snd_timer_params {
-        unsigned int flags;         /* flags - SNDRV_TIMER_PSFLG_* */
-        unsigned int ticks;         /* requested resolution in ticks */
-        unsigned int queue_size;    /* total size of queue (32-1024) */
-        unsigned int reserved0;     /* reserved, was: failure locations */
-        unsigned int filter;        /* event filter */
-        unsigned char reserved[60]; /* reserved */
-    };
-
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which parameters are to be set. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
-
-SNDRV_TIMER_IOCTL_STATUS - Getting status of selected timer
-
-    Read status of the selected timer. The status of the timer is returned in
-    the following structure:
-
-    struct snd_timer_status {
-        struct timespec tstamp;     /* Timestamp - last update */
-        unsigned int resolution;    /* current period resolution in ns */
-        unsigned int lost;          /* counter of master tick lost */
-        unsigned int overrun;       /* count of read queue overruns */
-        unsigned int queue;         /* used queue size */
-        unsigned char reserved[64]; /* reserved */
-    };
-
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which status is to be obtained. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
-
-Implementation notes:
-
-    All ioctls in this patch have pointer to some kind of a structure
-    as their third argument. That is the reason why corresponding
-    definitions were added in 'linux-user/syscall_types.h'. Structure
-    'snd_timer_status' has field of type 'struct timespec' which is why
-    a corresponding definition of that structure was also added in
-    'linux-user/syscall_types.h'. All of these strucutures have some
-    fields that are of type 'unsigned long'. That is the reason why
-    separate target structures were defined in 'linux-user/syscall_defs.h'.
-    Structure 'struct timespec' already had a separate target definition
-    so that definition was used to define a target structure for
-    'snd_timer_status'. The rest of the implementation was straightforward.
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-Message-Id: <1579117007-7565-12-git-send-email-Filip.Bozuta@rt-rk.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/ioctls.h        |  5 +++++
- linux-user/syscall_defs.h  | 25 +++++++++++++++++++++++++
- linux-user/syscall_types.h | 29 +++++++++++++++++++++++++++++
- 3 files changed, 59 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 8313af3672c6..de6948796367 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -472,6 +472,11 @@
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_gstatus)))
-   IOCTL(SNDRV_TIMER_IOCTL_SELECT, IOC_W,
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_select)))
-+  IOCTL(SNDRV_TIMER_IOCTL_INFO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_snd_timer_info)))
-+  IOCTL(SNDRV_TIMER_IOCTL_PARAMS, IOC_W,
-+        MK_PTR(MK_STRUCT(STRUCT_snd_timer_params)))
-+  IOCTL(SNDRV_TIMER_IOCTL_STATUS, IOC_R,
-+        MK_PTR(MK_STRUCT(STRUCT_snd_timer_status)))
- 
-   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
-   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index cac9228a37d0..cf34129fc3ac 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2479,6 +2479,25 @@ struct target_snd_timer_select {
-     unsigned char reserved[32];
- };
- 
-+struct target_snd_timer_info {
-+    unsigned int flags;
-+    int card;
-+    unsigned char id[64];
-+    unsigned char name[80];
-+    abi_ulong reserved0;
-+    abi_ulong resolution;
-+    unsigned char reserved[64];
-+};
-+
-+struct target_snd_timer_status {
-+    struct target_timespec tstamp;
-+    unsigned int resolution;
-+    unsigned int lost;
-+    unsigned int overrun;
-+    unsigned int queue;
-+    unsigned char reserved[64];
-+};
-+
- /* alsa timer ioctls */
- #define TARGET_SNDRV_TIMER_IOCTL_PVERSION     TARGET_IOR('T', 0x00, int)
- #define TARGET_SNDRV_TIMER_IOCTL_NEXT_DEVICE  TARGET_IOWR('T', 0x01,           \
-@@ -2491,6 +2510,12 @@ struct target_snd_timer_select {
-                                                 struct target_snd_timer_gstatus)
- #define TARGET_SNDRV_TIMER_IOCTL_SELECT       TARGET_IOW('T', 0x10,            \
-                                                 struct target_snd_timer_select)
-+#define TARGET_SNDRV_TIMER_IOCTL_INFO         TARGET_IOR('T', 0x11,            \
-+                                                struct target_snd_timer_info)
-+#define TARGET_SNDRV_TIMER_IOCTL_PARAMS       TARGET_IOW('T', 0x12,            \
-+                                                struct snd_timer_params)
-+#define TARGET_SNDRV_TIMER_IOCTL_STATUS       TARGET_IOR('T', 0x14,            \
-+                                                struct target_snd_timer_status)
- 
- /* vfat ioctls */
- #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 81bc71938241..4e12c1661ea6 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -120,6 +120,35 @@ STRUCT(snd_timer_select,
-        MK_STRUCT(STRUCT_snd_timer_id), /* id */
-        MK_ARRAY(TYPE_CHAR, 32)) /* reserved */
- 
-+STRUCT(snd_timer_info,
-+       TYPE_INT, /* flags */
-+       TYPE_INT, /* card */
-+       MK_ARRAY(TYPE_CHAR, 64), /* id */
-+       MK_ARRAY(TYPE_CHAR, 80), /* name */
-+       TYPE_ULONG, /* reserved0 */
-+       TYPE_ULONG, /* resolution */
-+       MK_ARRAY(TYPE_CHAR, 64)) /* reserved */
-+
-+STRUCT(snd_timer_params,
-+       TYPE_INT, /* flags */
-+       TYPE_INT, /* ticks */
-+       TYPE_INT, /* queue_size */
-+       TYPE_INT, /* reserved0 */
-+       TYPE_INT, /* filter */
-+       MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
-+
-+STRUCT(timespec,
-+       TYPE_LONG, /* tv_sec */
-+       TYPE_LONG) /* tv_nsec */
-+
-+STRUCT(snd_timer_status,
-+       MK_STRUCT(STRUCT_timespec), /* tstamp */
-+       TYPE_INT, /* resolution */
-+       TYPE_INT, /* lost */
-+       TYPE_INT, /* overrun */
-+       TYPE_INT, /* queue */
-+       MK_ARRAY(TYPE_CHAR, 64)) /* reserved */
-+
- /* loop device ioctls */
- STRUCT(loop_info,
-        TYPE_INT,                 /* lo_number */
--- 
-2.24.1
+Could have mentioned that in the cover letter, yes.
 
 
