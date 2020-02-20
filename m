@@ -7,54 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78106C7619D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB5AC5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43E6A21D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:27:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79E0921D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:28:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="P9l/S2Xu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E6A21D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="odBCp9Mw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79E0921D56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4cUY-0003BQ-D5
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:27:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41646)
+	id 1j4cVO-0005Az-L5
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:28:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cRU-0005cy-FV
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:24:01 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR3-0004ak-U3
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cRT-0000L2-B2
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:24:00 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:58279 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR2-0008Hz-K1
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:33 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45613 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4cRT-0008MX-0c; Wed, 19 Feb 2020 22:23:59 -0500
+ id 1j4cR1-0008Dg-Lt; Wed, 19 Feb 2020 22:23:32 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NKg250nsz9sSk; Thu, 20 Feb 2020 14:23:26 +1100 (AEDT)
+ id 48NKg01cdCz9sSD; Thu, 20 Feb 2020 14:23:24 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582169006;
- bh=GyzBZMDoAMPRnJCvIsnfxFsMHlBhNBqGfLr4nb9ELlM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582169004;
+ bh=3yZHI6i+ESlOY6Bm+OB1zHwskVZfGDMZIUebGR7XvSM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=P9l/S2XupeblVRk6FAraFfTj56Bl+B4I9PdBWu5OQ5aVh+1VhCQGmo8iCPSc7D+M1
- 1TYuIuOODHoZARciHmZnugdzmMnu1M6LSkz3Db4oJXU1vJXdCH2n3oEG031ikjRX19
- czyqRXPmtSqHLxUZ01KTlbymj0PopsHTGaWq9+Rw=
+ b=odBCp9MwioUg+1u11VhsKs9Qms7+bbIKDUF6m5ylZJ96pRdvZcotvxD7GdV/JmKLG
+ spHUaPuBV9zjDMF/XolTUeRpN0dui14Hn84RFYP2P/mKNPjGzl2kUc0GpEqaq4AdRN
+ DgBdpVne2pwO9d6N9WrlOrmpzGTt2jPCBELfGTmk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	groug@kaod.org,
 	clg@kaod.org
-Subject: [PATCH v5 18/18] spapr: Fold spapr_node0_size() into its only caller
-Date: Thu, 20 Feb 2020 14:23:16 +1100
-Message-Id: <20200220032317.96884-19-david@gibson.dropbear.id.au>
+Subject: [PATCH v5 02/18] ppc: Remove stub of PPC970 HID4 implementation
+Date: Thu, 20 Feb 2020 14:23:00 +1100
+Message-Id: <20200220032317.96884-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 References: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -82,93 +83,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Real Mode Area (RMA) needs to fit within the NUMA node owning memory
-at address 0.  That's usually node 0, but can be a later one if there are
-some nodes which have no memory (only CPUs).
+The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capabilit=
+y.
+However, it can be (and often was) strapped into "Apple mode", where the
+hypervisor capabilities were disabled (essentially putting it always in
+hypervisor mode).
 
-This is currently handled by the spapr_node0_size() helper.  It has only
-one caller, so there's not a lot of point splitting it out.  It's also
-extremely easy to misread the code as clamping to the size of the smalles=
-t
-node rather than the first node with any memory.
+That's actually the only mode of the 970 we support in qemu, and we're
+unlikely to change that any time soon.  However, we do have a partial
+implementation of the 970's HID4 register which affects things only
+relevant for hypervisor mode.
 
-So, fold it into the caller, and add some commentary to make it a bit
-clearer exactly what it's doing.
+That stub is also really ugly, since it attempts to duplicate the effects
+of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
+in a really confusing way.
+
+Just get rid of it.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c | 37 +++++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 16 deletions(-)
+ target/ppc/mmu-hash64.c         | 29 +----------------------------
+ target/ppc/translate_init.inc.c | 20 ++++++++------------
+ 2 files changed, 9 insertions(+), 40 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f0354b699d..9ba645c9cb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -296,20 +296,6 @@ static void spapr_populate_pa_features(SpaprMachineS=
-tate *spapr,
-     _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
- }
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index da8966ccf5..3e0be4d55f 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong =
+val)
 =20
--static hwaddr spapr_node0_size(MachineState *machine)
--{
--    if (machine->numa_state->num_nodes) {
--        int i;
--        for (i =3D 0; i < machine->numa_state->num_nodes; ++i) {
--            if (machine->numa_state->nodes[i].node_mem) {
--                return MIN(pow2floor(machine->numa_state->nodes[i].node_=
-mem),
--                           machine->ram_size);
--            }
+     /* Filter out bits */
+     switch (env->mmu_model) {
+-    case POWERPC_MMU_64B: /* 970 */
+-        if (val & 0x40) {
+-            lpcr |=3D LPCR_LPES0;
 -        }
--    }
--    return machine->ram_size;
+-        if (val & 0x8000000000000000ull) {
+-            lpcr |=3D LPCR_LPES1;
+-        }
+-        if (val & 0x20) {
+-            lpcr |=3D (0x4ull << LPCR_RMLS_SHIFT);
+-        }
+-        if (val & 0x4000000000000000ull) {
+-            lpcr |=3D (0x2ull << LPCR_RMLS_SHIFT);
+-        }
+-        if (val & 0x2000000000000000ull) {
+-            lpcr |=3D (0x1ull << LPCR_RMLS_SHIFT);
+-        }
+-        env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
+-
+-        /*
+-         * XXX We could also write LPID from HID4 here
+-         * but since we don't tag any translation on it
+-         * it doesn't actually matter
+-         *
+-         * XXX For proper emulation of 970 we also need
+-         * to dig HRMOR out of HID5
+-         */
+-        break;
+     case POWERPC_MMU_2_03: /* P5p */
+         lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
+                       LPCR_LPES0 | LPCR_LPES1 |
+@@ -1154,7 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
+al)
+         }
+         break;
+     default:
+-        ;
++        g_assert_not_reached();
+     }
+     env->spr[SPR_LPCR] =3D lpcr;
+     ppc_hash64_update_rmls(cpu);
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index a0d0eaabf2..ab79975fec 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -7895,25 +7895,21 @@ static void spr_write_lpcr(DisasContext *ctx, int=
+ sprn, int gprn)
+ {
+     gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
+ }
+-
+-static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
+-{
+-#if defined(TARGET_PPC64)
+-    spr_write_generic(ctx, sprn, gprn);
+-    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
+-#endif
 -}
 -
- static void add_str(GString *s, const gchar *s1)
+ #endif /* !defined(CONFIG_USER_ONLY) */
+=20
+ static void gen_spr_970_lpar(CPUPPCState *env)
  {
-     g_string_append_len(s, s1, strlen(s1) + 1);
-@@ -2652,10 +2638,24 @@ static hwaddr spapr_rma_size(SpaprMachineState *s=
-papr, Error **errp)
- {
-     MachineState *machine =3D MACHINE(spapr);
-     hwaddr rma_size =3D machine->ram_size;
--    hwaddr node0_size =3D spapr_node0_size(machine);
-=20
-     /* RMA has to fit in the first NUMA node */
--    rma_size =3D MIN(rma_size, node0_size);
-+    if (machine->numa_state->num_nodes) {
-+        /*
-+         * It's possible for there to be some zero-memory nodes first
-+         * in the list.  We need the RMA to fit inside the memory of
-+         * the first node which actually has some memory.
-+         */
-+        int i;
-+
-+        for (i =3D 0; i < machine->numa_state->num_nodes; ++i) {
-+            if (machine->numa_state->nodes[i].node_mem !=3D 0) {
-+                rma_size =3D MIN(rma_size,
-+                               machine->numa_state->nodes[i].node_mem);
-+                break;
-+            }
-+        }
-+    }
-=20
-     /*
-      * VRMA access is via a special 1TiB SLB mapping, so the RMA can
-@@ -2672,6 +2672,11 @@ static hwaddr spapr_rma_size(SpaprMachineState *sp=
-apr, Error **errp)
-         spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
-     }
-=20
+ #if !defined(CONFIG_USER_ONLY)
+-    /* Logical partitionning */
+-    /* PPC970: HID4 is effectively the LPCR */
 +    /*
-+     * RMA size must be a power of 2
++     * PPC970: HID4 covers things later controlled by the LPCR and
++     * RMOR in later CPUs, but with a different encoding.  We only
++     * support the 970 in "Apple mode" which has all hypervisor
++     * facilities disabled by strapping, so we can basically just
++     * ignore it
 +     */
-+    rma_size =3D pow2floor(rma_size);
-+
-     if (rma_size < (MIN_RMA_SLOF * MiB)) {
-         error_setg(errp,
- "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real Mode Area)",
+     spr_register(env, SPR_970_HID4, "HID4",
+                  SPR_NOACCESS, SPR_NOACCESS,
+-                 &spr_read_generic, &spr_write_970_hid4,
++                 &spr_read_generic, &spr_write_generic,
+                  0x00000000);
+ #endif
+ }
 --=20
 2.24.1
 
