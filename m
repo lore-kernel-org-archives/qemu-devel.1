@@ -2,92 +2,68 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC50C11D00
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486E7C11D00
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AAC520801
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:27:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="e+OQc6bv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AAC520801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1FC20801
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 23:32:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1FC20801
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4vDz-0002rX-93
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 18:27:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57948)
+	id 1j4vIz-0006QW-8h
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 18:32:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=31236d5d8=alistair.francis@wdc.com>)
- id 1j4vCM-0000PW-3i
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:25:39 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j4vIH-0005yb-Hr
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:31:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=31236d5d8=alistair.francis@wdc.com>)
- id 1j4vCK-0000hz-Kh
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:25:38 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:25480)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=31236d5d8=alistair.francis@wdc.com>)
- id 1j4vCK-0000h3-CR; Thu, 20 Feb 2020 18:25:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1582241136; x=1613777136;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=Vx2cxzup8vY5IuEbJlVv7GFIa45fWd375ToC+PpsS6c=;
- b=e+OQc6bv6lUqjFsI3gPHsQSH7KdRqRQ+i0SpaT2qp96+ti6iJ96yQIt9
- JOjaKbufNbiX1Cx2eV1kXq+xukX9KzJK13kq9WXaZgD/4dbZhD1eXeDO0
- KLDD+YjZvN6vahBKENjbgn5E0rwzAw4h89KOZlZJ4hXMZcjTG41sh1Jfw
- pAK9EXYG/p/6YOl5LE5vSJNKXrdnsct+9TBjtlJMlXDm8V53/jZU2/SD8
- /hFu5ynRyzpsVNoWKPJ00nSQh5EK/9NzYZZgEpPx3OS62AhxHqY6IlEe1
- 20tQjFB1t42D2tFWulgRyfvrF5KAv4hyzeNvh++1AVacx4njh4KHA5c1+ w==;
-IronPort-SDR: ebeWKn3AHm/p0dvnDo+KpYEl44JjYhvoCvG3TNeddBFn4u0984VR0h7VLaJvfYLNhZifGgVQnn
- UwXzRBRccIHSkXYzk/FzO1912NVMPhEkzraOB/dXGUzwzwiAfL/M4Pv3HtsPj/MtPTcgFMAZQ6
- 80S5nJHPBPSd0Nwk0gNFPx3IEB4VSPsBHWdeq/4jVSt/ck8B7obW1aWEOsTIr4UqUuf0H1hQqG
- UeNCqYrBXUZDPLLrJ2/OE0GWKJbABRWk6bZQEc3ykr1X3Kl4vtAdTlkmO1aRrlRqfMdVTcfD1L
- iBU=
-X-IronPort-AV: E=Sophos;i="5.70,466,1574092800"; d="scan'208";a="238445369"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 21 Feb 2020 07:25:32 +0800
-IronPort-SDR: cSXEs0a74B95GWAYMphGbHeQ7Fa8faFHq7EMCz0ISKxwZhOkZtsBEYDi/NGNtDA7WTM0nDq+Nx
- nby30nWwDbLtlbZVMAxvE81VvxLPYHvo0tFqY/Y3QzOPlh8CODr6/o2Olx6R54pqqVZej9+Znz
- JhWpPAuQCXGCR7dHAGAy6y1tqzPIr+r4jynGBYMWI01AUvsEc53RmOrNfy35bShGJj9LOxd8Us
- WjoyTYsRXIGFuX753fEZWsdcgz0SuwdSX/RtAyBz7CSOYWJAGyb9+tlzVjG3O02/2kragUy96C
- WgYkyhLMxMG32CqecgFj9a7U
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 20 Feb 2020 15:18:07 -0800
-IronPort-SDR: M6qZzrYVnUwdBsCewUNc2clQPmAuDVfolpmWfhmbeLNDY/YcfTSL6uD5sbFIw4ZGR6xSmlPGb6
- XWZffDasY0if7Oj9YdKnCwpiEjBbM5XSGaXf0fDzVBjzpUyWnJpLjgvuUBbNpQQ88PsbxIv+9T
- uXAAR5BQNuY8ktkpmU6GSQBrZd8gjq3a2nWAUgle8FTVrDwGzWsMRivIiujWXNMPw34fUO97ZC
- AmqB1JKptYYjxzenrbl3UfP44zN0zvbeyYablJpQPXNZ6uieWs2vAalyIKQfg+t3tUbpHirmya
- 4+Q=
-WDCIronportException: Internal
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip01.wdc.com with ESMTP; 20 Feb 2020 15:25:33 -0800
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 1/2] linux-user: Protect more syscalls
-Date: Thu, 20 Feb 2020 15:18:30 -0800
-Message-Id: <3fd846fa30a95eb11e2b27d95fce19f3d619d8f0.1582240656.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.25.0
+ (envelope-from <no-reply@patchew.org>) id 1j4vIF-0002xM-J3
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 18:31:45 -0500
+Resent-Date: Thu, 20 Feb 2020 18:31:45 -0500
+Resent-Message-Id: <E1j4vIF-0002xM-J3@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21112)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j4vIF-0002wE-Bi; Thu, 20 Feb 2020 18:31:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582241493; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=IBZx4vvC2CcPSCDpcoKEeD7raB91ny277podRleZjP0/CBDymKleG7HRi9hfmjrIMLh7hGAJgv38MEX+I9UKmXK55lk9k0TPtpj1WEQygDFS4ZUcjiGFVufWfi5Hc3aXx6R0V/NJjF7uT3Bs+crWZzPISJeXN06+TkTdIVdtQQw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582241493;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=DybI+LTU4t5xk9booofuIZWmeqXuhmJDgSjNIXyx85I=; 
+ b=iQ3w8lJQLWZG6tRYd9JYn+cBa7ao7cohSiA8xH9wotSRnR3WMlS0jAxe9xRR5L5OfCms6egelx6DMwWT8o9j5v+/4Hqmyh6LQtYo0JCpsqGUiSkVvrR36hOeWX3/DDES68MpyeO9hM1gp3XH78vUaJXJ4KjNtPciUStwHAaAnEk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582241491341404.01756982908;
+ Thu, 20 Feb 2020 15:31:31 -0800 (PST)
 In-Reply-To: <cover.1582240656.git.alistair.francis@wdc.com>
-References: <cover.1582240656.git.alistair.francis@wdc.com>
+Subject: Re: [PATCH v1 0/2]  linux-user: generate syscall_nr.sh for RISC-V
+Message-ID: <158224149003.31180.5954402657995887989@a1bbccc8075a>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.141.245
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alistair.francis@wdc.com
+Date: Thu, 20 Feb 2020 15:31:31 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,169 +75,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, palmer@dabbelt.com, laurent@vivier.eu,
- alistair23@gmail.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, laurent@vivier.eu,
+ alistair.francis@wdc.com, alistair23@gmail.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New y2038 safe 32-bit architectures (like RISC-V) don't support old
-syscalls with a 32-bit time_t. The kernel defines new *_time64 versions
-of these syscalls. Add some more #ifdefs to syscall.c in linux-user to
-allow us to compile without these old syscalls.
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- linux-user/strace.c  |  2 ++
- linux-user/syscall.c | 18 ++++++++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 3d4d684450..2eb8ae3d31 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -770,6 +770,7 @@ print_syscall_ret_newselect(const struct syscallname *name, abi_long ret)
- #define TARGET_TIME_OOP      3   /* leap second in progress */
- #define TARGET_TIME_WAIT     4   /* leap second has occurred */
- #define TARGET_TIME_ERROR    5   /* clock not synchronized */
-+#ifdef TARGET_NR_adjtimex
- static void
- print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
- {
-@@ -808,6 +809,7 @@ print_syscall_ret_adjtimex(const struct syscallname *name, abi_long ret)
- 
-     gemu_log("\n");
- }
-+#endif
- 
- UNUSED static struct flags access_flags[] = {
-     FLAG_GENERIC(F_OK),
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c930577686..44632a7f6a 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -738,8 +738,10 @@ safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
- safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
- safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
-               int, flags, mode_t, mode)
-+#if defined(TARGET_NR_wait4)
- safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
-               struct rusage *, rusage)
-+#endif
- safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
-               int, options, struct rusage *, rusage)
- safe_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
-@@ -776,8 +778,10 @@ safe_syscall4(int, rt_sigtimedwait, const sigset_t *, these, siginfo_t *, uinfo,
-               const struct timespec *, uts, size_t, sigsetsize)
- safe_syscall4(int, accept4, int, fd, struct sockaddr *, addr, socklen_t *, len,
-               int, flags)
-+#if defined(TARGET_NR_nanosleep)
- safe_syscall2(int, nanosleep, const struct timespec *, req,
-               struct timespec *, rem)
-+#endif
- #ifdef TARGET_NR_clock_nanosleep
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
-@@ -1063,6 +1067,7 @@ static inline abi_long host_to_target_rusage(abi_ulong target_addr,
-     return 0;
- }
- 
-+#ifdef TARGET_NR_setrlimit
- static inline rlim_t target_to_host_rlim(abi_ulong target_rlim)
- {
-     abi_ulong target_rlim_swap;
-@@ -1078,7 +1083,9 @@ static inline rlim_t target_to_host_rlim(abi_ulong target_rlim)
-     
-     return result;
- }
-+#endif
- 
-+#if defined(TARGET_NR_getrlimit) || defined (TARGET_NR_ugetrlimit)
- static inline abi_ulong host_to_target_rlim(rlim_t rlim)
- {
-     abi_ulong target_rlim_swap;
-@@ -1092,6 +1099,7 @@ static inline abi_ulong host_to_target_rlim(rlim_t rlim)
-     
-     return result;
- }
-+#endif
- 
- static inline int target_to_host_resource(int code)
- {
-@@ -8584,6 +8592,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#if defined(TARGET_NR_gettimeofday)
-     case TARGET_NR_gettimeofday:
-         {
-             struct timeval tv;
-@@ -8594,6 +8603,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-+#if defined(TARGET_NR_settimeofday)
-     case TARGET_NR_settimeofday:
-         {
-             struct timeval tv, *ptv = NULL;
-@@ -8615,6 +8626,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- 
-             return get_errno(settimeofday(ptv, ptz));
-         }
-+#endif
- #if defined(TARGET_NR_select)
-     case TARGET_NR_select:
- #if defined(TARGET_WANT_NI_OLD_SELECT)
-@@ -9260,6 +9272,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return do_syscall(cpu_env, arg1 & 0xffff, arg2, arg3, arg4, arg5,
-                           arg6, arg7, arg8, 0);
- #endif
-+#if defined(TARGET_NR_wait4)
-     case TARGET_NR_wait4:
-         {
-             int status;
-@@ -9287,6 +9300,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
- #ifdef TARGET_NR_swapoff
-     case TARGET_NR_swapoff:
-         if (!(p = lock_user_string(arg1)))
-@@ -9431,6 +9445,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return do_vm86(cpu_env, arg1, arg2);
- #endif
- #endif
-+#if defined(TARGET_NR_adjtimex)
-     case TARGET_NR_adjtimex:
-         {
-             struct timex host_buf;
-@@ -9446,6 +9461,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
- #if defined(TARGET_NR_clock_adjtime) && defined(CONFIG_CLOCK_ADJTIME)
-     case TARGET_NR_clock_adjtime:
-         {
-@@ -9971,6 +9987,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#if defined(TARGET_NR_nanosleep)
-     case TARGET_NR_nanosleep:
-         {
-             struct timespec req, rem;
-@@ -9981,6 +9998,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-     case TARGET_NR_prctl:
-         switch (arg1) {
-         case PR_GET_PDEATHSIG:
--- 
-2.25.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTgyMjQwNjU2Lmdp
+dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MSAwLzJdICBsaW51eC11c2VyOiBnZW5l
+cmF0ZSBzeXNjYWxsX25yLnNoIGZvciBSSVNDLVYKTWVzc2FnZS1pZDogY292ZXIuMTU4MjI0MDY1
+Ni5naXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwg
+fHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29y
+aXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4K
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
+L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy9jb3Zlci4xNTgyMjQwNjU2LmdpdC5h
+bGlzdGFpci5mcmFuY2lzQHdkYy5jb20gLT4gcGF0Y2hldy9jb3Zlci4xNTgyMjQwNjU2LmdpdC5h
+bGlzdGFpci5mcmFuY2lzQHdkYy5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwph
+OGY5NWZmIGxpbnV4LXVzZXIvcmlzY3Y6IFVwZGF0ZSB0aGUgc3lzY2FsbF9ucidzIHRvIHRoZSA1
+LjUga2VybmVsCjhmMzE5ZmUgbGludXgtdXNlcjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IDhmMzE5ZmU0MDQ0ZiAobGludXgt
+dXNlcjogUHJvdGVjdCBtb3JlIHN5c2NhbGxzKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3
+ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM3NTogRklMRTogbGlu
+dXgtdXNlci9zeXNjYWxsLmM6MTA4ODoKKyNpZiBkZWZpbmVkKFRBUkdFVF9OUl9nZXRybGltaXQp
+IHx8IGRlZmluZWQgKFRBUkdFVF9OUl91Z2V0cmxpbWl0KQoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
+cm5pbmdzLCAxMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgoyLzIgQ2hlY2tpbmcgY29tbWl0IGE4Zjk1ZmY3OGQyMCAobGludXgtdXNlci9yaXNj
+djogVXBkYXRlIHRoZSBzeXNjYWxsX25yJ3MgdG8gdGhlIDUuNSBrZXJuZWwpCldBUk5JTkc6IEJs
+b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzNzc6IEZJ
+TEU6IGxpbnV4LXVzZXIvcmlzY3Yvc3lzY2FsbF9uci5oOjQ0MjoKKy8qIEFsaWFzIHNvbWUgb2Yg
+dGhlIG9sZGVyIHByZSA2NC1iaXQgdGltZV90IHN5c2NhbGxzIHRvIHRoZSA2NC1iaXQKCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGluZQoj
+Mzc4OiBGSUxFOiBsaW51eC11c2VyL3Jpc2N2L3N5c2NhbGxfbnIuaDo0NDM6CisgKiBvbmVzIGZv
+ciBSVjMyLiBUaGlzIGlzIGJhc2VkIG9uIHRoZSBsaXN0IHVzZWQgYnkgZ2xpYmMuICovCgp0b3Rh
+bDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDM3MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU4MjI0MDY1Ni5naXQuYWxpc3RhaXIuZnJhbmNpc0B3
+ZGMuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
