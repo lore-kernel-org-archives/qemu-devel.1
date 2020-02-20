@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D48B6C11D24
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 04:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF47AC11D24
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 04:04:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90F71207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 04:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69E8E207FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 04:04:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YUDhrKEn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F71207FD
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KBNv2kY2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E8E207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4zX5-0006md-Pk
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 23:03:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41472)
+	id 1j4zYW-0007ia-KA
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 23:04:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bgardon@google.com>) id 1j4ph2-0002Yd-Qf
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:32:58 -0500
+ (envelope-from <bgardon@google.com>) id 1j4pj9-0005AE-2t
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:35:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bgardon@google.com>) id 1j4ph0-0008RR-WD
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:32:56 -0500
-Received: from mail-vs1-xe2f.google.com ([2607:f8b0:4864:20::e2f]:46935)
+ (envelope-from <bgardon@google.com>) id 1j4pj7-00013X-12
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:35:07 -0500
+Received: from mail-vs1-xe2b.google.com ([2607:f8b0:4864:20::e2b]:44716)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bgardon@google.com>) id 1j4ph0-0008R7-Pt
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:32:54 -0500
-Received: by mail-vs1-xe2f.google.com with SMTP id t12so3178825vso.13
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:32:54 -0800 (PST)
+ (Exim 4.71) (envelope-from <bgardon@google.com>) id 1j4pj6-00013D-QN
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 12:35:04 -0500
+Received: by mail-vs1-xe2b.google.com with SMTP id p6so3181277vsj.11
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 09:35:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lI0DKi+xVITa6H8ye7aVLK0VoHqI2d3P7pp88mZwmYw=;
- b=YUDhrKEnq6/6fFlBX+B9L4DFyHY4w02V6ePDeehQZkN8IhQtkT4hWzYfR9MfOGPIec
- PAuRbbVB+VZplEB6LS4eq9AbNJpKQSfzi234R0Wp+WxPtUQkRt+DcVVTdyaKP/wuHYOY
- YSNRz0RufVhIA1Rg53mhzN/YPFfA0/tY+E1XJy0MVs+mRp4+J8cFFMcpYigYnl7U+RW6
- UWcjks82rutPfdsNOA78bC9i8QYvGhUdFSue6hYOffBXAjd9IJmSwPmV7gXXEjE9JnI2
- ZUve+J+844wfEYVLpnSyWVkqa4wIXlGN3V01+MjGBYg6Dsm0jJrNz24GWC5ocqsuebSC
- pLLw==
+ :cc; bh=pmepnRQK+Zeo8qJsEnVROV7jHSWSqjA8jl+uj8g9eIM=;
+ b=KBNv2kY21Ekq9DJjatjVC+1UAKeTLzMFYY+GIqYkhD0imNTcI/tOFagRTRtxWQQUOZ
+ 9SvpD59m/sJqW1dNrAUebD/XLNSZn8utkzirgGA6HxmrBwUYAhovlQa/Pm/ujPgRz9xL
+ uCtRvZ4QB8pbmF7v4IuLrtM7Smmh6M94elINPcQr0bR5NFcuemcUHkJW1/vxT4zauneD
+ m/AuvwRul1Mn3uMMPzjKrH2lspInCYHZFfg6bBBGCr3DSdfKRthWIXhSonr2rHfqrYm5
+ +dgWzwFGqf9kZhTAGbjhAahT//foRnRBhg0oXsBGQMU2nKq/ODVNvbMZJAqmFIOFdIrF
+ OXKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=lI0DKi+xVITa6H8ye7aVLK0VoHqI2d3P7pp88mZwmYw=;
- b=fsPll6pQac2QMH1wU7/8b2RyQ4rZaGgw/eXwvKAglQiX5uHZa1oR4oJOMnYxIV1Ygt
- pGg9Hgl6VGlKnb/JVHlQAF4Ghpmp6Na1YDadx8x8L6Q48CqFBZnDMYmtu4uNSgnR5Rx3
- 03toP0n9bVoSrQdogaurLnM7EquiP9kOi5zDOsMP720+750KSTnzbkpVrXLQQYuZzDTx
- YyoIEYHODShRE2ZW9AebXsnkdDFGdcsKBBN1ySDeymjqdhgSXPwaaAkG07afD92FDGTi
- 6QKv+7K4zk/NLBiN9PRk40Edud1rrax1d2lJAaLjimvQU/nAvJfP3eyqxeKjuqKhMdHs
- ATrg==
-X-Gm-Message-State: APjAAAXZ9iLz/CzunZdYgegVL/3fxHCojnRkrmARBPA6iuqbyv+C/6Yx
- tIYvfC//z//KDYVgs1/TCOvRuGU9RBV17DvhrcgjBg==
-X-Google-Smtp-Source: APXvYqzU32Ehi8sYwv9rH2xIPBJlDU75H8go7NpjEaEBrzjb7hhthgqSs1oOeMflQ5FSTBnKPjyUdXE5zbxHS3rlQak=
-X-Received: by 2002:a05:6102:2f4:: with SMTP id
- j20mr18281448vsj.17.1582219973450; 
- Thu, 20 Feb 2020 09:32:53 -0800 (PST)
+ bh=pmepnRQK+Zeo8qJsEnVROV7jHSWSqjA8jl+uj8g9eIM=;
+ b=rqrv/ug/htnSuuwOhI0n81QIbQ07Qct6IqIUYedZE5SS2bev4dkBFytZMMt2814Io3
+ JeKKwykm5AvUpSNS82ROOx9w1sT8KbIYncd0xcW8XXlG5GHT/Mxl8cvElEYuYHdWdFRb
+ xWFfa55cuw4+Oom++gg5Cl1wAER2K4BXrrPiXkG3W3K/lFadNkHgpZhKKFAx4lwSnIYB
+ X8XpdQqf52c0B5vy7FUeffy4lGljG0iClOdtuU98KRJnGWmAZyqytxrz7XkPscciTjGz
+ FLLmAxHLJhptE5ayAOLgdATnTtE3cgBoGPZ4e1v9auWCjCcRQ+ZFsUnJ8ITEL1PVc0Ak
+ Eblw==
+X-Gm-Message-State: APjAAAX2eAZByb3+W0WLMGA7USDXceJMQHwR4Nw/ryoCAUsXIKQqKlTH
+ Yt7X4KMv9sa1DAJzIRv95eZ2GzcI+jcJQsKFGzvB/g==
+X-Google-Smtp-Source: APXvYqxJEi1XhN5xBDOdXVTbwudDgBOrXmAcvL/t5e4xbvxev5WQPoqMZZugmV8utCpq8q3pdC2gdhTQxSo3FgsJswA=
+X-Received: by 2002:a05:6102:394:: with SMTP id
+ m20mr17887422vsq.235.1582220103799; 
+ Thu, 20 Feb 2020 09:35:03 -0800 (PST)
 MIME-Version: 1.0
 References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
  <20200218174311.GE1408806@xz-x1>
@@ -71,10 +71,11 @@ References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei
  <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
 In-Reply-To: <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
 From: Ben Gardon <bgardon@google.com>
-Date: Thu, 20 Feb 2020 09:32:42 -0800
-Message-ID: <CANgfPd-7KOXqSi0vvs_KnY20vn1a-cZdrBTEM3UcboQuykHOYQ@mail.gmail.com>
+Date: Thu, 20 Feb 2020 09:34:52 -0800
+Message-ID: <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
 Subject: Re: RFC: Split EPT huge pages in advance of dirty logging
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>,
+ Junaid Shahid <junaids@google.com>
 Cc: Peter Xu <peterx@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "pbonzini@redhat.com" <pbonzini@redhat.com>, 
@@ -83,12 +84,11 @@ Cc: Peter Xu <peterx@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "Liujinsong (Paul)" <liu.jinsong@huawei.com>,
  "linfeng (M)" <linfeng23@huawei.com>, 
  "wangxin (U)" <wangxinxin.wang@huawei.com>,
- "Huangweidong (C)" <weidong.huang@huawei.com>, 
- Junaid Shahid <junaids@google.com>
+ "Huangweidong (C)" <weidong.huang@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e2f
+X-Received-From: 2607:f8b0:4864:20::e2b
 X-Mailman-Approved-At: Thu, 20 Feb 2020 23:01:56 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,19 +104,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
-FWIW, we currently do this eager splitting at Google for live
-migration. When the log-dirty-memory flag is set on a memslot we
-eagerly split all pages in the slot down to 4k granularity.
-As Jay said, this does not cause crippling lock contention because the
-vCPU page faults generated by write protection / splitting can be
-resolved in the fast page fault path without acquiring the MMU lock.
-I believe +Junaid Shahid tried to upstream this approach at some point
-in the past, but the patch set didn't make it in. (This was before my
-time, so I'm hoping he has a link.)
-I haven't done the analysis to know if eager splitting is more or less
-efficient with parallel slow-path page faults, but it's definitely
-faster under the MMU lock.
 
 On Thu, Feb 20, 2020 at 5:53 AM Zhoujian (jay) <jianjay.zhou@huawei.com> wrote:
 >
@@ -293,4 +280,19 @@ On Thu, Feb 20, 2020 at 5:53 AM Zhoujian (jay) <jianjay.zhou@huawei.com> wrote:
 >
 > Regards,
 > Jay Zhou
+
+(Ah I top-posted I'm sorry. Re-sending at the bottom.)
+
+FWIW, we currently do this eager splitting at Google for live
+migration. When the log-dirty-memory flag is set on a memslot we
+eagerly split all pages in the slot down to 4k granularity.
+As Jay said, this does not cause crippling lock contention because the
+vCPU page faults generated by write protection / splitting can be
+resolved in the fast page fault path without acquiring the MMU lock.
+I believe +Junaid Shahid tried to upstream this approach at some point
+in the past, but the patch set didn't make it in. (This was before my
+time, so I'm hoping he has a link.)
+I haven't done the analysis to know if eager splitting is more or less
+efficient with parallel slow-path page faults, but it's definitely
+faster under the MMU lock.
 
