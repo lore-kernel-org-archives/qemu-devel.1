@@ -2,142 +2,128 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EB2C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 927D0C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:26:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 780B82071E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:25:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 780B82071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5EA05206ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 11:26:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUMOSpTR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EA05206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4jxX-0005uT-Ng
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 06:25:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40575)
+	id 1j4jxx-0006Wi-EU
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 06:26:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40626)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j4jwe-0005Ey-Df
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:41 -0500
+ (envelope-from <david@redhat.com>) id 1j4jwt-0005T7-L3
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j4jwd-0006Dr-53
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12450)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j4jwc-0006Cn-NU
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:39 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01KBObGq112401
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:24:37 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2y8ueecr1m-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 06:24:36 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 20 Feb 2020 11:24:27 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 20 Feb 2020 11:24:25 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 01KBOOGH45351252
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 20 Feb 2020 11:24:24 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 54977A405C;
- Thu, 20 Feb 2020 11:24:24 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 08857A4054;
- Thu, 20 Feb 2020 11:24:24 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.185.143])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 20 Feb 2020 11:24:23 +0000 (GMT)
-Subject: Re: [PATCH v3 06/17] s390x: protvirt: Add migration blocker
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200214151636.8764-1-frankja@linux.ibm.com>
- <20200214151636.8764-7-frankja@linux.ibm.com>
- <20200220114815.01634a4c.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 20 Feb 2020 12:24:23 +0100
+ (envelope-from <david@redhat.com>) id 1j4jws-0006NR-DU
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28569
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j4jws-0006N7-92
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 06:24:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582197893;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=mXd1mQxzmWxEpr9VUVZrb/QOsS9zgTkkH/AV6Cyf/b0=;
+ b=GUMOSpTR5po64jU5dl+oZyYlrie5F54TaTGDL3q9OOTZtVMxdyzdKFFvFygSIIGkcG1Muo
+ sxtu/xFKVRU66skiL+2bSV2RWhutcPrEc5PgpXe1KJDPsOXwxTVzqThyAlEw4wLmfNpKYH
+ Fe3EjKGBOC0jvpdZtNppEC+JhNsRKK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-237-y9vuyhgNPMSH-OKsIl6NUg-1; Thu, 20 Feb 2020 06:24:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F0CE800D48;
+ Thu, 20 Feb 2020 11:24:51 +0000 (UTC)
+Received: from [10.36.118.29] (unknown [10.36.118.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F343490F79;
+ Thu, 20 Feb 2020 11:24:43 +0000 (UTC)
+Subject: Re: [PATCH v1 13/13] migrate/ram: Tolerate partially changed mappings
+ in postcopy code
+To: qemu-devel@nongnu.org
+References: <20200219161725.115218-1-david@redhat.com>
+ <20200219161725.115218-14-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <9887ef65-12b1-37d5-cbf3-fda0b7d7fda7@redhat.com>
+Date: Thu, 20 Feb 2020 12:24:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200220114815.01634a4c.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd"
-X-TM-AS-GCONF: 00
-x-cbid: 20022011-0016-0000-0000-000002E89141
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022011-0017-0000-0000-0000334BAD4A
-Message-Id: <fbcacbf4-75d6-55f9-2ad3-6cd47b400fce@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-20_03:2020-02-19,
- 2020-02-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0
- priorityscore=1501 mlxscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
- impostorscore=0 phishscore=0 mlxlogscore=999 suspectscore=2 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002200085
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20200219161725.115218-14-david@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: y9vuyhgNPMSH-OKsIl6NUg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,132 +135,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd
-Content-Type: multipart/mixed; boundary="HaBVZQGWZ07QODmydoEBNDC090QbbTykf"
+On 19.02.20 17:17, David Hildenbrand wrote:
+> When we partially change mappings (e.g., mmap over parts of an existing
+> mmap) where we have a userfaultfd handler registered, the handler will
+> implicitly be unregistered from the parts that changed. This is e.g., the
+> case when doing a qemu_ram_remap(), but is also a preparation for RAM
+> blocks with resizable allocations and we're shrinking RAM blocks.
+> 
+> When the mapping is changed and the handler is removed, any waiters are
+> woken up. Trying to place pages will fail. We can simply ignore erors
+> due to that when placing pages - as the mapping changed on the migration
+> destination, also the content is stale. E.g., after shrinking a RAM
+> block, nobody should be using that memory. After doing a
+> qemu_ram_remap(), the old memory is expected to have vanished.
+> 
+> Let's tolerate such errors (but still warn for now) when placing pages.
+> Also, add a comment why unregistering will continue to work even though
+> the mapping might have changed.
+> 
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Juan Quintela <quintela@redhat.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  migration/postcopy-ram.c | 43 ++++++++++++++++++++++++++++++++++------
+>  1 file changed, 37 insertions(+), 6 deletions(-)
+> 
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index c68caf4e42..df9d27c004 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -506,6 +506,13 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+>      range_struct.start = (uintptr_t)host_addr;
+>      range_struct.len = length;
+>  
+> +    /*
+> +     * In case the mapping was partially changed since we enabled userfault
+> +     * (esp. when whrinking RAM blocks and we have resizable allocations, or
+> +     * via qemu_ram_remap()), the userfaultfd handler was already removed for
+> +     * the mappings that changed. Unregistering will, however, still work and
+> +     * ignore mappings without a registered handler.
+> +     */
+>      if (ioctl(mis->userfault_fd, UFFDIO_UNREGISTER, &range_struct)) {
+>          error_report("%s: userfault unregister %s", __func__, strerror(errno));
+>  
+> @@ -1239,10 +1246,28 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+>       */
+>      if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
+>          int e = errno;
+> -        error_report("%s: %s copy host: %p from: %p (size: %zd)",
+> -                     __func__, strerror(e), host, from, pagesize);
+>  
+> -        return -e;
+> +        /*
+> +         * When the mapping gets partially changed before we try to place a page
+> +         * (esp. when whrinking RAM blocks and we have resizable allocations, or
+> +         * via qemu_ram_remap()), the userfaultfd handler will be removed and
+> +         * placing pages will fail. In that case, any waiter was already woken
+> +         * up when the mapping was changed. We can safely ignore this, as
+> +         * mappings that change once we're running on the destination imply
+> +         * that memory of these mappings vanishes. Let's still print a warning
+> +         * for now.
+> +         *
 
---HaBVZQGWZ07QODmydoEBNDC090QbbTykf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+After talking to Andrea, on mapping changes, no waiter will be woken up
+automatically. We have to do an UFFDIO_WAKE, which even works when there
+is no longer a handler registered for that reason. Interesting stuff :)
 
-On 2/20/20 11:48 AM, Cornelia Huck wrote:
-> On Fri, 14 Feb 2020 10:16:25 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> Migration is not yet supported.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 16 ++++++++++++++++
->>  1 file changed, 16 insertions(+)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 5fa4372083..d64724af91 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -42,6 +42,9 @@
->>  #include "hw/s390x/tod.h"
->>  #include "sysemu/sysemu.h"
->>  #include "hw/s390x/pv.h"
->> +#include "migration/blocker.h"
->> +
->> +static Error *pv_mig_blocker;
->> =20
->>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>  {
->> @@ -373,6 +376,7 @@ static void s390_machine_reset(MachineState *machi=
-ne)
->>      CPUState *cs, *t;
->>      S390CPU *cpu;
->>      S390CcwMachineState *ms =3D S390_CCW_MACHINE(machine);
->> +    static Error *local_err;
->> =20
->>      /* get the reset parameters, reset them once done */
->>      s390_ipl_get_reset_request(&cs, &reset_type);
->> @@ -422,6 +426,17 @@ static void s390_machine_reset(MachineState *mach=
-ine)
->>          }
->>          run_on_cpu(cs, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->> =20
->> +        if (!pv_mig_blocker) {
->> +            error_setg(&pv_mig_blocker,
->> +                       "protected VMs are currently not migrateable."=
-);
->> +        }
->> +        migrate_add_blocker(pv_mig_blocker, &local_err);
->=20
-> If I'm not lost in the context, that's during PV_RESET. I'm a bit
-> confused why you'd add the blocker here?
+-- 
+Thanks,
 
-Where would you want me to add it?
-It's here where we switch into secure mode and I need to block before
-switching and unblock if it fails.
-
-When having the blocker in diag.c, I'd have a hard time unblocking on a
-PV switch fail.
-
->=20
->> +        if (local_err) {
->> +            error_report_err(local_err);
->> +            error_free(pv_mig_blocker);
->> +            exit(1);
->=20
-> Why the exit()? Can't you fail the call?
-
-Well, if that fails and we go protected, I wouldn't be protected agains
-migrations, right?
-
->=20
->> +        }
->> +
->>          if (s390_machine_pv_secure(ms)) {
->>              CPU_FOREACH(t) {
->>                  s390_pv_vcpu_destroy(t);
->> @@ -430,6 +445,7 @@ static void s390_machine_reset(MachineState *machi=
-ne)
->>              ms->pv =3D false;
->> =20
->>              s390_machine_inject_pv_error(cs);
->> +            migrate_del_blocker(pv_mig_blocker);
->>              s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->>              return;
->>          }
->=20
->=20
-
-
-
---HaBVZQGWZ07QODmydoEBNDC090QbbTykf--
-
---JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5ObGcACgkQ41TmuOI4
-ufjTDA/+MvJ3OGSfPsR4+rJUEVzY5/0EVFGhQE8mKgTq+sjlPuY71OGfCaz+7txI
-cH7gIyo9S/zDgYMkq7y6E2SytjB9mm3RJDSkxBX9LUVrOiyrmbqL/TRnmrYHF5sW
-awDdV4JdsJxjMyd6264AJhGsDnhk0dJ1drEhl2qQyh367GvH3KWCeptBwg7toN4b
-KB8lv2N/Nw5P6ryrTYGzjysXytiySl+iwBfmHnstjjeoixo5+O0RrGP7D7UyaFvF
-EkenAHnOdZg168QTC2tlq8+/wGddmiFdP8oWfk5S5Bo3rjGTdd8yxF8mDTaZsMSZ
-i1S7q/Ui8Ab/TXSjIhqopuFQ+3lbsf+GNeHjR0KcswzlU9SwSLyVZssRSohh8pKK
-m/+9t8vNjAeIhJunkDPowLiXMoRJKXAFNCpnuuRwB28qwJZ7zh8muzSKdD+21zwc
-FjjsWptA6m+mvQ/hOJs9PkO4V2/0I/fFLrDuENaCYrhPnBkk0elCcIBzla6PlpFy
-HeQYVqYu1cMfxYHUPkZztj2TAbVt0fLGxRUgdLjBN5I8WbAQK5kZyj53cd9TumUl
-/MbqTUhKIPtoAp54voURzEmLmKDi4Wsk7T6KJ/rJe5PnYkJo3eL/blDINpz0T4Hu
-J/y31Qfd3KK0hIgOylKeu8+KFk7CqJQ6SojJRXTbMoo6UGVkIPg=
-=Qbkc
------END PGP SIGNATURE-----
-
---JF9mlHgCZuzM8drbH8NRHeHEEhbQ5dqKd--
+David / dhildenb
 
 
