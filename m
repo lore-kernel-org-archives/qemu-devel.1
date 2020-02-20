@@ -2,80 +2,66 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9520CC5ACC4
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3F5C5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B3424656
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC4D321D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 02:41:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FwAI+m2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B3424656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="y6+d2M6j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC4D321D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ozlabs.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4bhO-00049g-Dq
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 21:36:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36182)
+	id 1j4bmm-0005lR-1d
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 21:41:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36502)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laine@redhat.com>) id 1j4bgm-0003kI-DE
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:35:45 -0500
+ (envelope-from <paulus@ozlabs.org>) id 1j4bmA-0005Ef-Tz
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:41:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laine@redhat.com>) id 1j4bgk-0004MF-2K
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:35:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29760
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <paulus@ozlabs.org>) id 1j4bm9-0007vt-Jy
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:41:18 -0500
+Received: from ozlabs.org ([203.11.71.1]:56163)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <laine@redhat.com>) id 1j4bgj-0004IB-UX
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 21:35:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582166138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ssSNVnJMLsw0ZQgl0RKPIWnKYH3WyRdAwiv66/J/tyU=;
- b=FwAI+m2VvnapOKkgUs1Czneb6JAS/EiuI7T1Hp2Rz4XXyHbUKw7jHW50oV5dkUKYqn0pYi
- PjyVY9DUvmrfGha06w88pxkgiahOfGySHNDWCX8AP+CGj7ne9EJtAzNPZuJU3pEI9gskeq
- CFbfZqNlwCj5map1nSeTw/zUGUYL3rQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-TUwb9gl9N0mH_1KOlPkHBw-1; Wed, 19 Feb 2020 21:35:32 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FA9218A6EC0
- for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 02:35:31 +0000 (UTC)
-Received: from [10.10.125.146] (ovpn-125-146.rdu2.redhat.com [10.10.125.146])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD0028AC5B;
- Thu, 20 Feb 2020 02:35:22 +0000 (UTC)
-Subject: Re: [PATCH v2] pcie_root_port: Add enable_hotplug option
-To: qemu-devel@nongnu.org
-References: <20200219145540.648365-1-jusual@redhat.com>
-From: Laine Stump <laine@redhat.com>
-Message-ID: <0bf5b8fd-5ea7-b285-823e-54bb6482970c@redhat.com>
-Date: Wed, 19 Feb 2020 21:35:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <paulus@ozlabs.org>)
+ id 1j4bm8-0007r6-I5; Wed, 19 Feb 2020 21:41:17 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+ id 48NJkF41yCz9sRs; Thu, 20 Feb 2020 13:41:09 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+ t=1582166469; bh=EirTQ09/f5t1EYSbjUDyAxjWGTMXmVM84kkpySotjb0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=y6+d2M6j7B4K1rxB/0vFXF0338eqA0PG1Pc5DIC2zboR7tx2OeSEMKDme7Z4HRPPz
+ XxeuhSH8SHGE5w9aewijdSPEiVlQbEfEJy4/Nma6lRvx67TbCn/EcdvLZyiHNXMG2q
+ gviBcoMgx4k0/Q/ebnJEX6GNg2KDNEtHZIOaJLnKRInQqojiB04WfKa336PF4YSzvh
+ iOvgU7eKDSe46paaHCKOrKIbEt64zRx1OcICIX5KphPanvWyo2osVFwFumx4WLWXao
+ F5OqurMJHr4KRQrXBO8bzbv1J7OwuVl4WAwopEePtJltnFsXjnrsseHcR56+mMEbtq
+ LjsRKI4bkkz7Q==
+Date: Thu, 20 Feb 2020 13:41:06 +1100
+From: Paul Mackerras <paulus@ozlabs.org>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH v3 04/12] target/ppc: Introduce ppc_hash64_use_vrma()
+ helper
+Message-ID: <20200220024106.GA24750@oak.ozlabs.ibm.com>
+References: <20200219005414.15635-1-david@gibson.dropbear.id.au>
+ <20200219005414.15635-5-david@gibson.dropbear.id.au>
+ <87blpud63n.fsf@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200219145540.648365-1-jusual@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: TUwb9gl9N0mH_1KOlPkHBw-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87blpud63n.fsf@linux.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,53 +73,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Julia Suvorova <jusual@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, philmd@redhat.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/19/20 9:55 AM, Julia Suvorova wrote:
-> Make hot-plug/hot-unplug on PCIe Root Ports optional to allow libvirt
-> manage it and restrict unplug for the whole machine. This is going to
-> prevent user-initiated unplug in guests (Windows mostly).
-> Hotplug is enabled by default.
-> Usage:
->      -device pcie-root-port,enable-hotplug=3Dfalse,...
->=20
-> If you want to disable hot-unplug on some downstream ports of one
-> switch, disable hot-unplug on PCIe Root Port connected to the upstream
-> port as well as on the selected downstream ports.
->=20
-> Discussion related:
->      https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg00530.html
->=20
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> ---
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04868.html
->=20
-> v2:
->      * change name of the option to 'enable-hotplug' [Laine]
+On Wed, Feb 19, 2020 at 11:06:20AM -0300, Fabiano Rosas wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+> 
+> > When running guests under a hypervisor, the hypervisor obviously needs to
+> > be protected from guest accesses even if those are in what the guest
+> > considers real mode (translation off).  The POWER hardware provides two
+> > ways of doing that: The old way has guest real mode accesses simply offset
+> > and bounds checked into host addresses.  It works, but requires that a
+> > significant chunk of the guest's memory - the RMA - be physically
+> > contiguous in the host, which is pretty inconvenient.  The new way, known
+> > as VRMA, has guest real mode accesses translated in roughly the normal way
+> > but with some special parameters.
+> >
+> > In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes, but
+> > in POWER9 only VRMA mode is supported
+> 
+> ... when translation is off, right? Because I see in the 3.0 ISA that
+> LPCR[VPM1] is still there.
 
+VRMA stands for virtual real mode area, and the "real mode" part
+implies that translation is off.  VRMA is not used when translation is
+on because then the CPU is not in real mode.
 
-Heh... I didn't actually expect you to do that just for me :-)=20
-(especially since I guess nobody else was bothered by "disable"). But=20
-now that you did, I look at it and realize that the "enable-" part is=20
-redundant, ie. just "hotplug=3Don|off|true|false" is plenty descriptive=20
-(since it's implied that it's being enabled).
+LPCR[VPM1] is indeed still there, but it is a bit different to VPM0
+(or what VPM0 used to do); VPM1 doesn't change how translation is
+done, just what happens on a fault.
 
-But I've already created too much of a tempest over such a tiny detail,=20
-and kind of wish I'd just kept quiet instead...
-
-I'll try to test this with libvirt in the next day or two.
-
-
->      * change order of enabling capability bits [Igor]
->      * enable HPS bit [Igor]
->      * add option to xio3130_downstream [J=C3=A1n]
->=20
-
+Paul.
 
