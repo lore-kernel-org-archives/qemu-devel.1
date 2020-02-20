@@ -1,83 +1,78 @@
 Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06904C34031
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 05:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D244FC34031
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 06:02:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69A024656
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 05:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CC6F2465D
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 06:02:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALo6EFBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69A024656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IouBvzK+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC6F2465D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4edC-0001Ms-T6
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 00:44:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53628)
+	id 1j4euV-0005Tm-Q9
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 01:02:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1j4ecb-0000i2-3G
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 00:43:38 -0500
+ (envelope-from <gshan@redhat.com>) id 1j4eto-0004oT-NT
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 01:01:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1j4ecZ-0002nl-EL
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 00:43:37 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39374)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
- id 1j4ecU-0002lV-Oe; Thu, 20 Feb 2020 00:43:30 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 77so2569196oty.6;
- Wed, 19 Feb 2020 21:43:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K9bC3NaZCTcev60UV2PMeKYRdafUok1hs8UpWCqY4Qk=;
- b=ALo6EFBeQoW6VDzkkdDFhZyQmCbD7cEoaGdxXTwk9q/gCuLMPpEtTkCM34Hd2gdAg+
- ZWKd27V8oXLCjJ8zRTMCukuzWlkTVNqMTgpnJgM+9DcQZnly+Rway07RMXJ03d0Ae3wI
- 1EDEYIqFmYYuJH+A8j8BFVTxPrbXZCPA2u5jTLvqcoKK4aWgUs3WsPyrI0naPNETN9lg
- cuyD7EaxsN+Fe1MPQ5dtjxE89ULDySSpg0zVCc4WA1Y6M/aHinskmK+gioVK+YvxMcTy
- XZqAAcKzCIK8NQJvz9DkmiuyqY9/2E03hB4YXaW03VVe8MWpMrDPyo9QJLff6aJ2/XVa
- 5GxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K9bC3NaZCTcev60UV2PMeKYRdafUok1hs8UpWCqY4Qk=;
- b=dB5GWxgqUsyd+HLyvyyPTxagFwL6J8mwgT3XIqUvsIOkeoWb1QwGQLpxDzB2gQo1fj
- vkT6TwluDOj5AzUqL/dL+xC1UF7gm6Av7uxmefeUo838e//J6RLpvMCH3v60qwK+5vkb
- cru0amEYAathyfm4qAblz1Kgg9/fnqgcfeOtBwN8FjN7Ulk6RW8JkuEG7R73kkfO6Nzo
- XrE0mkZxW4f/2rk+2UQCpIp7rTIN+YYS1hBVHwFEVFKYqgbZmR5WudUMXA/VkUbwUrST
- AlRi0NRQoVW5rJDAM1s98n3U0A6ko7/3hnySbJv7uH+xvdf/AQMkj3zzVcibtOfClqjC
- 3vBQ==
-X-Gm-Message-State: APjAAAU5Il38898gjwlcI2KGgxTJjxDsyHN95tASEPvWiMIcOjnKUUrN
- iLAqtZUBsQ8jsqHmKmngF5N/sW7iAmKG7rQha34=
-X-Google-Smtp-Source: APXvYqxuH7ATmBKSr9HI7qgtx2hyamzF1bnskBeGwmwe9QYu1GDAl/EV3Y680HlFFbLQBrBESG4h+fgtOlh4v+EZ84k=
-X-Received: by 2002:a9d:22:: with SMTP id 31mr20935730ota.173.1582177409775;
- Wed, 19 Feb 2020 21:43:29 -0800 (PST)
+ (envelope-from <gshan@redhat.com>) id 1j4etn-0002hm-8D
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 01:01:24 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22866
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j4etn-0002hb-54
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 01:01:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582178482;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=UcmGmhawV5bGRFE7RaCRGF/3Tx0kPvxDecpGECUdhFI=;
+ b=IouBvzK+qH3C7R8BVIMo2fJoYqDafbdvKkEtUZrguTJFyfAEWG1K7G17hPoEp+U7b4cfFr
+ 23Vs6qhoPL/2XPA8Gs6DlFWIpyWzaJAkg7kdaIt+RuvHcyNJJFRz5qy1DnNsnnbBIPVan5
+ LSZiPM6boNAKFny1+yWdabV6KDCcsds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-fCCiIVQJNcONjmJmKHcFXQ-1; Thu, 20 Feb 2020 01:01:15 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E51B8018A7;
+ Thu, 20 Feb 2020 06:01:14 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-80.bne.redhat.com
+ [10.64.54.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7123819C58;
+ Thu, 20 Feb 2020 06:01:12 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [PATCH] hw/char/pl011: Output characters using best-effort mode
+Date: Thu, 20 Feb 2020 17:01:08 +1100
+Message-Id: <20200220060108.143668-1-gshan@redhat.com>
 MIME-Version: 1.0
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <CABLmASGhqbao0ngRAoHA7KBFA5CoMXLwaVh9wzv1Ec022FRjbQ@mail.gmail.com>
- <alpine.BSF.2.22.395.2002192001540.88848@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.22.395.2002192001540.88848@zero.eik.bme.hu>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Thu, 20 Feb 2020 06:43:18 +0100
-Message-ID: <CABLmASHhefWbz+wdbDmL_jLi9ad6HdWbEdFGc8f8Ei+Asy2fXw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Content-Type: multipart/alternative; boundary="0000000000007b3bae059efb6221"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: fCCiIVQJNcONjmJmKHcFXQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,265 +84,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Clarke <pc@us.ibm.com>, Programmingkid <programmingkidx@gmail.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, shan.gavin@gmail.com, maz@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007b3bae059efb6221
-Content-Type: text/plain; charset="UTF-8"
+Currently, PL011 is used by ARM virt board by default. It's possible to
+block the system from booting. With below parameters in command line, the
+backend could run into endless attempts of transmitting packets, which
+can't succeed because of running out of sending buffer. The socket might
+be not accepted n server side. It's not correct because disconnected
+serial port shouldn't stop the system from booting.
 
-On Wed, Feb 19, 2020 at 8:28 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
+   -machine virt,gic-version=3D3 -cpu max -m 4096
+   -monitor none -serial tcp:127.0.0.1:50900
 
-> On Wed, 19 Feb 2020, Howard Spoelstra wrote:
-> > I tested with the current ppc-for-5.0 branch and with v1 of the hardfloat
-> > patches applied on top of that. There is a noticeable speed improvement
-> in
-> > Linux and OSX hosts. Windows 10 host doesn't seem to be impressed at
-> all. I
-> > saw no obvious glitches so far. The fpu performance on OSX hosts seems
-> very
-> > slow. This was not always the case in the past, when it was on par with
-> > Linux performance.
->
-> Interesting, thanks for the measurements.
->
-> > Below are my results.
-> >
-> > Best,
-> > Howard
-> >
-> > Host Linux (Fedora 31):
-> > Mac OS tests: 9.2 with MacBench 5.0
-> > Baseline(100%): G3 300Mhz
-> > 5.0 branch + hardfloat patches: cpu 193%, fpu 86%
-> > 5.0 branch: cpu 188%, fpu 57%
->
-> Here there's a difference in cpu value before and after patch which I
-> can't explain (only changed FPU stuff so it should not change others) but
-> also not seen in other measurements so this could be some external
-> influence such as something else using CPU while running test? Unless this
-> happens consistently I'd put it down to measurement error.
->
+The issue can be reproduced by starting a program which listens on TCP
+port 50900 and then sleep without accepting any incoming connections. On
+the other hand, a VM is started with above parameters and modified qemu
+where the PL011 is flooded with 5000K data after it's created. Eventually,
+the flooding won't proceed and stops after transmitting 2574K data. It's
+basically to simulate tons of output from EDK-II and demonstrates how the
+tons of output can block the system from booting.
 
-  Yes, I would put that cpu value down to some fluctuation in the test
+This fixes the issue by using newly added API qemu_chr_fe_try_write_all(),
+which provides another type of service (best-effort). It's different from
+qemu_chr_fe_write_all() as the data will be dropped if the backend has
+been running into so-called broken state or 50 attempts of transmissions.
+The broken state is cleared if the data is transmitted at once.
 
->
-> > Mac OSX tests: 10.5 with Skidmarks 4.0 test
-> > Baseline(100%): G4 1.0Ghz.
-> > 5.0 branch + hardfloat patches: Int:131 FP:11 Vec:15
-> > 5.0 branch: Int:131 FP:9 Vec:11
-> >
-> > Host OSX Sierra:
-> > Mac OS tests: 9.2 with MacBench 5.0
-> > Baseline(100%): G3 300Mhz
-> > 5.0 branch + hardfloat patches: cpu 199%, fpu 66%
-> > 5.0 branch: cpu 199%, fpu 40%
-> > Mac OSX tests: 10.5 with Skidmarks 4.0 test
-> > Baseline(100%): G4 1.0Ghz.
-> > 5.0 branch + hardfloat patches: Int:129 PF:11 Vec:14
->
-> These values seem to match Linux measurement above so don't seem slower
-> although MacOS9 seems to be slower (66 vs. 86) so either this depends on
-> the ops used or something else.
->
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ chardev/char-fe.c         | 15 +++++++++++++--
+ chardev/char.c            | 20 ++++++++++++++------
+ hw/char/pl011.c           |  5 +----
+ include/chardev/char-fe.h | 14 ++++++++++++++
+ include/chardev/char.h    |  6 ++++--
+ 5 files changed, 46 insertions(+), 14 deletions(-)
 
- Yes, the baseline speed for the fpu in Mac OS 9.2 is relatively low.
+diff --git a/chardev/char-fe.c b/chardev/char-fe.c
+index f3530a90e6..6558fcfb94 100644
+--- a/chardev/char-fe.c
++++ b/chardev/char-fe.c
+@@ -39,7 +39,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf=
+, int len)
+         return 0;
+     }
+=20
+-    return qemu_chr_write(s, buf, len, false);
++    return qemu_chr_write(s, buf, len, false, false);
+ }
+=20
+ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len)
+@@ -50,7 +50,18 @@ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t=
+ *buf, int len)
+         return 0;
+     }
+=20
+-    return qemu_chr_write(s, buf, len, true);
++    return qemu_chr_write(s, buf, len, true, false);
++}
++
++int qemu_chr_fe_try_write_all(CharBackend *be, const uint8_t *buf, int len=
+)
++{
++    Chardev *s =3D be->chr;
++
++    if (!s) {
++        return 0;
++    }
++
++    return qemu_chr_write(s, buf, len, true, true);
+ }
+=20
+ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *buf, int len)
+diff --git a/chardev/char.c b/chardev/char.c
+index 87237568df..cd17fac123 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -106,9 +106,8 @@ static void qemu_chr_write_log(Chardev *s, const uint8_=
+t *buf, size_t len)
+     }
+ }
+=20
+-static int qemu_chr_write_buffer(Chardev *s,
+-                                 const uint8_t *buf, int len,
+-                                 int *offset, bool write_all)
++static int qemu_chr_write_buffer(Chardev *s, const uint8_t *buf, int len,
++                                 int *offset, bool write_all, bool best_ef=
+fort)
+ {
+     ChardevClass *cc =3D CHARDEV_GET_CLASS(s);
+     int res =3D 0;
+@@ -119,7 +118,14 @@ static int qemu_chr_write_buffer(Chardev *s,
+     retry:
+         res =3D cc->chr_write(s, buf + *offset, len - *offset);
+         if (res < 0 && errno =3D=3D EAGAIN && write_all) {
++            if (best_effort && s->retries > 50) {
++                break;
++            }
++
+             g_usleep(100);
++            if (best_effort) {
++                s->retries++;
++            }
+             goto retry;
+         }
+=20
+@@ -127,6 +133,7 @@ static int qemu_chr_write_buffer(Chardev *s,
+             break;
+         }
+=20
++        s->retries =3D 0;
+         *offset +=3D res;
+         if (!write_all) {
+             break;
+@@ -140,7 +147,8 @@ static int qemu_chr_write_buffer(Chardev *s,
+     return res;
+ }
+=20
+-int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all=
+)
++int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
++                   bool write_all, bool best_effort)
+ {
+     int offset =3D 0;
+     int res;
+@@ -148,11 +156,11 @@ int qemu_chr_write(Chardev *s, const uint8_t *buf, in=
+t len, bool write_all)
+     if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+         replay_char_write_event_load(&res, &offset);
+         assert(offset <=3D len);
+-        qemu_chr_write_buffer(s, buf, offset, &offset, true);
++        qemu_chr_write_buffer(s, buf, offset, &offset, true, false);
+         return res;
+     }
+=20
+-    res =3D qemu_chr_write_buffer(s, buf, len, &offset, write_all);
++    res =3D qemu_chr_write_buffer(s, buf, len, &offset, write_all, best_ef=
+fort);
+=20
+     if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+         replay_char_write_event_save(res, offset);
+diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+index 13e784f9d9..348188f49e 100644
+--- a/hw/char/pl011.c
++++ b/hw/char/pl011.c
+@@ -179,11 +179,8 @@ static void pl011_write(void *opaque, hwaddr offset,
+=20
+     switch (offset >> 2) {
+     case 0: /* UARTDR */
+-        /* ??? Check if transmitter is enabled.  */
+         ch =3D value;
+-        /* XXX this blocks entire thread. Rewrite to use
+-         * qemu_chr_fe_write and background I/O callbacks */
+-        qemu_chr_fe_write_all(&s->chr, &ch, 1);
++        qemu_chr_fe_try_write_all(&s->chr, &ch, 1);
+         s->int_level |=3D PL011_INT_TX;
+         pl011_update(s);
+         break;
+diff --git a/include/chardev/char-fe.h b/include/chardev/char-fe.h
+index a553843364..18281ccfca 100644
+--- a/include/chardev/char-fe.h
++++ b/include/chardev/char-fe.h
+@@ -220,6 +220,20 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t *=
+buf, int len);
+  */
+ int qemu_chr_fe_write_all(CharBackend *be, const uint8_t *buf, int len);
+=20
++/**
++ * qemu_chr_fe_try_write_all:
++ * @buf: the data
++ * @len: the number of bytes to send
++ *
++ * Write data to a character backend from the front end.  This function wi=
+ll
++ * send data from the front end to the back end. It provides function as t=
+o
++ * @qemu_chr_fe_write_all, except the data will be dropped after 50 attemp=
+ts
++ * of transmissions are done.
++ *
++ * Returns: the number of bytes consumed (0 if no associated Chardev)
++ */
++int qemu_chr_fe_try_write_all(CharBackend *be, const uint8_t *buf, int len=
+);
++
+ /**
+  * qemu_chr_fe_read_all:
+  * @buf: the data buffer
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 00589a6025..425a007a0a 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -65,6 +65,7 @@ struct Chardev {
+     char *filename;
+     int logfd;
+     int be_open;
++    int retries;
+     GSource *gsource;
+     GMainContext *gcontext;
+     DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
+@@ -221,8 +222,9 @@ void qemu_chr_set_feature(Chardev *chr,
+                           ChardevFeature feature);
+ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename,
+                                 bool permit_mux_mon);
+-int qemu_chr_write(Chardev *s, const uint8_t *buf, int len, bool write_all=
+);
+-#define qemu_chr_write_all(s, buf, len) qemu_chr_write(s, buf, len, true)
++int qemu_chr_write(Chardev *s, const uint8_t *buf, int len,
++                   bool write_all, bool best_effort);
++#define qemu_chr_write_all(s, buf, len) qemu_chr_write(s, buf, len, true, =
+false)
+ int qemu_chr_wait_connected(Chardev *chr, Error **errp);
+=20
+ #define TYPE_CHARDEV "chardev"
+--=20
+2.23.0
 
->
-> > 5.0 branch: Int:129 FP:8 Vec:9
-> >
-> > Host Windows 10:
-> > Mac OS tests: 9.2 with MacBench 5.0
-> > Baseline(100%): G3 300Mhz
-> > 5.0 branch + hardfloat patches: cpu 180%, fpu 54%
->
-
- new run 5.0 branch + hardfloat patches: cpu 184%, fpu 54%
-
-> 5.0 branch: cpu 199%, fpu 40%
->
-
- new run 5.0 branch: cpu 184%, fpu 56%
-
-It seems I misreported (copy/past without changing the values) the earlier
-Windows-based results with Mac OS 9.2 guest. As said above (and this now
-seems to confirm) Windows is not impressed at all and perhaps a bit slower
-even.
-Windows builds are particularly sensitive to any other activity on the
-system. Moving the qemu window drops performance considerably. Perhaps due
-to SDL not running in its own thread?
-
->
-> Here there's again difference in cpu value but the other way so maybe if
-> the cause is external CPU usage then this again may be an outlying
-> measurement? You could retake these two to verify if you get same numbers
-> again. The fpu value does seem to improve just not as much as the others
-> and it's also lower to start with. I wonder why.
->
-
-
-> > Mac OSX tests: 10.5 with Skidmarks 4.0 test
-> > Baseline(100%): G4 1.0Ghz.
-> > 5.0 branch + hardfloat patches: Int:130 FP:9 Vec:10
-> > 5.0 branch: Int:130 FP:10 Vec:11
-> >
-> > All tests done on the same host with v1 of the hardfloat patches
-> > Intel i7-4770K at 3.50Ghz. 32Gb memory
-> > All guests set to 1024x768 and "thousands" of colors.
->
-> Does it mean this host machine were rebooted into these OSes or these were
-> run in a VM. In case using VM, were all three running in VM or one was on
-> host (I'd guess OSX host with Linux and Windows VMs).
->
-> > Linux and OSX (with brew) use default compilers.
-> > Windows build cross-compiled from Fedora with x86_64-win64-mingw32
->
-> I assume Linux and OSX were 64 bit builds, is Windows 32 bit or 64 bit
-> exe?
->
-
-No virtualisation. I run all on the same bare metal, so booted into these
-three separately from separate SSDs. You might guess OSX Sierra is running
-on less "official" hardware and you would be right. All qemu builds were 64
-bit.
-
-Best,
-Howard
-
---0000000000007b3bae059efb6221
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Feb 19, 2020 at 8:28 PM BALAT=
-ON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu">balaton@eik.bme.hu</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On We=
-d, 19 Feb 2020, Howard Spoelstra wrote:<br>
-&gt; I tested with the current ppc-for-5.0 branch and with v1 of the hardfl=
-oat<br>
-&gt; patches applied on top of that. There is a noticeable speed improvemen=
-t in<br>
-&gt; Linux and OSX hosts. Windows 10 host doesn&#39;t seem to be impressed =
-at all. I<br>
-&gt; saw no obvious glitches so far. The fpu performance on OSX hosts seems=
- very<br>
-&gt; slow. This was not always the case in the past, when it was on par wit=
-h<br>
-&gt; Linux performance.<br>
-<br>
-Interesting, thanks for the measurements.<br>
-<br>
-&gt; Below are my results.<br>
-&gt;<br>
-&gt; Best,<br>
-&gt; Howard<br>
-&gt;<br>
-&gt; Host Linux (Fedora 31):<br>
-&gt; Mac OS tests: 9.2 with MacBench 5.0<br>
-&gt; Baseline(100%): G3 300Mhz<br>
-&gt; 5.0 branch + hardfloat patches: cpu 193%, fpu 86%<br>
-&gt; 5.0 branch: cpu 188%, fpu 57%<br>
-<br>
-Here there&#39;s a difference in cpu value before and after patch which I <=
-br>
-can&#39;t explain (only changed FPU stuff so it should not change others) b=
-ut <br>
-also not seen in other measurements so this could be some external <br>
-influence such as something else using CPU while running test? Unless this =
-<br>
-happens consistently I&#39;d put it down to measurement error.<br></blockqu=
-ote><div><br></div><div>=C2=A0 Yes, I would put that cpu value down to some=
- fluctuation in the test</div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">
-<br>
-&gt; Mac OSX tests: 10.5 with Skidmarks 4.0 test<br>
-&gt; Baseline(100%): G4 1.0Ghz.<br>
-&gt; 5.0 branch + hardfloat patches: Int:131 FP:11 Vec:15<br>
-&gt; 5.0 branch: Int:131 FP:9 Vec:11<br>
-&gt;<br>
-&gt; Host OSX Sierra:<br>
-&gt; Mac OS tests: 9.2 with MacBench 5.0<br>
-&gt; Baseline(100%): G3 300Mhz<br>
-&gt; 5.0 branch + hardfloat patches: cpu 199%, fpu 66%<br>
-&gt; 5.0 branch: cpu 199%, fpu 40%<br>
-&gt; Mac OSX tests: 10.5 with Skidmarks 4.0 test<br>
-&gt; Baseline(100%): G4 1.0Ghz.<br>
-&gt; 5.0 branch + hardfloat patches: Int:129 PF:11 Vec:14<br>
-<br>
-These values seem to match Linux measurement above so don&#39;t seem slower=
- <br>
-although MacOS9 seems to be slower (66 vs. 86) so either this depends on <b=
-r>
-the ops used or something else.<br></blockquote><div><br></div><div>=C2=A0Y=
-es, the baseline speed for the fpu in Mac OS 9.2 is relatively low.=C2=A0 <=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
-rder-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; 5.0 branch: Int:129 FP:8 Vec:9<br>
-&gt;<br>
-&gt; Host Windows 10:<br>
-&gt; Mac OS tests: 9.2 with MacBench 5.0<br>
-&gt; Baseline(100%): G3 300Mhz<br>
-&gt; 5.0 branch + hardfloat patches: cpu 180%, fpu 54%<br></blockquote><div=
-><br></div><div>=C2=A0new run
-5.0 branch + hardfloat patches: cpu 184%, fpu 54%</div><div><br></div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex">
-&gt; 5.0 branch: cpu 199%, fpu 40%<br></blockquote><div><br></div><div>=C2=
-=A0new run
-5.0 branch: cpu 184%, fpu 56% <br></div><div><br></div><div>It seems I misr=
-eported (copy/past without changing the values) the earlier Windows-based r=
-esults with Mac OS 9.2=20
-guest. As said above (and this now seems to confirm) Windows is not impress=
-ed at=20
-all and perhaps a bit slower even. <br></div><div>Windows builds are partic=
-ularly sensitive to any other activity on the system. Moving the qemu windo=
-w drops performance considerably. Perhaps due to SDL not running in its own=
- thread?<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px=
- 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-Here there&#39;s again difference in cpu value but the other way so maybe i=
-f <br>
-the cause is external CPU usage then this again may be an outlying <br>
-measurement? You could retake these two to verify if you get same numbers <=
-br>
-again. The fpu value does seem to improve just not as much as the others <b=
-r>
-and it&#39;s also lower to start with. I wonder why.<br></blockquote><br><b=
-lockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-le=
-ft:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; Mac OSX tests: 10.5 with Skidmarks 4.0 test<br>
-&gt; Baseline(100%): G4 1.0Ghz.<br>
-&gt; 5.0 branch + hardfloat patches: Int:130 FP:9 Vec:10<br>
-&gt; 5.0 branch: Int:130 FP:10 Vec:11<br>
-&gt;<br>
-&gt; All tests done on the same host with v1 of the hardfloat patches<br>
-&gt; Intel i7-4770K at 3.50Ghz. 32Gb memory<br>
-&gt; All guests set to 1024x768 and &quot;thousands&quot; of colors.<br>
-<br>
-Does it mean this host machine were rebooted into these OSes or these were =
-<br>
-run in a VM. In case using VM, were all three running in VM or one was on <=
-br>
-host (I&#39;d guess OSX host with Linux and Windows VMs).<br>
-<br>
-&gt; Linux and OSX (with brew) use default compilers.<br>
-&gt; Windows build cross-compiled from Fedora with x86_64-win64-mingw32<br>
-<br>
-I assume Linux and OSX were 64 bit builds, is Windows 32 bit or 64 bit <br>
-exe?<br></blockquote><div>=C2=A0</div><div>No virtualisation. I run all on =
-the same bare metal, so booted into=20
-these three separately from separate SSDs. You might guess OSX Sierra is
- running on less &quot;official&quot; hardware and you would be right. All =
-qemu=20
-builds were 64 bit.</div><div><br></div><div>Best,</div><div>Howard<br></di=
-v></div></div>
-
---0000000000007b3bae059efb6221--
 
