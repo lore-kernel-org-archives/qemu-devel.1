@@ -2,64 +2,62 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F63C11D81
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDC9C5ACC4
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:26:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 338B321D56
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9365921D56
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 03:26:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="g6xxKlTu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338B321D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OTr3aJxZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9365921D56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4cS5-0006WR-9h
-	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:24:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41318)
+	id 1j4cTk-0001bj-P2
+	for qemu-devel@archiver.kernel.org; Wed, 19 Feb 2020 22:26:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR8-0004cp-5m
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:39 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR4-0004ah-1C
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4cR6-0008Li-Mj
- for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:38 -0500
-Received: from ozlabs.org ([203.11.71.1]:35861)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4cR2-0008Hu-Jo
+ for qemu-devel@nongnu.org; Wed, 19 Feb 2020 22:23:33 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56693 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4cR6-0008Ic-Ba; Wed, 19 Feb 2020 22:23:36 -0500
+ id 1j4cR1-0008Dk-Lq; Wed, 19 Feb 2020 22:23:32 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NKg11jDTz9sSZ; Thu, 20 Feb 2020 14:23:24 +1100 (AEDT)
+ id 48NKg00350z9sRt; Thu, 20 Feb 2020 14:23:23 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582169005;
- bh=5V3Fkwnhhaf99LksVVnXh9d+PmvLqtote/We8hZMvyU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=g6xxKlTuVDFRhFigVBuaLQmCrDvi0vQBdFF9uNx2gzCMU9hp+y3dU30Q1ljUMN1rt
- oRUbtAx/6d31zbwQMlZypyEH1RnF5LE4QFHqZADJldP5MGDI9wnculft6837DFCyaM
- nKuykWh2rP8WqShs8nr3pnAEoCmA1z6P7QzVx7MI=
+ d=gibson.dropbear.id.au; s=201602; t=1582169004;
+ bh=FFr8QTXtG4J8rnGCRYb/tmkP97s+UaHKY8wEmJk8kxU=;
+ h=From:To:Cc:Subject:Date:From;
+ b=OTr3aJxZIvgj77qXrLJDPJ6mLqAu//khGSpUKXhi69Nb06G87fPYttERFZM0DDTI/
+ 2uX1yKX/LVIgRINXo2cYk9m3WPD4g9bzofChwSgQnrtDedX8fUPKd4EZg4hrizZIc4
+ 9IraXRm1nwpuKZuvdvFxizvV2cZZZQB0NBmJJ5gk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org,
 	groug@kaod.org,
 	clg@kaod.org
-Subject: [PATCH v5 09/18] target/ppc: Correct RMLS table
-Date: Thu, 20 Feb 2020 14:23:07 +1100
-Message-Id: <20200220032317.96884-10-david@gibson.dropbear.id.au>
+Subject: [PATCH v5 00/18] target/ppc: Correct some errors with real mode
+ handling
+Date: Thu, 20 Feb 2020 14:22:58 +1100
+Message-Id: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200220032317.96884-1-david@gibson.dropbear.id.au>
-References: <20200220032317.96884-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,47 +81,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The table of RMA limits based on the LPCR[RMLS] field is slightly wrong.
-We're missing the RMLS =3D=3D 0 =3D> 256 GiB RMA option, which is availab=
-le on
-POWER8, so add that.
+POWER "book S" (server class) cpus have a concept of "real mode" where
+MMU translation is disabled... sort of.  In fact this can mean a bunch
+of slightly different things when hypervisor mode and other
+considerations are present.
 
-The comment that goes with the table is much more wrong.  We *don't* filt=
-er
-invalid RMLS values when writing the LPCR, and there's not really a
-sensible way to do so.  Furthermore, while in theory the set of RMLS valu=
-es
-is implementation dependent, it seems in practice the same set has been
-available since around POWER4+ up until POWER8, the last model which
-supports RMLS at all.  So, correct that as well.
+We had some errors in edge cases here, so clean some things up and
+correct them.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- target/ppc/mmu-hash64.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Some of those limitations caused problems with calculating the size of
+the Real Mode Area of pseries guests, so continue on to clean up and
+correct those calculations as well.
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 4e6c1f722b..46690bc79b 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -762,12 +762,12 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
- {
-     CPUPPCState *env =3D &cpu->env;
-     /*
--     * This is the full 4 bits encoding of POWER8. Previous
--     * CPUs only support a subset of these but the filtering
--     * is done when writing LPCR
-+     * In theory the meanings of RMLS values are implementation
-+     * dependent.  In practice, this seems to have been the set from
-+     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
-      */
-     const target_ulong rma_sizes[] =3D {
--        [0] =3D 0,
-+        [0] =3D 256 * GiB,
-         [1] =3D 16 * GiB,
-         [2] =3D 1 * GiB,
-         [3] =3D 64 * MiB,
+Changes since v4:
+ * Some tiny cosmetic fixes to the original patches
+ * Added a bunch of extra patches correcting RMA calculation
+Changes since v3:
+ * Fix style errors reported by checkpatch
+Changes since v2:
+ * Removed 32-bit hypervisor stubs more completely
+ * Minor polish based on review comments
+Changes since RFCv1:
+ * Add a number of extra patches taking advantage of the initial
+   cleanups
+
+David Gibson (18):
+  ppc: Remove stub support for 32-bit hypervisor mode
+  ppc: Remove stub of PPC970 HID4 implementation
+  target/ppc: Correct handling of real mode accesses with vhyp on hash
+    MMU
+  target/ppc: Introduce ppc_hash64_use_vrma() helper
+  spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+  target/ppc: Remove RMOR register from POWER9 & POWER10
+  target/ppc: Use class fields to simplify LPCR masking
+  target/ppc: Streamline calculation of RMA limit from LPCR[RMLS]
+  target/ppc: Correct RMLS table
+  target/ppc: Only calculate RMLS derived RMA limit on demand
+  target/ppc: Streamline construction of VRMA SLB entry
+  target/ppc: Don't store VRMA SLBE persistently
+  spapr: Don't use weird units for MIN_RMA_SLOF
+  spapr,ppc: Simplify signature of kvmppc_rma_size()
+  spapr: Don't attempt to clamp RMA to VRMA constraint
+  spapr: Don't clamp RMA to 16GiB on new machine types
+  spapr: Clean up RMA size calculation
+  spapr: Fold spapr_node0_size() into its only caller
+
+ hw/ppc/spapr.c                  | 124 ++++++------
+ hw/ppc/spapr_cpu_core.c         |   6 +-
+ hw/ppc/spapr_hcall.c            |   4 +-
+ include/hw/ppc/spapr.h          |   4 +-
+ target/ppc/cpu-qom.h            |   1 +
+ target/ppc/cpu.h                |  25 +--
+ target/ppc/kvm.c                |   5 +-
+ target/ppc/kvm_ppc.h            |   7 +-
+ target/ppc/mmu-hash64.c         | 327 ++++++++++++--------------------
+ target/ppc/translate_init.inc.c |  63 ++++--
+ 10 files changed, 252 insertions(+), 314 deletions(-)
+
 --=20
 2.24.1
 
