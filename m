@@ -2,80 +2,94 @@ Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA37C11D04
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B652C11D04
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0974924670
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:44:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFXlk3vm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0974924670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4093824654
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 12:58:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4093824654
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40943 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4lBe-0001VV-8p
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 07:44:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51829)
+	id 1j4lPt-0007V4-Em
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 07:58:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j4lB5-00016J-Fc
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:43:40 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j4lOZ-0005tI-I2
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:57:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j4lB3-0005Ej-R0
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:43:38 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21243
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j4lB3-0005Dc-Ft
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:43:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582202616;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iwtCtM75BykrURzqDKszQeNWtR3uEDgVl+0pSFJQ3I8=;
- b=cFXlk3vmEpLgSQ5wvjtYpjM9Z3iNdtssMso14pnsNi8eiB3Wv9SITleiVRpaGZC7Kr19wi
- ZRlPjKBnGfbtRvtbFndpzZNJU4C58gl0mGgzkP3Y9sgoMl0YszTodFRl0/vnUKXBvb71QR
- z3CAIEG1wqLNRnqC0O2UFBFcEtNcgq0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-cJ7zLi2XNfqeK4SjvGykRg-1; Thu, 20 Feb 2020 07:43:34 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7AA241005513;
- Thu, 20 Feb 2020 12:43:33 +0000 (UTC)
-Received: from localhost (ovpn-200-36.brq.redhat.com [10.40.200.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5E4B31001B28;
- Thu, 20 Feb 2020 12:43:26 +0000 (UTC)
-Date: Thu, 20 Feb 2020 13:43:24 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v4 07/16] hw/i386: Rename apicid_from_topo_ids to
- x86_apicid_from_topo_ids
-Message-ID: <20200220134324.2ce64c38@redhat.com>
-In-Reply-To: <158161783201.48948.10267676745424104315.stgit@naples-babu.amd.com>
-References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
- <158161783201.48948.10267676745424104315.stgit@naples-babu.amd.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1j4lOY-0006N1-DB
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:57:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64236
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1j4lOY-0006Lk-88
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 07:57:34 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01KCtITT093196
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 07:57:33 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2y8ubygp0m-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 20 Feb 2020 07:57:32 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 20 Feb 2020 12:57:30 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 20 Feb 2020 12:57:29 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 01KCvSr230998824
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 20 Feb 2020 12:57:28 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0A2C1AE053;
+ Thu, 20 Feb 2020 12:57:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C93C0AE045;
+ Thu, 20 Feb 2020 12:57:26 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.185.143])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 20 Feb 2020 12:57:26 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 00/16] s390x: Protected Virtualization support
+Date: Thu, 20 Feb 2020 07:56:22 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: cJ7zLi2XNfqeK4SjvGykRg-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022012-0020-0000-0000-000003ABEB54
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022012-0021-0000-0000-00002203F0D2
+Message-Id: <20200220125638.7241-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-20_03:2020-02-19,
+ 2020-02-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ phishscore=0 clxscore=1015 malwarescore=0 adultscore=0 mlxlogscore=999
+ spamscore=0 suspectscore=1 mlxscore=0 bulkscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002200097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,64 +101,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, david@redhat.com,
+ cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Feb 2020 12:17:12 -0600
-Babu Moger <babu.moger@amd.com> wrote:
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
 
-> For consistancy rename apicid_from_topo_ids to x86_apicid_from_topo_ids.
-> No functional change.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+v4:
+	* Dropped reset patches which are already picked up
+	* Sync with KVM changes
+	* Review changes
 
-> ---
->  hw/i386/pc.c               |    2 +-
->  include/hw/i386/topology.h |    6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 02fdb3d506..be72a49716 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1808,7 +1808,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->          topo_ids.die_id = cpu->die_id;
->          topo_ids.core_id = cpu->core_id;
->          topo_ids.smt_id = cpu->thread_id;
-> -        cpu->apic_id = apicid_from_topo_ids(&topo_info, &topo_ids);
-> +        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
->      }
->  
->      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
-> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-> index 522c77e6a9..3158157430 100644
-> --- a/include/hw/i386/topology.h
-> +++ b/include/hw/i386/topology.h
-> @@ -107,8 +107,8 @@ static inline unsigned apicid_pkg_offset(X86CPUTopoInfo *topo_info)
->   *
->   * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
->   */
-> -static inline apic_id_t apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
-> -                                             const X86CPUTopoIDs *topo_ids)
-> +static inline apic_id_t x86_apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
-> +                                                 const X86CPUTopoIDs *topo_ids)
->  {
->      return (topo_ids->pkg_id  << apicid_pkg_offset(topo_info)) |
->             (topo_ids->die_id  << apicid_die_offset(topo_info)) |
-> @@ -160,7 +160,7 @@ static inline apic_id_t x86_apicid_from_cpu_idx(X86CPUTopoInfo *topo_info,
->  {
->      X86CPUTopoIDs topo_ids;
->      x86_topo_ids_from_idx(topo_info, cpu_index, &topo_ids);
-> -    return apicid_from_topo_ids(topo_info, &topo_ids);
-> +    return x86_apicid_from_topo_ids(topo_info, &topo_ids);
->  }
->  
->  #endif /* HW_I386_TOPOLOGY_H */
-> 
+V3:
+	* Use dedicated functions to access SIDA
+	* Smaller cleanups and segfault fixes
+	* Error reporting for Ultravisor calls
+	* Inject of RC of diag308 subcode 10 fails
+
+V2:
+	* Split out cleanups
+	* Internal PV state tracking
+	* Review feedback
+
+
+Christian Borntraeger (1):
+  s390x: Add unpack feature to GA1
+
+Janosch Frank (15):
+  Sync pv
+  s390x: protvirt: Add diag308 subcodes 8 - 10
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Add migration blocker
+  s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
+  s390x: protvirt: KVM intercept changes
+  s390x: Add SIDA memory ops
+  s390x: protvirt: Move STSI data over SIDAD
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDAD
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Move IO control structures over SIDA
+  s390x: protvirt: Handle SIGP store status correctly
+  docs: Add protvirt docs
+
+ docs/protvirt.rst                   |  53 +++++++++++
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  81 ++++++++++++++++-
+ hw/s390x/ipl.h                      |  33 +++++++
+ hw/s390x/pv.c                       | 106 ++++++++++++++++++++++
+ hw/s390x/pv.h                       |  34 +++++++
+ hw/s390x/s390-virtio-ccw.c          | 135 +++++++++++++++++++++++++++-
+ hw/s390x/sclp.c                     |  17 ++++
+ include/hw/s390x/s390-virtio-ccw.h  |   1 +
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/linux/kvm.h           |  48 +++++++++-
+ target/s390x/cpu.c                  |  27 ++++--
+ target/s390x/cpu.h                  |   8 +-
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 |  61 ++++++++++---
+ target/s390x/gen-features.c         |   1 +
+ target/s390x/helper.c               |   4 +
+ target/s390x/ioinst.c               | 113 ++++++++++++++++-------
+ target/s390x/kvm.c                  |  54 ++++++++++-
+ target/s390x/kvm_s390x.h            |   2 +
+ target/s390x/mmu_helper.c           |   9 ++
+ target/s390x/sigp.c                 |   1 +
+ 22 files changed, 726 insertions(+), 66 deletions(-)
+ create mode 100644 docs/protvirt.rst
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
+
+-- 
+2.20.1
 
 
