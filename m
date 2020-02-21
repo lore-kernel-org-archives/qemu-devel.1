@@ -2,69 +2,81 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ED6C35642
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9F8C35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:25:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF7A222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:09:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF7A222C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7B050246A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:25:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hf7jDjyj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B050246A8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j53Mx-0001cQ-No
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 03:09:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49303)
+	id 1j53cp-00067w-Lp
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 03:25:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52158)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j53MO-0001BC-9Z
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:33 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j53c7-0005iZ-86
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j53MM-0004Op-FD
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:31 -0500
-Resent-Date: Fri, 21 Feb 2020 03:08:31 -0500
-Resent-Message-Id: <E1j53MM-0004Op-FD@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21136)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j53MM-0004DM-5t
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:30 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582272498; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=E4tN4WYJo3p6K+IaIY9ie/HONe22xNxPXfdwk/dDPNlb8xzDPoVoLMtZjQ9rkhos7lSxlvMYTwjLCqg0V8zxhTh69Fb82nMMyVAlgytxMVxRozxpNXiKDDC+XZCx5PpurgcSFLop6okkS6woHa94aSS/8KlUbDgu8BB57/udEY8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582272498;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=UAXFcmHoDhRmni+1cQrCssoLBajHQDnfvrjZivx3LfQ=; 
- b=FJSe+yZWJku9tAOTyrpNOLq9G20N7/xk7Ez/QS9Gat+DxUoks7394q0JVyTJUUcdlbpAE2stkrmIVguy8B4DbMNmLNLaPGuc650My+SCr6QOzgK4xij6gfaRyx7XMg3JVGHhlMqTVzqcpBo8Qt2VLs0Yc4nk/W0Vf7QATggNiok=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582272496879842.3244392800112;
- Fri, 21 Feb 2020 00:08:16 -0800 (PST)
-In-Reply-To: <20200221065015.337915-1-jasper.lowell@bt.com>
-Subject: Re: [PATCH] hw/ide: Remove status register read side effect
-Message-ID: <158227249585.712.3062745536245409439@a1bbccc8075a>
+ (envelope-from <cohuck@redhat.com>) id 1j53c5-0000X0-08
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:24:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59269
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j53c4-0000VV-Q5
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:24:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582273483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZaRJ1SCIaJxKda4BNia2VQ6+r1Y3tA5eEwjll08kQGo=;
+ b=hf7jDjyjE2VG6as6uI6gzAENz3rqXV+Mio/cd8OAo6Yb0MNC6jXzS2/Grf0XOVNEtePJfs
+ JOkwsswKsPQuetWxKnv8i02MxtVR3iPAUItxYRNNGWfmyQolPasYfJpQ50VZdLjh7ImTyN
+ T5UzguKG+nsVAWmg6VzV1QOJIf24FjI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-qbasn4rXMdq5H8faha9Cgw-1; Fri, 21 Feb 2020 03:24:38 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF9D2477;
+ Fri, 21 Feb 2020 08:24:36 +0000 (UTC)
+Received: from gondolin (ovpn-117-64.ams2.redhat.com [10.36.117.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9179F27061;
+ Fri, 21 Feb 2020 08:24:34 +0000 (UTC)
+Date: Fri, 21 Feb 2020 09:24:32 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Tony Krowiak <akrowiak@linux.ibm.com>, "Jason J . Herne"
+ <jjherne@linux.ibm.com>
+Subject: Re: [PATCH v2 0/2] docs: rstfy some s390 docs
+Message-ID: <20200221092432.42d8a455.cohuck@redhat.com>
+In-Reply-To: <20200213162942.14177-1-cohuck@redhat.com>
+References: <20200213162942.14177-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: jasper.lowell@bt.com
-Date: Fri, 21 Feb 2020 00:08:16 -0800 (PST)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: qbasn4rXMdq5H8faha9Cgw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,52 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, jasper.lowell@bt.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyMTA2NTAxNS4zMzc5
-MTUtMS1qYXNwZXIubG93ZWxsQGJ0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
-IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2st
-cXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9pZGUtdGVzdAogIFRFU1QgICAgY2hlY2stdW5pdDog
-dGVzdHMvdGVzdC1pb3YKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2lk
-ZS10ZXN0LmM6Mjk0OnNlbmRfZG1hX3JlcXVlc3Q6IGFzc2VydGlvbiBmYWlsZWQ6ICghcXRlc3Rf
-Z2V0X2lycShxdHMsIElERV9QUklNQVJZX0lSUSkpCkVSUk9SIC0gQmFpbCBvdXQhIEVSUk9SOi90
-bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9pZGUtdGVzdC5jOjI5NDpzZW5kX2RtYV9yZXF1
-ZXN0OiBhc3NlcnRpb24gZmFpbGVkOiAoIXF0ZXN0X2dldF9pcnEocXRzLCBJREVfUFJJTUFSWV9J
-UlEpKQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2Fp
-dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMv
-dGVzdC1iaXRtYXAKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtYWlvCi0tLQogIFRF
-U1QgICAgaW90ZXN0LXFjb3cyOiAyODMKRmFpbHVyZXM6IDE2MQpGYWlsZWQgMSBvZiAxMTYgaW90
-ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNl
-YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
-ZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAg
-ICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxl
-ZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAn
-LS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTMzNDk5ODZhYjgzODQ5ZDViNDc1ZGQx
-MDFiZWQ0ZjA1JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNv
-bmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJ
-R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
-ZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12
-JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2Nh
-Y2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWd3NV9fZ2l5L3NyYy9k
-b2NrZXItc3JjLjIwMjAtMDItMjEtMDIuNTQuNDguMjc4Mjg6L3Zhci90bXAvcWVtdTp6LHJvJywg
-J3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVy
-bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
-dS5pbnN0YW5jZS51dWlkPTMzNDk5ODZhYjgzODQ5ZDViNDc1ZGQxMDFiZWQ0ZjA1Cm1ha2VbMV06
-ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
-ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWd3NV9fZ2l5L3NyYycKbWFrZTogKioqIFtkb2NrZXIt
-cnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxM20yNy4xODZzCnVzZXIg
-ICAgMG05LjA1NHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMjAwMjIxMDY1MDE1LjMzNzkxNS0xLWphc3Blci5sb3dlbGxAYnQuY29tL3Rl
-c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, 13 Feb 2020 17:29:40 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> https://qemu.readthedocs.io/en/latest/index.html collects various
+> documents from the QEMU docs/ subdirectory; however, none of the
+> s390 files are currently included. Therefore, I set out to convert
+> the existing files to rst and hook them up.
+> 
+> s390-dasd-ipl was straightforward enough; I also found a numbering
+> issue.
+> 
+> vfio-ap was quite a bit more involved, but I hope I have produced
+> something readable (more review can never hurt...) I also
+> moved this into the system/ subdirectory; not sure if that is the
+> best resting place, but it seemed to be the most reasonable one.
+> 
+> Tested via running 'make html' and inspecting the output.
+> 
+> Branch: https://github.com/cohuck/qemu rstfy-s390-v2
+> 
+> Changes v1->v2 (mostly addressing feedback from Peter; thanks!):
+> - dasd ipl: fix some indentation
+> - vfio-ap: autogenerate contents table
+> - vfio-ap: use more literals
+> - vfio-ap: convert some examples to tables
+> - vfio-ap: various other formatting cleanups 
+> 
+> Cornelia Huck (2):
+>   docs: rstfy s390 dasd ipl documentation
+>   docs: rstfy vfio-ap documentation
+> 
+>  MAINTAINERS                                   |   4 +-
+>  docs/devel/index.rst                          |   1 +
+>  .../{s390-dasd-ipl.txt => s390-dasd-ipl.rst}  | 119 +--
+>  docs/system/index.rst                         |   1 +
+>  docs/{vfio-ap.txt => system/vfio-ap.rst}      | 796 +++++++++---------
+>  5 files changed, 484 insertions(+), 437 deletions(-)
+>  rename docs/devel/{s390-dasd-ipl.txt => s390-dasd-ipl.rst} (51%)
+>  rename docs/{vfio-ap.txt => system/vfio-ap.rst} (55%)
+> 
+> 
+> base-commit: 81f49abaaac2b88062bd1b07f451d9527ed1c9ce
+
+Queued to s390-next.
+
 
