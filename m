@@ -2,79 +2,62 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7955BC35661
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 19:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09EAC35666
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 19:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 442EA20722
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 19:52:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KT9nhKAt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 442EA20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B5D9520722
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 19:53:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D9520722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5ELd-0006q6-EW
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 14:52:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45559)
+	id 1j5EMY-00080i-W2
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 14:53:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j5EL0-0006FU-8p
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 14:51:51 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j5ELo-0007CD-Rb
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 14:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j5EKz-0001yI-EP
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 14:51:50 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34262)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j5EKz-0001y3-7p; Fri, 21 Feb 2020 14:51:49 -0500
-Received: by mail-lj1-x242.google.com with SMTP id x7so3445991ljc.1;
- Fri, 21 Feb 2020 11:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2lWxd2Cf2utlVDiwyYn1+ICBDIjoIfk8vwUgNRBSwFo=;
- b=KT9nhKAtnMPcwLojT7RML7sKCbvcNN6l9KKL6a10PQN0IWMSjSXdiEfe1DZLkRgr4x
- W4kSd+16THWvT3SbD86BXaegfx+vBSF0Htj3wfo/VauEHY/KmPmHVlYtifg+oQv5xVxY
- HQVnF0c7bBBeR2/e3Uf8/1kTWixHbafM2ZSu157OeRMQKkra83hc50ceeBkbzP1tua46
- 0wtrFZ6yHCbOVaatVIYIbj39xqJ/7f8iiEXeyEt93RCwkl4U3q0OCbSxRA6U2CmfCjfN
- Hh64Crx6TUPisU5PLJVrwFZpwoxsSXlOkjLWpcgx6dxyXYWYkO2fYm1A20X0GTmWt6q0
- E++g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2lWxd2Cf2utlVDiwyYn1+ICBDIjoIfk8vwUgNRBSwFo=;
- b=rlErq1tWNvlStT1IdjwxPp2E5qK8t6sUgNAvEZQr5tev+SUaFt56hZ0zKHCc3N7xij
- r8vrlDtJcIiyz+Kz+29E8fbQwteP7lZPbP2vl35I4nJAKnWspqLwphpnUcUTlBx5llK7
- F4KF9ubhB0ISDSreeIZRuSZsxhyOpS1LoBfMbH+x8zZh/gcYVepVHWFx9nXufhGqT3Gx
- dpelxgrGOREUh7/marsZsosDiRYbzgFdLlJG0eRd8mXk7yIjUca0uN8AGwr6zqhm4Mt+
- /b9FS91f6UsnUZs594MDTPgXX9On/v4h0J4q54m1FGblWDDQ8KLggGaeRd0XnEL5crYf
- PSGA==
-X-Gm-Message-State: APjAAAWoOa7RCk2qOY2mpmbLMtxrX1b8XF4/fUt3xcnMF+Phpoflk7wt
- FAo9K0VITWUKCfrNRrqzaLar+FI7Ppz1I0v9VrSvIxAV
-X-Google-Smtp-Source: APXvYqzbOTVqsjLcii2QOPHRimNxgHvDbpASgo96C2uBFIY+qmiKp74qCbxYsLHJqzbTEOokg5FnEK79iM9P4PuD3Dw=
-X-Received: by 2002:a2e:7818:: with SMTP id t24mr22451118ljc.195.1582314707655; 
- Fri, 21 Feb 2020 11:51:47 -0800 (PST)
+ (envelope-from <balaton@eik.bme.hu>) id 1j5ELm-0002Xv-VW
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 14:52:40 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:16891)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j5ELm-0002WJ-PX; Fri, 21 Feb 2020 14:52:38 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 5E77D74637E;
+ Fri, 21 Feb 2020 20:52:35 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 367CD74637C; Fri, 21 Feb 2020 20:52:35 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 342DD745953;
+ Fri, 21 Feb 2020 20:52:35 +0100 (CET)
+Date: Fri, 21 Feb 2020 20:52:35 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-Reply-To: <CAFEAcA9-VzUXij1_vFr+d7KuMOw+Tdv0hvxW2WmfGxt=fAKvjg@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2002212034570.8472@zero.eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
+ <alpine.BSF.2.22.395.2002211643480.45267@zero.eik.bme.hu>
+ <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2002211807380.69986@zero.eik.bme.hu>
+ <CAFEAcA9-VzUXij1_vFr+d7KuMOw+Tdv0hvxW2WmfGxt=fAKvjg@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <1582209758-2996-1-git-send-email-bmeng.cn@gmail.com>
- <1582209758-2996-2-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1582209758-2996-2-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 21 Feb 2020 11:51:20 -0800
-Message-ID: <CAKmqyKOHyix_J-T=sFdwX=jTnxG8TO0r6i6edFixVdMZjZy7yQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] riscv: sifive_u: Update BIOS_FILENAME for 32-bit
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,53 +69,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ John Arbuckle <programmingkidx@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 20, 2020 at 6:43 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Fri, 21 Feb 2020, Peter Maydell wrote:
+> On Fri, 21 Feb 2020 at 18:04, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> On Fri, 21 Feb 2020, Peter Maydell wrote:
+>>> I think that is the wrong approach. Enabling use of the host
+>>> FPU should not affect the accuracy of the emulation, which
+>>> should remain bitwise-correct. We should only be using the
+>>> host FPU to the extent that we can do that without discarding
+>>> accuracy. As far as I'm aware that's how the hardfloat support
+>>> for other guest CPUs that use it works.
+>>
+>> I don't know of a better approach. Please see section 4.2.2 Floating-Point
+>> Status and Control Register on page 124 in this document:
+>>
+>> https://openpowerfoundation.org/?resource_lib=power-isa-version-3-0
+>>
+>> especially the definition of the FR and FI bits and tell me how can we
+>> emulate these accurately and use host FPU.
 >
-> Update BIOS_FILENAME to consider 32-bit bios image file name.
->
-> Tested booting Linux v5.5 32-bit image (built from rv32_defconfig
-> plus CONFIG_SOC_SIFIVE) with the default 32-bit bios image.
+> I don't know much about PPC, but if you can't emulate the
+> guest architecture accurately with the host FPU, then
+> don't use the host FPU. We used to have a kind of 'hardfloat'
 
-Do we really want to support a 32-bit sifive_u machine?
+I don't know if it's possible or not to emulate these accurately and use 
+the FPU but nobody did it for QEMU so far. But if someone knows a way 
+please speak up then we can try to implement it. Unfortunately this would 
+require more detailed knowledge about different FPU implementations (at 
+least X86_64, ARM and PPC that are the mostly used platforms) than what I 
+have or willing to spend time to learn.
 
-Alistair
+> support that was fast but inaccurate, but it was a mess
+> because it meant that most guest code sort of worked but
+> some guest code would confusingly misbehave. Deliberately
+> not correctly emulating the guest CPU/FPU behaviour is not
+> something I want us to return to.
+>
+> You're right that sometimes you can't get both speed
+> and accuracy; other emulators (and especially ones
+> which are trying to emulate games consoles) may choose
+> to prefer speed over accuracy. For QEMU we prefer to
+> choose accuracy over speed in this area.
 
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> ---
->
->  hw/riscv/sifive_u.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index ca561d3..371133e 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -57,7 +57,11 @@
->
->  #include <libfdt.h>
->
-> -#define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
-> +#if defined(TARGET_RISCV32)
-> +# define BIOS_FILENAME "opensbi-riscv32-sifive_u-fw_jump.bin"
-> +#else
-> +# define BIOS_FILENAME "opensbi-riscv64-sifive_u-fw_jump.bin"
-> +#endif
->
->  static const struct MemmapEntry {
->      hwaddr base;
-> --
-> 2.7.4
->
->
+OK, then how about keeping the default accurate but allow to opt in to use 
+FPU even if it's known to break some bits for workloads where users would 
+need speed over accuracy and would be happy to live with the limitation. 
+Note that i've found that just removing the define that disables hardfloat 
+for PPC target makes VMX vector instructions faster while normal FPU is a 
+little slower without any other changes so disabling hardfloat already 
+limits performance for guests using VMX even when not using the FPU for 
+cases when it would cause inaccuracy. If you say we want accuracy and 
+don't care about speed, then just don't disable hardfloat as it helps at 
+least VMX and then we can add option to allow the user to say we can use 
+hardfloat even if it's inaccurate then they can test their workload and 
+decide for themselves.
+
+Regards,
+BALATON Zoltan
 
