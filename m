@@ -2,73 +2,105 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7E8C35647
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAB4C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5096824650
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:12:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5096824650
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9CC20207FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:15:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DWInEruD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CC20207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j56EB-00066j-H4
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:12:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60741)
+	id 1j56Gx-00082t-Qs
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:15:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j56DO-0005fJ-PA
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:11:34 -0500
+ (envelope-from <philmd@redhat.com>) id 1j56GO-0007be-As
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:14:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j56DN-0007i3-IA
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:11:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38626)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j56DN-0007gm-Cj
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:11:25 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j56DL-00086Y-Tz
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 11:11:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E1F4A2E80C7
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 11:11:23 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1j56GL-0003yi-U0
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:14:31 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21762
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j56GL-0003xo-Ok
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:14:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582283668;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ECHrBDrgffJL9SDlmfIGpM3cwBRji4pyRv2dVyqmDd0=;
+ b=DWInEruD7GC+Yw5HnaGYoIFCU1F+HWv5B7b2O2J94TI0kI0yx0Uzg6QT174YN+5VoOY8UY
+ enScDpJCOcWg/VqL9wIOpk3TJdg+bkvn7OHfwN/tsuSTcg1GhwL5F9d0rh+8EnU4UTKScJ
+ 348G/k1Cpvw9/VqnGINAizLJEBtTKTg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-wOgE__K5OLuvA7U--8seKg-1; Fri, 21 Feb 2020 06:14:22 -0500
+X-MC-Unique: wOgE__K5OLuvA7U--8seKg-1
+Received: by mail-wr1-f71.google.com with SMTP id u8so875744wrp.10
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 03:14:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/U1Z1edV7HX8PTwGJhVD4S41faa+cVOWVbOj9ojg11E=;
+ b=fqHRC4cVfJ5V7dHRz94nr4MUks/dBKfNrH0yoFGQNGYM2TDK6Z20bGx9hv1Rj4/Z5g
+ zGIIZuX/bGfCnz82DU75hHDHC5F+U3PxLh45qVQBSDln0SnsmfBBSjiclTNm/cw0IMkz
+ ojtarNXdz5ENK5lmMthylGPZLny1nL06y9YhjPpnVOep8rLgmdN7u3X3C+nqiRcYbrd4
+ 09qTrN9khbvLQ2Ah3bMg43s5n2S4fXld9L7QNapAL8JGd3XRW02Wx0LTqLVqwuqsqXj9
+ ZtvKTAY1IsgeAK+JgYbegl5mT/CqSR+uBzyzi0sCCzjTX8y07DcdsZ9dd2geAVsbL3IE
+ cPyA==
+X-Gm-Message-State: APjAAAXIOnPJc4KlTnoTsQkMkTBTxA+Xe8Uej3d1Cfj8fUriwJhKLhmU
+ hQqlGO+b8Jn0A4OfYGRIlM3JPNoaa/DuPb2mJ87ufi+oa4Z259bweB7zGCNMK89sALBKmTvdLWT
+ Xrj3lVMrsIhvnLYc=
+X-Received: by 2002:a7b:c5d9:: with SMTP id n25mr3324950wmk.65.1582283660736; 
+ Fri, 21 Feb 2020 03:14:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyaO312KxB/e4xt4DhK3bwAOZiDJChq8esLk2X+iaIOWeTFmwihKp8jnrosaXocl3TxUiBWtg==
+X-Received: by 2002:a7b:c5d9:: with SMTP id n25mr3324905wmk.65.1582283660373; 
+ Fri, 21 Feb 2020 03:14:20 -0800 (PST)
+Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id s8sm3726277wrt.57.2020.02.21.03.14.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 21 Feb 2020 03:14:19 -0800 (PST)
+Subject: Re: [GSoC/Outreachy] Arduino complete setup visualization and
+ emulation
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Joaquin de Andres <me@xcancerberox.com.ar>
+References: <CAAdtpL524K2QFSU9ZK2zbW_EJyiDPJ=efhwRWVzCpsJUP6HioA@mail.gmail.com>
+ <20200211105119.GA422372@stefanha-x1.localdomain>
+ <20200221105620.GD1484511@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <675f0951-7f47-ada3-e30d-4f8b2416253c@redhat.com>
+Date: Fri, 21 Feb 2020 12:14:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200221105620.GD1484511@stefanha-x1.localdomain>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Feb 2020 10:58:19 -0000
-From: Geoffrey McRae <1722884@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gnif jens-nyberg
-X-Launchpad-Bug-Reporter: Geoffrey McRae (gnif)
-X-Launchpad-Bug-Modifier: Geoffrey McRae (gnif)
-References: <150774787109.964.13450141235232669497.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158228269973.24464.10218693734899292824.malone@gac.canonical.com>
-Subject: [Bug 1722884] Re: keyboard input while mouse moving triggers mouse
- failure
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 78110c046027edc35dbeb973667dbc8685b709a0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,55 +109,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1722884 <1722884@bugs.launchpad.net>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I tracked this down and fixed it last year, your issue is unrelated.
+On 2/21/20 11:56 AM, Stefan Hajnoczi wrote:
+> On Tue, Feb 11, 2020 at 10:51:19AM +0000, Stefan Hajnoczi wrote:
+>> On Mon, Feb 10, 2020 at 08:58:28PM +0100, Philippe Mathieu-Daud=E9 wrote=
+:
+>=20
+> Ping?
+>=20
+> QEMU has been accepted as a mentoring organization.  Please post a final
+> version of this project idea on the wiki:
+>=20
+>    https://wiki.qemu.org/Google_Summer_of_Code_2020
 
-https://github.com/qemu/qemu/commit/143c04c7e0639e53086519592ead15d2556bfbf2
-#diff-3b5bd599c018d558b135bd19647a00c6
+I apologize, quickly after we chat on IRC about this last week I did the=20
+modifications but forgot to reply to this thread.
 
-https://github.com/qemu/qemu/commit/7abe7eb29494b4e4a11ec99ae5623083409a2f1e
-#diff-3b5bd599c018d558b135bd19647a00c6
+There is the project description with 1 FIXME and 2 TODO (add the=20
+references), we will update the wiki tomorrow:
 
--- =
+---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1722884
+[*] Goal
 
-Title:
-  keyboard input while mouse moving triggers mouse failure
+Be able to use a visual virtual Arduino board, and program it with
+the Arduino IDE. The result should be easily usable by newcomers to
+the Arduino world.
 
-Status in QEMU:
-  New
+[*] Summary
 
-Bug description:
-  When QEMU is getting a ton of mouse input events if keys are pressed
-  on the keyboard the scan code will be corrupted causing erroneous
-  behavior. I have confirmed this problem in the latest version in git
-  (530049bc1dcc24c1178a29d99ca08b6dd08413e0).
+The project will add a visual representation of an Arduino board.
 
-  After the erroneous behavior the operating system issues a keyboard
-  reset which prevents the mouse from functioning until the operating
-  system is restarted.
+By running the code on the emulated AVR processor, the virtual board is
+updated and displays the changes. Interracting with the code via external
+events (sensors) triggers changes on the UI.
 
-  This seems to only occur if the PS2 mouse is being used as the input,
-  the tablet input device doesn't exhibit this behavior.
+[*] Materials provided
 
-  The same problem was reported here also:
-  https://openxt.atlassian.net/browse/OXT-562
+- a specific circuit configuration represented as a netlist.
+- preset Arduino tests compliant with QEMU limitations
+- QMP commands documentation
 
-  Host  : Debian 9
-  CPU   : Ryzen 1700X
-  RAM   : 16GB
-  Kernel: 4.12.0-0.bpo.2-amd64
+[*] Essential skills required
 
-  Guest : Windows 10 (KVM)
-  RAM   : 8GB (1GB Huge pages)
+- Fluent in C
+- Comfortable programming in Python
+- Knowledge of Javascript might be useful (Java will *not* be used).
+- Working knowledge with User Interfaces
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1722884/+subscriptions
+* Electrical engineering background is not essential
+
+
+[*] Deliverables
+
+- IDE Integration
+   Configure QEMU with the Arduino IDE (using chardev UART0).
+   Compile program and upload via serial.
+   The IDE doesn't need modifications.
+
+- UI (Python)
+   Connect UART1 (via QMP or chardev), display as textbox
+   (input is not important at this point).
+
+- QEMU: GPIO
+   Produce a script to extract the GPIO devices from the netlist.
+   Configure QEMU devices to use the previous names/values.
+   Publish GPIO events (name as a string and tension as float) via
+   a QMP socket (JSON form?).
+   Write a test which runs FreeRTOS to generate a stable output.
+
+- UI (Python)
+   Connect to the QMP socket and display the GPIO events.
+   Now GPIOs are connected to LEDs. Present graphical LEDs as ON/OFF.
+   Add an oscilloscope representation (matplotlib widget). Each GPIO
+   can be plugged into the oscilloscope channels.
+   Add Switches and PushButtons to the UI, generating QMP events which
+   trigger GPIO input.
+   Add a push button to reset the Arduino (already on board) signaling to
+   the core, and[to] switch for[to] general power (for QEMU shutdown and=20
+start).
+   ### FIXME check with Joaquin ###
+
+- QEMU: PWM
+   Modify script to extract PWM devices used from the netlist.
+   Configure QEMU devices to use the previous names/values.
+   Use QEMU sound API to generate a stream of PWM values (as a wav).
+   Add a QMP command to lookup the PWM wav stream.
+   Write a FreeRTOS test producing a sinusoidal via PWM, verify the
+   wav form.
+
+- UI (Python)
+   Lookup the wav stream via the QMP socket, connect to it, display
+   it on the oscilloscope view.
+   Add a graphical representation of the LED intensity.
+
+- QEMU: ADC
+   Modify the script to extract the ADC devices from the netlist.
+   Similarly to PWM, use the sound wav stream to read ADC samples.
+
+- UI: Python
+   Add a textbox to set the ambient temperature (a thermometer is
+   connected to some ADC pins).
+   Use a slider to set the tension sampled by the ADC (like if it
+   was a potentiometer).
+
+[*] Test with the preset arduino examples (### TODO add references ###)
+
+- Basic: "Blink: Turn a LED on and off."
+- Analog: "Fading: Use an analog output (PWM pin) to dim a LED."
+- Analog: "Analog Input: Use a potentiometer to control the flashing
+   of a LED."
+
+Additional tasks are available for applicants who completes the project.
+
+[References]
+
+
+[*] Prerequisites:
+
+- AVR port and Arduino machines merged upstream
+- AVR flash device working (for firmware upload via IDE)
+
+
+Co-mentor: Philippe Mathieu-Daud=E9 <address@hidden>
+Co-mentor: Joaqu=EDn De Andres <address@hidden>
+
+
+Reference Schema:
+
+            +-----+---------------------+
+            |     |                     |
+            |     |                     |
+            |     |                     |
+            |     |    Arduino IDE      |
+            |     |                     |
+            |     |                     |
+            |     +---------------------+
+            |     |                     |
+            |     |                     |
+            +-----+------------------+--+
+                                     |
+                                     |console
+               +------------------+  |chardev
+               |                  |  |
+               |                  <--+
+               |       QEMU       |
+   PWM stream  |                  |
++-------------+     AVR core     |
+|             |                  |
+|         +---+                  <------+
+|         |   |                  |      |JSON
+|    JSON |   +------------------+      |event
+|    event|                             | I/O
+|     I/O |                             |
+|         |                             |
+|    +----v-----------------------------+---+            ---\
+|    |        LED LED LED LED DIPSW         |               |
+|    | +---+                          +---+ |               |
+|    | |osc|    +-----------------+   |osc| |               |
+|    | +---+    |                 |   +---+ |               |
+|    | +---+    |                 |   +---+ |               |
+|    | |osc|    |  Arduino board  |   |osc| |               |
+|    | +---+    |                 |   +---+ |               | Virtual Board
+|    | +---+    |                 |   +---+ |               |    (UI)
+|    | |osc|    +-----------------+   |osc| |               |
++----> +---+                          +---+ |               |
+      |       POT POT 7LED PWM PWM PWM       |               |
+      +--------------------------------------+               |
+      |                                      |               |
+      |          Serial console              |               |
+      +--------------------------------------+            ---/
+
+
+[*] Additional tasks (saved on list)
+
+- QEMU: Other communication protocols
+   Modify the script to extract the RTC pin names (via I2C) and the SD card
+   pin names (via SPI) from the netlist. ### TODO upload the netlist ###
+
+- QEMU: Match physical electrical characteristics
+
+   Model the VOL/VOH/VIL/VIH ranges, and consider to mark an input
+   as dead if the provided value is out of range (smoke on the UI!)
+
+- QEMU: Connect 2 virtual Arduinos and ensure they are communicating
+   successfully with each other.
+
+- UI (Python)
+
+   Add graphical displays (Seven-Segment, SSD1306 128=D732, Nokia 5110
+   Graphic LCD).
+
+- Propose additional tests (Use of RTC, SD card, LCD, ...).
+
+---
+
 
