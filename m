@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686F9C11D27
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAD3C11D24
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36F28208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1929F208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IKM18Rfg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36F28208C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D/39LhHa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1929F208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4zD4-0002Ym-D6
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 22:42:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48916)
+	id 1j4zDj-0003no-4S
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 22:43:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4z7t-00028X-OV
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:19 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j4z81-0002HZ-QV
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4z7s-0008FE-Kc
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:17 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59091 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4z7z-0008Oi-Eu
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:24 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56509 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4z7s-0007yo-8W; Thu, 20 Feb 2020 22:37:16 -0500
+ id 1j4z7x-00087k-Lt; Thu, 20 Feb 2020 22:37:22 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NxwF49NWz9sSQ; Fri, 21 Feb 2020 14:37:00 +1100 (AEDT)
+ id 48NxwH576Fz9sSR; Fri, 21 Feb 2020 14:37:03 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582256221;
- bh=VHIoi9FLGrk+PIzLBolIqntm255sHndLBN6fVSUxh1Q=;
+ d=gibson.dropbear.id.au; s=201602; t=1582256223;
+ bh=BPtxECqm+DoofpUACmvk5YCWgbDZRCEcXzjUqAUFNNM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IKM18RfgB4ZdUZKje1D1QGAq/qzvhCWbZUcPi+yoLvkOs/oMh5w1g4N+fBK1/vQqR
- SJWXiVXEg5ryL/hucHc1+Q+3nRI2rUr5I5G4baBaW+PtkWtXE2YCBfvpkdXrUT97AK
- XdImbZXSl+QecnDrdSKjzlpQfQJQl5MUuOeB4nuw=
+ b=D/39LhHa36N0WW6vMShfVyZjQHYQJfu2tJZkYuLbQ7Yum5rmsc9KI+MORRtVRz2B9
+ zydE4vC/SbpSybusQkhWgDWn7rBFH9Yd9bWyDzXslliLbzzup+gvFWu99EaeAN+2zb
+ A6HYZF4JKz5CHK5Zh8c1XdX5qA+fvK5tdpqziwvQ=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/20] target/ppc/cpu.h: Remove duplicate includes
-Date: Fri, 21 Feb 2020 14:36:39 +1100
-Message-Id: <20200221033650.444386-10-david@gibson.dropbear.id.au>
+Subject: [PULL 14/20] target/ppc: Fix typo in comments
+Date: Fri, 21 Feb 2020 14:36:44 +1100
+Message-Id: <20200221033650.444386-15-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200221033650.444386-1-david@gibson.dropbear.id.au>
 References: <20200221033650.444386-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -70,39 +69,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: BALATON Zoltan <balaton@eik.bme.hu>
 
-Commit 74433bf083b added some includes but added them twice. Since
-these are guarded against multiple inclusion including them once is
-enough.
+"Deferred" was misspelled as "differed" in some comments, correct this
+typo,
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-Id: <20200212223207.5A37574637F@zero.eik.bme.hu>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20200214155748.0896B745953@zero.eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h | 2 --
- 1 file changed, 2 deletions(-)
+ target/ppc/fpu_helper.c            | 4 ++--
+ target/ppc/translate/fp-impl.inc.c | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 3a1eb76004..07dd2b4da7 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -23,8 +23,6 @@
- #include "qemu/int128.h"
- #include "exec/cpu-defs.h"
- #include "cpu-qom.h"
--#include "exec/cpu-defs.h"
--#include "cpu-qom.h"
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index dc383242f7..ae43b08eb5 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, b=
+ool set_fpcc,
+         env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
+         /* Update the floating-point enabled exception summary */
+         env->fpscr |=3D FP_FEX;
+-        /* Exception is differed */
++        /* Exception is deferred */
+     }
+ }
 =20
- /* #define PPC_EMULATE_32BITS_HYPV */
+@@ -644,7 +644,7 @@ static void do_float_check_status(CPUPPCState *env, u=
+intptr_t raddr)
+=20
+     if (cs->exception_index =3D=3D POWERPC_EXCP_PROGRAM &&
+         (env->error_code & POWERPC_EXCP_FP)) {
+-        /* Differred floating-point exception after target FPR update */
++        /* Deferred floating-point exception after target FPR update */
+         if (fp_exceptions_enabled(env)) {
+             raise_exception_err_ra(env, cs->exception_index,
+                                    env->error_code, raddr);
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
+-impl.inc.c
+index d8e27bf4d5..9f7868ee28 100644
+--- a/target/ppc/translate/fp-impl.inc.c
++++ b/target/ppc/translate/fp-impl.inc.c
+@@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
+         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
+         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
+     }
+-    /* We can raise a differed exception */
++    /* We can raise a deferred exception */
+     gen_helper_float_check_status(cpu_env);
+ }
+=20
+@@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
+         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
+         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
+     }
+-    /* We can raise a differed exception */
++    /* We can raise a deferred exception */
+     gen_helper_float_check_status(cpu_env);
+     tcg_temp_free_i64(t1);
+ }
+@@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
+         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
+         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
+     }
+-    /* We can raise a differed exception */
++    /* We can raise a deferred exception */
+     gen_helper_float_check_status(cpu_env);
+ }
 =20
 --=20
 2.24.1
