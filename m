@@ -2,87 +2,106 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD7EC35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04406C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:37:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED198208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:33:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C309F222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:37:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpqQgU/8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED198208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nq5kUbLo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C309F222C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j56Yk-0005tR-6b
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:33:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36763)
+	id 1j56ce-00081H-Ts
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:37:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37613)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1j56XX-0004Jn-Rz
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:32:16 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j56bd-00076u-Pp
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:36:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1j56XS-0004VJ-Ss
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:32:15 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1j56XS-0004UC-KC; Fri, 21 Feb 2020 06:32:10 -0500
-Received: by mail-wr1-x443.google.com with SMTP id k11so1632935wrd.9;
- Fri, 21 Feb 2020 03:32:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=S2LLqNjkKZp3tcCr5xhwHx3e45TUNECm+i3cyzlSNFA=;
- b=dpqQgU/8C7Bk9Jo+wFWbn2qto1fJqkRXBxgV0yULQqvg7mfftgt8tn+EVze3v07xd0
- kwPy4loTi/UKL++7MiXjgyzsP+4LVe6p8orwlwWBBygxCOxvOOzSK4ULufhIkXLJNMmS
- U9C6ICapsGHzkVk433/Z8h//i7qGEWza2bms/d+h+Qy1e/snCWIBAHqEn0UXbImNBr5A
- tFRWCKKTbbbErY1wgndklfvzNDUzHTRuz48b/jM6eGBVNRzQvk0Oz1v4Tx/MbosKh2cK
- n0LGIyNQ4iiMRh6LlSuRaBa1Wg+eVyDJSGGTCLNAThVdvVTPZ1M8tcPqZXQ9AShefk65
- qn3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=S2LLqNjkKZp3tcCr5xhwHx3e45TUNECm+i3cyzlSNFA=;
- b=f7AqAT7mUsmoaoQ6hYg/gZPSO/X/g+bB/nnooncetJvEomCj/sr+nUerir95cRDevM
- WRo4NxxBF4wrgtPLAebccPuy4A0nUXgKQw4f4cz+ALILmaxpDaOtrYAnpaghMdlPpIH/
- 4suoLL8R+yu+gAkSbqz+wQCc1NU88sVGagUvDb7aQOc2RpDcoPYtfFBRWVn16P9McvNa
- RoAA02Vf6Iw2hbFpKjUmdphZDxjFZUaFeU5mtKswYlYTjbwd9E3AT13FLJ7X6+GnEbmZ
- /zidiCUGhZQcF3H6N70K1OKdAjVpCQR6v4WXAaI6WOhKgEUyl6B66WhTkNYvDxkO7g6F
- MHqg==
-X-Gm-Message-State: APjAAAWsHIc3cKeQiUrsU8OSO4y6Gz9u1VJbVUqrpPo3qL4B7BjIt5SL
- hk9scc1WL8gyYA3yWrX2rCc=
-X-Google-Smtp-Source: APXvYqz93sdYL+Pn5i6PuKm+uEpWhpah7nbNmcguLW0+WXofmlYo+rFAHWz172rGlrToSANA2bt2pQ==
-X-Received: by 2002:adf:fe83:: with SMTP id l3mr50336760wrr.41.1582284729135; 
- Fri, 21 Feb 2020 03:32:09 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v8sm3607511wrw.2.2020.02.21.03.32.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 03:32:08 -0800 (PST)
-Date: Fri, 21 Feb 2020 11:32:07 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: pannengyuan@huawei.com
-Subject: Re: [PATCH 1/2] vhost-user-blk: delete virtioqueues in unrealize to
- fix memleaks
-Message-ID: <20200221113207.GH1484511@stefanha-x1.localdomain>
-References: <20200213012807.45552-1-pannengyuan@huawei.com>
- <20200213012807.45552-2-pannengyuan@huawei.com>
+ (envelope-from <mreitz@redhat.com>) id 1j56bb-0005z8-Nr
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:36:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58938
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j56bG-0005vK-H9
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:36:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582284965;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=M9KtHKNUR2hUbjatGhgENU7kilQpfiHGeSSP9cCMxQw=;
+ b=Nq5kUbLoGup8FybygGlOlOJEQmghB27Y2lFnah+ky3Dld40v5Z4ccut9PI4DHZf8T7L5hD
+ vAWx3yY6y1Zym+4H2arKPkmkPbZ7XoWQYBHa9dgdGIXn7hE/7ANUQ1etI+kkseC90s1yqo
+ dD+0ZU38i6iTqkaNOtcttLLe1nZ42mk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-C0mLogJEN4Ws2zErCfM6-Q-1; Fri, 21 Feb 2020 06:36:02 -0500
+X-MC-Unique: C0mLogJEN4Ws2zErCfM6-Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C3A0800D48;
+ Fri, 21 Feb 2020 11:36:01 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C62BE8B55C;
+ Fri, 21 Feb 2020 11:35:58 +0000 (UTC)
+Subject: Re: [RFC PATCH v3 12/27] qcow2: Replace QCOW2_CLUSTER_* with
+ QCOW2_SUBCLUSTER_*
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1577014346.git.berto@igalia.com>
+ <ed8f4e6adb5390e31c217a6d6c21b77ef202437a.1577014346.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fffa7706-d88e-2c81-4b48-72d7e2df4bf2@redhat.com>
+Date: Fri, 21 Feb 2020 12:35:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <ed8f4e6adb5390e31c217a6d6c21b77ef202437a.1577014346.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6lXr1rPCNTf1w0X8"
-Content-Disposition: inline
-In-Reply-To: <20200213012807.45552-2-pannengyuan@huawei.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ protocol="application/pgp-signature";
+ boundary="oxcXlLf5kb8NDc42GuZEjugcVz04WO4aU"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,66 +113,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- mst@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- Euler Robot <euler.robot@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oxcXlLf5kb8NDc42GuZEjugcVz04WO4aU
+Content-Type: multipart/mixed; boundary="h5jnfZD4ArzlrV1dESfRrh6JSMfJLCl60"
 
---6lXr1rPCNTf1w0X8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--h5jnfZD4ArzlrV1dESfRrh6JSMfJLCl60
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 13, 2020 at 09:28:06AM +0800, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
+On 22.12.19 12:36, Alberto Garcia wrote:
+> In order to support extended L2 entries some functions of the qcow2
+> driver need to start dealing with subclusters instead of clusters.
 >=20
-> virtio queues forgot to delete in unrealize, and aslo error path in
-> realize, this patch fix these memleaks, the leak stack is as follow:
+> qcow2_get_cluster_offset() is modified to return the subcluster
+> type instead of the cluster type, and all callers are updated to
+> replace all values of QCow2ClusterType with their QCow2SubclusterType
+> equivalents (as returned by qcow2_cluster_to_subcluster_type()).
 >=20
-> Direct leak of 114688 byte(s) in 16 object(s) allocated from:
->     #0 0x7f24024fdbf0 in calloc (/lib64/libasan.so.3+0xcabf0)
->     #1 0x7f2401642015 in g_malloc0 (/lib64/libglib-2.0.so.0+0x50015)
->     #2 0x55ad175a6447 in virtio_add_queue /mnt/sdb/qemu/hw/virtio/virtio.=
-c:2327
->     #3 0x55ad17570cf9 in vhost_user_blk_device_realize /mnt/sdb/qemu/hw/b=
-lock/vhost-user-blk.c:419
->     #4 0x55ad175a3707 in virtio_device_realize /mnt/sdb/qemu/hw/virtio/vi=
-rtio.c:3509
->     #5 0x55ad176ad0d1 in device_set_realized /mnt/sdb/qemu/hw/core/qdev.c=
-:876
->     #6 0x55ad1781ff9d in property_set_bool /mnt/sdb/qemu/qom/object.c:2080
->     #7 0x55ad178245ae in object_property_set_qobject /mnt/sdb/qemu/qom/qo=
-m-qobject.c:26
->     #8 0x55ad17821eb4 in object_property_set_bool /mnt/sdb/qemu/qom/objec=
-t.c:1338
->     #9 0x55ad177aeed7 in virtio_pci_realize /mnt/sdb/qemu/hw/virtio/virti=
-o-pci.c:1801
+> This patch only changes the data types, there are no semantic changes.
 >=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  hw/block/vhost-user-blk.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  block/qcow2-cluster.c | 19 +++++-----
+>  block/qcow2.c         | 82 +++++++++++++++++++++++++------------------
+>  block/qcow2.h         |  3 +-
+>  3 files changed, 60 insertions(+), 44 deletions(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[...]
 
---6lXr1rPCNTf1w0X8
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index e7607d90d4..9277d680ef 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -2223,22 +2227,23 @@ static coroutine_fn int qcow2_co_preadv_part(Bloc=
+kDriverState *bs,
+>          }
+> =20
+>          qemu_co_mutex_lock(&s->lock);
+> -        ret =3D qcow2_get_cluster_offset(bs, offset, &cur_bytes, &cluste=
+r_offset);
+> +        ret =3D qcow2_get_cluster_offset(bs, offset, &cur_bytes,
+> +                                       &cluster_offset, &type);
+
+I wonder whether this is kind of a bug fix here.  It=E2=80=99s entirely pos=
+sible
+that @ret isn=E2=80=99t set after this, and then we get to the =E2=80=9Cout=
+=E2=80=9D label,
+which has a check on =E2=80=9Cif (ret =3D=3D 0)=E2=80=9D.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--h5jnfZD4ArzlrV1dESfRrh6JSMfJLCl60--
+
+--oxcXlLf5kb8NDc42GuZEjugcVz04WO4aU
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5Pv7YACgkQnKSrs4Gr
-c8if6QgAsn1nlRKlA/+RLkur5XyskIg/Sid+6nNZ+6tWxCD5QzfCGF2HUqAHoNDf
-C010JvBVp5WU48k75/KSVKDAm6DKwJj3Wdp46QuXWBk36NfkYty9XV2zEVWZpH53
-HOvl7HaWLpChBvWJrYJoubf1WZW7xRagncMQFFolzblRlradq1Buy1GzsOma1CZ+
-XIxe+fSjBGD1QgCnzGsOxX8p0YsFC4ZWIrDYm4RIuOZIV7j7vwJQikG1qQQxiOsk
-IMQWU2Eqx+3+i0q6uW8DT0af2xBiHZ2BE6LB7yzuodYS/C6zj9/wYT4SS6ZTeGTP
-Cbf9lsXjU9m7Mo9WEmTcIepk5aIjXQ==
-=ameo
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5PwJwACgkQ9AfbAGHV
+z0Bx3QgAtJ+nOswP1aui/lujvqziQvfi8V3W8RIz2wBubUWyYaY32tUGzLaCwJVd
+rJybiI6zorki18zybv6qIAectVTl/ZVdikNOnSmzCb0Gar9bx9tCBl1okUvYknWJ
+gZeA00y0w6UzHMEfDjlQR012IHiFyTf0sj9TiKTDQykxsj9SO0+YpPP1prXUSc+Z
+rTarAVE4bKRtCoCnevKhzW5tWqA9XQkyLWKrHAnqF5OC5Xo0VCL5rWpGVigj8SRJ
+TP/lIuiy2NXPL+1YDsMTVGwc46ZXdAYbrqIGZJ8hQiZ9zhfH1EQqGEaB/aaInQ9P
+ykzTe5KK/ytuyHCNYnxXymWdnzPFqA==
+=H/lB
 -----END PGP SIGNATURE-----
 
---6lXr1rPCNTf1w0X8--
+--oxcXlLf5kb8NDc42GuZEjugcVz04WO4aU--
+
 
