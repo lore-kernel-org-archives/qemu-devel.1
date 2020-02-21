@@ -2,82 +2,57 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A63AC11D00
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 02:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C9EC11D00
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:01:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 598A1207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 02:39:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ofK53K3t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598A1207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 083FF208CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:01:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083FF208CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4yDq-00019w-Gk
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 21:39:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58899)
+	id 1j4yYn-0004gi-8n
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 22:01:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57947)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1j4yDH-0000ih-VQ
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 21:38:48 -0500
+ (envelope-from <zhukeqian1@huawei.com>) id 1j4yXl-00045b-Ru
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 21:59:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1j4yDG-0007W1-TZ
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 21:38:47 -0500
-Received: from mail-yw1-xc30.google.com ([2607:f8b0:4864:20::c30]:36504)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1j4yDG-0007UZ-PQ; Thu, 20 Feb 2020 21:38:46 -0500
-Received: by mail-yw1-xc30.google.com with SMTP id n184so438813ywc.3;
- Thu, 20 Feb 2020 18:38:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=9mJqNg+kd+Gnur2BCeF91WJfZ2SqDXmGECeJIATH4fY=;
- b=ofK53K3tKYbQyevhOmAsegcpMBB1URHWKWMmxFG5WzodnbIY3SdBQAiDaeScAS4DmK
- 2vXfaJbWtqxCPdhCmU5XBDgwRzIwTBPN2eGTExpB+sDFmrw1bEL9AnYIDcI8NBifZEly
- adk0C9MgTq7+Vdn27bKBonSu+hWzwhud92cVgy7o+uLA8VP1GQa1d0Sh1fxm1ScZWCDN
- B42foE/ZWyMKG50AgHNe+f1yUTagmGL3qNruWOLQLCVLAyJQNnLmTjZ8j2v2mZmeHL4T
- 5Kz9jYwhmqslICKR/eEd/Hvh+TdNcSxiolYLn4FV+bgTAiHvNZTUOM9Md6SLIv3Q2PrH
- XN5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=9mJqNg+kd+Gnur2BCeF91WJfZ2SqDXmGECeJIATH4fY=;
- b=QTyY4DVGW8MVj6eo2nv9oDtpWgRZ/T3FIbw3lwc/Ze3qoiYY89Jj17BWRzfHjLBCZ4
- SpfeWogjfiMmbc5+XEacPFnJok5MJWgWHDZ6GHw4vi66W1R2Lwsy9GNLSmDfqZgjBgQ7
- B0cho7NYN2l4FcLUPPDrJ7MMOrJfyTtf+qRbEFi4286aoS1XLXay5es7IFd4MM1fREw+
- ORSTDrovOYEuUfRia2YGF12t2tu5eIDuY2PeqMEU4SLPqzvMkH3LQZXnGQvWRZpeTQn/
- t2G4AMOGO9XCwPhz+LHMzbAmV6YwT87AK79yBfMM6nNahVe65OBJY2VtpHU4rOl9pt/Q
- IOmg==
-X-Gm-Message-State: APjAAAW0gND18XNAD++mRbqtvv2Qouew4TCHaTk5Fe40vJfFHazel9Gf
- WzZ0XiwoO4P+i9qw+ThGLnmHn9aCBBwWDmFak1A=
-X-Google-Smtp-Source: APXvYqzycAbddCUu5M52aui6RtGg3wAB8VVWFjrIkikTw2jazsAnA5pgI/1UXiMQ9lj2327ApdDZj+sqCpcvnZDP2ZI=
-X-Received: by 2002:a81:8606:: with SMTP id w6mr27116959ywf.137.1582252726048; 
- Thu, 20 Feb 2020 18:38:46 -0800 (PST)
+ (envelope-from <zhukeqian1@huawei.com>) id 1j4yXk-00034y-48
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 21:59:57 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2721 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhukeqian1@huawei.com>)
+ id 1j4yXf-0002le-UT; Thu, 20 Feb 2020 21:59:52 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 2C519A1C619A80C408AD;
+ Fri, 21 Feb 2020 10:59:42 +0800 (CST)
+Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 21 Feb 2020 10:59:36 +0800
+From: Keqian Zhu <zhukeqian1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] migration/throttle: Add throttle-trig-thres migration
+ parameter
+Date: Fri, 21 Feb 2020 10:57:27 +0800
+Message-ID: <20200221025727.63808-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-References: <1582209758-2996-1-git-send-email-bmeng.cn@gmail.com>
- <f92f1ec7-ac03-a012-f232-32c533beb9d2@redhat.com>
-In-Reply-To: <f92f1ec7-ac03-a012-f232-32c533beb9d2@redhat.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 21 Feb 2020 10:38:34 +0800
-Message-ID: <CAEUhbmV9ouup0aqrUvEfpGFAoggVNJXw-PLD0xYurBXg+h3OMA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] riscv: roms: Add 32-bit OpenSBI firmware image for
- sifive_u
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.212]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c30
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,51 +64,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Juan Quintela <quintela@redhat.com>, "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, Markus
+ Armbruster <armbru@redhat.com>, qemu-arm@nongnu.org, wanghaibin.wang@huawei.com,
+ Keqian Zhu <zhukeqian1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+Currently, if the bytes_dirty_period is more than the 50% of
+bytes_xfer_period, we start or increase throttling.
 
-On Fri, Feb 21, 2020 at 1:31 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Bin,
->
-> On 2/20/20 3:42 PM, Bin Meng wrote:
-> > Although the real world SiFive HiFive Unleashed board is a 64-bit
-> > hardware configuration, with QEMU it is possible to test 32-bit
-> > configuration with the same hardware features.
-> >
-> > This updates the roms Makefile to add the build rules for creating
-> > the 32-bit OpenSBI firmware image for sifive_u machine. A pre-built
-> > OpenSBI image (built from commit 3e7d666) has been added as the
-> > default bios for 32-bit sifive_u machine.
->
-> With QEMU:
->
-> fatal: ambiguous argument '3e7d666': unknown revision or path not in the
-> working tree.
->
-> This looks like an OpenSBI commit but QEMU only include up to v0.5.
->
-> Can you build v0.5? Else can you update the submodule?
->
+If we make this percentage higher, then we can tolerate higher
+dirty rate during migration, which means less impact on guest.
+The side effect of higher percentage is longer migration time.
 
-Will do in v2.
+We can configure this parameter to switch between migration time
+firt or guest performance first. The default value is 50.
 
-> Also, can you add a CI job to build this, so we have reproducible builds
-> (see QEMU commit 71920809ceabed as example)?
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+---
+ migration/migration.c | 24 ++++++++++++++++++++++++
+ migration/ram.c       | 21 +++++++++++++++------
+ monitor/hmp-cmds.c    |  7 +++++++
+ qapi/migration.json   | 16 +++++++++++++++-
+ 4 files changed, 61 insertions(+), 7 deletions(-)
 
-I cannot find any document for how to test CI job with gitlab CI. Does
-QEMU has a public CI runner for testing?
+diff --git a/migration/migration.c b/migration/migration.c
+index 8fb68795dc..e6c2451734 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -78,6 +78,7 @@
+ /*0: means nocompress, 1: best speed, ... 9: best compress ratio */
+ #define DEFAULT_MIGRATE_COMPRESS_LEVEL 1
+ /* Define default autoconverge cpu throttle migration parameters */
++#define DEFAULT_MIGRATE_THROTTLE_TRIG_THRES 50
+ #define DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL 20
+ #define DEFAULT_MIGRATE_CPU_THROTTLE_INCREMENT 10
+ #define DEFAULT_MIGRATE_MAX_CPU_THROTTLE 99
+@@ -778,6 +779,8 @@ MigrationParameters *qmp_query_migrate_parameters(Err=
+or **errp)
+     params->compress_wait_thread =3D s->parameters.compress_wait_thread;
+     params->has_decompress_threads =3D true;
+     params->decompress_threads =3D s->parameters.decompress_threads;
++    params->has_throttle_trig_thres =3D true;
++    params->throttle_trig_thres =3D s->parameters.throttle_trig_thres;
+     params->has_cpu_throttle_initial =3D true;
+     params->cpu_throttle_initial =3D s->parameters.cpu_throttle_initial;
+     params->has_cpu_throttle_increment =3D true;
+@@ -1164,6 +1167,15 @@ static bool migrate_params_check(MigrationParamete=
+rs *params, Error **errp)
+         return false;
+     }
+=20
++    if (params->has_throttle_trig_thres &&
++        (params->throttle_trig_thres < 1 ||
++         params->throttle_trig_thres > 99)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "throttle_trig_thres",
++                   "an integer in the range of 1 to 99");
++        return false;
++    }
++
+     if (params->has_cpu_throttle_initial &&
+         (params->cpu_throttle_initial < 1 ||
+          params->cpu_throttle_initial > 99)) {
+@@ -1279,6 +1291,10 @@ static void migrate_params_test_apply(MigrateSetPa=
+rameters *params,
+         dest->decompress_threads =3D params->decompress_threads;
+     }
+=20
++    if (params->has_throttle_trig_thres) {
++        dest->throttle_trig_thres =3D params->throttle_trig_thres;
++    }
++
+     if (params->has_cpu_throttle_initial) {
+         dest->cpu_throttle_initial =3D params->cpu_throttle_initial;
+     }
+@@ -1360,6 +1376,10 @@ static void migrate_params_apply(MigrateSetParamet=
+ers *params, Error **errp)
+         s->parameters.decompress_threads =3D params->decompress_threads;
+     }
+=20
++    if (params->has_throttle_trig_thres) {
++        s->parameters.throttle_trig_thres =3D params->throttle_trig_thre=
+s;
++    }
++
+     if (params->has_cpu_throttle_initial) {
+         s->parameters.cpu_throttle_initial =3D params->cpu_throttle_init=
+ial;
+     }
+@@ -3506,6 +3526,9 @@ static Property migration_properties[] =3D {
+     DEFINE_PROP_UINT8("x-decompress-threads", MigrationState,
+                       parameters.decompress_threads,
+                       DEFAULT_MIGRATE_DECOMPRESS_THREAD_COUNT),
++    DEFINE_PROP_UINT8("x-throttle-trig-thres", MigrationState,
++                      parameters.throttle_trig_thres,
++                      DEFAULT_MIGRATE_THROTTLE_TRIG_THRES),
+     DEFINE_PROP_UINT8("x-cpu-throttle-initial", MigrationState,
+                       parameters.cpu_throttle_initial,
+                       DEFAULT_MIGRATE_CPU_THROTTLE_INITIAL),
+@@ -3606,6 +3629,7 @@ static void migration_instance_init(Object *obj)
+     params->has_compress_level =3D true;
+     params->has_compress_threads =3D true;
+     params->has_decompress_threads =3D true;
++    params->has_throttle_trig_thres =3D true;
+     params->has_cpu_throttle_initial =3D true;
+     params->has_cpu_throttle_increment =3D true;
+     params->has_max_bandwidth =3D true;
+diff --git a/migration/ram.c b/migration/ram.c
+index ed23ed1c7c..28081cb1e1 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -901,6 +901,11 @@ static void migration_bitmap_sync(RAMState *rs)
+     RAMBlock *block;
+     int64_t end_time;
+     uint64_t bytes_xfer_now;
++    uint64_t bytes_dirty_period;
++    uint64_t bytes_xfer_period;
++    uint64_t bytes_dirty_thres;
++    uint64_t throttle_trig_thres;
++    MigrationState *s =3D migrate_get_current();
+=20
+     ram_counters.dirty_sync_count++;
+=20
+@@ -934,13 +939,17 @@ static void migration_bitmap_sync(RAMState *rs)
+          * throttling logic during the bulk phase of block migration. */
+         if (migrate_auto_converge() && !blk_mig_bulk_active()) {
+             /* The following detection logic can be refined later. For n=
+ow:
+-               Check to see if the dirtied bytes is 50% more than the ap=
+prox.
+-               amount of bytes that just got transferred since the last =
+time we
+-               were in this routine. If that happens twice, start or inc=
+rease
+-               throttling */
++               Check to see if the ratio between dirtied bytes and the a=
+pprox.
++               amount of bytes that just got transferred since the last =
+time
++               we were in this routine reaches the threshold. If that ha=
+ppens
++               twice, start or increase throttling. */
++
++            bytes_dirty_period =3D rs->num_dirty_pages_period * TARGET_P=
+AGE_SIZE;
++            bytes_xfer_period =3D bytes_xfer_now - rs->bytes_xfer_prev;
++            throttle_trig_thres =3D s->parameters.throttle_trig_thres;
++            bytes_dirty_thres =3D bytes_xfer_period * throttle_trig_thre=
+s / 100;
+=20
+-            if ((rs->num_dirty_pages_period * TARGET_PAGE_SIZE >
+-                   (bytes_xfer_now - rs->bytes_xfer_prev) / 2) &&
++            if ((bytes_dirty_period > bytes_dirty_thres) &&
+                 (++rs->dirty_rate_high_cnt >=3D 2)) {
+                     trace_migration_throttle();
+                     rs->dirty_rate_high_cnt =3D 0;
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index b237613e0d..8673f5eeb2 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -409,6 +409,10 @@ void hmp_info_migrate_parameters(Monitor *mon, const=
+ QDict *qdict)
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_DECOMPRESS_THREAD=
+S),
+             params->decompress_threads);
++        assert(params->has_throttle_trig_thres);
++        monitor_printf(mon, "%s: %u\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_THROTTLE_TRIG_THR=
+ES),
++            params->throttle_trig_thres);
+         assert(params->has_cpu_throttle_initial);
+         monitor_printf(mon, "%s: %u\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_CPU_THROTTLE_INIT=
+IAL),
+@@ -1764,6 +1768,9 @@ void hmp_migrate_set_parameter(Monitor *mon, const =
+QDict *qdict)
+         p->has_decompress_threads =3D true;
+         visit_type_int(v, param, &p->decompress_threads, &err);
+         break;
++    case MIGRATION_PARAMETER_THROTTLE_TRIG_THRES:
++        p->has_throttle_trig_thres =3D true;
++        visit_type_int(v, param, &p->throttle_trig_thres, &err);
+     case MIGRATION_PARAMETER_CPU_THROTTLE_INITIAL:
+         p->has_cpu_throttle_initial =3D true;
+         visit_type_int(v, param, &p->cpu_throttle_initial, &err);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 52f3429969..4da5385832 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -524,6 +524,10 @@
+ #                      compression, so set the decompress-threads to the=
+ number about 1/4
+ #                      of compress-threads is adequate.
+ #
++# @throttle-trig-thres: The ratio of bytes_dirty_period and bytes_xfer_p=
+eriod to
++#                       trigger throttling. It is expressed as percentag=
+e. The
++#                       default value is 50. (Since 5.0)
++#
+ # @cpu-throttle-initial: Initial percentage of time guest cpus are throt=
+tled
+ #                        when migration auto-converge is activated. The
+ #                        default value is 20. (Since 2.7)
+@@ -592,7 +596,7 @@
+   'data': ['announce-initial', 'announce-max',
+            'announce-rounds', 'announce-step',
+            'compress-level', 'compress-threads', 'decompress-threads',
+-           'compress-wait-thread',
++           'compress-wait-thread', 'throttle-trig-thres',
+            'cpu-throttle-initial', 'cpu-throttle-increment',
+            'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+@@ -626,6 +630,10 @@
+ #
+ # @decompress-threads: decompression thread count
+ #
++# @throttle-trig-thres: The ratio of bytes_dirty_period and bytes_xfer_p=
+eriod to
++#                       trigger throttling. It is expressed as percentag=
+e. The
++#                       default value is 50. (Since 5.0)
++#
+ # @cpu-throttle-initial: Initial percentage of time guest cpus are
+ #                        throttled when migration auto-converge is activ=
+ated.
+ #                        The default value is 20. (Since 2.7)
+@@ -701,6 +709,7 @@
+             '*compress-threads': 'int',
+             '*compress-wait-thread': 'bool',
+             '*decompress-threads': 'int',
++            '*throttle-trig-thres': 'int',
+             '*cpu-throttle-initial': 'int',
+             '*cpu-throttle-increment': 'int',
+             '*tls-creds': 'StrOrNull',
+@@ -759,6 +768,10 @@
+ #
+ # @decompress-threads: decompression thread count
+ #
++# @throttle-trig-thres: The ratio of bytes_dirty_period and bytes_xfer_p=
+eriod to
++#                       trigger throttling. It is expressed as percentag=
+e. The
++#                       default value is 50. (Since 5.0)
++#
+ # @cpu-throttle-initial: Initial percentage of time guest cpus are
+ #                        throttled when migration auto-converge is activ=
+ated.
+ #                        (Since 2.7)
+@@ -834,6 +847,7 @@
+             '*compress-threads': 'uint8',
+             '*compress-wait-thread': 'bool',
+             '*decompress-threads': 'uint8',
++            '*throttle-trig-thres': 'uint8',
+             '*cpu-throttle-initial': 'uint8',
+             '*cpu-throttle-increment': 'uint8',
+             '*tls-creds': 'str',
+--=20
+2.19.1
 
-Regards,
-Bin
 
