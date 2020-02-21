@@ -2,121 +2,82 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DBFC35657
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C28C35657
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1621A206E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65983206E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="eeUpKWdr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1621A206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U2b/wbq0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65983206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5CIM-0001g8-9L
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 12:40:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38376)
+	id 1j5CJK-0002VJ-Ke
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 12:41:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j5C9p-0007a5-HP
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:32:11 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5CDp-0004bY-Km
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:36:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j5C9n-0008FL-G3
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:32:08 -0500
-Received: from mail-ve1eur03on071d.outbound.protection.outlook.com
- ([2a01:111:f400:fe09::71d]:32258
- helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j5C9m-0008Dd-7A; Fri, 21 Feb 2020 12:32:06 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lWn9EDGhtjZfaZabiyzjSD00sTnC43qY/ozbpwvrLzVXUDyD51zZrEgykN2DRabwm8Jufuu288GG4B6QtzeFTcuAeBoJ8aItay184M4MDMR4SHw/cJYak17mXDRI3lANizgpEmeB5jLxKCq76TrjegvD2E76ZIlTHWe6xolToUkIwhSTnDwhs6Mh1jzMKtAQ5Myc2SAFm3UdN2rTdwG9N/2ecjS+ukkrLjRHHvwikjYXPEc/ELzKi5/TF+EoLAx/qTj0hw4X4LNx75hST0wBE+3eJVqC31F/hNu6dnbavNrQCGmf45LsX7alewK+qHin2VL2Zo6EZV1vem6cMDDSXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=De9oi+D5qtGD6H/lO4/hVswXUoHltfm4VlfdPII3PmM=;
- b=Bn1rW6ckhoGjjB62EIdjO+iMT3uU3LKCclNe31XxKmZiNBkKsNVzW0U0u8TbKk8IQmhrtJ5aUDoBWgRmGYqQsI1frCMLGE8zduqXwwCru9Oev2Y49e7yM/YaItUxMRhf/YHHeNfC+3bXx9dC3g4bb4XmQ9E7C8miq9H1nx8xdBSKiQdGbpd4AywAePL2L6xMEwcfnDImEkUgwijsjuvE4aKD5PS+UFCXayP+KS99Rw/UVFGPBjLQPhaqNJ6l4ee+64omZkEvQDOXW7+Jhv/YcyHVTBuPUSYdgwZC5sKAmTssoPBbch9nRQqf7n6kxSDJFZUBeo8bynvwbBMDseqZ0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=De9oi+D5qtGD6H/lO4/hVswXUoHltfm4VlfdPII3PmM=;
- b=eeUpKWdrHwydCvzMsv602+fYfQvHfOAREIaFmaS7W8f9hnPB54XMyvl1Stm+kBjlUqMMGvGuymD0eyNbwS/JyrEuT2Z9K9yX9Q2Tm7j8bVOTx2JVa7KpNKW8gmDv4aLCs0UmbqacOrjSSXeJWIlOoqJvFK2LrYfo4z3azFSoDMk=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6SPR01MB0057.eurprd08.prod.outlook.com (10.255.22.11) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.17; Fri, 21 Feb 2020 17:32:02 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.016; Fri, 21 Feb 2020
- 17:32:02 +0000
-Subject: Re: [PATCH v7 01/11] qapi/error: add (Error **errp) cleaning APIs
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
- <20200131130118.1716-2-vsementsov@virtuozzo.com>
- <87d0a88k6d.fsf@dusky.pond.sub.org>
- <7856fcbb-8c01-aba3-a11b-63058c117362@virtuozzo.com>
- <875zfz6gsh.fsf@dusky.pond.sub.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200221203155959
-Message-ID: <064ca8e9-458e-c780-92a0-05f40cf0975b@virtuozzo.com>
-Date: Fri, 21 Feb 2020 20:31:55 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <875zfz6gsh.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1P195CA0006.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::16)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <peter.maydell@linaro.org>) id 1j5CDn-0000qa-9D
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:36:16 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39006)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j5CDn-0000pl-31
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:36:15 -0500
+Received: by mail-oi1-x241.google.com with SMTP id z2so2352788oih.6
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 09:36:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=0hZPLrTx+QxGezTlJEFQJMlOxfvv4M75Fk3m8GySp+k=;
+ b=U2b/wbq02FNihsBqsviMPt31jwOChWp25VW+C94NWjLSj9BQTP3TiXjrdP7o/Hr2W3
+ uSLOF7xKUTGbjB5nr3MM9e/H9wvkgIGWp0h1tGFNwz2egdNqx38JTNfjp2aRd3znaye5
+ HIcIkq5hk83QRvDLr/LNxW6ZWRn7CYwhUpkFmry71tGpSiSFwg9vhD2OSj7jjTIwHuiS
+ pvzDRvoHxMOgWXHtt3DBEsx4DFkLAE2AJlWcTRo8+VUoXRH/n2H1eBcCDvcrY8dGDC7I
+ pYvhqhP6cv06WiMO8XLBLXdfRPb0dRJLOm/Ps6FBEedGpN16TVdb4sbqcsfT+SkFpoMe
+ aQxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0hZPLrTx+QxGezTlJEFQJMlOxfvv4M75Fk3m8GySp+k=;
+ b=e0n/QKVzN56gqvMRr/KKOQrQ9GDoJq5PqGnHHeytP7igit6/zgks9Za+XoJiIeGR80
+ pUz1vBlb8dn5D6imaXW/7xuJsQAO++czaVzGQPG1r1V/kFChgBfVyvy4U+G+GdvZE9iY
+ doA/+lXoKnj5N8vwndw94tEjfXs/onQK7W3sODTkkObYKu1JAQAEZagLNfHoi2dKoqew
+ JSfPEEb4/6LweNy8+dK4miTm9fGRkbGC8S+HXVowOyQgwTDEnmgwa4zLsMMmunrYbrbO
+ zW0lsPs9BRCQDEwTiPxvAmdraKBrCHSRSf2s739m/lTPNgJmQeJxiabMIE8+apCCszTa
+ RBzQ==
+X-Gm-Message-State: APjAAAVyEaL0UiguufS57rAIs7iPvUFF+Ti1Ru2JQstjZI+X7EB7eXDh
+ iXpbuRjOl3eBUJVbEFeBgLAsoFNMsVgwoI3JiLxcvA==
+X-Google-Smtp-Source: APXvYqxBxfiMzNYJBdQd5tbj09NPw89aj7x9fXxH8sgTJ2tSl6KBacWukJH47LxuJTcXu05BUZzIAD44OmjsLSadG9U=
+X-Received: by 2002:a05:6808:3b2:: with SMTP id
+ n18mr2834616oie.146.1582306574231; 
+ Fri, 21 Feb 2020 09:36:14 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P195CA0006.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.17 via Frontend Transport; Fri, 21 Feb 2020 17:32:01 +0000
-X-Tagtoolbar-Keys: D20200221203155959
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bfdb1672-398b-4a30-d62d-08d7b6f3f64b
-X-MS-TrafficTypeDiagnostic: AM6SPR01MB0057:
-X-Microsoft-Antispam-PRVS: <AM6SPR01MB0057F4D71D0E109A0B69A2A4C1120@AM6SPR01MB0057.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0320B28BE1
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(396003)(366004)(376002)(346002)(39850400004)(136003)(199004)(189003)(16576012)(316002)(54906003)(31686004)(66946007)(478600001)(66476007)(66556008)(31696002)(6486002)(81166006)(8936002)(86362001)(26005)(81156014)(8676002)(6916009)(16526019)(186003)(5660300002)(956004)(7416002)(36756003)(6666004)(2906002)(2616005)(4326008)(52116002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6SPR01MB0057;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2uAEmzSrMrgBj0++TKfDbH73YxO9znBlHHy/Rjv+e49nyBnt0Q1wTTtCH0ax0S6+aIGdCTFxVGA8d/moK6USmj+EExfGrcbBWHUznRDGh3SESjWxoryvz6eivPvCjMEkib3bKbgknytSA9WGUq97bvN3nJ+YVn7W16MeoDcANSeLmYvUjoTp7W9xlYrF2huWItsc+tCfEAtIaNGr+Ip2dCdWi7N2IcXr/2hAB1Ai8xjO/GnYuz+HB97ZG9wAlNfkMv3OJ2rSRSL4d2DlscpSF3dsV4wYtlICHTGzH/gxPsI2JgJ7zajkyTD0yPzpwH8LyYnawWskBw6Aqh8B9GIbsDuKvgc15hyIWoyEAZhFJ6Ejb/Q9DRQE1OSJWJM8DsZ4/xXm+zOfP4cyixgpyndl8LvF27RZ2q1u9l4vtVnCy/GGoVvdNt72j4ypFffcqH61
-X-MS-Exchange-AntiSpam-MessageData: gOrvb366LFT7xO/91E23E7ur+NIotbpJ+rDi1DM/aMPCoOi9WlF/woP1DljompZ8Q4vbcAXH0GPJcYQdDdlVMCvGv7xsJ7UhYB5Bfo3xzZUxmFqUerYtEkE8refpB5xYMjkrcQHuyxZZrfrCHJqHnA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfdb1672-398b-4a30-d62d-08d7b6f3f64b
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 17:32:02.3366 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mGY3/4FmZOIBSozIYJzmgfMjbt1Lg21uzddxMDWvhqoP8cPV1yCuERcEywmZgH+gNiKbnwyeLktLlkS6HctXADjOQXTiBk87YPw4P55Ro6U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6SPR01MB0057
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe09::71d
+References: <20200221173049.18134-1-philmd@redhat.com>
+ <20200221173049.18134-3-philmd@redhat.com>
+In-Reply-To: <20200221173049.18134-3-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Feb 2020 17:36:03 +0000
+Message-ID: <CAFEAcA8+LWYhNjaXUu-Y2oat1hsKGbt6Hcir_yeNpmY+c6+8KA@mail.gmail.com>
+Subject: Re: [PATCH 2/7] hw/arm: Let devices own the MemoryRegion they create
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,212 +89,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Laurent Vivier <laurent@vivier.eu>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>,
+ Peter Chubb <peter.chubb@nicta.com.au>, qemu-arm <qemu-arm@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.02.2020 19:34, Markus Armbruster wrote:
-> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->=20
->> 21.02.2020 10:38, Markus Armbruster wrote:
->>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>
->>>> Add functions to clean Error **errp: call corresponding Error *err
->>>> cleaning function an set pointer to NULL.
->>>>
->>>> New functions:
->>>>     error_free_errp
->>>>     error_report_errp
->>>>     warn_report_errp
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> Reviewed-by: Greg Kurz <groug@kaod.org>
->>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>> ---
->>>>
->>>> CC: Eric Blake <eblake@redhat.com>
->>>> CC: Kevin Wolf <kwolf@redhat.com>
->>>> CC: Max Reitz <mreitz@redhat.com>
->>>> CC: Greg Kurz <groug@kaod.org>
->>>> CC: Stefano Stabellini <sstabellini@kernel.org>
->>>> CC: Anthony Perard <anthony.perard@citrix.com>
->>>> CC: Paul Durrant <paul@xen.org>
->>>> CC: Stefan Hajnoczi <stefanha@redhat.com>
->>>> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->>>> CC: Laszlo Ersek <lersek@redhat.com>
->>>> CC: Gerd Hoffmann <kraxel@redhat.com>
->>>> CC: Stefan Berger <stefanb@linux.ibm.com>
->>>> CC: Markus Armbruster <armbru@redhat.com>
->>>> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>> CC: qemu-block@nongnu.org
->>>> CC: xen-devel@lists.xenproject.org
->>>>
->>>>    include/qapi/error.h | 26 ++++++++++++++++++++++++++
->>>>    1 file changed, 26 insertions(+)
->>>>
->>>> diff --git a/include/qapi/error.h b/include/qapi/error.h
->>>> index ad5b6e896d..d34987148d 100644
->>>> --- a/include/qapi/error.h
->>>> +++ b/include/qapi/error.h
->>>> @@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fmt=
-, ...)
->>>>    void error_reportf_err(Error *err, const char *fmt, ...)
->>>>        GCC_FMT_ATTR(2, 3);
->>>>    +/*
->>>> + * Functions to clean Error **errp: call corresponding Error *err cle=
-aning
->>>> + * function, then set pointer to NULL.
->>>> + */
->>>> +static inline void error_free_errp(Error **errp)
->>>> +{
->>>> +    assert(errp && *errp);
->>>> +    error_free(*errp);
->>>> +    *errp =3D NULL;
->>>> +}
->>>> +
->>>> +static inline void error_report_errp(Error **errp)
->>>> +{
->>>> +    assert(errp && *errp);
->>>> +    error_report_err(*errp);
->>>> +    *errp =3D NULL;
->>>> +}
->>>> +
->>>> +static inline void warn_report_errp(Error **errp)
->>>> +{
->>>> +    assert(errp && *errp);
->>>> +    warn_report_err(*errp);
->>>> +    *errp =3D NULL;
->>>> +}
->>>> +
->>>> +
->>>>    /*
->>>>     * Just like error_setg(), except you get to specify the error clas=
-s.
->>>>     * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR =
-is
->>>
->>> These appear to be unused apart from the Coccinelle script in PATCH 03.
->>>
->>> They are used in the full "[RFC v5 000/126] error: auto propagated
->>> local_err" series.  Options:
->>>
->>> 1. Pick a few more patches into this part I series, so these guys come
->>>      with users.
->>
->> It needs some additional effort for this series.. But it's possible. Sti=
-ll,
->> I think that we at least should not pull out patches which should be in
->> future series (for example from ppc or block/)..
->=20
-> Yes, we want to keep related stuff together.
->=20
->> Grepping through v5:
->>   for x in {warn_report_errp,error_report_errp,error_free_errp}; do echo=
- =3D=3D $x =3D=3D; git grep -l $x | grep -v coccinelle | grep -v 'error\.h'=
-; echo; done
->> =3D=3D warn_report_errp =3D=3D
->> block/file-posix.c
->> hw/ppc/spapr.c
->> hw/ppc/spapr_caps.c
->> hw/ppc/spapr_irq.c
->> hw/vfio/pci.c
->> net/tap.c
->> qom/object.c
->>
->> =3D=3D error_report_errp =3D=3D
->> hw/block/vhost-user-blk.c
->> util/oslib-posix.c
->>
->> =3D=3D error_free_errp =3D=3D
->> block.c
->> block/qapi.c
->> block/sheepdog.c
->> block/snapshot.c
->> blockdev.c
->> chardev/char-socket.c
->> hw/audio/intel-hda.c
->> hw/core/qdev-properties.c
->> hw/pci-bridge/pci_bridge_dev.c
->> hw/pci-bridge/pcie_pci_bridge.c
->> hw/scsi/megasas.c
->> hw/scsi/mptsas.c
->> hw/usb/hcd-xhci.c
->> io/net-listener.c
->> migration/colo.c
->> qga/commands-posix.c
->> qga/commands-win32.c
->> util/qemu-sockets.c
->>
->> What do you want to add?
->=20
-> PATCH v5 032 uses both error_report_errp() and error_free_errp().
-> Adding warn_report_errp() without a user is okay with me.  What do you
-> think?
->=20
-> If there are patches you consider related to 032, feel free to throw
-> them in.
+On Fri, 21 Feb 2020 at 17:31, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> To avoid orphean memory regions being added in the /unattached
 
-032 is qga/commands-win32.c and util/oslib-posix.c
+("orphan")
 
-Seems that they are wrongly grouped into one patch.
+> QOM container, use the memory_region_owner_nonnull.cocci script
+> to set the correct ownership.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/arm/exynos4210.c    | 14 +++++++-------
+>  hw/arm/fsl-imx25.c     | 14 +++++++-------
+>  hw/arm/fsl-imx31.c     | 10 +++++-----
+>  hw/arm/fsl-imx6.c      | 10 +++++-----
+>  hw/arm/fsl-imx6ul.c    | 14 +++++++-------
+>  hw/arm/msf2-soc.c      |  8 ++++----
+>  hw/arm/nrf51_soc.c     |  2 +-
+>  hw/arm/stm32f205_soc.c | 10 +++++-----
+>  hw/arm/stm32f405_soc.c | 13 +++++++------
+>  hw/arm/xlnx-zynqmp.c   | 13 ++++++-------
+>  10 files changed, 54 insertions(+), 54 deletions(-)
+>
+> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+> index 59a27bdd68..d4b05336ee 100644
+> --- a/hw/arm/exynos4210.c
+> +++ b/hw/arm/exynos4210.c
+> @@ -305,28 +305,28 @@ static void exynos4210_realize(DeviceState *socdev,=
+ Error **errp)
+>      /*** Memory ***/
+>
+>      /* Chip-ID and OMR */
+> -    memory_region_init_io(&s->chipid_mem, NULL, &exynos4210_chipid_and_o=
+mr_ops,
+> -        NULL, "exynos4210.chipid", sizeof(chipid_and_omr));
+> +    memory_region_init_io(&s->chipid_mem, OBJECT(socdev),
+> +                          &exynos4210_chipid_and_omr_ops, NULL,
+> +                          "exynos4210.chipid", sizeof(chipid_and_omr));
+>      memory_region_add_subregion(system_mem, EXYNOS4210_CHIPID_ADDR,
+>                                  &s->chipid_mem);
+>
+>      /* Internal ROM */
+> -    memory_region_init_ram(&s->irom_mem, NULL, "exynos4210.irom",
+> +    memory_region_init_ram(&s->irom_mem, OBJECT(socdev), "exynos4210.iro=
+m",
+>                             EXYNOS4210_IROM_SIZE, &error_fatal);
 
-qga/commands-win32.c matches qga/ (Michael Roth)
-and  util/oslib-posix.c matches POSIX (Paolo Bonzini)
+I have a feeling that the owner of a RAM memory region affects
+the name we use for the underlying ramblock, which in turn
+is used in the on-the-wire data stream in migration, which means
+that changing ownership breaks migration compatibility.
+That's probably OK in most cases as we don't care too much
+about migration-compat on most boards, but I think it does
+mean that you want to keep those changes separated out from
+the ones for IO and alias regions, which I think shouldn't
+have visible effects.
 
-So, it should be two separate patches anyway.
-
-For [1.] I only afraid that we'll have to wait for maintainers, who were
-not interested in previous iterations, to review these new patches..
-
->=20
->>>
->>> 2. Punt this patch to the first part that has users, along with the
->>>      part of the Coccinelle script that deals with them.
->>
->> But coccinelle script would be wrong, if we drop this part from it. I th=
-ink,
->> that after commit which adds coccinelle script, it should work with any =
-file,
->> not only subset of these series.
->>
->> So, it's probably OK for now to drop these functions, forcing their addi=
-tion if
->> coccinelle script will be applied where these functions are needed. We c=
-an, for
->> example comment these three functions.
->>
->> Splitting coccinelle script into two parts, which will be in different s=
-eries will
->> not help any patch-porting processes.
->>
->> Moreover, this will create dependencies between future series updating o=
-ther files.
->>
->> So, I don't like [2.]..
->=20
-> And it's likely more work than 1.
->=20
->>> 3. Do nothing: accept the functions without users.
->>
->> OK for me)
->>
->>>
->>> I habitually dislike 3., but reviewing the rest of this series might
->>> make me override that dislike.
-> [...]
->=20
-
-
---=20
-Best regards,
-Vladimir
+thanks
+-- PMM
 
