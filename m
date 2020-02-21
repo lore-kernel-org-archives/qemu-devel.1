@@ -2,68 +2,85 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA9DC35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 06:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7C1C35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 06:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFCBA207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 06:29:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFCBA207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 68983208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 06:32:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="at0MQCKM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68983208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j51oD-0005px-Ug
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 01:29:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
+	id 1j51rW-00071E-Ji
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 01:32:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j51nd-0005Hy-Du
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 01:28:34 -0500
+ (envelope-from <armbru@redhat.com>) id 1j51qI-0006Ys-F9
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 01:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j51nb-0002X2-QF
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 01:28:33 -0500
-Resent-Date: Fri, 21 Feb 2020 01:28:33 -0500
-Resent-Message-Id: <E1j51nb-0002X2-QF@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21161)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j51nb-0002Mu-HZ; Fri, 21 Feb 2020 01:28:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582266497; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=PYFC0QIm41SiA6zo5pDRVWgXkw8XBNynEhi4Ng5OvB1p71pl55BDplVfZ8zn+aHxNMhsP7JmrewkXsbro3sv6Mv27U4qekbziirUOuGsnxLodsyWIimAq/wIF/ylpVTjr8EJmFx4sjvtpvHnt5wZXTVpgq955Iv0cGbxA6AbMDI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582266497;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=3XwlUqY3rp92+axNgwONBIqN8HL2NuZX/lWJ8Azx/OM=; 
- b=SQuhrcr2J77Q4XG33EiWXFztCBxFsx6v/IvoW5yejoCE5NNRdX8W1+34kfwiCKOSmkdZANgkSNNN7bIhfaap/RosNhFMUmeFskfpvY30rCkYC4Ibw3SDBIN8HfvKNJGgMgzBuMn8T+kKeCVr3/vY/VSmGKxJtKiOyy8UD6grwBg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582266495550396.59628161498404;
- Thu, 20 Feb 2020 22:28:15 -0800 (PST)
-In-Reply-To: <20200221044908.266883-1-gshan@redhat.com>
-Subject: Re: [PATCH] hw/char/pl011: Enable TxFIFO and async transmission
-Message-ID: <158226649422.712.7285415168506294704@a1bbccc8075a>
+ (envelope-from <armbru@redhat.com>) id 1j51qG-0005jr-O3
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 01:31:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49958
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j51qG-0005fv-EI
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 01:31:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582266675;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bejW9W78OuIHRx0tVUTMDFA33x2UKfUN6LOoW6YpgF8=;
+ b=at0MQCKMscBhk80WaCshIvXu8kOrL/YiyPkrmV50ijtxUF7wtAVWz/yja0m2jF06OoukF1
+ 6cNue5T9ZrJBQ4C/o0QTOBDx6rYnzm8nkTtrJMaGDvkorBmvhD1yvJlzJLLM6thaL2TRGo
+ fGATncJw4GdZE6IW1ly2T97mW3Q8SR0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-RVHNvhNfM2uvDNjuMP19vQ-1; Fri, 21 Feb 2020 01:31:11 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED882801E66;
+ Fri, 21 Feb 2020 06:31:10 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54FB060BE0;
+ Fri, 21 Feb 2020 06:31:08 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C440611386A6; Fri, 21 Feb 2020 07:31:06 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org> <20200220201155.GJ2836@work-vm>
+Date: Fri, 21 Feb 2020 07:31:06 +0100
+In-Reply-To: <20200220201155.GJ2836@work-vm> (David Alan Gilbert's message of
+ "Thu, 20 Feb 2020 20:11:55 +0000")
+Message-ID: <87k14ga1ud.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: gshan@redhat.com
-Date: Thu, 20 Feb 2020 22:28:15 -0800 (PST)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: RVHNvhNfM2uvDNjuMP19vQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,49 +92,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, maz@kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, shan.gavin@gmail.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyMTA0NDkwOC4yNjY4
-ODMtMS1nc2hhbkByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBpb3Rlc3QtcWNv
-dzI6IDI4MwpQYXNzZWQgYWxsIDExNiBpb3Rlc3RzCioqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3Ny
-Yy90ZXN0cy9xdGVzdC9hY3BpLXV0aWxzLmM6MTQ1OmFjcGlfZmluZF9yc2RwX2FkZHJlc3NfdWVm
-aTogY29kZSBzaG91bGQgbm90IGJlIHJlYWNoZWQKRVJST1IgLSBCYWlsIG91dCEgRVJST1I6L3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2FjcGktdXRpbHMuYzoxNDU6YWNwaV9maW5kX3Jz
-ZHBfYWRkcmVzc191ZWZpOiBjb2RlIHNob3VsZCBub3QgYmUgcmVhY2hlZAptYWtlOiAqKiogW2No
-ZWNrLXF0ZXN0LWFhcmNoNjRdIEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxh
-c3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBpbiA8bW9k
-dWxlPgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJv
-cihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdb
-J3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3Rh
-bmNlLnV1aWQ9ZmE3MTMwYzYzYTRlNDE5MmJkYTAyYWIyOWJkNDUwODEnLCAnLXUnLCAnMTAwMycs
-ICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICctZScsICdU
-QVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywgJ1Y9Jywg
-Jy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAn
-Q0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hl
-L3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtc2p5dmthcWgvc3JjL2RvY2tlci1zcmMuMjAyMC0wMi0yMS0wMS4x
-Mi4wNC4xNTM5MjovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1w
-L3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMg
-Mi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZmE3MTMwYzYz
-YTRlNDE5MmJkYTAyYWIyOWJkNDUwODEKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAx
-Cm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAt
-c2p5dmthcWgvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBF
-cnJvciAyCgpyZWFsICAgIDE2bTkuNjE2cwp1c2VyICAgIDBtOC4yNTNzCgoKVGhlIGZ1bGwgbG9n
-IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDIyMTA0NDkwOC4y
-NjY4ODMtMS1nc2hhbkByZWRoYXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+
+> * Markus Armbruster (armbru@redhat.com) wrote:
+[...]
+>> Collecting several users before building infrastructure makes sense when
+>> the design of the infrastructure isn't obvious, or when the need for it
+>> is in doubt.
+>>=20
+>> Neither is the case for running QMP handlers in a coroutine: QMP
+>> commands blocking the main loop is without doubt a problem we need to
+>> solve, and the way to solve it was obvious enough for Kevin to do it
+>> with one user: block_resize.  A second one quickly followed: screendump.
+>>=20
+>> The only part that's different for HMP, I think, is "need".
+>>=20
+>> Is HMP blocking the main loop a problem?
+>>=20
+>> If yes, is it serious enough to justify solving it?
+>
+> I don't mind if HMP blocks for a small time while doing something, but
+> not if it can hang if the guest (or something else like it) misbehaves.
+> Not if it's something you might need to issue another command to recover
+> from.
+
+The issue isn't HMP being unavailable while a command executes.  The
+issue is HMP stopping the main loop while a command executes.
+
+Stopping the main loop not only stops everything running there, it can
+also stop other threads when they synchronize with the main loop via the
+Big QEMU Lock.
+
+The obvious example is a command accessing a remote filesystem.  Special
+case: NFS with the hard option can hang indefinitely.
+
+screendump does that, and also waits for asynchronous gfx_update() with
+qxl devices.  Networking again, with a different peer.
+
+We already decided that QMP commands stopping the main loop is serious.
+
+To say it's not serious for HMP amounts to "don't do that then, use
+QMP".  Which may be fair.  Not for me to decide, though.
+
 
