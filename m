@@ -2,71 +2,68 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F962C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33460C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F2CF24650
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:39:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lu16Wnf5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2CF24650
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0BE5F24650
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:41:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BE5F24650
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5BL5-0003lC-Gl
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:39:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50554)
+	id 1j5BNG-00065q-8m
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:41:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rdunlap@infradead.org>) id 1j5BHB-0005Kp-58
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:35:44 -0500
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1j5BKu-0003mK-QR
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rdunlap@infradead.org>) id 1j5BH9-0001xt-W2
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:35:41 -0500
-Received: from bombadil.infradead.org ([2607:7c80:54:e::133]:58110)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rdunlap@infradead.org>)
- id 1j5BH9-0001tX-Ol
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:35:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
- Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
- Subject:Sender:Reply-To:Content-ID:Content-Description;
- bh=VL6gh0yPQIpT2nL/+Hwg/Bl1b1dNG3KY79WqjmhXwG8=; b=Lu16Wnf5xgjg6FezgS0tFqeKPj
- tlX0AdWRAo+cJ0QadzQvCTV+iqpD+UiJ1/PoWHBXN7Gh9a7iwm9TaHSyOBR+VNkDfmyAI6fN3zZ+o
- qeDro/A338xHvEvS+VdB4v/IJhZ7AULjdBU89/ts77smD2uAZAO7OrKiRAlEbjb8yQRLZIlsh8zkl
- 50knhHs5T3HhvaQOa/3MWH/A1HEysEYc7nfq6LOFdVgnuQk8K8ZXmUrfIfdWMZKO6Q4bjLiRh4x6W
- fCn+I1hd+RZBkAFhgQUKthDC80MHPcJpcdn8RPy/1bp3yJqXKBlwtazHGOgzlbq15la9d9d1dnDeW
- wbqfYF8Q==;
-Received: from [2601:1c0:6280:3f0::19c2]
- by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
- id 1j5BGx-0008Nu-4M; Fri, 21 Feb 2020 16:35:27 +0000
-Subject: Re: [PATCH v5 4/5] docs: gpio: Add GPIO Aggregator documentation
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-References: <20200218151812.7816-1-geert+renesas@glider.be>
- <20200218151812.7816-5-geert+renesas@glider.be>
- <e2530fff-a17c-ae90-ba92-360b828582da@infradead.org>
- <CAMuHMdUFV0nbfrpxY60av2x+UUN62wDiVLbcEG83133aqfFcUQ@mail.gmail.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <98997c64-9486-ee64-32df-3172e518b70d@infradead.org>
-Date: Fri, 21 Feb 2020 08:35:24 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1j5BKt-0003zb-NL
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:39:32 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45873)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1j5BKt-0003yx-IY
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:39:31 -0500
+Received: by mail-ot1-f67.google.com with SMTP id 59so2502556otp.12
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:39:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4BgZBtTDREnYAapVdHrqgQ9W3R4CTcWbIkMjaCPQlXs=;
+ b=KXUVpLbi3u3qAL/PfQGiydOxkmaeXY+F9DSerLxflqhSj09QHARVAssIHY0+9Jmsid
+ 1tM13M/mgK1t2SB2yoyjVvErcCjhkroBJGxp+Yvoy83b4A/dmIAEWW7Sx37osHN4T6e2
+ 7vFXYjBJEZle2TG/njMEu9V2tg8HPIuaUAWCXbsoB/2I+teQ5tPqKIR3PQWWObh7T26c
+ 7DfGfXoklfxt9ttEj1ZmJk7VvF25OSBELwtPPeFJG8IAsOmqoxIgO3Rwcyy3/cbCSIZU
+ wWPYnt22r6s3oqC79IJos5rB/7lrWmOHjf9x5vCxJxYvPoHjiX590RpeK1typBh5seuD
+ +qPg==
+X-Gm-Message-State: APjAAAUPVyrepWU7JHB+2bL6/jqsPf3FQ1LqPyiUs1D1v3ABbF59fJ3W
+ e6YgPmR+L60rJezAM6YwwGmDCNYTp4YjsVkIvuQ=
+X-Google-Smtp-Source: APXvYqyHdwKbUhPCfLeqiqCgnHSzlLvGxUb88yDmpTUxNb9KdZfgkLsmdvKxBtKDh+BkPpxepYgxvBCP9OOjR7Ep3ks=
+X-Received: by 2002:a9d:dc1:: with SMTP id 59mr29016938ots.250.1582303170916; 
+ Fri, 21 Feb 2020 08:39:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdUFV0nbfrpxY60av2x+UUN62wDiVLbcEG83133aqfFcUQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:7c80:54:e::133
+References: <20200218151812.7816-1-geert+renesas@glider.be>
+In-Reply-To: <20200218151812.7816-1-geert+renesas@glider.be>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 21 Feb 2020 17:39:19 +0100
+Message-ID: <CAMuHMdWo_JBpBeS72RkZBwuWyMhMj79=9ErFdXcLSqC2rOhJDg@mail.gmail.com>
+Subject: Re: [PATCH v5 0/5] gpio: Add GPIO Aggregator
+To: Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,29 +79,50 @@ Cc: Mark Rutland <mark.rutland@arm.com>,
  Peter Maydell <peter.maydell@linaro.org>,
  QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
  Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ Marc Zyngier <marc.zyngier@arm.com>,
  "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
  Magnus Damm <magnus.damm@gmail.com>,
  Christoffer Dall <christoffer.dall@arm.com>,
  Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
  Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
  "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Rob Herring <robh+dt@kernel.org>, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
  Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/21/20 8:34 AM, Geert Uytterhoeven wrote:
-> Hi Randy,
-> 
+Hi Linus and Bartosz,
 
-Hi Geert,
-Those changes look good. Thanks.
+On Tue, Feb 18, 2020 at 4:18 PM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+> GPIO controllers are exported to userspace using /dev/gpiochip*
+> character devices.  Access control to these devices is provided by
+> standard UNIX file system permissions, on an all-or-nothing basis:
+> either a GPIO controller is accessible for a user, or it is not.
+> Currently no mechanism exists to control access to individual GPIOs.
+>
+> Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
+> them as a new gpiochip.  This is useful for implementing access control,
+> and assigning a set of GPIOs to a specific user.  Furthermore, this
+> simplifies and hardens exporting GPIOs to a virtual machine, as the VM
+> can just grab the full GPIO controller, and no longer needs to care
+> about which GPIOs to grab and which not, reducing the attack surface.
+
+Do you have any more comments, before I respin and post v6?
+
+Thanks, and have a niec weekend!
+
+Gr{oetje,eeting}s,
+
+                        Geert
 
 -- 
-~Randy
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
