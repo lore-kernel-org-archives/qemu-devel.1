@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E189C35643
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC926C35640
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:49:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF7F4207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8816B222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="mWlKCGvM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF7F4207FD
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="cDT+g8Tz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8816B222C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j532q-000263-V8
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 02:48:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60548)
+	id 1j5346-0003YW-OP
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 02:49:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <saipava@xilinx.com>) id 1j531R-0000w8-Cx
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:54 -0500
+ (envelope-from <saipava@xilinx.com>) id 1j531S-0000wF-PL
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <saipava@xilinx.com>) id 1j531P-0001AD-NX
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:52 -0500
-Received: from mail-dm6nam12on2047.outbound.protection.outlook.com
- ([40.107.243.47]:30816 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
+ (envelope-from <saipava@xilinx.com>) id 1j531P-0001Aj-U9
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:53 -0500
+Received: from mail-dm6nam11on2070.outbound.protection.outlook.com
+ ([40.107.223.70]:6081 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <saipava@xilinx.com>)
- id 1j531P-00014N-EN; Fri, 21 Feb 2020 02:46:51 -0500
+ id 1j531P-00015a-O7; Fri, 21 Feb 2020 02:46:51 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qc5Abza1yDsWY3ZqtAoPxE6z8P5Y7ijTmVKHK2ZPV7XZjR2s5M52ySJBDMslrb8AcJwDXYokqbBepkjbFq28ujCPGBdALsK26Q5OcQhhVGyl9Xgi1RZqnIP3ffechzqSo65eWFL8EiyDRvUNZWJQA/ttpNrmczU2j/b4HNJ4WppZg1t7Hz9KbqVDMv6nrGvy1q7+VtyUUZSFTxuuvbO2eyreS6B4JGg6lKhZuNQdpQcIQnLvqkkD/X8bbdG85fRCjNrCeK7QiKYEF0wjbJyiBpLwnTuXpGLv0yGSyKUcXfHxCWCYx58IGWLIdgo+hLyjMiXAgEciQF/1F4njq+ysIg==
+ b=IDHNcGFRqGWbxPg+oafuvdAJa0uwS5n5rjJFbHZzXu43k6O+a/xMWPVkwupRxZyfABxl9ZBbVyLBxm81TP1g+Y97v915PcKrgAyaBedHQvTJJ8C4OA9S+sr8WChOOpWFGAPRpXokKCIi7J/S8yWGFmUFbrUZsf21tUPShzBTO3id8bbzCWRP9/R2TbyfburP6wdrW/Mdx1EgeZjaKOsQDEEuVJd8LG2CcNPe02Z73BuVqrzK44Peqbs74XqTPTNUoOLXzSoS/zBqI9ZWXS805B1QAOauWy/ovDYN55AcF0qlno4JX4t5Z70mLcIY2olUFOnMWPKMaQNX6ze6TuKYlA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ctg6ylU4WJvlXSjMYkgx6eFanXH84h/3L2dU/wS1b6U=;
- b=J5iIFXXJ3gd/iigCL5OwTuAl4NtS6trGAeyVa4jBha4F6W9tQr2PsYbiB0P3t9SPzSUzY/uxywIiWK0Cj4BkAYZJ4PBk8xGRQZXhWL0fT8LWZCwFgmjnNbiyGb4gptUItBvJJdv4xAK4IvCBbWxwknwwEFOW5hdZ9seqE+VAlQl6MtdDUglkMCOtJuE0k20cqGZwqF+bYYU3FhjBs1BwRfIWy+zfo3go1jk/WLnKMv14YO+2WKZw17GIlchS3DRH2SaNp13raqTFO7AtS/6/M1v+4aXSBKsobsYPOrCXL0yF3a7HP3XkJXV2pMlpBLzxlNhsvHu6ak42vdbc7W0k5w==
+ bh=IYlNz8YaPKiBm+UMfGlKLwarvPCaLrRSOCOOTXu7C9w=;
+ b=MtXzcTMzK46AE2Q12q8CIM5oMFZ+emsZFLQ6VzpecAEjxVCoPkR+P3L55tPG1pob4v0mUybl9h3GlR0p5h8oaP8f1zwyQz5vPWOAmWG8+ii0D9ZxGf8KmeAcKuvmCW8usPBzrT8E5Yzdbkf1PwlCz8t7rdXqeSchDPtY0A4PobvjXTPDqw3RCMvdqJbNItWKZFjIsPMMm3OvJbr3aBu5cyoNthjeBLYILdf68TlyXsgd93Hvq7ma3c3I+OzaOM49cfqpNlgpoG6z58Pfkst5pp3hgqNGafARA2kHictlwRUG0k3Y+giJZz+JApprIcYanpGAasyaa6J2wii7cYcxig==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.60.83) smtp.rcpttodomain=suse.de smtp.mailfrom=xilinx.com;
  dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
@@ -50,18 +50,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ctg6ylU4WJvlXSjMYkgx6eFanXH84h/3L2dU/wS1b6U=;
- b=mWlKCGvMH61L572etutKMqU8hwk13FqyyfyI0YenmpebvI2Y3uDlpCSZLWL63z4SnjE8rWcVdQUNX1pi2Di4KX3WhdGTkEDf8bEW1Exj4RSAdHfgQVOh4YGcy49TNFekz9Ue7xW+gTnvq/HXrSffYMF7nGkxTvjTXYEX/H2LGz0=
-Received: from BL0PR02CA0051.namprd02.prod.outlook.com (2603:10b6:207:3d::28)
- by CH2PR02MB7045.namprd02.prod.outlook.com (2603:10b6:610:8b::22)
- with Microsoft SMTP Server (version=TLS1_2,
+ bh=IYlNz8YaPKiBm+UMfGlKLwarvPCaLrRSOCOOTXu7C9w=;
+ b=cDT+g8TzNAeorpg/oR/KR+AMZoxESY/mILk3qc+PRrajRELdKRwRXQJy21ttSK67x/47CYGbKGhqpIawlKfoiCtja1qsbjy8nn1a3hZSEy5ydO3WNk2CO4iEH8dDwVtnM0el8wwbmTe3xStO9w61ndRrGD4pYTG/e6qRl9RFp6s=
+Received: from BN6PR02CA0040.namprd02.prod.outlook.com (2603:10b6:404:5f::26)
+ by CY4PR02MB2278.namprd02.prod.outlook.com (2603:10b6:903:15::9) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.25; Fri, 21 Feb
- 2020 07:46:48 +0000
-Received: from CY1NAM02FT044.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e45::201) by BL0PR02CA0051.outlook.office365.com
- (2603:10b6:207:3d::28) with Microsoft SMTP Server (version=TLS1_2,
+ 2020 07:46:47 +0000
+Received: from SN1NAM02FT044.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e44::208) by BN6PR02CA0040.outlook.office365.com
+ (2603:10b6:404:5f::26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend
- Transport; Fri, 21 Feb 2020 07:46:47 +0000
+ Transport; Fri, 21 Feb 2020 07:46:46 +0000
 Authentication-Results: spf=pass (sender IP is 149.199.60.83)
  smtp.mailfrom=xilinx.com; suse.de; dkim=none (message not signed)
  header.d=none;suse.de; dmarc=bestguesspass action=none
@@ -70,34 +70,34 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT044.mail.protection.outlook.com (10.152.75.137) with Microsoft SMTP
+ SN1NAM02FT044.mail.protection.outlook.com (10.152.72.173) with Microsoft SMTP
  Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2750.18
- via Frontend Transport; Fri, 21 Feb 2020 07:46:47 +0000
+ via Frontend Transport; Fri, 21 Feb 2020 07:46:46 +0000
 Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j531K-0002CK-V9; Thu, 20 Feb 2020 23:46:46 -0800
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
+ id 1j531J-0002CJ-VC; Thu, 20 Feb 2020 23:46:45 -0800
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j531F-0006Cg-S7; Thu, 20 Feb 2020 23:46:41 -0800
-Received: from xsj-pvapsmtp01 (xsj-smtp.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 01L7kfvl017851; 
- Thu, 20 Feb 2020 23:46:41 -0800
+ id 1j531E-0006CZ-SI; Thu, 20 Feb 2020 23:46:40 -0800
+Received: from xsj-pvapsmtp01 (xsj-mail.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 01L7keGm018620; 
+ Thu, 20 Feb 2020 23:46:40 -0800
 Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1j531E-0006CW-QP; Thu, 20 Feb 2020 23:46:41 -0800
+ id 1j531D-0006CP-TG; Thu, 20 Feb 2020 23:46:40 -0800
 Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 801DE13C0FD3; Fri, 21 Feb 2020 13:12:16 +0530 (IST)
+ id 9A58F13C0374; Fri, 21 Feb 2020 13:12:15 +0530 (IST)
 From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 To: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
  Alistair Francis <alistair@alistair23.me>,
  Peter Maydell <peter.maydell@linaro.org>,
  Anthony Liguori <anthony@codemonkey.ws>, afaerber@suse.de
-Subject: [PATCH v2 2/3] cpu/a9mpcore: Set number of GIC priority bits to 5
-Date: Fri, 21 Feb 2020 13:12:06 +0530
-Message-Id: <1582270927-2568-3-git-send-email-sai.pavan.boddu@xilinx.com>
+Subject: [PATCH v2 1/3] arm_gic: Mask the un-supported priority bits
+Date: Fri, 21 Feb 2020 13:12:05 +0530
+Message-Id: <1582270927-2568-2-git-send-email-sai.pavan.boddu@xilinx.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1582270927-2568-1-git-send-email-sai.pavan.boddu@xilinx.com>
 References: <1582270927-2568-1-git-send-email-sai.pavan.boddu@xilinx.com>
@@ -108,32 +108,32 @@ X-EOPAttributedMessage: 0
 X-MS-Office365-Filtering-HT: Tenant
 X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:; CTRY:US; EFV:NLI;
  SFV:NSPM;
- SFS:(10009020)(4636009)(376002)(346002)(39850400004)(396003)(136003)(189003)(199004)(2616005)(4744005)(336012)(186003)(110136005)(81156014)(26005)(4326008)(5660300002)(2906002)(81166006)(42186006)(316002)(8676002)(8936002)(426003)(70206006)(70586007)(6266002)(6666004)(356004)(36756003)(478600001);
- DIR:OUT; SFP:1101; SCL:1; SRVR:CH2PR02MB7045; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
+ SFS:(10009020)(4636009)(376002)(39850400004)(396003)(136003)(346002)(199004)(189003)(8936002)(426003)(70206006)(336012)(70586007)(42186006)(316002)(6266002)(2616005)(110136005)(2906002)(5660300002)(356004)(6666004)(186003)(4326008)(478600001)(26005)(81156014)(8676002)(81166006)(36756003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR02MB2278; H:xsj-pvapsmtpgw01; FPR:;
+ SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; A:1; MX:1; 
 MIME-Version: 1.0
 Content-Type: text/plain
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4fb82471-59c8-478b-c97d-08d7b6a23450
-X-MS-TrafficTypeDiagnostic: CH2PR02MB7045:
-X-Microsoft-Antispam-PRVS: <CH2PR02MB7045193BA792FC8927C46915CA120@CH2PR02MB7045.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 2ebfaa9b-1b2d-4b3f-4c37-08d7b6a233bf
+X-MS-TrafficTypeDiagnostic: CY4PR02MB2278:
+X-Microsoft-Antispam-PRVS: <CY4PR02MB2278B1867DB9BDEB5A507D25CA120@CY4PR02MB2278.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:161;
+X-MS-Oob-TLC-OOBClassifiers: OLM:626;
 X-Forefront-PRVS: 0320B28BE1
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AjkcSiGdRB6vtKdoXfMH5k9nV1su3D6M/JzaqWGe/Z44e8xgkySyohMjqBrss0RFWmzJ298k+9W2PYnzAbzUruJTB++QXbuRB8S/3OcK4ZKOtSvjzhoB6qguISyztYjz/thN8omlV9wzA2uMbFhB4fACYGIZGHI4YeBbcJqd/NqKV3GdDp8zv8aqF2g6V78LQi7qEqUWy4Zp9O20i4QZu5WaWq8pMmRAfNKL+asBxdJ2cYjwDDlWxmv3viz4Gxg5UPnwenhSzuUdXQnsGHeI1y/SLMpqHs81NZKHYXdNjS2ELY+3XJ7mM25wLMkKeybvX317xjbQ16dl8uCILEOdoB5K3BJ0SGRqBg4Bjrqxhh9r1Rwg+jIIzdleBG9gm4OR4gF8328c3DFX0pTyz12Vwz3mQkSVJCciqLHLOOIbp/2vU7M0X7vK1vWjNvfIgZO4
+X-Microsoft-Antispam-Message-Info: 7XRKzyXILk4oN+5NbGc4zRp8AzepNC9swEz6X+3tnuzmBZRUkfvsKerOf7ZJ/8vCaY5pvOFW8rqY9broeOEbSziEe+Z9NdjdGVdZSzDQctytuSDyqCDOg6Gw+3e19DMo/Q8CKLhJKPSiuZX8dRdFOOqFeEC5LXKIF3Zv6VPKj64xst/+0ziidWrMRQncXgNZ4PU3R+NqooaGflvijHhch0ZursioOz3NpM6it2/L/344cS5bOK+SI/7JNjunMOEI8wUcC4aUp843MOWoPurKRLOyliAKhMcpqAQzNk4uM39mx4Y6LnOgqHZM7Y/WMPIuomCZlHDdQmSbB60KWk10mi3w2SEikkmOyI7v/RFVlOpUyt4dy4pZpk7zYW2Sd/swqKXadg5gd5owKFT+9ESm54foc+3uIvFiyrncIwlWc820GL/coCljnJWunNMYXsFT
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 07:46:47.3589 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fb82471-59c8-478b-c97d-08d7b6a23450
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 07:46:46.3875 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ebfaa9b-1b2d-4b3f-4c37-08d7b6a233bf
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB7045
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2278
 X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 40.107.243.47
+X-Received-From: 40.107.223.70
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,36 +150,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All A9 CPUs have a GIC with 5 bits of priority.
+Priority bits implemented in arm-gic can be 8 to 4, un-implemented bits
+are read as zeros(RAZ).
 
 Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/cpu/a9mpcore.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/intc/arm_gic.c                | 26 ++++++++++++++++++++++++--
+ hw/intc/arm_gic_common.c         |  1 +
+ include/hw/intc/arm_gic_common.h |  1 +
+ 3 files changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-index 1f8bc8a..b4f6a7e 100644
---- a/hw/cpu/a9mpcore.c
-+++ b/hw/cpu/a9mpcore.c
-@@ -16,6 +16,8 @@
- #include "hw/qdev-properties.h"
- #include "hw/core/cpu.h"
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 1d7da7b..dec8767 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -641,6 +641,23 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+     return ret;
+ }
  
-+#define A9_GIC_NUM_PRIORITY_BITS    5
++static uint32_t gic_fullprio_mask(GICState *s, int cpu)
++{
++    /*
++     * Return a mask word which clears the unimplemented priority
++     * bits from a priority value for an interrupt. (Not to be
++     * confused with the group priority, whose mask depends on BPR.)
++     */
++    int unimpBits;
 +
- static void a9mp_priv_set_irq(void *opaque, int irq, int level)
++    if (gic_is_vcpu(cpu)) {
++        unimpBits = GIC_VIRT_MAX_GROUP_PRIO_BITS;
++    } else {
++        unimpBits = 8 - s->n_prio_bits;
++    }
++    return ~0U << unimpBits;
++}
++
+ void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+                       MemTxAttrs attrs)
  {
-     A9MPPrivState *s = (A9MPPrivState *)opaque;
-@@ -68,6 +70,8 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
-     gicdev = DEVICE(&s->gic);
-     qdev_prop_set_uint32(gicdev, "num-cpu", s->num_cpu);
-     qdev_prop_set_uint32(gicdev, "num-irq", s->num_irq);
-+    qdev_prop_set_uint32(gicdev, "num-priority-bits",
-+                         A9_GIC_NUM_PRIORITY_BITS);
+@@ -669,7 +686,7 @@ static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
+         }
+         prio = (prio << 1) & 0xff; /* Non-secure view */
+     }
+-    return prio;
++    return prio & gic_fullprio_mask(s, cpu);
+ }
  
-     /* Make the GIC's TZ support match the CPUs. We assume that
-      * either all the CPUs have TZ, or none do.
+ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+@@ -684,7 +701,7 @@ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+             return;
+         }
+     }
+-    s->priority_mask[cpu] = pmask;
++    s->priority_mask[cpu] = pmask & gic_fullprio_mask(s, cpu);
+ }
+ 
+ static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
+@@ -2055,6 +2072,11 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    if (s->n_prio_bits > 8) {
++        error_setg(errp, "num-priority-bits cannot be greater than 8");
++        return;
++    }
++
+     /* This creates distributor, main CPU interface (s->cpuiomem[0]) and if
+      * enabled, virtualization extensions related interfaces (main virtual
+      * interface (s->vifaceiomem[0]) and virtual CPU interface).
+diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+index e6c4fe7..7b44d56 100644
+--- a/hw/intc/arm_gic_common.c
++++ b/hw/intc/arm_gic_common.c
+@@ -357,6 +357,7 @@ static Property arm_gic_common_properties[] = {
+     DEFINE_PROP_BOOL("has-security-extensions", GICState, security_extn, 0),
+     /* True if the GIC should implement the virtualization extensions */
+     DEFINE_PROP_BOOL("has-virtualization-extensions", GICState, virt_extn, 0),
++    DEFINE_PROP_UINT32("num-priority-bits", GICState, n_prio_bits, 8),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_common.h
+index b5585fe..6e0d6b8 100644
+--- a/include/hw/intc/arm_gic_common.h
++++ b/include/hw/intc/arm_gic_common.h
+@@ -96,6 +96,7 @@ typedef struct GICState {
+     uint16_t priority_mask[GIC_NCPU_VCPU];
+     uint16_t running_priority[GIC_NCPU_VCPU];
+     uint16_t current_pending[GIC_NCPU_VCPU];
++    uint32_t n_prio_bits;
+ 
+     /* If we present the GICv2 without security extensions to a guest,
+      * the guest can configure the GICC_CTLR to configure group 1 binary point
 -- 
 2.7.4
 
