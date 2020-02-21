@@ -2,119 +2,59 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E6FC35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C4C35657
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:04:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C88F20722
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 17:52:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="x6jYz6B/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C88F20722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id BECF220722
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:04:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECF220722
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5CTb-0006rh-QY
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 12:52:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42329)
+	id 1j5CfX-0003ly-RY
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 13:04:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1j5CSR-0005o9-NB
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:51:25 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j5Cet-0003FE-CB
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1j5CSQ-00078I-Bm
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:51:23 -0500
-Received: from mail-co1nam11on2087.outbound.protection.outlook.com
- ([40.107.220.87]:39136 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1j5CSQ-00077Z-0w
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 12:51:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VmQKwtPonSygMquxqMNI8NnmFUMb8C9IUdnY72AcZaz/4GgoLF76OkH7FT5reWHm7LQSo0+T4vEQTVNRw8wrj9GSv6AqzdLWquF9zuM2JGnDRTnpQjFxISt5L1Nay/R+K2fDotBF25sfZPDd8G5AK9HoQTcsQbboHBd1nNdj4SVbciEobGnibKLamaTedcXNiKOUfI9wG7x2f9HTf5FWODRJtyvJp0IhzZcwZw8EOkqlh4qXe5ssfKRxJ292qHFlTwJnPJxMI25onKTc01CT4gk2rZVqV+Wkx1P/6R/jbjRx//RzT5QFoNTGGqkojJdzw5dCuNrqrkUSDkv6zVHXvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=igTcMoNPdBPyrU4r1PmHi0i+zgZ04ZVLVvSkhYX4/cw=;
- b=USpryO/POQuohOSZ5ZoYHPvBGOLWJxC01zDopc94CnNyFfj+vYD8gl4r/TaTtMiwMrtwSor4l39brlypOw0mr82FEMbiKRak8k2r0V9bgmp+DSiRs1K6xauIjAt2B33gXMYuUo45EhalK2p6sdvAHYdqnTvSU3raQOhSyy20a0PKSqV56AL25+lZmCq1CMVI0B2A0WmMDhziIuQQB7PUbh8hibAnCWt8gxNHTUbcgbbWdkS4MmnxAxgHQ3OqpvnLp6XcCqpujCBtSSKB+THVlzpLQtdR2JQp7Fknxc3Oa2JA2tpepAcMc+not4oLak2K2YIhjV8IQSrSeJ8J+v/J3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=igTcMoNPdBPyrU4r1PmHi0i+zgZ04ZVLVvSkhYX4/cw=;
- b=x6jYz6B/V+zAACT0x0OqT67O/V0GjPqyx8AqIlSvN8kMLAZvRsaxmTZrq259s6PZbv4Ftu+tb6H/HEcV/Y3QnRfVrTHJ4kgCxDWUTbsyqddqGsM0axyn1tTOq2gBsGVk/jXh72XdZ2X7cbRr4oyky71nCK/4EMzii/1Lqzt8i7U=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.23; Fri, 21 Feb
- 2020 17:51:19 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2008:df09:34a9:62fa]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2008:df09:34a9:62fa%7]) with mapi id 15.20.2729.033; Fri, 21 Feb 2020
- 17:51:19 +0000
-Subject: Re: [PATCH v4 04/16] hw/i386: Introduce init_topo_info to initialize
- X86CPUTopoInfo
-To: Igor Mammedov <imammedo@redhat.com>
-References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
- <158161781120.48948.3568234592332597800.stgit@naples-babu.amd.com>
- <20200221180501.72e4ff3c@redhat.com>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <3188d0e7-7f1c-aa03-d3ec-f512d9905158@amd.com>
-Date: Fri, 21 Feb 2020 11:51:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200221180501.72e4ff3c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR12CA0008.namprd12.prod.outlook.com
- (2603:10b6:5:1c0::21) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (envelope-from <balaton@eik.bme.hu>) id 1j5Cer-0006dh-HU
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:14 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:18447)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j5Ceo-0006c4-Tp; Fri, 21 Feb 2020 13:04:13 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 6A1E0747DF8;
+ Fri, 21 Feb 2020 19:04:08 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id D75C7747DF7; Fri, 21 Feb 2020 19:04:07 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id D52DA74637E;
+ Fri, 21 Feb 2020 19:04:07 +0100 (CET)
+Date: Fri, 21 Feb 2020 19:04:07 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-Reply-To: <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2002211807380.69986@zero.eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
+ <alpine.BSF.2.22.395.2002211643480.45267@zero.eik.bme.hu>
+ <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Received: from [10.236.30.87] (165.204.77.1) by
- DM6PR12CA0008.namprd12.prod.outlook.com (2603:10b6:5:1c0::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.18 via Frontend Transport; Fri, 21 Feb 2020 17:51:17 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7744dabe-4635-4e75-ef9e-08d7b6f6a7d2
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2560:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2560EAFD702A8C029EB57E8595120@SN1PR12MB2560.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
-X-Forefront-PRVS: 0320B28BE1
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(189003)(199004)(36756003)(4326008)(44832011)(16526019)(86362001)(31696002)(478600001)(5660300002)(31686004)(2616005)(6916009)(16576012)(81156014)(956004)(6486002)(52116002)(53546011)(8936002)(8676002)(186003)(66556008)(316002)(81166006)(2906002)(26005)(66476007)(66946007);
- DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2560;
- H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 68po04jmVSObHiZXWfLA5OVY8wuVBbI/7S1hL4SYmEVnCk0Fz8NalGJ7PKqPrfsauCaP/HQ5Lm3K5+uSS1bTGoRyBKIEVN8BIx42D19JN/nnbkBVVAv1rxMRbc02fnq09dCijHp1cjJiURhIhlm6YrAVnY8oKmo+MMeU3zRYfNuWhdYD83PTxoc/r7skHcrqKNKq23ZyFR9daIPZIOUmPmJppJb9GP1qoeh68yPtk25ZT2H31GqfSnL383twb5+3blTOg74HmRFy0ka5zsuqqGdkxKcF6ZpAf+LE+9tuDG2JDqy+dIeFiUG/WVoDknkM8/ubXmfeImjzLXq0VLZDEdLQgQkGIkyAyxiozraKBH6EtYEDrjNk79Eii4tkdsV4CTNtzqMGhuxhxcYxG8rTjRLO0pM0sGDhkn6t6rF/tBhhjH3+B4Kw1pcSAobhpXhF
-X-MS-Exchange-AntiSpam-MessageData: P3t2dhETppWn9ETKqIx20luWUdsWAAwpuCHOermnNt4AfIjSki2LSHYIa/n7MZDvlKZZ4y/MK07Oke/xkyiMG7gdq79FST1ed1v24ULyBoe9iPbidyB7cnJKJsSdQKPv+VDXFYaRi8rp1KRjvoqdqQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7744dabe-4635-4e75-ef9e-08d7b6f6a7d2
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 17:51:19.1142 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z/l+fRNW7hF3iPP/2P8vPf+u3EMm+H3Vb0JiYC5x94sUNCEBX0hCTTo9P091u22b
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2560
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.220.87
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,169 +66,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ John Arbuckle <programmingkidx@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2/21/20 11:05 AM, Igor Mammedov wrote:
-> On Thu, 13 Feb 2020 12:16:51 -0600
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
->> Initialize all the parameters in one function init_topo_info.
-> 
-> is it possible to squash it in 2/16
-> 
-Sure. We can do that.
-> 
+On Fri, 21 Feb 2020, Peter Maydell wrote:
+> On Fri, 21 Feb 2020 at 16:05, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> On Thu, 20 Feb 2020, Richard Henderson wrote:
+>>> On 2/18/20 9:10 AM, BALATON Zoltan wrote:
+>>>> +    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, true),
+>>>
+>>> I would also prefer a different name here -- perhaps x-no-fp-fi.
 >>
->> Move the data structure X86CPUTopoIDs and X86CPUTopoInfo into
->> x86.h.
-> A reason why it's moved should be here.
+>> What's wrong with hardfloat? That's how the code refers to this so if
+>> anyone searches what it does would turn up some meaningful results.
+>
+> This prompted me to check what you're using the property for.
+> The cover letter says:
+>> This patch implements a simple way to keep the inexact flag set for
+>> hardfloat while still allowing to revert to softfloat for workloads
+>> that need more accurate albeit slower emulation. (Set hardfloat
+>> property of CPU, i.e. -cpu name,hardfloat=false for that.)
+>
+> I think that is the wrong approach. Enabling use of the host
+> FPU should not affect the accuracy of the emulation, which
+> should remain bitwise-correct. We should only be using the
+> host FPU to the extent that we can do that without discarding
+> accuracy. As far as I'm aware that's how the hardfloat support
+> for other guest CPUs that use it works.
 
-Apicid functions will be part of X86MachineState data structure(patches
-introduced later).These functions will use X86CPUTopoIDs and
-X86CPUTopoInfo definition. Will add these details. Thanks
+I don't know of a better approach. Please see section 4.2.2 Floating-Point 
+Status and Control Register on page 124 in this document:
 
-> 
->>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
->> ---
->>  hw/i386/pc.c               |    4 +---
->>  hw/i386/x86.c              |   14 +++-----------
->>  include/hw/i386/topology.h |   26 ++++++++++----------------
->>  include/hw/i386/x86.h      |   17 +++++++++++++++++
->>  4 files changed, 31 insertions(+), 30 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 2adf7f6afa..9803413dd9 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1749,9 +1749,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
->>          return;
->>      }
->>  
->> -    topo_info.dies_per_pkg = x86ms->smp_dies;
->> -    topo_info.cores_per_die = smp_cores;
->> -    topo_info.threads_per_core = smp_threads;
->> +    init_topo_info(&topo_info, x86ms);
->>  
->>      env->nr_dies = x86ms->smp_dies;
->>  
->> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
->> index f18cab8e5c..083effb2f5 100644
->> --- a/hw/i386/x86.c
->> +++ b/hw/i386/x86.c
->> @@ -63,15 +63,12 @@ static size_t pvh_start_addr;
->>  uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
->>                                      unsigned int cpu_index)
->>  {
->> -    MachineState *ms = MACHINE(x86ms);
->>      X86MachineClass *x86mc = X86_MACHINE_GET_CLASS(x86ms);
->>      X86CPUTopoInfo topo_info;
->>      uint32_t correct_id;
->>      static bool warned;
->>  
->> -    topo_info.dies_per_pkg = x86ms->smp_dies;
->> -    topo_info.cores_per_die = ms->smp.cores;
->> -    topo_info.threads_per_core = ms->smp.threads;
->> +    init_topo_info(&topo_info, x86ms);
->>  
->>      correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
->>      if (x86mc->compat_apic_id_mode) {
->> @@ -146,10 +143,7 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
->>     X86MachineState *x86ms = X86_MACHINE(ms);
->>     X86CPUTopoInfo topo_info;
->>  
->> -   topo_info.dies_per_pkg = x86ms->smp_dies;
->> -   topo_info.cores_per_die = ms->smp.cores;
->> -   topo_info.threads_per_core = ms->smp.threads;
->> -
->> +   init_topo_info(&topo_info, x86ms);
->>  
->>     assert(idx < ms->possible_cpus->len);
->>     x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
->> @@ -177,9 +171,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
->>                                    sizeof(CPUArchId) * max_cpus);
->>      ms->possible_cpus->len = max_cpus;
->>  
->> -    topo_info.dies_per_pkg = x86ms->smp_dies;
->> -    topo_info.cores_per_die = ms->smp.cores;
->> -    topo_info.threads_per_core = ms->smp.threads;
->> +    init_topo_info(&topo_info, x86ms);
->>  
->>      for (i = 0; i < ms->possible_cpus->len; i++) {
->>          X86CPUTopoIDs topo_ids;
->> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
->> index ba52d49079..ef0ab0b6a3 100644
->> --- a/include/hw/i386/topology.h
->> +++ b/include/hw/i386/topology.h
->> @@ -40,23 +40,17 @@
->>  
->>  
->>  #include "qemu/bitops.h"
->> +#include "hw/i386/x86.h"
->>  
->> -/* APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
->> - */
->> -typedef uint32_t apic_id_t;
->> -
->> -typedef struct X86CPUTopoIDs {
->> -    unsigned pkg_id;
->> -    unsigned die_id;
->> -    unsigned core_id;
->> -    unsigned smt_id;
->> -} X86CPUTopoIDs;
->> -
->> -typedef struct X86CPUTopoInfo {
->> -    unsigned dies_per_pkg;
->> -    unsigned cores_per_die;
->> -    unsigned threads_per_core;
->> -} X86CPUTopoInfo;
->> +static inline void init_topo_info(X86CPUTopoInfo *topo_info,
->> +                                  const X86MachineState *x86ms)
->> +{
->> +    MachineState *ms = MACHINE(x86ms);
->> +
->> +    topo_info->dies_per_pkg = x86ms->smp_dies;
->> +    topo_info->cores_per_die = ms->smp.cores;
->> +    topo_info->threads_per_core = ms->smp.threads;
->> +}
->>  
->>  /* Return the bit width needed for 'count' IDs
->>   */
->> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
->> index 4b84917885..ad62b01cf2 100644
->> --- a/include/hw/i386/x86.h
->> +++ b/include/hw/i386/x86.h
->> @@ -36,6 +36,23 @@ typedef struct {
->>      bool compat_apic_id_mode;
->>  } X86MachineClass;
->>  
->> +/* APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
->> + */
->> +typedef uint32_t apic_id_t;
->> +
->> +typedef struct X86CPUTopoIDs {
->> +    unsigned pkg_id;
->> +    unsigned die_id;
->> +    unsigned core_id;
->> +    unsigned smt_id;
->> +} X86CPUTopoIDs;
->> +
->> +typedef struct X86CPUTopoInfo {
->> +    unsigned dies_per_pkg;
->> +    unsigned cores_per_die;
->> +    unsigned threads_per_core;
->> +} X86CPUTopoInfo;
->> +
->>  typedef struct {
->>      /*< private >*/
->>      MachineState parent;
->>
-> 
+https://openpowerfoundation.org/?resource_lib=power-isa-version-3-0
+
+especially the definition of the FR and FI bits and tell me how can we 
+emulate these accurately and use host FPU. Not using the FPU even when 
+these bits are not needed (which seems to be the case for all workloads 
+we've tested so far) seriously limits the emulation speed so spending time 
+to emulate obscure and unused part of an architecture when not actually 
+needed just to keep emulation accurate but unusably slow does not seem to 
+be the right approach. In an ideal world of course this should be both 
+fast and accurate but we don't seem to have anyone who could achieve that 
+in past two years so maybe we could give up some accuracy now to get 
+usable speed and worry about emulating obscure features when we come 
+across some workload that actually needs it (but we have the option to 
+revert to accurate but slow emulation for that until a better way can be 
+devised that's both fast and accurate). Insisting on accuracy without any 
+solution to current state just hinders making any progress with this.
+
+Other PowerPC emulators also seem to not bother or have similar 
+optimisation. I've quickly checked three that I know about:
+
+https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppcdrc.cpp#L1893
+https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppcdrc.cpp#L3503
+there's also something here but no mention of FI bit I could notice:
+https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppccom.cpp#L2023
+
+https://github.com/xenia-project/xenia/blob/master/src/xenia/cpu/ppc/ppc_hir_builder.cc#L428
+
+https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/PowerPC/Jit64/Jit_FloatingPoint.cpp
+
+But I'm not sure I understand all of the above so hope this makes more 
+sense to someone and can advise.
+
+Regards,
+BALATON Zoltan
 
