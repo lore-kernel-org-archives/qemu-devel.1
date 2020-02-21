@@ -2,86 +2,127 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URG_BIZ,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61360C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DA0C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25D46206EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7957206EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:20:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OxDuygZI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25D46206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jj5NShTK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7957206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5A4n-0008FC-8G
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:18:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33283)
+	id 1j5A6h-0001Aj-KX
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:20:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33536)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1j5A3x-0007M2-Tk
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:17:59 -0500
+ (envelope-from <david@redhat.com>) id 1j5A4w-00005z-HW
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:19:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1j5A3w-0002F7-4f
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:17:57 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33427)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1j5A3v-0002Ec-R7
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:17:56 -0500
-Received: by mail-wm1-x344.google.com with SMTP id m10so5404352wmc.0
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 07:17:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=WDehYQnO9cBRJejNVybQcQivMdxlGD5Ay4hdrdrMZ9o=;
- b=OxDuygZITukKKpFdcZqmlA7/aRdvVn2mxkWRglkpkLRMAavIzpngUgU/2lDTeMKIyj
- cAxNfRC/+nVexLg2Ir/ZKLWjEUVihRgjeCbgCLowpv669rT8F6rhf3KnNsg/jNv2Vi+H
- iun8b23d8em0lXnGNd8BnpSBIdr/CpXuY0UQ6YvcGpI4UeFtSuXuGVm+B/NHtEwCMHe7
- 1dJ9xh+x9ZjIx9bKf7Gvh9DimuyHpS9R9p8ddIlKDRmJJNkeG1SLPJ8zhAHE+v3jLHXo
- 8mo0DI45X1pJJUhmyYRcJZYGSSREF/KLJmdh+0+HdTr2OqWIPnxjG+eI2d3w+gcEJFOV
- J3tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=WDehYQnO9cBRJejNVybQcQivMdxlGD5Ay4hdrdrMZ9o=;
- b=uK+iWYKdbHshDiBdqpcM9QUdEdjTTU6WXRLmFSrr2Riwt2ZgrxJwhwCrsgOWxQH2qB
- P1dDsRyzcmcS4n8TPLhICMB2zCDuiG22ktlrexzk5d6+aHnT6osCCoRoA2oqsMgY+Dvb
- x3qxBouWSZ4/QUCN64XIEIMLtaJacc3jVDpGtcQ+mSqevMGASeRlO8CWtODuPMU2EXrF
- glqKS5L8M3bw1yAteCYB8lIFcaK4lZLSxZ37owjEAZq4ysyuuDkO5HLg+ch9aem7VJDC
- tZ4N6JDN0fNmbPAyxG8fKmy2U4KxR3pBP+PoDiwNHZ682BA6R6WxIZW0urJOQVW5Inr4
- BogQ==
-X-Gm-Message-State: APjAAAXt78bq2llEhUO4UZW5YzfCeRYochJR2J6Ju+ldl7OTeEIq0ABF
- 9YYQ4aGOIwP3HNq2En3IWFQ=
-X-Google-Smtp-Source: APXvYqw7NS/FxbgRUF2rSuuSang3OEz5pRLABqruJbZ6f8X7fjF8X8DqR5U3Bveq2/7Y4pqIw8c9qg==
-X-Received: by 2002:a1c:a752:: with SMTP id q79mr4253061wme.64.1582298273852; 
- Fri, 21 Feb 2020 07:17:53 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id e17sm4783713wrn.62.2020.02.21.07.17.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 07:17:53 -0800 (PST)
-Date: Fri, 21 Feb 2020 15:17:51 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v10 00/22] Add virtual device fuzzing support
-Message-ID: <20200221151751.GR1484511@stefanha-x1.localdomain>
-References: <20200220041118.23264-1-alxndr@bu.edu>
+ (envelope-from <david@redhat.com>) id 1j5A4u-0002ds-Of
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:18:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31059
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j5A4u-0002dd-Jg
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:18:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582298336;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=euWCcxq4Lt9fJjOrOBeLtq3LMd1RDFxo8hdp485Spgk=;
+ b=Jj5NShTKkPchvskUXiKXUPV0zHeiEPkTrmztbnBdBtgJLIr3JXdCI8b+LHe21hrBnehOSA
+ jXaN4rTobwr0fxFruaeH96dtNv3EYUIqtq3qiOe9U5znSaE5iBmOxXT7ktaNRaQGo7PfWH
+ 9WfWCSMFFDDm18pgq3/u4yoKB5kbQXE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-YKNA1EYyMTuUCuxEvBeJ7g-1; Fri, 21 Feb 2020 10:18:54 -0500
+X-MC-Unique: YKNA1EYyMTuUCuxEvBeJ7g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F32B800D4E;
+ Fri, 21 Feb 2020 15:18:53 +0000 (UTC)
+Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A1BAE60499;
+ Fri, 21 Feb 2020 15:18:45 +0000 (UTC)
+Subject: Re: [PATCH v1 05/13] migrate/ram: Handle RAM block resizes during
+ precopy
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20200219161725.115218-1-david@redhat.com>
+ <20200219161725.115218-6-david@redhat.com> <20200221151447.GF2931@work-vm>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <d6552c8b-fc3e-18be-216c-2c66591faa0a@redhat.com>
+Date: Fri, 21 Feb 2020 16:18:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="CPn8Wy5ME997YUMW"
-Content-Disposition: inline
-In-Reply-To: <20200220041118.23264-1-alxndr@bu.edu>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20200221151447.GF2931@work-vm>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,193 +134,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, bsd@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, darren.kenny@oracle.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 21.02.20 16:14, Dr. David Alan Gilbert wrote:
+> * David Hildenbrand (david@redhat.com) wrote:
+>> Resizing while migrating is dangerous and does not work as expected.
+>> The whole migration code works on the usable_length of ram blocks and do=
+es
+>> not expect this to change at random points in time.
+>>
+>> In the case of precopy, the ram block size must not change on the source=
+,
+>> after syncing the RAM block list in ram_save_setup(), so as long as the
+>> guest is still running on the source.
+>>
+>> Resizing can be trigger *after* (but not during) a reset in
+>> ACPI code by the guest
+>> - hw/arm/virt-acpi-build.c:acpi_ram_update()
+>> - hw/i386/acpi-build.c:acpi_ram_update()
+>>
+>> Use the ram block notifier to get notified about resizes. Let's simply
+>> cancel migration and indicate the reason. We'll continue running on the
+>> source. No harm done.
+>>
+>> Update the documentation. Postcopy will be handled separately.
+>>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Juan Quintela <quintela@redhat.com>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Richard Henderson <richard.henderson@linaro.org>
+>> Cc: Shannon Zhao <shannon.zhao@linaro.org>
+>> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Peter Xu <peterx@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  exec.c                |  5 +++--
+>>  include/exec/memory.h | 10 ++++++----
+>>  migration/migration.c |  9 +++++++--
+>>  migration/migration.h |  1 +
+>>  migration/ram.c       | 41 +++++++++++++++++++++++++++++++++++++++++
+>>  5 files changed, 58 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index b75250e773..8b015821d6 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -2120,8 +2120,9 @@ static int memory_try_enable_merging(void *addr, s=
+ize_t len)
+>>      return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
+>>  }
+>> =20
+>> -/* Only legal before guest might have detected the memory size: e.g. on
+>> - * incoming migration, or right after reset.
+>> +/*
+>> + * Resizing RAM while migrating can result in the migration being cance=
+led.
+>> + * Care has to be taken if the guest might have already detected the me=
+mory.
+>>   *
+>>   * As memory core doesn't know how is memory accessed, it is up to
+>>   * resize callback to update device state and/or add assertions to dete=
+ct
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index e85b7de99a..de111347e8 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -113,7 +113,7 @@ typedef struct IOMMUNotifier IOMMUNotifier;
+>>  #define RAM_SHARED     (1 << 1)
+>> =20
+>>  /* Only a portion of RAM (used_length) is actually used, and migrated.
+>> - * This used_length size can change across reboots.
+>> + * Resizing RAM while migrating can result in the migration being cance=
+led.
+>>   */
+>>  #define RAM_RESIZEABLE (1 << 2)
+>> =20
+>> @@ -843,7 +843,9 @@ void memory_region_init_ram_shared_nomigrate(MemoryR=
+egion *mr,
+>>   *                                     RAM.  Accesses into the region w=
+ill
+>>   *                                     modify memory directly.  Only an=
+ initial
+>>   *                                     portion of this RAM is actually =
+used.
+>> - *                                     The used size can change across =
+reboots.
+>> + *                                     Changing the size while migratin=
+g
+>> + *                                     can result in the migration bein=
+g
+>> + *                                     canceled.
+>>   *
+>>   * @mr: the #MemoryRegion to be initialized.
+>>   * @owner: the object that tracks the region's reference count
+>> @@ -1464,8 +1466,8 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
+>> =20
+>>  /* memory_region_ram_resize: Resize a RAM region.
+>>   *
+>> - * Only legal before guest might have detected the memory size: e.g. on
+>> - * incoming migration, or right after reset.
+>> + * Resizing RAM while migrating can result in the migration being cance=
+led.
+>> + * Care has to be taken if the guest might have already detected the me=
+mory.
+>>   *
+>>   * @mr: a memory region created with @memory_region_init_resizeable_ram=
+.
+>>   * @newsize: the new size the region
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 8fb68795dc..ac9751dbe5 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -175,13 +175,18 @@ void migration_object_init(void)
+>>      }
+>>  }
+>> =20
+>> +void migration_cancel(void)
+>> +{
+>> +    migrate_fd_cancel(current_migration);
+>> +}
+>> +
+>>  void migration_shutdown(void)
+>>  {
+>>      /*
+>>       * Cancel the current migration - that will (eventually)
+>>       * stop the migration using this structure
+>>       */
+>> -    migrate_fd_cancel(current_migration);
+>> +    migration_cancel();
+>>      object_unref(OBJECT(current_migration));
+>>  }
+>> =20
+>> @@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, bo=
+ol blk,
+>> =20
+>>  void qmp_migrate_cancel(Error **errp)
+>>  {
+>> -    migrate_fd_cancel(migrate_get_current());
+>> +    migration_cancel();
+>>  }
+>> =20
+>>  void qmp_migrate_continue(MigrationStatus state, Error **errp)
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 8473ddfc88..79fd74afa5 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func,=
+ void *opaque);
+>>  void migration_make_urgent_request(void);
+>>  void migration_consume_urgent_request(void);
+>>  bool migration_rate_limit(void);
+>> +void migration_cancel(void);
+>> =20
+>>  #endif
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index ed23ed1c7c..57f32011a3 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -52,6 +52,7 @@
+>>  #include "migration/colo.h"
+>>  #include "block.h"
+>>  #include "sysemu/sysemu.h"
+>> +#include "sysemu/runstate.h"
+>>  #include "savevm.h"
+>>  #include "qemu/iov.h"
+>>  #include "multifd.h"
+>> @@ -3710,8 +3711,48 @@ static SaveVMHandlers savevm_ram_handlers =3D {
+>>      .resume_prepare =3D ram_resume_prepare,
+>>  };
+>> =20
+>> +static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
+>> +                                      size_t old_size, size_t new_size)
+>> +{
+>> +    ram_addr_t offset;
+>> +    Error *err =3D NULL;
+>> +    RAMBlock *rb =3D qemu_ram_block_from_host(host, false, &offset);
+>> +
+>> +    if (ramblock_is_ignored(rb)) {
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * Some resizes are triggered on the migration target by precopy co=
+de,
+>> +     * when synchronizing RAM block sizes. In these cases, the VM is no=
+t
+>> +     * running and migration is not idle. We have to ignore these resiz=
+es,
+>> +     * as we only care about resizes during precopy on the migration so=
+urce.
+>> +     * This handler is always registered, so ignore when migration is i=
+dle.
+>> +     */
+>> +    if (migration_is_idle() || !runstate_is_running() ||
+>> +        postcopy_is_running()) {
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * Precopy code cannot deal with the size of ram blocks changing at
+>> +     * random points in time. We're still running on the source, abort
+>> +     * the migration and continue running here. Make sure to wait until
+>> +     * migration was canceled.
+>> +     */
+>> +    error_setg(&err, "RAM block '%s' resized during precopy.", rb->idst=
+r);
+>> +    migrate_set_error(migrate_get_current(), err);
+>> +    error_free(err);
+>> +    migration_cancel();
+>> +}
+>> +
+>> +static RAMBlockNotifier ram_mig_ram_notifier =3D {
+>> +    .ram_block_resized =3D ram_mig_ram_block_resized,
+>> +};
+>> +
+>>  void ram_mig_init(void)
+>>  {
+>>      qemu_mutex_init(&XBZRLE.lock);
+>>      register_savevm_live("ram", 0, 4, &savevm_ram_handlers, &ram_state)=
+;
+>> +    ram_block_notifier_add(&ram_mig_ram_notifier);
+>=20
+> Can we avoid the question of the 'is_idle' checks by doing this
+> registration in save_setup/load_setup and unregistering in
+> save_cleanup/load_cleanup?
 
---CPn8Wy5ME997YUMW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Well, I figured it out now :)
 
-On Wed, Feb 19, 2020 at 11:10:56PM -0500, Alexander Bulekov wrote:
-> Hello,
->=20
-> This series adds a framework for coverage-guided fuzzing of
-> virtual-devices. Fuzzing targets are based on qtest and can make use of
-> libqos. Fuzzing can help discover device bugs, such as
-> assertion-failures, timeouts, and overflows, triggerable from within
-> guests.
->=20
-> V10:
->  * Update MAINTAINERS for vl.c, main.c and tests/qtest/fuzz
->  * Fix changes to checkpatch
->  * Fix typos in virtio-scsi fuzzer
->=20
-> V9:
->  * Fix bug in the virtio-scsi fuzzer. Virtqueues were being kicked only
->    if free_head !=3D 0 (which it never was).
->  * Move vl.c and main.c into a new directory: softmmu/
->  * virtio-net-fuzz: refactor the looop over used descriptor.
->  * Improve comments for i440fx and virtio-scsi fuzzers.
->=20
-> V8:
->  * Small fixes to the virtio-net.
->  * Keep rcu_atfork when not using qtest.
->=20
-> V7:
->  * virtio-net: add virtio-net-check-used which waits for inputs on
->  the tx/ctrl vq by watching the used vring.
->  * virtio-net: add virtio-net-socket which uses the socket backend and can
->  exercise the rx components of virtio-net.
->  * virtio-net: add virtio-net-slirp which uses the user backend and exerc=
-ises
->  slirp. This may lead to real traffic emitted by qemu so it is best to
->  run in an isolated network environment.
->  * build should succeed after each commit
->=20
-> V5/V6:
->  * added virtio-scsi fuzzer
->  * add support for using fork-based fuzzers with multiple libfuzzer
->    workers
->  * misc fixes addressing V4 comments
->  * cleanup in-process handlers/globals in libqtest.c
->  * small fixes to fork-based fuzzing and support for multiple workers
->  * changes to the virtio-net fuzzer to kick after each vq add
->=20
-> V4:
->  * add/transfer license headers to new files
->  * restructure the added QTestClientTransportOps struct
->  * restructure the FuzzTarget struct and fuzzer skeleton
->  * fork-based fuzzer now directly mmaps shm over the coverage bitmaps
->  * fixes to i440 and virtio-net fuzz targets
->  * undo the changes to qtest_memwrite
->  * possible to build /fuzz and /all in the same build-dir
->  * misc fixes to address V3 comments
->=20
-> V3:
->  * rebased onto v4.1.0+
->  * add the fuzzer as a new build-target type in the build-system
->  * add indirection to qtest client/server communication functions
->  * remove ramfile and snapshot-based fuzzing support
->  * add i440fx fuzz-target as a reference for developers.
->  * add linker-script to assist with fork-based fuzzer
->=20
-> V2:
->  * split off changes to qos virtio-net and qtest server to other patches
->  * move vl:main initialization into new func: qemu_init
->  * moved useful functions from qos-test.c to a separate object
->  * use struct of function pointers for add_fuzz_target(), instead of
->    arguments
->  * move ramfile to migration/qemu-file
->  * rewrite fork-based fuzzer pending patch to libfuzzer
->  * pass check-patch
->=20
-> Alexander Bulekov (22):
->   softmmu: move vl.c to softmmu/
->   softmmu: split off vl.c:main() into main.c
->   module: check module wasn't already initialized
->   fuzz: add FUZZ_TARGET module type
->   qtest: add qtest_server_send abstraction
->   libqtest: add a layer of abstraction to send/recv
->   libqtest: make bufwrite rely on the TransportOps
->   qtest: add in-process incoming command handler
->   libqos: rename i2c_send and i2c_recv
->   libqos: split qos-test and libqos makefile vars
->   libqos: move useful qos-test funcs to qos_external
->   fuzz: add fuzzer skeleton
->   exec: keep ram block across fork when using qtest
->   main: keep rcu_atfork callback enabled for qtest
->   fuzz: support for fork-based fuzzing.
->   fuzz: add support for qos-assisted fuzz targets
->   fuzz: add target/fuzz makefile rules
->   fuzz: add configure flag --enable-fuzzing
->   fuzz: add i440fx fuzz targets
->   fuzz: add virtio-net fuzz target
->   fuzz: add virtio-scsi fuzz target
->   fuzz: add documentation to docs/devel/
->=20
->  MAINTAINERS                         |  11 +-
->  Makefile                            |  15 +-
->  Makefile.objs                       |   2 -
->  Makefile.target                     |  19 ++-
->  configure                           |  39 +++++
->  docs/devel/fuzzing.txt              | 116 ++++++++++++++
->  exec.c                              |  12 +-
->  include/qemu/module.h               |   4 +-
->  include/sysemu/qtest.h              |   4 +
->  include/sysemu/sysemu.h             |   4 +
->  qtest.c                             |  31 +++-
->  scripts/checkpatch.pl               |   2 +-
->  scripts/get_maintainer.pl           |   3 +-
->  softmmu/Makefile.objs               |   3 +
->  softmmu/main.c                      |  53 +++++++
->  vl.c =3D> softmmu/vl.c                |  48 +++---
->  tests/qtest/Makefile.include        |  72 ++++-----
->  tests/qtest/fuzz/Makefile.include   |  18 +++
->  tests/qtest/fuzz/fork_fuzz.c        |  55 +++++++
->  tests/qtest/fuzz/fork_fuzz.h        |  23 +++
->  tests/qtest/fuzz/fork_fuzz.ld       |  37 +++++
->  tests/qtest/fuzz/fuzz.c             | 179 +++++++++++++++++++++
->  tests/qtest/fuzz/fuzz.h             |  95 +++++++++++
->  tests/qtest/fuzz/i440fx_fuzz.c      | 193 +++++++++++++++++++++++
->  tests/qtest/fuzz/qos_fuzz.c         | 234 ++++++++++++++++++++++++++++
->  tests/qtest/fuzz/qos_fuzz.h         |  33 ++++
->  tests/qtest/fuzz/virtio_net_fuzz.c  | 198 +++++++++++++++++++++++
->  tests/qtest/fuzz/virtio_scsi_fuzz.c | 213 +++++++++++++++++++++++++
->  tests/qtest/libqos/i2c.c            |  10 +-
->  tests/qtest/libqos/i2c.h            |   4 +-
->  tests/qtest/libqos/qos_external.c   | 168 ++++++++++++++++++++
->  tests/qtest/libqos/qos_external.h   |  28 ++++
->  tests/qtest/libqtest.c              | 119 ++++++++++++--
->  tests/qtest/libqtest.h              |   4 +
->  tests/qtest/pca9552-test.c          |  10 +-
->  tests/qtest/qos-test.c              | 132 +---------------
->  util/module.c                       |   7 +
->  37 files changed, 1969 insertions(+), 229 deletions(-)
->  create mode 100644 docs/devel/fuzzing.txt
->  create mode 100644 softmmu/Makefile.objs
->  create mode 100644 softmmu/main.c
->  rename vl.c =3D> softmmu/vl.c (99%)
->  create mode 100644 tests/qtest/fuzz/Makefile.include
->  create mode 100644 tests/qtest/fuzz/fork_fuzz.c
->  create mode 100644 tests/qtest/fuzz/fork_fuzz.h
->  create mode 100644 tests/qtest/fuzz/fork_fuzz.ld
->  create mode 100644 tests/qtest/fuzz/fuzz.c
->  create mode 100644 tests/qtest/fuzz/fuzz.h
->  create mode 100644 tests/qtest/fuzz/i440fx_fuzz.c
->  create mode 100644 tests/qtest/fuzz/qos_fuzz.c
->  create mode 100644 tests/qtest/fuzz/qos_fuzz.h
->  create mode 100644 tests/qtest/fuzz/virtio_net_fuzz.c
->  create mode 100644 tests/qtest/fuzz/virtio_scsi_fuzz.c
->  create mode 100644 tests/qtest/libqos/qos_external.c
->  create mode 100644 tests/qtest/libqos/qos_external.h
+migration_is_idle() is enough to handle it in this patch.
 
-Thomas Huth (tests/ maintainer) is away on leave and the device fuzzer
-covers virtio-blk/scsi, so I will merge this.
+>=20
+> That means if we land in the handler we know we're in either an incoming
+> or outgoing migration and then you just have to check which?
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Can save/load race with other QEMU code that might register/unregister
+notifiers? I want to avoid having to introduce locking just for that.
 
-Stefan
+--=20
+Thanks,
 
---CPn8Wy5ME997YUMW
-Content-Type: application/pgp-signature; name="signature.asc"
+David / dhildenb
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5P9J8ACgkQnKSrs4Gr
-c8hCWwf/UKzyrqhJdcfVP+tP4BQdIDZ8u/FxjswWfDLPzXjFLj1+tM3vnkhLTVAV
-uSi2w/5vdXawuRKCVeJRf0u5rZGGFbKOMcht3GK+8ke4RvRQU3nBb8Lcty8Y1Vxb
-dzy6BLrlPHhiIWW0HIHqakKaaQ7J9Fu0AVkAJfQ9TAGuMqnnl5TfhVrXW7Q+RJQY
-/UOnsAeQgsuRWtM9yxPUIThZpb58qgRFSOluTPisBmBV9wbFFdCyuY+5hihidXoh
-3eYYW5IHMUa1N6K7z5w7p4i/cTNnJHHCenQpKFg6tnJBU96cGXDHpNh0D3dGTPCg
-yvFTnD55KmpdXfQYIoVKiHyolxKKxw==
-=+P1d
------END PGP SIGNATURE-----
-
---CPn8Wy5ME997YUMW--
 
