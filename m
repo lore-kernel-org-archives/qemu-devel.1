@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DC2C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0247C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF51724650
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB3D824650
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:44:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSbYiH+Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF51724650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVn+ezH3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3D824650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5BPB-0000LS-St
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:43:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52560)
+	id 1j5BPQ-00011Y-PI
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:44:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j5BO9-0007Uq-VC
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:42:55 -0500
+ (envelope-from <david@redhat.com>) id 1j5BON-0007pE-4E
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j5BO7-0006Qc-62
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:42:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45561
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j5BOL-0006Zp-Tz
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:43:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50043
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j5BO7-0006QO-29
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:42:51 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j5BOL-0006ZP-QG
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:43:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582303370;
+ s=mimecast20190719; t=1582303385;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vLcrVEI98G1Z6tzXsu6C7bcrcZGVpS1kPeiuLeYj9GE=;
- b=hSbYiH+Q7Ym23dUOmfjMXIES6f6s+A4BhNBXZB5BZOs9p8KtD0NXmcOMJrFQwbDPEBMQTn
- 2RoFgIBbxMcnXreRAeBOHH4o2INQJCLdVqoQgTEdWtzbmeQGagUDO2dJK/ybkerzEGNWWO
- 50NPSDug1tdcNan6av6BuM6mQUa1H/o=
+ bh=u4+w8Dl/8EJ3e5XX4k6et7mBYqdEHtW545t5121MYbE=;
+ b=KVn+ezH3IGRgLlYtBPUBUsArtuwS8EanzSvySjD05LtC+jLJbkJ+P1DjxEhjL+tdXKUb4Z
+ ec8wm21jJSdkJSL187Pxg3uBQq6hYLF9Nw3teFXcWa5Dxwa5IvP7DinAKrQ6hhe4W/+D8C
+ 83lH18FkrxcrXZzEtdGkyYNKHunIgXM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-eAD_12FCPFKV5z0aY9Yh3A-1; Fri, 21 Feb 2020 11:42:49 -0500
-X-MC-Unique: eAD_12FCPFKV5z0aY9Yh3A-1
+ us-mta-367-SeDrM6YWNemd1pfxzj_NAA-1; Fri, 21 Feb 2020 11:43:03 -0500
+X-MC-Unique: SeDrM6YWNemd1pfxzj_NAA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B4A61902EC0;
- Fri, 21 Feb 2020 16:42:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E9E28024EC;
+ Fri, 21 Feb 2020 16:43:02 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-197.ams2.redhat.com [10.36.117.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE3DB90F7B;
- Fri, 21 Feb 2020 16:42:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7CFAD5C105;
+ Fri, 21 Feb 2020 16:42:48 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/13] util: vfio-helpers: Factor out and fix processing of
- existing ram blocks
-Date: Fri, 21 Feb 2020 17:41:52 +0100
-Message-Id: <20200221164204.105570-2-david@redhat.com>
+Subject: [PATCH v2 02/13] stubs/ram-block: Remove stubs that are no longer
+ needed
+Date: Fri, 21 Feb 2020 17:41:53 +0100
+Message-Id: <20200221164204.105570-3-david@redhat.com>
 In-Reply-To: <20200221164204.105570-1-david@redhat.com>
 References: <20200221164204.105570-1-david@redhat.com>
 MIME-Version: 1.0
@@ -75,7 +75,7 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,160 +88,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- David Hildenbrand <david@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor it out into common code when a new notifier is registered, just
-as done with the memory region notifier. This allows us to have the
-logic about how to process existing ram blocks at a central place (which
-will be extended soon).
-
-Just like when adding a new ram block, we have to register the max_length
-for now. We don't have a way to get notified about resizes yet, and some
-memory would not be mapped when growing the ram block.
-
-Note: Currently, ram blocks are only "fake resized". All memory
-(max_length) is accessible.
-
-We can get rid of a bunch of functions in stubs/ram-block.c . Print the
-warning from inside qemu_vfio_ram_block_added().
+Current code no longer needs these stubs to compile. Let's just remove
+them.
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Cc: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- exec.c                    |  5 +++++
- hw/core/numa.c            | 14 ++++++++++++++
- include/exec/cpu-common.h |  1 +
- util/vfio-helpers.c       | 29 ++++++++---------------------
- 4 files changed, 28 insertions(+), 21 deletions(-)
+ stubs/ram-block.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 8e9cc3b47c..dfd43d27c6 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2016,6 +2016,11 @@ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
-     return rb->used_length;
- }
+diff --git a/stubs/ram-block.c b/stubs/ram-block.c
+index 73c0a3ee08..10855b52dd 100644
+--- a/stubs/ram-block.c
++++ b/stubs/ram-block.c
+@@ -2,21 +2,6 @@
+ #include "exec/ramlist.h"
+ #include "exec/cpu-common.h"
 =20
-+ram_addr_t qemu_ram_get_max_length(RAMBlock *rb)
-+{
-+    return rb->max_length;
-+}
-+
- bool qemu_ram_is_shared(RAMBlock *rb)
- {
-     return rb->flags & RAM_SHARED;
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 0d1b4be76a..6599c69e05 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -899,9 +899,23 @@ void query_numa_node_mem(NumaNodeMem node_mem[], Machi=
-neState *ms)
-     }
- }
-=20
-+static int ram_block_notify_add_single(RAMBlock *rb, void *opaque)
-+{
-+    const ram_addr_t max_size =3D qemu_ram_get_max_length(rb);
-+    void *host =3D qemu_ram_get_host_addr(rb);
-+    RAMBlockNotifier *notifier =3D opaque;
-+
-+    if (host) {
-+        notifier->ram_block_added(notifier, host, max_size);
-+    }
-+    return 0;
-+}
-+
- void ram_block_notifier_add(RAMBlockNotifier *n)
- {
-     QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
-+    /* Notify about all existing ram blocks. */
-+    qemu_ram_foreach_block(ram_block_notify_add_single, n);
- }
-=20
- void ram_block_notifier_remove(RAMBlockNotifier *n)
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 81753bbb34..9760ac9068 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -59,6 +59,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
- void *qemu_ram_get_host_addr(RAMBlock *rb);
- ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
- ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
-+ram_addr_t qemu_ram_get_max_length(RAMBlock *rb);
- bool qemu_ram_is_shared(RAMBlock *rb);
- bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
- void qemu_ram_set_uf_zeroable(RAMBlock *rb);
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index ddd9a96e76..260570ae19 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -376,8 +376,14 @@ static void qemu_vfio_ram_block_added(RAMBlockNotifier=
- *n,
-                                       void *host, size_t size)
- {
-     QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
-+    int ret;
-+
-     trace_qemu_vfio_ram_block_added(s, host, size);
--    qemu_vfio_dma_map(s, host, size, false, NULL);
-+    ret =3D qemu_vfio_dma_map(s, host, size, false, NULL);
-+    if (ret) {
-+        error_report("qemu_vfio_dma_map(%p, %zu) failed: %s", host, size,
-+                     strerror(-ret));
-+    }
- }
-=20
- static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
-@@ -390,33 +396,14 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotif=
-ier *n,
-     }
- }
-=20
--static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
+-void *qemu_ram_get_host_addr(RAMBlock *rb)
 -{
--    void *host_addr =3D qemu_ram_get_host_addr(rb);
--    ram_addr_t length =3D qemu_ram_get_used_length(rb);
--    int ret;
--    QEMUVFIOState *s =3D opaque;
--
--    if (!host_addr) {
--        return 0;
--    }
--    ret =3D qemu_vfio_dma_map(s, host_addr, length, false, NULL);
--    if (ret) {
--        fprintf(stderr, "qemu_vfio_init_ramblock: failed %p %" PRId64 "\n"=
-,
--                host_addr, (uint64_t)length);
--    }
 -    return 0;
 -}
 -
- static void qemu_vfio_open_common(QEMUVFIOState *s)
+-ram_addr_t qemu_ram_get_offset(RAMBlock *rb)
+-{
+-    return 0;
+-}
+-
+-ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+-{
+-    return 0;
+-}
+-
+ void ram_block_notifier_add(RAMBlockNotifier *n)
  {
-     qemu_mutex_init(&s->lock);
-     s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
-     s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed;
--    ram_block_notifier_add(&s->ram_notifier);
-     s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
-     s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
--    qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
-+    ram_block_notifier_add(&s->ram_notifier);
  }
-=20
- /**
+@@ -24,8 +9,3 @@ void ram_block_notifier_add(RAMBlockNotifier *n)
+ void ram_block_notifier_remove(RAMBlockNotifier *n)
+ {
+ }
+-
+-int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
+-{
+-    return 0;
+-}
 --=20
 2.24.1
 
