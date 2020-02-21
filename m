@@ -2,69 +2,100 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C505C35656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D63C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:36:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F7D5208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:35:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F7D5208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8D66B20578
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:36:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pUD9bgOK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D66B20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5BH2-0004ju-FR
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:35:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50061)
+	id 1j5BHb-0005M6-KB
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:36:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1j5BFo-0003P6-3Q
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:34:17 -0500
+ (envelope-from <david.edmondson@oracle.com>) id 1j5BER-00013g-IS
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:32:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1j5BFm-00016r-Rb
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:34:16 -0500
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:36931)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1j5BFm-00016P-NQ
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:34:14 -0500
-Received: by mail-oi1-f196.google.com with SMTP id q84so2155116oic.4
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:34:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Q0P9tu6IOsuIOQ9cj+JFMIkV9AXW3CYPDjGH2uYPm8M=;
- b=VgkQ5FKw5T6havLsFdbDwyp98hOH1GPW0meFiOsFFtOiHyyzBQyJDVvuUFqQuE+xzc
- rQsMqIRCqWi3co+Ec8GQ+7HAOK41LZOV1wkdmEPjpmGfOaMdHrFI+eo3lgXppu0BDOpo
- Kv+YVQTyKhmHJTRXd66v4vzhDCySSA7LSuJdwiUuulZvA+0kAHWVwgE+7DB3YBXHeJLp
- r5HpTTTllU2JHTu8jlFxSDICne55mKme4t06JzxFYM5jHANl+Gcg8mzP90O99Dwtf8ql
- 78vAqtaXfCZsXxv7rdVBGVEd9Yw16vXlsFEWA3xFB3zfP+uYlqf5ZO7+Q7I8qNobj46J
- Di+Q==
-X-Gm-Message-State: APjAAAXdhGFFIyOq4shFaU4sOwfQVMmb+Uba+xcnkmDeWVKuH8ff3fk8
- r/2fsIp9ge9FipBJdY8bJyIkhLjewZTWaUKx02Y=
-X-Google-Smtp-Source: APXvYqzPNoAH+zVsto1+IiOMGfW8xsdQo0YD/gttJz8Iqi71pUo1KidDfXV90s/3JMzKKHdE/I36dl+GbJbfTmLaY4E=
-X-Received: by 2002:aca:c4d2:: with SMTP id u201mr2773907oif.54.1582302853428; 
- Fri, 21 Feb 2020 08:34:13 -0800 (PST)
+ (envelope-from <david.edmondson@oracle.com>) id 1j5BEQ-0000NJ-Hx
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:32:51 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:35766)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david.edmondson@oracle.com>)
+ id 1j5BEN-0000LA-LS; Fri, 21 Feb 2020 11:32:47 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01LGV5bH024253;
+ Fri, 21 Feb 2020 16:32:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=iBNQeoHxQwvpeGKNBw3AigaYz1rA0uTaMhD0FMSxPgc=;
+ b=pUD9bgOKifQOoVZmcncUcje5RrJYt8BHUT/MCXqc39xboQPh+wrXpx2SQPxBSAl3qMiy
+ VzNgIh020iwyhMoy0on5BUvtYUhT3YPobBhoofSPAJus8MRqSlbIYFEk0RZ/ROHhLwM6
+ JpyX69C1akN/jYNRnrlKSUXwCNuGYr5O9NSNaHRxO/YvxqLDxh2lBD5tE8KJ/mcQAXi8
+ 6HwiV2FGRElDnD/vVsOLgxCraap4IXB0fW7D3fg6SjCutiGIi3Y2zyR01rvjP7fCZI9c
+ Piz/eHixEx2eIfByL1VRqos0NjOgpK6MBAvD6jfZyBXmZjQen6XsZQZllTRJjilcUx0+ aA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2130.oracle.com with ESMTP id 2y8uddhm1n-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Feb 2020 16:32:45 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01LGVsXX124539;
+ Fri, 21 Feb 2020 16:32:44 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3020.oracle.com with ESMTP id 2y8udnskst-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 21 Feb 2020 16:32:44 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01LGWhpL019996;
+ Fri, 21 Feb 2020 16:32:43 GMT
+Received: from disaster-area.hh.sledj.net (/81.187.26.238)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 21 Feb 2020 08:32:42 -0800
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id a95ab626;
+ Fri, 21 Feb 2020 16:32:39 +0000 (UTC)
+From: David Edmondson <david.edmondson@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] block/curl: HTTP header fields allow whitespace around
+ values
+Date: Fri, 21 Feb 2020 16:32:37 +0000
+Message-Id: <20200221163238.60688-2-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200221163238.60688-1-david.edmondson@oracle.com>
+References: <20200221163238.60688-1-david.edmondson@oracle.com>
 MIME-Version: 1.0
-References: <20200218151812.7816-1-geert+renesas@glider.be>
- <20200218151812.7816-5-geert+renesas@glider.be>
- <e2530fff-a17c-ae90-ba92-360b828582da@infradead.org>
-In-Reply-To: <e2530fff-a17c-ae90-ba92-360b828582da@infradead.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 21 Feb 2020 17:34:02 +0100
-Message-ID: <CAMuHMdUFV0nbfrpxY60av2x+UUN62wDiVLbcEG83133aqfFcUQ@mail.gmail.com>
-Subject: Re: [PATCH v5 4/5] docs: gpio: Add GPIO Aggregator documentation
-To: Randy Dunlap <rdunlap@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.196
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9538
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ mlxlogscore=996
+ phishscore=0 suspectscore=1 mlxscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210124
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9538
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ impostorscore=0
+ mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=1
+ priorityscore=1501 bulkscore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002210123
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,97 +107,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
- Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Rob Herring <robh+dt@kernel.org>, Harish Jenny K N <harish_kandiga@mentor.com>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Eugeniu Rosca <erosca@de.adit-jv.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, David Edmondson <david.edmondson@oracle.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Randy,
+RFC 7230 section 3.2 indicates that whitespace is permitted between
+the field name and field value and after the field value.
 
-On Tue, Feb 18, 2020 at 7:30 PM Randy Dunlap <rdunlap@infradead.org> wrote:
-> On 2/18/20 7:18 AM, Geert Uytterhoeven wrote:
-> > Document the GPIO Aggregator, and the two typical use-cases.
-> >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+---
+ block/curl.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-> > --- /dev/null
-> > +++ b/Documentation/admin-guide/gpio/gpio-aggregator.rst
-> > @@ -0,0 +1,102 @@
-> > +.. SPDX-License-Identifier: GPL-2.0-only
-> > +
-> > +GPIO Aggregator
-> > +===============
-> > +
-> > +The GPIO Aggregator allows to aggregate GPIOs, and expose them as a new
->
-> "allows" really wants an object following the verb [although the kernel sources
-> and docs have many cases of it not having an object].  Something like
->
->                        allows {you, one, someone, users, a user} to aggregate
-
-Changing to:
-
-    provides a mechanism to aggregate GPIOs
-
-> > +gpio_chip.  This supports the following use cases.
-> > +
-> > +
-> > +Aggregating GPIOs using Sysfs
-> > +-----------------------------
-> > +
-> > +GPIO controllers are exported to userspace using /dev/gpiochip* character
-> > +devices.  Access control to these devices is provided by standard UNIX file
-> > +system permissions, on an all-or-nothing basis: either a GPIO controller is
-> > +accessible for a user, or it is not.
-> > +
-> > +The GPIO Aggregator allows access control for individual GPIOs, by aggregating
-
-Changing to:
-
-    provides access control for a set of one or more GPIOs
-
-> > +them into a new gpio_chip, which can be assigned to a group or user using
-> > +standard UNIX file ownership and permissions.  Furthermore, this simplifies and
-> > +hardens exporting GPIOs to a virtual machine, as the VM can just grab the full
-> > +GPIO controller, and no longer needs to care about which GPIOs to grab and
-> > +which not, reducing the attack surface.
-
-> > +Generic GPIO Driver
-> > +-------------------
-> > +
-> > +The GPIO Aggregator can also be used as a generic driver for a simple
-> > +GPIO-operated device described in DT, without a dedicated in-kernel driver.
-> > +This is useful in industrial control, and is not unlike e.g. spidev, which
-> > +allows to communicate with an SPI device from userspace.
->
->    allows {choose an object} to communicate
-
-Changing to:
-
-    allows the user to communicate
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/block/curl.c b/block/curl.c
+index f86299378e38..f9ffb7f4e2bf 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -214,11 +214,34 @@ static size_t curl_header_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+ {
+     BDRVCURLState *s = opaque;
+     size_t realsize = size * nmemb;
+-    const char *accept_line = "Accept-Ranges: bytes";
++    const char *header = (char *)ptr;
++    const char *end = header + realsize;
++    const char *accept_ranges = "Accept-Ranges:";
++    const char *bytes = "bytes";
+ 
+-    if (realsize >= strlen(accept_line)
+-        && strncmp((char *)ptr, accept_line, strlen(accept_line)) == 0) {
+-        s->accept_range = true;
++    if (realsize >= strlen(accept_ranges)
++        && strncmp(header, accept_ranges, strlen(accept_ranges)) == 0) {
++
++        char *p = strchr(header, ':') + 1;
++
++        /* Skip whitespace between the header name and value. */
++        while (p < end && *p && g_ascii_isspace(*p)) {
++            p++;
++        }
++
++        if (end - p >= strlen(bytes)
++            && strncmp(p, bytes, strlen(bytes)) == 0) {
++
++            /* Check that there is nothing but whitespace after the value. */
++            p += strlen(bytes);
++            while (p < end && *p && g_ascii_isspace(*p)) {
++                p++;
++            }
++
++            if (p == end || !*p) {
++                s->accept_range = true;
++            }
++        }
+     }
+ 
+     return realsize;
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.24.1
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
