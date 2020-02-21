@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA4B9C35647
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B3FC35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4A932073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F4A12073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:11:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BWdAlDLz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A932073A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e+gDthJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F4A12073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j584y-0003Uu-SK
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:10:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
+	id 1j585i-0004aY-AO
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:11:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56487)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j5824-0006YT-AN
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:53 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5827-0006f3-7u
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j5823-0002VS-4N
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:52 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:41736)
+ (envelope-from <peter.maydell@linaro.org>) id 1j5825-0002Wp-Pz
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:55 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45946)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j5822-0002V6-Uz
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:51 -0500
-Received: by mail-wr1-x434.google.com with SMTP id c9so1984449wrw.8
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:50 -0800 (PST)
+ id 1j5825-0002WM-Ja
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:53 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g3so1977158wrs.12
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=W8sFFOUvnvr4vVzeaXqbU35p4T4/zerZ5D4EmGJn+5w=;
- b=BWdAlDLz/X3g1j02cl3oHU43f5cg1Ao+DLWqsM4s2yntPvCjANJLBO+rAllK++gyR8
- 684NKjwa0CcyXb/rMdREnjHuaEUR6nSDOAsZco7OVSxpq/ZRf5YweNJVYxu78Dus0CsD
- gpe2kVNVgYZMsf1H1ZuaRy8CNcM915APQSXfANWxSr5ZgbihG8WEGB3YBAcojMgTit1U
- z3lGT7bLqYpj7zIXfjUxTgviV4qLH8w6BYoLoiprT1MPZVN/izCWAMyyEmyCs9Zj3k8S
- oZ3wRSTxCCGttVOzyeND5pYiC6PPBXCme5NQLR95qveLUSrP+2Nt92LTTSxfruz/peok
- /KcA==
+ bh=B8FETunjdDzohDWrvxwGEHSQ/75b6YPRtF3e06IhvLQ=;
+ b=e+gDthJf8CtX/fw9I0E6R7UjxY6ekWZg77lR+BHzWHoSXwey9pr9ny69Sbem3hAdcu
+ Vc9bdxNn3BTXIpGqXz+JYbXfqG+3Dbp5nbfaZhwZgSQHBSfOQMOdL6bROwVFsApizhXh
+ 0EF43GkHWtharvEVqXchS/f6W+Nrscal+awsyb40VKO3zjIt/9YwIe9le0ztWyYfPyPk
+ UEM859eLG8+DJsHtJT8pZdWnpepRcmmu9GeeelsjLEwfgl4Bd+Saaf1qKXUK1eAaqx8J
+ UNs+FFPU76LOzXvxm/+g62hM6I/x8lZA0pOwdM9qpcgAqJ3xcDHGw1IRBOi1WLBhWTMI
+ Qt3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=W8sFFOUvnvr4vVzeaXqbU35p4T4/zerZ5D4EmGJn+5w=;
- b=XNr1ITJR+g9UrPofs4lMJCsOBTS4JMrOBN3QFA15fQjf/SrRooZSmxMRpCLLpWZ4+U
- ivAm0IJKmSdYXdM7O8tqeShtZGvY2Gi7TRjchhAxQRpw5osl6sVPnj0N2N+iIEfby2dn
- WgIduF5SYnZPevVPy8P+NHwDQSr9Rb++bWRv87Sz9VQzjBTkQTMDKNK3By2cZcNrlg1F
- XOl9PCHPnCzV3szdYFLzv4CFkkcQ85GpjxaoP8RzpBlDSbzLYzad8tOitxTyrNl9aXzJ
- jOhgy383byQIydKTTF/t1aFkROKXAWPVFgyg8tZo7FBPqLSTB8dfHm5hLMKpH9y5GoGx
- 9X6g==
-X-Gm-Message-State: APjAAAVw6+Yc+DhGP/VGBW4HSns+dxmx94aje0keLBmCn82KPjPmV0ae
- Oun84eH/7olv18A/O3Gq7Zt6VlDUQhik8g==
-X-Google-Smtp-Source: APXvYqw1FZ68IH0p0wPns+bYXFnNAJ/dUqjzA9QszG+bgke39x5GKN13uTykJ8PmhnsJNJy329lJGA==
-X-Received: by 2002:adf:ec08:: with SMTP id x8mr45638132wrn.138.1582290469659; 
- Fri, 21 Feb 2020 05:07:49 -0800 (PST)
+ bh=B8FETunjdDzohDWrvxwGEHSQ/75b6YPRtF3e06IhvLQ=;
+ b=WbqtZ75DQceHsYU7xtBB98/RUro21nKiccmbrDRtAbBZZfTSji2SB+7RP8vqQgnYBi
+ F2TbWzKo265emkPMV9vPY3aGxw7byrtRdZpZq408qIuJfNIrQRnca2uTa0p44OzUEc4M
+ xpa6o6fiGdK8JElKpzdAGazFtvjuxH4bUSRiSgmYwvx4yvQh2uHCKX4YDeCb5rbOwuuB
+ Q/TK9MtPP9BE0pp1nnBx8hmrqcMZjHsOcBu2g+HXdWkgp1XmNKPV9nF7SqJ7DASBDvMo
+ L3vbphko2MFTnFDDW3gEpBvXEFGjXqeq3tFGaO7CmuWWRrWwX5Vip2n6O1BW1u4GYR0s
+ uyvg==
+X-Gm-Message-State: APjAAAVvaY4YRCcgBPsRUEz1molNatpBLx/qybJ4l7s5Qsb76/5T/4wG
+ 2nZS0Z4X1GNxOGfZZuDUJ6NFKXcSYw2tXw==
+X-Google-Smtp-Source: APXvYqxnbIoXnB0IlBm/kWORNwpdz/3c1o7+qEsvXWbdeyiSbuAMmLv+jjt+mhXGl0TLP3PclxDL2g==
+X-Received: by 2002:a5d:6703:: with SMTP id o3mr46556882wru.235.1582290472303; 
+ Fri, 21 Feb 2020 05:07:52 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.48
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.51
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:07:49 -0800 (PST)
+ Fri, 21 Feb 2020 05:07:51 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/52] target/arm: Flush high bits of sve register after
- AdvSIMD EXT
-Date: Fri, 21 Feb 2020 13:06:54 +0000
-Message-Id: <20200221130740.7583-7-peter.maydell@linaro.org>
+Subject: [PULL 08/52] target/arm: Flush high bits of sve register after
+ AdvSIMD ZIP/UZP/TRN
+Date: Fri, 21 Feb 2020 13:06:56 +0000
+Message-Id: <20200221130740.7583-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,9 +102,8 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Writes to AdvSIMD registers flush the bits above 128.
 
-Buglink: https://bugs.launchpad.net/bugs/1863247
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200214194643.23317-2-richard.henderson@linaro.org
+Message-id: 20200214194643.23317-4-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
@@ -112,17 +111,17 @@ Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 7c26c3bfebb..620a4290671 100644
+index 096a854aed7..b83d09dbcd7 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -6895,6 +6895,7 @@ static void disas_simd_ext(DisasContext *s, uint32_t insn)
+@@ -7054,6 +7054,7 @@ static void disas_simd_zip_trn(DisasContext *s, uint32_t insn)
      tcg_temp_free_i64(tcg_resl);
      write_vec_element(s, tcg_resh, rd, 1, MO_64);
      tcg_temp_free_i64(tcg_resh);
 +    clear_vec_high(s, true, rd);
  }
  
- /* TBL/TBX
+ /*
 -- 
 2.20.1
 
