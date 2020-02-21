@@ -2,128 +2,80 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7DAC35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6102C35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 473E820679
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:09:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74ACD20679
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:10:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iBxExTyC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473E820679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+t3OfBT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74ACD20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j54J3-0006ep-HH
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:09:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35434)
+	id 1j54KW-0007r6-N2
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:10:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j54IP-0006Di-0C
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:08:29 -0500
+ (envelope-from <maz@kernel.org>) id 1j54Jo-0007HE-QV
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:09:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j54IO-0006NH-07
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:08:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54360
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <maz@kernel.org>) id 1j54Jn-00007I-Gw
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:09:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41140)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j54IN-0006Mh-Rb
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:08:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582276107;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=C9I08qXdrP9NO2Id2bwlICeFv0AVzMztH3ybn2fA1kI=;
- b=iBxExTyC2lXMm+wpVmw2LUOSa40/7wNs3bH5awyYByNX6OjRzH17fIZYad8nbKAzZcpsDh
- ter8QEEpoHBaDV1VaZZDt6fi/jHN6HED2nKFlNeWwZsfVAvxkNpPoLOpTEEBH3QDWhD8ZV
- 0rpEY09FM9nsjN5NDrHcarihnbZLDCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-GGjcMGZLNhyn0lhZbhU6eQ-1; Fri, 21 Feb 2020 04:08:23 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <maz@kernel.org>)
+ id 1j54Jk-0008Mw-Ee; Fri, 21 Feb 2020 04:09:52 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA5F918B9FC1;
- Fri, 21 Feb 2020 09:08:22 +0000 (UTC)
-Received: from [10.36.117.197] (ovpn-117-197.ams2.redhat.com [10.36.117.197])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F2BBD89A9C;
- Fri, 21 Feb 2020 09:08:18 +0000 (UTC)
-Subject: Re: [PATCH v1 06/13] migrate/ram: Discard new RAM when growing RAM
- blocks and the VM is stopped
-To: qemu-devel@nongnu.org
-References: <20200219161725.115218-1-david@redhat.com>
- <20200219161725.115218-7-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <85682e4d-956f-080d-7c22-bcb292e67adf@redhat.com>
-Date: Fri, 21 Feb 2020 10:08:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mail.kernel.org (Postfix) with ESMTPSA id 41CE320679;
+ Fri, 21 Feb 2020 09:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1582276191;
+ bh=R7+5yU6mbOOiUk6fZSEKZTK9mWI3EWQBdjFrf3WRYfU=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=c+t3OfBTAUm8KLMJLaonEfVQtbMNbtkfkMR1wut7NY4Tz1J+9+gMcRChOXGlN2JQD
+ oodgVYqxXGtwqJLPuE4dxoAbyxYTS7A9667zl8k8ypIr+cPoNn0a2UVNmAJWc1/AIw
+ +HGlt/CYgdzG+xPWxfmNseUyLFm5H6CUU/mTRxmU=
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <maz@kernel.org>)
+ id 1j54Jh-006zi1-IF; Fri, 21 Feb 2020 09:09:49 +0000
 MIME-Version: 1.0
-In-Reply-To: <20200219161725.115218-7-david@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: GGjcMGZLNhyn0lhZbhU6eQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date: Fri, 21 Feb 2020 09:09:49 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH] hw/char/pl011: Output characters using best-effort mode
+In-Reply-To: <fda602ae-43d5-728c-a5bb-f607f0acd3df@redhat.com>
+References: <20200220060108.143668-1-gshan@redhat.com>
+ <f3c8adba729d050ba2144cc9c834fe82@kernel.org>
+ <CAFEAcA8inLO75XOcCO3bUiiJQyZT+nqmp1be+z6ZtQx2a=68+g@mail.gmail.com>
+ <fda602ae-43d5-728c-a5bb-f607f0acd3df@redhat.com>
+Message-ID: <69bdfa5b09791a9d148b791076f2441f@kernel.org>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/1.3.10
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: gshan@redhat.com, peter.maydell@linaro.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,57 +87,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.02.20 17:17, David Hildenbrand wrote:
-> In case we grow our RAM after ram_postcopy_incoming_init() (e.g., when
-> synchronizing the RAM block state with the migration source), the resized
-> part would not get discarded. Let's perform that when being notified
-> about a resize while postcopy has been advised and the guest is not
-> running yet.
+Hi Gavin,
+
+On 2020-02-21 04:24, Gavin Shan wrote:
+> Hi Peter and Marc,
 > 
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  migration/ram.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+> On 2/20/20 9:10 PM, Peter Maydell wrote:
+>> On Thu, 20 Feb 2020 at 09:10, Marc Zyngier <maz@kernel.org> wrote:
+>>> On 2020-02-20 06:01, Gavin Shan wrote:
+>>>> This fixes the issue by using newly added API
+>>>> qemu_chr_fe_try_write_all(),
+>>>> which provides another type of service (best-effort). It's different
+>>>> from
+>>>> qemu_chr_fe_write_all() as the data will be dropped if the backend 
+>>>> has
+>>>> been running into so-called broken state or 50 attempts of
+>>>> transmissions.
+>>>> The broken state is cleared if the data is transmitted at once.
+>>> 
+>>> I don't think dropping the serial port output is an acceptable 
+>>> outcome.
+>> 
+>> Agreed. The correct fix for this is the one cryptically described
+>> in the XXX comment this patch deletes:
+>> 
+>> -        /* XXX this blocks entire thread. Rewrite to use
+>> -         * qemu_chr_fe_write and background I/O callbacks */
+>> 
+>> The idea is that essentially we end up emulating the real
+>> hardware's transmit FIFO:
+>>   * as data arrives from the guest we put it in the FIFO
+>>   * we try to send the data with qemu_chr_fe_write(), which does
+>>     not block
+>>   * if qemu_chr_fe_write() tells us it did not send all the data,
+>>     we use qemu_chr_fe_add_watch() to set up an I/O callback
+>>     which will get called when the output chardev has drained
+>>     enough that we can try again
+>>   * we make sure all the guest visible registers and mechanisms
+>>     for tracking tx fifo level (status bits, interrupts, etc) are
+>>     correctly wired up
+>> 
+>> Then we don't lose data or block QEMU if the guest sends
+>> faster than the chardev backend can handle, assuming the
+>> guest is well-behaved -- just as with a real hardware slow
+>> serial port, the guest will fill the tx fifo and then either poll
+>> or wait for an interrupt telling it that the fifo has drained
+>> before it tries to send more data.
+>> 
+>> There is an example of this in hw/char/cadence_uart.c
+>> (and an example of how it works for a UART with no tx
+>> fifo in hw/char-cmsdk-apb-uart.c, which is basically the
+>> same except the 'fifo' is just one byte.)
+>> 
+>> You will also find an awful lot of XXX comments like the
+>> above one in various UART models in hw/char, because
+>> converting an old-style simple blocking UART implementation
+>> to a non-blocking one is a bit fiddly and needs knowledge
+>> of the specifics of the UART behaviour.
+>> 
+>> The other approach here would be that we could add
+>> options to relevant chardev backends so the user
+>> could say "if you couldn't connect to the tcp server I
+>> specified, throw away data rather than waiting", where
+>> we don't have suitable options already. If the user specifically
+>> tells us they're ok to throw away the serial data, then it's
+>> fine to throw away the serial data :-)
+>> 
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 57f32011a3..cbd54947fb 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -3722,6 +3722,25 @@ static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
->          return;
->      }
->  
-> +    /*
-> +     * Especially at the start of precopy on the migration target, before
-> +     * starting postcopy, we synchronize the RAM block sizes. Let's make sure
-> +     * that any resizes before starting the guest are properly handled by
-> +     * postcopy. Note: All other postcopy handling (e.g., registering handlers,
-> +     * disabling THP) happens after all resizes (e.g., during precopy) were
-> +     * performed.
-> +     */
+> I was intended to convince Marc that it's fine to lose data if the
+> serial connection is broken with an example. Now, I'm taking the
+> example trying to convince both of you: Lets assume we have a ARM
+> board and the UART (RS232) cable is unplugged and plugged in the middle 
+> of
+> system booting. I think we would get some output lost. We're emulating
+> pl011 and I think it would have same behavior. However, I'm not sure
+> if it makes sense :)
 
-I think it would be clearer to do a
+But the case you describe in the commit message is not that one.
+The analogy is that of a serial port *plugged* and asserting flow 
+control.
 
-ps >= POSTCOPY_INCOMING_ADVISE && ps < POSTCOPY_INCOMING_RUNNING
+Another thing is that the "system" as been constructed this way by the
+user. QEMU is not in a position to choose and output what is convenient,
+when it is convenient. In my world, the serial output is absolutely
+crucial. This is where I look for clues about failures and odd 
+behaviours,
+and I rely on the serial port emulation to be 100% reliable (and for 
+what
+it's worth, the Linux kernel can output to the serial port 
+asynchronously,
+to some extent).
 
-We really only want to do something when psotcopy has been advised but
-the guest is not running yet.
+[...]
 
-Will look into that as I find ways to actually test this :)
+> If above analysis is correct and the first approach doesn't work out. 
+> We have to
+> consider the 2nd approach - adding option to backend to allow losing 
+> data. I'm
+> going to add "allow-data-lost" option for TYPE_CHARDEV_SOCKET. With the 
+> option,
+> a back-off algorithm in tcp_chr_write(): The channel is consider as 
+> broken if
+> it fails to transmit data in last continuous 5 times. The transmission 
+> is still
+> issued when the channel is in broken state and recovered to normal 
+> state if
+> transmission succeeds for once.
 
--- 
+That'd be an option if you could configure the UART with something that 
+says
+"no flow control". In that case, dropping data on the floor becomes 
+perfectly
+acceptable, as it requires buy-in from the user.
+
 Thanks,
 
-David / dhildenb
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
