@@ -2,85 +2,94 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EAEC35656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FB3C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B0E2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C9A4208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XnoaEnRC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B0E2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJ1V1CP2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9A4208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5B2d-0001if-SS
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:20:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45853)
+	id 1j5B3W-0002dw-MX
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:21:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45999)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j5B0d-0000Qb-VR
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:18:37 -0500
+ (envelope-from <philmd@redhat.com>) id 1j5B2K-0001dh-4J
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:20:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j5B0c-00021H-7Y
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:18:35 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:56226)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j5B0b-00020x-VP
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:18:34 -0500
-Received: by mail-wm1-x331.google.com with SMTP id q9so2357538wmj.5
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:18:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=o12rlLRzlZZ6514VAo2M2WqeUWmqDbsn0zieNMqS1p4=;
- b=XnoaEnRCQp3wzeNTbpx2ladLXcWt8k6SAwwB43zI9u3bqy+rVHhZcZ7kcFISFPkyjA
- m6htQjQHpoomdJIlNVmSr6BoH54G9Ix3QqY45LL+GS6Uw1tmUP4d/TTGwk9RSrTnWfup
- yciQ2MX+K0caWutWBU+8k+mvJGs+6Ev90U7YqR0dfzH59g8VihSi78AIiq7b1mIbAkAs
- BKzwa0nMCRz8Eu431bSXxGQf6ffM/iHGDIK3DUKIxX1cTuvzneUjkUQ9YeCHP4KYispj
- sB6oU7lcIYA5w6cQB//vRRIndKJG9gsyWIbeCvOCoEc9nzP+KJRgaRFPipTCxT/58Z4o
- tZmg==
+ (envelope-from <philmd@redhat.com>) id 1j5B2J-0002hx-81
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:20:20 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25396
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j5B2J-0002hq-3Q
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:20:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582302018;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=RlS28yLXsqsfr1rK9KjCIUl+K4ng7LhTJEdDyW+5qGY=;
+ b=FJ1V1CP2s5ywI0RD7hXTAOJ0pbqhvSzMkKVqmPnKDltIRj8ODRNGf18gjMj8+Bv96MWJdx
+ CLbvA70//MsxrskHnrGWEyP7dPl1OALkue0BSHeYztIe7bx7c1q+dPo9MgJo+FEGrxA7Et
+ VZ8+iTy2/kxgODpVjpf2DNouk8hsRSU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-qb0EgROyPp6ivTfMXwKQrw-1; Fri, 21 Feb 2020 11:20:17 -0500
+X-MC-Unique: qb0EgROyPp6ivTfMXwKQrw-1
+Received: by mail-wm1-f70.google.com with SMTP id p2so781287wma.3
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:20:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=o12rlLRzlZZ6514VAo2M2WqeUWmqDbsn0zieNMqS1p4=;
- b=O5AYNsHOuYR99mPLutOKhQ3TxgdYyFnRxI5BGRISwsDZUMkoU6iWvSLlCmKpuxIaky
- 0zHZKS/PblA3xz9gRt2qQO0rGK5yaNsOh0P1C+Hy1ayN6mIDTNoU061YWK/zQBpIe6t6
- fIsb+Wz2CBf19JH6SzA+67onkKodrEv/f1FqCufZKWJU9RfhHMpEk5UFsnYCY0WPll0d
- o1EJHJmHBmOBl2TgxtOtBPy5S1tZf1DO/AzFOhrkPQ2iMBZ6A8Zx2rnNaUKnKNM57wfA
- oYfMvA1leQ44dx2HlopTg3iAPSvUfDF+AmRAuDWDYoiB4wsluuE0Dp3BRbDKg3ZJbPxl
- Kw5w==
-X-Gm-Message-State: APjAAAXK8qkpyXbMgwFVMBv+dsc3iIxEDDqV8mOXg2K2qmkDyIJSwvMx
- OcPSGiCVdXf3SWmcJX7rBA6rt1GWDXeHgg==
-X-Google-Smtp-Source: APXvYqzCF93OL7gbK9+yDEu+KzJw2nnJj/WkA5nDfSdpF81QcLwVCog3FYBGVwP9jQz4v2Ghf6WWGg==
-X-Received: by 2002:a1c:4d03:: with SMTP id o3mr4514252wmh.164.1582301912299; 
- Fri, 21 Feb 2020 08:18:32 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id g17sm4849616wru.13.2020.02.21.08.18.31
- for <qemu-devel@nongnu.org>
+ bh=NucZwwxE2rLlPt85TcvEmJXYWjTSnxUvHMBjuRGVljM=;
+ b=P+GOeTD9hNVfOXPntFi4lFJZ2vmYNrjSySTLeuBf1NAVSd9v59LP8R3kUvpcwdhb/3
+ +SbSMb5tCG4OH0HPbGr/pDPWr5f7n73fYKkpNGa6ONBMKkEtXQtPwFIF3yJY//J1hNcM
+ Mpi6UIIX3Em25lke/ufx8QBeanwi0mRVA/tKNHrT5ynyNWKUvlZzwc3PemkBtZaHtAba
+ 748BuTOKrSTZhLRAg23hZ58SfOeE33TgQCYWr3EfNW82Ay6lLEjalSNYs01sd+btYu3x
+ 2LZ355KhGRkCIJG+k9ierZhQdFr1yvEFBE237A6mRKVNTlu4pipbyOWEYsLqUWjjCZwe
+ 2W2Q==
+X-Gm-Message-State: APjAAAWRYYwjLWYN70HZkO+4d1TtVIfnw0CW7P8skXCj+pN56dk0oX3l
+ G+W0tsIgLLmOwGdj6i0JVhKz3hpgTIi7mYggHBrrGvQZLkRDCbjRGSIegoo+qPGqSB3pRtKpDbG
+ ieqLGsMdyeticx7w=
+X-Received: by 2002:a7b:cf08:: with SMTP id l8mr4525625wmg.169.1582302013788; 
+ Fri, 21 Feb 2020 08:20:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx9z6EixTMiFYsow6hAX8LAVG6PSqH9NH4eeyEdDQu17lUUYHZUu3LrWmjllaTPPs2qq5d1KA==
+X-Received: by 2002:a7b:cf08:: with SMTP id l8mr4525601wmg.169.1582302013534; 
+ Fri, 21 Feb 2020 08:20:13 -0800 (PST)
+Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.78])
+ by smtp.gmail.com with ESMTPSA id m3sm4558996wrs.53.2020.02.21.08.20.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 08:18:31 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Fri, 21 Feb 2020 08:20:13 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/46] target-arm queue
-Date: Fri, 21 Feb 2020 16:18:29 +0000
-Message-Id: <20200221161829.17142-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH] hw/mips/mips_int: Simplify cpu_mips_irq_init_cpu()
+Date: Fri, 21 Feb 2020 17:20:11 +0100
+Message-Id: <20200221162011.26383-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,136 +101,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v1->v2 changes: dropped the last 6 patches from rth as there's
-a problem with one of them that's too complicated to try to
-fix up.
+Since commit d8ed887bdc, the cpu_mips_irq_request handler takes
+a pointer to MIPSCPU in its opaque argument.  Directly pass the
+cpu pointer.
 
-thanks
--- PMM
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/mips/mips_int.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit a8c6af67e1e8d460e2c6e87070807e0a02c0fec2:
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 863ed45659..796730b11d 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -77,7 +77,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+     qemu_irq *qi;
+     int i;
+=20
+-    qi =3D qemu_allocate_irqs(cpu_mips_irq_request, env_archcpu(env), 8);
++    qi =3D qemu_allocate_irqs(cpu_mips_irq_request, cpu, 8);
+     for (i =3D 0; i < 8; i++) {
+         env->irq[i] =3D qi[i];
+     }
+--=20
+2.21.1
 
-  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200221' into staging (2020-02-21 14:20:42 +0000)
-
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200221-1
-
-for you to fetch changes up to 9eb4f58918a851fb46895fd9b7ce579afeac9d02:
-
-  target/arm: Set MVFR0.FPSP for ARMv5 cpus (2020-02-21 16:07:03 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * aspeed/scu: Implement chip ID register
- * hw/misc/iotkit-secctl: Fix writing to 'PPC Interrupt Clear' register
- * mainstone: Make providing flash images non-mandatory
- * z2: Make providing flash images non-mandatory
- * Fix failures to flush SVE high bits after AdvSIMD INS/ZIP/UZP/TRN/TBL/TBX/EXT
- * Minor performance improvement: spend less time recalculating hflags values
- * Code cleanup to isar_feature function tests
- * Implement ARMv8.1-PMU and ARMv8.4-PMU extensions
- * Bugfix: correct handling of PMCR_EL0.LC bit
- * Bugfix: correct definition of PMCRDP
- * Correctly implement ACTLR2, HACTLR2
- * allwinner: Wire up USB ports
- * Vectorize emulation of USHL, SSHL, PMUL*
- * xilinx_spips: Correct the number of dummy cycles for the FAST_READ_4 cmd
- * sh4: Fix PCI ISA IO memory subregion
-
-----------------------------------------------------------------
-Francisco Iglesias (1):
-      xilinx_spips: Correct the number of dummy cycles for the FAST_READ_4 cmd
-
-Guenter Roeck (6):
-      mainstone: Make providing flash images non-mandatory
-      z2: Make providing flash images non-mandatory
-      hw: usb: hcd-ohci: Move OHCISysBusState and TYPE_SYSBUS_OHCI to include file
-      hcd-ehci: Introduce "companion-enable" sysbus property
-      arm: allwinner: Wire up USB ports
-      sh4: Fix PCI ISA IO memory subregion
-
-Joel Stanley (2):
-      aspeed/scu: Create separate write callbacks
-      aspeed/scu: Implement chip ID register
-
-Peter Maydell (21):
-      target/arm: Add _aa32_ to isar_feature functions testing 32-bit ID registers
-      target/arm: Check aa32_pan in take_aarch32_exception(), not aa64_pan
-      target/arm: Add isar_feature_any_fp16 and document naming/usage conventions
-      target/arm: Define and use any_predinv isar_feature test
-      target/arm: Factor out PMU register definitions
-      target/arm: Add and use FIELD definitions for ID_AA64DFR0_EL1
-      target/arm: Use FIELD macros for clearing ID_DFR0 PERFMON field
-      target/arm: Define an aa32_pmu_8_1 isar feature test function
-      target/arm: Add _aa64_ and _any_ versions of pmu_8_1 isar checks
-      target/arm: Stop assuming DBGDIDR always exists
-      target/arm: Move DBGDIDR into ARMISARegisters
-      target/arm: Read debug-related ID registers from KVM
-      target/arm: Implement ARMv8.1-PMU extension
-      target/arm: Implement ARMv8.4-PMU extension
-      target/arm: Provide ARMv8.4-PMU in '-cpu max'
-      target/arm: Correct definition of PMCRDP
-      target/arm: Correct handling of PMCR_EL0.LC bit
-      target/arm: Test correct register in aa32_pan and aa32_ats1e1 checks
-      target/arm: Use isar_feature function for testing AA32HPD feature
-      target/arm: Use FIELD_EX32 for testing 32-bit fields
-      target/arm: Correctly implement ACTLR2, HACTLR2
-
-Philippe Mathieu-Daudé (1):
-      hw/misc/iotkit-secctl: Fix writing to 'PPC Interrupt Clear' register
-
-Richard Henderson (15):
-      target/arm: Flush high bits of sve register after AdvSIMD EXT
-      target/arm: Flush high bits of sve register after AdvSIMD TBL/TBX
-      target/arm: Flush high bits of sve register after AdvSIMD ZIP/UZP/TRN
-      target/arm: Flush high bits of sve register after AdvSIMD INS
-      target/arm: Use bit 55 explicitly for pauth
-      target/arm: Fix select for aa64_va_parameters_both
-      target/arm: Remove ttbr1_valid check from get_phys_addr_lpae
-      target/arm: Split out aa64_va_parameter_tbi, aa64_va_parameter_tbid
-      target/arm: Vectorize USHL and SSHL
-      target/arm: Convert PMUL.8 to gvec
-      target/arm: Convert PMULL.64 to gvec
-      target/arm: Convert PMULL.8 to gvec
-      target/arm: Rename isar_feature_aa32_simd_r32
-      target/arm: Use isar_feature_aa32_simd_r32 more places
-      target/arm: Set MVFR0.FPSP for ARMv5 cpus
-
- hw/usb/hcd-ohci.h              |  16 ++
- include/hw/arm/allwinner-a10.h |   6 +
- target/arm/cpu.h               | 145 ++++++++++---
- target/arm/helper-sve.h        |   2 +
- target/arm/helper.h            |  21 +-
- target/arm/internals.h         |  47 ++++-
- target/arm/translate.h         |   6 +
- hw/arm/allwinner-a10.c         |  43 ++++
- hw/arm/mainstone.c             |  11 +-
- hw/arm/z2.c                    |   6 -
- hw/intc/armv7m_nvic.c          |  10 +-
- hw/misc/aspeed_scu.c           |  93 ++++++--
- hw/misc/iotkit-secctl.c        |   2 +-
- hw/sh4/sh_pci.c                |  11 +-
- hw/ssi/xilinx_spips.c          |   2 +-
- hw/usb/hcd-ehci-sysbus.c       |   2 +
- hw/usb/hcd-ohci.c              |  15 --
- linux-user/elfload.c           |   4 +-
- target/arm/cpu.c               | 169 +++++++--------
- target/arm/cpu64.c             |  58 +++--
- target/arm/debug_helper.c      |   6 +-
- target/arm/helper.c            | 468 +++++++++++++++++++++++------------------
- target/arm/kvm32.c             |  25 +++
- target/arm/kvm64.c             |  46 ++++
- target/arm/neon_helper.c       | 117 -----------
- target/arm/pauth_helper.c      |   3 +-
- target/arm/translate-a64.c     |  92 ++++----
- target/arm/translate-vfp.inc.c |  53 ++---
- target/arm/translate.c         | 356 ++++++++++++++++++++++++++-----
- target/arm/vec_helper.c        | 211 +++++++++++++++++++
- target/arm/vfp_helper.c        |   2 +-
- 31 files changed, 1377 insertions(+), 671 deletions(-)
 
