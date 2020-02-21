@@ -2,61 +2,86 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B3EC35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 12:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C05C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 12:43:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B03B24650
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 12:36:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B03B24650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 6DB0F24653
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 12:43:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Kx9YyE8L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB0F24653
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j57XU-0002kW-Q9
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 07:36:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49305)
+	id 1j57eq-0004cp-6o
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 07:43:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1j57Wf-00028m-5P
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:35:26 -0500
+ (envelope-from <luc.michel@greensocs.com>) id 1j57c5-00042p-13
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j57Wd-0001Nc-RI
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:35:24 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:44534)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j57Wd-0001Hw-EI
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:35:23 -0500
-Received: from mail.ispras.ru (localhost [127.0.0.1])
- by mail.ispras.ru (Postfix) with ESMTPSA id 3682EC0101;
- Fri, 21 Feb 2020 15:35:21 +0300 (MSK)
+ (envelope-from <luc.michel@greensocs.com>) id 1j57c3-0005ed-Lr
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:41:00 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:48490)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <luc.michel@greensocs.com>)
+ id 1j57c3-0005dZ-6L
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 07:40:59 -0500
+Received: from [172.16.11.100] (tiramisu.bar.greensocs.com [172.16.11.100])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id A85E996EF0;
+ Fri, 21 Feb 2020 12:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582288856;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z4oAOsKxluNQcjR2kc/FmNsEGFD0balpHW5f8Xxp7zY=;
+ b=Kx9YyE8Lx1aNV5GM0VuLHDfygnpFrUCUTTkaPuSQx9PbpuwrjnIIy3szjb+PJ6Mklpc5Pt
+ Hc27wtrsxPrhiVRELhPj/gxR9NCtp1BEjSv+rej1LmxB34+oz2dc9k1N9HvIJmg0SSMXap
+ JyMEcmhZBf/zUBCaVPrDIVHgHgenUd0=
+Subject: Re: [PATCH v2] gdbstub: Fix single-step issue by confirming
+ 'vContSupported+' feature to gdb
+To: Changbin Du <changbin.du@gmail.com>, alex.bennee@linaro.org,
+ philmd@redhat.com
+References: <20200221002559.6768-1-changbin.du@gmail.com>
+From: Luc Michel <luc.michel@greensocs.com>
+Message-ID: <669a56c9-0c9a-5d49-1a83-185d05f7b750@greensocs.com>
+Date: Fri, 21 Feb 2020 13:40:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 21 Feb 2020 15:35:21 +0300
-From: dovgaluk <dovgaluk@ispras.ru>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: Race condition in overlayed qcow2?
-In-Reply-To: <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
-References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
- <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
- <5891b48a131321be62a4a311253da44c@ispras.ru>
- <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
- <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
- <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
- <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
-User-Agent: Roundcube Webmail/1.4.1
-Message-ID: <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
-X-Sender: dovgaluk@ispras.ru
+In-Reply-To: <20200221002559.6768-1-changbin.du@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-PH
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582288857;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z4oAOsKxluNQcjR2kc/FmNsEGFD0balpHW5f8Xxp7zY=;
+ b=KsPuLMA/EmWMdTRt5l5SbuaNB57DQ3scbkpy4uX8meM8rorYxEQDL3JX35ygmAn5KEUzSl
+ 8P0Up8gAwIUNdiSv+vV/YTgOmCqDf4xdH9BScFf9Uor5nnRWuHuOL6xx6U7lwoj5zKM+VX
+ g2lOvJMYlL2fbUwR2G17xELQE1EcTw8=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582288857; a=rsa-sha256; cv=none;
+ b=Fy99uyOZ9deiO7X3IkovbK6Gi0O2050DmabtYdzvevaxg+6QblijRWFkY3ObxSVskAV/C7
+ fi9E9s54KJbdZjEWU3lX6n4LyDhSwYVFkBCTmGmOaAm0C8MalxiQJz0nuBstm2HIjhp71p
+ 8fw653rcVoNK9QlWnMW6NKXNGGZ+DJo=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=luc smtp.mailfrom=luc.michel@greensocs.com
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 83.149.199.45
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,138 +93,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21 13=
-:09:
-> 21.02.2020 12:49, dovgaluk wrote:
->> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-20=
- 12:36:
->>>>> 1 or 2 are ok, and 4 or 8 lead to the failures.
->>>>>=20
->>>>>=20
->>>>> That is strange. I could think, that it was caused by the bugs in
->>>>> deterministic CPU execution, but the first difference in logs
->>>>> occur in READ operation (I dump read/write buffers in=20
->>>>> blk_aio_complete).
->>>>>=20
->>>>=20
->>>> Aha, yes, looks strange.
->>>>=20
->>>> Then next steps:
->>>>=20
->>>> 1. Does problem hit into the same offset every time?
->>>> 2. Do we write to this region before this strange read?
->>>>=20
->>>> 2.1. If yes, we need to check that we read what we write.. You say=20
->>>> you dump buffers
->>>> in blk_aio_complete... I think it would be more reliable to dump at=20
->>>> start of
->>>> bdrv_co_pwritev and at end of bdrv_co_preadv. Also, guest may modify=
-=20
->>>> its buffers
->>>> during operation which would be strange but possible.
->>>>=20
->>>> 2.2 If not, hmm...
->>>>=20
->>>>=20
->>>=20
->>> Another idea to check: use blkverify
->>=20
->> I added logging of file descriptor and discovered that different=20
->> results are obtained
->> when reading from the backing file.
->> And even more - replay runs of the same recording produce different=20
->> results.
->> Logs show that there is a preadv race, but I can't figure out the=20
->> source of the failure.
->>=20
->> Log1:
->> preadv c 30467e00
->> preadv c 30960000
->> --- sum =3D a2e1e
->> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 8200
->> --- sum =3D 10cdee
->> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len:=20
->> ee00
->>=20
->> Log2:
->> preadv c 30467e00
->> --- sum =3D a2e1e
->> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 8200
->> preadv c 30960000
->> --- sum =3D f094f
->> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len:=20
->> ee00
->>=20
->>=20
->> Checksum calculation was added to preadv in file-posix.c
->>=20
+On 2/21/20 1:25 AM, Changbin Du wrote:
+> Recently when debugging an arm32 system on qemu, I found sometimes the
+> single-step command (stepi) is not working. This can be reproduced by
+> below steps:
+>  1) start qemu-system-arm -s -S .. and wait for gdb connection.
+>  2) start gdb and connect to qemu. In my case, gdb gets a wrong value
+>     (0x60) for PC, which is an another bug.
+>  3) After connected, type 'stepi' and expect it will stop at next ins.
 >=20
-> So, preadv in file-posix.c returns different results for the same
-> offset, for file which is always opened in RO mode? Sounds impossible
-> :)
+> But, it has never stopped. This because:
+>  1) We doesn't report =E2=80=98vContSupported=E2=80=99 feature to gdb e=
+xplicitly and gdb
+>     think we do not support it. In this case, gdb use a software breakp=
+oint
+>     to emulate single-step.
+>  2) Since gdb gets a wrong initial value of PC, then gdb inserts a
+>     breakpoint to wrong place (PC+4).
+>=20
+> Not only for the arm target, Philippe has also encountered this on MIPS=
+.
+> Probably gdb has different assumption for different architectures.
+>=20
+> Since we do support =E2=80=98vContSupported=E2=80=99 query command, so =
+let's tell gdb that
+> we support it.
+>=20
+> Before this change, gdb send below 'Z0' packet to implement single-step=
+:
+> gdb_handle_packet: Z0,4,4
+>=20
+> After this change, gdb send "vCont;s.." which is expected:
+> gdb_handle_packet: vCont?
+> put_packet: vCont;c;C;s;S
+> gdb_handle_packet: vCont;s:p1.1;c:p1.-1
+>=20
+> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-True.
-Maybe my logging is wrong?
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
-static ssize_t
-qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t offset)
-{
-     ssize_t res =3D preadv(fd, iov, nr_iov, offset);
-     qemu_log("preadv %x %"PRIx64"\n", fd, (uint64_t)offset);
-     int i;
-     uint32_t sum =3D 0;
-     int cnt =3D 0;
-     for (i =3D 0 ; i < nr_iov ; ++i) {
-         int j;
-         for (j =3D 0 ; j < (int)iov[i].iov_len ; ++j)
-         {
-             sum +=3D ((uint8_t*)iov[i].iov_base)[j];
-             ++cnt;
-         }
-     }
-     qemu_log("size: %x sum: %x\n", cnt, sum);
-     assert(cnt =3D=3D res);
-     return res;
-}
-
-This code prints preadv checksum.
-But when I calculate the same with the standalone program, then it gives=20
-me another values of the checksums for the same offsets:
-
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/uio.h>
-
-unsigned char buf[0x100000];
-
-int main(int argc, char **argv)
-{
-   if (argc < 4) return 1;
-   int f =3D open(argv[1], O_RDONLY);
-   unsigned int cnt;
-   unsigned int offs;
-   sscanf(argv[2], "%x", &offs);
-   sscanf(argv[3], "%x", &cnt);
-   printf("file: %s offset: %x size: %x\n", argv[1], offs, cnt);
-   struct iovec iov =3D {buf, (size_t)cnt};
-   size_t sz =3D preadv(f, &iov, 1, offs);
-   printf("read %x\n", (int)sz);
-   int i;
-   unsigned int sum =3D 0;
-   for (i =3D 0 ; i < cnt ; ++i)
-     sum +=3D buf[i];
-   printf("sum =3D %x\n", sum);
-}
-
-
-
-Pavel Dovgalyuk
+>=20
+> ---
+> v2: polish commit message.
+> ---
+>  gdbstub.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/gdbstub.c b/gdbstub.c
+> index ce304ff482..adccd938e2 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -2111,7 +2111,7 @@ static void handle_query_supported(GdbCmdContext =
+*gdb_ctx, void *user_ctx)
+>          gdb_ctx->s->multiprocess =3D true;
+>      }
+> =20
+> -    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess=
++");
+> +    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";vContSupport=
+ed+;multiprocess+");
+>      put_packet(gdb_ctx->s, gdb_ctx->str_buf);
+>  }
+> =20
+>=20
 
