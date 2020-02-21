@@ -2,84 +2,80 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 747FAC3565B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ECFCC3565B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 406C2206E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:33:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BB50208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZyYCMJ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406C2206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y2ET64kw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BB50208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5D73-0000PX-CA
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 13:33:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49821)
+	id 1j5DBf-000262-EB
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 13:38:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1j5D5m-00083F-D6
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:32:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5DB5-0001bk-JH
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:37:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1j5D5l-00062u-C6
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:32:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23586
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1j5D5l-00062g-7V
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:32:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582309919;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9YdVxzlrPil0x15rzUCXXf2M11bXcpg55nRuwi41lvI=;
- b=IZyYCMJ/2uTj3u5JapgXl2gI0Pi6YzeUEKhEB/a+a4Tj3gKiCUKMxuJjv+v643V4XR75ZT
- KVROrudOwcmXq95Bnm6cRrmhDlXtMt0AVckbDeIm9Y1y17GdHrXCLDY5OcJkG0TImAzG9E
- x7M8GAXGd30qgmotdnDKPxU6VvhMEpc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-kuXJ6WMVP1KhvnKaN16j3g-1; Fri, 21 Feb 2020 13:31:47 -0500
-X-MC-Unique: kuXJ6WMVP1KhvnKaN16j3g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AE5E8017DF
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 18:31:46 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-92.gru2.redhat.com
- [10.97.116.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 619285C105;
- Fri, 21 Feb 2020 18:31:44 +0000 (UTC)
-Subject: Re: [PATCH v1 3/4] Acceptance test: provides new functions
-To: Oksana Vohchana <ovoshcha@redhat.com>, qemu-devel@nongnu.org
-References: <20200214145235.4378-1-ovoshcha@redhat.com>
- <20200214145235.4378-4-ovoshcha@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <875891d8-23f7-2603-2c51-9a734cf148b6@redhat.com>
-Date: Fri, 21 Feb 2020 15:31:42 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <peter.maydell@linaro.org>) id 1j5DB4-0004tF-Dq
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:37:31 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:40922)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j5DB4-0004sm-8W
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:37:30 -0500
+Received: by mail-ot1-x329.google.com with SMTP id i6so2884266otr.7
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 10:37:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ep2kTkoMeshB8FDWBTs1bikYdviCZRG5WooJpLuOS/4=;
+ b=Y2ET64kwSHnAdyf1UTGpFkSd9eqFP23hnky4TD3OhBq0GhEWAcIXmezedPGUbRmFcw
+ ZI4c9RFDQHcU2hjOKf7cGSnU/6x+eSkYE+6p3SdnFttFRrG7k+ODDQGlQIO0zvx4X0j2
+ cy8pmYEEUqosOI2Fnr/ay7R3SKW4nLWAQDaGX3GdPHLHlcdW+fdIyljWLwxpVJP+Trop
+ fvp6t6v3EyWlSv/H54zauJvE1/AgoLIqcUtjawDHVxkc5R9wnkJAoydjzI4gwKAYeSgw
+ IDFaGTQi7JqU8w4kQPuqpYIy/t5DtpqqFOM0mvkkwZlB5IV9QjcXEQMnELg4b3Mr2xCN
+ 8gdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ep2kTkoMeshB8FDWBTs1bikYdviCZRG5WooJpLuOS/4=;
+ b=Ihcg0+u86baCkd7pNZ+IELlTsn1lTZoYZ25/KCwW+VEIbKHE99tCZpD2r7f1nW+Bbr
+ CdgLPk8V5TNSQIXhjfYagGEbKI2DR5GdSNByg3uiCIy8i/jzmBU+Ba9ebLn7AeR1GQw5
+ S2dGl81kkWG3+HS3UgH1EkiX9HVoLmF6gy1aRNvAmeRqGpa4BktoZnu0Yd1fvi/M+l/R
+ IWYx8eU5xKdyfVBmeRYggLh4wd5RSRyAIRBz2a9+KKesfprvFXjqad7uBGhE0PDDEkHG
+ WtuRIB3p2i2apxHQwFSnG2Y871LiciW9RckLimLmZqpmc/NIsQmlyKmmBMvttSo2HmvE
+ p24g==
+X-Gm-Message-State: APjAAAVaYa51N3b8TTt5oTnS9ZZZJnFaPNo80wirvn0C+m0ICuL9MKWV
+ dgIfYTEKwveczx7o3dGW/pMan8vuU8J3hSI9jbiQtA==
+X-Google-Smtp-Source: APXvYqwR8W3eJkp5CE1VflZHD47LnOvYjDmgO2/y01DXIb6TgxgnTCo+cB2EsjffkRNQrY5x3TehURhMH+phWMwSKp8=
+X-Received: by 2002:a05:6830:1184:: with SMTP id
+ u4mr27960769otq.221.1582310249276; 
+ Fri, 21 Feb 2020 10:37:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200214145235.4378-4-ovoshcha@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200221132536.38364-1-dgilbert@redhat.com>
+In-Reply-To: <20200221132536.38364-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Feb 2020 18:37:18 +0000
+Message-ID: <CAFEAcA93VLAtzKwNG4iZzekt7=CdVzYu2kJhk_c4n=+Wxa+HQw@mail.gmail.com>
+Subject: Re: [PULL 0/6] virtiofs queue
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,85 +87,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, crosa@redhat.com
+Cc: Miroslav Rezanina <mrezanin@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, yangx.jy@cn.fujitsu.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Oksana,
-
-On 2/14/20 12:52 PM, Oksana Vohchana wrote:
-> Adds functions to check if service RDMA is enabled and gets the interface
-> where it was configured
+On Fri, 21 Feb 2020 at 13:52, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
 >
-> Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
-> ---
->   tests/acceptance/migration.py | 17 +++++++++++++++++
->   1 file changed, 17 insertions(+)
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
-> index 8209dcf71d..bbd88f8dda 100644
-> --- a/tests/acceptance/migration.py
-> +++ b/tests/acceptance/migration.py
-> @@ -11,12 +11,16 @@
->   
->   
->   import tempfile
-> +import re
-> +import netifaces
-
-Since netifaces isn't a standard Python library that import might fail.
-
-The tests dependencies are listed in tests/requirements.txt, and 
-installed in the environment created by `make check-acceptance`. If you 
-want to ensure the test behaves well even when executed manually (i.e. 
-not via `make check-acceptance`), you can add runtime checks as can be 
-seen in tests/acceptance/machine_m68k_nextcube.py
-
->   from avocado_qemu import Test
->   from avocado import skipUnless
->   
->   from avocado.utils import network
->   from avocado.utils import wait
->   from avocado.utils.path import find_command
-> +from avocado.utils import service
-> +from avocado.utils import process
->   
->   
->   class Migration(Test):
-> @@ -58,6 +62,19 @@ class Migration(Test):
->               self.cancel('Failed to find a free port')
->           return port
->   
-> +    def _if_rdma_enable(self):
-> +        rdma_stat = service.ServiceManager()
-> +        rdma = rdma_stat.status('rdma')
-> +        return rdma
+> The following changes since commit b651b80822fa8cb66ca30087ac7fbc75507ae5d2:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.0-pull-request' into staging (2020-02-20 17:35:42 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/dagrh/qemu.git tags/pull-virtiofs-20200221
+>
+> for you to fetch changes up to 5bb8e8beedb47fc0d0a44957a154918c4f4afc80:
+>
+>   docs: Fix virtiofsd.1 location (2020-02-21 13:05:27 +0000)
+>
+> ----------------------------------------------------------------
+> virtiofs pull 20200221
+>
+> Mostly minor cleanups.
+> Miroslav's fixes a make install corner case.
+> Philippe's set includes an error corner case fix.
+>
 
 
-Above function is used on patch04, but actually I don't think it needs 
-to check this service for RoCE. It would be needed if it was using the 
-rxe_cfg to configure the rdma link. Or am I missing something?
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-> +
-> +    def _get_ip_rdma(self):
-> +        get_ip_rdma = process.run('rdma link show').stdout.decode()
-> +        for line in get_ip_rdma.split('\n'):
-> +            if re.search(r"ACTIVE", line):
-> +                interface = line.split(" ")[-2]
-> +                ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
-> +                return ip
-> +
-
-I suggest that it explicitly returns None if none is found.
-
-Thanks!
-
-- Wainer
-
->   
->       def test_migration_with_tcp_localhost(self):
->           dest_uri = 'tcp:localhost:%u' % self._get_free_port()
-
+-- PMM
 
