@@ -2,83 +2,81 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8462C35656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCD4C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 764892073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27C14208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:31:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axcKzau1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 764892073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="prw/lj0M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27C14208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5AFo-0008GW-GQ
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:30:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36062)
+	id 1j5AHA-0001fc-2N
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:31:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36384)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j5AEs-0007Kc-FH
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:29:15 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5AG0-0000PP-IX
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:30:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j5AEr-0001v6-4R
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:29:13 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52051
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j5AEr-0001uU-0t
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:29:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582298951;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5oGiI9Ez6zBo1YbY2paGvIgRUjI17CEfivu6Tunwdj4=;
- b=axcKzau1ujxDKFBVpAHSuzW9EeHRd28sCN+Qou9vAfrgrErujcNbUQeMZC2Vxm0eXlxFww
- vNmP8OCWVx05zcVcHJaiFqpfGxjEEM0nbFjB3SlKhmKfQTGrVoeXpeMl7uKnL5eIAcyjSV
- Cgc4L7omIiosTle6iqLbNr34XsGmnwo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-6g36JQMhMBKUbRsy3X4KnQ-1; Fri, 21 Feb 2020 10:29:07 -0500
-X-MC-Unique: 6g36JQMhMBKUbRsy3X4KnQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5DFA801E66;
- Fri, 21 Feb 2020 15:29:06 +0000 (UTC)
-Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A924627096;
- Fri, 21 Feb 2020 15:29:03 +0000 (UTC)
-Date: Fri, 21 Feb 2020 15:29:02 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 5/5] aio-posix: make AioHandler dispatch O(1) with epoll
-Message-ID: <20200221152902.GC1511783@stefanha-x1.localdomain>
-References: <20200214171712.541358-1-stefanha@redhat.com>
- <20200214171712.541358-6-stefanha@redhat.com>
- <38c8e61b-377b-07bd-f55b-a1a773b72701@redhat.com>
- <20200221125948.GI1484511@stefanha-x1.localdomain>
- <425318ef-0b19-983b-b2ea-93754c48cb8d@redhat.com>
- <20200221144708.GD1501077@stefanha-x1.localdomain>
- <607d1b80-f66f-6519-b3e5-af48e1a65900@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j5AFz-0002ft-5Q
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:30:24 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44203)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j5AFy-0002f0-Un
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:30:23 -0500
+Received: by mail-ot1-x342.google.com with SMTP id h9so2295779otj.11
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 07:30:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8q1sawrAR7L0CtEGCE+s9tKiGKo+ZNnF45eMhlEP5bk=;
+ b=prw/lj0MFL1ohYfunJmvfyt8+yw1W2KsB0Dkb0yrTyiVqOL1aknpqtDry7n1OmCrVA
+ DKHZjjC4V3wje41lNWrObHfuH4zowyxjvilsMENtjAdvJaL/71w1glKUwM5oG7fobItf
+ vtCR5sH/O7AsDWzJYlKXvZzntbEBhJJqFwmcG9JUf+2aZZsYmFET8xTtudRJLaAQFrPP
+ /QMaxkGKElvbCGLCgvzvIHSqn2x1cL/2cIAslJkH0naFJKQzkqzAyGP5G1MjW/8dU/CU
+ nmrXYVL2z9xlods4Q4e+uhdchgI/C+7lXrHzCC4yKFmKvPTYPjnBiY/TnJUsWfGyb8LY
+ tKiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8q1sawrAR7L0CtEGCE+s9tKiGKo+ZNnF45eMhlEP5bk=;
+ b=CYtjdiaOYVoPxPJU17HFRHFVLQiDuC/IqYJKVh4XDhjEvNjwrj55aYl0J9bj8muvmv
+ 9WP88E5Ii8nRaMn9OvSUbXSI+BW6TUbtPPyD/nsv5GrqeNCe0Vv8AA2LIE8oD48gB7y8
+ JiPWS31dNhPj/CLxi//HWld2MvCy9nkiT2MHYK4a6x5nLOXERk6Dv07zSE6w/Ayi8t9c
+ c6P5zECngGGgbZw4na3XOHOBOq8Aija4sMMW97CgMtI0Ej/Q2G7SX+eBHOh4srkyzDyh
+ 1GzAGUYVdKdpe90macnEVIhNlESmzlao22DTLTjDW2dDPtgwGvnEbKnN/FMvCOiTTorB
+ 4Otg==
+X-Gm-Message-State: APjAAAWmEOT3ByCeH7WFy0vFw1nMEb/ixQqimF3MU6/fK/GMmcxvWeno
+ MS4y4M2Sxuq1H+K9iROTbEyAmskwiV9I+j8u0Om9AQ==
+X-Google-Smtp-Source: APXvYqxvKMctwVhcPPp3ymAsEEgVNouQ1f6ZSyJLqu4vvtSGX+0sY304GPhEh7EfBcxeulUep0maq9mi0+v9ZWycpGs=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr28894585otd.91.1582299020896; 
+ Fri, 21 Feb 2020 07:30:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <607d1b80-f66f-6519-b3e5-af48e1a65900@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="QRj9sO5tAVLaXnSD"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <1582270927-2568-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1582270927-2568-2-git-send-email-sai.pavan.boddu@xilinx.com>
+In-Reply-To: <1582270927-2568-2-git-send-email-sai.pavan.boddu@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Feb 2020 15:30:10 +0000
+Message-ID: <CAFEAcA-NYkaQuJq=0Ft7j0XEPqJQz=G=wwKTWTxdbCmSRUh6uA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] arm_gic: Mask the un-supported priority bits
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,59 +88,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Anthony Liguori <anthony@codemonkey.ws>,
+ "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---QRj9sO5tAVLaXnSD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Fri, 21 Feb 2020 at 07:46, Sai Pavan Boddu
+<sai.pavan.boddu@xilinx.com> wrote:
+>
+> Priority bits implemented in arm-gic can be 8 to 4, un-implemented bits
+> are read as zeros(RAZ).
+>
+> Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+> ---
+>  hw/intc/arm_gic.c                | 26 ++++++++++++++++++++++++--
+>  hw/intc/arm_gic_common.c         |  1 +
+>  include/hw/intc/arm_gic_common.h |  1 +
+>  3 files changed, 26 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index 1d7da7b..dec8767 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -641,6 +641,23 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+>      return ret;
+>  }
+>
+> +static uint32_t gic_fullprio_mask(GICState *s, int cpu)
+> +{
+> +    /*
+> +     * Return a mask word which clears the unimplemented priority
+> +     * bits from a priority value for an interrupt. (Not to be
+> +     * confused with the group priority, whose mask depends on BPR.)
+> +     */
+> +    int unimpBits;
+> +
+> +    if (gic_is_vcpu(cpu)) {
+> +        unimpBits = GIC_VIRT_MAX_GROUP_PRIO_BITS;
+> +    } else {
+> +        unimpBits = 8 - s->n_prio_bits;
 
-On Fri, Feb 21, 2020 at 04:04:10PM +0100, Paolo Bonzini wrote:
-> On 21/02/20 15:47, Stefan Hajnoczi wrote:
-> >>>       QLIST_SAFE_REMOVE(node, node_ready); /* remove from nested pare=
-nt's list */
-> >>>       ^---- would cause corruption if node->node_ready was stale!
-> >>>
-> >>> Would you like me to add a comment?
-> >> No, it's okay.
-> > Are you happy with this series?
->=20
-> Yes.  Let's keep the Q*_REMOVE cleanup on the todo list.  I'd keep
-> Q*_SAFE_REMOVE, but clear the pointer unconditionally in Q*_REMOVE so
-> that we can have something like Q*_IN_LIST too.
+This isn't right; GIC_VIRT_MAX_GROUP_PRIO_BITS should
+be handled the same way as s->n_prio_bits. The expression
+I suggested in my comment on your v1 should work:
 
-QLIST_IS_INSERTED() is part of this patch series, although I can rename
-it to Q*_IN_LIST() and cover all linked list variants. :)
+    if (gic_is_vcpu(cpu)) {
+        pribits = GIC_VIRT_MAX_GROUP_PRIO_BITS;
+    } else {
+        pribits = s->n_prio_bits;
+    }
+    return ~0U << (8 - s->n_prio_bits);
 
-> > Shall I include it in my next pull request or do you want to merge it?
->=20
-> No, it's yours.
+> +    }
+> +    return ~0U << unimpBits;
+> +}
+> +
+>  void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+>                        MemTxAttrs attrs)
+>  {
 
-Thanks!
 
-Stefan
+You seem to have lost the part of the patch which applies
+the mask in gic_dist_set_priority(). If the GIC only
+has 5 bits of priority we should not allow the guest to
+set more than that.
 
---QRj9sO5tAVLaXnSD
-Content-Type: application/pgp-signature; name="signature.asc"
+> @@ -669,7 +686,7 @@ static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
+>          }
+>          prio = (prio << 1) & 0xff; /* Non-secure view */
+>      }
+> -    return prio;
+> +    return prio & gic_fullprio_mask(s, cpu);
+>  }
+>
+>  static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+> @@ -684,7 +701,7 @@ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
+>              return;
+>          }
+>      }
+> -    s->priority_mask[cpu] = pmask;
+> +    s->priority_mask[cpu] = pmask & gic_fullprio_mask(s, cpu);
+>  }
+>
+>  static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
+> @@ -2055,6 +2072,11 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>
+> +    if (s->n_prio_bits > 8) {
+> +        error_setg(errp, "num-priority-bits cannot be greater than 8");
+> +        return;
+> +    }
 
------BEGIN PGP SIGNATURE-----
+You need to also check that the value is at least as large
+as the lowest permitted value, as I suggested in my v1 comment.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5P9z4ACgkQnKSrs4Gr
-c8gAhAf8DYlnsM35zMCy3OSEpf+J1340nHCjwekImTvtNf8vVnZd+65vZZW9qH4C
-NktEZkpOck0uKa0E+jAVnfxAfHVGgZsG1oqONWe+2Pb0G3vk1n5PAccLJ/ZCYikC
-algWnLhl+Of3BOCj4ryJ6vqOAUfvcLmnNEBkzdvvPO680wZ5jULN/nYLnJlDg1+e
-OiM4fpTDwZBR/LHslHujebmoxN2NdIZcNb8U+9DPFvUFV4tBAYCiTcEIFe7YgfUs
-PrMm73xocHzrjI1wPabhu99nTs20mL66iD690KLnBi4fmLcOBa+loOnDUKYT1tN0
-8sBNrbEfw3DG7gvnKFIK2XuXvNJY5w==
-=37zH
------END PGP SIGNATURE-----
-
---QRj9sO5tAVLaXnSD--
-
+thanks
+-- PMM
 
