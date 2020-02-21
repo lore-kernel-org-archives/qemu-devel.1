@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B763BC35647
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E748BC35655
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 817A72073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:08:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B638C24650
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:08:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Os/lQ0px"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817A72073A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oi8PnEj8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B638C24650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j582z-0008AQ-Lf
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:08:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56393)
+	id 1j5831-0008J6-VU
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:08:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j581z-0006Tg-6A
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:48 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5820-0006Ts-Rk
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j581x-0002Rx-W4
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:47 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:52264)
+ (envelope-from <peter.maydell@linaro.org>) id 1j581z-0002Tc-SA
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:48 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37637)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j581x-0002RY-P3
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:45 -0500
-Received: by mail-wm1-x331.google.com with SMTP id p9so1734402wmc.2
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:45 -0800 (PST)
+ id 1j581z-0002T9-M3
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:47 -0500
+Received: by mail-wr1-x434.google.com with SMTP id w15so1996176wru.4
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=nzHzFg20+dv2Qj6R5QZ1RVKcfKZ0HBelWmrraQzT7AY=;
- b=Os/lQ0pxQoLY0DtDVn92hJvBYKr2+5kiTz+XfLeqsCAgKTb7Tz3XM6rcfj2SeFoGQk
- EujgAyRRy628bC6flc3UYyDSTySFZNgQlOZYoseAsk+2p7ZCaNgGdlAT3eIWRPXFe+u7
- QdA1/ASpRxQuZRqwk7jH+JgTwVREI+jrphmiiwP5wAiMm5aUIE485z02WWNqnZiUebtf
- JjjmAcRe+8fZWjwVu65mwGf5nEX5jRD7g4DhFI3SXaymBVOe9sv+NsKCDdWxqjl3rxmo
- oj98iOQX3lr+JM8KWYLVh5TCncpeGkS1RqbgGIDjpoQkZAWaCI4i9WzrLNbTf3g6/bsV
- oykg==
+ bh=LnZwcALAQoLYwtLg7hngxVlKU2Xi0Rug4qNNkDV9UPk=;
+ b=oi8PnEj8oSnxe9G6eaPjm6z7AAaUB77jlRhs87NTI4MZR9S5mLP1PAvzXEFA58AZic
+ h+dkWtOC58rvvEPpehoJlEBXd6xge+fg84/rkCqwc9XlhKs93kBX22Ddz/Mx/Ei7iHig
+ kmJMzqhRiXvatS72dRpZqVbxne5BDV3GBuImMNyCyb37vli1tM7X4dYx9sC2DpOPzD2+
+ wqXLvDKsZ9hc+F4ogk/OGzYmYtoXZcFZzPzXSl6ND/GGseZ6DDwHN7l8z2YYtY6J7QSD
+ 34sTetIoRSxm/G6r5f7Yudf4fLOej1HK1DNxAzsrrD2wbV6CQdsi1NphKPWWkgsySP71
+ zPoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nzHzFg20+dv2Qj6R5QZ1RVKcfKZ0HBelWmrraQzT7AY=;
- b=HizEOG/V/iw8Kui90u5XYVAiQVxHj0Ns7/fSOtIhEOOALmuhqNj9kb0nYxlRa1DeiH
- LD4dsep7QcegUpXDLgR3h1d9Xsc5VjmZPN0x/MWVpnIuPNlM7TMYhG22qSu4YicnpojW
- U8a8ejo+f7xtYGPO1oCCdNQ9DD9Zklels5gTomFODQ3um4I/jbB7HeBPlVJykUhMG+Jq
- 5WW8RYgkp2+Ow33fVHgzZV6Zckxwewa2RQHnL7BoRWda99GGjCiLPkHZ3LhlMqxK6mAM
- 7RwaqIe9A/KRpFeb0U2zidAX+D9xXy7tubvuGzEdp0mtSq3fymeREzHRcfUgQJly+fTk
- T95g==
-X-Gm-Message-State: APjAAAXmqQwQauZFVGqiJg85rhonCFRzJCpVBSubuuqfE98c3BEtDolZ
- q7/yn8Yku9qF0DMVxVuVUtmcbrlVzo2p9A==
-X-Google-Smtp-Source: APXvYqwtuPcCf53T9ZsqGTy0Y2x7iviqx8hUf6aY4Tipe+VUPUtTv0c4lD7ool4KKFHpxO5WkpR8KQ==
-X-Received: by 2002:a1c:20d6:: with SMTP id g205mr3959431wmg.38.1582290463793; 
- Fri, 21 Feb 2020 05:07:43 -0800 (PST)
+ bh=LnZwcALAQoLYwtLg7hngxVlKU2Xi0Rug4qNNkDV9UPk=;
+ b=mZEKf+WxAKXFpraY0Z7qwrCXOBDZOs449IH22/s+RH5rcYlGFtxguYmk1Gww88Vrpu
+ 1MRAmVsXOnuMI56sVSsiZq6BsTMx9VVYLwF6KxeZHGvsn0hAn5yxKZMqRa79D17ccQ8E
+ bAn3IeVXeGAwkNOLfd89TsVvFjLAzGcFhSF+5zbYnAKVyMeka3CTAYL3BVfjzKxe24+N
+ NUedCaW0a2q/Zd3K6gwFF0KSPrxJHHIWQqBTmEejhGFmjljWYaJIwMLSAf1peXZTA9v7
+ 9SUDODs/h3cMtqRgpomFYn5ZUnoAUZXCIg0QmewAFgMEe9iPc1qQSAfMaLU+PofPo1a/
+ g3DA==
+X-Gm-Message-State: APjAAAWtsBkj8c+5LaF9G0We5RfhtFSu1RKrwRtfvepPuqk7cX63orSv
+ Xuq5Q57kMAgNURFEltcatjeFY7wydjwbLQ==
+X-Google-Smtp-Source: APXvYqxoDFtzxcohHAYxsNP/Z6z+V68R3ci6PT+sYafanxsIRT2cqDggdSmEm+aSIyI0iT4R4B8CEw==
+X-Received: by 2002:a5d:65c6:: with SMTP id e6mr21378938wrw.45.1582290466416; 
+ Fri, 21 Feb 2020 05:07:46 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.42
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.45
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:07:43 -0800 (PST)
+ Fri, 21 Feb 2020 05:07:45 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/52] aspeed/scu: Create separate write callbacks
-Date: Fri, 21 Feb 2020 13:06:49 +0000
-Message-Id: <20200221130740.7583-2-peter.maydell@linaro.org>
+Subject: [PULL 03/52] hw/misc/iotkit-secctl: Fix writing to 'PPC Interrupt
+ Clear' register
+Date: Fri, 21 Feb 2020 13:06:51 +0000
+Message-Id: <20200221130740.7583-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,144 +99,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This splits the common write callback into separate ast2400 and ast2500
-implementations. This makes it clearer when implementing differing
-behaviour.
+Fix warning reported by Clang static code analyzer:
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200121013302.43839-2-joel@jms.id.au
+    CC      hw/misc/iotkit-secctl.o
+  hw/misc/iotkit-secctl.c:343:9: warning: Value stored to 'value' is never read
+          value &= 0x00f000f3;
+          ^        ~~~~~~~~~~
+
+Fixes: b3717c23e1c
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200217132922.24607-1-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/aspeed_scu.c | 80 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 57 insertions(+), 23 deletions(-)
+ hw/misc/iotkit-secctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index ce2f9562d4c..6cb388330a8 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -232,8 +232,47 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
-     return s->regs[reg];
- }
- 
--static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
--                             unsigned size)
-+static void aspeed_ast2400_scu_write(void *opaque, hwaddr offset,
-+                                     uint64_t data, unsigned size)
-+{
-+    AspeedSCUState *s = ASPEED_SCU(opaque);
-+    int reg = TO_REG(offset);
-+
-+    if (reg >= ASPEED_SCU_NR_REGS) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Out-of-bounds write at offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+        return;
-+    }
-+
-+    if (reg > PROT_KEY && reg < CPU2_BASE_SEG1 &&
-+            !s->regs[PROT_KEY]) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: SCU is locked!\n", __func__);
-+    }
-+
-+    trace_aspeed_scu_write(offset, size, data);
-+
-+    switch (reg) {
-+    case PROT_KEY:
-+        s->regs[reg] = (data == ASPEED_SCU_PROT_KEY) ? 1 : 0;
-+        return;
-+    case SILICON_REV:
-+    case FREQ_CNTR_EVAL:
-+    case VGA_SCRATCH1 ... VGA_SCRATCH8:
-+    case RNG_DATA:
-+    case FREE_CNTR4:
-+    case FREE_CNTR4_EXT:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Write to read-only offset 0x%" HWADDR_PRIx "\n",
-+                      __func__, offset);
-+        return;
-+    }
-+
-+    s->regs[reg] = data;
-+}
-+
-+static void aspeed_ast2500_scu_write(void *opaque, hwaddr offset,
-+                                     uint64_t data, unsigned size)
- {
-     AspeedSCUState *s = ASPEED_SCU(opaque);
-     int reg = TO_REG(offset);
-@@ -257,25 +296,11 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
-     case PROT_KEY:
-         s->regs[reg] = (data == ASPEED_SCU_PROT_KEY) ? 1 : 0;
-         return;
--    case CLK_SEL:
--        s->regs[reg] = data;
--        break;
-     case HW_STRAP1:
--        if (ASPEED_IS_AST2500(s->regs[SILICON_REV])) {
--            s->regs[HW_STRAP1] |= data;
--            return;
--        }
--        /* Jump to assignment below */
--        break;
-+        s->regs[HW_STRAP1] |= data;
-+        return;
-     case SILICON_REV:
--        if (ASPEED_IS_AST2500(s->regs[SILICON_REV])) {
--            s->regs[HW_STRAP1] &= ~data;
--        } else {
--            qemu_log_mask(LOG_GUEST_ERROR,
--                          "%s: Write to read-only offset 0x%" HWADDR_PRIx "\n",
--                          __func__, offset);
--        }
--        /* Avoid assignment below, we've handled everything */
-+        s->regs[HW_STRAP1] &= ~data;
-         return;
-     case FREQ_CNTR_EVAL:
-     case VGA_SCRATCH1 ... VGA_SCRATCH8:
-@@ -291,9 +316,18 @@ static void aspeed_scu_write(void *opaque, hwaddr offset, uint64_t data,
-     s->regs[reg] = data;
- }
- 
--static const MemoryRegionOps aspeed_scu_ops = {
-+static const MemoryRegionOps aspeed_ast2400_scu_ops = {
-     .read = aspeed_scu_read,
--    .write = aspeed_scu_write,
-+    .write = aspeed_ast2400_scu_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+    .valid.unaligned = false,
-+};
-+
-+static const MemoryRegionOps aspeed_ast2500_scu_ops = {
-+    .read = aspeed_scu_read,
-+    .write = aspeed_ast2500_scu_write,
-     .endianness = DEVICE_LITTLE_ENDIAN,
-     .valid.min_access_size = 4,
-     .valid.max_access_size = 4,
-@@ -469,7 +503,7 @@ static void aspeed_2400_scu_class_init(ObjectClass *klass, void *data)
-     asc->calc_hpll = aspeed_2400_scu_calc_hpll;
-     asc->apb_divider = 2;
-     asc->nr_regs = ASPEED_SCU_NR_REGS;
--    asc->ops = &aspeed_scu_ops;
-+    asc->ops = &aspeed_ast2400_scu_ops;
- }
- 
- static const TypeInfo aspeed_2400_scu_info = {
-@@ -489,7 +523,7 @@ static void aspeed_2500_scu_class_init(ObjectClass *klass, void *data)
-     asc->calc_hpll = aspeed_2500_scu_calc_hpll;
-     asc->apb_divider = 4;
-     asc->nr_regs = ASPEED_SCU_NR_REGS;
--    asc->ops = &aspeed_scu_ops;
-+    asc->ops = &aspeed_ast2500_scu_ops;
- }
- 
- static const TypeInfo aspeed_2500_scu_info = {
+diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
+index 609869821a1..9fdb82056a8 100644
+--- a/hw/misc/iotkit-secctl.c
++++ b/hw/misc/iotkit-secctl.c
+@@ -340,7 +340,7 @@ static MemTxResult iotkit_secctl_s_write(void *opaque, hwaddr addr,
+         qemu_set_irq(s->sec_resp_cfg, s->secrespcfg);
+         break;
+     case A_SECPPCINTCLR:
+-        value &= 0x00f000f3;
++        s->secppcintstat &= ~(value & 0x00f000f3);
+         foreach_ppc(s, iotkit_secctl_ppc_update_irq_clear);
+         break;
+     case A_SECPPCINTEN:
 -- 
 2.20.1
 
