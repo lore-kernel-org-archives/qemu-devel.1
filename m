@@ -2,87 +2,95 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA9BC35647
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3782CC35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:20:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C20F207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:19:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 032CB24656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 11:20:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nysyK/yV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C20F207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfP3caCC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 032CB24656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j56Kh-0001uy-QU
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:18:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34172)
+	id 1j56ME-0003wu-4X
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 06:20:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1j56Jr-0000eZ-9g
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:18:08 -0500
+ (envelope-from <mst@redhat.com>) id 1j56LG-0002vR-Qw
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1j56Jq-0005l8-Ag
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:18:07 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41158)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1j56Jq-0005km-40; Fri, 21 Feb 2020 06:18:06 -0500
-Received: by mail-wr1-x444.google.com with SMTP id c9so1582895wrw.8;
- Fri, 21 Feb 2020 03:18:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=7PutZxexlNapWDA8hZ+U0o774pVrySnXaNVLvj7honU=;
- b=nysyK/yVQ2YWIFVQ/srZ750EtdWOrvf6bH44kzSQcNcvb1zmuk+/YpjFwZ8PUnL2Ns
- yP5sgWjUVTT8h/UUavxNineeFMlLh2ZUXL/pHNUqhNUBnZKCvC4NgB9UGgJk8cpRO4ck
- eGxI23xOB59dsbn+hvjcdZD28TAh32lcT6uZlYEBaeHXrHdHqGcETNqTOu0NIBr7u/Wi
- aNF13kzDafM4i1rY+mPbCLMea7nZMKW3QsoQs1TIAWTiZvgBFrZn7dQ5Guf9UgqMM7f3
- 71E6EuHyZSWzlQfiuT9IxqiDX73mBsdOaZ9YnhAlF2oz5coMQOz6ypidybhIN+QZhJhn
- kb+w==
+ (envelope-from <mst@redhat.com>) id 1j56LF-0007CC-NC
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:19:34 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51252
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j56LF-0007B3-JA
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 06:19:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582283969;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=k4ebQwlt11Gl0jrM7qcleoPwEVIE6AQamzr2NAIpqU4=;
+ b=CfP3caCCLmOZsfwg/EiZFlrhYBT8HkAVjtH6v3d3/VwGOH5skQB/hD2+rDA2jaDpe22tkR
+ i5hQBSzhDKT1T6wH7OsTCbos3zXaJBXy/ViSp8V6/w7U1QR9zdUCk1xoKwF89/pF4gwu+F
+ QWcswXd4y3wusei/cJoeXWZTKE5iux8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-tTppOu2LP5ipl8htr_m5ww-1; Fri, 21 Feb 2020 06:19:25 -0500
+X-MC-Unique: tTppOu2LP5ipl8htr_m5ww-1
+Received: by mail-qv1-f71.google.com with SMTP id e26so1131247qvb.4
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 03:19:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7PutZxexlNapWDA8hZ+U0o774pVrySnXaNVLvj7honU=;
- b=C40bM9JZPztLtVE8Jicc7+0RzvOZIf+mfX8nocQJwPOMEmvWYgQd5sMPRa9EDGoUpH
- hlt2K6HnTdOENEDt6v1frFx97MAXQN+CfN5MmjwvM8UfbqWJWEEhaf8oAv/DCX7bDYQi
- 6tYMyaN38gT2DRm4L7F2M8fFGx6d9u32Hx4ApDvkx+Jag0DeEEYVIiqttfxucIOqITLY
- 9v38Ppgrbb3Sbt2gjuUlR+Loby4XJu7B/vrlB5PkQo5aevMsB/n7Xar9BEjaOo7OSpQb
- rJ/7GnEa9qVQonXSc+qz2CMp/9aJMS3iY7d+9RG2omQv7AlJTkbeqgCZpLSbTPZw0tRb
- +8GQ==
-X-Gm-Message-State: APjAAAVo0yEh32dn7lcflfdNABJ3q8V7o+vX9KY3Kd8izDamp2onaomD
- slJWzDp3pL2eHJZELENN/do=
-X-Google-Smtp-Source: APXvYqxQEg/uHVgoQxQn3MC5gn3GBaIw2RDOFbTc4peKHoXW/woMopfjoTvvtWHWjV5slXp1eK0Vvg==
-X-Received: by 2002:a5d:448c:: with SMTP id j12mr47221873wrq.125.1582283884865; 
- Fri, 21 Feb 2020 03:18:04 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id d22sm3050668wmd.39.2020.02.21.03.18.03
+ bh=7txp7z1X8erN7BC9QYO3PQSZ4yDrqkuOWmxBfekEQjM=;
+ b=kKLNyRoGKXkBMBeVYkxmkHSMlPnJwkRisPxvzyKlQo/iohtNWuPBUyN7qLBwlYH7+c
+ J5LKNWLUyE/E9yR3SeJxL6a6eilfXEr1bwJQ8pX8eJeN63k+aRw9yuvsKlrsBa38HBWM
+ 7aRGatA27ZzgYsHwMAvPhUSEtjetrc8uERHT9+cOsDc2QlE275fJ52vx5lLE86NYUpTV
+ FYAlwtARZEK0MGSeNXrN4nde/OFLh3uhCA4k7jVAt527UoiyFPvEHZWPPwJijWMFnNPX
+ ToujA4Ij0NPX0neHgFlRneCYGYCkwBUkiRXWH49Jb42LGmy4z5Q5wlmZr3AGvPiF4QNA
+ t3kw==
+X-Gm-Message-State: APjAAAU4WKJOP0HBXmcKGXUoyDsrni20LxbHBJs7UvwGiJ0Rtw5Rf1qm
+ xXDKerRcFYLp6o7RMy9XIC25ScEuolQGULMS0Vfh2DQqvx2Uy4yXXGoaUyQhnTOoUsezZ7JPUmP
+ 3Rw5Y8itMLN/pTR4=
+X-Received: by 2002:ac8:425a:: with SMTP id r26mr31032977qtm.138.1582283965353; 
+ Fri, 21 Feb 2020 03:19:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyEYI/1JwoIqXH1oGA8/qEEp3fDLCv4oEsDMkSZ7ZFlFWeitxRZvT0VxRdkchJrjgSYW2BAcw==
+X-Received: by 2002:ac8:425a:: with SMTP id r26mr31032950qtm.138.1582283965127; 
+ Fri, 21 Feb 2020 03:19:25 -0800 (PST)
+Received: from redhat.com (bzq-109-67-14-209.red.bezeqint.net. [109.67.14.209])
+ by smtp.gmail.com with ESMTPSA id q14sm1359692qkn.30.2020.02.21.03.19.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 03:18:03 -0800 (PST)
-Date: Fri, 21 Feb 2020 11:18:02 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v3 2/4] luks: implement .bdrv_measure()
-Message-ID: <20200221111802.GF1484511@stefanha-x1.localdomain>
-References: <20200211160318.453650-1-stefanha@redhat.com>
- <20200211160318.453650-3-stefanha@redhat.com>
- <f93c484a-39e6-2745-e493-a9c2ed0a83c2@redhat.com>
+ Fri, 21 Feb 2020 03:19:24 -0800 (PST)
+Date: Fri, 21 Feb 2020 06:19:19 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yubo Miao <miaoyubo@huawei.com>
+Subject: Re: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie for arm
+Message-ID: <20200221061811-mutt-send-email-mst@kernel.org>
+References: <20200221063512.1104-1-miaoyubo@huawei.com>
+ <20200221063512.1104-4-miaoyubo@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="4f28nU6agdXSinmL"
+In-Reply-To: <20200221063512.1104-4-miaoyubo@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <f93c484a-39e6-2745-e493-a9c2ed0a83c2@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,78 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, imammedo@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, shannon.zhaosl@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---4f28nU6agdXSinmL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Feb 19, 2020 at 04:46:34PM +0100, Max Reitz wrote:
-> On 11.02.20 17:03, Stefan Hajnoczi wrote:
-> > Add qemu-img measure support in the "luks" block driver.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  block/crypto.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 62 insertions(+)
-> >=20
-> > diff --git a/block/crypto.c b/block/crypto.c
-> > index 24823835c1..453119875e 100644
-> > --- a/block/crypto.c
-> > +++ b/block/crypto.c
-> > @@ -484,6 +484,67 @@ static int64_t block_crypto_getlength(BlockDriverS=
-tate *bs)
+On Fri, Feb 21, 2020 at 02:35:12PM +0800, Yubo Miao wrote:
+> From: miaoyubo <miaoyubo@huawei.com>
 >=20
-> [...]
+> Currently, pxb-pcie could be defined by the cmdline like
+>     --device pxb-pcie,id=3Dpci.9,bus_nr=3D128
+> However pxb-pcie is not described in acpi tables for arm.
 >=20
-> > +    cryptoopts =3D qemu_opts_to_qdict_filtered(opts, NULL,
-> > +            &block_crypto_create_opts_luks, true);
-> > +    qdict_put_str(cryptoopts, "format", "luks");
-> > +    create_opts =3D block_crypto_create_opts_init(cryptoopts, errp);
+> The formal two patches support pxb-pcie for arm, escpcially the
+> specification for pxb-pcie in DSDT table.
 >=20
-> It looks a bit weird to me to use errp here...
+> Add a testcase to make sure the ACPI table is correct for guest.
 >=20
-> > +    qobject_unref(cryptoopts);
-> > +    if (!create_opts) {
-> > +        goto err;
-> > +    }
-> > +
-> > +    if (!qcrypto_block_calculate_payload_offset(create_opts, NULL,
-> > +                                                &luks_payload_size,
-> > +                                                &local_err)) {
+> Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+
+
+Please look at the top of tests/qtest/bios-tables-test.c
+for how to add or update tests.
+
+> ---
+>  tests/data/acpi/virt/DSDT.pxb  | Bin 0 -> 34209 bytes
+>  tests/qtest/bios-tables-test.c |  54 +++++++++++++++++++++++++++++----
+>  2 files changed, 48 insertions(+), 6 deletions(-)
+>  create mode 100644 tests/data/acpi/virt/DSDT.pxb
 >=20
-> ...and local_err here.  Either works, but consistent style would be a
-> bit nicer.
->=20
-> But not more correct, so:
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> diff --git a/tests/data/acpi/virt/DSDT.pxb b/tests/data/acpi/virt/DSDT.px=
+b
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..4eea3192c75ff28f7054d626a=
+9363ca025b6c0ad
+> GIT binary patch
 
-Thanks, will fix!
+I can't read this.
 
-Stefan
+> literal 34209
+> zcmeI*cXU+szJ~D)1PGxe5PG+us9-{<Do8R35G4>YGz}UAMT!L#ks?x*Dx!d5hoIPd
+> z?}}o>iWL;GW5HgrlKbvVM&HM??^)~qbMIProvd|8p2_U*%qO!m?AgcPkRQ(<wr)WX
+> zR3DKyBsMVKK5tZUEMJ#Z3xXj0I{cizY-H-_vUpxu>HL<ltgNimvVn#9^>bszg^Hd*
+> zYT59@{GfDxK}u{$QSzH5MFX?4va_qcnOYVriD$G-YqqdX5KgQUqzA#0T0ymH9aJ-P
+> zt=3D#;Qdf_)p=3DV$jH6t9{xXmH68P3ev)8EFlwrs(=3DX$_(9dxJh>6UU8FZi5vcVla%Bp
+> zz50)g^-pXvw4i9XAYFAU@nN}Xb+t___n%u<uhU$chBua*GNL5;Gf3Q8mfgX>w)`8L
+> z7F4goX88!*;pB+$X8&bG_2BOj*;OO*!h6xx&B+mI)uU#l*o>||BPVi3ji?#5Y(|dH
+> z=3DoUF6C2B^h&FJPcx<}5a88su#W_0%%JtAk+ikeZ+X7unGJtJq-j+)WHX7uzKy&`9%
 
---4f28nU6agdXSinmL
-Content-Type: application/pgp-signature; name="signature.asc"
+...
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5PvGoACgkQnKSrs4Gr
-c8hHQgf/Tt2mnGTWob7rdTC1xloAiKRtWT9NF0TiYcpQN6kGRT91cPV222ilOBlz
-Uko0VGrdF1kQhXPZYeVEKFP6LK7+uedhYOWMURkBO0eQIrFCY8nsGkKt6deVdo6r
-xZ8aoHr2bZ62ThIPDDtVE+nGfXmBjEpm8+Vgq4jbEC73gOk1MYXciapilO30QefN
-pDvfC8LE+bRFChi2o72MmQvYCEpE3eX1an9wB806XYT1b8frqZc39LSMAts+Nr9b
-RfBMwXmbelRLYyrkGkYlk2rBn+xGPbxOs1I7nZys3GxAqWFMcLBGrNCrLAQ4Njp5
-1QIHTtnI089jt6POJrJ7NNy5ydIC5w==
-=Hkh1
------END PGP SIGNATURE-----
-
---4f28nU6agdXSinmL--
 
