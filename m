@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53826C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4798C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 211C924650
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:22:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F9B8206D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TWqNjT1o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211C924650
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kcE0vzAa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9B8206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j58GG-0005DY-7k
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:22:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56810)
+	id 1j58Hy-00087f-PS
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:24:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j582U-0007Sv-P4
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j582v-00007J-8l
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j582T-00035L-Ap
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:18 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37066)
+ (envelope-from <peter.maydell@linaro.org>) id 1j582t-00042w-TA
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:45 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46943)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j582T-00034w-3Q
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:17 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a6so1777892wme.2
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:17 -0800 (PST)
+ id 1j582t-00041B-MV
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:43 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z7so1970138wrl.13
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=FgrSznS6GQA2r5mNaBbVlZPpkueYI11Yncfhcl8nXSI=;
- b=TWqNjT1oW4nBL+siIovxN33o+NgO5a+tqblWw8YdCWdkmqq/9S1NxRafrrOc2AcBUx
- URAhxMxcMa/1JeASX7LCg5s7r+XFOWgt36IsFkj6GJDqAS72+VWbpt+iPIDnMTpgz99H
- 1mH+2Fol6x+63UeYR6n0QrhKuePBVKzj0bl8e/IzkIVnJPdcymiYPgTSCWQBXbouju+y
- v1YBse5lIsLF2OoLMS/AWpGbJ/kJLxh3Ha4dCfH8K9Nt1HLB0/lkJfE/EMnuca0/E3+g
- ICEUC2mZXmYbZVIJfMsQlY6Bw/IF+wytaQOZRMN1uFApcMIxwoq4eJLZraSjUX/r6MKm
- Anow==
+ bh=O5FrGw//Kf20i1r0SXQ2jfWdoET0BPsu80ZZ6EIsSSg=;
+ b=kcE0vzAagzRnaipCDzWZc44m78pxWviB+VPBzHHLept3XhAsWpdidQC9jScO0SeYw5
+ m/g5/H4GmmrTqyoVSSc6/D5yodn+8VLOYgZ6nOCzGcjWpQdzAKSGT/2N8mAa/HJkTgY4
+ N0+9SdBG4El4OcqKzvI8cNw/oZp9ah0k9ARh6Cmy0UChnHga3wMFn+upgJikswD0enPr
+ hPLJIhuSB0clNPb/MTWwYqFzl1pzQq+/pBT3DVzm6G2BWoPRV/bkHIOVqHuEp8/ms37w
+ 93pktYqh61Be1E6mC2grTtZxqVhl7aox9n7ElVhEvRgLUPNuZFNpEVWA8qeTwYkEZXHQ
+ cUog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FgrSznS6GQA2r5mNaBbVlZPpkueYI11Yncfhcl8nXSI=;
- b=bx9yFmAmKd35r06WlUgRMynoKypDgqgn4wRsNlf8E9KTpvJVcbv3n7NBiTHZK9Kv9b
- LFlyD705H52/bJsQbv0LXV3H4CoAt4GJsYRnoSvL1AphvKo7ED64RcVbCPakGzKNcs2O
- XBO8XMymSD3CPjKNQiBoJ+wz358TcY4sEp24lryz7a21YnSkaVuiJX76Luqwka0rzS6f
- 1F2JFAvAykf2eaUXA4fOPh7PqJB0grvS438KKf7qeIvbPtIg9H8s1X0cQJsEZGQ3ckQB
- d6VwSbIhUo9RmaX/nMr3rAt2DLIa+HK4kuRNntDZaL+KG+InL3XMbAnNi/368wjFfmr/
- IZsw==
-X-Gm-Message-State: APjAAAXSbGj4d6TkDy8qHAXxiDCjV8xHtjChb70GU9dU315x4DrGfqT9
- MMDKxC0x7uE0mWZ2RWVjVhwsshpXr1IcEA==
-X-Google-Smtp-Source: APXvYqyXIucbqCKyD0rnmJc6s2WICrYIgd6sWDnDvNhIuKaVxkn5/1n+BrA89ebcKwYQYPICITKTcA==
-X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr3702295wmk.131.1582290495626; 
- Fri, 21 Feb 2020 05:08:15 -0800 (PST)
+ bh=O5FrGw//Kf20i1r0SXQ2jfWdoET0BPsu80ZZ6EIsSSg=;
+ b=jmZXNDWt2eXZ7lqBn2/O/WwIGrG1rLAlaVUepkWRpbidOVuYZcQ7/qHWG4eLXjkIy8
+ h/roZcy08+JmwbaQeWGqd/3Bm8XqgNsI8Ms3gO4HqGhTW9xKz22R3WiyOAl3KfLaj4Sh
+ 2eXmr211XtCjOqs5DdG3UeVGsY54330wCUybHxaeOz3aD2PAaUnHfo5boyKCj5lWbEvk
+ 2r3jxyZh6IJO6Tk4npP3aztKendc7BNKEyvKWAwVAbpnms0TNN97cGbRnXViIMWTKJFK
+ otlYGB4oQLj+L2o39Sx6/pyU/odBOo60vZt70lCDgslKq7E8X5Md0KWWdQfNWhIvxyjN
+ bLmQ==
+X-Gm-Message-State: APjAAAVmCeBLT1DjWt6nTIr0XdvLZfMLJnZwCvToBDtTOCn4uV/rktJt
+ fi+qWpOrEZsAZ3u6XBJdv5VROChZ0MIWVA==
+X-Google-Smtp-Source: APXvYqxp377UelAni/CcZYK8NQmbYfq7yaWa+qNzk8f6U8yyqvUoySkyklzB40dt6r0rQ/0LthZfsw==
+X-Received: by 2002:adf:f744:: with SMTP id z4mr43958210wrp.318.1582290515175; 
+ Fri, 21 Feb 2020 05:08:35 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.14
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.34
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:08:14 -0800 (PST)
+ Fri, 21 Feb 2020 05:08:34 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/52] target/arm: Implement ARMv8.4-PMU extension
-Date: Fri, 21 Feb 2020 13:07:15 +0000
-Message-Id: <20200221130740.7583-28-peter.maydell@linaro.org>
+Subject: [PULL 43/52] sh4: Fix PCI ISA IO memory subregion
+Date: Fri, 21 Feb 2020 13:07:31 +0000
+Message-Id: <20200221130740.7583-44-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,130 +97,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ARMv8.4-PMU extension adds:
- * one new required event, STALL
- * one new system register PMMIR_EL1
+From: Guenter Roeck <linux@roeck-us.net>
 
-(There are also some more L1-cache related events, but since
-we don't implement any cache we don't provide these, in the
-same way we don't provide the base-PMUv3 cache events.)
+Booting the r2d machine from flash fails because flash is not discovered.
+Looking at the flattened memory tree, we see the following.
 
-The STALL event "counts every attributable cycle on which no
-attributable instruction or operation was sent for execution on this
-PE".  QEMU doesn't stall in this sense, so this is another
-always-reads-zero event.
+FlatView #1
+ AS "memory", root: system
+ AS "cpu-memory-0", root: system
+ AS "sh_pci_host", root: bus master container
+ Root memory region: system
+  0000000000000000-000000000000ffff (prio 0, i/o): io
+  0000000000010000-0000000000ffffff (prio 0, i/o): r2d.flash @0000000000010000
 
-The PMMIR_EL1 register is a read-only register providing
-implementation-specific information about the PMU; currently it has
-only one field, SLOTS, which defines behaviour of the STALL_SLOT PMU
-event.  Since QEMU doesn't implement the STALL_SLOT event, we can
-validly make the register read zero.
+The overlapping memory region is sh_pci.isa, ie the ISA I/O region bridge.
+This region is initially assigned to address 0xfe240000, but overwritten
+with a write into the PCIIOBR register. This write is expected to adjust
+the PCI memory window, but not to change the region's base adddress.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Peter Maydell provided the following detailed explanation.
+
+"Section 22.3.7 and in particular figure 22.3 (of "SSH7751R user's manual:
+hardware") are clear about how this is supposed to work: there is a window
+at 0xfe240000 in the system register space for PCI I/O space. When the CPU
+makes an access into that area, the PCI controller calculates the PCI
+address to use by combining bits 0..17 of the system address with the
+bits 31..18 value that the guest has put into the PCIIOBR. That is, writing
+to the PCIIOBR changes which section of the IO address space is visible in
+the 0xfe240000 window. Instead what QEMU's implementation does is move the
+window to whatever value the guest writes to the PCIIOBR register -- so if
+the guest writes 0 we put the window at 0 in system address space."
+
+Fix the problem by calling memory_region_set_alias_offset() instead of
+removing and re-adding the PCI ISA subregion on writes into PCIIOBR.
+At the same time, in sh_pci_device_realize(), don't set iobr since
+it is overwritten later anyway. Instead, pass the base address to
+memory_region_add_subregion() directly.
+
+Many thanks to Peter Maydell for the detailed problem analysis, and for
+providing suggestions on how to fix the problem.
+
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+Message-id: 20200218201050.15273-1-linux@roeck-us.net
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200214175116.9164-15-peter.maydell@linaro.org
 ---
- target/arm/cpu.h    | 18 ++++++++++++++++++
- target/arm/helper.c | 22 +++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 1 deletion(-)
+ hw/sh4/sh_pci.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e043932fcb1..cfa9fd6c1b9 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3519,6 +3519,13 @@ static inline bool isar_feature_aa32_pmu_8_1(const ARMISARegisters *id)
-         FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
+diff --git a/hw/sh4/sh_pci.c b/hw/sh4/sh_pci.c
+index 71afd23b679..08f2fc1ddee 100644
+--- a/hw/sh4/sh_pci.c
++++ b/hw/sh4/sh_pci.c
+@@ -67,12 +67,8 @@ static void sh_pci_reg_write (void *p, hwaddr addr, uint64_t val,
+         pcic->mbr = val & 0xff000001;
+         break;
+     case 0x1c8:
+-        if ((val & 0xfffc0000) != (pcic->iobr & 0xfffc0000)) {
+-            memory_region_del_subregion(get_system_memory(), &pcic->isa);
+-            pcic->iobr = val & 0xfffc0001;
+-            memory_region_add_subregion(get_system_memory(),
+-                                        pcic->iobr & 0xfffc0000, &pcic->isa);
+-        }
++        pcic->iobr = val & 0xfffc0001;
++        memory_region_set_alias_offset(&pcic->isa, val & 0xfffc0000);
+         break;
+     case 0x220:
+         pci_data_write(phb->bus, pcic->par, val, 4);
+@@ -147,8 +143,7 @@ static void sh_pci_device_realize(DeviceState *dev, Error **errp)
+                              get_system_io(), 0, 0x40000);
+     sysbus_init_mmio(sbd, &s->memconfig_p4);
+     sysbus_init_mmio(sbd, &s->memconfig_a7);
+-    s->iobr = 0xfe240000;
+-    memory_region_add_subregion(get_system_memory(), s->iobr, &s->isa);
++    memory_region_add_subregion(get_system_memory(), 0xfe240000, &s->isa);
+ 
+     s->dev = pci_create_simple(phb->bus, PCI_DEVFN(0, 0), "sh_pci_host");
  }
- 
-+static inline bool isar_feature_aa32_pmu_8_4(const ARMISARegisters *id)
-+{
-+    /* 0xf means "non-standard IMPDEF PMU" */
-+    return FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) >= 5 &&
-+        FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
-+}
-+
- /*
-  * 64-bit feature tests via id registers.
-  */
-@@ -3704,6 +3711,12 @@ static inline bool isar_feature_aa64_pmu_8_1(const ARMISARegisters *id)
-         FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
- }
- 
-+static inline bool isar_feature_aa64_pmu_8_4(const ARMISARegisters *id)
-+{
-+    return FIELD_EX32(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 5 &&
-+        FIELD_EX32(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
-+}
-+
- /*
-  * Feature tests for "does this exist in either 32-bit or 64-bit?"
-  */
-@@ -3722,6 +3735,11 @@ static inline bool isar_feature_any_pmu_8_1(const ARMISARegisters *id)
-     return isar_feature_aa64_pmu_8_1(id) || isar_feature_aa32_pmu_8_1(id);
- }
- 
-+static inline bool isar_feature_any_pmu_8_4(const ARMISARegisters *id)
-+{
-+    return isar_feature_aa64_pmu_8_4(id) || isar_feature_aa32_pmu_8_4(id);
-+}
-+
- /*
-  * Forward to the above feature tests given an ARMCPU pointer.
-  */
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 2fe09c1d604..72c9c7e694a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1130,6 +1130,12 @@ static bool pmu_8_1_events_supported(CPUARMState *env)
-     return cpu_isar_feature(any_pmu_8_1, env_archcpu(env));
- }
- 
-+static bool pmu_8_4_events_supported(CPUARMState *env)
-+{
-+    /* For events which are supported in any v8.1 PMU */
-+    return cpu_isar_feature(any_pmu_8_4, env_archcpu(env));
-+}
-+
- static uint64_t zero_event_get_count(CPUARMState *env)
- {
-     /* For events which on QEMU never fire, so their count is always zero */
-@@ -1170,6 +1176,11 @@ static const pm_event pm_events[] = {
-       .get_count = zero_event_get_count,
-       .ns_per_count = zero_event_ns_per,
-     },
-+    { .number = 0x03c, /* STALL */
-+      .supported = pmu_8_4_events_supported,
-+      .get_count = zero_event_get_count,
-+      .ns_per_count = zero_event_ns_per,
-+    },
- };
- 
- /*
-@@ -1178,7 +1189,7 @@ static const pm_event pm_events[] = {
-  * should first be updated to something sparse instead of the current
-  * supported_event_map[] array.
-  */
--#define MAX_EVENT_ID 0x24
-+#define MAX_EVENT_ID 0x3c
- #define UNSUPPORTED_EVENT UINT16_MAX
- static uint16_t supported_event_map[MAX_EVENT_ID + 1];
- 
-@@ -6414,6 +6425,15 @@ static void define_pmu_regs(ARMCPU *cpu)
-         };
-         define_arm_cp_regs(cpu, v81_pmu_regs);
-     }
-+    if (cpu_isar_feature(any_pmu_8_4, cpu)) {
-+        static const ARMCPRegInfo v84_pmmir = {
-+            .name = "PMMIR_EL1", .state = ARM_CP_STATE_BOTH,
-+            .opc0 = 3, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 6,
-+            .access = PL1_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
-+            .resetvalue = 0
-+        };
-+        define_one_arm_cp_reg(cpu, &v84_pmmir);
-+    }
- }
- 
- /* We don't know until after realize whether there's a GICv3
 -- 
 2.20.1
 
