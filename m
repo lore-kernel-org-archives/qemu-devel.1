@@ -2,77 +2,80 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08BBDC35642
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D75B0C35642
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8C80207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:02:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FA8120722
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DorupPEl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8C80207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Df3A6k6q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA8120722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j558p-0007Ux-Q2
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 05:02:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40085)
+	id 1j55Dn-0000Z0-Qv
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 05:07:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j557K-0006K9-J3
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:01:07 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j55DF-00006y-8X
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:07:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j557I-0001FN-Rp
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:01:06 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44264
+ (envelope-from <kwolf@redhat.com>) id 1j55DD-00025u-Ix
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:07:12 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41784
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j557I-0001AN-Jg
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:01:04 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j55DD-00025c-Ec
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:07:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582279263;
+ s=mimecast20190719; t=1582279630;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hYNYk/ZBzFhuET+UFCiRZYMcZx/AnwFOJuiQ8SK+V4Q=;
- b=DorupPElVpNT/7LNNg8zxF9AtycCt4QPehFWJVH+aZ/9Vi0QhxExafuuqOugPc5NjJa/RJ
- BcqCH/FdQlq93j7jrvXXsqdh7CUWHJ7hFho0I2cpowka3lDkEJlfyfgBDUBlxwGuP6ZJI9
- gUpnPWhjJHLH1B/9sZ0nNMDEvp6FzFc=
+ bh=IToZr3Yl94vxod4FBmfy218XDEWCaOlNLZaxqbwmfNY=;
+ b=Df3A6k6qVXVFLbcVlcprGf97IB2iO2G4PFYVp1mpzzgVAkEDVjhW9KxAYFCBlNwAz7eo5l
+ 2GEyZXhaf0miYnWei4JHGqWikkudv8KitbfnoqKItGIl1eGPayFYKveU7wYNcnF+7+Bjz+
+ ddNynCunl7SJm+JE/3kfR9WZC4f0TTs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-OKncACr1MHaD8GBYTwfGzQ-1; Fri, 21 Feb 2020 05:01:02 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-478-RBT-5KctPOCmsHqhCBicKg-1; Fri, 21 Feb 2020 05:07:06 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FAE2801E53;
- Fri, 21 Feb 2020 10:01:01 +0000 (UTC)
-Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 562BB9182C;
- Fri, 21 Feb 2020 10:00:57 +0000 (UTC)
-Date: Fri, 21 Feb 2020 11:00:54 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v4 16/16] docs: Add protvirt docs
-Message-ID: <20200221110054.322d8206.cohuck@redhat.com>
-In-Reply-To: <20200220125638.7241-17-frankja@linux.ibm.com>
-References: <20200220125638.7241-1-frankja@linux.ibm.com>
- <20200220125638.7241-17-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 967BC800D5E;
+ Fri, 21 Feb 2020 10:07:05 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-15.ams2.redhat.com [10.36.117.15])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B1A4419756;
+ Fri, 21 Feb 2020 10:07:01 +0000 (UTC)
+Date: Fri, 21 Feb 2020 11:07:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+Message-ID: <20200221100700.GA5254@linux.fritz.box>
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: OKncACr1MHaD8GBYTwfGzQ-1
+In-Reply-To: <87blptckoi.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: RBT-5KctPOCmsHqhCBicKg-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -86,111 +89,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ QEMU <qemu-devel@nongnu.org>, David Alan Gilbert <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 20 Feb 2020 07:56:38 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Am 20.02.2020 um 17:01 hat Markus Armbruster geschrieben:
+> >> >  void qmp_screendump(const char *filename, bool has_device, const ch=
+ar *device,
+> >> >                      bool has_head, int64_t head, Error **errp)
+> >> >  {
+> >> >      QemuConsole *con;
+> >> >      DisplaySurface *surface;
+> >> > +    g_autoptr(pixman_image_t) image =3D NULL;
+> >> >      int fd;
+> >> >
+> >> >      if (has_device) {
+> >> > @@ -365,7 +375,15 @@ void qmp_screendump(const char *filename, bool =
+has_device, const char *device,
+> >> >          }
+> >> >      }
+> >> >
+> >> > -    graphic_hw_update(con);
+> >> > +    if (qemu_in_coroutine()) {
+> >> > +        assert(!con->screendump_co);
+> >> > +        con->screendump_co =3D qemu_coroutine_self();
+> >> > +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> >> > +                                graphic_hw_update_bh, con);
+> >> > +        qemu_coroutine_yield();
+> >> > +        con->screendump_co =3D NULL;
+> >> > +    }
+> >>
+> >> What if multiple QMP monitors simultaneously screendump?  Hmm, it work=
+s
+> >> because all execute one after another in the same coroutine
+> >> qmp_dispatcher_co.  Implicit mutual exclusion.
+> >>
+> >> Executing them one after another is bad, because it lets an ill-behave=
+d
+> >> QMP command starve *all* QMP monitors.  We do it only out of
+> >> (reasonable!) fear of implicit mutual exclusion requirements like the
+> >> one you add.
+> >>
+> >> Let's not add more if we can help it.
+> >
+> > The situation is not worse than the current blocking handling.
+>=20
+> Really?
+>=20
+> What makes executing multiple qmp_screendump() concurrently (in separate
+> threads) or interleaved (in separate coroutines in the same thread)
+> unsafe before this patch?
 
-> Lets add some documentation for the Protected VM functionality.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  docs/protvirt.rst | 53 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 53 insertions(+)
->  create mode 100644 docs/protvirt.rst
+QMP command handlers are guaranteed to run in the main thread with the
+BQL held, so there is no concurrency. If you want to change this, you
+would have much more complicated problems to solve than in this handler.
+I'm not sure it's fair to require thread-safety from one handler when
+no other handler is thread safe (except accidentally) and nobody seems
+to plan actually calling them from multiple threads.
 
-You'll probably want to add that file to an index as well, so that it
-gets built properly.
+> >> Your screendump_co is per QemuConsole instead of per QMP monitor only
+> >> because you need to find the coroutine in graphic_hw_update_done().  C=
+an
+> >> we somehow pass it via function arguments?
+> >
+> > I think it could be done later, so I suggest a TODO.
+>=20
+> We should avoid making our dependence on implicit mutual exclusion
+> worse.  When we do it anyway, a big, fat, ugly comment is definitely
+> called for.
 
-> 
-> diff --git a/docs/protvirt.rst b/docs/protvirt.rst
-> new file mode 100644
-> index 0000000000..8bfa72be01
-> --- /dev/null
-> +++ b/docs/protvirt.rst
-> @@ -0,1 +1,53 @@
-> +Protected Virtualization on s390x
-> +========================
+Anyway, what I really wanted to add:
 
-Please lengthen the underlining :)
+This should be easy to solve by having a CoQueue instead of a single
+Coroutine pointer. The coroutine would just call qemu_co_queue_wait(),
+which adds itself to the queue before it yields and the update
+completion would wake up all coroutines that are currently queued with
+qemu_co_queue_restart_all().
 
-Also, it might improve readability of the text doc if you added an
-empty line beneath the headers.
+qemu_co_queue_wait() takes a lock as its second parameter. You don't
+need it in this context and can just pass NULL. (This is a lock that
+would be dropped while the coroutine is sleeping and automatically
+reacquired afterwards.)
 
-> +The memory and most of the register contents of Protected Virtual
-> +Machines (PVMs) are inaccessible to the hypervisor, effectively
-> +prohibiting VM introspection when the VM is running. At rest, PVMs are
-> +encrypted and can only be decrypted by the firmware of specific IBM Z
-> +machines.
-> +
-> +
-> +Prerequisites
-> +-------------
-> +To run PVMs, you need to have a machine with the Protected
-> +Virtualization feature, which is indicated by the Ultravisor Call
-> +facility (stfle bit 158). This is a KVM only feature, therefore you
-> +need a KVM which is able to support PVMs and activate the Ultravisor
-> +initialization by setting "prot_virt=1" on the kernel command line.
+> >> In case avoiding the mutual exclusion is impractical: please explain i=
+t
+> >> in a comment to make it somewhat less implicit.
+>=20
+> It is anything but: see appended patch.
 
-`prot_virt=1`, so that it gets rendered as a literal in html?
+This works, too, but it requires an additional struct. I think the queue
+is easier. (Note there is a difference in the mechanism: Your patch
+waits for the specific update it triggered, while the CoQueue would wait
+for _any_ update to complete. I assume effectively the result is the
+same.)
 
-> +
-> +If those requirements are met, the capability "KVM_CAP_S390_PROTECTED"
-
-`KVM_CAP_S390_PROTECTED`
-
-> +will indicate that KVM can support PVMs on that LPAR.
-> +
-> +
-> +QEMU Settings
-> +-------------
-> +To indicate to the VM that it can move into protected mode, the
-> +"Unpack facility" (stfle bit 161) needs to be part of the cpu model of
-> +the VM.
-
-Add an example invocation here?
-
-> +
-> +All I/O devices need to use the IOMMU.
-> +Passthrough devices are currently not supported.
-
-s/Passthrough devices/Passthrough (vfio) devices/ ?
-
-> +
-> +Host huge page backings are not supported. The guest however can use
-> +huge pages as indicated by its facilities.
-> +
-> +
-> +Boot Process
-> +-----------------
-
-Underlining too long :)
-
-> +A secure guest image can be booted from disk and using the QEMU
-
-"can be both booted from..." ?
-
-> +command line. Booting from disk is done by the unmodified s390-ccw
-> +BIOS. I.e., the bootmap is interpreted and a number of components is
-> +read into memory and control is transferred to one of the components
-> +(zipl stage3), which does some fixups and then transfers control to
-> +some program residing in guest memory, which is normally the OS
-> +kernel. The secure image has another component prepended (stage3a)
-> +which uses the new diag308 subcodes 8 and 10 to trigger the transition
-> +into secure mode.
-> +
-> +Booting from the command line requires that the file passed
-> +via -kernel has the same memory layout as would result from the disk
-> +boot. This memory layout includes the encrypted components (kernel,
-> +initrd, cmdline), the stage3a loader and metadata. In case this boot
-> +method is used, the command line options -initrd and -cmdline are
-> +ineffective.  The preparation of secure guest image is done by a
-> +program (name tbd) of the s390-tools package.
-
-Hm... do you have an ETA for that tbd program?
+Kevin
 
 
