@@ -2,59 +2,95 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E86C4C35657
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7C4C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BECF220722
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:04:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BECF220722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 3AA5B20722
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 18:05:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I749B3+a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA5B20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5CfX-0003ly-RY
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 13:04:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
+	id 1j5CgF-0004eA-FU
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 13:05:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45601)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j5Cet-0003FE-CB
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:16 -0500
+ (envelope-from <peterx@redhat.com>) id 1j5CfQ-0003nb-Or
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j5Cer-0006dh-HU
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:14 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:18447)
+ (envelope-from <peterx@redhat.com>) id 1j5CfO-0006wU-Qd
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:47 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48479
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j5Ceo-0006c4-Tp; Fri, 21 Feb 2020 13:04:13 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 6A1E0747DF8;
- Fri, 21 Feb 2020 19:04:08 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D75C7747DF7; Fri, 21 Feb 2020 19:04:07 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id D52DA74637E;
- Fri, 21 Feb 2020 19:04:07 +0100 (CET)
-Date: Fri, 21 Feb 2020 19:04:07 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-In-Reply-To: <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2002211807380.69986@zero.eik.bme.hu>
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
- <alpine.BSF.2.22.395.2002211643480.45267@zero.eik.bme.hu>
- <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j5CfO-0006vO-L3
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 13:04:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582308285;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kpGXQkXHUeaMoHpMAQOGOZUE/N5imtyDcaBopDcc2Z0=;
+ b=I749B3+aefbe0j1VAIidYMjrGnA09y0k1+vyjJ+NV06HTmwcNv6J6jKtOUh4xAXHztKNvC
+ QkHmISDYEFDqSrRtaMiW0f0c7MpI3vEN3hIji1GH4CkS85XoirYYe84ah6ErrWe9i6Z1Rb
+ CH4eVEXoFlI7obTKitsqkcO3LoJQXZ0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-Hzs0RTQXOZeq8s0E0qjXeQ-1; Fri, 21 Feb 2020 13:04:43 -0500
+X-MC-Unique: Hzs0RTQXOZeq8s0E0qjXeQ-1
+Received: by mail-qv1-f70.google.com with SMTP id v3so1879145qvm.2
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 10:04:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=W8peW3FQIPtTKF2cUwS2FUJ0ehcEM8fGHL7Yz9MFAtg=;
+ b=XVUP6nv8gb1hOt20JVOdsWeyjrGubcrqUYHWGNuoyzQdM22P1ShpPpaR5pT6nLWRCJ
+ 8BM37hZr8xqgcYrkSc4iKcMGbeSr94OIk23J6AndfRTcbJmp03k+Iz5WZkZEhJdBmjWX
+ 6fImCra0QFU5kaRWij9sYwMCp/xIQyZH93qNN2494E+CRTzea1M25Z/myrM2RI6zk0mZ
+ gVf+VuznHFZ5QjLFdBDDURZsF7V8MQbijxCBzMlXiFEo8L5iUsF4eDx0VCJcF2c+k3Kc
+ KF15o4U3WJniWVnl1DgnpKo58BLgwJ/IVaE3BoUCdDufam+V8xmc8BKIlFiG4nA8FeCj
+ GGCQ==
+X-Gm-Message-State: APjAAAULYY2v4Eh1+gMuIvdJ9iz7dsCqOQ8yrsLucv+pV75HxYmDitgl
+ 8HhLx5qi2c7p5IMG3O4SWFAyGbfShmfnVOrr+B4UYJdd5I0UR+L7R65X2bJ48bry+WOpNhmjWLJ
+ kYFrQdKqB4zhbVw4=
+X-Received: by 2002:aed:3e53:: with SMTP id m19mr33422667qtf.387.1582308283191; 
+ Fri, 21 Feb 2020 10:04:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyCCxi4ySoGKe68p1tfsz7+cfluKfG07qA5l9L6U2zWmC3FkXe6CO8F1dL11k7nLoTimaUO7Q==
+X-Received: by 2002:aed:3e53:: with SMTP id m19mr33422632qtf.387.1582308282918; 
+ Fri, 21 Feb 2020 10:04:42 -0800 (PST)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
+ [72.137.123.47])
+ by smtp.gmail.com with ESMTPSA id u12sm1973225qtj.84.2020.02.21.10.04.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 21 Feb 2020 10:04:42 -0800 (PST)
+Date: Fri, 21 Feb 2020 13:04:40 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 00/13] migrate/ram: Fix resizing RAM blocks while
+ migrating
+Message-ID: <20200221180440.GE37727@xz-x1>
+References: <20200221164204.105570-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20200221164204.105570-1-david@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,75 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- John Arbuckle <programmingkidx@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paul Durrant <paul@xen.org>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Feb 2020, Peter Maydell wrote:
-> On Fri, 21 Feb 2020 at 16:05, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> On Thu, 20 Feb 2020, Richard Henderson wrote:
->>> On 2/18/20 9:10 AM, BALATON Zoltan wrote:
->>>> +    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, true),
->>>
->>> I would also prefer a different name here -- perhaps x-no-fp-fi.
->>
->> What's wrong with hardfloat? That's how the code refers to this so if
->> anyone searches what it does would turn up some meaningful results.
->
-> This prompted me to check what you're using the property for.
-> The cover letter says:
->> This patch implements a simple way to keep the inexact flag set for
->> hardfloat while still allowing to revert to softfloat for workloads
->> that need more accurate albeit slower emulation. (Set hardfloat
->> property of CPU, i.e. -cpu name,hardfloat=false for that.)
->
-> I think that is the wrong approach. Enabling use of the host
-> FPU should not affect the accuracy of the emulation, which
-> should remain bitwise-correct. We should only be using the
-> host FPU to the extent that we can do that without discarding
-> accuracy. As far as I'm aware that's how the hardfloat support
-> for other guest CPUs that use it works.
+On Fri, Feb 21, 2020 at 05:41:51PM +0100, David Hildenbrand wrote:
+> I was now able to actually test resizing while migrating. I am using the
+> prototype of virtio-mem to test (which also makes use of resizable
+> allocations). Things I was able to reproduce:
 
-I don't know of a better approach. Please see section 4.2.2 Floating-Point 
-Status and Control Register on page 124 in this document:
+The test cases cover quite a lot.  Thanks for doing that.
 
-https://openpowerfoundation.org/?resource_lib=power-isa-version-3-0
+> - Resize while still running on the migration source. Migration is cancel=
+ed
+> -- Test case for "migraton/ram: Handle RAM block resizes during precopy"
 
-especially the definition of the FR and FI bits and tell me how can we 
-emulate these accurately and use host FPU. Not using the FPU even when 
-these bits are not needed (which seems to be the case for all workloads 
-we've tested so far) seriously limits the emulation speed so spending time 
-to emulate obscure and unused part of an architecture when not actually 
-needed just to keep emulation accurate but unusably slow does not seem to 
-be the right approach. In an ideal world of course this should be both 
-fast and accurate but we don't seem to have anyone who could achieve that 
-in past two years so maybe we could give up some accuracy now to get 
-usable speed and worry about emulating obscure features when we come 
-across some workload that actually needs it (but we have the option to 
-revert to accurate but slow emulation for that until a better way can be 
-devised that's both fast and accurate). Insisting on accuracy without any 
-solution to current state just hinders making any progress with this.
+> - Resize (grow+shrink) on the migration target during postcopy migration
+>   (when syncing RAM blocks), while not yet running on the target
+> -- Test case for "migration/ram: Discard new RAM when growing RAM blocks
+>    and the VM is stopped", and overall RAM size synchronization. Seems to
+>    work just fine.
 
-Other PowerPC emulators also seem to not bother or have similar 
-optimisation. I've quickly checked three that I know about:
+This won't be able to trigger without virtio-mem, right?
 
-https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppcdrc.cpp#L1893
-https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppcdrc.cpp#L3503
-there's also something here but no mention of FI bit I could notice:
-https://github.com/mamedev/mame/blob/master/src/devices/cpu/powerpc/ppccom.cpp#L2023
+And I'm also curious on how to test this even with virtio-mem.  Is
+that a QMP command to extend/shrink virtio-mem?
 
-https://github.com/xenia-project/xenia/blob/master/src/xenia/cpu/ppc/ppc_hir_builder.cc#L428
+> - Resize (grow+shrink) on the migration tagret during postcopy migration
+>   while already running on the target.
+> -- Test case for "migration/ram: Handle RAM block resizes during postcopy=
+"
+> -- Test case for "migration/ram: Tolerate partially changed mappings in
+>    postcopy code" - I can see that -ENOENT is actually triggered and that
+>    migration succeeds. Migration seems to work just fine.
 
-https://github.com/dolphin-emu/dolphin/blob/master/Source/Core/Core/PowerPC/Jit64/Jit_FloatingPoint.cpp
+Thanks,
 
-But I'm not sure I understand all of the above so hope this makes more 
-sense to someone and can advise.
+--=20
+Peter Xu
 
-Regards,
-BALATON Zoltan
 
