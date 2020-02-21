@@ -2,80 +2,86 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183A1C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC14C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:57:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDEA620578
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:57:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D0D2208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:57:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NFrGUoFN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDEA620578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RbS9qmve"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0D2208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j58nh-0006r1-1m
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:57:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38505)
+	id 1j58o4-0007Su-77
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:57:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j58mw-0005vu-10
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:18 -0500
+ (envelope-from <stefanha@gmail.com>) id 1j58n5-00064j-4B
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j58mu-00033K-Rl
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:17 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35118)
+ (envelope-from <stefanha@gmail.com>) id 1j58n3-00038a-3A
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:27 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41310)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j58mu-00032M-MG
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:16 -0500
-Received: by mail-ot1-x341.google.com with SMTP id r16so2056185otd.2
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:56:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=c4760tBMjRqhqroGKwzEfY8GzOZj9O6HB76lR+c+SFg=;
- b=NFrGUoFNSIdGqDfAVZhihtnr7cD3fv6fqPJeNRGRwpq5GTgdInFDsU9ccEEFa2+oGA
- X5HHIO5kbrPGti6whwmX0djXPSb/woOoDMiOd5Vcj6bpDc3Ypo1N5f8XlCTFw6Wo07O9
- WlbPy+ehHO1l7zGxe5R96sndT5OWzfnMeEPccREyjsH5KahTsZVeHS1uPNjA4yg3H8Ny
- lTODPN1KzdROdDoBWRgBb74Jrp2w+GI9fhL9SV8XWmZGF/3GuvLDX4VrcekuOMty9JH3
- NUw/Cb1OIG4PitbRj3VNXz0q25wCRxPBRAv5peQXerunqn3ZiB7Me4zvLj7u47s/b+yh
- DzTw==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1j58n2-00037S-Sj
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:56:25 -0500
+Received: by mail-wr1-x442.google.com with SMTP id c9so2169463wrw.8
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:56:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=C6khDLhnNEWJAB13BrdphdApp4hcEUz0Bu5uQFOau+w=;
+ b=RbS9qmveHGIx3m3aKxjHMIMsf9qO/yZbSW1rYBwnZO3eL6I5sQk0rmZY5f3HErDH29
+ TicjuIJwh4Lxs41BLFZkNbEUHBmyqvnZrYm8jmM5KMcOXc8pVoxooIjhNsAFD2Wokkxf
+ JrNa0OEyKspIA7QouA+a+qidZk18Vpzlh35+O/9NXfEMx4SPHpHJEoPIrrUBH4/q/gnX
+ AQVOf2s7K/mp43dzGK2BIQMdLsbkyUagJb3ic3xw1Tt358XvBRwfcQICGLhUp0SoiwiC
+ 8/DJwx4PwVP3sNUX4ZRRI5LYW3QnPzhOvKOcjOsqdidTFMzx7qacZwzNSk4b0bynrFA7
+ JJpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=c4760tBMjRqhqroGKwzEfY8GzOZj9O6HB76lR+c+SFg=;
- b=UHyLXUrEwEAkYQcF0BzcG2qx4kn4WGDTvmk8mJrzAB46v7MlcjiipnMT2Br/OfVDfY
- l1XZ3QW/1mSq7euCw/adPFJKzoW2wWnC/fpoFUoN8wThpIckNrdxo6cjffQpW4IxuKC/
- aDGSlY80M8OruGl1L0/CA9xdzQU8m9zsEimk5Koo5nRfFLllI3Pq/Hdsmt4BGANGKx8H
- uF3pkgHhrL2lZYOvGB3+0Z/vKDkM1TI9CdFzM4XbClAMr/DLaQz/ggwpxLNTQ1cNFcM/
- /+yGjMVRa7mjAhx4MNp6FdJ/NWyXSNalD7l/znN+W8MmLnZToZG40e6CMkTdMe5S21jq
- ONmQ==
-X-Gm-Message-State: APjAAAXIDFi9S3IoprFCsn2CLmAo9T+Wd6OojOOCq8QjV6E6JNJp/Ovg
- cyJUFQ89Z/TOcaGv3PBitVDikDn31pdSl6327s5kOg==
-X-Google-Smtp-Source: APXvYqysYCuli2degmyMzWwW+R2/BUsYiFMOLUHTOy6V9LYxzPDdkQlLVzkTyjDPGcnG2sGaS8Pfu3OQlj3uu2rlUSI=
-X-Received: by 2002:a05:6830:13da:: with SMTP id
- e26mr26452878otq.97.1582293375527; 
- Fri, 21 Feb 2020 05:56:15 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=C6khDLhnNEWJAB13BrdphdApp4hcEUz0Bu5uQFOau+w=;
+ b=KaGQgp314gIXNfy0jZRRgqHt9JbE9Q+0cCjIePSQW8juDADmUlzFbiMT+/Nblq7Idi
+ tkQmPWaWsze/TkLaTQSOFzbnOD51oVvsz7HNL2TS5oinopMgX12OzhO2POaSS9ysfAEm
+ O6Rw/clL8KlfLsAUUSsqL9unySZlkBmFhrJ7+9GnMtUmplxviWt+qzqd4fRADh2Zg40U
+ QZAr7fOLzDyU3Or+afBuNw86Lug3Ps4YokP1GNodaYQj0zayQtML/yp+7Bv/85mtK95L
+ G4/1dLvUMKFvDEcYRQC5WGPnavLEO56c0KIK8q/L0IW+ga6+KUZoojT09UnKSqWc8cg3
+ KHaQ==
+X-Gm-Message-State: APjAAAVTOZU1hPoAd56pKs6I/Qy8qOEAO3IUwJekH7zNX5dOM7+vTz5P
+ Vi698Bsap/4IqxDTQSUQB0s=
+X-Google-Smtp-Source: APXvYqzLOg4/X7T2U1HmiM/TR+4kQLb8/aGfkuh8FrpC3bOQh66IDKsKURjflxdVTXol0hGDtFQwpQ==
+X-Received: by 2002:a5d:69cf:: with SMTP id s15mr21526946wrw.184.1582293383982; 
+ Fri, 21 Feb 2020 05:56:23 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id s15sm4014983wrp.4.2020.02.21.05.56.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 21 Feb 2020 05:56:23 -0800 (PST)
+Date: Fri, 21 Feb 2020 13:56:22 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: [PATCH v10 01/22] softmmu: move vl.c to softmmu/
+Message-ID: <20200221135622.GP1484511@stefanha-x1.localdomain>
+References: <20200220041118.23264-1-alxndr@bu.edu>
+ <20200220041118.23264-2-alxndr@bu.edu>
 MIME-Version: 1.0
-References: <20200219220333.1411905-1-laurent@vivier.eu>
- <CAFEAcA8g+uRrGuNLdURegmpjRLtk=vVC9zUE1+QVKRitPjJy7A@mail.gmail.com>
-In-Reply-To: <CAFEAcA8g+uRrGuNLdURegmpjRLtk=vVC9zUE1+QVKRitPjJy7A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Feb 2020 13:56:04 +0000
-Message-ID: <CAFEAcA9xfrevtS=KupC1H2oMCG3p2LUqDvKN9KX-cW12OhJbGA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/20] linux-user: generate syscall_nr.sh
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="o41d8xLWOaLD8vYh"
+Content-Disposition: inline
+In-Reply-To: <20200220041118.23264-2-alxndr@bu.edu>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,44 +93,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: pbonzini@redhat.com, bsd@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, darren.kenny@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Feb 2020 at 13:45, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Wed, 19 Feb 2020 at 22:07, Laurent Vivier <laurent@vivier.eu> wrote:
-> >
-> > This series copies the files syscall.tbl from linux v5.5 and generates
-> > the file syscall_nr.h from them.
-> >
-> > This is done for all the QEMU targets that have a syscall.tbl
-> > in the linux source tree: mips, mips64, i386, x86_64, sparc, s390x,
-> > ppc, arm, microblaze, sh4, xtensa, m68k, hppa and alpha.
-> >
-> > tilegx and cris are depecrated in linux (tilegx has no maintainer in QEMU)
-> >
-> > aarch64, nios2, openrisc and riscv have no syscall.tbl in linux.
->
-> Is it the case that all our architectures either:
->  (1) have a syscall.tbl
->  (2) are using the asm-generic common numbering system ?
 
-I think that for asm-generic we should be able to generate
-the syscall_nr.h by suitably defining a __SYSCALL macro
-before #including linux-headers/asm-whatever/unistd.h --
-They basically define syscall numbers like this:
-#define __NR_setxattr 5
-__SYSCALL(__NR_setxattr, sys_setxattr)
+--o41d8xLWOaLD8vYh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-so a C program that just did the autogeneration has the
-info it needs.
+On Wed, Feb 19, 2020 at 11:10:57PM -0500, Alexander Bulekov wrote:
+> Move vl.c to a separate directory, similar to linux-user/
+> Update the chechpatch and get_maintainer scripts, since they relied on
+> /vl.c for top_of_tree checks.
+>=20
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+>  MAINTAINERS               | 2 +-
+>  Makefile.objs             | 2 --
+>  Makefile.target           | 1 +
+>  scripts/checkpatch.pl     | 2 +-
+>  scripts/get_maintainer.pl | 3 ++-
+>  softmmu/Makefile.objs     | 2 ++
+>  vl.c =3D> softmmu/vl.c      | 0
+>  7 files changed, 7 insertions(+), 5 deletions(-)
+>  create mode 100644 softmmu/Makefile.objs
+>  rename vl.c =3D> softmmu/vl.c (100%)
 
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--o41d8xLWOaLD8vYh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5P4YUACgkQnKSrs4Gr
+c8gXXgf+JQQP/urSgC5nhrxj32yRJVqq5KrAUxuevUIOxRKDYsJo+XVyIpLSIiRk
+fYk3d5w2IhbKtGC1zkNBU/V+nRZdQPLz+mOswocQXKItMMxXKex71BG+QiEH+Q9d
+EVsy6mHdONWjxF+REVx7DrMGEgL1BsxnuRHmlEE6SZ9KW+KFbGxOWSERaxkCJbjb
+X68jWV66bH5Y9eQmNQ5K5YAxE7p61z1olHO6ZmOfKS0qfXPBi2bGHgTIxCI9mCJi
+biLSaNLmWn4d0mcIPLgn2oz9H/VNH4zmtjDUBWCJRzOLgyki6x/sIvnDk9DVBh8N
+HWdcgf0cbc9SApPoEoMZHw2mmKf7+A==
+=tofH
+-----END PGP SIGNATURE-----
+
+--o41d8xLWOaLD8vYh--
 
