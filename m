@@ -2,88 +2,80 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE8EC35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA8AC35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:40:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB6AB208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8F80208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:40:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sece08w/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB6AB208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nk29l1AR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F80208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j58Vk-0004rH-6V
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:38:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57092)
+	id 1j58XB-0007Ib-Up
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:40:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j582m-0008DM-Me
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:37 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j58JR-0002ml-F0
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j582l-0003kc-Ks
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:36 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:41737)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j582l-0003jC-EN
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:35 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id c9so1987403wrw.8
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=xSiTZ3bbGCGd/uM9CAsKu9wKQwmjm99/Hgqy9CM1+t4=;
- b=sece08w/bOhVfcwMb3/YlVpUDibrQtTEizvqPiiDMaUO1UlQ0dzdCalD7ia4F/d+GR
- daaD/7FvqHJyQ704yQwPEuwcY27faVOKtxzSwbkcVaXP5W6uh4niGiErRWMwnBID5jJJ
- OZqyo0xkRIL1VJy6+7NgtuhXbbpH9UJlMeg6FCPIjUiP0W0+LDbIAKj0FPwtH13zvoBg
- c3tfmMiXybj7vIBAhCQg5gAutxVHrUQcKbWdcxMARn3QFIk1rEWWIFQj1Rg3pheercTT
- 09vAjRzW/k3j8z53fmSH3FWJOBZrK3GsOu6xliRIPX3xulpezohBsilitV6hZ5Z5Zodv
- WBeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xSiTZ3bbGCGd/uM9CAsKu9wKQwmjm99/Hgqy9CM1+t4=;
- b=qEHTZEviocLOcvifWtBqUjpJ946MqdTBwAtOjgfhTus44EDW3eYA2ruO99BBFMq3+0
- Ch+JnwQMHlIRA8HZIxnBFDM49GO080m/DeGKQaliZlLg+tosgi42nR5VlkCafHwOoVas
- 39SaXTD7CH7M6g9sNIfVvIZzxit5lTQ52r+Tj0uJ/diHmv6ei0TrmCNJGtMDXzWNvtyM
- gxkvxHEbQAuOD3Msbj/HzYZLgQosSx1DLyCeDSy6/mwb6nAQt+B/SrD+eSrCTbh0v/Nm
- 3xqsCdPgpEVTNoRfPHTQnUM5ZooJEiNQn3pk/5NSXVWXxNPXwiX6AXDvOLzvBq9Fl9qH
- DZSg==
-X-Gm-Message-State: APjAAAUHKMLK7pp7TCKpsnKbpTk83hJvnCvNr6xLFL7LSA6dUx8WpeDP
- VrphToUDFGlPQ49GomAGwbs0T+91QL0iyg==
-X-Google-Smtp-Source: APXvYqw2tMfTk1f5N4RvatMFZ4VgSrxGSPD1F0FNqzRRLgOsT2j4E/w+ppMtZ3ymsAlnyYusvN98ZQ==
-X-Received: by 2002:adf:b605:: with SMTP id f5mr46479361wre.383.1582290514004; 
- Fri, 21 Feb 2020 05:08:34 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.32
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:08:33 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 42/52] xilinx_spips: Correct the number of dummy cycles for the
- FAST_READ_4 cmd
-Date: Fri, 21 Feb 2020 13:07:30 +0000
-Message-Id: <20200221130740.7583-43-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
-References: <20200221130740.7583-1-peter.maydell@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1j58JO-0007Dp-P0
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:25:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36356
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j58JO-0007CQ-Gw
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:25:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582291545;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ou82nfRlLTKFiiP9tvRubo3I4987Bvtv3Cz7XMNiIrg=;
+ b=Nk29l1ARcTi18y2/oM6ztUOfVdA40fHOjhoGWU9oesUBwttzrrotsong8VVeHv2zSUUYHu
+ Ge1dr6zgE4CRyyHBJVFkx6aI2/wkILJmdlPpVvG8m6yxcsQNSG0kPwVJBe1VM3epL+rlhk
+ FKFcgvBWYxbof5ZdKAewfnIB6i3XLw0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-Hx0QJl4DP0KZBPwJI8IjRg-1; Fri, 21 Feb 2020 08:25:42 -0500
+X-MC-Unique: Hx0QJl4DP0KZBPwJI8IjRg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2C4CDB23;
+ Fri, 21 Feb 2020 13:25:41 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A9C3A8B745;
+ Fri, 21 Feb 2020 13:25:40 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, philmd@redhat.com, yangx.jy@cn.fujitsu.com,
+ mrezanin@redhat.com
+Subject: [PULL 1/6] virtiofsd: Help message fix for 'seconds'
+Date: Fri, 21 Feb 2020 13:25:31 +0000
+Message-Id: <20200221132536.38364-2-dgilbert@redhat.com>
+In-Reply-To: <20200221132536.38364-1-dgilbert@redhat.com>
+References: <20200221132536.38364-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,39 +91,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Francisco Iglesias <francisco.iglesias@xilinx.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Correct the number of dummy cycles required by the FAST_READ_4 command (to
-be eight, one dummy byte).
+second should be seconds.
 
-Fixes: ef06ca3946 ("xilinx_spips: Add support for RX discard and RX drain")
-Suggested-by: Cédric Le Goater <clg@kaod.org>
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200218113350.6090-1-frasse.iglesias@gmail.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Christophe de Dinechin <dinechin@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/ssi/xilinx_spips.c | 2 +-
+ tools/virtiofsd/helper.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 6c9ef597796..c57850a5051 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -576,11 +576,11 @@ static int xilinx_spips_num_dummies(XilinxQSPIPS *qs, uint8_t command)
-     case FAST_READ:
-     case DOR:
-     case QOR:
-+    case FAST_READ_4:
-     case DOR_4:
-     case QOR_4:
-         return 1;
-     case DIOR:
--    case FAST_READ_4:
-     case DIOR_4:
-         return 2;
-     case QIOR:
--- 
-2.20.1
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 0801cf752c..819c2bc13c 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -165,7 +165,7 @@ void fuse_cmdline_help(void)
+            "                               enable/disable readirplus\n"
+            "                               default: readdirplus except wit=
+h "
+            "cache=3Dnone\n"
+-           "    -o timeout=3D<number>        I/O timeout (second)\n"
++           "    -o timeout=3D<number>        I/O timeout (seconds)\n"
+            "                               default: depends on cache=3D op=
+tion.\n"
+            "    -o writeback|no_writeback  enable/disable writeback cache\=
+n"
+            "                               default: no_writeback\n"
+--=20
+2.24.1
 
 
