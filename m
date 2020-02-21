@@ -2,81 +2,81 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C9DC35656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B1F5C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5A482067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:05:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27A362067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:05:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GHPanR9L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5A482067D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f6mlvJ4u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A362067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5Ans-0004Xp-Of
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:05:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43268)
+	id 1j5AoF-0004yI-5v
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:05:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43610)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j5AlB-00022d-LE
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:02:38 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5AmX-0003PH-UG
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j5AlA-0003dz-LH
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:02:37 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39351)
+ (envelope-from <peter.maydell@linaro.org>) id 1j5AmX-0003yq-0o
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:01 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38268)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j5AlA-0003dm-G4
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:02:36 -0500
-Received: by mail-oi1-x244.google.com with SMTP id z2so2040573oih.6
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:02:36 -0800 (PST)
+ id 1j5AmW-0003yd-S0
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:00 -0500
+Received: by mail-ot1-x343.google.com with SMTP id z9so2436837oth.5
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:04:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BPprKegcKiXE/RIVcSob040jFDwvy+Y0T7ts8ETA4Bc=;
- b=GHPanR9Lg8ciZj7XCmK9wc6m9uI9ZCsnwvBTOTr3HEt6SrE/T7egghQLeVVdNXIjbM
- WJm/EvIQl1gtrVn8Qvr2PFO9KBdtSjcWEZ2kP1hmBQC9VXsx2GEl9BEICBCJpDWVB/MD
- xC0f9Bmlrvm3VtrFtL+8zpgfpaL1j0xQTT1vRDIZGq2mBXoPRrC1fv8DZAtYE9vzMLZ6
- A+J3xiFPeR3LSHmCdj6gG8mSL7k8FYDQQAQtQLuWigf7cXb4aTSei+M6oG7cWv1HKqG+
- YR5Jv7pByfqfSAJap77sB4U/U0+4Mgvxdmnk84bXi23LX520AqnsZtI2CSediqoZY/0k
- hcAw==
+ :cc; bh=cbNrZE4MQtjj7M5CHdQeU/3MnI3hR8oaeJyT8p8EYug=;
+ b=f6mlvJ4unfKci45F2Lp84TQD26TnEyjwyOCfDiOA5H6eoX8p+T2LzHpDickPn0McDG
+ bXAdHLkscZFFfcUUv2bB5UZ+DtpL59YNiEVCEcP6bOOmjyE0b9IvPAk6mqUVDY1NgXg6
+ 3FHHN6jtL1303jEucKjixoygDRHoONtqsaFfs/SNWRpUc8oYIUmJ3oetD4QoopZvbdUV
+ rXv5rCfMToBDJ5F2Amu9sIKrLLAXo8Icigqc0wB3lNaPBMBvyAPVwb4QuVWIECyK1B6H
+ u4ga7mKE0F4cEYqXkdGWb41NWG++dlfPI0itcQHvmhrwKpaK4iRUQxiPGQum9p1/REg3
+ CAvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=BPprKegcKiXE/RIVcSob040jFDwvy+Y0T7ts8ETA4Bc=;
- b=ibwWSk8BtYBTBZBk+oNEY/EJ8JhakU53/evr6FCocW2pWTRqWxaafUTEF2T5GsB2/4
- 83FX9yIB6Qckw2dUy3uauPnSVKt5hROMB3Pdu4zZn9u4kLgIICDvm+QelY6FXv3poJR/
- /u79Ja0VtTc88zSI3CKwO8Wi1/6kXE2RUhxcCbCd7B0tqM9evPAxsKOP6ubqhViOFk4+
- as4GreLIbrwPzNXPCCE1UCfLAP7vY1Y1sulNxw9lf1OHIujltmf3SAh3HTIgt5dgqRXM
- 2/b83c2PGtQpdhD9A7GMJs767fmZFp8Cj/J6hv2l0BZOaFqwF9jhFckID5DdEEQrF1aF
- 7Ijw==
-X-Gm-Message-State: APjAAAUxnGCGC9u5kM923yPgD3sGKx06rcZiihqhFMmd+c4W9Ehle69/
- OtV44bOPrevSOUVKcIlvxfBJ8/yQhC066SoEAJScVQ==
-X-Google-Smtp-Source: APXvYqydF1qXBwP0G/AIwAH/R92oKGY7IBTvxZ6v6kW6LALbzK7j59V3yp+uXwm9Wot15wQJULojGXVkifckd1g/pU8=
-X-Received: by 2002:a54:4f16:: with SMTP id e22mr2629432oiy.170.1582300955848; 
- Fri, 21 Feb 2020 08:02:35 -0800 (PST)
+ bh=cbNrZE4MQtjj7M5CHdQeU/3MnI3hR8oaeJyT8p8EYug=;
+ b=VMzyhPnv0FZ14reLjXwKuHRAu1TxtwS2JoZ47sSN2Fa7Lj9TsC6LGadROO+9BGtviy
+ B8PqJ9xmqgEl25PcXLxOCyqs99jJAxl9qFR6+uZUYf8mNShePG7Pr3S2KBJCpwIiWBtC
+ nqYSHkX6aDM7GeP9VghklqVf8WOzlyH444ULZHykCPIdcYtGSDHZdkb+enqdKSO4qrnJ
+ tvYiHC65N9fBuKQSqFQzsIDXwAUVARcpUNKQJtV9RXwoaiqVyq7NzXI/UGWreJLtX+ax
+ e8UYQ6NFgm4zP5F9aWFoJT6MEBfYE7l6tKqUphp2TzILiIVtIbz4W33rayeN3VCqDj3r
+ Ih7Q==
+X-Gm-Message-State: APjAAAWxqaTlzWVAtdUmsB3eoyxBkAG7wcF33esHL6sK+EnXj3b7XR1p
+ ab/mDjWsjzyKNXKR+XsA6FTQQUPTvudIppirTJiRpA==
+X-Google-Smtp-Source: APXvYqwwU1wxJ2d2C4NJmlvUBf/yiSJuJXNjiY1NdAhq/V45YPTrc5zgn4J0KoRF1Q0zKeLAqkpl1JvLIq7+N2PZWbM=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr26918262otq.97.1582301040162; 
+ Fri, 21 Feb 2020 08:04:00 -0800 (PST)
 MIME-Version: 1.0
 References: <20200214181547.21408-1-richard.henderson@linaro.org>
- <20200214181547.21408-4-richard.henderson@linaro.org>
-In-Reply-To: <20200214181547.21408-4-richard.henderson@linaro.org>
+ <20200214181547.21408-8-richard.henderson@linaro.org>
+In-Reply-To: <20200214181547.21408-8-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Feb 2020 16:02:24 +0000
-Message-ID: <CAFEAcA8qjx8_+3+bwbc8KrN2pfEPnV22V6ypTC6HoCDN1qx7Sg@mail.gmail.com>
-Subject: Re: [PATCH 03/19] target/arm: Use isar_feature_aa32_simd_r32 more
- places
+Date: Fri, 21 Feb 2020 16:03:49 +0000
+Message-ID: <CAFEAcA_FcWbZdK8GHWZenc59dFjwkBQFadtaCdJb3oL9NyeWUg@mail.gmail.com>
+Subject: Re: [PATCH 07/19] target/arm: Add isar_feature_aa32_{fpsp_v2, fpsp_v3,
+ fpdp_v3}
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,10 +96,13 @@ Sender: "Qemu-devel"
 On Fri, 14 Feb 2020 at 18:15, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Many uses of ARM_FEATURE_VFP3 are testing for the number of simd
-> registers implemented.  Use the proper test vs MVCR0.SIMDReg.
+> We will shortly use these to test for VFPv2 and VFPv3
+> in different situations.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
