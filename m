@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A3A8C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43176C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5601B2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F276C2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L4v/EB1N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5601B2073A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nNkUe5L7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F276C2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j589R-00030O-HR
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:15:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56613)
+	id 1j58BH-0005QH-5p
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:17:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56669)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j582G-0006oL-1r
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:05 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j582K-00071b-Gd
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j582E-0002iE-D1
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:03 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53632)
+ (envelope-from <peter.maydell@linaro.org>) id 1j582I-0002pq-QB
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:08 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39765)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j582E-0002eK-5c
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:02 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id s10so1730427wmh.3
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:01 -0800 (PST)
+ id 1j582I-0002oy-J2
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:06 -0500
+Received: by mail-wr1-x443.google.com with SMTP id y11so1995631wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=ab/N74S0Z/UQCYSVFfJ9xvcUWpUkXYgMA94Bf6u7eRk=;
- b=L4v/EB1Ngl2j8yRTvJHFsdxqKXMMA0m16HO58KAV6LQcWaN50dYVfmjxEEsdBNqzk0
- mWQE1K5RzneQbQ5ZXdlCtFgFbThJ8A4VnR4mP1uD8Q34SvYOdu9s2tA2hjoRYmeLPdCG
- c4uKUkfFEYg664LXAJocA1jeZXLkTwUOXsjvUFJxeeAZ+8y1fIn7G9DhRo1qWqYXUg+k
- 3nBBL/PMPIYa1VVQgCH6q67SXVcMUfR/DnWd7q95YjyUDwPsm9CmW4FcO8oD7TRsaxfd
- lEvNHGRdmTCln5oU7Ttn372JwRBngRfegYV0hpYk2VgDoNxWPEDSnXcpMTjbFnyh8do3
- c7Sw==
+ bh=8bdHdi62p5PzPAd0CdOGxqVtsuzmqbR0T0M8VLe4aj4=;
+ b=nNkUe5L7XNgCNJYsr+LNVUTzdRO1VHn2BJnWzNthWjvcRXoWe+vuoNfiPERXua08P6
+ FMeQoXNLMtVmtl9MvDXlG/rC5b1rFJ8gmwtxdfn1usZXFtWRlfue2JptzLjhMJc8agUG
+ pwTzA6mFCy99xCkB4s8LyifPcdz7tnF9Lx2W3WzQlm8NAhILOfga1cdsJxl2UvBIhlJl
+ Omnn1SVjBkbnbmXq5Iyu+UIPcFGDanJEGFSnoRt0mGrftVvu1xNQ6JbNRL/wcwHJ976y
+ HvXnMl7BFfqbZ7yIHOMOfTO7PblF7OecV668vFuJHqVAxJ8YqMGiowjCuYi8GRU1prnm
+ OwRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ab/N74S0Z/UQCYSVFfJ9xvcUWpUkXYgMA94Bf6u7eRk=;
- b=QcQ/rdT/0U/hsxt2BGxbXerbZL6EmrroOMCzaJHNP88khGDE05Cl3DifTjMnE/14tw
- I6BKnuIqCzkNuwi/lZ/uJ+55JfYgTDmsSUsfJz9p8EpPQvLAH1KUlgOy0FtDe0qGxDtQ
- Li+9stQjEL400NwPyDO3V29w6ure/7m/tqBY7jXVH+43gCYJmmTuy3YT5ywKU26TcZGM
- glpuhKMQPcU57UtL87O2+EtMYoT4ZATA6jbXyLqiyj9Hfgbdt7YiJ4G+vCIG4PIKpE8k
- bdMMWOKGfkgYoc++ESSG1zIcgH1EywnyrAnZ3lqD0FA6uW3n3ka0ZHKRlCcMCDuwKGKE
- reug==
-X-Gm-Message-State: APjAAAXnj7G4gAZPIC/MVBytx0u7WcK5KzBq9X632eMC7NOzPp25S/Xv
- zITpgUIQwvCIbxBxWaodkZZ2tNwDp7qz8w==
-X-Google-Smtp-Source: APXvYqwlu91xSYTQC1Z/uqCcdeesQrJK8cC8deYiQZ/Bj9JWz4T5xcSEtucmU/VPBbGIvDFVnrQC9g==
-X-Received: by 2002:a1c:20d6:: with SMTP id g205mr3961010wmg.38.1582290479513; 
- Fri, 21 Feb 2020 05:07:59 -0800 (PST)
+ bh=8bdHdi62p5PzPAd0CdOGxqVtsuzmqbR0T0M8VLe4aj4=;
+ b=BbDiOI2jMA1teBGsTcJ6MCM2KemHk33brYpCCfoPREpBjPuIBHTSNbQJ3Lr0vhN5DL
+ GPGYckWBnZkBaHPyX22NaJMHG3HOJU5Qfp1mk0fGWaRaVsKWy06Y5/UpZnwCqQNHHCf+
+ xeCQesSBSQq2N1N9IUnqgeJ+XkhEZatpfKTPG1WdCrYN++gHAxy28Jd1abs9ngWt9ZIJ
+ 8jrVd2USGpjKnSN//DGKlziavFzMVBoS3xjgeVeOzjdOlSetBAYiNAfaOrg3f3GlVBA5
+ z6N/N0iUe1hg7sLK77fuDv+egW2aHodcEkAy3hB08V8pJaUa02HJ7QMZ9kQzOSbCnXIr
+ XQqA==
+X-Gm-Message-State: APjAAAU9XXnUye/VXK+cwzhAHjMCncWFqFwJbO9r4/skK21iP04vMzlf
+ lCZBzZ+TBd6oqFoYOARENN0Zq2nd//5L6Q==
+X-Google-Smtp-Source: APXvYqyZGOp6lCNV6Ciu/5lSYz81JU03rAsqg1vhtfYSjT01XM3m31T7ef469ZRMtUDyTdyWnecZgg==
+X-Received: by 2002:a5d:4f8a:: with SMTP id d10mr22577212wru.143.1582290484848; 
+ Fri, 21 Feb 2020 05:08:04 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.58
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:07:58 -0800 (PST)
+ Fri, 21 Feb 2020 05:08:04 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/52] target/arm: Add _aa32_ to isar_feature functions testing
- 32-bit ID registers
-Date: Fri, 21 Feb 2020 13:07:02 +0000
-Message-Id: <20200221130740.7583-15-peter.maydell@linaro.org>
+Subject: [PULL 18/52] target/arm: Factor out PMU register definitions
+Date: Fri, 21 Feb 2020 13:07:06 +0000
+Message-Id: <20200221130740.7583-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,154 +98,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enforce a convention that an isar_feature function that tests a
-32-bit ID register always has _aa32_ in its name, and one that
-tests a 64-bit ID register always has _aa64_ in its name.
-We already follow this except for three cases: thumb_div,
-arm_div and jazelle, which all need _aa32_ adding.
+Pull the code that defines the various PMU registers out
+into its own function, matching the pattern we have
+already for the debug registers.
 
-(As noted in the comment, isar_feature_aa32_fp16_arith()
-is an exception in that it currently tests ID_AA64PFR0_EL1,
-but will switch to MVFR1 once we've properly implemented
-FP16 for AArch32.)
+Apart from one style fix to a multi-line comment, this
+is purely movement of code with no changes to it.
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200214175116.9164-2-peter.maydell@linaro.org
+Message-id: 20200214175116.9164-6-peter.maydell@linaro.org
 ---
- target/arm/cpu.h       | 13 ++++++++++---
- target/arm/internals.h |  2 +-
- linux-user/elfload.c   |  4 ++--
- target/arm/cpu.c       |  6 ++++--
- target/arm/helper.c    |  2 +-
- target/arm/translate.c |  6 +++---
- 6 files changed, 21 insertions(+), 12 deletions(-)
+ target/arm/helper.c | 158 +++++++++++++++++++++++---------------------
+ 1 file changed, 82 insertions(+), 76 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e943ffe8a9a..37d40e57901 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3324,20 +3324,27 @@ static inline uint64_t *aa64_vfp_qreg(CPUARMState *env, unsigned regno)
- /* Shared between translate-sve.c and sve_helper.c.  */
- extern const uint64_t pred_esz_masks[4];
- 
-+/*
-+ * Naming convention for isar_feature functions:
-+ * Functions which test 32-bit ID registers should have _aa32_ in
-+ * their name. Functions which test 64-bit ID registers should have
-+ * _aa64_ in their name.
-+ */
-+
- /*
-  * 32-bit feature tests via id registers.
-  */
--static inline bool isar_feature_thumb_div(const ARMISARegisters *id)
-+static inline bool isar_feature_aa32_thumb_div(const ARMISARegisters *id)
- {
-     return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) != 0;
- }
- 
--static inline bool isar_feature_arm_div(const ARMISARegisters *id)
-+static inline bool isar_feature_aa32_arm_div(const ARMISARegisters *id)
- {
-     return FIELD_EX32(id->id_isar0, ID_ISAR0, DIVIDE) > 1;
- }
- 
--static inline bool isar_feature_jazelle(const ARMISARegisters *id)
-+static inline bool isar_feature_aa32_jazelle(const ARMISARegisters *id)
- {
-     return FIELD_EX32(id->id_isar1, ID_ISAR1, JAZELLE) != 0;
- }
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 14328e3f7da..31aaa0eff87 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1091,7 +1091,7 @@ static inline uint32_t aarch32_cpsr_valid_mask(uint64_t features,
-     if ((features >> ARM_FEATURE_THUMB2) & 1) {
-         valid |= CPSR_IT;
-     }
--    if (isar_feature_jazelle(id)) {
-+    if (isar_feature_aa32_jazelle(id)) {
-         valid |= CPSR_J;
-     }
-     if (isar_feature_aa32_pan(id)) {
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index f3080a16358..b1a895f24ce 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -475,8 +475,8 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE(ARM_FEATURE_VFP3, ARM_HWCAP_ARM_VFPv3);
-     GET_FEATURE(ARM_FEATURE_V6K, ARM_HWCAP_ARM_TLS);
-     GET_FEATURE(ARM_FEATURE_VFP4, ARM_HWCAP_ARM_VFPv4);
--    GET_FEATURE_ID(arm_div, ARM_HWCAP_ARM_IDIVA);
--    GET_FEATURE_ID(thumb_div, ARM_HWCAP_ARM_IDIVT);
-+    GET_FEATURE_ID(aa32_arm_div, ARM_HWCAP_ARM_IDIVA);
-+    GET_FEATURE_ID(aa32_thumb_div, ARM_HWCAP_ARM_IDIVT);
-     /* All QEMU's VFPv3 CPUs have 32 registers, see VFP_DREG in translate.c.
-      * Note that the ARM_HWCAP_ARM_VFPv3D16 bit is always the inverse of
-      * ARM_HWCAP_ARM_VFPD32 (and so always clear for QEMU); it is unrelated
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index de733aceeb8..56f2ab865da 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1586,7 +1586,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-          * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
-          * Security Extensions is ARM_FEATURE_EL3.
-          */
--        assert(!tcg_enabled() || no_aa32 || cpu_isar_feature(arm_div, cpu));
-+        assert(!tcg_enabled() || no_aa32 ||
-+               cpu_isar_feature(aa32_arm_div, cpu));
-         set_feature(env, ARM_FEATURE_LPAE);
-         set_feature(env, ARM_FEATURE_V7);
-     }
-@@ -1612,7 +1613,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     if (arm_feature(env, ARM_FEATURE_V6)) {
-         set_feature(env, ARM_FEATURE_V5);
-         if (!arm_feature(env, ARM_FEATURE_M)) {
--            assert(!tcg_enabled() || no_aa32 || cpu_isar_feature(jazelle, cpu));
-+            assert(!tcg_enabled() || no_aa32 ||
-+                   cpu_isar_feature(aa32_jazelle, cpu));
-             set_feature(env, ARM_FEATURE_AUXCR);
-         }
-     }
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8d0f6eca27b..9c02d5d6b8e 100644
+index ab36f33b719..cb2f4d8bbdb 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7396,7 +7396,7 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-     if (arm_feature(env, ARM_FEATURE_LPAE)) {
-         define_arm_cp_regs(cpu, lpae_cp_reginfo);
+@@ -6317,6 +6317,87 @@ static void define_debug_regs(ARMCPU *cpu)
      }
--    if (cpu_isar_feature(jazelle, cpu)) {
-+    if (cpu_isar_feature(aa32_jazelle, cpu)) {
-         define_arm_cp_regs(cpu, jazelle_regs);
-     }
-     /* Slightly awkwardly, the OMAP and StrongARM cores need all of
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 20f89ace2fd..93f028f256b 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -42,7 +42,7 @@
- #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
- /* currently all emulated v5 cores are also v5TE, so don't bother */
- #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
--#define ENABLE_ARCH_5J    dc_isar_feature(jazelle, s)
-+#define ENABLE_ARCH_5J    dc_isar_feature(aa32_jazelle, s)
- #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
- #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
- #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
-@@ -9845,8 +9845,8 @@ static bool op_div(DisasContext *s, arg_rrr *a, bool u)
-     TCGv_i32 t1, t2;
+ }
  
-     if (s->thumb
--        ? !dc_isar_feature(thumb_div, s)
--        : !dc_isar_feature(arm_div, s)) {
-+        ? !dc_isar_feature(aa32_thumb_div, s)
-+        : !dc_isar_feature(aa32_arm_div, s)) {
-         return false;
++static void define_pmu_regs(ARMCPU *cpu)
++{
++    /*
++     * v7 performance monitor control register: same implementor
++     * field as main ID register, and we implement four counters in
++     * addition to the cycle count register.
++     */
++    unsigned int i, pmcrn = 4;
++    ARMCPRegInfo pmcr = {
++        .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
++        .access = PL0_RW,
++        .type = ARM_CP_IO | ARM_CP_ALIAS,
++        .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmcr),
++        .accessfn = pmreg_access, .writefn = pmcr_write,
++        .raw_writefn = raw_write,
++    };
++    ARMCPRegInfo pmcr64 = {
++        .name = "PMCR_EL0", .state = ARM_CP_STATE_AA64,
++        .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 0,
++        .access = PL0_RW, .accessfn = pmreg_access,
++        .type = ARM_CP_IO,
++        .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcr),
++        .resetvalue = (cpu->midr & 0xff000000) | (pmcrn << PMCRN_SHIFT),
++        .writefn = pmcr_write, .raw_writefn = raw_write,
++    };
++    define_one_arm_cp_reg(cpu, &pmcr);
++    define_one_arm_cp_reg(cpu, &pmcr64);
++    for (i = 0; i < pmcrn; i++) {
++        char *pmevcntr_name = g_strdup_printf("PMEVCNTR%d", i);
++        char *pmevcntr_el0_name = g_strdup_printf("PMEVCNTR%d_EL0", i);
++        char *pmevtyper_name = g_strdup_printf("PMEVTYPER%d", i);
++        char *pmevtyper_el0_name = g_strdup_printf("PMEVTYPER%d_EL0", i);
++        ARMCPRegInfo pmev_regs[] = {
++            { .name = pmevcntr_name, .cp = 15, .crn = 14,
++              .crm = 8 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
++              .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
++              .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
++              .accessfn = pmreg_access },
++            { .name = pmevcntr_el0_name, .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 8 | (3 & (i >> 3)),
++              .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
++              .type = ARM_CP_IO,
++              .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
++              .raw_readfn = pmevcntr_rawread,
++              .raw_writefn = pmevcntr_rawwrite },
++            { .name = pmevtyper_name, .cp = 15, .crn = 14,
++              .crm = 12 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
++              .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
++              .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
++              .accessfn = pmreg_access },
++            { .name = pmevtyper_el0_name, .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 12 | (3 & (i >> 3)),
++              .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
++              .type = ARM_CP_IO,
++              .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
++              .raw_writefn = pmevtyper_rawwrite },
++            REGINFO_SENTINEL
++        };
++        define_arm_cp_regs(cpu, pmev_regs);
++        g_free(pmevcntr_name);
++        g_free(pmevcntr_el0_name);
++        g_free(pmevtyper_name);
++        g_free(pmevtyper_el0_name);
++    }
++    if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >= 4 &&
++            FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) != 0xf) {
++        ARMCPRegInfo v81_pmu_regs[] = {
++            { .name = "PMCEID2", .state = ARM_CP_STATE_AA32,
++              .cp = 15, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 4,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = extract64(cpu->pmceid0, 32, 32) },
++            { .name = "PMCEID3", .state = ARM_CP_STATE_AA32,
++              .cp = 15, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 5,
++              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
++              .resetvalue = extract64(cpu->pmceid1, 32, 32) },
++            REGINFO_SENTINEL
++        };
++        define_arm_cp_regs(cpu, v81_pmu_regs);
++    }
++}
++
+ /* We don't know until after realize whether there's a GICv3
+  * attached, and that is what registers the gicv3 sysregs.
+  * So we have to fill in the GIC fields in ID_PFR/ID_PFR1_EL1/ID_AA64PFR0_EL1
+@@ -6859,67 +6940,6 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_arm_cp_regs(cpu, pmovsset_cp_reginfo);
      }
- 
+     if (arm_feature(env, ARM_FEATURE_V7)) {
+-        /* v7 performance monitor control register: same implementor
+-         * field as main ID register, and we implement four counters in
+-         * addition to the cycle count register.
+-         */
+-        unsigned int i, pmcrn = 4;
+-        ARMCPRegInfo pmcr = {
+-            .name = "PMCR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 0,
+-            .access = PL0_RW,
+-            .type = ARM_CP_IO | ARM_CP_ALIAS,
+-            .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmcr),
+-            .accessfn = pmreg_access, .writefn = pmcr_write,
+-            .raw_writefn = raw_write,
+-        };
+-        ARMCPRegInfo pmcr64 = {
+-            .name = "PMCR_EL0", .state = ARM_CP_STATE_AA64,
+-            .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 0,
+-            .access = PL0_RW, .accessfn = pmreg_access,
+-            .type = ARM_CP_IO,
+-            .fieldoffset = offsetof(CPUARMState, cp15.c9_pmcr),
+-            .resetvalue = (cpu->midr & 0xff000000) | (pmcrn << PMCRN_SHIFT),
+-            .writefn = pmcr_write, .raw_writefn = raw_write,
+-        };
+-        define_one_arm_cp_reg(cpu, &pmcr);
+-        define_one_arm_cp_reg(cpu, &pmcr64);
+-        for (i = 0; i < pmcrn; i++) {
+-            char *pmevcntr_name = g_strdup_printf("PMEVCNTR%d", i);
+-            char *pmevcntr_el0_name = g_strdup_printf("PMEVCNTR%d_EL0", i);
+-            char *pmevtyper_name = g_strdup_printf("PMEVTYPER%d", i);
+-            char *pmevtyper_el0_name = g_strdup_printf("PMEVTYPER%d_EL0", i);
+-            ARMCPRegInfo pmev_regs[] = {
+-                { .name = pmevcntr_name, .cp = 15, .crn = 14,
+-                  .crm = 8 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
+-                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
+-                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
+-                  .accessfn = pmreg_access },
+-                { .name = pmevcntr_el0_name, .state = ARM_CP_STATE_AA64,
+-                  .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 8 | (3 & (i >> 3)),
+-                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
+-                  .type = ARM_CP_IO,
+-                  .readfn = pmevcntr_readfn, .writefn = pmevcntr_writefn,
+-                  .raw_readfn = pmevcntr_rawread,
+-                  .raw_writefn = pmevcntr_rawwrite },
+-                { .name = pmevtyper_name, .cp = 15, .crn = 14,
+-                  .crm = 12 | (3 & (i >> 3)), .opc1 = 0, .opc2 = i & 7,
+-                  .access = PL0_RW, .type = ARM_CP_IO | ARM_CP_ALIAS,
+-                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
+-                  .accessfn = pmreg_access },
+-                { .name = pmevtyper_el0_name, .state = ARM_CP_STATE_AA64,
+-                  .opc0 = 3, .opc1 = 3, .crn = 14, .crm = 12 | (3 & (i >> 3)),
+-                  .opc2 = i & 7, .access = PL0_RW, .accessfn = pmreg_access,
+-                  .type = ARM_CP_IO,
+-                  .readfn = pmevtyper_readfn, .writefn = pmevtyper_writefn,
+-                  .raw_writefn = pmevtyper_rawwrite },
+-                REGINFO_SENTINEL
+-            };
+-            define_arm_cp_regs(cpu, pmev_regs);
+-            g_free(pmevcntr_name);
+-            g_free(pmevcntr_el0_name);
+-            g_free(pmevtyper_name);
+-            g_free(pmevtyper_el0_name);
+-        }
+         ARMCPRegInfo clidr = {
+             .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
+             .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
+@@ -6930,24 +6950,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         define_one_arm_cp_reg(cpu, &clidr);
+         define_arm_cp_regs(cpu, v7_cp_reginfo);
+         define_debug_regs(cpu);
++        define_pmu_regs(cpu);
+     } else {
+         define_arm_cp_regs(cpu, not_v7_cp_reginfo);
+     }
+-    if (FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) >= 4 &&
+-            FIELD_EX32(cpu->id_dfr0, ID_DFR0, PERFMON) != 0xf) {
+-        ARMCPRegInfo v81_pmu_regs[] = {
+-            { .name = "PMCEID2", .state = ARM_CP_STATE_AA32,
+-              .cp = 15, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 4,
+-              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
+-              .resetvalue = extract64(cpu->pmceid0, 32, 32) },
+-            { .name = "PMCEID3", .state = ARM_CP_STATE_AA32,
+-              .cp = 15, .opc1 = 0, .crn = 9, .crm = 14, .opc2 = 5,
+-              .access = PL0_R, .accessfn = pmreg_access, .type = ARM_CP_CONST,
+-              .resetvalue = extract64(cpu->pmceid1, 32, 32) },
+-            REGINFO_SENTINEL
+-        };
+-        define_arm_cp_regs(cpu, v81_pmu_regs);
+-    }
+     if (arm_feature(env, ARM_FEATURE_V8)) {
+         /* AArch64 ID registers, which all have impdef reset values.
+          * Note that within the ID register ranges the unused slots
 -- 
 2.20.1
 
