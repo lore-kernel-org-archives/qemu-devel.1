@@ -2,59 +2,78 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82586C35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FC1C35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5888E206EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:51:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5888E206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 51C1A206EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:54:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="prgVOION"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C1A206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j54yG-0003Jq-JP
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:51:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35305)
+	id 1j550l-0004Vf-Ip
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:54:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1j54wf-0001HD-9h
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:50:08 -0500
+ (envelope-from <stefanha@gmail.com>) id 1j550C-00040W-KI
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j54wd-0002Zm-Na
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:50:05 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:48104)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j54wd-0002WE-BF
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:50:03 -0500
-Received: from mail.ispras.ru (localhost [127.0.0.1])
- by mail.ispras.ru (Postfix) with ESMTPSA id 8ADF3C0101;
- Fri, 21 Feb 2020 12:49:59 +0300 (MSK)
+ (envelope-from <stefanha@gmail.com>) id 1j550B-0006vl-Kf
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:53:44 -0500
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:33900)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1j550B-0006vH-Gy; Fri, 21 Feb 2020 04:53:43 -0500
+Received: by mail-qk1-x743.google.com with SMTP id c20so1296372qkm.1;
+ Fri, 21 Feb 2020 01:53:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EUfubrhvu8AXMm3943SlgW5+SEQU2dQHLijSnm+K4iI=;
+ b=prgVOION0fnaBPXu3FQDkR3Fv6/FJ6wf2rFiRRaMwWaJBdUFRqXSDEnw5c53rBUH5M
+ +oZy/g75/8FBKKhdIF2Xj590w2z+/tt7rAWVNi/m38sy79VVZM0MfWxiBvksXOwP+p3N
+ Axji4CmiKg7iKqJGtkrtmDUd/u/3UoUytbt5QUZXK219ELoYhoL6XNPXiwYCx5SVDKw8
+ OSLaHaKyLV7nMdcZXN3xf3BbVkRR1NR9A6GRd3cmPRKpmttRP8uYk56TUNVzDukgfoza
+ oSLQXkWDYWhOcRj96FCdTaINqwQaJ7mTVs3p6CLuKkGQQVT73OnUNVWTuDvBHif/1mMw
+ PDig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EUfubrhvu8AXMm3943SlgW5+SEQU2dQHLijSnm+K4iI=;
+ b=E6+FR9QNUW/6uTacqhiZxsRBEG06h1/kLgB4Gm8asiiAi4Vq1NBE7DSxCTzsZCDX6z
+ 9LC2vdNXpKfTrWkNXq9sKWew7mpgtmQ4hSSVK0XiGTRVcK9xeWVIzt/a3eSTKI2nUopL
+ DxrlGrY+c2uPDip5iqHjDCc6Sq8r+PsAMA3GKIe+jrC5UVxUgVM+46ritX4tGnsaFIWp
+ m17AJmA0590hKTd1VngpkC+YGbGPHDN+eGoJcK0/e/LY5gX8JmbsLQw5QochLUITt9tp
+ 2b4YBrQFeu20jDNnlYxdX7QbtG00uvzoSnqM4vcT1frzHCAbzM5G83nnxSq5ojmTgXbB
+ JpIw==
+X-Gm-Message-State: APjAAAXSwxVZV1pRIvzs6+8usgrd3nEjzDdJze4niiLP5VkKyNGhc4tj
+ zb2rc9zCfKdBy3ou1qFwnLRFXojVPaL613uzEO4=
+X-Google-Smtp-Source: APXvYqxUmnpQKWLIy9/x1RQxIMR5NvjGBV12DkhOYuq0DJ+AW3x2EFu83ThmuW4GZrVsL3u9f2VDW7caNLloyzwDBfE=
+X-Received: by 2002:ae9:e518:: with SMTP id w24mr31602404qkf.236.1582278822652; 
+ Fri, 21 Feb 2020 01:53:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 21 Feb 2020 12:49:59 +0300
-From: dovgaluk <dovgaluk@ispras.ru>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: Race condition in overlayed qcow2?
-In-Reply-To: <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
-References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
- <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
- <5891b48a131321be62a4a311253da44c@ispras.ru>
- <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
- <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
-User-Agent: Roundcube Webmail/1.4.1
-Message-ID: <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
-X-Sender: dovgaluk@ispras.ru
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 83.149.199.45
+References: <20200221093951.1414693-1-stefanha@redhat.com>
+In-Reply-To: <20200221093951.1414693-1-stefanha@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 21 Feb 2020 09:53:31 +0000
+Message-ID: <CAJSP0QU4Nvw5q3U2BMkQKeSB=Rpt9o3t29-hnzULi6yP9A1pQA@mail.gmail.com>
+Subject: Re: [PATCH v3] util/async: make bh_aio_poll() O(1)
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::743
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,223 +85,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-20 12=
-:36:
-> 20.02.2020 12:05, Vladimir Sementsov-Ogievskiy wrote:
->> 20.02.2020 11:31, dovgaluk wrote:
->>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-1=
-9 19:07:
->>>> 19.02.2020 17:32, dovgaluk wrote:
->>>>> I encountered a problem with record/replay of QEMU execution and=20
->>>>> figured out the following, when
->>>>> QEMU is started with one virtual disk connected to the qcow2 image=20
->>>>> with applied 'snapshot' option.
->>>>>=20
->>>>> The patch d710cf575ad5fb3ab329204620de45bfe50caa53 "block/qcow2:=20
->>>>> introduce parallel subrequest handling in read and write"
->>>>> introduces some kind of race condition, which causes difference in=20
->>>>> the data read from the disk.
->>>>>=20
->>>>> I detected this by adding the following code, which logs IO=20
->>>>> operation checksum. And this checksum may be different in different=
-=20
->>>>> runs of the same recorded execution.
->>>>>=20
->>>>> logging in blk_aio_complete function:
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("%"PRId64=
-": blk_aio_complete\n",=20
->>>>> replay_get_current_icount());
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMUIOVector *qiov=
- =3D acb->rwco.iobuf;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (qiov && qiov->=
-iov) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 size_t i, j;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 uint64_t sum =3D 0;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 int count =3D 0;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 for (i =3D 0 ; i < qiov->niov ; ++i) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (j =3D 0 ; j < qiov->iov[i].iov_len ; ++j=
-) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sum +=3D ((uint8_t*)q=
-iov->iov[i].iov_base)[j];
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ++count;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 qemu_log("--- iobuf offset %"PRIx64" len %x sum:=20
->>>>> %"PRIx64"\n", acb->rwco.offset, count, sum);
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>>=20
->>>>> I tried to get rid of aio task by patching qcow2_co_preadv_part:
->>>>> ret =3D qcow2_co_preadv_task(bs, ret, cluster_offset, offset,=20
->>>>> cur_bytes, qiov, qiov_offset);
->>>>>=20
->>>>> That change fixed a bug, but I have no idea what to debug next to=20
->>>>> figure out the exact reason of the failure.
->>>>>=20
->>>>> Do you have any ideas or hints?
->>>>>=20
->>>>=20
->>>> Hi!
->>>>=20
->>>> Hmm, do mean that read from the disk may return wrong data? It would
->>>> be very bad of course :(
->>>> Could you provide a reproducer, so that I can look at it and debug?
->>>=20
->>> It is just a winxp-32 image. I record the execution and replay it=20
->>> with the following command lines:
->>>=20
->>> qemu-system-i386 -icount shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin -m=
- 512M=20
->>> -drive file=3Dxp.qcow2,if=3Dnone,id=3Ddevice-34-file,snapshot -drive=20
->>> driver=3Dblkreplay,if=3Dnone,image=3Ddevice-34-file,id=3Ddevice-34-dr=
-iver=20
->>> -device ide-hd,drive=3Ddevice-34-driver,bus=3Dide.0,id=3Ddevice-34 -n=
-et=20
->>> none
->>>=20
->>> qemu-system-i386 -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -m=
- 512M=20
->>> -drive file=3Dxp.qcow2,if=3Dnone,id=3Ddevice-34-file,snapshot -drive=20
->>> driver=3Dblkreplay,if=3Dnone,image=3Ddevice-34-file,id=3Ddevice-34-dr=
-iver=20
->>> -device ide-hd,drive=3Ddevice-34-driver,bus=3Dide.0,id=3Ddevice-34 -n=
-et=20
->>> none
->>>=20
->>> Replay stalls at some moment due to the non-determinism of the=20
->>> execution (probably caused by the wrong data read).
->>=20
->> Hmm.. I tried it=C2=A0 (with x86_64 qemu and centos image). I waited f=
-or=20
->> some time for a first command, than Ctrl+C it. After it replay.bin was=
-=20
->> 4M. Than started the second command. It works, not failing, not=20
->> finishing. Is it bad? What is expected behavior and what is wrong?
->>=20
->>>=20
->>>> What is exactly the case? May be you have other parallel aio
->>>> operations to the same region?
->>>=20
->>> As far as I understand, all aio operations, initiated by IDE=20
->>> controller, are performed one-by-one.
->>> I don't see anything else in the logs.
->>>=20
->>>> Ideas to experiment:
->>>>=20
->>>> 1. change QCOW2_MAX_WORKERS to 1 or to 2, will it help?
->>>=20
->>> 1 or 2 are ok, and 4 or 8 lead to the failures.
->>>=20
->>>> 2. understand what is the case in code: is it read from one or=20
->>>> several
->>>> clusters, is it aligned,
->>>> what is the type of clusters, is encryption in use, compression?
->>>=20
->>> There is no encryption and I thinks compression is not enabled too.
->>> Clusters are read from the temporary overlay:
->>>=20
->>> blk_aio_prwv
->>> blk_aio_read_entry
->>> bdrv_co_preadv_part complete offset: 26300000 qiov_offset: 1c200 len:=
-=20
->>> 1e00
->>> bdrv_co_preadv_part complete offset: 24723e00 qiov_offset: 0 len:=20
->>> 1c200
->>> bdrv_co_preadv_part complete offset: c0393e00 qiov_offset: 0 len:=20
->>> 1e000
->>> bdrv_co_preadv_part complete offset: c0393e00 qiov_offset: 0 len:=20
->>> 1e000
->>> bdrv_co_preadv_part complete offset: c0393e00 qiov_offset: 0 len:=20
->>> 1e000
->>>=20
->>>=20
->>>> 3. understand what kind of data corruption. What we read instead of
->>>> correct data? Just garbage, or may be zeroes, or what..
->>>=20
->>> Most bytes are the same, but some are different:
->>>=20
->>> < 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02 00
->>> < 46 49 4c 45 30 00 03 00 18 d1 33 02 00 00 00 00
->>> < 01 00 01 00 38 00 01 00 68 01 00 00 00 04 00 00
->>> < 00 00 00 00 00 00 00 00 04 00 00 00 9d 0e 00 00
->>> < 02 00 00 00 00 00 00 00 10 00 00 00 60 00 00 00
->>> ---
->>>> 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04 00
->>>> 46 49 4c 45 30 00 03 00 86 78 35 03 00 00 00 00
->>>> 01 00 01 00 38 00 01 00 60 01 00 00 00 04 00 00
->>>> 00 00 00 00 00 00 00 00 04 00 00 00 a1 0e 00 00
->>>> 04 00 00 00 00 00 00 00 10 00 00 00 60 00 00 00
->>>=20
->>> That is strange. I could think, that it was caused by the bugs in
->>> deterministic CPU execution, but the first difference in logs
->>> occur in READ operation (I dump read/write buffers in=20
->>> blk_aio_complete).
->>>=20
->>=20
->> Aha, yes, looks strange.
->>=20
->> Then next steps:
->>=20
->> 1. Does problem hit into the same offset every time?
->> 2. Do we write to this region before this strange read?
->>=20
->> 2.1. If yes, we need to check that we read what we write.. You say you=
-=20
->> dump buffers
->> in blk_aio_complete... I think it would be more reliable to dump at=20
->> start of
->> bdrv_co_pwritev and at end of bdrv_co_preadv. Also, guest may modify=20
->> its buffers
->> during operation which would be strange but possible.
->>=20
->> 2.2 If not, hmm...
->>=20
->>=20
->=20
-> Another idea to check: use blkverify
+On Fri, Feb 21, 2020 at 9:40 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> The ctx->first_bh list contains all created BHs, including those that
+> are not scheduled.  The list is iterated by the event loop and therefore
+> has O(n) time complexity with respected to the number of created BHs.
+>
+> Rewrite BHs so that only scheduled or deleted BHs are enqueued.
+> Only BHs that actually require action will be iterated.
+>
+> One semantic change is required: qemu_bh_delete() enqueues the BH and
+> therefore invokes aio_notify().  The
+> tests/test-aio.c:test_source_bh_delete_from_cb() test case assumed that
+> g_main_context_iteration(NULL, false) returns false after
+> qemu_bh_delete() but it now returns true for one iteration.  Fix up the
+> test case.
+>
+> This patch makes aio_compute_timeout() and aio_bh_poll() drop from a CPU
+> profile reported by perf-top(1).  Previously they combined to 9% CPU
+> utilization when AioContext polling is commented out and the guest has 2
+> virtio-blk,num-queues=1 and 99 virtio-blk,num-queues=32 devices.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v3:
+>  * Use QSLIST_FOREACH_RCU() and QSLIST_FIRST_RCU() [Paolo]
 
-I added logging of file descriptor and discovered that different results=20
-are obtained
-when reading from the backing file.
-And even more - replay runs of the same recording produce different=20
-results.
-Logs show that there is a preadv race, but I can't figure out the source=20
-of the failure.
+I forgot to include Paolo's R-b that he gave conditional on making this change:
 
-Log1:
-preadv c 30467e00
-preadv c 30960000
---- sum =3D a2e1e
-bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 8200
---- sum =3D 10cdee
-bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len:=20
-ee00
-
-Log2:
-preadv c 30467e00
---- sum =3D a2e1e
-bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 8200
-preadv c 30960000
---- sum =3D f094f
-bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len:=20
-ee00
-
-
-Checksum calculation was added to preadv in file-posix.c
-
-Pavel Dovgalyuk
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
