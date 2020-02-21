@@ -2,85 +2,87 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3457C35647
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE92C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:45:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCA5D207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85956222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 10:45:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G61nfUz4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA5D207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZaDOunaD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85956222C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j55W1-00021o-Ux
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 05:26:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46424)
+	id 1j55nn-00069X-ML
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 05:44:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j55VQ-0001bF-HS
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:26:01 -0500
+ (envelope-from <stefanha@gmail.com>) id 1j55nF-0005iV-Hp
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:44:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j55VP-0003VZ-Fo
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:26:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28179
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j55VP-0003V9-Bs
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:25:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582280758;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IWHp7UJ+iuNrvvkTAkgknJN4pFQix2N3TG9NIPvtJpM=;
- b=G61nfUz4RWCHjQfcee4OfF1AcOrOMq9iUHRJkJSqmpjHfrQ0mlJCsd8tUzIGni9Z0MlFGM
- 5SlKvGiqwNixhRLr0Egr0moKtUTx22SFnj2hJKQTKaw1FE9m7y/PQaPDbo7YYK6G37xx3L
- 4Y6JX5JxGii1Bdpk+Y/ySyd2xfuEExo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-nqXrpn5sMiCkJJk25zgK2A-1; Fri, 21 Feb 2020 05:25:56 -0500
-X-MC-Unique: nqXrpn5sMiCkJJk25zgK2A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C56018AB2C0;
- Fri, 21 Feb 2020 10:25:55 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.1])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C13819076D;
- Fri, 21 Feb 2020 10:25:51 +0000 (UTC)
-Date: Fri, 21 Feb 2020 10:25:48 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] console: make QMP screendump use coroutine
-Message-ID: <20200221102548.GA2931@work-vm>
-References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
- <87a75dn1gd.fsf@dusky.pond.sub.org>
- <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
- <87blptckoi.fsf@dusky.pond.sub.org> <20200220201155.GJ2836@work-vm>
- <87k14ga1ud.fsf@dusky.pond.sub.org>
+ (envelope-from <stefanha@gmail.com>) id 1j55nE-0005bq-0a
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:44:25 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38857)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1j55nD-0005aj-Pi
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 05:44:23 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a9so1222911wmj.3
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 02:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=uawWNR65+uvZdCiEla1V2RYcQ6AC9pgGiCSFnoe0q5g=;
+ b=ZaDOunaDCDpm380aTbeQliLlOInzm7Mn2TgGS8DJ1gWYeNUNW3yK2KE5Z9IJEGjkkB
+ 1fvHLDlZIID6vFVqFB/b6gD/YwIDz7us73dleb2EyLVAO4JdyysgKDpaiHAdOPqV52x5
+ 9KMHdNZDoIHM20EgDFS4bnnPiISGzY4VpiVBXgvESu8RwiXwkXAUsRf3t7dSYOmtukUP
+ fBLEThJWBIoQKLlhEanmMhM7KlrmPtZ+SQ3VMhOhmWLLGJszysQfel6R0JjEViQiPutb
+ YhqI3/fGDsyKTGMoFnvdsvfQU/j7j+D1aYymbN5EXTwy1nxC0KPusmCdsiKqaQeSeuAD
+ 2OIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uawWNR65+uvZdCiEla1V2RYcQ6AC9pgGiCSFnoe0q5g=;
+ b=BjXktKwoI1vd8hQqVC4W3jMLepQ0InFRTgORG5alifeH5swchwowJxnlyt4/jeKRbP
+ wYuluXT1oNqqJqr3+oxcIXVx45h4TA7GmzpfKaAYSsUQFIPa8T1yHBJ9bdmSkqVEFJ12
+ 4xXQEabsUU9orfybXZQOXEAveULDI8UOeOuJVA16z2C/tcoH4evYzwwneZYcQZdXzx+K
+ 6O7CFX+0CC2QELiAVnQYzHx2+xrzU9FotkUjDW/IlTGRrSivYXzdxSa7Q2krr3CfzgxT
+ npfynA/rvDWo8GPo0ztaY4p/J8ap9sn6jppjY7PYgOKCU9X20BYpF2vCrhW2sY5ADF/C
+ IM2Q==
+X-Gm-Message-State: APjAAAVKqM85HBuyYvCcfAE3eR/MFABNC7aeNaIJ2KkhSC4jBUDIUIZE
+ SIHw2q5lQyRO+lsBfcJOGGs=
+X-Google-Smtp-Source: APXvYqypg2tCa/mIYpjHUHaCPoIlubq96YVrY/nDDwVrZSo+MNQqFCy8ywsFNfzIBSFOaN8GggS08w==
+X-Received: by 2002:a05:600c:291e:: with SMTP id
+ i30mr3157215wmd.40.1582281862500; 
+ Fri, 21 Feb 2020 02:44:22 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id y139sm3517680wmd.24.2020.02.21.02.44.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 21 Feb 2020 02:44:21 -0800 (PST)
+Date: Fri, 21 Feb 2020 10:44:20 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Nikos Dragazis <ndragazis@arrikto.com>
+Subject: Re: [PATCH/RFC 0/1] Vhost User Cross Cable: Intro
+Message-ID: <20200221104420.GB1484511@stefanha-x1.localdomain>
+References: <CAJSP0QW6cC=rCTn--vJ84t+LzeFND_SeN76CdF1fv6-F4NVDyg@mail.gmail.com>
+ <10735dfd-1da5-416e-1b25-b5c354bb1901@arrikto.com>
 MIME-Version: 1.0
-In-Reply-To: <87k14ga1ud.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="uZ3hkaAS1mZxFaxD"
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <10735dfd-1da5-416e-1b25-b5c354bb1901@arrikto.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,75 +94,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
- QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Vangelis Koukis <vkoukis@arrikto.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ "V." <mail@winaoe.org>, "Stojaczyk, Dariusz" <dariusz.stojaczyk@intel.com>,
+ Maxime Coquelin <maxime.coquelin@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->=20
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> [...]
-> >> Collecting several users before building infrastructure makes sense wh=
-en
-> >> the design of the infrastructure isn't obvious, or when the need for i=
-t
-> >> is in doubt.
-> >>=20
-> >> Neither is the case for running QMP handlers in a coroutine: QMP
-> >> commands blocking the main loop is without doubt a problem we need to
-> >> solve, and the way to solve it was obvious enough for Kevin to do it
-> >> with one user: block_resize.  A second one quickly followed: screendum=
-p.
-> >>=20
-> >> The only part that's different for HMP, I think, is "need".
-> >>=20
-> >> Is HMP blocking the main loop a problem?
-> >>=20
-> >> If yes, is it serious enough to justify solving it?
+
+--uZ3hkaAS1mZxFaxD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Feb 13, 2020 at 03:48:59PM +0200, Nikos Dragazis wrote:
+> On Tue, 14 Jan 2020 at 10:20 Stefan Hajnoczi
+> <stefanha@gmail.com> wrote:
+> > On Fri, Jan 10, 2020 at 10:34 AM Marc-Andr=C3=A9 Lureau
+> > <address@hidden> wrote:
+> > > On Wed, Jan 8, 2020 at 5:57 AM V. <address@hidden> wrote:
 > >
-> > I don't mind if HMP blocks for a small time while doing something, but
-> > not if it can hang if the guest (or something else like it) misbehaves.
-> > Not if it's something you might need to issue another command to recove=
-r
-> > from.
+> > Hi V.,
+> > I think I remember you from Etherboot/gPXE days :).
+> >
+> > > > 3.
+> > > > Now if Cross Cable is actually a new and (after a code-rewrite of 1=
+0) a
+> > > > viable way to connect 2 QEMU's together, could I actually
+> > > > suggest a better way?
+> > > > I am thinking of a '-netdev vhost-user-slave' option to connect (as=
+ client
+> > > > or server) to a master QEMU running '-netdev vhost-user'.
+> > > > This way there is no need for any external program at all, the mast=
+er can
+> > > > have it's memory unshared and everything would just work
+> > > > and be fast.
+> > > > Also the whole thing can fall back to normal virtio if memory is no=
+t shared
+> > > > and it would even work in pure usermode without any
+> > > > context switch.
+> > > >
+> > > > Building a patch for this idea I could maybe get around to, don't c=
+learly
+> > > > have an idea how much work this would be but I've done
+> > > > crazier things.
+> > > > But is this is something that someone might be able to whip up in a=
+n hour
+> > > > or two? Someone who actually does have a clue about vhost
+> > > > and virtio maybe? ;-)
+> > >
+> > > I believe https://wiki.qemu.org/Features/VirtioVhostUser is what you
+> > > are after. It's still being discussed and non-trivial, but not very
+> > > active lately afaik.
+> >
+> > virtio-vhost-user is being experimented with in the SPDK community but
+> > there has been no activity on VIRTIO standardization or the QEMU
+> > patches for some time.=C2=A0 More info here:
+> > https://ndragazis.github.io/spdk.html
+> >
+> > I think the new ivshmem v2 feature may provide the functionality you
+> > are looking for, but I haven't looked at them yet.=C2=A0 Here is the li=
+nk:
+> > https://www.mail-archive.com/address@hidden/msg668749.html
+> >
+> > And here is Jan's KVM Forum presentation on ivshmem v2:
+> > https://www.youtube.com/watch?v=3DTiZrngLUFMA
+> >
+> > Stefan
 >=20
-> The issue isn't HMP being unavailable while a command executes.  The
-> issue is HMP stopping the main loop while a command executes.
 >=20
-> Stopping the main loop not only stops everything running there, it can
-> also stop other threads when they synchronize with the main loop via the
-> Big QEMU Lock.
-
-Yep.
-
-> The obvious example is a command accessing a remote filesystem.  Special
-> case: NFS with the hard option can hang indefinitely.
-
-That I don't worry about too much for HMP; if your host is hosed, fix your =
-host.
-
-> screendump does that, and also waits for asynchronous gfx_update() with
-> qxl devices.  Networking again, with a different peer.
-
-That I would worry about since that's probably got interactions with the
-guest and spice, and all the type of things you might be trying to debug
-or test.
-
-> We already decided that QMP commands stopping the main loop is serious.
+> Hi Stefan,
 >=20
-> To say it's not serious for HMP amounts to "don't do that then, use
-> QMP".  Which may be fair.  Not for me to decide, though.
+> First of all, sorry for the delayed response. The mail got lost
+> somewhere in my inbox. Please keep Cc-ing me on all threads related to
+> virtio-vhost-user.
+>=20
+> As you correctly pointed out, I have been experimenting with
+> virtio-vhost-user on SPDK and [1] is a working demo on this matter. I
+> have been working on getting it merged with SPDK and, to this end, I
+> have been interacting with the SPDK team [2][3] and mostly with Darek
+> Stojaczyk (Cc-ing him).
+>=20
+> The reason that you haven=E2=80=99t seen any activity for the last months=
+ is
+> that I got a job and hence my schedule has become tighter. But I will
+> definitely find some space and fit it into my schedule. Let me give you
+> a heads up, so that we get synced:
+>=20
+> Originally, I created and sent a patch (influenced from your DPDK patch
+> [4]) to SPDK that was enhancing SPDK=E2=80=99s internal rte_vhost library=
+ with
+> the virtio-vhost-user transport. However, a few weeks later, the SPDK
+> team decided to switch from their internal rte_vhost library to using
+> DPDK=E2=80=99s rte_vhost library directly [3]. Given that, I refactored a=
+nd sent
+> the patch for the virtio-vhost-user transport to the DPDK mailing list
+> [5]. Regarding the virtio-vhost-user device, I have made some
+> enhancements [6] on your original RFC device implementation and, as you
+> may remember, I have sent some revised versions of the spec to the
+> virtio mailing list [7].
+>=20
+> At the moment, the blocker is the virtio spec. The last update on this
+> was my discussion with Michael Tsirkin (Cc-ing him as well) about the
+> need for the VIRTIO_PCI_CAP_DOORBELL_CFG and
+> VIRTIO_PCI_CAP_NOTIFICATION_CFG configuration structures [8].
+>=20
+> So, I think the next steps should be the following:
+>=20
+> 1. merging the spec
+> 2. adding the device on QEMU
+> 3. adding the vvu transport on DPDK
+> 4. extending SPDK to make use of the new vhost-user transport
+>=20
+> To conclude, I still believe that this device is useful and should be
+> part of virtio/qemu/dpdk/spdk and I will continue working on this
+> direction.
 
-It's certainly more important for QMP; you don't want the main lock
-being held for everyday type of interactions with management layers.
+Thanks for letting me know.  Feel free to resend the latest VIRTIO spec
+changes to restart the discussion.  I am certainly interested.
 
-Dave
+Stefan
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--uZ3hkaAS1mZxFaxD
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5PtIMACgkQnKSrs4Gr
+c8icbwgAqBTJU2VUDGhPEGN9rsV9/+nhF4/mO/V0jmwMltwvE03WcvoX228exdau
+ha9cjHlZARSFpoDTKZgANgTVRyXk1oL7SOcXNIlk1kUtmMVzDluxhp4+ecSayKKK
+WYN2QjNPJyGYt3dEyyw91xiZgfggPr8A/IZvfwHeoTcK/humvIUI6NfSSTcjTiWo
+LJbmHfBvCBAkGsOX8EtJJ+D9V12/dTPkV3y5y/XkV5ULVC0k4ymUHuoAM6IjAaK8
+yu6bglTnUCY8utDpBEg/cYKQYbYh9SeMUY8yDDtlvUMCWvIBMBxIb8Aky1mVbUAb
+NJxpG0rjt/6fhavfC8GAjsf5dU8MCA==
+=ZQdc
+-----END PGP SIGNATURE-----
+
+--uZ3hkaAS1mZxFaxD--
 
