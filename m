@@ -2,75 +2,120 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8672FC35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6AFC35640
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:43:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41753207FD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C94C2207FD
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L2aepA7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41753207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="knSBC7eU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C94C2207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j54nl-0001h1-Ep
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:40:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57698)
+	id 1j54qA-000321-2U
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:43:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59264)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j54n1-00015L-VB
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:40:09 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j54pB-0002WT-PX
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j54n0-0004P4-1c
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:40:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58994
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j54mz-0004O6-TK
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:40:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582278005;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Sx84lV32BWFrzEN6KerWWG6PkoErgNK8hOZd1tmgSDI=;
- b=L2aepA7qPRe+SFwjMk3ppcpq00GxFbe9aA/1vd6/up06rg1La5HooVlcLGDLDwXW2BvlyI
- onKHbSCAckNykR3soc/P0YxxDLLFsKAQcf36HQ9cAM5joe9Rd0moBCxkbRuYOMNL47OPsk
- eUsCDVYGUN1w133WL/TxWGaMQODvyTY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-XEowyAqVMJ6NDDpByuasiQ-1; Fri, 21 Feb 2020 04:39:58 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3918133656C;
- Fri, 21 Feb 2020 09:39:56 +0000 (UTC)
-Received: from localhost (ovpn-117-223.ams2.redhat.com [10.36.117.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6DF3B8C062;
- Fri, 21 Feb 2020 09:39:52 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] util/async: make bh_aio_poll() O(1)
-Date: Fri, 21 Feb 2020 09:39:51 +0000
-Message-Id: <20200221093951.1414693-1-stefanha@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j54pA-0001OZ-4i
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:42:21 -0500
+Received: from mail-vi1eur05on2139.outbound.protection.outlook.com
+ ([40.107.21.139]:28641 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j54p5-0001FR-LN; Fri, 21 Feb 2020 04:42:16 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Vy8V1kTAtHzczIRvLEqOLHjId+WLYiFBc3WM3kQxW8c9JrM/0PmJjSGoLu15sugthx4k+2hu1ahtCpIV4NK7GzdWRgGsxxSidQzwZPqJsVSMI7BliHmW30utXs1bq24GaCHsW7oHR1oCiO+dONKRG1xAZwu9rx0s28pnFI4cgkRvFIvbcvkJHyZabM3VrncNskCepjzMn+aR2M9hRnjBwHn/0hFbqIrNhij9ypsR83r4ww24sFtiBi1G4+pKdNAHqbuPaMd5NnUsL8Jw82gS5C8HYgOSqEUtj7XDUAFMNWCWooAuzqbqCI13kKKaodtstq/A9UY+kCZ/3WntRIZE5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ANrgGt89xnsTdD129Tx6yS+FCPRYqGtcR2MAwyoM29M=;
+ b=WDgOQqULarZahFgFCOmYWf6Xnd8in6w4wRotkL2KDCrLSi20OmAI0dx+iTReRcxlJJq+VGn9FsJxKcsDl/ds/Y7/HrjW5twLvA/G52gvc/d4SIvdcJ52UVvYAoQB0cTU/eG8aAsuCdy85ONzUFiu7fj861RuW3W3jKGON05crjyb5REyGLHtEwECG7wSXMch/Njo0kjHYPfYbWNezONtZ9S23zth5a97N7wIDgw8wI/bZL1VtLECM4fJbKt4cKRp6TcS1blJETTcAes96gZuCE1dPqDoyuOpq9j7zoYwO1+fX/a1exPMKa6vdlMBpMSLSsFTK3sJ1bMsAHIitQGwag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ANrgGt89xnsTdD129Tx6yS+FCPRYqGtcR2MAwyoM29M=;
+ b=knSBC7eUCCkGZ+FrwPBNQAJ+eKWPNHsIYJne6pgiFMF6VllkG5BBWvCtoRYPqTXRxY1WJwBbcOlYizRj2Bzhic28T0qyX8mYkrpFE16KzogFGaFr4TmmP65SyOm1xCtSzOatp7P8WGKT9DV86LzdP9FzH8U9sHATG02tTq71MHw=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4294.eurprd08.prod.outlook.com (20.179.7.14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.18; Fri, 21 Feb 2020 09:42:09 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.016; Fri, 21 Feb 2020
+ 09:42:09 +0000
+Subject: Re: [PATCH v7 02/11] error: auto propagated local_err
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+ <20200131130118.1716-3-vsementsov@virtuozzo.com>
+ <87mu9c70x1.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200221124206439
+Message-ID: <278458e5-c62c-8eaa-672f-cc70bbc15304@virtuozzo.com>
+Date: Fri, 21 Feb 2020 12:42:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <87mu9c70x1.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1PR0102CA0005.eurprd01.prod.exchangelabs.com
+ (2603:10a6:7:14::18) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: XEowyAqVMJ6NDDpByuasiQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0102CA0005.eurprd01.prod.exchangelabs.com (2603:10a6:7:14::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.17 via Frontend
+ Transport; Fri, 21 Feb 2020 09:42:08 +0000
+X-Tagtoolbar-Keys: D20200221124206439
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5f2feebc-7047-4aa6-e570-08d7b6b25225
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4294:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB42943483B302F6D533E7D675C1120@AM6PR08MB4294.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-Forefront-PRVS: 0320B28BE1
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(136003)(39840400004)(366004)(346002)(396003)(376002)(189003)(199004)(316002)(31696002)(86362001)(16576012)(5660300002)(54906003)(4326008)(478600001)(66476007)(66946007)(36756003)(956004)(66556008)(2906002)(2616005)(8676002)(186003)(81156014)(81166006)(7416002)(16526019)(8936002)(52116002)(26005)(31686004)(6916009)(6486002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4294;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I7wbKiPONEjvWV/f9haDIzdFiYX64DysVot72b0litOjL4ACwxQIrg9vQaGsEBR4G9BfRsiQaU3IUv9bEXYGNS7FlIMIV4wYeuMSUwaeC7pVa/sax6Nz1JJV1mKY0/5azqu2XIz9fRzuGREtHGsHflEhozC24FWQT2TLiveQO30VOuRx9vdOWTamlfzFbAdS3N5VbyQj7I40QWvlKEZfzvU8hk237NWAeXWGw2SbhcGoIRaOjOwpBwJgFRjDTR+hqZ3kUxTAku6ONBHFa4F0jUYMvGYfLMa3TXv2Oar0gA3xNgzdNuMvYiOG2ko8LzgoBMUv3z4AXYFkaturIWjvPxBrO9FIK2IpmtgHj3riSsh62rdyrnA0CKrQFzLlAvkFIYiDo3tOyRjwT/jF7kJOIbZCLJvDp89pHW0+FEaRffkgVK6KURIolE1Ai2J/9LyO
+X-MS-Exchange-AntiSpam-MessageData: 2OOje9fwgeLYxEnGJW/ZNUV0aisHJaLNhwzc1nHAJKFBUNBqFtuMLYRpCW1bnc+XnLsRaxfJmYpeJHKoN6uXON15ShQID/Zn0YKV7htrQnkrZsNnid0M2f5P8pyqX+r0oEAxeYCKckAppepDZjQLNQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f2feebc-7047-4aa6-e570-08d7b6b25225
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 09:42:09.6262 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eyUbEaOAWiCLXAf2K0VH7PSiTFLE0HsonBelcQgzC9DSlEfHKPM0pgiW7M7xNMOow6Iz95Ru67ybIxHB+smSvddBcZyW8kpyCWoP/DOQOL4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4294
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.21.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,258 +127,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhlIGN0eC0+Zmlyc3RfYmggbGlzdCBjb250YWlucyBhbGwgY3JlYXRlZCBCSHMsIGluY2x1ZGlu
-ZyB0aG9zZSB0aGF0CmFyZSBub3Qgc2NoZWR1bGVkLiAgVGhlIGxpc3QgaXMgaXRlcmF0ZWQgYnkg
-dGhlIGV2ZW50IGxvb3AgYW5kIHRoZXJlZm9yZQpoYXMgTyhuKSB0aW1lIGNvbXBsZXhpdHkgd2l0
-aCByZXNwZWN0ZWQgdG8gdGhlIG51bWJlciBvZiBjcmVhdGVkIEJIcy4KClJld3JpdGUgQkhzIHNv
-IHRoYXQgb25seSBzY2hlZHVsZWQgb3IgZGVsZXRlZCBCSHMgYXJlIGVucXVldWVkLgpPbmx5IEJI
-cyB0aGF0IGFjdHVhbGx5IHJlcXVpcmUgYWN0aW9uIHdpbGwgYmUgaXRlcmF0ZWQuCgpPbmUgc2Vt
-YW50aWMgY2hhbmdlIGlzIHJlcXVpcmVkOiBxZW11X2JoX2RlbGV0ZSgpIGVucXVldWVzIHRoZSBC
-SCBhbmQKdGhlcmVmb3JlIGludm9rZXMgYWlvX25vdGlmeSgpLiAgVGhlCnRlc3RzL3Rlc3QtYWlv
-LmM6dGVzdF9zb3VyY2VfYmhfZGVsZXRlX2Zyb21fY2IoKSB0ZXN0IGNhc2UgYXNzdW1lZCB0aGF0
-CmdfbWFpbl9jb250ZXh0X2l0ZXJhdGlvbihOVUxMLCBmYWxzZSkgcmV0dXJucyBmYWxzZSBhZnRl
-cgpxZW11X2JoX2RlbGV0ZSgpIGJ1dCBpdCBub3cgcmV0dXJucyB0cnVlIGZvciBvbmUgaXRlcmF0
-aW9uLiAgRml4IHVwIHRoZQp0ZXN0IGNhc2UuCgpUaGlzIHBhdGNoIG1ha2VzIGFpb19jb21wdXRl
-X3RpbWVvdXQoKSBhbmQgYWlvX2JoX3BvbGwoKSBkcm9wIGZyb20gYSBDUFUKcHJvZmlsZSByZXBv
-cnRlZCBieSBwZXJmLXRvcCgxKS4gIFByZXZpb3VzbHkgdGhleSBjb21iaW5lZCB0byA5JSBDUFUK
-dXRpbGl6YXRpb24gd2hlbiBBaW9Db250ZXh0IHBvbGxpbmcgaXMgY29tbWVudGVkIG91dCBhbmQg
-dGhlIGd1ZXN0IGhhcyAyCnZpcnRpby1ibGssbnVtLXF1ZXVlcz0xIGFuZCA5OSB2aXJ0aW8tYmxr
-LG51bS1xdWV1ZXM9MzIgZGV2aWNlcy4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8
-c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCnYzOgogKiBVc2UgUVNMSVNUX0ZPUkVBQ0hfUkNVKCkg
-YW5kIFFTTElTVF9GSVJTVF9SQ1UoKSBbUGFvbG9dCnYyOgogKiBVc2UgUVNMSVNUIGZvciBCSHMg
-YW5kIFFTSU1QTEVRIGZvciBCSExpc3RTbGljZXMgW1Bhb2xvXQogICAoTm90ZSB0aGF0IEkgcmVw
-bGFjZWQgYmggPSBhdG9taWNfcmN1X3JlYWQoJmZpcnN0X2JoKSB3aXRoCiAgICBRU0xJU1RfRk9S
-RUFDSCgmYmhfbGlzdCkgc28gdGhlcmUgaXMgbm8gbWVtb3J5IG9yZGVyaW5nIGJ1dCBJIHRoaW5r
-CiAgICB0aGlzIGlzIHNhZmUuKQogKiBDb21tZW50IGNsYXJpZmljYXRpb25zIFtQYW9sb10KCkJh
-c2VkLW9uOiAyMDIwMDIyMDEwMzgyOC4yNDUyNS0xLXBib256aW5pQHJlZGhhdC5jb20KICAgICAg
-ICAgICgiW1BBVENIXSByY3VfcXVldWU6IGFkZCBRU0xJU1QgZnVuY3Rpb25zIikKLS0tCiBpbmNs
-dWRlL2Jsb2NrL2Fpby5oIHwgIDIwICsrKy0KIHRlc3RzL3Rlc3QtYWlvLmMgICAgfCAgIDMgKy0K
-IHV0aWwvYXN5bmMuYyAgICAgICAgfCAyMzcgKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tLS0tLS0tLS0KIDMgZmlsZXMgY2hhbmdlZCwgMTU4IGluc2VydGlvbnMoKyksIDEwMiBk
-ZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9pbmNsdWRlL2Jsb2NrL2Fpby5oIGIvaW5jbHVkZS9i
-bG9jay9haW8uaAppbmRleCA3YmE5YmQ3ODc0Li4xYTJjZTljYTI2IDEwMDY0NAotLS0gYS9pbmNs
-dWRlL2Jsb2NrL2Fpby5oCisrKyBiL2luY2x1ZGUvYmxvY2svYWlvLmgKQEAgLTUxLDYgKzUxLDE5
-IEBAIHN0cnVjdCBUaHJlYWRQb29sOwogc3RydWN0IExpbnV4QWlvU3RhdGU7CiBzdHJ1Y3QgTHVy
-aW5nU3RhdGU7CiAKKy8qCisgKiBFYWNoIGFpb19iaF9wb2xsKCkgY2FsbCBjYXJ2ZXMgb2ZmIGEg
-c2xpY2Ugb2YgdGhlIEJIIGxpc3QsIHNvIHRoYXQgbmV3bHkKKyAqIHNjaGVkdWxlZCBCSHMgYXJl
-IG5vdCBwcm9jZXNzZWQgdW50aWwgdGhlIG5leHQgYWlvX2JoX3BvbGwoKSBjYWxsLiAgQWxsCisg
-KiBhY3RpdmUgYWlvX2JoX3BvbGwoKSBjYWxscyBjaGFpbiB0aGVpciBzbGljZXMgdG9nZXRoZXIg
-aW4gYSBsaXN0LCBzbyB0aGF0CisgKiBuZXN0ZWQgYWlvX2JoX3BvbGwoKSBjYWxscyBwcm9jZXNz
-IGFsbCBzY2hlZHVsZWQgYm90dG9tIGhhbHZlcy4KKyAqLwordHlwZWRlZiBRU0xJU1RfSEVBRCgs
-IFFFTVVCSCkgQkhMaXN0OwordHlwZWRlZiBzdHJ1Y3QgQkhMaXN0U2xpY2UgQkhMaXN0U2xpY2U7
-CitzdHJ1Y3QgQkhMaXN0U2xpY2UgeworICAgIEJITGlzdCBiaF9saXN0OworICAgIFFTSU1QTEVR
-X0VOVFJZKEJITGlzdFNsaWNlKSBuZXh0OworfTsKKwogc3RydWN0IEFpb0NvbnRleHQgewogICAg
-IEdTb3VyY2Ugc291cmNlOwogCkBAIC05MSw4ICsxMDQsMTEgQEAgc3RydWN0IEFpb0NvbnRleHQg
-ewogICAgICAqLwogICAgIFFlbXVMb2NrQ250IGxpc3RfbG9jazsKIAotICAgIC8qIEFuY2hvciBv
-ZiB0aGUgbGlzdCBvZiBCb3R0b20gSGFsdmVzIGJlbG9uZ2luZyB0byB0aGUgY29udGV4dCAqLwot
-ICAgIHN0cnVjdCBRRU1VQkggKmZpcnN0X2JoOworICAgIC8qIEJvdHRvbSBIYWx2ZXMgcGVuZGlu
-ZyBhaW9fYmhfcG9sbCgpIHByb2Nlc3NpbmcgKi8KKyAgICBCSExpc3QgYmhfbGlzdDsKKworICAg
-IC8qIENoYWluZWQgQkggbGlzdCBzbGljZXMgZm9yIGVhY2ggbmVzdGVkIGFpb19iaF9wb2xsKCkg
-Y2FsbCAqLworICAgIFFTSU1QTEVRX0hFQUQoLCBCSExpc3RTbGljZSkgYmhfc2xpY2VfbGlzdDsK
-IAogICAgIC8qIFVzZWQgYnkgYWlvX25vdGlmeS4KICAgICAgKgpkaWZmIC0tZ2l0IGEvdGVzdHMv
-dGVzdC1haW8uYyBiL3Rlc3RzL3Rlc3QtYWlvLmMKaW5kZXggODZmYjczYjNkNS4uOGE0NjA3ODQ2
-MyAxMDA2NDQKLS0tIGEvdGVzdHMvdGVzdC1haW8uYworKysgYi90ZXN0cy90ZXN0LWFpby5jCkBA
-IC02MTUsNyArNjE1LDggQEAgc3RhdGljIHZvaWQgdGVzdF9zb3VyY2VfYmhfZGVsZXRlX2Zyb21f
-Y2Iodm9pZCkKICAgICBnX2Fzc2VydF9jbXBpbnQoZGF0YTEubiwgPT0sIGRhdGExLm1heCk7CiAg
-ICAgZ19hc3NlcnQoZGF0YTEuYmggPT0gTlVMTCk7CiAKLSAgICBnX2Fzc2VydCghZ19tYWluX2Nv
-bnRleHRfaXRlcmF0aW9uKE5VTEwsIGZhbHNlKSk7CisgICAgYXNzZXJ0KGdfbWFpbl9jb250ZXh0
-X2l0ZXJhdGlvbihOVUxMLCBmYWxzZSkpOworICAgIGFzc2VydCghZ19tYWluX2NvbnRleHRfaXRl
-cmF0aW9uKE5VTEwsIGZhbHNlKSk7CiB9CiAKIHN0YXRpYyB2b2lkIHRlc3Rfc291cmNlX2JoX2Rl
-bGV0ZV9mcm9tX2NiX21hbnkodm9pZCkKZGlmZiAtLWdpdCBhL3V0aWwvYXN5bmMuYyBiL3V0aWwv
-YXN5bmMuYwppbmRleCBjMTkyYTI0YTYxLi5iOTQ1MThiOTQ4IDEwMDY0NAotLS0gYS91dGlsL2Fz
-eW5jLmMKKysrIGIvdXRpbC9hc3luYy5jCkBAIC0yOSw2ICsyOSw3IEBACiAjaW5jbHVkZSAiYmxv
-Y2svdGhyZWFkLXBvb2wuaCIKICNpbmNsdWRlICJxZW11L21haW4tbG9vcC5oIgogI2luY2x1ZGUg
-InFlbXUvYXRvbWljLmgiCisjaW5jbHVkZSAicWVtdS9yY3VfcXVldWUuaCIKICNpbmNsdWRlICJi
-bG9jay9yYXctYWlvLmgiCiAjaW5jbHVkZSAicWVtdS9jb3JvdXRpbmVfaW50LmgiCiAjaW5jbHVk
-ZSAidHJhY2UuaCIKQEAgLTM2LDE2ICszNyw3NiBAQAogLyoqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqLwogLyogYm90dG9tIGhhbHZlcyAo
-Y2FuIGJlIHNlZW4gYXMgdGltZXJzIHdoaWNoIGV4cGlyZSBBU0FQKSAqLwogCisvKiBRRU1VQkg6
-OmZsYWdzIHZhbHVlcyAqLworZW51bSB7CisgICAgLyogQWxyZWFkeSBlbnF1ZXVlZCBhbmQgd2Fp
-dGluZyBmb3IgYWlvX2JoX3BvbGwoKSAqLworICAgIEJIX1BFTkRJTkcgICA9ICgxIDw8IDApLAor
-CisgICAgLyogSW52b2tlIHRoZSBjYWxsYmFjayAqLworICAgIEJIX1NDSEVEVUxFRCA9ICgxIDw8
-IDEpLAorCisgICAgLyogRGVsZXRlIHdpdGhvdXQgaW52b2tpbmcgY2FsbGJhY2sgKi8KKyAgICBC
-SF9ERUxFVEVEICAgPSAoMSA8PCAyKSwKKworICAgIC8qIERlbGV0ZSBhZnRlciBpbnZva2luZyBj
-YWxsYmFjayAqLworICAgIEJIX09ORVNIT1QgICA9ICgxIDw8IDMpLAorCisgICAgLyogU2NoZWR1
-bGUgcGVyaW9kaWNhbGx5IHdoZW4gdGhlIGV2ZW50IGxvb3AgaXMgaWRsZSAqLworICAgIEJIX0lE
-TEUgICAgICA9ICgxIDw8IDQpLAorfTsKKwogc3RydWN0IFFFTVVCSCB7CiAgICAgQWlvQ29udGV4
-dCAqY3R4OwogICAgIFFFTVVCSEZ1bmMgKmNiOwogICAgIHZvaWQgKm9wYXF1ZTsKLSAgICBRRU1V
-QkggKm5leHQ7Ci0gICAgYm9vbCBzY2hlZHVsZWQ7Ci0gICAgYm9vbCBpZGxlOwotICAgIGJvb2wg
-ZGVsZXRlZDsKKyAgICBRU0xJU1RfRU5UUlkoUUVNVUJIKSBuZXh0OworICAgIHVuc2lnbmVkIGZs
-YWdzOwogfTsKIAorLyogQ2FsbGVkIGNvbmN1cnJlbnRseSBmcm9tIGFueSB0aHJlYWQgKi8KK3N0
-YXRpYyB2b2lkIGFpb19iaF9lbnF1ZXVlKFFFTVVCSCAqYmgsIHVuc2lnbmVkIG5ld19mbGFncykK
-K3sKKyAgICBBaW9Db250ZXh0ICpjdHggPSBiaC0+Y3R4OworICAgIHVuc2lnbmVkIG9sZF9mbGFn
-czsKKworICAgIC8qCisgICAgICogVGhlIG1lbW9yeSBiYXJyaWVyIGltcGxpY2l0IGluIGF0b21p
-Y19mZXRjaF9vciBtYWtlcyBzdXJlIHRoYXQ6CisgICAgICogMS4gaWRsZSAmIGFueSB3cml0ZXMg
-bmVlZGVkIGJ5IHRoZSBjYWxsYmFjayBhcmUgZG9uZSBiZWZvcmUgdGhlCisgICAgICogICAgbG9j
-YXRpb25zIGFyZSByZWFkIGluIHRoZSBhaW9fYmhfcG9sbC4KKyAgICAgKiAyLiBjdHggaXMgbG9h
-ZGVkIGJlZm9yZSB0aGUgY2FsbGJhY2sgaGFzIGEgY2hhbmNlIHRvIGV4ZWN1dGUgYW5kIGJoCisg
-ICAgICogICAgY291bGQgYmUgZnJlZWQuCisgICAgICovCisgICAgb2xkX2ZsYWdzID0gYXRvbWlj
-X2ZldGNoX29yKCZiaC0+ZmxhZ3MsIEJIX1BFTkRJTkcgfCBuZXdfZmxhZ3MpOworICAgIGlmICgh
-KG9sZF9mbGFncyAmIEJIX1BFTkRJTkcpKSB7CisgICAgICAgIFFTTElTVF9JTlNFUlRfSEVBRF9B
-VE9NSUMoJmN0eC0+YmhfbGlzdCwgYmgsIG5leHQpOworICAgIH0KKworICAgIGFpb19ub3RpZnko
-Y3R4KTsKK30KKworLyogT25seSBjYWxsZWQgZnJvbSBhaW9fYmhfcG9sbCgpIGFuZCBhaW9fY3R4
-X2ZpbmFsaXplKCkgKi8KK3N0YXRpYyBRRU1VQkggKmFpb19iaF9kZXF1ZXVlKEJITGlzdCAqaGVh
-ZCwgdW5zaWduZWQgKmZsYWdzKQoreworICAgIFFFTVVCSCAqYmggPSBRU0xJU1RfRklSU1RfUkNV
-KGhlYWQpOworCisgICAgaWYgKCFiaCkgeworICAgICAgICByZXR1cm4gTlVMTDsKKyAgICB9CisK
-KyAgICBRU0xJU1RfUkVNT1ZFX0hFQUQoaGVhZCwgbmV4dCk7CisKKyAgICAvKgorICAgICAqIFRo
-ZSBhdG9taWNfYW5kIGlzIHBhaXJlZCB3aXRoIGFpb19iaF9lbnF1ZXVlKCkuICBUaGUgaW1wbGlj
-aXQgbWVtb3J5CisgICAgICogYmFycmllciBlbnN1cmVzIHRoYXQgdGhlIGNhbGxiYWNrIHNlZXMg
-YWxsIHdyaXRlcyBkb25lIGJ5IHRoZSBzY2hlZHVsaW5nCisgICAgICogdGhyZWFkLiAgSXQgYWxz
-byBlbnN1cmVzIHRoYXQgdGhlIHNjaGVkdWxpbmcgdGhyZWFkIHNlZXMgdGhlIGNsZWFyZWQKKyAg
-ICAgKiBmbGFnIGJlZm9yZSBiaC0+Y2IgaGFzIHJ1biwgYW5kIHRodXMgd2lsbCBjYWxsIGFpb19u
-b3RpZnkgYWdhaW4gaWYKKyAgICAgKiBuZWNlc3NhcnkuCisgICAgICovCisgICAgKmZsYWdzID0g
-YXRvbWljX2ZldGNoX2FuZCgmYmgtPmZsYWdzLAorICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgfihCSF9QRU5ESU5HIHwgQkhfU0NIRURVTEVEIHwgQkhfSURMRSkpOworICAgIHJldHVybiBi
-aDsKK30KKwogdm9pZCBhaW9fYmhfc2NoZWR1bGVfb25lc2hvdChBaW9Db250ZXh0ICpjdHgsIFFF
-TVVCSEZ1bmMgKmNiLCB2b2lkICpvcGFxdWUpCiB7CiAgICAgUUVNVUJIICpiaDsKQEAgLTU1LDE1
-ICsxMTYsNyBAQCB2b2lkIGFpb19iaF9zY2hlZHVsZV9vbmVzaG90KEFpb0NvbnRleHQgKmN0eCwg
-UUVNVUJIRnVuYyAqY2IsIHZvaWQgKm9wYXF1ZSkKICAgICAgICAgLmNiID0gY2IsCiAgICAgICAg
-IC5vcGFxdWUgPSBvcGFxdWUsCiAgICAgfTsKLSAgICBxZW11X2xvY2tjbnRfbG9jaygmY3R4LT5s
-aXN0X2xvY2spOwotICAgIGJoLT5uZXh0ID0gY3R4LT5maXJzdF9iaDsKLSAgICBiaC0+c2NoZWR1
-bGVkID0gMTsKLSAgICBiaC0+ZGVsZXRlZCA9IDE7Ci0gICAgLyogTWFrZSBzdXJlIHRoYXQgdGhl
-IG1lbWJlcnMgYXJlIHJlYWR5IGJlZm9yZSBwdXR0aW5nIGJoIGludG8gbGlzdCAqLwotICAgIHNt
-cF93bWIoKTsKLSAgICBjdHgtPmZpcnN0X2JoID0gYmg7Ci0gICAgcWVtdV9sb2NrY250X3VubG9j
-aygmY3R4LT5saXN0X2xvY2spOwotICAgIGFpb19ub3RpZnkoY3R4KTsKKyAgICBhaW9fYmhfZW5x
-dWV1ZShiaCwgQkhfU0NIRURVTEVEIHwgQkhfT05FU0hPVCk7CiB9CiAKIFFFTVVCSCAqYWlvX2Jo
-X25ldyhBaW9Db250ZXh0ICpjdHgsIFFFTVVCSEZ1bmMgKmNiLCB2b2lkICpvcGFxdWUpCkBAIC03
-NSwxMiArMTI4LDYgQEAgUUVNVUJIICphaW9fYmhfbmV3KEFpb0NvbnRleHQgKmN0eCwgUUVNVUJI
-RnVuYyAqY2IsIHZvaWQgKm9wYXF1ZSkKICAgICAgICAgLmNiID0gY2IsCiAgICAgICAgIC5vcGFx
-dWUgPSBvcGFxdWUsCiAgICAgfTsKLSAgICBxZW11X2xvY2tjbnRfbG9jaygmY3R4LT5saXN0X2xv
-Y2spOwotICAgIGJoLT5uZXh0ID0gY3R4LT5maXJzdF9iaDsKLSAgICAvKiBNYWtlIHN1cmUgdGhh
-dCB0aGUgbWVtYmVycyBhcmUgcmVhZHkgYmVmb3JlIHB1dHRpbmcgYmggaW50byBsaXN0ICovCi0g
-ICAgc21wX3dtYigpOwotICAgIGN0eC0+Zmlyc3RfYmggPSBiaDsKLSAgICBxZW11X2xvY2tjbnRf
-dW5sb2NrKCZjdHgtPmxpc3RfbG9jayk7CiAgICAgcmV0dXJuIGJoOwogfQogCkBAIC04OSw5MSAr
-MTM2LDU2IEBAIHZvaWQgYWlvX2JoX2NhbGwoUUVNVUJIICpiaCkKICAgICBiaC0+Y2IoYmgtPm9w
-YXF1ZSk7CiB9CiAKLS8qIE11bHRpcGxlIG9jY3VycmVuY2VzIG9mIGFpb19iaF9wb2xsIGNhbm5v
-dCBiZSBjYWxsZWQgY29uY3VycmVudGx5LgotICogVGhlIGNvdW50IGluIGN0eC0+bGlzdF9sb2Nr
-IGlzIGluY3JlbWVudGVkIGJlZm9yZSB0aGUgY2FsbCwgYW5kIGlzCi0gKiBub3QgYWZmZWN0ZWQg
-YnkgdGhlIGNhbGwuCi0gKi8KKy8qIE11bHRpcGxlIG9jY3VycmVuY2VzIG9mIGFpb19iaF9wb2xs
-IGNhbm5vdCBiZSBjYWxsZWQgY29uY3VycmVudGx5LiAqLwogaW50IGFpb19iaF9wb2xsKEFpb0Nv
-bnRleHQgKmN0eCkKIHsKLSAgICBRRU1VQkggKmJoLCAqKmJocCwgKm5leHQ7Ci0gICAgaW50IHJl
-dDsKLSAgICBib29sIGRlbGV0ZWQgPSBmYWxzZTsKLQotICAgIHJldCA9IDA7Ci0gICAgZm9yIChi
-aCA9IGF0b21pY19yY3VfcmVhZCgmY3R4LT5maXJzdF9iaCk7IGJoOyBiaCA9IG5leHQpIHsKLSAg
-ICAgICAgbmV4dCA9IGF0b21pY19yY3VfcmVhZCgmYmgtPm5leHQpOwotICAgICAgICAvKiBUaGUg
-YXRvbWljX3hjaGcgaXMgcGFpcmVkIHdpdGggdGhlIG9uZSBpbiBxZW11X2JoX3NjaGVkdWxlLiAg
-VGhlCi0gICAgICAgICAqIGltcGxpY2l0IG1lbW9yeSBiYXJyaWVyIGVuc3VyZXMgdGhhdCB0aGUg
-Y2FsbGJhY2sgc2VlcyBhbGwgd3JpdGVzCi0gICAgICAgICAqIGRvbmUgYnkgdGhlIHNjaGVkdWxp
-bmcgdGhyZWFkLiAgSXQgYWxzbyBlbnN1cmVzIHRoYXQgdGhlIHNjaGVkdWxpbmcKLSAgICAgICAg
-ICogdGhyZWFkIHNlZXMgdGhlIHplcm8gYmVmb3JlIGJoLT5jYiBoYXMgcnVuLCBhbmQgdGh1cyB3
-aWxsIGNhbGwKLSAgICAgICAgICogYWlvX25vdGlmeSBhZ2FpbiBpZiBuZWNlc3NhcnkuCi0gICAg
-ICAgICAqLwotICAgICAgICBpZiAoYXRvbWljX3hjaGcoJmJoLT5zY2hlZHVsZWQsIDApKSB7Cisg
-ICAgQkhMaXN0U2xpY2Ugc2xpY2U7CisgICAgQkhMaXN0U2xpY2UgKnM7CisgICAgaW50IHJldCA9
-IDA7CisKKyAgICBRU0xJU1RfTU9WRV9BVE9NSUMoJnNsaWNlLmJoX2xpc3QsICZjdHgtPmJoX2xp
-c3QpOworICAgIFFTSU1QTEVRX0lOU0VSVF9UQUlMKCZjdHgtPmJoX3NsaWNlX2xpc3QsICZzbGlj
-ZSwgbmV4dCk7CisKKyAgICB3aGlsZSAoKHMgPSBRU0lNUExFUV9GSVJTVCgmY3R4LT5iaF9zbGlj
-ZV9saXN0KSkpIHsKKyAgICAgICAgUUVNVUJIICpiaDsKKyAgICAgICAgdW5zaWduZWQgZmxhZ3M7
-CisKKyAgICAgICAgYmggPSBhaW9fYmhfZGVxdWV1ZSgmcy0+YmhfbGlzdCwgJmZsYWdzKTsKKyAg
-ICAgICAgaWYgKCFiaCkgeworICAgICAgICAgICAgUVNJTVBMRVFfUkVNT1ZFX0hFQUQoJmN0eC0+
-Ymhfc2xpY2VfbGlzdCwgbmV4dCk7CisgICAgICAgICAgICBjb250aW51ZTsKKyAgICAgICAgfQor
-CisgICAgICAgIGlmICgoZmxhZ3MgJiAoQkhfU0NIRURVTEVEIHwgQkhfREVMRVRFRCkpID09IEJI
-X1NDSEVEVUxFRCkgewogICAgICAgICAgICAgLyogSWRsZSBCSHMgZG9uJ3QgY291bnQgYXMgcHJv
-Z3Jlc3MgKi8KLSAgICAgICAgICAgIGlmICghYmgtPmlkbGUpIHsKKyAgICAgICAgICAgIGlmICgh
-KGZsYWdzICYgQkhfSURMRSkpIHsKICAgICAgICAgICAgICAgICByZXQgPSAxOwogICAgICAgICAg
-ICAgfQotICAgICAgICAgICAgYmgtPmlkbGUgPSAwOwogICAgICAgICAgICAgYWlvX2JoX2NhbGwo
-YmgpOwogICAgICAgICB9Ci0gICAgICAgIGlmIChiaC0+ZGVsZXRlZCkgewotICAgICAgICAgICAg
-ZGVsZXRlZCA9IHRydWU7CisgICAgICAgIGlmIChmbGFncyAmIChCSF9ERUxFVEVEIHwgQkhfT05F
-U0hPVCkpIHsKKyAgICAgICAgICAgIGdfZnJlZShiaCk7CiAgICAgICAgIH0KICAgICB9CiAKLSAg
-ICAvKiByZW1vdmUgZGVsZXRlZCBiaHMgKi8KLSAgICBpZiAoIWRlbGV0ZWQpIHsKLSAgICAgICAg
-cmV0dXJuIHJldDsKLSAgICB9Ci0KLSAgICBpZiAocWVtdV9sb2NrY250X2RlY19pZl9sb2NrKCZj
-dHgtPmxpc3RfbG9jaykpIHsKLSAgICAgICAgYmhwID0gJmN0eC0+Zmlyc3RfYmg7Ci0gICAgICAg
-IHdoaWxlICgqYmhwKSB7Ci0gICAgICAgICAgICBiaCA9ICpiaHA7Ci0gICAgICAgICAgICBpZiAo
-YmgtPmRlbGV0ZWQgJiYgIWJoLT5zY2hlZHVsZWQpIHsKLSAgICAgICAgICAgICAgICAqYmhwID0g
-YmgtPm5leHQ7Ci0gICAgICAgICAgICAgICAgZ19mcmVlKGJoKTsKLSAgICAgICAgICAgIH0gZWxz
-ZSB7Ci0gICAgICAgICAgICAgICAgYmhwID0gJmJoLT5uZXh0OwotICAgICAgICAgICAgfQotICAg
-ICAgICB9Ci0gICAgICAgIHFlbXVfbG9ja2NudF9pbmNfYW5kX3VubG9jaygmY3R4LT5saXN0X2xv
-Y2spOwotICAgIH0KICAgICByZXR1cm4gcmV0OwogfQogCiB2b2lkIHFlbXVfYmhfc2NoZWR1bGVf
-aWRsZShRRU1VQkggKmJoKQogewotICAgIGJoLT5pZGxlID0gMTsKLSAgICAvKiBNYWtlIHN1cmUg
-dGhhdCBpZGxlICYgYW55IHdyaXRlcyBuZWVkZWQgYnkgdGhlIGNhbGxiYWNrIGFyZSBkb25lCi0g
-ICAgICogYmVmb3JlIHRoZSBsb2NhdGlvbnMgYXJlIHJlYWQgaW4gdGhlIGFpb19iaF9wb2xsLgot
-ICAgICAqLwotICAgIGF0b21pY19tYl9zZXQoJmJoLT5zY2hlZHVsZWQsIDEpOworICAgIGFpb19i
-aF9lbnF1ZXVlKGJoLCBCSF9TQ0hFRFVMRUQgfCBCSF9JRExFKTsKIH0KIAogdm9pZCBxZW11X2Jo
-X3NjaGVkdWxlKFFFTVVCSCAqYmgpCiB7Ci0gICAgQWlvQ29udGV4dCAqY3R4OwotCi0gICAgY3R4
-ID0gYmgtPmN0eDsKLSAgICBiaC0+aWRsZSA9IDA7Ci0gICAgLyogVGhlIG1lbW9yeSBiYXJyaWVy
-IGltcGxpY2l0IGluIGF0b21pY194Y2hnIG1ha2VzIHN1cmUgdGhhdDoKLSAgICAgKiAxLiBpZGxl
-ICYgYW55IHdyaXRlcyBuZWVkZWQgYnkgdGhlIGNhbGxiYWNrIGFyZSBkb25lIGJlZm9yZSB0aGUK
-LSAgICAgKiAgICBsb2NhdGlvbnMgYXJlIHJlYWQgaW4gdGhlIGFpb19iaF9wb2xsLgotICAgICAq
-IDIuIGN0eCBpcyBsb2FkZWQgYmVmb3JlIHNjaGVkdWxlZCBpcyBzZXQgYW5kIHRoZSBjYWxsYmFj
-ayBoYXMgYSBjaGFuY2UKLSAgICAgKiAgICB0byBleGVjdXRlLgotICAgICAqLwotICAgIGlmIChh
-dG9taWNfeGNoZygmYmgtPnNjaGVkdWxlZCwgMSkgPT0gMCkgewotICAgICAgICBhaW9fbm90aWZ5
-KGN0eCk7Ci0gICAgfQorICAgIGFpb19iaF9lbnF1ZXVlKGJoLCBCSF9TQ0hFRFVMRUQpOwogfQog
-Ci0KIC8qIFRoaXMgZnVuYyBpcyBhc3luYy4KICAqLwogdm9pZCBxZW11X2JoX2NhbmNlbChRRU1V
-QkggKmJoKQogewotICAgIGF0b21pY19tYl9zZXQoJmJoLT5zY2hlZHVsZWQsIDApOworICAgIGF0
-b21pY19hbmQoJmJoLT5mbGFncywgfkJIX1NDSEVEVUxFRCk7CiB9CiAKIC8qIFRoaXMgZnVuYyBp
-cyBhc3luYy5UaGUgYm90dG9tIGhhbGYgd2lsbCBkbyB0aGUgZGVsZXRlIGFjdGlvbiBhdCB0aGUg
-ZmluaWFsCkBAIC0xODEsMjEgKzE5MywxNiBAQCB2b2lkIHFlbXVfYmhfY2FuY2VsKFFFTVVCSCAq
-YmgpCiAgKi8KIHZvaWQgcWVtdV9iaF9kZWxldGUoUUVNVUJIICpiaCkKIHsKLSAgICBiaC0+c2No
-ZWR1bGVkID0gMDsKLSAgICBiaC0+ZGVsZXRlZCA9IDE7CisgICAgYWlvX2JoX2VucXVldWUoYmgs
-IEJIX0RFTEVURUQpOwogfQogCi1pbnQ2NF90Ci1haW9fY29tcHV0ZV90aW1lb3V0KEFpb0NvbnRl
-eHQgKmN0eCkKK3N0YXRpYyBpbnQ2NF90IGFpb19jb21wdXRlX2JoX3RpbWVvdXQoQkhMaXN0ICpo
-ZWFkLCBpbnQgdGltZW91dCkKIHsKLSAgICBpbnQ2NF90IGRlYWRsaW5lOwotICAgIGludCB0aW1l
-b3V0ID0gLTE7CiAgICAgUUVNVUJIICpiaDsKIAotICAgIGZvciAoYmggPSBhdG9taWNfcmN1X3Jl
-YWQoJmN0eC0+Zmlyc3RfYmgpOyBiaDsKLSAgICAgICAgIGJoID0gYXRvbWljX3JjdV9yZWFkKCZi
-aC0+bmV4dCkpIHsKLSAgICAgICAgaWYgKGJoLT5zY2hlZHVsZWQpIHsKLSAgICAgICAgICAgIGlm
-IChiaC0+aWRsZSkgeworICAgIFFTTElTVF9GT1JFQUNIX1JDVShiaCwgaGVhZCwgbmV4dCkgewor
-ICAgICAgICBpZiAoKGJoLT5mbGFncyAmIChCSF9TQ0hFRFVMRUQgfCBCSF9ERUxFVEVEKSkgPT0g
-QkhfU0NIRURVTEVEKSB7CisgICAgICAgICAgICBpZiAoYmgtPmZsYWdzICYgQkhfSURMRSkgewog
-ICAgICAgICAgICAgICAgIC8qIGlkbGUgYm90dG9tIGhhbHZlcyB3aWxsIGJlIHBvbGxlZCBhdCBs
-ZWFzdAogICAgICAgICAgICAgICAgICAqIGV2ZXJ5IDEwbXMgKi8KICAgICAgICAgICAgICAgICB0
-aW1lb3V0ID0gMTAwMDAwMDA7CkBAIC0yMDcsNiArMjE0LDI4IEBAIGFpb19jb21wdXRlX3RpbWVv
-dXQoQWlvQ29udGV4dCAqY3R4KQogICAgICAgICB9CiAgICAgfQogCisgICAgcmV0dXJuIHRpbWVv
-dXQ7Cit9CisKK2ludDY0X3QKK2Fpb19jb21wdXRlX3RpbWVvdXQoQWlvQ29udGV4dCAqY3R4KQor
-eworICAgIEJITGlzdFNsaWNlICpzOworICAgIGludDY0X3QgZGVhZGxpbmU7CisgICAgaW50IHRp
-bWVvdXQgPSAtMTsKKworICAgIHRpbWVvdXQgPSBhaW9fY29tcHV0ZV9iaF90aW1lb3V0KCZjdHgt
-PmJoX2xpc3QsIHRpbWVvdXQpOworICAgIGlmICh0aW1lb3V0ID09IDApIHsKKyAgICAgICAgcmV0
-dXJuIDA7CisgICAgfQorCisgICAgUVNJTVBMRVFfRk9SRUFDSChzLCAmY3R4LT5iaF9zbGljZV9s
-aXN0LCBuZXh0KSB7CisgICAgICAgIHRpbWVvdXQgPSBhaW9fY29tcHV0ZV9iaF90aW1lb3V0KCZz
-LT5iaF9saXN0LCB0aW1lb3V0KTsKKyAgICAgICAgaWYgKHRpbWVvdXQgPT0gMCkgeworICAgICAg
-ICAgICAgcmV0dXJuIDA7CisgICAgICAgIH0KKyAgICB9CisKICAgICBkZWFkbGluZSA9IHRpbWVy
-bGlzdGdyb3VwX2RlYWRsaW5lX25zKCZjdHgtPnRsZyk7CiAgICAgaWYgKGRlYWRsaW5lID09IDAp
-IHsKICAgICAgICAgcmV0dXJuIDA7CkBAIC0yMzcsMTUgKzI2NiwyNCBAQCBhaW9fY3R4X2NoZWNr
-KEdTb3VyY2UgKnNvdXJjZSkKIHsKICAgICBBaW9Db250ZXh0ICpjdHggPSAoQWlvQ29udGV4dCAq
-KSBzb3VyY2U7CiAgICAgUUVNVUJIICpiaDsKKyAgICBCSExpc3RTbGljZSAqczsKIAogICAgIGF0
-b21pY19hbmQoJmN0eC0+bm90aWZ5X21lLCB+MSk7CiAgICAgYWlvX25vdGlmeV9hY2NlcHQoY3R4
-KTsKIAotICAgIGZvciAoYmggPSBjdHgtPmZpcnN0X2JoOyBiaDsgYmggPSBiaC0+bmV4dCkgewot
-ICAgICAgICBpZiAoYmgtPnNjaGVkdWxlZCkgeworICAgIFFTTElTVF9GT1JFQUNIX1JDVShiaCwg
-JmN0eC0+YmhfbGlzdCwgbmV4dCkgeworICAgICAgICBpZiAoKGJoLT5mbGFncyAmIChCSF9TQ0hF
-RFVMRUQgfCBCSF9ERUxFVEVEKSkgPT0gQkhfU0NIRURVTEVEKSB7CiAgICAgICAgICAgICByZXR1
-cm4gdHJ1ZTsKICAgICAgICAgfQogICAgIH0KKworICAgIFFTSU1QTEVRX0ZPUkVBQ0gocywgJmN0
-eC0+Ymhfc2xpY2VfbGlzdCwgbmV4dCkgeworICAgICAgICBRU0xJU1RfRk9SRUFDSF9SQ1UoYmgs
-ICZzLT5iaF9saXN0LCBuZXh0KSB7CisgICAgICAgICAgICBpZiAoKGJoLT5mbGFncyAmIChCSF9T
-Q0hFRFVMRUQgfCBCSF9ERUxFVEVEKSkgPT0gQkhfU0NIRURVTEVEKSB7CisgICAgICAgICAgICAg
-ICAgcmV0dXJuIHRydWU7CisgICAgICAgICAgICB9CisgICAgICAgIH0KKyAgICB9CiAgICAgcmV0
-dXJuIGFpb19wZW5kaW5nKGN0eCkgfHwgKHRpbWVybGlzdGdyb3VwX2RlYWRsaW5lX25zKCZjdHgt
-PnRsZykgPT0gMCk7CiB9CiAKQEAgLTI2NSw2ICszMDMsOCBAQCBzdGF0aWMgdm9pZAogYWlvX2N0
-eF9maW5hbGl6ZShHU291cmNlICAgICAqc291cmNlKQogewogICAgIEFpb0NvbnRleHQgKmN0eCA9
-IChBaW9Db250ZXh0ICopIHNvdXJjZTsKKyAgICBRRU1VQkggKmJoOworICAgIHVuc2lnbmVkIGZs
-YWdzOwogCiAgICAgdGhyZWFkX3Bvb2xfZnJlZShjdHgtPnRocmVhZF9wb29sKTsKIApAQCAtMjg3
-LDE4ICszMjcsMTUgQEAgYWlvX2N0eF9maW5hbGl6ZShHU291cmNlICAgICAqc291cmNlKQogICAg
-IGFzc2VydChRU0xJU1RfRU1QVFkoJmN0eC0+c2NoZWR1bGVkX2Nvcm91dGluZXMpKTsKICAgICBx
-ZW11X2JoX2RlbGV0ZShjdHgtPmNvX3NjaGVkdWxlX2JoKTsKIAotICAgIHFlbXVfbG9ja2NudF9s
-b2NrKCZjdHgtPmxpc3RfbG9jayk7Ci0gICAgYXNzZXJ0KCFxZW11X2xvY2tjbnRfY291bnQoJmN0
-eC0+bGlzdF9sb2NrKSk7Ci0gICAgd2hpbGUgKGN0eC0+Zmlyc3RfYmgpIHsKLSAgICAgICAgUUVN
-VUJIICpuZXh0ID0gY3R4LT5maXJzdF9iaC0+bmV4dDsKKyAgICAvKiBUaGVyZSBtdXN0IGJlIG5v
-IGFpb19iaF9wb2xsKCkgY2FsbHMgZ29pbmcgb24gKi8KKyAgICBhc3NlcnQoUVNJTVBMRVFfRU1Q
-VFkoJmN0eC0+Ymhfc2xpY2VfbGlzdCkpOwogCisgICAgd2hpbGUgKChiaCA9IGFpb19iaF9kZXF1
-ZXVlKCZjdHgtPmJoX2xpc3QsICZmbGFncykpKSB7CiAgICAgICAgIC8qIHFlbXVfYmhfZGVsZXRl
-KCkgbXVzdCBoYXZlIGJlZW4gY2FsbGVkIG9uIEJIcyBpbiB0aGlzIEFpb0NvbnRleHQgKi8KLSAg
-ICAgICAgYXNzZXJ0KGN0eC0+Zmlyc3RfYmgtPmRlbGV0ZWQpOworICAgICAgICBhc3NlcnQoZmxh
-Z3MgJiBCSF9ERUxFVEVEKTsKIAotICAgICAgICBnX2ZyZWUoY3R4LT5maXJzdF9iaCk7Ci0gICAg
-ICAgIGN0eC0+Zmlyc3RfYmggPSBuZXh0OworICAgICAgICBnX2ZyZWUoYmgpOwogICAgIH0KLSAg
-ICBxZW11X2xvY2tjbnRfdW5sb2NrKCZjdHgtPmxpc3RfbG9jayk7CiAKICAgICBhaW9fc2V0X2V2
-ZW50X25vdGlmaWVyKGN0eCwgJmN0eC0+bm90aWZpZXIsIGZhbHNlLCBOVUxMLCBOVUxMKTsKICAg
-ICBldmVudF9ub3RpZmllcl9jbGVhbnVwKCZjdHgtPm5vdGlmaWVyKTsKQEAgLTQ0NSw2ICs0ODIs
-OCBAQCBBaW9Db250ZXh0ICphaW9fY29udGV4dF9uZXcoRXJyb3IgKiplcnJwKQogICAgIEFpb0Nv
-bnRleHQgKmN0eDsKIAogICAgIGN0eCA9IChBaW9Db250ZXh0ICopIGdfc291cmNlX25ldygmYWlv
-X3NvdXJjZV9mdW5jcywgc2l6ZW9mKEFpb0NvbnRleHQpKTsKKyAgICBRU0xJU1RfSU5JVCgmY3R4
-LT5iaF9saXN0KTsKKyAgICBRU0lNUExFUV9JTklUKCZjdHgtPmJoX3NsaWNlX2xpc3QpOwogICAg
-IGFpb19jb250ZXh0X3NldHVwKGN0eCk7CiAKICAgICByZXQgPSBldmVudF9ub3RpZmllcl9pbml0
-KCZjdHgtPm5vdGlmaWVyLCBmYWxzZSk7Ci0tIAoyLjI0LjEKCg==
+21.02.2020 12:19, Markus Armbruster wrote:
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>=20
+>> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+>> functions with an errp OUT parameter.
+>>
+>> It has three goals:
+>>
+>> 1. Fix issue with error_fatal and error_prepend/error_append_hint: user
+>> can't see this additional information, because exit() happens in
+>> error_setg earlier than information is added. [Reported by Greg Kurz]
+>>
+>> 2. Fix issue with error_abort and error_propagate: when we wrap
+>> error_abort by local_err+error_propagate, the resulting coredump will
+>> refer to error_propagate and not to the place where error happened.
+>> (the macro itself doesn't fix the issue, but it allows us to [3.] drop
+>> the local_err+error_propagate pattern, which will definitely fix the
+>> issue) [Reported by Kevin Wolf]
+>>
+>> 3. Drop local_err+error_propagate pattern, which is used to workaround
+>> void functions with errp parameter, when caller wants to know resulting
+>> status. (Note: actually these functions could be merely updated to
+>> return int error code).
+>>
+>> To achieve these goals, later patches will add invocations
+>> of this macro at the start of functions with either use
+>> error_prepend/error_append_hint (solving 1) or which use
+>> local_err+error_propagate to check errors, switching those
+>> functions to use *errp instead (solving 2 and 3).
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>
+>> CC: Eric Blake <eblake@redhat.com>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Greg Kurz <groug@kaod.org>
+>> CC: Stefano Stabellini <sstabellini@kernel.org>
+>> CC: Anthony Perard <anthony.perard@citrix.com>
+>> CC: Paul Durrant <paul@xen.org>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+>> CC: Laszlo Ersek <lersek@redhat.com>
+>> CC: Gerd Hoffmann <kraxel@redhat.com>
+>> CC: Stefan Berger <stefanb@linux.ibm.com>
+>> CC: Markus Armbruster <armbru@redhat.com>
+>> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
+>> CC: qemu-block@nongnu.org
+>> CC: xen-devel@lists.xenproject.org
+>>
+>>   include/qapi/error.h | 83 +++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 82 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/qapi/error.h b/include/qapi/error.h
+>> index d34987148d..b9452d4806 100644
+>> --- a/include/qapi/error.h
+>> +++ b/include/qapi/error.h
+>> @@ -78,7 +78,7 @@
+>>    * Call a function treating errors as fatal:
+>>    *     foo(arg, &error_fatal);
+>>    *
+>> - * Receive an error and pass it on to the caller:
+>> + * Receive an error and pass it on to the caller (DEPRECATED*):
+>>    *     Error *err =3D NULL;
+>>    *     foo(arg, &err);
+>>    *     if (err) {
+>> @@ -98,6 +98,50 @@
+>>    *     foo(arg, errp);
+>>    * for readability.
+>>    *
+>> + * DEPRECATED* This pattern is deprecated now, the use ERRP_AUTO_PROPAG=
+ATE macro
+>> + * instead (defined below).
+>> + * It's deprecated because of two things:
+>> + *
+>> + * 1. Issue with error_abort and error_propagate: when we wrap error_ab=
+ort by
+>> + * local_err+error_propagate, the resulting coredump will refer to
+>> + * error_propagate and not to the place where error happened.
+>> + *
+>> + * 2. A lot of extra code of the same pattern
+>> + *
+>> + * How to update old code to use ERRP_AUTO_PROPAGATE?
+>> + *
+>> + * All you need is to add ERRP_AUTO_PROPAGATE() invocation at function =
+start,
+>> + * than you may safely dereference errp to check errors and do not need=
+ any
+>> + * additional local Error variables or calls to error_propagate().
+>> + *
+>> + * Example:
+>> + *
+>> + * old code
+>> + *
+>> + *     void fn(..., Error **errp) {
+>> + *         Error *err =3D NULL;
+>> + *         foo(arg, &err);
+>> + *         if (err) {
+>> + *             handle the error...
+>> + *             error_propagate(errp, err);
+>> + *             return;
+>> + *         }
+>> + *         ...
+>> + *     }
+>> + *
+>> + * updated code
+>> + *
+>> + *     void fn(..., Error **errp) {
+>> + *         ERRP_AUTO_PROPAGATE();
+>> + *         foo(arg, errp);
+>> + *         if (*errp) {
+>> + *             handle the error...
+>> + *             return;
+>> + *         }
+>> + *         ...
+>> + *     }
+>> + *
+>> + *
+>>    * Receive and accumulate multiple errors (first one wins):
+>>    *     Error *err =3D NULL, *local_err =3D NULL;
+>>    *     foo(arg, &err);
+>=20
+> Let's explain what should be done *first*, and only then talk about the
+> deprecated pattern and how to convert it to current usage.
+>=20
+>> @@ -348,6 +392,43 @@ void error_set_internal(Error **errp,
+>>                           ErrorClass err_class, const char *fmt, ...)
+>>       GCC_FMT_ATTR(6, 7);
+>>  =20
+>> +typedef struct ErrorPropagator {
+>> +    Error *local_err;
+>> +    Error **errp;
+>> +} ErrorPropagator;
+>> +
+>> +static inline void error_propagator_cleanup(ErrorPropagator *prop)
+>> +{
+>> +    error_propagate(prop->errp, prop->local_err);
+>> +}
+>> +
+>> +G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(ErrorPropagator, error_propagator_clea=
+nup);
+>> +
+>> +/*
+>> + * ERRP_AUTO_PROPAGATE
+>> + *
+>> + * This macro is created to be the first line of a function which use
+>> + * Error **errp parameter to report error. It's needed only in cases wh=
+ere we
+>> + * want to use error_prepend, error_append_hint or dereference *errp. I=
+t's
+>> + * still safe (but useless) in other cases.
+>> + *
+>> + * If errp is NULL or points to error_fatal, it is rewritten to point t=
+o a
+>> + * local Error object, which will be automatically propagated to the or=
+iginal
+>> + * errp on function exit (see error_propagator_cleanup).
+>> + *
+>> + * After invocation of this macro it is always safe to dereference errp
+>> + * (as it's not NULL anymore) and to add information by error_prepend o=
+r
+>> + * error_append_hint (as, if it was error_fatal, we swapped it with a
+>> + * local_error to be propagated on cleanup).
+>> + *
+>> + * Note: we don't wrap the error_abort case, as we want resulting cored=
+ump
+>> + * to point to the place where the error happened, not to error_propaga=
+te.
+>=20
+> Tradeoff: we gain more useful backtraces, we lose message improvements
+> from error_prepend(), error_append_hint() and such, if any.  Makes
+> sense.
+>=20
+>> + */
+>=20
+> The comment's contents looks okay to me.  I'll want to tweak formatting
+> to better blend in with the rest of this file, but let's not worry about
+> that now.
+>=20
+>> +#define ERRP_AUTO_PROPAGATE()                                  \
+>> +    g_auto(ErrorPropagator) _auto_errp_prop =3D {.errp =3D errp};  \
+>> +    errp =3D ((errp =3D=3D NULL || *errp =3D=3D error_fatal)           =
+  \
+>> +            ? &_auto_errp_prop.local_err : errp)
+>> +
+>>   /*
+>>    * Special error destination to abort on error.
+>>    * See error_setg() and error_propagate() for details.
+>=20
+> *errp =3D=3D error_fatal tests *errp =3D=3D NULL, which is not what you w=
+ant.
+> You need to test errp =3D=3D &error_fatal, just like error_handle_fatal()=
+.
 
+Oops, great bug) And nobody noticed before) Of course, you are right.
+
+>=20
+> Superfluous parenthesis around the first operand of ?:.
+>=20
+> Wouldn't
+>=20
+>     #define ERRP_AUTO_PROPAGATE()                                  \
+>         g_auto(ErrorPropagator) _auto_errp_prop =3D {.errp =3D errp};  \
+>         if (!errp || errp =3D=3D &error_fatal) {                       \
+>             errp =3D &_auto_errp_prop.local_err;                     \
+>         }
+>=20
+> be clearer?
+>=20
+
+Hmm, notation with "if" will allow omitting ';' after macro invocation, whi=
+ch seems not good..
+And if I'm not wrong we've already discussed it somewhere in previous versi=
+ons.
+
+Still, no objections for s/errp =3D=3D NULL/!errp/ and we need s/*errp =3D=
+=3D error_fatal/errp =3D=3D &error_fatal/ for sure.
+
+--=20
+Best regards,
+Vladimir
 
