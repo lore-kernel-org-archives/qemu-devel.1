@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAD3C11D24
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA96FC11D24
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1929F208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 855E8208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 03:43:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D/39LhHa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1929F208C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CzlokUDr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 855E8208C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4zDj-0003no-4S
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 22:43:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49219)
+	id 1j4zEM-0004ov-MW
+	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 22:43:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j4z81-0002HZ-QV
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:27 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j4z7z-0008Oi-Eu
+ (envelope-from <dgibson@ozlabs.org>) id 1j4z7z-0002F9-KQ
  for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:24 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56509 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1j4z7x-0008Ml-R0
+ for qemu-devel@nongnu.org; Thu, 20 Feb 2020 22:37:23 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:33791 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j4z7x-00087k-Lt; Thu, 20 Feb 2020 22:37:22 -0500
+ id 1j4z7x-00080P-Ez; Thu, 20 Feb 2020 22:37:21 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48NxwH576Fz9sSR; Fri, 21 Feb 2020 14:37:03 +1100 (AEDT)
+ id 48NxwG37Lgz9sSV; Fri, 21 Feb 2020 14:37:02 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582256223;
- bh=BPtxECqm+DoofpUACmvk5YCWgbDZRCEcXzjUqAUFNNM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582256222;
+ bh=oto2DP51lfwFNY8850lSwPwMGWIzyB8Fptb3GKQeMEM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=D/39LhHa36N0WW6vMShfVyZjQHYQJfu2tJZkYuLbQ7Yum5rmsc9KI+MORRtVRz2B9
- zydE4vC/SbpSybusQkhWgDWn7rBFH9Yd9bWyDzXslliLbzzup+gvFWu99EaeAN+2zb
- A6HYZF4JKz5CHK5Zh8c1XdX5qA+fvK5tdpqziwvQ=
+ b=CzlokUDrjrdyR1xI8BDsyLYN7fvapZewHiN6SYWvCT3DqPzs6BnPF80r97DPGTKK+
+ skZltN/BTjkp2wPSuuXMvOMAF1BL0wpTezZ3/D0zlG9RuH4neZPi4N0EaC1ziYgz3p
+ Bl6DHdDDvROLhq9IZ7BNlRNvYorOs6jlekzcMeA4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 14/20] target/ppc: Fix typo in comments
-Date: Fri, 21 Feb 2020 14:36:44 +1100
-Message-Id: <20200221033650.444386-15-david@gibson.dropbear.id.au>
+Subject: [PULL 11/20] pnv/phb4: Fix error path in pnv_pec_realize()
+Date: Fri, 21 Feb 2020 14:36:41 +1100
+Message-Id: <20200221033650.444386-12-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200221033650.444386-1-david@gibson.dropbear.id.au>
 References: <20200221033650.444386-1-david@gibson.dropbear.id.au>
@@ -74,75 +74,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Greg Kurz <groug@kaod.org>
 
-"Deferred" was misspelled as "differed" in some comments, correct this
-typo,
+Obviously, we want to pass &local_err so that we can check it then
+line below, not errp.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Message-Id: <20200214155748.0896B745953@zero.eik.bme.hu>
+Reported-by: Coverity CID 1419395 'Constant' variable guards dead code
+Fixes: 4f9924c4d4cf "ppc/pnv: Add models for POWER9 PHB4 PCIe Host bridge=
+"
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <158153364605.3229002.2796177658957390343.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c            | 4 ++--
- target/ppc/translate/fp-impl.inc.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ hw/pci-host/pnv_phb4_pec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index dc383242f7..ae43b08eb5 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -293,7 +293,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, b=
-ool set_fpcc,
-         env->error_code =3D POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
-         /* Update the floating-point enabled exception summary */
-         env->fpscr |=3D FP_FEX;
--        /* Exception is differed */
-+        /* Exception is deferred */
-     }
- }
+diff --git a/hw/pci-host/pnv_phb4_pec.c b/hw/pci-host/pnv_phb4_pec.c
+index 68e1db3eac..911d147ffd 100644
+--- a/hw/pci-host/pnv_phb4_pec.c
++++ b/hw/pci-host/pnv_phb4_pec.c
+@@ -391,7 +391,7 @@ static void pnv_pec_realize(DeviceState *dev, Error *=
+*errp)
 =20
-@@ -644,7 +644,7 @@ static void do_float_check_status(CPUPPCState *env, u=
-intptr_t raddr)
-=20
-     if (cs->exception_index =3D=3D POWERPC_EXCP_PROGRAM &&
-         (env->error_code & POWERPC_EXCP_FP)) {
--        /* Differred floating-point exception after target FPR update */
-+        /* Deferred floating-point exception after target FPR update */
-         if (fp_exceptions_enabled(env)) {
-             raise_exception_err_ra(env, cs->exception_index,
-                                    env->error_code, raddr);
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp=
--impl.inc.c
-index d8e27bf4d5..9f7868ee28 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -781,7 +781,7 @@ static void gen_mtfsb1(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
-=20
-@@ -817,7 +817,7 @@ static void gen_mtfsf(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
-     tcg_temp_free_i64(t1);
- }
-@@ -850,7 +850,7 @@ static void gen_mtfsfi(DisasContext *ctx)
-         tcg_gen_trunc_tl_i32(cpu_crf[1], cpu_fpscr);
-         tcg_gen_shri_i32(cpu_crf[1], cpu_crf[1], FPSCR_OX);
-     }
--    /* We can raise a differed exception */
-+    /* We can raise a deferred exception */
-     gen_helper_float_check_status(cpu_env);
- }
-=20
+         object_property_set_int(stk_obj, i, "stack-no", &error_abort);
+         object_property_set_link(stk_obj, OBJECT(pec), "pec", &error_abo=
+rt);
+-        object_property_set_bool(stk_obj, true, "realized", errp);
++        object_property_set_bool(stk_obj, true, "realized", &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
 --=20
 2.24.1
 
