@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 625EFC35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B73C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D1D7206D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26940206D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qxqtQAhJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1D7206D7
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ALrj4K9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26940206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j58I8-0008Nv-AK
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:24:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56888)
+	id 1j58IB-0008Or-B9
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:24:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56722)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j582a-0007ia-7C
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:25 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j582P-0007Eo-CF
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j582Z-0003Bj-3Y
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:24 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44162)
+ (envelope-from <peter.maydell@linaro.org>) id 1j582N-0002wW-UM
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:13 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:55607)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j582Y-0003BD-TW
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:23 -0500
-Received: by mail-wr1-x441.google.com with SMTP id m16so1976732wrx.11
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:22 -0800 (PST)
+ id 1j582N-0002vn-Ny
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:08:11 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id q9so1719957wmj.5
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:08:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=e7EtrQPP4lbwreuGx+Kl/vTgu6XaCFRgZZBcf+txFYM=;
- b=qxqtQAhJtgPVW55AUGEcg+1dYw1H3n31/Y9h1gAWo2jL7EOqyZodicKMDAJ6N88GhQ
- hzzxJNxS4Up3sGfCvSX+O0HJf2CCXW6ZsPy5sooixrH1QdRhp8jfeQJKG8WttCq5Fqd0
- u6Jc9uR+sxn1k/OgmLZ9OaMKL2kVtRisSa3QuA1RkxQa/v/WX/dJwMUXZT5OrGwt9sD5
- P7TVQW5SjlxAxMPMGsOb97qtgVSQ631lwT4Q23N74RC4GD5AAP8HNs0SzltRA6FSNbFT
- T1eAwQvu05u6nuFR4RHA+EKwUdj0rECtpZmEoax0VowwDmeT3QxMVZpoGdJc9Hv0BcKc
- 1iiA==
+ bh=EsdiaTm0IFB2gzMCnWsA71C+8ZH9oy94y+EHWu8Arx4=;
+ b=ALrj4K9M14gp9kwKII/ofaQUUYxEa+RBEdM+s3KPYHpmzINtVg3CsOhv3pNyPsffkB
+ mxfsEZ05lnmdCQdQnoBBFRWd0biZqCJwWgijG7IQ2MzIkyup9R5bV8+WgTNHziRjRjO+
+ SAHu2c5d9N4+/2qfVTmOwkDbTqj84V5RgkUGUFyXskKqUoOSNp4fJr9hUP6+IPbTIiDN
+ mkKK6Bb3XBh4NVxiB/7OJUZ1yi/WLSexq8uR5M84lABGunpqptGJWb5Yo+2VdnJLeXgm
+ hL68FOKQVRgCyMpLwLfj+3g3NxUFNMADKpL3LnuJNh+HqiMSVP9LUvqR6YzE2mcziNUS
+ 3XYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=e7EtrQPP4lbwreuGx+Kl/vTgu6XaCFRgZZBcf+txFYM=;
- b=tWgursUStjVDfAdcylMrix7UaxIKHkTQ447kubK1c6AiqIrLGYuPBT+iVJKrfT+T0/
- 49ZE8j6D99G36S4YMD6udUt3SFyVN5M0fEnU4zByVbCM7dpuDUgNvOt+4L4IbVAL3qj6
- 1S849BBirGfVy4PmcGpAxn5p3zArCc7bDXBXnTQU6zs2RZZ3Iw7ccrUHF4EALD3scFIx
- WhwGzkRDj4pXvMxyYuOKaIgfBGStvdQqqMHdkozMF8MrhTuJK/PuyOCAPO4dtLAFBixq
- z6Z978BJYssL+7MMIn4m9P4wlzcCDoEoL3a/n6KxdjU0Tu5OO86Wq6LySjHFFINb6qxO
- FZHQ==
-X-Gm-Message-State: APjAAAW+O1ZaTq2apsXuarANL4Ihvt3+AB3YpSWUxWzWrzZnf/EB+ztC
- 2NH1/X854in5dwl8+h/ASc6KJ4o765O8oQ==
-X-Google-Smtp-Source: APXvYqzJKqDCWzj2nMrulNwFlJHqfoxXn+xGLpFRhd74B8RnFrhNaDQXaVeq1uCIims1eH1Jl7CSlA==
-X-Received: by 2002:adf:fa87:: with SMTP id h7mr51177548wrr.172.1582290501558; 
- Fri, 21 Feb 2020 05:08:21 -0800 (PST)
+ bh=EsdiaTm0IFB2gzMCnWsA71C+8ZH9oy94y+EHWu8Arx4=;
+ b=XKN1tXAf5pNKZv7YoEYVlosIbSZIV/30IL9itkjHlDw9Jrs3QIYH+yFLO3FiKUVGU4
+ ycsgP9lOl9+qY/jn7XHDPN0kUBJhogrqDUfm/2AoXNfF/AVSHr4jdLZuPsM3lAz4zGfm
+ Q2yXJyYIRE9E93w4QSv2v4GU/potGxxkfddtqkRsHh8u5g2wb/lCbVZCYpUnN0WfOY4n
+ +C6qRZ51r1YLJ5vb8j3CPt2vHEweaGCN5j2GocKdS6+wwNdt7mRM+sI8zcCFPZ/4CzQO
+ BT5sf2gcC1EFh5he96V+Sg62mKuGvCBpHhbnBeuucsFnZ/jrT73kCMIL9uHiGt6OthFp
+ WVYg==
+X-Gm-Message-State: APjAAAX2tvlCSoh6UWKSn9md62/e0leFk3RY52lDaqNYAPmXOSevOFUR
+ T/08Lq1nZmk3+rphkEuDVy13vT83g2VJsA==
+X-Google-Smtp-Source: APXvYqwnRhnzRjhvq6d7Q0INO69kT3UnorSyctzRZ6PoTgnN+/MRCbKLo1DOgkRIUYDKOVzcIYmEhQ==
+X-Received: by 2002:a05:600c:21da:: with SMTP id
+ x26mr3711841wmj.114.1582290489546; 
+ Fri, 21 Feb 2020 05:08:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.20
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.08.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:08:21 -0800 (PST)
+ Fri, 21 Feb 2020 05:08:08 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 32/52] target/arm: Use isar_feature function for testing
- AA32HPD feature
-Date: Fri, 21 Feb 2020 13:07:20 +0000
-Message-Id: <20200221130740.7583-33-peter.maydell@linaro.org>
+Subject: [PULL 22/52] target/arm: Add _aa64_ and _any_ versions of pmu_8_1
+ isar checks
+Date: Fri, 21 Feb 2020 13:07:10 +0000
+Message-Id: <20200221130740.7583-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,52 +100,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now we have moved ID_MMFR4 into the ARMISARegisters struct, we
-can define and use an isar_feature for the presence of the
-ARMv8.2-AA32HPD feature, rather than open-coding the test.
+Add the 64-bit version of the "is this a v8.1 PMUv3?"
+ID register check function, and the _any_ version that
+checks for either AArch32 or AArch64 support. We'll use
+this in a later commit.
 
-While we're here, correct a comment typo which missed an 'A'
-from the feature name.
+We don't (yet) do any isar_feature checks on ID_AA64DFR1_EL1,
+but we move id_aa64dfr1 into the ARMISARegisters struct with
+id_aa64dfr0, for consistency.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200214175116.9164-20-peter.maydell@linaro.org
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200214175116.9164-10-peter.maydell@linaro.org
 ---
- target/arm/cpu.h    | 5 +++++
- target/arm/helper.c | 4 ++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ target/arm/cpu.h    | 15 +++++++++++++--
+ target/arm/cpu.c    |  3 ++-
+ target/arm/cpu64.c  |  6 +++---
+ target/arm/helper.c | 12 +++++++-----
+ 4 files changed, 25 insertions(+), 11 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ba97fc75c1d..276030a5cf3 100644
+index 6c6088eb587..98240224c0c 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -3526,6 +3526,11 @@ static inline bool isar_feature_aa32_pmu_8_4(const ARMISARegisters *id)
-         FIELD_EX32(id->id_dfr0, ID_DFR0, PERFMON) != 0xf;
+@@ -873,6 +873,8 @@ struct ARMCPU {
+         uint64_t id_aa64mmfr0;
+         uint64_t id_aa64mmfr1;
+         uint64_t id_aa64mmfr2;
++        uint64_t id_aa64dfr0;
++        uint64_t id_aa64dfr1;
+     } isar;
+     uint32_t midr;
+     uint32_t revidr;
+@@ -889,8 +891,6 @@ struct ARMCPU {
+     uint32_t id_mmfr2;
+     uint32_t id_mmfr3;
+     uint32_t id_mmfr4;
+-    uint64_t id_aa64dfr0;
+-    uint64_t id_aa64dfr1;
+     uint64_t id_aa64afr0;
+     uint64_t id_aa64afr1;
+     uint32_t dbgdidr;
+@@ -3686,6 +3686,12 @@ static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
  }
  
-+static inline bool isar_feature_aa32_hpd(const ARMISARegisters *id)
++static inline bool isar_feature_aa64_pmu_8_1(const ARMISARegisters *id)
 +{
-+    return FIELD_EX32(id->id_mmfr4, ID_MMFR4, HPDS) != 0;
++    return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >= 4 &&
++        FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
 +}
 +
  /*
-  * 64-bit feature tests via id registers.
+  * Feature tests for "does this exist in either 32-bit or 64-bit?"
   */
+@@ -3699,6 +3705,11 @@ static inline bool isar_feature_any_predinv(const ARMISARegisters *id)
+     return isar_feature_aa64_predinv(id) || isar_feature_aa32_predinv(id);
+ }
+ 
++static inline bool isar_feature_any_pmu_8_1(const ARMISARegisters *id)
++{
++    return isar_feature_aa64_pmu_8_1(id) || isar_feature_aa32_pmu_8_1(id);
++}
++
+ /*
+  * Forward to the above feature tests given an ARMCPU pointer.
+  */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index b85040d36bc..7759e0f9329 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1718,7 +1718,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+                 cpu);
+ #endif
+     } else {
+-        cpu->id_aa64dfr0 = FIELD_DP64(cpu->id_aa64dfr0, ID_AA64DFR0, PMUVER, 0);
++        cpu->isar.id_aa64dfr0 =
++            FIELD_DP64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, PMUVER, 0);
+         cpu->isar.id_dfr0 = FIELD_DP32(cpu->isar.id_dfr0, ID_DFR0, PERFMON, 0);
+         cpu->pmceid0 = 0;
+         cpu->pmceid1 = 0;
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 9e4387158f9..2030e5e384b 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -135,7 +135,7 @@ static void aarch64_a57_initfn(Object *obj)
+     cpu->isar.id_isar5 = 0x00011121;
+     cpu->isar.id_isar6 = 0;
+     cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->id_aa64dfr0 = 0x10305106;
++    cpu->isar.id_aa64dfr0 = 0x10305106;
+     cpu->isar.id_aa64isar0 = 0x00011120;
+     cpu->isar.id_aa64mmfr0 = 0x00001124;
+     cpu->dbgdidr = 0x3516d000;
+@@ -189,7 +189,7 @@ static void aarch64_a53_initfn(Object *obj)
+     cpu->isar.id_isar5 = 0x00011121;
+     cpu->isar.id_isar6 = 0;
+     cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->id_aa64dfr0 = 0x10305106;
++    cpu->isar.id_aa64dfr0 = 0x10305106;
+     cpu->isar.id_aa64isar0 = 0x00011120;
+     cpu->isar.id_aa64mmfr0 = 0x00001122; /* 40 bit physical addr */
+     cpu->dbgdidr = 0x3516d000;
+@@ -241,7 +241,7 @@ static void aarch64_a72_initfn(Object *obj)
+     cpu->isar.id_isar4 = 0x00011142;
+     cpu->isar.id_isar5 = 0x00011121;
+     cpu->isar.id_aa64pfr0 = 0x00002222;
+-    cpu->id_aa64dfr0 = 0x10305106;
++    cpu->isar.id_aa64dfr0 = 0x10305106;
+     cpu->isar.id_aa64isar0 = 0x00011120;
+     cpu->isar.id_aa64mmfr0 = 0x00001124;
+     cpu->dbgdidr = 0x3516d000;
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 441e8bb6022..19d749a1913 100644
+index f78500e2a9e..679f340c55f 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7408,8 +7408,8 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-     } else {
-         define_arm_cp_regs(cpu, vmsa_pmsa_cp_reginfo);
-         define_arm_cp_regs(cpu, vmsa_cp_reginfo);
--        /* TTCBR2 is introduced with ARMv8.2-A32HPD.  */
--        if (FIELD_EX32(cpu->isar.id_mmfr4, ID_MMFR4, HPDS) != 0) {
-+        /* TTCBR2 is introduced with ARMv8.2-AA32HPD.  */
-+        if (cpu_isar_feature(aa32_hpd, cpu)) {
-             define_one_arm_cp_reg(cpu, &ttbcr2_reginfo);
-         }
+@@ -25,6 +25,7 @@
+ #include "hw/semihosting/semihost.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/tcg.h"
+ #include "qemu/range.h"
+ #include "qapi/qapi-commands-machine-target.h"
+ #include "qapi/error.h"
+@@ -6266,9 +6267,10 @@ static void define_debug_regs(ARMCPU *cpu)
+      * check that if they both exist then they agree.
+      */
+     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+-        assert(FIELD_EX64(cpu->id_aa64dfr0, ID_AA64DFR0, BRPS) == brps);
+-        assert(FIELD_EX64(cpu->id_aa64dfr0, ID_AA64DFR0, WRPS) == wrps);
+-        assert(FIELD_EX64(cpu->id_aa64dfr0, ID_AA64DFR0, CTX_CMPS) == ctx_cmps);
++        assert(FIELD_EX64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, BRPS) == brps);
++        assert(FIELD_EX64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, WRPS) == wrps);
++        assert(FIELD_EX64(cpu->isar.id_aa64dfr0, ID_AA64DFR0, CTX_CMPS)
++               == ctx_cmps);
      }
+ 
+     define_one_arm_cp_reg(cpu, &dbgdidr);
+@@ -7010,12 +7012,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 0,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .accessfn = access_aa64_tid3,
+-              .resetvalue = cpu->id_aa64dfr0 },
++              .resetvalue = cpu->isar.id_aa64dfr0 },
+             { .name = "ID_AA64DFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
+               .accessfn = access_aa64_tid3,
+-              .resetvalue = cpu->id_aa64dfr1 },
++              .resetvalue = cpu->isar.id_aa64dfr1 },
+             { .name = "ID_AA64DFR2_EL1_RESERVED", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 5, .opc2 = 2,
+               .access = PL1_R, .type = ARM_CP_CONST,
 -- 
 2.20.1
 
