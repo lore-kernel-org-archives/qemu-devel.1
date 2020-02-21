@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66E1C35655
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDA7C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:12:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4D292073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:12:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BDAD2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:12:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cx14x+zd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D292073A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w4KI827a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDAD2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j586w-0006wN-Px
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:12:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56512)
+	id 1j586z-00072A-D7
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:12:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56476)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j5829-0006gH-3n
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:58 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5825-0006bu-Sn
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j5828-0002Xz-6E
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:57 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37595)
+ (envelope-from <peter.maydell@linaro.org>) id 1j5824-0002W8-SW
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:53 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36596)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j5827-0002XZ-VK
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:56 -0500
-Received: by mail-wr1-x441.google.com with SMTP id w15so1996689wru.4
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:55 -0800 (PST)
+ id 1j5824-0002Vm-Mu
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:07:52 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p17so1776516wma.1
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:07:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=kEbZ0H6BPcwPTKlgGDMsr9sYvm7F+OeNwNzpuyE6fjM=;
- b=Cx14x+zdlr4CfYn+gZ/j2E05IpYY52A7kALoVOySYJlgoDy3AIBN6oaijZIYt12nVB
- UhBz1fz1giuPLTmf3h/xj0e5tZ7t4x3K7F/Grf5Onk6n9T4nVOYqpG+lZr3s12Zica7d
- z4DA4tLDsmGb5p7vnF0SZBdOlvJTdtVwTYn11otqkVCeXngJWxTZPhj7NwMsRFZWnQNX
- eBjhibnq68ALOi+c9wDSp++l5chHvKNLnhb5WDVJJEKRBi9XMp7N42/TGnV/qn3EU49X
- NOFoCN7XgajK5rNoJ8nfVTCwinIEOJ5WLvDI502qZeQbPQM5T0Z6JyUwFGnTMeNmtMU6
- iUsg==
+ bh=DxdO7EU52xd3l5dM1HO6ldFtWdD2ROmRpEMpsBaKfGc=;
+ b=w4KI827aC8d2X/kqG1eJviq5sBTgfcslYEyuzjtlK6vi6zkX6r+YdujR7Lf9SxHu0l
+ YwHBHxoE9e3+bIMt6RMnLgexFgvRGkQtPj5tooT25WUYoctU7c/IjUyi6JA29su++1WR
+ Yj+nYIgRkS7BQc6jrrDpec1qI+/QddIK23kg7XmWQXWTGlr1022IuBAiaf+zvvRQl6x5
+ YlgzQu/opojExWBaobwOEcnail5MWWJxCKByfhDjLnq2M1sa+moekq3ECrgHlxCnZkZN
+ 8cgFYVR2ImTOkwaoA1K93C+cSSUdD6e1y1EvV942kgkaCv6uIREibhDxSF6y3fXVGgSC
+ po8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kEbZ0H6BPcwPTKlgGDMsr9sYvm7F+OeNwNzpuyE6fjM=;
- b=lXjFheqIhAArpdZv4+33teM2q35nzDrnet8feMbPYgkx4QdfadtQEvxdbcjzQJa0xU
- +dw14Hic43cTGsxcG1cfU3LrV5V+GFtlg+b4IVKBv8yboaJhnUqUJFMTzuTlpAW1nXxx
- Tk3OANhNpPNpbE1JNPfKexv4Rk4+bhX2QL8uwD0vqSnAz9BEVXfZN2jEUiJbgW1Wc70w
- EQuzTxwsgr8/uMfzWgj21PlyFKlu4w4wR0P3mch1Z7Aqb0R0JUtzqupJi88cwdSN7yq5
- gLFs821CdegumAiUVBBvwVXi3fOy22/uK4VSBwf3BftOfmE3EE7SnFVyJvk8XF6RzjZD
- LXCg==
-X-Gm-Message-State: APjAAAUllbGTn/P8KAM2rYTAyIbd9j/XOPbZm/PG11U94EaIvHD/qfU8
- 08NvjgS9HPHICabtzQvc2+waBunIs5J9Hw==
-X-Google-Smtp-Source: APXvYqwTuXvWNsIVXXvYLenqZ09snTdL1PsxYOZSpTDMuF6gde9e4SKXoAPnhuvh0zf7yoNH/GRJkg==
-X-Received: by 2002:adf:b351:: with SMTP id k17mr48286933wrd.199.1582290474574; 
- Fri, 21 Feb 2020 05:07:54 -0800 (PST)
+ bh=DxdO7EU52xd3l5dM1HO6ldFtWdD2ROmRpEMpsBaKfGc=;
+ b=sSZLXi/H3ZR0leoffympUA5RCz3cpgRPYl7ysLnjZ7GPb0H5psbHpktHGpEkzYNQkz
+ 125t2EWhoLuTLAD8VKoOLga20VFdR2DrYe+/NXc/c1fDxXZoMPjJIdyqaKXMQeNUSEi1
+ rPv2P3Ff5pXFYtZsgtE3J8ElTCTs8ycX5sobEmoL+GdKQGVHIVHe4C3npQTyTgGEnGpx
+ u/xXZf0B+aki1zEFE5TJgU6YiAYVV/gCXEi9Y/sIabJx/TNvH5HIRrp7npVZFcE9NCTf
+ y+5QOmlZioR3UdJpK9ZrTOsnLv4LRBBmiPf2727dQSns6VXYgcsrDm+m3l7G0KbUsZM1
+ mpfw==
+X-Gm-Message-State: APjAAAWggwqiGDvVtcvFzDvve/Z55ivgXTefTB+x1rk9hsqfFHzDJpOU
+ 1sDq8PGLWo437ZIKAXL7fRx4oBJCN6E1JQ==
+X-Google-Smtp-Source: APXvYqwHHQTlduBU9Fiz62M8sK5flmled3nrVC4c+ie65EBSYAder/uPOie4vcYv+brI7xep1dFA2A==
+X-Received: by 2002:a1c:238e:: with SMTP id j136mr3736756wmj.17.1582290471292; 
+ Fri, 21 Feb 2020 05:07:51 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.53
+ by smtp.gmail.com with ESMTPSA id p15sm3598892wma.40.2020.02.21.05.07.49
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:07:53 -0800 (PST)
+ Fri, 21 Feb 2020 05:07:50 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/52] target/arm: Use bit 55 explicitly for pauth
-Date: Fri, 21 Feb 2020 13:06:58 +0000
-Message-Id: <20200221130740.7583-11-peter.maydell@linaro.org>
+Subject: [PULL 07/52] target/arm: Flush high bits of sve register after
+ AdvSIMD TBL/TBX
+Date: Fri, 21 Feb 2020 13:06:55 +0000
+Message-Id: <20200221130740.7583-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200221130740.7583-1-peter.maydell@linaro.org>
 References: <20200221130740.7583-1-peter.maydell@linaro.org>
@@ -81,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +100,28 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-The psuedocode in aarch64/functions/pac/auth/Auth and
-aarch64/functions/pac/strip/Strip always uses bit 55 for
-extfield and do not consider if the current regime has 2 ranges.
+Writes to AdvSIMD registers flush the bits above 128.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200214194643.23317-3-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200216194343.21331-2-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/pauth_helper.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/translate-a64.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
-index 9746e32bf81..b909630317e 100644
---- a/target/arm/pauth_helper.c
-+++ b/target/arm/pauth_helper.c
-@@ -320,7 +320,8 @@ static uint64_t pauth_addpac(CPUARMState *env, uint64_t ptr, uint64_t modifier,
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 620a4290671..096a854aed7 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -6964,6 +6964,7 @@ static void disas_simd_tb(DisasContext *s, uint32_t insn)
+     tcg_temp_free_i64(tcg_resl);
+     write_vec_element(s, tcg_resh, rd, 1, MO_64);
+     tcg_temp_free_i64(tcg_resh);
++    clear_vec_high(s, true, rd);
+ }
  
- static uint64_t pauth_original_ptr(uint64_t ptr, ARMVAParameters param)
- {
--    uint64_t extfield = -param.select;
-+    /* Note that bit 55 is used whether or not the regime has 2 ranges. */
-+    uint64_t extfield = sextract64(ptr, 55, 1);
-     int bot_pac_bit = 64 - param.tsz;
-     int top_pac_bit = 64 - 8 * param.tbi;
- 
+ /* ZIP/UZP/TRN
 -- 
 2.20.1
 
