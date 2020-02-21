@@ -2,83 +2,83 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URG_BIZ,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA47C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 572E9C35656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:18:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAB9B206EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:16:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2211A206EF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 15:18:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7w9eJSa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB9B206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o2TBR5Ni"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2211A206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5A31-0006F7-2T
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:16:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60872)
+	id 1j5A3z-0007CL-Bm
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 10:17:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j5A1I-00052f-E9
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:15:14 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5A2o-0006FF-3V
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:16:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j5A1F-0000UV-OA
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:15:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47927
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j5A1F-0000Te-J0
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:15:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582298108;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uTG4/15rK4FE9jhreYjIh+knHd/iEu3xJyJAukuG+Q4=;
- b=N7w9eJSajUgWaoe0wW8p4H+z7AhedTj7WhosDTALNcCTtzbi1xaB6W+Bq+yDcuMgR97bUN
- JqPun0YBQzTAu4AwdG2kUc42pu1aCT9Y167YNaa3gnJZU8SF28FYkZrPM5wJKsL6cH3OH0
- X452HjzPEEgebkop/imiIqoTwcmAo9I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-zYzEfPX9NjG5jDXE6TyJ4A-1; Fri, 21 Feb 2020 10:15:05 -0500
-X-MC-Unique: zYzEfPX9NjG5jDXE6TyJ4A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2784094DF3;
- Fri, 21 Feb 2020 15:15:00 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.1])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CA996E3EE;
- Fri, 21 Feb 2020 15:14:49 +0000 (UTC)
-Date: Fri, 21 Feb 2020 15:14:47 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 05/13] migrate/ram: Handle RAM block resizes during
- precopy
-Message-ID: <20200221151447.GF2931@work-vm>
-References: <20200219161725.115218-1-david@redhat.com>
- <20200219161725.115218-6-david@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j5A2k-0001he-9r
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:16:45 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44032)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j5A2k-0001hE-3i
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 10:16:42 -0500
+Received: by mail-ot1-x342.google.com with SMTP id h9so2254479otj.11
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 07:16:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/nmisr1JrQlfkp7UrLG7y7cEfP6qoNvMsqKLbYiGlNA=;
+ b=o2TBR5NiuqNEswkNQKPYEdJxkoNNug+xCPB8bUtXOEqfG9NKKOC2Zi6qEEvhwIapCm
+ KctaFMEYfhFEntNA2doi5mG0iNdKVRCfM7zgjb6lMHSMDSfyETBh+Ut0NP9iTZ6Bi5Jg
+ Djw0EKoOexDLNI/9NTBI7YZyl7UhptLUrfaPVUsJErk0k4jU+C7WDIi+tXXqBr0E+mxc
+ R5jk8zxLYRlzFYrk6RgagQJVRUtXNewE32cuoCOwoAB5KfklSepOQdQvlSEuauq0fBvz
+ BKPZN+EfsZ4l6UO48mJru1nY3Qb/yDRjq3Bt/BrVN4a19c7yS8DNUszaYxVRmmC9CboL
+ j3BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/nmisr1JrQlfkp7UrLG7y7cEfP6qoNvMsqKLbYiGlNA=;
+ b=qdLjeCpsgMKTgCMJ82noUfscThlhmtakBg2lxhJtl6/USUtfDQiXikmSE2AIa0n7bn
+ KzP/dHKGGbP2bD5dNGQGOqHiSPm3E2GeXTLUryPB2dsmyHsJyjyVeD5DTDfnjNBub/7S
+ xAMST4ENs0b5MXY8RTSOoG2pQSatgkweVa1t4l0HG5a8dilOd/k5gZgBRDFHRCZTBosC
+ JUoaJJjRliPEiXSK/T4y5ec5aTQJXBLlPnlSYFz9PXG9BLUnnQcZasuNWAku5W3Di29t
+ YzmXKERl4stl8a183eDD4pR77iiDLq/Gx6p0lz30QVbF+2qMBwFhihbI2qWvrsSC0OFp
+ FFEw==
+X-Gm-Message-State: APjAAAUpYN2d0MFJLED0YbEF1x+dt+0PgZUgeA1YINflgAmD+SmbxhED
+ NNhHd9Ecc+TIQv6y6qBsCzy7uV7wF+BPy7zl7EQ2KA==
+X-Google-Smtp-Source: APXvYqw+vQNzTXFS33+6iKMEi9sCN7SJkRC4AbCi3EQdxbUITLW76c2d3NMByz2oQFEVxbt8FRiaLnFiYuE/FxJXBGc=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr28859098ota.232.1582298200452; 
+ Fri, 21 Feb 2020 07:16:40 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200219161725.115218-6-david@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+References: <20200220142001.20774-1-kchamart@redhat.com>
+ <20200220142001.20774-2-kchamart@redhat.com>
+In-Reply-To: <20200220142001.20774-2-kchamart@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Feb 2020 15:16:29 +0000
+Message-ID: <CAFEAcA9_tDWLxBrsw42uxs7E_QmA5XzsMs6zwmzpckv=B0ksuw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] docs: Convert qemu-cpu-models.texi to rST
+To: Kashyap Chamarthy <kchamart@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,246 +90,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* David Hildenbrand (david@redhat.com) wrote:
-> Resizing while migrating is dangerous and does not work as expected.
-> The whole migration code works on the usable_length of ram blocks and doe=
-s
-> not expect this to change at random points in time.
->=20
-> In the case of precopy, the ram block size must not change on the source,
-> after syncing the RAM block list in ram_save_setup(), so as long as the
-> guest is still running on the source.
->=20
-> Resizing can be trigger *after* (but not during) a reset in
-> ACPI code by the guest
-> - hw/arm/virt-acpi-build.c:acpi_ram_update()
-> - hw/i386/acpi-build.c:acpi_ram_update()
->=20
-> Use the ram block notifier to get notified about resizes. Let's simply
-> cancel migration and indicate the reason. We'll continue running on the
-> source. No harm done.
->=20
-> Update the documentation. Postcopy will be handled separately.
->=20
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Shannon Zhao <shannon.zhao@linaro.org>
-> Cc: Alex Benn=E9e <alex.bennee@linaro.org>
-> Cc: Peter Xu <peterx@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Thu, 20 Feb 2020 at 14:20, Kashyap Chamarthy <kchamart@redhat.com> wrote=
+:
+>
+> This doc was originally written by Daniel P. Berrang=C3=A9
+> <berrange@redhat.com>, introduced via commit[1]: 2544e9e4aa (docs: add
+> guidance on configuring CPU models for x86, 2018-06-27).
+>
+> In this patch:
+>
+>   - 1-1 conversion of Texinfo to rST, besides a couple of minor
+>     tweaks that are too trivial to mention.   (Thanks to Stephen
+>     Finucane on IRC for the suggestion to use rST "definition lists"
+>     instead of bullets in some places.)
+>
+>     Further modifications will be done via a separate patch.
+>
+>   - rST and related infra changes: for building the manual page,
+>     Makefile fixes, clean up references to qemu-cpu-models.texi, etc.
+>
+> [1] https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D2544e9e4aa
+>
+> Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
 > ---
->  exec.c                |  5 +++--
->  include/exec/memory.h | 10 ++++++----
->  migration/migration.c |  9 +++++++--
->  migration/migration.h |  1 +
->  migration/ram.c       | 41 +++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 58 insertions(+), 8 deletions(-)
->=20
-> diff --git a/exec.c b/exec.c
-> index b75250e773..8b015821d6 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2120,8 +2120,9 @@ static int memory_try_enable_merging(void *addr, si=
-ze_t len)
->      return qemu_madvise(addr, len, QEMU_MADV_MERGEABLE);
->  }
-> =20
-> -/* Only legal before guest might have detected the memory size: e.g. on
-> - * incoming migration, or right after reset.
-> +/*
-> + * Resizing RAM while migrating can result in the migration being cancel=
-ed.
-> + * Care has to be taken if the guest might have already detected the mem=
-ory.
->   *
->   * As memory core doesn't know how is memory accessed, it is up to
->   * resize callback to update device state and/or add assertions to detec=
-t
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index e85b7de99a..de111347e8 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -113,7 +113,7 @@ typedef struct IOMMUNotifier IOMMUNotifier;
->  #define RAM_SHARED     (1 << 1)
-> =20
->  /* Only a portion of RAM (used_length) is actually used, and migrated.
-> - * This used_length size can change across reboots.
-> + * Resizing RAM while migrating can result in the migration being cancel=
-ed.
->   */
->  #define RAM_RESIZEABLE (1 << 2)
-> =20
-> @@ -843,7 +843,9 @@ void memory_region_init_ram_shared_nomigrate(MemoryRe=
-gion *mr,
->   *                                     RAM.  Accesses into the region wi=
-ll
->   *                                     modify memory directly.  Only an =
-initial
->   *                                     portion of this RAM is actually u=
-sed.
-> - *                                     The used size can change across r=
-eboots.
-> + *                                     Changing the size while migrating
-> + *                                     can result in the migration being
-> + *                                     canceled.
->   *
->   * @mr: the #MemoryRegion to be initialized.
->   * @owner: the object that tracks the region's reference count
-> @@ -1464,8 +1466,8 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
-> =20
->  /* memory_region_ram_resize: Resize a RAM region.
->   *
-> - * Only legal before guest might have detected the memory size: e.g. on
-> - * incoming migration, or right after reset.
-> + * Resizing RAM while migrating can result in the migration being cancel=
-ed.
-> + * Care has to be taken if the guest might have already detected the mem=
-ory.
->   *
->   * @mr: a memory region created with @memory_region_init_resizeable_ram.
->   * @newsize: the new size the region
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 8fb68795dc..ac9751dbe5 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -175,13 +175,18 @@ void migration_object_init(void)
->      }
->  }
-> =20
-> +void migration_cancel(void)
-> +{
-> +    migrate_fd_cancel(current_migration);
-> +}
-> +
->  void migration_shutdown(void)
->  {
->      /*
->       * Cancel the current migration - that will (eventually)
->       * stop the migration using this structure
->       */
-> -    migrate_fd_cancel(current_migration);
-> +    migration_cancel();
->      object_unref(OBJECT(current_migration));
->  }
-> =20
-> @@ -2019,7 +2024,7 @@ void qmp_migrate(const char *uri, bool has_blk, boo=
-l blk,
-> =20
->  void qmp_migrate_cancel(Error **errp)
->  {
-> -    migrate_fd_cancel(migrate_get_current());
-> +    migration_cancel();
->  }
-> =20
->  void qmp_migrate_continue(MigrationStatus state, Error **errp)
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 8473ddfc88..79fd74afa5 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -343,5 +343,6 @@ int foreach_not_ignored_block(RAMBlockIterFunc func, =
-void *opaque);
->  void migration_make_urgent_request(void);
->  void migration_consume_urgent_request(void);
->  bool migration_rate_limit(void);
-> +void migration_cancel(void);
-> =20
->  #endif
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ed23ed1c7c..57f32011a3 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -52,6 +52,7 @@
->  #include "migration/colo.h"
->  #include "block.h"
->  #include "sysemu/sysemu.h"
-> +#include "sysemu/runstate.h"
->  #include "savevm.h"
->  #include "qemu/iov.h"
->  #include "multifd.h"
-> @@ -3710,8 +3711,48 @@ static SaveVMHandlers savevm_ram_handlers =3D {
->      .resume_prepare =3D ram_resume_prepare,
->  };
-> =20
-> +static void ram_mig_ram_block_resized(RAMBlockNotifier *n, void *host,
-> +                                      size_t old_size, size_t new_size)
-> +{
-> +    ram_addr_t offset;
-> +    Error *err =3D NULL;
-> +    RAMBlock *rb =3D qemu_ram_block_from_host(host, false, &offset);
-> +
-> +    if (ramblock_is_ignored(rb)) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Some resizes are triggered on the migration target by precopy cod=
-e,
-> +     * when synchronizing RAM block sizes. In these cases, the VM is not
-> +     * running and migration is not idle. We have to ignore these resize=
-s,
-> +     * as we only care about resizes during precopy on the migration sou=
-rce.
-> +     * This handler is always registered, so ignore when migration is id=
-le.
-> +     */
-> +    if (migration_is_idle() || !runstate_is_running() ||
-> +        postcopy_is_running()) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Precopy code cannot deal with the size of ram blocks changing at
-> +     * random points in time. We're still running on the source, abort
-> +     * the migration and continue running here. Make sure to wait until
-> +     * migration was canceled.
-> +     */
-> +    error_setg(&err, "RAM block '%s' resized during precopy.", rb->idstr=
-);
-> +    migrate_set_error(migrate_get_current(), err);
-> +    error_free(err);
-> +    migration_cancel();
-> +}
-> +
-> +static RAMBlockNotifier ram_mig_ram_notifier =3D {
-> +    .ram_block_resized =3D ram_mig_ram_block_resized,
-> +};
-> +
->  void ram_mig_init(void)
->  {
->      qemu_mutex_init(&XBZRLE.lock);
->      register_savevm_live("ram", 0, 4, &savevm_ram_handlers, &ram_state);
-> +    ram_block_notifier_add(&ram_mig_ram_notifier);
+> v2: Fix rST conversion, man page creation, Makefile changes, et al
+>     (thanks, Peter Maydell)
+> ---
+>  MAINTAINERS                     |   2 +-
+>  Makefile                        |  10 +-
+>  docs/qemu-cpu-models.texi       | 677 --------------------------------
+>  docs/system/conf.py             |   3 +
+>  docs/system/index.rst           |   1 +
+>  docs/system/qemu-cpu-models.rst | 514 ++++++++++++++++++++++++
+>  qemu-doc.texi                   |   5 -
+>  7 files changed, 524 insertions(+), 688 deletions(-)
+>  delete mode 100644 docs/qemu-cpu-models.texi
+>  create mode 100644 docs/system/qemu-cpu-models.rst
 
-Can we avoid the question of the 'is_idle' checks by doing this
-registration in save_setup/load_setup and unregistering in
-save_cleanup/load_cleanup?
+> @@ -1056,6 +1055,8 @@ $(call define-manpage-rule,interop,\
+>
+>  $(call define-manpage-rule,system,qemu-block-drivers.7)
+>
+> +$(call define-manpage-rule,system,qemu-cpu-models.7)
 
-That means if we land in the handler we know we're in either an incoming
-or outgoing migration and then you just have to check which?
+The new manpage should be added to the existing define-manpage-rule
+invocation for the system manual: the last argument is a space
+separated list of all the manpages in the manual, like this:
 
-Dave
+$(call define-manpage-rule,system,qemu-block-drivers.7 qemu-cpu-models.7)
 
->  }
-> --=20
-> 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +
+>  $(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-versi=
+on.h
+>         @mkdir -p "$(MANUAL_BUILDDIR)"
+>         $(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
 
+
+
+> -@c man begin AUTHOR
+> -Daniel P. Berrange
+> -@c man end
+
+> diff --git a/docs/system/conf.py b/docs/system/conf.py
+> index 7ca115f5e0..7cc9da9508 100644
+> --- a/docs/system/conf.py
+> +++ b/docs/system/conf.py
+> @@ -18,5 +18,8 @@ html_theme_options['description'] =3D u'System Emulatio=
+n User''s Guide'
+>  man_pages =3D [
+>      ('qemu-block-drivers', 'qemu-block-drivers',
+>       u'QEMU block drivers reference',
+> +     ['Fabrice Bellard and the QEMU Project developers'], 7),
+> +    ('qemu-cpu-models', 'qemu-cpu-models',
+> +     u'QEMU CPU Models',
+>       ['Fabrice Bellard and the QEMU Project developers'], 7)
+>  ]
+
+The old manpage/documentation credits Dan as the author,
+so that's what we should specify in the conf.py line,
+rather than 'Fabrice and the project devs' (which we
+use for qemu-block-drivers.7 because that's what the
+old texi version of that file specified as the authors).
+
+
+> +Preferred CPU models for Intel x86 hosts
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +The following CPU models are preferred for use on Intel hosts.
+> +Administrators / applications are recommended to use the CPU model that
+> +matches the generation of the host CPUs in use. In a deployment with a
+> +mixture of host CPU models between machines, if live migration
+> +compatibility is required, use the newest CPU model that is compatible
+> +across all desired hosts.
+> +
+> +* Intel Xeon Processor (Skylake, 2016)
+> +
+> +  * ``Skylake-Server``
+> +  * ``Skylake-Server-IBRS``
+
+This reverses the old ordering of these lists, which consistently
+had the QEMU CPU model names as the 'term' and the explanations
+as the 'definition' of a definition-list. Now we have the
+'explanation' first and the 'terms' second...
+
+> +* AMD EPYC Processor (2017)
+> +
+> +  * ``EPYC``
+> +  * ``EPYC-IBPB``
+> +
+> +* ``Opteron_G5`` =E2=80=93 AMD Opteron 63xx class CPU (2012)
+> +
+> +* ``Opteron_G4`` =E2=80=93 AMD Opteron 62xx class CPU (2011)
+> +
+> +* ``Opteron_G3`` =E2=80=93 AMD Opteron 23xx (Gen 3 Class Opteron, 2009)
+> +
+> +* ``Opteron_G2`` =E2=80=93 AMD Opteron 22xx (Gen 2 Class Opteron, 2006)
+> +
+> +* ``Opteron_G1`` =E2=80=93 AMD Opteron 240 (Gen 1 Class Opteron, 2004)
+
+...but here we become inconsistent, switching back to
+term first and explanation second. I think the
+term-first approach of the original texi makes more sense,
+as we're trying to document the behaviour of the various
+CPU models QEMU supports.
+
+rST is not a fan of having multiple definition list items
+sharing a definition, which is probably why you ended up with
+the list approach you did, but we can do:
+
+``Skylake-Server``, ``Skylake-Server-IBRS``
+    Intel Xeon Processor (Skylake, 2016)
+
+``Skylake-Client``, ``Skylake-Client-IBRS``
+    Intel Core Processor (Skylake, 2015)
+
+Or we can actually document what the difference is between
+a "Skylake-Server" and a "Skylake-Server-IBRS", rather than
+leaving the user to guess :-), in which case we could write
+
+``Skylake-Server``
+    Intel Xeon Processor (Skylake, 2016)
+``Skylake-Server-IBRS``
+    Like ``Skylake-Server`` but with extra magic
+
+(or whatever the difference is...)
+
+Regardless of how we format this, we should be consistent
+in using the same format throughout the document.
+
+thanks
+-- PMM
 
