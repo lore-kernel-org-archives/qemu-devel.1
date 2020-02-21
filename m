@@ -2,138 +2,117 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC926C35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EED8C35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8816B222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:49:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="cDT+g8Tz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8816B222C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0922C222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:55:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0922C222C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5346-0003YW-OP
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 02:49:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60588)
+	id 1j539o-0005wO-7A
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 02:55:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <saipava@xilinx.com>) id 1j531S-0000wF-PL
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:59 -0500
+ (envelope-from <sw@weilnetz.de>) id 1j538q-00050l-RH
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <saipava@xilinx.com>) id 1j531P-0001Aj-U9
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:46:53 -0500
-Received: from mail-dm6nam11on2070.outbound.protection.outlook.com
- ([40.107.223.70]:6081 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <saipava@xilinx.com>)
- id 1j531P-00015a-O7; Fri, 21 Feb 2020 02:46:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IDHNcGFRqGWbxPg+oafuvdAJa0uwS5n5rjJFbHZzXu43k6O+a/xMWPVkwupRxZyfABxl9ZBbVyLBxm81TP1g+Y97v915PcKrgAyaBedHQvTJJ8C4OA9S+sr8WChOOpWFGAPRpXokKCIi7J/S8yWGFmUFbrUZsf21tUPShzBTO3id8bbzCWRP9/R2TbyfburP6wdrW/Mdx1EgeZjaKOsQDEEuVJd8LG2CcNPe02Z73BuVqrzK44Peqbs74XqTPTNUoOLXzSoS/zBqI9ZWXS805B1QAOauWy/ovDYN55AcF0qlno4JX4t5Z70mLcIY2olUFOnMWPKMaQNX6ze6TuKYlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IYlNz8YaPKiBm+UMfGlKLwarvPCaLrRSOCOOTXu7C9w=;
- b=MtXzcTMzK46AE2Q12q8CIM5oMFZ+emsZFLQ6VzpecAEjxVCoPkR+P3L55tPG1pob4v0mUybl9h3GlR0p5h8oaP8f1zwyQz5vPWOAmWG8+ii0D9ZxGf8KmeAcKuvmCW8usPBzrT8E5Yzdbkf1PwlCz8t7rdXqeSchDPtY0A4PobvjXTPDqw3RCMvdqJbNItWKZFjIsPMMm3OvJbr3aBu5cyoNthjeBLYILdf68TlyXsgd93Hvq7ma3c3I+OzaOM49cfqpNlgpoG6z58Pfkst5pp3hgqNGafARA2kHictlwRUG0k3Y+giJZz+JApprIcYanpGAasyaa6J2wii7cYcxig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=suse.de smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IYlNz8YaPKiBm+UMfGlKLwarvPCaLrRSOCOOTXu7C9w=;
- b=cDT+g8TzNAeorpg/oR/KR+AMZoxESY/mILk3qc+PRrajRELdKRwRXQJy21ttSK67x/47CYGbKGhqpIawlKfoiCtja1qsbjy8nn1a3hZSEy5ydO3WNk2CO4iEH8dDwVtnM0el8wwbmTe3xStO9w61ndRrGD4pYTG/e6qRl9RFp6s=
-Received: from BN6PR02CA0040.namprd02.prod.outlook.com (2603:10b6:404:5f::26)
- by CY4PR02MB2278.namprd02.prod.outlook.com (2603:10b6:903:15::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2729.25; Fri, 21 Feb
- 2020 07:46:47 +0000
-Received: from SN1NAM02FT044.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e44::208) by BN6PR02CA0040.outlook.office365.com
- (2603:10b6:404:5f::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18 via Frontend
- Transport; Fri, 21 Feb 2020 07:46:46 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; suse.de; dkim=none (message not signed)
- header.d=none;suse.de; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT044.mail.protection.outlook.com (10.152.72.173) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2750.18
- via Frontend Transport; Fri, 21 Feb 2020 07:46:46 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j531J-0002CJ-VC; Thu, 20 Feb 2020 23:46:45 -0800
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j531E-0006CZ-SI; Thu, 20 Feb 2020 23:46:40 -0800
-Received: from xsj-pvapsmtp01 (xsj-mail.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 01L7keGm018620; 
- Thu, 20 Feb 2020 23:46:40 -0800
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1j531D-0006CP-TG; Thu, 20 Feb 2020 23:46:40 -0800
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 9A58F13C0374; Fri, 21 Feb 2020 13:12:15 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Peter Maydell <peter.maydell@linaro.org>,
- Anthony Liguori <anthony@codemonkey.ws>, afaerber@suse.de
-Subject: [PATCH v2 1/3] arm_gic: Mask the un-supported priority bits
-Date: Fri, 21 Feb 2020 13:12:05 +0530
-Message-Id: <1582270927-2568-2-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1582270927-2568-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1582270927-2568-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(376002)(39850400004)(396003)(136003)(346002)(199004)(189003)(8936002)(426003)(70206006)(336012)(70586007)(42186006)(316002)(6266002)(2616005)(110136005)(2906002)(5660300002)(356004)(6666004)(186003)(4326008)(478600001)(26005)(81156014)(8676002)(81166006)(36756003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:CY4PR02MB2278; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; A:1; MX:1; 
+ (envelope-from <sw@weilnetz.de>) id 1j538p-0005FS-It
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:32 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:59494
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1j538p-00059c-9I
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:31 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id E259FDB8116;
+ Fri, 21 Feb 2020 08:54:28 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id srIHiCWRLhE8; Fri, 21 Feb 2020 08:54:27 +0100 (CET)
+Received: from macbook02.fritz.box (p57B42574.dip0.t-ipconnect.de
+ [87.180.37.116])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id DFB76DB8115;
+ Fri, 21 Feb 2020 08:54:26 +0100 (CET)
+Subject: Re: [EXTERNAL] Re: [PATCH] WHPX: Assigning maintainer for Windows
+ Hypervisor Platform
+To: "Justin Terry (SF)" <juterry@microsoft.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
+References: <SN4PR2101MB0880E245954826FD91C9D67DC0110@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <BN8PR21MB1297D3D88C41B6AFADE36DCCB6110@BN8PR21MB1297.namprd21.prod.outlook.com>
+ <ecc9b0c5-7cd7-1f8d-d10c-bee7aff8fa01@redhat.com>
+ <BN8PR21MB12974CEDAEC173FC8CD626DFB6100@BN8PR21MB1297.namprd21.prod.outlook.com>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <6b5c046a-af4b-8adf-e3a2-64d904c9ff16@weilnetz.de>
+Date: Fri, 21 Feb 2020 08:54:26 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2ebfaa9b-1b2d-4b3f-4c37-08d7b6a233bf
-X-MS-TrafficTypeDiagnostic: CY4PR02MB2278:
-X-Microsoft-Antispam-PRVS: <CY4PR02MB2278B1867DB9BDEB5A507D25CA120@CY4PR02MB2278.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:626;
-X-Forefront-PRVS: 0320B28BE1
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7XRKzyXILk4oN+5NbGc4zRp8AzepNC9swEz6X+3tnuzmBZRUkfvsKerOf7ZJ/8vCaY5pvOFW8rqY9broeOEbSziEe+Z9NdjdGVdZSzDQctytuSDyqCDOg6Gw+3e19DMo/Q8CKLhJKPSiuZX8dRdFOOqFeEC5LXKIF3Zv6VPKj64xst/+0ziidWrMRQncXgNZ4PU3R+NqooaGflvijHhch0ZursioOz3NpM6it2/L/344cS5bOK+SI/7JNjunMOEI8wUcC4aUp843MOWoPurKRLOyliAKhMcpqAQzNk4uM39mx4Y6LnOgqHZM7Y/WMPIuomCZlHDdQmSbB60KWk10mi3w2SEikkmOyI7v/RFVlOpUyt4dy4pZpk7zYW2Sd/swqKXadg5gd5owKFT+9ESm54foc+3uIvFiyrncIwlWc820GL/coCljnJWunNMYXsFT
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Feb 2020 07:46:46.3875 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ebfaa9b-1b2d-4b3f-4c37-08d7b6a233bf
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2278
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+In-Reply-To: <BN8PR21MB12974CEDAEC173FC8CD626DFB6100@BN8PR21MB1297.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 40.107.223.70
+X-Received-From: 37.120.169.71
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,104 +124,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Priority bits implemented in arm-gic can be 8 to 4, un-implemented bits
-are read as zeros(RAZ).
+Am 19.02.20 um 16:50 schrieb Justin Terry (SF):
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/intc/arm_gic.c                | 26 ++++++++++++++++++++++++--
- hw/intc/arm_gic_common.c         |  1 +
- include/hw/intc/arm_gic_common.h |  1 +
- 3 files changed, 26 insertions(+), 2 deletions(-)
+> Ha yes. LGTM Thanks!
+>
+> Reviewed-by: Justin Terry (VM) <juterry@microsoft.com>
+>
+>> -----Original Message-----
+>> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Sent: Wednesday, February 19, 2020 12:32 AM
+>> To: Justin Terry (SF) <juterry@microsoft.com>; Sunil Muthuswamy
+>> <sunilmut@microsoft.com>; Eduardo Habkost <ehabkost@redhat.com>;
+>> Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson
+>> <rth@twiddle.net>
+>> Cc: Stefan Weil <sw@weilnetz.de>; qemu-devel@nongnu.org
+>> Subject: [EXTERNAL] Re: [PATCH] WHPX: Assigning maintainer for Windows=
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 1d7da7b..dec8767 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -641,6 +641,23 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-     return ret;
- }
- 
-+static uint32_t gic_fullprio_mask(GICState *s, int cpu)
-+{
-+    /*
-+     * Return a mask word which clears the unimplemented priority
-+     * bits from a priority value for an interrupt. (Not to be
-+     * confused with the group priority, whose mask depends on BPR.)
-+     */
-+    int unimpBits;
-+
-+    if (gic_is_vcpu(cpu)) {
-+        unimpBits = GIC_VIRT_MAX_GROUP_PRIO_BITS;
-+    } else {
-+        unimpBits = 8 - s->n_prio_bits;
-+    }
-+    return ~0U << unimpBits;
-+}
-+
- void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-                       MemTxAttrs attrs)
- {
-@@ -669,7 +686,7 @@ static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
-         }
-         prio = (prio << 1) & 0xff; /* Non-secure view */
-     }
--    return prio;
-+    return prio & gic_fullprio_mask(s, cpu);
- }
- 
- static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
-@@ -684,7 +701,7 @@ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
-             return;
-         }
-     }
--    s->priority_mask[cpu] = pmask;
-+    s->priority_mask[cpu] = pmask & gic_fullprio_mask(s, cpu);
- }
- 
- static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
-@@ -2055,6 +2072,11 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (s->n_prio_bits > 8) {
-+        error_setg(errp, "num-priority-bits cannot be greater than 8");
-+        return;
-+    }
-+
-     /* This creates distributor, main CPU interface (s->cpuiomem[0]) and if
-      * enabled, virtualization extensions related interfaces (main virtual
-      * interface (s->vifaceiomem[0]) and virtual CPU interface).
-diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-index e6c4fe7..7b44d56 100644
---- a/hw/intc/arm_gic_common.c
-+++ b/hw/intc/arm_gic_common.c
-@@ -357,6 +357,7 @@ static Property arm_gic_common_properties[] = {
-     DEFINE_PROP_BOOL("has-security-extensions", GICState, security_extn, 0),
-     /* True if the GIC should implement the virtualization extensions */
-     DEFINE_PROP_BOOL("has-virtualization-extensions", GICState, virt_extn, 0),
-+    DEFINE_PROP_UINT32("num-priority-bits", GICState, n_prio_bits, 8),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_common.h
-index b5585fe..6e0d6b8 100644
---- a/include/hw/intc/arm_gic_common.h
-+++ b/include/hw/intc/arm_gic_common.h
-@@ -96,6 +96,7 @@ typedef struct GICState {
-     uint16_t priority_mask[GIC_NCPU_VCPU];
-     uint16_t running_priority[GIC_NCPU_VCPU];
-     uint16_t current_pending[GIC_NCPU_VCPU];
-+    uint32_t n_prio_bits;
- 
-     /* If we present the GICv2 without security extensions to a guest,
-      * the guest can configure the GICC_CTLR to configure group 1 binary point
--- 
-2.7.4
+>> Hypervisor Platform
+>>
+>> Thank you Sunil!
+>>
+>> On 2/18/20 9:51 PM, Justin Terry (SF) wrote:
+>>> Looks good to me! Thanks Sunil.
+>>>
+>>> Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+
+
+Hello Justin, hello Sunil,
+
+just a reminder: we still have the problem with the proprietary license
+for the required Microsoft header files.
+
+Can you estimate when this will be solved?
+
+Regards,
+Stefan
+
 
 
