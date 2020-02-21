@@ -2,95 +2,104 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E93CAC35656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 967C2C35647
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:45:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3423208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:44:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6212B208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 13:45:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NsS9t5eS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3423208C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHKsYmuA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6212B208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58149 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j58bQ-0006sD-Rf
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:44:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33030)
+	id 1j58cg-0000PW-Ju
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 08:45:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j58Jm-00032H-BM
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:26:16 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j58SM-00075G-6w
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:35:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j58Jj-0007Ra-6d
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:26:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36135
+ (envelope-from <mreitz@redhat.com>) id 1j58SJ-0006sw-LL
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:35:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60047
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j58Jj-0007Og-2Q
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:26:07 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j58SJ-0006rr-Hf
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 08:34:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582291560;
+ s=mimecast20190719; t=1582292098;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=knm7izTn3QMDeqGkdlsTr7WEWsDthOUVCNGPYSj8q90=;
- b=NsS9t5eStfytKrs/RU3KxSl9FKLEAtVvNpG4QHATDbDQ3EVM/wO2wqKPApyta+4oeO06Or
- nFfbOFlzyWMu4etxSfxu+7yskexLYrPqD3yP0r3c5hyRzuzDKdbXvIy1bfS7HF7AT6xjs0
- vJWU476KRhLXNS+dcz+m/M5KuO8yXNs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-YqpKcDUDPIW-g4P1ZVooCQ-1; Fri, 21 Feb 2020 08:25:56 -0500
-X-MC-Unique: YqpKcDUDPIW-g4P1ZVooCQ-1
-Received: by mail-wm1-f70.google.com with SMTP id p26so607904wmg.5
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 05:25:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=i4tc3X06KlldR4fgJ2DnHVlEIqgio/XYk4CRiPLhiQE=;
- b=gR5CdJGedQ4sPtC6OWhRBNDYAoL/qMtNUtjZzmzDJsshX258PoINMqg1axsSB9RpY7
- QHBuJVGTizkmLEAWY41NwVdeZ3UlI777JmoVqBcn2Z5K+KbkO3BWSh4gHq2f263fNMzr
- gwHLvTfxK+Se9lUakLtfB1MLSoHPhuI4pBW9QF1udbAa5kw3fb/t2J3ui48jt/xj05q7
- 2Gjy7FD8XNBqGu0fePwY3m5fntrpOBa8LUTv3blOLxGXhmNeZnYR8J1DOYUEg+95eec0
- rvUkCJPNwjAdBkHhbMF68gDYa7O8T28pXWl/eCWvJPS7tCjBoZuxcY+Vr30RzmtuK6Qa
- d1Hg==
-X-Gm-Message-State: APjAAAWSwUeVnR0t91x5EYqkPp2q45fCO7NLKm1/j8b520PM4j84Y6es
- pMSa+rmFN2EBzYbE9A9zmYY6RMJLLJerq0T5QIsX8qho+d8DZjtaT8gQfjN+RgnmQfkyW84DX+v
- heg3jIS0Vsj+ygV8=
-X-Received: by 2002:a5d:62c8:: with SMTP id o8mr47793227wrv.316.1582291555172; 
- Fri, 21 Feb 2020 05:25:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwBkWPDof7tB9gbioJ+go7V27Hj14HlPsHFiHSeDJLh2zDSwQS68e2jbTp1o8eVzNT4n3wk7w==
-X-Received: by 2002:a5d:62c8:: with SMTP id o8mr47793197wrv.316.1582291554961; 
- Fri, 21 Feb 2020 05:25:54 -0800 (PST)
-Received: from x1w.redhat.com (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id t13sm3947679wrw.19.2020.02.21.05.25.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Feb 2020 05:25:54 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] hw/scsi/esp: Let ESPDMAMemoryReadWriteFunc take void
- pointer and size_t
-Date: Fri, 21 Feb 2020 14:25:49 +0100
-Message-Id: <20200221132550.22156-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200221132550.22156-1-philmd@redhat.com>
-References: <20200221132550.22156-1-philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=1d07UTcIDyALElk9DjVOihtamuRYXUTaExri6ZjmW6o=;
+ b=eHKsYmuATAexXV3I+2DOG+3WEy9z+ZoLwphBou/tFPLTLm/Cv1Y1K5SyBrYYO1eDZY5WEk
+ GXqs19YHOAXGxXutGRdO4BYOmifqPkGicHz+1QgUIrfrZeXw3aITnV1fNzRSLdujkriypN
+ 5nCk2nf1Z4vVmi5jFw6U2TjwiavZhg4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-MH2IE9ytNgODFF6kxYbgcw-1; Fri, 21 Feb 2020 08:34:53 -0500
+X-MC-Unique: MH2IE9ytNgODFF6kxYbgcw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4629213E5;
+ Fri, 21 Feb 2020 13:34:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A455060C63;
+ Fri, 21 Feb 2020 13:34:49 +0000 (UTC)
+Subject: Re: [RFC PATCH v3 14/27] qcow2: Add subcluster support to
+ calculate_l2_meta()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1577014346.git.berto@igalia.com>
+ <c8a083950e07b219c2d3aa5bfec0fe13529ddb28.1577014346.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <aecf3eb8-8999-cbea-85e0-e5f9469db8d4@redhat.com>
+Date: Fri, 21 Feb 2020 14:34:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <c8a083950e07b219c2d3aa5bfec0fe13529ddb28.1577014346.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="6bdGH6f2ihQdDpEoXBJ9fDzWrr2gcI5WA"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -105,101 +114,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ESPDMAMemoryReadWriteFunc handlers end calling
-dma_memory_read/write, which both take void pointers (since
-introduced in commit d86a77f8). The ESPDMAMemoryReadWriteFunc
-handlers can take a void pointer too.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6bdGH6f2ihQdDpEoXBJ9fDzWrr2gcI5WA
+Content-Type: multipart/mixed; boundary="SxIbJnYOKz9Ji9X7tAPkZ56tMpcnibbBv"
 
-All calls to these handlers in hw/scsi/esp.c use an unsigned
-length. Use size_t type.
+--SxIbJnYOKz9Ji9X7tAPkZ56tMpcnibbBv
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- include/hw/scsi/esp.h | 2 +-
- hw/dma/sparc32_dma.c  | 4 ++--
- hw/scsi/esp-pci.c     | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+On 22.12.19 12:36, Alberto Garcia wrote:
+> If an image has subclusters then there are more copy-on-write
+> scenarios that we need to consider. Let's say we have a write request
+> from the middle of subcluster #3 until the end of the cluster:
+>=20
+>    - If the cluster is new, then subclusters #0 to #3 from the old
+>      cluster must be copied into the new one.
+>=20
+>    - If the cluster is new but the old cluster was unallocated, then
+>      only subcluster #3 needs copy-on-write. #0 to #2 are marked as
+>      unallocated in the bitmap of the new L2 entry.
+>=20
+>    - If we are overwriting an old cluster and subcluster #3 is
+>      unallocated or has the all-zeroes bit set then we need
+>      copy-on-write on subcluster #3.
+>=20
+>    - If we are overwriting an old cluster and subcluster #3 was
+>      allocated then there is no need to copy-on-write.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 140 +++++++++++++++++++++++++++++++++---------
+>  1 file changed, 110 insertions(+), 30 deletions(-)
 
-diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
-index 6ba47dac41..fff0ebc4d4 100644
---- a/include/hw/scsi/esp.h
-+++ b/include/hw/scsi/esp.h
-@@ -6,7 +6,7 @@
-=20
- /* esp.c */
- #define ESP_MAX_DEVS 7
--typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, uint8_t *buf, int =
-len);
-+typedef void (*ESPDMAMemoryReadWriteFunc)(void *opaque, void *buf, size_t =
-len);
-=20
- #define ESP_REGS 16
- #define TI_BUFSZ 16
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index c9e313938c..fbe58b8fea 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -142,7 +142,7 @@ static void dma_set_irq(void *opaque, int irq, int leve=
-l)
-     }
- }
-=20
--static void espdma_memory_read(void *opaque, uint8_t *buf, int len)
-+static void espdma_memory_read(void *opaque, void *buf, size_t len)
- {
-     DMADeviceState *s =3D opaque;
-     IOMMUState *is =3D (IOMMUState *)s->iommu;
-@@ -152,7 +152,7 @@ static void espdma_memory_read(void *opaque, uint8_t *b=
-uf, int len)
-     s->dmaregs[1] +=3D len;
- }
-=20
--static void espdma_memory_write(void *opaque, uint8_t *buf, int len)
-+static void espdma_memory_write(void *opaque, void *buf, size_t len)
- {
-     DMADeviceState *s =3D opaque;
-     IOMMUState *is =3D (IOMMUState *)s->iommu;
-diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
-index d5a1f9e017..8f11c4a2d2 100644
---- a/hw/scsi/esp-pci.c
-+++ b/hw/scsi/esp-pci.c
-@@ -242,7 +242,7 @@ static uint64_t esp_pci_io_read(void *opaque, hwaddr ad=
-dr,
-     return ret;
- }
-=20
--static void esp_pci_dma_memory_rw(PCIESPState *pci, uint8_t *buf, int len,
-+static void esp_pci_dma_memory_rw(PCIESPState *pci, void *buf, size_t len,
-                                   DMADirection dir)
- {
-     dma_addr_t addr;
-@@ -278,13 +278,13 @@ static void esp_pci_dma_memory_rw(PCIESPState *pci, u=
-int8_t *buf, int len,
-     }
- }
-=20
--static void esp_pci_dma_memory_read(void *opaque, uint8_t *buf, int len)
-+static void esp_pci_dma_memory_read(void *opaque, void *buf, size_t len)
- {
-     PCIESPState *pci =3D opaque;
-     esp_pci_dma_memory_rw(pci, buf, len, DMA_DIRECTION_TO_DEVICE);
- }
-=20
--static void esp_pci_dma_memory_write(void *opaque, uint8_t *buf, int len)
-+static void esp_pci_dma_memory_write(void *opaque, void *buf, size_t len)
- {
-     PCIESPState *pci =3D opaque;
-     esp_pci_dma_memory_rw(pci, buf, len, DMA_DIRECTION_FROM_DEVICE);
---=20
-2.21.1
+It=E2=80=99s all a bit tough to wrap my head around.  One thing I got
+particularly hung up is how we ensure that for new clusters the
+head/tail subcluster bits that do not need COW are initialized to the
+correct value.  Then I realized that we just have to keep them as they
+are (unallocated or zero, respectively), because this path is only for
+when we already have L2 entries, it=E2=80=99s just that they point to norma=
+l
+non-COPIED clusters.  (So only the L2 offset entry has to be changed,
+not the bitmap.  At least not for the subclusters that aren=E2=80=99t touch=
+ed by
+the write.)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--SxIbJnYOKz9Ji9X7tAPkZ56tMpcnibbBv--
+
+--6bdGH6f2ihQdDpEoXBJ9fDzWrr2gcI5WA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5P3HcACgkQ9AfbAGHV
+z0DGIwgAtMuswPBw/+mI47nEprEa0PSy5RA2bE4ha1q8G/iU6vDrO2A8LG/hCOnZ
+fhKzwr1CrPwhbRaBfafFZgApUen39eJ444LdcFmQ9OYf0377YzKN1L48PVX7vehw
+b+/TQOEkohS24+CfbDXOdMOmotdqoN63ihUgpNCrPBBZ+oCHUOuA2WFevlgr+N6F
+wZnUQYh8Dz8IysEXzkQoHPA/0mJBJxBAZbiWkk3WyShooU8eYG/4JWTSp0pR3GW+
+3kOD8jQ/FC+79bssW14mJguD55x1qC/Mlipe58GmVfVxma7m1bjFJp/bafc412xm
+FFOqkvdqR3UgrLKCZ1dMIK7NcS+/Aw==
+=+JMB
+-----END PGP SIGNATURE-----
+
+--6bdGH6f2ihQdDpEoXBJ9fDzWrr2gcI5WA--
 
 
