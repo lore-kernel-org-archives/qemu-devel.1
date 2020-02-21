@@ -2,80 +2,78 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33B2C35646
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 14:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5672DC35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 14:29:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3014208C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 14:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20037208C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 14:29:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nh33IvWz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3014208C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cEuv6GA6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20037208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j59HI-0000zX-0L
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 09:27:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47855)
+	id 1j59It-0002cR-AM
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 09:29:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j59GS-0008TT-FJ
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:26:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j59HL-0001NF-W0
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:27:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j59GR-000666-Ii
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:26:48 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39496)
+ (envelope-from <peter.maydell@linaro.org>) id 1j59HL-0006p8-3V
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:27:43 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37615)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j59GR-00065X-E8
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:26:47 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 77so2127272oty.6
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 06:26:47 -0800 (PST)
+ id 1j59HK-0006oZ-VL
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 09:27:43 -0500
+Received: by mail-oi1-x244.google.com with SMTP id q84so1730811oic.4
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 06:27:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/2fCPIpVt94NvvPO4CigqPV2g3CIeYezuT4KDYa1ew4=;
- b=Nh33IvWzD1cGAius/dAaiBVbeejIvxJ9uS1+A1EdpV+fJZ38EO9k/WPySxsLIstvxO
- U4wgRIfFQSbF1ZA2Pf1zsNq9hNYFo3sJ3gdLKgKGUs99BBPgiG84BURx6junSNENq6lG
- g5LR7C12CWST+ipLJNQ0OqjRHym0JfH1JsQr+1ufCtgjZ2TVdhIdbhfP5IZssr2UYi8+
- 11WwGEBSL9aLiSdlVSZIsDvxlPMyCaYdJXC1wM+a9GbaBwdL9kGSxcGiypFEinIg7ZHe
- 1fNWZ9acj1sGqFf55EzsBCodGmK1BR52vJmhGV9ukkTKXAlogTV8NBJBEFhBantOlBaI
- XS4g==
+ :cc; bh=gOOjDSokGK2bCgDj0ql5Xh2E0DCjU6rwL/YmDNbmj4Q=;
+ b=cEuv6GA66jmFY/oRWZz1IMvzPhVIvmW5rdQUYcYd+b+m5Gap27PWHu53eBTsfC6t5K
+ eLePIBpZny3d+boV7iwyMpHmE0hRRtGD5ujkGtSE4i2CTHcY1XDVm+Qg3JzYhHnBi/fO
+ JEORDSkCC6KWhpKu/yeQSZtGx+A+SJgwkw+dSO1V56VUX5i7to6Aw8purWEUocoDd6rL
+ 6Ta66jZHDBYG7OYXOQUWJE2lYuA7nhwBwUMIV6Zc1cOmNfy0Qes9HY4oSi/0LYkizcT3
+ rLAaXnAGQLRZdZ0RAGwe/5uRli5j4QdW8w9CbCQLKo+dKKMzngUecw0B2vANA3wvvDJT
+ 9apw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=/2fCPIpVt94NvvPO4CigqPV2g3CIeYezuT4KDYa1ew4=;
- b=mJ96dtMvc/4hoJy25HRJItXN2AQXCviORHHQZUocm2PfZmlkfxrfvik46bzf7nz7YE
- +XdX30xvK4I1Ve7re482M9U2OPa3EzKAwJPjgy3R5/CsQU8tEeKa31prc8NoqZGn+v9k
- fe4D2HcahqThIDeLKqZJ+ZEc+LSp9Vb4f6ZslgzeW8F6RjIUWWrPcf1qotTHxa8QDrgE
- 3hXMT9bLptXL7R+A4l4d8VS3XNaHSnYDD1/BU1D7JELdWkAc9DI343cFzoDS2x12sbzE
- ObqXEdnd1hmJBZmrNkWbstZ7s9qp65xcAxd4/RImXWyK/MPGROTBsheiD5VQLbCq6RzV
- 8+dA==
-X-Gm-Message-State: APjAAAXIzwlm9yvy2n7vE7aoOvNJTKI0TjmlphOB6crHOH/ZRNCUTWV7
- LcpwHTr+BCjxJtO00wp0g/DEAlqhUgic29b8BbPtjw==
-X-Google-Smtp-Source: APXvYqx+GovfvBgYdYeQ1jj5sQVgNxefHMuCY9QBjRxRN+COHKwHIacGn7W8vpL2LYayLliwcaDREnASteBxgUAt/mw=
-X-Received: by 2002:a9d:68d9:: with SMTP id i25mr16283516oto.135.1582295206690; 
- Fri, 21 Feb 2020 06:26:46 -0800 (PST)
+ bh=gOOjDSokGK2bCgDj0ql5Xh2E0DCjU6rwL/YmDNbmj4Q=;
+ b=Y5Mo7eygDUitOneOZjgNGvnO/BuvukdeMwo4tiEQt7Rv62uxLnM2Q8T2AxqYoIY/4Z
+ TQUxoXjcu28m5vlVXI9gnefexMArspIGqITE7IDnNiIVVx9ZZxJX71kou8LecL5OTxVc
+ CS6M19z0inSz6HmhgbDEocNphFGHkCkWX6pXzRekOitbhBHbNokUFYctWqeTJSdYiCTm
+ 5WKF1K2nqsAMjpxBUB7GcmhREkgy+SG52i8EZc0iEwwSqiyPW6m17FlxlwaXLS66y6cY
+ j5K3FxpX90V2JOBJ/S/PHEyjV2lVRnXDT1c6JNk9OGmCT1ary4dgCHJGE2Mkmgcczo85
+ jcfQ==
+X-Gm-Message-State: APjAAAWY+PI/gSWdCXlvszbwq4qJdentYLWyTh6BEXGnxX5lgQZ43H64
+ Qmr8wNCfnfjS8oxwF0hhjEITgju3UDQq41Dxz/LXhQ==
+X-Google-Smtp-Source: APXvYqzvjQFSwgwgrcMVvZElH4qAYaiKC7sOn0gYUUMn2TTs0wv+dQn6TYa+P0fA69RR3Fsjib0vsRteBtpGuYjGID4=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr2259550oiy.170.1582295261855; 
+ Fri, 21 Feb 2020 06:27:41 -0800 (PST)
 MIME-Version: 1.0
 References: <20200214132745.23392-1-eric.auger@redhat.com>
- <20200214132745.23392-11-eric.auger@redhat.com>
-In-Reply-To: <20200214132745.23392-11-eric.auger@redhat.com>
+In-Reply-To: <20200214132745.23392-1-eric.auger@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Feb 2020 14:26:35 +0000
-Message-ID: <CAFEAcA9HFAV+gPOkNWaixNqEKmsWUAAYjNcet8-tNJXvUyOrOg@mail.gmail.com>
-Subject: Re: [PATCH v16 10/10] MAINTAINERS: add virtio-iommu related files
+Date: Fri, 21 Feb 2020 14:27:30 +0000
+Message-ID: <CAFEAcA-U9b7GVXOd0QDw526JChoD3gRhVBzLcSy++PQzHbVzFg@mail.gmail.com>
+Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
 To: Eric Auger <eric.auger@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,36 +95,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 14 Feb 2020 at 13:29, Eric Auger <eric.auger@redhat.com> wrote:
+On Fri, 14 Feb 2020 at 13:28, Eric Auger <eric.auger@redhat.com> wrote:
 >
-> Add a new "virtio-iommu" section with the new files
-> related to this device.
+> This series implements the QEMU virtio-iommu device.
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  MAINTAINERS | 6 ++++++
->  1 file changed, 6 insertions(+)
+> This matches the v0.12 spec (voted) and the corresponding
+> virtio-iommu driver upstreamed in 5.3. All kernel dependencies
+> are resolved for DT integration. The virtio-iommu can be
+> instantiated in ARM virt using:
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index c7717df720..b7a7a18737 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1623,6 +1623,12 @@ F: hw/input/virtio-input*.c
->  F: include/hw/virtio/virtio-input.h
->  F: contrib/vhost-user-input/*
+> "-device virtio-iommu-pci".
 >
-> +virtio-iommu
-> +M: Eric Auger <eric.auger@redhat.com>
-> +S: Maintained
-> +F: hw/virtio/virtio-iommu*.c
-> +F: include/hw/virtio/virtio-iommu.h
-> +
->  virtio-serial
->  M: Laurent Vivier <lvivier@redhat.com>
->  R: Amit Shah <amit@kernel.org>
-> --
+> Non DT mode is not yet supported as it has non resolved kernel
+> dependencies [1].
+>
+> This feature targets 5.0.
+>
+> Integration with vhost devices and vfio devices is not part
+> of this series. Please follow Bharat's respins [2].
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+I think everything here has reviewed-by tags now -- does
+anybody still want more time to review it, and what
+is the preference for how it goes into master?
 
 thanks
 -- PMM
