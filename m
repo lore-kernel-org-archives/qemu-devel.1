@@ -2,58 +2,80 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEDDC35657
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A01C35646
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:06:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35B422067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:06:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B422067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id DF98B2067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 16:06:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oQxi+JKV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF98B2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5AoR-0005X2-8k
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:05:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43736)
+	id 1j5AoV-0005k1-Qn
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 11:06:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43780)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j5Amy-0003jJ-Dy
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:29 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j5An5-0003qV-Qd
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j5Amu-0004BW-Q5
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:27 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:18289)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j5Amu-00048s-Hp; Fri, 21 Feb 2020 11:04:24 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 0A0B0747DF7;
- Fri, 21 Feb 2020 17:04:22 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id D56DA74637E; Fri, 21 Feb 2020 17:04:21 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id D3720745953;
- Fri, 21 Feb 2020 17:04:21 +0100 (CET)
-Date: Fri, 21 Feb 2020 17:04:21 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-In-Reply-To: <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
-Message-ID: <alpine.BSF.2.22.395.2002211643480.45267@zero.eik.bme.hu>
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <peter.maydell@linaro.org>) id 1j5An4-0004ES-04
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:35 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41700)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j5An3-0004EM-QL
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 11:04:33 -0500
+Received: by mail-oi1-x243.google.com with SMTP id i1so2037322oie.8
+ for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 08:04:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=LSU4FUlq+syBoMcowgvLR4s8zSj9sBbPg+bklQA1bos=;
+ b=oQxi+JKV6uwfsw2ed2nZEpUXonR5ey+O/uHrfGLAxUeD3wCuttEPnCfAozPlCQAWnn
+ SPGXLyU8o1cAE9l10nLBo6U6udOpNLjmlp3rawHIKv93I7dFqL09HIF0bRNqn4eLahy5
+ w16XGE+wLBh6SuELRW4EgNliAESTdZpQD1x1b49NivNRj/Tc9YSqUlcv5xwKW59H5vDg
+ /xvbAw93U8R7HZRTVWM0CuJLXbUfiMrrH0tXbUcyaXxGW9PvdUiiuttSS/kxWaUsazGh
+ EuVJwnyt4TachKN7d6RIyFQilHEX+S6flqd289hodUy8Zcytarhyb9D0TggeFND9sFkm
+ LL8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=LSU4FUlq+syBoMcowgvLR4s8zSj9sBbPg+bklQA1bos=;
+ b=Cp9kXN/01eL365dQpqEKoxZEuWvlDwb0kpPedzvW6YuaAWqd7H1ZJpWckAMkE9RXjg
+ VccdpsCDEdC0O7ewSU87zH6tkp38u6l1n5QJ4nH1g4QOlH9v3QPJyDSF9wZ4TxBpMLpV
+ sbFf/YBMvmN0s9IBjr1yEV439JunBtUVEuS9KcpfMYAamT3vJHLNPlYDqNLbtiGN/ruY
+ Jt/OP8tl3eeqP9AKb7lsmJv/yYsvnjYlFn/REkBNgQRndDI+wb3RR9oCFHdZv4uVWkQ7
+ y+Ev9zcEbcHFhHcXbtguw+CVBop050Sg5PQuQCAjMSHLwnI0Erj7hDdHWiVAt1ngSGmX
+ 1/Iw==
+X-Gm-Message-State: APjAAAWdDizQF56/7dVDa7jK+c1AOrX567vogoH9rWO2wjqrDe9g9UmA
+ J2462kmwibGr9p9fddF8VIPJ1Tw//L0cbSQE1SVipw==
+X-Google-Smtp-Source: APXvYqxbOBHmU1WZ6XnSshmDchtKw//1RiTQPt+MmHe8jSJJF0FpGxkE08/So3+WVBKnzDcoEpl8rN5cF9TTXcbzzHc=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr2638888oiy.170.1582301072958; 
+ Fri, 21 Feb 2020 08:04:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+References: <20200214181547.21408-1-richard.henderson@linaro.org>
+ <20200214181547.21408-9-richard.henderson@linaro.org>
+In-Reply-To: <20200214181547.21408-9-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Feb 2020 16:04:22 +0000
+Message-ID: <CAFEAcA9my1NeR5xZDKfoKnipAfDck0_YKSy6SW1WdV_Yv3aveg@mail.gmail.com>
+Subject: Re: [PATCH 08/19] target/arm: Perform fpdp_v2 check first
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,83 +87,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, John Arbuckle <programmingkidx@gmail.com>,
- qemu-ppc@nongnu.org, Paul Clarke <pc@us.ibm.com>,
- Howard Spoelstra <hsp.cat7@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 20 Feb 2020, Richard Henderson wrote:
-> On 2/18/20 9:10 AM, BALATON Zoltan wrote:
->>  void helper_reset_fpstatus(CPUPPCState *env)
->>  {
->> -    set_float_exception_flags(0, &env->fp_status);
->> +    set_float_exception_flags(env->default_fp_excpt_flags, &env->fp_status);
->>  }
+On Fri, 14 Feb 2020 at 18:15, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> What I don't like is the forced setting of inexact.  I don't mind leaving it
-> set if it is already set, which corresponds to the normal accumulation of
-> exceptions.
-
-In a previous reply I've explained this (apart from just trying to get it 
-work the simplest way for testing first):
-
-On Wed, 19 Feb 2020, BALATON Zoltan wrote:
-> Some of the problems with inexact may be fixed by not always forcing the 
-> flag on but just not clearing it. As I undersood other targets do that 
-> so it starts with softfloat but the first time the inexact flag is set 
-> it will start using hardfloat as long as the guest does not clear this 
-> flag. Probably this is done to automatically detect code that needs the 
-> flag and assume it's not used when it's not touched. Since PPC also has 
-> an inexact flag just for previous FP op (the FI bit) apart from the 
-> usual cumulative flag, the client could read that instead of clearing 
-> the cumulative flag so we can't detect guest usage this way, therefore 
-> we might as well break inexact completely to always use hardfloat and 
-> need to manually enable it for guests that we know need it. I'm not sure 
-> however if forcing the inexact flag would lead to unwanted FP exceptions 
-> as well so this may also need to be made conditional on the 
-> enabled/disabled status of inexact FP exceptions. Does anyone have more 
-> info on this?
-
-So I know this should be improved but not sure how. I would not worry 
-about setting the bit from the start due to the above but exceptions are 
-likely wrong this way as you say.
-
-> In addition, if the inexact exception is unmasked, I would expect a signal to
-> be delivered only when an inexact exception happens.  Whereas this patch would
-> deliver a signal for every fp operation.
+> Shuffle the order of the checks so that we test the ISA
+> before we test anything else, such as the register arguments.
 >
-> It should be just as easy to do
->
->    flags = get_float_exception_flags(status);
->    flags &= env->save_fp_exception_flags;
->    set_float_exception_flags(flags, status);
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
 
-I'm not sure I get this. Can you please explain a bit more? Where would 
-save_flags be set and where would the above masking with it be done? 
-Currently we reset flags before every FP op as far as I understand and 
-detecting of exceptions rely on this and test fp_status bits. Probably we 
-should not reset the flags and change this to keep one fp_status 
-accumulating flags and only reset if softfloat is forced but that would 
-need rewriting exception handling that I'm not sure yet how to do. Any 
-idea? Maybe if we could just unbreak inexact exceptions when enabled with 
-current patch then this rewrite of exception handling could be done later.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
->> +    DEFINE_PROP_BOOL("hardfloat", PowerPCCPU, hardfloat, true),
->
-> I would also prefer a different name here -- perhaps x-no-fp-fi.
-
-What's wrong with hardfloat? That's how the code refers to this so if 
-anyone searches what it does would turn up some meaningful results. Your 
-proposed property name is very cryptic and nobody would be able to guess 
-what is it for. If you insist not to use hardfloat maybe we could invert 
-it to softfloat or try x-use-fpu maybe. I specificaly don't want to tie it 
-to the FI but as there's at least another non-sticky bit in FPSCR (don't 
-remember which now) that might also need to be broken for best hardfloat 
-results.
-
-Regards,
-BALATON Zoltan
+thanks
+-- PMM
 
