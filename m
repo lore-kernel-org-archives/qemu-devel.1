@@ -2,117 +2,69 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EED8C35641
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:55:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ED6C35642
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0922C222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 07:55:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0922C222C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 7FF7A222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 08:09:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF7A222C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j539o-0005wO-7A
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 02:55:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48974)
+	id 1j53Mx-0001cQ-No
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 03:09:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1j538q-00050l-RH
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:33 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j53MO-0001BC-9Z
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1j538p-0005FS-It
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:32 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:59494
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1j538p-00059c-9I
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 02:54:31 -0500
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id E259FDB8116;
- Fri, 21 Feb 2020 08:54:28 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id srIHiCWRLhE8; Fri, 21 Feb 2020 08:54:27 +0100 (CET)
-Received: from macbook02.fritz.box (p57B42574.dip0.t-ipconnect.de
- [87.180.37.116])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id DFB76DB8115;
- Fri, 21 Feb 2020 08:54:26 +0100 (CET)
-Subject: Re: [EXTERNAL] Re: [PATCH] WHPX: Assigning maintainer for Windows
- Hypervisor Platform
-To: "Justin Terry (SF)" <juterry@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
-References: <SN4PR2101MB0880E245954826FD91C9D67DC0110@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <BN8PR21MB1297D3D88C41B6AFADE36DCCB6110@BN8PR21MB1297.namprd21.prod.outlook.com>
- <ecc9b0c5-7cd7-1f8d-d10c-bee7aff8fa01@redhat.com>
- <BN8PR21MB12974CEDAEC173FC8CD626DFB6100@BN8PR21MB1297.namprd21.prod.outlook.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <6b5c046a-af4b-8adf-e3a2-64d904c9ff16@weilnetz.de>
-Date: Fri, 21 Feb 2020 08:54:26 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1j53MM-0004Op-FD
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:31 -0500
+Resent-Date: Fri, 21 Feb 2020 03:08:31 -0500
+Resent-Message-Id: <E1j53MM-0004Op-FD@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21136)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j53MM-0004DM-5t
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 03:08:30 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582272498; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=E4tN4WYJo3p6K+IaIY9ie/HONe22xNxPXfdwk/dDPNlb8xzDPoVoLMtZjQ9rkhos7lSxlvMYTwjLCqg0V8zxhTh69Fb82nMMyVAlgytxMVxRozxpNXiKDDC+XZCx5PpurgcSFLop6okkS6woHa94aSS/8KlUbDgu8BB57/udEY8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582272498;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=UAXFcmHoDhRmni+1cQrCssoLBajHQDnfvrjZivx3LfQ=; 
+ b=FJSe+yZWJku9tAOTyrpNOLq9G20N7/xk7Ez/QS9Gat+DxUoks7394q0JVyTJUUcdlbpAE2stkrmIVguy8B4DbMNmLNLaPGuc650My+SCr6QOzgK4xij6gfaRyx7XMg3JVGHhlMqTVzqcpBo8Qt2VLs0Yc4nk/W0Vf7QATggNiok=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582272496879842.3244392800112;
+ Fri, 21 Feb 2020 00:08:16 -0800 (PST)
+In-Reply-To: <20200221065015.337915-1-jasper.lowell@bt.com>
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+Message-ID: <158227249585.712.3062745536245409439@a1bbccc8075a>
 MIME-Version: 1.0
-In-Reply-To: <BN8PR21MB12974CEDAEC173FC8CD626DFB6100@BN8PR21MB1297.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jasper.lowell@bt.com
+Date: Fri, 21 Feb 2020 00:08:16 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 37.120.169.71
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,46 +76,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, jasper.lowell@bt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.02.20 um 16:50 schrieb Justin Terry (SF):
-
-> Ha yes. LGTM Thanks!
->
-> Reviewed-by: Justin Terry (VM) <juterry@microsoft.com>
->
->> -----Original Message-----
->> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> Sent: Wednesday, February 19, 2020 12:32 AM
->> To: Justin Terry (SF) <juterry@microsoft.com>; Sunil Muthuswamy
->> <sunilmut@microsoft.com>; Eduardo Habkost <ehabkost@redhat.com>;
->> Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson
->> <rth@twiddle.net>
->> Cc: Stefan Weil <sw@weilnetz.de>; qemu-devel@nongnu.org
->> Subject: [EXTERNAL] Re: [PATCH] WHPX: Assigning maintainer for Windows=
-
->> Hypervisor Platform
->>
->> Thank you Sunil!
->>
->> On 2/18/20 9:51 PM, Justin Terry (SF) wrote:
->>> Looks good to me! Thanks Sunil.
->>>
->>> Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-
-
-Hello Justin, hello Sunil,
-
-just a reminder: we still have the problem with the proprietary license
-for the required Microsoft header files.
-
-Can you estimate when this will be solved?
-
-Regards,
-Stefan
-
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyMTA2NTAxNS4zMzc5
+MTUtMS1qYXNwZXIubG93ZWxsQGJ0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
+IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
+IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2st
+cXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9pZGUtdGVzdAogIFRFU1QgICAgY2hlY2stdW5pdDog
+dGVzdHMvdGVzdC1pb3YKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2lk
+ZS10ZXN0LmM6Mjk0OnNlbmRfZG1hX3JlcXVlc3Q6IGFzc2VydGlvbiBmYWlsZWQ6ICghcXRlc3Rf
+Z2V0X2lycShxdHMsIElERV9QUklNQVJZX0lSUSkpCkVSUk9SIC0gQmFpbCBvdXQhIEVSUk9SOi90
+bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9pZGUtdGVzdC5jOjI5NDpzZW5kX2RtYV9yZXF1
+ZXN0OiBhc3NlcnRpb24gZmFpbGVkOiAoIXF0ZXN0X2dldF9pcnEocXRzLCBJREVfUFJJTUFSWV9J
+UlEpKQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2Fp
+dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMv
+dGVzdC1iaXRtYXAKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtYWlvCi0tLQogIFRF
+U1QgICAgaW90ZXN0LXFjb3cyOiAyODMKRmFpbHVyZXM6IDE2MQpGYWlsZWQgMSBvZiAxMTYgaW90
+ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3RzL2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNl
+YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
+ZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAg
+ICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxl
+ZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAn
+LS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTMzNDk5ODZhYjgzODQ5ZDViNDc1ZGQx
+MDFiZWQ0ZjA1JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNv
+bmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJ
+R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
+ZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12
+JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2Nh
+Y2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWd3NV9fZ2l5L3NyYy9k
+b2NrZXItc3JjLjIwMjAtMDItMjEtMDIuNTQuNDguMjc4Mjg6L3Zhci90bXAvcWVtdTp6LHJvJywg
+J3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVy
+bmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVt
+dS5pbnN0YW5jZS51dWlkPTMzNDk5ODZhYjgzODQ5ZDViNDc1ZGQxMDFiZWQ0ZjA1Cm1ha2VbMV06
+ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWd3NV9fZ2l5L3NyYycKbWFrZTogKioqIFtkb2NrZXIt
+cnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxM20yNy4xODZzCnVzZXIg
+ICAgMG05LjA1NHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
+Lm9yZy9sb2dzLzIwMjAwMjIxMDY1MDE1LjMzNzkxNS0xLWphc3Blci5sb3dlbGxAYnQuY29tL3Rl
+c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
