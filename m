@@ -2,99 +2,79 @@ Return-Path: <SRS0=IEfc=4J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F005C35640
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A634CC35641
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:50:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED0D9222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:50:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 711D4222C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Feb 2020 09:50:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LezRnyGM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED0D9222C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8QdtPtX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711D4222C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j54wy-00016f-Ue
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:50:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34295)
+	id 1j54x6-0001Na-LH
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 04:50:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j54uO-0006Lf-3Z
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:47:45 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j54vv-0008P7-CA
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:49:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j54uN-000770-5K
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:47:44 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48383
+ (envelope-from <cohuck@redhat.com>) id 1j54vu-0001Q3-6e
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:49:19 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37173
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j54uN-00075k-1O
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:47:43 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j54vu-0001Od-1l
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 04:49:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582278462;
+ s=mimecast20190719; t=1582278557;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Se12IwhABkMpwMomB3ITQ2ynSwiJ5gxQVNaBMiIBya0=;
- b=LezRnyGMU0DQ4htY0G3yMA+o+6lSnleo98kw24eqKnmAWnQmJtr4rCuWEnn8sdGYO38XcN
- 8kLzIPws5RedbsoIQSpVlSM5i55cKGbmerJqe11NXpsRYbOyuqQPO/vE5Xj5A7wpEhlDyK
- qkTOzWP29TRKFZxOvDIzrQwUAvsK2I8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-QxEOuDAtOhGXTAKXP3gI1w-1; Fri, 21 Feb 2020 04:47:41 -0500
-X-MC-Unique: QxEOuDAtOhGXTAKXP3gI1w-1
-Received: by mail-wr1-f72.google.com with SMTP id c6so769945wrm.18
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 01:47:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Jag29nL/+lr4Lx24TK8cqqM42UrldPUBANMdtnAkGEY=;
- b=DBmj4In+yp44oKL6MlO6BME2ANFJm9tIbSoykcRCTBYhUf3ADUAC11EcQUNan+7rvv
- pJBZGxVLubxch8b/8j9MXETT/CqS3LxfLIU22LEFPLeXFQnOwqIbTbzlPYoL45J7jE7u
- kPMSagWn2MKVHPtoTb/40aVUdB5LNej6+G8Q9UFH4V2WE9uVGw1s2AnGmxRejI4v4zbf
- Rtm3ZqgFdpFTFH76RBdnwGliI+CqIk5kgo09qnh3dOYDhoJumJhQ8EJBOlllSNj3lYTj
- C2CWebdEa6Q13DOQnO1sM0DnzE4y/TR/XyOcyRBA5sxmJ9lJ+TPP1KMai/8kcOjPT+vt
- c8/Q==
-X-Gm-Message-State: APjAAAXR2QyUb7IVC6brxA51Rs/ugmpFpcLUmY6CvFaYPvp3pVJCM2nW
- LZT66NqmhNXDyZwK8EHEu8PPiPd1SF36CyB4x+fssfTF0bSv3AYk74+Ay53kR9C6tQOhT7OQB7m
- UGmEio28QvsbbUqo=
-X-Received: by 2002:a1c:39d7:: with SMTP id g206mr2733354wma.111.1582278460011; 
- Fri, 21 Feb 2020 01:47:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyOXtIm4lbiDZUim0gGl4pBbuH0Sk4s0jjdCa2EE97URrSWmDXUuqY4iLPX9hHP1OT2gyGGpw==
-X-Received: by 2002:a1c:39d7:: with SMTP id g206mr2733333wma.111.1582278459857; 
- Fri, 21 Feb 2020 01:47:39 -0800 (PST)
-Received: from [192.168.1.35] (78.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.78])
- by smtp.gmail.com with ESMTPSA id i16sm3136177wrr.71.2020.02.21.01.47.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Feb 2020 01:47:39 -0800 (PST)
-Subject: Re: [PATCH] virtiofsd: Remove fuse.h and struct fuse_module
-To: Xiao Yang <yangx.jy@cn.fujitsu.com>, virtio-fs@redhat.com
-References: <20200221065515.4476-1-yangx.jy@cn.fujitsu.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <96dca240-e221-a4ab-4f8f-198891c1b16a@redhat.com>
-Date: Fri, 21 Feb 2020 10:47:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=izhuloIbjeBJt15cistugJTnZiA/YtlXu6SOpYMF2FU=;
+ b=I8QdtPtXJUawA1ecb+mGAddmPgFw0+enZZTAKNgcU2oLYn4vQ4B1h0e2jU0woLIfbTAnzd
+ R4rv+5MIcyWd1wr86Q2hwN3JuwBvSnEFY0SnBLMpiWejad/DeAsn9xThmH2i98t2BPiF3m
+ 89a2+yvbg8SDOuJ9dAOGm6j73snO0Xo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-jrPwCEx6PEmYzhbI8nV8sQ-1; Fri, 21 Feb 2020 04:49:15 -0500
+X-MC-Unique: jrPwCEx6PEmYzhbI8nV8sQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66BAF92AA0;
+ Fri, 21 Feb 2020 09:49:14 +0000 (UTC)
+Received: from gondolin (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A17C60BE0;
+ Fri, 21 Feb 2020 09:49:10 +0000 (UTC)
+Date: Fri, 21 Feb 2020 10:49:08 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v4 02/16] s390x: protvirt: Add diag308 subcodes 8 - 10
+Message-ID: <20200221104908.7c54fd64.cohuck@redhat.com>
+In-Reply-To: <20200220125638.7241-3-frankja@linux.ibm.com>
+References: <20200220125638.7241-1-frankja@linux.ibm.com>
+ <20200220125638.7241-3-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200221065515.4476-1-yangx.jy@cn.fujitsu.com>
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,22 +86,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, qemu-devel@nongnu.org,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/21/20 7:55 AM, Xiao Yang wrote:
-> All code in fuse.h and struct fuse_module are not used by virtiofsd
-> so removing them is safe.
->=20
-> Signed-off-by: Xiao Yang <yangx.jy@cn.fujitsu.com>
-> ---
->   tools/virtiofsd/fuse.h   | 1229 --------------------------------------
->   tools/virtiofsd/fuse_i.h |   16 -
->   2 files changed, 1245 deletions(-)
->   delete mode 100644 tools/virtiofsd/fuse.h
+On Thu, 20 Feb 2020 07:56:24 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> For diag308 subcodes 8 - 10 we have a new ipib of type 5. The ipib
+> holds the address and length of the secure execution header, as well
+> as a list of guest components.
+> 
+> Each component is a block of memory, for example kernel or initrd,
+> which needs to be decrypted by the Ultravisor in order to run a
+> protected VM. The secure execution header instructs the Ultravisor on
+> how to handle the protected VM and its components.
+> 
+> Subcodes 8 and 9 are similiar to 5 and 6 and subcode 10 will finally
+> start the protected guest.
+> 
+> Subcodes 8-10 are not valid in protected mode, we have to do a subcode
+> 3 and then the 8 and 10 combination for a protected reboot.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.c      | 48 ++++++++++++++++++++++++++++++++++++++++++---
+>  hw/s390x/ipl.h      | 31 +++++++++++++++++++++++++++++
+>  target/s390x/diag.c | 27 ++++++++++++++++++++++---
+>  3 files changed, 100 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 7773499d7f..e92d989813 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -538,15 +538,56 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
+>      return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
+>  }
+>  
+> +int s390_ipl_pv_check_components(IplParameterBlock *iplb)
+> +{
+> +    int i;
+> +    IPLBlockPV *ipib_pv = &iplb->pv;
+> +
+> +    if (ipib_pv->num_comp == 0) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    for (i = 0; i < ipib_pv->num_comp; i++) {
+> +
+> +        /* Addr must be 4k aligned */
+> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        /* Tweak prefix is monotonously increasing with each component */
+> +        if (i < ipib_pv->num_comp - 1 &&
+> +            ipib_pv->components[i].tweak_pref >
+> +            ipib_pv->components[i + 1].tweak_pref) {
+> +            return -EINVAL;
+> +        }
+> +    }
+> +    return 1;
+
+Any reason why you return 1 here? 0 vs negative error is the more usual
+pattern.
+
+> +}
+> +
+
+(...)
+
+> @@ -117,7 +123,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>  
+>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+>  
+> -        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb)) {
+> +        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
+> +            !(iplb_valid_pv(iplb) && s390_ipl_pv_check_components(iplb) >= 0)) {
+
+!s390_ipl_pv_check_components() would also read nicer IMHO :)
+
+>              env->regs[r1 + 1] = DIAG_308_RC_INVALID;
+>              goto out;
+>          }
+
+Otherwise, looks good to me.
 
 
