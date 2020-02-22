@@ -2,56 +2,53 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E260DC35669
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EBDC35671
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAAEB208C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAAEB208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 3A934208C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:05:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A934208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5Pn6-0007OT-P8
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:05:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57676)
+	id 1j5Pn8-0007NY-Ay
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:05:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1j5Pjy-0002Sn-UL
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:24 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1j5Pjj-0002B9-SI
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1j5Pjw-0008CU-P0
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:22 -0500
-Received: from mga12.intel.com ([192.55.52.136]:36228)
+ (envelope-from <yi.l.liu@intel.com>) id 1j5Pjh-0007zf-Nm
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:07 -0500
+Received: from mga12.intel.com ([192.55.52.136]:36218)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j5Pju-0007zv-Vs
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:20 -0500
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j5Pjh-0007tM-Ep
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:05 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 22 Feb 2020 00:01:58 -0800
+ 22 Feb 2020 00:01:57 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,471,1574150400"; d="scan'208";a="240547699"
+X-IronPort-AV: E=Sophos;i="5.70,471,1574150400"; d="scan'208";a="240547652"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga006.jf.intel.com with ESMTP; 22 Feb 2020 00:01:57 -0800
+ by orsmga006.jf.intel.com with ESMTP; 22 Feb 2020 00:01:56 -0800
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [RFC v3.1 16/22] intel_iommu: replay pasid binds after context cache
- invalidation
-Date: Sat, 22 Feb 2020 00:07:17 -0800
-Message-Id: <1582358843-51931-17-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3.1 00/22] intel_iommu: expose Shared Virtual Addressing to VMs
+Date: Sat, 22 Feb 2020 00:07:01 -0800
+Message-Id: <1582358843-51931-1-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1582358843-51931-1-git-send-email-yi.l.liu@intel.com>
-References: <1582358843-51931-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.136
@@ -66,175 +63,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- Richard Henderson <rth@twiddle.net>, david@gibson.dropbear.id.au
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, kvm@vger.kernel.org,
+ mst@redhat.com, jun.j.tian@intel.com, eric.auger@redhat.com,
+ yi.y.sun@intel.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch replays guest pasid bindings after context cache
-invalidation. This is a behavior to ensure safety. Actually,
-programmer should issue pasid cache invalidation with proper
-granularity after issuing a context cache invalidation.
+Shared Virtual Addressing (SVA), a.k.a, Shared Virtual Memory (SVM) on
+Intel platforms allows address space sharing between device DMA and
+applications. SVA can reduce programming complexity and enhance security.
 
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
----
- hw/i386/intel_iommu.c          | 67 ++++++++++++++++++++++++++++++++++++++++++
- hw/i386/intel_iommu_internal.h |  6 +++-
- hw/i386/trace-events           |  1 +
- 3 files changed, 73 insertions(+), 1 deletion(-)
+This QEMU series is intended to expose SVA usage to VMs. i.e. Sharing
+guest application address space with passthru devices. This is called
+vSVA in this series. The whole vSVA enabling requires QEMU/VFIO/IOMMU
+changes. This version is 3.1 to address comments in RFCv3. It is based
+on the kernel which can be found in below github. This kernel has some
+internal tweak between VFIO and VT-d iommu driver, so it is not sent
+out to community review. But the interface between kernel and QEMU are
+latest. So I send out this version for review.
+https://github.com/luxis1999/linux-vsva: vsva-linux-5.5-rc3-rfcv3.1
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e7c9677..b85aad3 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -70,6 +70,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
- static void vtd_pasid_cache_reset(IntelIOMMUState *s);
- static int vtd_update_pe_cache_for_dev(IntelIOMMUState *s,
-               VTDBus *vtd_bus, int devfn, int pasid, VTDPASIDEntry *pe);
-+static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
-+                                           uint16_t *did, bool is_dsi);
-+static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-+                                  VTDBus *vtd_bus, uint16_t devfn);
- 
- static void vtd_panic_require_caching_mode(void)
- {
-@@ -1865,6 +1869,8 @@ static void vtd_context_global_invalidate(IntelIOMMUState *s)
-      * VT-d emulation codes.
-      */
-     vtd_iommu_replay_all(s);
-+
-+    vtd_replay_guest_pasid_bindings(s, NULL, false);
- }
- 
- static int vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-@@ -1991,6 +1997,22 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-                  * happened.
-                  */
-                 vtd_sync_shadow_page_table(vtd_as);
-+                /*
-+                 * Per spec, context flush should also followed with PASID
-+                 * cache and iotlb flush. Regards to a device selective
-+                 * context cache invalidation:
-+                 * if (emaulted_device)
-+                 *    modify the pasid cache gen and pasid-based iotlb gen
-+                 *    value (will be added in following patches)
-+                 * else if (assigned_device)
-+                 *    check if the device has been bound to any pasid
-+                 *    invoke pasid_unbind regards to each bound pasid
-+                 * Here, we have vtd_pasid_cache_devsi() to invalidate pasid
-+                 * caches, while for piotlb in QEMU, we don't have it yet, so
-+                 * no handling. For assigned device, host iommu driver would
-+                 * flush piotlb when a pasid unbind is pass down to it.
-+                 */
-+                 vtd_pasid_cache_devsi(s, vtd_bus, devfn_it);
-             }
-         }
-     }
-@@ -2586,6 +2608,12 @@ static gboolean vtd_flush_pasid(gpointer key, gpointer value,
-         /* Fall through */
-     case VTD_PASID_CACHE_GLOBAL:
-         break;
-+    case VTD_PASID_CACHE_DEVSI:
-+        if (pc_info->vtd_bus != vtd_bus ||
-+            pc_info->devfn == devfn) {
-+            return false;
-+        }
-+        break;
-     default:
-         error_report("invalid pc_info->flags");
-         abort();
-@@ -2995,6 +3023,45 @@ static int vtd_pasid_cache_psi(IntelIOMMUState *s,
-     return 0;
- }
- 
-+static void vtd_pasid_cache_devsi(IntelIOMMUState *s,
-+                                  VTDBus *vtd_bus, uint16_t devfn)
-+{
-+    VTDPASIDCacheInfo pc_info;
-+    VTDContextEntry ce;
-+    PCIDevice *dev;
-+    vtd_pasid_table_walk_info info;
-+
-+    trace_vtd_pasid_cache_devsi(devfn);
-+
-+    pc_info.flags = VTD_PASID_CACHE_DEVSI;
-+    pc_info.vtd_bus = vtd_bus;
-+    pc_info.devfn = devfn;
-+
-+    vtd_iommu_lock(s);
-+    g_hash_table_foreach_remove(s->vtd_pasid_as, vtd_flush_pasid, &pc_info);
-+    vtd_iommu_unlock(s);
-+
-+    /*
-+     * To be safe, after invalidating the pasid caches,
-+     * emulator needs to replay the pasid bindings by
-+     * walking guest pasid dir and pasid table.
-+     */
-+    dev = vtd_bus->bus->devices[devfn];
-+    if (pci_device_host_iommu_context(dev) &&
-+        !vtd_dev_to_context_entry(s, pci_bus_num(vtd_bus->bus),
-+                                  devfn, &ce)) {
-+        info.flags = 0x0;
-+        info.did = 0;
-+        info.vtd_bus = vtd_bus;
-+        info.devfn = devfn;
-+        vtd_sm_pasid_table_walk(s,
-+                                VTD_CE_GET_PASID_DIR_TABLE(&ce),
-+                                0,
-+                                VTD_MAX_HPASID,
-+                                &info);
-+    }
-+}
-+
- /**
-  * Caller of this function should hold iommu_lock
-  */
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 46cec5c..d427895 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -500,13 +500,17 @@ struct VTDPASIDCacheInfo {
- #define VTD_PASID_CACHE_GLOBAL   (1ULL << 0)
- #define VTD_PASID_CACHE_DOMSI    (1ULL << 1)
- #define VTD_PASID_CACHE_PASIDSI  (1ULL << 2)
-+#define VTD_PASID_CACHE_DEVSI    (1ULL << 3)
-     uint32_t flags;
-     uint16_t domain_id;
-     uint32_t pasid;
-+    VTDBus *vtd_bus;
-+    uint16_t devfn;
- };
- #define VTD_PASID_CACHE_INFO_MASK    (VTD_PASID_CACHE_GLOBAL | \
-                                       VTD_PASID_CACHE_DOMSI  | \
--                                      VTD_PASID_CACHE_PASIDSI)
-+                                      VTD_PASID_CACHE_PASIDSI | \
-+                                      VTD_PASID_CACHE_DEVSI)
- typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
- 
- /* Masks for struct VTDRootEntry */
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 87364a3..34bab09 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -26,6 +26,7 @@ vtd_pasid_cache_reset(void) ""
- vtd_pasid_cache_gsi(void) ""
- vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
- vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
-+vtd_pasid_cache_devsi(uint16_t devfn) "Dev selective PC invalidation dev: 0x%"PRIx16
- vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
- vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
- vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
+The high-level architecture for SVA virtualization is as below, the key
+design of vSVA support is to utilize the dual-stage IOMMU translation (
+also known as IOMMU nesting translation) capability in host IOMMU.
+
+    .-------------.  .---------------------------.
+    |   vIOMMU    |  | Guest process CR3, FL only|
+    |             |  '---------------------------'
+    .----------------/
+    | PASID Entry |--- PASID cache flush -
+    '-------------'                       |
+    |             |                       V
+    |             |                CR3 in GPA
+    '-------------'
+Guest
+------| Shadow |--------------------------|--------
+      v        v                          v
+Host
+    .-------------.  .----------------------.
+    |   pIOMMU    |  | Bind FL for GVA-GPA  |
+    |             |  '----------------------'
+    .----------------/  |
+    | PASID Entry |     V (Nested xlate)
+    '----------------\.------------------------------.
+    |             |   |SL for GPA-HPA, default domain|
+    |             |   '------------------------------'
+    '-------------'
+Where:
+ - FL = First level/stage one page tables
+ - SL = Second level/stage two page tables
+
+The complete vSVA kernel upstream patches are divided into three phases:
+    1. Common APIs and PCI device direct assignment
+    2. IOMMU-backed Mediated Device assignment
+    3. Page Request Services (PRS) support
+
+This QEMU RFC patchset is aiming for the phase 1 and phase 2.
+
+Related series:
+[1] [PATCH V9 00/10] Nested Shared Virtual Address (SVA) VT-d support:
+    https://lkml.org/lkml/2020/1/29/37
+    [PATCH 0/3] IOMMU user API enhancement:
+    https://lkml.org/lkml/2020/1/29/45
+
+[2] [RFC v3 0/8] vfio: expose virtual Shared Virtual Addressing to VMs
+    https://lkml.org/lkml/2020/1/29/255
+
+There are roughly two parts:
+ 1. Introduce HostIOMMUContext as abstract of host IOMMU. It provides explicit
+    method for vIOMMU emulators to communicate with host IOMMU. e.g. propagate
+    guest page table binding to host IOMMU to setup dual-stage DMA translation
+    in host IOMMU and flush iommu iotlb.
+ 2. Setup dual-stage IOMMU translation for Intel vIOMMU. Includes 
+    - Check IOMMU uAPI version compatibility and VFIO Nesting capabilities which
+      includes hardware compatibility (stage 1 format) and VFIO_PASID_REQ
+      availability. This is preparation for setting up dual-stage DMA translation
+      in host IOMMU.
+    - Propagate guest PASID allocation and free request to host.
+    - Propagate guest page table binding to host to setup dual-stage IOMMU DMA
+      translation in host IOMMU.
+    - Propagate guest IOMMU cache invalidation to host to ensure iotlb
+      correctness.
+
+The complete QEMU set can be found in below link:
+https://github.com/luxis1999/qemu.git: sva_qemu_rfcv3.1
+
+Complete kernel can be found in:
+https://github.com/luxis1999/linux-vsva.git: vsva-linux-5.5-rc3-rfcv3.1
+
+Tests: basci functionality test, VM reboot/shutdown, full comapilation.
+          <more test would be done as this is RFC series>
+
+Changelog:
+	- RFC v3 -> v3.1:
+	  a) Drop IOMMUContext, and rename DualStageIOMMUObject to HostIOMMUContext.
+             HostIOMMUContext is per-vfio-container, it is exposed to  vIOMMU via PCI
+             layer. VFIO registers a PCIHostIOMMUFunc callback to PCI layer, vIOMMU
+             could get HostIOMMUContext instance via it.
+          b) Check IOMMU uAPI version by VFIO_CHECK_EXTENSION
+          c) Add a check on VFIO_PASID_REQ availability via VFIO_GET_IOMMU_IHNFO
+          d) Reorder the series, put vSVA linux header file update in the beginning
+             put the x-scalable-mode option mofification in the end of the series.
+          e) Dropped patch "[RFC v3 01/25] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps"
+          RFCv3: https://patchwork.kernel.org/cover/11356033/
+
+	- RFC v2 -> v3:
+	  a) Introduce DualStageIOMMUObject to abstract the host IOMMU programming
+	  capability. e.g. request PASID from host, setup IOMMU nesting translation
+	  on host IOMMU. The pasid_alloc/bind_guest_page_table/iommu_cache_flush
+	  operations are moved to be DualStageIOMMUOps. Thus, DualStageIOMMUObject
+	  is an abstract layer which provides QEMU vIOMMU emulators with an explicit
+	  method to program host IOMMU.
+	  b) Compared with RFC v2, the IOMMUContext has also been updated. It is
+	  modified to provide an abstract for vIOMMU emulators. It provides the
+	  method for pass-through modules (like VFIO) to communicate with host IOMMU.
+	  e.g. tell vIOMMU emulators about the IOMMU nesting capability on host side
+	  and report the host IOMMU DMA translation faults to vIOMMU emulators.
+	  RFC v2: https://www.spinics.net/lists/kvm/msg198556.html
+
+	- RFC v1 -> v2:
+	  Introduce IOMMUContext to abstract the connection between VFIO
+	  and vIOMMU emulators, which is a replacement of the PCIPASIDOps
+	  in RFC v1. Modify x-scalable-mode to be string option instead of
+	  adding a new option as RFC v1 did. Refined the pasid cache management
+	  and addressed the TODOs mentioned in RFC v1. 
+	  RFC v1: https://patchwork.kernel.org/cover/11033657/
+
+Eric Auger (1):
+  scripts/update-linux-headers: Import iommu.h
+
+Liu Yi L (21):
+  header file update VFIO/IOMMU vSVA APIs
+  vfio: check VFIO_TYPE1_NESTING_IOMMU support
+  hw/iommu: introduce HostIOMMUContext
+  hw/pci: add pci_device_setup_iommu
+  vfio/pci: init HostIOMMUContext per-container
+  vfio: get nesting iommu cap info from Kernel
+  vfio/common: add pasid_alloc/free support
+  hw/pci: add pci_device_host_iommu_context()
+  intel_iommu: add virtual command capability support
+  intel_iommu: process pasid cache invalidation
+  intel_iommu: add PASID cache management infrastructure
+  vfio: add bind stage-1 page table support
+  intel_iommu: bind/unbind guest page table to host
+  intel_iommu: replay guest pasid bindings to host
+  intel_iommu: replay pasid binds after context cache invalidation
+  intel_iommu: do not pass down pasid bind for PASID #0
+  vfio/common: add support for flush iommu stage-1 cache
+  intel_iommu: process PASID-based iotlb invalidation
+  intel_iommu: propagate PASID-based iotlb invalidation to host
+  intel_iommu: process PASID-based Device-TLB invalidation
+  intel_iommu: modify x-scalable-mode to be string option
+
+ hw/Makefile.objs                      |    1 +
+ hw/i386/intel_iommu.c                 | 1176 ++++++++++++++++++++++++++++++++-
+ hw/i386/intel_iommu_internal.h        |  119 ++++
+ hw/i386/trace-events                  |    6 +
+ hw/iommu/Makefile.objs                |    1 +
+ hw/iommu/host_iommu_context.c         |   88 +++
+ hw/pci/pci.c                          |   18 +
+ hw/vfio/common.c                      |  236 ++++++-
+ hw/vfio/pci.c                         |   21 +
+ include/hw/i386/intel_iommu.h         |   41 +-
+ include/hw/iommu/host_iommu_context.h |  106 +++
+ include/hw/pci/pci.h                  |    7 +
+ include/hw/vfio/vfio-common.h         |    2 +
+ linux-headers/linux/iommu.h           |  372 +++++++++++
+ linux-headers/linux/vfio.h            |  127 ++++
+ scripts/update-linux-headers.sh       |    2 +-
+ 16 files changed, 2311 insertions(+), 12 deletions(-)
+ create mode 100644 hw/iommu/Makefile.objs
+ create mode 100644 hw/iommu/host_iommu_context.c
+ create mode 100644 include/hw/iommu/host_iommu_context.h
+ create mode 100644 linux-headers/linux/iommu.h
+
 -- 
 2.7.4
 
