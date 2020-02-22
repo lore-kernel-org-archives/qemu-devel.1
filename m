@@ -2,72 +2,75 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7310AC35671
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 09:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91739C35666
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 11:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42CB62071E
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 09:41:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42CB62071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57EBB206EF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 11:24:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HVkKSFoM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57EBB206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5RHX-0004LN-EI
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 04:41:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45287)
+	id 1j5Stw-0005XP-Fd
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 06:24:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1j5RGg-0003q9-3v
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 04:40:15 -0500
+ (envelope-from <eblake@redhat.com>) id 1j5Ssx-0004Hy-JZ
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 06:23:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1j5RGe-0001Gr-Q4
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 04:40:13 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2447 helo=huawei.com)
+ (envelope-from <eblake@redhat.com>) id 1j5Ssv-0005jm-HC
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 06:23:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56727
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j5RGe-0000yA-E3
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 04:40:12 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 904FA3E0AA9FE18EA6AC;
- Sat, 22 Feb 2020 17:40:08 +0800 (CST)
-Received: from dggeme705-chm.china.huawei.com (10.1.199.101) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 22 Feb 2020 17:40:08 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme705-chm.china.huawei.com (10.1.199.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Sat, 22 Feb 2020 17:40:07 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
- Sat, 22 Feb 2020 17:40:07 +0800
-From: miaoyubo <miaoyubo@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie for arm
-Thread-Topic: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie for arm
-Thread-Index: AQHV6IEd6Svy29h+HkqfrMST6pP6Uagk+maAgAH8DnA=
-Date: Sat, 22 Feb 2020 09:40:07 +0000
-Message-ID: <817d9cb2699d4294a2ba4ae949079eea@huawei.com>
-References: <20200221063512.1104-1-miaoyubo@huawei.com>
- <20200221063512.1104-4-miaoyubo@huawei.com>
- <20200221061811-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200221061811-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.177.131.16]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j5Ssv-0005g3-CB
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 06:23:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582370628;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kYq7tSLEtP8ND4+O3+Ud5lL5ww0wn3vA66AzZSDN/7A=;
+ b=HVkKSFoMA8/iq1E2HY3vX7Ip3btolDuq1PGgOTndn+WcmTs8TlZYoWLg9t6/VF1QB8wFxX
+ ddcN6uYWxuyoLxXdHZNZrvKrVhZg4EhJ26++P+qaDfiF5HWbqcMwhguEdBib+6C8nM+MX5
+ zeA+UaixDtIvc+baLip2aJQcZEUO21Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-Dp2XilclNheanBTR9ThQdg-1; Sat, 22 Feb 2020 06:23:46 -0500
+X-MC-Unique: Dp2XilclNheanBTR9ThQdg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48F2B801E53;
+ Sat, 22 Feb 2020 11:23:45 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-90.phx2.redhat.com [10.3.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2385D60499;
+ Sat, 22 Feb 2020 11:23:41 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] Tighten qemu-img rules on missing backing format
+Date: Sat, 22 Feb 2020 05:23:38 -0600
+Message-Id: <20200222112341.4170045-1-eblake@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.187
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,95 +82,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>
+Cc: libvir-list@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+In the past, we have had CVEs caused by qemu probing one image type
+when an image started out as another but the guest was able to modify
+content.  The solution to those CVEs was to encode backing format
+information into qcow2, to ensure that once we make a decision, we
+don't have to probe any further.  However, we failed to enforce this
+at the time.  And now that libvirt is switching to -blockdev, it has
+come back to bite us: with -block, libvirt had no easy way (other than
+json:{} pseudoprotocol) to force a backing file, but with -blockdev,
+libvirt HAS to use blockdev-open on the backing chain and supply a
+backing format there, and thus has to probe images.  If libvirt ever
+probes differently than qemu, we are back to the potential
+guest-visible data corruption or potential host CVEs.
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Friday, February 21, 2020 7:19 PM
-> To: miaoyubo <miaoyubo@huawei.com>
-> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; Xiexiangyou
-> <xiexiangyou@huawei.com>; imammedo@redhat.com;
-> qemu-devel@nongnu.org
-> Subject: Re: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie for=
- arm
->=20
-> On Fri, Feb 21, 2020 at 02:35:12PM +0800, Yubo Miao wrote:
-> > From: miaoyubo <miaoyubo@huawei.com>
-> >
-> > Currently, pxb-pcie could be defined by the cmdline like
-> >     --device pxb-pcie,id=3Dpci.9,bus_nr=3D128 However pxb-pcie is not
-> > described in acpi tables for arm.
-> >
-> > The formal two patches support pxb-pcie for arm, escpcially the
-> > specification for pxb-pcie in DSDT table.
-> >
-> > Add a testcase to make sure the ACPI table is correct for guest.
-> >
-> > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
->=20
->=20
-> Please look at the top of tests/qtest/bios-tables-test.c for how to add o=
-r
-> update tests.
->=20
+It's time to deprecate images without backing formats.  This patch
+series does two things: 1. record an implicit backing format where one
+is learned (although sadly, not all qemu-img commands are able to
+learn a format), 2. warn to the user any time a probe had ambiguous
+results or a backing format is omitted from an image.  All previous
+images without a backing format are still usable, but hopefully the
+warnings (along with libvirt's complaints about images without a
+backing format) help us pinpoint remaining applications that are
+creating images on their own without recording a backing format.
 
-Thanks for replying, I didn't notice that, I would follow the steps to rebu=
-ild this patch.
+Perhaps I need to amend patch 3 and/or add a followup patch 4 that
+adds further iotest coverage of all the new warnings (patch 1 touched
+all the './check -qcow2' tests that were affected by the new warnings,
+except for 114 which actually wanted to trigger the warning, if you
+want to apply the series out of order to see the impact of the
+warnings).
 
-> > ---
-> >  tests/data/acpi/virt/DSDT.pxb  | Bin 0 -> 34209 bytes
-> > tests/qtest/bios-tables-test.c |  54 +++++++++++++++++++++++++++++----
-> >  2 files changed, 48 insertions(+), 6 deletions(-)  create mode 100644
-> > tests/data/acpi/virt/DSDT.pxb
-> >
-> > diff --git a/tests/data/acpi/virt/DSDT.pxb
-> > b/tests/data/acpi/virt/DSDT.pxb new file mode 100644 index
-> >
-> 0000000000000000000000000000000000000000..4eea3192c75ff28f7054d626
-> a936
-> > 3ca025b6c0ad
-> > GIT binary patch
->=20
-> I can't read this.
->=20
+Eric Blake (3):
+  iotests: Specify explicit backing format where sensible
+  block: Add support to warn on backing file change without format
+  qemu-img: Deprecate use of -b without -F
 
-I just have a question that is:=20
-I just rebuild this aml with tests/data/acpi/rebuild-expected-aml.sh
-and git send it or send the aml with attachment?
+ block.c                       | 31 ++++++++++++++++++++---
+ block/qcow2.c                 |  2 +-
+ block/stream.c                |  2 +-
+ blockdev.c                    |  3 ++-
+ include/block/block.h         |  4 +--
+ qemu-deprecated.texi          | 12 +++++++++
+ qemu-img.c                    | 10 ++++++--
+ tests/qemu-iotests/017        |  2 +-
+ tests/qemu-iotests/017.out    |  2 +-
+ tests/qemu-iotests/018        |  2 +-
+ tests/qemu-iotests/018.out    |  2 +-
+ tests/qemu-iotests/019        |  5 ++--
+ tests/qemu-iotests/019.out    |  2 +-
+ tests/qemu-iotests/020        |  2 +-
+ tests/qemu-iotests/020.out    |  2 +-
+ tests/qemu-iotests/024        |  8 +++---
+ tests/qemu-iotests/024.out    |  5 ++--
+ tests/qemu-iotests/028        |  4 +--
+ tests/qemu-iotests/028.out    |  2 +-
+ tests/qemu-iotests/030        | 26 +++++++++++++------
+ tests/qemu-iotests/034        |  2 +-
+ tests/qemu-iotests/034.out    |  2 +-
+ tests/qemu-iotests/037        |  2 +-
+ tests/qemu-iotests/037.out    |  2 +-
+ tests/qemu-iotests/038        |  2 +-
+ tests/qemu-iotests/038.out    |  2 +-
+ tests/qemu-iotests/039        |  3 ++-
+ tests/qemu-iotests/039.out    |  2 +-
+ tests/qemu-iotests/040        | 47 +++++++++++++++++++++++++----------
+ tests/qemu-iotests/041        | 37 ++++++++++++++++++---------
+ tests/qemu-iotests/042        |  4 +--
+ tests/qemu-iotests/043        | 18 +++++++-------
+ tests/qemu-iotests/043.out    | 16 +++++++-----
+ tests/qemu-iotests/046        |  2 +-
+ tests/qemu-iotests/046.out    |  2 +-
+ tests/qemu-iotests/050        |  4 +--
+ tests/qemu-iotests/050.out    |  2 +-
+ tests/qemu-iotests/051        |  2 +-
+ tests/qemu-iotests/051.out    |  2 +-
+ tests/qemu-iotests/051.pc.out |  2 +-
+ tests/qemu-iotests/060        |  2 +-
+ tests/qemu-iotests/060.out    |  2 +-
+ tests/qemu-iotests/061        | 10 ++++----
+ tests/qemu-iotests/061.out    | 10 ++++----
+ tests/qemu-iotests/069        |  2 +-
+ tests/qemu-iotests/069.out    |  2 +-
+ tests/qemu-iotests/073        |  2 +-
+ tests/qemu-iotests/073.out    |  2 +-
+ tests/qemu-iotests/082        | 16 +++++++-----
+ tests/qemu-iotests/082.out    | 16 ++++++------
+ tests/qemu-iotests/085        |  4 +--
+ tests/qemu-iotests/085.out    |  6 ++---
+ tests/qemu-iotests/089        |  2 +-
+ tests/qemu-iotests/089.out    |  2 +-
+ tests/qemu-iotests/095        |  4 +--
+ tests/qemu-iotests/095.out    |  4 +--
+ tests/qemu-iotests/097        |  4 +--
+ tests/qemu-iotests/097.out    | 16 ++++++------
+ tests/qemu-iotests/098        |  2 +-
+ tests/qemu-iotests/098.out    |  8 +++---
+ tests/qemu-iotests/110        |  4 +--
+ tests/qemu-iotests/110.out    |  4 +--
+ tests/qemu-iotests/114        |  4 +--
+ tests/qemu-iotests/114.out    |  1 +
+ tests/qemu-iotests/122        | 27 ++++++++++++--------
+ tests/qemu-iotests/122.out    |  8 +++---
+ tests/qemu-iotests/126        |  4 +--
+ tests/qemu-iotests/126.out    |  4 +--
+ tests/qemu-iotests/127        |  4 +--
+ tests/qemu-iotests/127.out    |  4 +--
+ tests/qemu-iotests/129        |  3 ++-
+ tests/qemu-iotests/133        |  2 +-
+ tests/qemu-iotests/133.out    |  2 +-
+ tests/qemu-iotests/139        |  2 +-
+ tests/qemu-iotests/141        |  4 +--
+ tests/qemu-iotests/141.out    |  4 +--
+ tests/qemu-iotests/142        |  2 +-
+ tests/qemu-iotests/142.out    |  2 +-
+ tests/qemu-iotests/153        | 14 +++++------
+ tests/qemu-iotests/153.out    | 35 ++++++++++++++------------
+ tests/qemu-iotests/154        | 42 +++++++++++++++----------------
+ tests/qemu-iotests/154.out    | 42 +++++++++++++++----------------
+ tests/qemu-iotests/155        | 12 ++++++---
+ tests/qemu-iotests/156        |  9 ++++---
+ tests/qemu-iotests/156.out    |  6 ++---
+ tests/qemu-iotests/158        |  2 +-
+ tests/qemu-iotests/158.out    |  2 +-
+ tests/qemu-iotests/161        |  8 +++---
+ tests/qemu-iotests/161.out    |  8 +++---
+ tests/qemu-iotests/176        |  4 +--
+ tests/qemu-iotests/176.out    | 32 ++++++++++++------------
+ tests/qemu-iotests/177        |  2 +-
+ tests/qemu-iotests/177.out    |  2 +-
+ tests/qemu-iotests/179        |  2 +-
+ tests/qemu-iotests/179.out    |  2 +-
+ tests/qemu-iotests/189        |  2 +-
+ tests/qemu-iotests/189.out    |  2 +-
+ tests/qemu-iotests/191        | 12 ++++-----
+ tests/qemu-iotests/191.out    | 12 ++++-----
+ tests/qemu-iotests/195        |  6 ++---
+ tests/qemu-iotests/195.out    |  6 ++---
+ tests/qemu-iotests/198        |  2 +-
+ tests/qemu-iotests/198.out    |  3 ++-
+ tests/qemu-iotests/204        |  2 +-
+ tests/qemu-iotests/204.out    |  2 +-
+ tests/qemu-iotests/216        |  2 +-
+ tests/qemu-iotests/224        |  4 +--
+ tests/qemu-iotests/228        |  5 ++--
+ tests/qemu-iotests/245        |  3 ++-
+ tests/qemu-iotests/249        |  4 +--
+ tests/qemu-iotests/249.out    |  4 +--
+ tests/qemu-iotests/252        |  2 +-
+ tests/qemu-iotests/257        |  3 ++-
+ tests/qemu-iotests/267        |  4 +--
+ tests/qemu-iotests/267.out    |  6 ++---
+ tests/qemu-iotests/270        |  2 +-
+ tests/qemu-iotests/270.out    |  2 +-
+ tests/qemu-iotests/273        |  4 +--
+ tests/qemu-iotests/273.out    |  4 +--
+ tests/qemu-iotests/279        |  4 +--
+ tests/qemu-iotests/279.out    |  4 +--
+ 121 files changed, 466 insertions(+), 348 deletions(-)
 
-> > literal 34209
-> >
-> zcmeI*cXU+szJ~D)1PGxe5PG+us9-{<Do8R35G4>YGz}UAMT!L#ks?x*Dx!d5hoIP
-> d
-> >
-> z?}}o>iWL;GW5HgrlKbvVM&HM??^)~qbMIProvd|8p2_U*%qO!m?AgcPkRQ(<w
-> r)WX
-> >
-> zR3DKyBsMVKK5tZUEMJ#Z3xXj0I{cizY-H-_vUpxu>HL<ltgNimvVn#9^>bszg^Hd*
-> >
-> zYT59@{GfDxK}u{$QSzH5MFX?4va_qcnOYVriD$G-YqqdX5KgQUqzA#0T0ymH9a
-> J-P
-> > zt=3D#;Qdf_)p=3DV$jH6t9{xXmH68P3ev)8EFlwrs(=3DX$_(9dxJh>6UU8FZi5vcVla%B=
-p
-> >
-> zz50)g^-pXvw4i9XAYFAU@nN}Xb+t___n%u<uhU$chBua*GNL5;Gf3Q8mfgX>w)`
-> 8L
-> >
-> z7F4goX88!*;pB+$X8&bG_2BOj*;OO*!h6xx&B+mI)uU#l*o>||BPVi3ji?#5Y(|dH
-> >
-> z=3DoUF6C2B^h&FJPcx<}5a88su#W_0%%JtAk+ikeZ+X7unGJtJq-j+)WHX7uzKy&`9
-> %
->=20
-> ...
+--=20
+2.24.1
 
-Regards,
-Miao
 
