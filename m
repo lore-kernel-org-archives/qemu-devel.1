@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4872C35671
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF746C35672
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FCBD2071E
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:58:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EADB2071E
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1bbS/Xw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FCBD2071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/vXDKrb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EADB2071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5Qbo-0000vj-CD
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:58:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38438)
+	id 1j5Qbp-0000yY-Rd
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:58:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38973)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j5QX1-0008VV-9S
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:53:05 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j5QYq-0003jd-8v
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j5QX0-0000e8-CM
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:53:03 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57900
+ (envelope-from <stefanha@redhat.com>) id 1j5QYp-0002nd-8c
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:54:56 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44208
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j5QX0-0000dw-9D
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:53:02 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j5QYp-0002nN-4p
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:54:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582361581;
+ s=mimecast20190719; t=1582361694;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5FGI7HEQJgbwPvROfTkjFPAH/TyN7FlE/u4vpR9orNQ=;
- b=Z1bbS/XwgjG86ixtMEpJpynAmFd02ukWDZEJZq2OIH27OwRVKne/swPtepsra8fdbM+75f
- CWexPUct47wr2/D8LHVA+naELaoY1UiuZqiBh5Dtk+LBucHXXihgl8utcJ1Wce081oTbf8
- 6vWi4yMwdeQWFKis7eR1X472fpKDQMY=
+ bh=w/kxCr/mGPa4guwdR3SAt74RiSdH9fGx83pZOl9u8+w=;
+ b=X/vXDKrbymYvOFlNNuydiDs6sZShi1ahFKsZ3yYCI83Lr6Pg3NdnL0EVKrkL2/K9lB3pp2
+ runP7zN4+DwfGLswzaH8lR2UfGVXQ95PtnadGjjinnwbZk2Tlc0OErAIWxP+bvWVjwScDy
+ KfJep9BOkHGArYaPDfasqvpm8PJ/Ppw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-5mYMcDKRMzuL8wH9DP9RrQ-1; Sat, 22 Feb 2020 03:52:59 -0500
-X-MC-Unique: 5mYMcDKRMzuL8wH9DP9RrQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-125-KLoUWVVaOzKMVAzfNY6RXQ-1; Sat, 22 Feb 2020 03:54:52 -0500
+X-MC-Unique: KLoUWVVaOzKMVAzfNY6RXQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 168DB100550E;
- Sat, 22 Feb 2020 08:52:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52F74183B554;
+ Sat, 22 Feb 2020 08:54:51 +0000 (UTC)
 Received: from localhost (ovpn-116-74.ams2.redhat.com [10.36.116.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C452E87B0A;
- Sat, 22 Feb 2020 08:52:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 731505D9CD;
+ Sat, 22 Feb 2020 08:54:40 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/31] fuzz: add FUZZ_TARGET module type
-Date: Sat, 22 Feb 2020 08:50:12 +0000
-Message-Id: <20200222085030.1760640-14-stefanha@redhat.com>
+Subject: [PULL 23/31] main: keep rcu_atfork callback enabled for qtest
+Date: Sat, 22 Feb 2020 08:50:22 +0000
+Message-Id: <20200222085030.1760640-24-stefanha@redhat.com>
 In-Reply-To: <20200222085030.1760640-1-stefanha@redhat.com>
 References: <20200222085030.1760640-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -99,28 +99,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbTogQWxleGFuZGVyIEJ1bGVrb3YgPGFseG5kckBidS5lZHU+CgpTaWduZWQtb2ZmLWJ5OiBB
-bGV4YW5kZXIgQnVsZWtvdiA8YWx4bmRyQGJ1LmVkdT4KUmV2aWV3ZWQtYnk6IFN0ZWZhbiBIYWpu
-b2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6IERhcnJlbiBLZW5ueSA8ZGFy
-cmVuLmtlbm55QG9yYWNsZS5jb20+Ck1lc3NhZ2UtaWQ6IDIwMjAwMjIwMDQxMTE4LjIzMjY0LTUt
-YWx4bmRyQGJ1LmVkdQpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJl
-ZGhhdC5jb20+Ci0tLQogaW5jbHVkZS9xZW11L21vZHVsZS5oIHwgNCArKystCiAxIGZpbGUgY2hh
-bmdlZCwgMyBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9xZW11L21vZHVsZS5oIGIvaW5jbHVkZS9xZW11L21vZHVsZS5oCmluZGV4IDY1YmE1OTZlNDYu
-LjY4NDc1M2Q4MDggMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvcWVtdS9tb2R1bGUuaAorKysgYi9pbmNs
-dWRlL3FlbXUvbW9kdWxlLmgKQEAgLTQ2LDYgKzQ2LDcgQEAgdHlwZWRlZiBlbnVtIHsKICAgICBN
-T0RVTEVfSU5JVF9UUkFDRSwKICAgICBNT0RVTEVfSU5JVF9YRU5fQkFDS0VORCwKICAgICBNT0RV
-TEVfSU5JVF9MSUJRT1MsCisgICAgTU9EVUxFX0lOSVRfRlVaWl9UQVJHRVQsCiAgICAgTU9EVUxF
-X0lOSVRfTUFYCiB9IG1vZHVsZV9pbml0X3R5cGU7CiAKQEAgLTU2LDcgKzU3LDggQEAgdHlwZWRl
-ZiBlbnVtIHsKICNkZWZpbmUgeGVuX2JhY2tlbmRfaW5pdChmdW5jdGlvbikgbW9kdWxlX2luaXQo
-ZnVuY3Rpb24sIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgTU9EVUxFX0lOSVRfWEVOX0JBQ0tFTkQpCiAjZGVmaW5lIGxpYnFvc19pbml0KGZ1bmN0aW9u
-KSBtb2R1bGVfaW5pdChmdW5jdGlvbiwgTU9EVUxFX0lOSVRfTElCUU9TKQotCisjZGVmaW5lIGZ1
-enpfdGFyZ2V0X2luaXQoZnVuY3Rpb24pIG1vZHVsZV9pbml0KGZ1bmN0aW9uLCBcCisgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE1PRFVMRV9JTklUX0ZVWlpf
-VEFSR0VUKQogI2RlZmluZSBibG9ja19tb2R1bGVfbG9hZF9vbmUobGliKSBtb2R1bGVfbG9hZF9v
-bmUoImJsb2NrLSIsIGxpYikKICNkZWZpbmUgdWlfbW9kdWxlX2xvYWRfb25lKGxpYikgbW9kdWxl
-X2xvYWRfb25lKCJ1aS0iLCBsaWIpCiAjZGVmaW5lIGF1ZGlvX21vZHVsZV9sb2FkX29uZShsaWIp
-IG1vZHVsZV9sb2FkX29uZSgiYXVkaW8tIiwgbGliKQotLSAKMi4yNC4xCgo=
+RnJvbTogQWxleGFuZGVyIEJ1bGVrb3YgPGFseG5kckBidS5lZHU+CgpUaGUgcXRlc3QtYmFzZWQg
+ZnV6emVyIG1ha2VzIHVzZSBvZiBmb3JraW5nIHRvIHJlc2V0LXN0YXRlIGJldHdlZW4KdGVzdHMu
+IEtlZXAgdGhlIGNhbGxiYWNrIGVuYWJsZWQsIHNvIHRoZSBjYWxsX3JjdSB0aHJlYWQgZ2V0cyBj
+cmVhdGVkCndpdGhpbiB0aGUgY2hpbGQgcHJvY2Vzcy4KClNpZ25lZC1vZmYtYnk6IEFsZXhhbmRl
+ciBCdWxla292IDxhbHhuZHJAYnUuZWR1PgpSZXZpZXdlZC1ieTogRGFycmVuIEtlbm55IDxkYXJy
+ZW4ua2VubnlAb3JhY2xlLmNvbT4KQWNrZWQtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFA
+cmVkaGF0LmNvbT4KTWVzc2FnZS1pZDogMjAyMDAyMjAwNDExMTguMjMyNjQtMTUtYWx4bmRyQGJ1
+LmVkdQpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+
+Ci0tLQogc29mdG1tdS92bC5jIHwgMTIgKysrKysrKysrKystCiAxIGZpbGUgY2hhbmdlZCwgMTEg
+aW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL3NvZnRtbXUvdmwuYyBi
+L3NvZnRtbXUvdmwuYwppbmRleCAwODBkM2I1MTA2Li45MmM3YjNhNmU5IDEwMDY0NAotLS0gYS9z
+b2Z0bW11L3ZsLmMKKysrIGIvc29mdG1tdS92bC5jCkBAIC0zNzgyLDcgKzM3ODIsMTcgQEAgdm9p
+ZCBxZW11X2luaXQoaW50IGFyZ2MsIGNoYXIgKiphcmd2LCBjaGFyICoqZW52cCkKICAgICBzZXRf
+bWVtb3J5X29wdGlvbnMoJnJhbV9zbG90cywgJm1heHJhbV9zaXplLCBtYWNoaW5lX2NsYXNzKTsK
+IAogICAgIG9zX2RhZW1vbml6ZSgpOwotICAgIHJjdV9kaXNhYmxlX2F0Zm9yaygpOworCisgICAg
+LyoKKyAgICAgKiBJZiBRVGVzdCBpcyBlbmFibGVkLCBrZWVwIHRoZSByY3VfYXRmb3JrIGVuYWJs
+ZWQsIHNpbmNlIHN5c3RlbSBwcm9jZXNzZXMKKyAgICAgKiBtYXkgYmUgZm9ya2VkIHRlc3Rpbmcg
+cHVycG9zZXMgKGUuZy4gZm9yay1zZXJ2ZXIgYmFzZWQgZnV6emluZykgVGhlIGZvcmsKKyAgICAg
+KiBzaG91bGQgaGFwcGVuIGJlZm9yZSBhIHNpZ25sZSBjcHUgaW5zdHJ1Y3Rpb24gaXMgZXhlY3V0
+ZWQsIHRvIHByZXZlbnQKKyAgICAgKiBkZWFkbG9ja3MuIFNlZSBjb21taXQgNzNjNmU0MCwgcmN1
+OiAiY29tcGxldGVseSBkaXNhYmxlIHB0aHJlYWRfYXRmb3JrCisgICAgICogY2FsbGJhY2tzIGFz
+IHNvb24gYXMgcG9zc2libGUiCisgICAgICovCisgICAgaWYgKCFxdGVzdF9lbmFibGVkKCkpIHsK
+KyAgICAgICAgcmN1X2Rpc2FibGVfYXRmb3JrKCk7CisgICAgfQogCiAgICAgaWYgKHBpZF9maWxl
+ICYmICFxZW11X3dyaXRlX3BpZGZpbGUocGlkX2ZpbGUsICZlcnIpKSB7CiAgICAgICAgIGVycm9y
+X3JlcG9ydGZfZXJyKGVyciwgImNhbm5vdCBjcmVhdGUgUElEIGZpbGU6ICIpOwotLSAKMi4yNC4x
+Cgo=
 
 
