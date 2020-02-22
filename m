@@ -2,101 +2,61 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8720CC35671
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 07:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5872C35671
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 07:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49E4120707
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 07:37:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d46TErtw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49E4120707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71A84208C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 07:57:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A84208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5PMI-0005ut-EH
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 02:37:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52316)
+	id 1j5Pfd-0001PF-N9
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 02:57:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j5PLk-0005TN-Nw
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 02:37:21 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1j5Pf0-0000ra-Tg
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 02:57:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j5PLe-0004N9-Ty
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 02:37:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30529
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1j5Pf0-0004N2-16
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 02:57:14 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3240 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j5PLe-0004Jh-N6
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 02:37:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582357033;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BADePD2CDWPVnUUrjtkaGZWirrjoPe2vBaoNADjEj8o=;
- b=d46TErtwyiUnXfUKCAnMohEi/hRdoW5clLuaFfuuXnu4rbxxHYlwG78Y3GcJiGfgsd9V5p
- sDYy6/mGz/kNxcIBEwCB2fxaK8r818NwVh787Hn0o3Z6wdXko1woO8rOWXtGjPr8AHJ2tY
- +kCfuBpYoRGbdtruNGyqX7vP/mGSitU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-9ecAI1E9P5-auuoa_c-jEw-1; Sat, 22 Feb 2020 02:37:11 -0500
-X-MC-Unique: 9ecAI1E9P5-auuoa_c-jEw-1
-Received: by mail-wr1-f72.google.com with SMTP id w6so2157016wrm.16
- for <qemu-devel@nongnu.org>; Fri, 21 Feb 2020 23:37:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BADePD2CDWPVnUUrjtkaGZWirrjoPe2vBaoNADjEj8o=;
- b=jgZpjh7LFYeWEvjTFAjuz0qnFweTQEeTZYbnzFVswF1R1oIPocn3V8c35iAfME5xRz
- NynEb7jCyNFCkRmhngSvPZKkM4Z818A31LuIK2t7S9si+FDmatWdSy4DQ4DLh4eHuPaV
- 5vTI8Ry13jg+NIjK+EzQKvld6LAIQdmeP69NOB9daQcx58nrX7ZHJTk4IE2sKpLeSxlU
- D7OIS+fC2XSzzoj1Ma9+bwhVUHOYYlaLJZvDT94ik8nBu9zZj7nHy6e2hb4mDftF0ef2
- a4suA1kXj99oALrIlW6xbVqIQh4GSLQxDBR/fOf7Cs7vAjerMoKUNHuESzjAGXC4vEi9
- PuhQ==
-X-Gm-Message-State: APjAAAWo8aG0XM6nNFoLpTQJq4aKbiunJOIaGF+1byHe80Wn25M5+IOk
- sMedNnxnd4PsrdunmSxypIiy6e2h8MwJa1OJAHprziBf20YrqxImUYi0Qdr4bQarMVnsofMO3r/
- /pf8Ifk0U8GNSg+0=
-X-Received: by 2002:a5d:5007:: with SMTP id e7mr53595771wrt.228.1582357030679; 
- Fri, 21 Feb 2020 23:37:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyaBZIx3DKBwoM+G1KuVbpVf64luAW4oF89n0wNE2LT5MhVT7/E1O2WIBKTYfn0Brks2Bktfw==
-X-Received: by 2002:a5d:5007:: with SMTP id e7mr53595746wrt.228.1582357030389; 
- Fri, 21 Feb 2020 23:37:10 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:ec41:5e57:ff4d:8e51?
- ([2001:b07:6468:f312:ec41:5e57:ff4d:8e51])
- by smtp.gmail.com with ESMTPSA id a13sm7428590wrp.93.2020.02.21.23.37.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Feb 2020 23:37:09 -0800 (PST)
-Subject: Re: [PATCH] target: i386: Check float overflow about register stack
-To: Chen Gang <chengang@emindsoft.com.cn>
-References: <20200221034547.5215-1-chengang@emindsoft.com.cn>
- <a5533719-7ef1-938b-e52c-20711e65417f@redhat.com>
- <900fd511-72f0-675d-4a7e-d228b2ade9c7@emindsoft.com.cn>
- <d893eac5-0b7a-ddfe-2acf-a6f27ab48ccf@redhat.com>
- <f3bea474-468b-5818-9f69-5463be6d9b2a@emindsoft.com.cn>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2ab8ed82-dadd-2d5e-5bbc-69a67ba89e26@redhat.com>
-Date: Sat, 22 Feb 2020 08:37:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1j5Pex-00049M-F0; Sat, 22 Feb 2020 02:57:11 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 250A63F1B51777DBFC9D;
+ Sat, 22 Feb 2020 15:57:01 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server (TLS) id 14.3.439.0; Sat, 22 Feb
+ 2020 15:56:51 +0800
+Subject: Re: [PATCH 2/2] vhost-use-blk: convert to new virtio_delete_queue
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <20200213012807.45552-1-pannengyuan@huawei.com>
+ <20200213012807.45552-3-pannengyuan@huawei.com>
+ <20200221113118.GG1484511@stefanha-x1.localdomain>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <be4bd36a-9ada-bc66-007a-9583d5b04108@huawei.com>
+Date: Sat, 22 Feb 2020 15:56:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <f3bea474-468b-5818-9f69-5463be6d9b2a@emindsoft.com.cn>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200221113118.GG1484511@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,22 +68,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Chen Gang <gang.chen.5i5j@gmail.com>,
- ehabkost@redhat.com, rth@twiddle.net
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ mst@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/02/20 03:10, Chen Gang wrote:
-> Set C1 to 1 if stack overflow occurred; set to 0 otherwise".
+
+
+On 2/21/2020 7:31 PM, Stefan Hajnoczi wrote:
+> On Thu, Feb 13, 2020 at 09:28:07AM +0800, pannengyuan@huawei.com wrote:
+>> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+>> index 2eba8b9db0..ed6a5cc03b 100644
+>> --- a/hw/block/vhost-user-blk.c
+>> +++ b/hw/block/vhost-user-blk.c
+>> @@ -420,9 +420,10 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+>>      virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+>>                  sizeof(struct virtio_blk_config));
+>>  
+>> +    s->virtqs = g_new0(VirtQueue *, s->num_queues);
 > 
-> In helper_fxam_ST0, I guess, we need "env->fpus |= 0x200" (but I don't
-> know wheter it will be conflict with SIGND(temp)). And we have to still
-> need foverflow, because all env->fptags being 0 doesn't mean overflow.
+> Minor point, up to you if you want to change it: the array is fully
+> initialized by the for loop in the next line.  There is no need to clear
+> the memory first:
+> 
+> s/g_new0/g_new/
+OK, it's fine, I will change it.
 
-No, you need to add "env->fpus |= 0x200" and "env->fpus &= ~0x200"
-directly to fpush, fpop, etc.
+Thanks.
 
-Polo
+> 
+>> diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+>> index 108bfadeeb..f68911f6f0 100644
+>> --- a/include/hw/virtio/vhost-user-blk.h
+>> +++ b/include/hw/virtio/vhost-user-blk.h
+>> @@ -37,6 +37,7 @@ typedef struct VHostUserBlk {
+>>      struct vhost_inflight *inflight;
+>>      VhostUserState vhost_user;
+>>      struct vhost_virtqueue *vqs;
+>> +    VirtQueue **virtqs;
+> 
+> Both vqs and virtqs exist and are easily confused.  Please rename vqs to
+> vhost_vqs.
 
+OK, I will do it.
+
+Thanks.
+
+> 
 
