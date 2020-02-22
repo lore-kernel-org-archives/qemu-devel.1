@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37957C35672
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2E8C35669
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:12:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 002F02071E
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:10:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002F02071E
+	by mail.kernel.org (Postfix) with ESMTPS id A4D822071E
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:12:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D822071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5PrV-0008DB-5T
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:10:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57575)
+	id 1j5PtN-0002Km-Sg
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:12:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1j5Pjn-0002Cj-Ll
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:15 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1j5Pjm-0002Bf-Jt
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1j5Pji-000817-AV
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:11 -0500
-Received: from mga12.intel.com ([192.55.52.136]:36223)
+ (envelope-from <yi.l.liu@intel.com>) id 1j5Pji-00081x-UM
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:10 -0500
+Received: from mga17.intel.com ([192.55.52.151]:49242)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j5Pjh-0007tv-U2
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1j5Pji-0007zy-LK
  for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:02:06 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 22 Feb 2020 00:01:57 -0800
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Feb 2020 00:01:58 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,471,1574150400"; d="scan'208";a="240547656"
+X-IronPort-AV: E=Sophos;i="5.70,471,1574150400"; d="scan'208";a="240547695"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga006.jf.intel.com with ESMTP; 22 Feb 2020 00:01:56 -0800
+ by orsmga006.jf.intel.com with ESMTP; 22 Feb 2020 00:01:57 -0800
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org,
 	alex.williamson@redhat.com,
 	peterx@redhat.com
-Subject: [RFC v3.1 02/22] header file update VFIO/IOMMU vSVA APIs
-Date: Sat, 22 Feb 2020 00:07:03 -0800
-Message-Id: <1582358843-51931-3-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v3.1 15/22] intel_iommu: replay guest pasid bindings to host
+Date: Sat, 22 Feb 2020 00:07:16 -0800
+Message-Id: <1582358843-51931-16-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1582358843-51931-1-git-send-email-yi.l.liu@intel.com>
 References: <1582358843-51931-1-git-send-email-yi.l.liu@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.136
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,572 +66,280 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kevin.tian@intel.com, yi.l.liu@intel.com, Yi Sun <yi.y.sun@linux.intel.com>,
- kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
- Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- david@gibson.dropbear.id.au
+ Richard Henderson <rth@twiddle.net>, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kernel uapi/linux/iommu.h header file includes the
-extensions for vSVA support. e.g. bind gpasid, iommu
-fault report related user structures and etc.
+This patch adds guest pasid bindings replay for domain
+selective pasid cache invalidation(dsi) and global pasid
+cache invalidation by walking guest pasid table.
 
-Note: this should be replaced with a full header files update when
-the vSVA uPAPI is stable.
+Reason:
+Guest OS may flush the pasid cache with a larger granularity.
+e.g. guest does a svm_bind() but flush the pasid cache with
+global or domain selective pasid cache invalidation instead
+of pasid selective(psi) pasid cache invalidation. Regards to
+such case, it works in host. Per spec, a global or domain
+selective pasid cache invalidation should be able to cover
+what a pasid selective invalidation does. The only concern
+is performance deduction since dsi and global cache invalidation
+will flush more than psi. To align with native, vIOMMU needs
+emulator needs to do replay for the two invalidation granularity
+to reflect the latest pasid bindings in guest pasid table.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- linux-headers/linux/iommu.h | 372 ++++++++++++++++++++++++++++++++++++++++++++
- linux-headers/linux/vfio.h  | 127 +++++++++++++++
- 2 files changed, 499 insertions(+)
- create mode 100644 linux-headers/linux/iommu.h
+ hw/i386/intel_iommu.c          | 183 ++++++++++++++++++++++++++++++++++++++---
+ hw/i386/intel_iommu_internal.h |   1 +
+ 2 files changed, 173 insertions(+), 11 deletions(-)
 
-diff --git a/linux-headers/linux/iommu.h b/linux-headers/linux/iommu.h
-new file mode 100644
-index 0000000..04cc4b0
---- /dev/null
-+++ b/linux-headers/linux/iommu.h
-@@ -0,0 +1,372 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * IOMMU user API definitions
-+ */
-+
-+#ifndef _IOMMU_H
-+#define _IOMMU_H
-+
-+#include <linux/types.h>
-+
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 8bd27b1..e7c9677 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -68,6 +68,8 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s);
+ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n);
+ 
+ static void vtd_pasid_cache_reset(IntelIOMMUState *s);
++static int vtd_update_pe_cache_for_dev(IntelIOMMUState *s,
++              VTDBus *vtd_bus, int devfn, int pasid, VTDPASIDEntry *pe);
+ 
+ static void vtd_panic_require_caching_mode(void)
+ {
+@@ -2631,6 +2633,127 @@ remove:
+     return true;
+ }
+ 
 +/**
-+ * Current version of the IOMMU user API. This is intended for query
-+ * between user and kernel to determine compatible data structures.
-+ *
-+ * Having a single UAPI version to govern the user-kernel data structures
-+ * makes compatibility check straightforward. On the contrary, supporting
-+ * combinations of multiple versions of the data can be a nightmare.
-+ *
-+ * UAPI version can be bumped up with the following rules:
-+ * 1. All data structures passed between user and kernel space share
-+ *    the same version number. i.e. any extension to to any structure
-+ *    results in version bump up.
-+ *
-+ * 2. Data structures are open to extension but closed to modification.
-+ *    New fields must be added at the end of each data structure with
-+ *    64bit alignment. Flag bits can be added without size change but
-+ *    existing ones cannot be altered.
-+ *
-+ * 3. Versions are backward compatible.
-+ *
-+ * 4. Version to size lookup is supported by kernel internal API for each
-+ *    API function type. @version is mandatory for new data structures
-+ *    and must be at the beginning with type of __u32.
++ * Constant information used during pasid table walk
++   @vtd_bus, @devfn: device info
++ * @flags: indicates if it is domain selective walk
++ * @did: domain ID of the pasid table walk
 + */
-+#define IOMMU_UAPI_VERSION	1
-+static __inline__ int iommu_get_uapi_version(void)
++typedef struct {
++    VTDBus *vtd_bus;
++    uint16_t devfn;
++#define VTD_PASID_TABLE_DID_SEL_WALK   (1ULL << 0);
++    uint32_t flags;
++    uint16_t did;
++} vtd_pasid_table_walk_info;
++
++static bool vtd_sm_pasid_table_walk_one(IntelIOMMUState *s,
++                                       dma_addr_t pt_base,
++                                       int start,
++                                       int end,
++                                       vtd_pasid_table_walk_info *info)
 +{
-+	return IOMMU_UAPI_VERSION;
++    VTDPASIDEntry pe;
++    int pasid = start;
++    int pasid_next;
++
++    while (pasid < end) {
++        pasid_next = pasid + 1;
++
++        if (!vtd_get_pe_in_pasid_leaf_table(s, pasid, pt_base, &pe)
++            && vtd_pe_present(&pe)) {
++            if (vtd_update_pe_cache_for_dev(s, info->vtd_bus,
++                                      info->devfn, pasid, &pe)) {
++                error_report_once("%s, bus: %d, devfn: %d, pasid: %d",
++                                  __func__,
++                                  pci_bus_num(info->vtd_bus->bus),
++                                  info->devfn, pasid);
++                return false;
++            }
++        }
++        pasid = pasid_next;
++    }
++    return true;
 +}
 +
 +/*
-+ * Supported UAPI features that can be reported to user space.
-+ * These types represent the capability available in the kernel.
-+ *
-+ * REVISIT: UAPI version also implies the capabilities. Should we
-+ * report them explicitly?
++ * Currently, VT-d scalable mode pasid table is a two level table,
++ * this function aims to loop a range of PASIDs in a given pasid
++ * table to identify the pasid config in guest.
 + */
-+enum IOMMU_UAPI_DATA_TYPES {
-+	IOMMU_UAPI_BIND_GPASID,
-+	IOMMU_UAPI_CACHE_INVAL,
-+	IOMMU_UAPI_PAGE_RESP,
-+	NR_IOMMU_UAPI_TYPE,
-+};
++static void vtd_sm_pasid_table_walk(IntelIOMMUState *s,
++                                    dma_addr_t pdt_base,
++                                    int start,
++                                    int end,
++                                    vtd_pasid_table_walk_info *info)
++{
++    VTDPASIDDirEntry pdire;
++    int pasid = start;
++    int pasid_next;
++    dma_addr_t pt_base;
 +
-+#define IOMMU_UAPI_CAP_MASK ((1 << IOMMU_UAPI_BIND_GPASID) |	\
-+				(1 << IOMMU_UAPI_CACHE_INVAL) |	\
-+				(1 << IOMMU_UAPI_PAGE_RESP))
-+
-+#define IOMMU_FAULT_PERM_READ	(1 << 0) /* read */
-+#define IOMMU_FAULT_PERM_WRITE	(1 << 1) /* write */
-+#define IOMMU_FAULT_PERM_EXEC	(1 << 2) /* exec */
-+#define IOMMU_FAULT_PERM_PRIV	(1 << 3) /* privileged */
-+
-+/* Generic fault types, can be expanded IRQ remapping fault */
-+enum iommu_fault_type {
-+	IOMMU_FAULT_DMA_UNRECOV = 1,	/* unrecoverable fault */
-+	IOMMU_FAULT_PAGE_REQ,		/* page request fault */
-+};
-+
-+enum iommu_fault_reason {
-+	IOMMU_FAULT_REASON_UNKNOWN = 0,
-+
-+	/* Could not access the PASID table (fetch caused external abort) */
-+	IOMMU_FAULT_REASON_PASID_FETCH,
-+
-+	/* PASID entry is invalid or has configuration errors */
-+	IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
-+
-+	/*
-+	 * PASID is out of range (e.g. exceeds the maximum PASID
-+	 * supported by the IOMMU) or disabled.
-+	 */
-+	IOMMU_FAULT_REASON_PASID_INVALID,
-+
-+	/*
-+	 * An external abort occurred fetching (or updating) a translation
-+	 * table descriptor
-+	 */
-+	IOMMU_FAULT_REASON_WALK_EABT,
-+
-+	/*
-+	 * Could not access the page table entry (Bad address),
-+	 * actual translation fault
-+	 */
-+	IOMMU_FAULT_REASON_PTE_FETCH,
-+
-+	/* Protection flag check failed */
-+	IOMMU_FAULT_REASON_PERMISSION,
-+
-+	/* access flag check failed */
-+	IOMMU_FAULT_REASON_ACCESS,
-+
-+	/* Output address of a translation stage caused Address Size fault */
-+	IOMMU_FAULT_REASON_OOR_ADDRESS,
-+};
++    while (pasid < end) {
++        pasid_next = pasid + VTD_PASID_TBL_ENTRY_NUM;
++        if (!vtd_get_pdire_from_pdir_table(pdt_base, pasid, &pdire)
++            && vtd_pdire_present(&pdire)) {
++            pt_base = pdire.val & VTD_PASID_TABLE_BASE_ADDR_MASK;
++            if (!vtd_sm_pasid_table_walk_one(s,
++                              pt_base, pasid, pasid_next, info)) {
++                break;
++            }
++        }
++        pasid = pasid_next;
++    }
++}
 +
 +/**
-+ * struct iommu_fault_unrecoverable - Unrecoverable fault data
-+ * @reason: reason of the fault, from &enum iommu_fault_reason
-+ * @flags: parameters of this fault (IOMMU_FAULT_UNRECOV_* values)
-+ * @pasid: Process Address Space ID
-+ * @perm: requested permission access using by the incoming transaction
-+ *        (IOMMU_FAULT_PERM_* values)
-+ * @addr: offending page address
-+ * @fetch_addr: address that caused a fetch abort, if any
++ * This function replay the guest pasid bindings to hots by
++ * walking the guest PASID table. This ensures host will have
++ * latest guest pasid bindings.
 + */
-+struct iommu_fault_unrecoverable {
-+	__u32	reason;
-+#define IOMMU_FAULT_UNRECOV_PASID_VALID		(1 << 0)
-+#define IOMMU_FAULT_UNRECOV_ADDR_VALID		(1 << 1)
-+#define IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID	(1 << 2)
-+	__u32	flags;
-+	__u32	pasid;
-+	__u32	perm;
-+	__u64	addr;
-+	__u64	fetch_addr;
-+};
++static void vtd_replay_guest_pasid_bindings(IntelIOMMUState *s,
++                                            uint16_t *did,
++                                            bool is_dsi)
++{
++    VTDContextEntry ce;
++    VTDBus *vtd_bus;
++    int bus_n, devfn;
++    vtd_pasid_table_walk_info info;
 +
-+/**
-+ * struct iommu_fault_page_request - Page Request data
-+ * @flags: encodes whether the corresponding fields are valid and whether this
-+ *         is the last page in group (IOMMU_FAULT_PAGE_REQUEST_* values)
-+ * @pasid: Process Address Space ID
-+ * @grpid: Page Request Group Index
-+ * @perm: requested page permissions (IOMMU_FAULT_PERM_* values)
-+ * @addr: page address
-+ * @private_data: device-specific private information
-+ */
-+struct iommu_fault_page_request {
-+#define IOMMU_FAULT_PAGE_REQUEST_PASID_VALID	(1 << 0)
-+#define IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE	(1 << 1)
-+#define IOMMU_FAULT_PAGE_REQUEST_PRIV_DATA	(1 << 2)
-+	__u32	flags;
-+	__u32	pasid;
-+	__u32	grpid;
-+	__u32	perm;
-+	__u64	addr;
-+	__u64	private_data[2];
-+};
++    if (is_dsi) {
++        info.flags = VTD_PASID_TABLE_DID_SEL_WALK;
++        info.did = *did;
++    }
 +
-+/**
-+ * struct iommu_fault - Generic fault data
-+ * @type: fault type from &enum iommu_fault_type
-+ * @padding: reserved for future use (should be zero)
-+ * @event: fault event, when @type is %IOMMU_FAULT_DMA_UNRECOV
-+ * @prm: Page Request message, when @type is %IOMMU_FAULT_PAGE_REQ
-+ * @padding2: sets the fault size to allow for future extensions
-+ */
-+struct iommu_fault {
-+	__u32	type;
-+	__u32	padding;
-+	union {
-+		struct iommu_fault_unrecoverable event;
-+		struct iommu_fault_page_request prm;
-+		__u8 padding2[56];
-+	};
-+};
++    /*
++     * In this replay, only needs to care about the devices which
++     * has iommu_context created. For the one not have iommu_context,
++     * it is not necessary to replay the bindings since their cache
++     * could be re-created in the next DMA address transaltion.
++     */
++    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
++        vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
++        if (!vtd_bus) {
++            continue;
++        }
++        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
++            PCIDevice *dev;
 +
-+/**
-+ * enum iommu_page_response_code - Return status of fault handlers
-+ * @IOMMU_PAGE_RESP_SUCCESS: Fault has been handled and the page tables
-+ *	populated, retry the access. This is "Success" in PCI PRI.
-+ * @IOMMU_PAGE_RESP_FAILURE: General error. Drop all subsequent faults from
-+ *	this device if possible. This is "Response Failure" in PCI PRI.
-+ * @IOMMU_PAGE_RESP_INVALID: Could not handle this fault, don't retry the
-+ *	access. This is "Invalid Request" in PCI PRI.
-+ */
-+enum iommu_page_response_code {
-+	IOMMU_PAGE_RESP_SUCCESS = 0,
-+	IOMMU_PAGE_RESP_INVALID,
-+	IOMMU_PAGE_RESP_FAILURE,
-+};
++            dev = vtd_bus->bus->devices[devfn];
++            if (pci_device_host_iommu_context(dev) &&
++                !vtd_dev_to_context_entry(s, bus_n, devfn, &ce)) {
++                info.vtd_bus = vtd_bus;
++                info.devfn = devfn;
++                vtd_sm_pasid_table_walk(s,
++                                        VTD_CE_GET_PASID_DIR_TABLE(&ce),
++                                        0,
++                                        VTD_MAX_HPASID,
++                                        &info);
++            }
++        }
++    }
++}
 +
-+/**
-+ * struct iommu_page_response - Generic page response information
-+ * @version: IOMMU_UAPI_VERSION
-+ * @flags: encodes whether the corresponding fields are valid
-+ *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
-+ * @pasid: Process Address Space ID
-+ * @grpid: Page Request Group Index
-+ * @code: response code from &enum iommu_page_response_code
-+ */
-+struct iommu_page_response {
-+	__u32	version;
-+#define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
-+	__u32	flags;
-+	__u32	pasid;
-+	__u32	grpid;
-+	__u32	code;
-+};
-+
-+/* defines the granularity of the invalidation */
-+enum iommu_inv_granularity {
-+	IOMMU_INV_GRANU_DOMAIN,	/* domain-selective invalidation */
-+	IOMMU_INV_GRANU_PASID,	/* PASID-selective invalidation */
-+	IOMMU_INV_GRANU_ADDR,	/* page-selective invalidation */
-+	IOMMU_INV_GRANU_NR,	/* number of invalidation granularities */
-+};
-+
-+/**
-+ * struct iommu_inv_addr_info - Address Selective Invalidation Structure
-+ *
-+ * @flags: indicates the granularity of the address-selective invalidation
-+ * - If the PASID bit is set, the @pasid field is populated and the invalidation
-+ *   relates to cache entries tagged with this PASID and matching the address
-+ *   range.
-+ * - If ARCHID bit is set, @archid is populated and the invalidation relates
-+ *   to cache entries tagged with this architecture specific ID and matching
-+ *   the address range.
-+ * - Both PASID and ARCHID can be set as they may tag different caches.
-+ * - If neither PASID or ARCHID is set, global addr invalidation applies.
-+ * - The LEAF flag indicates whether only the leaf PTE caching needs to be
-+ *   invalidated and other paging structure caches can be preserved.
-+ * @pasid: process address space ID
-+ * @archid: architecture-specific ID
-+ * @addr: first stage/level input address
-+ * @granule_size: page/block size of the mapping in bytes
-+ * @nb_granules: number of contiguous granules to be invalidated
-+ */
-+struct iommu_inv_addr_info {
-+#define IOMMU_INV_ADDR_FLAGS_PASID	(1 << 0)
-+#define IOMMU_INV_ADDR_FLAGS_ARCHID	(1 << 1)
-+#define IOMMU_INV_ADDR_FLAGS_LEAF	(1 << 2)
-+	__u32	flags;
-+	__u32	archid;
-+	__u64	pasid;
-+	__u64	addr;
-+	__u64	granule_size;
-+	__u64	nb_granules;
-+};
-+
-+/**
-+ * struct iommu_inv_pasid_info - PASID Selective Invalidation Structure
-+ *
-+ * @flags: indicates the granularity of the PASID-selective invalidation
-+ * - If the PASID bit is set, the @pasid field is populated and the invalidation
-+ *   relates to cache entries tagged with this PASID and matching the address
-+ *   range.
-+ * - If the ARCHID bit is set, the @archid is populated and the invalidation
-+ *   relates to cache entries tagged with this architecture specific ID and
-+ *   matching the address range.
-+ * - Both PASID and ARCHID can be set as they may tag different caches.
-+ * - At least one of PASID or ARCHID must be set.
-+ * @pasid: process address space ID
-+ * @archid: architecture-specific ID
-+ */
-+struct iommu_inv_pasid_info {
-+#define IOMMU_INV_PASID_FLAGS_PASID	(1 << 0)
-+#define IOMMU_INV_PASID_FLAGS_ARCHID	(1 << 1)
-+	__u32	flags;
-+	__u32	archid;
-+	__u64	pasid;
-+};
-+
-+/**
-+ * struct iommu_cache_invalidate_info - First level/stage invalidation
-+ *     information
-+ * @version: IOMMU_UAPI_VERSION
-+ * @cache: bitfield that allows to select which caches to invalidate
-+ * @granularity: defines the lowest granularity used for the invalidation:
-+ *     domain > PASID > addr
-+ * @padding: reserved for future use (should be zero)
-+ * @pasid_info: invalidation data when @granularity is %IOMMU_INV_GRANU_PASID
-+ * @addr_info: invalidation data when @granularity is %IOMMU_INV_GRANU_ADDR
-+ *
-+ * Not all the combinations of cache/granularity are valid:
-+ *
-+ * +--------------+---------------+---------------+---------------+
-+ * | type /       |   DEV_IOTLB   |     IOTLB     |      PASID    |
-+ * | granularity  |               |               |      cache    |
-+ * +==============+===============+===============+===============+
-+ * | DOMAIN       |       N/A     |       Y       |       Y       |
-+ * +--------------+---------------+---------------+---------------+
-+ * | PASID        |       Y       |       Y       |       Y       |
-+ * +--------------+---------------+---------------+---------------+
-+ * | ADDR         |       Y       |       Y       |       N/A     |
-+ * +--------------+---------------+---------------+---------------+
-+ *
-+ * Invalidations by %IOMMU_INV_GRANU_DOMAIN don't take any argument other than
-+ * @version and @cache.
-+ *
-+ * If multiple cache types are invalidated simultaneously, they all
-+ * must support the used granularity.
-+ */
-+struct iommu_cache_invalidate_info {
-+	__u32	version;
-+/* IOMMU paging structure cache */
-+#define IOMMU_CACHE_INV_TYPE_IOTLB	(1 << 0) /* IOMMU IOTLB */
-+#define IOMMU_CACHE_INV_TYPE_DEV_IOTLB	(1 << 1) /* Device IOTLB */
-+#define IOMMU_CACHE_INV_TYPE_PASID	(1 << 2) /* PASID cache */
-+#define IOMMU_CACHE_INV_TYPE_NR		(3)
-+	__u8	cache;
-+	__u8	granularity;
-+	__u8	padding[2];
-+	union {
-+		struct iommu_inv_pasid_info pasid_info;
-+		struct iommu_inv_addr_info addr_info;
-+	};
-+};
-+
-+/**
-+ * struct iommu_gpasid_bind_data_vtd - Intel VT-d specific data on device and guest
-+ * SVA binding.
-+ *
-+ * @flags:	VT-d PASID table entry attributes
-+ * @pat:	Page attribute table data to compute effective memory type
-+ * @emt:	Extended memory type
-+ *
-+ * Only guest vIOMMU selectable and effective options are passed down to
-+ * the host IOMMU.
-+ */
-+struct iommu_gpasid_bind_data_vtd {
-+#define IOMMU_SVA_VTD_GPASID_SRE	(1 << 0) /* supervisor request */
-+#define IOMMU_SVA_VTD_GPASID_EAFE	(1 << 1) /* extended access enable */
-+#define IOMMU_SVA_VTD_GPASID_PCD	(1 << 2) /* page-level cache disable */
-+#define IOMMU_SVA_VTD_GPASID_PWT	(1 << 3) /* page-level write through */
-+#define IOMMU_SVA_VTD_GPASID_EMTE	(1 << 4) /* extended mem type enable */
-+#define IOMMU_SVA_VTD_GPASID_CD		(1 << 5) /* PASID-level cache disable */
-+	__u64 flags;
-+	__u32 pat;
-+	__u32 emt;
-+};
-+#define IOMMU_SVA_VTD_GPASID_EMT_MASK	(IOMMU_SVA_VTD_GPASID_CD | \
-+					 IOMMU_SVA_VTD_GPASID_EMTE | \
-+					 IOMMU_SVA_VTD_GPASID_PCD |  \
-+					 IOMMU_SVA_VTD_GPASID_PWT)
-+/**
-+ * struct iommu_gpasid_bind_data - Information about device and guest PASID binding
-+ * @version:	IOMMU_UAPI_VERSION
-+ * @format:	PASID table entry format
-+ * @flags:	Additional information on guest bind request
-+ * @gpgd:	Guest page directory base of the guest mm to bind
-+ * @hpasid:	Process address space ID used for the guest mm in host IOMMU
-+ * @gpasid:	Process address space ID used for the guest mm in guest IOMMU
-+ * @addr_width:	Guest virtual address width
-+ * @padding:	Reserved for future use (should be zero)
-+ * @vtd:	Intel VT-d specific data
-+ *
-+ * Guest to host PASID mapping can be an identity or non-identity, where guest
-+ * has its own PASID space. For non-identify mapping, guest to host PASID lookup
-+ * is needed when VM programs guest PASID into an assigned device. VMM may
-+ * trap such PASID programming then request host IOMMU driver to convert guest
-+ * PASID to host PASID based on this bind data.
-+ */
-+struct iommu_gpasid_bind_data {
-+	__u32 version;
-+#define IOMMU_PASID_FORMAT_INTEL_VTD	1
-+	__u32 format;
-+#define IOMMU_SVA_GPASID_VAL	(1 << 0) /* guest PASID valid */
-+	__u64 flags;
-+	__u64 gpgd;
-+	__u64 hpasid;
-+	__u64 gpasid;
-+	__u32 addr_width;
-+	__u8  padding[12];
-+	/* Vendor specific data */
-+	union {
-+		struct iommu_gpasid_bind_data_vtd vtd;
-+	};
-+};
-+
-+#endif /* _IOMMU_H */
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index fb10370..7f87ccd 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -14,6 +14,7 @@
+ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+ {
+     VTDPASIDCacheInfo pc_info;
+@@ -2649,13 +2772,14 @@ static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+     vtd_iommu_unlock(s);
  
- #include <linux/types.h>
- #include <linux/ioctl.h>
-+#include <linux/iommu.h>
+     /*
+-     * TODO: Domain selective PASID cache invalidation
+-     * flushes all the pasid caches within a domain. To
+-     * be safe, after invalidating the pasid caches, emulator
+-     * needs to replay the pasid bindings by walking guest
+-     * pasid dir and pasid table. e.g. When the guest setup a
+-     * new PASID entry then send a PASID DSI.
++     * Domain selective PASID cache invalidation flushes
++     * all the pasid caches within a domain. To be safe,
++     * after invalidating the pasid caches, emulator needs
++     * to replay the pasid bindings by walking guest pasid
++     * dir and pasid table. e.g. When the guest setup a new
++     * PASID entry then send a PASID DSI.
+      */
++    vtd_replay_guest_pasid_bindings(s, &domain_id, true);
+     return 0;
+ }
  
- #define VFIO_API_VERSION	0
- 
-@@ -47,6 +48,15 @@
- #define VFIO_NOIOMMU_IOMMU		8
- 
- /*
-+ * Hardware IOMMUs with two-stage translation capability give userspace
-+ * the ownership of stage-1 translation structures (e.g. page tables).
-+ * VFIO exposes the two-stage IOMMU programming capability to userspace
-+ * based on the IOMMU UAPIs. Therefore user of VFIO_TYPE1_NESTING should
-+ * check the IOMMU UAPI version compatibility.
-+ */
-+#define VFIO_NESTING_IOMMU_UAPI		9
-+
-+/*
-  * The IOCTL interface is designed for extensibility by embedding the
-  * structure length (argsz) and flags into structures passed between
-  * kernel and userspace.  We therefore use the _IO() macro for these
-@@ -748,6 +758,15 @@ struct vfio_iommu_type1_info_cap_iova_range {
- 	struct	vfio_iova_range iova_ranges[];
- };
- 
-+#define VFIO_IOMMU_TYPE1_INFO_CAP_NESTING  2
-+
-+struct vfio_iommu_type1_info_cap_nesting {
-+	struct	vfio_info_cap_header header;
-+#define VFIO_IOMMU_PASID_REQS	(1 << 0)
-+	__u32	nesting_capabilities;
-+	__u32	stage1_format;
-+};
-+
- #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+@@ -2723,6 +2847,42 @@ static inline void vtd_fill_in_pe_cache(
+ }
  
  /**
-@@ -794,6 +813,114 @@ struct vfio_iommu_type1_dma_unmap {
- #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
- #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
++ * This function updates the pasid entry cached in &vtd_pasid_as.
++ */
++static int vtd_update_pe_cache_for_dev(IntelIOMMUState *s,
++                                       VTDBus *vtd_bus,
++                                       int devfn, int pasid,
++                                       VTDPASIDEntry *pe)
++{
++    VTDPASIDAddressSpace *vtd_pasid_as;
++    VTDPASIDCacheEntry *pc_entry;
++    int ret;
++
++    vtd_iommu_lock(s);
++    vtd_pasid_as = vtd_add_find_pasid_as(s, vtd_bus,
++                                        devfn, pasid);
++    if (!vtd_pasid_as) {
++        error_report_once("%s, fatal error happened!\n", __func__);
++        ret = -1;
++        goto out;
++    }
++
++    pc_entry = &vtd_pasid_as->pasid_cache_entry;
++    if (pc_entry->pasid_cache_gen == s->pasid_cache_gen &&
++        vtd_pasid_entry_compare(pe, &pc_entry->pasid_entry)) {
++        /* No need to go further as cached pasid entry is latest */
++        ret = 0;
++        goto out;
++    }
++
++    vtd_fill_in_pe_cache(vtd_pasid_as, pe);
++    ret = 0;
++out:
++    vtd_iommu_unlock(s);
++    return ret;
++}
++
++/**
+  * Caller of this function should hold iommu_lock
+  */
+ static void vtd_new_pasid_bind_for_dev(IntelIOMMUState *s, VTDBus *vtd_bus,
+@@ -2869,12 +3029,13 @@ static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
+     vtd_iommu_unlock(s);
  
-+/*
-+ * PASID (Process Address Space ID) is a PCIe concept which
-+ * has been extended to support DMA isolation in fine-grain.
-+ * With device assigned to user space (e.g. VMs), PASID alloc
-+ * and free need to be system wide. This structure defines
-+ * the info for pasid alloc/free between user space and kernel
-+ * space.
-+ *
-+ * @flag=VFIO_IOMMU_PASID_ALLOC, refer to the @alloc_pasid
-+ * @flag=VFIO_IOMMU_PASID_FREE, refer to @free_pasid
-+ */
-+struct vfio_iommu_type1_pasid_request {
-+	__u32	argsz;
-+#define VFIO_IOMMU_PASID_ALLOC	(1 << 0)
-+#define VFIO_IOMMU_PASID_FREE	(1 << 1)
-+	__u32	flags;
-+	union {
-+		struct {
-+			__u32 min;
-+			__u32 max;
-+			__u32 result;
-+		} alloc_pasid;
-+		__u32 free_pasid;
-+	};
-+};
-+
-+#define VFIO_PASID_REQUEST_MASK	(VFIO_IOMMU_PASID_ALLOC | \
-+					 VFIO_IOMMU_PASID_FREE)
-+
-+/**
-+ * VFIO_IOMMU_PASID_REQUEST - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-+ *				struct vfio_iommu_type1_pasid_request)
-+ *
-+ * Availability of this feature depends on PASID support in the device,
-+ * its bus, the underlying IOMMU and the CPU architecture. In VFIO, it
-+ * is available after VFIO_SET_IOMMU.
-+ *
-+ * returns: 0 on success, -errno on failure.
-+ */
-+#define VFIO_IOMMU_PASID_REQUEST	_IO(VFIO_TYPE, VFIO_BASE + 22)
-+
-+/**
-+ * Supported flags:
-+ *	- VFIO_IOMMU_BIND_GUEST_PGTBL: bind guest page tables to host for
-+ *			nesting type IOMMUs. In @data field It takes struct
-+ *			iommu_gpasid_bind_data.
-+ *	- VFIO_IOMMU_UNBIND_GUEST_PGTBL: undo a bind guest page table operation
-+ *			invoked by VFIO_IOMMU_BIND_GUEST_PGTBL.
-+ *
-+ */
-+struct vfio_iommu_type1_bind {
-+	__u32		argsz;
-+	__u32		flags;
-+#define VFIO_IOMMU_BIND_GUEST_PGTBL	(1 << 0)
-+#define VFIO_IOMMU_UNBIND_GUEST_PGTBL	(1 << 1)
-+	__u8		data[];
-+};
-+
-+#define VFIO_IOMMU_BIND_MASK	(VFIO_IOMMU_BIND_GUEST_PGTBL | \
-+					VFIO_IOMMU_UNBIND_GUEST_PGTBL)
-+
-+/**
-+ * VFIO_IOMMU_BIND - _IOW(VFIO_TYPE, VFIO_BASE + 23,
-+ *				struct vfio_iommu_type1_bind)
-+ *
-+ * Manage address spaces of devices in this container. Initially a TYPE1
-+ * container can only have one address space, managed with
-+ * VFIO_IOMMU_MAP/UNMAP_DMA.
-+ *
-+ * An IOMMU of type VFIO_TYPE1_NESTING_IOMMU can be managed by both MAP/UNMAP
-+ * and BIND ioctls at the same time. MAP/UNMAP acts on the stage-2 (host) page
-+ * tables, and BIND manages the stage-1 (guest) page tables. Other types of
-+ * IOMMU may allow MAP/UNMAP and BIND to coexist, where MAP/UNMAP controls
-+ * the traffics only require single stage translation while BIND controls the
-+ * traffics require nesting translation. But this depends on the underlying
-+ * IOMMU architecture and isn't guaranteed. Example of this is the guest SVA
-+ * traffics, such traffics need nesting translation to gain gVA->gPA and then
-+ * gPA->hPA translation.
-+ *
-+ * Availability of this feature depends on the device, its bus, the underlying
-+ * IOMMU and the CPU architecture.
-+ *
-+ * returns: 0 on success, -errno on failure.
-+ */
-+#define VFIO_IOMMU_BIND		_IO(VFIO_TYPE, VFIO_BASE + 23)
-+
-+/**
-+ * VFIO_IOMMU_CACHE_INVALIDATE - _IOW(VFIO_TYPE, VFIO_BASE + 24,
-+ *			struct vfio_iommu_type1_cache_invalidate)
-+ *
-+ * Propagate guest IOMMU cache invalidation to the host. The cache
-+ * invalidation information is conveyed by @cache_info, the content
-+ * format would be structures defined in uapi/linux/iommu.h. User
-+ * should be aware of that the struct  iommu_cache_invalidate_info
-+ * has a @version field, vfio needs to parse this field before getting
-+ * data from userspace.
-+ *
-+ * Availability of this IOCTL is after VFIO_SET_IOMMU.
-+ *
-+ * returns: 0 on success, -errno on failure.
-+ */
-+struct vfio_iommu_type1_cache_invalidate {
-+	__u32   argsz;
-+	__u32   flags;
-+	struct	iommu_cache_invalidate_info cache_info;
-+};
-+#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
-+
- /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+     /*
+-     * TODO: Global PASID cache invalidation may be
+-     * flushes all the pasid caches. To be safe, after
+-     * invalidating the pasid caches, emulator needs
+-     * to replay the pasid bindings by walking guest
+-     * pasid dir and pasid table.
++     * Global PASID cache invalidation flushes all
++     * the pasid caches. To be safe, after invalidating
++     * the pasid caches, emulator needs to replay the
++     * pasid bindings by walking guest pasid dir and
++     * pasid table.
+      */
++    vtd_replay_guest_pasid_bindings(s, NULL, false);
+     return 0;
+ }
  
- /*
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 9ee5856..46cec5c 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -554,6 +554,7 @@ typedef struct VTDPASIDCacheInfo VTDPASIDCacheInfo;
+ #define VTD_PASID_TABLE_BITS_MASK     (0x3fULL)
+ #define VTD_PASID_TABLE_INDEX(pasid)  ((pasid) & VTD_PASID_TABLE_BITS_MASK)
+ #define VTD_PASID_ENTRY_FPD           (1ULL << 1) /* Fault Processing Disable */
++#define VTD_PASID_TBL_ENTRY_NUM       (1ULL << 6)
+ 
+ /* PASID Granular Translation Type Mask */
+ #define VTD_PASID_ENTRY_P              1ULL
 -- 
 2.7.4
 
