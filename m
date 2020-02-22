@@ -2,84 +2,74 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1AAC35669
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 03:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25458C35669
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 04:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FB552071E
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 03:57:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELSTn8nf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB552071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBCA420707
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 04:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBCA420707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5Lug-0003EC-AA
-	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 22:57:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54038)
+	id 1j5MNI-0007YP-4o
+	for qemu-devel@archiver.kernel.org; Fri, 21 Feb 2020 23:26:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56803)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j5Lu1-0002So-Hw
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 22:56:30 -0500
+ (envelope-from <bounces@canonical.com>) id 1j5MMT-0006kX-Pi
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 23:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j5Lu0-0004IB-56
- for qemu-devel@nongnu.org; Fri, 21 Feb 2020 22:56:29 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:33585)
+ (envelope-from <bounces@canonical.com>) id 1j5MMQ-0005MA-6v
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 23:25:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40668)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j5Ltz-0004Gr-B9; Fri, 21 Feb 2020 22:56:28 -0500
-Received: by mail-lf1-x143.google.com with SMTP id n25so2978305lfl.0;
- Fri, 21 Feb 2020 19:56:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=woi3ySoOv+ecVjiWFyYVse2ocLaVQusf6u61ghetHjk=;
- b=ELSTn8nfG/aP3692/2BXMX9wqhcgumN43JxMaAkwCa1Fy0dLq7J6M16ZbxoPoZtXWe
- zdZyDmJSTx+cg7ZHxy22/qOz3Ju5y/O/QKGLTIjUykx/+syUd1zcLkdQiDlGjg+3Zrlw
- XI5w06CQm8lxqOPvuH9zApeZ/N8JUVuqWjD8eyMFf5XcWwhxaWeof/8sroNbxbrwZHBh
- GaX+AJKvzDWr1J16sFsVQAZB6g2eVzqswNatm3eZIhmgpoKXWdvRdbHSW+Uj2/sudQMe
- zOSz9zEcEVHxE+nl7Y2iYT8kLGtRxWS1UBucifGkPl2EBV6tTZmmqPs8+hQ+QDHT6BmP
- l+AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=woi3ySoOv+ecVjiWFyYVse2ocLaVQusf6u61ghetHjk=;
- b=YBDU9lrcXpsuI9UQfkv4avqRWR26pK6gBU6alrDt+OroCkwnwuvVbq0qvTP8qzD/Zx
- ewAQeSfFRRgXX2XV14AvOsiPizbn93YBBLPR0ZWbPzY8eWCpxRsK08pyFbvd03UHmXuG
- qdQX2nZZ1HAEoCcCTlhD/829WTWHksuXLmHq9M+5oT2JMBB91GAUFfsTl9bsu89V/10D
- tFW/wuUWeaT76dV/qfw4B5wJcKRsBV3RO3qDXCqnNJKuliFV9trVpbSM3t5vdEfuxZow
- LE5Y7iJFWqHMwOssZQo/SeTchPDUFZLrpMKorgoOADdTpOXwmrWmbsrzsANSWqDF9DFp
- RqpA==
-X-Gm-Message-State: APjAAAWtt0eWxOkR+A/aCK9isYSIoo6Fcdw3/p6AY7C4PJx+UvvkBPA+
- gfgI6hDpgGwkjxsFF0TGmNuys+UmBzopKk2vCkI=
-X-Google-Smtp-Source: APXvYqxeM44GttoGQF3eaDfLd9JU5I6BO3+C/3AVsAhwlU+sT8EDAljt5SHURF8HNAaMNsdBYK4R1NIHC3+kskSMV6Y=
-X-Received: by 2002:a19:5057:: with SMTP id z23mr21917399lfj.132.1582343785797; 
- Fri, 21 Feb 2020 19:56:25 -0800 (PST)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j5MMP-0005Lg-Fn
+ for qemu-devel@nongnu.org; Fri, 21 Feb 2020 23:25:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j5MMM-0005Eo-TU
+ for <qemu-devel@nongnu.org>; Sat, 22 Feb 2020 04:25:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C9F3D2E80D3
+ for <qemu-devel@nongnu.org>; Sat, 22 Feb 2020 04:25:46 +0000 (UTC)
 MIME-Version: 1.0
-References: <1582209758-2996-1-git-send-email-bmeng.cn@gmail.com>
- <1582209758-2996-2-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKOHyix_J-T=sFdwX=jTnxG8TO0r6i6edFixVdMZjZy7yQ@mail.gmail.com>
- <CAEUhbmUJ9gvX0paRF8o5PY_DWvT=16sVmrrnota+PqqEJHV2dg@mail.gmail.com>
-In-Reply-To: <CAEUhbmUJ9gvX0paRF8o5PY_DWvT=16sVmrrnota+PqqEJHV2dg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 21 Feb 2020 19:55:59 -0800
-Message-ID: <CAKmqyKOHprQ2_1DzKiSR7iCnZMy7hUBWZ9H2fsRo-wQ6hkiJRw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] riscv: sifive_u: Update BIOS_FILENAME for 32-bit
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 22 Feb 2020 04:17:23 -0000
+From: Launchpad Bug Tracker <1719282@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: drive-mirror
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: farid67z janitor jnsnow
+X-Launchpad-Bug-Reporter: Farid Zarazvand (farid67z)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <150633291490.21822.10650098875082014124.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158234504399.8772.16879367956995903567.malone@loganberry.canonical.com>
+Subject: [Bug 1719282] Re: Unable to boot after drive-mirror
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b08fa42b1f5c55e6ac06352a6bec81f8f1fbc2d8
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,41 +78,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Reply-To: Bug 1719282 <1719282@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 21, 2020 at 6:53 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> On Sat, Feb 22, 2020 at 3:51 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Thu, Feb 20, 2020 at 6:43 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > Update BIOS_FILENAME to consider 32-bit bios image file name.
-> > >
-> > > Tested booting Linux v5.5 32-bit image (built from rv32_defconfig
-> > > plus CONFIG_SOC_SIFIVE) with the default 32-bit bios image.
-> >
-> > Do we really want to support a 32-bit sifive_u machine?
-> >
->
-> QEMU is an emulator, why not? With 32-bit sifive_u machine, we can
-> have 32-bit test coverage for SiFive specific drivers that cannot be
-> done with the 'virt' machine.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-That is a good point.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+-- =
 
-Alistair
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1719282
 
->
-> Regards,
-> Bin
+Title:
+  Unable to boot after drive-mirror
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Hi,
+  I am using "drive-mirror" qmp block-job command to transfer VM disk image=
+ to other path (different physical disk on host).
+  Unfortunately after shutting down and starting from new image, VM is unab=
+le to boot and qrub enters rescue mode displaying following error:
+  ```
+  error: file '/grub/i386-pc/normal.mod' not found.
+  Entering rescue mode...
+  grub rescue>
+  ```
+
+  To investigate the problem, I compared both RAW images using linux
+  "cmp -l" command and found out that they differ in 569028 bytes
+  starting from address 185598977 to 252708864 which are located on
+  /boot partition.
+
+  So I mounted /boot partition of mirrored RAW image on host OS and it
+  seems that file-system is broken and grub folder is not recognized.
+  But /boot on original RAW image has no problem.
+
+  Mirrored Image:
+  ls -l /mnt/vm-boot/
+  ls: cannot access /mnt/vm-boot/grub: Structure needs cleaning
+  total 38168
+  -rw-r--r-- 1 root root   157721 Oct 19  2016 config-3.16.0-4-amd64
+  -rw-r--r-- 1 root root   129281 Sep 20  2015 config-3.2.0-4-amd64
+  d????????? ? ?    ?           ?            ? grub
+  -rw-r--r-- 1 root root 15739360 Nov  2  2016 initrd.img-3.16.0-4-amd64
+  -rw-r--r-- 1 root root 12115412 Oct 10  2015 initrd.img-3.2.0-4-amd64
+  drwxr-xr-x 2 root root    12288 Oct  7  2013 lost+found
+  -rw-r--r-- 1 root root  2679264 Oct 19  2016 System.map-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2114662 Sep 20  2015 System.map-3.2.0-4-amd64
+  -rw-r--r-- 1 root root  3126448 Oct 19  2016 vmlinuz-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2842592 Sep 20  2015 vmlinuz-3.2.0-4-amd64
+
+  Original Image:
+  ls /mnt/vm-boot/ -l
+  total 38173
+  -rw-r--r-- 1 root root   157721 Oct 19  2016 config-3.16.0-4-amd64
+  -rw-r--r-- 1 root root   129281 Sep 20  2015 config-3.2.0-4-amd64
+  drwxr-xr-x 5 root root     5120 Nov  2  2016 grub
+  -rw-r--r-- 1 root root 15739360 Nov  2  2016 initrd.img-3.16.0-4-amd64
+  -rw-r--r-- 1 root root 12115412 Oct 10  2015 initrd.img-3.2.0-4-amd64
+  drwxr-xr-x 2 root root    12288 Oct  7  2013 lost+found
+  -rw-r--r-- 1 root root  2679264 Oct 19  2016 System.map-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2114662 Sep 20  2015 System.map-3.2.0-4-amd64
+  -rw-r--r-- 1 root root  3126448 Oct 19  2016 vmlinuz-3.16.0-4-amd64
+  -rw-r--r-- 1 root root  2842592 Sep 20  2015 vmlinuz-3.2.0-4-amd64
+
+  ls /mnt/vm-boot/grub/ -l
+  total 2376
+  -rw-r--r-- 1 root root      48 Oct  7  2013 device.map
+  drwxr-xr-x 2 root root    1024 Oct 10  2015 fonts
+  -r--r--r-- 1 root root    9432 Nov  2  2016 grub.cfg
+  -rw-r--r-- 1 root root    1024 Oct  7  2013 grubenv
+  drwxr-xr-x 2 root root    6144 Aug  6  2016 i386-pc
+  drwxr-xr-x 2 root root    1024 Aug  6  2016 locale
+  -rw-r--r-- 1 root root 2400500 Aug  6  2016 unicode.pf2
+
+  qemu Version: 2.7.0-10
+
+  Host OS: Debian 8x64
+  Guest OS: Debian 8x64
+
+  QMP Commands log:
+  socat UNIX-CONNECT:/var/run/qemu-server/48016.qmp STDIO
+  {"QMP": {"version": {"qemu": {"micro": 0, "minor": 7, "major": 2}, "packa=
+ge": "pve-qemu-kvm_2.7.0-10"}, "capabilities": []}}
+  { "execute": "qmp_capabilities" }
+  {"return": {}}
+  { "execute": "drive-mirror",
+    "arguments": {
+      "device": "drive-ide0",
+      "target": "/diskc/48016/vm-48016-disk-2.raw",
+      "sync": "full",
+      "mode": "absolute-paths",
+      "speed": 0
+    }
+  }
+  {"return": {}}
+  {"timestamp": {"seconds": 1506331591, "microseconds": 623095}, "event": "=
+BLOCK_JOB_READY", "data": {"device": "drive-ide0", "len": 269445758976, "of=
+fset": 269445758976, "speed": 0, "type": "mirror"}}
+  {"timestamp": {"seconds": 1506332641, "microseconds": 245272}, "event": "=
+SHUTDOWN"}
+  {"timestamp": {"seconds": 1506332641, "microseconds": 377751}, "event": "=
+BLOCK_JOB_COMPLETED", "data": {"device": "drive-ide0", "len": 271707340800,=
+ "offset": 271707340800, "speed": 0, "type": "mirror"}}
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1719282/+subscriptions
 
