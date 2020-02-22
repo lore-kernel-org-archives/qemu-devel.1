@@ -2,88 +2,75 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2BBC35669
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8D8C35671
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 579CF20707
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B63DE2071E
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 08:52:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ibknjp5y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 579CF20707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7Mgt+tS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B63DE2071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5Q5k-0000Vn-K1
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:24:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33161)
+	id 1j5QW5-0005zv-75
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 03:52:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j5Q58-0008Qs-Cb
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:24:16 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j5QUx-0004Q4-Us
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:50:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j5Q56-00050d-Hp
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:24:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60354
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1j5QUw-0007kO-Di
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:50:55 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24133
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j5Q56-00050E-ED
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:24:12 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j5QUw-0007k4-AC
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 03:50:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582359851;
+ s=mimecast20190719; t=1582361452;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T45vrP9XIhTb9vS7RjFPPl1JpkYIOutb0fUu3RFTTrw=;
- b=Ibknjp5yCD9t8t8M1bLmQSxRwMfGL24Jt/+owGZ9h5EqoQ24qkat4Tr6Rwln85defxydlu
- ffKxfpWGYsQ6H0UTCWxUjW5DqwfcGv5Khgun91oUtol/h82gp9FTvZvjEHzEvN0UWOJONJ
- IftnMcfhyMG6bv0kjqgqkg2xesXmQ40=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fARLk3pu2DSnJAnCHt1jugBZuUOLzP2jVGEZqlMBb98=;
+ b=L7Mgt+tS5tOUV1m8d+NFK1DvltE197a/Ey7tGuT14ZpiLH2DafnA101U9G2wJqmiC7/BIT
+ WNufWo8AEPY9syyJif3QGSTu3OWd0RE3GoHb5ra0sBdcrE387e4BaTMpEWSIUZVUl4uUhc
+ PBtbhS+ZDmWMMK8mLj8RH9voEExz8C4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-52XP2uA5M1qKR3W2VghM7A-1; Sat, 22 Feb 2020 03:24:09 -0500
-X-MC-Unique: 52XP2uA5M1qKR3W2VghM7A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-438-g73NzqecPTypeDJ0hPAGbg-1; Sat, 22 Feb 2020 03:50:45 -0500
+X-MC-Unique: g73NzqecPTypeDJ0hPAGbg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A4C189F760;
- Sat, 22 Feb 2020 08:24:07 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F176391;
- Sat, 22 Feb 2020 08:24:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A616511386A6; Sat, 22 Feb 2020 09:23:59 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v7 01/11] qapi/error: add (Error **errp) cleaning APIs
-References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
- <20200131130118.1716-2-vsementsov@virtuozzo.com>
- <87d0a88k6d.fsf@dusky.pond.sub.org>
- <7856fcbb-8c01-aba3-a11b-63058c117362@virtuozzo.com>
- <875zfz6gsh.fsf@dusky.pond.sub.org>
- <064ca8e9-458e-c780-92a0-05f40cf0975b@virtuozzo.com>
-Date: Sat, 22 Feb 2020 09:23:59 +0100
-In-Reply-To: <064ca8e9-458e-c780-92a0-05f40cf0975b@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Fri, 21 Feb 2020 20:31:55 +0300")
-Message-ID: <87sgj31140.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 288A6800D50;
+ Sat, 22 Feb 2020 08:50:44 +0000 (UTC)
+Received: from localhost (ovpn-116-74.ams2.redhat.com [10.36.116.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4E07F5C105;
+ Sat, 22 Feb 2020 08:50:31 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/31] Block patches
+Date: Sat, 22 Feb 2020 08:49:59 +0000
+Message-Id: <20200222085030.1760640-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,187 +82,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
- Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> 21.02.2020 19:34, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>
->>> 21.02.2020 10:38, Markus Armbruster wrote:
->>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>>
->>>>> Add functions to clean Error **errp: call corresponding Error *err
->>>>> cleaning function an set pointer to NULL.
->>>>>
->>>>> New functions:
->>>>>     error_free_errp
->>>>>     error_report_errp
->>>>>     warn_report_errp
->>>>>
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
->>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>>> ---
->>>>>
->>>>> CC: Eric Blake <eblake@redhat.com>
->>>>> CC: Kevin Wolf <kwolf@redhat.com>
->>>>> CC: Max Reitz <mreitz@redhat.com>
->>>>> CC: Greg Kurz <groug@kaod.org>
->>>>> CC: Stefano Stabellini <sstabellini@kernel.org>
->>>>> CC: Anthony Perard <anthony.perard@citrix.com>
->>>>> CC: Paul Durrant <paul@xen.org>
->>>>> CC: Stefan Hajnoczi <stefanha@redhat.com>
->>>>> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->>>>> CC: Laszlo Ersek <lersek@redhat.com>
->>>>> CC: Gerd Hoffmann <kraxel@redhat.com>
->>>>> CC: Stefan Berger <stefanb@linux.ibm.com>
->>>>> CC: Markus Armbruster <armbru@redhat.com>
->>>>> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>> CC: qemu-block@nongnu.org
->>>>> CC: xen-devel@lists.xenproject.org
->>>>>
->>>>>    include/qapi/error.h | 26 ++++++++++++++++++++++++++
->>>>>    1 file changed, 26 insertions(+)
->>>>>
->>>>> diff --git a/include/qapi/error.h b/include/qapi/error.h
->>>>> index ad5b6e896d..d34987148d 100644
->>>>> --- a/include/qapi/error.h
->>>>> +++ b/include/qapi/error.h
->>>>> @@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fm=
-t, ...)
->>>>>    void error_reportf_err(Error *err, const char *fmt, ...)
->>>>>        GCC_FMT_ATTR(2, 3);
->>>>>    +/*
->>>>> + * Functions to clean Error **errp: call corresponding Error *err cl=
-eaning
->>>>> + * function, then set pointer to NULL.
->>>>> + */
->>>>> +static inline void error_free_errp(Error **errp)
->>>>> +{
->>>>> +    assert(errp && *errp);
->>>>> +    error_free(*errp);
->>>>> +    *errp =3D NULL;
->>>>> +}
->>>>> +
->>>>> +static inline void error_report_errp(Error **errp)
->>>>> +{
->>>>> +    assert(errp && *errp);
->>>>> +    error_report_err(*errp);
->>>>> +    *errp =3D NULL;
->>>>> +}
->>>>> +
->>>>> +static inline void warn_report_errp(Error **errp)
->>>>> +{
->>>>> +    assert(errp && *errp);
->>>>> +    warn_report_err(*errp);
->>>>> +    *errp =3D NULL;
->>>>> +}
->>>>> +
->>>>> +
->>>>>    /*
->>>>>     * Just like error_setg(), except you get to specify the error cla=
-ss.
->>>>>     * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR=
- is
->>>>
->>>> These appear to be unused apart from the Coccinelle script in PATCH 03=
-.
->>>>
->>>> They are used in the full "[RFC v5 000/126] error: auto propagated
->>>> local_err" series.  Options:
->>>>
->>>> 1. Pick a few more patches into this part I series, so these guys come
->>>>      with users.
->>>
->>> It needs some additional effort for this series.. But it's possible. St=
-ill,
->>> I think that we at least should not pull out patches which should be in
->>> future series (for example from ppc or block/)..
->>
->> Yes, we want to keep related stuff together.
->>
->>> Grepping through v5:
->>>   for x in {warn_report_errp,error_report_errp,error_free_errp}; do ech=
-o =3D=3D $x =3D=3D; git grep -l $x | grep -v coccinelle | grep -v 'error\.h=
-'; echo; done
->>> =3D=3D warn_report_errp =3D=3D
->>> block/file-posix.c
->>> hw/ppc/spapr.c
->>> hw/ppc/spapr_caps.c
->>> hw/ppc/spapr_irq.c
->>> hw/vfio/pci.c
->>> net/tap.c
->>> qom/object.c
->>>
->>> =3D=3D error_report_errp =3D=3D
->>> hw/block/vhost-user-blk.c
->>> util/oslib-posix.c
->>>
->>> =3D=3D error_free_errp =3D=3D
->>> block.c
->>> block/qapi.c
->>> block/sheepdog.c
->>> block/snapshot.c
->>> blockdev.c
->>> chardev/char-socket.c
->>> hw/audio/intel-hda.c
->>> hw/core/qdev-properties.c
->>> hw/pci-bridge/pci_bridge_dev.c
->>> hw/pci-bridge/pcie_pci_bridge.c
->>> hw/scsi/megasas.c
->>> hw/scsi/mptsas.c
->>> hw/usb/hcd-xhci.c
->>> io/net-listener.c
->>> migration/colo.c
->>> qga/commands-posix.c
->>> qga/commands-win32.c
->>> util/qemu-sockets.c
->>>
->>> What do you want to add?
->>
->> PATCH v5 032 uses both error_report_errp() and error_free_errp().
->> Adding warn_report_errp() without a user is okay with me.  What do you
->> think?
->>
->> If there are patches you consider related to 032, feel free to throw
->> them in.
->
-> 032 is qga/commands-win32.c and util/oslib-posix.c
->
-> Seems that they are wrongly grouped into one patch.
->
-> qga/commands-win32.c matches qga/ (Michael Roth)
-> and  util/oslib-posix.c matches POSIX (Paolo Bonzini)
->
-> So, it should be two separate patches anyway.
->
-> For [1.] I only afraid that we'll have to wait for maintainers, who were
-> not interested in previous iterations, to review these new patches..
-
-We won't.
-
-We should and we will give every maintainer a chance to review these
-patches, even though the changes are mechanical.  Maintainers are free
-to decline or ignore this offer.  I will feel free to interpret that as
-"go ahead and merge this through your tree".
-
-In fact, I fully expect the bulk of the changes to go through my tree.
-Chasing umpteen maintainers for each one to merge a trivial part of this
-massive tree-wide change would take ages and accomplish nothing.
-
-[...]
+VGhlIGZvbGxvd2luZyBjaGFuZ2VzIHNpbmNlIGNvbW1pdCA5YWM1ZGYyMGY1MWZhYmNiYTBkOTAy
+MDI1ZGY0YmQ3ZWE5ODdjMTU4OgoKICBNZXJnZSByZW1vdGUtdHJhY2tpbmcgYnJhbmNoICdyZW1v
+dGVzL3BtYXlkZWxsL3RhZ3MvcHVsbC10YXJnZXQtYXJtLTIwMjAwMjIxLTEnIGludG8gc3RhZ2lu
+ZyAoMjAyMC0wMi0yMSAxNjoxODozOCArMDAwMCkKCmFyZSBhdmFpbGFibGUgaW4gdGhlIEdpdCBy
+ZXBvc2l0b3J5IGF0OgoKICBodHRwczovL2dpdGh1Yi5jb20vc3RlZmFuaGEvcWVtdS5naXQgdGFn
+cy9ibG9jay1wdWxsLXJlcXVlc3QKCmZvciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0byBlNWM1
+OTM1NWFlOWY3MjQ3NzdjNjFjODU5MjkyZWM5ZGIyYzhjMmFiOgoKICBmdXp6OiBhZGQgZG9jdW1l
+bnRhdGlvbiB0byBkb2NzL2RldmVsLyAoMjAyMC0wMi0yMiAwODoyNjo0OCArMDAwMCkKCi0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0KUHVsbCByZXF1ZXN0CgpUaGlzIHB1bGwgcmVxdWVzdCBjb250YWlucyBhIHZpcnRpby1ibGsv
+c2NzaSBwZXJmb3JtYW5jZSBvcHRpbWl6YXRpb24sIGV2ZW50Cmxvb3Agc2NhbGFiaWxpdHkgaW1w
+cm92ZW1lbnRzLCBhbmQgYSBxdGVzdC1iYXNlZCBkZXZpY2UgZnV6emluZyBmcmFtZXdvcmsuICBJ
+CmFtIGluY2x1ZGluZyB0aGUgZnV6emluZyBwYXRjaGVzIGJlY2F1c2UgSSBoYXZlIHJldmlld2Vk
+IHRoZW0gYW5kIFRob21hcyBIdXRoCmlzIGN1cnJlbnRseSBhd2F5IG9uIGxlYXZlLgoKLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQoKQWxleGFuZGVyIEJ1bGVrb3YgKDIyKToKICBzb2Z0bW11OiBtb3ZlIHZsLmMgdG8gc29mdG1t
+dS8KICBzb2Z0bW11OiBzcGxpdCBvZmYgdmwuYzptYWluKCkgaW50byBtYWluLmMKICBtb2R1bGU6
+IGNoZWNrIG1vZHVsZSB3YXNuJ3QgYWxyZWFkeSBpbml0aWFsaXplZAogIGZ1eno6IGFkZCBGVVpa
+X1RBUkdFVCBtb2R1bGUgdHlwZQogIHF0ZXN0OiBhZGQgcXRlc3Rfc2VydmVyX3NlbmQgYWJzdHJh
+Y3Rpb24KICBsaWJxdGVzdDogYWRkIGEgbGF5ZXIgb2YgYWJzdHJhY3Rpb24gdG8gc2VuZC9yZWN2
+CiAgbGlicXRlc3Q6IG1ha2UgYnVmd3JpdGUgcmVseSBvbiB0aGUgVHJhbnNwb3J0T3BzCiAgcXRl
+c3Q6IGFkZCBpbi1wcm9jZXNzIGluY29taW5nIGNvbW1hbmQgaGFuZGxlcgogIGxpYnFvczogcmVu
+YW1lIGkyY19zZW5kIGFuZCBpMmNfcmVjdgogIGxpYnFvczogc3BsaXQgcW9zLXRlc3QgYW5kIGxp
+YnFvcyBtYWtlZmlsZSB2YXJzCiAgbGlicW9zOiBtb3ZlIHVzZWZ1bCBxb3MtdGVzdCBmdW5jcyB0
+byBxb3NfZXh0ZXJuYWwKICBmdXp6OiBhZGQgZnV6emVyIHNrZWxldG9uCiAgZXhlYzoga2VlcCBy
+YW0gYmxvY2sgYWNyb3NzIGZvcmsgd2hlbiB1c2luZyBxdGVzdAogIG1haW46IGtlZXAgcmN1X2F0
+Zm9yayBjYWxsYmFjayBlbmFibGVkIGZvciBxdGVzdAogIGZ1eno6IHN1cHBvcnQgZm9yIGZvcmst
+YmFzZWQgZnV6emluZy4KICBmdXp6OiBhZGQgc3VwcG9ydCBmb3IgcW9zLWFzc2lzdGVkIGZ1enog
+dGFyZ2V0cwogIGZ1eno6IGFkZCB0YXJnZXQvZnV6eiBtYWtlZmlsZSBydWxlcwogIGZ1eno6IGFk
+ZCBjb25maWd1cmUgZmxhZyAtLWVuYWJsZS1mdXp6aW5nCiAgZnV6ejogYWRkIGk0NDBmeCBmdXp6
+IHRhcmdldHMKICBmdXp6OiBhZGQgdmlydGlvLW5ldCBmdXp6IHRhcmdldAogIGZ1eno6IGFkZCB2
+aXJ0aW8tc2NzaSBmdXp6IHRhcmdldAogIGZ1eno6IGFkZCBkb2N1bWVudGF0aW9uIHRvIGRvY3Mv
+ZGV2ZWwvCgpEZW5pcyBQbG90bmlrb3YgKDEpOgogIHZpcnRpbzogaW5jcmVhc2UgdmlydHF1ZXVl
+IHNpemUgZm9yIHZpcnRpby1zY3NpIGFuZCB2aXJ0aW8tYmxrCgpQYW9sbyBCb256aW5pICgxKToK
+ICByY3VfcXVldWU6IGFkZCBRU0xJU1QgZnVuY3Rpb25zCgpTdGVmYW4gSGFqbm9jemkgKDcpOgog
+IGFpby1wb3NpeDogYXZvaWQgcmVhY3F1aXJpbmcgcmN1X3JlYWRfbG9jaygpIHdoZW4gcG9sbGlu
+ZwogIHV0aWwvYXN5bmM6IG1ha2UgYmhfYWlvX3BvbGwoKSBPKDEpCiAgYWlvLXBvc2l4OiBmaXgg
+dXNlIGFmdGVyIGxlYXZpbmcgc2NvcGUgaW4gYWlvX3BvbGwoKQogIGFpby1wb3NpeDogZG9uJ3Qg
+cGFzcyBucyB0aW1lb3V0IHRvIGVwb2xsX3dhaXQoKQogIHFlbXUvcXVldWUuaDogYWRkIFFMSVNU
+X1NBRkVfUkVNT1ZFKCkKICBhaW8tcG9zaXg6IG1ha2UgQWlvSGFuZGxlciBkZWxldGlvbiBPKDEp
+CiAgYWlvLXBvc2l4OiBtYWtlIEFpb0hhbmRsZXIgZGlzcGF0Y2ggTygxKSB3aXRoIGVwb2xsCgog
+TUFJTlRBSU5FUlMgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTEgKy0KIE1ha2VmaWxlICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDE1ICstCiBNYWtlZmlsZS5vYmpzICAgICAgICAg
+ICAgICAgICAgICAgICB8ICAgMiAtCiBNYWtlZmlsZS50YXJnZXQgICAgICAgICAgICAgICAgICAg
+ICB8ICAxOSArKy0KIGJsb2NrLmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA1ICst
+CiBjaGFyZGV2L3NwaWNlLmMgICAgICAgICAgICAgICAgICAgICB8ICAgNCArLQogY29uZmlndXJl
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMzkgKysrKysKIGRvY3MvZGV2ZWwvZnV6emlu
+Zy50eHQgICAgICAgICAgICAgIHwgMTE2ICsrKysrKysrKysrKysrCiBleGVjLmMgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICB8ICAxMiArLQogaHcvYmxvY2svdmlydGlvLWJsay5jICAgICAg
+ICAgICAgICAgfCAgIDIgKy0KIGh3L2NvcmUvbWFjaGluZS5jICAgICAgICAgICAgICAgICAgIHwg
+ICAyICsKIGh3L3Njc2kvdmlydGlvLXNjc2kuYyAgICAgICAgICAgICAgIHwgICAyICstCiBpbmNs
+dWRlL2Jsb2NrL2Fpby5oICAgICAgICAgICAgICAgICB8ICAyNiArKy0KIGluY2x1ZGUvcWVtdS9t
+b2R1bGUuaCAgICAgICAgICAgICAgIHwgICA0ICstCiBpbmNsdWRlL3FlbXUvcXVldWUuaCAgICAg
+ICAgICAgICAgICB8ICAzMiArKystCiBpbmNsdWRlL3FlbXUvcmN1X3F1ZXVlLmggICAgICAgICAg
+ICB8ICA0NyArKysrKysKIGluY2x1ZGUvc3lzZW11L3F0ZXN0LmggICAgICAgICAgICAgIHwgICA0
+ICsKIGluY2x1ZGUvc3lzZW11L3N5c2VtdS5oICAgICAgICAgICAgIHwgICA0ICsKIHF0ZXN0LmMg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDMxICsrKy0KIHNjcmlwdHMvY2hlY2twYXRj
+aC5wbCAgICAgICAgICAgICAgIHwgICAyICstCiBzY3JpcHRzL2dldF9tYWludGFpbmVyLnBsICAg
+ICAgICAgICB8ICAgMyArLQogc29mdG1tdS9NYWtlZmlsZS5vYmpzICAgICAgICAgICAgICAgfCAg
+IDMgKwogc29mdG1tdS9tYWluLmMgICAgICAgICAgICAgICAgICAgICAgfCAgNTMgKysrKysrKwog
+dmwuYyA9PiBzb2Z0bW11L3ZsLmMgICAgICAgICAgICAgICAgfCAgNDggKysrLS0tCiB0ZXN0cy9N
+YWtlZmlsZS5pbmNsdWRlICAgICAgICAgICAgICB8ICAgMiArCiB0ZXN0cy9xdGVzdC9NYWtlZmls
+ZS5pbmNsdWRlICAgICAgICB8ICA3MiArKysrKy0tLS0KIHRlc3RzL3F0ZXN0L2Z1enovTWFrZWZp
+bGUuaW5jbHVkZSAgIHwgIDE4ICsrKwogdGVzdHMvcXRlc3QvZnV6ei9mb3JrX2Z1enouYyAgICAg
+ICAgfCAgNTUgKysrKysrKwogdGVzdHMvcXRlc3QvZnV6ei9mb3JrX2Z1enouaCAgICAgICAgfCAg
+MjMgKysrCiB0ZXN0cy9xdGVzdC9mdXp6L2ZvcmtfZnV6ei5sZCAgICAgICB8ICAzNyArKysrKwog
+dGVzdHMvcXRlc3QvZnV6ei9mdXp6LmMgICAgICAgICAgICAgfCAxNzkgKysrKysrKysrKysrKysr
+KysrKysrCiB0ZXN0cy9xdGVzdC9mdXp6L2Z1enouaCAgICAgICAgICAgICB8ICA5NSArKysrKysr
+KysrKwogdGVzdHMvcXRlc3QvZnV6ei9pNDQwZnhfZnV6ei5jICAgICAgfCAxOTMgKysrKysrKysr
+KysrKysrKysrKysrKwogdGVzdHMvcXRlc3QvZnV6ei9xb3NfZnV6ei5jICAgICAgICAgfCAyMzQg
+KysrKysrKysrKysrKysrKysrKysrKysrKysrCiB0ZXN0cy9xdGVzdC9mdXp6L3Fvc19mdXp6Lmgg
+ICAgICAgICB8ICAzMyArKysrCiB0ZXN0cy9xdGVzdC9mdXp6L3ZpcnRpb19uZXRfZnV6ei5jICB8
+IDE5OCArKysrKysrKysrKysrKysrKysrKysrKwogdGVzdHMvcXRlc3QvZnV6ei92aXJ0aW9fc2Nz
+aV9mdXp6LmMgfCAyMTMgKysrKysrKysrKysrKysrKysrKysrKysrKwogdGVzdHMvcXRlc3QvbGli
+cW9zL2kyYy5jICAgICAgICAgICAgfCAgMTAgKy0KIHRlc3RzL3F0ZXN0L2xpYnFvcy9pMmMuaCAg
+ICAgICAgICAgIHwgICA0ICstCiB0ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmMgICB8
+IDE2OCArKysrKysrKysrKysrKysrKysrKwogdGVzdHMvcXRlc3QvbGlicW9zL3Fvc19leHRlcm5h
+bC5oICAgfCAgMjggKysrKwogdGVzdHMvcXRlc3QvbGlicXRlc3QuYyAgICAgICAgICAgICAgfCAx
+MTkgKysrKysrKysrKysrLS0KIHRlc3RzL3F0ZXN0L2xpYnF0ZXN0LmggICAgICAgICAgICAgIHwg
+ICA0ICsKIHRlc3RzL3F0ZXN0L3BjYTk1NTItdGVzdC5jICAgICAgICAgIHwgIDEwICstCiB0ZXN0
+cy9xdGVzdC9xb3MtdGVzdC5jICAgICAgICAgICAgICB8IDEzMiArLS0tLS0tLS0tLS0tLS0tCiB0
+ZXN0cy90ZXN0LWFpby5jICAgICAgICAgICAgICAgICAgICB8ICAgMyArLQogdGVzdHMvdGVzdC1y
+Y3UtbGlzdC5jICAgICAgICAgICAgICAgfCAgMTYgKysKIHRlc3RzL3Rlc3QtcmN1LXNsaXN0LmMg
+ICAgICAgICAgICAgIHwgICAyICsKIHV0aWwvYWlvLXBvc2l4LmMgICAgICAgICAgICAgICAgICAg
+IHwgMTg3ICsrKysrKysrKysrKysrKy0tLS0tLS0KIHV0aWwvYXN5bmMuYyAgICAgICAgICAgICAg
+ICAgICAgICAgIHwgMjM3ICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0KIHV0aWwvbW9kdWxl
+LmMgICAgICAgICAgICAgICAgICAgICAgIHwgICA3ICsKIDUxIGZpbGVzIGNoYW5nZWQsIDIzNjUg
+aW5zZXJ0aW9ucygrKSwgNDAwIGRlbGV0aW9ucygtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGRvY3Mv
+ZGV2ZWwvZnV6emluZy50eHQKIGNyZWF0ZSBtb2RlIDEwMDY0NCBzb2Z0bW11L01ha2VmaWxlLm9i
+anMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBzb2Z0bW11L21haW4uYwogcmVuYW1lIHZsLmMgPT4gc29m
+dG1tdS92bC5jICg5OSUpCiBjcmVhdGUgbW9kZSAxMDA2NDQgdGVzdHMvcXRlc3QvZnV6ei9NYWtl
+ZmlsZS5pbmNsdWRlCiBjcmVhdGUgbW9kZSAxMDA2NDQgdGVzdHMvcXRlc3QvZnV6ei9mb3JrX2Z1
+enouYwogY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3F0ZXN0L2Z1enovZm9ya19mdXp6LmgKIGNy
+ZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9mdXp6L2ZvcmtfZnV6ei5sZAogY3JlYXRlIG1v
+ZGUgMTAwNjQ0IHRlc3RzL3F0ZXN0L2Z1enovZnV6ei5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgdGVz
+dHMvcXRlc3QvZnV6ei9mdXp6LmgKIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9mdXp6
+L2k0NDBmeF9mdXp6LmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9mdXp6L3Fvc19m
+dXp6LmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9mdXp6L3Fvc19mdXp6LmgKIGNy
+ZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9mdXp6L3ZpcnRpb19uZXRfZnV6ei5jCiBjcmVh
+dGUgbW9kZSAxMDA2NDQgdGVzdHMvcXRlc3QvZnV6ei92aXJ0aW9fc2NzaV9mdXp6LmMKIGNyZWF0
+ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmMKIGNyZWF0ZSBt
+b2RlIDEwMDY0NCB0ZXN0cy9xdGVzdC9saWJxb3MvcW9zX2V4dGVybmFsLmgKIGNyZWF0ZSBtb2Rl
+IDEwMDY0NCB0ZXN0cy90ZXN0LXJjdS1zbGlzdC5jCgotLSAKMi4yNC4xCgo=
 
 
