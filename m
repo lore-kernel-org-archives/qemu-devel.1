@@ -2,88 +2,53 @@ Return-Path: <SRS0=sqIQ=4K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA326C35671
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 19:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F471C35671
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 19:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF1D206EF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 19:40:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF1D206EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 61ECA206E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Feb 2020 19:55:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61ECA206E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5adO-0003bn-1E
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 14:40:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53862)
+	id 1j5asQ-000156-MW
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 14:55:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57195)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j5acX-00039z-AK
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:39:26 -0500
+ (envelope-from <balaton@jedlik.phy.bme.hu>) id 1j5are-0000FY-M0
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:55:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j5acW-0001vX-5a
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:39:25 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:36420
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j5acW-0001v0-04
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:39:24 -0500
-Received: from host86-177-178-1.range86-177.btcentralplus.com ([86.177.178.1]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j5ace-00007W-N2; Sat, 22 Feb 2020 19:39:38 +0000
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200221132550.22156-1-philmd@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <9e4081f7-3ae0-fb8f-462a-d196ec499d19@ilande.co.uk>
-Date: Sat, 22 Feb 2020 19:39:14 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <balaton@jedlik.phy.bme.hu>) id 1j5arZ-0001pH-Kx
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:55:02 -0500
+Received: from jedlik.phy.bme.hu ([152.66.102.83]:38038)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@jedlik.phy.bme.hu>)
+ id 1j5arZ-0001fS-Eh
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 14:54:57 -0500
+Received: by jedlik.phy.bme.hu (Postfix, from userid 1000)
+ id 52315A00E6; Sat, 22 Feb 2020 20:45:09 +0100 (CET)
+Date: Sat, 22 Feb 2020 20:45:09 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+In-Reply-To: <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+Message-ID: <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
+References: <20200221065015.337915-1-jasper.lowell@bt.com>
+ <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+User-Agent: Alpine 2.03 (LMD 1266 2009-07-14)
 MIME-Version: 1.0
-In-Reply-To: <20200221132550.22156-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.177.178.1
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 0/3] hw: More dma_memory_read/write() API cleanup
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 152.66.102.83
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,41 +60,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: jsnow@redhat.com, qemu-devel@nongnu.org, jasper.lowell@bt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/02/2020 13:25, Philippe Mathieu-Daudé wrote:
+On Sat, 22 Feb 2020, Mark Cave-Ayland wrote:
+> On 21/02/2020 06:50, jasper.lowell@bt.com wrote:
+>> The Linux libATA API documentation mentions that on some hardware,
+>> reading the status register has the side effect of clearing the
+>> interrupt condition. When emulating the generic Sun4u machine running
+>> Solaris 10, the Solaris 10 CMD646 driver exits fatally because of this
+>> emulated side effect. This side effect is likely to not exist on real
+>> CMD646 hardware.
+>>
+>> Signed-off-by: Jasper Lowell <jasper.lowell@bt.com>
+>> ---
+>>  hw/ide/core.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 80000eb766..82fd0632ac 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -2210,7 +2210,6 @@ uint32_t ide_ioport_read(void *opaque, uint32_t addr)
+>>          } else {
+>>              ret = s->status;
+>>          }
+>> -        qemu_irq_lower(bus->irq);
+>>          break;
+>>      }
+>
+> I don't think that this is correct: from memory when I last looked at this, there
+> were 2 IDE status registers: the one from the original specification which clears the
+> IRQ upon read, and another one in subsequent revisions which allows you to read the
+> value without clearing any pending IRQ. My guess would be that changing this would
+> not only cause QEMU to deviate from the specification, but causes problems in other OSs.
 
-> Following up "global exec/memory/dma APIs cleanup"
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg681475.html
-> 
-> Few more cleanups in PCNET & SCSI ESP devices.
-> 
-> Philippe Mathieu-Daudé (3):
->   hw/dma/sparc32_dma: Make espdma_memory_[read/write] static
->   hw/scsi/esp: Let ESPDMAMemoryReadWriteFunc take void pointer and
->     size_t
->   hw/net/pcnet: Let phys_mem_read/write take void pointer and boolean
-> 
->  hw/net/pcnet.h                 |  4 ++--
->  include/hw/scsi/esp.h          |  2 +-
->  include/hw/sparc/sparc32_dma.h |  6 ++----
->  hw/dma/sparc32_dma.c           |  8 ++++----
->  hw/net/pcnet-pci.c             |  5 +++--
->  hw/net/pcnet.c                 | 16 ++++++++--------
->  hw/scsi/esp-pci.c              |  6 +++---
->  7 files changed, 23 insertions(+), 24 deletions(-)
+You're right, legacy ide has two status registers as described here:
 
-LGTM.
+ftp://ftp.seagate.com/pub/acrobat/reference/111-1c.pdf
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Now question is which of these the above is emulating? Looks like CMD646 
+should not clear interrupt when reading status reg so maybe instead of 
+removing this from here another change is needed to CMD646 specific read 
+func to read alternate status instead of status reg?
 
-
-ATB,
-
-Mark.
+Regards,
+BALATON Zoltan
 
