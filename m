@@ -2,59 +2,98 @@ Return-Path: <SRS0=CqNf=4L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=FROM_WSP_TRAIL,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BF8C35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 21:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE77C35671
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 21:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98761206E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 21:09:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98761206E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED014206E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 21:26:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cD65hkG7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED014206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5yUv-0006NL-RT
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 16:09:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56610)
+	id 1j5ylS-0001GN-3g
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 16:26:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1j5ySv-0004Eh-UF
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:07:07 -0500
+ (envelope-from <mst@redhat.com>) id 1j5yko-0000p2-0z
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:25:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1j5ySu-0001gR-J0
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:07:05 -0500
-Received: from mga05.intel.com ([192.55.52.43]:59518)
+ (envelope-from <mst@redhat.com>) id 1j5ykm-0003hk-98
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:25:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42585
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1j5ySu-0001eg-At
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:07:04 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Feb 2020 13:07:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,477,1574150400"; d="scan'208";a="230945816"
-Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by fmsmga008.fm.intel.com with ESMTP; 23 Feb 2020 13:07:01 -0800
-From: Zhang Chen <chen.zhang@intel.com >
-To: Jason Wang <jasowang@redhat.com>,
-	qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH 2/2] net/colo-compare.c: Expose "expired_scan_cycle" to user
-Date: Mon, 24 Feb 2020 04:58:05 +0800
-Message-Id: <20200223205805.26412-3-chen.zhang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200223205805.26412-1-chen.zhang@intel.com>
-References: <20200223205805.26412-1-chen.zhang@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j5ykm-0003hV-13
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 16:25:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582493131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kjJBK8EO57Kkis0js0dYCK68MHLgDGJhoa4v0JLnBCE=;
+ b=cD65hkG7U3EPUTKfdIPcMau3oJ5tpKQsm/dY4CAeiPMQ6ZsCs/qjhXIl5bc3ov+NeNyTuA
+ 9JOQAAgEgYZEq74gr6Ibsr1pyEepGYGN8AHzkZUS2Gm9104wV23jsJuRG4Ij+A6FG8pLk2
+ zEi7/O5DF2TTQP8aV7PA6te8+izAJEg=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-j54VEzxDOqCGt05e7ob2Yg-1; Sun, 23 Feb 2020 16:25:29 -0500
+X-MC-Unique: j54VEzxDOqCGt05e7ob2Yg-1
+Received: by mail-qv1-f71.google.com with SMTP id ce2so6613227qvb.23
+ for <qemu-devel@nongnu.org>; Sun, 23 Feb 2020 13:25:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=pDDoQQOrOYeC/NLDoSF1kjMPYpzkJ3XIoYGsRACZR0A=;
+ b=R2yVmWs7e1BAEec98z5ek0fzn3afQ31VGDa8aTBy19fvwgZi0z0JWjD1VjeBmhyYmW
+ uIEluWoiwGrRQe3xLDsl8IcmA5V/Bx2+ASwPlQWFTdP4SYKW2fj4uKF7SkTpoz6HKjaK
+ UJs3NsRVYB/+2e3cTF7IIHIVffk9d5Fk/LfIJSfhVf7r+Pwn9GlQUdppDHuiLZN+tK72
+ Zv1UcGaWEgZrJjWseSriX14HE0hkA3IOlVW6s4vbMjo6d1k2rSel3q+kYUI9+Uw9AJLy
+ ukmIKbqVWr3p9Q5hjWeAFJkbyfjnIJ7/IkyGkWvIRDAKEF6tZN5eougPjDvZd3SLlfaN
+ XTfw==
+X-Gm-Message-State: APjAAAVxSrtzs6Wl1zDUlEvRlUQFtuDfNKAH99QHxq3FESjqV5Jk2y/W
+ LQl8HLoCqgO+D4hsayOxuktMP7z7+fxQnF4MlaedjXtLL8NipwZDCnWjUxgFyt2PpMlfKjaOftF
+ LU+9Fxw6e4kEhBhg=
+X-Received: by 2002:ad4:48c6:: with SMTP id v6mr40085751qvx.207.1582493128649; 
+ Sun, 23 Feb 2020 13:25:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzOjhAJ4YJC09/n5DtyF/iGRO7seGpjNKO8TQJ8ZQv5+XgiBu7EJSuQbb7ii3Yo5cXLf39x7Q==
+X-Received: by 2002:ad4:48c6:: with SMTP id v6mr40085740qvx.207.1582493128431; 
+ Sun, 23 Feb 2020 13:25:28 -0800 (PST)
+Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
+ by smtp.gmail.com with ESMTPSA id
+ s42sm5039478qtk.87.2020.02.23.13.25.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 23 Feb 2020 13:25:27 -0800 (PST)
+Date: Sun, 23 Feb 2020 16:25:22 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: miaoyubo <miaoyubo@huawei.com>
+Subject: Re: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie for arm
+Message-ID: <20200223162502-mutt-send-email-mst@kernel.org>
+References: <20200221063512.1104-1-miaoyubo@huawei.com>
+ <20200221063512.1104-4-miaoyubo@huawei.com>
+ <20200221061811-mutt-send-email-mst@kernel.org>
+ <817d9cb2699d4294a2ba4ae949079eea@huawei.com>
+MIME-Version: 1.0
+In-Reply-To: <817d9cb2699d4294a2ba4ae949079eea@huawei.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,147 +105,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Cho <danielcho@qnap.com>, Zhang Chen <chen.zhang@intel.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Zhang Chen <zhangckid@gmail.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Xiexiangyou <xiexiangyou@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+On Sat, Feb 22, 2020 at 09:40:07AM +0000, miaoyubo wrote:
+>=20
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Friday, February 21, 2020 7:19 PM
+> > To: miaoyubo <miaoyubo@huawei.com>
+> > Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; Xiexiangyou
+> > <xiexiangyou@huawei.com>; imammedo@redhat.com;
+> > qemu-devel@nongnu.org
+> > Subject: Re: [RFC v3 3/3] ACPI/unit-test: Add a new test for pxb-pcie f=
+or arm
+> >=20
+> > On Fri, Feb 21, 2020 at 02:35:12PM +0800, Yubo Miao wrote:
+> > > From: miaoyubo <miaoyubo@huawei.com>
+> > >
+> > > Currently, pxb-pcie could be defined by the cmdline like
+> > >     --device pxb-pcie,id=3Dpci.9,bus_nr=3D128 However pxb-pcie is not
+> > > described in acpi tables for arm.
+> > >
+> > > The formal two patches support pxb-pcie for arm, escpcially the
+> > > specification for pxb-pcie in DSDT table.
+> > >
+> > > Add a testcase to make sure the ACPI table is correct for guest.
+> > >
+> > > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+> >=20
+> >=20
+> > Please look at the top of tests/qtest/bios-tables-test.c for how to add=
+ or
+> > update tests.
+> >=20
+>=20
+> Thanks for replying, I didn't notice that, I would follow the steps to re=
+build this patch.
+>=20
+> > > ---
+> > >  tests/data/acpi/virt/DSDT.pxb  | Bin 0 -> 34209 bytes
+> > > tests/qtest/bios-tables-test.c |  54 +++++++++++++++++++++++++++++---=
+-
+> > >  2 files changed, 48 insertions(+), 6 deletions(-)  create mode 10064=
+4
+> > > tests/data/acpi/virt/DSDT.pxb
+> > >
+> > > diff --git a/tests/data/acpi/virt/DSDT.pxb
+> > > b/tests/data/acpi/virt/DSDT.pxb new file mode 100644 index
+> > >
+> > 0000000000000000000000000000000000000000..4eea3192c75ff28f7054d626
+> > a936
+> > > 3ca025b6c0ad
+> > > GIT binary patch
+> >=20
+> > I can't read this.
+> >=20
+>=20
+> I just have a question that is:=20
+> I just rebuild this aml with tests/data/acpi/rebuild-expected-aml.sh
+> and git send it or send the aml with attachment?
 
-The "expired_scan_cycle" determines colo-compare scan expired
-net packet cycle.
+git send it pls
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- net/colo-compare.c | 48 +++++++++++++++++++++++++++++++++++++++++++---
- qemu-options.hx    |  3 ++-
- 2 files changed, 47 insertions(+), 4 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index ec09b2a524..10c0239f9d 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -48,7 +48,6 @@ static NotifierList colo_compare_notifiers =
- #define COLO_COMPARE_FREE_PRIMARY     0x01
- #define COLO_COMPARE_FREE_SECONDARY   0x02
- 
--/* TODO: Should be configurable */
- #define REGULAR_PACKET_CHECK_MS 3000
- #define DEFAULT_TIME_OUT_MS 3000
- 
-@@ -94,6 +93,7 @@ typedef struct CompareState {
-     SocketReadState notify_rs;
-     bool vnet_hdr;
-     uint32_t compare_timeout;
-+    uint32_t expired_scan_cycle;
- 
-     /*
-      * Record the connection that through the NIC
-@@ -823,7 +823,7 @@ static void check_old_packet_regular(void *opaque)
-     /* if have old packet we will notify checkpoint */
-     colo_old_packet_check(s);
-     timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--                REGULAR_PACKET_CHECK_MS);
-+              s->expired_scan_cycle);
- }
- 
- /* Public API, Used for COLO frame to notify compare event */
-@@ -853,7 +853,7 @@ static void colo_compare_timer_init(CompareState *s)
-                                 SCALE_MS, check_old_packet_regular,
-                                 s);
-     timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
--                    REGULAR_PACKET_CHECK_MS);
-+              s->expired_scan_cycle);
- }
- 
- static void colo_compare_timer_del(CompareState *s)
-@@ -1018,6 +1018,39 @@ out:
-     error_propagate(errp, local_err);
- }
- 
-+static void compare_get_expired_scan_cycle(Object *obj, Visitor *v,
-+                                           const char *name, void *opaque,
-+                                           Error **errp)
-+{
-+    CompareState *s = COLO_COMPARE(obj);
-+    uint32_t value = s->expired_scan_cycle;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void compare_set_expired_scan_cycle(Object *obj, Visitor *v,
-+                                           const char *name, void *opaque,
-+                                           Error **errp)
-+{
-+    CompareState *s = COLO_COMPARE(obj);
-+    Error *local_err = NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (!value) {
-+        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+                   object_get_typename(obj), name);
-+        goto out;
-+    }
-+    s->expired_scan_cycle = value;
-+
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
- static void compare_pri_rs_finalize(SocketReadState *pri_rs)
- {
-     CompareState *s = container_of(pri_rs, CompareState, pri_rs);
-@@ -1129,6 +1162,11 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
-         s->compare_timeout = DEFAULT_TIME_OUT_MS;
-     }
- 
-+    if (!s->expired_scan_cycle) {
-+        /* Set default value to 3000 MS */
-+        s->expired_scan_cycle = REGULAR_PACKET_CHECK_MS;
-+    }
-+
-     if (find_and_check_chardev(&chr, s->pri_indev, errp) ||
-         !qemu_chr_fe_init(&s->chr_pri_in, chr, errp)) {
-         return;
-@@ -1228,6 +1266,10 @@ static void colo_compare_init(Object *obj)
-                         compare_get_timeout,
-                         compare_set_timeout, NULL, NULL, NULL);
- 
-+    object_property_add(obj, "expired_scan_cycle", "uint32",
-+                        compare_get_expired_scan_cycle,
-+                        compare_set_expired_scan_cycle, NULL, NULL, NULL);
-+
-     s->vnet_hdr = false;
-     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
-                              compare_set_vnet_hdr, NULL);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 3832d0ae8a..8069428c73 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4598,7 +4598,7 @@ Dump the network traffic on netdev @var{dev} to the file specified by
- The file format is libpcap, so it can be analyzed with tools such as tcpdump
- or Wireshark.
- 
--@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}][,compare_timeout=@var{ms}]
-+@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}][,compare_timeout=@var{ms}][,expired_scan_cycle=@var{ms}]
- 
- Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
- secondary packet. If the packets are same, we will output primary
-@@ -4608,6 +4608,7 @@ In order to improve efficiency, we need to put the task of comparison
- in another thread. If it has the vnet_hdr_support flag, colo compare
- will send/recv packet with vnet_hdr_len. The compare_timeout=@var{ms}
- determines the maximum time colo-compare wait for primary packet.
-+The expired_scan_cycle=@var{ms} to set the expired packet scan cycle.
- If you want to use Xen COLO, will need the notify_dev to notify Xen
- colo-frame to do checkpoint.
- 
--- 
-2.17.1
+> > > literal 34209
+> > >
+> > zcmeI*cXU+szJ~D)1PGxe5PG+us9-{<Do8R35G4>YGz}UAMT!L#ks?x*Dx!d5hoIP
+> > d
+> > >
+> > z?}}o>iWL;GW5HgrlKbvVM&HM??^)~qbMIProvd|8p2_U*%qO!m?AgcPkRQ(<w
+> > r)WX
+> > >
+> > zR3DKyBsMVKK5tZUEMJ#Z3xXj0I{cizY-H-_vUpxu>HL<ltgNimvVn#9^>bszg^Hd*
+> > >
+> > zYT59@{GfDxK}u{$QSzH5MFX?4va_qcnOYVriD$G-YqqdX5KgQUqzA#0T0ymH9a
+> > J-P
+> > > zt=3D#;Qdf_)p=3DV$jH6t9{xXmH68P3ev)8EFlwrs(=3DX$_(9dxJh>6UU8FZi5vcVla=
+%Bp
+> > >
+> > zz50)g^-pXvw4i9XAYFAU@nN}Xb+t___n%u<uhU$chBua*GNL5;Gf3Q8mfgX>w)`
+> > 8L
+> > >
+> > z7F4goX88!*;pB+$X8&bG_2BOj*;OO*!h6xx&B+mI)uU#l*o>||BPVi3ji?#5Y(|dH
+> > >
+> > z=3DoUF6C2B^h&FJPcx<}5a88su#W_0%%JtAk+ikeZ+X7unGJtJq-j+)WHX7uzKy&`9
+> > %
+> >=20
+> > ...
+>=20
+> Regards,
+> Miao
 
 
