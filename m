@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D88C35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CC0C35673
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E197920637
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E197920637
+	by mail.kernel.org (Postfix) with ESMTPS id F1F7A20637
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F7A20637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52899 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5rK1-0001ko-Vk
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:29:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41662)
+	id 1j5rK4-0001sm-4t
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:29:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-00005J-P1
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-00005I-Jc
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003se-Bi
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003sT-Af
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:00 -0500
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:45195)
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:45201)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003rh-2k
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003rj-2j
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:27:59 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 056DBE3489;
- Sun, 23 Feb 2020 22:27:56 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 33F17E34A9;
+ Sun, 23 Feb 2020 22:27:57 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 76F2D24008F;
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id CDE2F240090;
  Sun, 23 Feb 2020 22:27:56 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v31 01/22] MAINTAINERS: Add RX
-Date: Sun, 23 Feb 2020 22:27:28 +0900
-Message-Id: <20200223132750.69480-2-ysato@users.sourceforge.jp>
+Subject: [PATCH RESEND v31 02/22] qemu/bitops.h: Add extract8 and extract16
+Date: Sun, 23 Feb 2020 22:27:29 +0900
+Message-Id: <20200223132750.69480-3-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 References: <20200223132750.69480-1-ysato@users.sourceforge.jp>
@@ -74,49 +74,63 @@ Sender: "Qemu-devel"
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-18-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-10-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ include/qemu/bitops.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1740a4fddc..c5008f638d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -274,6 +274,13 @@ F: include/hw/riscv/
- F: linux-user/host/riscv32/
- F: linux-user/host/riscv64/
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 02c1ce6a5d..f55ce8b320 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -301,6 +301,44 @@ static inline uint32_t extract32(uint32_t value, int=
+ start, int length)
+     return (value >> start) & (~0U >> (32 - length));
+ }
 =20
-+RENESAS RX CPUs
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: target/rx/
-+F: hw/rx/
-+F: include/hw/rx/
++/**
++ * extract8:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 8 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 8 bit word. It is valid to request that
++ * all 8 bits are returned (ie @length 8 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint8_t extract8(uint8_t value, int start, int length)
++{
++    assert(start >=3D 0 && length > 0 && length <=3D 8 - start);
++    return extract32(value, start, length);
++}
 +
- S390 TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- M: David Hildenbrand <david@redhat.com>
-@@ -1167,6 +1174,18 @@ F: pc-bios/canyonlands.dt[sb]
- F: pc-bios/u-boot-sam460ex-20100605.bin
- F: roms/u-boot-sam460ex
-=20
-+RX Machines
-+-----------
-+rx-virt
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: hw/rx/rxqemu.c
-+F: hw/intc/rx_icu.c
-+F: hw/timer/renesas_*.c
-+F: hw/char/renesas_sci.c
-+F: include/hw/timer/renesas_*.h
-+F: include/hw/char/renesas_sci.h
++/**
++ * extract16:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 16 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 16 bit word. It is valid to request that
++ * all 16 bits are returned (ie @length 16 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint16_t extract16(uint16_t value, int start, int length)
++{
++    assert(start >=3D 0 && length > 0 && length <=3D 16 - start);
++    return extract32(value, start, length);
++}
 +
- SH4 Machines
- ------------
- R2D
+ /**
+  * extract64:
+  * @value: the value to extract the bit field from
 --=20
 2.20.1
 
