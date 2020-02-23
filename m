@@ -6,49 +6,51 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C10CC35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F73C35666
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1158220637
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:35:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1158220637
+	by mail.kernel.org (Postfix) with ESMTPS id 5FC4020637
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:35:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC4020637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5rPP-0000eg-4N
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:34:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41825)
+	id 1j5rPV-0000rg-H4
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:35:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIk-0000BS-90
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:07 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIi-0003xe-8o
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:06 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45968)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIi-0003x3-0I
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIg-00005h-T7
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:04 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIf-0003ui-E3
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:02 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45953)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIf-0003u5-6b
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:01 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 4F78AE47B6;
- Sun, 23 Feb 2020 22:28:03 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 7A46FE499A;
+ Sun, 23 Feb 2020 22:28:00 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 14D3B240091;
- Sun, 23 Feb 2020 22:28:03 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 3B8FC240090;
+ Sun, 23 Feb 2020 22:28:00 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v31 22/22] qemu-doc.texi: Add RX section.
-Date: Sun, 23 Feb 2020 22:27:49 +0900
-Message-Id: <20200223132750.69480-23-ysato@users.sourceforge.jp>
+Subject: [PATCH RESEND v31 12/22] target/rx: Collect all bytes during
+ disassembly
+Date: Sun, 23 Feb 2020 22:27:39 +0900
+Message-Id: <20200223132750.69480-13-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 References: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -64,87 +66,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Describe emulated target specification. And two examples.
+From: Richard Henderson <richard.henderson@linaro.org>
 
+Collected, to be used in the next patch.
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-23-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- qemu-doc.texi | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 42 insertions(+), 20 deletions(-)
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 33b9597b1d..d80a9c64f7 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -1719,6 +1719,7 @@ differences are mentioned in the following sections=
-.
- * Microblaze System emulator::
- * SH4 System emulator::
- * Xtensa System emulator::
-+* RX System emulator::
- @end menu
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index ebc1a44249..5a32a87534 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -25,43 +25,59 @@ typedef struct DisasContext {
+     disassemble_info *dis;
+     uint32_t addr;
+     uint32_t pc;
++    uint8_t len;
++    uint8_t bytes[8];
+ } DisasContext;
 =20
- @node PowerPC System emulator
-@@ -2487,6 +2488,49 @@ so should only be used with trusted guest OS.
 =20
- @c man end
+ static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
+-                           int i, int n)
++                                  int i, int n)
+ {
+-    bfd_byte buf;
++    uint32_t addr =3D ctx->addr;
++
++    g_assert(ctx->len =3D=3D i);
++    g_assert(n <=3D ARRAY_SIZE(ctx->bytes));
++
+     while (++i <=3D n) {
+-        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
+-        insn |=3D buf << (32 - i * 8);
++        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->d=
+is);
++        insn |=3D ctx->bytes[i - 1] << (32 - i * 8);
+     }
++    ctx->addr =3D addr;
++    ctx->len =3D n;
++
+     return insn;
+ }
 =20
-+@node RX System emulator
-+@section RX System emulator
-+@cindex system emulation (RX)
-+
-+Use the executable @file{qemu-system-rx} to simulate a Virtual RX target=
-.
-+This target emulated following devices.
-+
-+@itemize @minus
-+@item
-+R5F562N8 MCU
-+@item
-+On-chip memory (ROM 512KB, RAM 96KB)
-+@item
-+Interrupt Control Unit (ICUa)
-+@item
-+8Bit Timer x 1CH (TMR0,1)
-+@item
-+Compare Match Timer x 2CH (CMT0,1)
-+@item
-+Serial Communication Interface x 1CH (SCI0)
-+@item
-+External memory 16MByte
-+@end itemize
-+
-+Example of @file{qemu-system-rx} usage for rx is shown below:
-+
-+Download @code{u-boot_image} from @url{https://osdn.net/users/ysato/pf/q=
-emu/dl/u-boot.bin.gz}
-+
-+Start emulation of rx-virt:
-+@example
-+qemu-system-rx -bios @code{u-boot_image}
-+@end example
-+
-+Download @code{kernel_image} from @url{https://osdn.net/users/ysato/pf/q=
-emu/dl/zImage}
-+
-+Download @code{device_tree_blob} from @url{https://osdn.net/users/ysato/=
-pf/qemu/dl/rx-virt.dtb}
-+
-+Start emulation of rx-virt:
-+@example
-+qemu-system-rx -kernel @code{kernel_image} -dtb @code{device_tree_blob} =
-\
-+  -append "earlycon"
-+@end example
-+
- @node QEMU User space emulator
- @chapter QEMU User space emulator
+ static int32_t li(DisasContext *ctx, int sz)
+ {
+-    int32_t addr;
+-    bfd_byte buf[4];
+-    addr =3D ctx->addr;
++    uint32_t addr =3D ctx->addr;
++    uintptr_t len =3D ctx->len;
 =20
+     switch (sz) {
+     case 1:
++        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 1;
+-        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+-        return (int8_t)buf[0];
++        ctx->len +=3D 1;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
++        return (int8_t)ctx->bytes[len];
+     case 2:
++        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 2;
+-        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+-        return ldsw_le_p(buf);
++        ctx->len +=3D 2;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
++        return ldsw_le_p(ctx->bytes + len);
+     case 3:
++        g_assert(len + 3 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 3;
+-        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
+-        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
++        ctx->len +=3D 3;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
++        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes =
++ len);
+     case 0:
++        g_assert(len + 4 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 4;
+-        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
+-        return ldl_le_p(buf);
++        ctx->len +=3D 4;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
++        return ldl_le_p(ctx->bytes + len);
+     default:
+         g_assert_not_reached();
+     }
+@@ -110,7 +126,7 @@ static const char psw[] =3D {
+ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
+)
+ {
+     uint32_t addr =3D ctx->addr;
+-    uint8_t buf[2];
++    uintptr_t len =3D ctx->len;
+     uint16_t dsp;
+=20
+     switch (ld) {
+@@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char o=
+ut[8], int ld, int mi)
+         out[0] =3D '\0';
+         return;
+     case 1:
++        g_assert(len + 1 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 1;
+-        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+-        dsp =3D buf[0];
++        ctx->len +=3D 1;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
++        dsp =3D ctx->bytes[len];
+         break;
+     case 2:
++        g_assert(len + 2 <=3D ARRAY_SIZE(ctx->bytes));
+         ctx->addr +=3D 2;
+-        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+-        dsp =3D lduw_le_p(buf);
++        ctx->len +=3D 2;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
++        dsp =3D lduw_le_p(ctx->bytes + len);
+         break;
+     default:
+         g_assert_not_reached();
+@@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *=
+dis)
+     DisasContext ctx;
+     uint32_t insn;
+     int i;
++
+     ctx.dis =3D dis;
+     ctx.pc =3D ctx.addr =3D addr;
++    ctx.len =3D 0;
+=20
+     insn =3D decode_load(&ctx);
+     if (!decode(&ctx, insn)) {
 --=20
 2.20.1
 
