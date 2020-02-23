@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B99E5C35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6463C35671
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9056920637
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9056920637
+	by mail.kernel.org (Postfix) with ESMTPS id A07D920637
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A07D920637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5rKM-00025T-MU
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:29:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41709)
+	id 1j5rKO-0002Ce-Qb
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:29:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41737)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIg-00005g-K1
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:03 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIh-00005q-Da
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-0003uG-UT
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:02 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45946)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIf-0003uU-6D
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:03 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:45950)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-0003tN-LZ
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:00 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-0003tf-U7
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:01 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id EB8E9E4890;
- Sun, 23 Feb 2020 22:27:59 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 3D8C0E4899;
+ Sun, 23 Feb 2020 22:28:00 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B5AAB24008F;
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id EB1FC24008E;
  Sun, 23 Feb 2020 22:27:59 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v31 10/22] target/rx: Use prt_ldmi for XCHG_mr
- disassembly
-Date: Sun, 23 Feb 2020 22:27:37 +0900
-Message-Id: <20200223132750.69480-11-ysato@users.sourceforge.jp>
+Subject: [PATCH RESEND v31 11/22] target/rx: Emit all disassembly in one prt()
+Date: Sun, 23 Feb 2020 22:27:38 +0900
+Message-Id: <20200223132750.69480-12-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 References: <20200223132750.69480-1-ysato@users.sourceforge.jp>
@@ -74,36 +73,195 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Note that the ld =3D=3D 3 case handled by prt_ldmi is decoded as
-XCHG_rr and cannot appear here.
+Many of the multi-part prints have been eliminated by previous
+patches.  Eliminate the rest of them.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-21-ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-22-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ target/rx/disas.c | 75 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
 diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 515b365528..db10385fd0 100644
+index db10385fd0..ebc1a44249 100644
 --- a/target/rx/disas.c
 +++ b/target/rx/disas.c
-@@ -366,13 +366,7 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XCH=
-G_rr *a)
- /* xchg dsp[rs].<mi>,rd */
- static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
+@@ -228,24 +228,21 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV=
+_ra *a)
+ /* mov.[bwl] rs,rd */
+ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
  {
--    static const char msize[][4] =3D {
--        "b", "w", "l", "ub", "uw",
--    };
--    char dsp[8];
--
--    rx_index_addr(ctx, dsp, a->ld, a->mi);
--    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
-+    prt_ldmi(ctx, "xchg", a->ld, a->mi, a->rs, a->rd);
+-    char dspd[8], dsps[8];
++    char dspd[8], dsps[8], szc =3D size[a->sz];
+=20
+-    prt("mov.%c\t", size[a->sz]);
+     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
+         /* mov.[bwl] rs,rd */
+-        prt("r%d, r%d", a->rs, a->rd);
+-        return true;
+-    }
+-    if (a->lds =3D=3D 3) {
++        prt("mov.%c\tr%d, r%d", szc, a->rs, a->rd);
++    } else if (a->lds =3D=3D 3) {
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
++        prt("mov.%c\tr%d, %s[r%d]", szc, a->rs, dspd, a->rd);
+     } else if (a->ldd =3D=3D 3) {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+-        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
++        prt("mov.%c\t%s[r%d], r%d", szc, dsps, a->rs, a->rd);
+     } else {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
++        prt("mov.%c\t%s[r%d], %s[r%d]", szc, dsps, a->rs, dspd, a->rd);
+     }
+     return true;
+ }
+@@ -254,8 +251,11 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_=
+mm *a)
+ /* mov.[bwl] rs,[-rd] */
+ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
+ {
+-    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    if (a->ad) {
++        prt("mov.%c\tr%d, [-r%d]", size[a->sz], a->rs, a->rd);
++    } else {
++        prt("mov.%c\tr%d, [r%d+]", size[a->sz], a->rs, a->rd);
++    }
+     return true;
+ }
+=20
+@@ -263,9 +263,11 @@ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_=
+rp *a)
+ /* mov.[bwl] [-rd],rs */
+ static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
+ {
+-    prt("mov.%c\t", size[a->sz]);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("mov.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
++    } else {
++        prt("mov.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
++    }
+     return true;
+ }
+=20
+@@ -299,9 +301,11 @@ static bool trans_MOVU_ar(DisasContext *ctx, arg_MOV=
+U_ar *a)
+ /* movu.[bw] [-rs],rd */
+ static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
+ {
+-    prt("movu.%c\t", size[a->sz]);
+-    prt((a->ad =3D=3D 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("movu.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
++    } else {
++        prt("movu.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
++    }
+     return true;
+ }
+=20
+@@ -478,11 +482,11 @@ static bool trans_TST_mr(DisasContext *ctx, arg_TST=
+_mr *a)
+ /* not rs, rd */
+ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
+ {
+-    prt("not\t");
+     if (a->rs !=3D a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("not\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("not\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -490,11 +494,11 @@ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT=
+_rr *a)
+ /* neg rs, rd */
+ static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
+ {
+-    prt("neg\t");
+     if (a->rs !=3D a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("neg\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("neg\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -606,11 +610,10 @@ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB=
+_mr *a)
+ /* abs rs, rd */
+ static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
+ {
+-    prt("abs\t");
+-    if (a->rs =3D=3D a->rd) {
+-        prt("r%d", a->rd);
++    if (a->rs !=3D a->rd) {
++        prt("abs\tr%d, r%d", a->rs, a->rd);
+     } else {
+-        prt("r%d, r%d", a->rs, a->rd);
++        prt("abs\tr%d", a->rs);
+     }
+     return true;
+ }
+@@ -733,11 +736,11 @@ static bool trans_DIVU_mr(DisasContext *ctx, arg_DI=
+VU_mr *a)
+ /* shll #imm:5, rs, rd */
+ static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
+ {
+-    prt("shll\t#%d, ", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shll\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shll\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -752,11 +755,11 @@ static bool trans_SHLL_rr(DisasContext *ctx, arg_SH=
+LL_rr *a)
+ /* shar #imm:5, rs, rd */
+ static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
+ {
+-    prt("shar\t#%d,", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shar\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shar\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+=20
+@@ -771,11 +774,11 @@ static bool trans_SHAR_rr(DisasContext *ctx, arg_SH=
+AR_rr *a)
+ /* shlr #imm:5, rs, rd */
+ static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
+ {
+-    prt("shlr\t#%d, ", a->imm);
+     if (a->rs2 !=3D a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shlr\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shlr\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
      return true;
  }
 =20
