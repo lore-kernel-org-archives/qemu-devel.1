@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22CC35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 06:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC8DC35673
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 06:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0877206ED
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 06:58:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0877206ED
+	by mail.kernel.org (Postfix) with ESMTPS id B4EBB206ED
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 06:58:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4EBB206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5lDE-0002F7-4z
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 01:58:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34471)
+	id 1j5lDF-0002Jb-TY
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 01:58:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6k-0004Hl-0b
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6l-0004Kq-Hr
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 01:51:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6g-0004hI-8H
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 01:51:17 -0500
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:47186)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6h-0004lO-Qk
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 01:51:19 -0500
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:38291)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6f-0004f8-PB
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 01:51:14 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5l6h-0004hR-GI
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 01:51:15 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 5EABDE35CE;
- Sun, 23 Feb 2020 15:51:11 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 2BB5C53DCC;
+ Sun, 23 Feb 2020 15:51:15 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 0840624008E;
- Sun, 23 Feb 2020 15:51:11 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B7DD7240093;
+ Sun, 23 Feb 2020 15:51:14 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v31 05/22] target/rx: TCG helper
-Date: Sun, 23 Feb 2020 15:50:45 +0900
-Message-Id: <20200223065102.61652-6-ysato@users.sourceforge.jp>
+Subject: [PATCH v31 14/22] hw/intc: RX62N interrupt controller (ICUa)
+Date: Sun, 23 Feb 2020 15:50:54 +0900
+Message-Id: <20200223065102.61652-15-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200223065102.61652-1-ysato@users.sourceforge.jp>
 References: <20200223065102.61652-1-ysato@users.sourceforge.jp>
@@ -53,7 +53,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.15
+X-Received-From: 202.224.55.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,238 +65,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, philmd@redhat.com,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+This implementation supported only ICUa.
+Hardware manual.
+https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
+ej0140_rx62n.pdf
 
-Message-Id: <20190616142836.10614-3-ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190607091116.49044-3-ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-6-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Removed tlb_fill, extracted from patch of Yoshinori Sato
- 'Convert to CPUClass::tlb_fill']
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- target/rx/helper.h    |  31 +++
- target/rx/helper.c    | 149 +++++++++++++
- target/rx/op_helper.c | 470 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 650 insertions(+)
- create mode 100644 target/rx/helper.h
- create mode 100644 target/rx/helper.c
- create mode 100644 target/rx/op_helper.c
+ include/hw/intc/rx_icu.h |  56 ++++++
+ hw/intc/rx_icu.c         | 379 +++++++++++++++++++++++++++++++++++++++
+ hw/intc/Kconfig          |   3 +
+ hw/intc/Makefile.objs    |   1 +
+ 4 files changed, 439 insertions(+)
+ create mode 100644 include/hw/intc/rx_icu.h
+ create mode 100644 hw/intc/rx_icu.c
 
-diff --git a/target/rx/helper.h b/target/rx/helper.h
+diff --git a/include/hw/intc/rx_icu.h b/include/hw/intc/rx_icu.h
 new file mode 100644
-index 0000000000..f0b7ebbbf7
+index 0000000000..acfcf06aef
 --- /dev/null
-+++ b/target/rx/helper.h
-@@ -0,0 +1,31 @@
-+DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
-+DEF_HELPER_1(raise_access_fault, noreturn, env)
-+DEF_HELPER_1(raise_privilege_violation, noreturn, env)
-+DEF_HELPER_1(wait, noreturn, env)
-+DEF_HELPER_1(debug, noreturn, env)
-+DEF_HELPER_2(rxint, noreturn, env, i32)
-+DEF_HELPER_1(rxbrk, noreturn, env)
-+DEF_HELPER_FLAGS_3(fadd, TCG_CALL_NO_WG, f32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fsub, TCG_CALL_NO_WG, f32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fmul, TCG_CALL_NO_WG, f32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fdiv, TCG_CALL_NO_WG, f32, env, f32, f32)
-+DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_WG, void, env, f32, f32)
-+DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
-+DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
-+DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
-+DEF_HELPER_2(set_fpsw, void, env, i32)
-+DEF_HELPER_FLAGS_2(racw, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_FLAGS_2(set_psw_rte, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_FLAGS_2(set_psw, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_1(pack_psw, i32, env)
-+DEF_HELPER_FLAGS_3(div, TCG_CALL_NO_WG, i32, env, i32, i32)
-+DEF_HELPER_FLAGS_3(divu, TCG_CALL_NO_WG, i32, env, i32, i32)
-+DEF_HELPER_FLAGS_1(scmpu, TCG_CALL_NO_WG, void, env)
-+DEF_HELPER_1(smovu, void, env)
-+DEF_HELPER_1(smovf, void, env)
-+DEF_HELPER_1(smovb, void, env)
-+DEF_HELPER_2(sstr, void, env, i32)
-+DEF_HELPER_FLAGS_2(swhile, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_FLAGS_2(suntil, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_FLAGS_2(rmpa, TCG_CALL_NO_WG, void, env, i32)
-+DEF_HELPER_1(satr, void, env)
-diff --git a/target/rx/helper.c b/target/rx/helper.c
-new file mode 100644
-index 0000000000..a6a337a311
---- /dev/null
-+++ b/target/rx/helper.c
-@@ -0,0 +1,149 @@
-+/*
-+ *  RX emulation
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++++ b/include/hw/intc/rx_icu.h
+@@ -0,0 +1,56 @@
++#ifndef RX_ICU_H
++#define RX_ICU_H
 +
-+#include "qemu/osdep.h"
-+#include "qemu/bitops.h"
-+#include "cpu.h"
-+#include "exec/log.h"
-+#include "exec/cpu_ldst.h"
-+#include "sysemu/sysemu.h"
++#include "qemu-common.h"
 +#include "hw/irq.h"
 +
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte)
-+{
-+    if (env->psw_pm =3D=3D 0) {
-+        env->psw_ipl =3D FIELD_EX32(psw, PSW, IPL);
-+        if (rte) {
-+            /* PSW.PM can write RTE and RTFI */
-+            env->psw_pm =3D FIELD_EX32(psw, PSW, PM);
-+        }
-+        env->psw_u =3D FIELD_EX32(psw, PSW, U);
-+        env->psw_i =3D FIELD_EX32(psw, PSW, I);
-+    }
-+    env->psw_o =3D FIELD_EX32(psw, PSW, O) << 31;
-+    env->psw_s =3D FIELD_EX32(psw, PSW, S) << 31;
-+    env->psw_z =3D 1 - FIELD_EX32(psw, PSW, Z);
-+    env->psw_c =3D FIELD_EX32(psw, PSW, C);
-+}
++enum TRG_MODE {
++    TRG_LEVEL =3D 0,
++    TRG_NEDGE =3D 1,      /* Falling */
++    TRG_PEDGE =3D 2,      /* Raising */
++    TRG_BEDGE =3D 3,      /* Both */
++};
 +
-+#define INT_FLAGS (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR)
-+void rx_cpu_do_interrupt(CPUState *cs)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+    int do_irq =3D cs->interrupt_request & INT_FLAGS;
-+    uint32_t save_psw;
++struct IRQSource {
++    enum TRG_MODE sense;
++    int level;
++};
 +
-+    env->in_sleep =3D 0;
++enum {
++    /* Software interrupt request */
++    SWI =3D 27,
++    NR_IRQS =3D 256,
++};
 +
-+    if (env->psw_u) {
-+        env->usp =3D env->regs[0];
-+    } else {
-+        env->isp =3D env->regs[0];
-+    }
-+    save_psw =3D rx_cpu_pack_psw(env);
-+    env->psw_pm =3D env->psw_i =3D env->psw_u =3D 0;
++struct RXICUState {
++    SysBusDevice parent_obj;
 +
-+    if (do_irq) {
-+        if (do_irq & CPU_INTERRUPT_FIR) {
-+            env->bpc =3D env->pc;
-+            env->bpsw =3D save_psw;
-+            env->pc =3D env->fintv;
-+            env->psw_ipl =3D 15;
-+            cs->interrupt_request &=3D ~CPU_INTERRUPT_FIR;
-+            qemu_set_irq(env->ack, env->ack_irq);
-+            qemu_log_mask(CPU_LOG_INT, "fast interrupt raised\n");
-+        } else if (do_irq & CPU_INTERRUPT_HARD) {
-+            env->isp -=3D 4;
-+            cpu_stl_data(env, env->isp, save_psw);
-+            env->isp -=3D 4;
-+            cpu_stl_data(env, env->isp, env->pc);
-+            env->pc =3D cpu_ldl_data(env, env->intb + env->ack_irq * 4);
-+            env->psw_ipl =3D env->ack_ipl;
-+            cs->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
-+            qemu_set_irq(env->ack, env->ack_irq);
-+            qemu_log_mask(CPU_LOG_INT,
-+                          "interrupt 0x%02x raised\n", env->ack_irq);
-+        }
-+    } else {
-+        uint32_t vec =3D cs->exception_index;
-+        const char *expname =3D "unknown exception";
++    MemoryRegion memory;
++    struct IRQSource src[NR_IRQS];
++    char *icutype;
++    uint32_t nr_irqs;
++    uint32_t *map;
++    uint32_t nr_sense;
++    uint32_t *init_sense;
 +
-+        env->isp -=3D 4;
-+        cpu_stl_data(env, env->isp, save_psw);
-+        env->isp -=3D 4;
-+        cpu_stl_data(env, env->isp, env->pc);
++    uint8_t ir[NR_IRQS];
++    uint8_t dtcer[NR_IRQS];
++    uint8_t ier[NR_IRQS / 8];
++    uint8_t ipr[142];
++    uint8_t dmasr[4];
++    uint16_t fir;
++    uint8_t nmisr;
++    uint8_t nmier;
++    uint8_t nmiclr;
++    uint8_t nmicr;
++    int req_irq;
++    qemu_irq _irq;
++    qemu_irq _fir;
++    qemu_irq _swi;
++};
++typedef struct RXICUState RXICUState;
 +
-+        if (vec < 0x100) {
-+            env->pc =3D cpu_ldl_data(env, 0xffffffc0 + vec * 4);
-+        } else {
-+            env->pc =3D cpu_ldl_data(env, env->intb + (vec & 0xff) * 4);
-+        }
-+        switch (vec) {
-+        case 20:
-+            expname =3D "privilege violation";
-+            break;
-+        case 21:
-+            expname =3D "access exception";
-+            break;
-+        case 23:
-+            expname =3D "illegal instruction";
-+            break;
-+        case 25:
-+            expname =3D "fpu exception";
-+            break;
-+        case 30:
-+            expname =3D "non-maskable interrupt";
-+            break;
-+        case 0x100 ... 0x1ff:
-+            expname =3D "unconditional trap";
-+        }
-+        qemu_log_mask(CPU_LOG_INT, "exception 0x%02x [%s] raised\n",
-+                      (vec & 0xff), expname);
-+    }
-+    env->regs[0] =3D env->isp;
-+}
++#define TYPE_RXICU "rx-icu"
++#define RXICU(obj) OBJECT_CHECK(RXICUState, (obj), TYPE_RXICU)
 +
-+bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+    int accept =3D 0;
-+    /* hardware interrupt (Normal) */
-+    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
-+        env->psw_i && (env->psw_ipl < env->req_ipl)) {
-+        env->ack_irq =3D env->req_irq;
-+        env->ack_ipl =3D env->req_ipl;
-+        accept =3D 1;
-+    }
-+    /* hardware interrupt (FIR) */
-+    if ((interrupt_request & CPU_INTERRUPT_FIR) &&
-+        env->psw_i && (env->psw_ipl < 15)) {
-+        accept =3D 1;
-+    }
-+    if (accept) {
-+        rx_cpu_do_interrupt(cs);
-+        return true;
-+    }
-+    return false;
-+}
-+
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-+{
-+    return addr;
-+}
-diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
++#endif /* RX_ICU_H */
+diff --git a/hw/intc/rx_icu.c b/hw/intc/rx_icu.c
 new file mode 100644
-index 0000000000..f89d294f2b
+index 0000000000..ab9a300467
 --- /dev/null
-+++ b/target/rx/op_helper.c
-@@ -0,0 +1,470 @@
++++ b/hw/intc/rx_icu.c
+@@ -0,0 +1,379 @@
 +/*
-+ *  RX helper functions
++ * RX Interrupt Control Unit
 + *
-+ *  Copyright (c) 2019 Yoshinori Sato
++ * Warning: Only ICUa is supported.
++ *
++ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
++ * (Rev.1.40 R01UH0033EJ0140)
++ *
++ * Copyright (c) 2019 Yoshinori Sato
 + *
 + * This program is free software; you can redistribute it and/or modify =
 it
@@ -316,459 +188,383 @@ ng with
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/bitops.h"
++#include "qemu-common.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
 +#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "exec/helper-proto.h"
-+#include "exec/cpu_ldst.h"
-+#include "fpu/softfloat.h"
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/qdev-properties.h"
++#include "hw/intc/rx_icu.h"
++#include "migration/vmstate.h"
++#include "qemu/error-report.h"
 +
-+static inline void QEMU_NORETURN raise_exception(CPURXState *env, int in=
-dex,
-+                                                 uintptr_t retaddr);
++REG8(IR, 0)
++  FIELD(IR, IR,  0, 1)
++REG8(DTCER, 0x100)
++  FIELD(DTCER, DTCE,  0, 1)
++REG8(IER, 0x200)
++REG8(SWINTR, 0x2e0)
++  FIELD(SWINTR, SWINT, 0, 1)
++REG16(FIR, 0x2f0)
++  FIELD(FIR, FVCT, 0, 8)
++  FIELD(FIR, FIEN, 15, 1)
++REG8(IPR, 0x300)
++  FIELD(IPR, IPR, 0, 4)
++REG8(DMRSR, 0x400)
++REG8(IRQCR, 0x500)
++  FIELD(IRQCR, IRQMD, 2, 2)
++REG8(NMISR, 0x580)
++  FIELD(NMISR, NMIST, 0, 1)
++  FIELD(NMISR, LVDST, 1, 1)
++  FIELD(NMISR, OSTST, 2, 1)
++REG8(NMIER, 0x581)
++  FIELD(NMIER, NMIEN, 0, 1)
++  FIELD(NMIER, LVDEN, 1, 1)
++  FIELD(NMIER, OSTEN, 2, 1)
++REG8(NMICLR, 0x582)
++  FIELD(NMICLR, NMICLR, 0, 1)
++  FIELD(NMICLR, OSTCLR, 2, 1)
++REG8(NMICR, 0x583)
++  FIELD(NMICR, NMIMD, 3, 1)
 +
-+static void _set_psw(CPURXState *env, uint32_t psw, uint32_t rte)
++#define request(icu, n) (icu->ipr[icu->map[n]] << 8 | n)
++
++static void set_irq(RXICUState *icu, int n_IRQ, int req)
 +{
-+    uint32_t prev_u;
-+    prev_u =3D env->psw_u;
-+    rx_cpu_unpack_psw(env, psw, rte);
-+    if (prev_u !=3D env->psw_u) {
-+        /* switch r0  */
-+        if (env->psw_u) {
-+            env->isp =3D env->regs[0];
-+            env->regs[0] =3D env->usp;
-+        } else {
-+            env->usp =3D env->regs[0];
-+            env->regs[0] =3D env->isp;
-+        }
++    if ((icu->fir & R_FIR_FIEN_MASK) &&
++        (icu->fir & R_FIR_FVCT_MASK) =3D=3D n_IRQ) {
++        qemu_set_irq(icu->_fir, req);
++    } else {
++        qemu_set_irq(icu->_irq, req);
 +    }
 +}
 +
-+void helper_set_psw(CPURXState *env, uint32_t psw)
++static void rxicu_request(RXICUState *icu, int n_IRQ)
 +{
-+    _set_psw(env, psw, 0);
-+}
++    int enable;
 +
-+void helper_set_psw_rte(CPURXState *env, uint32_t psw)
-+{
-+    _set_psw(env, psw, 1);
-+}
-+
-+uint32_t helper_pack_psw(CPURXState *env)
-+{
-+    return rx_cpu_pack_psw(env);
-+}
-+
-+#define SET_FPSW(b)                                             \
-+    do {                                                        \
-+        env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, C ## b, 1);     \
-+        if (!FIELD_EX32(env->fpsw, FPSW, E ## b)) {             \
-+            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, F ## b, 1); \
-+        }                                                       \
-+    } while (0)
-+
-+/* fp operations */
-+static void update_fpsw(CPURXState *env, float32 ret, uintptr_t retaddr)
-+{
-+    int xcpt, cause, enable;
-+
-+    env->psw_z =3D ret & ~(1 << 31); /* mask sign bit */
-+    env->psw_s =3D ret;
-+
-+    xcpt =3D get_float_exception_flags(&env->fp_status);
-+
-+    /* Clear the cause entries */
-+    env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, CAUSE, 0);
-+
-+    /* set FPSW */
-+    if (unlikely(xcpt)) {
-+        if (xcpt & float_flag_invalid) {
-+            SET_FPSW(V);
-+        }
-+        if (xcpt & float_flag_divbyzero) {
-+            SET_FPSW(Z);
-+        }
-+        if (xcpt & float_flag_overflow) {
-+            SET_FPSW(O);
-+        }
-+        if (xcpt & float_flag_underflow) {
-+            SET_FPSW(U);
-+        }
-+        if (xcpt & float_flag_inexact) {
-+            SET_FPSW(X);
-+        }
-+        if ((xcpt & (float_flag_input_denormal
-+                     | float_flag_output_denormal))
-+            && !FIELD_EX32(env->fpsw, FPSW, DN)) {
-+            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, CE, 1);
-+        }
-+
-+        /* update FPSW_FLAG_S */
-+        if (FIELD_EX32(env->fpsw, FPSW, FLAGS) !=3D 0) {
-+            env->fpsw =3D FIELD_DP32(env->fpsw, FPSW, FS, 1);
-+        }
-+
-+        /* Generate an exception if enabled */
-+        cause =3D FIELD_EX32(env->fpsw, FPSW, CAUSE);
-+        enable =3D FIELD_EX32(env->fpsw, FPSW, ENABLE);
-+        enable |=3D 1 << 5; /* CE always enabled */
-+        if (cause & enable) {
-+            raise_exception(env, 21, retaddr);
-+        }
++    enable =3D icu->ier[n_IRQ / 8] & (1 << (n_IRQ & 7));
++    if (n_IRQ > 0 && enable !=3D 0 && atomic_read(&icu->req_irq) < 0) {
++        atomic_set(&icu->req_irq, n_IRQ);
++        set_irq(icu, n_IRQ, request(icu, n_IRQ));
 +    }
 +}
 +
-+void helper_set_fpsw(CPURXState *env, uint32_t val)
++static void rxicu_set_irq(void *opaque, int n_IRQ, int level)
 +{
-+    static const int roundmode[] =3D {
-+        float_round_nearest_even,
-+        float_round_to_zero,
-+        float_round_up,
-+        float_round_down,
-+    };
-+    uint32_t fpsw =3D env->fpsw;
-+    fpsw |=3D 0x7fffff03;
-+    val &=3D ~0x80000000;
-+    fpsw &=3D val;
-+    FIELD_DP32(fpsw, FPSW, FS, FIELD_EX32(fpsw, FPSW, FLAGS) !=3D 0);
-+    env->fpsw =3D fpsw;
-+    set_float_rounding_mode(roundmode[FIELD_EX32(env->fpsw, FPSW, RM)],
-+                            &env->fp_status);
-+}
++    RXICUState *icu =3D opaque;
++    struct IRQSource *src;
++    int issue;
 +
-+#define FLOATOP(op, func)                                           \
-+    float32 helper_##op(CPURXState *env, float32 t0, float32 t1)    \
-+    {                                                               \
-+        float32 ret;                                                \
-+        ret =3D func(t0, t1, &env->fp_status);                        \
-+        update_fpsw(env, *(uint32_t *)&ret, GETPC());               \
-+        return ret;                                                 \
-+    }
-+
-+FLOATOP(fadd, float32_add)
-+FLOATOP(fsub, float32_sub)
-+FLOATOP(fmul, float32_mul)
-+FLOATOP(fdiv, float32_div)
-+
-+void helper_fcmp(CPURXState *env, float32 t0, float32 t1)
-+{
-+    int st;
-+    st =3D float32_compare(t0, t1, &env->fp_status);
-+    update_fpsw(env, 0, GETPC());
-+    env->psw_z =3D 1;
-+    env->psw_s =3D env->psw_o =3D 0;
-+    switch (st) {
-+    case float_relation_equal:
-+        env->psw_z =3D 0;
-+        break;
-+    case float_relation_less:
-+        env->psw_s =3D -1;
-+        break;
-+    case float_relation_unordered:
-+        env->psw_o =3D -1;
-+        break;
-+    }
-+}
-+
-+uint32_t helper_ftoi(CPURXState *env, float32 t0)
-+{
-+    uint32_t ret;
-+    ret =3D float32_to_int32_round_to_zero(t0, &env->fp_status);
-+    update_fpsw(env, ret, GETPC());
-+    return ret;
-+}
-+
-+uint32_t helper_round(CPURXState *env, float32 t0)
-+{
-+    uint32_t ret;
-+    ret =3D float32_to_int32(t0, &env->fp_status);
-+    update_fpsw(env, ret, GETPC());
-+    return ret;
-+}
-+
-+float32 helper_itof(CPURXState *env, uint32_t t0)
-+{
-+    float32 ret;
-+    ret =3D int32_to_float32(t0, &env->fp_status);
-+    update_fpsw(env, ret, GETPC());
-+    return ret;
-+}
-+
-+/* string operations */
-+void helper_scmpu(CPURXState *env)
-+{
-+    uint8_t tmp0, tmp1;
-+    if (env->regs[3] =3D=3D 0) {
++    if (n_IRQ >=3D NR_IRQS) {
++        error_report("%s: IRQ %d out of range", __func__, n_IRQ);
 +        return;
 +    }
-+    while (env->regs[3] !=3D 0) {
-+        tmp0 =3D cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
-+        tmp1 =3D cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
-+        env->regs[3]--;
-+        if (tmp0 !=3D tmp1 || tmp0 =3D=3D '\0') {
-+            break;
++
++    src =3D &icu->src[n_IRQ];
++
++    level =3D (level !=3D 0);
++    switch (src->sense) {
++    case TRG_LEVEL:
++        /* level-sensitive irq */
++        issue =3D level;
++        src->level =3D level;
++        break;
++    case TRG_NEDGE:
++        issue =3D (level =3D=3D 0 && src->level =3D=3D 1);
++        src->level =3D level;
++        break;
++    case TRG_PEDGE:
++        issue =3D (level =3D=3D 1 && src->level =3D=3D 0);
++        src->level =3D level;
++        break;
++    case TRG_BEDGE:
++        issue =3D ((level ^ src->level) & 1);
++        src->level =3D level;
++        break;
++    default:
++        g_assert_not_reached();
++    }
++    if (issue =3D=3D 0 && src->sense =3D=3D TRG_LEVEL) {
++        icu->ir[n_IRQ] =3D 0;
++        if (atomic_read(&icu->req_irq) =3D=3D n_IRQ) {
++            /* clear request */
++            set_irq(icu, n_IRQ, 0);
++            atomic_set(&icu->req_irq, -1);
 +        }
-+    }
-+    env->psw_z =3D tmp0 - tmp1;
-+    env->psw_c =3D (tmp0 >=3D tmp1);
-+}
-+
-+static uint32_t (* const cpu_ldufn[])(CPUArchState *env,
-+                                     target_ulong ptr,
-+                                     uintptr_t retaddr) =3D {
-+    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
-+};
-+
-+static uint32_t (* const cpu_ldfn[])(CPUArchState *env,
-+                                     target_ulong ptr,
-+                                     uintptr_t retaddr) =3D {
-+    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
-+};
-+
-+static void (* const cpu_stfn[])(CPUArchState *env,
-+                                 target_ulong ptr,
-+                                 uint32_t val,
-+                                 uintptr_t retaddr) =3D {
-+    cpu_stb_data_ra, cpu_stw_data_ra, cpu_stl_data_ra,
-+};
-+
-+void helper_sstr(CPURXState *env, uint32_t sz)
-+{
-+    tcg_debug_assert(sz < 3);
-+    while (env->regs[3] !=3D 0) {
-+        cpu_stfn[sz](env, env->regs[1], env->regs[2], GETPC());
-+        env->regs[1] +=3D 1 << sz;
-+        env->regs[3]--;
-+    }
-+}
-+
-+#define OP_SMOVU 1
-+#define OP_SMOVF 0
-+#define OP_SMOVB 2
-+
-+static void smov(uint32_t mode, CPURXState *env)
-+{
-+    uint8_t tmp;
-+    int dir;
-+
-+    dir =3D (mode & OP_SMOVB) ? -1 : 1;
-+    while (env->regs[3] !=3D 0) {
-+        tmp =3D cpu_ldub_data_ra(env, env->regs[2], GETPC());
-+        cpu_stb_data_ra(env, env->regs[1], tmp, GETPC());
-+        env->regs[1] +=3D dir;
-+        env->regs[2] +=3D dir;
-+        env->regs[3]--;
-+        if ((mode & OP_SMOVU) && tmp =3D=3D 0) {
-+            break;
-+        }
-+    }
-+}
-+
-+void helper_smovu(CPURXState *env)
-+{
-+    smov(OP_SMOVU, env);
-+}
-+
-+void helper_smovf(CPURXState *env)
-+{
-+    smov(OP_SMOVF, env);
-+}
-+
-+void helper_smovb(CPURXState *env)
-+{
-+    smov(OP_SMOVB, env);
-+}
-+
-+
-+void helper_suntil(CPURXState *env, uint32_t sz)
-+{
-+    uint32_t tmp;
-+    tcg_debug_assert(sz < 3);
-+    if (env->regs[3] =3D=3D 0) {
-+        return ;
-+    }
-+    while (env->regs[3] !=3D 0) {
-+        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
-+        env->regs[1] +=3D 1 << sz;
-+        env->regs[3]--;
-+        if (tmp =3D=3D env->regs[2]) {
-+            break;
-+        }
-+    }
-+    env->psw_z =3D tmp - env->regs[2];
-+    env->psw_c =3D (tmp <=3D env->regs[2]);
-+}
-+
-+void helper_swhile(CPURXState *env, uint32_t sz)
-+{
-+    uint32_t tmp;
-+    tcg_debug_assert(sz < 3);
-+    if (env->regs[3] =3D=3D 0) {
-+        return ;
-+    }
-+    while (env->regs[3] !=3D 0) {
-+        tmp =3D cpu_ldufn[sz](env, env->regs[1], GETPC());
-+        env->regs[1] +=3D 1 << sz;
-+        env->regs[3]--;
-+        if (tmp !=3D env->regs[2]) {
-+            break;
-+        }
-+    }
-+    env->psw_z =3D env->regs[3];
-+    env->psw_c =3D (tmp <=3D env->regs[2]);
-+}
-+
-+/* accumlator operations */
-+void helper_rmpa(CPURXState *env, uint32_t sz)
-+{
-+    uint64_t result_l, prev;
-+    int32_t result_h;
-+    int64_t tmp0, tmp1;
-+
-+    if (env->regs[3] =3D=3D 0) {
 +        return;
 +    }
-+    result_l =3D env->regs[5];
-+    result_l <<=3D 32;
-+    result_l |=3D env->regs[4];
-+    result_h =3D env->regs[6];
-+    env->psw_o =3D 0;
++    if (issue) {
++        icu->ir[n_IRQ] =3D 1;
++        rxicu_request(icu, n_IRQ);
++    }
++}
 +
-+    while (env->regs[3] !=3D 0) {
-+        tmp0 =3D cpu_ldfn[sz](env, env->regs[1], GETPC());
-+        tmp1 =3D cpu_ldfn[sz](env, env->regs[2], GETPC());
-+        tmp0 *=3D tmp1;
-+        prev =3D result_l;
-+        result_l +=3D tmp0;
-+        /* carry / bollow */
-+        if (tmp0 < 0) {
-+            if (prev > result_l) {
-+                result_h--;
-+            }
-+        } else {
-+            if (prev < result_l) {
-+                result_h++;
++static void rxicu_ack_irq(void *opaque, int no, int level)
++{
++    RXICUState *icu =3D opaque;
++    int i;
++    int n_IRQ;
++    int max_pri;
++
++    n_IRQ =3D atomic_read(&icu->req_irq);
++    if (n_IRQ < 0) {
++        return;
++    }
++    atomic_set(&icu->req_irq, -1);
++    if (icu->src[n_IRQ].sense !=3D TRG_LEVEL) {
++        icu->ir[n_IRQ] =3D 0;
++    }
++
++    max_pri =3D 0;
++    n_IRQ =3D -1;
++    for (i =3D 0; i < NR_IRQS; i++) {
++        if (icu->ir[i]) {
++            if (max_pri < icu->ipr[icu->map[i]]) {
++                n_IRQ =3D i;
++                max_pri =3D icu->ipr[icu->map[i]];
 +            }
 +        }
-+
-+        env->regs[1] +=3D 1 << sz;
-+        env->regs[2] +=3D 1 << sz;
 +    }
-+    env->psw_s =3D result_h;
-+    env->psw_o =3D (result_h !=3D 0 && result_h !=3D -1) << 31;
-+    env->regs[6] =3D result_h;
-+    env->regs[5] =3D result_l >> 32;
-+    env->regs[4] =3D result_l & 0xffffffff;
++
++    if (n_IRQ >=3D 0) {
++        rxicu_request(icu, n_IRQ);
++    }
 +}
 +
-+void helper_racw(CPURXState *env, uint32_t imm)
++static uint64_t icu_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    int64_t acc;
-+    acc =3D env->acc;
-+    acc <<=3D (imm + 1);
-+    acc +=3D 0x0000000080000000LL;
-+    if (acc > 0x00007fff00000000LL) {
-+        acc =3D 0x00007fff00000000LL;
-+    } else if (acc < -0x800000000000LL) {
-+        acc =3D -0x800000000000LL;
-+    } else {
-+        acc &=3D 0xffffffff00000000LL;
++    RXICUState *icu =3D opaque;
++    int reg =3D addr & 0xff;
++
++    if ((addr !=3D A_FIR && size !=3D 1) ||
++        (addr =3D=3D A_FIR && size !=3D 2)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "rx_icu: Invalid read size 0x%"
++                      HWADDR_PRIX "\n", addr);
++        return UINT64_MAX;
 +    }
-+    env->acc =3D acc;
++    switch (addr) {
++    case A_IR ... A_IR + 0xff:
++        return icu->ir[reg] & R_IR_IR_MASK;
++    case A_DTCER ... A_DTCER + 0xff:
++        return icu->dtcer[reg] & R_DTCER_DTCE_MASK;
++    case A_IER ... A_IER + 0x1f:
++        return icu->ier[reg];
++    case A_SWINTR:
++        return 0;
++    case A_FIR:
++        return icu->fir & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
++    case A_IPR ... A_IPR + 0x8f:
++        return icu->ipr[reg] & R_IPR_IPR_MASK;
++    case A_DMRSR:
++    case A_DMRSR + 4:
++    case A_DMRSR + 8:
++    case A_DMRSR + 12:
++        return icu->dmasr[reg >> 2];
++    case A_IRQCR ... A_IRQCR + 0x1f:
++        return icu->src[64 + reg].sense << R_IRQCR_IRQMD_SHIFT;
++    case A_NMISR:
++    case A_NMICLR:
++        return 0;
++    case A_NMIER:
++        return icu->nmier;
++    case A_NMICR:
++        return icu->nmicr;
++    default:
++        qemu_log_mask(LOG_UNIMP, "rx_icu: Register 0x%" HWADDR_PRIX
++                      " not implemented.\n", addr);
++        break;
++    }
++    return UINT64_MAX;
 +}
 +
-+void helper_satr(CPURXState *env)
++static void icu_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
+size)
 +{
-+    if (env->psw_o >> 31) {
-+        if ((int)env->psw_s < 0) {
-+            env->regs[6] =3D 0x00000000;
-+            env->regs[5] =3D 0x7fffffff;
-+            env->regs[4] =3D 0xffffffff;
++    RXICUState *icu =3D opaque;
++    int reg =3D addr & 0xff;
++
++    if ((addr !=3D A_FIR && size !=3D 1) ||
++        (addr =3D=3D A_FIR && size !=3D 2)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "rx_icu: Invalid write size at 0x=
+%"
++                      HWADDR_PRIX "\n", addr);
++        return;
++    }
++    switch (addr) {
++    case A_IR ... A_IR + 0xff:
++        if (icu->src[reg].sense !=3D TRG_LEVEL && val =3D=3D 0) {
++            icu->ir[reg] =3D 0;
++        }
++        break;
++    case A_DTCER ... A_DTCER + 0xff:
++        icu->dtcer[reg] =3D val & R_DTCER_DTCE_MASK;
++        qemu_log_mask(LOG_UNIMP,
++                      "rx_icu: DTC not implemented\n");
++        break;
++    case A_IER ... A_IER + 0x1f:
++        icu->ier[reg] =3D val;
++        break;
++    case A_SWINTR:
++        if (val & R_SWINTR_SWINT_MASK) {
++            qemu_irq_pulse(icu->_swi);
++        }
++        break;
++    case A_FIR:
++        icu->fir =3D val & (R_FIR_FIEN_MASK | R_FIR_FVCT_MASK);
++        break;
++    case A_IPR ... A_IPR + 0x8f:
++        icu->ipr[reg] =3D val & R_IPR_IPR_MASK;
++        break;
++    case A_DMRSR:
++    case A_DMRSR + 4:
++    case A_DMRSR + 8:
++    case A_DMRSR + 12:
++        icu->dmasr[reg >> 2] =3D val;
++        qemu_log_mask(LOG_UNIMP,
++                      "rx_icu: DMAC not implemented\n");
++        break;
++    case A_IRQCR ... A_IRQCR + 0x1f:
++        icu->src[64 + reg].sense =3D val >> R_IRQCR_IRQMD_SHIFT;
++        break;
++    case A_NMICLR:
++        break;
++    case A_NMIER:
++        icu->nmier |=3D val & (R_NMIER_NMIEN_MASK |
++                             R_NMIER_LVDEN_MASK |
++                             R_NMIER_OSTEN_MASK);
++            break;
++    case A_NMICR:
++        if ((icu->nmier & R_NMIER_NMIEN_MASK) =3D=3D 0) {
++            icu->nmicr =3D val & R_NMICR_NMIMD_MASK;
++        }
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "rx_icu: Register 0x%" HWADDR_PRIX
++                      " not implemented\n", addr);
++        break;
++    }
++}
++
++static const MemoryRegionOps icu_ops =3D {
++    .write =3D icu_write,
++    .read  =3D icu_read,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++    .impl =3D {
++        .max_access_size =3D 2,
++    },
++};
++
++static void rxicu_realize(DeviceState *dev, Error **errp)
++{
++    RXICUState *icu =3D RXICU(dev);
++    int i, j;
++
++    if (icu->init_sense =3D=3D NULL) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "rx_icu: trigger-level property must be set.");
++        return;
++    }
++    for (i =3D j =3D 0; i < NR_IRQS; i++) {
++        if (icu->init_sense[j] =3D=3D i) {
++            icu->src[i].sense =3D TRG_LEVEL;
++            if (j < icu->nr_sense) {
++                j++;
++            }
 +        } else {
-+            env->regs[6] =3D 0xffffffff;
-+            env->regs[5] =3D 0x80000000;
-+            env->regs[4] =3D 0x00000000;
++            icu->src[i].sense =3D TRG_PEDGE;
 +        }
 +    }
++    icu->req_irq =3D -1;
 +}
 +
-+/* div */
-+uint32_t helper_div(CPURXState *env, uint32_t num, uint32_t den)
++static void rxicu_init(Object *obj)
 +{
-+    uint32_t ret =3D num;
-+    if (!((num =3D=3D INT_MIN && den =3D=3D -1) || den =3D=3D 0)) {
-+        ret =3D (int32_t)num / (int32_t)den;
-+        env->psw_o =3D 0;
-+    } else {
-+        env->psw_o =3D -1;
++    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
++    RXICUState *icu =3D RXICU(obj);
++
++    memory_region_init_io(&icu->memory, OBJECT(icu), &icu_ops,
++                          icu, "rx-icu", 0x600);
++    sysbus_init_mmio(d, &icu->memory);
++
++    qdev_init_gpio_in(DEVICE(d), rxicu_set_irq, NR_IRQS);
++    qdev_init_gpio_in_named(DEVICE(d), rxicu_ack_irq, "ack", 1);
++    sysbus_init_irq(d, &icu->_irq);
++    sysbus_init_irq(d, &icu->_fir);
++    sysbus_init_irq(d, &icu->_swi);
++}
++
++static void rxicu_fini(Object *obj)
++{
++    RXICUState *icu =3D RXICU(obj);
++    g_free(icu->map);
++    g_free(icu->init_sense);
++}
++
++static const VMStateDescription vmstate_rxicu =3D {
++    .name =3D "rx-icu",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
 +    }
-+    return ret;
-+}
++};
 +
-+uint32_t helper_divu(CPURXState *env, uint32_t num, uint32_t den)
++static Property rxicu_properties[] =3D {
++    DEFINE_PROP_ARRAY("ipr-map", RXICUState, nr_irqs, map,
++                      qdev_prop_uint32, uint32_t),
++    DEFINE_PROP_ARRAY("trigger-level", RXICUState, nr_sense, init_sense,
++                      qdev_prop_uint32, uint32_t),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void rxicu_class_init(ObjectClass *klass, void *data)
 +{
-+    uint32_t ret =3D num;
-+    if (den !=3D 0) {
-+        ret =3D num / den;
-+        env->psw_o =3D 0;
-+    } else {
-+        env->psw_o =3D -1;
-+    }
-+    return ret;
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D rxicu_realize;
++    dc->vmsd =3D &vmstate_rxicu;
++    device_class_set_props(dc, rxicu_properties);
 +}
 +
-+/* exception */
-+static inline void QEMU_NORETURN raise_exception(CPURXState *env, int in=
-dex,
-+                                                 uintptr_t retaddr)
++static const TypeInfo rxicu_info =3D {
++    .name       =3D TYPE_RXICU,
++    .parent     =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(RXICUState),
++    .instance_init =3D rxicu_init,
++    .instance_finalize =3D rxicu_fini,
++    .class_init =3D rxicu_class_init,
++};
++
++static void rxicu_register_types(void)
 +{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D index;
-+    cpu_loop_exit_restore(cs, retaddr);
++    type_register_static(&rxicu_info);
 +}
 +
-+void QEMU_NORETURN helper_raise_privilege_violation(CPURXState *env)
-+{
-+    raise_exception(env, 20, GETPC());
-+}
++type_init(rxicu_register_types)
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index a189d6fedd..f562342bab 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -61,3 +61,6 @@ config S390_FLIC_KVM
+=20
+ config OMPIC
+     bool
 +
-+void QEMU_NORETURN helper_raise_access_fault(CPURXState *env)
-+{
-+    raise_exception(env, 21, GETPC());
-+}
-+
-+void QEMU_NORETURN helper_raise_illegal_instruction(CPURXState *env)
-+{
-+    raise_exception(env, 23, GETPC());
-+}
-+
-+void QEMU_NORETURN helper_wait(CPURXState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->halted =3D 1;
-+    env->in_sleep =3D 1;
-+    raise_exception(env, EXCP_HLT, 0);
-+}
-+
-+void QEMU_NORETURN helper_debug(CPURXState *env)
-+{
-+    CPUState *cs =3D env_cpu(env);
-+
-+    cs->exception_index =3D EXCP_DEBUG;
-+    cpu_loop_exit(cs);
-+}
-+
-+void QEMU_NORETURN helper_rxint(CPURXState *env, uint32_t vec)
-+{
-+    raise_exception(env, 0x100 + vec, 0);
-+}
-+
-+void QEMU_NORETURN helper_rxbrk(CPURXState *env)
-+{
-+    raise_exception(env, 0x100, 0);
-+}
++config RX_ICU
++    bool
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index f726d87532..f17cbd1a9f 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -49,3 +49,4 @@ obj-$(CONFIG_ARM_GIC) +=3D arm_gicv3_cpuif.o
+ obj-$(CONFIG_MIPS_CPS) +=3D mips_gic.o
+ obj-$(CONFIG_NIOS2) +=3D nios2_iic.o
+ obj-$(CONFIG_OMPIC) +=3D ompic.o
++obj-$(CONFIG_RX) +=3D rx_icu.o
 --=20
 2.20.1
 
