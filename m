@@ -2,88 +2,84 @@ Return-Path: <SRS0=CqNf=4L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03ED3C35669
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 03:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34673C35670
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 04:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BACEE2067D
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 03:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA4672067D
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 04:00:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="R9aYvIhh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BACEE2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhWrUyOQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA4672067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5hcH-00053y-Vn
-	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 22:07:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50675)
+	id 1j5iRK-00008F-4I
+	for qemu-devel@archiver.kernel.org; Sat, 22 Feb 2020 23:00:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cota@braap.org>) id 1j5hbg-0004XP-Ky
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 22:07:01 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1j5iQk-00088K-Vd
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 22:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cota@braap.org>) id 1j5hbf-0005K8-KU
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 22:07:00 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:40332)
+ (envelope-from <bmeng.cn@gmail.com>) id 1j5iQk-00024i-0N
+ for qemu-devel@nongnu.org; Sat, 22 Feb 2020 22:59:46 -0500
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:35416)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cota@braap.org>) id 1j5hbf-0005Jo-6W
- for qemu-devel@nongnu.org; Sat, 22 Feb 2020 22:06:59 -0500
-Received: by mail-qt1-x841.google.com with SMTP id v25so4293475qto.7
- for <qemu-devel@nongnu.org>; Sat, 22 Feb 2020 19:06:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=braap-org.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=4a//ttCQXSg0FbXMz/XNiDY/oVy6LdIHEUyR9Ye3AD8=;
- b=R9aYvIhh5ZaBs1j2oi9VLDT7UtvsNdKml/Rt5Y1436gH3Co5dz3Z0+Vrbri+lBHN2A
- OM3ZJaoS9wNVgyfu1ennfgiCMkJta2XahZOYgQbMea3mUa5ogPBJsPwTQVkyUul2Zyaj
- 1UPS9nQvtw7HbTma+0jH5l/mzoTwC77BTwv8iW6grQ+sesAZnNemFXCLcwd5nbha+ebV
- sL9Xlm2OAPGkzKJXay2xdKpNhdX8u9a2/Qh/0cw0Tv/B0CUlAk6w9q3S6K+ES2HiSsgR
- Il8n4Pj3TONzXxJhHoSrRFIDYRwvQQmRPcyf/V/H3bJBad6d+pyb08JDCWaSZcYgsAAJ
- WyPw==
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1j5iQj-00024P-Su; Sat, 22 Feb 2020 22:59:45 -0500
+Received: by mail-yw1-xc41.google.com with SMTP id i190so3634317ywc.2;
+ Sat, 22 Feb 2020 19:59:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=mLUD0Tfh1gY4f7W+19o7k3ooXhot98r8f2MwTNGaSjI=;
+ b=UhWrUyOQT0667mMAjDcFFeNnKFHGNNad1bXV5IgYNRMl2qgkKwMsYCltp6Pyyu3i33
+ 5/rwJk8dHvX5vWCQKjAn6LsTdH6I68MyfYBPkszYcE0Vp/Q8/G2UdQNcRaksj9HQHmXH
+ X/188B4iJS9trXm4jfT7oX4TySaiTXaui91TmtVQqjwofWWAd6sLSa/ZXUtXpVLH4hb/
+ 2Vodvpmdk/fz26Ox5UDYtacGRluSKzNJwxPfk33aRTTniQmciSLPg8KoyvEuxfCRLbWA
+ MN2vH2S11bxcoIRshRGvcR+NPS9//GHdaGaSaut2gSFsGi6ZSXcD9FfNWZFTIFvH3Rga
+ vZ6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=4a//ttCQXSg0FbXMz/XNiDY/oVy6LdIHEUyR9Ye3AD8=;
- b=Jv4bsvwWAxoQ/TgnNQveXFf1KTSR5CXGcJfs2t0Ot0r/6rSBrhmKhdgV/ZryGjYd5q
- qx2KOy4CiU065aYfsmJJVSIW6QKN86rFIUVxd0F9KN8TMqiDELdMraOkFY8VmiJxc61x
- ndva3/0FC9/yr6mnUF6JEJkuCwQE4HGwvXzonsUiZmtzjH8ZhwYKqGf5DG8dbhWDM/6a
- BD6JsvOjvabPYnw2VYR/he239vqB3YqQeJnIMy+3XL4Yb+TSs+33VDiLbWsYaotZ2kF0
- SJoLLqFm2LpgIxdrjzkdb4IXgsMjHOSflGsudI3CH4au8HzOJWDgS0oP7Jkmp58TLIh+
- 1msA==
-X-Gm-Message-State: APjAAAXp65Py2L2fmkWOZ4UQdb8MEUoB5EYuob6Y9tV5HQ8FrkCxNQps
- hxLGQ5gpMxE/HUSkHpFQ9dR7tg==
-X-Google-Smtp-Source: APXvYqzmicr7GpoEVtySyjkEWzD6sV9fBrZQ0cuJ/IeCkGrKapSTJsjsCawKFTUAKZou9VeL8EwZFw==
-X-Received: by 2002:ac8:4e3c:: with SMTP id d28mr40293966qtw.190.1582427218098; 
- Sat, 22 Feb 2020 19:06:58 -0800 (PST)
-Received: from localhost ([70.19.54.161])
- by smtp.gmail.com with ESMTPSA id i13sm3940089qki.70.2020.02.22.19.06.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 22 Feb 2020 19:06:57 -0800 (PST)
-Date: Sat, 22 Feb 2020 22:06:56 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH  v2 17/19] tcg: save vaddr temp for plugin usage
-Message-ID: <20200223030656.GA10709@t420>
-References: <20200213225109.13120-1-alex.bennee@linaro.org>
- <20200213225109.13120-18-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=mLUD0Tfh1gY4f7W+19o7k3ooXhot98r8f2MwTNGaSjI=;
+ b=m/QFxIGK8nJbLL6N40FVEmQi+S9e4hxkPukOSlpoXdbH0PfsaqLaxg3eMmUtUKp+BM
+ dm29IQoPlh0VceD2ATdzB8/4G7vpdT9fRCX5Z7TN+bUs0higG/eDK0/CGNWo+rhSjMCK
+ yC6RqyVID8B2Y8BqPuaQB5LAV5ARNkNHjXGX6M69MEiAQFZwouJwKD85zrFz44E/SF4Z
+ QmPzxDpHOHku/DM81YyYql2m49XizdFyzzL4OjweUdvdR1Va/beJqtRQHn+mdKOfBLpL
+ nyDUleVKKnj9zJmWiJZZs0Y5j8g0ot7aWnN3LlSljw1MAZwx7E8VY1JQAVCARWuJIK5M
+ 1kAA==
+X-Gm-Message-State: APjAAAWYE+prkHTCpKDZtyWg1ajDYvOy8BOD8bf+lsy49+Jf8HEEYDIn
+ wZSsfkNmXMaTqMuVk3yKlTKqM74M8O3D7Mtdisk=
+X-Google-Smtp-Source: APXvYqxejFPsQw1szrYkluQSgPPx0gdyjbEJMpe00VxKkfVhCpTcdCANXN2jgPAX2CW3JP5/nVxP/T74lAK5AfQhzVU=
+X-Received: by 2002:a81:8a06:: with SMTP id a6mr34218699ywg.240.1582430384989; 
+ Sat, 22 Feb 2020 19:59:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200213225109.13120-18-alex.bennee@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Sun, 23 Feb 2020 11:59:34 +0800
+Message-ID: <CAEUhbmVJJNhgDvenWnWU134NneGDmtc_7i5TP2vKtKh=QzYrjQ@mail.gmail.com>
+Subject: Re: [PATCH v2] riscv: sifive_u: Add a "serial" property for board
+ serial number
+To: Alistair Francis <Alistair.Francis@wdc.com>, 
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>, 
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, 
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,29 +91,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- stefanb@linux.vnet.ibm.com, qemu-stable@nongnu.org,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
- f4bug@amsat.org, marcandre.lureau@redhat.com, aaron@os.amperecomputing.com,
- pbonzini@redhat.com, stefanha@redhat.com, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org, aurelien@aurel32.net,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 22:51:07 +0000, Alex Bennée wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
-> 
-> While do_gen_mem_cb does copy (via extu_tl_i64) vaddr into a new temp
-> this won't help if the vaddr temp gets clobbered by the actual
-> load/store op. To avoid this clobbering we explicitly copy vaddr
-> before the op to ensure it is live my the time we do the
-> instrumentation.
+On Sun, Feb 16, 2020 at 9:55 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> At present the board serial number is hard-coded to 1, and passed
+> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> the serial number to generate a unique MAC address for the on-chip
+> ethernet controller. When multiple QEMU 'sifive_u' instances are
+> created and connected to the same subnet, they all have the same
+> MAC address hence it creates a unusable network.
+>
+> A new "serial" property is introduced to specify the board serial
+> number. When not given, the default serial number 1 is used.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>
+> ---
+>
+> Changes in v2:
+> - Move setting OTP serial number property from riscv_sifive_u_soc_init()
+>   to riscv_sifive_u_soc_realize(), to fix the 'check-qtest-riscv' error.
+>   I am not really sure why doing so could fix the 'make check' error.
+>   The v1 patch worked fine and nothing seems wrong.
+>
+>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+>  include/hw/riscv/sifive_u.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+>
 
-s/my the time/by the time/
+Ping?
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-
-		E.
+Regards,
+Bin
 
