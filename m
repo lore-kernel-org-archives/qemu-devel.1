@@ -2,53 +2,50 @@ Return-Path: <SRS0=CqNf=4L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDEAC35671
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D468C35671
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0085B20637
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0085B20637
+	by mail.kernel.org (Postfix) with ESMTPS id 37B2520637
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 13:33:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37B2520637
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j5rNa-0005QY-2N
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:33:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41656)
+	id 1j5rNc-0005UB-9c
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 08:33:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-00005H-Hh
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rIe-00005K-UD
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003sZ-B9
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003sJ-9D
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:28:00 -0500
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:45196)
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:45191)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003rg-35
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j5rId-0003rd-11
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 08:27:59 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 588EFE3508;
- Sun, 23 Feb 2020 22:27:57 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id C00FCE3456;
+ Sun, 23 Feb 2020 22:27:56 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1A17B24008E;
- Sun, 23 Feb 2020 22:27:57 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 26B2B24008E;
+ Sun, 23 Feb 2020 22:27:56 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v31 03/22] hw/registerfields.h: Add 8bit and 16bit
- register macros
-Date: Sun, 23 Feb 2020 22:27:30 +0900
-Message-Id: <20200223132750.69480-4-ysato@users.sourceforge.jp>
+Subject: [PATCH RESEND v31 00/22] Add RX archtecture support
+Date: Sun, 23 Feb 2020 22:27:27 +0900
+Message-Id: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200223132750.69480-1-ysato@users.sourceforge.jp>
-References: <20200223132750.69480-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -66,130 +63,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: richard.henderson@linaro.org, philmd@redhat.com,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Sorry. I missed commit 1 changes.
+Fixed it.
 
-Some RX peripheral using 8bit and 16bit registers.
-Added 8bit and 16bit APIs.
+Hello.
+This patch series is added Renesas RX target emulation.
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-11-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/registerfields.h | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+Changes for v30.
+Follow master changes.
+Fix checkpatch error.
 
-diff --git a/include/hw/registerfields.h b/include/hw/registerfields.h
-index 2659a58737..a0bb0654d6 100644
---- a/include/hw/registerfields.h
-+++ b/include/hw/registerfields.h
-@@ -22,6 +22,14 @@
-     enum { A_ ## reg =3D (addr) };                                      =
-    \
-     enum { R_ ## reg =3D (addr) / 4 };
-=20
-+#define REG8(reg, addr)                                                 =
- \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) };
-+
-+#define REG16(reg, addr)                                                =
-  \
-+    enum { A_ ## reg =3D (addr) };                                      =
-    \
-+    enum { R_ ## reg =3D (addr) / 2 };
-+
- /* Define SHIFT, LENGTH and MASK constants for a field within a register=
- */
-=20
- /* This macro will define R_FOO_BAR_MASK, R_FOO_BAR_SHIFT and R_FOO_BAR_=
-LENGTH
-@@ -34,6 +42,12 @@
-                                         MAKE_64BIT_MASK(shift, length)};
-=20
- /* Extract a field from a register */
-+#define FIELD_EX8(storage, reg, field)                                  =
-  \
-+    extract8((storage), R_ ## reg ## _ ## field ## _SHIFT,              =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
-+#define FIELD_EX16(storage, reg, field)                                 =
-  \
-+    extract16((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-+              R_ ## reg ## _ ## field ## _LENGTH)
- #define FIELD_EX32(storage, reg, field)                                 =
-  \
-     extract32((storage), R_ ## reg ## _ ## field ## _SHIFT,             =
-  \
-               R_ ## reg ## _ ## field ## _LENGTH)
-@@ -49,6 +63,22 @@
-  * Assigning values larger then the target field will result in
-  * compilation warnings.
-  */
-+#define FIELD_DP8(storage, reg, field, val) ({                          =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint8_t d;                                                          =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
-+#define FIELD_DP16(storage, reg, field, val) ({                         =
-  \
-+    struct {                                                            =
-  \
-+        unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-+    } v =3D { .v =3D val };                                             =
-      \
-+    uint16_t d;                                                         =
-  \
-+    d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-+                  R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-+    d; })
- #define FIELD_DP32(storage, reg, field, val) ({                         =
-  \
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-@@ -57,7 +87,7 @@
-     d =3D deposit32((storage), R_ ## reg ## _ ## field ## _SHIFT,       =
-    \
-                   R_ ## reg ## _ ## field ## _LENGTH, v.v);             =
-  \
-     d; })
--#define FIELD_DP64(storage, reg, field, val) ({                         =
-  \
-+#define FIELD_DP64(storage, reg, field, val) ({                         =
-\
-     struct {                                                            =
-  \
-         unsigned int v:R_ ## reg ## _ ## field ## _LENGTH;              =
-  \
-     } v =3D { .v =3D val };                                             =
-      \
+Changes for v29.
+Add target description XML. It required gdb-9.1.
+Follow git master changes.
+
+Changes for v28.
+Allow -m option.
+With this option, 16 Mbytes or more can be specified.
+Add example for qemu-doc.
+Fix build error on latest master.
+
+Changes for v27.
+Added RX section to qemu-doc.
+Rebase for master
+
+Changes for v26.
+Rebase for 5.0
+Update machine.json for 5.0
+
+Changes for v25.
+Update commit message.
+Squashed qapi/machine.json changes.
+
+Changes for v24.
+Add note for qapi/machine.json.
+Added Acked-by for 6/22.
+git rebase master.
+
+Changes for v23.
+Follow master changes.
+
+Changes for v22.
+Added some include.
+
+Changes for v21.
+rebase latest master.
+Remove unneeded hmp_info_tlb.
+
+Chanegs for v20.
+Reorderd patches.
+Squashed v19 changes.
+
+Changes for v19.
+Follow tcg changes.
+Cleanup cpu.c.
+simplify rx_cpu_class_by_name and rx_load_image move to rx-virt.
+
+My git repository is bellow.
+git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20200223
+
+Testing binaries bellow.
+u-boot
+Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+
+starting
+$ gzip -d u-boot.bin.gz
+$ qemu-system-rx -bios u-boot.bin
+
+linux and pico-root (only sash)
+Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+           https://osdn.net/users/ysato/pf/qemu/dl/rx-virt.dtb (DeviceTre=
+e)
+
+starting
+$ qemu-system-rx -kernel zImage -dtb rx-virt.dtb -append "earlycon"
+
+Philippe Mathieu-Daud=C3=A9 (3):
+  hw/registerfields.h: Add 8bit and 16bit register macros
+  hw/rx: Restrict the RX62N microcontroller to the RX62N CPU core
+  BootLinuxConsoleTest: Test the RX-Virt machine
+
+Richard Henderson (7):
+  target/rx: Disassemble rx_index_addr into a string
+  target/rx: Replace operand with prt_ldmi in disassembler
+  target/rx: Use prt_ldmi for XCHG_mr disassembly
+  target/rx: Emit all disassembly in one prt()
+  target/rx: Collect all bytes during disassembly
+  target/rx: Dump bytes for each insn during disassembly
+  hw/rx: Honor -accel qtest
+
+Yoshinori Sato (12):
+  MAINTAINERS: Add RX
+  qemu/bitops.h: Add extract8 and extract16
+  target/rx: TCG translation
+  target/rx: TCG helper
+  target/rx: CPU definition
+  target/rx: RX disassembler
+  hw/intc: RX62N interrupt controller (ICUa)
+  hw/timer: RX62N internal timer modules
+  hw/char: RX62N serial communication interface (SCI)
+  hw/rx: RX Target hardware definition
+  Add rx-softmmu
+  qemu-doc.texi: Add RX section.
+
+ qemu-doc.texi                          |   44 +
+ configure                              |   11 +-
+ default-configs/rx-softmmu.mak         |    3 +
+ qapi/machine.json                      |    2 +-
+ include/disas/dis-asm.h                |    5 +
+ include/exec/poison.h                  |    1 +
+ include/hw/char/renesas_sci.h          |   45 +
+ include/hw/intc/rx_icu.h               |   56 +
+ include/hw/registerfields.h            |   32 +-
+ include/hw/rx/rx.h                     |    7 +
+ include/hw/rx/rx62n.h                  |   91 +
+ include/hw/timer/renesas_cmt.h         |   38 +
+ include/hw/timer/renesas_tmr.h         |   53 +
+ include/qemu/bitops.h                  |   38 +
+ include/sysemu/arch_init.h             |    1 +
+ target/rx/cpu-param.h                  |   31 +
+ target/rx/cpu-qom.h                    |   42 +
+ target/rx/cpu.h                        |  181 ++
+ target/rx/helper.h                     |   31 +
+ target/rx/insns.decode                 |  621 ++++++
+ arch_init.c                            |    2 +
+ hw/char/renesas_sci.c                  |  342 ++++
+ hw/intc/rx_icu.c                       |  379 ++++
+ hw/rx/rx-virt.c                        |  144 ++
+ hw/rx/rx62n.c                          |  247 +++
+ hw/timer/renesas_cmt.c                 |  278 +++
+ hw/timer/renesas_tmr.c                 |  458 +++++
+ target/rx/cpu.c                        |  218 +++
+ target/rx/disas.c                      | 1446 ++++++++++++++
+ target/rx/gdbstub.c                    |  112 ++
+ target/rx/helper.c                     |  149 ++
+ target/rx/op_helper.c                  |  470 +++++
+ target/rx/translate.c                  | 2432 ++++++++++++++++++++++++
+ tests/qtest/machine-none-test.c        |    1 +
+ MAINTAINERS                            |   19 +
+ gdb-xml/rx-core.xml                    |   70 +
+ hw/Kconfig                             |    1 +
+ hw/char/Kconfig                        |    3 +
+ hw/char/Makefile.objs                  |    1 +
+ hw/intc/Kconfig                        |    3 +
+ hw/intc/Makefile.objs                  |    1 +
+ hw/rx/Kconfig                          |   14 +
+ hw/rx/Makefile.objs                    |    2 +
+ hw/timer/Kconfig                       |    6 +
+ hw/timer/Makefile.objs                 |    3 +
+ target/rx/Makefile.objs                |   11 +
+ tests/acceptance/boot_linux_console.py |   46 +
+ 47 files changed, 8188 insertions(+), 3 deletions(-)
+ create mode 100644 default-configs/rx-softmmu.mak
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 include/hw/intc/rx_icu.h
+ create mode 100644 include/hw/rx/rx.h
+ create mode 100644 include/hw/rx/rx62n.h
+ create mode 100644 include/hw/timer/renesas_cmt.h
+ create mode 100644 include/hw/timer/renesas_tmr.h
+ create mode 100644 target/rx/cpu-param.h
+ create mode 100644 target/rx/cpu-qom.h
+ create mode 100644 target/rx/cpu.h
+ create mode 100644 target/rx/helper.h
+ create mode 100644 target/rx/insns.decode
+ create mode 100644 hw/char/renesas_sci.c
+ create mode 100644 hw/intc/rx_icu.c
+ create mode 100644 hw/rx/rx-virt.c
+ create mode 100644 hw/rx/rx62n.c
+ create mode 100644 hw/timer/renesas_cmt.c
+ create mode 100644 hw/timer/renesas_tmr.c
+ create mode 100644 target/rx/cpu.c
+ create mode 100644 target/rx/disas.c
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/op_helper.c
+ create mode 100644 target/rx/translate.c
+ create mode 100644 gdb-xml/rx-core.xml
+ create mode 100644 hw/rx/Kconfig
+ create mode 100644 hw/rx/Makefile.objs
+ create mode 100644 target/rx/Makefile.objs
+
 --=20
 2.20.1
 
