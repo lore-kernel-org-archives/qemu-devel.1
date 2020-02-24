@@ -2,82 +2,85 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 307DBC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28671C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:21:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFFEC20836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E92FD2084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:21:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpIrKcNe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFEC20836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uOAYE0OR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92FD2084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6GNv-0001M1-42
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 11:15:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38673)
+	id 1j6GU1-00069x-4F
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 11:21:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j6GNL-0000pP-Lx
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:14:32 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j6GTQ-0005Xg-F0
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j6GNJ-0007da-P3
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:14:31 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24042
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j6GNJ-0007dB-CQ
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:14:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582560868;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=u3P01IwPpH+zD32MMHqt10pP4f8QJr01GaPAm1hisr0=;
- b=VpIrKcNeq/pUyg3oa+V9rgCY0atMGqyWsFg2ZrRrdeYclp7MJCUbtiRwVWcKlAudmWb3cN
- xuy7vTPCfFDjzR36DbzSTerwN7jxUjE5RU3orIlpPqagebMQ9I9iQ6uivIHchUqRW7Oiq6
- BMt0uJSDVb6uiEUkuRShxHLJG/LNeGI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-GfHQxzwEMM-FEqXZl78sSA-1; Mon, 24 Feb 2020 11:14:26 -0500
-X-MC-Unique: GfHQxzwEMM-FEqXZl78sSA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DDD31005F7B;
- Mon, 24 Feb 2020 16:14:25 +0000 (UTC)
-Received: from [10.3.116.90] (ovpn-116-90.phx2.redhat.com [10.3.116.90])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B4C4A1001B30;
- Mon, 24 Feb 2020 16:14:22 +0000 (UTC)
-Subject: Re: [PATCH 0/3] Tighten qemu-img rules on missing backing format
-To: Peter Krempa <pkrempa@redhat.com>
-References: <20200222112341.4170045-1-eblake@redhat.com>
- <20200224110145.GB3296@andariel.pipo.sk>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <5ddf0595-843d-5a60-fea3-fe4f9bfac87c@redhat.com>
-Date: Mon, 24 Feb 2020 10:14:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j6GTP-0003Ag-6f
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:20:48 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54484)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1j6GTO-0003AQ-Vn
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:20:47 -0500
+Received: by mail-wm1-x343.google.com with SMTP id z12so6379174wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 08:20:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=MHhiCvHP6qkd0sQN5DXO7glZ8xdNaXzCtbf4mWvs878=;
+ b=uOAYE0OR0j4/yOsThdTP0za6rblLA6r9iUcOF+iakquA/v9rC421Ox6npJ0sxi+63o
+ JvQzsMfSkPQAN5I1vNOyesOCYIrwEE1NCOTUBW8FTQHA5vLTZSsmTP5mT/+mtihk+box
+ 3oO/vZ4sxDQYBhtfbvO05CMsX23Mm2dSQq5DZaIncvHuv+WpkOSSiCfFyRLRVDBYJk34
+ Bvcg65WP0+VMZNiy6QcGBJTz9RGv3Z+YC9+TG2ljjDb0lNAiXdQ1/mzvKB9gfTTCErb4
+ ROy5LF7hW8e3H7ag7bsmAulk9hiaPUMdROmkhgCo0DcUOb24Qv9Tdy/H6BipMMdTo2QB
+ EjhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=MHhiCvHP6qkd0sQN5DXO7glZ8xdNaXzCtbf4mWvs878=;
+ b=Kig1jLFJPDGXdhTJMeRZtVl7R7tJi9E5BZMj8sLsnuDBk0w4ZH1bTkRSjrOQHGKNG8
+ W8N5tol62TBbHUOmZdKlN4Rnq7OZA4ZSGvnbUd1Z7w4u/0K2fKy/UpYfpY3fEaxsgx9/
+ +Wl4j0HBEhAo75tbQE+QIOEgmi2wXUjGtz/EC4IAJIe/7mlvyjTdp8BiVqtsIjh0Betx
+ Z58AcrAyPuLe5IrJon7EQinMcqwlRySUk63b8YC+LsZiGOYRUgvX0RPk7/skg9Mep70H
+ /0I4mv78r+HZWNoPcr5FlTUKgYKl9j3yIF7TDpFTWnh7oe0S/K6UAa+LzKAJRovCSu1M
+ UgmA==
+X-Gm-Message-State: APjAAAW9I24aqJcPnUNeU8sBJNeAzE9q8lGGKrBmwCAxSBDz/UqC4xC4
+ gOTrOBxHZgW4osmq/jQaxsLwtMh82pzgiKx77Ig=
+X-Google-Smtp-Source: APXvYqxKxoEoOms1ANZzFUEU/qYFHN3HglPw6jIitLqvH1ZMBV1xKPwdiR1ljh9mKEExDvTVhUsEXlbWoS391m3AXYg=
+X-Received: by 2002:a1c:9c87:: with SMTP id f129mr23898100wme.26.1582561245463; 
+ Mon, 24 Feb 2020 08:20:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200224110145.GB3296@andariel.pipo.sk>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org> <20200221100700.GA5254@linux.fritz.box>
+ <87pne751g9.fsf@dusky.pond.sub.org>
+In-Reply-To: <87pne751g9.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 24 Feb 2020 17:20:33 +0100
+Message-ID: <CAJ+F1CKbZiVk0DCQxMojxu8FyEskg5Cw32B08Vi9emaEMw79fQ@mail.gmail.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,83 +92,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, David Alan Gilbert <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/24/20 5:01 AM, Peter Krempa wrote:
-> On Sat, Feb 22, 2020 at 05:23:38 -0600, Eric Blake wrote:
->> In the past, we have had CVEs caused by qemu probing one image type
->> when an image started out as another but the guest was able to modify
->> content.  The solution to those CVEs was to encode backing format
->> information into qcow2, to ensure that once we make a decision, we
->> don't have to probe any further.  However, we failed to enforce this
->> at the time.  And now that libvirt is switching to -blockdev, it has
->> come back to bite us: with -block, libvirt had no easy way (other than
-> 
-> s/-block/-drive/ ?
+Hi
 
-Whoops, yes.
+On Fri, Feb 21, 2020 at 5:50 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Kevin Wolf <kwolf@redhat.com> writes:
+>
+> > Am 20.02.2020 um 17:01 hat Markus Armbruster geschrieben:
+> >> >> >  void qmp_screendump(const char *filename, bool has_device, const=
+ char *device,
+> >> >> >                      bool has_head, int64_t head, Error **errp)
+> >> >> >  {
+> >> >> >      QemuConsole *con;
+> >> >> >      DisplaySurface *surface;
+> >> >> > +    g_autoptr(pixman_image_t) image =3D NULL;
+> >> >> >      int fd;
+> >> >> >
+> >> >> >      if (has_device) {
+> >> >> > @@ -365,7 +375,15 @@ void qmp_screendump(const char *filename, bo=
+ol has_device, const char *device,
+> >> >> >          }
+> >> >> >      }
+> >> >> >
+> >> >> > -    graphic_hw_update(con);
+> >> >> > +    if (qemu_in_coroutine()) {
+> >> >> > +        assert(!con->screendump_co);
+> >> >> > +        con->screendump_co =3D qemu_coroutine_self();
+> >> >> > +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> >> >> > +                                graphic_hw_update_bh, con);
+> >> >> > +        qemu_coroutine_yield();
+> >> >> > +        con->screendump_co =3D NULL;
+> >> >> > +    }
+> >> >>
+> >> >> What if multiple QMP monitors simultaneously screendump?  Hmm, it w=
+orks
+> >> >> because all execute one after another in the same coroutine
+> >> >> qmp_dispatcher_co.  Implicit mutual exclusion.
+> >> >>
+> >> >> Executing them one after another is bad, because it lets an ill-beh=
+aved
+> >> >> QMP command starve *all* QMP monitors.  We do it only out of
+> >> >> (reasonable!) fear of implicit mutual exclusion requirements like t=
+he
+> >> >> one you add.
+> >> >>
+> >> >> Let's not add more if we can help it.
+> >> >
+> >> > The situation is not worse than the current blocking handling.
+> >>
+> >> Really?
+> >>
+> >> What makes executing multiple qmp_screendump() concurrently (in separa=
+te
+> >> threads) or interleaved (in separate coroutines in the same thread)
+> >> unsafe before this patch?
+> >
+> > QMP command handlers are guaranteed to run in the main thread with the
+> > BQL held, so there is no concurrency. If you want to change this, you
+> > would have much more complicated problems to solve than in this handler=
+.
+> > I'm not sure it's fair to require thread-safety from one handler when
+> > no other handler is thread safe (except accidentally) and nobody seems
+> > to plan actually calling them from multiple threads.
+>
+> "Let's not [...] if we can help it." is hardly a "change this or else no
+> merge" demand.  It is a challenge to find a more elegant solution.
+>
+> >> >> Your screendump_co is per QemuConsole instead of per QMP monitor on=
+ly
+> >> >> because you need to find the coroutine in graphic_hw_update_done().=
+  Can
+> >> >> we somehow pass it via function arguments?
+> >> >
+> >> > I think it could be done later, so I suggest a TODO.
+> >>
+> >> We should avoid making our dependence on implicit mutual exclusion
+> >> worse.  When we do it anyway, a big, fat, ugly comment is definitely
+> >> called for.
+> >
+> > Anyway, what I really wanted to add:
+> >
+> > This should be easy to solve by having a CoQueue instead of a single
+>
+> Ah, challenge accepted!  Exactly the outcome I was hoping for :)
+>
+> > Coroutine pointer. The coroutine would just call qemu_co_queue_wait(),
+> > which adds itself to the queue before it yields and the update
+> > completion would wake up all coroutines that are currently queued with
+> > qemu_co_queue_restart_all().
+> >
+> > qemu_co_queue_wait() takes a lock as its second parameter. You don't
+> > need it in this context and can just pass NULL. (This is a lock that
+> > would be dropped while the coroutine is sleeping and automatically
+> > reacquired afterwards.)
+> >
+> >> >> In case avoiding the mutual exclusion is impractical: please explai=
+n it
+> >> >> in a comment to make it somewhat less implicit.
+> >>
+> >> It is anything but: see appended patch.
+> >
+> > This works, too, but it requires an additional struct. I think the queu=
+e
+> > is easier. (Note there is a difference in the mechanism: Your patch
+> > waits for the specific update it triggered, while the CoQueue would wai=
+t
+> > for _any_ update to complete. I assume effectively the result is the
+> > same.)
+>
+> Your idea sounds much nicer to me.  Thanks!
 
-> 
->> json:{} pseudoprotocol) to force a backing file, but with -blockdev,
-> 
-> "json:{}" is basically -blockdev with extra steps. Old -drive usage
-> didn't have any way to do that apart from rewriting the image. Which is
-> basically the same since json:{} also needs to be recorded in the image
-> to take effect.
+Similar to the NULL check you asked to remove,
+having a CoQueue there would lead to think that several concurrently
+running screendump are possible.
 
-Discussed in my other reply (it looks like I'll need to distinguish 
-between json: pointing to just a protocol as the backing layer, vs. the 
-more typical json: pointing to a format as the backing layer).
+Is this a direction we are willing to take?
 
-> 
->> libvirt HAS to use blockdev-open on the backing chain and supply a
->> backing format there, and thus has to probe images.  If libvirt ever
->> probes differently than qemu, we are back to the potential
->> guest-visible data corruption or potential host CVEs.
-> 
-> As I've elaborated in [1] I disagree with the host CVE part. The
-> insecure part is not probing the format itself, but probing format AND
-> using the backing file of the image if we probed format.
-> 
-> I agree that mis-probing format leads to data corruption though.
+fwiw, my earlier async series did allow that, and was using a queue
+for concurrent screendumps (but without coroutine & CoQueue, since it
+was all traditional callback/events-based)
 
-Your argument that there are other means at hand to prevent CVE when 
-probing does occur is valid, however, my point is that CVEs due to 
-probing were historically possible if the rest of the toolchain is not 
-careful.  It is more of a burden-shifting problem: when qemu is not 
-preventing probing, then other applications like libvirt have to take on 
-extra measures to ensure libvirt does not have a CVE (the fact that we 
-haven't had any in a few years is a good sign that we are at least aware 
-of the problem and have worked hard to remain safe, even if it has 
-required duplicated effort across multiple tools); whereas if qemu takes 
-a hard-line stance on probing (which is the goal of the deprecation 
-introduced in this series), now qemu has ensured safety whether or not 
-the other layers also take measures to avoid any CVE.
 
-> 
->> It's time to deprecate images without backing formats.  This patch
->> series does two things: 1. record an implicit backing format where one
->> is learned (although sadly, not all qemu-img commands are able to
->> learn a format), 2. warn to the user any time a probe had ambiguous
->> results or a backing format is omitted from an image.  All previous
->> images without a backing format are still usable, but hopefully the
->> warnings (along with libvirt's complaints about images without a
->> backing format) help us pinpoint remaining applications that are
-> 
-> It is not a warning in libvirt though. We just refuse it now because we
-> don't do probing. Previously we allowed qemu to probe the format and the
-> only thing that prevented host CVEs was if the host used selinux or any
-> other security approach which would prevent opening the backing file.
-> 
->> creating images on their own without recording a backing format.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
