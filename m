@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D84C9C38BFA
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2284EC38BF9
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:47:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A540421556
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E160A21556
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:47:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZqxv46V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A540421556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCWLZKaa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E160A21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6LYs-0000hH-Rp
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:46:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53168)
+	id 1j6LZS-0001V2-2I
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:47:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6Kr7-0006jd-J1
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:34 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6KrO-0006zi-1q
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6Kr6-0007Go-Jb
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47936
+ (envelope-from <philmd@redhat.com>) id 1j6KrM-0007Xb-Re
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24431
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Kr6-0007GF-FM
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:32 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6KrM-0007W3-Hf
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 16:01:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582578092;
+ s=mimecast20190719; t=1582578108;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7saW0lUMlIpBkC9nkeABH78vi2gIhiCg17Oi76zLWlE=;
- b=ZZqxv46VMKdcpEyXTx0t4+ifjeyWSgqo37NUapuPVJbeeY/85YUUQ0kM80im+oDkEPDX/p
- cSDOuLZrAGXVsevO2xrO25LSJX+9FFPL4Qs7pGwDgsff2YaHIEaAwy06fBFbGxZQZ/jyTG
- BO2VgHCsahuuN4QI1B5PqwkTXsp91eQ=
+ bh=d82MUeKk+/4B02rjdl6yI9CuL1FxqpOnif29vr+0CBA=;
+ b=XCWLZKaaeOk/lAcvUL2fZQSXiRaMHsKj4eG2GR2WAdb5N4+YocVZFkya8NbIDuepZX1RlR
+ 3faClZixKRIWybCvl3u5kku6CYfdAvjvpRtHMfT3me+p95qOsPKMIC94fuD8/dE6I6E1xP
+ Q0oaluHA9Ou86BgKhIXWtBOwdbi//Bg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-M1AD5Pb4OvK-RNGG5JgPPg-1; Mon, 24 Feb 2020 16:01:30 -0500
-X-MC-Unique: M1AD5Pb4OvK-RNGG5JgPPg-1
+ us-mta-243-B2jLMgkmPbOAS-FuawXTqw-1; Mon, 24 Feb 2020 16:01:45 -0500
+X-MC-Unique: B2jLMgkmPbOAS-FuawXTqw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E06CADBA5;
- Mon, 24 Feb 2020 21:01:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09EEB1005512;
+ Mon, 24 Feb 2020 21:01:41 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-162.brq.redhat.com [10.40.205.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5E225C651;
- Mon, 24 Feb 2020 21:01:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 588485C54A;
+ Mon, 24 Feb 2020 21:01:26 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH RESEND v2 24/32] hw/char: Let devices own the MemoryRegion
+Subject: [PATCH RESEND v2 25/32] hw/core: Let devices own the MemoryRegion
  they create
-Date: Mon, 24 Feb 2020 21:55:25 +0100
-Message-Id: <20200224205533.23798-25-philmd@redhat.com>
+Date: Mon, 24 Feb 2020 21:55:26 +0100
+Message-Id: <20200224205533.23798-26-philmd@redhat.com>
 In-Reply-To: <20200224205533.23798-1-philmd@redhat.com>
 References: <20200224205533.23798-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -125,38 +125,25 @@ scripts/coccinelle/memory-region-housekeeping.cocci.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/char/serial.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/core/platform-bus.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 9298881af9..2ab8b69e03 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -997,7 +997,7 @@ static void serial_io_realize(DeviceState *dev, Error *=
-*errp)
-         return;
-     }
+diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
+index 22c5f76dd0..d494e5cec1 100644
+--- a/hw/core/platform-bus.c
++++ b/hw/core/platform-bus.c
+@@ -187,7 +187,8 @@ static void platform_bus_realize(DeviceState *dev, Erro=
+r **errp)
+     d =3D SYS_BUS_DEVICE(dev);
+     pbus =3D PLATFORM_BUS_DEVICE(dev);
 =20
--    memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
-+    memory_region_init_io(&s->io, OBJECT(dev), &serial_io_ops, s, "serial"=
-, 8);
-     sysbus_init_mmio(SYS_BUS_DEVICE(sio), &s->io);
-     sysbus_init_irq(SYS_BUS_DEVICE(sio), &s->irq);
- }
-@@ -1106,8 +1106,9 @@ static void serial_mm_realize(DeviceState *dev, Error=
- **errp)
-         return;
-     }
+-    memory_region_init(&pbus->mmio, NULL, "platform bus", pbus->mmio_size)=
+;
++    memory_region_init(&pbus->mmio, OBJECT(dev), "platform bus",
++                       pbus->mmio_size);
+     sysbus_init_mmio(d, &pbus->mmio);
 =20
--    memory_region_init_io(&s->io, NULL, &serial_mm_ops[smm->endianness], s=
-mm,
--                          "serial", 8 << smm->regshift);
-+    memory_region_init_io(&s->io, OBJECT(dev),
-+                          &serial_mm_ops[smm->endianness], smm, "serial",
-+                          8 << smm->regshift);
-     sysbus_init_mmio(SYS_BUS_DEVICE(smm), &s->io);
-     sysbus_init_irq(SYS_BUS_DEVICE(smm), &smm->serial.irq);
- }
+     pbus->used_irqs =3D bitmap_new(pbus->num_irqs);
 --=20
 2.21.1
 
