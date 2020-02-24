@@ -2,90 +2,122 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 514CBC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54578C11D32
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:55:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 138392080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DD8F20836
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 16:55:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWVZWExL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138392080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="3NkskxUt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DD8F20836
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6GWv-00081D-7t
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 11:24:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40163)
+	id 1j6H0X-0005iO-B7
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 11:55:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1j6GWF-0007Ct-DO
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:23:44 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1j6Gzv-0005H1-OI
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:54:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1j6GWD-0004Co-0d
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:23:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40620
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1j6GWC-0004C1-RK
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:23:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582561419;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jaw3SmCktmpI+hX6wGmut4wg4apv8E/jH+KCDj9ypQ0=;
- b=GWVZWExLZGtdmg+suDC3tkLSdLP5W2F6jE2HXeRVf2yxU+Lr/QV2eQNV6AOuzMW+0avGZp
- UOJi7b32PAwTdf+/67qehXgnl0jS8y7U8lX1wrDH6qjLFUqZqop0qAj/skO84vf51wMa1m
- bRhrQLA/DefEYpyTRUmx+quSrDTTClA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-SC_MP95nOdm1eh3mE8KJJw-1; Mon, 24 Feb 2020 11:23:29 -0500
-X-MC-Unique: SC_MP95nOdm1eh3mE8KJJw-1
-Received: by mail-wr1-f70.google.com with SMTP id n23so5816136wra.20
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 08:23:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9UbYCv2YQ6hMkWZsrg5XkxDk6aVE19XE40GnZj+ocpk=;
- b=posi0ZEhDU4DyFCaIy4wC9iie6Q808cPhBEV4VDFZdNWxQlovxu8stI2N2b4K2v7Lo
- 54B5pI1/+nJ77q1w2pD09RCxyYZHNBiW3WvW1G5f7BZWn8xbQWq6pHflZjSGmwOYjm5o
- H2n8WEFEP7Lagk/WhRqdg1wCjJmopx/WpYh3Y1CpY9DIwBZjIKwTctEL24cBAzleeBMh
- 5IgYIJMW04lC46J6UqwGVh2z2SVsvHl2G2J1QWMaFsFZg0FGY78NhSTZ47am7YjIqjb8
- 3WNjWC8Yw3JKZcPuSda1Qm2txjOTD/6W5UYsyg3ZpTOFS94UmDHD3F98qLJNDJUdIt6z
- NDlQ==
-X-Gm-Message-State: APjAAAU05/qemfsGGWhyUD7ceBqHx675j+7UyWcolwMfs9oP08VRd+md
- zypPiywWLhVOhMqto6EEvZKOAL1PZ7bQH7LfMkWG1c0YryOXLgSyk+bGLyFTax9X8B8TJZhK2M8
- Zd4Z4/UR/fn3KMTkiQ3SrYP2MpXYPWgQ=
-X-Received: by 2002:a5d:4d04:: with SMTP id z4mr72674035wrt.157.1582561408071; 
- Mon, 24 Feb 2020 08:23:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyZDjliXNWp45/LJGyxIDJohi1FBiGM8JeYDVmLxwhyclX8UsKOvxx42lJOf9zW1kiSOfdo4VPYmH0y3bxL1r4=
-X-Received: by 2002:a5d:4d04:: with SMTP id z4mr72674007wrt.157.1582561407847; 
- Mon, 24 Feb 2020 08:23:27 -0800 (PST)
+ (envelope-from <Babu.Moger@amd.com>) id 1j6Gzu-0000eJ-JE
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:54:23 -0500
+Received: from mail-dm6nam11on2054.outbound.protection.outlook.com
+ ([40.107.223.54]:6092 helo=NAM11-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1j6Gzu-0000dv-7s
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 11:54:22 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n+4r8QXcuXJx2ZoB+ByMvOFer4N3H97B8K6/mnoavm/WFPNJdAmnp8o4bwtHPFsv+vSUbav09ycn5tCvgj02oMTqXWYHLhX5ZktsM0jMNY7Zo3VT2DaXldKrFqIy3egYTyeVdfRisnbZhG889GNjnYdzvIrX+7qpbkYnQjuDIWAi3r5zCsCfSfNdd/6zWgHIeRkDbYGjJvg8q/orMejX5i7DTLPzloMZajivWHfd8FkGQsfDDnlw131reCztzJN7ILFWmDEQ6KmIUtLqB7Mi+vnhgYYDyneWt/QJUZlMO8pnpiF3pU/9HeGTJqagk8DE2Fv9j0Vt3sEPRX8G88xzZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fAqdQZixbY4/Cd8sWHJTdQfrCT6519oGYXv+XvaCbnU=;
+ b=Z8iMEvJ0A/KsrSF6uxdokc15r8kuetKWxXorw9O9gP9kro2ERQGBU50hgYdl28PiSL2RxrYX+qtEYbCcxNAZfUH/NmWVtbvijbPG7sc5+kXP6Bse4O88RuA/VaR2cQ6wtjLBiMQVdfCgHacUtXq+MZrGDiKLDbkBnGTe9aQu8zUtvveNyTrD4FBFmOIzrskC6RY7pxcmrPXxEgjeSVIp8BMpS6sW1XM4l046XRzPrDPf7sShrbTvBZUtGXL6BlsulFIMrqEbGlCpzjHRUuGBkUvtyKIgi076+kAK4QXwBsrmt+59/BccsrVuZf6mzbdSaFKVyRdqTfbOzqiGLQHi5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fAqdQZixbY4/Cd8sWHJTdQfrCT6519oGYXv+XvaCbnU=;
+ b=3NkskxUt0Evgk99AHnGE179iMiLDSLdCY1Ic3aUynpdiXr6PEipi6g6SO8r8Tobn2LMu8UhJ3tftZvNXv2rS7T99Djkv3iFsaJisU3zmGRPJNnr7JBErw1VefUD0iVL94NkhwanQKm07dAzToZ/wXQ1zmDGKTJp/7LA0mm6AlmI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2478.namprd12.prod.outlook.com (2603:10b6:802:23::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.18; Mon, 24 Feb
+ 2020 16:54:20 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2008:df09:34a9:62fa]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::2008:df09:34a9:62fa%7]) with mapi id 15.20.2750.021; Mon, 24 Feb 2020
+ 16:54:20 +0000
+Subject: Re: [PATCH v4 04/16] hw/i386: Introduce init_topo_info to initialize
+ X86CPUTopoInfo
+To: Igor Mammedov <imammedo@redhat.com>
+References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
+ <158161781120.48948.3568234592332597800.stgit@naples-babu.amd.com>
+ <20200221180501.72e4ff3c@redhat.com>
+ <3188d0e7-7f1c-aa03-d3ec-f512d9905158@amd.com>
+ <20200224091833.2d3dec7f@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <47d531cb-1f52-f9b4-dcf2-24f119baadff@amd.com>
+Date: Mon, 24 Feb 2020 10:54:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200224091833.2d3dec7f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR04CA0096.namprd04.prod.outlook.com
+ (2603:10b6:805:f2::37) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-References: <20200214145235.4378-1-ovoshcha@redhat.com>
- <20200214145235.4378-4-ovoshcha@redhat.com>
- <875891d8-23f7-2603-2c51-9a734cf148b6@redhat.com>
-In-Reply-To: <875891d8-23f7-2603-2c51-9a734cf148b6@redhat.com>
-From: Oksana Voshchana <ovoshcha@redhat.com>
-Date: Mon, 24 Feb 2020 18:23:15 +0200
-Message-ID: <CAMXCgj4STmWcco4vqr1Mvwrc+YE-B6r+bAh00S0PmPZya001yA@mail.gmail.com>
-Subject: Re: [PATCH v1 3/4] Acceptance test: provides new functions
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="0000000000008ce307059f54cabb"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.87] (165.204.77.1) by
+ SN6PR04CA0096.namprd04.prod.outlook.com (2603:10b6:805:f2::37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21 via Frontend Transport; Mon, 24 Feb 2020 16:54:18 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 199772b3-e6e3-4296-5ca0-08d7b94a30f8
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2478:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB24787FAFFB974520623FB2BE95EC0@SN1PR12MB2478.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 032334F434
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(346002)(366004)(396003)(136003)(39860400002)(376002)(199004)(189003)(16526019)(186003)(66556008)(66946007)(6486002)(2906002)(66476007)(26005)(36756003)(53546011)(478600001)(81166006)(86362001)(31696002)(5660300002)(956004)(81156014)(8676002)(2616005)(44832011)(316002)(52116002)(8936002)(16576012)(6916009)(31686004)(4326008);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2478;
+ H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xvv1L0rN0XIvPMGBUayiPGurXHgSLzO8I9ThGFVt/eLXuMYcDIanSFFHKy8c4j67n7IA6Aavff3Pta8fzKV9VMJMPUg8TAmK2rkxEuwgaY5UMcXXRSOHXVyaLguEeJWmqz5uStaGCvavck1AyRbh5XjfPdQwrgNn645AQkDoi8dvH4SpY1ry0Es8IOqzhK2VuzUROPaYE1fAW2blq8Rq7ZLDwMfNElq6hUa4I6qCEhWYtD4FpGikPzf5ZKkvPJ2fg7FXAw+/LcCF4j9I7PL1Jd3QshsscbHZUJ8VESfwstsTJEkL9JJxeuNxoAx7wNBNZYromgBaSunuj8FRKe5VnpU51l00xZEh2uLKsPhC9hu//JMn7m8cRqhVJpqLrH0UTJWTonPMjbpygBcOACuDly6WzH633/IInSpb95sf2Rn66GpRmy1YAUsjbKztU11F
+X-MS-Exchange-AntiSpam-MessageData: F+vlR+5hU1DnAOZ4c3BXv+mMH4cuSrAI83ogR9XYPoLW7FofO0n6aILkbC/v2pRmKEhTYxrRI6SAgTvgfaYYRtMgU2mS/3aGVdid/YdjM6afUnTLDVN5MVa23VvNFXsEGUNUr+8+N6+YgPPzt8iMjA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 199772b3-e6e3-4296-5ca0-08d7b94a30f8
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2020 16:54:20.0573 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Tvn1lFG8RWARVE9pyNGP1n4i7twVaj1QukI1ql/DhZwvVVwRc8WKSx/egGHaSECJ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2478
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 40.107.223.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,235 +129,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008ce307059f54cabb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Wainer,
-Thanks for review
-
-On Fri, Feb 21, 2020 at 8:31 PM Wainer dos Santos Moschetta <
-wainersm@redhat.com> wrote:
-
-> Hi Oksana,
->
-> On 2/14/20 12:52 PM, Oksana Vohchana wrote:
-> > Adds functions to check if service RDMA is enabled and gets the interfa=
-ce
-> > where it was configured
-> >
-> > Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
-> > ---
-> >   tests/acceptance/migration.py | 17 +++++++++++++++++
-> >   1 file changed, 17 insertions(+)
-> >
-> > diff --git a/tests/acceptance/migration.py
-> b/tests/acceptance/migration.py
-> > index 8209dcf71d..bbd88f8dda 100644
-> > --- a/tests/acceptance/migration.py
-> > +++ b/tests/acceptance/migration.py
-> > @@ -11,12 +11,16 @@
-> >
-> >
-> >   import tempfile
-> > +import re
-> > +import netifaces
->
-> Since netifaces isn't a standard Python library that import might fail.
->
-> The tests dependencies are listed in tests/requirements.txt, and
-> installed in the environment created by `make check-acceptance`. If you
-> want to ensure the test behaves well even when executed manually (i.e.
-> not via `make check-acceptance`), you can add runtime checks as can be
-> seen in tests/acceptance/machine_m68k_nextcube.py
->
-
-Thanks, a "runtime checks" is a good approach
-I'll improve it
 
 
->
-> >   from avocado_qemu import Test
-> >   from avocado import skipUnless
-> >
-> >   from avocado.utils import network
-> >   from avocado.utils import wait
-> >   from avocado.utils.path import find_command
-> > +from avocado.utils import service
-> > +from avocado.utils import process
-> >
-> >
-> >   class Migration(Test):
-> > @@ -58,6 +62,19 @@ class Migration(Test):
-> >               self.cancel('Failed to find a free port')
-> >           return port
-> >
-> > +    def _if_rdma_enable(self):
-> > +        rdma_stat =3D service.ServiceManager()
-> > +        rdma =3D rdma_stat.status('rdma')
-> > +        return rdma
->
->
-> Above function is used on patch04, but actually I don't think it needs
-> to check this service for RoCE. It would be needed if it was using the
-> rxe_cfg to configure the rdma link. Or am I missing something?
->
->  The function _if_rdma_enable() checks if RDMA service enabled in the
-system it does not depend on wich utils we will use to check if some
-network configuration present (rdma or rxe_cfg)
+On 2/24/20 2:18 AM, Igor Mammedov wrote:
+> On Fri, 21 Feb 2020 11:51:15 -0600
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+>> On 2/21/20 11:05 AM, Igor Mammedov wrote:
+>>> On Thu, 13 Feb 2020 12:16:51 -0600
+>>> Babu Moger <babu.moger@amd.com> wrote:
+>>>   
+>>>> Initialize all the parameters in one function init_topo_info.  
+>>>
+>>> is it possible to squash it in 2/16
+>>>   
+>> Sure. We can do that.
+>>>   
+>>>>
+>>>> Move the data structure X86CPUTopoIDs and X86CPUTopoInfo into
+>>>> x86.h.  
+>>> A reason why it's moved should be here.  
+>>
+>> Apicid functions will be part of X86MachineState data structure(patches
+>> introduced later).These functions will use X86CPUTopoIDs and
+>> X86CPUTopoInfo definition. Will add these details. Thanks
+> 
+> why not just include topology.h into the X86MachineState header,
+> and keep topo structures/functions where they are now?
+> (I dislike a little scattering consolidated pieces across multiple files,
+> but what worries me more is that it makes target/i386/cpu.c via
+> topology.h -> x86.h chain pull in a lot of unrelated dependencies)
+> 
+> So I'd keep X86CPUTopoIDs and X86CPUTopoInfo in topology.h 
 
+Ok. Sure. we can do that.
 
-> > +
-> > +    def _get_ip_rdma(self):
-> > +        get_ip_rdma =3D process.run('rdma link show').stdout.decode()
-> > +        for line in get_ip_rdma.split('\n'):
-> > +            if re.search(r"ACTIVE", line):
-> > +                interface =3D line.split(" ")[-2]
-> > +                ip =3D
-> netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
-> > +                return ip
-> > +
->
-> I suggest that it explicitly returns None if none is found.
->
+> 
+> [...]
+>>>> +static inline void init_topo_info(X86CPUTopoInfo *topo_info,
+>>>> +                                  const X86MachineState *x86ms)
+>>>> +{
+>>>> +    MachineState *ms = MACHINE(x86ms);
+>>>> +
+>>>> +    topo_info->dies_per_pkg = x86ms->smp_dies;
+>>>> +    topo_info->cores_per_die = ms->smp.cores;
+>>>> +    topo_info->threads_per_core = ms->smp.threads;
+>>>> +}
+> 
+> this is pure machine specific helper, and aren't used anywhere else
+> beside machine code.
+> Suggest to put it in pc.c or x86.c to keep topology.h machine independent.
 
-Ok, I agree
-I'll improve it
+Ok. Will do.
 
-
-> Thanks!
->
-> - Wainer
->
-> >
-> >       def test_migration_with_tcp_localhost(self):
-> >           dest_uri =3D 'tcp:localhost:%u' % self._get_free_port()
->
->
-
-Thanks!
-
---0000000000008ce307059f54cabb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hi=C2=A0Wainer,</div><div>Thanks for review<br><br></=
-div><div dir=3D"ltr"><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"g=
-mail_attr">On Fri, Feb 21, 2020 at 8:31 PM Wainer dos Santos Moschetta &lt;=
-<a href=3D"mailto:wainersm@redhat.com" target=3D"_blank">wainersm@redhat.co=
-m</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->Hi Oksana,<br>
-<br>
-On 2/14/20 12:52 PM, Oksana Vohchana wrote:<br>
-&gt; Adds functions to check if service RDMA is enabled and gets the interf=
-ace<br>
-&gt; where it was configured<br>
-&gt;<br>
-&gt; Signed-off-by: Oksana Vohchana &lt;<a href=3D"mailto:ovoshcha@redhat.c=
-om" target=3D"_blank">ovoshcha@redhat.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 =C2=A0tests/acceptance/migration.py | 17 +++++++++++++++++<br>
-&gt;=C2=A0 =C2=A01 file changed, 17 insertions(+)<br>
-&gt;<br>
-&gt; diff --git a/tests/acceptance/migration.py b/tests/acceptance/migratio=
-n.py<br>
-&gt; index 8209dcf71d..bbd88f8dda 100644<br>
-&gt; --- a/tests/acceptance/migration.py<br>
-&gt; +++ b/tests/acceptance/migration.py<br>
-&gt; @@ -11,12 +11,16 @@<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0import tempfile<br>
-&gt; +import re<br>
-&gt; +import netifaces<br>
-<br>
-Since netifaces isn&#39;t a standard Python library that import might fail.=
-<br>
-<br>
-The tests dependencies are listed in tests/requirements.txt, and <br>
-installed in the environment created by `make check-acceptance`. If you <br=
->
-want to ensure the test behaves well even when executed manually (i.e. <br>
-not via `make check-acceptance`), you can add runtime checks as can be <br>
-seen in tests/acceptance/machine_m68k_nextcube.py<br></blockquote><div><br>=
-</div><div>Thanks, a &quot;runtime checks&quot; is a good approach</div><di=
-v>I&#39;ll improve it</div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">
-<br>
-&gt;=C2=A0 =C2=A0from avocado_qemu import Test<br>
-&gt;=C2=A0 =C2=A0from avocado import skipUnless<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0from avocado.utils import network<br>
-&gt;=C2=A0 =C2=A0from avocado.utils import wait<br>
-&gt;=C2=A0 =C2=A0from avocado.utils.path import find_command<br>
-&gt; +from avocado.utils import service<br>
-&gt; +from avocado.utils import process<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0class Migration(Test):<br>
-&gt; @@ -58,6 +62,19 @@ class Migration(Test):<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.cancel(&#39=
-;Failed to find a free port&#39;)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return port<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt; +=C2=A0 =C2=A0 def _if_rdma_enable(self):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma_stat =3D service.ServiceManager()<br=
->
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 rdma =3D rdma_stat.status(&#39;rdma&#39;)=
-<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return rdma<br>
-<br>
-<br>
-Above function is used on patch04, but actually I don&#39;t think it needs =
-<br>
-to check this service for RoCE. It would be needed if it was using the <br>
-rxe_cfg to configure the rdma link. Or am I missing something?<br>
-<br></blockquote><div>=C2=A0The function _if_rdma_enable()=C2=A0checks if R=
-DMA service enabled in the system it does not depend on wich utils we will =
-use to check if some network configuration present (rdma or rxe_cfg)</div><=
-div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
- 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 def _get_ip_rdma(self):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 get_ip_rdma =3D process.run(&#39;rdma lin=
-k show&#39;).stdout.decode()<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 for line in get_ip_rdma.split(&#39;\n&#39=
-;):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if re.search(r&quot;ACTIVE&=
-quot;, line):<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 interface =3D=
- line.split(&quot; &quot;)[-2]<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ip =3D netifa=
-ces.ifaddresses(interface)[netifaces.AF_INET][0][&#39;addr&#39;]<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return ip<br>
-&gt; +<br>
-<br>
-I suggest that it explicitly returns None if none is found.<br>
-</blockquote><div><br></div><div>Ok, I agree<br>I&#39;ll improve it<br></di=
-v><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
-x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Thanks=
-!<br>
-<br>
-- Wainer<br>
-<br>
-&gt;=C2=A0 =C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0def test_migration_with_tcp_localhost(self):=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dest_uri =3D &#39;tcp:localhos=
-t:%u&#39; % self._get_free_port()<br>
-<br></blockquote><div><br></div><div><br></div><div>Thanks!=C2=A0</div></di=
-v></div>
-</div>
-
---0000000000008ce307059f54cabb--
-
+> 
+>>>>  
+>>>>  /* Return the bit width needed for 'count' IDs
+>>>>   */
+>>>> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+>>>> index 4b84917885..ad62b01cf2 100644
+>>>> --- a/include/hw/i386/x86.h
+>>>> +++ b/include/hw/i386/x86.h
+>>>> @@ -36,6 +36,23 @@ typedef struct {
+>>>>      bool compat_apic_id_mode;
+>>>>  } X86MachineClass;
+>>>>  
+>>>> +/* APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
+>>>> + */
+>>>> +typedef uint32_t apic_id_t;
+>>>> +
+>>>> +typedef struct X86CPUTopoIDs {
+>>>> +    unsigned pkg_id;
+>>>> +    unsigned die_id;
+>>>> +    unsigned core_id;
+>>>> +    unsigned smt_id;
+>>>> +} X86CPUTopoIDs;
+>>>> +
+>>>> +typedef struct X86CPUTopoInfo {
+>>>> +    unsigned dies_per_pkg;
+>>>> +    unsigned cores_per_die;
+>>>> +    unsigned threads_per_core;
+>>>> +} X86CPUTopoInfo;
+>>>> +
+>>>>  typedef struct {
+>>>>      /*< private >*/
+>>>>      MachineState parent;
+>>>>  
+>>>   
+>>
+> 
 
