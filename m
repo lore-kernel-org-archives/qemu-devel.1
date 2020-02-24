@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114C6C11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86551C11D34
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:37:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF17A20714
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55C9120714
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:37:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCZbpBij"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF17A20714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4vmrqb+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C9120714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Eqt-00043W-K5
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:36:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50775)
+	id 1j6ErZ-0005EW-CM
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:37:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6El5-0001wm-AR
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:56 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6Ekl-0001S6-VI
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6El3-0002Mi-UG
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45566
+ (envelope-from <kwolf@redhat.com>) id 1j6Ekk-0001vq-Eh
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:35 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54500
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6El3-0002Mb-Pa
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:53 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6Ekk-0001vX-BC
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582554653;
+ s=mimecast20190719; t=1582554633;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=njL4p+O8e20nCibvaiBgf6Oi+xeoYFNnJeIvfkpwLfc=;
- b=JCZbpBijVkKPdj3+f0heHL6M5Xh3IrYsSCt9k6Yi+w+d5yntFXbjLPhkyp22FKsk0+bUGS
- ZbKDBoBTHEywqxbToHrULifzSw0tYrXg22kh8joN5XsyNeU/pky/ygi9dOIkuSk5nV02/8
- SqWhdlgOdwbWF/0D0XWtY85F//AZp/Y=
+ bh=dPKIsCcQthcgEF3vGr1fM/jPzSM0CtjEd4BHQRSKfJ4=;
+ b=F4vmrqb+Hhq1HFyDvfXbd87IieD5ZG4yCg7Qy4RdJNG1bIhOmBT/XfFgzmOmPTEoKPNYix
+ 5XjzoKrDTNuY8Bmvd4DFWYTGqu4NBl+4+8sY4pHb08V/EKveHG5q9EMNGi8Ecry/HE4ZC/
+ /+M8ryi41VFD+BSh6kauxOYvG3kP7GE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-uh_IhfU7NL6kaNkgj6045w-1; Mon, 24 Feb 2020 09:30:49 -0500
-X-MC-Unique: uh_IhfU7NL6kaNkgj6045w-1
+ us-mta-31-RJwVTZe1OpCPKLC6K2xmQw-1; Mon, 24 Feb 2020 09:30:30 -0500
+X-MC-Unique: RJwVTZe1OpCPKLC6K2xmQw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E3FD8024DF;
- Mon, 24 Feb 2020 14:30:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4AE918AB2C2;
+ Mon, 24 Feb 2020 14:30:28 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
  [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EDD995C114;
- Mon, 24 Feb 2020 14:30:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1259191835;
+ Mon, 24 Feb 2020 14:30:26 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 08/20] qemu-storage-daemon: Add --object option
-Date: Mon, 24 Feb 2020 15:29:56 +0100
-Message-Id: <20200224143008.13362-9-kwolf@redhat.com>
+Subject: [PATCH v2 01/20] qemu-storage-daemon: Add barebone tool
+Date: Mon, 24 Feb 2020 15:29:49 +0100
+Message-Id: <20200224143008.13362-2-kwolf@redhat.com>
 In-Reply-To: <20200224143008.13362-1-kwolf@redhat.com>
 References: <20200224143008.13362-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -73,7 +73,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,135 +92,200 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a command line option to create user-creatable QOM objects.
+This adds a new binary qemu-storage-daemon that doesn't yet do more than
+some typical initialisation for tools and parsing the basic command
+options --version, --help and --trace.
+
+Even though this doesn't add any options yet that create things (like
+--object or --blockdev), already document that we're planning to process
+them in the order they are given on the command line rather than trying
+(and failing, like vl.c) to resolve dependencies between options
+automatically.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-storage-daemon.c | 47 +++++++++++++++++++++++++++++++++++++++++++
- Makefile.objs         |  2 +-
- qom/Makefile.objs     |  1 +
- 3 files changed, 49 insertions(+), 1 deletion(-)
+ configure             |   2 +-
+ qemu-storage-daemon.c | 127 ++++++++++++++++++++++++++++++++++++++++++
+ Makefile              |   1 +
+ 3 files changed, 129 insertions(+), 1 deletion(-)
+ create mode 100644 qemu-storage-daemon.c
 
+diff --git a/configure b/configure
+index d57261e3ad..c9ea8cc8fb 100755
+--- a/configure
++++ b/configure
+@@ -6257,7 +6257,7 @@ tools=3D""
+ if test "$want_tools" =3D "yes" ; then
+   tools=3D"qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-edid\$(EXESUF) $tools=
+"
+   if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" ] ; =
+then
+-    tools=3D"qemu-nbd\$(EXESUF) $tools"
++    tools=3D"qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
+   fi
+   if [ "$ivshmem" =3D "yes" ]; then
+     tools=3D"ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
 diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index c30caaf59e..0cd8144c81 100644
---- a/qemu-storage-daemon.c
+new file mode 100644
+index 0000000000..fc4aef572b
+--- /dev/null
 +++ b/qemu-storage-daemon.c
-@@ -33,15 +33,19 @@
- #include "qapi/error.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qmp/qdict.h"
- #include "qapi/qobject-input-visitor.h"
-=20
- #include "qemu-common.h"
- #include "qemu-version.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-+#include "qemu/help_option.h"
- #include "qemu/log.h"
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
-+#include "qemu/option.h"
-+#include "qom/object_interfaces.h"
-=20
- #include "trace/control.h"
-=20
-@@ -63,12 +67,31 @@ static void help(void)
- "             [,driver specific parameters...]\n"
- "                         configure a block backend\n"
- "\n"
-+"  --object help          list object types that can be added\n"
-+"  --object <type>,help   list properties for the given object type\n"
-+"  --object <type>[,<property>=3D<value>...]\n"
-+"                         create a new object of type <type>, setting\n"
-+"                         properties in the order they are specified. Note=
-\n"
-+"                         that the 'id' property must be set.\n"
-+"                         See the qemu(1) man page for documentation of th=
-e\n"
-+"                         objects that can be added.\n"
+@@ -0,0 +1,127 @@
++/*
++ * QEMU storage daemon
++ *
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ * Copyright (c) 2019 Kevin Wolf <kwolf@redhat.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a=
+ copy
++ * of this software and associated documentation files (the "Software"), t=
+o deal
++ * in the Software without restriction, including without limitation the r=
+ights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
+ll
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included=
+ in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS=
+ OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
+,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
+HER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
+ FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
+IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++
++#include <getopt.h>
++
++#include "block/block.h"
++#include "crypto/init.h"
++
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "qemu-version.h"
++#include "qemu/config-file.h"
++#include "qemu/error-report.h"
++#include "qemu/log.h"
++#include "qemu/main-loop.h"
++#include "qemu/module.h"
++
++#include "trace/control.h"
++
++static void help(void)
++{
++    printf(
++"Usage: %s [options]\n"
++"QEMU storage daemon\n"
 +"\n"
- QEMU_HELP_BOTTOM "\n",
-     error_get_progname());
- }
-=20
- enum {
-     OPTION_BLOCKDEV =3D 256,
-+    OPTION_OBJECT,
-+};
++"  -h, --help             display this help and exit\n"
++"  -T, --trace [[enable=3D]<pattern>][,events=3D<file>][,file=3D<file>]\n"
++"                         specify tracing options\n"
++"  -V, --version          output version information and exit\n"
++"\n"
++QEMU_HELP_BOTTOM "\n",
++    error_get_progname());
++}
 +
-+static QemuOptsList qemu_object_opts =3D {
-+    .name =3D "object",
-+    .implied_opt_name =3D "qom-type",
-+    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
-+    .desc =3D {
-+        { }
-+    },
- };
-=20
- static void process_options(int argc, char *argv[])
-@@ -78,6 +101,7 @@ static void process_options(int argc, char *argv[])
-     static const struct option long_options[] =3D {
-         {"blockdev", required_argument, NULL, OPTION_BLOCKDEV},
-         {"help", no_argument, NULL, 'h'},
-+        {"object", required_argument, NULL, OPTION_OBJECT},
-         {"trace", required_argument, NULL, 'T'},
-         {"version", no_argument, NULL, 'V'},
-         {0, 0, 0, 0}
-@@ -121,6 +145,29 @@ static void process_options(int argc, char *argv[])
-                 qapi_free_BlockdevOptions(options);
-                 break;
-             }
-+        case OPTION_OBJECT:
++static void process_options(int argc, char *argv[])
++{
++    int c;
++
++    static const struct option long_options[] =3D {
++        {"help", no_argument, NULL, 'h'},
++        {"trace", required_argument, NULL, 'T'},
++        {"version", no_argument, NULL, 'V'},
++        {0, 0, 0, 0}
++    };
++
++    /*
++     * In contrast to the system emulator, options are processed in the or=
+der
++     * they are given on the command lines. This means that things must be
++     * defined first before they can be referenced in another option.
++     */
++    while ((c =3D getopt_long(argc, argv, "hT:V", long_options, NULL)) !=
+=3D -1) {
++        switch (c) {
++        case '?':
++            exit(EXIT_FAILURE);
++        case 'h':
++            help();
++            exit(EXIT_SUCCESS);
++        case 'T':
 +            {
-+                QemuOpts *opts;
-+                const char *type;
-+                QDict *args;
-+                QObject *ret_data =3D NULL;
-+
-+                /* FIXME The keyval parser rejects 'help' arguments, so we=
- must
-+                 * unconditionall try QemuOpts first. */
-+                opts =3D qemu_opts_parse(&qemu_object_opts,
-+                                       optarg, true, &error_fatal);
-+                type =3D qemu_opt_get(opts, "qom-type");
-+                if (type && user_creatable_print_help(type, opts)) {
-+                    exit(EXIT_SUCCESS);
-+                }
-+                qemu_opts_del(opts);
-+
-+                args =3D keyval_parse(optarg, "qom-type", &error_fatal);
-+                qmp_object_add(args, &ret_data, &error_fatal);
-+                qobject_unref(args);
-+                qobject_unref(ret_data);
++                char *trace_file =3D trace_opt_parse(optarg);
++                trace_init_file(trace_file);
++                g_free(trace_file);
 +                break;
 +            }
-         default:
-             g_assert_not_reached();
-         }
-diff --git a/Makefile.objs b/Makefile.objs
-index c7e1b36130..fa92b00427 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -31,7 +31,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- # storage-daemon-obj-y is code used by qemu-storage-daemon (these objects =
-are
- # used for system emulation, too, but specified separately there)
++        case 'V':
++            printf("qemu-storage-daemon version "
++                   QEMU_FULL_VERSION "\n" QEMU_COPYRIGHT "\n");
++            exit(EXIT_SUCCESS);
++        default:
++            g_assert_not_reached();
++        }
++    }
++    if (optind !=3D argc) {
++        error_report("Unexpected argument: %s", argv[optind]);
++        exit(EXIT_FAILURE);
++    }
++}
++
++int main(int argc, char *argv[])
++{
++#ifdef CONFIG_POSIX
++    signal(SIGPIPE, SIG_IGN);
++#endif
++
++    error_init(argv[0]);
++    qemu_init_exec_dir(argv[0]);
++
++    module_call_init(MODULE_INIT_QOM);
++    module_call_init(MODULE_INIT_TRACE);
++    qemu_add_opts(&qemu_trace_opts);
++    qcrypto_init(&error_fatal);
++    bdrv_init();
++
++    if (!trace_init_backends()) {
++        return EXIT_FAILURE;
++    }
++    qemu_set_log(LOG_TRACE);
++
++    qemu_init_main_loop(&error_fatal);
++    process_options(argc, argv);
++
++    return EXIT_SUCCESS;
++}
+diff --git a/Makefile b/Makefile
+index 146a91bc3e..44b3c8a342 100644
+--- a/Makefile
++++ b/Makefile
+@@ -573,6 +573,7 @@ qemu-img.o: qemu-img-cmds.h
+ qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
+) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
+) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) =
+$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block=
+-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
 =20
--storage-daemon-obj-y =3D block/
-+storage-daemon-obj-y =3D block/ qom/
- storage-daemon-obj-y +=3D blockdev.o iothread.o
+ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
 =20
- ######################################################################
-diff --git a/qom/Makefile.objs b/qom/Makefile.objs
-index f9d77350ac..1b45d104ba 100644
---- a/qom/Makefile.objs
-+++ b/qom/Makefile.objs
-@@ -2,3 +2,4 @@ qom-obj-y =3D object.o container.o qom-qobject.o
- qom-obj-y +=3D object_interfaces.o
-=20
- common-obj-$(CONFIG_SOFTMMU) +=3D qom-hmp-cmds.o qom-qmp-cmds.o
-+storage-daemon-obj-y +=3D qom-qmp-cmds.o
 --=20
 2.20.1
 
