@@ -2,82 +2,78 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB716C3567B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE2DC11D27
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8612A20658
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:19:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B96CE20675
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+dFtjVY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8612A20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMOEkyi4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96CE20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j68xp-00070K-IS
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:19:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55224)
+	id 1j69DT-0001PY-U4
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:35:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j68xD-0006aa-A4
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:19:04 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j69CX-0000ug-VZ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j68xB-0005MT-Fa
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:19:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39423
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1j69CU-0007Cv-2h
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:34:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43058
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j68xB-0005L2-Bq
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:19:01 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j69CT-0007Bw-TQ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:34:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582532340;
+ s=mimecast20190719; t=1582533288;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rXsbuP+UGTrrRwYOOcIYs5kwT0nXYTPJY8VdyCYjHpY=;
- b=A+dFtjVYDD/xbjUPum5oTt/WB4JFV0CilxwVpxUiUwRc00M1hjDJ4OxWVcVPiUaJg8Jhhi
- aaBassvPWoPnZOH7H5lXDKyVGHAT6tZh8jNLph4UglpAZbc64LNTxy5dGUxGRO1c2l4HZc
- ujyIqjR0DkBQ0A8eGjLNOLqKUVyvU8s=
+ bh=w9LF8Blo6a2VRJC+79EuhzoQY9DLuxx5DMN39eE2xig=;
+ b=DMOEkyi4KK5f/1gbUOMSbe9ygzpVBFD7Zcsf5nxInPTM06TWKPSPKyP/m1V8Svv69a4vIm
+ oBBOyHmKhRM4yF370q0sT1s/ZMfiXHpet86PScH8ZcRTVsjjfIpSegIvFqybrZDAMzhTmU
+ YfP3PfkMh5q9JbVNLc02eMgROIicaN8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-o67wr48GNCGT_T-54QYJiw-1; Mon, 24 Feb 2020 03:18:41 -0500
-X-MC-Unique: o67wr48GNCGT_T-54QYJiw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-198-1mu_4jgHOp6rH-Py-NH6GQ-1; Mon, 24 Feb 2020 03:34:46 -0500
+X-MC-Unique: 1mu_4jgHOp6rH-Py-NH6GQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B44CC1005513;
- Mon, 24 Feb 2020 08:18:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F02F13E2;
+ Mon, 24 Feb 2020 08:34:45 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BF04327081;
- Mon, 24 Feb 2020 08:18:35 +0000 (UTC)
-Date: Mon, 24 Feb 2020 09:18:33 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8169F5D9CD;
+ Mon, 24 Feb 2020 08:34:41 +0000 (UTC)
+Date: Mon, 24 Feb 2020 09:34:39 +0100
 From: Igor Mammedov <imammedo@redhat.com>
 To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v4 04/16] hw/i386: Introduce init_topo_info to
- initialize X86CPUTopoInfo
-Message-ID: <20200224091833.2d3dec7f@redhat.com>
-In-Reply-To: <3188d0e7-7f1c-aa03-d3ec-f512d9905158@amd.com>
+Subject: Re: [PATCH v4 06/16] hw/i386: Update structures for nodes_per_pkg
+Message-ID: <20200224093439.5fda5656@redhat.com>
+In-Reply-To: <158161782489.48948.9328710425201785950.stgit@naples-babu.amd.com>
 References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
- <158161781120.48948.3568234592332597800.stgit@naples-babu.amd.com>
- <20200221180501.72e4ff3c@redhat.com>
- <3188d0e7-7f1c-aa03-d3ec-f512d9905158@amd.com>
+ <158161782489.48948.9328710425201785950.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,84 +91,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 21 Feb 2020 11:51:15 -0600
+On Thu, 13 Feb 2020 12:17:04 -0600
 Babu Moger <babu.moger@amd.com> wrote:
 
-> On 2/21/20 11:05 AM, Igor Mammedov wrote:
-> > On Thu, 13 Feb 2020 12:16:51 -0600
-> > Babu Moger <babu.moger@amd.com> wrote:
-> >   
-> >> Initialize all the parameters in one function init_topo_info.  
-> > 
-> > is it possible to squash it in 2/16
-> >   
-> Sure. We can do that.
-> >   
-> >>
-> >> Move the data structure X86CPUTopoIDs and X86CPUTopoInfo into
-> >> x86.h.  
-> > A reason why it's moved should be here.  
+> Update structures X86CPUTopoIDs and CPUX86State to hold the nodes_per_pkg.
+> This is required to build EPYC mode topology.
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  hw/i386/pc.c               |    1 +
+>  hw/i386/x86.c              |    2 ++
+>  include/hw/i386/topology.h |    2 ++
+>  include/hw/i386/x86.h      |    1 +
+>  target/i386/cpu.c          |    1 +
+>  target/i386/cpu.h          |    1 +
+>  6 files changed, 8 insertions(+)
 > 
-> Apicid functions will be part of X86MachineState data structure(patches
-> introduced later).These functions will use X86CPUTopoIDs and
-> X86CPUTopoInfo definition. Will add these details. Thanks
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f13721ac43..02fdb3d506 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1753,6 +1753,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      init_topo_info(&topo_info, x86ms);
+>  
+>      env->nr_dies = x86ms->smp_dies;
+> +    env->nr_nodes = ms->numa_state->num_nodes / ms->smp.sockets;
 
-why not just include topology.h into the X86MachineState header,
-and keep topo structures/functions where they are now?
-(I dislike a little scattering consolidated pieces across multiple files,
-but what worries me more is that it makes target/i386/cpu.c via
-topology.h -> x86.h chain pull in a lot of unrelated dependencies)
+it would be better if calculation would result in valid result
+so you won't have to later scatter MAX(env->nr_nodes, 1) everywhere.
 
-So I'd keep X86CPUTopoIDs and X86CPUTopoInfo in topology.h 
+also I'd use earlier intialized:
+  env->nr_nodes = topo_info->nodes_per_pkg
+to avoid repeating calculation
 
-[...]
-> >> +static inline void init_topo_info(X86CPUTopoInfo *topo_info,
-> >> +                                  const X86MachineState *x86ms)
-> >> +{
-> >> +    MachineState *ms = MACHINE(x86ms);
-> >> +
-> >> +    topo_info->dies_per_pkg = x86ms->smp_dies;
-> >> +    topo_info->cores_per_die = ms->smp.cores;
-> >> +    topo_info->threads_per_core = ms->smp.threads;
-> >> +}
+>      /*
+>       * If APIC ID is not set,
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 083effb2f5..3d944f68e6 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -89,11 +89,13 @@ void x86_cpu_new(X86MachineState *x86ms, int64_t apic_id, Error **errp)
+>      Object *cpu = NULL;
+>      Error *local_err = NULL;
+>      CPUX86State *env = NULL;
+> +    MachineState *ms = MACHINE(x86ms);
+>  
+>      cpu = object_new(MACHINE(x86ms)->cpu_type);
+>  
+>      env = &X86_CPU(cpu)->env;
+>      env->nr_dies = x86ms->smp_dies;
+> +    env->nr_nodes = ms->numa_state->num_nodes / ms->smp.sockets;
 
-this is pure machine specific helper, and aren't used anywhere else
-beside machine code.
-Suggest to put it in pc.c or x86.c to keep topology.h machine independent.
+Is this really necessary?  (I think pc_cpu_pre_plug should take care of setting it)
 
-> >>  
-> >>  /* Return the bit width needed for 'count' IDs
-> >>   */
-> >> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-> >> index 4b84917885..ad62b01cf2 100644
-> >> --- a/include/hw/i386/x86.h
-> >> +++ b/include/hw/i386/x86.h
-> >> @@ -36,6 +36,23 @@ typedef struct {
-> >>      bool compat_apic_id_mode;
-> >>  } X86MachineClass;
-> >>  
-> >> +/* APIC IDs can be 32-bit, but beware: APIC IDs > 255 require x2APIC support
-> >> + */
-> >> +typedef uint32_t apic_id_t;
-> >> +
-> >> +typedef struct X86CPUTopoIDs {
-> >> +    unsigned pkg_id;
-> >> +    unsigned die_id;
-> >> +    unsigned core_id;
-> >> +    unsigned smt_id;
-> >> +} X86CPUTopoIDs;
-> >> +
-> >> +typedef struct X86CPUTopoInfo {
-> >> +    unsigned dies_per_pkg;
-> >> +    unsigned cores_per_die;
-> >> +    unsigned threads_per_core;
-> >> +} X86CPUTopoInfo;
-> >> +
-> >>  typedef struct {
-> >>      /*< private >*/
-> >>      MachineState parent;
-> >>  
-> >   
+>      object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
+>      object_property_set_bool(cpu, true, "realized", &local_err);
+> diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+> index ef0ab0b6a3..522c77e6a9 100644
+> --- a/include/hw/i386/topology.h
+> +++ b/include/hw/i386/topology.h
+> @@ -41,12 +41,14 @@
+>  
+>  #include "qemu/bitops.h"
+>  #include "hw/i386/x86.h"
+> +#include "sysemu/numa.h"
+>  
+>  static inline void init_topo_info(X86CPUTopoInfo *topo_info,
+>                                    const X86MachineState *x86ms)
+>  {
+>      MachineState *ms = MACHINE(x86ms);
+>  
+> +    topo_info->nodes_per_pkg = ms->numa_state->num_nodes / ms->smp.sockets;
+>      topo_info->dies_per_pkg = x86ms->smp_dies;
+>      topo_info->cores_per_die = ms->smp.cores;
+>      topo_info->threads_per_core = ms->smp.threads;
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index ad62b01cf2..d76fd0bbb1 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -48,6 +48,7 @@ typedef struct X86CPUTopoIDs {
+>  } X86CPUTopoIDs;
+>  
+>  typedef struct X86CPUTopoInfo {
+> +    unsigned nodes_per_pkg;
+>      unsigned dies_per_pkg;
+>      unsigned cores_per_die;
+>      unsigned threads_per_core;
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 7e630f47ac..5d6edfd09b 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6761,6 +6761,7 @@ static void x86_cpu_initfn(Object *obj)
+>      FeatureWord w;
+>  
+>      env->nr_dies = 1;
+> +    env->nr_nodes = 1;
+>      cpu_set_cpustate_pointers(cpu);
+>  
+>      object_property_add(obj, "family", "int",
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index af282936a7..627a8cb9be 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1603,6 +1603,7 @@ typedef struct CPUX86State {
+>      TPRAccess tpr_access_type;
+>  
+>      unsigned nr_dies;
+> +    unsigned nr_nodes;
+>  } CPUX86State;
+>  
+>  struct kvm_msrs;
 > 
 
 
