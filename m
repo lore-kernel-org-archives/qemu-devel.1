@@ -2,79 +2,68 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE613C38BE1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D027C38BE0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA53F20838
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:07:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pgHeKxjg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA53F20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4433B20838
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:17:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4433B20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6J4l-0002eL-S2
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:07:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35303)
+	id 1j6JEf-0005Dx-Ea
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:17:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j6J46-0002AY-H8
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:06:51 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j6JE4-0004ca-U5
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:17:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j6J45-0003Xg-F7
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:06:50 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43740)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j6J41-0003OQ-Tj; Mon, 24 Feb 2020 14:06:46 -0500
-Received: by mail-lj1-x243.google.com with SMTP id a13so11331378ljm.10;
- Mon, 24 Feb 2020 11:06:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vROQhmF37GxxVHdJLrkoLplAKn72rc6FbAjeldPt1/8=;
- b=pgHeKxjg+Hr5hUbhV43A0DUC5jNbD1y4SHU1UuTF+nMdLwMbg04gs5hBeWE+G43eC5
- jJr67Fu3CvFUF0fmKawg4L4dDemS2N8HW6wq5FJTI18dOGUu93BfFqInlVWhcmbQ10EX
- zMAicxLnoXF2+mvbdBvOQ8qvYvtFv2eMHFajh4Lnyq9qsHM1b47kKXmoSX4uJ3bc0Pd1
- 6uSrx4nnOPhE7Do9X1Coh+h3wTXsS0N6h+D5cnoCbVivCprS5coYbXqhsJFRqi2ldhc/
- wISyaWzCbSV4aGq2lLcrRIuLn7eret2GKumboZO8eFOuy1NHy3a95oqTkw6B7MeKFJrf
- 0Wuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vROQhmF37GxxVHdJLrkoLplAKn72rc6FbAjeldPt1/8=;
- b=gbzTERqCSJBLRvC2qaBdmmOh0m+dbfZ8gEAYVVnyU8bzWu8XQWQoL/jY4hJYDA3UyD
- 2Rso8LSvXDazgukLkh3BFifKlcPgVHiVteywL9RkBFTEAgM93vI8QYbyG9FR+u1fu0fX
- KGea51vyCL+fh+8Kb06pVRlNEb+MNhn1jxiYWHPe9WXgGfRGxj07uVEn5tzpypRY4uS9
- QdbsBFhN9TI3MysUIiKUxk+0l6KSjSAlGo99SQ6bqu0X+8cQjjbRWDtWgJBB+0sB69v9
- 2sOueqWTT+PocY6CcmJFelOyia+n+lcjwQUdYAxYF5tAjozXQBGhgvhCvZuIBPXSTXUN
- ALtw==
-X-Gm-Message-State: APjAAAXM6s74ONIxoehbPR3wVqnBCvlPK00c0awzjapckgzW8xKFAmUN
- DjyDdijJlD2Voubvmz5nNtWY0pySfDNZwWq+3J0=
-X-Google-Smtp-Source: APXvYqwd15A+vzRlt+BYQ+c6QIDpepQenvlcH/o4I4gi7fGxqS9IS5izIROp9ywW1/pYutZezWJQNrWdicjc3hKE8sY=
-X-Received: by 2002:a2e:b0db:: with SMTP id g27mr30207478ljl.74.1582571204256; 
- Mon, 24 Feb 2020 11:06:44 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1j6JE2-0001Lz-QV
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:17:08 -0500
+Resent-Date: Mon, 24 Feb 2020 14:17:07 -0500
+Resent-Message-Id: <E1j6JE2-0001Lz-QV@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21125)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j6JE1-0001JH-FM; Mon, 24 Feb 2020 14:17:06 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582571810; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=oEbDLCyhVrnMQTNpasLjnjC0ctFwkmoAB/SThLRP8caIgTlZlfe7/zZx5xzdNc+uZFI8MpPVrawOmN+6DYAXoHbg2gNutZV6LmCviD0/ctn+AFoWArLU4QBXULkq9lOR9fs6I2sgi9zRhd+4f1jZ7h3I7dVDsbC61i05ErJXJco=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582571810;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=w4rZ9K+FDadgh4A3FjLDkqDk9zsbozG/qn0aox1kzhE=; 
+ b=QKO5s/sd8ZVGUXa5U+xscM31k4m/8S0ozJ+KEMlYnuhHw0ty/8CUv1xY8z82iVz/h/5BkEeDwMa0WBVKcvUWxPd0z9eQxWhxWLitoXE6bRqEA4dUNSTcocaxopq4ArSsh5zBxtSyl4mTNWUpwfvH+c1cd203luvIZcsUM5bVcFU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582571808840430.0547574500098;
+ Mon, 24 Feb 2020 11:16:48 -0800 (PST)
+In-Reply-To: <20200224170301.246623-1-damien.hedde@greensocs.com>
+Subject: Re: [PATCH v7 0/9] Clock framework API
+Message-ID: <158257180673.10132.9769642807925986716@a1bbccc8075a>
 MIME-Version: 1.0
-References: <0c4859f90948ba392da456c9e1daf8fde8f5b22e.1582453384.git.rajnesh.kanwal49@gmail.com>
- <CAC41xo0PWCZw4mrcEfRq9fv+b3mSk9sN0mWhFXPwgdD6LR8xnQ@mail.gmail.com>
-In-Reply-To: <CAC41xo0PWCZw4mrcEfRq9fv+b3mSk9sN0mWhFXPwgdD6LR8xnQ@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 24 Feb 2020 10:59:05 -0800
-Message-ID: <CAKmqyKNn8V0yWA8t7dQeMwxcnmywDJoGKag9vQzwFruaygKL7Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] target/riscv: Fix VS mode interrupts forwarding.
-To: Jose Martins <josemartins90@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: damien.hedde@greensocs.com
+Date: Mon, 24 Feb 2020 11:16:48 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,74 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmerdabbelt@google.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, rajnesh.kanwal49@gmail.com,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org, berrange@redhat.com,
+ ehabkost@redhat.com, alistair@alistair23.me, mark.burton@greensocs.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, marcandre.lureau@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Feb 23, 2020 at 11:23 AM Jose Martins <josemartins90@gmail.com> wrote:
->
-> Hello rajnesh,
->
-> I had already submitted almost this exact patch a few weeks ago.
-
-To QEMU? I don't see the patch.
-
-Alistair
-
->
-> Jose
->
-> On Sun, 23 Feb 2020 at 13:51, <rajnesh.kanwal49@gmail.com> wrote:
-> >
-> > From: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
-> >
-> > Currently riscv_cpu_local_irq_pending is used to find out pending
-> > interrupt and VS mode interrupts are being shifted to represent
-> > S mode interrupts in this function. So when the cause returned by
-> > this function is passed to riscv_cpu_do_interrupt to actually
-> > forward the interrupt, the VS mode forwarding check does not work
-> > as intended and interrupt is actually forwarded to hypervisor. This
-> > patch fixes this issue.
-> >
-> > Signed-off-by: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
-> > ---
-> >  target/riscv/cpu_helper.c | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > index b9e90dfd9a..59535ecba6 100644
-> > --- a/target/riscv/cpu_helper.c
-> > +++ b/target/riscv/cpu_helper.c
-> > @@ -46,7 +46,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
-> >      target_ulong pending = env->mip & env->mie &
-> >                                 ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
-> >      target_ulong vspending = (env->mip & env->mie &
-> > -                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)) >> 1;
-> > +                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
-> >
-> >      target_ulong mie    = env->priv < PRV_M ||
-> >                            (env->priv == PRV_M && mstatus_mie);
-> > @@ -900,6 +900,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-> >
-> >              if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
-> >                  !force_hs_execp) {
-> > +                /*
-> > +                 * See if we need to adjust cause. Yes if its VS mode interrupt
-> > +                 * no if hypervisor has delegated one of hs mode's interrupt
-> > +                 */
-> > +                if (cause == IRQ_VS_TIMER || cause == IRQ_VS_SOFT ||
-> > +                    cause == IRQ_VS_EXT)
-> > +                    cause = cause - 1;
-> >                  /* Trap to VS mode */
-> >              } else if (riscv_cpu_virt_enabled(env)) {
-> >                  /* Trap into HS mode, from virt */
-> > --
-> > 2.17.1
-> >
-> >
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNDE3MDMwMS4yNDY2
+MjMtMS1kYW1pZW4uaGVkZGVAZ3JlZW5zb2NzLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWls
+ZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRl
+c3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2Vy
+IGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtl
+IGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3Qt
+bWluZ3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIEND
+ICAgICAgbmV0L3RyYWNlLm8KICBDQyAgICAgIHVpL3RyYWNlLm8KCldhcm5pbmcsIHRyZWF0ZWQg
+YXMgZXJyb3I6Ci90bXAvcWVtdS10ZXN0L3NyYy9kb2NzL2RldmVsL2Nsb2Nrcy5yc3Q6NjM6VW5l
+eHBlY3RlZCBpbmRlbnRhdGlvbi4KICBDQyAgICAgIGh3L2NvcmUvdHJhY2UubwogIENDICAgICAg
+aHcvZGlzcGxheS90cmFjZS5vCi0tLQogIENDICAgICAgc3R1YnMvZHVtcC5vCiAgQ0MgICAgICBz
+dHVicy9lcnJvci1wcmludGYubwogIENDICAgICAgc3R1YnMvZmRzZXQubwptYWtlOiAqKiogW01h
+a2VmaWxlOjEwNjE6IGRvY3MvZGV2ZWwvaW5kZXguaHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2Fp
+dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwg
+bGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjQsIGluIDxt
+b2R1bGU+Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
+cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
+ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD04OWRiZDlhNzA4
+NjY0ZGE1ODRmY2VmMjBkMDkxZThjYicsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0Jywg
+J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
+ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
+ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
+Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6
+L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTJ2
+aDJmejMzL3NyYy9kb2NrZXItc3JjLjIwMjAtMDItMjQtMTQuMTQuMTAuODkwOi92YXIvdG1wL3Fl
+bXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3
+J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJl
+bD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTg5ZGJkOWE3MDg2NjRkYTU4NGZjZWYyMGQwOTFlOGNi
+Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVj
+dG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTJ2aDJmejMzL3NyYycKbWFrZTogKioq
+IFtkb2NrZXItcnVuLXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtMzYuODgz
+cwp1c2VyICAgIDBtOC4wNzVzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
+cGF0Y2hldy5vcmcvbG9ncy8yMDIwMDIyNDE3MDMwMS4yNDY2MjMtMS1kYW1pZW4uaGVkZGVAZ3Jl
+ZW5zb2NzLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
+dC5jb20=
 
