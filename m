@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0498C35DE6
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECFFC35DE4
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AD3A2084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49FF62084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lBGUvJaJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AD3A2084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jyhHKcNj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49FF62084E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NLJ-0003sr-Jw
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:40:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47131)
+	id 1j6NLQ-0004EX-Bm
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:41:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIL-0006Kx-EO
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:50 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIP-0006VX-86
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIK-00086h-13
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:49 -0500
-Received: from ozlabs.org ([203.11.71.1]:46699)
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIO-000892-1P
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:53 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:38821)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6NIJ-00083A-B0; Mon, 24 Feb 2020 18:37:47 -0500
+ id 1j6NIN-00083v-Mh; Mon, 24 Feb 2020 18:37:51 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RJQ256Wlz9sRN; Tue, 25 Feb 2020 10:37:30 +1100 (AEDT)
+ id 48RJQ42Yjgz9sSM; Tue, 25 Feb 2020 10:37:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582587450;
- bh=GpG7JIVsiHpMpesoVJsSFbR7MFKVdTtNyC10o80HfXM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582587452;
+ bh=/E6r6c1U/O72mbX+roOccD8oy03Pdofs/lMnmoRwM/s=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=lBGUvJaJYSMWEcxMYfTo/3GL2YEISwMo2dsklK0mKQZR1SRtJF1W/PQryDYqxM45q
- IIY+JI8IalBpvWhZqs0SK381fqYMtJOZ9zlAbvOWOIPxZChnZO1zXqSticwhkgqvSp
- FKeiKCfhxYFHYwcYmMEIpRdi/UxsYqyBcMI47GrQ=
+ b=jyhHKcNjcjm4McK+vbaMJBjNoV9gyPZ+gU92OmjQ4fJM0C7EtYZiF42zVUyLCtlyH
+ 3GBHzVUqlBpyWOBnrVn1MB2RCJ2yIuQ4iRIlOarM7+Bc1/vXUEWUKLBmo8d3dhZPmB
+ XYwFFnCTFDRaX92I4A5/PrHkDQeMfYfqE8WLu5G8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: [PATCH v6 04/18] target/ppc: Correct handling of real mode accesses
- with vhyp on hash MMU
-Date: Tue, 25 Feb 2020 10:37:10 +1100
-Message-Id: <20200224233724.46415-5-david@gibson.dropbear.id.au>
+Subject: [PATCH v6 10/18] target/ppc: Correct RMLS table
+Date: Tue, 25 Feb 2020 10:37:16 +1100
+Message-Id: <20200224233724.46415-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,139 +81,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
-only model the non-hypervisor-privileged parts of the cpu.  Essentially w=
-e
-model the hypervisor's behaviour from the point of view of a guest OS, bu=
-t
-we don't model the hypervisor's execution.
+The table of RMA limits based on the LPCR[RMLS] field is slightly wrong.
+We're missing the RMLS =3D=3D 0 =3D> 256 GiB RMA option, which is availab=
+le on
+POWER8, so add that.
 
-In particular, in this mode, qemu's notion of target physical address is
-a guest physical address from the vcpu's point of view.  So accesses in
-guest real mode don't require translation.  If we were modelling the
-hypervisor mode, we'd need to translate the guest physical address into
-a host physical address.
-
-Currently, we handle this sloppily: we rely on setting up the virtual LPC=
-R
-and RMOR registers so that GPAs are simply HPAs plus an offset, which we
-set to zero.  This is already conceptually dubious, since the LPCR and RM=
-OR
-registers don't exist in the non-hypervisor portion of the CPU.  It gets
-worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
-
-Clean this up by explicitly handling the vhyp case.  While we're there,
-remove some unnecessary nesting of if statements that made the logic to
-select the correct real mode behaviour a bit less clear than it could be.
+The comment that goes with the table is much more wrong.  We *don't* filt=
+er
+invalid RMLS values when writing the LPCR, and there's not really a
+sensible way to do so.  Furthermore, while in theory the set of RMLS valu=
+es
+is implementation dependent, it seems in practice the same set has been
+available since around POWER4+ up until POWER8, the last model which
+supports RMLS at all.  So, correct that as well.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 25 deletions(-)
+ target/ppc/mmu-hash64.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 3e0be4d55f..392f90e0ae 100644
+index 4f082d775d..dd0df6fd01 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
-          */
-         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
-=20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if (msr_hv || !env->has_hv_mode) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+        } else if (msr_hv || !env->has_hv_mode) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             if (!(eaddr >> 63)) {
-                 raddr |=3D env->spr[SPR_HRMOR];
-             }
--        } else {
--            /* Otherwise, check VPM for RMA vs VRMA */
--            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
--                slb =3D &env->vrma_slb;
--                if (slb->sps) {
--                    goto skip_slb_search;
--                }
--                /* Not much else to do here */
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-+            slb =3D &env->vrma_slb;
-+            if (!slb->sps) {
-+                /* Invalid VRMA setup, machine check */
-                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
-                 env->error_code =3D 0;
-                 return 1;
--            } else if (raddr < env->rmls) {
--                /* RMA. Check bounds in RMLS */
--                raddr |=3D env->spr[SPR_RMOR];
--            } else {
--                /* The access failed, generate the approriate interrupt =
-*/
-+            }
-+
-+            goto skip_slb_search;
-+        } else {
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-                 if (rwx =3D=3D 2) {
-                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-@@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-                 }
-                 return 1;
-             }
-+
-+            raddr |=3D env->spr[SPR_RMOR];
-         }
-         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
-ASK,
-                      PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
-@@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
-         /* In real mode the top 4 effective address bits are ignored */
-         raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
-=20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+            return raddr;
-+        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             return raddr | env->spr[SPR_HRMOR];
--        }
--
--        /* Otherwise, check VPM for RMA vs VRMA */
--        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-             slb =3D &env->vrma_slb;
-             if (!slb->sps) {
-                 return -1;
-             }
--        } else if (raddr < env->rmls) {
--            /* RMA. Check bounds in RMLS */
--            return raddr | env->spr[SPR_RMOR];
-         } else {
--            return -1;
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-+                return -1;
-+            }
-+            return raddr | env->spr[SPR_RMOR];
-         }
-     } else {
-         slb =3D slb_lookup(cpu, addr);
+@@ -762,12 +762,12 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+ {
+     CPUPPCState *env =3D &cpu->env;
+     /*
+-     * This is the full 4 bits encoding of POWER8. Previous
+-     * CPUs only support a subset of these but the filtering
+-     * is done when writing LPCR
++     * In theory the meanings of RMLS values are implementation
++     * dependent.  In practice, this seems to have been the set from
++     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
+      */
+     const target_ulong rma_sizes[] =3D {
+-        [0] =3D 0,
++        [0] =3D 256 * GiB,
+         [1] =3D 16 * GiB,
+         [2] =3D 1 * GiB,
+         [3] =3D 64 * MiB,
 --=20
 2.24.1
 
