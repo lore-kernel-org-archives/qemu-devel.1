@@ -2,57 +2,80 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15940C35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 075D6C35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D22EE2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:45:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D22EE2072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id B22952072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:48:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JwgS1QGj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B22952072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6D7A-0003BI-VQ
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 07:45:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34726)
+	id 1j6DA7-0004GH-Uu
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 07:48:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1j6D6U-0002V7-ES
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:44:55 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6D9P-0003mX-Q4
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Aleksandar.Markovic@rt-rk.com>) id 1j6D6T-0005fM-2v
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:44:54 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:55739 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Aleksandar.Markovic@rt-rk.com>)
- id 1j6D6S-0005dw-Rw
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:44:53 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 2E86B1A1D98;
- Mon, 24 Feb 2020 13:44:48 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: by mail.rt-rk.com (Postfix, from userid 492)
- id 2CFE71A1E5B; Mon, 24 Feb 2020 13:44:45 +0100 (CET)
-in-reply-to: <CAP+75-UByGQ88k9eTJsB0SM9i-CxTeP33=xWvC11E=AGRV3TDw@mail.gmail.com>
-to: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-from: "Aleksandar Markovic" <Aleksandar.Markovic@rt-rk.com>
-message-id: <4173-5e53c500-1-4bb99580@45567176>
-subject: =?utf-8?q?Re=3A?==?utf-8?q?_=5BPATCH=5D?==?utf-8?q?_MAINTAINERS=3A?= 
- Reactivate MIPS KVM CPUs
-X-Forward: 127.0.0.1
-date: Mon, 24 Feb 2020 13:44:45 +0100
+ (envelope-from <peter.maydell@linaro.org>) id 1j6D9O-0006dy-L5
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:55 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40844)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6D9O-0006de-Ec
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:54 -0500
+Received: by mail-ot1-x344.google.com with SMTP id i6so8539796otr.7
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 04:47:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GjboJdXb5jdDi6o9EnROEYBh6eM6T95EPWUm/aFCl3U=;
+ b=JwgS1QGj2wTggan5BVMyPZotIUypaszQ0x0tSLcJn/viR5Tpz3RYX7U+4p+89eUHXc
+ rxXkpp52nx0ZD5ubgSklOyzkDNKdm7bahCknc9ZmYkWZPh1Q0kyPr2P2/NE7fC8SDbPh
+ pY2/mD5wYNhPKXz8GkHiNUl5eXANg57ARgVX4hQoLooTs3Wlx8f0Af3BkHnYx4KWyQ9N
+ aUBuBUeg6xSI+ChtHzcvV00IhvKWE5CXZ22eR5DCFpfcqzOZV9uCkgZ8hG3tolhzHp4p
+ T0SNsbY9NVcnle/Zh5NIHNdoVq2js8xOA35nXy/u3TDDmPXtLPh7v+9+St9WoMwiqeE9
+ AIiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GjboJdXb5jdDi6o9EnROEYBh6eM6T95EPWUm/aFCl3U=;
+ b=Fyu20eOl7Bgsbt01OvYtQW3k49uG5WvqGS1PYwu6NRmCowzLmVUT4FqVHSZJLXPF/W
+ JSzxvJzLAPBTG2k1G8i8gRiPcTjsxqul2f7z41SkfBNIxwx9TG5ghAzUcoZW41xS6wgo
+ JlX2fURexxK4VDSlq5uodEPIFHjvwcK6xAVtnWvE4kQ/sVCufjpkNxHqYLRb27WJ+SiA
+ bmt8uUC63v5h77ZHo+u5KSEF9BwXG+uYVKNDMKgw/TkgJAu1cTMvVuLU3kdq0JVvoihm
+ VetSz7nJPV8OaeO7jYYZu/HRE0f6tOhKPUghH7g0uex9+L8zKLmriBX61yiQnqi/mmVq
+ g0Kg==
+X-Gm-Message-State: APjAAAUD450m70XQLsqI52KHPV2CHEPVa2w3l2C/z9lMhqdnm+XLhw0t
+ G8KRtIxm1VGhRJajYCChZcohWmF4fBIpgaK+NhGd8w==
+X-Google-Smtp-Source: APXvYqw7Mu9b2xI68hCpUBQnIH9UOV5sCGbIi91wMjvj5cVVpRVPDTlaucUWtwWCaG9FyjmBKMdXZO5CcCQl7mhvPI8=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr40206411otd.91.1582548473597; 
+ Mon, 24 Feb 2020 04:47:53 -0800 (PST)
 MIME-Version: 1.0
-content-type: multipart/alternative;
- boundary="----=_=-_OpenGroupware_org_NGMime-16755-1582548285.140905-0------"
-User-Agent: SOGoMail 2.3.10
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+References: <20200222085030.1760640-1-stefanha@redhat.com>
+In-Reply-To: <20200222085030.1760640-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Feb 2020 12:47:42 +0000
+Message-ID: <CAFEAcA9jUDfm_kPPEtWtdBe+a=j3bysj49WWyzZxwwUSC69YGw@mail.gmail.com>
+Subject: Re: [PULL 00/31] Block patches
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,73 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: James Hogan <jhogan@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ Bandan Das <bsd@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-------=_=-_OpenGroupware_org_NGMime-16755-1582548285.140905-0------
-content-type: text/plain; charset=utf-8
-content-length: 991
-content-transfer-encoding: quoted-printable
-
-
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> > >> diff --git a/MAINTAINERS b/MAINTAINERS
-> > >> index b0728c8..9cc55d5 100644
-> > >> --- a/MAINTAINERS
-> > >> +++ b/MAINTAINERS
-> > >> @@ -365,8 +365,8 @@ S: Maintained
-> > >>=C2=A0=C2=A0 F: target/arm/kvm.c
-> > >>
-> > >>=C2=A0=C2=A0 MIPS KVM CPUs
-> > >> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+On Sat, 22 Feb 2020 at 08:50, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> BTW are you sure you want to remove Aleksandar Rikalo as reviewer?
-> (There is no description about this change.)
+> The following changes since commit 9ac5df20f51fabcba0d902025df4bd7ea987c158:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200221-1' into staging (2020-02-21 16:18:38 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to e5c59355ae9f724777c61c859292ec9db2c8c2ab:
+>
+>   fuzz: add documentation to docs/devel/ (2020-02-22 08:26:48 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> This pull request contains a virtio-blk/scsi performance optimization, event
+> loop scalability improvements, and a qtest-based device fuzzing framework.  I
+> am including the fuzzing patches because I have reviewed them and Thomas Huth
+> is currently away on leave.
 
-Aleksandar Rikalo is an experienced engineer very familiar
-with QEMU, and he is helping reviewing many other areas of
-QEMU for MIPS - however, his main day-to-day duties currently
-involve projects other than QEMU, and he is not sure if he will
-manage to get enough time to devote to KVM/MIPS. I talked to
-him too about the whole situation. If the current situation
-changes (he gets more time), and he wishes to participate,
-he will be welcomed, and we can add him easily.
 
-Thank you,
-Aleksandar
+Applied, thanks.
 
-=C2=A0
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-------=_=-_OpenGroupware_org_NGMime-16755-1582548285.140905-0------
-content-type: text/html; charset=utf-8
-content-length: 1318
-content-transfer-encoding: quoted-printable
-
-<html>&gt; Philippe Mathieu-Daud&eacute; &lt;philmd@redhat.com&gt; wrot=
-e:<br />&gt; &gt; &gt;&gt; diff --git a/MAINTAINERS b/MAINTAINERS<br />=
-&gt; &gt; &gt;&gt; index b0728c8..9cc55d5 100644<br />&gt; &gt; &gt;&gt=
-; --- a/MAINTAINERS<br />&gt; &gt; &gt;&gt; +++ b/MAINTAINERS<br />&gt;=
- &gt; &gt;&gt; @@ -365,8 +365,8 @@ S: Maintained<br />&gt; &gt; &gt;&gt=
-;&nbsp;&nbsp; F: target/arm/kvm.c<br />&gt; &gt; &gt;&gt;<br />&gt; &gt=
-; &gt;&gt;&nbsp;&nbsp; MIPS KVM CPUs<br />&gt; &gt; &gt;&gt; -R: Aleksa=
-ndar Rikalo &lt;aleksandar.rikalo@rt-rk.com&gt;<br />&gt;<br />&gt; BTW=
- are you sure you want to remove Aleksandar Rikalo as reviewer?<br />&g=
-t; (There is no description about this change.)<br /><br />Aleksandar R=
-ikalo is an experienced engineer very familiar<br />with QEMU, and he i=
-s helping reviewing many other areas of<br />QEMU for MIPS - however, h=
-is main day-to-day duties currently<br />involve projects other than QE=
-MU, and he is not sure if he will<br />manage to get enough time to dev=
-ote to KVM/MIPS. I talked to<br />him too about the whole situation. If=
- the current situation<br />changes (he gets more time), and he wishes =
-to participate,<br />he will be welcomed, and we can add him easily.<br=
- /><br />Thank you,<br />Aleksandar<br /><br />&nbsp;</html>
-
-------=_=-_OpenGroupware_org_NGMime-16755-1582548285.140905-0--------
-
+-- PMM
 
