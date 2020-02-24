@@ -2,57 +2,56 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3A5C35DE4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814D8C35DEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA04D2084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:38:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4EC5D2084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bhk2x6/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA04D2084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DXkuB8AE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EC5D2084E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NJS-00083s-RZ
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:38:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47060)
+	id 1j6NJT-00086l-Gy
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:38:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47036)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIG-0006Df-Bi
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:45 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIE-00083b-J8
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIF-0006DZ-21
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:44 -0500
-Received: from ozlabs.org ([203.11.71.1]:48205)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NID-00081e-OB
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:42 -0500
+Received: from ozlabs.org ([203.11.71.1]:44273)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6NIE-0007mJ-8I; Mon, 24 Feb 2020 18:37:42 -0500
+ id 1j6NIC-0007mG-Ri; Mon, 24 Feb 2020 18:37:41 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RJQ22PRTz9sRJ; Tue, 25 Feb 2020 10:37:29 +1100 (AEDT)
+ id 48RJQ14NPLz9sQt; Tue, 25 Feb 2020 10:37:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582587450;
- bh=XfjqatoySBeh8fCxko51poY2tUcpJr05c4AB3WcSL8E=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bhk2x6/fTr2fRxqV8d5Wg/WtP2PltjKDjhWVIOxTqeXat/uhsJ088TbH4wCnDv9GO
- NQKKu7bytgBtXfoZHdWKd+fo1iLw4kV8LtggL4nKJl+HJCtBjU2XYH+wGL6ur54kBl
- VpnGG3vv8nPf2enqr2lVVylPIKs1eGvFVZ11qtnE=
+ d=gibson.dropbear.id.au; s=201602; t=1582587449;
+ bh=oFITgY0EVz6a8Qvz7LUejHqMbN+eBMDQ3oUKNL29O/s=;
+ h=From:To:Cc:Subject:Date:From;
+ b=DXkuB8AE/GVnIKIKGybZzJKutekdDlcl5C54agG1sUwh0bBKW215Ro+9WfFiDmOg9
+ C2bvJT4qr/ZqbrU6PhQrtS8heOMx5S7MBG1zUOXMhLVSoPBxL3JGujfHDiNEosl+Rc
+ DwLZoMXV6EnlcxfUPu8HgCwHxtGUf/gwiZ8CXlX8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: [PATCH v6 02/18] ppc: Remove stub support for 32-bit hypervisor mode
-Date: Tue, 25 Feb 2020 10:37:08 +1100
-Message-Id: <20200224233724.46415-3-david@gibson.dropbear.id.au>
+Subject: [PATCH v6 00/18] target/ppc: Correct some errors with real mode
+ handling
+Date: Tue, 25 Feb 2020 10:37:06 +1100
+Message-Id: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200224233724.46415-1-david@gibson.dropbear.id.au>
-References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -80,131 +79,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-a4f30719a8cd, way back in 2007 noted that "PowerPC hypervisor mode is not
-fundamentally available only for PowerPC 64" and added a 32-bit version
-of the MSR[HV] bit.
+POWER "book S" (server class) cpus have a concept of "real mode" where
+MMU translation is disabled... sort of.  In fact this can mean a bunch
+of slightly different things when hypervisor mode and other
+considerations are present.
 
-But nothing was ever really done with that; there is no meaningful suppor=
-t
-for 32-bit hypervisor mode 13 years later.  Let's stop pretending and jus=
-t
-remove the stubs.
+We had some errors in edge cases here, so clean some things up and
+correct them.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/cpu.h                | 21 +++++++--------------
- target/ppc/translate_init.inc.c |  6 +++---
- 2 files changed, 10 insertions(+), 17 deletions(-)
+Some of those limitations caused problems with calculating the size of
+the Real Mode Area of pseries guests, so continue on to clean up and
+correct those calculations as well.
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b283042515..8077fdb068 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -24,8 +24,6 @@
- #include "exec/cpu-defs.h"
- #include "cpu-qom.h"
-=20
--/* #define PPC_EMULATE_32BITS_HYPV */
--
- #define TCG_GUEST_DEFAULT_MO 0
-=20
- #define TARGET_PAGE_BITS_64K 16
-@@ -300,13 +298,12 @@ typedef struct ppc_v3_pate_t {
- #define MSR_SF   63 /* Sixty-four-bit mode                            hf=
-lags */
- #define MSR_TAG  62 /* Tag-active mode (POWERx ?)                       =
-     */
- #define MSR_ISF  61 /* Sixty-four-bit interrupt mode on 630             =
-     */
--#define MSR_SHV  60 /* hypervisor state                               hf=
-lags */
-+#define MSR_HV   60 /* hypervisor state                               hf=
-lags */
- #define MSR_TS0  34 /* Transactional state, 2 bits (Book3s)             =
-     */
- #define MSR_TS1  33
- #define MSR_TM   32 /* Transactional Memory Available (Book3s)          =
-     */
- #define MSR_CM   31 /* Computation mode for BookE                     hf=
-lags */
- #define MSR_ICM  30 /* Interrupt computation mode for BookE             =
-     */
--#define MSR_THV  29 /* hypervisor state for 32 bits PowerPC           hf=
-lags */
- #define MSR_GS   28 /* guest state for BookE                            =
-     */
- #define MSR_UCLE 26 /* User-mode cache lock enable for BookE            =
-     */
- #define MSR_VR   25 /* altivec available                            x hf=
-lags */
-@@ -401,10 +398,13 @@ typedef struct ppc_v3_pate_t {
-=20
- #define msr_sf   ((env->msr >> MSR_SF)   & 1)
- #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
--#define msr_shv  ((env->msr >> MSR_SHV)  & 1)
-+#if defined(TARGET_PPC64)
-+#define msr_hv   ((env->msr >> MSR_HV)   & 1)
-+#else
-+#define msr_hv   (0)
-+#endif
- #define msr_cm   ((env->msr >> MSR_CM)   & 1)
- #define msr_icm  ((env->msr >> MSR_ICM)  & 1)
--#define msr_thv  ((env->msr >> MSR_THV)  & 1)
- #define msr_gs   ((env->msr >> MSR_GS)   & 1)
- #define msr_ucle ((env->msr >> MSR_UCLE) & 1)
- #define msr_vr   ((env->msr >> MSR_VR)   & 1)
-@@ -449,16 +449,9 @@ typedef struct ppc_v3_pate_t {
-=20
- /* Hypervisor bit is more specific */
- #if defined(TARGET_PPC64)
--#define MSR_HVB (1ULL << MSR_SHV)
--#define msr_hv  msr_shv
--#else
--#if defined(PPC_EMULATE_32BITS_HYPV)
--#define MSR_HVB (1ULL << MSR_THV)
--#define msr_hv  msr_thv
-+#define MSR_HVB (1ULL << MSR_HV)
- #else
- #define MSR_HVB (0ULL)
--#define msr_hv  (0)
--#endif
- #endif
-=20
- /* DSISR */
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index 53995f62ea..a0d0eaabf2 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8804,7 +8804,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_PM_ISA206;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
-@@ -9017,7 +9017,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
-@@ -9228,7 +9228,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
-)
-                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
-     pcc->msr_mask =3D (1ull << MSR_SF) |
--                    (1ull << MSR_SHV) |
-+                    (1ull << MSR_HV) |
-                     (1ull << MSR_TM) |
-                     (1ull << MSR_VR) |
-                     (1ull << MSR_VSX) |
+Changes since v5:
+ * Fixed an error in the sense of a test (pointed out by Fabiano Rosas)
+Changes since v4:
+ * Some tiny cosmetic fixes to the original patches
+ * Added a bunch of extra patches correcting RMA calculation
+Changes since v3:
+ * Fix style errors reported by checkpatch
+Changes since v2:
+ * Removed 32-bit hypervisor stubs more completely
+ * Minor polish based on review comments
+Changes since RFCv1:
+ * Add a number of extra patches taking advantage of the initial
+   cleanups
+
+Alexey Kardashevskiy (1):
+  pseries: Update SLOF firmware image
+
+David Gibson (17):
+  ppc: Remove stub support for 32-bit hypervisor mode
+  ppc: Remove stub of PPC970 HID4 implementation
+  target/ppc: Correct handling of real mode accesses with vhyp on hash
+    MMU
+  target/ppc: Introduce ppc_hash64_use_vrma() helper
+  spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+  target/ppc: Remove RMOR register from POWER9 & POWER10
+  target/ppc: Use class fields to simplify LPCR masking
+  target/ppc: Streamline calculation of RMA limit from LPCR[RMLS]
+  target/ppc: Correct RMLS table
+  target/ppc: Only calculate RMLS derived RMA limit on demand
+  target/ppc: Don't store VRMA SLBE persistently
+  spapr: Don't use weird units for MIN_RMA_SLOF
+  spapr,ppc: Simplify signature of kvmppc_rma_size()
+  spapr: Don't attempt to clamp RMA to VRMA constraint
+  spapr: Don't clamp RMA to 16GiB on new machine types
+  spapr: Clean up RMA size calculation
+  spapr: Fold spapr_node0_size() into its only caller
+
+ hw/ppc/spapr.c                  | 124 ++++++------
+ hw/ppc/spapr_cpu_core.c         |   6 +-
+ hw/ppc/spapr_hcall.c            |   4 +-
+ include/hw/ppc/spapr.h          |   4 +-
+ pc-bios/README                  |   2 +-
+ pc-bios/slof.bin                | Bin 931032 -> 968616 bytes
+ roms/SLOF                       |   2 +-
+ target/ppc/cpu-qom.h            |   1 +
+ target/ppc/cpu.h                |  25 +--
+ target/ppc/kvm.c                |   5 +-
+ target/ppc/kvm_ppc.h            |   7 +-
+ target/ppc/mmu-hash64.c         | 327 ++++++++++++--------------------
+ target/ppc/translate_init.inc.c |  63 ++++--
+ 13 files changed, 254 insertions(+), 316 deletions(-)
+
 --=20
 2.24.1
 
