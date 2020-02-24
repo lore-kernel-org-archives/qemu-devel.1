@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C8AC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D59FC11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E893420828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B6B720828
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3mPpPx0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E893420828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cc+YdUxF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B6B720828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6EoU-0007aa-2u
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:34:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50741)
+	id 1j6Eon-0008BU-9L
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:34:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6El2-0001rA-Sg
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:54 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6Ekl-0001Rq-LM
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6El1-0002KZ-3F
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:52 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58346
+ (envelope-from <kwolf@redhat.com>) id 1j6Ekk-0001wP-Je
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:35 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51088
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6El0-0002KO-UM
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:51 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6Ekk-0001vO-Ew
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582554650;
+ s=mimecast20190719; t=1582554633;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AZ8c4lv673Ml8nGwmYyEs+bXXK1XOqXwykw2590D9Ao=;
- b=T3mPpPx0tBpixuVNFXJDhjKE53U2/fj5EjOi34lbdbWJ5uzMbhpgajcZhE/hxEZ9aw7LIw
- 91YFPm7sH7xvpKITzw5oTxOGVP0GXwMiKOujH8p8hWrsKoHQPHDq87C+N8PVK0MCF+cFVA
- W7ok4+3n407AewbBDdFyshnvixvjitY=
+ bh=njn4UydcJJdeqk/x+jce44/LXqUdnaYJCL4k0nxXV2E=;
+ b=cc+YdUxFbjw7PSAmgmlVKC0H3yQ2dgLLY7Wq7bQiBhONqgfdyyVEEKMs9AkvU38YDzJTyD
+ tm4rJ+HevqqefvAWHfz9ropJtJpQToM1FEMrgVlrFV/s/dZxRF/OnwZmBeL3BTQr4IBl8p
+ lzPs3zfI7WBc6d7t5xSaAq8puuPencI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-GbOEeCZsO-mdWM3prZEP_g-1; Mon, 24 Feb 2020 09:30:46 -0500
-X-MC-Unique: GbOEeCZsO-mdWM3prZEP_g-1
+ us-mta-44-nL4NYS83Nv6HGKl4_0c7nQ-1; Mon, 24 Feb 2020 09:30:32 -0500
+X-MC-Unique: nL4NYS83Nv6HGKl4_0c7nQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A24F910509B9;
- Mon, 24 Feb 2020 14:30:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27FE7DB60;
+ Mon, 24 Feb 2020 14:30:31 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
  [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1F8E55C114;
- Mon, 24 Feb 2020 14:30:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DF6490F5B;
+ Mon, 24 Feb 2020 14:30:29 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 07/20] qapi: Flatten object-add
-Date: Mon, 24 Feb 2020 15:29:55 +0100
-Message-Id: <20200224143008.13362-8-kwolf@redhat.com>
+Subject: [PATCH v2 02/20] stubs: Add arch_type
+Date: Mon, 24 Feb 2020 15:29:50 +0100
+Message-Id: <20200224143008.13362-3-kwolf@redhat.com>
 In-Reply-To: <20200224143008.13362-1-kwolf@redhat.com>
 References: <20200224143008.13362-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -91,220 +91,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mapping object-add to the command line as is doesn't result in nice
-syntax because of the nesting introduced with 'props'. This becomes
-nicer and more consistent with device_add and netdev_add when we accept
-properties for the object on the top level instead.
-
-'props' is still accepted after this patch, but marked as deprecated.
+blockdev.c uses the arch_type constant, so before we can use the file in
+tools (i.e. outside of the system emulator), we need to add a stub for
+it. A new QEMU_ARCH_NONE is introduced for this case.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/qom.json                   | 12 +++++++---
- include/qom/object_interfaces.h |  7 ++++++
- hw/block/xen-block.c            | 11 ++++++++-
- monitor/misc.c                  |  2 ++
- qom/qom-qmp-cmds.c              | 42 +++++++++++++++++++++++++++------
- qemu-deprecated.texi            |  4 ++++
- 6 files changed, 67 insertions(+), 11 deletions(-)
+ include/sysemu/arch_init.h | 2 ++
+ stubs/arch_type.c          | 4 ++++
+ stubs/Makefile.objs        | 1 +
+ 3 files changed, 7 insertions(+)
+ create mode 100644 stubs/arch_type.c
 
-diff --git a/qapi/qom.json b/qapi/qom.json
-index ecc60c4401..8abe998962 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -210,7 +210,12 @@
- #
- # @id: the name of the new object
- #
--# @props: a dictionary of properties to be passed to the backend
-+# @props: a dictionary of properties to be passed to the backend. Deprecat=
-ed
-+#         since 5.0, specify the properties on the top level instead. It i=
-s an
-+#         error to specify the same option both on the top level and in @p=
-rops.
-+#
-+# Additional arguments depend on qom-type and are passed to the backend
-+# unchanged.
- #
- # Returns: Nothing on success
- #          Error if @qom-type is not a valid class name
-@@ -221,12 +226,13 @@
- #
- # -> { "execute": "object-add",
- #      "arguments": { "qom-type": "rng-random", "id": "rng1",
--#                     "props": { "filename": "/dev/hwrng" } } }
-+#                     "filename": "/dev/hwrng" } }
- # <- { "return": {} }
- #
- ##
- { 'command': 'object-add',
--  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
-+  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'},
-+  'gen': false } # so we can get the additional arguments
-=20
- ##
- # @object-del:
-diff --git a/include/qom/object_interfaces.h b/include/qom/object_interface=
-s.h
-index 3e4e1d928b..6f92f3cebb 100644
---- a/include/qom/object_interfaces.h
-+++ b/include/qom/object_interfaces.h
-@@ -162,4 +162,11 @@ void user_creatable_del(const char *id, Error **errp);
-  */
- void user_creatable_cleanup(void);
-=20
-+/**
-+ * qmp_object_add:
-+ *
-+ * QMP command handler for object-add. See the QAPI schema for documentati=
-on.
-+ */
-+void qmp_object_add(QDict *qdict, QObject **ret_data, Error **errp);
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 62c6fe4cf1..01392dc945 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -24,6 +24,8 @@ enum {
+     QEMU_ARCH_NIOS2 =3D (1 << 17),
+     QEMU_ARCH_HPPA =3D (1 << 18),
+     QEMU_ARCH_RISCV =3D (1 << 19),
 +
- #endif
-diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
-index 686bbc3f0d..3885464513 100644
---- a/hw/block/xen-block.c
-+++ b/hw/block/xen-block.c
-@@ -18,6 +18,7 @@
- #include "qapi/visitor.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-+#include "qom/object_interfaces.h"
- #include "hw/xen/xen_common.h"
- #include "hw/block/xen_blkif.h"
- #include "hw/qdev-properties.h"
-@@ -858,10 +859,18 @@ static XenBlockIOThread *xen_block_iothread_create(co=
-nst char *id,
- {
-     XenBlockIOThread *iothread =3D g_new(XenBlockIOThread, 1);
-     Error *local_err =3D NULL;
-+    QDict *opts;
-+    QObject *ret_data;
++    QEMU_ARCH_NONE =3D (1 << 31),
+ };
 =20
-     iothread->id =3D g_strdup(id);
-=20
--    qmp_object_add(TYPE_IOTHREAD, id, false, NULL, &local_err);
-+    opts =3D qdict_new();
-+    qdict_put_str(opts, "qom-type", TYPE_IOTHREAD);
-+    qdict_put_str(opts, "id", id);
-+    qmp_object_add(opts, &ret_data, &local_err);
-+    qobject_unref(opts);
-+    qobject_unref(ret_data);
+ extern const uint32_t arch_type;
+diff --git a/stubs/arch_type.c b/stubs/arch_type.c
+new file mode 100644
+index 0000000000..fc5423bc98
+--- /dev/null
++++ b/stubs/arch_type.c
+@@ -0,0 +1,4 @@
++#include "qemu/osdep.h"
++#include "sysemu/arch_init.h"
 +
-     if (local_err) {
-         error_propagate(errp, local_err);
-=20
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 6c41293102..1748ab3911 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -248,6 +248,8 @@ static void monitor_init_qmp_commands(void)
-                          QCO_NO_OPTIONS);
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
-+    qmp_register_command(&qmp_commands, "object-add", qmp_object_add,
-+                         QCO_NO_OPTIONS);
-=20
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities"=
-,
-diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
-index 6136efec16..49db926fcc 100644
---- a/qom/qom-qmp-cmds.c
-+++ b/qom/qom-qmp-cmds.c
-@@ -14,6 +14,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "block/qdict.h"
- #include "hw/qdev-core.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-qdev.h"
-@@ -240,13 +241,34 @@ ObjectPropertyInfoList *qmp_qom_list_properties(const=
- char *typename,
-     return prop_list;
- }
-=20
--void qmp_object_add(const char *type, const char *id,
--                    bool has_props, QObject *props, Error **errp)
-+void qmp_object_add(QDict *qdict, QObject **ret_data, Error **errp)
- {
-+    QObject *props;
-     QDict *pdict;
-     Visitor *v;
-     Object *obj;
-+    const char *type;
-+    const char *id;
-=20
-+    type =3D qdict_get_try_str(qdict, "qom-type");
-+    if (!type) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
-+        return;
-+    } else {
-+        type =3D g_strdup(type);
-+        qdict_del(qdict, "qom-type");
-+    }
-+
-+    id =3D qdict_get_try_str(qdict, "id");
-+    if (!id) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, "id");
-+        return;
-+    } else {
-+        id =3D g_strdup(id);
-+        qdict_del(qdict, "id");
-+    }
-+
-+    props =3D qdict_get(qdict, "props");
-     if (props) {
-         pdict =3D qobject_to(QDict, props);
-         if (!pdict) {
-@@ -254,17 +276,23 @@ void qmp_object_add(const char *type, const char *id,
-             return;
-         }
-         qobject_ref(pdict);
--    } else {
--        pdict =3D qdict_new();
-+        qdict_del(qdict, "props");
-+        qdict_join(qdict, pdict, false);
-+        if (qdict_size(pdict) !=3D 0) {
-+            error_setg(errp, "Option in 'props' conflicts with top level")=
-;
-+            qobject_unref(pdict);
-+            return;
-+        }
-+        qobject_unref(pdict);
-     }
-=20
--    v =3D qobject_input_visitor_new(QOBJECT(pdict));
--    obj =3D user_creatable_add_type(type, id, pdict, v, errp);
-+    v =3D qobject_input_visitor_new(QOBJECT(qdict));
-+    obj =3D user_creatable_add_type(type, id, qdict, v, errp);
-     visit_free(v);
-     if (obj) {
-         object_unref(obj);
-     }
--    qobject_unref(pdict);
-+    *ret_data =3D QOBJECT(qdict_new());
- }
-=20
- void qmp_object_del(const char *id, Error **errp)
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 0671c26c80..faf99d3f91 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -167,6 +167,10 @@ Use ``migrate-set-parameters'' instead.
-=20
- Use ``migrate-set-parameters'' and ``query-migrate-parameters'' instead.
-=20
-+@subsection object-add option props (since 5.0)
-+
-+Specify the properties for the object as top-level arguments instead.
-+
- @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
-=20
- The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
++const uint32_t arch_type =3D QEMU_ARCH_NONE;
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 7afbe5fb61..24062ce7d9 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -1,3 +1,4 @@
++stub-obj-y +=3D arch_type.o
+ stub-obj-y +=3D bdrv-next-monitor-owned.o
+ stub-obj-y +=3D blk-commit-all.o
+ stub-obj-y +=3D blockdev-close-all-bdrv-states.o
 --=20
 2.20.1
 
