@@ -2,80 +2,98 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3215C38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:27:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC03C38C00
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD6E6218AC
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:27:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCB5B218AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:29:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9WtCZne"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD6E6218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wPejLVWQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB5B218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6LGG-0001E7-Sw
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:27:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51215)
+	id 1j6LHs-0004FA-SX
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:29:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6KnJ-0000T8-5x
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:38 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kn5-0000DG-KE
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6KnH-0004LZ-II
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23218
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6KnH-0004L4-4z
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582577854;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=shskCEX2uYtXc4beNl78HPxrHEcrnngUbNyRlJDIBE8=;
- b=B9WtCZnehnMS9NX1zocgB3+Jsk3Kg9uQIHatKr7Qdvt+7doKuJYvEYdx5+xPbrkGG4050+
- UXvGYvet3D2gVBYlmLc3YOpPAj/LopuS79engnX11Rl4OmpqmJlXLPWv6RJPdSlz2XE97I
- 9DXgVR/nOezge5eWVarAzXN5KQ7nvjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-ZTrULF2jMiO5BKSC1h24ow-1; Mon, 24 Feb 2020 15:57:32 -0500
-X-MC-Unique: ZTrULF2jMiO5BKSC1h24ow-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A39B3801FA7;
- Mon, 24 Feb 2020 20:57:28 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-162.brq.redhat.com [10.40.205.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C9995C241;
- Mon, 24 Feb 2020 20:57:10 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH RESEND v2 05/32] hw/arm: Use memory_region_init_rom() with
- read-only regions
-Date: Mon, 24 Feb 2020 21:55:06 +0100
-Message-Id: <20200224205533.23798-6-philmd@redhat.com>
-In-Reply-To: <20200224205533.23798-1-philmd@redhat.com>
-References: <20200224205533.23798-1-philmd@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kn4-0004CN-8x
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:23 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:54132)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1j6Kn3-00042p-W6
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:22 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKraG9164141;
+ Mon, 24 Feb 2020 20:57:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : in-reply-to :
+ references; s=corp-2020-01-29;
+ bh=r33JqoYyvd7qRET/DSaqmHS6AvTJ0RmaWoQwJRwosSY=;
+ b=wPejLVWQJV0EispF7OgFGpqA8zm6wRQeDTIdM/mf7smtF3048/87zIK1fG2upe+p0fK6
+ h7JguyfHvUAXKYbO7rL/G5hndPqKXLWHXdeHVltCb+jRkkiXtNn23lIft3s8qm4+kDcI
+ /sXFFzu0vB2pFnwLoFnql0TfgxdV80El5kOaWcUL4On2odH5opytvEc2tEXouwlfHym0
+ Udtfn3+FDYJvgPUDkgAhukf5QqiQQnS74dFKJ4MZsQJbdHGuSHDW2e0gh8/clMN3x0LJ
+ Zg5mWbwWQuqy2dmCuMEAdC+tuowE9fhF5eHLPFv3ihsqFhnWmVYMnTz2FsJXe6Nefl7m VQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 2ybvr4p99a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 24 Feb 2020 20:57:07 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqoFK172448;
+ Mon, 24 Feb 2020 20:57:06 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 2ybdshkss5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 24 Feb 2020 20:57:06 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKv42U028905;
+ Mon, 24 Feb 2020 20:57:05 GMT
+Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 24 Feb 2020 12:57:04 -0800
+From: Jagannathan Raman <jag.raman@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 44/50] multi-process/mig: refactor runstate_check into
+ common file
+Date: Mon, 24 Feb 2020 15:55:35 -0500
+Message-Id: <99597f15a6e42c34b5a2e7f88430ed56c89feb76.1582576372.git.jag.raman@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ suspectscore=1 spamscore=0
+ malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002240153
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ spamscore=0
+ clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240153
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,175 +105,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>, Palmer Dabbelt <palmer@dabbelt.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-riscv@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
- Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+runstate_check file is refactored into vl-parse.c
+
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- hw/arm/exynos4210.c | 3 +--
- hw/arm/mainstone.c  | 3 +--
- hw/arm/omap_sx1.c   | 6 ++----
- hw/arm/palm.c       | 3 +--
- hw/arm/spitz.c      | 3 +--
- hw/arm/stellaris.c  | 3 +--
- hw/arm/tosa.c       | 3 +--
- 7 files changed, 8 insertions(+), 16 deletions(-)
+ Makefile.objs             |  2 ++
+ include/sysemu/runstate.h |  2 ++
+ runstate.c                | 36 ++++++++++++++++++++++++++++++++++++
+ softmmu/vl.c              | 10 ----------
+ stubs/runstate-check.c    |  3 +++
+ 5 files changed, 43 insertions(+), 10 deletions(-)
+ create mode 100644 runstate.c
 
-diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-index 59a27bdd68..3af6502a5e 100644
---- a/hw/arm/exynos4210.c
-+++ b/hw/arm/exynos4210.c
-@@ -311,9 +311,8 @@ static void exynos4210_realize(DeviceState *socdev, Err=
-or **errp)
-                                 &s->chipid_mem);
-=20
-     /* Internal ROM */
--    memory_region_init_ram(&s->irom_mem, NULL, "exynos4210.irom",
-+    memory_region_init_rom(&s->irom_mem, NULL, "exynos4210.irom",
-                            EXYNOS4210_IROM_SIZE, &error_fatal);
--    memory_region_set_readonly(&s->irom_mem, true);
-     memory_region_add_subregion(system_mem, EXYNOS4210_IROM_BASE_ADDR,
-                                 &s->irom_mem);
-     /* mirror of iROM */
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index 6e64dfab50..05a806b422 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -125,9 +125,8 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-     /* Setup CPU & memory */
-     mpu =3D pxa270_init(address_space_mem, mainstone_binfo.ram_size,
-                       machine->cpu_type);
--    memory_region_init_ram(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-+    memory_region_init_rom(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-                            &error_fatal);
--    memory_region_set_readonly(rom, true);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
- #ifdef TARGET_WORDS_BIGENDIAN
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index be245714db..6c3fd1b271 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -126,9 +126,8 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-     mpu =3D omap310_mpu_init(dram, machine->cpu_type);
-=20
-     /* External Flash (EMIFS) */
--    memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
-+    memory_region_init_rom(flash, NULL, "omap_sx1.flash0-0", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(address_space, OMAP_CS0_BASE, flash);
-=20
-     memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val,
-@@ -168,9 +167,8 @@ static void sx1_init(MachineState *machine, const int v=
-ersion)
-     if ((version =3D=3D 1) &&
-             (dinfo =3D drive_get(IF_PFLASH, 0, fl_idx)) !=3D NULL) {
-         MemoryRegion *flash_1 =3D g_new(MemoryRegion, 1);
--        memory_region_init_ram(flash_1, NULL, "omap_sx1.flash1-0",
-+        memory_region_init_rom(flash_1, NULL, "omap_sx1.flash1-0",
-                                flash1_size, &error_fatal);
--        memory_region_set_readonly(flash_1, true);
-         memory_region_add_subregion(address_space, OMAP_CS1_BASE, flash_1)=
-;
-=20
-         memory_region_init_io(&cs[1], NULL, &static_ops, &cs1val,
-diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-index 72eca8cc55..265d5891a6 100644
---- a/hw/arm/palm.c
-+++ b/hw/arm/palm.c
-@@ -206,9 +206,8 @@ static void palmte_init(MachineState *machine)
-     mpu =3D omap310_mpu_init(dram, machine->cpu_type);
-=20
-     /* External Flash (EMIFS) */
--    memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
-+    memory_region_init_rom(flash, NULL, "palmte.flash", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(address_space_mem, OMAP_CS0_BASE, flash);
-=20
-     memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val, "palmte-cs0"=
-,
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index e001088103..1d27399721 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -924,8 +924,7 @@ static void spitz_common_init(MachineState *machine,
-=20
-     sl_flash_register(mpu, (model =3D=3D spitz) ? FLASH_128M : FLASH_1024M=
-);
-=20
--    memory_region_init_ram(rom, NULL, "spitz.rom", SPITZ_ROM, &error_fatal=
-);
--    memory_region_set_readonly(rom, true);
-+    memory_region_init_rom(rom, NULL, "spitz.rom", SPITZ_ROM, &error_fatal=
-);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
-     /* Setup peripherals */
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 221a78674e..d136ba1a92 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -1300,9 +1300,8 @@ static void stellaris_init(MachineState *ms, stellari=
-s_board_info *board)
-     sram_size =3D ((board->dc0 >> 18) + 1) * 1024;
-=20
-     /* Flash programming is done via the SCU, so pretend it is ROM.  */
--    memory_region_init_ram(flash, NULL, "stellaris.flash", flash_size,
-+    memory_region_init_rom(flash, NULL, "stellaris.flash", flash_size,
-                            &error_fatal);
--    memory_region_set_readonly(flash, true);
-     memory_region_add_subregion(system_memory, 0, flash);
-=20
-     memory_region_init_ram(sram, NULL, "stellaris.sram", sram_size,
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 4d95a1f3e2..5dee2d76c6 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -226,8 +226,7 @@ static void tosa_init(MachineState *machine)
-=20
-     mpu =3D pxa255_init(address_space_mem, tosa_binfo.ram_size);
-=20
--    memory_region_init_ram(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
--    memory_region_set_readonly(rom, true);
-+    memory_region_init_rom(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
-     memory_region_add_subregion(address_space_mem, 0, rom);
-=20
-     tmio =3D tc6393xb_init(address_space_mem, 0x10000000,
---=20
-2.21.1
+diff --git a/Makefile.objs b/Makefile.objs
+index 65009da..cf2200d 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -40,6 +40,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) += blockdev.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += qdev-monitor.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += bootdevice.o
+ remote-pci-obj-$(CONFIG_MPQEMU) += iothread.o
++remote-pci-obj-$(CONFIG_MPQEMU) += runstate.o
+ 
+ ##############################################################
+ # remote-lsi-obj-y is code used to implement remote LSI device
+@@ -103,6 +104,7 @@ qemu-seccomp.o-libs := $(SECCOMP_LIBS)
+ common-obj-$(CONFIG_FDT) += device_tree.o
+ 
+ common-obj-y += vl-parse.o
++common-obj-y += runstate.o
+ 
+ #######################################################################
+ # qapi
+diff --git a/include/sysemu/runstate.h b/include/sysemu/runstate.h
+index f760094..ece939f 100644
+--- a/include/sysemu/runstate.h
++++ b/include/sysemu/runstate.h
+@@ -4,6 +4,8 @@
+ #include "qapi/qapi-types-run-state.h"
+ #include "qemu/notify.h"
+ 
++extern RunState current_run_state;
++
+ bool runstate_check(RunState state);
+ void runstate_set(RunState new_state);
+ int runstate_is_running(void);
+diff --git a/runstate.c b/runstate.c
+new file mode 100644
+index 0000000..273345a
+--- /dev/null
++++ b/runstate.c
+@@ -0,0 +1,36 @@
++/*
++ * Copyright (c) 2003-2008 Fabrice Bellard
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "sysemu/runstate.h"
++
++/***********************************************************/
++/* QEMU state */
++
++RunState current_run_state = RUN_STATE_PRECONFIG;
++
++bool runstate_check(RunState state)
++{
++    return current_run_state == state;
++}
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 42d5682..d95ee2f 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -620,11 +620,6 @@ static int default_driver_check(void *opaque, QemuOpts *opts, Error **errp)
+     return 0;
+ }
+ 
+-/***********************************************************/
+-/* QEMU state */
+-
+-static RunState current_run_state = RUN_STATE_PRECONFIG;
+-
+ /* We use RUN_STATE__MAX but any invalid value will do */
+ static RunState vmstop_requested = RUN_STATE__MAX;
+ static QemuMutex vmstop_lock;
+@@ -732,11 +727,6 @@ static const RunStateTransition runstate_transitions_def[] = {
+ 
+ static bool runstate_valid_transitions[RUN_STATE__MAX][RUN_STATE__MAX];
+ 
+-bool runstate_check(RunState state)
+-{
+-    return current_run_state == state;
+-}
+-
+ bool runstate_store(char *str, size_t size)
+ {
+     const char *state = RunState_str(current_run_state);
+diff --git a/stubs/runstate-check.c b/stubs/runstate-check.c
+index 2ccda2b..3038bcb 100644
+--- a/stubs/runstate-check.c
++++ b/stubs/runstate-check.c
+@@ -1,6 +1,9 @@
+ #include "qemu/osdep.h"
+ 
+ #include "sysemu/runstate.h"
++
++#pragma weak runstate_check
++
+ bool runstate_check(RunState state)
+ {
+     return state == RUN_STATE_PRELAUNCH;
+-- 
+1.8.3.1
 
 
