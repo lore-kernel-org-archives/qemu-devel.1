@@ -2,102 +2,79 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C26C11D30
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475D6C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8717D20828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8717D20828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1426D20828
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXcwwgNP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1426D20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Enk-0005m7-Lo
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:33:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49400)
+	id 1j6EoO-0007M1-4C
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:34:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <muriloo@linux.ibm.com>) id 1j6EgP-0002Q2-CM
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:07 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6Ekz-0001kJ-Mw
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <muriloo@linux.ibm.com>) id 1j6EgO-0007rW-1X
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8294
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
- id 1j6EgN-0007r2-Rx
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:03 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01OEOtmr046066; Mon, 24 Feb 2020 09:25:59 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1c6acwk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 24 Feb 2020 09:25:59 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01OEP8NG047787;
- Mon, 24 Feb 2020 09:25:59 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1c6acvf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 24 Feb 2020 09:25:59 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01OEPBAA025757;
- Mon, 24 Feb 2020 14:25:57 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01wdc.us.ibm.com with ESMTP id 2yaux643hj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 24 Feb 2020 14:25:57 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01OEPuEg50659590
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 14:25:56 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 85E1ABE053;
- Mon, 24 Feb 2020 14:25:56 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 09EB8BE054;
- Mon, 24 Feb 2020 14:25:54 +0000 (GMT)
-Received: from localhost (unknown [9.85.197.149])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Mon, 24 Feb 2020 14:25:54 +0000 (GMT)
-From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v2 fixed 08/16] util/mmap-alloc: Factor out calculation of
- pagesize to mmap_pagesize()
-Date: Mon, 24 Feb 2020 11:25:52 -0300
-Message-ID: <4591604.1lD6THJHVr@kermit.br.ibm.com>
-Organization: IBM
-In-Reply-To: <3378805.CNlBlhNnSm@kermit.br.ibm.com>
-References: <20200212134254.11073-1-david@redhat.com>
- <7252629e-6290-5709-ea3c-d215622975ed@redhat.com>
- <3378805.CNlBlhNnSm@kermit.br.ibm.com>
+ (envelope-from <kwolf@redhat.com>) id 1j6Eky-0002GA-6C
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21149
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6Eky-0002Ff-2O
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582554647;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ia38OPTV1CkiYPUVpdttHvJJ8KRirq7hiJmiLqgfnCY=;
+ b=ZXcwwgNP+bKmuRHzdvPI2yIRqYdPaMp6tcYoxYI2Py6I5ZGgB/GjQIpfvDGFaywIyvAOxc
+ QgUO0a1hQOiKXzoYJiLLPu1AVbsZwe1sBjUkFNuSCYXYpW2l30wLtdhXSFXikU45D0YCuf
+ H34iv88CwJkEgLrkbwSGejNVo3GrjRs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-R26ijo80O2yJ2gWnm97PxA-1; Mon, 24 Feb 2020 09:30:46 -0500
+X-MC-Unique: R26ijo80O2yJ2gWnm97PxA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C512C107ACC4;
+ Mon, 24 Feb 2020 14:30:40 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
+ [10.36.117.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95AB1790FF;
+ Mon, 24 Feb 2020 14:30:38 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 06/20] qemu-storage-daemon: Add --blockdev option
+Date: Mon, 24 Feb 2020 15:29:54 +0100
+Message-Id: <20200224143008.13362-7-kwolf@redhat.com>
+In-Reply-To: <20200224143008.13362-1-kwolf@redhat.com>
+References: <20200224143008.13362-1-kwolf@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-24_04:2020-02-21,
- 2020-02-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0
- priorityscore=1501 impostorscore=0 suspectscore=1 adultscore=0
- mlxlogscore=999 bulkscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0
- spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240119
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,98 +86,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ coiby.xu@gmail.com, mreitz@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Monday, February 24, 2020 11:16:16 AM -03 Murilo Opsfelder Ara=FAjo wrot=
-e:
-> On Monday, February 24, 2020 7:57:03 AM -03 David Hildenbrand wrote:
-> > On 24.02.20 11:50, David Hildenbrand wrote:
-> > > On 19.02.20 23:46, Peter Xu wrote:
-> > >> On Wed, Feb 12, 2020 at 02:42:46PM +0100, David Hildenbrand wrote:
-> > >>> Factor it out and add a comment.
-> > >>>
-> > >>> Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
-> > >>> Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-> > >>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > >>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > >>> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-> > >>> Cc: Greg Kurz <groug@kaod.org>
-> > >>> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > >>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > >>> Cc: Igor Mammedov <imammedo@redhat.com>
-> > >>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> > >>> ---
-> > >>>
-> > >>>  util/mmap-alloc.c | 21 ++++++++++++---------
-> > >>>  1 file changed, 12 insertions(+), 9 deletions(-)
-> > >>>
-> > >>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-> > >>> index 27dcccd8ec..82f02a2cec 100644
-> > >>> --- a/util/mmap-alloc.c
-> > >>> +++ b/util/mmap-alloc.c
-> > >>> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char
-> > >>> *mem_path)
-> > >>>
-> > >>>      return qemu_real_host_page_size;
-> > >>>
-> > >>>  }
-> > >>>
-> > >>> +static inline size_t mmap_pagesize(int fd)
-> > >>> +{
-> > >>> +#if defined(__powerpc64__) && defined(__linux__)
-> > >>> +    /* Mappings in the same segment must share the same page size =
-*/
-> > >>> +    return qemu_fd_getpagesize(fd);
-> > >>> +#else
-> > >>> +    return qemu_real_host_page_size;
-> > >>> +#endif
-> > >>> +}
-> > >>
-> > >> Pure question: This will return 4K even for huge pages on x86, is th=
-is
-> > >> what we want?
-> > >
-> > > (was asking myself the same question) I *think* it's intended. It's
-> > > mainly only used to allocate one additional guard page. The callers of
-> > > qemu_ram_mmap() make sure that the size is properly aligned (e.g., to
-> > > huge pages).
-> > >
-> > > Of course, a 4k guard page is sufficient - unless we can't use that
-> > > (special case for ppc64 here).
-> > >
-> > > Thanks!
-> >
-> > We could rename the function to mmap_guard_pagesize(), thoughts?
->
-> The existing qemu_fd_getpagesize() already returns qemu_real_host_page_si=
-ze
-> for non-anonymous mappings (when fd =3D=3D -1).  I think this new
-> mmap_pagesize() could be dropped in favor of qemu_fd_getpagesize().
+This adds a --blockdev option to the storage daemon that works the same
+as the -blockdev option of the system emulator.
 
-s/non-//
+In order to be able to link with blockdev.o, we also need to change
+stream.o from common-obj to block-obj, which is where all other block
+jobs already are.
 
-I mean "for anonymous mappings".
+In contrast to the system emulator, qemu-storage-daemon options will be
+processed in the order they are given. The user needs to take care to
+refer to other objects only after defining them.
 
->
-> A side effect of this change would be guard page using a bit more memory =
-for
-> non-anonymous mapping.  Could that be a problem?
->
-> What do you think?
->
-> --
-> Murilo
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ qemu-storage-daemon.c | 31 +++++++++++++++++++++++++++++++
+ Makefile              |  5 ++++-
+ Makefile.objs         |  7 +++++++
+ block/Makefile.objs   |  2 +-
+ 4 files changed, 43 insertions(+), 2 deletions(-)
 
+diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+index fc4aef572b..c30caaf59e 100644
+--- a/qemu-storage-daemon.c
++++ b/qemu-storage-daemon.c
+@@ -31,6 +31,10 @@
+ #include "crypto/init.h"
+=20
+ #include "qapi/error.h"
++#include "qapi/qapi-visit-block-core.h"
++#include "qapi/qapi-commands-block-core.h"
++#include "qapi/qobject-input-visitor.h"
++
+ #include "qemu-common.h"
+ #include "qemu-version.h"
+ #include "qemu/config-file.h"
+@@ -52,15 +56,27 @@ static void help(void)
+ "                         specify tracing options\n"
+ "  -V, --version          output version information and exit\n"
+ "\n"
++"  --blockdev [driver=3D]<driver>[,node-name=3D<N>][,discard=3Dignore|unma=
+p]\n"
++"             [,cache.direct=3Don|off][,cache.no-flush=3Don|off]\n"
++"             [,read-only=3Don|off][,auto-read-only=3Don|off]\n"
++"             [,force-share=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
++"             [,driver specific parameters...]\n"
++"                         configure a block backend\n"
++"\n"
+ QEMU_HELP_BOTTOM "\n",
+     error_get_progname());
+ }
+=20
++enum {
++    OPTION_BLOCKDEV =3D 256,
++};
++
+ static void process_options(int argc, char *argv[])
+ {
+     int c;
+=20
+     static const struct option long_options[] =3D {
++        {"blockdev", required_argument, NULL, OPTION_BLOCKDEV},
+         {"help", no_argument, NULL, 'h'},
+         {"trace", required_argument, NULL, 'T'},
+         {"version", no_argument, NULL, 'V'},
+@@ -90,6 +106,21 @@ static void process_options(int argc, char *argv[])
+             printf("qemu-storage-daemon version "
+                    QEMU_FULL_VERSION "\n" QEMU_COPYRIGHT "\n");
+             exit(EXIT_SUCCESS);
++        case OPTION_BLOCKDEV:
++            {
++                Visitor *v;
++                BlockdevOptions *options;
++
++                v =3D qobject_input_visitor_new_str(optarg, "driver",
++                                                  &error_fatal);
++
++                visit_type_BlockdevOptions(v, NULL, &options, &error_fatal=
+);
++                visit_free(v);
++
++                qmp_blockdev_add(options, &error_fatal);
++                qapi_free_BlockdevOptions(options);
++                break;
++            }
+         default:
+             g_assert_not_reached();
+         }
+diff --git a/Makefile b/Makefile
+index 44b3c8a342..750cff8d0a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -450,6 +450,8 @@ dummy :=3D $(call unnest-vars,, \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
+                 block-obj-m \
++                storage-daemon-obj-y \
++                storage-daemon-obj-m \
+                 crypto-obj-y \
+                 qom-obj-y \
+                 io-obj-y \
+@@ -482,6 +484,7 @@ TARGET_DIRS_RULES :=3D $(foreach t, all clean install, =
+$(addsuffix /$(t), $(TARGET
+ SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
+ $(SOFTMMU_ALL_RULES): $(authz-obj-y)
+ $(SOFTMMU_ALL_RULES): $(block-obj-y)
++$(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
+ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+ $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+ $(SOFTMMU_ALL_RULES): $(io-obj-y)
+@@ -573,7 +576,7 @@ qemu-img.o: qemu-img-cmds.h
+ qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
+) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
+) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) =
+$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+-qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block=
+-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block=
+-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(=
+COMMON_LDADDS)
+=20
+ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+=20
+diff --git a/Makefile.objs b/Makefile.objs
+index 26b9cff954..c7e1b36130 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -27,6 +27,13 @@ io-obj-y =3D io/
+=20
+ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+=20
++#######################################################################
++# storage-daemon-obj-y is code used by qemu-storage-daemon (these objects =
+are
++# used for system emulation, too, but specified separately there)
++
++storage-daemon-obj-y =3D block/
++storage-daemon-obj-y +=3D blockdev.o iothread.o
++
+ ######################################################################
+ # Target independent part of system emulation. The long term path is to
+ # suppress *all* target specific code in case of system emulation, i.e. a
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index e06cf0b284..cb36ae2503 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -46,7 +46,7 @@ block-obj-y +=3D aio_task.o
+ block-obj-y +=3D backup-top.o
+ block-obj-y +=3D filter-compress.o
+=20
+-common-obj-y +=3D stream.o
++block-obj-y +=3D stream.o
+=20
+ common-obj-y +=3D qapi-sysemu.o
+=20
+--=20
+2.20.1
 
-=2D-
-Murilo
 
