@@ -2,83 +2,80 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3C9C11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E4FC11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 992C320836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:18:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32A5920836
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:20:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="VW+w7Wqr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 992C320836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhJGPXxR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A5920836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6HNa-0001us-Ef
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:18:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46991)
+	id 1j6HOw-0003FR-AY
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:20:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6H8j-0003Ar-TN
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:32 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j6HO4-0002d3-GV
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6H8h-0005jm-Uy
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:29 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:46594)
+ (envelope-from <imammedo@redhat.com>) id 1j6HO3-0004Ti-4Z
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:19:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21508
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1j6H8V-0005Z6-38; Mon, 24 Feb 2020 12:03:15 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id B9B9796F54;
- Mon, 24 Feb 2020 17:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1582563794;
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j6HO2-0004TH-WD
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:19:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582564758;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y+VidZFDeFu/Fdff/HCFXfq3MWocQJ9t6/2A2e7PZ7A=;
- b=VW+w7WqrRspucgrU1DN7gBPLPEEc4cLYkkt4HojE/i2dw9OdFl+LmLqhEu7KvALg5TstXo
- nCfw6f+zm61bnkPFXVZ8cMaaMHpVLNa+zICXmq3j6m+u2LF3SK4EHspVybGGDu/RqPCExa
- bT5GFm4bUQkfUODBFtQyfZFdH4/BvPs=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 6/9] hw/misc/zynq_slcr: add clock generation for uarts
-Date: Mon, 24 Feb 2020 18:02:58 +0100
-Message-Id: <20200224170301.246623-7-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200224170301.246623-1-damien.hedde@greensocs.com>
-References: <20200224170301.246623-1-damien.hedde@greensocs.com>
+ bh=nhtRJY6il+zG1glAHnNWwdGIl5h679rWNsy8y6QiDo8=;
+ b=dhJGPXxRUCZhkROjNltNi6UODLy+vxtGCHdjoSErQUJMX/OPw6p/iV2Agi6eAW6jgKZDfg
+ Z6USTuODdPhUKps47q2bYjFefvCjxLeffKkxUM/NXyYz0RRWrNRkggFFtPz10Y/eJV5lKs
+ 0r4CpAcZyRyOIjAS7hjA7XZBY/BwmoU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-KIcqbwQoMmG1nu-GD3IXDA-1; Mon, 24 Feb 2020 12:19:10 -0500
+X-MC-Unique: KIcqbwQoMmG1nu-GD3IXDA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74450801E53;
+ Mon, 24 Feb 2020 17:19:09 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2700491856;
+ Mon, 24 Feb 2020 17:19:04 +0000 (UTC)
+Date: Mon, 24 Feb 2020 18:19:03 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v4 12/16] hw/i386: Use the apicid handlers from
+ X86MachineState
+Message-ID: <20200224181903.19790bad@redhat.com>
+In-Reply-To: <158161786628.48948.1813866541108702762.stgit@naples-babu.amd.com>
+References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
+ <158161786628.48948.1813866541108702762.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1582563794;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=y+VidZFDeFu/Fdff/HCFXfq3MWocQJ9t6/2A2e7PZ7A=;
- b=zYRqZa+UXuyWVqxi6p+WMnfsn6Ik75iipPLw8n2eHavHMOYiQy1yvi3O/spxbmAKa42DmU
- /fE8O1Tx8mNtrbi33R6cnwovfWknJpgcwaGFQken+AwU6p2Jpk1+A/4FyzOYeEeuamOo4s
- 3EhN1XNvzaYa09Oqmk0JYUBAAMEWU0A=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582563794; a=rsa-sha256; cv=none;
- b=EHR+QYzcmJFZQ4i7/hUR6fea+yW2yoIHCDAV/2JtG32z8qKFCTOzxGxNjPJbvA4gOo+kXE
- Pjx1ksA7qlw6saoXhkVgcDruqn0bGlOkk+hlSZ2GKrmzAx9Ycgtpah9MmYvkVf4OX6B4TK
- NlU9eHKH7LaqBu5teVlc5MOt+Ly9PnA=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-X-Spam: Yes
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,294 +87,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
- alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add some clocks to zynq_slcr
-+ the main input clock (ps_clk)
-+ the reference clock outputs for each uart (uart0 & 1)
+On Thu, 13 Feb 2020 12:17:46 -0600
+Babu Moger <babu.moger@amd.com> wrote:
 
-This commit also transitional the slcr to multi-phase reset as it is
-required to initialize the clocks correctly.
+> Check and Load the apicid handlers from X86CPUDefinition if available.
+> Update the calling convention for the apicid handlers.
 
-The clock frequencies are computed using the internal pll & uart configur=
-ation
-registers and the input ps_clk frequency.
+Previous and this patch look too complicated for the task at the hand.
+In particular, cpu_x86_init_apicid_fns() from previous patch adds 1 more
+reference to Machine into i386/cpu.c (even though it's just a helper function)
+and I think un-necessary hooks to X86CPUDefinition (it's not really CPU's
+businesses to make up APIC-IDs).
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+I'd rather do opposite and get rid of the last explicit dependency to
+ms->smp.cpus from cpu.c. But well, it's out of scope of this series,
+so for this series I'd just try to avoid adding more Machine dependencies.
+
+All 11/16 does is basically using hooks as a switch "I'm EPYC" to
+set epyc specific encoding topo routines.
+
+It could be accomplished by a simple Boolean flag like
+ X86CPUDefinition::use_epyc_apic_id_encoding
+
+and then cpu_x86_init_apicid_fns() could be replaced with trivial
+helper like:
+
+  x86_use_epyc_apic_id_encoding(char *cpu_type)
+  {
+      X86CPUClass *xcc = ... cpu_type ...
+      return xcc->model->cpudef->use_epyc_apic_id_encoding
+  }
+
+then machine could override default[1] hooks using this helper
+as the trigger
+  x86_cpus_init()
+  {
+      // no need in dedicated function as it's the only instance it's going to be called ever
+      if (x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
+            x86ms->apicid_from_cpu_idx = ...epyc...
+            x86ms->topo_ids_from_apicid = ...epyc...
+            x86ms->apicid_from_topo_ids = ...epyc...
+            x86ms->apicid_pkg_offset = ...epyc...
+      }
+  }
+
+That would be less invasive and won't create non necessary dependencies.
+
 ---
+1) defaults should be set in x86_machine_class_init()
 
-v7:
-  + handle migration of input clock
-  + update ClockIn/ClockOut types
-  + comments correction/precision (Peter)
----
- hw/misc/zynq_slcr.c | 172 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 168 insertions(+), 4 deletions(-)
+Eduardo, what's your take on this?
 
-diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
-index b9a38272d9..f7472d1f3c 100644
---- a/hw/misc/zynq_slcr.c
-+++ b/hw/misc/zynq_slcr.c
-@@ -22,6 +22,7 @@
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "hw/registerfields.h"
-+#include "hw/qdev-clock.h"
-=20
- #ifndef ZYNQ_SLCR_ERR_DEBUG
- #define ZYNQ_SLCR_ERR_DEBUG 0
-@@ -45,6 +46,12 @@ REG32(LOCKSTA, 0x00c)
- REG32(ARM_PLL_CTRL, 0x100)
- REG32(DDR_PLL_CTRL, 0x104)
- REG32(IO_PLL_CTRL, 0x108)
-+/* fields for [ARM|DDR|IO]_PLL_CTRL registers */
-+    FIELD(xxx_PLL_CTRL, PLL_RESET, 0, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_PWRDWN, 1, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_QUAL, 3, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_BYPASS_FORCE, 4, 1)
-+    FIELD(xxx_PLL_CTRL, PLL_FPDIV, 12, 7)
- REG32(PLL_STATUS, 0x10c)
- REG32(ARM_PLL_CFG, 0x110)
- REG32(DDR_PLL_CFG, 0x114)
-@@ -64,6 +71,10 @@ REG32(SMC_CLK_CTRL, 0x148)
- REG32(LQSPI_CLK_CTRL, 0x14c)
- REG32(SDIO_CLK_CTRL, 0x150)
- REG32(UART_CLK_CTRL, 0x154)
-+    FIELD(UART_CLK_CTRL, CLKACT0, 0, 1)
-+    FIELD(UART_CLK_CTRL, CLKACT1, 1, 1)
-+    FIELD(UART_CLK_CTRL, SRCSEL,  4, 2)
-+    FIELD(UART_CLK_CTRL, DIVISOR, 8, 6)
- REG32(SPI_CLK_CTRL, 0x158)
- REG32(CAN_CLK_CTRL, 0x15c)
- REG32(CAN_MIOCLK_CTRL, 0x160)
-@@ -179,11 +190,127 @@ typedef struct ZynqSLCRState {
-     MemoryRegion iomem;
-=20
-     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
-+
-+    Clock *ps_clk;
-+    Clock *uart0_ref_clk;
-+    Clock *uart1_ref_clk;
- } ZynqSLCRState;
-=20
--static void zynq_slcr_reset(DeviceState *d)
-+/*
-+ * return the output frequency of ARM/DDR/IO pll
-+ * using input frequency and PLL_CTRL register
-+ */
-+static uint64_t zynq_slcr_compute_pll(uint64_t input, uint32_t ctrl_reg)
-+{
-+    uint32_t mult =3D ((ctrl_reg & R_xxx_PLL_CTRL_PLL_FPDIV_MASK) >>
-+            R_xxx_PLL_CTRL_PLL_FPDIV_SHIFT);
-+
-+    /* first, check if pll is bypassed */
-+    if (ctrl_reg & R_xxx_PLL_CTRL_PLL_BYPASS_FORCE_MASK) {
-+        return input;
-+    }
-+
-+    /* is pll disabled ? */
-+    if (ctrl_reg & (R_xxx_PLL_CTRL_PLL_RESET_MASK |
-+                    R_xxx_PLL_CTRL_PLL_PWRDWN_MASK)) {
-+        return 0;
-+    }
-+
-+    /* frequency multiplier -> period division */
-+    return input / mult;
-+}
-+
-+/*
-+ * return the output period of a clock given:
-+ * + the periods in an array corresponding to input mux selector
-+ * + the register xxx_CLK_CTRL value
-+ * + enable bit index in ctrl register
-+ *
-+ * This function makes the assumption that the ctrl_reg value is organiz=
-ed as
-+ * follows:
-+ * + bits[13:8]  clock frequency divisor
-+ * + bits[5:4]   clock mux selector (index in array)
-+ * + bits[index] clock enable
-+ */
-+static uint64_t zynq_slcr_compute_clock(const uint64_t periods[],
-+                                        uint32_t ctrl_reg,
-+                                        unsigned index)
-+{
-+    uint32_t srcsel =3D extract32(ctrl_reg, 4, 2); /* bits [5:4] */
-+    uint32_t divisor =3D extract32(ctrl_reg, 8, 6); /* bits [13:8] */
-+
-+    /* first, check if clock is disabled */
-+    if (((ctrl_reg >> index) & 1u) =3D=3D 0) {
-+        return 0;
-+    }
-+
-+    /*
-+     * according to the Zynq technical ref. manual UG585 v1.12.2 in
-+     * Clocks chapter, section 25.10.1 page 705:
-+     * "The 6-bit divider provides a divide range of 1 to 63"
-+     * We follow here what is implemented in linux kernel and consider
-+     * the 0 value as a bypass (no division).
-+     */
-+    /* frequency divisor -> period multiplication */
-+    return periods[srcsel] * (divisor ? divisor : 1u);
-+}
-+
-+/*
-+ * macro helper around zynq_slcr_compute_clock to avoid repeating
-+ * the register name.
-+ */
-+#define ZYNQ_COMPUTE_CLK(state, plls, reg, enable_field) \
-+    zynq_slcr_compute_clock((plls), (state)->regs[reg], \
-+                            reg ## _ ## enable_field ## _SHIFT)
-+
-+/**
-+ * Compute and set the ouputs clocks periods.
-+ * But do not propagate them further. Connected clocks
-+ * will not receive any updates (See zynq_slcr_compute_clocks())
-+ */
-+static void zynq_slcr_compute_clocks(ZynqSLCRState *s)
-+{
-+    uint64_t ps_clk =3D clock_get(s->ps_clk);
-+
-+    /* consider outputs clocks are disabled while in reset */
-+    if (device_is_in_reset(DEVICE(s))) {
-+        ps_clk =3D 0;
-+    }
-+
-+    uint64_t io_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_IO_PLL_C=
-TRL]);
-+    uint64_t arm_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_ARM_PLL=
-_CTRL]);
-+    uint64_t ddr_pll =3D zynq_slcr_compute_pll(ps_clk, s->regs[R_DDR_PLL=
-_CTRL]);
-+
-+    uint64_t uart_mux[4] =3D {io_pll, io_pll, arm_pll, ddr_pll};
-+
-+    /* compute uartX reference clocks */
-+    clock_set(s->uart0_ref_clk,
-+              ZYNQ_COMPUTE_CLK(s, uart_mux, R_UART_CLK_CTRL, CLKACT0));
-+    clock_set(s->uart1_ref_clk,
-+              ZYNQ_COMPUTE_CLK(s, uart_mux, R_UART_CLK_CTRL, CLKACT1));
-+}
-+
-+/**
-+ * Propagate the outputs clocks.
-+ * zynq_slcr_compute_clocks() should have been called before
-+ * to configure them.
-+ */
-+static void zynq_slcr_propagate_clocks(ZynqSLCRState *s)
- {
--    ZynqSLCRState *s =3D ZYNQ_SLCR(d);
-+    clock_propagate(s->uart0_ref_clk);
-+    clock_propagate(s->uart1_ref_clk);
-+}
-+
-+static void zynq_slcr_ps_clk_callback(void *opaque)
-+{
-+    ZynqSLCRState *s =3D (ZynqSLCRState *) opaque;
-+    zynq_slcr_compute_clocks(s);
-+    zynq_slcr_propagate_clocks(s);
-+}
-+
-+static void zynq_slcr_reset_init(Object *obj, ResetType type)
-+{
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-     int i;
-=20
-     DB_PRINT("RESET\n");
-@@ -277,6 +404,23 @@ static void zynq_slcr_reset(DeviceState *d)
-     s->regs[R_DDRIOB + 12] =3D 0x00000021;
- }
-=20
-+static void zynq_slcr_reset_hold(Object *obj)
-+{
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-+
-+    /* will disable all output clocks */
-+    zynq_slcr_compute_clocks(s);
-+    zynq_slcr_propagate_clocks(s);
-+}
-+
-+static void zynq_slcr_reset_exit(Object *obj)
-+{
-+    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-+
-+    /* will compute output clocks according to ps_clk and registers */
-+    zynq_slcr_compute_clocks(s);
-+    zynq_slcr_propagate_clocks(s);
-+}
-=20
- static bool zynq_slcr_check_offset(hwaddr offset, bool rnw)
- {
-@@ -409,6 +553,13 @@ static void zynq_slcr_write(void *opaque, hwaddr off=
-set,
-             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         }
-         break;
-+    case R_IO_PLL_CTRL:
-+    case R_ARM_PLL_CTRL:
-+    case R_DDR_PLL_CTRL:
-+    case R_UART_CLK_CTRL:
-+        zynq_slcr_compute_clocks(s);
-+        zynq_slcr_propagate_clocks(s);
-+        break;
-     }
- }
-=20
-@@ -418,6 +569,13 @@ static const MemoryRegionOps slcr_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
-+static const ClockPortInitArray zynq_slcr_clocks =3D {
-+    QDEV_CLOCK_IN(ZynqSLCRState, ps_clk, zynq_slcr_ps_clk_callback),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart0_ref_clk),
-+    QDEV_CLOCK_OUT(ZynqSLCRState, uart1_ref_clk),
-+    QDEV_CLOCK_END
-+};
-+
- static void zynq_slcr_init(Object *obj)
- {
-     ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
-@@ -425,14 +583,17 @@ static void zynq_slcr_init(Object *obj)
-     memory_region_init_io(&s->iomem, obj, &slcr_ops, s, "slcr",
-                           ZYNQ_SLCR_MMIO_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
-+
-+    qdev_init_clocks(DEVICE(obj), zynq_slcr_clocks);
- }
-=20
- static const VMStateDescription vmstate_zynq_slcr =3D {
-     .name =3D "zynq_slcr",
--    .version_id =3D 2,
-+    .version_id =3D 3,
-     .minimum_version_id =3D 2,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_UINT32_ARRAY(regs, ZynqSLCRState, ZYNQ_SLCR_NUM_REGS),
-+        VMSTATE_CLOCK_V(ps_clk, ZynqSLCRState, 3),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -440,9 +601,12 @@ static const VMStateDescription vmstate_zynq_slcr =3D=
- {
- static void zynq_slcr_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
-=20
-     dc->vmsd =3D &vmstate_zynq_slcr;
--    dc->reset =3D zynq_slcr_reset;
-+    rc->phases.enter =3D zynq_slcr_reset_init;
-+    rc->phases.hold  =3D zynq_slcr_reset_hold;
-+    rc->phases.exit  =3D zynq_slcr_reset_exit;
- }
-=20
- static const TypeInfo zynq_slcr_info =3D {
---=20
-2.24.1
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  hw/i386/pc.c  |    6 +++---
+>  hw/i386/x86.c |   27 +++++++++++++++++++++++----
+>  2 files changed, 26 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index be72a49716..93063af6a8 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1808,14 +1808,14 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>          topo_ids.die_id = cpu->die_id;
+>          topo_ids.core_id = cpu->core_id;
+>          topo_ids.smt_id = cpu->thread_id;
+> -        cpu->apic_id = x86_apicid_from_topo_ids(&topo_info, &topo_ids);
+> +        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info, &topo_ids);
+>      }
+>  
+>      cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+>      if (!cpu_slot) {
+>          MachineState *ms = MACHINE(pcms);
+>  
+> -        x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>          error_setg(errp,
+>              "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+>              " APIC ID %" PRIu32 ", valid index range 0:%d",
+> @@ -1836,7 +1836,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      /* TODO: move socket_id/core_id/thread_id checks into x86_cpu_realizefn()
+>       * once -smp refactoring is complete and there will be CPU private
+>       * CPUState::nr_cores and CPUState::nr_threads fields instead of globals */
+> -    x86_topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> +    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+>      if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+>          error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+>              " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id, topo_ids.pkg_id);
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 3d944f68e6..b825861b85 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -52,6 +52,22 @@
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+>  static size_t pvh_start_addr;
+>  
+> +/*
+> + * Check for apicid handlers in X86MachineState. Load them if
+> + * not loaded already. These handlers are loaded from X86CPUDefinition.
+> + */
+> +static void x86_check_apicid_handlers(MachineState *ms)
+> +{
+> +    X86MachineState *x86ms = X86_MACHINE(ms);
+> +
+> +    if (!x86ms->apicid_from_cpu_idx ||
+> +        !x86ms->topo_ids_from_apicid ||
+> +        !x86ms->apicid_from_topo_ids ||
+> +        !x86ms->apicid_pkg_offset) {
+> +        cpu_x86_init_apicid_fns(ms);
+> +    }
+> +}
+> +
+>  /*
+>   * Calculates initial APIC ID for a specific CPU index
+>   *
+> @@ -70,7 +86,7 @@ uint32_t x86_cpu_apic_id_from_index(X86MachineState *x86ms,
+>  
+>      init_topo_info(&topo_info, x86ms);
+>  
+> -    correct_id = x86_apicid_from_cpu_idx(&topo_info, cpu_index);
+> +    correct_id = x86ms->apicid_from_cpu_idx(&topo_info, cpu_index);
+>      if (x86mc->compat_apic_id_mode) {
+>          if (cpu_index != correct_id && !warned && !qtest_enabled()) {
+>              error_report("APIC IDs set in compatibility mode, "
+> @@ -148,8 +164,8 @@ int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx)
+>     init_topo_info(&topo_info, x86ms);
+>  
+>     assert(idx < ms->possible_cpus->len);
+> -   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> -                            &topo_info, &topo_ids);
+> +   x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
+> +                               &topo_info, &topo_ids);
+>     return topo_ids.pkg_id % ms->numa_state->num_nodes;
+>  }
+>  
+> @@ -169,6 +185,9 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>          return ms->possible_cpus;
+>      }
+>  
+> +    /* Initialize apicid handlers */
+> +    x86_check_apicid_handlers(ms);
+> +
+>      ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+>                                    sizeof(CPUArchId) * max_cpus);
+>      ms->possible_cpus->len = max_cpus;
+> @@ -182,7 +201,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms)
+>          ms->possible_cpus->cpus[i].vcpus_count = 1;
+>          ms->possible_cpus->cpus[i].arch_id =
+>              x86_cpu_apic_id_from_index(x86ms, i);
+> -        x86_topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+> +        x86ms->topo_ids_from_apicid(ms->possible_cpus->cpus[i].arch_id,
+>                                   &topo_info, &topo_ids);
+>          ms->possible_cpus->cpus[i].props.has_socket_id = true;
+>          ms->possible_cpus->cpus[i].props.socket_id = topo_ids.pkg_id;
+> 
+> 
 
 
