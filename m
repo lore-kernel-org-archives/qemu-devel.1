@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF21C38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFFCC38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0561C21556
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0786521556
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Z/Ch88wT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0561C21556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vv9oZXb0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0786521556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6L53-0006RV-4z
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:15:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50649)
+	id 1j6L6C-0007hx-3O
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:17:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmV-00075i-93
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:48 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmt-00088z-Ij
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmU-0003Zb-2V
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:47 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:53514)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kms-00040k-Ct
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:11 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:42542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6KmT-0003XD-Pm
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:46 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKraCW164147;
- Mon, 24 Feb 2020 20:56:41 GMT
+ id 1j6Kms-0003za-42
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:10 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqcnW017744;
+ Mon, 24 Feb 2020 20:57:05 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=J8Xaz+gGxdaFRzPsqSOpPdy1ej1AcSmDgOKijRk3X8A=;
- b=Z/Ch88wTpt7hsotSbrTcWr1BnXETGUk2xpAgRC0DJbzk9hpfFGOkBarZphL426zkNN6p
- fyaVB1TdLgixuasWLupPgimSQ8K0YbltABMbYe4m4q5QlN7wLLRcU00XnwoLc/QZ24Ak
- 7JEEMerzqBrGZ/YZVWEH2ytN3h9IGYrCgmLAylsfHzggMs4Z/GRgSdVhK3qnH1TkU4QH
- t3BjRCGnsXRzE3fqMA4tkCFPYgtB74D8n/lptAqSy2UsFWflofe5LcD7kswgLQLFUgy0
- KKwJFdVo0Vni0osRaotaOwkttiFIvlZxU5nIdmyQ+qP9XtQBpsO4iXcI+sJT4x1nK7P5 /Q== 
+ bh=0B1eKZbJOs4Nl5F0dscdR1L40vi/ljBXpJqgDQFRAwQ=;
+ b=Vv9oZXb0GeHp71ZaCdHjE6yoEf/BrRA61FgRrSgIjma0ZiByv5kP6xgsh7R9icq7AMNf
+ NZnTQ+DceZTYhkAXON3MVFjUVCyX1NU894ExlvgmIKqMyXvO6K4zMMaDoe6wbgWhYMUE
+ /u4xAYq3wYDyiSAjSla0rSxMdI2HJSb71dMtFUIlnv9RGKFeYmzD63TPxzoFyV7v8Ykp
+ auwd8lRT52wjRInBdGy77m1m2aLckkINOSqo1/4IqDLGFrh+hZBfC8MmngAh2+6dvHLA
+ aU3HzKZDZqPDYlcifkEbMxS5nRgT9YC94CDrbXIhOq/lyTmCW2giA2HCwyr5bVtgc3dc cA== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2ybvr4p96g-1
+ by userp2120.oracle.com with ESMTP id 2yavxrhyky-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:41 +0000
+ Mon, 24 Feb 2020 20:57:04 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKud0W073024;
- Mon, 24 Feb 2020 20:56:40 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 2ybduv6d8t-1
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKucBb072957;
+ Mon, 24 Feb 2020 20:57:04 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 2ybduv6dxf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:40 +0000
+ Mon, 24 Feb 2020 20:57:04 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKuX0j009417;
- Mon, 24 Feb 2020 20:56:33 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKv3h1028883;
+ Mon, 24 Feb 2020 20:57:03 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:33 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:57:03 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 24/50] multi-process: add processing of remote device
- command line
-Date: Mon, 24 Feb 2020 15:55:15 -0500
-Message-Id: <48965605c3f49f453b4b4f107bb8c7171eec2af9.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 43/50] multi-process/mig: Load VMSD in the proxy object
+Date: Mon, 24 Feb 2020 15:55:34 -0500
+Message-Id: <728f5cdb2108ccfd0916c1efcc8c7dab99daf6ad.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
@@ -86,14 +85,14 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
  engine=8.12.0-2001150001 definitions=main-2002240154
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ lowpriorityscore=0
+ spamscore=0 clxscore=1015 suspectscore=1 bulkscore=0 mlxlogscore=999
+ malwarescore=0 phishscore=0 adultscore=0 priorityscore=1501 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002240153
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,80 +118,96 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add processing of command line options for devices emulated
-in the remote process.
-After remote devices are created along with their proxies,
-signal the proxies to finish the configuration steps.
+The Proxy object loads the VMSD of remote process in source
+and send it to the remote process in the destination
 
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- softmmu/vl.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ hw/proxy/qemu-proxy.c    | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/io/mpqemu-link.h |  1 +
+ 2 files changed, 51 insertions(+)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 94a7b93..79a286c 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -35,6 +35,11 @@
- #include "sysemu/runstate.h"
- #include "sysemu/seccomp.h"
- #include "sysemu/tcg.h"
-+#include "qapi/qmp/qdict.h"
-+#include "block/qdict.h"
-+#include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qlist.h"
- 
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-@@ -2065,10 +2070,35 @@ static int device_help_func(void *opaque, QemuOpts *opts, Error **errp)
-     return qdev_device_help(opts);
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+index 19f0dbb..1649f60 100644
+--- a/hw/proxy/qemu-proxy.c
++++ b/hw/proxy/qemu-proxy.c
+@@ -581,12 +581,62 @@ static int proxy_post_save(void *opaque)
+     return 0;
  }
  
-+#if defined(CONFIG_MPQEMU)
-+static int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
++static int proxy_post_load(void *opaque, int version_id)
 +{
-+    DeviceState *dev;
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    PCIProxyDev *pdev = opaque;
++    QEMUFile *f_remote;
++    MPQemuMsg msg = {0};
++    Error *err = NULL;
++    QIOChannel *ioc;
++    uint64_t size;
++    uint8_t byte;
++    int fd[2];
 +
-+    dev = qdev_remote_add(opts, errp);
-+    if (!dev) {
-+        error_setg(errp, "qdev_remote_add failed for device.");
++    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
 +        return -1;
 +    }
-+    object_unref(OBJECT(dev));
++
++    ioc = qio_channel_new_fd(fd[0], &err);
++    if (err) {
++        error_report_err(err);
++        return -1;
++    }
++
++    qio_channel_set_name(QIO_CHANNEL(ioc), "proxy-migration-channel");
++
++    f_remote = qemu_fopen_channel_output(ioc);
++
++    msg.cmd = START_MIG_IN;
++    msg.bytestream = 0;
++    msg.num_fds = 1;
++    msg.fds[0] = fd[1];
++
++    mpqemu_msg_send(&msg, pdev->mpqemu_link->com);
++
++    size = pdev->migsize;
++
++    while (size) {
++        byte = qemu_get_byte(mis->from_src_file);
++        qemu_put_byte(f_remote, byte);
++        size--;
++    }
++
++    qemu_fflush(f_remote);
++    qemu_fclose(f_remote);
++
++    close(fd[1]);
++
 +    return 0;
 +}
-+#endif
 +
- static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     DeviceState *dev;
+ const VMStateDescription vmstate_pci_proxy_device = {
+     .name = "PCIProxyDevice",
+     .version_id = 2,
+     .minimum_version_id = 1,
+     .pre_save = proxy_pre_save,
+     .post_save = proxy_post_save,
++    .post_load = proxy_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_dev, PCIProxyDev),
+         VMSTATE_UINT64(migsize, PCIProxyDev),
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index b42c003..01371fc 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -64,6 +64,7 @@ typedef enum {
+     MMIO_RETURN,
+     DEVICE_RESET,
+     START_MIG_OUT,
++    START_MIG_IN,
+     MAX,
+ } mpqemu_cmd_t;
  
-+#if defined(CONFIG_MPQEMU)
-+    const char *remote;
-+
-+    remote = qemu_opt_get(opts, "remote");
-+    if (remote) {
-+        /* This will be a remote process */
-+        return rdevice_init_func(opaque, opts, errp);
-+    }
-+#endif
-+
-     dev = qdev_device_add(opts, errp);
-     if (!dev && *errp) {
-         error_report_err(*errp);
-@@ -4307,6 +4337,9 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_register_reset(resettable_cold_reset_fn, sysbus_get_default());
-     qemu_run_machine_init_done_notifiers();
- 
-+#if defined(CONFIG_MPQEMU)
-+    qdev_proxy_fire();
-+#endif
-     if (rom_check_and_register_reset() != 0) {
-         error_report("rom check and register reset failed");
-         exit(1);
 -- 
 1.8.3.1
 
