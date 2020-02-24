@@ -6,59 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B043C35669
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 04:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EC0C35641
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 04:11:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5087A206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 04:07:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5087A206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 7D319206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 04:11:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D319206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j651P-0005zf-H4
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 23:07:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32769)
+	id 1j655b-0008EB-HP
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 23:11:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhang.zhanghailiang@huawei.com>) id 1j650Z-0005XN-G4
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:06:17 -0500
+ (envelope-from <zhang.zhanghailiang@huawei.com>) id 1j654v-0007mz-LT
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:10:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhang.zhanghailiang@huawei.com>) id 1j650X-0002Fb-0k
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:06:14 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2500 helo=huawei.com)
+ (envelope-from <zhang.zhanghailiang@huawei.com>) id 1j654t-0004ue-SI
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:10:45 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2449 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1j650V-0002At-AG
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:06:12 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id D20A4F8BD043F33D46EF;
- Mon, 24 Feb 2020 12:06:04 +0800 (CST)
-Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 24 Feb 2020 12:06:04 +0800
+ id 1j654t-0004t3-A3
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 23:10:43 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 8862CA2AB6E9EC2E0841;
+ Mon, 24 Feb 2020 12:10:38 +0800 (CST)
+Received: from dggeme708-chm.china.huawei.com (10.1.199.104) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Feb 2020 12:10:38 +0800
 Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
+ dggeme708-chm.china.huawei.com (10.1.199.104) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 24 Feb 2020 12:06:03 +0800
+ 15.1.1713.5; Mon, 24 Feb 2020 12:10:37 +0800
 Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
  dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
- Mon, 24 Feb 2020 12:06:03 +0800
+ Mon, 24 Feb 2020 12:10:37 +0800
 From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: RE: [PATCH 2/3] COLO: Migrate dirty pages during the gap of
- checkpointing
-Thread-Topic: [PATCH 2/3] COLO: Migrate dirty pages during the gap of
- checkpointing
-Thread-Index: AQHV5TCSFfzxcgsk4EWoL4ZepiiUW6giWqSAgAdkO5A=
-Date: Mon, 24 Feb 2020 04:06:03 +0000
-Message-ID: <e6a8c41a50584bda826a024cffcc5f0f@huawei.com>
+Subject: RE: [PATCH 3/3] COLO: Optimize memory back-up process
+Thread-Topic: [PATCH 3/3] COLO: Optimize memory back-up process
+Thread-Index: AQHV5TCV+wMf+byK4kaFhKpkDIuDMagj5ZKAgAXfx4A=
+Date: Mon, 24 Feb 2020 04:10:37 +0000
+Message-ID: <f0d2519fb1a04301a102cd3e8d2bba30@huawei.com>
 References: <20200217012049.22988-1-zhang.zhanghailiang@huawei.com>
- <20200217012049.22988-3-zhang.zhanghailiang@huawei.com>
- <20200219185117.GJ3089@work-vm>
-In-Reply-To: <20200219185117.GJ3089@work-vm>
+ <20200217012049.22988-4-zhang.zhanghailiang@huawei.com>
+ <20200220182447.GF2836@work-vm>
+In-Reply-To: <20200220182447.GF2836@work-vm>
 Accept-Language: zh-CN, en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
@@ -70,7 +68,7 @@ MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.188
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,264 +88,232 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Dave,
+
 > -----Original Message-----
 > From: Dr. David Alan Gilbert [mailto:dgilbert@redhat.com]
-> Sent: Thursday, February 20, 2020 2:51 AM
+> Sent: Friday, February 21, 2020 2:25 AM
 > To: Zhanghailiang <zhang.zhanghailiang@huawei.com>
 > Cc: qemu-devel@nongnu.org; quintela@redhat.com; chen.zhang@intel.com;
 > danielcho@qnap.com
-> Subject: Re: [PATCH 2/3] COLO: Migrate dirty pages during the gap of
-> checkpointing
+> Subject: Re: [PATCH 3/3] COLO: Optimize memory back-up process
 >=20
 > * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
-> > We can migrate some dirty pages during the gap of checkpointing,
-> > by this way, we can reduce the amount of ram migrated during
-> checkpointing.
+> > This patch will reduce the downtime of VM for the initial process,
+> > Privously, we copied all these memory in preparing stage of COLO
+> > while we need to stop VM, which is a time-consuming process.
+> > Here we optimize it by a trick, back-up every page while in migration
+> > process while COLO is enabled, though it affects the speed of the
+> > migration, but it obviously reduce the downtime of back-up all SVM'S
+> > memory in COLO preparing stage.
 > >
 > > Signed-off-by: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+>=20
+> OK, I think this is right, but it took me quite a while to understand,
+> I think one of the comments below might not be right:
+>=20
+
 > > ---
-> >  migration/colo.c       | 69
-> +++++++++++++++++++++++++++++++++++++++---
-> >  migration/migration.h  |  1 +
-> >  migration/trace-events |  1 +
-> >  qapi/migration.json    |  4 ++-
-> >  4 files changed, 70 insertions(+), 5 deletions(-)
+> >  migration/colo.c |  3 +++
+> >  migration/ram.c  | 35 +++++++++++++++++++++++++++--------
+> >  migration/ram.h  |  1 +
+> >  3 files changed, 31 insertions(+), 8 deletions(-)
 > >
 > > diff --git a/migration/colo.c b/migration/colo.c
-> > index 93c5a452fb..d30c6bc4ad 100644
+> > index d30c6bc4ad..febf010571 100644
 > > --- a/migration/colo.c
 > > +++ b/migration/colo.c
-> > @@ -46,6 +46,13 @@ static COLOMode last_colo_mode;
+> > @@ -26,6 +26,7 @@
+> >  #include "qemu/main-loop.h"
+> >  #include "qemu/rcu.h"
+> >  #include "migration/failover.h"
+> > +#include "migration/ram.h"
+> >  #ifdef CONFIG_REPLICATION
+> >  #include "replication.h"
+> >  #endif
+> > @@ -906,6 +907,8 @@ void *colo_process_incoming_thread(void
+> *opaque)
+> >       */
+> >      qemu_file_set_blocking(mis->from_src_file, true);
 > >
-> >  #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
-> >
-> > +#define DEFAULT_RAM_PENDING_CHECK 1000
+> > +    colo_incoming_start_dirty_log();
 > > +
-> > +/* should be calculated by bandwidth and max downtime ? */
-> > +#define THRESHOLD_PENDING_SIZE (100 * 1024 * 1024UL)
->=20
-> Turn both of these magic constants into parameters.
->=20
-
-Good idea, will do this in later patches.
-
-> > +static int checkpoint_request;
-> > +
-> >  bool migration_in_colo_state(void)
-> >  {
-> >      MigrationState *s =3D migrate_get_current();
-> > @@ -516,6 +523,20 @@ static void
-> colo_compare_notify_checkpoint(Notifier *notifier, void *data)
-> >      colo_checkpoint_notify(data);
-> >  }
-> >
-> > +static bool colo_need_migrate_ram_background(MigrationState *s)
-> > +{
-> > +    uint64_t pending_size, pend_pre, pend_compat, pend_post;
-> > +    int64_t max_size =3D THRESHOLD_PENDING_SIZE;
-> > +
-> > +    qemu_savevm_state_pending(s->to_dst_file, max_size, &pend_pre,
-> > +                              &pend_compat, &pend_post);
-> > +    pending_size =3D pend_pre + pend_compat + pend_post;
-> > +
-> > +    trace_colo_need_migrate_ram_background(pending_size);
-> > +    return (pending_size >=3D max_size);
-> > +}
-> > +
-> > +
-> >  static void colo_process_checkpoint(MigrationState *s)
-> >  {
-> >      QIOChannelBuffer *bioc;
-> > @@ -571,6 +592,8 @@ static void
-> colo_process_checkpoint(MigrationState *s)
-> >
-> >      timer_mod(s->colo_delay_timer,
-> >              current_time + s->parameters.x_checkpoint_delay);
-> > +    timer_mod(s->pending_ram_check_timer,
-> > +        current_time + DEFAULT_RAM_PENDING_CHECK);
->=20
-> What happens if the iterate takes a while and this triggers in the
-> middle of the iterate?
->=20
-
-It will trigger another iterate after this one been finished.
-
-> >      while (s->state =3D=3D MIGRATION_STATUS_COLO) {
-> >          if (failover_get_state() !=3D FAILOVER_STATUS_NONE) {
-> > @@ -583,10 +606,25 @@ static void
-> colo_process_checkpoint(MigrationState *s)
-> >          if (s->state !=3D MIGRATION_STATUS_COLO) {
-> >              goto out;
+> >      bioc =3D qio_channel_buffer_new(COLO_BUFFER_BASE_SIZE);
+> >      fb =3D qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+> >      object_unref(OBJECT(bioc));
+> > diff --git a/migration/ram.c b/migration/ram.c
+> > index ed23ed1c7c..24a8aa3527 100644
+> > --- a/migration/ram.c
+> > +++ b/migration/ram.c
+> > @@ -2986,7 +2986,6 @@ int colo_init_ram_cache(void)
+> >                  }
+> >                  return -errno;
+> >              }
+> > -            memcpy(block->colo_cache, block->host,
+> block->used_length);
 > >          }
-> > -        ret =3D colo_do_checkpoint_transaction(s, bioc, fb);
-> > -        if (ret < 0) {
-> > -            goto out;
-> > -        }
-> > +        if (atomic_xchg(&checkpoint_request, 0)) {
-> > +            /* start a colo checkpoint */
-> > +            ret =3D colo_do_checkpoint_transaction(s, bioc, fb);
-> > +            if (ret < 0) {
-> > +                goto out;
-> > +            }
-> > +        } else {
-> > +            if (colo_need_migrate_ram_background(s)) {
-> > +                colo_send_message(s->to_dst_file,
-> > +
-> COLO_MESSAGE_MIGRATE_RAM_BACKGROUND,
-> > +                                  &local_err);
-> > +                if (local_err) {
-> > +                    goto out;
-> > +                }
-> > +
-> > +                qemu_savevm_state_iterate(s->to_dst_file, false);
-> > +                qemu_put_byte(s->to_dst_file, QEMU_VM_EOF);
->=20
-> Maybe you should do a qemu_file_get_error(..) at this point to check
-> it's OK.
-
-Agreed, we should check it.
-
->=20
-> > +            }
-> > +         }
 > >      }
 > >
-> >  out:
-> > @@ -626,6 +664,8 @@ out:
-> >      colo_compare_unregister_notifier(&packets_compare_notifier);
-> >      timer_del(s->colo_delay_timer);
-> >      timer_free(s->colo_delay_timer);
-> > +    timer_del(s->pending_ram_check_timer);
-> > +    timer_free(s->pending_ram_check_timer);
-> >      qemu_sem_destroy(&s->colo_checkpoint_sem);
-> >
-> >      /*
-> > @@ -643,6 +683,7 @@ void colo_checkpoint_notify(void *opaque)
-> >      MigrationState *s =3D opaque;
-> >      int64_t next_notify_time;
-> >
-> > +    atomic_inc(&checkpoint_request);
->=20
-> Can you explain what you've changed about this atomic in this patch,
-> I don't quite see what you're doing.
->=20
-
-We use this to check who waked it from waiting for colo_checkpoint_sem,
-By background migration request or checkpoint request.
-If the value is zero, it is waked by background migration request, or it is=
- waked
-By checkpoint request.
-
-
-> >      qemu_sem_post(&s->colo_checkpoint_sem);
-> >      s->colo_checkpoint_time =3D
-> qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> >      next_notify_time =3D s->colo_checkpoint_time +
-> > @@ -650,6 +691,19 @@ void colo_checkpoint_notify(void *opaque)
-> >      timer_mod(s->colo_delay_timer, next_notify_time);
-> >  }
-> >
-> > +static void colo_pending_ram_check_notify(void *opaque)
-> > +{
-> > +    int64_t next_notify_time;
-> > +    MigrationState *s =3D opaque;
+> > @@ -3005,12 +3004,16 @@ int colo_init_ram_cache(void)
+> >              bitmap_set(block->bmap, 0, pages);
+> >          }
+> >      }
 > > +
-> > +    if (migration_in_colo_state()) {
-> > +        next_notify_time =3D DEFAULT_RAM_PENDING_CHECK +
-> > +
-> qemu_clock_get_ms(QEMU_CLOCK_HOST);
-> > +        timer_mod(s->pending_ram_check_timer, next_notify_time);
-> > +        qemu_sem_post(&s->colo_checkpoint_sem);
-> > +    }
+> > +    return 0;
 > > +}
 > > +
-> >  void migrate_start_colo_process(MigrationState *s)
-> >  {
-> >      qemu_mutex_unlock_iothread();
-> > @@ -657,6 +711,8 @@ void migrate_start_colo_process(MigrationState
-> *s)
-> >      s->colo_delay_timer =3D  timer_new_ms(QEMU_CLOCK_HOST,
-> >                                  colo_checkpoint_notify, s);
+> > +void colo_incoming_start_dirty_log(void)
+> > +{
+> >      ram_state =3D g_new0(RAMState, 1);
+> >      ram_state->migration_dirty_pages =3D 0;
+> >      qemu_mutex_init(&ram_state->bitmap_mutex);
+> >      memory_global_dirty_log_start();
+> > -
+> > -    return 0;
+> >  }
 > >
-> > +    s->pending_ram_check_timer =3D
-> timer_new_ms(QEMU_CLOCK_HOST,
-> > +                                colo_pending_ram_check_notify, s);
-> >      qemu_sem_init(&s->colo_exit_sem, 0);
-> >      migrate_set_state(&s->state, MIGRATION_STATUS_ACTIVE,
-> >                        MIGRATION_STATUS_COLO);
-> > @@ -805,6 +861,11 @@ static void
-> colo_wait_handle_message(MigrationIncomingState *mis,
-> >      case COLO_MESSAGE_CHECKPOINT_REQUEST:
-> >          colo_incoming_process_checkpoint(mis, fb, bioc, errp);
-> >          break;
-> > +    case COLO_MESSAGE_MIGRATE_RAM_BACKGROUND:
-> > +        if (qemu_loadvm_state_main(mis->from_src_file, mis) < 0) {
-> > +            error_setg(errp, "Load ram background failed");
+> >  /* It is need to hold the global lock to call this helper */
+> > @@ -3348,7 +3351,7 @@ static int ram_load_precopy(QEMUFile *f)
+> >
+> >      while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+> >          ram_addr_t addr, total_ram_bytes;
+> > -        void *host =3D NULL;
+> > +        void *host =3D NULL, *host_bak =3D NULL;
+> >          uint8_t ch;
+> >
+> >          /*
+> > @@ -3378,13 +3381,26 @@ static int ram_load_precopy(QEMUFile *f)
+> >          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
+> >                       RAM_SAVE_FLAG_COMPRESS_PAGE |
+> RAM_SAVE_FLAG_XBZRLE)) {
+> >              RAMBlock *block =3D ram_block_from_stream(f, flags);
+> > -
+> >              /*
+> > -             * After going into COLO, we should load the Page into
+> colo_cache.
+> > +             * After going into COLO, we should load the Page into
+> colo_cache
+> > +             * NOTE: We need to keep a copy of SVM's ram in
+> colo_cache.
+> > +             * Privously, we copied all these memory in preparing stag=
+e
+> of COLO
+> > +             * while we need to stop VM, which is a time-consuming
+> process.
+> > +             * Here we optimize it by a trick, back-up every page whil=
+e
+> in
+> > +             * migration process while COLO is enabled, though it
+> affects the
+> > +             * speed of the migration, but it obviously reduce the
+> downtime of
+> > +             * back-up all SVM'S memory in COLO preparing stage.
+> >               */
+> > -            if (migration_incoming_in_colo_state()) {
+> > +            if (migration_incoming_colo_enabled()) {
+> >                  host =3D colo_cache_from_block_offset(block, addr);
+> > -            } else {
+> > +                /*
+> > +                 * After going into COLO, load the Page into
+> colo_cache.
+> > +                 */
+> > +                if (!migration_incoming_in_colo_state()) {
+> > +                    host_bak =3D host;
+> > +                }
+> > +            }
+> > +            if (!migration_incoming_in_colo_state()) {
+> >                  host =3D host_from_ram_block_offset(block, addr);
+>=20
+> So this works out as quite complicated:
+>    a) In normal migration we do the last one and just set:
+>          host =3D host_from_ram_block_offset(block, addr);
+>          host_bak =3D NULL
+>=20
+>    b) At the start, when colo_enabled, but !in_colo_state
+>          host =3D colo_cache
+>          host_bak =3D host
+>          host =3D host_from_ram_block_offset
+>=20
+>    c) in_colo_state
+>          host =3D colo_cache
+>          host_bak =3D NULL
+>=20
+>=20
+> (b) is pretty confusing, setting host twice; can't we tidy that up?
+>=20
+> Also, that last comment 'After going into COLO' I think is really
+>   'Before COLO state, copy from ram into cache'
+>=20
+
+The code logic here is not good, I have fixed this in V2 like this :)
+
++            host =3D host_from_ram_block_offset(block, addr);
+             /*
+-             * After going into COLO, we should load the Page into colo_ca=
+che.
++             * After going into COLO stage, we should not load the page
++             * into SVM's memory diretly, we put them into colo_cache firs=
+tly.
++             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
++             * Privously, we copied all these memory in preparing stage of=
+ COLO
++             * while we need to stop VM, which is a time-consuming process=
+.
++             * Here we optimize it by a trick, back-up every page while in
++             * migration process while COLO is enabled, though it affects =
+the
++             * speed of the migration, but it obviously reduce the downtim=
+e of
++             * back-up all SVM'S memory in COLO preparing stage.
+              */
+-            if (migration_incoming_in_colo_state()) {
+-                host =3D colo_cache_from_block_offset(block, addr);
+-            } else {
+-                host =3D host_from_ram_block_offset(block, addr);
++            if (migration_incoming_colo_enabled()) {
++                if (migration_incoming_in_colo_state()) {
++                    /* In COLO stage, put all pages into cache temporarily=
+ */
++                    host =3D colo_cache_from_block_offset(block, addr);
++                } else {
++                   /*
++                    * In migration stage but before COLO stage,
++                    * Put all pages into both cache and SVM's memory.
++                    */
++                    host_bak =3D colo_cache_from_block_offset(block, addr)=
+;
++                }
+
+
+Thanks,
+Hailiang
+
+> Dave
+>=20
+> >              }
+> >              if (!host) {
+> > @@ -3506,6 +3522,9 @@ static int ram_load_precopy(QEMUFile *f)
+> >          if (!ret) {
+> >              ret =3D qemu_file_get_error(f);
+> >          }
+> > +        if (!ret && host_bak && host) {
+> > +            memcpy(host_bak, host, TARGET_PAGE_SIZE);
 > > +        }
->=20
-> OK, that's a little dangerou, in that it relies on the source being good
-> and only sending iterative data;  stuff would break badly if it actually
-> sent you devices.
->=20
-
-You are right, we should check it, besides we should have a timeout mechani=
-sm to
-avoid been stuck here.=20
-
-> > +        break;
-> >      default:
-> >          error_setg(errp, "Got unknown COLO message: %d", msg);
-> >          break;
-> > diff --git a/migration/migration.h b/migration/migration.h
-> > index 8473ddfc88..5355259789 100644
-> > --- a/migration/migration.h
-> > +++ b/migration/migration.h
-> > @@ -219,6 +219,7 @@ struct MigrationState
-> >      QemuSemaphore colo_checkpoint_sem;
-> >      int64_t colo_checkpoint_time;
-> >      QEMUTimer *colo_delay_timer;
-> > +    QEMUTimer *pending_ram_check_timer;
+> >      }
 > >
-> >      /* The first error that has occurred.
-> >         We used the mutex to be able to return the 1st error message */
-> > diff --git a/migration/trace-events b/migration/trace-events
-> > index 4ab0a503d2..f2ed0c8645 100644
-> > --- a/migration/trace-events
-> > +++ b/migration/trace-events
-> > @@ -295,6 +295,7 @@
-> migration_tls_incoming_handshake_complete(void) ""
-> >  colo_vm_state_change(const char *old, const char *new) "Change '%s' =
-=3D>
-> '%s'"
-> >  colo_send_message(const char *msg) "Send '%s' message"
-> >  colo_receive_message(const char *msg) "Receive '%s' message"
-> > +colo_need_migrate_ram_background(uint64_t pending_size) "Pending
-> 0x%" PRIx64 " dirty ram"
+> >      ret |=3D wait_for_decompress_done();
+> > diff --git a/migration/ram.h b/migration/ram.h
+> > index a553d40751..5ceaff7cb4 100644
+> > --- a/migration/ram.h
+> > +++ b/migration/ram.h
+> > @@ -66,5 +66,6 @@ int ram_dirty_bitmap_reload(MigrationState *s,
+> RAMBlock *rb);
+> >  /* ram cache */
+> >  int colo_init_ram_cache(void);
+> >  void colo_release_ram_cache(void);
+> > +void colo_incoming_start_dirty_log(void);
 > >
-> >  # colo-failover.c
-> >  colo_failover_set_state(const char *new_state) "new state %s"
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index b7348d0c8b..ff7a4f18b0 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -977,12 +977,14 @@
-> >  #
-> >  # @vmstate-loaded: VM's state has been loaded by SVM.
-> >  #
-> > +# @migrate-ram-background: Send some dirty pages during the gap of
-> COLO checkpoint
-> > +#
-> >  # Since: 2.8
-> >  ##
-> >  { 'enum': 'COLOMessage',
-> >    'data': [ 'checkpoint-ready', 'checkpoint-request', 'checkpoint-repl=
-y',
-> >              'vmstate-send', 'vmstate-size', 'vmstate-received',
-> > -            'vmstate-loaded' ] }
-> > +            'vmstate-loaded', 'migrate-ram-background' ] }
-> >
-> >  ##
-> >  # @COLOMode:
+> >  #endif
 > > --
 > > 2.21.0
 > >
