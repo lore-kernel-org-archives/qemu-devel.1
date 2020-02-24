@@ -2,68 +2,100 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C80C11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BB4C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:49:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B6BD20838
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:48:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B6BD20838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB5820838
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:49:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GfcPVa3c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB5820838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Hq8-0004zC-73
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:48:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53059)
+	id 1j6Hqu-0005z4-NF
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:49:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j6HpT-0004VJ-KT
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:47:40 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6Hq3-00057Y-UW
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:48:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j6HpS-0004fv-FN
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:47:39 -0500
-Resent-Date: Mon, 24 Feb 2020 12:47:39 -0500
-Resent-Message-Id: <E1j6HpS-0004fv-FN@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21158)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j6HpP-0004e6-Ea; Mon, 24 Feb 2020 12:47:35 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582566448; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=D3LVHhtOfxTEVDZRqKA7VAnfbPsWqM3DgjFsgMqQvaStkikjWs84+1jUmB7VNlM68EAYCX4cpfa6H+S9qf5tNGzNQAaN5Ecsmkb17G1DR/e71i+3sHhy7ER/Lw9hM5sM6Cw2oIA163aMBgvqw10DnqZbsd13fQfNl1PI8RuN+Bc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582566448;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=xqnUuGVNRZ2euNsdf+Cjx1uK7+qBaooxdcozlLb+2js=; 
- b=d9c8Ngzigzh77yNYRTStrx2xHZZTHhzQ3xvE/W/4RJKTo2kEa48k853GM8jHuIIYzhwkutkiqU2gsN2YYJk7g5GpDfWfdlMFpQN6F84VWtGEySIP9xXpaYpIffUV37yPBowoc2kpyAY20pYD2N0m9IjwJ1dGp/lW0exYHKUyR9s=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582566446732806.6098541034702;
- Mon, 24 Feb 2020 09:47:26 -0800 (PST)
-In-Reply-To: <20200224171631.384314-1-mreitz@redhat.com>
-Subject: Re: [PATCH] iotests: Fix cleanup path in some tests
-Message-ID: <158256644547.10132.8843525335833726236@a1bbccc8075a>
+ (envelope-from <philmd@redhat.com>) id 1j6Hq2-00058J-Md
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:48:15 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40096
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Hq2-000587-EO
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:48:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582566493;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HEo8Owo3dxAt8duIBP68fE93UzuHq/vpdKVFc2vfq40=;
+ b=GfcPVa3cCNiExh7kGgRmrLP3oknUSaNT0A3pAhFXwBC2AqsNk95XeFvgoBUA/TcLkk/yrh
+ TSfMqWwqzc4OmwfjP9LyG8qR60Cjcd1uNQd0IcKvK6gyGJuz2UfqjuFVnquzyMT5JVCMUl
+ Fu7++oo73M5Nb8yvvbmr3fxQ4MjogBI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-eS0kp3AxMXyGJEo_hdjLqQ-1; Mon, 24 Feb 2020 12:48:11 -0500
+X-MC-Unique: eS0kp3AxMXyGJEo_hdjLqQ-1
+Received: by mail-wm1-f71.google.com with SMTP id b205so68669wmh.2
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 09:48:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CYthtwoHtlW7P8CCYCmGqIORp+qZPl+s7XsdJtf+IA4=;
+ b=TAyLTIR3UfNgR2kMVJy6DF4QznzJKGxHSL2NY4Rfs+vNBLSz57Eoi2m4oAURGI+ttJ
+ KbvS3l/IT5Vg6ACd9mmx6rpYY3UNfci6aHZkjzMN3MqTdatnakLkeTq8v8zJ4d+hhDcG
+ le1CTTtF44fFzjULd1pycrFv588DY8/97E15R2oCM+X0Um+KIx0drqziGr0mKy0oltJS
+ tjMy8ZJ4lbXErID6n4//K/iSgvBM0Mzez8M4Wfk2/pkmMkHiwIBov+mybmqazetV0WYF
+ Ms9KGmffWUTgIqbRiohpDqTcnOeEnm+jawuQCDTEOqhlJeWI1B6+1R/7jkQ+rqwdFrhk
+ GdEQ==
+X-Gm-Message-State: APjAAAVYlpLNVB78pZmp4mXPcT6xLLe+ezO7Id7qAZ9CTUMtUjMlt5d2
+ WZOoX7lci4QgcSkiKBt6zCIt6aFquJPNjqSMt/XCR2RKqh2rASqYSMCAnmp+1rkQoAoWngpuYDR
+ Ru4luczdDc0ChCEo=
+X-Received: by 2002:adf:ea88:: with SMTP id s8mr67768797wrm.293.1582566490285; 
+ Mon, 24 Feb 2020 09:48:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxDv01H1OnfDqzUgvZiTA2xXYq7G6eSgy5BW5UKBoQYxU3GtEuq9So5jkEPLowMssuB4i5k7g==
+X-Received: by 2002:adf:ea88:: with SMTP id s8mr67768780wrm.293.1582566490105; 
+ Mon, 24 Feb 2020 09:48:10 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id z6sm20307343wrs.96.2020.02.24.09.48.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 24 Feb 2020 09:48:09 -0800 (PST)
+Subject: Re: [PATCH 1/3] target/arm: Fix wrong use of FIELD_EX32 on ID_AA64DFR0
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200224172846.13053-1-peter.maydell@linaro.org>
+ <20200224172846.13053-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3ce87bfc-a6bc-7d8a-d968-dbb205235e48@redhat.com>
+Date: Mon, 24 Feb 2020 18:48:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mreitz@redhat.com
-Date: Mon, 24 Feb 2020 09:47:26 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20200224172846.13053-2-peter.maydell@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,44 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNDE3MTYzMS4zODQz
-MTQtMS1tcmVpdHpAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
-Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
-bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
-ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
-VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
-MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpOb3QgcnVuOiAyNTkKRmFpbHVy
-ZXM6IDE2MQpGYWlsZWQgMSBvZiAxMTYgaW90ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3RzL2No
-ZWNrLWJsb2NrLnNoXSBFcnJvciAxClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToK
-ICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2NCwgaW4gPG1vZHVsZT4K
-ICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0
-Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRv
-JywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51
-dWlkPTcwMjhlNTdkNzE3YjRiMTE5ZDcwYjUwMTM3NWMyOTQzJywgJy11JywgJzEwMDEnLCAnLS1z
-ZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VU
-X0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScs
-ICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNI
-RV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUt
-ZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3
-LXRlc3Rlci10bXAtbnlhbjZrdGwvc3JjL2RvY2tlci1zcmMuMjAyMC0wMi0yNC0xMi4zMy4yMi4y
-MDUxOTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUv
-cnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmls
-dGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NzAyOGU1N2Q3MTdiNGIx
-MTlkNzBiNTAxMzc1YzI5NDMKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2Vb
-MV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbnlhbjZr
-dGwvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAy
-CgpyZWFsICAgIDE0bTMuNDUwcwp1c2VyICAgIDBtOC43MTNzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
-YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDIyNDE3MTYzMS4zODQzMTQt
-MS1tcmVpdHpAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1l
-c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
-czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEByZWRoYXQuY29t
+On 2/24/20 6:28 PM, Peter Maydell wrote:
+> We missed an instance of using FIELD_EX32 on a 64-bit ID
+> register, in isar_feature_aa64_pmu_8_4(). Fix it.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   target/arm/cpu.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 65171cb30ee..b647d8df916 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -3723,8 +3723,8 @@ static inline bool isar_feature_aa64_pmu_8_1(const =
+ARMISARegisters *id)
+>  =20
+>   static inline bool isar_feature_aa64_pmu_8_4(const ARMISARegisters *id)
+>   {
+> -    return FIELD_EX32(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >=3D 5 &&
+> -        FIELD_EX32(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) !=3D 0xf;
+> +    return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) >=3D 5 &&
+> +        FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) !=3D 0xf;
+>   }
+>  =20
+>   /*
+>=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
 
