@@ -7,92 +7,97 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CC6C38BE2
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACF1C38BE2
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:02:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E37721556
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98FA121556
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DiNWdT7e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E37721556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nidLenEi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98FA121556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Kro-0007Bu-85
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:02:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50054)
+	id 1j6Krr-0007Dz-MD
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:02:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6Klx-0005nc-DW
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:14 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Km3-00060C-0d
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6Klv-0002p9-Qr
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:13 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:43576)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Km0-0002vH-NG
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:18 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52644)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6Klv-0002mP-1G
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:11 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKsNiu032661;
- Mon, 24 Feb 2020 20:55:59 GMT
+ id 1j6Km0-0002st-EA
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:16 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrwDv164267;
+ Mon, 24 Feb 2020 20:56:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
- references; s=corp-2020-01-29;
- bh=+KNQXGw+FOEATZ3vkQ3OTGzKbnHZBhe4ZmiQCe7+cw4=;
- b=DiNWdT7eTM4cWiyvgC//yGeNxHzqzJxrv2GXEwbJQncFTvpGxQnVXAcc/OKFnwf0/nGE
- 998GRQPtydI8D7Qc7erB+y27Xlunhqukf8vCZFPbDCdzElJcPzT9beLF1o05/+DHORUq
- Nr/O4gHhpa+SuQoBGXNuu4us1rXzmriE3NjJ51avRuff0XW4b3ERkgfTFYUULHOZzLGB
- Vvr0llmHx3o8hsHT583X8l3f7OiiTAvwL1npu5CdsstUO2q//pqCJJDdqvM7VbGnIFaN
- Y7CRycEN/LuhdzMruL1HXSimjW8l6Ye2Dua840kwi0ILgrKShbt0lmWsq59nE7SFET3k sQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 2yauqua0hb-1
+ references : mime-version : content-type : content-transfer-encoding;
+ s=corp-2020-01-29; bh=2Sv8kRe5boqvpwqshlB2kRRqiGqW/uKXB3bGdhdbmAc=;
+ b=nidLenEia59pAf2iac/0/eI/+SQxiqrYKgVGzEVYz9voQcws+wrfWSYVZpAtJ+YUyO2R
+ b36modhaOOqzWvkCCVIVOdEXhDXd7rxCmFZN1mtrFxl7ZXrOnD70N3O/Y10cWSoTNlFj
+ UZHkKhsEdAGJH0j7umCaxnuEGKIVy8XNuQv4Dq81hoSNctaMbMw5jUovJe9+XHMN8BRK
+ k7UF/R4YM4seHBuUKYfBak0pfX31WkUZeKqCuEStJYlPliEEtEhVUjBdnnWkvnz1j8+G
+ u0e4FwiIQcofzUgj0TKA46aUKQvfdzsyE5CnRHkus4xuQp83Hx7xLGWd/XmOp1OcTXV2 Uw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 2ybvr4p931-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:55:59 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKptJU108463;
- Mon, 24 Feb 2020 20:55:59 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 2ybe123ryh-1
+ Mon, 24 Feb 2020 20:56:08 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqWXP016815;
+ Mon, 24 Feb 2020 20:56:08 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 2ybduv6cmh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:55:58 +0000
+ Mon, 24 Feb 2020 20:56:07 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKtune028202;
- Mon, 24 Feb 2020 20:55:56 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKu4wx029541;
+ Mon, 24 Feb 2020 20:56:04 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:55:56 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:56:04 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 01/50] multi-process: memory: alloc RAM from file at offset
-Date: Mon, 24 Feb 2020 15:54:52 -0500
-Message-Id: <e5ab1f93904f30113b358561e207a94076e24653.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 06/50] multi-process: build system for remote device process
+Date: Mon, 24 Feb 2020 15:54:57 -0500
+Message-Id: <6ef9a3f85252c3c2f1b6b69cd19ae2230d69db4a.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=1
+ mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240153
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
  spamscore=0
- suspectscore=3 malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002240153
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- bulkscore=0
- clxscore=1011 malwarescore=0 impostorscore=0 adultscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 01OKrwDv164267
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,159 +121,387 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow RAM MemoryRegion to be created from an offset in a file, instead
-of allocating at offset of 0 by default. This is needed to synchronize
-RAM between QEMU & remote process.
-This will be needed for the following patches.
+Modify Makefile to support the building of the remote
+device process. Implements main() function of remote
+device process.
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- exec.c                    | 11 +++++++----
- include/exec/ram_addr.h   |  2 +-
- include/qemu/mmap-alloc.h |  3 ++-
- memory.c                  |  2 +-
- util/mmap-alloc.c         |  7 ++++---
- util/oslib-posix.c        |  2 +-
- 6 files changed, 16 insertions(+), 11 deletions(-)
+ Makefile                |  2 ++
+ Makefile.objs           | 26 +++++++++++++++++++++
+ Makefile.target         | 61 +++++++++++++++++++++++++++++++++++++++++++=
++++++-
+ accel/Makefile.objs     |  2 ++
+ backends/Makefile.objs  |  2 ++
+ block/Makefile.objs     |  2 ++
+ hw/Makefile.objs        |  7 ++++++
+ hw/block/Makefile.objs  |  2 ++
+ hw/core/Makefile.objs   | 18 +++++++++++++++
+ hw/nvram/Makefile.objs  |  2 ++
+ hw/pci/Makefile.objs    |  4 ++++
+ hw/scsi/Makefile.objs   |  2 ++
+ migration/Makefile.objs |  2 ++
+ qom/Makefile.objs       |  3 +++
+ remote/Makefile.objs    |  1 +
+ remote/remote-main.c    | 23 +++++++++++++++++++
+ stubs/replay.c          |  4 ++++
+ 17 files changed, 162 insertions(+), 1 deletion(-)
+ create mode 100644 remote/Makefile.objs
+ create mode 100644 remote/remote-main.c
 
-diff --git a/exec.c b/exec.c
-index c930040..e524185 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1841,6 +1841,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             ram_addr_t memory,
-                             int fd,
-                             bool truncate,
-+                            off_t offset,
-                             Error **errp)
+diff --git a/Makefile b/Makefile
+index 15f8e53..f91dcb9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -454,6 +454,8 @@ dummy :=3D $(call unnest-vars,, \
+                 qom-obj-y \
+                 io-obj-y \
+                 common-obj-y \
++                remote-pci-obj-y \
++                remote-lsi-obj-y \
+                 common-obj-m \
+                 trace-obj-y)
+=20
+diff --git a/Makefile.objs b/Makefile.objs
+index 8a1cbe8..c80e107 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -21,6 +21,32 @@ block-obj-$(CONFIG_REPLICATION) +=3D replication.o
+=20
+ block-obj-m =3D block/
+=20
++#########################################################
++# remote-pci-obj-y is common code used by remote devices
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D hw/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qom/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D backends/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D migration/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D accel/
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D cpus-common.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D dma-helpers.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D blockdev.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qdev-monitor.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D bootdevice.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D iothread.o
++
++##############################################################
++# remote-lsi-obj-y is code used to implement remote LSI device
++
++remote-lsi-obj-$(CONFIG_MPQEMU) +=3D hw/
++
++#######################################################################
++# crypto-obj-y is code used by both qemu system emulation and qemu-img
++
+ crypto-obj-y =3D crypto/
+=20
+ io-obj-y =3D io/
+diff --git a/Makefile.target b/Makefile.target
+index 2d43dc5..375fdaa 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -36,7 +36,17 @@ QEMU_PROG_BUILD =3D $(QEMU_PROG)
+ endif
+ endif
+=20
++ifdef CONFIG_MPQEMU
++SCSI_DEV_PROG=3Dqemu-scsi-dev
++SCSI_DEV_BUILD =3D $(SCSI_DEV_PROG)
++endif
++
+ PROGS=3D$(QEMU_PROG) $(QEMU_PROGW)
++
++ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
++PROGS +=3D $(SCSI_DEV_PROG)
++endif
++
+ STPFILES=3D
+=20
+ config-target.h: config-target.h-timestamp
+@@ -121,6 +131,20 @@ LIBS :=3D $(libs_cpu) $(LIBS)
+=20
+ obj-$(CONFIG_PLUGIN) +=3D plugins/
+=20
++ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/kvm-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/tcg-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/hax-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D accel/stubs/whpx-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/vl-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/net-stub.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/monitor.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/replay.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/xen-mapcache.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/audio.o
++remote-pci-tgt-obj-$(CONFIG_MPQEMU) +=3D stubs/monitor.o
++endif
++
+ #########################################################
+ # Linux user emulator target
+=20
+@@ -178,6 +202,20 @@ endif # CONFIG_SOFTMMU
+ dummy :=3D $(call unnest-vars,,obj-y)
+ all-obj-y :=3D $(obj-y)
+=20
++dummy :=3D $(call unnest-vars,..,remote-pci-tgt-obj-y)
++all-remote-pci-obj-y :=3D $(remote-pci-tgt-obj-y)
++
++ifeq ($(TARGET_NAME)-$(CONFIG_MPQEMU)-$(CONFIG_USER_ONLY), x86_64-y-)
++all-remote-pci-obj-y +=3D memory.o
++all-remote-pci-obj-y +=3D exec.o
++all-remote-pci-obj-y +=3D exec-vary.o
++all-remote-pci-obj-y +=3D ioport.o
++all-remote-pci-obj-y +=3D cpus.o
++endif
++
++remote-pci-obj-y :=3D
++remote-lsi-obj-y :=3D
++
+ include $(SRC_PATH)/Makefile.objs
+ dummy :=3D $(call unnest-vars,.., \
+                authz-obj-y \
+@@ -188,7 +226,10 @@ dummy :=3D $(call unnest-vars,.., \
+                qom-obj-y \
+                io-obj-y \
+                common-obj-y \
+-               common-obj-m)
++               common-obj-m \
++               remote-pci-obj-y \
++               remote-lsi-obj-y)
++
+ all-obj-y +=3D $(common-obj-y)
+ all-obj-y +=3D $(qom-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) +=3D $(authz-obj-y)
+@@ -196,8 +237,19 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(block-obj-y) $(char=
+dev-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) +=3D $(crypto-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
+=20
++all-remote-pci-obj-y +=3D $(authz-obj-y)
++all-remote-pci-obj-y +=3D $(block-obj-y)
++all-remote-pci-obj-y +=3D $(crypto-obj-y)
++all-remote-pci-obj-y +=3D $(io-obj-y)
++all-remote-pci-obj-y +=3D $(chardev-obj-y)
++all-remote-pci-obj-y +=3D $(remote-pci-obj-y)
++
++
++all-remote-lsi-obj-y +=3D $(all-remote-pci-obj-y) $(remote-lsi-obj-y)
++
+ ifdef CONFIG_SOFTMMU
+ $(QEMU_PROG_BUILD): config-devices.mak
++$(SCSI_DEV_BUILD): config-devices.mak
+ endif
+=20
+ COMMON_LDADDS =3D ../libqemuutil.a
+@@ -210,6 +262,13 @@ ifdef CONFIG_DARWIN
+ 	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
+ endif
+=20
++$(SCSI_DEV_BUILD): $(all-remote-lsi-obj-y) $(COMMON_LDADDS)
++	$(call LINK, $(filter-out %.mak, $^))
++ifdef CONFIG_DARWIN
++	$(call quiet-command,Rez -append $(SRC_PATH)/pc-bios/qemu.rsrc -o $@,"R=
+EZ","$(TARGET_DIR)$@")
++	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
++endif
++
+ gdbstub-xml.c: $(TARGET_XML_FILES) $(SRC_PATH)/scripts/feature_to_c.sh
+ 	$(call quiet-command,rm -f $@ && $(SHELL) $(SRC_PATH)/scripts/feature_t=
+o_c.sh $@ $(TARGET_XML_FILES),"GEN","$(TARGET_DIR)$@")
+=20
+diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+index 17e5ac6..e312dd4 100644
+--- a/accel/Makefile.objs
++++ b/accel/Makefile.objs
+@@ -3,3 +3,5 @@ obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) +=3D q=
+test.o
+ obj-$(CONFIG_KVM) +=3D kvm/
+ obj-$(CONFIG_TCG) +=3D tcg/
+ obj-y +=3D stubs/
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D accel.o
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 28a847c..947cde3 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -21,3 +21,5 @@ common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
+ common-obj-$(CONFIG_GIO) +=3D dbus-vmstate.o
+ dbus-vmstate.o-cflags =3D $(GIO_CFLAGS)
+ dbus-vmstate.o-libs =3D $(GIO_LIBS)
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D hostmem.o
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 3bcb35c..6398613 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -71,3 +71,5 @@ io_uring.o-cflags  :=3D $(LINUX_IO_URING_CFLAGS)
+ io_uring.o-libs    :=3D $(LINUX_IO_URING_LIBS)
+ parallels.o-cflags :=3D $(LIBXML2_CFLAGS)
+ parallels.o-libs   :=3D $(LIBXML2_LIBS)
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D stream.o
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 660e2b4..af9235b 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -44,3 +44,10 @@ endif
+=20
+ common-obj-y +=3D $(devices-dirs-y)
+ obj-y +=3D $(devices-dirs-y)
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D core/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D pci/
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D nvram/
++
++remote-lsi-obj-$(CONFIG_MPQEMU) +=3D scsi/
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 4b4a2b3..0b4644f 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -16,3 +16,5 @@ obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk.o
+ obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk.o
+=20
+ obj-y +=3D dataplane/
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D block.o cdrom.o hd-geometry.o
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index 6215e7c..e3e8084 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -31,3 +31,21 @@ common-obj-$(CONFIG_OR_IRQ) +=3D or-irq.o
+ common-obj-$(CONFIG_SPLIT_IRQ) +=3D split-irq.o
+ common-obj-$(CONFIG_PLATFORM_BUS) +=3D platform-bus.o
+ common-obj-$(CONFIG_GENERIC_LOADER) +=3D generic-loader.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qdev-properties.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qdev.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D bus.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D irq.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D hotplug.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D machine.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D fw-path-provider.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D reset.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D sysbus.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D loader.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D nmi.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qdev-properties-system.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qdev-fw.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D numa.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D cpu.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D vmstate-if.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D resettable.o
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+index f3ad921..4d2d809 100644
+--- a/hw/nvram/Makefile.objs
++++ b/hw/nvram/Makefile.objs
+@@ -6,3 +6,5 @@ common-obj-$(CONFIG_CHRP_NVRAM) +=3D chrp_nvram.o
+ common-obj-$(CONFIG_MAC_NVRAM) +=3D mac_nvram.o
+ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_nvm.o
+ obj-$(CONFIG_PSERIES) +=3D spapr_nvram.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D fw_cfg.o
+diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
+index c78f2fb..955be54 100644
+--- a/hw/pci/Makefile.objs
++++ b/hw/pci/Makefile.objs
+@@ -12,3 +12,7 @@ common-obj-$(CONFIG_PCI_EXPRESS) +=3D pcie_port.o pcie_=
+host.o
+=20
+ common-obj-$(call lnot,$(CONFIG_PCI)) +=3D pci-stub.o
+ common-obj-$(CONFIG_ALL) +=3D pci-stub.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D pci.o pci_bridge.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D msi.o msix.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D pcie.o
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 54b36ed..ef97770 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -13,3 +13,5 @@ obj-y +=3D virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) +=3D vhost-scsi-common.o vhost-scsi.o
+ obj-$(CONFIG_VHOST_USER_SCSI) +=3D vhost-scsi-common.o vhost-user-scsi.o
+ endif
++
++remote-lsi-obj-$(CONFIG_MPQEMU) +=3D scsi-generic.o scsi-bus.o lsi53c895=
+a.o scsi-disk.o emulation.o
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+index d3623d5..e7cdc76 100644
+--- a/migration/Makefile.objs
++++ b/migration/Makefile.objs
+@@ -14,3 +14,5 @@ common-obj-$(CONFIG_RDMA) +=3D rdma.o
+ common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) +=3D block.o
+=20
+ rdma.o-libs :=3D $(RDMA_LIBS)
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D qemu-file.o vmstate.o qjson.o vmsta=
+te-types.o
+diff --git a/qom/Makefile.objs b/qom/Makefile.objs
+index f9d7735..07e50e5 100644
+--- a/qom/Makefile.objs
++++ b/qom/Makefile.objs
+@@ -2,3 +2,6 @@ qom-obj-y =3D object.o container.o qom-qobject.o
+ qom-obj-y +=3D object_interfaces.o
+=20
+ common-obj-$(CONFIG_SOFTMMU) +=3D qom-hmp-cmds.o qom-qmp-cmds.o
++
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D object.o qom-qobject.o container.o
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D object_interfaces.o
+diff --git a/remote/Makefile.objs b/remote/Makefile.objs
+new file mode 100644
+index 0000000..a9b2256
+--- /dev/null
++++ b/remote/Makefile.objs
+@@ -0,0 +1 @@
++remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote-main.o
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+new file mode 100644
+index 0000000..7c0764a
+--- /dev/null
++++ b/remote/remote-main.c
+@@ -0,0 +1,23 @@
++/*
++ * Remote device initialization
++ *
++ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++
++#include <stdio.h>
++
++#include "qemu/module.h"
++
++int main(int argc, char *argv[])
++{
++    module_call_init(MODULE_INIT_QOM);
++
++    return 0;
++}
+diff --git a/stubs/replay.c b/stubs/replay.c
+index 2e3feee..9b53c0c 100644
+--- a/stubs/replay.c
++++ b/stubs/replay.c
+@@ -102,3 +102,7 @@ int replay_get_instructions(void)
+ void replay_account_executed_instructions(void)
  {
-     Error *err = NULL;
-@@ -1893,7 +1894,8 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
- 
-     area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-+                         block->flags & RAM_SHARED, block->flags & RAM_PMEM,
-+                         offset);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-@@ -2322,7 +2324,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
- #ifdef CONFIG_POSIX
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  uint32_t ram_flags, int fd,
--                                 Error **errp)
-+                                 off_t offset, Error **errp)
- {
-     RAMBlock *new_block;
-     Error *local_err = NULL;
-@@ -2367,7 +2369,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     new_block->used_length = size;
-     new_block->max_length = size;
-     new_block->flags = ram_flags;
--    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-+    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, offset,
-+                                     errp);
-     if (!new_block->host) {
-         g_free(new_block);
-         return NULL;
-@@ -2397,7 +2400,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
-     }
- 
--    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
-+    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
-     if (!block) {
-         if (created) {
-             unlink(mem_path);
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 5e59a3d..1b9f489 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -121,7 +121,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    Error **errp);
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  uint32_t ram_flags, int fd,
--                                 Error **errp);
-+                                 off_t offset, Error **errp);
- 
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                   MemoryRegion *mr, Error **errp);
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index e786266..4f57985 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
-                     size_t size,
-                     size_t align,
-                     bool shared,
--                    bool is_pmem);
-+                    bool is_pmem,
-+                    off_t start);
- 
- void qemu_ram_munmap(int fd, void *ptr, size_t size);
- 
-diff --git a/memory.c b/memory.c
-index aeaa8dc..131bc6c 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1595,7 +1595,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-     mr->destructor = memory_region_destructor_ram;
-     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-                                            share ? RAM_SHARED : 0,
--                                           fd, &err);
-+                                           fd, 0, &err);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-     if (err) {
-         mr->size = int128_zero();
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 27dcccd..a28f702 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
-                     size_t size,
-                     size_t align,
-                     bool shared,
--                    bool is_pmem)
-+                    bool is_pmem,
-+                    off_t start)
- {
-     int flags;
-     int map_sync_flags = 0;
-@@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
-     offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
- 
-     ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--               flags | map_sync_flags, fd, 0);
-+               flags | map_sync_flags, fd, start);
- 
-     if (ptr == MAP_FAILED && map_sync_flags) {
-         if (errno == ENOTSUP) {
-@@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
-          * we will remove these flags to handle compatibility.
-          */
-         ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--                   flags, fd, 0);
-+                   flags, fd, start);
-     }
- 
-     if (ptr == MAP_FAILED) {
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 5a291cc..bd221dd 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -205,7 +205,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared, false, 0);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
--- 
+ }
++
++void replay_add_blocker(Error *reason)
++{
++}
+--=20
 1.8.3.1
 
 
