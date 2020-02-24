@@ -2,76 +2,102 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE73BC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C26C11D30
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98CA620828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/8ncsN3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98CA620828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8717D20828
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:33:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8717D20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6En4-0004dH-O1
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:32:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50551)
+	id 1j6Enk-0005m7-Lo
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:33:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6Ekj-0001Na-R1
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:35 -0500
+ (envelope-from <muriloo@linux.ibm.com>) id 1j6EgP-0002Q2-CM
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6Eki-0001uw-8h
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39994
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6Eki-0001rt-4h
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582554631;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=jcbAvH7+FUscnbAd3TKaAwZuIg4wq6vi18Fa0KSvaY0=;
- b=O/8ncsN3pZv6OI86izVdS7VPVqOeF8vGXgY44weksHbAZNFBG8mFGacwYSlf9ggOMFpQ28
- 5Ba1jzR0Ek1F5t4kXG/iJ0aBGy8K2OXqR+k6B6gn80sa07+tBYJRuY9FQw8qdxkKE/GVv2
- pL2EDcJrDHGwHo72huKcL7AwqzyCkbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-ezeyaaJ8Or6cs2U2WAwksw-1; Mon, 24 Feb 2020 09:30:27 -0500
-X-MC-Unique: ezeyaaJ8Or6cs2U2WAwksw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE3CF801E72;
- Mon, 24 Feb 2020 14:30:26 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
- [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4DC4F5C114;
- Mon, 24 Feb 2020 14:30:22 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 00/20] Add qemu-storage-daemon
-Date: Mon, 24 Feb 2020 15:29:48 +0100
-Message-Id: <20200224143008.13362-1-kwolf@redhat.com>
+ (envelope-from <muriloo@linux.ibm.com>) id 1j6EgO-0007rW-1X
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:05 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8294
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+ id 1j6EgN-0007r2-Rx
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:26:03 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01OEOtmr046066; Mon, 24 Feb 2020 09:25:59 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1c6acwk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Feb 2020 09:25:59 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01OEP8NG047787;
+ Mon, 24 Feb 2020 09:25:59 -0500
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1c6acvf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Feb 2020 09:25:59 -0500
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01OEPBAA025757;
+ Mon, 24 Feb 2020 14:25:57 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma01wdc.us.ibm.com with ESMTP id 2yaux643hj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Feb 2020 14:25:57 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01OEPuEg50659590
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 24 Feb 2020 14:25:56 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 85E1ABE053;
+ Mon, 24 Feb 2020 14:25:56 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 09EB8BE054;
+ Mon, 24 Feb 2020 14:25:54 +0000 (GMT)
+Received: from localhost (unknown [9.85.197.149])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Mon, 24 Feb 2020 14:25:54 +0000 (GMT)
+From: Murilo Opsfelder =?ISO-8859-1?Q?Ara=FAjo?= <muriloo@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 fixed 08/16] util/mmap-alloc: Factor out calculation of
+ pagesize to mmap_pagesize()
+Date: Mon, 24 Feb 2020 11:25:52 -0300
+Message-ID: <4591604.1lD6THJHVr@kermit.br.ibm.com>
+Organization: IBM
+In-Reply-To: <3378805.CNlBlhNnSm@kermit.br.ibm.com>
+References: <20200212134254.11073-1-david@redhat.com>
+ <7252629e-6290-5709-ea3c-d215622975ed@redhat.com>
+ <3378805.CNlBlhNnSm@kermit.br.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset="iso-8859-1"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-24_04:2020-02-21,
+ 2020-02-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ priorityscore=1501 impostorscore=0 suspectscore=1 adultscore=0
+ mlxlogscore=999 bulkscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240119
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,129 +109,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- coiby.xu@gmail.com, mreitz@redhat.com, stefanha@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds a new tool 'qemu-storage-daemon', which can be used to
-export and perform operations on block devices. There is some overlap
-between qemu-img/qemu-nbd and the new qemu-storage-daemon, but there are
-a few important differences:
+On Monday, February 24, 2020 11:16:16 AM -03 Murilo Opsfelder Ara=FAjo wrot=
+e:
+> On Monday, February 24, 2020 7:57:03 AM -03 David Hildenbrand wrote:
+> > On 24.02.20 11:50, David Hildenbrand wrote:
+> > > On 19.02.20 23:46, Peter Xu wrote:
+> > >> On Wed, Feb 12, 2020 at 02:42:46PM +0100, David Hildenbrand wrote:
+> > >>> Factor it out and add a comment.
+> > >>>
+> > >>> Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+> > >>> Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> > >>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> > >>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > >>> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+> > >>> Cc: Greg Kurz <groug@kaod.org>
+> > >>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > >>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > >>> Cc: Igor Mammedov <imammedo@redhat.com>
+> > >>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> > >>> ---
+> > >>>
+> > >>>  util/mmap-alloc.c | 21 ++++++++++++---------
+> > >>>  1 file changed, 12 insertions(+), 9 deletions(-)
+> > >>>
+> > >>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> > >>> index 27dcccd8ec..82f02a2cec 100644
+> > >>> --- a/util/mmap-alloc.c
+> > >>> +++ b/util/mmap-alloc.c
+> > >>> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char
+> > >>> *mem_path)
+> > >>>
+> > >>>      return qemu_real_host_page_size;
+> > >>>
+> > >>>  }
+> > >>>
+> > >>> +static inline size_t mmap_pagesize(int fd)
+> > >>> +{
+> > >>> +#if defined(__powerpc64__) && defined(__linux__)
+> > >>> +    /* Mappings in the same segment must share the same page size =
+*/
+> > >>> +    return qemu_fd_getpagesize(fd);
+> > >>> +#else
+> > >>> +    return qemu_real_host_page_size;
+> > >>> +#endif
+> > >>> +}
+> > >>
+> > >> Pure question: This will return 4K even for huge pages on x86, is th=
+is
+> > >> what we want?
+> > >
+> > > (was asking myself the same question) I *think* it's intended. It's
+> > > mainly only used to allocate one additional guard page. The callers of
+> > > qemu_ram_mmap() make sure that the size is properly aligned (e.g., to
+> > > huge pages).
+> > >
+> > > Of course, a 4k guard page is sufficient - unless we can't use that
+> > > (special case for ppc64 here).
+> > >
+> > > Thanks!
+> >
+> > We could rename the function to mmap_guard_pagesize(), thoughts?
+>
+> The existing qemu_fd_getpagesize() already returns qemu_real_host_page_si=
+ze
+> for non-anonymous mappings (when fd =3D=3D -1).  I think this new
+> mmap_pagesize() could be dropped in favor of qemu_fd_getpagesize().
 
-* The qemu-storage-daemon has QMP support. The command set is obviously
-  restricted compared to the system emulator because there is no guest,
-  but all of the block operations that are not tied to gues devices are
-  present.
+s/non-//
 
-  This means that it can access advanced options or operations that the
-  qemu-img command line doesn't expose. For example, blockdev-create is
-  a lot more powerful than 'qemu-img create', and qemu-storage-daemon
-  allows to execute it without starting a guest.
+I mean "for anonymous mappings".
 
-  Compared to qemu-nbd it means that, for example, block jobs can now be
-  executed on the server side, and backing chains shared by multiple VMs
-  can be modified this way.
+>
+> A side effect of this change would be guard page using a bit more memory =
+for
+> non-anonymous mapping.  Could that be a problem?
+>
+> What do you think?
+>
+> --
+> Murilo
 
-* The existing tools all have a separately invented one-off syntax for
-  the job at hand, which usually comes with restrictions compared to the
-  system emulator. qemu-storage-daemon shares the same syntax with the
-  system emulator for most options and prefers QAPI based interfaces
-  where possible (such as --blockdev), so it should be easy to make use
-  of in libvirt.
 
-  The exception is --chardev, for which not clear design for a QAPIfied
-  command line exists yet. We'll consider this interface unstable until
-  we've figured out how to solve it. For now it just uses the same
-  QemuOpts-based code as the system emulator.
-
-* While this series implements only NBD exports, the storage daemon is
-  intended to serve multiple protocols and its syntax reflects this. In
-  the past, we had proposals to add new one-off tools for exporting over
-  new protocols like FUSE or TCMU.
-
-  With a generic storage daemon, additional export methods have a home
-  without adding a new tool for each of them.
-
-The plan is to merge qemu-storage-daemon as an experimental feature with
-a reduced API stability promise in 5.0.
-
-Kevin Wolf (20):
-  qemu-storage-daemon: Add barebone tool
-  stubs: Add arch_type
-  block: Move system emulator QMP commands to block/qapi-sysemu.c
-  block: Move common QMP commands to block-core QAPI module
-  block: Move sysemu QMP commands to QAPI block module
-  qemu-storage-daemon: Add --blockdev option
-  qapi: Flatten object-add
-  qemu-storage-daemon: Add --object option
-  qemu-storage-daemon: Add --nbd-server option
-  blockdev-nbd: Boxed argument type for nbd-server-add
-  qemu-storage-daemon: Add --export option
-  qemu-storage-daemon: Add main loop
-  qemu-storage-daemon: Add --chardev option
-  stubs: Update monitor stubs for qemu-storage-daemon
-  qapi: Create 'pragma' module
-  monitor: Create QAPIfied monitor_init()
-  qmp: Fail gracefully if chardev is already in use
-  hmp: Fail gracefully if chardev is already in use
-  monitor: Add allow_hmp parameter to monitor_init()
-  qemu-storage-daemon: Add --monitor option
-
- qapi/block-core.json                 | 730 +++++++++++++--------------
- qapi/block.json                      | 512 +++++++++++--------
- qapi/control.json                    |  37 ++
- qapi/pragma.json                     |  24 +
- qapi/qapi-schema.json                |  25 +-
- qapi/qom.json                        |  12 +-
- qapi/transaction.json                |   2 +-
- configure                            |   2 +-
- include/block/nbd.h                  |   1 +
- include/monitor/monitor.h            |   6 +-
- include/qom/object_interfaces.h      |   7 +
- include/sysemu/arch_init.h           |   2 +
- block/qapi-sysemu.c                  | 590 ++++++++++++++++++++++
- blockdev-nbd.c                       |  40 +-
- blockdev.c                           | 559 --------------------
- chardev/char.c                       |   8 +-
- gdbstub.c                            |   2 +-
- hw/block/xen-block.c                 |  11 +-
- monitor/hmp-cmds.c                   |  21 +-
- monitor/hmp.c                        |   8 +-
- monitor/misc.c                       |   2 +
- monitor/monitor.c                    |  86 ++--
- monitor/qmp-cmds.c                   |   2 +-
- monitor/qmp.c                        |  11 +-
- qemu-storage-daemon.c                | 340 +++++++++++++
- qom/qom-qmp-cmds.c                   |  42 +-
- stubs/arch_type.c                    |   4 +
- stubs/monitor-core.c                 |  21 +
- stubs/monitor.c                      |  17 +-
- tests/test-util-sockets.c            |   4 +-
- scripts/qapi/gen.py                  |   5 +
- Makefile                             |  37 ++
- Makefile.objs                        |   9 +
- block/Makefile.objs                  |   4 +-
- monitor/Makefile.objs                |   2 +
- qapi/Makefile.objs                   |   7 +-
- qemu-deprecated.texi                 |   4 +
- qom/Makefile.objs                    |   1 +
- storage-daemon/Makefile.objs         |   1 +
- storage-daemon/qapi/Makefile.objs    |   1 +
- storage-daemon/qapi/qapi-schema.json |  26 +
- stubs/Makefile.objs                  |   2 +
- 42 files changed, 1955 insertions(+), 1272 deletions(-)
- create mode 100644 qapi/pragma.json
- create mode 100644 block/qapi-sysemu.c
- create mode 100644 qemu-storage-daemon.c
- create mode 100644 stubs/arch_type.c
- create mode 100644 stubs/monitor-core.c
- create mode 100644 storage-daemon/Makefile.objs
- create mode 100644 storage-daemon/qapi/Makefile.objs
- create mode 100644 storage-daemon/qapi/qapi-schema.json
-
---=20
-2.20.1
-
+=2D-
+Murilo
 
