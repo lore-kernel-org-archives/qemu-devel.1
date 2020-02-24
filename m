@@ -2,53 +2,53 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B845BC35DEC
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C242DC35DEB
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:45:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A74B2084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE942176D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:45:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pfh6D2b/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A74B2084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fqNIrEhU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE942176D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NOM-0002eY-Ms
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:44:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47300)
+	id 1j6NPp-0004uB-Nw
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:45:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIR-0006cw-UL
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIS-0006ds-BQ
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIQ-0008B0-Fj
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:55 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:58809)
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIQ-0008Aq-Et
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:56 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:39967)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6NIQ-00087b-46; Mon, 24 Feb 2020 18:37:54 -0500
+ id 1j6NIQ-00087O-23; Mon, 24 Feb 2020 18:37:54 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RJQ6596pz9sSX; Tue, 25 Feb 2020 10:37:33 +1100 (AEDT)
+ id 48RJQ53F5Dz9sSY; Tue, 25 Feb 2020 10:37:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582587454;
- bh=2HMMcHS71SZcl1mdEZbUO8BqzSboB4TqxyWpdz2JwgM=;
+ d=gibson.dropbear.id.au; s=201602; t=1582587453;
+ bh=G9vVCBQAxL325dmu2RbgIx5Jm0SP2MYRe+FEiLxyaO4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Pfh6D2b/hCpTqdbe2xOgLDE1NoGtFr4CAZgf0QxMb3Q7KW65rTdeTtxxcbTxob/UK
- G8g9SIEomasRU+4kCF661JpmUjnHKv+qlUeBLLWzYGaAjto9xKbqOwHj6OXP69UMHL
- pFNofn+Ijb9IE0SM+go0J902hUzDr7wBb/B90SNI=
+ b=fqNIrEhUlo13XwfTVkg6NFgxcCi9A9eViTRF/MgkMPTh1kXOs3EWnYH6K9B2AzMOp
+ M4LZBRiycS1ftX0CAH+ipLbCKHGsAxDXZUDSPaTutH4ub9Od//MpkawHD+NjzTA4AD
+ 71nZefaPzFEH2kwmAVwOl+NNt5a+VUbaM/nW9Dh0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: [PATCH v6 17/18] spapr: Clean up RMA size calculation
-Date: Tue, 25 Feb 2020 10:37:23 +1100
-Message-Id: <20200224233724.46415-18-david@gibson.dropbear.id.au>
+Subject: [PATCH v6 14/18] spapr,ppc: Simplify signature of kvmppc_rma_size()
+Date: Tue, 25 Feb 2020 10:37:20 +1100
+Message-Id: <20200224233724.46415-15-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
@@ -72,124 +72,116 @@ Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
  Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Igor Mammedov <imammedo@redhat.com>, paulus@samba.org,
- Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Cedric Le Goater <clg@fr.ibm.com>,
+ paulus@samba.org, Paolo Bonzini <pbonzini@redhat.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the calculation of the Real Mode Area (RMA) size into a helper
-function.  While we're there clean it up and correct it in a few ways:
-  * Add comments making it clearer where the various constraints come fro=
-m
-  * Remove a pointless check that the RMA fits within Node 0 (we've just
-    clamped it so that it does)
+This function calculates the maximum size of the RMA as implied by the
+host's page size of structure of the VRMA (there are a number of other
+constraints on the RMA size which will supersede this one in many
+circumstances).
+
+The current interface takes the current RMA size estimate, and clamps it
+to the VRMA derived size.  The only current caller passes in an arguably
+wrong value (it will match the current RMA estimate in some but not all
+cases).
+
+We want to fix that, but for now just keep concerns separated by having t=
+he
+KVM helper function just return the VRMA derived limit, and let the calle=
+r
+combine it with other constraints.  We call the new function
+kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
+
+The helper should only ever be called in the KVM enabled case, so replace
+its !CONFIG_KVM stub with an assert() rather than a dummy value.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/ppc/spapr.c | 59 ++++++++++++++++++++++++++++++--------------------
- 1 file changed, 35 insertions(+), 24 deletions(-)
+ hw/ppc/spapr.c       | 5 +++--
+ target/ppc/kvm.c     | 5 ++---
+ target/ppc/kvm_ppc.h | 7 +++----
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6e9f15f64d..f0354b699d 100644
+index 272a270b7a..b68d80ba69 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2648,6 +2648,40 @@ static PCIHostState *spapr_create_default_phb(void=
-)
-     return PCI_HOST_BRIDGE(dev);
+@@ -1586,8 +1586,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *sp=
+apr)
+     spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
+=20
+     if (spapr->vrma_adjust) {
+-        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(MACHINE(spa=
+pr)),
+-                                          spapr->htab_shift);
++        hwaddr vrma_limit =3D kvmppc_vrma_limit(spapr->htab_shift);
++
++        spapr->rma_size =3D MIN(spapr_node0_size(MACHINE(spapr)), vrma_l=
+imit);
+     }
  }
 =20
-+static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
-+{
-+    MachineState *machine =3D MACHINE(spapr);
-+    hwaddr rma_size =3D machine->ram_size;
-+    hwaddr node0_size =3D spapr_node0_size(machine);
-+
-+    /* RMA has to fit in the first NUMA node */
-+    rma_size =3D MIN(rma_size, node0_size);
-+
-+    /*
-+     * VRMA access is via a special 1TiB SLB mapping, so the RMA can
-+     * never exceed that
-+     */
-+    rma_size =3D MIN(rma_size, TiB);
-+
-+    /*
-+     * Clamp the RMA size based on machine type.  This is for
-+     * migration compatibility with older qemu versions, which limited
-+     * the RMA size for complicated and mostly bad reasons.
-+     */
-+    if (smc->rma_limit) {
-+        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
-+    }
-+
-+    if (rma_size < (MIN_RMA_SLOF * MiB)) {
-+        error_setg(errp,
-+"pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real Mode Area)",
-+                   MIN_RMA_SLOF);
-+        return -1;
-+    }
-+
-+    return rma_size;
-+}
-+
- /* pSeries LPAR / sPAPR hardware init */
- static void spapr_machine_init(MachineState *machine)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 7f44b1aa1a..597f72be1b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2113,7 +2113,7 @@ void kvmppc_error_append_smt_possible_hint(Error *c=
+onst *errp)
+=20
+=20
+ #ifdef TARGET_PPC64
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
  {
-@@ -2660,7 +2694,6 @@ static void spapr_machine_init(MachineState *machin=
-e)
-     int i;
-     MemoryRegion *sysmem =3D get_system_memory();
-     MemoryRegion *ram =3D g_new(MemoryRegion, 1);
--    hwaddr node0_size =3D spapr_node0_size(machine);
-     long load_limit, fw_size;
-     char *filename;
-     Error *resize_hpt_err =3D NULL;
-@@ -2700,22 +2733,7 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-         exit(1);
-     }
-=20
--    spapr->rma_size =3D node0_size;
--
--    /*
--     * Clamp the RMA size based on machine type.  This is for
--     * migration compatibility with older qemu versions, which limited
--     * the RMA size for complicated and mostly bad reasons.
--     */
--    if (smc->rma_limit) {
--        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
--    }
--
--    if (spapr->rma_size > node0_size) {
--        error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx"=
-)",
--                     spapr->rma_size);
--        exit(1);
--    }
-+    spapr->rma_size =3D spapr_rma_size(spapr, &error_fatal);
-=20
-     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
-     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-@@ -2954,13 +2972,6 @@ static void spapr_machine_init(MachineState *machi=
-ne)
+     struct kvm_ppc_smmu_info info;
+     long rampagesize, best_page_shift;
+@@ -2140,8 +2140,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
+igned int hash_shift)
          }
      }
 =20
--    if (spapr->rma_size < MIN_RMA_SLOF) {
--        error_report(
--            "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real =
-Mode Area memory)",
--            MIN_RMA_SLOF / MiB);
--        exit(1);
--    }
--
-     if (kernel_filename) {
-         uint64_t lowaddr =3D 0;
+-    return MIN(current_size,
+-               1ULL << (best_page_shift + hash_shift - 7));
++    return 1ULL << (best_page_shift + hash_shift - 7);
+ }
+ #endif
 =20
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 9e4f2357cc..332fa0aa1c 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -47,7 +47,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t =
+page_shift,
+                               int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)=
+;
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
+ bool kvmppc_has_cap_spapr_vfio(void);
+ #endif /* !CONFIG_USER_ONLY */
+ bool kvmppc_has_cap_epr(void);
+@@ -255,10 +255,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
+     return 0;
+ }
+=20
+-static inline uint64_t kvmppc_rma_size(uint64_t current_size,
+-                                       unsigned int hash_shift)
++static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
+ {
+-    return ram_size;
++    g_assert_not_reached();
+ }
+=20
+ static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
 --=20
 2.24.1
 
