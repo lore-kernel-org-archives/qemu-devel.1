@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30289C11D34
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF867C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:21:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 082A22072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 082A22072D
+	by mail.kernel.org (Postfix) with ESMTPS id A643A2080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:21:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A643A2080D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Eb0-00063p-2l
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:20:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48275)
+	id 1j6EcH-00013P-OB
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:21:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea4-0004Im-JW
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:33 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea5-0004Ix-Uf
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea2-0005o8-Ga
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:32 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:55143)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea4-0005qL-NF
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:33 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:55158)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea2-0005mC-7Z
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:30 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea4-0005pJ-Eq
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:32 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id B882FE494F;
- Mon, 24 Feb 2020 23:19:27 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id C4C3FE553D;
+ Mon, 24 Feb 2020 23:19:31 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 702C124008F;
- Mon, 24 Feb 2020 23:19:27 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 8660D24008E;
+ Mon, 24 Feb 2020 23:19:31 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v32 01/22] MAINTAINERS: Add RX
-Date: Mon, 24 Feb 2020 23:19:02 +0900
-Message-Id: <20200224141923.82118-2-ysato@users.sourceforge.jp>
+Subject: [PATCH v32 13/22] target/rx: Dump bytes for each insn during
+ disassembly
+Date: Mon, 24 Feb 2020 23:19:14 +0900
+Message-Id: <20200224141923.82118-14-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200224141923.82118-1-ysato@users.sourceforge.jp>
 References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
@@ -65,58 +66,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+
+There are so many different forms of each RX instruction
+that it will be very useful to be able to look at the bytes
+to see on which path a bug may lie.
+
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-18-ysato@users.sourceforge.jp>
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190607091116.49044-24-ysato@users.sourceforge.jp>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ target/rx/disas.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 195dd58cac..d2611f043b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -274,6 +274,13 @@ F: include/hw/riscv/
- F: linux-user/host/riscv32/
- F: linux-user/host/riscv64/
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 5a32a87534..d73b53db44 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
+ /* Include the auto-generated decoder.  */
+ #include "decode.inc.c"
 =20
-+RENESAS RX CPUs
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: target/rx/
-+F: hw/rx/
-+F: include/hw/rx/
+-#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS_=
+_)
++static void dump_bytes(DisasContext *ctx)
++{
++    int i, len =3D ctx->len;
 +
- S390 TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- M: David Hildenbrand <david@redhat.com>
-@@ -1167,6 +1174,18 @@ F: pc-bios/canyonlands.dt[sb]
- F: pc-bios/u-boot-sam460ex-20100605.bin
- F: roms/u-boot-sam460ex
++    for (i =3D 0; i < len; ++i) {
++        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i])=
+;
++    }
++    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
++}
++
++#define prt(...) \
++    do {                                                        \
++        dump_bytes(ctx);                                        \
++        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
++    } while (0)
 =20
-+RX Machines
-+-----------
-+rx-virt
-+M: Yoshinori Sato <ysato@users.sourceforge.jp>
-+S: Maintained
-+F: hw/rx/rxqemu.c
-+F: hw/intc/rx_icu.c
-+F: hw/timer/renesas_*.c
-+F: hw/char/renesas_sci.c
-+F: include/hw/timer/renesas_*.h
-+F: include/hw/char/renesas_sci.h
-+
- SH4 Machines
- ------------
- R2D
+ #define RX_MEMORY_BYTE 0
+ #define RX_MEMORY_WORD 1
 --=20
 2.20.1
 
