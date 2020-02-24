@@ -1,76 +1,88 @@
-Return-Path: <SRS0=d4IR=4I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15EC0C11D41
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 05:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C61C38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D558324656
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Feb 2020 05:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2314218AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:25:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SH75W5cB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D558324656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ml/LGDeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2314218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j4eaM-0008RW-3N
-	for qemu-devel@archiver.kernel.org; Thu, 20 Feb 2020 00:41:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53499)
+	id 1j6MAC-0000vu-Ta
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 17:25:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <waynli329@gmail.com>) id 1j4eZV-0007xD-4n
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 00:40:26 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j6M7l-0004OL-0i
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <waynli329@gmail.com>) id 1j4eZT-0001f9-W7
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 00:40:25 -0500
-Received: from mail-io1-xd35.google.com ([2607:f8b0:4864:20::d35]:38232)
+ (envelope-from <richard.henderson@linaro.org>) id 1j6M7j-0005sN-Jo
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:48 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42367)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <waynli329@gmail.com>) id 1j4eZT-0001ee-P3
- for qemu-devel@nongnu.org; Thu, 20 Feb 2020 00:40:23 -0500
-Received: by mail-io1-xd35.google.com with SMTP id s24so3329185iog.5
- for <qemu-devel@nongnu.org>; Wed, 19 Feb 2020 21:40:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=XpUvSMXyRD3z5fSJMN3JcEX0vjhaxC0G5oiclnrjVn8=;
- b=SH75W5cBzrJ39+WKUvCaBcbNRrRMKFmQeCLt6Mi9HG3Oa0nV8p1XlbWClo3V7Todse
- xt6c8JpPOUn+UwpdNJektmKamB/qA3xOBT19SjodYeJNJs5X+zOyn4GNqPRTcdNYFhqA
- Pgk0cCdUlIWopUMDwMSmtslscletfVyOTvCj15bF9AAeGmKF/zCPW3CefRTGf4KkPTnB
- 4hu50H5ram0ZXJ/gjdG5ELMMPcqCKhcKgGRLR4qAB2RiCCzq6l5SY4Xlb7K1nH5ei3Je
- nOA4Ht4dRGJCe7azk7AkceMS1ixHa/jg4IJmBHHRfUiiTzWY9AewicANDVCicfitxUl0
- gr+Q==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j6M7j-0005s0-EQ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:47 -0500
+Received: by mail-pf1-x443.google.com with SMTP id 4so6063238pfz.9
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:22:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ABqg53SHadErlQ1KJw2EVsyG66DudT3m5ptP92s2kV4=;
+ b=ml/LGDeM83+tA/QuI9WQvvsXX+P52t3WEQ5SAtw+bAXUiCz0nN4ReHgPEwUqPnhZsD
+ fvaMa4fOI+ttGPyxkAZ9L1Lmrvf8zS1PcbbxL1VHrWWls1eInuHQnSTvLqjuv3VJ/z6j
+ xEknPQQu8h1NZrIAz9KLGE92mSw1cUXs3TPPo7TxBramSMrtftYEeINKRFenVtvGrtQ3
+ ag2l6KyYT3IwXljfc13/ciUf7TWjY2fEQfAAmXsfiZFwCaVutE8sSFASLtWEi1hibzgz
+ fXsfpQNt1C1TKFcdttXosEUF7SQv5UM7zM4I4khWEUSsKbbDQSICfBSyAWs4adBpF/uL
+ +Kcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=XpUvSMXyRD3z5fSJMN3JcEX0vjhaxC0G5oiclnrjVn8=;
- b=pmd1eN/wzmeTFMcbJXmV8zEj3d1Wm0c1ZLbG3XmL0/1ew3L6VhC/6ja6zMKMO8Qr3a
- V7HnCW0fx+dhrKleaPAn5nOc4bXuDugxpb5bRymXSzoLfapxZjxhD+O/oyh8HxHFbq0h
- 8qUqfgzTON8ANKSkTHNIsanIdsUAfv8C105n19fwnGH4gT7X0nhVaFKxbnjvRSKpo2NE
- E0m/qmTqzfD8VoCruzAQRV9nl4m+gz2yS9uGjECGHPGIy7aMrW5cVc5ObBEPqmv65R86
- mRWfe5T1gq8ECgik+M5gUyAPKlkWCd62pcn2E7qrjev5uTAztfQ7twkUKoa4OVZxmbJ+
- PGZw==
-X-Gm-Message-State: APjAAAWyGjfdott1HqtKENzv46meLhBgKh8Pj99Gkjh3AZn5pSegmgab
- ocjC9swRgUeJLz1R69KdcVFWx03utzvx47yaJBy0pw==
-X-Google-Smtp-Source: APXvYqxaHbg9wGrhPDC7KY9h4/T6gJtOK/cjPOQuHZ/cm5bMXyegNG4BJPnQF+hwTrK2/cIW5aXbEGRonidH9XKFVMo=
-X-Received: by 2002:a5d:9c4e:: with SMTP id 14mr23106426iof.166.1582177221738; 
- Wed, 19 Feb 2020 21:40:21 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ABqg53SHadErlQ1KJw2EVsyG66DudT3m5ptP92s2kV4=;
+ b=Wl/+dzLAELPNeJDe1FU30Hr+CwxUDVcENljyV7olbxWt1pLTva1OMxQS6ZP7pRx+iU
+ vN26uoyeo6YBPQhZZHCkF5MYxA9U9nMCr0+D7k2kdGbzzZQjKocEu5IDQfCL4HWrsB5X
+ 6wUHqNvTzRKZklvUIPgR1f/28g5X9cxRYJT/ZdwAXYtb/mmUdwLF7L56UfmvO3An6VoL
+ Qsa89UKokj68SgB2UQgq7n3yT1vRgKjch8gIaS5PW6S09GXlw8pEoVPM94Xv7+eBpdTc
+ TrtBBLltvtzG1BmFgR/hv3MZA07wPff5GpPliPG2ExlehQ5O4OVnRHPLCjKly/R/NzFY
+ l0og==
+X-Gm-Message-State: APjAAAWyKTwrmmEN8reYwRAtUlFLUjvutgNW+iN5E52AgWi3bsaK2Z2j
+ TV1nxdnrabbzZCpRW0v2c+x7pEdMBHM=
+X-Google-Smtp-Source: APXvYqyRh9lcxlT3hIw4otRhwLAUUnR28xRJVkiTYMMPrOoQnnKhSGxwJ2yPZb3PZakxHREoIjm88Q==
+X-Received: by 2002:a65:5905:: with SMTP id f5mr17972398pgu.87.1582582966092; 
+ Mon, 24 Feb 2020 14:22:46 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id o6sm13897097pgg.37.2020.02.24.14.22.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 24 Feb 2020 14:22:45 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 09/17] target/arm: Replace ARM_FEATURE_VFP4 with
+ isar_feature_aa32_simdfmac
+Date: Mon, 24 Feb 2020 14:22:24 -0800
+Message-Id: <20200224222232.13807-10-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200224222232.13807-1-richard.henderson@linaro.org>
+References: <20200224222232.13807-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-From: Wayne Li <waynli329@gmail.com>
-Date: Wed, 19 Feb 2020 23:40:10 -0600
-Message-ID: <CAM2K0npCdHfCeMCKO9TX_ifQGDZFFNyMEKH2qByYL9SnXnaPmw@mail.gmail.com>
-Subject: 
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000460395059efb57af"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d35
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,67 +94,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000460395059efb57af
-Content-Type: text/plain; charset="UTF-8"
+All remaining tests for VFP4 are for fused multiply-add insns.
 
-Dear QEMU list members,
+Since the MVFR1 field is used for both VFP and NEON, move its adjustment
+from the !has_neon block to the (!has_vfp && !has_neon) block.
 
-This will kind of be a repost but I'd like to post my question again
-because I've gained some more knowledge that makes me feel that my question
-would be easier to answer.  So we developed a custom-made QEMU VM that
-emulates a custom machine that has an e5500 processor.  I'm running this VM
-on a T4240-RDB board which has an e6500 processor and I'm trying to get the
-VM running with KVM enabled.  The problem I'm having is the program counter
-refuses to increment at all.  It just stays at the address 0xFFFFFFFC.  On
-a run without KVM enabled, the VM will also start executing at this same
-address but the program counter beings to increment immediately.  I know
-this is a custom QEMU VM and maybe some of the startup stuff we do could be
-causing problems, but what could possibly stop the program counter from
-incrementing altogether?
+Test for vfp of the appropraite width alongside the test for simdfmac
+within translate-vfp.inc.c.  Within disas_neon_data_insn, we have
+already tested for ARM_FEATURE_NEON.
 
-Also, I do have another side question.  When running with KVM enabled, I
-see the kernel-level ioctl call KVM_RUN running and then returning over and
-over again (by the way before the VM kinda grinds to a halt I only see QEMU
-make the KVM_RUN call twice, but the kernel-level ioctl function is being
-called over and over again for some reason).  And each time the KVM_RUN
-call returns, the return-from-interrupt takes the VM to the address
-0xFFFFFFFC.  What is the KVM_RUN ioctl call used for?  Why is it being
-called over and over again?  Maybe if I understood this better I'd be able
-to figure out what's stopping my program counter from incrementing.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+v2: Applied Peter's fixups, plus test fpdp_v2 in trans_VFM_dp.
+---
+ target/arm/cpu.h               | 12 ++++++++++++
+ target/arm/cpu.c               |  6 +++++-
+ target/arm/translate-vfp.inc.c | 22 ++++++++++++++++++----
+ target/arm/translate.c         |  2 +-
+ 4 files changed, 36 insertions(+), 6 deletions(-)
 
--Thanks, Wayne Li
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b94d2a5ace..b29b0eddfc 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3514,6 +3514,18 @@ static inline bool isar_feature_aa32_fp16_dpconv(const ARMISARegisters *id)
+     return FIELD_EX32(id->mvfr1, MVFR1, FPHP) > 1;
+ }
+ 
++/*
++ * Note that this ID register field covers both VFP and Neon FMAC,
++ * so should usually be tested in combination with some other
++ * check that confirms the presence of whichever of VFP or Neon is
++ * relevant, to avoid accidentally enabling a Neon feature on
++ * a VFP-no-Neon core or vice-versa.
++ */
++static inline bool isar_feature_aa32_simdfmac(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->mvfr1, MVFR1, SIMDFMAC) != 0;
++}
++
+ static inline bool isar_feature_aa32_vsel(const ARMISARegisters *id)
+ {
+     return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 1;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f10f34b655..bdcaa46b8a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1501,7 +1501,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         u = FIELD_DP32(u, MVFR1, SIMDINT, 0);
+         u = FIELD_DP32(u, MVFR1, SIMDSP, 0);
+         u = FIELD_DP32(u, MVFR1, SIMDHP, 0);
+-        u = FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
+         cpu->isar.mvfr1 = u;
+ 
+         u = cpu->isar.mvfr2;
+@@ -1524,6 +1523,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         u = cpu->isar.mvfr0;
+         u = FIELD_DP32(u, MVFR0, SIMDREG, 0);
+         cpu->isar.mvfr0 = u;
++
++        /* Despite the name, this field covers both VFP and Neon */
++        u = cpu->isar.mvfr1;
++        u = FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
++        cpu->isar.mvfr1 = u;
+     }
+ 
+     if (arm_feature(env, ARM_FEATURE_AARCH64) &&
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index f88a95438f..03ba8d7aac 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1803,11 +1803,18 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+ 
+     /*
+      * Present in VFPv4 only.
++     * Note that we can't rely on the SIMDFMAC check alone, because
++     * in a Neon-no-VFP core that ID register field will be non-zero.
++     */
++    if (!dc_isar_feature(aa32_simdfmac, s) ||
++        !dc_isar_feature(aa32_fpsp_v2, s)) {
++        return false;
++    }
++    /*
+      * In v7A, UNPREDICTABLE with non-zero vector length/stride; from
+      * v8A, must UNDEF. We choose to UNDEF for both v7A and v8A.
+      */
+-    if (!arm_dc_feature(s, ARM_FEATURE_VFP4) ||
+-        (s->vec_len != 0 || s->vec_stride != 0)) {
++    if (s->vec_len != 0 || s->vec_stride != 0) {
+         return false;
+     }
+ 
+@@ -1861,11 +1868,18 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+ 
+     /*
+      * Present in VFPv4 only.
++     * Note that we can't rely on the SIMDFMAC check alone, because
++     * in a Neon-no-VFP core that ID register field will be non-zero.
++     */
++    if (!dc_isar_feature(aa32_simdfmac, s) ||
++        !dc_isar_feature(aa32_fpdp_v2, s)) {
++        return false;
++    }
++    /*
+      * In v7A, UNPREDICTABLE with non-zero vector length/stride; from
+      * v8A, must UNDEF. We choose to UNDEF for both v7A and v8A.
+      */
+-    if (!arm_dc_feature(s, ARM_FEATURE_VFP4) ||
+-        (s->vec_len != 0 || s->vec_stride != 0)) {
++    if (s->vec_len != 0 || s->vec_stride != 0) {
+         return false;
+     }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 79880adaad..0489e0cdaa 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -5150,7 +5150,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             }
+             break;
+         case NEON_3R_VFM_VQRDMLSH:
+-            if (!arm_dc_feature(s, ARM_FEATURE_VFP4)) {
++            if (!dc_isar_feature(aa32_simdfmac, s)) {
+                 return 1;
+             }
+             break;
+-- 
+2.20.1
 
---000000000000460395059efb57af
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Dear QEMU list members,<div><br></div><div>This will kind =
-of be a repost but I&#39;d like to post my question again because I&#39;ve =
-gained some more knowledge that makes me feel that my question would be eas=
-ier to answer.=C2=A0 So we developed a custom-made QEMU VM that emulates a =
-custom machine that has an e5500 processor.=C2=A0 I&#39;m running this VM o=
-n a T4240-RDB board which has an e6500 processor and I&#39;m trying to get =
-the VM running with KVM enabled.=C2=A0 The problem I&#39;m having is the pr=
-ogram counter refuses to increment at all.=C2=A0 It just stays at the addre=
-ss 0xFFFFFFFC.=C2=A0 On a run without KVM enabled, the VM will also start e=
-xecuting at this same address but the program counter beings to increment i=
-mmediately.=C2=A0 I know this is a custom QEMU VM and maybe some of the sta=
-rtup stuff we do could be causing problems, but what could possibly stop th=
-e program counter from incrementing altogether?</div><div><br></div><div>Al=
-so, I do have another side question.=C2=A0 When running with KVM enabled, I=
- see the kernel-level ioctl call KVM_RUN running and then returning over an=
-d over again (by the way before the VM kinda grinds to a halt I only see QE=
-MU make the KVM_RUN call twice, but the kernel-level ioctl function is bein=
-g called over and over again for some reason).=C2=A0 And each time the KVM_=
-RUN call returns, the return-from-interrupt takes the VM to the address 0xF=
-FFFFFFC.=C2=A0 What is the KVM_RUN ioctl call used for?=C2=A0 Why is it bei=
-ng called over and over again?=C2=A0 Maybe if I understood this better I&#3=
-9;d be able to figure out what&#39;s stopping my program counter from incre=
-menting.</div><div><br></div><div>-Thanks, Wayne Li</div></div>
-
---000000000000460395059efb57af--
 
