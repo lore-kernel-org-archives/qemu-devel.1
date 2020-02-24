@@ -2,98 +2,78 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D76C38BE6
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C195BC38BE0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:00:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E4D721556
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CEE621556
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:00:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ucysf1QP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4D721556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7IFn7uM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CEE621556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6KpF-0003Gh-6v
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 15:59:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
+	id 1j6KqM-0005KF-OE
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:00:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6Km4-00063i-Rp
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:22 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6Km4-00063N-MG
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6Km3-0002ys-C6
+ (envelope-from <philmd@redhat.com>) id 1j6Km2-0002xu-KL
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:20 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:40968)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6Km3-0002xE-34
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:19 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqUse017543;
- Mon, 24 Feb 2020 20:56:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references; s=corp-2020-01-29;
- bh=qVGAGC6C18wJ+u7koWS8q2G+1agjZ5LGHLUEggWIpvg=;
- b=Ucysf1QPfWCGisyEL/FZGhAGVkKDpXcLEWm5jk3AU+Mq/83yu0OV0AHbWg2JK4igkFCD
- LyHV+15ln4vqkRQcC0PiA2aOu88xg1Ao7RoDAWI7VuVh+4/6cHHm5rtqOE7g5YxJ6VFY
- zvFVxYQQIM4oC7ecvJmZWaV/2aUrX1oE7i4EBscZydZfmpxyEXkgfzjT5awykB3zk1Hl
- lGSk34fWWdTpib5BO7qqtRpyv/j5mjgIJFM2+1uPqCqxbA9JyMBOt+BO/2ksoVAmxcXw
- yZXwqcZULi0INMW/WFuAwkTlUK6PYDA0ZJ2e7mAwfp+2x41W2+4Gqom7hTmC5bVDueIP Gg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2yavxrhydm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqhVI017288;
- Mon, 24 Feb 2020 20:56:11 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 2ybduv6cq1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:10 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKu84e029598;
- Mon, 24 Feb 2020 20:56:09 GMT
-Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:08 -0800
-From: Jagannathan Raman <jag.raman@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 08/50] multi-process: add functions to synchronize proxy
- and remote endpoints
-Date: Mon, 24 Feb 2020 15:54:59 -0500
-Message-Id: <3d013f0091ac6babb55f30cadf6ed806c322b7ce.1582576372.git.jag.raman@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
-References: <cover.1582576372.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
-References: <cover.1582576372.git.jag.raman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- suspectscore=1
- mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
- lowpriorityscore=0
- spamscore=0 clxscore=1015 suspectscore=1 bulkscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002240153
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48018
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Km2-0002wv-Dm
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582577777;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aBf1Nz3dO7lmnq6x8HgckUD4/9P7/UEzlUI+mgbV/5Q=;
+ b=Z7IFn7uMULPt+eEx54eV8f1N9jpH0HtqbV/jXBGsuPXv2eqlqXjaJP/arRvd559dcfotUJ
+ SpWvpQM4SwpnHK3GgYRe0Jo1RXXLlp4saq37BttCMSee1NnHQW9gHpDBr8kJ7uom03lYHk
+ jKC4UKb5LHddmKs5AUnaSDXe6MXxLi8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-vv3vpfscMoS28J8ygPcnhA-1; Mon, 24 Feb 2020 15:56:15 -0500
+X-MC-Unique: vv3vpfscMoS28J8ygPcnhA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E001B107ACC4;
+ Mon, 24 Feb 2020 20:56:10 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-162.brq.redhat.com [10.40.205.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C390B5C883;
+ Mon, 24 Feb 2020 20:55:52 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH RESEND v2 01/32] memory: Correctly return alias region type
+Date: Mon, 24 Feb 2020 21:55:02 +0100
+Message-Id: <20200224205533.23798-2-philmd@redhat.com>
+In-Reply-To: <20200224205533.23798-1-philmd@redhat.com>
+References: <20200224205533.23798-1-philmd@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,106 +85,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
+ qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+ Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In some cases, for example MMIO read, QEMU has to wait for the remote to
-complete a command before proceeding. An eventfd based mechanism is
-added to synchronize QEMU & remote process.
+Since memory region aliases are neither rom nor ram, they are
+described as i/o, which is often incorrect. Return instead the
+type of the original region we are aliasing.
 
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/io/mpqemu-link.h |  7 +++++++
- io/mpqemu-link.c         | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
+Cc: qemu-trivial@nongnu.org
 
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 2f2dd83..ae04fca 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -135,4 +135,11 @@ void mpqemu_link_set_callback(MPQemuLinkState *s,
-                               mpqemu_link_callback callback);
- void mpqemu_start_coms(MPQemuLinkState *s);
- 
-+#define GET_REMOTE_WAIT eventfd(0, EFD_CLOEXEC)
-+#define PUT_REMOTE_WAIT(wait) close(wait)
-+#define PROXY_LINK_WAIT_DONE 1
-+
-+uint64_t wait_for_remote(int efd);
-+void notify_proxy(int fd, uint64_t val);
-+
- #endif
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index bac120b..73b7032 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -10,6 +10,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu-common.h"
-+#include <poll.h>
- 
- #include "qemu/module.h"
- #include "io/mpqemu-link.h"
-@@ -216,6 +217,46 @@ int mpqemu_msg_recv(MPQemuMsg *msg, MPQemuChannel *chan)
-     return rc;
- }
- 
-+uint64_t wait_for_remote(int efd)
-+{
-+    struct pollfd pfd = { .fd = efd, .events = POLLIN };
-+    uint64_t val;
-+    int ret;
-+
-+    ret = poll(&pfd, 1, 1000);
-+
-+    switch (ret) {
-+    case 0:
-+        qemu_log_mask(LOG_REMOTE_DEBUG, "Error wait_for_remote: Timed out\n");
-+        /* TODO: Kick-off error recovery */
-+        return ULLONG_MAX;
-+    case -1:
-+        qemu_log_mask(LOG_REMOTE_DEBUG, "Poll error wait_for_remote: %s\n",
-+                      strerror(errno));
-+        return ULLONG_MAX;
-+    default:
-+        if (read(efd, &val, sizeof(val)) == -1) {
-+            qemu_log_mask(LOG_REMOTE_DEBUG, "Error wait_for_remote: %s\n",
-+                          strerror(errno));
-+            return ULLONG_MAX;
-+        }
-+    }
-+
-+    val = (val == ULLONG_MAX) ? val : (val - 1);
-+
-+    return val;
-+}
-+
-+void notify_proxy(int efd, uint64_t val)
-+{
-+    val = (val == ULLONG_MAX) ? val : (val + 1);
-+
-+    if (write(efd, &val, sizeof(val)) == -1) {
-+        qemu_log_mask(LOG_REMOTE_DEBUG, "Error notify_proxy: %s\n",
-+                      strerror(errno));
-+    }
-+}
-+
- static gboolean mpqemu_link_handler_prepare(GSource *gsrc, gint *timeout)
+ memory.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/memory.c b/memory.c
+index aeaa8dcc9e..ce1179874e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2818,6 +2818,9 @@ void address_space_destroy(AddressSpace *as)
+=20
+ static const char *memory_region_type(MemoryRegion *mr)
  {
-     g_assert(timeout);
--- 
-1.8.3.1
++    if (mr->alias) {
++        return memory_region_type(mr->alias);
++    }
+     if (memory_region_is_ram_device(mr)) {
+         return "ramd";
+     } else if (memory_region_is_romd(mr)) {
+--=20
+2.21.1
 
 
