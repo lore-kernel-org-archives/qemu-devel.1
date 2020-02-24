@@ -1,86 +1,75 @@
-Return-Path: <SRS0=CqNf=4L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4E5C35673
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 23:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD658C35670
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:08:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5823820704
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Feb 2020 23:58:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OY4WaYIt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5823820704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 955C420675
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:08:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955C420675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j618L-0002Z4-JG
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 18:58:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41038)
+	id 1j62Ep-0007hz-L0
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 20:08:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gshan@redhat.com>) id 1j617m-000273-S0
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 18:57:28 -0500
+ (envelope-from <jianjay.zhou@huawei.com>) id 1j62EC-0007Fr-09
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gshan@redhat.com>) id 1j617k-0004sM-Qr
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 18:57:26 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39789
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jianjay.zhou@huawei.com>) id 1j62EA-0004CX-Kn
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:07 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2448 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1j617k-0004rx-MY
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 18:57:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582502243;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vQsa5htc3UPwO2qSfJjEM7AdRsMCOivhC27dTmnOIng=;
- b=OY4WaYItFiBVsM/8W+SbrL1MUR7NRWU/Dmq8z/OCa4+z3Ij763TqNYnc7lNjrnGy4C6ubC
- X87IVpXlVjUSzlTOnUzBdrmAzzR3JH9Zml5VWP0wHOMzFh4uzbz/i4McUHurmoDVyqBLlq
- PFvL0AhGxkMIKul2KAWBtheUuXSzh4M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-zWnR_FrkO8SBiZAOlxJ0AQ-1; Sun, 23 Feb 2020 18:57:22 -0500
-X-MC-Unique: zWnR_FrkO8SBiZAOlxJ0AQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF67D100550E;
- Sun, 23 Feb 2020 23:57:20 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-48.bne.redhat.com [10.64.54.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7A9F1001902;
- Sun, 23 Feb 2020 23:57:18 +0000 (UTC)
-Subject: Re: [PATCH] hw/char/pl011: Output characters using best-effort mode
-To: Marc Zyngier <maz@kernel.org>
-References: <20200220060108.143668-1-gshan@redhat.com>
- <f3c8adba729d050ba2144cc9c834fe82@kernel.org>
- <CAFEAcA8inLO75XOcCO3bUiiJQyZT+nqmp1be+z6ZtQx2a=68+g@mail.gmail.com>
- <fda602ae-43d5-728c-a5bb-f607f0acd3df@redhat.com>
- <69bdfa5b09791a9d148b791076f2441f@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <4eec5935-1114-2c8e-05ce-21f80f71d041@redhat.com>
-Date: Mon, 24 Feb 2020 10:57:16 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+ id 1j62EA-00047D-Aa
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:06 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 43B0C58324CD8F3D7D0C;
+ Mon, 24 Feb 2020 09:07:55 +0800 (CST)
+Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Feb 2020 09:07:54 +0800
+Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.45]) by
+ dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
+ Mon, 24 Feb 2020 09:07:47 +0800
+From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
+To: Peter Feiner <pfeiner@google.com>, Junaid Shahid <junaids@google.com>
+Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
+Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abuggAMs8gCAAd62AIAAJJ4A//xJ+gA=
+Date: Mon, 24 Feb 2020 01:07:47 +0000
+Message-ID: <B2D15215269B544CADD246097EACE7474BB18354@dggemm508-mbx.china.huawei.com>
+References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
+ <20200218174311.GE1408806@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
+ <20200219171919.GA34517@xz-x1>
+ <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
+ <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
+ <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
+ <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+In-Reply-To: <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.228.206]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <69bdfa5b09791a9d148b791076f2441f@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,146 +81,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Gavin Shan <gshan@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Shan Gavin <shan.gavin@gmail.com>
+Cc: "Liujinsong \(Paul\)" <liu.jinsong@huawei.com>,
+ "linfeng \(M\)" <linfeng23@huawei.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, Ben Gardon <bgardon@google.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "Huangweidong \(C\)" <weidong.huang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Marc,
-
-On 2/21/20 8:09 PM, Marc Zyngier wrote:
-> On 2020-02-21 04:24, Gavin Shan wrote:
->> On 2/20/20 9:10 PM, Peter Maydell wrote:
->>> On Thu, 20 Feb 2020 at 09:10, Marc Zyngier <maz@kernel.org> wrote:
->>>> On 2020-02-20 06:01, Gavin Shan wrote:
->>>>> This fixes the issue by using newly added API
->>>>> qemu_chr_fe_try_write_all(),
->>>>> which provides another type of service (best-effort). It's different
->>>>> from
->>>>> qemu_chr_fe_write_all() as the data will be dropped if the backend ha=
-s
->>>>> been running into so-called broken state or 50 attempts of
->>>>> transmissions.
->>>>> The broken state is cleared if the data is transmitted at once.
->>>>
->>>> I don't think dropping the serial port output is an acceptable outcome=
-.
->>>
->>> Agreed. The correct fix for this is the one cryptically described
->>> in the XXX comment this patch deletes:
->>>
->>> -=A0=A0=A0=A0=A0=A0=A0 /* XXX this blocks entire thread. Rewrite to use
->>> -=A0=A0=A0=A0=A0=A0=A0=A0 * qemu_chr_fe_write and background I/O callba=
-cks */
->>>
->>> The idea is that essentially we end up emulating the real
->>> hardware's transmit FIFO:
->>> =A0 * as data arrives from the guest we put it in the FIFO
->>> =A0 * we try to send the data with qemu_chr_fe_write(), which does
->>> =A0=A0=A0 not block
->>> =A0 * if qemu_chr_fe_write() tells us it did not send all the data,
->>> =A0=A0=A0 we use qemu_chr_fe_add_watch() to set up an I/O callback
->>> =A0=A0=A0 which will get called when the output chardev has drained
->>> =A0=A0=A0 enough that we can try again
->>> =A0 * we make sure all the guest visible registers and mechanisms
->>> =A0=A0=A0 for tracking tx fifo level (status bits, interrupts, etc) are
->>> =A0=A0=A0 correctly wired up
->>>
->>> Then we don't lose data or block QEMU if the guest sends
->>> faster than the chardev backend can handle, assuming the
->>> guest is well-behaved -- just as with a real hardware slow
->>> serial port, the guest will fill the tx fifo and then either poll
->>> or wait for an interrupt telling it that the fifo has drained
->>> before it tries to send more data.
->>>
->>> There is an example of this in hw/char/cadence_uart.c
->>> (and an example of how it works for a UART with no tx
->>> fifo in hw/char-cmsdk-apb-uart.c, which is basically the
->>> same except the 'fifo' is just one byte.)
->>>
->>> You will also find an awful lot of XXX comments like the
->>> above one in various UART models in hw/char, because
->>> converting an old-style simple blocking UART implementation
->>> to a non-blocking one is a bit fiddly and needs knowledge
->>> of the specifics of the UART behaviour.
->>>
->>> The other approach here would be that we could add
->>> options to relevant chardev backends so the user
->>> could say "if you couldn't connect to the tcp server I
->>> specified, throw away data rather than waiting", where
->>> we don't have suitable options already. If the user specifically
->>> tells us they're ok to throw away the serial data, then it's
->>> fine to throw away the serial data :-)
->>>
->>
->> I was intended to convince Marc that it's fine to lose data if the
->> serial connection is broken with an example. Now, I'm taking the
->> example trying to convince both of you: Lets assume we have a ARM
->> board and the UART (RS232) cable is unplugged and plugged in the middle =
-of
->> system booting. I think we would get some output lost. We're emulating
->> pl011 and I think it would have same behavior. However, I'm not sure
->> if it makes sense :)
->=20
-> But the case you describe in the commit message is not that one.
-> The analogy is that of a serial port *plugged* and asserting flow control=
-.
->=20
-
-Thanks for your time on the discussion.
-
-Well, I would say we saw two side of a coin. TCP connection isn't bidirecti=
-onal
-until accept() is called on server side. The connection isn't fully functio=
-nal
-until two directions are finalized. It would be unplug if the connection is=
- treated
-as the cable :)
-
-> Another thing is that the "system" as been constructed this way by the
-> user. QEMU is not in a position to choose and output what is convenient,
-> when it is convenient. In my world, the serial output is absolutely
-> crucial. This is where I look for clues about failures and odd behaviours=
-,
-> and I rely on the serial port emulation to be 100% reliable (and for what
-> it's worth, the Linux kernel can output to the serial port asynchronously=
-,
-> to some extent).
->=20
-> [...]
->=20
-
-Yep, totally agreed :)
-
->> If above analysis is correct and the first approach doesn't work out. We=
- have to
->> consider the 2nd approach - adding option to backend to allow losing dat=
-a. I'm
->> going to add "allow-data-lost" option for TYPE_CHARDEV_SOCKET. With the =
-option,
->> a back-off algorithm in tcp_chr_write(): The channel is consider as brok=
-en if
->> it fails to transmit data in last continuous 5 times. The transmission i=
-s still
->> issued when the channel is in broken state and recovered to normal state=
- if
->> transmission succeeds for once.
->=20
-> That'd be an option if you could configure the UART with something that s=
-ays
-> "no flow control". In that case, dropping data on the floor becomes perfe=
-ctly
-> acceptable, as it requires buy-in from the user.
->=20
-
-Yep, the point is to has user's buy-in and it seems an explicit option like
-"allow-data-lost" fills the gap, but it seems Peter isn't reaching conclusi=
-on
-or decision yet. Lets see what's that finally :)
-
-Thanks,
-Gavin
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgRmVpbmVyIFtt
+YWlsdG86cGZlaW5lckBnb29nbGUuY29tXQ0KPiBTZW50OiBTYXR1cmRheSwgRmVicnVhcnkgMjIs
+IDIwMjAgODoxOSBBTQ0KPiBUbzogSnVuYWlkIFNoYWhpZCA8anVuYWlkc0Bnb29nbGUuY29tPg0K
+PiBDYzogQmVuIEdhcmRvbiA8YmdhcmRvbkBnb29nbGUuY29tPjsgWmhvdWppYW4gKGpheSkNCj4g
+PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsN
+Cj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBwYm9uemluaUBy
+ZWRoYXQuY29tOw0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBxdWludGVsYUByZWRoYXQuY29tOyBM
+aXVqaW5zb25nIChQYXVsKQ0KPiA8bGl1LmppbnNvbmdAaHVhd2VpLmNvbT47IGxpbmZlbmcgKE0p
+IDxsaW5mZW5nMjNAaHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpDQo+IDx3YW5neGlueGluLndhbmdA
+aHVhd2VpLmNvbT47IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNv
+bT4NCj4gU3ViamVjdDogUmU6IFJGQzogU3BsaXQgRVBUIGh1Z2UgcGFnZXMgaW4gYWR2YW5jZSBv
+ZiBkaXJ0eSBsb2dnaW5nDQo+IA0KPiBPbiBGcmksIEZlYiAyMSwgMjAyMCBhdCAyOjA4IFBNIEp1
+bmFpZCBTaGFoaWQgPGp1bmFpZHNAZ29vZ2xlLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiAyLzIw
+LzIwIDk6MzQgQU0sIEJlbiBHYXJkb24gd3JvdGU6DQo+ID4gPg0KPiA+ID4gRldJVywgd2UgY3Vy
+cmVudGx5IGRvIHRoaXMgZWFnZXIgc3BsaXR0aW5nIGF0IEdvb2dsZSBmb3IgbGl2ZQ0KPiA+ID4g
+bWlncmF0aW9uLiBXaGVuIHRoZSBsb2ctZGlydHktbWVtb3J5IGZsYWcgaXMgc2V0IG9uIGEgbWVt
+c2xvdCB3ZQ0KPiA+ID4gZWFnZXJseSBzcGxpdCBhbGwgcGFnZXMgaW4gdGhlIHNsb3QgZG93biB0
+byA0ayBncmFudWxhcml0eS4NCj4gPiA+IEFzIEpheSBzYWlkLCB0aGlzIGRvZXMgbm90IGNhdXNl
+IGNyaXBwbGluZyBsb2NrIGNvbnRlbnRpb24gYmVjYXVzZQ0KPiA+ID4gdGhlIHZDUFUgcGFnZSBm
+YXVsdHMgZ2VuZXJhdGVkIGJ5IHdyaXRlIHByb3RlY3Rpb24gLyBzcGxpdHRpbmcgY2FuDQo+ID4g
+PiBiZSByZXNvbHZlZCBpbiB0aGUgZmFzdCBwYWdlIGZhdWx0IHBhdGggd2l0aG91dCBhY3F1aXJp
+bmcgdGhlIE1NVSBsb2NrLg0KPiA+ID4gSSBiZWxpZXZlICtKdW5haWQgU2hhaGlkIHRyaWVkIHRv
+IHVwc3RyZWFtIHRoaXMgYXBwcm9hY2ggYXQgc29tZQ0KPiA+ID4gcG9pbnQgaW4gdGhlIHBhc3Qs
+IGJ1dCB0aGUgcGF0Y2ggc2V0IGRpZG4ndCBtYWtlIGl0IGluLiAoVGhpcyB3YXMNCj4gPiA+IGJl
+Zm9yZSBteSB0aW1lLCBzbyBJJ20gaG9waW5nIGhlIGhhcyBhIGxpbmsuKSBJIGhhdmVuJ3QgZG9u
+ZSB0aGUNCj4gPiA+IGFuYWx5c2lzIHRvIGtub3cgaWYgZWFnZXIgc3BsaXR0aW5nIGlzIG1vcmUg
+b3IgbGVzcyBlZmZpY2llbnQgd2l0aA0KPiA+ID4gcGFyYWxsZWwgc2xvdy1wYXRoIHBhZ2UgZmF1
+bHRzLCBidXQgaXQncyBkZWZpbml0ZWx5IGZhc3RlciB1bmRlciB0aGUNCj4gPiA+IE1NVSBsb2Nr
+Lg0KPiA+ID4NCj4gPg0KPiA+IEkgYW0gbm90IHN1cmUgaWYgd2UgZXZlciBwb3N0ZWQgdGhvc2Ug
+cGF0Y2hlcyB1cHN0cmVhbS4gUGV0ZXIgRmVpbmVyIHdvdWxkDQo+IGtub3cgZm9yIHN1cmUuIE9u
+ZSBub3RhYmxlIGRpZmZlcmVuY2UgaW4gd2hhdCB3ZSBkbyBjb21wYXJlZCB0byB0aGUgYXBwcm9h
+Y2gNCj4gb3V0bGluZWQgYnkgSmF5IGlzIHRoYXQgd2UgZG9uJ3QgcmVseSBvbiB0ZHBfcGFnZV9m
+YXVsdCgpIHRvIGRvIHRoZSBzcGxpdHRpbmcuIFNvDQo+IHdlIGRvbid0IGhhdmUgdG8gY3JlYXRl
+IGEgZHVtbXkgVkNQVSBhbmQgdGhlIHNwZWNpYWxpemVkIHNwbGl0IGZ1bmN0aW9uIGlzIGFsc28N
+Cj4gbXVjaCBmYXN0ZXIuDQoNCkknbSBjdXJpb3VzIGFuZCBpbnRlcmVzdGVkIGluIHRoZSB3YXkg
+eW91IGltcGxlbWVudGVkLCBlc3BlY2lhbGx5IHlvdSBtZW50aW9uZWQNCnRoYXQgdGhlIHBlcmZv
+cm1hbmNlIGlzIG11Y2ggZmFzdGVyIHdpdGhvdXQgYSBkdW1teSBWQ1BVLg0KDQo+IFdlJ3ZlIGJl
+ZW4gY2FycnlpbmcgdGhlc2UgcGF0Y2hlcyBzaW5jZSAyMDE1LiBJJ3ZlIG5ldmVyIHBvc3RlZCB0
+aGVtLg0KPiBHZXR0aW5nIHRoZW0gaW4gc2hhcGUgZm9yIHVwc3RyZWFtIGNvbnN1bXB0aW9uIHdp
+bGwgdGFrZSBzb21lIHdvcmsuIEkgY2FuDQo+IGxvb2sgaW50byB0aGlzIG5leHQgd2Vlay4NCg0K
+SXQgd2lsbCBiZSBuaWNlIGlmIHlvdSdyZSBnb2luZyB0byBwb3N0IGl0IHRvIHRoZSB1cHN0cmVh
+bS4NCg0KUmVnYXJkcywNCkpheSBaaG91DQoNCj4gDQo+IFBldGVyDQo=
 
