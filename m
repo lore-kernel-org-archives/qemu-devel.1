@@ -2,88 +2,96 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	SUBJ_ALL_CAPS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F320C35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF28C35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8BD20828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:37:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46E572072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S+ToiSGT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8BD20828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GZajhM+z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E572072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Cyx-0007rv-GC
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 07:37:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34008)
+	id 1j6D0r-0000qR-Ec
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 07:39:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j6CyK-0007Pv-1D
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:36:29 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j6D0I-0000OH-4i
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:38:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j6CyI-0007lS-IR
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:36:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50947
+ (envelope-from <pbonzini@redhat.com>) id 1j6D0G-0001E4-VV
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:38:30 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52324
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j6CyI-0007l8-EV
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:36:26 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j6D0G-0001Do-Rl
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:38:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582547785;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1582547908;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/sQKXA/vIJD8x4wO/9gpqU5mLEVmJZfQsa+odjyIjR4=;
- b=S+ToiSGT4VMWX/qOaXnPQN0P1vCuqOcAjcx86fvJYULobabRsPEI/D4y6kskDqopL7MoJE
- f4TSp5yFWiUVipQLQAHc+PdwXi17mWwOrWvMEFTFqzGlcobRp7p5oa+xriE0HTODO256yA
- NkrzxsQGhIdINLt+mi5M06kqdedCod0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-mOcV9FeWPJaVFOKfE3mbDw-1; Mon, 24 Feb 2020 07:36:14 -0500
-X-MC-Unique: mOcV9FeWPJaVFOKfE3mbDw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 970D718A6EC0;
- Mon, 24 Feb 2020 12:36:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A2A95C3FA;
- Mon, 24 Feb 2020 12:36:08 +0000 (UTC)
-Date: Mon, 24 Feb 2020 12:36:06 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: miaoyubo <miaoyubo@huawei.com>
-Subject: Re: [RFC 2/2] pci-expender-bus:Add pcie-root-port to pxb-pcie under
- arm.
-Message-ID: <20200224123606.GM635661@redhat.com>
-References: <20200213074952.544-1-miaoyubo@huawei.com>
- <20200213074952.544-3-miaoyubo@huawei.com>
- <20200213135145.GN594756@redhat.com>
- <3fc86f5a6aaf4c6f81dad4f25fcafda0@huawei.com>
- <20200214102451.GA613610@redhat.com>
- <8f977fbdd8e346ef911ebfe71dbb1514@huawei.com>
+ bh=J1xdIqZgcyicmxr19zD8cD2E2yjdMndIxpkiw5NHfEw=;
+ b=GZajhM+zRiBDCLO+UW28Y7Vr0Xb8j1oaCXF44p+knqS+kIzszLEiivETNMd0GlNrUTiUb3
+ wjp91TxhIuQgjTNh/+/5/lHZamkEdLSaXrm/EE8relC7um+sVc3iLIALmwlz+1rfF0Itej
+ 9hPSQcwYeKojf6wQK0cBBbonzPNLnJY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-308-ZPnVDLaHP7-Ra0MIENQABA-1; Mon, 24 Feb 2020 07:38:26 -0500
+X-MC-Unique: ZPnVDLaHP7-Ra0MIENQABA-1
+Received: by mail-wr1-f70.google.com with SMTP id p8so5537938wrw.5
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 04:38:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J1xdIqZgcyicmxr19zD8cD2E2yjdMndIxpkiw5NHfEw=;
+ b=DEgZ2X2lMY60pb3d0lwnZTQLhCwjkC82uhHfcmoFQdFCayaxY8B1nZuCXuRpwv8wd2
+ TSJju6L46GK2ywr94PQzpy0s7iDd5ptRtygGNtOTkn1G/GAOVVlZNlo7JEmDHGYhUP5X
+ O6TFTsoH/Ush7g3t+/mSwPE4WeFz3c1z0SVghLrAtwiE+6jRlbZcwTDxp+bZdinoaqXy
+ hYndIlG9530FdlFCR+D5z1zEcqvVhEGVqb1X3XgZkMOU6g1E3Spk23LMRTAGojkJTW2H
+ IrW2d0WG+U8qG+OusI5mXVwEq2HBXWviS4AzW6ElqlT+EuqwM/hTVfJFNS7WbmJJ0Dje
+ /6FQ==
+X-Gm-Message-State: APjAAAV2GeblggCL6RlbXWbqzb/TdQA8qHZ5Eq9wqBN6FtIdBFRUlwAQ
+ +iTPFcZgoNC5Dgttmipjgt0WPmSEMfVD+9hrIm6r0oIkRAFY7/tSEXDbcYKfMTpnlsBy3rRUvDV
+ gCU2JWo9ETkf91Jw=
+X-Received: by 2002:a1c:7315:: with SMTP id d21mr22155712wmb.186.1582547905355; 
+ Mon, 24 Feb 2020 04:38:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxtLDym9VVrck1zq118bXBDb16J948Ax0LHZpyHu/rbvJ6Ct4cpDF9JzwS+UMX6PpJKNhhKHg==
+X-Received: by 2002:a1c:7315:: with SMTP id d21mr22155699wmb.186.1582547905170; 
+ Mon, 24 Feb 2020 04:38:25 -0800 (PST)
+Received: from [192.168.178.40] ([151.21.175.179])
+ by smtp.gmail.com with ESMTPSA id d13sm19339747wrc.64.2020.02.24.04.38.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 24 Feb 2020 04:38:24 -0800 (PST)
+Subject: Re: [PATCH] MAINTAINERS: KVM/MIPS
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1582545058-31609-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dd3d5d1e-de57-7233-7d7a-109819701f8d@redhat.com>
+Date: Mon, 24 Feb 2020 13:38:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <8f977fbdd8e346ef911ebfe71dbb1514@huawei.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <1582545058-31609-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,107 +103,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: James Hogan <jhogan@kernel.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Feb 15, 2020 at 08:59:28AM +0000, miaoyubo wrote:
->=20
-> > -----Original Message-----
-> > From: Daniel P. Berrang=C3=A9 [mailto:berrange@redhat.com]
-> > Sent: Friday, February 14, 2020 6:25 PM
-> > To: miaoyubo <miaoyubo@huawei.com>
-> > Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> > imammedo@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
-> > <xiexiangyou@huawei.com>; mst@redhat.com
-> > Subject: Re: [RFC 2/2] pci-expender-bus:Add pcie-root-port to pxb-pcie =
-under
-> > arm.
-> >=20
-> > On Fri, Feb 14, 2020 at 07:25:43AM +0000, miaoyubo wrote:
-> > >
-> > > > -----Original Message-----
-> > > > From: Daniel P. Berrang=C3=A9 [mailto:berrange@redhat.com]
-> > > > Sent: Thursday, February 13, 2020 9:52 PM
-> > > > To: miaoyubo <miaoyubo@huawei.com>
-> > > > Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> > > > imammedo@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
-> > > > <xiexiangyou@huawei.com>; mst@redhat.com
-> > > > Subject: Re: [RFC 2/2] pci-expender-bus:Add pcie-root-port to
-> > > > pxb-pcie under arm.
-> > > >
-> > > > On Thu, Feb 13, 2020 at 03:49:52PM +0800, Yubo Miao wrote:
-> > > > > From: miaoyubo <miaoyubo@huawei.com>
-> > > > >
-> > > > > Since devices could not directly plugged into pxb-pcie, under arm=
-,
-> > > > > one pcie-root port is plugged into pxb-pcie. Due to the bus for
-> > > > > each pxb-pcie is defined as 2 in acpi dsdt tables(one for
-> > > > > pxb-pcie, one for pcie-root-port), only one device could be plugg=
-ed into
-> > one pxb-pcie.
-> > > >
-> > > > What is the cause of this arm specific requirement for pxb-pcie and
-> > > > more importantly can be fix it so that we don't need this patch ?
-> > > > I think it is highly undesirable to have such a per-arch difference
-> > > > in configuration of the pxb-pcie device. It means any mgmt app whic=
-h
-> > > > already supports pxb-pcie will be broken and need to special case a=
-rm.
-> > > >
-> > >
-> > > Thanks for your reply, Without this patch, the pxb-pcie is also
-> > > useable, however, one extra pcie-root-port or pci-bridge or something
-> > > else need to be defined by mgmt. app. This patch will could be abando=
-ned.
-> >=20
-> > That's not really answering my question. IIUC, this pxb-pcie device wor=
-ks fine
-> > on x86_64, and I want to know why it doesn't work on arm ?
-> > Requiring different setups by the mgmt apps is not at all nice because =
-it will
-> > inevitably lead to broken arm setups. x86_64 gets far more testing & us=
-age,
-> > developers won't realize arm is different.
-> >=20
-> >
->=20
-> Thanks for replying. Currently, on x86_64, pxb-pcie devices is presented
-> in acpi tables but on arm, It is not, only one main host bridge is
-> presented for arm in acpi dsdt tables. That's why pxb-pcie works on
-> x86_64 but doesn't work on arm. The patch 1/2 do the work to present
-> and allocate resources for pxb-pcie in arm.
+On 24/02/20 12:50, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> This patch is just a follow up to James' wish to be releived
+> of QEMU KVM/MIPS mainatainer duties. Many thanks to James for
+> his substantial contributions to QEMU for MIPS made over many
+> years, and not only in KVM area.
+> 
+> CC: James Hogan <jhogan@kernel.org>
+> CC: Christian Borntraeger <borntraeger@de.ibm.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Aleksandar Markovic (1):
+>   MAINTAINERS: Reactivate MIPS KVM CPUs
+> 
+>  MAINTAINERS | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
 
-Yes, this first patch makes sense
-
-> For x86_64, if one device is going to be plugged into pxb-pcie, one
-> extra pcie-root-port or pci-bridge have to be defined and plugged on
-> pxb-pcie, then the device is plugged on the pcie-root-port or pci-bridge.
-
-> This patch 2/2 just auto defined one pcie-root-port for arm. If this
-> patch abandoned, the usage of pxb-pcie would be the same with x86_64,
-> therefore, to keep the same step for x86 and arm, this patch 2/2 could
-> be abandonded.
-
-Yes, I think abandoning this patch 2 is best. Applications that know
-how to use pxb-pcie on x86_64, will already do the right thing on
-arm too, once your first patch is merged.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
