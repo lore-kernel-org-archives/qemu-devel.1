@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C7FC38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7798AC38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 962D8218AC
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:25:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41B4B218AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="z+i7Lu4Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 962D8218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kvIchio4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B4B218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6LEJ-0005a6-NF
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:25:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51068)
+	id 1j6LEU-00065K-JZ
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:25:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6Kn4-0000AA-IM
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:23 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmn-0007pM-BF
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6Kn3-0004BW-45
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:22 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:45512)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmm-0003wQ-2k
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:05 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45050)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6Kn2-0004Aq-RZ
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:21 -0500
+ id 1j6Kml-0003vM-Ps
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:04 -0500
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrXG9032136;
- Mon, 24 Feb 2020 20:57:15 GMT
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrQVM032081;
+ Mon, 24 Feb 2020 20:56:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=gmyHrbZBFH56LM7a/G7epr+zPv1pFhtt2NM9agSpkqY=;
- b=z+i7Lu4QvzoowhqpGlSQRE6dIH3/kwSm4xpz/JumZPZ6pvJslB87/q7gaIS20zFi8ULO
- y+MTAJHPjka78wLLI+d/r4WVKOVVQyADIY+S7holi1UgrHmAegOQProCTyfyZish5lZT
- ynyB4S4H4XjoXXzC04DfUdV40lxhy+thvRDmstLkgtwVST/0mFcYP31wXwYmg6VpInbL
- gizD4JojC4zk9HVQpxTkOfhaRIBdR9MjhlLtTwoBW7egBlDaVYT05pTGY0KCTadHOEFI
- cXZOZsXyaCKojWc3c6HsoHauRhMr03geQ9E1UgTZrXXikthedm5hW6sBENXaOdouc0AT Bw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 2yauqua0sc-1
+ bh=kNFIpLb5KqA13nmBN7fGm+89ZBH0qWuchoDbUdd84xU=;
+ b=kvIchio4+AHvgs6csXqgac69kxcaowpGanOObtQ5ZKE86G/qqUkw2c6I/pkTD5f2pxKR
+ UHYSc9Mf1TN++KV24uSvG12lv1oKLZ2VtEYHiUHeIwniQkizQAXlNWwDPdThLQ2+aU07
+ LX/qB9YO2r5sOYLJtRdJoUOJCGiL6QL+FezxfysQwmJYvC6/CjeJQnxyPp7drwxNbgdu
+ hEN7OaiqFQo+bX9Nj+EB1qM+H4tcNJ+BtZZg+vNF264my3ovsisA9onjrpB8jk1N5at8
+ n8LT+eK846BfHrJuzAppk67PKqoLv5QN4Q7m272SIaq4nH/VHnsOU37sezgsEVyk0bYl bA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2yauqua0q5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:57:15 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKq65G108991;
- Mon, 24 Feb 2020 20:57:15 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 2ybe123v5j-1
+ Mon, 24 Feb 2020 20:56:58 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKufLC073328;
+ Mon, 24 Feb 2020 20:56:57 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 2ybduv6dnr-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:57:15 +0000
+ Mon, 24 Feb 2020 20:56:57 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKvEYT009858;
- Mon, 24 Feb 2020 20:57:14 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKutDM030075;
+ Mon, 24 Feb 2020 20:56:55 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:57:13 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:56:55 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 50/50] multi-process: add configure and usage information
-Date: Mon, 24 Feb 2020 15:55:41 -0500
-Message-Id: <bbba8cdef9f876ec6d194f3e1974347860eca732.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 38/50] multi-process/mon: Initialize QMP module for remote
+ processes
+Date: Mon, 24 Feb 2020 15:55:29 -0500
+Message-Id: <5dde2ceee2e0867302b411857baaa3b6d99668e6.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
@@ -78,11 +79,11 @@ In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- suspectscore=1 malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=1
+ mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240154
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
@@ -116,108 +117,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- docs/qemu-multiprocess.txt | 86 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
- create mode 100644 docs/qemu-multiprocess.txt
+ remote/remote-main.c | 11 +++++++++++
+ remote/remote-opts.c | 10 ++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/docs/qemu-multiprocess.txt b/docs/qemu-multiprocess.txt
-new file mode 100644
-index 0000000..f156177
---- /dev/null
-+++ b/docs/qemu-multiprocess.txt
-@@ -0,0 +1,86 @@
-+Multi-process QEMU
-+==================
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 23fc0df..58d9905 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -56,6 +56,7 @@
+ #include "monitor/monitor.h"
+ #include "chardev/char.h"
+ #include "sysemu/reset.h"
++#include "vl.h"
+ 
+ static MPQemuLinkState *mpqemu_link;
+ 
+@@ -436,6 +437,8 @@ int main(int argc, char *argv[])
+ 
+     module_call_init(MODULE_INIT_QOM);
+ 
++    monitor_init_globals();
 +
-+This document describes how to configure and use multi-process qemu.
-+For the design document refer to docs/devel/qemu-multiprocess.
+     bdrv_init_with_whitelist();
+ 
+     if (qemu_init_main_loop(&err)) {
+@@ -453,6 +456,8 @@ int main(int argc, char *argv[])
+ 
+     qemu_add_opts(&qemu_device_opts);
+     qemu_add_opts(&qemu_drive_opts);
++    qemu_add_opts(&qemu_chardev_opts);
++    qemu_add_opts(&qemu_mon_opts);
+     qemu_add_drive_opts(&qemu_legacy_drive_opts);
+     qemu_add_drive_opts(&qemu_common_drive_opts);
+     qemu_add_drive_opts(&qemu_drive_opts);
+@@ -483,6 +488,12 @@ int main(int argc, char *argv[])
+ 
+     mpqemu_link_set_callback(mpqemu_link, process_msg);
+ 
++    qemu_opts_foreach(qemu_find_opts("chardev"),
++                      chardev_init_func, NULL, &error_fatal);
 +
-+1) Configuration
-+----------------
++    qemu_opts_foreach(qemu_find_opts("mon"),
++                      mon_init_func, NULL, &error_fatal);
 +
-+To enable support for multi-process add --enable-mpqemu
-+to the list of options for the "configure" script.
-+
-+
-+2) Usage
-+--------
-+
-+To start qemu with devices intended to run in a separate emulation
-+process without libvirtd support, the following should be used on QEMU
-+command line. As of now, we only support the emulation of lsi53c895a
-+in a separate process
-+
-+* Since parts of the RAM are shared between QEMU & remote process, a
-+  memory-backend-file is required to facilitate this, as follows:
-+
-+  -object memory-backend-file,id=mem,mem-path=/dev/shm/,size=4096M,share=on
-+
-+* The devices to be emulated in the separate process are defined as
-+  before with addition of "rid" suboption that serves as a remote group
-+  identificator.
-+
-+  -device <device options>,rid="remote process id"
-+
-+  For example, for non multi-process qemu:
-+    -device lsi53c895a,id=scsi0 device
-+    -device scsi-hd,drive=drive0,bus=scsi0.0,scsi-id=0
-+    -drive id=drive0,file=data-disk.img
-+
-+  and for multi-process qemu and no libvirt
-+  support (i.e. QEMU forks child processes):
-+    -device lsi53c895a,id=scsi0,rid=0
-+    -device scsi-hd,drive=drive0,bus=scsi0.0,scsi-id=0,rid=0
-+
-+* The command-line options for the remote process are added to the "command"
-+  suboption of the newly added "-remote" option. 
-+
-+   -remote [socket],rid=0,exec="...",command="..."
-+
-+  The drives to be emulated by the remote process are specified as part of
-+  this command sub-option. The device to be used to connect to the monitor
-+  is also specified as part of this suboption.
-+
-+  For example, the following option adds a drive and monitor to the remote
-+  process:
-+  -remote rid=0,exec="qemu-scsi-dev",command="-drive id=drive0,,file=data-disk.img -monitor unix:/home/qmp-sock,,server,,nowait"
-+
-+  Note: There's an issue with this "command" sub-option which we are in the
-+  process of fixing. To work around this issue, it requires additional
-+  "comma" characters as illustrated above, and in the example below.
-+
-+* Example QEMU command-line to launch lsi53c895a in a remote process
-+
-+  #/bin/sh
-+  qemu-system-x86_64 \
-+  -name "OL7.4" \
-+  -machine q35,accel=kvm \
-+  -smp sockets=1,cores=1,threads=1 \
-+  -cpu host \
-+  -m 2048 \
-+  -object memory-backend-file,id=mem,mem-path=/dev/shm/,size=2G,share=on \
-+  -numa node,memdev=mem \
-+  -device virtio-scsi-pci,id=virtio_scsi_pci0 \
-+  -drive id=drive_image1,if=none,format=raw,file=/root/ol7.qcow2 \
-+  -device scsi-hd,id=image1,drive=drive_image1,bus=virtio_scsi_pci0.0 \
-+  -boot d \
-+  -monitor stdio \
-+  -vnc :0 \
-+  -device lsi53c895a,id=lsi0,remote,rid=8,command="qemu-scsi-dev" \
-+  -device scsi-hd,id=drive2,drive=drive_image2,bus=lsi0.0,scsi-id=0,remote,rid=8,command="qemu-scsi-dev"\
-+  -remote rid=8,exec="qemu-scsi-dev",command="-drive id=drive_image2,,file=/root/remote-process-disk.img -monitor unix:/home/qmp-sock,,server,,nowait"
-+
-+  We could connect to the monitor using the following command:
-+  socat /home/qmp-sock stdio
-+
-+  After hotplugging disks to the remote process, please execute the
-+  following command in the guest to refresh the list of storage devices:
-+  rescan_scsi_bus.sh -a
+     mpqemu_start_coms(mpqemu_link);
+ 
+     return 0;
+diff --git a/remote/remote-opts.c b/remote/remote-opts.c
+index 565e641..e22ad5c 100644
+--- a/remote/remote-opts.c
++++ b/remote/remote-opts.c
+@@ -82,6 +82,16 @@ void parse_cmdline(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_qmp:
++                monitor_parse(optarg, "control", false);
++                break;
++            case QEMU_OPTION_monitor:
++                if (!strncmp(optarg, "stdio", 5)) {
++                    warn_report("STDIO not supported in remote process");
++                } else if (strncmp(optarg, "none", 4)) {
++                    monitor_parse(optarg, "readline", false);
++                }
++                break;
+             default:
+                 break;
+             }
 -- 
 1.8.3.1
 
