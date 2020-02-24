@@ -2,74 +2,61 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD658C35670
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B2AC35677
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 955C420675
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:08:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955C420675
+	by mail.kernel.org (Postfix) with ESMTPS id 3006620836
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 01:13:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3006620836
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j62Ep-0007hz-L0
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 20:08:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46170)
+	id 1j62Iy-0000bC-74
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 20:13:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jianjay.zhou@huawei.com>) id 1j62EC-0007Fr-09
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:09 -0500
+ (envelope-from <zhukeqian1@huawei.com>) id 1j62IJ-0008UD-Bf
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jianjay.zhou@huawei.com>) id 1j62EA-0004CX-Kn
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:07 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2448 helo=huawei.com)
+ (envelope-from <zhukeqian1@huawei.com>) id 1j62II-00005z-9D
+ for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:12:23 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:54138 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
- id 1j62EA-00047D-Aa
- for qemu-devel@nongnu.org; Sun, 23 Feb 2020 20:08:06 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 43B0C58324CD8F3D7D0C;
- Mon, 24 Feb 2020 09:07:55 +0800 (CST)
-Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Mon, 24 Feb 2020 09:07:54 +0800
-Received: from DGGEMM508-MBX.china.huawei.com ([169.254.2.45]) by
- dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
- Mon, 24 Feb 2020 09:07:47 +0800
-From: "Zhoujian (jay)" <jianjay.zhou@huawei.com>
-To: Peter Feiner <pfeiner@google.com>, Junaid Shahid <junaids@google.com>
-Subject: RE: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Topic: RFC: Split EPT huge pages in advance of dirty logging
-Thread-Index: AdXmU97BvyK5YKoyS5++my9GnvXVk///1+yA//428yCAA1S3gP/+abuggAMs8gCAAd62AIAAJJ4A//xJ+gA=
-Date: Mon, 24 Feb 2020 01:07:47 +0000
-Message-ID: <B2D15215269B544CADD246097EACE7474BB18354@dggemm508-mbx.china.huawei.com>
-References: <B2D15215269B544CADD246097EACE7474BAF9AB6@DGGEMM528-MBX.china.huawei.com>
- <20200218174311.GE1408806@xz-x1>
- <B2D15215269B544CADD246097EACE7474BAFF835@DGGEMM528-MBX.china.huawei.com>
- <20200219171919.GA34517@xz-x1>
- <B2D15215269B544CADD246097EACE7474BB03772@DGGEMM528-MBX.china.huawei.com>
- <CANgfPd-P_=GqcMiwLSSkUhZDt42aMLUsCJt+CPdUN5yR3RLHmQ@mail.gmail.com>
- <cd4626a1-44b5-1a62-cf4b-716950a6db1b@google.com>
- <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
-In-Reply-To: <CAM3pwhGF3ABoew5UOd9xUxtm14VN_o0gr+D=KfR3ZEQjmKgUdQ@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.228.206]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <zhukeqian1@huawei.com>)
+ id 1j62IE-0008Pe-2R; Sun, 23 Feb 2020 20:12:18 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 8A27BEAEE350FBB22DA4;
+ Mon, 24 Feb 2020 09:12:09 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.230) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0;
+ Mon, 24 Feb 2020 09:11:44 +0800
+Subject: Re: [PATCH] migration/throttle: Add throttle-trig-thres migration
+ parameter
+To: Eric Blake <eblake@redhat.com>, <qemu-devel@nongnu.org>
+References: <20200221025727.63808-1-zhukeqian1@huawei.com>
+ <2db47b97-729f-4ccb-dab2-585771acc2fe@redhat.com>
+From: zhukeqian <zhukeqian1@huawei.com>
+Message-ID: <96ff3eed-2baf-9ea4-99cd-9d8b8884ae78@huawei.com>
+Date: Mon, 24 Feb 2020 09:11:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <2db47b97-729f-4ccb-dab2-585771acc2fe@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.221.230]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.187
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,59 +68,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Liujinsong \(Paul\)" <liu.jinsong@huawei.com>,
- "linfeng \(M\)" <linfeng23@huawei.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, Ben Gardon <bgardon@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>
+Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgRmVpbmVyIFtt
-YWlsdG86cGZlaW5lckBnb29nbGUuY29tXQ0KPiBTZW50OiBTYXR1cmRheSwgRmVicnVhcnkgMjIs
-IDIwMjAgODoxOSBBTQ0KPiBUbzogSnVuYWlkIFNoYWhpZCA8anVuYWlkc0Bnb29nbGUuY29tPg0K
-PiBDYzogQmVuIEdhcmRvbiA8YmdhcmRvbkBnb29nbGUuY29tPjsgWmhvdWppYW4gKGpheSkNCj4g
-PGppYW5qYXkuemhvdUBodWF3ZWkuY29tPjsgUGV0ZXIgWHUgPHBldGVyeEByZWRoYXQuY29tPjsN
-Cj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBwYm9uemluaUBy
-ZWRoYXQuY29tOw0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBxdWludGVsYUByZWRoYXQuY29tOyBM
-aXVqaW5zb25nIChQYXVsKQ0KPiA8bGl1LmppbnNvbmdAaHVhd2VpLmNvbT47IGxpbmZlbmcgKE0p
-IDxsaW5mZW5nMjNAaHVhd2VpLmNvbT47IHdhbmd4aW4gKFUpDQo+IDx3YW5neGlueGluLndhbmdA
-aHVhd2VpLmNvbT47IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNv
-bT4NCj4gU3ViamVjdDogUmU6IFJGQzogU3BsaXQgRVBUIGh1Z2UgcGFnZXMgaW4gYWR2YW5jZSBv
-ZiBkaXJ0eSBsb2dnaW5nDQo+IA0KPiBPbiBGcmksIEZlYiAyMSwgMjAyMCBhdCAyOjA4IFBNIEp1
-bmFpZCBTaGFoaWQgPGp1bmFpZHNAZ29vZ2xlLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBPbiAyLzIw
-LzIwIDk6MzQgQU0sIEJlbiBHYXJkb24gd3JvdGU6DQo+ID4gPg0KPiA+ID4gRldJVywgd2UgY3Vy
-cmVudGx5IGRvIHRoaXMgZWFnZXIgc3BsaXR0aW5nIGF0IEdvb2dsZSBmb3IgbGl2ZQ0KPiA+ID4g
-bWlncmF0aW9uLiBXaGVuIHRoZSBsb2ctZGlydHktbWVtb3J5IGZsYWcgaXMgc2V0IG9uIGEgbWVt
-c2xvdCB3ZQ0KPiA+ID4gZWFnZXJseSBzcGxpdCBhbGwgcGFnZXMgaW4gdGhlIHNsb3QgZG93biB0
-byA0ayBncmFudWxhcml0eS4NCj4gPiA+IEFzIEpheSBzYWlkLCB0aGlzIGRvZXMgbm90IGNhdXNl
-IGNyaXBwbGluZyBsb2NrIGNvbnRlbnRpb24gYmVjYXVzZQ0KPiA+ID4gdGhlIHZDUFUgcGFnZSBm
-YXVsdHMgZ2VuZXJhdGVkIGJ5IHdyaXRlIHByb3RlY3Rpb24gLyBzcGxpdHRpbmcgY2FuDQo+ID4g
-PiBiZSByZXNvbHZlZCBpbiB0aGUgZmFzdCBwYWdlIGZhdWx0IHBhdGggd2l0aG91dCBhY3F1aXJp
-bmcgdGhlIE1NVSBsb2NrLg0KPiA+ID4gSSBiZWxpZXZlICtKdW5haWQgU2hhaGlkIHRyaWVkIHRv
-IHVwc3RyZWFtIHRoaXMgYXBwcm9hY2ggYXQgc29tZQ0KPiA+ID4gcG9pbnQgaW4gdGhlIHBhc3Qs
-IGJ1dCB0aGUgcGF0Y2ggc2V0IGRpZG4ndCBtYWtlIGl0IGluLiAoVGhpcyB3YXMNCj4gPiA+IGJl
-Zm9yZSBteSB0aW1lLCBzbyBJJ20gaG9waW5nIGhlIGhhcyBhIGxpbmsuKSBJIGhhdmVuJ3QgZG9u
-ZSB0aGUNCj4gPiA+IGFuYWx5c2lzIHRvIGtub3cgaWYgZWFnZXIgc3BsaXR0aW5nIGlzIG1vcmUg
-b3IgbGVzcyBlZmZpY2llbnQgd2l0aA0KPiA+ID4gcGFyYWxsZWwgc2xvdy1wYXRoIHBhZ2UgZmF1
-bHRzLCBidXQgaXQncyBkZWZpbml0ZWx5IGZhc3RlciB1bmRlciB0aGUNCj4gPiA+IE1NVSBsb2Nr
-Lg0KPiA+ID4NCj4gPg0KPiA+IEkgYW0gbm90IHN1cmUgaWYgd2UgZXZlciBwb3N0ZWQgdGhvc2Ug
-cGF0Y2hlcyB1cHN0cmVhbS4gUGV0ZXIgRmVpbmVyIHdvdWxkDQo+IGtub3cgZm9yIHN1cmUuIE9u
-ZSBub3RhYmxlIGRpZmZlcmVuY2UgaW4gd2hhdCB3ZSBkbyBjb21wYXJlZCB0byB0aGUgYXBwcm9h
-Y2gNCj4gb3V0bGluZWQgYnkgSmF5IGlzIHRoYXQgd2UgZG9uJ3QgcmVseSBvbiB0ZHBfcGFnZV9m
-YXVsdCgpIHRvIGRvIHRoZSBzcGxpdHRpbmcuIFNvDQo+IHdlIGRvbid0IGhhdmUgdG8gY3JlYXRl
-IGEgZHVtbXkgVkNQVSBhbmQgdGhlIHNwZWNpYWxpemVkIHNwbGl0IGZ1bmN0aW9uIGlzIGFsc28N
-Cj4gbXVjaCBmYXN0ZXIuDQoNCkknbSBjdXJpb3VzIGFuZCBpbnRlcmVzdGVkIGluIHRoZSB3YXkg
-eW91IGltcGxlbWVudGVkLCBlc3BlY2lhbGx5IHlvdSBtZW50aW9uZWQNCnRoYXQgdGhlIHBlcmZv
-cm1hbmNlIGlzIG11Y2ggZmFzdGVyIHdpdGhvdXQgYSBkdW1teSBWQ1BVLg0KDQo+IFdlJ3ZlIGJl
-ZW4gY2FycnlpbmcgdGhlc2UgcGF0Y2hlcyBzaW5jZSAyMDE1LiBJJ3ZlIG5ldmVyIHBvc3RlZCB0
-aGVtLg0KPiBHZXR0aW5nIHRoZW0gaW4gc2hhcGUgZm9yIHVwc3RyZWFtIGNvbnN1bXB0aW9uIHdp
-bGwgdGFrZSBzb21lIHdvcmsuIEkgY2FuDQo+IGxvb2sgaW50byB0aGlzIG5leHQgd2Vlay4NCg0K
-SXQgd2lsbCBiZSBuaWNlIGlmIHlvdSdyZSBnb2luZyB0byBwb3N0IGl0IHRvIHRoZSB1cHN0cmVh
-bS4NCg0KUmVnYXJkcywNCkpheSBaaG91DQoNCj4gDQo+IFBldGVyDQo=
+Hi, Eric
+
+On 2020/2/21 22:14, Eric Blake wrote:
+> On 2/20/20 8:57 PM, Keqian Zhu wrote:
+>> Currently, if the bytes_dirty_period is more than the 50% of
+>> bytes_xfer_period, we start or increase throttling.
+>>
+>> If we make this percentage higher, then we can tolerate higher
+>> dirty rate during migration, which means less impact on guest.
+>> The side effect of higher percentage is longer migration time.
+>>
+>> We can configure this parameter to switch between migration time
+>> firt or guest performance first. The default value is 50.
+>>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>> Cc: Juan Quintela <quintela@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Eric Blake <eblake@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>> ---
+> 
+>> +++ b/qapi/migration.json
+>> @@ -524,6 +524,10 @@
+>>   #                      compression, so set the decompress-threads to the number about 1/4
+>>   #                      of compress-threads is adequate.
+>>   #
+>> +# @throttle-trig-thres: The ratio of bytes_dirty_period and bytes_xfer_period to
+>> +#                       trigger throttling. It is expressed as percentage. The
+>> +#                       default value is 50. (Since 5.0)
+>> +#
+> 
+> Abbreviating feels odd; can you please spell this out as throttle-trigger-threshold?
+OK, I will use full name in v2.
+> 
+> Can the threshold exceed 100%?
+If the threshold exceed 100% and the dirty rate is between 100% and threshold, then throttling
+will not be started, so the migration will not converge and last an uncertain time until the workload
+in guest is down by itself. So I think that the threshold exceed 100% maybe not suitable :).
+> 
+
+Thanks.
+Keqian
+
 
