@@ -2,88 +2,69 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4360BC38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C3DC38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEDB22176D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:32:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v6587C+n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEDB22176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9AF9E2176D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF9E2176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6MGq-0003gd-2N
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 17:32:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38055)
+	id 1j6MH9-0004Oi-PM
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 17:32:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j6M7t-0004lF-T8
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:59 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j6M9T-00084V-An
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j6M7s-0005yC-6l
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:57 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46458)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j6M7r-0005xb-Vj
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:56 -0500
-Received: by mail-pl1-x643.google.com with SMTP id y8so4607982pll.13
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:22:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=UjJ9iZKHSouFYZlDrlpMHjdteZRncNwvhF4XGeCLWsY=;
- b=v6587C+nZ28pjxxCIAVJ4LI3tsgys+6pFrwhEJSb6vYV7gLZeXAHDEwUXdZe2TDkyE
- C4xNY32wTN5M9/i1N6MjlN+LXLR6QVt5hxks8T2YiHDinvyG3RhHHRYCcEydSbrlHUWS
- KNJ83G5bGZxIsu0Nq4VEGK2y4MzEwoMm2Y1TYCgfKRhw0hsPq4RMPouuL1WiEwrOaB1T
- mftxYmIDk0X1gxYVvu4IKeAQaIPUc8Vt8smiYXBZN7hUvyxCKtpidMZ239zaLcafk9xM
- PJdFAIfoW3BrHak2XsL3tSc7yGx5yeOtG7bvrmovAJI1ci8Ohvo6T2hoCrt3aCOoJKU7
- PVPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UjJ9iZKHSouFYZlDrlpMHjdteZRncNwvhF4XGeCLWsY=;
- b=kqk4+8Ckgm386ILRCIOXKSxcf0l3G4X29pmUfhiBqB6qmePWnL2V7V4bJcNOi7Hjkm
- svSfJFQbelpE5Z0hRdQStD7tHHsuHHqdAPycvYobSWyIY6XgcTBCwgE5HCj9q7EheSQY
- EirArhYFfCEkhc83q2OaZV68GJ1IB8EB5G5Ki4xROiMxKQCE1BKWeALQ0TVpjUgMcXSx
- 7zvKixtGrb2vkCInHnSmyR8/RMQKx59Luv/DTX3NK6+Mj7TKYTFsVuJAyWy1alHkLk+c
- u3kxGfDB9pbDyEHH0SzyxwKKEeTQvvwO8KqxpsJSvYQ/6j/uZXS+Yqgrl1bF+eLYqui+
- iURQ==
-X-Gm-Message-State: APjAAAV3uP8MX2NGWEhoL2HJphjW+CxeGcBZ3PODfFfe9dGmJAIN2uX0
- GnEXlTGfzVBy6faxWosDwWmQazqDbks=
-X-Google-Smtp-Source: APXvYqyjY63fn3H9ciiZhl3vypKBSQZJ3UW48VZXvMc60nj1kvaiM1tZmmLUFPCbYKtAfolb2vFsiw==
-X-Received: by 2002:a17:90a:db0f:: with SMTP id
- g15mr1404254pjv.40.1582582974177; 
- Mon, 24 Feb 2020 14:22:54 -0800 (PST)
-Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
- [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id o6sm13897097pgg.37.2020.02.24.14.22.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Feb 2020 14:22:53 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/17] target/arm: Add formats for some vfp 2 and
- 3-register insns
-Date: Mon, 24 Feb 2020 14:22:30 -0800
-Message-Id: <20200224222232.13807-16-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200224222232.13807-1-richard.henderson@linaro.org>
-References: <20200224222232.13807-1-richard.henderson@linaro.org>
+ (envelope-from <no-reply@patchew.org>) id 1j6M9R-0006rd-Pq
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:24:35 -0500
+Resent-Date: Mon, 24 Feb 2020 17:24:35 -0500
+Resent-Message-Id: <E1j6M9R-0006rd-Pq@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21134)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j6M9R-0006rA-H5
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:24:33 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582583041; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=hsFphQXb7NH731LDW7ujqIVwgWHi5miUG6lUvh8eL/X9G8Bukd94cKurGHVcGZueD62SPXgQv4reTH7wDuwabDJyG5R8NFFNuoXCKceNz5Cn5SjRxClqDnWBirGMXo8R4cjz46aS4ZFYfMCaHSqRjEGC1xzsP2Z3FG1bZ/R7eQ8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582583041;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=VBKsFD0Apr5oa5Hkh90ApPqAcwCadgXyRXCodB4lou0=; 
+ b=hg18dExzNEqo6JKguDcAWt0MFZi0imbHRMuWSzig4n01uWNtgBWhf/T7Zw3xF96pLn7KDBe+bpCBdj2W9zj3aPLhdYgE6L079bz6Lfo44kTLRDp6Xs+ycEG1bd91bx/IKo3zn5bbLzZeZewBVKsiIwqnCMupbJGm0+5hlAnMhuc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582583038206170.36458632506879;
+ Mon, 24 Feb 2020 14:23:58 -0800 (PST)
+In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
+Subject: Re: [PATCH v5 00/50] Initial support for multi-process qemu
+Message-ID: <158258303525.10132.16101667667220110836@a1bbccc8075a>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jag.raman@oracle.com
+Date: Mon, 24 Feb 2020 14:23:58 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,224 +76,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ jag.raman@oracle.com, quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Those vfp instructions without extra opcode fields can
-share a common @format for brevity.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/vfp.decode | 134 ++++++++++++++++--------------------------
- 1 file changed, 52 insertions(+), 82 deletions(-)
-
-diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 592fe9e1e4..4f294f88be 100644
---- a/target/arm/vfp.decode
-+++ b/target/arm/vfp.decode
-@@ -46,6 +46,14 @@
- 
- %vmov_imm 16:4 0:4
- 
-+@vfp_dnm_s   ................................ vm=%vm_sp vn=%vn_sp vd=%vd_sp
-+@vfp_dnm_d   ................................ vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+
-+@vfp_dm_ss   ................................ vm=%vm_sp vd=%vd_sp
-+@vfp_dm_dd   ................................ vm=%vm_dp vd=%vd_dp
-+@vfp_dm_ds   ................................ vm=%vm_sp vd=%vd_dp
-+@vfp_dm_sd   ................................ vm=%vm_dp vd=%vd_sp
-+
- # VMOV scalar to general-purpose register; note that this does
- # include some Neon cases.
- VMOV_to_gp   ---- 1110 u:1 1.        1 .... rt:4 1011 ... 1 0000 \
-@@ -66,20 +74,15 @@ VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
-              vn=%vn_dp
- 
- VMSR_VMRS    ---- 1110 111 l:1 reg:4 rt:4 1010 0001 0000
--VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000 \
--             vn=%vn_sp
-+VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000    vn=%vn_sp
- 
--VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 .... \
--             vm=%vm_sp
--VMOV_64_dp   ---- 1100 010 op:1 rt2:4 rt:4 1011 00.1 .... \
--             vm=%vm_dp
-+VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 ....   vm=%vm_sp
-+VMOV_64_dp   ---- 1100 010 op:1 rt2:4 rt:4 1011 00.1 ....   vm=%vm_dp
- 
- # Note that the half-precision variants of VLDR and VSTR are
- # not part of this decodetree at all because they have bits [9:8] == 0b01
--VLDR_VSTR_sp ---- 1101 u:1 .0 l:1 rn:4 .... 1010 imm:8 \
--             vd=%vd_sp
--VLDR_VSTR_dp ---- 1101 u:1 .0 l:1 rn:4 .... 1011 imm:8 \
--             vd=%vd_dp
-+VLDR_VSTR_sp ---- 1101 u:1 .0 l:1 rn:4 .... 1010 imm:8      vd=%vd_sp
-+VLDR_VSTR_dp ---- 1101 u:1 .0 l:1 rn:4 .... 1011 imm:8      vd=%vd_dp
- 
- # We split the load/store multiple up into two patterns to avoid
- # overlap with other insns in the "Advanced SIMD load/store and 64-bit move"
-@@ -100,50 +103,32 @@ VLDM_VSTM_dp ---- 1101 0.1 l:1 rn:4 .... 1011 imm:8 \
-              vd=%vd_dp p=1 u=0 w=1
- 
- # 3-register VFP data-processing; bits [23,21:20,6] identify the operation.
--VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VMLS_sp      ---- 1110 0.00 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMLS_dp      ---- 1110 0.00 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMLS_sp      ---- 1110 0.00 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VMLS_dp      ---- 1110 0.00 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VNMLS_sp     ---- 1110 0.01 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMLS_dp     ---- 1110 0.01 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMLS_sp     ---- 1110 0.01 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VNMLS_dp     ---- 1110 0.01 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VNMLA_sp     ---- 1110 0.01 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMLA_dp     ---- 1110 0.01 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMLA_sp     ---- 1110 0.01 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VNMLA_dp     ---- 1110 0.01 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VMUL_sp      ---- 1110 0.10 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMUL_dp      ---- 1110 0.10 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMUL_sp      ---- 1110 0.10 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VMUL_dp      ---- 1110 0.10 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VNMUL_sp     ---- 1110 0.10 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMUL_dp     ---- 1110 0.10 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMUL_sp     ---- 1110 0.10 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VNMUL_dp     ---- 1110 0.10 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VADD_sp      ---- 1110 0.11 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VADD_dp      ---- 1110 0.11 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VADD_sp      ---- 1110 0.11 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VADD_dp      ---- 1110 0.11 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VSUB_sp      ---- 1110 0.11 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VSUB_sp      ---- 1110 0.11 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
- VFM_sp       ---- 1110 1.01 .... .... 1010 . o2:1 . 0 .... \
-              vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=1
-@@ -159,25 +144,17 @@ VMOV_imm_sp  ---- 1110 1.11 .... .... 1010 0000 .... \
- VMOV_imm_dp  ---- 1110 1.11 .... .... 1011 0000 .... \
-              vd=%vd_dp imm=%vmov_imm
- 
--VMOV_reg_sp  ---- 1110 1.11 0000 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VMOV_reg_dp  ---- 1110 1.11 0000 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VMOV_reg_sp  ---- 1110 1.11 0000 .... 1010 01.0 ....        @vfp_dm_ss
-+VMOV_reg_dp  ---- 1110 1.11 0000 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VABS_sp      ---- 1110 1.11 0000 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VABS_dp      ---- 1110 1.11 0000 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VABS_sp      ---- 1110 1.11 0000 .... 1010 11.0 ....        @vfp_dm_ss
-+VABS_dp      ---- 1110 1.11 0000 .... 1011 11.0 ....        @vfp_dm_dd
- 
--VNEG_sp      ---- 1110 1.11 0001 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VNEG_dp      ---- 1110 1.11 0001 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VNEG_sp      ---- 1110 1.11 0001 .... 1010 01.0 ....        @vfp_dm_ss
-+VNEG_dp      ---- 1110 1.11 0001 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 ....        @vfp_dm_ss
-+VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 ....        @vfp_dm_dd
- 
- VCMP_sp      ---- 1110 1.11 010 z:1 .... 1010 e:1 1.0 .... \
-              vd=%vd_sp vm=%vm_sp
-@@ -190,32 +167,26 @@ VCVT_f32_f16 ---- 1110 1.11 0010 .... 1010 t:1 1.0 .... \
- VCVT_f64_f16 ---- 1110 1.11 0010 .... 1011 t:1 1.0 .... \
-              vd=%vd_dp vm=%vm_sp
- 
--# VCVTB and VCVTT to f16: Vd format is always vd_sp; Vm format depends on size bit
-+# VCVTB and VCVTT to f16: Vd format is always vd_sp;
-+# Vm format depends on size bit
- VCVT_f16_f32 ---- 1110 1.11 0011 .... 1010 t:1 1.0 .... \
-              vd=%vd_sp vm=%vm_sp
- VCVT_f16_f64 ---- 1110 1.11 0011 .... 1011 t:1 1.0 .... \
-              vd=%vd_sp vm=%vm_dp
- 
--VRINTR_sp    ---- 1110 1.11 0110 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTR_dp    ---- 1110 1.11 0110 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTR_sp    ---- 1110 1.11 0110 .... 1010 01.0 ....        @vfp_dm_ss
-+VRINTR_dp    ---- 1110 1.11 0110 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VRINTZ_sp    ---- 1110 1.11 0110 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTZ_dp    ---- 1110 1.11 0110 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTZ_sp    ---- 1110 1.11 0110 .... 1010 11.0 ....        @vfp_dm_ss
-+VRINTZ_dp    ---- 1110 1.11 0110 .... 1011 11.0 ....        @vfp_dm_dd
- 
--VRINTX_sp    ---- 1110 1.11 0111 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTX_dp    ---- 1110 1.11 0111 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTX_sp    ---- 1110 1.11 0111 .... 1010 01.0 ....        @vfp_dm_ss
-+VRINTX_dp    ---- 1110 1.11 0111 .... 1011 01.0 ....        @vfp_dm_dd
- 
--# VCVT between single and double: Vm precision depends on size; Vd is its reverse
--VCVT_sp      ---- 1110 1.11 0111 .... 1010 11.0 .... \
--             vd=%vd_dp vm=%vm_sp
--VCVT_dp      ---- 1110 1.11 0111 .... 1011 11.0 .... \
--             vd=%vd_sp vm=%vm_dp
-+# VCVT between single and double:
-+# Vm precision depends on size; Vd is its reverse
-+VCVT_sp      ---- 1110 1.11 0111 .... 1010 11.0 ....        @vfp_dm_ds
-+VCVT_dp      ---- 1110 1.11 0111 .... 1011 11.0 ....        @vfp_dm_sd
- 
- # VCVT from integer to floating point: Vm always single; Vd depends on size
- VCVT_int_sp  ---- 1110 1.11 1000 .... 1010 s:1 1.0 .... \
-@@ -224,8 +195,7 @@ VCVT_int_dp  ---- 1110 1.11 1000 .... 1011 s:1 1.0 .... \
-              vd=%vd_dp vm=%vm_sp
- 
- # VJCVT is always dp to sp
--VJCVT        ---- 1110 1.11 1001 .... 1011 11.0 .... \
--             vd=%vd_sp vm=%vm_dp
-+VJCVT        ---- 1110 1.11 1001 .... 1011 11.0 ....        @vfp_dm_sd
- 
- # VCVT between floating-point and fixed-point. The immediate value
- # is in the same format as a Vm single-precision register number.
--- 
-2.20.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTgyNTc2MzcyLmdp
+dC5qYWcucmFtYW5Ab3JhY2xlLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpxZW11LXN5c3RlbS1hYXJjaDY0
+OiBmYWxsaW5nIGJhY2sgdG8gdGNnCiAgVEVTVCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWNo
+YXIKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QtY2hhci5jOjIzMDpjaGFy
+X211eF90ZXN0OiBhc3NlcnRpb24gZmFpbGVkIChoMS5sYXN0X2V2ZW50ID09IDQyKTogKDMgPT0g
+NDIpCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAwNApxZW11LXN5c3RlbS1hYXJjaDY0OiAtYWNj
+ZWwga3ZtOiBpbnZhbGlkIGFjY2VsZXJhdG9yIGt2bQpxZW11LXN5c3RlbS1hYXJjaDY0OiBmYWxs
+aW5nIGJhY2sgdG8gdGNnCkVSUk9SIC0gQmFpbCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3Ny
+Yy90ZXN0cy90ZXN0LWNoYXIuYzoyMzA6Y2hhcl9tdXhfdGVzdDogYXNzZXJ0aW9uIGZhaWxlZCAo
+aDEubGFzdF9ldmVudCA9PSA0Mik6ICgzID09IDQyKQptYWtlOiAqKiogW2NoZWNrLXVuaXRdIEVy
+cm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAg
+IGNoZWNrLXF0ZXN0LXg4Nl82NDogdGVzdHMvcXRlc3QvZmRjLXRlc3QKICBURVNUICAgIGlvdGVz
+dC1xY293MjogMDA1Ci0tLQpOb3QgcnVuOiAyNTkKRmFpbHVyZXM6IDAzMCAwNDAgMDQxIDA3MSAw
+OTkgMTIwIDE4NCAxODYgMjY3CkZhaWxlZCA5IG9mIDExNiBpb3Rlc3RzCm1ha2U6ICoqKiBbY2hl
+Y2stdGVzdHMvY2hlY2stYmxvY2suc2hdIEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBj
+YWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjY0LCBp
+biA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFByb2Nl
+c3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21t
+YW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5xZW11
+Lmluc3RhbmNlLnV1aWQ9MDg0ZjQ0OGJmYjQxNGQ2NmEyMmEyY2NmMTMzZjcxNjMnLCAnLXUnLCAn
+MTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScsICct
+ZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1lJywg
+J1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEnLCAn
+LWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8u
+Y2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIv
+dG1wL3BhdGNoZXctdGVzdGVyLXRtcC0wdmh6NDdfYy9zcmMvZG9ja2VyLXNyYy4yMDIwLTAyLTI0
+LTE3LjA5LjE2LjExNzQ6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFy
+L3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
+dHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTA4NGY0
+NDhiZmI0MTRkNjZhMjJhMmNjZjEzM2Y3MTYzCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJy
+b3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLTB2aHo0N19jL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9z
+N10gRXJyb3IgMgoKcmVhbCAgICAxNG0zOS45MDZzCnVzZXIgICAgMG04LjM0MHMKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1ODI1
+NzYzNzIuZ2l0LmphZy5yYW1hbkBvcmFjbGUuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRv
+czcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
