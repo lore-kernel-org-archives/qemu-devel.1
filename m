@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 475D6C11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C8AC11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1426D20828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E893420828
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXcwwgNP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1426D20828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3mPpPx0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E893420828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6EoO-0007M1-4C
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:34:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50692)
+	id 1j6EoU-0007aa-2u
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:34:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6Ekz-0001kJ-Mw
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:51 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6El2-0001rA-Sg
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6Eky-0002GA-6C
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21149
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1j6El1-0002KZ-3F
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58346
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6Eky-0002Ff-2O
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:48 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6El0-0002KO-UM
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:30:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582554647;
+ s=mimecast20190719; t=1582554650;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ia38OPTV1CkiYPUVpdttHvJJ8KRirq7hiJmiLqgfnCY=;
- b=ZXcwwgNP+bKmuRHzdvPI2yIRqYdPaMp6tcYoxYI2Py6I5ZGgB/GjQIpfvDGFaywIyvAOxc
- QgUO0a1hQOiKXzoYJiLLPu1AVbsZwe1sBjUkFNuSCYXYpW2l30wLtdhXSFXikU45D0YCuf
- H34iv88CwJkEgLrkbwSGejNVo3GrjRs=
+ bh=AZ8c4lv673Ml8nGwmYyEs+bXXK1XOqXwykw2590D9Ao=;
+ b=T3mPpPx0tBpixuVNFXJDhjKE53U2/fj5EjOi34lbdbWJ5uzMbhpgajcZhE/hxEZ9aw7LIw
+ 91YFPm7sH7xvpKITzw5oTxOGVP0GXwMiKOujH8p8hWrsKoHQPHDq87C+N8PVK0MCF+cFVA
+ W7ok4+3n407AewbBDdFyshnvixvjitY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-R26ijo80O2yJ2gWnm97PxA-1; Mon, 24 Feb 2020 09:30:46 -0500
-X-MC-Unique: R26ijo80O2yJ2gWnm97PxA-1
+ us-mta-414-GbOEeCZsO-mdWM3prZEP_g-1; Mon, 24 Feb 2020 09:30:46 -0500
+X-MC-Unique: GbOEeCZsO-mdWM3prZEP_g-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C512C107ACC4;
- Mon, 24 Feb 2020 14:30:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A24F910509B9;
+ Mon, 24 Feb 2020 14:30:45 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
  [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 95AB1790FF;
- Mon, 24 Feb 2020 14:30:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1F8E55C114;
+ Mon, 24 Feb 2020 14:30:40 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 06/20] qemu-storage-daemon: Add --blockdev option
-Date: Mon, 24 Feb 2020 15:29:54 +0100
-Message-Id: <20200224143008.13362-7-kwolf@redhat.com>
+Subject: [PATCH v2 07/20] qapi: Flatten object-add
+Date: Mon, 24 Feb 2020 15:29:55 +0100
+Message-Id: <20200224143008.13362-8-kwolf@redhat.com>
 In-Reply-To: <20200224143008.13362-1-kwolf@redhat.com>
 References: <20200224143008.13362-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -73,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,161 +91,220 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a --blockdev option to the storage daemon that works the same
-as the -blockdev option of the system emulator.
+Mapping object-add to the command line as is doesn't result in nice
+syntax because of the nesting introduced with 'props'. This becomes
+nicer and more consistent with device_add and netdev_add when we accept
+properties for the object on the top level instead.
 
-In order to be able to link with blockdev.o, we also need to change
-stream.o from common-obj to block-obj, which is where all other block
-jobs already are.
-
-In contrast to the system emulator, qemu-storage-daemon options will be
-processed in the order they are given. The user needs to take care to
-refer to other objects only after defining them.
+'props' is still accepted after this patch, but marked as deprecated.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-storage-daemon.c | 31 +++++++++++++++++++++++++++++++
- Makefile              |  5 ++++-
- Makefile.objs         |  7 +++++++
- block/Makefile.objs   |  2 +-
- 4 files changed, 43 insertions(+), 2 deletions(-)
+ qapi/qom.json                   | 12 +++++++---
+ include/qom/object_interfaces.h |  7 ++++++
+ hw/block/xen-block.c            | 11 ++++++++-
+ monitor/misc.c                  |  2 ++
+ qom/qom-qmp-cmds.c              | 42 +++++++++++++++++++++++++++------
+ qemu-deprecated.texi            |  4 ++++
+ 6 files changed, 67 insertions(+), 11 deletions(-)
 
-diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index fc4aef572b..c30caaf59e 100644
---- a/qemu-storage-daemon.c
-+++ b/qemu-storage-daemon.c
-@@ -31,6 +31,10 @@
- #include "crypto/init.h"
+diff --git a/qapi/qom.json b/qapi/qom.json
+index ecc60c4401..8abe998962 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -210,7 +210,12 @@
+ #
+ # @id: the name of the new object
+ #
+-# @props: a dictionary of properties to be passed to the backend
++# @props: a dictionary of properties to be passed to the backend. Deprecat=
+ed
++#         since 5.0, specify the properties on the top level instead. It i=
+s an
++#         error to specify the same option both on the top level and in @p=
+rops.
++#
++# Additional arguments depend on qom-type and are passed to the backend
++# unchanged.
+ #
+ # Returns: Nothing on success
+ #          Error if @qom-type is not a valid class name
+@@ -221,12 +226,13 @@
+ #
+ # -> { "execute": "object-add",
+ #      "arguments": { "qom-type": "rng-random", "id": "rng1",
+-#                     "props": { "filename": "/dev/hwrng" } } }
++#                     "filename": "/dev/hwrng" } }
+ # <- { "return": {} }
+ #
+ ##
+ { 'command': 'object-add',
+-  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
++  'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'},
++  'gen': false } # so we can get the additional arguments
 =20
- #include "qapi/error.h"
-+#include "qapi/qapi-visit-block-core.h"
-+#include "qapi/qapi-commands-block-core.h"
-+#include "qapi/qobject-input-visitor.h"
+ ##
+ # @object-del:
+diff --git a/include/qom/object_interfaces.h b/include/qom/object_interface=
+s.h
+index 3e4e1d928b..6f92f3cebb 100644
+--- a/include/qom/object_interfaces.h
++++ b/include/qom/object_interfaces.h
+@@ -162,4 +162,11 @@ void user_creatable_del(const char *id, Error **errp);
+  */
+ void user_creatable_cleanup(void);
+=20
++/**
++ * qmp_object_add:
++ *
++ * QMP command handler for object-add. See the QAPI schema for documentati=
+on.
++ */
++void qmp_object_add(QDict *qdict, QObject **ret_data, Error **errp);
 +
- #include "qemu-common.h"
- #include "qemu-version.h"
- #include "qemu/config-file.h"
-@@ -52,15 +56,27 @@ static void help(void)
- "                         specify tracing options\n"
- "  -V, --version          output version information and exit\n"
- "\n"
-+"  --blockdev [driver=3D]<driver>[,node-name=3D<N>][,discard=3Dignore|unma=
-p]\n"
-+"             [,cache.direct=3Don|off][,cache.no-flush=3Don|off]\n"
-+"             [,read-only=3Don|off][,auto-read-only=3Don|off]\n"
-+"             [,force-share=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
-+"             [,driver specific parameters...]\n"
-+"                         configure a block backend\n"
-+"\n"
- QEMU_HELP_BOTTOM "\n",
-     error_get_progname());
+ #endif
+diff --git a/hw/block/xen-block.c b/hw/block/xen-block.c
+index 686bbc3f0d..3885464513 100644
+--- a/hw/block/xen-block.c
++++ b/hw/block/xen-block.c
+@@ -18,6 +18,7 @@
+ #include "qapi/visitor.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
++#include "qom/object_interfaces.h"
+ #include "hw/xen/xen_common.h"
+ #include "hw/block/xen_blkif.h"
+ #include "hw/qdev-properties.h"
+@@ -858,10 +859,18 @@ static XenBlockIOThread *xen_block_iothread_create(co=
+nst char *id,
+ {
+     XenBlockIOThread *iothread =3D g_new(XenBlockIOThread, 1);
+     Error *local_err =3D NULL;
++    QDict *opts;
++    QObject *ret_data;
+=20
+     iothread->id =3D g_strdup(id);
+=20
+-    qmp_object_add(TYPE_IOTHREAD, id, false, NULL, &local_err);
++    opts =3D qdict_new();
++    qdict_put_str(opts, "qom-type", TYPE_IOTHREAD);
++    qdict_put_str(opts, "id", id);
++    qmp_object_add(opts, &ret_data, &local_err);
++    qobject_unref(opts);
++    qobject_unref(ret_data);
++
+     if (local_err) {
+         error_propagate(errp, local_err);
+=20
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 6c41293102..1748ab3911 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -248,6 +248,8 @@ static void monitor_init_qmp_commands(void)
+                          QCO_NO_OPTIONS);
+     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+                          QCO_NO_OPTIONS);
++    qmp_register_command(&qmp_commands, "object-add", qmp_object_add,
++                         QCO_NO_OPTIONS);
+=20
+     QTAILQ_INIT(&qmp_cap_negotiation_commands);
+     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilities"=
+,
+diff --git a/qom/qom-qmp-cmds.c b/qom/qom-qmp-cmds.c
+index 6136efec16..49db926fcc 100644
+--- a/qom/qom-qmp-cmds.c
++++ b/qom/qom-qmp-cmds.c
+@@ -14,6 +14,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "block/qdict.h"
+ #include "hw/qdev-core.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-qdev.h"
+@@ -240,13 +241,34 @@ ObjectPropertyInfoList *qmp_qom_list_properties(const=
+ char *typename,
+     return prop_list;
  }
 =20
-+enum {
-+    OPTION_BLOCKDEV =3D 256,
-+};
-+
- static void process_options(int argc, char *argv[])
+-void qmp_object_add(const char *type, const char *id,
+-                    bool has_props, QObject *props, Error **errp)
++void qmp_object_add(QDict *qdict, QObject **ret_data, Error **errp)
  {
-     int c;
++    QObject *props;
+     QDict *pdict;
+     Visitor *v;
+     Object *obj;
++    const char *type;
++    const char *id;
 =20
-     static const struct option long_options[] =3D {
-+        {"blockdev", required_argument, NULL, OPTION_BLOCKDEV},
-         {"help", no_argument, NULL, 'h'},
-         {"trace", required_argument, NULL, 'T'},
-         {"version", no_argument, NULL, 'V'},
-@@ -90,6 +106,21 @@ static void process_options(int argc, char *argv[])
-             printf("qemu-storage-daemon version "
-                    QEMU_FULL_VERSION "\n" QEMU_COPYRIGHT "\n");
-             exit(EXIT_SUCCESS);
-+        case OPTION_BLOCKDEV:
-+            {
-+                Visitor *v;
-+                BlockdevOptions *options;
++    type =3D qdict_get_try_str(qdict, "qom-type");
++    if (!type) {
++        error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
++        return;
++    } else {
++        type =3D g_strdup(type);
++        qdict_del(qdict, "qom-type");
++    }
 +
-+                v =3D qobject_input_visitor_new_str(optarg, "driver",
-+                                                  &error_fatal);
++    id =3D qdict_get_try_str(qdict, "id");
++    if (!id) {
++        error_setg(errp, QERR_MISSING_PARAMETER, "id");
++        return;
++    } else {
++        id =3D g_strdup(id);
++        qdict_del(qdict, "id");
++    }
 +
-+                visit_type_BlockdevOptions(v, NULL, &options, &error_fatal=
-);
-+                visit_free(v);
-+
-+                qmp_blockdev_add(options, &error_fatal);
-+                qapi_free_BlockdevOptions(options);
-+                break;
-+            }
-         default:
-             g_assert_not_reached();
++    props =3D qdict_get(qdict, "props");
+     if (props) {
+         pdict =3D qobject_to(QDict, props);
+         if (!pdict) {
+@@ -254,17 +276,23 @@ void qmp_object_add(const char *type, const char *id,
+             return;
          }
-diff --git a/Makefile b/Makefile
-index 44b3c8a342..750cff8d0a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -450,6 +450,8 @@ dummy :=3D $(call unnest-vars,, \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-+                storage-daemon-obj-y \
-+                storage-daemon-obj-m \
-                 crypto-obj-y \
-                 qom-obj-y \
-                 io-obj-y \
-@@ -482,6 +484,7 @@ TARGET_DIRS_RULES :=3D $(foreach t, all clean install, =
-$(addsuffix /$(t), $(TARGET
- SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
- $(SOFTMMU_ALL_RULES): $(authz-obj-y)
- $(SOFTMMU_ALL_RULES): $(block-obj-y)
-+$(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
- $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
- $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
- $(SOFTMMU_ALL_RULES): $(io-obj-y)
-@@ -573,7 +576,7 @@ qemu-img.o: qemu-img-cmds.h
- qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
-) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
-) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) =
-$(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block=
--obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-+qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block=
--obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(=
-COMMON_LDADDS)
+         qobject_ref(pdict);
+-    } else {
+-        pdict =3D qdict_new();
++        qdict_del(qdict, "props");
++        qdict_join(qdict, pdict, false);
++        if (qdict_size(pdict) !=3D 0) {
++            error_setg(errp, "Option in 'props' conflicts with top level")=
+;
++            qobject_unref(pdict);
++            return;
++        }
++        qobject_unref(pdict);
+     }
 =20
- qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+-    v =3D qobject_input_visitor_new(QOBJECT(pdict));
+-    obj =3D user_creatable_add_type(type, id, pdict, v, errp);
++    v =3D qobject_input_visitor_new(QOBJECT(qdict));
++    obj =3D user_creatable_add_type(type, id, qdict, v, errp);
+     visit_free(v);
+     if (obj) {
+         object_unref(obj);
+     }
+-    qobject_unref(pdict);
++    *ret_data =3D QOBJECT(qdict_new());
+ }
 =20
-diff --git a/Makefile.objs b/Makefile.objs
-index 26b9cff954..c7e1b36130 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -27,6 +27,13 @@ io-obj-y =3D io/
+ void qmp_object_del(const char *id, Error **errp)
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 0671c26c80..faf99d3f91 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -167,6 +167,10 @@ Use ``migrate-set-parameters'' instead.
 =20
- endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ Use ``migrate-set-parameters'' and ``query-migrate-parameters'' instead.
 =20
-+#######################################################################
-+# storage-daemon-obj-y is code used by qemu-storage-daemon (these objects =
-are
-+# used for system emulation, too, but specified separately there)
++@subsection object-add option props (since 5.0)
 +
-+storage-daemon-obj-y =3D block/
-+storage-daemon-obj-y +=3D blockdev.o iothread.o
++Specify the properties for the object as top-level arguments instead.
 +
- ######################################################################
- # Target independent part of system emulation. The long term path is to
- # suppress *all* target specific code in case of system emulation, i.e. a
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index e06cf0b284..cb36ae2503 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -46,7 +46,7 @@ block-obj-y +=3D aio_task.o
- block-obj-y +=3D backup-top.o
- block-obj-y +=3D filter-compress.o
+ @subsection query-block result field dirty-bitmaps[i].status (since 4.0)
 =20
--common-obj-y +=3D stream.o
-+block-obj-y +=3D stream.o
-=20
- common-obj-y +=3D qapi-sysemu.o
-=20
+ The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
 --=20
 2.20.1
 
