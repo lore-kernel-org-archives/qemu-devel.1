@@ -2,85 +2,69 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF45AC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DDC1C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA98520828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:47:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUkWO/uk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA98520828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F65920714
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:48:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F65920714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6F18-0004Bx-RF
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:47:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53226)
+	id 1j6F26-0005Db-BP
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:48:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j6F0C-0003Ld-3J
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:46:33 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j6F1L-0004d4-OQ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j6F0A-00081o-C1
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:46:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35335
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j6F0A-00081f-8E
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:46:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582555589;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6vGduk1A+w295XIUufIvOPd1A0vBCfHwQmIvBwHJqA4=;
- b=KUkWO/ukYU8SGmwfSTBwxzkMdiqGPwyaaeUFBYPtypyw6fKRN8ziZAhhhpYHDGgGKIEFy0
- QR9PIpZDF23PHithY9c+6MvEElw+ntlHiatRnJpxlekUcV14Nys1QCiZ7zfcKvMBWxdy++
- 1KVX/QSybbAwZ6DNhs1knNBA5PIxCUc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-yiuN4XLkOwydSyEGFm6UoQ-1; Mon, 24 Feb 2020 09:46:25 -0500
-X-MC-Unique: yiuN4XLkOwydSyEGFm6UoQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 797F68017DF;
- Mon, 24 Feb 2020 14:46:24 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 234EF91833;
- Mon, 24 Feb 2020 14:46:23 +0000 (UTC)
-Date: Mon, 24 Feb 2020 14:46:21 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots (was: [PATCH
- 02/13] qcrypto-luks: implement encryption key management)
-Message-ID: <20200224144621.GT635661@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
- <20200217103700.GC6309@linux.fritz.box>
- <fd30b30b11772bd59ccf4573a35fc01d5bd51379.camel@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1j6F1H-0008DY-K1
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:47:43 -0500
+Resent-Date: Mon, 24 Feb 2020 09:47:43 -0500
+Resent-Message-Id: <E1j6F1H-0008DY-K1@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21142)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j6F1H-0008CG-Bp
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:47:39 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582555640; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=k1uCPy5jFFRHjra3Uv5dohdD8p3bDgJ9vRd55GeVNVxn1eTN2CHQxGvL1Hg//gQopp8JyA1FvdEPF6hI24rl4EcMn6Q12LXfOk/jFGtaJyJHfTy30CAi7OHH+p1+SS8wULeMpDby/H17WvW+Xugww345ga+j16gq2+MUUKI7qE0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582555640;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=+yN2YM4pUC4dzboj/CkqBxyNS3MZC1weAh8wy5geYn0=; 
+ b=Y41r2OW8Pwf4A8EzCI/ellqEKxnUy+ms1Er8sEHysK2p0kgzoaRvfi73SmT4KyaJ2XOjkfceGb52Fp1hGGGW6o9u1UDJuPxVPcNnOVBxZaZPJZq/HwQIs1+v9j8H/WxY3NyNfaS2gFXp0dpDMYT3siR+LOdPFwPbfvwQHE/Le9w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582555635737847.3652443897779;
+ Mon, 24 Feb 2020 06:47:15 -0800 (PST)
+In-Reply-To: <20200224141923.82118-1-ysato@users.sourceforge.jp>
+Subject: Re: [PATCH v32 00/22] Add RX archtecture support
+Message-ID: <158255563427.10132.4903752445702453612@a1bbccc8075a>
 MIME-Version: 1.0
-In-Reply-To: <fd30b30b11772bd59ccf4573a35fc01d5bd51379.camel@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Mon, 24 Feb 2020 06:47:15 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,213 +76,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: philmd@redhat.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 17, 2020 at 01:07:23PM +0200, Maxim Levitsky wrote:
-> On Mon, 2020-02-17 at 11:37 +0100, Kevin Wolf wrote:
-> > Am 15.02.2020 um 15:51 hat Markus Armbruster geschrieben:
-> > > Review of this patch led to a lengthy QAPI schema design discussion.
-> > > Let me try to condense it into a concrete proposal.
-> > >=20
-> > > This is about the QAPI schema, and therefore about QMP.  The
-> > > human-friendly interface is out of scope.  Not because it's not
-> > > important (it clearly is!), only because we need to *focus* to have a
-> > > chance at success.
-> > >=20
-> > > I'm going to include a few design options.  I'll mark them "Option:".
-> > >=20
-> > > The proposed "amend" interface takes a specification of desired state=
-,
-> > > and figures out how to get from here to there by itself.  LUKS keyslo=
-ts
-> > > are one part of desired state.
-> > >=20
-> > > We commonly have eight LUKS keyslots.  Each keyslot is either active =
-or
-> > > inactive.  An active keyslot holds a secret.
-> > >=20
-> > > Goal: a QAPI type for specifying desired state of LUKS keyslots.
-> > >=20
-> > > Proposal:
-> > >=20
-> > >     { 'enum': 'LUKSKeyslotState',
-> > >       'data': [ 'active', 'inactive' ] }
-> > >=20
-> > >     { 'struct': 'LUKSKeyslotActive',
-> > >       'data': { 'secret': 'str',
-> > >                 '*iter-time': 'int } }
-> > >=20
-> > >     { 'struct': 'LUKSKeyslotInactive',
-> > >       'data': { '*old-secret': 'str' } }
-> > >=20
-> > >     { 'union': 'LUKSKeyslotAmend',
-> > >       'base': { '*keyslot': 'int',
-> > >                 'state': 'LUKSKeyslotState' }
-> > >       'discriminator': 'state',
-> > >       'data': { 'active': 'LUKSKeyslotActive',
-> > >                 'inactive': 'LUKSKeyslotInactive' } }
-> > >=20
-> > > LUKSKeyslotAmend specifies desired state for a set of keyslots.
-> >=20
-> > Though not arbitrary sets of keyslots, it's only a single keyslot or
-> > multiple keyslots containing the same secret. Might be good enough in
-> > practice, though it means that you may have to issue multiple amend
-> > commands to get to the final state that you really want (even if doing
-> > everything at once would be safe).
-> >=20
-> > > Four cases:
-> > >=20
-> > > * @state is "active"
-> > >=20
-> > >   Desired state is active holding the secret given by @secret.  Optio=
-nal
-> > >   @iter-time tweaks key stretching.
-> > >=20
-> > >   The keyslot is chosen either by the user or by the system, as follo=
-ws:
-> > >=20
-> > >   - @keyslot absent
-> > >=20
-> > >     One inactive keyslot chosen by the system.  If none exists, error=
-.
-> > >=20
-> > >   - @keyslot present
-> > >=20
-> > >     The keyslot given by @keyslot.
-> > >=20
-> > >     If it's already active holding @secret, no-op.  Rationale: the
-> > >     current state is the desired state.
-> > >=20
-> > >     If it's already active holding another secret, error.  Rationale:
-> > >     update in place is unsafe.
-> > >=20
-> > >     Option: delete the "already active holding @secret" case.  Feels
-> > >     inelegant to me.  Okay if it makes things substantially simpler.
-> > >=20
-> > > * @state is "inactive"
-> > >=20
-> > >   Desired state is inactive.
-> > >=20
-> > >   Error if the current state has active keyslots, but the desired sta=
-te
-> > >   has none.
-> > >=20
-> > >   The user choses the keyslot by number and/or by the secret it holds=
-,
-> > >   as follows:
-> > >=20
-> > >   - @keyslot absent, @old-secret present
-> > >=20
-> > >     All active keyslots holding @old-secret.  If none exists, error.
-> > >=20
-> > >   - @keyslot present, @old-secret absent
-> > >=20
-> > >     The keyslot given by @keyslot.
-> > >=20
-> > >     If it's already inactive, no-op.  Rationale: the current state is
-> > >     the desired state.
-> > >=20
-> > >   - both @keyslot and @old-secret present
-> > >=20
-> > >     The keyslot given by keyslot.
-> > >=20
-> > >     If it's inactive or holds a secret other than @old-secret, error.
-> > >=20
-> > >     Option: error regardless of @old-secret, if that makes things
-> > >     simpler.
-> > >=20
-> > >   - neither @keyslot not @old-secret present
-> > >=20
-> > >     All keyslots.  Note that this will error out due to "desired stat=
-e
-> > >     has no active keyslots" unless the current state has none, either=
-.
-> > >=20
-> > >     Option: error out unconditionally.
-> > >=20
-> > > Note that LUKSKeyslotAmend can specify only one desired state for
-> > > commonly just one keyslot.  Rationale: this satisfies practical needs=
-.
-> > > An array of LUKSKeyslotAmend could specify desired state for all
-> > > keyslots.  However, multiple array elements could then apply to the s=
-ame
-> > > slot.  We'd have to specify how to resolve such conflicts, and we'd h=
-ave
-> > > to code up conflict detection.  Not worth it.
-> > >=20
-> > > Examples:
-> > >=20
-> > > * Add a secret to some free keyslot:
-> > >=20
-> > >   { "state": "active", "secret": "CIA/GRU/MI6" }
-> > >=20
-> > > * Deactivate all keyslots holding a secret:
-> > >=20
-> > >   { "state": "inactive", "old-secret": "CIA/GRU/MI6" }
-> > >=20
-> > > * Add a secret to a specific keyslot:
-> > >=20
-> > >   { "state": "active", "secret": "CIA/GRU/MI6", "keyslot": 0 }
-> > >=20
-> > > * Deactivate a specific keyslot:
-> > >=20
-> > >   { "state": "inactive", "keyslot": 0 }
-> > >=20
-> > >   Possibly less dangerous:
-> > >=20
-> > >   { "state": "inactive", "keyslot": 0, "old-secret": "CIA/GRU/MI6" }
-> > >=20
-> > > Option: Make use of Max's patches to support optional union tag with
-> > > default value to let us default @state to "active".  I doubt this mak=
-es
-> > > much of a difference in QMP.  A human-friendly interface should proba=
-bly
-> > > be higher level anyway (Daniel pointed to cryptsetup).
-> > >=20
-> > > Option: LUKSKeyslotInactive member @old-secret could also be named
-> > > @secret.  I don't care.
-> > >=20
-> > > Option: delete @keyslot.  It provides low-level slot access.
-> > > Complicates the interface.  Fine if we need lov-level slot access.  D=
-o
-> > > we?
-> > >=20
-> > > I apologize for the time it has taken me to write this.
-> > >=20
-> > > Comments?
-> >=20
-> > Works for me (without taking any of the options).
-> >=20
-> > The unclear part is what the human-friendly interface should look like
-> > and where it should live. I'm afraid doing only the QMP part and callin=
-g
-> > the feature completed like we do so often won't work in this case.
->=20
-> IMHO, I think that the best way to create human friendly part is to imple=
-ment
-> luks specific commands for qemu-img and use interface very similar
-> to what cryptsetup does.
-
-I think we can have a generic 'qemu-img amend' for machine type, with the
-complex dotted syntax.
-
-And then have two human friendly commands 'qemu-img crypt-add-key' and
-'qemu-img crypt-del-key' similarish to cryptsetup.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNDE0MTkyMy44MjEx
+OC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
+IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
+Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjMyIDAwLzIyXSBBZGQgUlggYXJj
+aHRlY3R1cmUgc3VwcG9ydApNZXNzYWdlLWlkOiAyMDIwMDIyNDE0MTkyMy44MjExOC0xLXlzYXRv
+QHVzZXJzLnNvdXJjZWZvcmdlLmpwClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
+b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1Qg
+U0NSSVBUIEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDAyMjQxNDE5MjMuODIxMTgtMS15
+c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcCAtPiBwYXRjaGV3LzIwMjAwMjI0MTQxOTIzLjgyMTE4
+LTEteXNhdG9AdXNlcnMuc291cmNlZm9yZ2UuanAKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwowYWUzOGU2IHFlbXUtZG9jLnRleGk6IEFkZCBSWCBzZWN0aW9uLgo4YjkwNzNmIEJvb3RM
+aW51eENvbnNvbGVUZXN0OiBUZXN0IHRoZSBSWC1WaXJ0IG1hY2hpbmUKZjhkMDY1MCBBZGQgcngt
+c29mdG1tdQpjZjEzODFlIGh3L3J4OiBSZXN0cmljdCB0aGUgUlg2Mk4gbWljcm9jb250cm9sbGVy
+IHRvIHRoZSBSWDYyTiBDUFUgY29yZQo1ZDVjMWE1IGh3L3J4OiBIb25vciAtYWNjZWwgcXRlc3QK
+NzI4ZjJlYiBody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24KODQ4MWJmMCBody9j
+aGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkKZWU3NjJhYiBo
+dy90aW1lcjogUlg2Mk4gaW50ZXJuYWwgdGltZXIgbW9kdWxlcwowM2QxMDEyIGh3L2ludGM6IFJY
+NjJOIGludGVycnVwdCBjb250cm9sbGVyIChJQ1VhKQoyZTA3YmU4IHRhcmdldC9yeDogRHVtcCBi
+eXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNhc3NlbWJseQoyZDRhMjVhIHRhcmdldC9yeDog
+Q29sbGVjdCBhbGwgYnl0ZXMgZHVyaW5nIGRpc2Fzc2VtYmx5CjJkYmEyMTcgdGFyZ2V0L3J4OiBF
+bWl0IGFsbCBkaXNhc3NlbWJseSBpbiBvbmUgcHJ0KCkKOThiN2I1YiB0YXJnZXQvcng6IFVzZSBw
+cnRfbGRtaSBmb3IgWENIR19tciBkaXNhc3NlbWJseQpiNzkwNTMwIHRhcmdldC9yeDogUmVwbGFj
+ZSBvcGVyYW5kIHdpdGggcHJ0X2xkbWkgaW4gZGlzYXNzZW1ibGVyCmY4OWY4ZTggdGFyZ2V0L3J4
+OiBEaXNhc3NlbWJsZSByeF9pbmRleF9hZGRyIGludG8gYSBzdHJpbmcKMTRlNzBiMyB0YXJnZXQv
+cng6IFJYIGRpc2Fzc2VtYmxlcgoxYWI4Y2E1IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KMDdl
+YThhYSB0YXJnZXQvcng6IFRDRyBoZWxwZXIKMTg3MDEwNSB0YXJnZXQvcng6IFRDRyB0cmFuc2xh
+dGlvbgoyMjg5ZTYzIGh3L3JlZ2lzdGVyZmllbGRzLmg6IEFkZCA4Yml0IGFuZCAxNmJpdCByZWdp
+c3RlciBtYWNyb3MKZDJlMGYyMCBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJh
+Y3QxNgoxNDk4NDNlIE1BSU5UQUlORVJTOiBBZGQgUlgKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEv
+MjIgQ2hlY2tpbmcgY29tbWl0IDE0OTg0M2U2N2Q5YiAoTUFJTlRBSU5FUlM6IEFkZCBSWCkKMi8y
+MiBDaGVja2luZyBjb21taXQgZDJlMGYyMGRhMjYzIChxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFj
+dDggYW5kIGV4dHJhY3QxNikKMy8yMiBDaGVja2luZyBjb21taXQgMjI4OWU2MzhkNDczIChody9y
+ZWdpc3RlcmZpZWxkcy5oOiBBZGQgOGJpdCBhbmQgMTZiaXQgcmVnaXN0ZXIgbWFjcm9zKQpVc2Ug
+b2YgdW5pbml0aWFsaXplZCB2YWx1ZSBpbiBjb25jYXRlbmF0aW9uICguKSBvciBzdHJpbmcgYXQg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgbGluZSAyNDk1LgpFUlJPUjogTWFjcm9zIHdpdGggbXVs
+dGlwbGUgc3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AK
+IzI3OiBGSUxFOiBpbmNsdWRlL2h3L3JlZ2lzdGVyZmllbGRzLmg6MjU6CisjZGVmaW5lIFJFRzgo
+cmVnLCBhZGRyKSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXAorICAgIGVudW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSB9
+OwoKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xv
+c2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMzMTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZp
+ZWxkcy5oOjI5OgorI2RlZmluZSBSRUcxNihyZWcsIGFkZHIpICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgZW51bSB7IEFfICMjIHJlZyA9IChh
+ZGRyKSB9OyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBl
+bnVtIHsgUl8gIyMgcmVnID0gKGFkZHIpIC8gMiB9OwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5p
+bmdzLCA1NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgo0LzIyIENoZWNraW5nIGNvbW1pdCAxODcwMTA1ZjI1MzAgKHRhcmdldC9yeDogVENHIHRy
+YW5zbGF0aW9uKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyMDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMwNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8y
+MiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1LzIyIENoZWNraW5nIGNvbW1pdCAwN2VhOGFh
+ZDRlODEgKHRhcmdldC9yeDogVENHIGhlbHBlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRl
+bGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjE6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NTAgbGluZXMg
+Y2hlY2tlZAoKUGF0Y2ggNS8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo2LzIyIENoZWNr
+aW5nIGNvbW1pdCAxYWI4Y2E1ZTU5MzkgKHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24pCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzIyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgNjU5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjIgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KNy8yMiBDaGVja2luZyBjb21taXQgMTRlNzBiMzU2MjhlICh0YXJnZXQvcng6
+IFJYIGRpc2Fzc2VtYmxlcikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShz
+KSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzg6IApuZXcgZmlsZSBtb2RlIDEw
+MDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDk3IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yMiBDaGVja2luZyBjb21taXQg
+Zjg5ZjhlODgwODUyICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4X2luZGV4X2FkZHIgaW50byBh
+IHN0cmluZykKOS8yMiBDaGVja2luZyBjb21taXQgYjc5MDUzMGYzYTBhICh0YXJnZXQvcng6IFJl
+cGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxlcikKMTAvMjIgQ2hlY2tp
+bmcgY29tbWl0IDk4YjdiNWIwMTQyZSAodGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdf
+bXIgZGlzYXNzZW1ibHkpCjExLzIyIENoZWNraW5nIGNvbW1pdCAyZGJhMjE3MWU0N2QgKHRhcmdl
+dC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpKQoxMi8yMiBDaGVja2luZyBj
+b21taXQgMmQ0YTI1YWY5ZGRhICh0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBk
+aXNhc3NlbWJseSkKMTMvMjIgQ2hlY2tpbmcgY29tbWl0IDJlMDdiZThhZGEwMiAodGFyZ2V0L3J4
+OiBEdW1wIGJ5dGVzIGZvciBlYWNoIGluc24gZHVyaW5nIGRpc2Fzc2VtYmx5KQoxNC8yMiBDaGVj
+a2luZyBjb21taXQgMDNkMTAxMmJiOGVmIChody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29udHJv
+bGxlciAoSUNVYSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQwOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDQ1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE0
+LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE1LzIyIENoZWNraW5nIGNvbW1pdCBlZTc2
+MmFiZDE5OTYgKGh3L3RpbWVyOiBSWDYyTiBpbnRlcm5hbCB0aW1lciBtb2R1bGVzKQpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM1MDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDg0NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNS8yMiBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoxNi8yMiBDaGVja2luZyBjb21taXQgODQ4MWJmMGQ3YjRlIChody9jaGFyOiBS
+WDYyTiBzZXJpYWwgY29tbXVuaWNhdGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVk
+LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
+Zz8KIzQzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
+cywgNDAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCjE3LzIyIENoZWNraW5nIGNvbW1pdCA3MjhmMmViNGZmYTQgKGh3L3J4OiBSWCBUYXJnZXQg
+aGFyZHdhcmUgZGVmaW5pdGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjM6IApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0OTUgbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggMTcvMjIgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTgvMjIgQ2hlY2tpbmcgY29t
+bWl0IDVkNWMxYTU1MDkzYyAoaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdCkKMTkvMjIgQ2hlY2tp
+bmcgY29tbWl0IGNmMTM4MWU3NGNhNSAoaHcvcng6IFJlc3RyaWN0IHRoZSBSWDYyTiBtaWNyb2Nv
+bnRyb2xsZXIgdG8gdGhlIFJYNjJOIENQVSBjb3JlKQoyMC8yMiBDaGVja2luZyBjb21taXQgZjhk
+MDY1MDYzMGJlIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0
+ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjk6IApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA3NiBsaW5lcyBjaGVj
+a2VkCgpQYXRjaCAyMC8yMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyMS8yMiBDaGVja2lu
+ZyBjb21taXQgOGI5MDczZjc2ZDUwIChCb290TGludXhDb25zb2xlVGVzdDogVGVzdCB0aGUgUlgt
+VmlydCBtYWNoaW5lKQoyMi8yMiBDaGVja2luZyBjb21taXQgMGFlMzhlNjdiMDQxIChxZW11LWRv
+Yy50ZXhpOiBBZGQgUlggc2VjdGlvbi4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
+Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjI0MTQxOTIzLjgyMTE4LTEteXNhdG9AdXNlcnMuc291
+cmNlZm9yZ2UuanAvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
