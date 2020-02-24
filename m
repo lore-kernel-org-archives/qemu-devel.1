@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A93C38BE0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AD7C38BE0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:49:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12A0C218AC
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:49:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 711B3218AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 20:49:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWIGHcEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A0C218AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NqVLEnns"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711B3218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Kfn-00038W-3l
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 15:49:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48532)
+	id 1j6Kfr-0003Oe-Ig
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 15:49:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6Kef-0000mc-Mr
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:42 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6Kej-0000vS-H2
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6Kee-0005zb-IU
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43945
+ (envelope-from <philmd@redhat.com>) id 1j6Kei-000646-Cc
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54283
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Kee-0005xJ-EF
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:40 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Kei-00063j-91
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:48:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582577319;
+ s=mimecast20190719; t=1582577323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FHdRJiFy2+sRYmNBB/Zm10M7PeGOon/0i7FrH36WST8=;
- b=ZWIGHcEUiZDuNwtg2v2GKwV08cJ9n44qA5LPGWwETzkCswIojgjIFjdqml6F4BedXbVJGp
- wv58biN3Y+EIlp00JaExc9sUKOPFX7oyXFHCaeKRnj8kxULaRTtOVDTjWnFLcoYto5e60y
- SBp3BJt3RkV4OIvL2tax/SgUrpZosTo=
+ bh=pxC+1Wm7lZTcIVTNIaK8R7xk0TXOBYBpGoQjSWP/PII=;
+ b=NqVLEnnsg78r+aABrJoVQazeHYfj/FgReavidfMKwPl03+0yYKgULibBPkEeix0UO55Ecw
+ wsbeqGHbYLW+CHdmidz53OmnIk53yjrwf/j6dtBabwYDtSoGzrxpnNMER3a72IV1nGTbqB
+ Lsn+8G7r6MdNi5igTtCBzNQkPJrxB4c=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464--QQwS5XwMqGtUEUlKIRSuA-1; Mon, 24 Feb 2020 15:48:37 -0500
-X-MC-Unique: -QQwS5XwMqGtUEUlKIRSuA-1
-Received: by mail-wm1-f70.google.com with SMTP id p26so237291wmg.5
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 12:48:37 -0800 (PST)
+ us-mta-269-razanunqNReFVWwEx6iCgw-1; Mon, 24 Feb 2020 15:48:39 -0500
+X-MC-Unique: razanunqNReFVWwEx6iCgw-1
+Received: by mail-wm1-f70.google.com with SMTP id g26so236093wmk.6
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 12:48:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ZClVMiunKveJxIk817JDRiraYdietQ4sjQAY6VMZbY4=;
- b=BX09sAXseuS9WyuZbLNG+xmMNqBKVDBuX4rDv7M3/yrBe6UdDVyxN6SffRMWs5H+SB
- 6s/gS6dWl4h5BwRacHrT7FUKqi3MBWYnhcBb2lTBxLmRVLRIzXbgO/KsKesKOJJ3PbM9
- hBbyIYyT6i/1qmulz8EXmDja3C75D3RMDbntXmZZMPxCmlcDgUN00HWMwv7yi4EDJ5F2
- d+sswT53NVxc30/QgdRoWBRlRTMPWyB0xucQvHHs3u3+AATD8K2TPfqBGEMIPNpwS6y1
- oWDAxeshhALRFgbLC1ovFnOgNRu+CpkQ0QWUCp8JCxsK1zxqNnlxJcv1ZrsxDvQ5VlNB
- fYVw==
-X-Gm-Message-State: APjAAAWuUkorluQBksnwAZ4UGxfOhim8E04xTk6nCEQFLeE4KJl9s+R/
- QoZHjTHSi+pEF7eWGgBq+Gjjvj7ig5gizw49w6pRqCPFGsfDe1X89umSNuKSpTMjlo7d3ggMnQB
- /Yyau38AumXAwcoU=
-X-Received: by 2002:a5d:484f:: with SMTP id n15mr68380866wrs.365.1582577316141; 
- Mon, 24 Feb 2020 12:48:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwxB+Vm+i34MxlUQyPhCSr3BdJbqkJu1QAmnjdIH/eqSCWOoIPFgzbAU0Q5gnonM9PI843rig==
-X-Received: by 2002:a5d:484f:: with SMTP id n15mr68380843wrs.365.1582577315965; 
- Mon, 24 Feb 2020 12:48:35 -0800 (PST)
+ bh=gxYYROcVaswdAAx61tJuJg4MU34WxQsacT4wWudpNIs=;
+ b=jMaWAx/tOE9fGHG3SCstUFg12aKMQYVvSeZxhQZI39awhm9TCHg314ncQPfZAYFxv8
+ uHlwMAmw/gnpoJS25zaaVvshS93JaQkzVh1jhD55iEq4WMHhltpOmMFcvgLISlProo99
+ sU1hcQ0XIyRY63u7fB9wTWNy1xwrGrmpIaDDFV6PHtBhs7eoE7iCAwmLPeLz5F5xb4o4
+ +2l6bx559+JBwLwoQprbHadGljwRzEkdc4ZBnUQMhWFEN3vb+zZBYAii1h0Ef7GM8y38
+ v6PwaB3xAVQKbTlYD3IP/AtlISzbibeSRe4wA298vy6Jl1MqeckG794s3WtaMaQXWwBs
+ q/ew==
+X-Gm-Message-State: APjAAAWW6gIItTrbC9P7xYqz1nlF3F592bgf7ZOho163CMibg0GuA3z+
+ kBYJPuQvmzzOWwKD7a3pWAaWfwBX3FPEbZE36X/FXkke9bkxR3g4ZwHEnvs2gOk9XbXfRG6Z33C
+ K2Xf/C2cFPERUJmI=
+X-Received: by 2002:a1c:988c:: with SMTP id a134mr754281wme.163.1582577318815; 
+ Mon, 24 Feb 2020 12:48:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzF5UQ/qMSypEffTZ4LT2TIQPI6VnHE6rztTv1MazMcJxwUbIcYMiiwSsJE1b22ph9AcNyntA==
+X-Received: by 2002:a1c:988c:: with SMTP id a134mr754255wme.163.1582577318492; 
+ Mon, 24 Feb 2020 12:48:38 -0800 (PST)
 Received: from x1w.redhat.com (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id t81sm863436wmg.6.2020.02.24.12.48.33
+ by smtp.gmail.com with ESMTPSA id t81sm863436wmg.6.2020.02.24.12.48.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Feb 2020 12:48:35 -0800 (PST)
+ Mon, 24 Feb 2020 12:48:37 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Subject: [PATCH v2 02/32] memory: Simplify memory_region_init_rom_nomigrate()
- to ease review
-Date: Mon, 24 Feb 2020 21:47:58 +0100
-Message-Id: <20200224204828.23167-3-philmd@redhat.com>
+Subject: [PATCH v2 03/32] scripts/cocci: Rename memory-region-{init-ram ->
+ housekeeping}
+Date: Mon, 24 Feb 2020 21:47:59 +0100
+Message-Id: <20200224204828.23167-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200224204828.23167-1-philmd@redhat.com>
 References: <20200224204828.23167-1-philmd@redhat.com>
@@ -93,7 +93,8 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,43 +135,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-memory_region_init_rom_nomigrate() has the same content than
-memory_region_init_ram_shared_nomigrate(), with setting the
-readonly mode. The code is easier to review as creating a
-readonly ram/shared/nomigrate region.
+As we are going to add various semantic changes related to the memory
+region API, rename this script to be more generic.
+Add a 'usage' header, and an entry in MAINTAINERS to avoid checkpatch
+warning.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- memory.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ ...t-ram.cocci =3D> memory-region-housekeeping.cocci} | 13 +++++++++++++
+ MAINTAINERS                                         |  1 +
+ 2 files changed, 14 insertions(+)
+ rename scripts/coccinelle/{memory-region-init-ram.cocci =3D> memory-region=
+-housekeeping.cocci} (84%)
 
-diff --git a/memory.c b/memory.c
-index ce1179874e..6a327a54ed 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1659,19 +1659,8 @@ void memory_region_init_rom_nomigrate(MemoryRegion *=
-mr,
-                                       uint64_t size,
-                                       Error **errp)
- {
--    Error *err =3D NULL;
--    memory_region_init(mr, owner, name, size);
--    mr->ram =3D true;
-+    memory_region_init_ram_shared_nomigrate(mr, owner, name, size, false, =
-errp);
-     mr->readonly =3D true;
--    mr->terminates =3D true;
--    mr->destructor =3D memory_region_destructor_ram;
--    mr->ram_block =3D qemu_ram_alloc(size, false, mr, &err);
--    mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
--    if (err) {
--        mr->size =3D int128_zero();
--        object_unparent(OBJECT(mr));
--        error_propagate(errp, err);
--    }
- }
+diff --git a/scripts/coccinelle/memory-region-init-ram.cocci b/scripts/cocc=
+inelle/memory-region-housekeeping.cocci
+similarity index 84%
+rename from scripts/coccinelle/memory-region-init-ram.cocci
+rename to scripts/coccinelle/memory-region-housekeeping.cocci
+index d290150872..3699c1017e 100644
+--- a/scripts/coccinelle/memory-region-init-ram.cocci
++++ b/scripts/coccinelle/memory-region-housekeeping.cocci
+@@ -1,3 +1,16 @@
++/*
++  Usage:
++
++    spatch \
++        --macro-file scripts/cocci-macro-file.h \
++        --sp-file scripts/coccinelle/memory-region-housekeeping.cocci \
++        --keep-comments \
++        --in-place \
++        --dir .
++
++*/
++
++
+ // Replace by-hand memory_region_init_ram_nomigrate/vmstate_register_ram
+ // code sequences with use of the new memory_region_init_ram function.
+ // Similarly for the _rom and _rom_device functions.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 195dd58cac..316a8edbb6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1998,6 +1998,7 @@ F: include/exec/ramblock.h
+ F: memory.c
+ F: include/exec/memory-internal.h
+ F: exec.c
++F: scripts/coccinelle/memory-region-housekeeping.cocci
 =20
- void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+ SPICE
+ M: Gerd Hoffmann <kraxel@redhat.com>
 --=20
 2.21.1
 
