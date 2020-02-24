@@ -2,78 +2,84 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C88AC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06882C11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:46:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59C0F20828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4D4220714
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:46:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEYKl1C1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C0F20828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVb5V8rk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D4220714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Exm-0000fz-Hu
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:44:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51024)
+	id 1j6Ezg-0002Hw-VJ
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:46:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6ElX-0002Tl-Lj
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:31:24 -0500
+ (envelope-from <berrange@redhat.com>) id 1j6ExT-0000Sq-Ax
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6ElW-0002xc-Km
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:31:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23557
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1j6ExS-0007Xk-17
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:43:43 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43676
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6ElW-0002wJ-Go
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:31:22 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j6ExR-0007Xe-Sj
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:43:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582554682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1582555421;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kBa7U5Scjuxiou/Q3JgDAKz4JwgKecQXFncadPgqf34=;
- b=LEYKl1C1ZRLRU4baDuF6ywvhqY15jmaCyYXywYYSSMOrOP68ScR9aFACk5iUIxNiqzPWZp
- jzJuHuE+wMkcrED2hY5jtVvHkc4ea1q4j+mC5znF+mtFWPPT0XBfjIVW2smEqZ+gBSiD/7
- kTzHIPLlMip2+M+NmR7Bfhi0V+NnVUo=
+ bh=ELIRJW++q5+xz3dY5jYArDty86u8tOgUfi/0jnLdeyA=;
+ b=SVb5V8rkv2YmgfLwi6R5LfC/cf+hQ3wI4qWWDnLbpeVECS4EjefY2oOPXzWuZ8/vhFYGDV
+ dfCeHA7fLiuihRU5VA5BE6a049n19jIg7S7Tj2IvH1E2ZM4ow2JIagnCwIgZ/POPNVZMl7
+ zU+C1kSzAzr3IL+tqwkj90purv51zbE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-LI1KSHlMO5203_ARIcwvhg-1; Mon, 24 Feb 2020 09:31:20 -0500
-X-MC-Unique: LI1KSHlMO5203_ARIcwvhg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-132-oOQjATuhPt2dG-uvj_xCbg-1; Mon, 24 Feb 2020 09:43:35 -0500
+X-MC-Unique: oOQjATuhPt2dG-uvj_xCbg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 605191005510;
- Mon, 24 Feb 2020 14:31:19 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-134.ams2.redhat.com
- [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13D7C91835;
- Mon, 24 Feb 2020 14:31:14 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 19/20] monitor: Add allow_hmp parameter to monitor_init()
-Date: Mon, 24 Feb 2020 15:30:07 +0100
-Message-Id: <20200224143008.13362-20-kwolf@redhat.com>
-In-Reply-To: <20200224143008.13362-1-kwolf@redhat.com>
-References: <20200224143008.13362-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 552F68017CC;
+ Mon, 24 Feb 2020 14:43:34 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20F9919C7F;
+ Mon, 24 Feb 2020 14:43:33 +0000 (UTC)
+Date: Mon, 24 Feb 2020 14:43:30 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: QAPI schema for desired state of LUKS keyslots
+Message-ID: <20200224144330.GR635661@redhat.com>
+References: <20200114193350.10830-1-mlevitsk@redhat.com>
+ <20200114193350.10830-3-mlevitsk@redhat.com>
+ <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+ <20200217103700.GC6309@linux.fritz.box>
+ <87ftf9s8ho.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87ftf9s8ho.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,94 +91,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- coiby.xu@gmail.com, mreitz@redhat.com, stefanha@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new parameter allow_hmp to monitor_init() so that the storage
-daemon can disable HMP.
+On Mon, Feb 17, 2020 at 01:28:51PM +0100, Markus Armbruster wrote:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 15.02.2020 um 15:51 hat Markus Armbruster geschrieben:
+> >> Review of this patch led to a lengthy QAPI schema design discussion.
+> >> Let me try to condense it into a concrete proposal.
+> >>=20
+> >> This is about the QAPI schema, and therefore about QMP.  The
+> >> human-friendly interface is out of scope.  Not because it's not
+> >> important (it clearly is!), only because we need to *focus* to have a
+> >> chance at success.
+> >>=20
+> >> I'm going to include a few design options.  I'll mark them "Option:".
+> >>=20
+> >> The proposed "amend" interface takes a specification of desired state,
+> >> and figures out how to get from here to there by itself.  LUKS keyslot=
+s
+> >> are one part of desired state.
+> >>=20
+> >> We commonly have eight LUKS keyslots.  Each keyslot is either active o=
+r
+> >> inactive.  An active keyslot holds a secret.
+> >>=20
+> >> Goal: a QAPI type for specifying desired state of LUKS keyslots.
+> >>=20
+> >> Proposal:
+> >>=20
+> >>     { 'enum': 'LUKSKeyslotState',
+> >>       'data': [ 'active', 'inactive' ] }
+> >>=20
+> >>     { 'struct': 'LUKSKeyslotActive',
+> >>       'data': { 'secret': 'str',
+> >>                 '*iter-time': 'int } }
+> >>=20
+> >>     { 'struct': 'LUKSKeyslotInactive',
+> >>       'data': { '*old-secret': 'str' } }
+> >>=20
+> >>     { 'union': 'LUKSKeyslotAmend',
+> >>       'base': { '*keyslot': 'int',
+> >>                 'state': 'LUKSKeyslotState' }
+> >>       'discriminator': 'state',
+> >>       'data': { 'active': 'LUKSKeyslotActive',
+> >>                 'inactive': 'LUKSKeyslotInactive' } }
+> >>=20
+> >> LUKSKeyslotAmend specifies desired state for a set of keyslots.
+> >
+> > Though not arbitrary sets of keyslots, it's only a single keyslot or
+> > multiple keyslots containing the same secret. Might be good enough in
+> > practice, though it means that you may have to issue multiple amend
+> > commands to get to the final state that you really want (even if doing
+> > everything at once would be safe).
+>=20
+> True.  I traded expressiveness for simplicity.
+>=20
+> Here's the only practical case I can think of where the lack of
+> expressiveness may hurt: replace secrets.
+>=20
+> With this interface, you need two operations: activate a free slot with
+> the new secret, deactivate the slot(s) with the old secret.  There is an
+> intermediate state with both secrets active.
+>=20
+> A more expressive interface could let you do both in one step.  Relevant
+> only if the implementation actually provides atomicity.  Can it?
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/control.json         |  3 ++-
- include/monitor/monitor.h |  2 +-
- monitor/monitor.c         | 12 ++++++++++--
- 3 files changed, 13 insertions(+), 4 deletions(-)
+This restriction is already present in the the long standing
+cryptsetup command, so I don't think it is a big deal. Or to
+put it another way I don't see a compelling justification for
+why QEMU needs to be special and do it in op.
 
-diff --git a/qapi/control.json b/qapi/control.json
-index 3ee086aec7..85b12fe0fb 100644
---- a/qapi/control.json
-+++ b/qapi/control.json
-@@ -237,7 +237,8 @@
- #
- # @id:          Name of the monitor
- #
--# @mode:        Selects the monitor mode (default: readline)
-+# @mode:        Selects the monitor mode (default: readline in the system
-+#               emulator, control in qemu-storage-daemon)
- #
- # @pretty:      Enables pretty printing (QMP only)
- #
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index ad823b9edb..1018d754a6 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -19,7 +19,7 @@ void monitor_init_globals(void);
- void monitor_init_globals_core(void);
- void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp);
- void monitor_init_hmp(Chardev *chr, bool use_readline, Error **errp);
--int monitor_init(MonitorOptions *opts, Error **errp);
-+int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp);
- int monitor_init_opts(QemuOpts *opts, Error **errp);
- void monitor_cleanup(void);
-=20
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index 4a36107afb..7e49914626 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -611,7 +611,7 @@ void monitor_init_globals_core(void)
-                                    NULL);
- }
-=20
--int monitor_init(MonitorOptions *opts, Error **errp)
-+int monitor_init(MonitorOptions *opts, bool allow_hmp, Error **errp)
- {
-     Chardev *chr;
-     Error *local_err =3D NULL;
-@@ -622,11 +622,19 @@ int monitor_init(MonitorOptions *opts, Error **errp)
-         return -1;
-     }
-=20
-+    if (!opts->has_mode) {
-+        opts->mode =3D allow_hmp ? MONITOR_MODE_READLINE : MONITOR_MODE_CO=
-NTROL;
-+    }
-+
-     switch(opts->mode) {
-     case MONITOR_MODE_CONTROL:
-         monitor_init_qmp(chr, opts->pretty, &local_err);
-         break;
-     case MONITOR_MODE_READLINE:
-+        if (!allow_hmp) {
-+            error_setg(errp, "Only QMP is supported");
-+            return -1;
-+        }
-         if (opts->pretty) {
-             warn_report("'pretty' is deprecated for HMP monitors, it has n=
-o "
-                         "effect and will be removed in future versions");
-@@ -658,7 +666,7 @@ int monitor_init_opts(QemuOpts *opts, Error **errp)
-         goto out;
-     }
-=20
--    monitor_init(options, &local_err);
-+    monitor_init(options, true, &local_err);
-     qapi_free_MonitorOptions(options);
-=20
- out:
+
+Regards,
+Daniel
 --=20
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
