@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC57C38BFA
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD99C38BE2
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98AD020CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A96820CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:15:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uykGE8go"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AD020CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="snUzxX27"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A96820CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6L3v-00048J-SB
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:14:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50789)
+	id 1j6L4J-0005AD-6M
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:15:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51003)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6Kmf-0007VN-Tn
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:59 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmz-0008Pu-P1
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6Kme-0003jn-1Z
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:57 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44798)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmy-00047u-Iv
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:17 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45340)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6Kmd-0003ih-OW
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:55 -0500
+ id 1j6Kmy-000478-9s
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:16 -0500
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrXG6032136;
- Mon, 24 Feb 2020 20:56:51 GMT
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrgSd032171;
+ Mon, 24 Feb 2020 20:57:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=vpe0/c5G0MXd4JAhsy6/u+S1fhUP7KtMyY9f4+3J9y0=;
- b=uykGE8go7EUwEw0hPoulYcC8MArfUGyM7lglFb7LD0RmG/br2pOVg+YuNJxKoZbKSPvJ
- BxWcdiD7LkL0E1mA1Ed/ZkC623UJlHGbS19T6vz3uW4DtD4naD3+yejUVDBOCv7EHSrr
- /S8SKPcYUR6gCaVG8rBJyQoZKD+ZVKHgNQ5v3cNStnMt25fIYCl82bYJEZrwI3Ivbk2N
- 7ElRFkPzgSebxb7IQfWfV+ya3P5dwU9fyVF3Zh4lZJkQPV/dGTdHki/JtW68L66079yF
- oBJIjmQK+jUkl94GCLReh/WbLh5UxzVyGaDbvMHd+RMk9VVcDiQSKYiTa+VVVdyKXDAl Pg== 
+ bh=0bgtJYi5Q+wqi1vj3BeRoc/5jB6JYG14IQlZmOpXzdM=;
+ b=snUzxX27V0itBBRYmJGEsjo/W75fvVRQyfI1qtQ14w4b90fxai6sN61xLwz0xL+GlzEy
+ F8mNZdFwXtsITViHsVzKKb+W2W9LALHdG2T0YQUwq5cHM/0szTv32hVZklCtl4ocOEfh
+ mW6xR7+S3Yb7z6N3UjnFbG5F+q4QmG+fuTvdEmvyVdM57vP5Y4//eHqW8Qks8tv9EPUl
+ Huro0jo6beW14yvyoO9MDXutRg6hK2ZRw3fKGHr5y3YRsXVyH3/EWqKrqeNC+0Gn5xxK
+ H7Aam4K8QDyfnoTWl5PBb1Zq4omp2bYJURFFtlSJqxDviwVhQsx7arspjvYOHWHNycyf ng== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2130.oracle.com with ESMTP id 2yauqua0pk-1
+ by userp2130.oracle.com with ESMTP id 2yauqua0rq-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:50 +0000
+ Mon, 24 Feb 2020 20:57:10 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKq5u5171230;
- Mon, 24 Feb 2020 20:56:50 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2ybdshksbm-1
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKq5fO171086;
+ Mon, 24 Feb 2020 20:57:10 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2ybdshksuk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:50 +0000
+ Mon, 24 Feb 2020 20:57:09 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKunv2028718;
- Mon, 24 Feb 2020 20:56:49 GMT
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKv8VW030212;
+ Mon, 24 Feb 2020 20:57:08 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:49 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:57:07 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 34/50] multi-process/mon: choose HMP commands based on
- target
-Date: Mon, 24 Feb 2020 15:55:25 -0500
-Message-Id: <bf5c4efc14dc27a778509ff31190c82862af9fa1.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 46/50] multi-process/mig: Restore the VMSD in remote process
+Date: Mon, 24 Feb 2020 15:55:37 -0500
+Message-Id: <68144e5a0cdc4a16c1fe63f4a7482191f86b7c0f.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
@@ -81,7 +80,7 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
  suspectscore=1 spamscore=0
- malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=964 adultscore=0
+ malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
  definitions=main-2002240153
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
@@ -119,340 +118,138 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add "targets" field to HMP command definition to select the targets
-which would be supported by each command
+The remote process accepts the VMSD from Proxy object and
+restores it
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- hmp-commands-info.hx | 10 ++++++++++
- hmp-commands.hx      | 20 ++++++++++++++++++++
- scripts/hxtool       | 44 ++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 72 insertions(+), 2 deletions(-)
- mode change 100644 => 100755 scripts/hxtool
+ migration/savevm.c   | 36 ++++++++++++++++++++++++++++++++++++
+ migration/savevm.h   |  1 +
+ remote/remote-main.c | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 70 insertions(+)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index 257ee7d..631cc76 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -19,6 +19,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the version of QEMU",
-         .cmd        = hmp_info_version,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 09af14d..e95ea4a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2969,3 +2969,39 @@ int qemu_remote_savevm(QEMUFile *f)
  
-@@ -48,6 +49,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the character devices",
-         .cmd        = hmp_info_chardev,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
+     return 0;
+ }
++
++int qemu_remote_loadvm(QEMUFile *f)
++{
++    uint8_t section_type;
++    int ret = 0;
++
++    qemu_mutex_lock_iothread();
++
++    while (true) {
++        section_type = qemu_get_byte(f);
++
++        if (qemu_file_get_error(f)) {
++            ret = qemu_file_get_error(f);
++            break;
++        }
++
++        switch (section_type) {
++        case QEMU_VM_SECTION_FULL:
++            ret = qemu_loadvm_section_start_full(f, NULL);
++            if (ret < 0) {
++                break;
++            }
++            break;
++        case QEMU_VM_EOF:
++            goto out;
++        default:
++            ret = -EINVAL;
++            goto out;
++        }
++    }
++
++out:
++    qemu_mutex_unlock_iothread();
++
++    return ret;
++}
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 0491d3a..8741c66 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -66,5 +66,6 @@ int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+ int qemu_load_device_state(QEMUFile *f);
  
-@@ -64,6 +66,7 @@ ETEXI
-         .help       = "show info of one block device or all block devices "
-                       "(-n: show named nodes; -v: show details)",
-         .cmd        = hmp_info_block,
-+        .targets    = "scsi",
-     },
+ int qemu_remote_savevm(QEMUFile *f);
++int qemu_remote_loadvm(QEMUFile *f);
  
- STEXI
-@@ -78,6 +81,7 @@ ETEXI
-         .params     = "",
-         .help       = "show block device statistics",
-         .cmd        = hmp_info_blockstats,
-+        .targets    = "scsi",
-     },
+ #endif
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 0260c7c..ab4ad0b 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -68,6 +68,7 @@
+ #include "chardev/char.h"
+ #include "sysemu/reset.h"
+ #include "vl.h"
++#include "migration/misc.h"
  
- STEXI
-@@ -92,6 +96,7 @@ ETEXI
-         .params     = "",
-         .help       = "show progress of ongoing block device operations",
-         .cmd        = hmp_info_block_jobs,
-+        .targets    = "scsi",
-     },
+ static MPQemuLinkState *mpqemu_link;
  
- STEXI
-@@ -167,6 +172,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the command line history",
-         .cmd        = hmp_info_history,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
- 
-@@ -224,6 +230,7 @@ ETEXI
-         .params     = "",
-         .help       = "show PCI info",
-         .cmd        = hmp_info_pci,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -630,6 +637,7 @@ ETEXI
-         .params     = "",
-         .help       = "show device tree",
-         .cmd        = hmp_info_qtree,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -644,6 +652,7 @@ ETEXI
-         .params     = "",
-         .help       = "show qdev device model list",
-         .cmd        = hmp_info_qdm,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -658,6 +667,7 @@ ETEXI
-         .params     = "[path]",
-         .help       = "show QOM composition tree",
-         .cmd        = hmp_info_qom_tree,
-+        .targets    = "scsi",
-         .flags      = "p",
-     },
- 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index dc23185..ecc6169 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -49,6 +49,7 @@ ETEXI
-         .params     = "",
-         .help       = "quit the emulator",
-         .cmd        = hmp_quit,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -82,6 +83,7 @@ ETEXI
-         .params     = "device size",
-         .help       = "resize a block image",
-         .cmd        = hmp_block_resize,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -99,6 +101,7 @@ ETEXI
-         .params     = "device [speed [base]]",
-         .help       = "copy data from a backing file into a block device",
-         .cmd        = hmp_block_stream,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -113,6 +116,7 @@ ETEXI
-         .params     = "device speed",
-         .help       = "set maximum speed for a background block operation",
-         .cmd        = hmp_block_job_set_speed,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -129,6 +133,7 @@ ETEXI
-                       "\n\t\t\t if you want to abort the operation immediately"
-                       "\n\t\t\t instead of keep running until data is in sync)",
-         .cmd        = hmp_block_job_cancel,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -143,6 +148,7 @@ ETEXI
-         .params     = "device",
-         .help       = "stop an active background block operation",
-         .cmd        = hmp_block_job_complete,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -158,6 +164,7 @@ ETEXI
-         .params     = "device",
-         .help       = "pause an active background block operation",
-         .cmd        = hmp_block_job_pause,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -172,6 +179,7 @@ ETEXI
-         .params     = "device",
-         .help       = "resume a paused background block operation",
-         .cmd        = hmp_block_job_resume,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -186,6 +194,7 @@ ETEXI
-         .params     = "[-f] device",
-         .help       = "eject a removable medium (use -f to force it)",
-         .cmd        = hmp_eject,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -200,6 +209,7 @@ ETEXI
-         .params     = "device",
-         .help       = "remove host block device",
-         .cmd        = hmp_drive_del,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -219,6 +229,7 @@ ETEXI
-         .params     = "device filename [format [read-only-mode]]",
-         .help       = "change a removable medium, optional format",
-         .cmd        = hmp_change,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -732,6 +743,7 @@ ETEXI
-         .help       = "add device, like -device on the command line",
-         .cmd        = hmp_device_add,
-         .command_completion = device_add_completion,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -747,6 +759,7 @@ ETEXI
-         .help       = "remove device",
-         .cmd        = hmp_device_del,
-         .command_completion = device_del_completion,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1351,6 +1364,7 @@ ETEXI
-                       "The -c flag requests QEMU to compress backup data\n\t\t\t"
-                       "(if the target format supports it).\n\t\t\t",
-         .cmd        = hmp_drive_backup,
-+        .targets    = "scsi",
-     },
- STEXI
- @item drive_backup
-@@ -1368,6 +1382,7 @@ ETEXI
-                       "[,readonly=on|off][,copy-on-read=on|off]",
-         .help       = "add drive to PCI storage controller",
-         .cmd        = hmp_drive_add,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1816,6 +1831,7 @@ ETEXI
-         .help       = "add chardev",
-         .cmd        = hmp_chardev_add,
-         .command_completion = chardev_add_completion,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1831,6 +1847,7 @@ ETEXI
-         .params     = "id args",
-         .help       = "change chardev",
-         .cmd        = hmp_chardev_change,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1848,6 +1865,7 @@ ETEXI
-         .help       = "remove chardev",
-         .cmd        = hmp_chardev_remove,
-         .command_completion = chardev_remove_completion,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1864,6 +1882,7 @@ ETEXI
-         .help       = "send a break on chardev",
-         .cmd        = hmp_chardev_send_break,
-         .command_completion = chardev_remove_completion,
-+        .targets    = "scsi",
-     },
- 
- STEXI
-@@ -1940,6 +1959,7 @@ ETEXI
-         .params     = "[subcommand]",
-         .help       = "show various information about the system state",
-         .cmd        = hmp_info_help,
-+        .targets    = "scsi",
-         .sub_table  = hmp_info_cmds,
-         .flags      = "p",
-     },
-diff --git a/scripts/hxtool b/scripts/hxtool
-old mode 100644
-new mode 100755
-index 0003e7b..802cbd4
---- a/scripts/hxtool
-+++ b/scripts/hxtool
-@@ -10,7 +10,14 @@ hxtoh()
-             STEXI*|ETEXI*|SRST*|ERST*) flag=$(($flag^1))
-             ;;
-             *)
--            test $flag -eq 1 && printf "%s\n" "$str"
-+            # Skip line that has ".targets" as it is for multi-process targets based hmp
-+            # commands generation.
-+            echo $str | grep -q '.targets'
-+            if [ $? -eq 0 ]; then
-+                continue
-+            else
-+                test $flag -eq 1 && printf "%s\n" "$str"
-+            fi
-             ;;
-         esac
-     done
-@@ -84,16 +91,49 @@ hxtotexi()
-             print_texi_heading "$(expr "$str" : "ARCHHEADING(\(.*\),.*)")"
-             ;;
-             *)
--            test $flag -eq 1 && printf '%s\n' "$str"
-+            # Skip line that has ".targets" as it is for multi-process targets based hmp
-+            # commands generation.
-+            echo $str | grep -q '.targetss'
-+            if [ $? -eq 0 ]; then
-+                continue
-+            else
-+                test $flag -eq 1 && printf '%s\n' "$str"
-+            fi
-             ;;
-         esac
-         line=$((line+1))
-     done
+@@ -363,6 +364,30 @@ static void process_start_mig_out(MPQemuMsg *msg)
+     qemu_fclose(f);
  }
  
-+hxtoh_tgt()
++static int process_start_mig_in(MPQemuMsg *msg)
 +{
-+    section=""
-+    flag=1
-+    use_section=0
-+    while read -r str; do
-+        # Print section if it has ".targets" and the second argument passed to the
-+        # script, such as "scsi".
-+        echo "$str" | grep -q -E ".targets.*$1"
-+        if [ $? -eq 0 ]; then
-+            use_section=1
-+            continue
-+        fi
-+        case $str in
-+            HXCOMM*)
-+            ;;
-+            STEXI*|ETEXI*) flag=$(($flag^1)); test $use_section -eq 1 && printf '%s' "$section"; section=""; use_section=0
-+            ;;
-+            *)
-+            test $flag -eq 1 && section="${section} ${str} ${IFS}"
-+            ;;
-+        esac
-+    done
++    Error *err = NULL;
++    QIOChannel *ioc;
++    QEMUFile *f;
++    int rc = -EINVAL;
++
++    ioc = qio_channel_new_fd(msg->fds[0], &err);
++    if (err) {
++        error_report_err(err);
++        return rc;
++    }
++
++    qio_channel_set_name(QIO_CHANNEL(ioc), "remote-migration-channel");
++
++    f = qemu_fopen_channel_input(ioc);
++
++    rc = qemu_remote_loadvm(f);
++
++    qemu_fclose(f);
++
++    return rc;
 +}
 +
- case "$1" in
- "-h") hxtoh ;;
- "-t") hxtotexi ;;
-+"-tgt") hxtoh_tgt $2 ;;
- *) exit 1 ;;
- esac
+ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+ {
+     MPQemuMsg *msg = NULL;
+@@ -455,6 +480,12 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+     case START_MIG_OUT:
+         process_start_mig_out(msg);
+         break;
++    case START_MIG_IN:
++        if (process_start_mig_in(msg)) {
++            error_setg(&err, "Incoming migration failed.");
++            goto finalize_loop;
++        }
++        break;
+     case RUNSTATE_SET:
+         remote_runstate_set(msg->data1.runstate.state);
+         notify_proxy(msg->fds[0], 0);
+@@ -532,6 +563,8 @@ int main(int argc, char *argv[])
+     }
+     mpqemu_init_channel(mpqemu_link, &mpqemu_link->mmio, fd);
  
++    migration_object_init();
++
+     parse_cmdline(argc - 3, argv + 3, NULL);
+ 
+     mpqemu_link_set_callback(mpqemu_link, process_msg);
 -- 
 1.8.3.1
 
