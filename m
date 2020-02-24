@@ -2,80 +2,80 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075D6C35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB497C35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B22952072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 12:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B760420836
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:27:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JwgS1QGj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B22952072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoD+S2Mj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B760420836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6DA7-0004GH-Uu
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 07:48:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34912)
+	id 1j6Dlx-0004v2-Sj
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 08:27:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j6D9P-0003mX-Q4
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:56 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6DlF-0004Pw-HZ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:27:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j6D9O-0006dy-L5
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:55 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40844)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j6D9O-0006de-Ec
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 07:47:54 -0500
-Received: by mail-ot1-x344.google.com with SMTP id i6so8539796otr.7
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 04:47:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GjboJdXb5jdDi6o9EnROEYBh6eM6T95EPWUm/aFCl3U=;
- b=JwgS1QGj2wTggan5BVMyPZotIUypaszQ0x0tSLcJn/viR5Tpz3RYX7U+4p+89eUHXc
- rxXkpp52nx0ZD5ubgSklOyzkDNKdm7bahCknc9ZmYkWZPh1Q0kyPr2P2/NE7fC8SDbPh
- pY2/mD5wYNhPKXz8GkHiNUl5eXANg57ARgVX4hQoLooTs3Wlx8f0Af3BkHnYx4KWyQ9N
- aUBuBUeg6xSI+ChtHzcvV00IhvKWE5CXZ22eR5DCFpfcqzOZV9uCkgZ8hG3tolhzHp4p
- T0SNsbY9NVcnle/Zh5NIHNdoVq2js8xOA35nXy/u3TDDmPXtLPh7v+9+St9WoMwiqeE9
- AIiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GjboJdXb5jdDi6o9EnROEYBh6eM6T95EPWUm/aFCl3U=;
- b=Fyu20eOl7Bgsbt01OvYtQW3k49uG5WvqGS1PYwu6NRmCowzLmVUT4FqVHSZJLXPF/W
- JSzxvJzLAPBTG2k1G8i8gRiPcTjsxqul2f7z41SkfBNIxwx9TG5ghAzUcoZW41xS6wgo
- JlX2fURexxK4VDSlq5uodEPIFHjvwcK6xAVtnWvE4kQ/sVCufjpkNxHqYLRb27WJ+SiA
- bmt8uUC63v5h77ZHo+u5KSEF9BwXG+uYVKNDMKgw/TkgJAu1cTMvVuLU3kdq0JVvoihm
- VetSz7nJPV8OaeO7jYYZu/HRE0f6tOhKPUghH7g0uex9+L8zKLmriBX61yiQnqi/mmVq
- g0Kg==
-X-Gm-Message-State: APjAAAUD450m70XQLsqI52KHPV2CHEPVa2w3l2C/z9lMhqdnm+XLhw0t
- G8KRtIxm1VGhRJajYCChZcohWmF4fBIpgaK+NhGd8w==
-X-Google-Smtp-Source: APXvYqw7Mu9b2xI68hCpUBQnIH9UOV5sCGbIi91wMjvj5cVVpRVPDTlaucUWtwWCaG9FyjmBKMdXZO5CcCQl7mhvPI8=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr40206411otd.91.1582548473597; 
- Mon, 24 Feb 2020 04:47:53 -0800 (PST)
+ (envelope-from <kwolf@redhat.com>) id 1j6DlD-0007rC-Vb
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:27:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29227)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6DlD-0007qv-Rs
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:26:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582550819;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LweV1LzNzThk3R4MiLdz3gS3KrTzFEgrb7NvsPgzhvc=;
+ b=NoD+S2MjxZczZmVDDSJUPc+dsRfdwX5g3nkR1QVuOxQOp7UBbrveLgIzhA8DtSWjSPwGgp
+ iOq/stCc/Gd0WU9x7uR4Kaq7PwMTxDCUhl2nTRKCkcSZjp6E3i2w0yMWRaOr8eCFL5rZi7
+ tYxDMixWnoPUwmPeIpYrabxh9VgKWWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-YJe6hq__MVqX2X5fwWj97w-1; Mon, 24 Feb 2020 08:26:56 -0500
+X-MC-Unique: YJe6hq__MVqX2X5fwWj97w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B19A3801E66;
+ Mon, 24 Feb 2020 13:26:54 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B6578C066;
+ Mon, 24 Feb 2020 13:26:53 +0000 (UTC)
+Date: Mon, 24 Feb 2020 14:26:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Ring <stefanrin@gmail.com>
+Subject: Re: Strange data corruption issue with gluster (libgfapi) and ZFS
+Message-ID: <20200224132652.GA7088@linux.fritz.box>
+References: <CAAxjCEzHQz4cG_8m7S6=CwCBoN5daQs+KVyuU5GL5Tq3Bky1NA@mail.gmail.com>
+ <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200222085030.1760640-1-stefanha@redhat.com>
-In-Reply-To: <20200222085030.1760640-1-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Feb 2020 12:47:42 +0000
-Message-ID: <CAFEAcA9jUDfm_kPPEtWtdBe+a=j3bysj49WWyzZxwwUSC69YGw@mail.gmail.com>
-Subject: Re: [PULL 00/31] Block patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,45 +87,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- Bandan Das <bsd@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: integration@gluster.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 22 Feb 2020 at 08:50, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> The following changes since commit 9ac5df20f51fabcba0d902025df4bd7ea987c158:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200221-1' into staging (2020-02-21 16:18:38 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/stefanha/qemu.git tags/block-pull-request
->
-> for you to fetch changes up to e5c59355ae9f724777c61c859292ec9db2c8c2ab:
->
->   fuzz: add documentation to docs/devel/ (2020-02-22 08:26:48 +0000)
->
-> ----------------------------------------------------------------
-> Pull request
->
-> This pull request contains a virtio-blk/scsi performance optimization, event
-> loop scalability improvements, and a qtest-based device fuzzing framework.  I
-> am including the fuzzing patches because I have reviewed them and Thomas Huth
-> is currently away on leave.
+Am 24.02.2020 um 13:35 hat Stefan Ring geschrieben:
+> On Thu, Feb 20, 2020 at 10:19 AM Stefan Ring <stefanrin@gmail.com> wrote:
+> >
+> > Hi,
+> >
+> > I have a very curious problem on an oVirt-like virtualization host
+> > whose storage lives on gluster (as qcow2).
+> >
+> > The problem is that of the writes done by ZFS, whose sizes according
+> > to blktrace are a mixture of 8, 16, 24, ... 256 (512 byte)
+> > blocks,sometimes the first 4KB or more, but at least the first 4KB,
+> > end up zeroed out when read back later from storage. To clarify: ZFS
+> > is only used in the guest. In my current test scenario, I write
+> > approx. 3GB to the guest machine, which takes roughly a minute.
+> > Actually it=E2=80=99s around 35 GB which gets compressed down to 3GB by=
+ lz4.
+> > Within that, I end up with close to 100 data errors when I read it
+> > back from storage afterwards (zpool scrub).
+> >
+> > There are quite a few machines running on this host, and we have not
+> > experienced other problems so far. So right now, only ZFS is able to
+> > trigger this for some reason. The guest has 8 virtual cores. I also
+> > tried writing directly to the affected device from user space in
+> > patterns mimicking what I see in blktrace, but so far have been unable
+> > to trigger the same issue that way. Of the many ZFS knobs, I know at
+> > least one that makes a huge difference: When I set
+> > zfs_vdev_async_write_max_active to 1 (as opposed to 2 or 10), the
+> > error count goes through the roof (11.000).
 
+Wait, that does this setting actually do? Does it mean that QEMU should
+never sees more than a single active write request at the same time?
+So if this makes the error a lot more prominent, does this mean that
+async I/O actually makes the problem _less_ likely to occur?
 
-Applied, thanks.
+This sounds weird, so probably I'm misunderstanding the setting?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+> > Curiously, when I switch
+> > off ZFS compression, the data amount written increases almost
+> > 10-fold,while the absolute error amount drops to close to, but not
+> > entirely,zero. Which I guess supports my suspicion that this must be
+> > somehow related to timing.
+> >
+> > Switching the guest storage driver between scsi and virtio does not
+> > make a difference.
+> >
+> > Switching the storage backend to file on glusterfs-fuse does make a
+> > difference, i.e. the problem disappears.
+> >
+> > Any hints? I'm still trying to investigate a few things, but what bugs
+> > me most that only ZFS seems to trigger this behavior, although I am
+> > almost sure that ZFS is not really at fault here.
+> >
+> > Software versions used:
+> >
+> > Host
+> > kernel 3.10.0-957.12.1.el7.x86_64
+> > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
+> > glusterfs-api-5.6-1.el7.x86_64
+> >
+> > Guest
+> > kernel 3.10.0-1062.12.1.el7.x86_64
+> > kmod-zfs-0.8.3-1.el7.x86_64 (from the official ZoL binaries)
+>=20
+> I can actually reproduce this on my Fedora 31 home machine with 3 VMs.
 
--- PMM
+This means QEMU 4.1.1, right?
+
+> All 3 running CentOS 7.7. Two for glusterd, one for ZFS. Briefly, I
+> also got rid of the 2 glusterd VMs altogether, i.e. running glusterd
+> (the Fedora version) directly on the host, and it would still occur.
+> So my impression is that the server side of GlusterFS does not matter
+> much =E2=80=93 I=E2=80=99ve seen it happen on 4.x, 6.x, 7.2 and 7.3. Also=
+, as it
+> happens in the same way on a Fedora 31 qemu as well as a CentOS 7 one,
+> the qemu version is equally irrelevant.
+>=20
+> The main conclusion so far is that it has to do with growing the qcow2
+> image. With a fully pre-populated image, I cannot trigger it.
+
+Ok, that's a good data point.
+
+Is the corruption that you're seeing only in the guest data or is qcow2
+metadata also affected (does 'qemu-img check' report errors)?
+
+> I poked around a little in the glfs api integration, but trying to
+> make sense of two unknown asynchronous io systems (QEMU's and
+> GlusterFS's) interacting with each other is demanding a bit much for a
+> single weekend ;). The one thing I did verify so far is that there is
+> only one thread ever calling qemu_gluster_co_rw. As already stated in
+> the original post, the problem only occurs with multiple parallel
+> write requests happening.
+>=20
+> What I plan to do next is look at the block ranges being written in
+> the hope of finding overlaps there.
+
+Either that, or other interesting patterns.
+
+Did you try to remove the guest from the equation? If you say that the
+problem is with multiple parallel requests, maybe 'qemu-img bench' can
+cause the same kind of corruption? (Though if it's only corruption in
+the content rather than qcow2 metadata, it may be hard to detect.
+Giving qemu-io an explicit list of requests could still be an option
+once we have a suspicion what pattern creates the problem.)
+
+Kevin
+
 
