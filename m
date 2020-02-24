@@ -2,84 +2,78 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 430EDC11D30
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA98CC11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FB832080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B58642080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:10:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="3bH2GieB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB832080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sxc5meTR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58642080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6HDq-0007eg-2f
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:08:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46921)
+	id 1j6HFV-0001RP-Qw
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:10:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6H8h-0003Ag-JM
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:32 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j6HCY-000718-CW
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6H8e-0005hM-Sf
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:26 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:46534)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1j6H8T-0005VW-1K; Mon, 24 Feb 2020 12:03:13 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id D821396F50;
- Mon, 24 Feb 2020 17:03:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1582563791;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v4G+xlL/fUt5DMmB/QGEqSlK0ypIhsRcgyJCMOphg+8=;
- b=3bH2GieBoJbrit2fN9HPDpMhgtByLj9BeUKwPyT6ZVpMbjwp1hGFsggPH34Ynd4/kVCiWc
- GWfjEWikr3+hxkHyCV95mjBfeQ9UzlRh3/W7RlUc+1OOuR0lR35+OZXxln1nXSpV9+ya3r
- oWwPA1rrZnTI7fHnfnDBdIPaRE9U1l8=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 2/9] hw/core/clock-vmstate: define a vmstate entry for
- clock state
-Date: Mon, 24 Feb 2020 18:02:54 +0100
-Message-Id: <20200224170301.246623-3-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200224170301.246623-1-damien.hedde@greensocs.com>
-References: <20200224170301.246623-1-damien.hedde@greensocs.com>
+ (envelope-from <alistair23@gmail.com>) id 1j6HCU-0007vl-BN
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:07:26 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:34911)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j6HCU-0007tZ-36; Mon, 24 Feb 2020 12:07:22 -0500
+Received: by mail-lj1-x243.google.com with SMTP id q8so10945166ljb.2;
+ Mon, 24 Feb 2020 09:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=orrvvzInLtQuwUUgLtyXlZ9FER/ZvACaLeTV6qD2WlY=;
+ b=Sxc5meTRsoNNB9r+BapQ/KDLbFIx8CfK7pKz+sqLFyKrgKyrleSHFTvp/mN8W72kB8
+ 4eVMb8t6Y6hnavHAwdnrXr4vb+MljR8T2sDLUiT5vLAUiPZpObe2l3wBCcd1SWLBEuR4
+ Sf1Ad4CkJVgQYP3C9lO6C2aAG9/rMt1VXknwN5d4mGcHsELKXELvxj63nU/myJaafJAR
+ c3otTv7JM7FjTw0ZF7yj25v2Q1e3uLefzyXe9nSo2etpb7Xca/ZTuFHtW1LDy4VgKtcy
+ Zeha/A1CdV9dpebV0rLJtMqRR1VdUbKdRT4oMUvKOm7cQ4PfulJn3vfinLuMV0g5ESQp
+ bf1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=orrvvzInLtQuwUUgLtyXlZ9FER/ZvACaLeTV6qD2WlY=;
+ b=cFlDMp+Q66DR85FWIpaQNMcDBotKCnl48fuUSSDWxdCh975DpKX7H/uSDk2aFGJmrQ
+ XNCZdIKKbd/LF9rPljpGQBMNeUAz0sv9vL9H3R8N5v9Li/ipaqb5u+8OPTpyRSw4jNOh
+ BABSPcYE94n//nUzm/BYk42moRh2F6+dzSmfjiT0lcJ5J++2x/XB+DmtphLb5eqBaNHC
+ H9hL4C3YokuKVr2YDGBSgXqsbc0U44kHjA5sWJor8t7YY1+g6QuypGGxZamBEw6UAzmS
+ /vzjoWSib2YNZ6BEcarbFxwV1HTFCbz8G9us3rbDGdeN19nAh1C5+Zh0P9LQwmJR4RTv
+ HxhQ==
+X-Gm-Message-State: APjAAAUqAJ2MKrBC5u4oeFPDUKy2So1uQvZEbUU7csdvy60tguwkMjuE
+ AR+V23uKA8xu+gS4+GqCPhuaIvDhe5Dhw0y/pKQ=
+X-Google-Smtp-Source: APXvYqza5v++LriJ7R0ZevqGdnYeR7uP9vhM7XsrUZ7GZDm5Rc5LlCg9ZudFip6fCPX18L3MWbWhC8aKuwiDgQdtIY8=
+X-Received: by 2002:a2e:8197:: with SMTP id e23mr29587890ljg.250.1582564040727; 
+ Mon, 24 Feb 2020 09:07:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1582563791;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v4G+xlL/fUt5DMmB/QGEqSlK0ypIhsRcgyJCMOphg+8=;
- b=2NkdHeYpnOQZx1QmoRPG7Ecs1RNa6DBet+LqkYhvqYt4daz78AYZGggHl8l1T5eX6qcEM/
- /mtkH2rn3e7lX4McX8JfudEOM2/dmtqBP9glsZdpan/YuuN2/uhnExVfpJDPOE7OMyb8qg
- /83vI7Gp8zosj0m+FUU8aE49cIdJ8os=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582563791; a=rsa-sha256; cv=none;
- b=j/+4CaaPx/vB8f0nqG2s2v1DQSEpWmYxwZofgVMZ/3mYz1GRv6kVA1NYp4/0w9X3u4+qGe
- dr8X94dginSYUGov/ESOkvVBBjkh/PgeXi/6BusKyJ8PpNCfC7KrPGZDs33nByDVxu1ew/
- bf5/yajH6DjsCow8is4s8PLJsITk6XQ=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
+References: <20200224041633.97345-1-gshan@redhat.com>
+In-Reply-To: <20200224041633.97345-1-gshan@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Feb 2020 08:59:46 -0800
+Message-ID: <CAKmqyKNTL8Z74aKiM9ve8pDTEKjf3cSq+E+43TQhTUbupfc-oA@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm: Use TYPE_PL011 to create serial port
+To: Gavin Shan <gshan@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,93 +85,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
- alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, shan.gavin@gmail.com,
+ Edgar Iglesias <edgar.iglesias@gmail.com>, leif@nuviainc.com,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
---
+On Sun, Feb 23, 2020 at 8:17 PM Gavin Shan <gshan@redhat.com> wrote:
+>
+> This uses TYPE_PL011 when creating the serial port, to make the code
+> a bit more atomatic.
+>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
 
-v7: remove leading underscores in macro args
----
- include/hw/clock.h      |  9 +++++++++
- hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
- hw/core/Makefile.objs   |  1 +
- 3 files changed, 35 insertions(+)
- create mode 100644 hw/core/clock-vmstate.c
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index 30ac9a9946..8c191751a1 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -74,6 +74,15 @@ struct Clock {
-     QLIST_ENTRY(Clock) sibling;
- };
-=20
-+/*
-+ * vmstate description entry to be added in device vmsd.
-+ */
-+extern const VMStateDescription vmstate_clock;
-+#define VMSTATE_CLOCK(field, state) \
-+    VMSTATE_CLOCK_V(field, state, 0)
-+#define VMSTATE_CLOCK_V(field, state, version) \
-+    VMSTATE_STRUCT_POINTER_V(field, state, version, vmstate_clock, Clock=
-)
-+
- /**
-  * clock_setup_canonical_path:
-  * @clk: clock
-diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
-new file mode 100644
-index 0000000000..260b13fc2c
---- /dev/null
-+++ b/hw/core/clock-vmstate.c
-@@ -0,0 +1,25 @@
-+/*
-+ * Clock migration structure
-+ *
-+ * Copyright GreenSocs 2019-2020
-+ *
-+ * Authors:
-+ *  Damien Hedde
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "migration/vmstate.h"
-+#include "hw/clock.h"
-+
-+const VMStateDescription vmstate_clock =3D {
-+    .name =3D "clock",
-+    .version_id =3D 0,
-+    .minimum_version_id =3D 0,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT64(period, Clock),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index d7080edf89..e3d796fdd4 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -22,6 +22,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
- common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
- common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
- common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
-+common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
- obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
-=20
- common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
---=20
-2.24.1
+Alistair
 
+> ---
+>  hw/arm/sbsa-ref.c    | 3 ++-
+>  hw/arm/virt.c        | 3 ++-
+>  hw/arm/xlnx-versal.c | 3 ++-
+>  3 files changed, 6 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> index 9b5bcb5634..df0a165047 100644
+> --- a/hw/arm/sbsa-ref.c
+> +++ b/hw/arm/sbsa-ref.c
+> @@ -39,6 +39,7 @@
+>  #include "hw/pci-host/gpex.h"
+>  #include "hw/qdev-properties.h"
+>  #include "hw/usb.h"
+> +#include "hw/char/pl011.h"
+>  #include "net/net.h"
+>
+>  #define RAMLIMIT_GB 8192
+> @@ -409,7 +410,7 @@ static void create_uart(const SBSAMachineState *sms, int uart,
+>  {
+>      hwaddr base = sbsa_ref_memmap[uart].base;
+>      int irq = sbsa_ref_irqmap[uart];
+> -    DeviceState *dev = qdev_create(NULL, "pl011");
+> +    DeviceState *dev = qdev_create(NULL, TYPE_PL011);
+>      SysBusDevice *s = SYS_BUS_DEVICE(dev);
+>
+>      qdev_prop_set_chr(dev, "chardev", chr);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index f788fe27d6..d0da513737 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -71,6 +71,7 @@
+>  #include "hw/mem/pc-dimm.h"
+>  #include "hw/mem/nvdimm.h"
+>  #include "hw/acpi/generic_event_device.h"
+> +#include "hw/char/pl011.h"
+>
+>  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+>      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+> @@ -724,7 +725,7 @@ static void create_uart(const VirtMachineState *vms, int uart,
+>      int irq = vms->irqmap[uart];
+>      const char compat[] = "arm,pl011\0arm,primecell";
+>      const char clocknames[] = "uartclk\0apb_pclk";
+> -    DeviceState *dev = qdev_create(NULL, "pl011");
+> +    DeviceState *dev = qdev_create(NULL, TYPE_PL011);
+>      SysBusDevice *s = SYS_BUS_DEVICE(dev);
+>
+>      qdev_prop_set_chr(dev, "chardev", chr);
+> diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+> index 1cf3daaf4f..403fc7b881 100644
+> --- a/hw/arm/xlnx-versal.c
+> +++ b/hw/arm/xlnx-versal.c
+> @@ -22,6 +22,7 @@
+>  #include "hw/misc/unimp.h"
+>  #include "hw/intc/arm_gicv3_common.h"
+>  #include "hw/arm/xlnx-versal.h"
+> +#include "hw/char/pl011.h"
+>
+>  #define XLNX_VERSAL_ACPU_TYPE ARM_CPU_TYPE_NAME("cortex-a72")
+>  #define GEM_REVISION        0x40070106
+> @@ -144,7 +145,7 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+>          DeviceState *dev;
+>          MemoryRegion *mr;
+>
+> -        dev = qdev_create(NULL, "pl011");
+> +        dev = qdev_create(NULL, TYPE_PL011);
+>          s->lpd.iou.uart[i] = SYS_BUS_DEVICE(dev);
+>          qdev_prop_set_chr(dev, "chardev", serial_hd(i));
+>          object_property_add_child(OBJECT(s), name, OBJECT(dev), &error_fatal);
+> --
+> 2.23.0
+>
+>
 
