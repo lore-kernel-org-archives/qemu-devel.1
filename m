@@ -2,86 +2,84 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BADEC35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1949C35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9F42072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A84392072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:44:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hdh0b6iG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9F42072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cV1SbPcx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A84392072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6C74-0002MF-At
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 06:41:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53305)
+	id 1j6CAK-0003S6-Qd
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 06:44:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1j6C4r-0000I9-GU
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:39:10 -0500
+ (envelope-from <pkrempa@redhat.com>) id 1j6C9g-000330-Ha
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1j6C4q-0007DS-IV
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:39:09 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52453)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1j6C4p-0007BT-6f; Mon, 24 Feb 2020 06:39:07 -0500
-Received: by mail-wm1-x344.google.com with SMTP id p9so8669361wmc.2;
- Mon, 24 Feb 2020 03:39:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=XvLlnINkR4GetBSg1b0UzjnnrDmjsxkOG0qN8Hr7AME=;
- b=hdh0b6iGB6MJLJV/M9eMUeLqJqWtT10+uIlCPFkD/BLjEol5rplecquqeI+2mhe9dn
- BpzOlKU2ndJo9lILAEFK5C8D1CXoUpVCRAC+V76XfzcvLsIhCPL5rODRkqmWiJvOkFur
- AImT6NYDL7ZO4cVs7nk2V+6VmgjmR8RbrRQXOffL9GSxuM5ZcrhhT8Ix1lkMQRg9AuJD
- g15AK2ub7WYE9T5Cz6jDSykm/0h3fNX7PTX/yZwqbebarDLDAss+1aC9ppdMUQ7HhTs0
- fQaMif0ZZY5l0H7NeH/yfKZ9Mq11OHINf/Q9lm/jl9apuzlEjqRYN2tnx9TMERh5d/4l
- PDrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XvLlnINkR4GetBSg1b0UzjnnrDmjsxkOG0qN8Hr7AME=;
- b=Rbv1TGtwy6lh2/fIdZuADSpgIDBC4985SMR+pi/GCjbLvGiGxAIkcyjzxflAfsiBYj
- W/devoA6rIgCF2whTH0DyVylsOSTcXUouRPWEX2dIH1rTLWJ4SLo1nTrQUglPw0hDAVw
- 0I7uNnU9bmMEZTIzFbPbQc4sw7eaOX79EMnUre9l+xyCSRzRP+eDgb6VBLk/XHpAgKa0
- nKtG+03zNU+TniQCKubqWAVG6Rpqf2+WYvR5NTGE4u61PzVjl1Hn68T6o+ZgA6K/Cm4O
- invkI96FpFals5+tRN+RCjKuw0RR8baJEFNNFoEJAoBclqcKWxNoqfaacFaSA1fZ4Z5V
- 98rw==
-X-Gm-Message-State: APjAAAVmAWNBFvXBOErWDEdnreuSG9DV0vcgArZWrajOfX1MctO75HAQ
- y6UosafObrZouM/Ef9dPiSGVrLvH8orFpw==
-X-Google-Smtp-Source: APXvYqz4AKvODxkOkTDpmR4p96fm+Psz017mNYZH8jGb0w/uct0gqLLF64putccrDOMxorjACFIp7w==
-X-Received: by 2002:a1c:720a:: with SMTP id n10mr21699803wmc.103.1582544345519; 
- Mon, 24 Feb 2020 03:39:05 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v16sm16928079wml.11.2020.02.24.03.39.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Feb 2020 03:39:04 -0800 (PST)
-Date: Mon, 24 Feb 2020 11:39:03 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 0/2] qemu/queue.h: clear linked list pointers on remove
-Message-ID: <20200224113903.GD1896567@stefanha-x1.localdomain>
-References: <20200224103406.1894923-1-stefanha@redhat.com>
- <158254173238.10132.7761755657862330006@a1bbccc8075a>
+ (envelope-from <pkrempa@redhat.com>) id 1j6C9f-00028K-Dx
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:44:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46118
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1j6C9f-00028D-9H
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:44:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582544646;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mqjeL9elM34+DRT35i6Rrj3lAQACibs0F0yxjpbe1ng=;
+ b=cV1SbPcxQR4b8orqupn0kq8wepZVx/nwD/OINAjqu91AZrvo7m818c7y9o+nN62IezwqCE
+ CN6zOHhRn4FSymSr4Qq4D0j9ZSzTTOljAsoio8wcdqrsAT7S+iYK8I4Cx+J4LsI5QVape1
+ S7XdwAYZOnOi5FrpyoeuvoCiv8wQTrQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-0MAFI2GsPi-tkR_vqc9N0w-1; Mon, 24 Feb 2020 06:44:04 -0500
+X-MC-Unique: 0MAFI2GsPi-tkR_vqc9N0w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF2361005510;
+ Mon, 24 Feb 2020 11:44:03 +0000 (UTC)
+Received: from andariel.pipo.sk (ovpn-204-177.brq.redhat.com [10.40.204.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B73C60BF3;
+ Mon, 24 Feb 2020 11:43:59 +0000 (UTC)
+Date: Mon, 24 Feb 2020 12:43:56 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 0/3] Tighten qemu-img rules on missing backing format
+Message-ID: <20200224114356.GD3296@andariel.pipo.sk>
+References: <20200222112341.4170045-1-eblake@redhat.com>
+ <20200224110145.GB3296@andariel.pipo.sk>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cQXOx3fnlpmgJsTP"
+In-Reply-To: <20200224110145.GB3296@andariel.pipo.sk>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <158254173238.10132.7761755657862330006@a1bbccc8075a>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-detected-operating-system: by eggs.gnu.org: Error: Can't connect to API
+ socket.
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,48 +91,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com, qemu-block@nongnu.org,
- stefanha@redhat.com
+Cc: libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Feb 24, 2020 at 12:01:45 +0100, Peter Krempa wrote:
+> On Sat, Feb 22, 2020 at 05:23:38 -0600, Eric Blake wrote:
 
---cQXOx3fnlpmgJsTP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-On Mon, Feb 24, 2020 at 02:55:33AM -0800, no-reply@patchew.org wrote:
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> 1/2 Checking commit f913b2430ad3 (qemu/queue.h: clear linked list pointer=
-s on remove)
-> ERROR: do not use assignment in if condition
-> #65: FILE: include/qemu/queue.h:314:
-> +    if (((head)->sqh_first =3D elm->field.sqe_next) =3D=3D NULL)        =
-      \
+> > libvirt HAS to use blockdev-open on the backing chain and supply a
+> > backing format there, and thus has to probe images.  If libvirt ever
+> > probes differently than qemu, we are back to the potential
+> > guest-visible data corruption or potential host CVEs.
 >=20
-> total: 1 errors, 0 warnings, 59 lines checked
+> As I've elaborated in [1] I disagree with the host CVE part. The
 
-The same pattern is used elsewhere in this file.  This code comes from
-BSD and doesn't comply with QEMU's coding style.
+[1] https://www.redhat.com/archives/libvir-list/2020-February/msg00624.html
 
-Stefan
+> insecure part is not probing the format itself, but probing format AND
+> using the backing file of the image if we probed format.
 
---cQXOx3fnlpmgJsTP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5TtdcACgkQnKSrs4Gr
-c8jkfgf9GcChzVTwI8bF8CRlM54LLHTRYKZrc0SG2dSasbl8kVSt3MnVTjzyzKW4
-al2qyhkqgLxdyZqsGTi3dk5TRoLX88E3Nc0A6W0OUMuNhpGVVkoBDBZD0fbZSBME
-PEjKq0y4Fafkoe0l2SCbSP6DfbBqsgoKFHDiD4VRaETS7mcb5gUztwW462rzxwbR
-0FTO1NcZLh9TN+3RaBc4wsocdlvPrUn0NDPg5PGHkSMeU47xrEzm1RUuRAu7i14A
-YIx8SGI+PFhQqLJGXYROCC7jfUbuTA13e9pnuGqzLgPnJ0ocRjZAFTgMoCgs8N9c
-8uobaMrEvGPjvCyRBrLd8daZ/POLsg==
-=v6ee
------END PGP SIGNATURE-----
-
---cQXOx3fnlpmgJsTP--
 
