@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA68C38BE2
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E364BC38BF9
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8E6020CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD4EB20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:19:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lD7VSVmB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8E6020CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gNfQKp5s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD4EB20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6L7l-0001lz-Oi
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50655)
+	id 1j6L8G-00032f-QR
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:19:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmV-00076G-FH
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:48 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kmt-00089D-LY
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmU-0003Zy-Ea
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:47 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:53508)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Kms-00040R-BI
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:11 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:45210)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6KmU-0003Wa-5b
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:46 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKraCV164147;
- Mon, 24 Feb 2020 20:56:40 GMT
+ id 1j6Kms-0003zI-2F
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:10 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrMsA032061;
+ Mon, 24 Feb 2020 20:57:04 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=n6V5S01kaW9DM0TRseWApUxtUCbdgdHcMVr0wIVgh/g=;
- b=lD7VSVmBBJb9d0Y5lKKzVEO3nmq1xl36Drwqko4ipNixC0tIt6VRh6FRYbZD7qYu2zYQ
- wpecj3vWYn9y/Dq6eMd2WmW4p+n2tgeAjSN53xkPW406zCHbFAp396UwhCzN7JzhcGFO
- wZNKyg+KBVKcg8uTNdjOvucwVwdIYU0cZQxeM4yy0sSEo1lf17lM4MIGbU9CcvEVeGwR
- AAa3qVgWDtpMVxqMtcTrq6sDC4aBeUsFf6k/sVA0yQUcHO5P9sRtOqs17D+Q/HGNjWS6
- C8B4As9CLmGa/WSUZOcUJqbg9akm+z+gudBivHDomDZpU8LzulX8+AUzmOxQquTpDjR8 dg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2ybvr4p96b-1
+ bh=lmaqRAdO5l0CBs7Nbf1bisuy3QrUQnsM4khCkN3guhY=;
+ b=gNfQKp5s98ZytpVHET8y9aNqcVQzoa9W5LYMXkXJENkXtbdtvgxoYI66XAaV2tjJTYRs
+ vbmWCRtZ38AltjuLIFCoAS4/Pa3o7mKu3nqgKP+2u/NhFL5zJo66YxNGa5d+edkmnFkb
+ lKx30IMKfeyqdOW+rHwbXW2e0qCwVSNzYBDJlAgPQLLCNG+bBd4bSPbKpMotN+9tSmt3
+ OERbVmEJf+0vmW59sUnQ7aL0/My6hRrjwtEKn9JGh7kdhatpfTeaWEtvIjAnHXiNYOJn
+ eKbyFidvCIupo7nqsAHGuyVEardrNMJMyt37m7mAk79qtHkJoUmS8m0ESFFFeYf/DOwE 3g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 2yauqua0r5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:40 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKpsOC108241;
- Mon, 24 Feb 2020 20:56:39 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 2ybe123tvq-1
+ Mon, 24 Feb 2020 20:57:04 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKueug073151;
+ Mon, 24 Feb 2020 20:57:03 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 2ybduv6dwu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:39 +0000
+ Mon, 24 Feb 2020 20:57:03 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKucCo009446;
- Mon, 24 Feb 2020 20:56:38 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKv1Cu028884;
+ Mon, 24 Feb 2020 20:57:01 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:38 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:57:01 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 27/50] multi-process: add remote option
-Date: Mon, 24 Feb 2020 15:55:18 -0500
-Message-Id: <c88775d69e6f64f4342fdfe6a3673320d23be5a0.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 42/50] multi-process/mig: Send VMSD of remote to the Proxy
+ object
+Date: Mon, 24 Feb 2020 15:55:33 -0500
+Message-Id: <74d6f7b67720a31a53c25164f8d9769c32d8c643.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
@@ -78,21 +79,21 @@ In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- suspectscore=1 malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=1
+ mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240154
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ bulkscore=0
+ clxscore=1015 malwarescore=0 impostorscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002240153
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,47 +117,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+The remote process sends the VMSD to the Proxy object, on the source
+side
 
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 ---
- qemu-options.hx | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ migration/savevm.c   | 27 +++++++++++++++++++++++++++
+ migration/savevm.h   |  2 ++
+ remote/remote-main.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ac315c1..2c5e97f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -27,6 +27,27 @@ STEXI
- Display version information and exit
- ETEXI
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 1d4220e..09af14d 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2942,3 +2942,30 @@ bool vmstate_check_only_migratable(const VMStateDescription *vmsd)
  
-+DEF("remote", HAS_ARG, QEMU_OPTION_remote,
-+    "-remote socket[,prop[=value][,...]]\n"
-+    "                add remote process\n"
-+    "                prop=value,... sets driver properties\n"
-+    "                use '-remote help' to print all possible properties\n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@table @option
-+@item rid
-+@findex -rid
-+remote id
-+@item socket
-+@findex -socket
-+Remote process socket
-+@item command
-+@findex -command
-+Remote process command.
+     return !(vmsd && vmsd->unmigratable);
+ }
 +
-+@end table
-+ETEXI
++int qemu_remote_savevm(QEMUFile *f)
++{
++    SaveStateEntry *se;
++    int ret;
 +
- DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (!se->vmsd || !vmstate_save_needed(se->vmsd, se->opaque)) {
++            continue;
++        }
++
++        save_section_header(f, se, QEMU_VM_SECTION_FULL);
++
++        ret = vmstate_save(f, se, NULL);
++        if (ret) {
++            qemu_file_set_error(f, ret);
++            return ret;
++        }
++
++        save_section_footer(f, se);
++    }
++
++    qemu_put_byte(f, QEMU_VM_EOF);
++    qemu_fflush(f);
++
++    return 0;
++}
+diff --git a/migration/savevm.h b/migration/savevm.h
+index ba64a7e..0491d3a 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -65,4 +65,6 @@ void qemu_loadvm_state_cleanup(void);
+ int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+ int qemu_load_device_state(QEMUFile *f);
+ 
++int qemu_remote_savevm(QEMUFile *f);
++
+ #endif
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 58d9905..e97eb76 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -53,6 +53,16 @@
+ #include "qemu/log.h"
+ #include "qemu/cutils.h"
+ #include "remote-opts.h"
++#include "qapi/error.h"
++#include "io/channel-util.h"
++
++#include "io/channel.h"
++#include "io/channel-socket.h"
++#include "migration/qemu-file-types.h"
++#include "migration/savevm.h"
++#include "migration/qemu-file-channel.h"
++#include "migration/qemu-file.h"
++
+ #include "monitor/monitor.h"
+ #include "chardev/char.h"
+ #include "sysemu/reset.h"
+@@ -322,6 +332,36 @@ static int setup_device(MPQemuMsg *msg, Error **errp)
+ 
+ }
+ 
++static void process_start_mig_out(MPQemuMsg *msg)
++{
++    int wait = msg->fds[1];
++    Error *err = NULL;
++    QIOChannel *ioc;
++    QEMUFile *f;
++
++    ioc = qio_channel_new_fd(msg->fds[0], &err);
++    if (err) {
++        error_report_err(err);
++        return;
++    }
++
++    qio_channel_set_name(QIO_CHANNEL(ioc), "remote-migration-channel");
++
++    f = qemu_fopen_channel_output(ioc);
++
++    bdrv_drain_all();
++    (void)bdrv_flush_all();
++
++    (void)qemu_remote_savevm(f);
++
++    qemu_fflush(f);
++
++    notify_proxy(wait, (uint64_t)qemu_ftell(f));
++    PUT_REMOTE_WAIT(wait);
++
++    qemu_fclose(f);
++}
++
+ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+ {
+     MPQemuMsg *msg = NULL;
+@@ -411,6 +451,9 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+             notify_proxy(msg->fds[0], 0);
+         }
+         break;
++    case START_MIG_OUT:
++        process_start_mig_out(msg);
++        break;
+     default:
+         error_setg(&err, "Unknown command");
+         goto finalize_loop;
 -- 
 1.8.3.1
 
