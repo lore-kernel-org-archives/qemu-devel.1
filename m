@@ -2,87 +2,95 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B44C38BFF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FEEC38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 795562176D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1D1B20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 22:38:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tF5EoHy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795562176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hE4lTNKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1D1B20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6MLW-0002Ky-MX
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 17:37:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37955)
+	id 1j6MMY-0003b5-VY
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 17:38:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j6M7o-0004Xp-Pt
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:54 -0500
+ (envelope-from <peterx@redhat.com>) id 1j6MBL-0003M4-Tz
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:26:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j6M7n-0005us-Cv
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:52 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46341)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j6M7n-0005uN-6V
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:22:51 -0500
-Received: by mail-pg1-x543.google.com with SMTP id y30so5817897pga.13
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:22:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Jm8KlY79fmi10gEwUaheKwxsBU3LYmbPeN5QBjFnnb0=;
- b=tF5EoHy5mkqDGJ11etcAOiB0Np57GLPUdwsPK1yz19pH0koGH/STl2Yc73VDAWUgAh
- NdMaFiBTz/m0AgPc41k0z+WeYCY7EoYDLsq+ttMBFy95yDu0iyl8EBY+nQ1AiBYyuWPB
- owt6cWmAv/x+1NU12HAuE+eaMv6RydEtWKiTi95pALW1Q3zEBPY9kkL/hJVBZHNE6Jd5
- 5FlAuAYCr+VouSgI+8lUb6FZCo8DP4zjcZ7w59QZBng0cUjQun7RUdcCEMOPMbLx1A9v
- YtnMTi3yiQTJXWJT/T2VF0kWoPmUKxPlqwL3bm4YM5b2ewvHkTf/a2N++NnCmt721GlC
- TVUA==
+ (envelope-from <peterx@redhat.com>) id 1j6MBK-0007bq-GV
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:26:31 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42189
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j6MBI-0007a2-UJ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 17:26:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582583186;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Tk7+NUh4F6PNuzBUgDrMyUujqWjrtANohetARUwFSrw=;
+ b=hE4lTNKxzBe0XwEkC/rfUyt2AGjkNseP/j/KfET67iWixwf142gvh9Vh+XB5WFwKvo6cYM
+ rWo1fvdUMitTiE2KuoY/CeAadt6FjMZz8zgecQD+EgzkdoHQdMllEWrwAAKx2J6z7EFELC
+ KcrrQeGbW06jeWT3uaVQ05WA2iJr3HI=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-DkVj9vM1OLOiHueAxL6B7w-1; Mon, 24 Feb 2020 17:26:22 -0500
+X-MC-Unique: DkVj9vM1OLOiHueAxL6B7w-1
+Received: by mail-qk1-f197.google.com with SMTP id 205so3583823qkg.0
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:26:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Jm8KlY79fmi10gEwUaheKwxsBU3LYmbPeN5QBjFnnb0=;
- b=RxmscznJrQEcYEYPaSag40yF7v8JP2v4dEdZr8xlHLxLyxaM6DwxgAzydS9I1zzWm8
- zWcP16/ESR0NDPi2x7zCWfjsqesBhz8rnc+MsTG4fJZPJD1zFiZd1+BKMCfhjeT1d9q6
- ms9hphNby7gCylFqwojUeLiwgyrT2Hq6BUjyacZAEquET7Al4d4nD8N4UjHsW37k4rKo
- iEGPOMs2Ca1XQCBrULObMx6yu/VCFFg+cnLFV9rjrk6O+q+UqG4gPNW78Ic2FPvuQY2a
- i4kUD9xVCZsg62fvWnzyixM9zlgP9rqym3uhjdlHThGdmVib/XDsGsVsl7R3OiWijn1T
- U1Mg==
-X-Gm-Message-State: APjAAAX0Bvh8kQS/LushH/M4sBIDwIveCsLuXf0PRXB0tTaLxJAC8Dfr
- J2eziG7PKH9NBtVi4YpuGoPT8wrYQ2s=
-X-Google-Smtp-Source: APXvYqzXHK7wmq7szzmDa9BJUqt40iM7rniCQefQiXXJlK6vHVoA+Wec/8IM+dH34W3/iSFAOBzKOw==
-X-Received: by 2002:a62:ab06:: with SMTP id p6mr29829193pff.52.1582582969821; 
- Mon, 24 Feb 2020 14:22:49 -0800 (PST)
-Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
- [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id o6sm13897097pgg.37.2020.02.24.14.22.48
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Utr9gdKR0MeStAEEWHwNDo0tcnBNfmKFvMtXm4/Axuw=;
+ b=dQm0gd1KtRunk69lE2tv5/K0iaDlROJ7b0d0YlQbOXcyo4i+FqXIOJFea2vye/K8Pp
+ bq64q72HL/csWTctdudhAwc2c+RH0cIg9iSVtfgNLfcNUmpRtY6OhuFdqS5OmGfzOyCI
+ JeyzJx5n1baYGq7uRht4XCR7bRmuYMcYgv947pIyBPMPhut1VcuzfPUdqfLg07tdPiJP
+ c2/Nppi0t1RzIEl06+oar76Lk52FQNIVtTvd1Ehxb5t7YrEwiRY0Gr/kOQtw6gbdObFN
+ ApX/MiPtOnbiuEtHBF1tm28ZMPAs/BezOIQF6tXibufk2xYyLt72ZrvA6njV+Lwt2IKS
+ mXfA==
+X-Gm-Message-State: APjAAAUNcDdR4T9EEXbYQMvlK+O0LveLy3182NZax1kwzeQ2v5+0UktK
+ vCDilRhG5hExvehFeFSFifAfjmVjGhq8oZcxGgDSZzPMKmQYa7wBWxPxgioQmeOY94bwAFtohjZ
+ 1xes0VAFgNADoeb4=
+X-Received: by 2002:ad4:53a8:: with SMTP id j8mr46720578qvv.149.1582583181695; 
+ Mon, 24 Feb 2020 14:26:21 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw8iwoEEbXwhT86pLJ36XtOo23hsco1O3sdzMh+kr6Qc3cWmzSZlsGckNwt8WfaqnnsNVSO3A==
+X-Received: by 2002:ad4:53a8:: with SMTP id j8mr46720567qvv.149.1582583181468; 
+ Mon, 24 Feb 2020 14:26:21 -0800 (PST)
+Received: from xz-x1 ([104.156.64.75])
+ by smtp.gmail.com with ESMTPSA id t23sm6538152qtp.82.2020.02.24.14.26.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Feb 2020 14:22:49 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 12/17] target/arm: Move the vfp decodetree calls next to
- the base isa
-Date: Mon, 24 Feb 2020 14:22:27 -0800
-Message-Id: <20200224222232.13807-13-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200224222232.13807-1-richard.henderson@linaro.org>
-References: <20200224222232.13807-1-richard.henderson@linaro.org>
+ Mon, 24 Feb 2020 14:26:20 -0800 (PST)
+Date: Mon, 24 Feb 2020 17:26:18 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 10/13] migration/ram: Handle RAM block resizes during
+ postcopy
+Message-ID: <20200224222618.GA113102@xz-x1>
+References: <20200221164204.105570-1-david@redhat.com>
+ <20200221164204.105570-11-david@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+In-Reply-To: <20200221164204.105570-11-david@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,165 +102,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Have the calls adjacent as an intermediate step toward
-actually merging the decodes.
+On Fri, Feb 21, 2020 at 05:42:01PM +0100, David Hildenbrand wrote:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v2: Fix fallthrough in disas_arm_insn vs vfp insns.
----
- target/arm/translate.c | 83 +++++++++++++++---------------------------
- 1 file changed, 29 insertions(+), 54 deletions(-)
+[...]
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 5b7cad1ea2..6259064ea7 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -2646,31 +2646,6 @@ static void gen_neon_dup_high16(TCGv_i32 var)
-     tcg_temp_free_i32(tmp);
- }
- 
--/*
-- * Disassemble a VFP instruction.  Returns nonzero if an error occurred
-- * (ie. an undefined instruction).
-- */
--static int disas_vfp_insn(DisasContext *s, uint32_t insn)
--{
--    /*
--     * If the decodetree decoder handles this insn it will always
--     * emit code to either execute the insn or generate an appropriate
--     * exception; so we don't need to ever return non-zero to tell
--     * the calling code to emit an UNDEF exception.
--     */
--    if (extract32(insn, 28, 4) == 0xf) {
--        if (disas_vfp_uncond(s, insn)) {
--            return 0;
--        }
--    } else {
--        if (disas_vfp(s, insn)) {
--            return 0;
--        }
--    }
--    /* If the decodetree decoder didn't handle this insn, it must be UNDEF */
--    return 1;
--}
--
- static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
- {
- #ifndef CONFIG_USER_ONLY
-@@ -10778,7 +10753,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-         ARCH(5);
- 
-         /* Unconditional instructions.  */
--        if (disas_a32_uncond(s, insn)) {
-+        /* TODO: Perhaps merge these into one decodetree output file.  */
-+        if (disas_a32_uncond(s, insn) ||
-+            disas_vfp_uncond(s, insn)) {
-             return;
-         }
-         /* fall back to legacy decoder */
-@@ -10805,13 +10782,6 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             }
-             return;
-         }
--        if ((insn & 0x0f000e10) == 0x0e000a00) {
--            /* VFP.  */
--            if (disas_vfp_insn(s, insn)) {
--                goto illegal_op;
--            }
--            return;
--        }
-         if ((insn & 0x0e000f00) == 0x0c000100) {
-             if (arm_dc_feature(s, ARM_FEATURE_IWMMXT)) {
-                 /* iWMMXt register transfer.  */
-@@ -10842,7 +10812,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-         arm_skip_unless(s, cond);
-     }
- 
--    if (disas_a32(s, insn)) {
-+    /* TODO: Perhaps merge these into one decodetree output file.  */
-+    if (disas_a32(s, insn) ||
-+        disas_vfp(s, insn)) {
-         return;
-     }
-     /* fall back to legacy decoder */
-@@ -10852,11 +10824,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-     case 0xd:
-     case 0xe:
-         if (((insn >> 8) & 0xe) == 10) {
--            /* VFP.  */
--            if (disas_vfp_insn(s, insn)) {
--                goto illegal_op;
--            }
--        } else if (disas_coproc_insn(s, insn)) {
-+            /* VFP, but failed disas_vfp.  */
-+            goto illegal_op;
-+        }
-+        if (disas_coproc_insn(s, insn)) {
-             /* Coprocessor.  */
-             goto illegal_op;
-         }
-@@ -10945,7 +10916,14 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-         ARCH(6T2);
-     }
- 
--    if (disas_t32(s, insn)) {
-+    /*
-+     * TODO: Perhaps merge these into one decodetree output file.
-+     * Note disas_vfp is written for a32 with cond field in the
-+     * top nibble.  The t32 encoding requires 0xe in the top nibble.
-+     */
-+    if (disas_t32(s, insn) ||
-+        disas_vfp_uncond(s, insn) ||
-+        ((insn >> 28) == 0xe && disas_vfp(s, insn))) {
-         return;
-     }
-     /* fall back to legacy decoder */
-@@ -10962,17 +10940,15 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 goto illegal_op; /* op0 = 0b11 : unallocated */
-             }
- 
--            if (disas_vfp_insn(s, insn)) {
--                if (((insn >> 8) & 0xe) == 10 &&
--                    dc_isar_feature(aa32_fpsp_v2, s)) {
--                    /* FP, and the CPU supports it */
--                    goto illegal_op;
--                } else {
--                    /* All other insns: NOCP */
--                    gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
--                                       syn_uncategorized(),
--                                       default_exception_el(s));
--                }
-+            if (((insn >> 8) & 0xe) == 10 &&
-+                dc_isar_feature(aa32_fpsp_v2, s)) {
-+                /* FP, and the CPU supports it */
-+                goto illegal_op;
-+            } else {
-+                /* All other insns: NOCP */
-+                gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
-+                                   syn_uncategorized(),
-+                                   default_exception_el(s));
-             }
-             break;
-         }
-@@ -10995,9 +10971,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 goto illegal_op;
-             }
-         } else if (((insn >> 8) & 0xe) == 10) {
--            if (disas_vfp_insn(s, insn)) {
--                goto illegal_op;
--            }
-+            /* VFP, but failed disas_vfp.  */
-+            goto illegal_op;
-         } else {
-             if (insn & (1 << 28))
-                 goto illegal_op;
--- 
-2.20.1
+> @@ -3160,7 +3160,13 @@ static int ram_load_postcopy(QEMUFile *f)
+>                  break;
+>              }
+> =20
+> -            if (!offset_in_ramblock(block, addr)) {
+> +            /*
+> +             * Relying on used_length is racy and can result in false po=
+sitives.
+> +             * We might place pages beyond used_length in case RAM was s=
+hrunk
+> +             * while in postcopy, which is fine - trying to place via
+> +             * UFFDIO_COPY/UFFDIO_ZEROPAGE will never segfault.
+> +             */
+> +            if (!block->host || addr >=3D block->postcopy_length) {
+
+I'm thinking whether we can even avoid the -ENOENT failure of
+UFFDIO_COPY.  With the postcopy_length you introduced, I think it's
+the case when addr >=3D used_length && addr < postcopy_length, right?
+Can we skip those?
+
+Thanks,
+
+>                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+>                  ret =3D -EINVAL;
+>                  break;
+> @@ -3757,6 +3763,7 @@ static void ram_mig_ram_block_resized(RAMBlockNotif=
+ier *n, void *host,
+>                               rb->idstr);
+>              }
+>          }
+> +        rb->postcopy_length =3D new_size;
+>          break;
+>      case POSTCOPY_INCOMING_NONE:
+>      case POSTCOPY_INCOMING_RUNNING:
+> --=20
+> 2.24.1
+>=20
+
+--=20
+Peter Xu
 
 
