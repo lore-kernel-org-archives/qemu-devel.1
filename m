@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E868EC35DE6
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09089C35DE4
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA4C92084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA98F2084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KM+9D4os"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA4C92084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="McfMWxPW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA98F2084E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NMb-0006ve-O9
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:42:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47210)
+	id 1j6NMe-000720-0y
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:42:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47227)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIP-0006Vf-8X
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIP-0006Wv-Lp
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIN-00088p-VD
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIO-00089M-BL
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:53 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:43209)
+Received: from ozlabs.org ([203.11.71.1]:45531)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6NIN-00084M-Jw; Mon, 24 Feb 2020 18:37:51 -0500
+ id 1j6NIN-00086R-VT; Mon, 24 Feb 2020 18:37:52 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RJQ44LF9z9sRt; Tue, 25 Feb 2020 10:37:32 +1100 (AEDT)
+ id 48RJQ45mbLz9sSQ; Tue, 25 Feb 2020 10:37:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1582587452;
- bh=/gYCLL/Jk6TTuPaJCqEEFdhUfEKdZ2BLlTEIKLhOQP8=;
+ bh=aBsVfkPLqtLYAJVvSFLlYU9uQn9tdTvG94/i9S6mjsA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KM+9D4osvKZ9PLVeJwdJMyToWJJchiXsZHtgHGxqGQD3qyzQGIm6/080bP2wUsS+/
- tJKx5+kPzBAK5eUc5auoEOxUdC8w/jiZzs5dicl4qCB7Pp619aG9obD8vIBO8c/bf4
- 7QPbazSKfcRf/iziAgZvjhCFRRpE/1K9hRB2jOvI=
+ b=McfMWxPW19Kby1wByDIvcbGGCAr5vunIN1oepyQqdBDUXTnrPn8QNWsjlAF7H1r/R
+ OpcHyuIfvD2ClHJm2+BkduHkRJGMg3Gy4ZzJdc3wXps9gdCwrl7o3c1Snmvbeo6FJ7
+ CndnIwI8NdFjBanBpFRFOkHCay6YAiRp+5W+p6oo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: [PATCH v6 12/18] target/ppc: Don't store VRMA SLBE persistently
-Date: Tue, 25 Feb 2020 10:37:18 +1100
-Message-Id: <20200224233724.46415-13-david@gibson.dropbear.id.au>
+Subject: [PATCH v6 13/18] spapr: Don't use weird units for MIN_RMA_SLOF
+Date: Tue, 25 Feb 2020 10:37:19 +1100
+Message-Id: <20200224233724.46415-14-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,112 +80,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, we construct the SLBE used for VRMA translations when the LPCR
-is written (which controls some bits in the SLBE), then use it later for
-translations.
+MIN_RMA_SLOF records the minimum about of RMA that the SLOF firmware
+requires.  It lets us give a meaningful error if the RMA ends up too smal=
+l,
+rather than just letting SLOF crash.
 
-This is a bit complex and confusing - simplify it by simply constructing
-the SLBE directly from the LPCR when we need it.
+It's currently stored as a number of megabytes, which is strange for glob=
+al
+constants.  Move that megabyte scaling into the definition of the constan=
+t
+like most other things use.
+
+Change from M to MiB in the associated message while we're at it.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h        |  3 ---
- target/ppc/mmu-hash64.c | 28 ++++++----------------------
- 2 files changed, 6 insertions(+), 25 deletions(-)
+ hw/ppc/spapr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index f9871b1233..5a55fb02bd 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1044,9 +1044,6 @@ struct CPUPPCState {
-     uint32_t flags;
-     uint64_t insns_flags;
-     uint64_t insns_flags2;
--#if defined(TARGET_PPC64)
--    ppc_slb_t vrma_slb;
--#endif
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 828e2cc135..272a270b7a 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -103,7 +103,7 @@
+ #define FW_OVERHEAD             0x2800000
+ #define KERNEL_LOAD_ADDR        FW_MAX_SIZE
 =20
-     int error_code;
-     uint32_t pending_interrupts;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index ac21c14f68..f8bf92aa2e 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -825,6 +825,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
- {
-     CPUState *cs =3D CPU(cpu);
-     CPUPPCState *env =3D &cpu->env;
-+    ppc_slb_t vrma_slbe;
-     ppc_slb_t *slb;
-     unsigned apshift;
-     hwaddr ptex;
-@@ -863,8 +864,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-             }
-         } else if (ppc_hash64_use_vrma(env)) {
-             /* Emulated VRMA mode */
--            slb =3D &env->vrma_slb;
--            if (!slb->sps) {
-+            slb =3D &vrma_slbe;
-+            if (build_vrma_slbe(cpu, slb) !=3D 0) {
-                 /* Invalid VRMA setup, machine check */
-                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
-                 env->error_code =3D 0;
-@@ -1012,6 +1013,7 @@ skip_slb_search:
- hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr=
-)
- {
-     CPUPPCState *env =3D &cpu->env;
-+    ppc_slb_t vrma_slbe;
-     ppc_slb_t *slb;
-     hwaddr ptex, raddr;
-     ppc_hash_pte64_t pte;
-@@ -1033,8 +1035,8 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
-             return raddr | env->spr[SPR_HRMOR];
-         } else if (ppc_hash64_use_vrma(env)) {
-             /* Emulated VRMA mode */
--            slb =3D &env->vrma_slb;
--            if (!slb->sps) {
-+            slb =3D &vrma_slbe;
-+            if (build_vrma_slbe(cpu, slb) !=3D 0) {
-                 return -1;
-             }
-         } else {
-@@ -1072,30 +1074,12 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, t=
-arget_ulong ptex,
-     cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_F=
-LUSH;
- }
+-#define MIN_RMA_SLOF            128UL
++#define MIN_RMA_SLOF            (128 * MiB)
 =20
--static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
--{
--    CPUPPCState *env =3D &cpu->env;
--    ppc_slb_t *slb =3D &env->vrma_slb;
--
--    /* Is VRMA enabled ? */
--    if (ppc_hash64_use_vrma(env)) {
--        if (build_vrma_slbe(cpu, slb) =3D=3D 0) {
--            return;
--        }
--    }
--
--    /* Otherwise, clear it to indicate error */
--    slb->esid =3D slb->vsid =3D 0;
--    slb->sps =3D NULL;
--}
--
- void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
- {
-     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     CPUPPCState *env =3D &cpu->env;
+ #define PHANDLE_INTC            0x00001111
 =20
-     env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
--    ppc_hash64_update_vrma(cpu);
- }
+@@ -2959,10 +2959,10 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+         }
+     }
 =20
- void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+-    if (spapr->rma_size < (MIN_RMA_SLOF * MiB)) {
++    if (spapr->rma_size < MIN_RMA_SLOF) {
+         error_report(
+-            "pSeries SLOF firmware requires >=3D %ldM guest RMA (Real Mo=
+de Area memory)",
+-            MIN_RMA_SLOF);
++            "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real =
+Mode Area memory)",
++            MIN_RMA_SLOF / MiB);
+         exit(1);
+     }
+=20
 --=20
 2.24.1
 
