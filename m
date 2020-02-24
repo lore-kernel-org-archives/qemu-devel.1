@@ -2,97 +2,79 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71513C38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 154F3C38BF9
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3411720CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:19:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3F1620CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:21:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TyJqx1TS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3411720CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JRs2QhDP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F1620CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6L8a-0003Dy-BF
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:19:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
+	id 1j6LA6-0005pL-W7
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:21:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmX-0007Ab-43
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6KnT-0000rh-QP
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmV-0003bi-Hn
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:49 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:53550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6KmV-0003a2-80
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:47 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKral6164128;
- Mon, 24 Feb 2020 20:56:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references; s=corp-2020-01-29;
- bh=I0MCFzsj7Hs8gCp2U945/nTXJZSYe2xsHlKItOC4YrQ=;
- b=TyJqx1TSD3H5xoi1hVy1f1VqqLBUpeUl7nPcR36pSblhuqbvpMS3vNHSVQLiEOYZ8lNy
- 22xoED6ylzORWpheXBlfDPWXvREW3Xg9p87UHXBm/XEm9RMEr954tsvIo7C66FdcpjfY
- QwE10UiTWXxnXnY/icV1YPC9T+/e3jQSpbEtUHeZO46uir9HI9Sg39bBxCt8ye/3H4xW
- 1l+8NQEb/hmFJhze5SXvFcTE1uF2CtcrjBmkm+BSRFvX8jfilM156ARcFW73hlIpK/9M
- 29NCCHrkpxi7VADEcPXVMB83jQ7d+NDVzGfV7aCCkqla8HF1RVY8ffLIap1PRA65h2Zm og== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2ybvr4p96p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:42 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKq8cm089110;
- Mon, 24 Feb 2020 20:56:42 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 2yby5dmce7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:42 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKueaa029940;
- Mon, 24 Feb 2020 20:56:40 GMT
-Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:39 -0800
-From: Jagannathan Raman <jag.raman@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 28/50] multi-process: add remote options parser
-Date: Mon, 24 Feb 2020 15:55:19 -0500
-Message-Id: <8ed88052f089814b70d32fcf17f0f963daa03c28.1582576372.git.jag.raman@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
-References: <cover.1582576372.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
-References: <cover.1582576372.git.jag.raman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxscore=0 bulkscore=0
- suspectscore=1 mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002240153
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+ (envelope-from <philmd@redhat.com>) id 1j6KnS-0004Zp-Pz
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:47 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34974
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6KnR-0004XD-M4
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:57:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582577865;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DAKyL7Tqa+fBdxrFOnKvFsx39GH2EjqIV6ZKoapzE/Q=;
+ b=JRs2QhDPrB+Zgz0xB54Bkj7P+WmgAyBM0/cg9Ffq48VaVkhigOp0fHqfp4oJ1Kb6fFAxv1
+ Uj8RgmYynhKpdgAVB7P+EISYLg/eNT7n5wqUrVyipSIoj5DaEz1IHAdXfK1Gse2+IgMvdv
+ XLjAenVhPBa3UPqCue+rZ7bczOMFWA8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-92-WEuuKmVzO9K1-WgNWVdffA-1; Mon, 24 Feb 2020 15:57:43 -0500
+X-MC-Unique: WEuuKmVzO9K1-WgNWVdffA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17FC6800D53;
+ Mon, 24 Feb 2020 20:57:39 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-162.brq.redhat.com [10.40.205.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2364C5C651;
+ Mon, 24 Feb 2020 20:57:28 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH RESEND v2 06/32] hw/display: Use memory_region_init_rom() with
+ read-only regions
+Date: Mon, 24 Feb 2020 21:55:07 +0100
+Message-Id: <20200224205533.23798-7-philmd@redhat.com>
+In-Reply-To: <20200224205533.23798-1-philmd@redhat.com>
+References: <20200224205533.23798-1-philmd@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,241 +86,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-block@nongnu.org,
+ Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Alistair Francis <alistair@alistair23.me>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-riscv@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+ Michael Walle <michael@walle.cc>, qemu-ppc@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/monitor/qdev.h |   1 +
- softmmu/vl.c           | 105 +++++++++++++++++++++++++++++++++++++++++++++++++
- vl-parse.c             |  31 +++++++++++++++
- vl.h                   |   1 +
- 4 files changed, 138 insertions(+)
+ hw/display/cg3.c | 5 ++---
+ hw/display/tcx.c | 5 ++---
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/include/monitor/qdev.h b/include/monitor/qdev.h
-index d47a544..f3a56fa 100644
---- a/include/monitor/qdev.h
-+++ b/include/monitor/qdev.h
-@@ -23,6 +23,7 @@ struct remote_process {
-     unsigned int type;
-     int socket;
-     char *command;
-+    char *exec;
-     QemuOpts *opts;
- 
-     QLIST_ENTRY(remote_process) next;
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index b277de3..a8a6f35 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -253,6 +253,32 @@ static QemuOptsList qemu_option_rom_opts = {
-     },
- };
- 
-+static QemuOptsList qemu_remote_opts = {
-+    .name = "remote",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_remote_opts.head),
-+    .desc = {
-+        {
-+            .name = "rid",
-+            .type = QEMU_OPT_NUMBER,
-+            .help = "id of the remote process"
-+        },{
-+            .name = "socket",
-+            .type = QEMU_OPT_NUMBER,
-+            .help = "Socket for remote",
-+        },{
-+            .name = "command",
-+            .type = QEMU_OPT_STRING,
-+            .help = "command to run",
-+        },{
-+            .name = "exec",
-+            .type = QEMU_OPT_STRING,
-+            .help = "exec name",
-+        },
-+        { /* end of list */ }
-+    },
-+};
-+
-+
- static QemuOptsList qemu_machine_opts = {
-     .name = "machine",
-     .implied_opt_name = "type",
-@@ -314,6 +340,71 @@ static QemuOptsList qemu_boot_opts = {
-     },
- };
- 
-+#if defined(CONFIG_MPQEMU)
-+static int parse_remote(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    int rid;
-+    int socket;
-+    char  *c_sock = NULL;
-+    char *command = NULL;
-+    char *exec = NULL;
-+    struct remote_process r_proc;
-+
-+    rid = atoi(qemu_opt_get(opts, "rid"));
-+    if (rid < 0) {
-+        error_setg(errp, "rid is required.");
-+        return -1;
-+    }
-+    if (get_remote_process_rid(rid)) {
-+        error_setg(errp, "There is already process with rid %d", rid);
-+        goto cont_devices;
-+    }
-+
-+    c_sock = (char *)qemu_opt_get(opts, "socket");
-+    if (c_sock) {
-+        socket = atoi(c_sock);
-+    } else {
-+        socket = -1;
-+    }
-+    if (socket <= STDERR_FILENO && socket != -1) {
-+        socket = -1;
-+    }
-+
-+    exec = (char *)qemu_opt_get(opts, "exec");
-+
-+    if (!exec && socket < 0) {
-+        error_setg(errp, "No socket or exec defined for remote.");
-+        return -1;
-+    }
-+    if (exec && (socket != -1)) {
-+        error_setg(errp, "Both socket and exec are specified, " \
-+                         "need only one of those.");
-+        return -1;
-+    }
-+
-+    command = (char *)qemu_opt_get(opts, "command");
-+    if (!command && socket < 0) {
-+        error_setg(errp, "Remote process command option is not specified.");
-+        return -1;
-+    }
-+
-+    r_proc.rid = rid;
-+    r_proc.socket = socket;
-+    r_proc.command = g_strdup(command);
-+    r_proc.exec = g_strdup(exec);
-+    remote_process_register(&r_proc);
-+
-+ cont_devices:
-+    if (qemu_opts_foreach(qemu_find_opts("device"), device_remote_add,
-+                          &rid, NULL)) {
-+        error_setg(errp, "Could not process some of the remote devices.");
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+#endif
-+
- static QemuOptsList qemu_add_fd_opts = {
-     .name = "add-fd",
-     .head = QTAILQ_HEAD_INITIALIZER(qemu_add_fd_opts.head),
-@@ -2751,6 +2842,7 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_icount_opts);
-     qemu_add_opts(&qemu_semihosting_config_opts);
-     qemu_add_opts(&qemu_fw_cfg_opts);
-+    qemu_add_opts(&qemu_remote_opts);
-     module_call_init(MODULE_INIT_OPTS);
- 
-     runstate_init();
-@@ -3575,6 +3667,14 @@ void qemu_init(int argc, char **argv, char **envp)
-                 exit(1);
- #endif
-                 break;
-+            case QEMU_OPTION_remote:
-+                opts = qemu_opts_parse_noisily(qemu_find_opts("remote"),
-+                                               optarg, false);
-+                if (!opts) {
-+                    exit(1);
-+                }
-+                break;
-+
-             case QEMU_OPTION_object:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("object"),
-                                                optarg, true);
-@@ -4170,6 +4270,11 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_opts_foreach(qemu_find_opts("device"),
-                       device_init_func, NULL, &error_fatal);
- 
-+#ifdef CONFIG_MPQEMU
-+    qemu_opts_foreach(qemu_find_opts("remote"),
-+                      parse_remote, NULL, &error_fatal);
-+#endif
-+
-     cpu_synchronize_all_post_init();
- 
-     rom_reset_order_override();
-diff --git a/vl-parse.c b/vl-parse.c
-index b76bc95..1f6a3f0 100644
---- a/vl-parse.c
-+++ b/vl-parse.c
-@@ -85,6 +85,37 @@ const QEMUOption *lookup_opt(int argc, char **argv,
-     return popt;
- }
- 
-+#if defined(CONFIG_MPQEMU)
-+int device_remote_add(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    unsigned int rid = 0;
-+    const char *opt_rid = NULL;
-+    struct remote_process *p = NULL;
-+
-+    if (opaque) {
-+        rid = *(unsigned int *)opaque;
-+    }
-+    opt_rid = qemu_opt_get(opts, "rid");
-+    if (!opt_rid) {
-+        return 0;
-+    }
-+
-+    p = get_remote_process_rid(rid);
-+    if (!p) {
-+        error_setg(errp, "No process for rid %d", rid);
-+        return -EINVAL;
-+    }
-+
-+    if (atoi(opt_rid) == rid) {
-+        qemu_opt_set(opts, "command", p->command, errp);
-+        qemu_opt_set(opts, "exec", p->exec, errp);
-+        rdevice_init_func(opaque, opts, errp);
-+        qemu_opts_del(opts);
-+    }
-+    return 0;
-+}
-+#endif
-+
- int drive_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     BlockInterfaceType *block_default_type = opaque;
-diff --git a/vl.h b/vl.h
-index a171fab..d84bf63 100644
---- a/vl.h
-+++ b/vl.h
-@@ -36,6 +36,7 @@ int device_init_func(void *opaque, QemuOpts *opts, Error **errp);
- 
- #if defined(CONFIG_MPQEMU)
- int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp);
-+int device_remote_add(void *opaque, QemuOpts *opts, Error **errp);
- #endif
- 
- #endif /* VL_H */
--- 
-1.8.3.1
+diff --git a/hw/display/cg3.c b/hw/display/cg3.c
+index 4fb67c6b1c..a1ede10394 100644
+--- a/hw/display/cg3.c
++++ b/hw/display/cg3.c
+@@ -287,9 +287,8 @@ static void cg3_initfn(Object *obj)
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+     CG3State *s =3D CG3(obj);
+=20
+-    memory_region_init_ram_nomigrate(&s->rom, obj, "cg3.prom", FCODE_MAX_R=
+OM_SIZE,
+-                           &error_fatal);
+-    memory_region_set_readonly(&s->rom, true);
++    memory_region_init_rom_nomigrate(&s->rom, obj, "cg3.prom",
++                                     FCODE_MAX_ROM_SIZE, &error_fatal);
+     sysbus_init_mmio(sbd, &s->rom);
+=20
+     memory_region_init_io(&s->reg, obj, &cg3_reg_ops, s, "cg3.reg",
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+index ca458f94fe..76de16e8ea 100644
+--- a/hw/display/tcx.c
++++ b/hw/display/tcx.c
+@@ -755,9 +755,8 @@ static void tcx_initfn(Object *obj)
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+     TCXState *s =3D TCX(obj);
+=20
+-    memory_region_init_ram_nomigrate(&s->rom, obj, "tcx.prom", FCODE_MAX_R=
+OM_SIZE,
+-                           &error_fatal);
+-    memory_region_set_readonly(&s->rom, true);
++    memory_region_init_rom_nomigrate(&s->rom, obj, "tcx.prom",
++                                     FCODE_MAX_ROM_SIZE, &error_fatal);
+     sysbus_init_mmio(sbd, &s->rom);
+=20
+     /* 2/STIP : Stippler */
+--=20
+2.21.1
 
 
