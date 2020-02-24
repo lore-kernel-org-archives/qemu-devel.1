@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B527AC38BE0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22414C38BE2
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8388521927
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF8C620CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:09:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sNa/T9J2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8388521927
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KftiRQgA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF8C620CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Kxf-0008V1-NL
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:08:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50249)
+	id 1j6KyU-0001D6-15
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:09:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6Km6-00068n-OL
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:24 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6KmB-0006JO-0v
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6Km4-00030y-Sl
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:22 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:52800)
+ (envelope-from <jag.raman@oracle.com>) id 1j6Km8-00034t-Pk
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:26 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52894)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6Km4-0002zN-Ge
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:20 -0500
+ id 1j6Km8-00033s-Fe
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:24 -0500
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrajF164104;
- Mon, 24 Feb 2020 20:56:14 GMT
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrgcg164180;
+ Mon, 24 Feb 2020 20:56:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=QIN4OBnH8pfK/FQg/Ngm3RypA/DQPqJb+C20uwyiIM0=;
- b=sNa/T9J2Zx6yUkNSKIBXT1yBluwwIksfec48dOY/lbhun6iUHOdvwEdLA9nzMLCTytFn
- Y/H+YJ8Q8kDO6GYl5P+SLrjm3AGp6PX8Hwgge5Wm0fGBo68kgfyCQhO5ZZ7EMJrUi/tG
- tM3zi95QmgfPKXduR34a0Flks9HUhoh2oaRYD4QcDsmtko9Tfd8MVEvsIXgvAJErZ6C4
- gn3lf4Zcu4BvNsUCO2Ae1PvBQJteg2imUTj/9QsEjoZFJjElysjj0mxmgCjB3pi31uzA
- U/T2gEb9HXrzgf5BRrWGB7F2Zh/3yTg2D/i9FILCP0mE32Rh+2pstrDnrB9Cf61Id3Kd VA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 2ybvr4p93g-1
+ s=corp-2020-01-29; bh=yKz45Eb+loFnirKzQAZdSGDq5E8OjxdEbf9hqkMJUVY=;
+ b=KftiRQgAiBB3G4PqQCtCQ2UqI4y/Rp88L7HFMznptNHLHNGRFr7suQdbPVCapC8G/d6O
+ nKDWsO80JrEQ1xH2d+pgrgD7iHKngYXzF0BJU/2w3qbnqUMSpEh9wmHenOWJU5M9aHJ6
+ /UC4PeAteah+GNq7jLV26KzCg70gkZa13/UYPJ9ll6Ur2Ee5fd/jn4Jmjd4HlxwnICiw
+ ntrJ4yiDX3fQeks8GjWL85q4WKfDpfYtfj1VXZ4yoC26PiL87wOmsZxdPLz8TP0xYsq/
+ TD1YPeR2MPBIocQH7Syjp1JL2KyHHSadM81n7kNw2Sb9z974QiO9vhxCOWX+l42RTkqv PA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2ybvr4p93x-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:14 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKpuFv108591;
- Mon, 24 Feb 2020 20:56:13 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 2ybe123sm5-1
+ Mon, 24 Feb 2020 20:56:19 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKqfLZ090002;
+ Mon, 24 Feb 2020 20:56:19 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 2yby5dmayh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:13 +0000
+ Mon, 24 Feb 2020 20:56:18 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 01OKuCvE029677;
- Mon, 24 Feb 2020 20:56:12 GMT
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKuGX3028367;
+ Mon, 24 Feb 2020 20:56:16 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:11 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:56:16 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/50] multi-process: setup a machine object for remote
- device process
-Date: Mon, 24 Feb 2020 15:55:01 -0500
-Message-Id: <c149a5116f8afee0ecfb5503a78de19b01a7daab.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 13/50] multi-process: introduce proxy object
+Date: Mon, 24 Feb 2020 15:55:04 -0500
+Message-Id: <be851ebe99e510a78fae2f9285ba528b51fca07b.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
@@ -81,11 +80,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- suspectscore=1 malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240153
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxscore=0 bulkscore=0
+ suspectscore=1 mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002240153
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
@@ -96,7 +95,7 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
  engine=8.12.0-2001150001 definitions=main-2002240153
 Content-Transfer-Encoding: quoted-printable
 X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 01OKrajF164104
+ 01OKrgcg164180
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,89 +121,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-remote-machine object sets up various subsystems of the remote device
-process. Instantiate PCI host bridge object and initialize RAM, IO &
-PCI memory regions.
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Defines a PCI Device proxy object as a parent of TYPE_PCI_DEVICE.
+PCI Proxy Object is responsible for registering PCI BARs,i
+MemoryRegionOps to handle access to the BARs and forwarding those
+to the remote device.
+PCI Proxy object intercepts config space reads and writes. In case
+of pci config write it forwards it to the remote device using
+communication channel set by proxy-link object.
+
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 ---
  v4 -> v5:
-  - Refactor notifier code into a common file
-  - Moved global initialization out of object specific code
-  - Added a child property relationship between RemMachineState & RemPCIH=
-ost
+  - Switched to execv
 
- Makefile.objs                 |  1 +
- exec.c                        |  3 +-
- include/exec/address-spaces.h |  2 ++
- include/remote/machine.h      | 30 ++++++++++++++++
- remote/Makefile.objs          |  1 +
- remote/machine.c              | 84 +++++++++++++++++++++++++++++++++++++=
+ hw/Makefile.objs              |   2 +
+ hw/proxy/Makefile.objs        |   1 +
+ hw/proxy/qemu-proxy.c         | 226 ++++++++++++++++++++++++++++++++++++=
 ++++++
- remote/remote-main.c          |  7 ++++
- util/Makefile.objs            |  2 ++
- 8 files changed, 128 insertions(+), 2 deletions(-)
- create mode 100644 include/remote/machine.h
- create mode 100644 remote/machine.c
+ include/hw/proxy/qemu-proxy.h |  54 ++++++++++
+ include/io/mpqemu-link.h      |   1 +
+ remote/remote-main.c          |  28 ++++++
+ 6 files changed, 312 insertions(+)
+ create mode 100644 hw/proxy/Makefile.objs
+ create mode 100644 hw/proxy/qemu-proxy.c
+ create mode 100644 include/hw/proxy/qemu-proxy.h
 
-diff --git a/Makefile.objs b/Makefile.objs
-index c80e107..aad33fc 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -31,6 +31,7 @@ remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D migration/
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote/
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D accel/
-+remote-pci-obj-$(CONFIG_MPQEMU) +=3D util/
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index af9235b..7b489b1 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -45,6 +45,8 @@ endif
+ common-obj-y +=3D $(devices-dirs-y)
+ obj-y +=3D $(devices-dirs-y)
 =20
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D cpus-common.o
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D dma-helpers.o
-diff --git a/exec.c b/exec.c
-index e524185..b4c9cc6 100644
---- a/exec.c
-+++ b/exec.c
-@@ -161,7 +161,6 @@ typedef struct subpage_t {
- #define PHYS_SECTION_UNASSIGNED 0
-=20
- static void io_mem_init(void);
--static void memory_map_init(void);
- static void tcg_log_global_after_sync(MemoryListener *listener);
- static void tcg_commit(MemoryListener *listener);
-=20
-@@ -3002,7 +3001,7 @@ static void tcg_commit(MemoryListener *listener)
-     tlb_flush(cpuas->cpu);
- }
-=20
--static void memory_map_init(void)
-+void memory_map_init(void)
- {
-     system_memory =3D g_malloc(sizeof(*system_memory));
-=20
-diff --git a/include/exec/address-spaces.h b/include/exec/address-spaces.=
-h
-index db8bfa9..56a877b 100644
---- a/include/exec/address-spaces.h
-+++ b/include/exec/address-spaces.h
-@@ -33,6 +33,8 @@ MemoryRegion *get_system_memory(void);
-  */
- MemoryRegion *get_system_io(void);
-=20
-+void memory_map_init(void);
++common-obj-$(CONFIG_MPQEMU) +=3D proxy/
 +
- extern AddressSpace address_space_memory;
- extern AddressSpace address_space_io;
-=20
-diff --git a/include/remote/machine.h b/include/remote/machine.h
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D core/
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D block/
+ remote-pci-obj-$(CONFIG_MPQEMU) +=3D pci/
+diff --git a/hw/proxy/Makefile.objs b/hw/proxy/Makefile.objs
 new file mode 100644
-index 0000000..7e9bdbe
+index 0000000..eb81624
 --- /dev/null
-+++ b/include/remote/machine.h
-@@ -0,0 +1,30 @@
++++ b/hw/proxy/Makefile.objs
+@@ -0,0 +1 @@
++common-obj-$(CONFIG_MPQEMU) +=3D qemu-proxy.o
+diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+new file mode 100644
+index 0000000..828bbd7
+--- /dev/null
++++ b/hw/proxy/qemu-proxy.c
+@@ -0,0 +1,226 @@
 +/*
-+ * Remote machine configuration
-+ *
 + * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or la=
@@ -213,162 +185,356 @@ ter.
 + *
 + */
 +
-+#ifndef REMOTE_MACHINE_H
-+#define REMOTE_MACHINE_H
-+
 +#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "hw/boards.h"
-+#include "remote/pcihost.h"
-+#include "qemu/notify.h"
-+
-+typedef struct RemMachineState {
-+    MachineState parent_obj;
-+
-+    RemPCIHost *host;
-+} RemMachineState;
-+
-+#define TYPE_REMOTE_MACHINE "remote-machine"
-+#define REMOTE_MACHINE(obj) \
-+    OBJECT_CHECK(RemMachineState, (obj), TYPE_REMOTE_MACHINE)
-+
-+#endif
-diff --git a/remote/Makefile.objs b/remote/Makefile.objs
-index 2757f5a..13d4c48 100644
---- a/remote/Makefile.objs
-+++ b/remote/Makefile.objs
-@@ -1,2 +1,3 @@
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote-main.o
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D pcihost.o
-+remote-pci-obj-$(CONFIG_MPQEMU) +=3D machine.o
-diff --git a/remote/machine.c b/remote/machine.c
-new file mode 100644
-index 0000000..97e4f19
---- /dev/null
-+++ b/remote/machine.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Machine for remote device
-+ *
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include <stdint.h>
-+#include <sys/types.h>
-+
-+#include "qemu/osdep.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "exec/address-spaces.h"
-+#include "exec/memory.h"
-+#include "exec/ioport.h"
-+#include "qemu/thread.h"
-+#include "qom/object.h"
-+#include "qemu/module.h"
 +#include "qapi/error.h"
-+#include "qemu/main-loop.h"
-+#include "qemu-common.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/notify.h"
++#include "io/mpqemu-link.h"
++#include "exec/memory.h"
++#include "exec/cpu-common.h"
++#include "exec/address-spaces.h"
++#include "hw/pci/pci.h"
++#include "qapi/qmp/qjson.h"
++#include "qapi/qmp/qstring.h"
++#include "hw/proxy/qemu-proxy.h"
 +
-+static void remote_machine_init(Object *obj)
++static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
++
++static int remote_spawn(PCIProxyDev *pdev, const char *opts,
++                        const char *exec_name, Error **errp)
 +{
-+    RemMachineState *s =3D REMOTE_MACHINE(obj);
-+    RemPCIHost *rem_host;
-+    MemoryRegion *system_memory, *system_io, *pci_memory;
++    char *args[3];
++    pid_t rpid;
++    int fd[2] =3D {-1, -1};
++    Error *local_error =3D NULL;
++    int rc =3D -EINVAL;
 +
-+    Error *error_abort =3D NULL;
-+
-+    object_property_add_child(object_get_root(), "machine", obj, &error_=
-abort);
-+    if (error_abort) {
-+        error_report_err(error_abort);
++    if (pdev->managed) {
++        /* Child is forked by external program (such as libvirt). */
++        error_setg(errp, "Remote processed is managed and launched by ex=
+ternal program");
++        return -1;
 +    }
 +
-+    memory_map_init();
++    if (!exec_name) {
++        error_setg(errp, "The remote exec name is NULL.");
++        return rc;
++    }
 +
-+    system_memory =3D get_system_memory();
-+    system_io =3D get_system_io();
++    if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
++        error_setg(errp, "Unable to create unix socket.");
++        return -1;
++    }
++    /* TODO: Restrict the forked process' permissions and capabilities. =
+*/
++    rpid =3D qemu_fork(&local_error);
 +
-+    pci_memory =3D g_new(MemoryRegion, 1);
-+    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
++    if (rpid =3D=3D -1) {
++        error_setg(errp, "Unable to spawn emulation program.");
++        close(fd[0]);
++        close(fd[1]);
++        return -1;
++    }
 +
-+    rem_host =3D REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_D=
-EVICE));
++    if (rpid =3D=3D 0) {
++        close(fd[0]);
 +
-+    rem_host->mr_pci_mem =3D pci_memory;
-+    rem_host->mr_sys_mem =3D system_memory;
-+    rem_host->mr_sys_io =3D system_io;
++        args[0] =3D g_strdup(exec_name);
++        args[1] =3D g_strdup_printf("%d", fd[1]);
++        args[2] =3D NULL;
++        execvp(args[0], (char *const *)args);
++        exit(1);
++    }
++    pdev->remote_pid =3D rpid;
 +
-+    s->host =3D rem_host;
++    close(fd[1]);
 +
-+    object_property_add_child(OBJECT(s), "remote-device", OBJECT(rem_hos=
-t),
-+                              &error_abort);
-+    if (error_abort) {
-+        error_report_err(error_abort);
++    return 0;
++}
++
++static int get_proxy_sock(PCIDevice *dev)
++{
++    PCIProxyDev *pdev;
++
++    pdev =3D PCI_PROXY_DEV(dev);
++
++    return pdev->socket;
++}
++
++static void set_proxy_sock(PCIDevice *dev, int socket)
++{
++    PCIProxyDev *pdev;
++
++    pdev =3D PCI_PROXY_DEV(dev);
++
++    pdev->socket =3D socket;
++    pdev->managed =3D true;
++}
++
++static int config_op_send(PCIProxyDev *dev, uint32_t addr, uint32_t *val=
+, int l,
++                          unsigned int op)
++{
++    MPQemuMsg msg;
++    struct conf_data_msg conf_data;
++    int wait;
++
++    memset(&msg, 0, sizeof(MPQemuMsg));
++    conf_data.addr =3D addr;
++    conf_data.val =3D (op =3D=3D PCI_CONFIG_WRITE) ? *val : 0;
++    conf_data.l =3D l;
++
++    msg.data2 =3D (uint8_t *)&conf_data;
++    if (!msg.data2) {
++        return -ENOMEM;
++    }
++
++    msg.size =3D sizeof(conf_data);
++    msg.cmd =3D op;
++    msg.bytestream =3D 1;
++
++    if (op =3D=3D PCI_CONFIG_WRITE) {
++        msg.num_fds =3D 0;
++    } else {
++        /* TODO: Dont create fd each time for send. */
++        wait =3D GET_REMOTE_WAIT;
++        msg.num_fds =3D 1;
++        msg.fds[0] =3D wait;
++    }
++
++    mpqemu_msg_send(&msg, dev->mpqemu_link->com);
++
++    if (op =3D=3D PCI_CONFIG_READ) {
++        *val =3D (uint32_t)wait_for_remote(wait);
++        PUT_REMOTE_WAIT(wait);
++    }
++
++    return 0;
++}
++
++static uint32_t pci_proxy_read_config(PCIDevice *d, uint32_t addr, int l=
+en)
++{
++    uint32_t val;
++
++    (void)pci_default_read_config(d, addr, len);
++
++    config_op_send(PCI_PROXY_DEV(d), addr, &val, len, PCI_CONFIG_READ);
++
++    return val;
++}
++
++static void pci_proxy_write_config(PCIDevice *d, uint32_t addr, uint32_t=
+ val,
++                                   int l)
++{
++    pci_default_write_config(d, addr, val, l);
++
++    config_op_send(PCI_PROXY_DEV(d), addr, &val, l, PCI_CONFIG_WRITE);
++}
++
++static void pci_proxy_dev_class_init(ObjectClass *klass, void *data)
++{
++    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
++
++    k->realize =3D pci_proxy_dev_realize;
++    k->config_read =3D pci_proxy_read_config;
++    k->config_write =3D pci_proxy_write_config;
++}
++
++static const TypeInfo pci_proxy_dev_type_info =3D {
++    .name          =3D TYPE_PCI_PROXY_DEV,
++    .parent        =3D TYPE_PCI_DEVICE,
++    .instance_size =3D sizeof(PCIProxyDev),
++    .abstract      =3D true,
++    .class_size    =3D sizeof(PCIProxyDevClass),
++    .class_init    =3D pci_proxy_dev_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void pci_proxy_dev_register_types(void)
++{
++    type_register_static(&pci_proxy_dev_type_info);
++}
++
++type_init(pci_proxy_dev_register_types)
++
++static void init_proxy(PCIDevice *dev, char *command, char *exec_name,
++                       Error **errp)
++{
++    PCIProxyDev *pdev =3D PCI_PROXY_DEV(dev);
++    Error *local_error =3D NULL;
++
++    if (!pdev->managed) {
++        if (command) {
++            remote_spawn(pdev, command, exec_name, &local_error);
++        } else {
++            return;
++        }
++    } else {
++        pdev->remote_pid =3D atoi(pdev->rid);
++        if (pdev->remote_pid =3D=3D -1) {
++            error_setg(errp, "Remote PID is -1");
++            return;
++        }
++    }
++
++    pdev->mpqemu_link =3D mpqemu_link_create();
++
++    if (!pdev->mpqemu_link) {
++        error_setg(errp, "Failed to create proxy link");
 +        return;
 +    }
 +
-+    qemu_mutex_lock_iothread();
-+    memory_region_add_subregion_overlap(system_memory, 0x0, pci_memory, =
--1);
-+    qemu_mutex_unlock_iothread();
-+
-+    qdev_init_nofail(DEVICE(rem_host));
++    mpqemu_init_channel(pdev->mpqemu_link, &pdev->mpqemu_link->com,
++                        pdev->socket);
 +}
 +
-+static const TypeInfo remote_machine =3D {
-+    .name =3D TYPE_REMOTE_MACHINE,
-+    .parent =3D TYPE_MACHINE,
-+    .instance_size =3D sizeof(RemMachineState),
-+    .instance_init =3D remote_machine_init,
-+};
-+
-+static void remote_machine_register_types(void)
++static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
 +{
-+    type_register_static(&remote_machine);
-+}
++    PCIProxyDev *dev =3D PCI_PROXY_DEV(device);
++    PCIProxyDevClass *k =3D PCI_PROXY_DEV_GET_CLASS(dev);
++    Error *local_err =3D NULL;
 +
-+type_init(remote_machine_register_types);
++    if (k->realize) {
++        k->realize(dev, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++        }
++    }
++
++    dev->set_proxy_sock =3D set_proxy_sock;
++    dev->get_proxy_sock =3D get_proxy_sock;
++    dev->init_proxy =3D init_proxy;
++}
+diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.=
+h
+new file mode 100644
+index 0000000..28b0114
+--- /dev/null
++++ b/include/hw/proxy/qemu-proxy.h
+@@ -0,0 +1,54 @@
++/*
++ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef QEMU_PROXY_H
++#define QEMU_PROXY_H
++
++#include "io/mpqemu-link.h"
++
++#define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
++
++#define PCI_PROXY_DEV(obj) \
++            OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
++
++#define PCI_PROXY_DEV_CLASS(klass) \
++            OBJECT_CLASS_CHECK(PCIProxyDevClass, (klass), TYPE_PCI_PROXY=
+_DEV)
++
++#define PCI_PROXY_DEV_GET_CLASS(obj) \
++            OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV=
+)
++
++typedef struct PCIProxyDev {
++    PCIDevice parent_dev;
++
++    MPQemuLinkState *mpqemu_link;
++
++    pid_t remote_pid;
++    int socket;
++
++    char *rid;
++
++    bool managed;
++
++    void (*set_proxy_sock) (PCIDevice *dev, int socket);
++    int (*get_proxy_sock) (PCIDevice *dev);
++
++    void (*proxy_ready) (PCIDevice *dev);
++    void (*init_proxy) (PCIDevice *dev, char *command, char *exec_name,
++                        Error **errp);
++
++} PCIProxyDev;
++
++typedef struct PCIProxyDevClass {
++    PCIDeviceClass parent_class;
++
++    void (*realize)(PCIProxyDev *dev, Error **errp);
++
++    char *command;
++} PCIProxyDevClass;
++
++#endif /* QEMU_PROXY_H */
+diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+index 78c0818..5a2be48 100644
+--- a/include/io/mpqemu-link.h
++++ b/include/io/mpqemu-link.h
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+=20
++#include "sys/eventfd.h"
+ #include "qom/object.h"
+ #include "qemu/thread.h"
+ #include "exec/cpu-common.h"
 diff --git a/remote/remote-main.c b/remote/remote-main.c
-index 7c0764a..ecf30e0 100644
+index 56315cd..7b4cf2f 100644
 --- a/remote/remote-main.c
 +++ b/remote/remote-main.c
-@@ -14,10 +14,17 @@
- #include <stdio.h>
+@@ -37,6 +37,32 @@
+ static MPQemuLinkState *mpqemu_link;
+ PCIDevice *remote_pci_dev;
 =20
- #include "qemu/module.h"
-+#include "remote/pcihost.h"
-+#include "remote/machine.h"
-+#include "hw/boards.h"
-+#include "hw/qdev-core.h"
-+#include "qemu/main-loop.h"
-=20
- int main(int argc, char *argv[])
++static void process_config_write(MPQemuMsg *msg)
++{
++    struct conf_data_msg *conf =3D (struct conf_data_msg *)msg->data2;
++
++    qemu_mutex_lock_iothread();
++    pci_default_write_config(remote_pci_dev, conf->addr, conf->val, conf=
+->l);
++    qemu_mutex_unlock_iothread();
++}
++
++static void process_config_read(MPQemuMsg *msg)
++{
++    struct conf_data_msg *conf =3D (struct conf_data_msg *)msg->data2;
++    uint32_t val;
++    int wait;
++
++    wait =3D msg->fds[0];
++
++    qemu_mutex_lock_iothread();
++    val =3D pci_default_read_config(remote_pci_dev, conf->addr, conf->l)=
+;
++    qemu_mutex_unlock_iothread();
++
++    notify_proxy(wait, val);
++
++    PUT_REMOTE_WAIT(wait);
++}
++
+ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
  {
-     module_call_init(MODULE_INIT_QOM);
-=20
-+    current_machine =3D MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MA=
-CHINE)));
-+
-     return 0;
- }
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index 6b38b67..80b2067 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -60,3 +60,5 @@ util-obj-y +=3D guest-random.o
- util-obj-$(CONFIG_GIO) +=3D dbus.o
- dbus.o-cflags =3D $(GIO_CFLAGS)
- dbus.o-libs =3D $(GIO_LIBS)
-+
-+remote-pci-obj-$(CONFIG_MPQEMU) +=3D notify.o
+     MPQemuMsg *msg =3D NULL;
+@@ -57,8 +83,10 @@ static void process_msg(GIOCondition cond, MPQemuChann=
+el *chan)
+     case INIT:
+         break;
+     case PCI_CONFIG_WRITE:
++        process_config_write(msg);
+         break;
+     case PCI_CONFIG_READ:
++        process_config_read(msg);
+         break;
+     default:
+         error_setg(&err, "Unknown command");
 --=20
 1.8.3.1
 
