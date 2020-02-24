@@ -2,58 +2,88 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A9AC11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB7AC11D30
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BC8F2080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:28:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC8F2080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id D83C02080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 14:28:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fp1L9+Cm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D83C02080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Eih-0006CW-MB
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:28:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48466)
+	id 1j6Eij-0006H1-Vz
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 09:28:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6EaA-0004U2-Qj
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:42 -0500
+ (envelope-from <berrange@redhat.com>) id 1j6Ef0-0007dC-8z
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea5-0005rr-Vr
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:38 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:55162)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1j6Ea5-0005ql-Fu
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:19:33 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id B9EC4E494F;
- Mon, 24 Feb 2020 23:19:32 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 5AE5F240091;
- Mon, 24 Feb 2020 23:19:32 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v32 15/22] hw/timer: RX62N internal timer modules
-Date: Mon, 24 Feb 2020 23:19:16 +0900
-Message-Id: <20200224141923.82118-16-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200224141923.82118-1-ysato@users.sourceforge.jp>
-References: <20200224141923.82118-1-ysato@users.sourceforge.jp>
+ (envelope-from <berrange@redhat.com>) id 1j6Eex-0007V9-5s
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:24:37 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53268
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j6Eew-0007Ui-V7
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 09:24:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582554271;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ukXQRli8+QrX/PiWYNdL6MhSs7xjaDM55ABp7oTpH9c=;
+ b=Fp1L9+CmR+tXvZxUOU8MciKOdcEANXA487Lr+VTteM2SAkwTpQDmnClawV83+ndVSxE8FV
+ 05iX2W7Sx/nkaL9i5ORPjuUcvVpG6n2RVy3FA3cAxj0YIeDXL/YtfIMJWGF5XUZ4NSKBaQ
+ BAbu8DQWG85773HVu/Oqs7I/ZZ1DJ10=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-8wehWcNSONCXmdxqTybFew-1; Mon, 24 Feb 2020 09:24:22 -0500
+X-MC-Unique: 8wehWcNSONCXmdxqTybFew-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37B011005513
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:24:21 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A1EF1CB;
+ Mon, 24 Feb 2020 14:24:17 +0000 (UTC)
+Date: Mon, 24 Feb 2020 14:24:15 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Krempa <pkrempa@redhat.com>
+Subject: Re: [PATCH 8/9] virStorageFileGetMetadataRecurse: Allow format
+ probing under special circumstances
+Message-ID: <20200224142415.GP635661@redhat.com>
+References: <cover.1581959449.git.pkrempa@redhat.com>
+ <e6d268fcb8b2e92f2cf0c6b29bab3a9f645a7051.1581959449.git.pkrempa@redhat.com>
+ <ef597fda-4b3f-d270-824f-82df391ff223@redhat.com>
+ <20200219164034.GF1011498@angien.pipo.sk>
+ <fa77907b-1378-b4ed-3a40-fa19fe67f7cf@redhat.com>
+ <20200219185740.GA3423556@angien.pipo.sk>
+ <6d228d74-0b74-14e0-60cf-5c69dad2a65b@redhat.com>
+ <20200224133416.GE3296@andariel.pipo.sk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200224133416.GE3296@andariel.pipo.sk>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.224.55.14
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,944 +95,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, philmd@redhat.com,
- Yoshinori Sato <ysato@users.sourceforge.jp>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-renesas_tmr: 8bit timer modules.
-renesas_cmt: 16bit compare match timer modules.
-This part use many renesas's CPU.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
+On Mon, Feb 24, 2020 at 02:34:16PM +0100, Peter Krempa wrote:
+> On Wed, Feb 19, 2020 at 13:12:53 -0600, Eric Blake wrote:
+> > [adding qemu]
+>=20
+> Adding Daniel as he objected to qemu-img.
+>=20
+> >=20
+> > On 2/19/20 12:57 PM, Peter Krempa wrote:
+>=20
+> [...]
+>=20
+> > > Additionally I think that we could just get rid of the copy of the im=
+age
+> > > detection copy in libvirt and replace it by invocation of qemu-img. T=
+hat
+> > > way we could avoid any discrepancies in the detection process in the
+> > > first place.
+> >=20
+> > Now there's an interesting thought.  Since data corruption occurs when =
+there
+> > is disagreement about which mode to use, getting libvirt out of the pro=
+bing
+> > business by deferring all decisions to qemu-img info is a smart move - =
+if
+> > qemu says an image probes as qcow2 (in an environment where probing is
+> > safe), then libvirt passing an explicit qcow2 to qemu for guest usage (=
+in an
+> > environment where probing is not safe) will at least see the same
+> > guest-visible data.  Less code to maintain in libvirt, and no chance fo=
+r a
+> > mismatch between the two projects on which format a probe should result=
+ in.
+>=20
+> I raised the use of qemu-img to Daniel and he disagreed with use of
+> qemu-img in libvirt for doing the probing on multiple reasons:
+>  - qemu-img instantiates many data structures relevant to the format so
+>    it has a huge attack surface
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-7-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/hw/timer/renesas_cmt.h |  38 +++
- include/hw/timer/renesas_tmr.h |  53 ++++
- hw/timer/renesas_cmt.c         | 278 ++++++++++++++++++++
- hw/timer/renesas_tmr.c         | 458 +++++++++++++++++++++++++++++++++
- hw/timer/Kconfig               |   6 +
- hw/timer/Makefile.objs         |   3 +
- 6 files changed, 836 insertions(+)
- create mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 hw/timer/renesas_cmt.c
- create mode 100644 hw/timer/renesas_tmr.c
+This was the most critical reason why we have this code in libvirt
+in the first place.
 
-diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cm=
-t.h
-new file mode 100644
-index 0000000000..acd25c6e0b
---- /dev/null
-+++ b/include/hw/timer/renesas_cmt.h
-@@ -0,0 +1,38 @@
-+/*
-+ * Renesas Compare-match timer Object
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#ifndef HW_RENESAS_CMT_H
-+#define HW_RENESAS_CMT_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_CMT "renesas-cmt"
-+#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
-+
-+enum {
-+    CMT_CH =3D 2,
-+    CMT_NR_IRQ =3D 1 * CMT_CH,
-+};
-+
-+typedef struct RCMTState {
-+    SysBusDevice parent_obj;
-+
-+    uint64_t input_freq;
-+    MemoryRegion memory;
-+
-+    uint16_t cmstr;
-+    uint16_t cmcr[CMT_CH];
-+    uint16_t cmcnt[CMT_CH];
-+    uint16_t cmcor[CMT_CH];
-+    int64_t tick[CMT_CH];
-+    qemu_irq cmi[CMT_CH];
-+    QEMUTimer *timer[CMT_CH];
-+} RCMTState;
-+
-+#endif
-diff --git a/include/hw/timer/renesas_tmr.h b/include/hw/timer/renesas_tm=
-r.h
-new file mode 100644
-index 0000000000..5787004c74
---- /dev/null
-+++ b/include/hw/timer/renesas_tmr.h
-@@ -0,0 +1,53 @@
-+/*
-+ * Renesas 8bit timer Object
-+ *
-+ * Copyright (c) 2018 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#ifndef HW_RENESAS_TMR_H
-+#define HW_RENESAS_TMR_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_TMR "renesas-tmr"
-+#define RTMR(obj) OBJECT_CHECK(RTMRState, (obj), TYPE_RENESAS_TMR)
-+
-+enum timer_event {
-+    cmia =3D 0,
-+    cmib =3D 1,
-+    ovi =3D 2,
-+    none =3D 3,
-+    TMR_NR_EVENTS =3D 4
-+};
-+
-+enum {
-+    TMR_CH =3D 2,
-+    TMR_NR_IRQ =3D 3 * TMR_CH,
-+};
-+
-+typedef struct RTMRState {
-+    SysBusDevice parent_obj;
-+
-+    uint64_t input_freq;
-+    MemoryRegion memory;
-+
-+    uint8_t tcnt[TMR_CH];
-+    uint8_t tcora[TMR_CH];
-+    uint8_t tcorb[TMR_CH];
-+    uint8_t tcr[TMR_CH];
-+    uint8_t tccr[TMR_CH];
-+    uint8_t tcor[TMR_CH];
-+    uint8_t tcsr[TMR_CH];
-+    int64_t tick;
-+    int64_t div_round[TMR_CH];
-+    enum timer_event next[TMR_CH];
-+    qemu_irq cmia[TMR_CH];
-+    qemu_irq cmib[TMR_CH];
-+    qemu_irq ovi[TMR_CH];
-+    QEMUTimer *timer[TMR_CH];
-+} RTMRState;
-+
-+#endif
-diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
-new file mode 100644
-index 0000000000..574772b89b
---- /dev/null
-+++ b/hw/timer/renesas_cmt.c
-@@ -0,0 +1,278 @@
-+/*
-+ * Renesas 16bit Compare-match timer
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/timer.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+
-+/*
-+ *  +0 CMSTR - common control
-+ *  +2 CMCR  - ch0
-+ *  +4 CMCNT - ch0
-+ *  +6 CMCOR - ch0
-+ *  +8 CMCR  - ch1
-+ * +10 CMCNT - ch1
-+ * +12 CMCOR - ch1
-+ * If we think that the address of CH 0 has an offset of +2,
-+ * we can treat it with the same address as CH 1, so define it like that=
-.
-+ */
-+REG16(CMSTR, 0)
-+  FIELD(CMSTR, STR0, 0, 1)
-+  FIELD(CMSTR, STR1, 1, 1)
-+  FIELD(CMSTR, STR,  0, 2)
-+/* This addeess is channel offset */
-+REG16(CMCR, 0)
-+  FIELD(CMCR, CKS, 0, 2)
-+  FIELD(CMCR, CMIE, 6, 1)
-+REG16(CMCNT, 2)
-+REG16(CMCOR, 4)
-+
-+static void update_events(RCMTState *cmt, int ch)
-+{
-+    int64_t next_time;
-+
-+    if ((cmt->cmstr & (1 << ch)) =3D=3D 0) {
-+        /* count disable, so not happened next event. */
-+        return ;
-+    }
-+    next_time =3D cmt->cmcor[ch] - cmt->cmcnt[ch];
-+    next_time *=3D NANOSECONDS_PER_SECOND;
-+    next_time /=3D cmt->input_freq;
-+    /*
-+     * CKS -> div rate
-+     *  0 -> 8 (1 << 3)
-+     *  1 -> 32 (1 << 5)
-+     *  2 -> 128 (1 << 7)
-+     *  3 -> 512 (1 << 9)
-+     */
-+    next_time *=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(cmt->timer[ch], next_time);
-+}
-+
-+static int64_t read_cmcnt(RCMTState *cmt, int ch)
-+{
-+    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+
-+    if (cmt->cmstr & (1 << ch)) {
-+        delta =3D (now - cmt->tick[ch]);
-+        delta /=3D NANOSECONDS_PER_SECOND;
-+        delta /=3D cmt->input_freq;
-+        delta /=3D 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
-+        cmt->tick[ch] =3D now;
-+        return cmt->cmcnt[ch] + delta;
-+    } else {
-+        return cmt->cmcnt[ch];
-+    }
-+}
-+
-+static uint64_t cmt_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset =3D addr & 0x0f;
-+    RCMTState *cmt =3D opaque;
-+    int ch =3D offset / 0x08;
-+    uint64_t ret;
-+
-+    if (offset =3D=3D A_CMSTR) {
-+        ret =3D 0;
-+        ret =3D FIELD_DP16(ret, CMSTR, STR,
-+                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
-+        return ret;
-+    } else {
-+        offset &=3D 0x07;
-+        if (ch =3D=3D 0) {
-+            offset -=3D 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            ret =3D 0;
-+            ret =3D FIELD_DP16(ret, CMCR, CKS,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
-+            ret =3D FIELD_DP16(ret, CMCR, CMIE,
-+                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
-+            return ret;
-+        case A_CMCNT:
-+            return read_cmcnt(cmt, ch);
-+        case A_CMCOR:
-+            return cmt->cmcor[ch];
-+        }
-+    }
-+    qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%"
-+                  HWADDR_PRIX " not implemented\n", offset);
-+    return UINT64_MAX;
-+}
-+
-+static void start_stop(RCMTState *cmt, int ch, int st)
-+{
-+    if (st) {
-+        update_events(cmt, ch);
-+    } else {
-+        timer_del(cmt->timer[ch]);
-+    }
-+}
-+
-+static void cmt_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    hwaddr offset =3D addr & 0x0f;
-+    RCMTState *cmt =3D opaque;
-+    int ch =3D offset / 0x08;
-+
-+    if (offset =3D=3D A_CMSTR) {
-+        cmt->cmstr =3D FIELD_EX16(val, CMSTR, STR);
-+        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
-+        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
-+    } else {
-+        offset &=3D 0x07;
-+        if (ch =3D=3D 0) {
-+            offset -=3D 0x02;
-+        }
-+        switch (offset) {
-+        case A_CMCR:
-+            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
-+                                       FIELD_EX16(val, CMCR, CKS));
-+            cmt->cmcr[ch] =3D FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
-+                                       FIELD_EX16(val, CMCR, CMIE));
-+            break;
-+        case 2:
-+            cmt->cmcnt[ch] =3D val;
-+            break;
-+        case 4:
-+            cmt->cmcor[ch] =3D val;
-+            break;
-+        default:
-+            qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register -0x%" HWADDR=
-_PRIX
-+                          " not implemented\n", offset);
-+            return;
-+        }
-+        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
-+            update_events(cmt, ch);
-+        }
-+    }
-+}
-+
-+static const MemoryRegionOps cmt_ops =3D {
-+    .write =3D cmt_write,
-+    .read  =3D cmt_read,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .min_access_size =3D 2,
-+        .max_access_size =3D 2,
-+    },
-+};
-+
-+static void timer_events(RCMTState *cmt, int ch)
-+{
-+    cmt->cmcnt[ch] =3D 0;
-+    cmt->tick[ch] =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    update_events(cmt, ch);
-+    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
-+        qemu_irq_pulse(cmt->cmi[ch]);
-+    }
-+}
-+
-+static void timer_event0(void *opaque)
-+{
-+    RCMTState *cmt =3D opaque;
-+
-+    timer_events(cmt, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RCMTState *cmt =3D opaque;
-+
-+    timer_events(cmt, 1);
-+}
-+
-+static void rcmt_reset(DeviceState *dev)
-+{
-+    RCMTState *cmt =3D RCMT(dev);
-+    cmt->cmstr =3D 0;
-+    cmt->cmcr[0] =3D cmt->cmcr[1] =3D 0;
-+    cmt->cmcnt[0] =3D cmt->cmcnt[1] =3D 0;
-+    cmt->cmcor[0] =3D cmt->cmcor[1] =3D 0xffff;
-+}
-+
-+static void rcmt_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RCMTState *cmt =3D RCMT(obj);
-+    int i;
-+
-+    memory_region_init_io(&cmt->memory, OBJECT(cmt), &cmt_ops,
-+                          cmt, "renesas-cmt", 0x10);
-+    sysbus_init_mmio(d, &cmt->memory);
-+
-+    for (i =3D 0; i < ARRAY_SIZE(cmt->cmi); i++) {
-+        sysbus_init_irq(d, &cmt->cmi[i]);
-+    }
-+    cmt->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, cmt=
-);
-+    cmt->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, cmt=
-);
-+}
-+
-+static const VMStateDescription vmstate_rcmt =3D {
-+    .name =3D "rx-cmt",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rcmt_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RCMTState, input_freq, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rcmt_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_rcmt;
-+    dc->reset =3D rcmt_reset;
-+    device_class_set_props(dc, rcmt_properties);
-+}
-+
-+static const TypeInfo rcmt_info =3D {
-+    .name       =3D TYPE_RENESAS_CMT,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RCMTState),
-+    .instance_init =3D rcmt_init,
-+    .class_init =3D rcmt_class_init,
-+};
-+
-+static void rcmt_register_types(void)
-+{
-+    type_register_static(&rcmt_info);
-+}
-+
-+type_init(rcmt_register_types)
-diff --git a/hw/timer/renesas_tmr.c b/hw/timer/renesas_tmr.c
-new file mode 100644
-index 0000000000..9adbee7922
---- /dev/null
-+++ b/hw/timer/renesas_tmr.c
-@@ -0,0 +1,458 @@
-+/*
-+ * Renesas 8bit timer
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/timer.h"
-+#include "qemu/bitops.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_tmr.h"
-+#include "migration/vmstate.h"
-+#include "qemu/error-report.h"
-+
-+REG8(TCR, 0)
-+  FIELD(TCR, CCLR, 3, 2)
-+  FIELD(TCR, OVIE, 5, 1)
-+  FIELD(TCR, CMIEA, 6, 1)
-+  FIELD(TCR, CMIEB, 7, 1)
-+REG8(TCSR, 2)
-+  FIELD(TCSR, OSA, 0, 2)
-+  FIELD(TCSR, OSB, 2, 2)
-+  FIELD(TCSR, ADTE, 4, 2)
-+REG8(TCORA, 4)
-+REG8(TCORB, 6)
-+REG8(TCNT, 8)
-+REG8(TCCR, 10)
-+  FIELD(TCCR, CKS, 0, 3)
-+  FIELD(TCCR, CSS, 3, 2)
-+  FIELD(TCCR, TMRIS, 7, 1)
-+
-+#define INTERNAL  0x01
-+#define CASCADING 0x03
-+#define CCLR_A    0x01
-+#define CCLR_B    0x02
-+
-+static const int clkdiv[] =3D {0, 1, 2, 8, 32, 64, 1024, 8192};
-+
-+#define concat_reg(reg) ((reg[0] << 8) | reg[1])
-+static void update_events(RTMRState *tmr, int ch)
-+{
-+    uint16_t diff[TMR_NR_EVENTS], min;
-+    int64_t next_time;
-+    int i, event;
-+
-+    if (tmr->tccr[ch] =3D=3D 0) {
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[ch], TCCR, CSS) =3D=3D 0) {
-+        /* external clock mode */
-+        /* event not happened */
-+        return ;
-+    }
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) =3D=3D CASCADING) {
-+        /* cascading mode */
-+        if (ch =3D=3D 1) {
-+            tmr->next[ch] =3D none;
-+            return ;
-+        }
-+        diff[cmia] =3D concat_reg(tmr->tcora) - concat_reg(tmr->tcnt);
-+        diff[cmib] =3D concat_reg(tmr->tcorb) - concat_reg(tmr->tcnt);
-+        diff[ovi] =3D 0x10000 - concat_reg(tmr->tcnt);
-+    } else {
-+        /* separate mode */
-+        diff[cmia] =3D tmr->tcora[ch] - tmr->tcnt[ch];
-+        diff[cmib] =3D tmr->tcorb[ch] - tmr->tcnt[ch];
-+        diff[ovi] =3D 0x100 - tmr->tcnt[ch];
-+    }
-+    /* Search for the most recently occurring event. */
-+    for (event =3D 0, min =3D diff[0], i =3D 1; i < none; i++) {
-+        if (min > diff[i]) {
-+            event =3D i;
-+            min =3D diff[i];
-+        }
-+    }
-+    tmr->next[ch] =3D event;
-+    next_time =3D diff[event];
-+    next_time *=3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    next_time *=3D NANOSECONDS_PER_SECOND;
-+    next_time /=3D tmr->input_freq;
-+    next_time +=3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    timer_mod(tmr->timer[ch], next_time);
-+}
-+
-+
-+static inline int elapsed_time(RTMRState *tmr, int ch, int64_t delta)
-+{
-+    int divrate =3D clkdiv[FIELD_EX8(tmr->tccr[ch], TCCR, CKS)];
-+    int et;
-+
-+    tmr->div_round[ch] +=3D delta;
-+    if (divrate > 0) {
-+        et =3D tmr->div_round[ch] / divrate;
-+        tmr->div_round[ch] %=3D divrate;
-+    } else {
-+        /* disble clock. so no update */
-+        et =3D 0;
-+    }
-+    return et;
-+}
-+static uint16_t read_tcnt(RTMRState *tmr, unsigned size, int ch)
-+{
-+    int64_t delta, now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    int elapsed, ovf =3D 0;
-+    uint16_t tcnt[2];
-+    uint32_t ret;
-+
-+    delta =3D (now - tmr->tick) * NANOSECONDS_PER_SECOND / tmr->input_fr=
-eq;
-+    if (delta > 0) {
-+        tmr->tick =3D now;
-+
-+        if (FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D INTERNAL) {
-+            /* timer1 count update */
-+            elapsed =3D elapsed_time(tmr, 1, delta);
-+            if (elapsed >=3D 0x100) {
-+                ovf =3D elapsed >> 8;
-+            }
-+            tcnt[1] =3D tmr->tcnt[1] + (elapsed & 0xff);
-+        }
-+        switch (FIELD_EX8(tmr->tccr[0], TCCR, CSS)) {
-+        case INTERNAL:
-+            elapsed =3D elapsed_time(tmr, 0, delta);
-+            tcnt[0] =3D tmr->tcnt[0] + elapsed;
-+            break;
-+        case CASCADING:
-+            if (ovf > 0) {
-+                tcnt[0] =3D tmr->tcnt[0] + ovf;
-+            }
-+            break;
-+        }
-+    } else {
-+        tcnt[0] =3D tmr->tcnt[0];
-+        tcnt[1] =3D tmr->tcnt[1];
-+    }
-+    if (size =3D=3D 1) {
-+        return tcnt[ch];
-+    } else {
-+        ret =3D 0;
-+        ret =3D deposit32(ret, 0, 8, tcnt[1]);
-+        ret =3D deposit32(ret, 8, 8, tcnt[0]);
-+        return ret;
-+    }
-+}
-+
-+static inline uint8_t read_tccr(uint8_t r)
-+{
-+    uint8_t tccr =3D 0;
-+    tccr =3D FIELD_DP8(tccr, TCCR, TMRIS,
-+                     FIELD_EX8(r, TCCR, TMRIS));
-+    tccr =3D FIELD_DP8(tccr, TCCR, CSS,
-+                     FIELD_EX8(r, TCCR, CSS));
-+    tccr =3D FIELD_DP8(tccr, TCCR, CKS,
-+                     FIELD_EX8(r, TCCR, CKS));
-+    return tccr;
-+}
-+
-+static uint64_t tmr_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RTMRState *tmr =3D opaque;
-+    int ch =3D addr & 1;
-+    uint64_t ret;
-+
-+    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
-A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "renesas_tmr: Invalid read size 0=
-x%"
-+                      HWADDR_PRIX "\n", addr);
-+        return UINT64_MAX;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        ret =3D 0;
-+        ret =3D FIELD_DP8(ret, TCR, CCLR,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CCLR));
-+        ret =3D FIELD_DP8(ret, TCR, OVIE,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, OVIE));
-+        ret =3D FIELD_DP8(ret, TCR, CMIEA,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEA));
-+        ret =3D FIELD_DP8(ret, TCR, CMIEB,
-+                        FIELD_EX8(tmr->tcr[ch], TCR, CMIEB));
-+        return ret;
-+    case A_TCSR:
-+        ret =3D 0;
-+        ret =3D FIELD_DP8(ret, TCSR, OSA,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSA));
-+        ret =3D FIELD_DP8(ret, TCSR, OSB,
-+                        FIELD_EX8(tmr->tcsr[ch], TCSR, OSB));
-+        switch (ch) {
-+        case 0:
-+            ret =3D FIELD_DP8(ret, TCSR, ADTE,
-+                            FIELD_EX8(tmr->tcsr[ch], TCSR, ADTE));
-+            break;
-+        case 1: /* CH1 ADTE unimplement always 1 */
-+            ret =3D FIELD_DP8(ret, TCSR, ADTE, 1);
-+            break;
-+        }
-+        return ret;
-+    case A_TCORA:
-+        if (size =3D=3D 1) {
-+            return tmr->tcora[ch];
-+        } else if (ch =3D=3D 0) {
-+            return concat_reg(tmr->tcora);
-+        }
-+    case A_TCORB:
-+        if (size =3D=3D 1) {
-+            return tmr->tcorb[ch];
-+        } else {
-+            return concat_reg(tmr->tcorb);
-+        }
-+    case A_TCNT:
-+        return read_tcnt(tmr, size, ch);
-+    case A_TCCR:
-+        if (size =3D=3D 1) {
-+            return read_tccr(tmr->tccr[ch]);
-+        } else {
-+            return read_tccr(tmr->tccr[0]) << 8 | read_tccr(tmr->tccr[1]=
-);
-+        }
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+        break;
-+    }
-+    return UINT64_MAX;
-+}
-+
-+#define COUNT_WRITE(reg, val)                   \
-+    do {                                        \
-+        if (size =3D=3D 1) {                        \
-+            tmr->reg[ch] =3D val;                 \
-+            update_events(tmr, ch);             \
-+        } else {                                \
-+            tmr->reg[0] =3D extract32(val, 8, 8); \
-+            tmr->reg[1] =3D extract32(val, 0, 8); \
-+            update_events(tmr, 0);              \
-+            update_events(tmr, 1);              \
-+        }                                       \
-+    } while (0)
-+
-+static void tmr_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    RTMRState *tmr =3D opaque;
-+    int ch =3D addr & 1;
-+
-+    if (size =3D=3D 2 && (ch !=3D 0 || addr =3D=3D A_TCR || addr =3D=3D =
-A_TCSR)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_tmr: Invalid write size 0x%" HWADDR_PRIX
-+                      "\n", addr);
-+        return;
-+    }
-+    switch (addr & 0x0e) {
-+    case A_TCR:
-+        tmr->tcr[ch] =3D val;
-+        break;
-+    case A_TCSR:
-+        tmr->tcsr[ch] =3D val;
-+        break;
-+    case A_TCORA:
-+        COUNT_WRITE(tcora, val);
-+        break;
-+    case A_TCORB:
-+        COUNT_WRITE(tcorb, val);
-+        break;
-+    case A_TCNT:
-+        COUNT_WRITE(tcnt, val);
-+        break;
-+    case A_TCCR:
-+        COUNT_WRITE(tccr, val);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_tmr: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", addr);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps tmr_ops =3D {
-+    .write =3D tmr_write,
-+    .read  =3D tmr_read,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 2,
-+    },
-+};
-+
-+static void timer_events(RTMRState *tmr, int ch);
-+
-+static uint16_t issue_event(RTMRState *tmr, int ch, int sz,
-+                        uint16_t tcnt, uint16_t tcora, uint16_t tcorb)
-+{
-+    uint16_t ret =3D tcnt;
-+
-+    switch (tmr->next[ch]) {
-+    case none:
-+        break;
-+    case cmia:
-+        if (tcnt >=3D tcora) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_A) {
-+                ret =3D tcnt - tcora;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEA)) {
-+                qemu_irq_pulse(tmr->cmia[ch]);
-+            }
-+            if (sz =3D=3D 8 && ch =3D=3D 0 &&
-+                FIELD_EX8(tmr->tccr[1], TCCR, CSS) =3D=3D CASCADING) {
-+                tmr->tcnt[1]++;
-+                timer_events(tmr, 1);
-+            }
-+        }
-+        break;
-+    case cmib:
-+        if (tcnt >=3D tcorb) {
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CCLR) =3D=3D CCLR_B) {
-+                ret =3D tcnt - tcorb;
-+            }
-+            if (FIELD_EX8(tmr->tcr[ch], TCR, CMIEB)) {
-+                qemu_irq_pulse(tmr->cmib[ch]);
-+            }
-+        }
-+        break;
-+    case ovi:
-+        if ((tcnt >=3D (1 << sz)) && FIELD_EX8(tmr->tcr[ch], TCR, OVIE))=
- {
-+            qemu_irq_pulse(tmr->ovi[ch]);
-+        }
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return ret;
-+}
-+
-+static void timer_events(RTMRState *tmr, int ch)
-+{
-+    uint16_t tcnt;
-+    tmr->tcnt[ch] =3D read_tcnt(tmr, 1, ch);
-+    if (FIELD_EX8(tmr->tccr[0], TCCR, CSS) !=3D CASCADING) {
-+        tmr->tcnt[ch] =3D issue_event(tmr, ch, 8,
-+                                    tmr->tcnt[ch],
-+                                    tmr->tcora[ch], tmr->tcorb[ch]) & 0x=
-ff;
-+    } else {
-+        if (ch =3D=3D 1) {
-+            return ;
-+        }
-+        tcnt =3D issue_event(tmr, ch, 16,
-+                           concat_reg(tmr->tcnt),
-+                           concat_reg(tmr->tcora),
-+                           concat_reg(tmr->tcorb));
-+        tmr->tcnt[0] =3D (tcnt >> 8) & 0xff;
-+        tmr->tcnt[1] =3D tcnt & 0xff;
-+    }
-+    update_events(tmr, ch);
-+}
-+
-+static void timer_event0(void *opaque)
-+{
-+    RTMRState *tmr =3D opaque;
-+
-+    timer_events(tmr, 0);
-+}
-+
-+static void timer_event1(void *opaque)
-+{
-+    RTMRState *tmr =3D opaque;
-+
-+    timer_events(tmr, 1);
-+}
-+
-+static void rtmr_reset(DeviceState *dev)
-+{
-+    RTMRState *tmr =3D RTMR(dev);
-+    tmr->tcr[0]   =3D tmr->tcr[1]   =3D 0x00;
-+    tmr->tcsr[0]  =3D 0x00;
-+    tmr->tcsr[1]  =3D 0x10;
-+    tmr->tcnt[0]  =3D tmr->tcnt[1]  =3D 0x00;
-+    tmr->tcora[0] =3D tmr->tcora[1] =3D 0xff;
-+    tmr->tcorb[0] =3D tmr->tcorb[1] =3D 0xff;
-+    tmr->tccr[0]  =3D tmr->tccr[1]  =3D 0x00;
-+    tmr->next[0]  =3D tmr->next[1]  =3D none;
-+    tmr->tick =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void rtmr_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RTMRState *tmr =3D RTMR(obj);
-+    int i;
-+
-+    memory_region_init_io(&tmr->memory, OBJECT(tmr), &tmr_ops,
-+                          tmr, "renesas-tmr", 0x10);
-+    sysbus_init_mmio(d, &tmr->memory);
-+
-+    for (i =3D 0; i < ARRAY_SIZE(tmr->ovi); i++) {
-+        sysbus_init_irq(d, &tmr->cmia[i]);
-+        sysbus_init_irq(d, &tmr->cmib[i]);
-+        sysbus_init_irq(d, &tmr->ovi[i]);
-+    }
-+    tmr->timer[0] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event0, tmr=
-);
-+    tmr->timer[1] =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, timer_event1, tmr=
-);
-+}
-+
-+static const VMStateDescription vmstate_rtmr =3D {
-+    .name =3D "rx-tmr",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rtmr_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RTMRState, input_freq, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rtmr_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_rtmr;
-+    dc->reset =3D rtmr_reset;
-+    device_class_set_props(dc, rtmr_properties);
-+}
-+
-+static const TypeInfo rtmr_info =3D {
-+    .name       =3D TYPE_RENESAS_TMR,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RTMRState),
-+    .instance_init =3D rtmr_init,
-+    .class_init =3D rtmr_class_init,
-+};
-+
-+static void rtmr_register_types(void)
-+{
-+    type_register_static(&rtmr_info);
-+}
-+
-+type_init(rtmr_register_types)
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 59b3f44d69..ec26e54fcc 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -35,3 +35,9 @@ config CMSDK_APB_TIMER
- config CMSDK_APB_DUALTIMER
-     bool
-     select PTIMER
-+
-+config RENESAS_TMR8
-+    bool
-+
-+config RENESAS_CMT
-+    bool
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index dece235fd7..d9b78dc248 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -28,6 +28,9 @@ common-obj-$(CONFIG_MIPS_CPS) +=3D mips_gictimer.o
-=20
- common-obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
-=20
-+obj-$(CONFIG_RENESAS_TMR8) +=3D renesas_tmr.o
-+obj-$(CONFIG_RENESAS_CMT) +=3D renesas_cmt.o
-+
- common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
- common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
-=20
+NB, we need to be sure we are comparing the same things between
+libvirt and QEMU when we discuss "probing".
+
+What we're talking about by probing in libvirt context is
+
+  - Detect the image format
+  - Detect the image virtual size
+  - Detect the image physical size
+  - Detect the image backing store location
+  - Detect the image backing store format
+  - Detect the image encryption usage
+
+In QEMU 'format probing' (as impl by bdrv_probe in QEMU's block layer)
+only covers the very first point, 'detect the image format'. All the
+other information can only be acquired by opening the image (bdrv_open
+in QEMU's block layer).
+
+The issue is that bdrv_open does waaaaaay more than we desire here,
+because it is serving the broader purpose of allowing QEMU to actually
+use the image. qcow2 is probably the worst case example, as it has
+to parse the image and setup data structures for l1, l2 tables,
+refcount tables, snapshots, and initialize the encryption layer if
+present.
+
+It is known that this code is vulnerable to maliciously created
+qcow2 images. This resulted in OpenStack being vulnerable to
+CVE-2015-5162 https://bugs.launchpad.net/ossa/+bug/1449062
+
+It isn't possible to do anything to avoid this risk if you are
+invoking qemu-img on untrustworthy images. The best you can do
+is to mitigate the effects by placing memory/CPU ulimits on
+the qemu-img process. Determining these limits then introduces
+a new problem, as you have to pick a limit which is low enough
+to avoid DoS, while large enough to allow all valid usage.
+
+Since mitigating CVE-2015-5162 OpenStack has faced this problem
+with users reporting that the limits it set were breaking valid
+usage, as so had to increase the limits, which increases the
+DoS impact.  Then there's also the pain that OSP suffered when
+QEMU introduced mandatory locking which broke all existing
+usage of 'qemu-img info' when a VM was running.
+
+Of course when you launch QEMU later, it is susceptible to the
+DoS in the system emulator, but this is mitigated by fact that
+upfront probing is going to reject some malicious images. If
+some bad images do get past, then it will be dealt with by the
+mgmt apps normal monitoring of a running VM resource usage
+and/or cgroups limits.
+
+The libvirt probing code is designed to do the minimal work
+needed to get the information we require. Of course there may
+be bugs in libvirt's code, but it is much more straightforward
+for us to analyse & understand risks, as most of the problematic
+code that QEMU has simply doesn't exist in libvirt.
+
+>  - performance of spawning extra processes would be way worse
+
+Yes, this was the second motivation for having this code in libvirt
+originally. The QEMU VM startup case wasn't the target, but rather
+storage pools code. When we start a storage pool with 100's of images,
+the time to spawn 100's of instances of qemu-img adds up very quickly.
+Even if qemu-img had exactly the same minimalist code as libvirt's
+current probing logic it would still be worse. The overhead of process
+startup vs the time spent probing the image is a poor ratio, such that
+process startup/exec time dominates.
+
+
+The third reason why libvirt has this code is because historically
+the error reporting from qemu-img has been quite unhelpful - many
+errors just end up being a generic EINVAL error message. Things have
+improved over time, but error reporting is always a challenge when
+spawning external commands to do work.
+
+
+The fourth reason why libvirt has this image file detection code is
+that it is used by non-QEMU drivers in libvirt, mostly notably the
+storage pool driver, and we didn't wish to force people to install
+qemu-img on hosts which were not running the QEMU virt driver.
+I don't think this reason is especially a technical show stopper,
+since these days all distros allow you to install qemu-img, without
+pulling in the rest of QEMU. In fact the storage pool driver RPM
+depends on qemu-img explicitly since we dropped support for the
+Xen tools for image creation a while ago.
+
+
+
+There is scope for something to replace the current libvirt probing
+code, but spawning 'qemu-img info' is certainly not that something.
+
+Libvirt (and apps above libvirt in general) would really benefit from
+having a library that they can use for readonly querying of information
+about disk images. Of course that library can't just spawn qemu-img
+otherwise that defeats the point of using a library.
+
+Unfortunately QEMU's block layer can't practically serve this role
+because its GPLv2-only licensing is too restrictive for some apps
+needs.=20
+
+It would have to be something conceptually similar in complexity to
+what libvirt's current probing code does, so that we can have good
+confidence in its behaviour in the face of malicious input.
+
+> I'll reiterate the historical state of the problem because I think it's
+> important:
+>=20
+> Pre-blockdev:
+>   - we internally assumed that if the image format of an backing image
+>     was not present in the overlay it is 'raw'
+>   - this influenced security labelling but not actually how qemu viewed
+>     or probed the file. If it was qcow2 probed as qcow2 qemu opened it
+>     as qcow2 possibly even including the backing file if selinux or
+>     other mechanism didn't prevent it.
+>=20
+> post-blockdev:
+>   - the assumption of 'raw' would now be expressed into the qemu
+>     configuration. This assumption turned into data corruption since we
+>     no longer allowed qemu to probe the format and forced it as raw.
+>   - fix was to always require the format to be recorded in the overlay
+>   - this made users unhappy who neglected to record the format into the
+>     overlay when creating it manually
+
+So the key problem we have is that with -blockdev we are always explicitly
+telling QEMU what the backing file is for every image.
+
+Can we fix this to have the exact same behaviour as before by *not* telling
+QEMU anything about the backing file when using -blockdev, if there is no
+well defined backing format present. ie, use -blockdev, but let QEMU probe
+just as it did in non-blockdev days.
+
+Would there be any downsides to this that did not already exist in the
+non-blockdev days ?
+
+I don't think we can solve the regressions in behaviour of backing files
+by doing probing of the backing files in libvirt, because that only works
+for the case where libvirt can actually open the file. ie a local file on
+disk. We don't have logic for opening backing files on RBD, GlusterFS,
+iSCSI, HTTP, SSH, etc, and nor do we want todo that.
+
+So to me it looks like the only viable option is to not specify the
+backing file info to QEMU at all.
+
+> Now this adds an interresting dimension to this problem. If libvirt
+> forces the users to specify the image format, and the users don't know
+> it they will probe. So we are basically making this a problem of
+> somebody else. [2] As you can see in that patch, it uses 'qemu-img'
+> anyways and also additionally actually allows the chain to continue
+> deeper! [3]
+
+Yeah, this is a really bad situation given the difficulty in safely
+using qemu-img, without also breaking valid usage.
+
+We don't want to push this off to apps
+
+> This boils down to whether we want to accept some possibility of image
+> corruption in trade for avoiding regression of behaviour in the secure
+> cases as well as management apps and users not having to re-invent when
+> probing an image is actually safe.
+
+I feel like the risk of image corruption is pretty minor. Our probing
+handles all normal cases the same way as QEMU and newly introduced
+image formats are rare.
+
+>=20
+> Finally I think we should either decide to fix it in this release, or
+> stick with the error message forever. Fixing it later will not make
+> much sense as many users already fixed their scripts and we'd just add
+> back the trade-off of possible image corruption.
+>=20
+> Peter
+>=20
+> [1] If e.g. the security subsystem of the host didn't forbid the use of
+> the backing file such a qcow2 qemu would happily open it.
+>=20
+> [2] https://www.redhat.com/archives/libguestfs/2020-February/msg00013.htm=
+l
+>=20
+> [3] As implemented in [2] the backing image is not checked whether it
+> has a backing file or not but the format is probed, which way result
+> into accessing the backing chain of the probed image.
+>=20
+> Prior to this detection, it would be prevented by sVirt or alternatively
+> also by libvit itself in -blockdev mode when this patch would be
+> accepted.
+
+Regards,
+Daniel
 --=20
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
