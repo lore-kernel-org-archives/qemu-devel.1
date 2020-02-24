@@ -2,79 +2,83 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D55C11D2F
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2313AC11D2F
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1149020836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:12:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A328020838
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 17:13:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yk/Cd+6F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1149020836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Nj2SRToL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A328020838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6HHe-0004jR-8z
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:12:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47384)
+	id 1j6HHz-0004Mm-GP
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 12:13:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j6HBP-0005wV-98
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:06:17 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6H8j-0003Aq-T0
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j6HBL-0006tV-DD
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:06:15 -0500
-Received: from mail-lf1-x12f.google.com ([2a00:1450:4864:20::12f]:41163)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j6HBL-0006st-4c; Mon, 24 Feb 2020 12:06:11 -0500
-Received: by mail-lf1-x12f.google.com with SMTP id y17so4211099lfe.8;
- Mon, 24 Feb 2020 09:06:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K2lollYogFHHyQXa6uhkLeqNvv20M9DV6fI1nPg7JwE=;
- b=Yk/Cd+6FGemSVmolvlJHIejsAfaqYwBuI0JdTENk+WUg3hXEUu3ow3VOvOL5wZwBfq
- WgKeZBzAd+SZhvu1CkPRN8cRG/boBU2Xf4kituY7ZRHTE0Ax/l7ylrrU4gl3lBcpPFzQ
- 535p1B+yqXhHBHaveXPXdAsDMzfW2c1qX4NYpBz0ltuRVnlOVvocugfeSRzzmvu63wGh
- GNVEaFHtfqVwz1LSq74jwCjWlOWvuzGsFVlwuPVwQUs05VYIfEAPFeOAHSkCNGyCmnhp
- wr7fADzFRA/SCkx22p/Axwm9vj9KaTY4KDjmTrm8NQd2EU1UJFF4uv0Lnf/tpn69hd6E
- hcIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K2lollYogFHHyQXa6uhkLeqNvv20M9DV6fI1nPg7JwE=;
- b=S52IZP8H2Bd4qDGpI3IKV3aYNk2lCQTed5L6CWQeYfIh6p1PURxAe04iypfm1TCyhv
- /QoCrm6nqvE4NZvtQeMoweCmomNxyxJH+OePGBBnwRQo4PpS5cXTm0yuJ0bcf4xqTywQ
- vxgtNf7N5ZqG3Ce4PqSV0GRo+2yR5dOtmWWOemT7F98WT+HuyHHqYbJjsb070iYsXje/
- SULJ4t4+DWogvuGVY8/3B1QS+Sb3FiWIyxwa5aK7kdCkblJ49w/KsC3YaoGdxCPGDa4J
- DL7zzv3MGXN33Vsay5L6sbXuFKKwV9OyqZbTL/WFfe1rWkaMmQeI5HXITFuq1PvLUOuM
- kjPA==
-X-Gm-Message-State: APjAAAXFrkc9WOQRdRuvQBItbhI6hUUsvITOX5ZzWeQxa86nAt6Mc4u9
- NB9c3/I9ZlFmae2XgHNguMmUVO4bB7nunmu30BM=
-X-Google-Smtp-Source: APXvYqxWqEXT4KmnVn+jPODSrVz6t+5FztMWikPw5gBDdsPO/NSm7KWNyMovMho8x5AIIjX8UF9VxmTyBgOWj1LoPOk=
-X-Received: by 2002:a19:4a:: with SMTP id 71mr28015241lfa.50.1582563968755;
- Mon, 24 Feb 2020 09:06:08 -0800 (PST)
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6H8h-0005jn-V3
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 12:03:29 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:46602)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1j6H8V-0005aE-Nc; Mon, 24 Feb 2020 12:03:15 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 5C09896F56;
+ Mon, 24 Feb 2020 17:03:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582563794;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bB21GtN06DZNJaUHjbU4l90Vg+Ru8G4ozYaR4LBMQ+Q=;
+ b=Nj2SRToLewbAxnWA4H/Kl/bK2Wz/bxZWe6nlAvyUx53xLYKJ8XBahma1dWwRoxwYa70Z5N
+ NA95OJ4pUESnEVeHqcJ0WtbkWFo33xKdl5NWSxQHcCTdsX06xlmTWFAkGXqasMTv0xBPGe
+ skGiJ3+V/hpvyYZZqOEB/9u/AmKz/cE=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 7/9] hw/char/cadence_uart: add clock support
+Date: Mon, 24 Feb 2020 18:02:59 +0100
+Message-Id: <20200224170301.246623-8-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200224170301.246623-1-damien.hedde@greensocs.com>
+References: <20200224170301.246623-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-References: <1582551584-20093-1-git-send-email-bmeng.cn@gmail.com>
- <1582551584-20093-2-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1582551584-20093-2-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 24 Feb 2020 08:58:35 -0800
-Message-ID: <CAKmqyKOgUG4cbyjh3YYWcMqTnNU3dqGv_fxgwWp8p6Gzs_vp5Q@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] roms: opensbi: Upgrade from v0.5 to v0.6
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::12f
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582563794;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bB21GtN06DZNJaUHjbU4l90Vg+Ru8G4ozYaR4LBMQ+Q=;
+ b=Rjlb4WLwH4wHwPcTw1rVwhcmoHbMFDrbBC52GG4uPpSaI88Qmd0lWxGnkaYZIIBqUZGxhK
+ MkTR0bibdKYD7D3ByQCFc8AwbIWbsq7lRD1mX5VNaZ+A4XzMlzxkDb5BIfX4wfEOi18mtq
+ zO+EmF8SsBwaxYoXMFPEYZAkC6fZYSc=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582563794; a=rsa-sha256; cv=none;
+ b=W8aAoPKwah911pI+zTBD3ec0s43WGulxTnlOOKffm/MEvjxPjU/uTT7G5a5HSdTKVJhbky
+ fvCirljDvjvHAs30XsiejwBa2Z4IFNVg8bx8yQnyRkKVjHCdfjczz27DC8PBlQKKofBrkA
+ fRbxgV3KklpXO6h4fdgMfKCjjqrXx+k=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+X-Spam: Yes
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,141 +90,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
+ alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 24, 2020 at 5:42 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Upgrade OpenSBI from v0.5 to v0.6 and the pre-built bios images.
->
-> The v0.6 release includes the following commits:
->
-> dd8ef28 firmware: Fix compile error for FW_PAYLOAD with latest GCC binutils
-> 98f4a20 firmware: Introduce relocation lottery
-> f728a0b include: Sync-up encoding with priv v1.12-draft and hypervisor v0.5-draft
-> 18897aa include: Use _UL() and _ULL() for defines in riscv_encoding.h
-> 7a13beb firmware: Add preferred boot HART field in struct fw_dynamic_info
-> 215421c lib: Remove date and time from init message
-> 838657c include: Remove ilen member of struct unpriv_trap
-> b1d8c98 lib: No need to set VSSTATUS.MXR bit in get_insn()
-> 0e1322b lib: Better naming of unpriv APIs for wider use
-> 75f903d lib: Simplify trap parameters in sbi_ecall functions
-> c96cc03 lib: Fix CPU capabilities detection function
-> ab14f94 lib: Fix probe extension
-> 813f7f4 lib: Add error detection for misa_extension
-> dc40042 include: sbi_platform: fix compilation for GCC-9
-> bd732ae include: Add guest external interrupt related defines
-> 6590a7d lib: Delegate guest page faults to HS-mode
-> 4370f18 include: Extend struct sbi_trap_info for mtval2 and mtinst
-> 086dbdf lib: Fix sbi_get_insn() for load guest page fault
-> 2be424b lib: Extend trap redirection for hypervisor v0.5 spec
-> 7219477 lib: Use MTINST CSR in misaligned load/store emulation
-> b8732fe lib: Add replacement extension and function ids
-> aa0ed1d lib: Remove redundant IPI types
-> 1092663 lib: Add TIME extension in SBI
-> 9777aee lib: Add IPI extension in SBI
-> 9407202 lib: Add hfence instruction encoding
-> 331ff6a lib: Support stage1 and stage2 tlb flushing
-> 86a31f5 lib: Implement RFENCE extension
-> c7d1b12 firmware: Return real DTB address when FW_xyz_FDT_ADDR is not defined
-> 9beb573 firmware: Improve comments for fw_prev_arg1() and fw_next_arg1()
-> fc6bd90 docs: Improve docs for FDT address passing
-> 46a90d9 lib: utils: Support CLINT with 32bit MMIO access on RV64 system
-> c0849cd platform: Add T-head C910 initial support
-> e746673 lib: Remove unnecessary checks from init_coldboot() and init_warmboot()
-> c3e406f lib: Add initial sbi_exit() API
-> 55e191e lib: Add system early_exit and final_exit APIs
-> 6469ed1 lib: Add timer exit API
-> b325f6b lib: Add ipi exit API
-> 1993182 lib: Add irqchip exit API
-> 2aa43a1 lib: save/restore MIE CSR in sbi_hart_wait_for_coldboot()
-> b0c9787 lib: do sbi_exit() upon halt IPI
-> 15ed1e7 lib: improve system reboot and shutdown implementation
-> 73c19e6 lib: zero-out memory allocated using sbi_scratch_alloc_offset()
-> a67fd68 lib: Add sbi_init_count() API
-> 049ad0b build: Use -ffreestanding
-> e340bbf include: Add OPENSBI_EXTERNAL_SBI_TYPES in sbi_types.h
-> b28b8ac docs: Add description of using OPENSBI_EXTERNAL_SBI_TYPES
-> adf8b73 platform: thead/c910: Remove SBI_PLATFORM_HAS_PMP
-> f95dd39 docs: platform: Update SiFive FU540 doc as-per U-Boot v2020.01
-> 6ffe1be firmware: Fix placement of .align directives
-> 7daccae platform: thead/c910: Don't enable L2 cache in warm boot
-> a73d45c platform: thead/c910: Don't set plic/clint address in warm boot
-> 30cdf00 scripts: Add C910 to platform list in the binary archive script
-> 0492c5d include: Typo fix in comment for SBI_SCRATCH_SIZE define
-> 046cc16 lib: Move struct sbi_ipi_data definition to sbi_ipi.c
-> 3d2aaac lib: Introduce sbi_ipi_send_smode() API
-> da9b76b lib: Introduce sbi_ipi_send_halt() API
-> a8b4b83 lib: Introduce sbi_tlb_fifo_request() API
-> 5f762d1 lib: Introduce sbi_ipi_event_create/destroy() APIs
-> 817d50d lib: Drop _fifo from the name of various sbi_tlb_fifo_xyz() functions
-> 84cd4fc lib: Initialize TLB management directly from coldboot/warmboot path
-> 0a411bf include: Add generic and simple list handling APIs
-> 37923c4 lib: Add dynamic registration of SBI extensions
-> 7668502 lib: Factor-out SBI legacy extension
-> 161b348 lib: Factor-out SBI replacement extensions
-> 43ac621 lib: Factor-out SBI vendor extension
-> 021b9e7 lib: Factor-out SBI base extension
-> 85647a1 platform: template: typo fix in system reboot/shutdown names
-> ac1c229 platform: Update UART base addresses for qemu/sifve_u
-> d79173b platform: Add an platform ops to return platform specific tlb flush limit
-> 2c2bbe7 platform: sifive/fu540: Set tlb range flush limit to zero
-> 5ff1ab0 makefile: add support for building on macOS
-> 6d0b4c5 platform: Drop qemu/sifive_u support
-> 9a717ec platform: sifive: fu540: Add platform specific 'make run' cmd
-> d6fa7f9 doc: sifive: fu540: Update QEMU instruction when using U-Boot as the payload
-> 179edde lib: sbi_scratch: use bitwise ops in sbi_scratch_alloc_offset()
-> 897b8fb lib: Use __builtin_ctzl() in pmp_get()
-> 1a8ca08 lib: Initialize out value in SBI calls
-> c2bfa2b lib: irqchip/plic: Disable all contexts and IRQs
-> c2f23cc platform: Add Spike initial support
-> a062200 platform: Remove stale options from config.mk files
-> c03c8a1 scripts: Add Spike to platform list of binary archive script
-> 29bb2a6 docs: platform: Add documentation for Spike platform
-> 48b06ad ThirdPartyNotices: Fix doc styles
-> 892e879 doc: coreboot: Fix doc styles
-> fdfb533 doc: payload_linux: Fix doc styles
-> 44d1296 doc: andes-ae350: Fix doc styles
-> a8ef0b5 doc: ariane-fpga: Fix doc styles
-> 82fd42f doc: qemu_virt: Fix doc styles
-> f8ce996 doc: sifive_fu540: Fix doc styles
-> 27a5c7f doc: thead-c910: Fix doc styles
-> 0b41453 Revert "lib: Use __builtin_ctzl() in pmp_get()"
-> c66543d lib: utils: htif: Fix 32-bit build
-> bc874e3 lib: Don't check MIDELEG and MEDELEG at end of delegate_traps()
-> 24c3082 lib: Print interrupt and exception delegation in boot prints
-> 66fb729 platform: sifive: fu540: Add 32-bit specific fdt/payload addresses
-> 3e7d666 platform: qemu: virt: Correct the typo in config.mk
-> c3b3b8f lib: Fix typo in atomic exchange functions
-> 3936243 lib: Use available hart mask for correct hbase value
-> f8b3bb8 lib: Simplify the for-loop in sbi_ipi_send_many()
-> ac5e821 include: Bump-up version to 0.6
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Switch the cadence uart to multi-phase reset and add the
+reference clock input.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+The input clock frequency is added to the migration structure.
 
-Alistair
+The reference clock controls the baudrate generation. If it disabled,
+any input characters and events are ignored.
 
->
-> ---
->
-> Changes in v2:
-> - new patch: Upgrade opensbi from v0.5 to v0.6
->
->  pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 40984 -> 41280 bytes
->  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 49160 -> 53760 bytes
->  pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 45064 -> 49664 bytes
->  roms/opensbi                                 |   2 +-
->  4 files changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/pc-bios/opensbi-riscv32-virt-fw_jump.bin b/pc-bios/opensbi-riscv32-virt-fw_jump.bin
+If this clock remains unconnected, the uart behaves as before
+(it default to a 50MHz ref clock).
+
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+
+---
+
+v7:
+ + update ClockIn/ClockOut types
+ + update due to resettable changes
+ + use a versioned field instead subsection in vmstate
+---
+ include/hw/char/cadence_uart.h |  1 +
+ hw/char/cadence_uart.c         | 73 +++++++++++++++++++++++++++++-----
+ hw/char/trace-events           |  3 ++
+ 3 files changed, 67 insertions(+), 10 deletions(-)
+
+diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uar=
+t.h
+index 47cec956c4..2a179a572f 100644
+--- a/include/hw/char/cadence_uart.h
++++ b/include/hw/char/cadence_uart.h
+@@ -49,6 +49,7 @@ typedef struct {
+     CharBackend chr;
+     qemu_irq irq;
+     QEMUTimer *fifo_trigger_handle;
++    Clock *refclk;
+ } CadenceUARTState;
+=20
+ static inline DeviceState *cadence_uart_create(hwaddr addr,
+diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+index 22e47972f1..e196906c92 100644
+--- a/hw/char/cadence_uart.c
++++ b/hw/char/cadence_uart.c
+@@ -31,6 +31,8 @@
+ #include "qemu/module.h"
+ #include "hw/char/cadence_uart.h"
+ #include "hw/irq.h"
++#include "hw/qdev-clock.h"
++#include "trace.h"
+=20
+ #ifdef CADENCE_UART_ERR_DEBUG
+ #define DB_PRINT(...) do { \
+@@ -97,7 +99,7 @@
+ #define LOCAL_LOOPBACK         (0x2 << UART_MR_CHMODE_SH)
+ #define REMOTE_LOOPBACK        (0x3 << UART_MR_CHMODE_SH)
+=20
+-#define UART_INPUT_CLK         50000000
++#define UART_DEFAULT_REF_CLK (50 * 1000 * 1000)
+=20
+ #define R_CR       (0x00/4)
+ #define R_MR       (0x04/4)
+@@ -171,12 +173,15 @@ static void uart_send_breaks(CadenceUARTState *s)
+ static void uart_parameters_setup(CadenceUARTState *s)
+ {
+     QEMUSerialSetParams ssp;
+-    unsigned int baud_rate, packet_size;
++    unsigned int baud_rate, packet_size, input_clk;
++    input_clk =3D clock_get_hz(s->refclk);
+=20
+-    baud_rate =3D (s->r[R_MR] & UART_MR_CLKS) ?
+-            UART_INPUT_CLK / 8 : UART_INPUT_CLK;
++    baud_rate =3D (s->r[R_MR] & UART_MR_CLKS) ? input_clk / 8 : input_cl=
+k;
++    baud_rate /=3D (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
++    trace_cadence_uart_baudrate(baud_rate);
++
++    ssp.speed =3D baud_rate;
+=20
+-    ssp.speed =3D baud_rate / (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
+     packet_size =3D 1;
+=20
+     switch (s->r[R_MR] & UART_MR_PAR) {
+@@ -215,6 +220,13 @@ static void uart_parameters_setup(CadenceUARTState *=
+s)
+     }
+=20
+     packet_size +=3D ssp.data_bits + ssp.stop_bits;
++    if (ssp.speed =3D=3D 0) {
++        /*
++         * Avoid division-by-zero below.
++         * TODO: find something better
++         */
++        ssp.speed =3D 1;
++    }
+     s->char_tx_time =3D (NANOSECONDS_PER_SECOND / ssp.speed) * packet_si=
+ze;
+     qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
+ }
+@@ -340,6 +352,11 @@ static void uart_receive(void *opaque, const uint8_t=
+ *buf, int size)
+     CadenceUARTState *s =3D opaque;
+     uint32_t ch_mode =3D s->r[R_MR] & UART_MR_CHMODE;
+=20
++    /* ignore characters when unclocked or in reset */
++    if (!clock_is_enabled(s->refclk) || device_is_in_reset(DEVICE(s))) {
++        return;
++    }
++
+     if (ch_mode =3D=3D NORMAL_MODE || ch_mode =3D=3D ECHO_MODE) {
+         uart_write_rx_fifo(opaque, buf, size);
+     }
+@@ -353,6 +370,11 @@ static void uart_event(void *opaque, QEMUChrEvent ev=
+ent)
+     CadenceUARTState *s =3D opaque;
+     uint8_t buf =3D '\0';
+=20
++    /* ignore characters when unclocked or in reset */
++    if (!clock_is_enabled(s->refclk) || device_is_in_reset(DEVICE(s))) {
++        return;
++    }
++
+     if (event =3D=3D CHR_EVENT_BREAK) {
+         uart_write_rx_fifo(opaque, &buf, 1);
+     }
+@@ -462,9 +484,9 @@ static const MemoryRegionOps uart_ops =3D {
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+ };
+=20
+-static void cadence_uart_reset(DeviceState *dev)
++static void cadence_uart_reset_init(Object *obj, ResetType type)
+ {
+-    CadenceUARTState *s =3D CADENCE_UART(dev);
++    CadenceUARTState *s =3D CADENCE_UART(obj);
+=20
+     s->r[R_CR] =3D 0x00000128;
+     s->r[R_IMR] =3D 0;
+@@ -473,6 +495,11 @@ static void cadence_uart_reset(DeviceState *dev)
+     s->r[R_BRGR] =3D 0x0000028B;
+     s->r[R_BDIV] =3D 0x0000000F;
+     s->r[R_TTRIG] =3D 0x00000020;
++}
++
++static void cadence_uart_reset_hold(Object *obj)
++{
++    CadenceUARTState *s =3D CADENCE_UART(obj);
+=20
+     uart_rx_reset(s);
+     uart_tx_reset(s);
+@@ -491,6 +518,14 @@ static void cadence_uart_realize(DeviceState *dev, E=
+rror **errp)
+                              uart_event, NULL, s, NULL, true);
+ }
+=20
++static void cadence_uart_refclk_update(void *opaque)
++{
++    CadenceUARTState *s =3D opaque;
++
++    /* recompute uart's speed on clock change */
++    uart_parameters_setup(s);
++}
++
+ static void cadence_uart_init(Object *obj)
+ {
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+@@ -500,9 +535,23 @@ static void cadence_uart_init(Object *obj)
+     sysbus_init_mmio(sbd, &s->iomem);
+     sysbus_init_irq(sbd, &s->irq);
+=20
++    s->refclk =3D qdev_init_clock_in(DEVICE(obj), "refclk",
++            cadence_uart_refclk_update, s);
++    /* initialize the frequency in case the clock remains unconnected */
++    clock_set_hz(s->refclk, UART_DEFAULT_REF_CLK);
++
+     s->char_tx_time =3D (NANOSECONDS_PER_SECOND / 9600) * 10;
+ }
+=20
++static int cadence_uart_pre_load(void *opaque)
++{
++    CadenceUARTState *s =3D opaque;
++
++    /* the frequency will be overriden if the refclk field is present */
++    clock_set_hz(s->refclk, UART_DEFAULT_REF_CLK);
++    return 0;
++}
++
+ static int cadence_uart_post_load(void *opaque, int version_id)
+ {
+     CadenceUARTState *s =3D opaque;
+@@ -521,8 +570,9 @@ static int cadence_uart_post_load(void *opaque, int v=
+ersion_id)
+=20
+ static const VMStateDescription vmstate_cadence_uart =3D {
+     .name =3D "cadence_uart",
+-    .version_id =3D 2,
++    .version_id =3D 3,
+     .minimum_version_id =3D 2,
++    .pre_load =3D cadence_uart_pre_load,
+     .post_load =3D cadence_uart_post_load,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_UINT32_ARRAY(r, CadenceUARTState, CADENCE_UART_R_MAX),
+@@ -534,8 +584,9 @@ static const VMStateDescription vmstate_cadence_uart =
+=3D {
+         VMSTATE_UINT32(tx_count, CadenceUARTState),
+         VMSTATE_UINT32(rx_wpos, CadenceUARTState),
+         VMSTATE_TIMER_PTR(fifo_trigger_handle, CadenceUARTState),
++        VMSTATE_CLOCK_V(refclk, CadenceUARTState, 3),
+         VMSTATE_END_OF_LIST()
+-    }
++    },
+ };
+=20
+ static Property cadence_uart_properties[] =3D {
+@@ -546,10 +597,12 @@ static Property cadence_uart_properties[] =3D {
+ static void cadence_uart_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
++    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
+=20
+     dc->realize =3D cadence_uart_realize;
+     dc->vmsd =3D &vmstate_cadence_uart;
+-    dc->reset =3D cadence_uart_reset;
++    rc->phases.enter =3D cadence_uart_reset_init;
++    rc->phases.hold  =3D cadence_uart_reset_hold;
+     device_class_set_props(dc, cadence_uart_properties);
+   }
+=20
+diff --git a/hw/char/trace-events b/hw/char/trace-events
+index 6f938301d9..d20eafd56f 100644
+--- a/hw/char/trace-events
++++ b/hw/char/trace-events
+@@ -97,3 +97,6 @@ exynos_uart_wo_read(uint32_t channel, const char *name,=
+ uint32_t reg) "UART%d: T
+ exynos_uart_rxsize(uint32_t channel, uint32_t size) "UART%d: Rx FIFO siz=
+e: %d"
+ exynos_uart_channel_error(uint32_t channel) "Wrong UART channel number: =
+%d"
+ exynos_uart_rx_timeout(uint32_t channel, uint32_t stat, uint32_t intsp) =
+"UART%d: Rx timeout stat=3D0x%x intsp=3D0x%x"
++
++# hw/char/cadence_uart.c
++cadence_uart_baudrate(unsigned baudrate) "baudrate %u"
+--=20
+2.24.1
+
 
