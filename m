@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97938C35679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 03:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71681C35641
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 03:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DB0120675
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 03:59:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB0120675
+	by mail.kernel.org (Postfix) with ESMTPS id 4B3F520675
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 03:59:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B3F520675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j64tZ-00034m-Ee
-	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 22:59:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60131)
+	id 1j64tb-000398-Eh
+	for qemu-devel@archiver.kernel.org; Sun, 23 Feb 2020 22:59:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j64so-0001cV-GM
+ (envelope-from <pannengyuan@huawei.com>) id 1j64so-0001cU-Ch
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 22:58:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j64sn-00065z-Du
+ (envelope-from <pannengyuan@huawei.com>) id 1j64sn-00065s-Ap
  for qemu-devel@nongnu.org; Sun, 23 Feb 2020 22:58:14 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2725 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2724 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j64sk-00062g-Qu; Sun, 23 Feb 2020 22:58:11 -0500
+ id 1j64sk-00062i-RU; Sun, 23 Feb 2020 22:58:11 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 68B52134498437A9FDAD;
+ by Forcepoint Email with ESMTP id 6E2FE300CAFF946C47B1;
  Mon, 24 Feb 2020 11:58:02 +0800 (CST)
 Received: from localhost.localdomain (10.175.104.216) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 24 Feb 2020 11:57:55 +0800
+ 14.3.439.0; Mon, 24 Feb 2020 11:57:56 +0800
 From: <pannengyuan@huawei.com>
 To: <mst@redhat.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
-Subject: [PATCH v2 1/2] vhost-user-blk: delete virtioqueues in unrealize to
- fix memleaks
-Date: Mon, 24 Feb 2020 12:13:35 +0800
-Message-ID: <20200224041336.30790-2-pannengyuan@huawei.com>
+Subject: [PATCH v2 2/2] vhost-use-blk: convert to new virtio_delete_queue
+Date: Mon, 24 Feb 2020 12:13:36 +0800
+Message-ID: <20200224041336.30790-3-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200224041336.30790-1-pannengyuan@huawei.com>
 References: <20200224041336.30790-1-pannengyuan@huawei.com>
@@ -73,63 +72,93 @@ Sender: "Qemu-devel"
 
 From: Pan Nengyuan <pannengyuan@huawei.com>
 
-virtio queues forgot to delete in unrealize, and aslo error path in
-realize, this patch fix these memleaks, the leak stack is as follow:
+use the new virtio_delete_queue function to cleanup.
 
-Direct leak of 114688 byte(s) in 16 object(s) allocated from:
-    #0 0x7f24024fdbf0 in calloc (/lib64/libasan.so.3+0xcabf0)
-    #1 0x7f2401642015 in g_malloc0 (/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x55ad175a6447 in virtio_add_queue /mnt/sdb/qemu/hw/virtio/virtio.c:2327
-    #3 0x55ad17570cf9 in vhost_user_blk_device_realize /mnt/sdb/qemu/hw/block/vhost-user-blk.c:419
-    #4 0x55ad175a3707 in virtio_device_realize /mnt/sdb/qemu/hw/virtio/virtio.c:3509
-    #5 0x55ad176ad0d1 in device_set_realized /mnt/sdb/qemu/hw/core/qdev.c:876
-    #6 0x55ad1781ff9d in property_set_bool /mnt/sdb/qemu/qom/object.c:2080
-    #7 0x55ad178245ae in object_property_set_qobject /mnt/sdb/qemu/qom/qom-qobject.c:26
-    #8 0x55ad17821eb4 in object_property_set_bool /mnt/sdb/qemu/qom/object.c:1338
-    #9 0x55ad177aeed7 in virtio_pci_realize /mnt/sdb/qemu/hw/virtio/virtio-pci.c:1801
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
-v2->v1: There is no change in this patch(only change the patch2/2)
+V2->V1:
+- rename vqs to vhost_vqs to avoid confusing with virtqs (suggented by Stefan Hajnoczi)
 ---
- hw/block/vhost-user-blk.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/block/vhost-user-blk.c          | 19 +++++++++++--------
+ include/hw/virtio/vhost-user-blk.h |  3 ++-
+ 2 files changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index d8c459c575..2eba8b9db0 100644
+index 2eba8b9db0..12925a47ec 100644
 --- a/hw/block/vhost-user-blk.c
 +++ b/hw/block/vhost-user-blk.c
-@@ -460,6 +460,9 @@ reconnect:
- virtio_err:
-     g_free(s->vqs);
-     g_free(s->inflight);
-+    for (i = 0; i < s->num_queues; i++) {
-+        virtio_del_queue(vdev, i);
-+    }
-     virtio_cleanup(vdev);
-     vhost_user_cleanup(&s->vhost_user);
- }
-@@ -468,6 +471,7 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(dev);
-+    int i;
+@@ -306,7 +306,7 @@ static int vhost_user_blk_connect(DeviceState *dev)
+     s->connected = true;
  
-     virtio_set_status(vdev, 0);
-     qemu_chr_fe_set_handlers(&s->chardev,  NULL, NULL, NULL,
-@@ -476,6 +480,10 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
-     vhost_dev_free_inflight(s->inflight);
-     g_free(s->vqs);
+     s->dev.nvqs = s->num_queues;
+-    s->dev.vqs = s->vqs;
++    s->dev.vqs = s->vhost_vqs;
+     s->dev.vq_index = 0;
+     s->dev.backend_features = 0;
+ 
+@@ -420,13 +420,14 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
+                 sizeof(struct virtio_blk_config));
+ 
++    s->virtqs = g_new(VirtQueue *, s->num_queues);
+     for (i = 0; i < s->num_queues; i++) {
+-        virtio_add_queue(vdev, s->queue_size,
+-                         vhost_user_blk_handle_output);
++        s->virtqs[i] = virtio_add_queue(vdev, s->queue_size,
++                                        vhost_user_blk_handle_output);
+     }
+ 
+     s->inflight = g_new0(struct vhost_inflight, 1);
+-    s->vqs = g_new0(struct vhost_virtqueue, s->num_queues);
++    s->vhost_vqs = g_new0(struct vhost_virtqueue, s->num_queues);
+     s->watch = 0;
+     s->connected = false;
+ 
+@@ -458,11 +459,12 @@ reconnect:
+     return;
+ 
+ virtio_err:
+-    g_free(s->vqs);
++    g_free(s->vhost_vqs);
      g_free(s->inflight);
-+
-+    for (i = 0; i < s->num_queues; i++) {
-+        virtio_del_queue(vdev, i);
-+    }
+     for (i = 0; i < s->num_queues; i++) {
+-        virtio_del_queue(vdev, i);
++        virtio_delete_queue(s->virtqs[i]);
+     }
++    g_free(s->virtqs);
      virtio_cleanup(vdev);
      vhost_user_cleanup(&s->vhost_user);
  }
+@@ -478,12 +480,13 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
+                              NULL, NULL, NULL, false);
+     vhost_dev_cleanup(&s->dev);
+     vhost_dev_free_inflight(s->inflight);
+-    g_free(s->vqs);
++    g_free(s->vhost_vqs);
+     g_free(s->inflight);
+ 
+     for (i = 0; i < s->num_queues; i++) {
+-        virtio_del_queue(vdev, i);
++        virtio_delete_queue(s->virtqs[i]);
+     }
++    g_free(s->virtqs);
+     virtio_cleanup(vdev);
+     vhost_user_cleanup(&s->vhost_user);
+ }
+diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+index 108bfadeeb..05ea0ad183 100644
+--- a/include/hw/virtio/vhost-user-blk.h
++++ b/include/hw/virtio/vhost-user-blk.h
+@@ -36,7 +36,8 @@ typedef struct VHostUserBlk {
+     struct vhost_dev dev;
+     struct vhost_inflight *inflight;
+     VhostUserState vhost_user;
+-    struct vhost_virtqueue *vqs;
++    struct vhost_virtqueue *vhost_vqs;
++    VirtQueue **virtqs;
+     guint watch;
+     bool connected;
+ } VHostUserBlk;
 -- 
 2.18.2
 
