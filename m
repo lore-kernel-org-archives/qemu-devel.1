@@ -2,130 +2,79 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A2AC38BE0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE613C38BE1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03E6E2080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:01:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA53F20838
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g95+c+BP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E6E2080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pgHeKxjg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA53F20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6IzI-0001Au-3U
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:01:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34623)
+	id 1j6J4l-0002eL-S2
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:07:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6Iyb-0000gs-8i
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:10 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j6J46-0002AY-H8
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:06:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6IyY-0008Vp-OR
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31655
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6IyY-0008TI-F9
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582570865;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zfMd2WMhwZJQ7H8rImltnLQJwqFzfJktU/DwmcD0VSQ=;
- b=g95+c+BPjOOBi6rCA7T91CQOn7IxeRT9JxVKugCqiVPXD5q361A198NQUbnqiAEAdoITe8
- Ty8yoMpbmdnh6dKaxNkaEb/N8mrIw/YqLhq1BbpeJSeCrkll754lwmpETzthhsVJD0zCwk
- Ah2ARGYQjMbcO894yeLyipcXFIIqvgg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-B7h8GBrqOpuBgp0jFK-KZw-1; Mon, 24 Feb 2020 13:59:26 -0500
-X-MC-Unique: B7h8GBrqOpuBgp0jFK-KZw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D995418B5F6A;
- Mon, 24 Feb 2020 18:59:24 +0000 (UTC)
-Received: from [10.36.116.78] (ovpn-116-78.ams2.redhat.com [10.36.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 34D481001B2C;
- Mon, 24 Feb 2020 18:59:11 +0000 (UTC)
-Subject: Re: [PATCH v2 00/13] migrate/ram: Fix resizing RAM blocks while
- migrating
-From: David Hildenbrand <david@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-References: <20200221164204.105570-1-david@redhat.com>
- <20200221180440.GE37727@xz-x1>
- <d10b53cc-89f3-042b-9889-d16ea7572f42@redhat.com>
- <20200224174515.GJ37727@xz-x1>
- <39ced494-023b-e020-e986-218919063af5@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <0ffb449a-84a3-3555-e0c1-0bc842977bb2@redhat.com>
-Date: Mon, 24 Feb 2020 19:59:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <alistair23@gmail.com>) id 1j6J45-0003Xg-F7
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:06:50 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:43740)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j6J41-0003OQ-Tj; Mon, 24 Feb 2020 14:06:46 -0500
+Received: by mail-lj1-x243.google.com with SMTP id a13so11331378ljm.10;
+ Mon, 24 Feb 2020 11:06:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vROQhmF37GxxVHdJLrkoLplAKn72rc6FbAjeldPt1/8=;
+ b=pgHeKxjg+Hr5hUbhV43A0DUC5jNbD1y4SHU1UuTF+nMdLwMbg04gs5hBeWE+G43eC5
+ jJr67Fu3CvFUF0fmKawg4L4dDemS2N8HW6wq5FJTI18dOGUu93BfFqInlVWhcmbQ10EX
+ zMAicxLnoXF2+mvbdBvOQ8qvYvtFv2eMHFajh4Lnyq9qsHM1b47kKXmoSX4uJ3bc0Pd1
+ 6uSrx4nnOPhE7Do9X1Coh+h3wTXsS0N6h+D5cnoCbVivCprS5coYbXqhsJFRqi2ldhc/
+ wISyaWzCbSV4aGq2lLcrRIuLn7eret2GKumboZO8eFOuy1NHy3a95oqTkw6B7MeKFJrf
+ 0Wuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vROQhmF37GxxVHdJLrkoLplAKn72rc6FbAjeldPt1/8=;
+ b=gbzTERqCSJBLRvC2qaBdmmOh0m+dbfZ8gEAYVVnyU8bzWu8XQWQoL/jY4hJYDA3UyD
+ 2Rso8LSvXDazgukLkh3BFifKlcPgVHiVteywL9RkBFTEAgM93vI8QYbyG9FR+u1fu0fX
+ KGea51vyCL+fh+8Kb06pVRlNEb+MNhn1jxiYWHPe9WXgGfRGxj07uVEn5tzpypRY4uS9
+ QdbsBFhN9TI3MysUIiKUxk+0l6KSjSAlGo99SQ6bqu0X+8cQjjbRWDtWgJBB+0sB69v9
+ 2sOueqWTT+PocY6CcmJFelOyia+n+lcjwQUdYAxYF5tAjozXQBGhgvhCvZuIBPXSTXUN
+ ALtw==
+X-Gm-Message-State: APjAAAXM6s74ONIxoehbPR3wVqnBCvlPK00c0awzjapckgzW8xKFAmUN
+ DjyDdijJlD2Voubvmz5nNtWY0pySfDNZwWq+3J0=
+X-Google-Smtp-Source: APXvYqwd15A+vzRlt+BYQ+c6QIDpepQenvlcH/o4I4gi7fGxqS9IS5izIROp9ywW1/pYutZezWJQNrWdicjc3hKE8sY=
+X-Received: by 2002:a2e:b0db:: with SMTP id g27mr30207478ljl.74.1582571204256; 
+ Mon, 24 Feb 2020 11:06:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <39ced494-023b-e020-e986-218919063af5@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <0c4859f90948ba392da456c9e1daf8fde8f5b22e.1582453384.git.rajnesh.kanwal49@gmail.com>
+ <CAC41xo0PWCZw4mrcEfRq9fv+b3mSk9sN0mWhFXPwgdD6LR8xnQ@mail.gmail.com>
+In-Reply-To: <CAC41xo0PWCZw4mrcEfRq9fv+b3mSk9sN0mWhFXPwgdD6LR8xnQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Feb 2020 10:59:05 -0800
+Message-ID: <CAKmqyKNn8V0yWA8t7dQeMwxcnmywDJoGKag9vQzwFruaygKL7Q@mail.gmail.com>
+Subject: Re: [PATCH 1/1] target/riscv: Fix VS mode interrupts forwarding.
+To: Jose Martins <josemartins90@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,112 +86,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paul Durrant <paul@xen.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Palmer Dabbelt <palmerdabbelt@google.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, rajnesh.kanwal49@gmail.com,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.02.20 19:44, David Hildenbrand wrote:
-> On 24.02.20 18:45, Peter Xu wrote:
->> On Mon, Feb 24, 2020 at 10:09:19AM +0100, David Hildenbrand wrote:
->>> On 21.02.20 19:04, Peter Xu wrote:
->>>> On Fri, Feb 21, 2020 at 05:41:51PM +0100, David Hildenbrand wrote:
->>>>> I was now able to actually test resizing while migrating. I am using the
->>>>> prototype of virtio-mem to test (which also makes use of resizable
->>>>> allocations). Things I was able to reproduce:
->>>>
->>>> The test cases cover quite a lot.  Thanks for doing that.
->>>>
->>>>> - Resize while still running on the migration source. Migration is canceled
->>>>> -- Test case for "migraton/ram: Handle RAM block resizes during precopy"
->>>>
->>>>> - Resize (grow+shrink) on the migration target during postcopy migration
->>>>>   (when syncing RAM blocks), while not yet running on the target
->>>>> -- Test case for "migration/ram: Discard new RAM when growing RAM blocks
->>>>>    and the VM is stopped", and overall RAM size synchronization. Seems to
->>>>>    work just fine.
->>>>
->>>> This won't be able to trigger without virtio-mem, right?
->>>
->>> AFAIK all cases can also be triggered without virtio-mem (not just that
->>> easily :) ). This case would be "RAM block is bigger on source than on
->>> destination.".
->>>
->>>>
->>>> And I'm also curious on how to test this even with virtio-mem.  Is
->>>> that a QMP command to extend/shrink virtio-mem?
->>>
->>> Currently, there is a single qom property that can be modifed via
->>> QMP/HMP - "requested-size". With resizable resizable memory backends,
->>> increasing the requested size will also implicitly grow the RAM block.
->>> Shrinking the requested size will currently result in shrinking the RAM
->>> block on the next reboot.
->>>
->>> So, to trigger growing of a RAM block (assuming requested-size was
->>> smaller before, e.g., 1000M)
->>>
->>> echo "qom-set vm1 requested-size 6000M" | sudo nc -U $MON
->>>
->>> To trigger shrinking (assuming requested-size was bigger before)
->>>
->>> echo "qom-set vm1 requested-size 100M" | sudo nc -U $MON
->>> echo 'system_reset' | sudo nc -U $MON
->>>
->>>
->>> Placing these at the right spots during a migration allows to test this
->>> very reliably.
->>
->> I see, thanks for the context.  The question was majorly about when
->> you say "during postcopy migration (when syncing RAM blocks), while
->> not yet running on the target" - it's not easy to do so imho, because:
-> 
-> This case is very easy to trigger, even with acpi. Simply have a ram
-> block on the source be bigger than one on the target. The sync code
-> (migration/ram.c:qemu_ram_resize()) will perform the resize during
-> precopy. Postcopy misses to discard the additional memory.
-> 
-> Maybe my description was confusing. But this really just triggers when
-> 
-> - Postcopy is advised and discards memory on all ram blocks
-> - Precopy grows the RAM block when syncing the RAM block sizes with the
-> source
-> 
-> Postcopy misses to discard the new RAM.
-> 
->>
->>   - it's a very short transition period between precopy and postcopy,
->>     so I was curious about how you made sure that the grow/shrink
->>     happened exactly during that period
->>
->>   - during the period, IIUC it was still in the main thread, which
->>     means logically QEMU should not be able to respond to any QMP/HMP
->>     command at all...  So even if you send a command, I think it'll
->>     only be executed later after the transition completes
->>
->>   - this I'm not sure, but ... even for virtio-mem, the resizing can
->>     only happen after guest ack it, right?  During the precopy to
->>     postcopy transition period, the VM is stopped, AFAICT, so
->>     logically we can't trigger resizing during the transition
+On Sun, Feb 23, 2020 at 11:23 AM Jose Martins <josemartins90@gmail.com> wrote:
+>
+> Hello rajnesh,
+>
+> I had already submitted almost this exact patch a few weeks ago.
 
-Regarding that question: Resizes will happen without guest interaction
-(e.g., during a reboot, or when increasing the requested size). In the
-future, there are theoretical plans to have resizes that can be
-triggered by guest interaction/request to some extend as well.
+To QEMU? I don't see the patch.
 
--- 
-Thanks,
+Alistair
 
-David / dhildenb
-
+>
+> Jose
+>
+> On Sun, 23 Feb 2020 at 13:51, <rajnesh.kanwal49@gmail.com> wrote:
+> >
+> > From: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
+> >
+> > Currently riscv_cpu_local_irq_pending is used to find out pending
+> > interrupt and VS mode interrupts are being shifted to represent
+> > S mode interrupts in this function. So when the cause returned by
+> > this function is passed to riscv_cpu_do_interrupt to actually
+> > forward the interrupt, the VS mode forwarding check does not work
+> > as intended and interrupt is actually forwarded to hypervisor. This
+> > patch fixes this issue.
+> >
+> > Signed-off-by: Rajnesh Kanwal <rajnesh.kanwal49@gmail.com>
+> > ---
+> >  target/riscv/cpu_helper.c | 9 ++++++++-
+> >  1 file changed, 8 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > index b9e90dfd9a..59535ecba6 100644
+> > --- a/target/riscv/cpu_helper.c
+> > +++ b/target/riscv/cpu_helper.c
+> > @@ -46,7 +46,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+> >      target_ulong pending = env->mip & env->mie &
+> >                                 ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
+> >      target_ulong vspending = (env->mip & env->mie &
+> > -                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)) >> 1;
+> > +                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP));
+> >
+> >      target_ulong mie    = env->priv < PRV_M ||
+> >                            (env->priv == PRV_M && mstatus_mie);
+> > @@ -900,6 +900,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+> >
+> >              if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
+> >                  !force_hs_execp) {
+> > +                /*
+> > +                 * See if we need to adjust cause. Yes if its VS mode interrupt
+> > +                 * no if hypervisor has delegated one of hs mode's interrupt
+> > +                 */
+> > +                if (cause == IRQ_VS_TIMER || cause == IRQ_VS_SOFT ||
+> > +                    cause == IRQ_VS_EXT)
+> > +                    cause = cause - 1;
+> >                  /* Trap to VS mode */
+> >              } else if (riscv_cpu_virt_enabled(env)) {
+> >                  /* Trap into HS mode, from virt */
+> > --
+> > 2.17.1
+> >
+> >
+>
 
