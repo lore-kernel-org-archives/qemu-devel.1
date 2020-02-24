@@ -2,83 +2,101 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1BEC35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7E6C35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:40:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34D1A2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96D1D2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 11:40:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxXxd1n4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D1A2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGDiwiYJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D1D2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6C5U-0000af-Bt
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 06:39:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53262)
+	id 1j6C67-0001VH-Qf
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 06:40:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1j6C4R-0008T6-HR
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:38:44 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6C5D-0000dW-Ug
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1j6C4Q-0006Bi-5I
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:38:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52713
+ (envelope-from <philmd@redhat.com>) id 1j6C5B-0007LN-VS
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:39:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52981
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1j6C4Q-0006Bb-1S
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:38:42 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6C5A-0007Ks-6r
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 06:39:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582544321;
+ s=mimecast20190719; t=1582544367;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GezWtJiVYxcbr8h8TVEuUpWs+EuuY3CHHGu4eJIIWu0=;
- b=KxXxd1n4EXKr9S6SqIwd2FJzv7KVDPV8r/dKQ7l5UrYU0aax8f8AwmjF0oMpgSxZSB52hC
- /31zOjsO7vqYwJMqapeDNZ4Ng7p0juZ34HjYOzJfhk5hpKxvzj5QM6ZiO0haI/6MKK3WwC
- +H5USz7xoAnOhw+Q/DXL7U2XMtKeV+U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-x601qb7aMVK299pJ4ZBDlA-1; Mon, 24 Feb 2020 06:38:37 -0500
-X-MC-Unique: x601qb7aMVK299pJ4ZBDlA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6664189F760;
- Mon, 24 Feb 2020 11:38:36 +0000 (UTC)
-Received: from andariel.pipo.sk (ovpn-204-177.brq.redhat.com [10.40.204.177])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC93927189;
- Mon, 24 Feb 2020 11:38:31 +0000 (UTC)
-Date: Mon, 24 Feb 2020 12:38:27 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 3/3] qemu-img: Deprecate use of -b without -F
-Message-ID: <20200224113827.GC3296@andariel.pipo.sk>
-References: <20200222112341.4170045-1-eblake@redhat.com>
- <20200222112341.4170045-4-eblake@redhat.com>
+ bh=Tld274PxuEdRWCHH/mrUXPjW9GX3dRl0u3qG16b7hLA=;
+ b=WGDiwiYJwhuSBmMGciUfZgQopZykSKmqAkr74YwE1BvuV5xDjoaBV+zm89StIKo+4+uf4i
+ j5Q4uI/hQkGbOjJdketas3oMu7qMw4U34fBWT1hsqclqx/xufssj6zCHTTmKF5nkOXSPkc
+ WOadlOCFoXW7x9/ncGXOI1DMwqzisIE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-FsxjT4ZoPdmRUo5CWN3aSw-1; Mon, 24 Feb 2020 06:39:25 -0500
+X-MC-Unique: FsxjT4ZoPdmRUo5CWN3aSw-1
+Received: by mail-wr1-f70.google.com with SMTP id e5so3843526wro.12
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 03:39:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=67jicjQ4EaxBoxwDhhlBAQ9tzq/en4rNlfvk/h89pvI=;
+ b=Tw8xCNWqD3+0wHe6gFBA9RQQxnYVdeXgmCCmTQjQZhbsFTW7tQGSASCaaiKOcD3f8/
+ TyLqtmdEbYGOiVYsQEdG065pYZDss0t3aC/Y4EcxI/ZohvCJythcDBDgfaNFw5qKW0zn
+ N6CFXlEU5Ev3kv+R1IFYTMSXowB9K34RTqW2VH6vBoLXFdlHHW1AGuOX79LRUXmOGizK
+ LKAhEryWcnHdZcsDAVcAImuNwQk3dy/S9vWWEhnJ/pS/0HGoHhDcZurP67beL6+Mczyi
+ 9y72ZcossTGCk9JUG1XSgpI3b5QzeRzsn73D1uHiJYU6jy3M+c2zk74pladAU2qXZKBN
+ l1zQ==
+X-Gm-Message-State: APjAAAVLeTSOXF3h9Rl3EyZRcS4DWDGXN5gjMI2OiLSnLIc96CmEpEgQ
+ +r33LydTMAl378GIFYbDvsr2wHw7z8hJcHj4PuQY++rochGB4iJTz2JHE16ispIr1KFM+Ic51iw
+ f4q5VDtCsUmZw+6U=
+X-Received: by 2002:adf:ec83:: with SMTP id z3mr63933168wrn.133.1582544364253; 
+ Mon, 24 Feb 2020 03:39:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzXQZ2rE+IB9t8N2+0W4jX+m0fi5cVqAngd6Q1QifebsVcnR53Kun3bMK5w1SyvLq4+7N7fJw==
+X-Received: by 2002:adf:ec83:: with SMTP id z3mr63933144wrn.133.1582544363995; 
+ Mon, 24 Feb 2020 03:39:23 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id z6sm18810813wrs.96.2020.02.24.03.39.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 24 Feb 2020 03:39:23 -0800 (PST)
+Subject: Re: [PATCH v6 00/79] refactor main RAM allocation to use hostmem
+ backend
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200219160953.13771-1-imammedo@redhat.com>
+ <09a2f9da-998c-545b-ea15-f1ae3490fb54@redhat.com>
+ <20200224123342.14b67e6d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <09c404a5-6207-f019-d7da-edcf146f2899@redhat.com>
+Date: Mon, 24 Feb 2020 12:38:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200222112341.4170045-4-eblake@redhat.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20200224123342.14b67e6d@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,162 +108,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Feb 22, 2020 at 05:23:41 -0600, Eric Blake wrote:
-> Creating an image that requires format probing of the backing image is
-> inherently unsafe (we've had several CVEs over the years based on
-> probes leaking information to the guest on a subsequent boot).  If our
-> probing algorithm ever changes, or if other tools like libvirt
-> determine a different probe result than we do, then subsequent use of
-> that backing file under a different format will present corrupted data
-> to the guest.  Start a deprecation clock so that future qemu-img can
-> refuse to create unsafe backing chains that would rely on probing.
+On 2/24/20 12:33 PM, Igor Mammedov wrote:
+> On Mon, 24 Feb 2020 09:45:11 +0100
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 >=20
-> However, there is one time where probing is safe: when we first create
-> an image, no guest has yet used the new image, so as long as we record
-> what we probed, all future uses of the image will see the same data -
-
-I disagree. If you are creating an overlay on top of an existing image
-it's not safe to probe the format any more generally. (obviously you'd
-have to trust the image and express the trust somehow)
-
-The image may have been used in a VM as raw and that means that the VM
-might have recorded a valid qcow2 header into it. Creating the overlay
-with probing would legitimize this.
-
-Let's assume we have a malicious image written by the guest but we
-simulate it by:
-
-$ qemu-img  create -f qcow2 -F raw -b /etc/passwd /tmp/malicious
-Formatting '/tmp/malicious', fmt=3Dqcow2 size=3D2560 backing_file=3D/etc/pa=
-sswd backing_fmt=3Draw cluster_size=3D65536 lazy_refcounts=3Doff refcount_b=
-its=3D16
-
-
-Now we want to create an overlay.
-
-a) without this patchset:
-
-$ qemu-img create -f qcow2 -b /tmp/malicious /tmp/pre-patch.qcow2
-Formatting '/tmp/pre-patch.qcow2', fmt=3Dqcow2 size=3D2560 backing_file=3D/=
-tmp/malicious cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-$ qemu-img info /tmp/pre-patch.qcow2
-image: /tmp/pre-patch.qcow2
-file format: qcow2
-virtual size: 2.5 KiB (2560 bytes)
-disk size: 196 KiB
-cluster_size: 65536
-backing file: /tmp/malicious
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
-
-There's no 'backing file format'. When used by libvirt we'd not allow
-the VM to touch the backing file of /tmp/malicious in pre-blockdev era
-and in libvirt-6.0 we'd report an error right away.
-
-b) Now with this patchset:
-
-$ ./qemu-img create -f qcow2 -b /tmp/malicious /tmp/post-patch.qcow2
-qemu-img: warning: Deprecated use of non-raw backing file without explicit =
-backing format, using detected format of qcow2
-Formatting '/tmp/post-patch.qcow2', fmt=3Dqcow2 size=3D2560 backing_file=3D=
-/tmp/malicious backing_fmt=3Dqcow2 cluster_size=3D65536 lazy_refcounts=3Dof=
-f refcount_bits=3D16
-$ qemu-img info /tmp/post-patch.qcow2
-image: /tmp/post-patch.qcow2
-file format: qcow2
-virtual size: 2.5 KiB (2560 bytes)
-disk size: 196 KiB
-cluster_size: 65536
-backing file: /tmp/malicious
-backing file format: qcow2
-Format specific information:
-    compat: 1.1
-    lazy refcounts: false
-    refcount bits: 16
-    corrupt: false
-
-You now get a warning, but "backing file format" is now recorded in the
-overlay. Now this is WAY worse than it was before. The overlay now
-legitimizes the format recorded by the malicious guest which circumvents
-libvirt's protections. The warning is very easy to miss, and if you run
-it in scripts you might never get to see it. We can't allow that.
-
-
-> so the code now records the probe results as if the user had passed
-> -F.  When this happens, it is unconditionally safe to record a probe
-> of 'raw', but any other probe is still worth warning the user in case
-
-While it's safe I don't think it should be encouraged. IMO -F should be
-made mandatory with -b.
-
-> our probe differed from their expectations.  Similarly, if the backing
-> file name uses the json: psuedo-protocol, the backing name includes
-> the format.
-
-Not necessarily. The backing store string can be e.g.:
-
-$ ./qemu-img create -f qcow1 -b 'json:{"driver":"file","filename":"/tmp/mal=
-icious"}' /tmp/json.qcow2
-Formatting '/tmp/json.qcow1', fmt=3Dqcow2 size=3D197120 backing_file=3Djson=
-:{"driver":"file",,"filename":"/tmp/malicious"} cluster_size=3D65536 lazy_r=
-efcounts=3Doff refcount_bits=3D16
-$ qemu-img info /tmp/json.qcow1
-image: /tmp/json.qcow1
-file format: qcow1
-virtual size: 191 KiB (197120 bytes)
-disk size: 195 KiB
-cluster_size: 65535
-backing file: json:{"driver":"file","filename":"/tmp/malicious"}
-Format specific information:
-    compat: 0.1
-    lazy refcounts: false
-    refcount bits: 15
-    corrupt: false
-
-Now this has the old semantics but we didn't even get the warning. But
-at least the backing file format is not written into the overlay.
-
-
-> iotest 114 specifically wants to create an unsafe image for later
-> amendment rather than defaulting to our new default of recording a
-> probed format, so it needs an update.
+>> Hi Igor,
+>>
+>> On 2/19/20 5:08 PM, Igor Mammedov wrote:
+>> [...]
+>>> Series removes ad hoc RAM allocation API (memory_region_allocate_system=
+_memory)
+>>> and consolidates it around hostmem backend. It allows to
+>>>    * resolve conflicts between global -mem-prealloc and hostmem's "poli=
+cy" option
+>>>      fixing premature allocation before binding policy is applied
+>>>    * simplify complicated memory allocation routines which had to deal =
+with 2 ways
+>>>      to allocate RAM.
+>>>    * it allows to reuse hostmem backends of a choice for main RAM witho=
+ut adding
+>>>      extra CLI options to duplicate hostmem features.
+>>>      Recent case was -mem-shared, to enable vhost-user on targets that =
+don't
+>>>      support hostmem backends [1] (ex: s390)
+>>>    * move RAM allocation from individual boards into generic machine co=
+de and
+>>>      provide them with prepared MemoryRegion.
+>>>    * clean up deprecated NUMA features which were tied to the old API (=
+see patches)
+>>>       - "numa: remove deprecated -mem-path fallback to anonymous RAM"
+>>>       - (POSTPONED, waiting on libvirt side) "forbid '-numa node,mem' f=
+or 5.0 and newer machine types"
+>>>       - (POSTPONED) "numa: remove deprecated implicit RAM distribution =
+between nodes"
+>>>
+>>> Conversion introduces a new machine.memory-backend property and wrapper=
+ code that
+>>> aliases global -mem-path and -mem-alloc into automatically created host=
+mem
+>>> backend properties (provided memory-backend was not set explicitly give=
+n by user).
+>>> And then follows bulk of trivial patches that incrementally convert ind=
+ividual
+>>> boards to using machine.memory-backend provided MemoryRegion.
+>>>
+>>> Board conversion typically involves:
+>>>    * providing MachineClass::default_ram_size and MachineClass::default=
+_ram_id
+>>>      so generic code could create default backend if user didn't explic=
+itly provide
+>>>      memory-backend or -m options
+>>>    * dropping memory_region_allocate_system_memory() call
+>>>    * using convenience MachineState::ram MemoryRegion, which points to =
+MemoryRegion
+>>>      allocated by ram-memdev
+>>> On top of that for some boards:
+>>>    * added missing ram_size checks (typically it were boards with fixed=
+ ram size)
+>>>    * ram_size fixups were replaced by checks and hard errors, forcing u=
+ser to
+>>>      provide correct "-m" values instead of ignoring it and continuing =
+running.
+>>>
+>>> After all boards are converted the old API is removed and memory alloca=
+tion
+>>> routines are cleaned up.
+>>
+>> I wonder about the pre-QOM machines. As they don't call
+>> memory_region_allocate_system_memory(), the conversion is not required?
+>> (See for example pxa270_init).
+> Since they weren't using memory_region_allocate_system_memory(), they are
+> out of scope of this series.
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block.c                    | 17 ++++++++++++++++-
->  qemu-deprecated.texi       | 12 ++++++++++++
->  qemu-img.c                 |  8 +++++++-
->  tests/qemu-iotests/114     |  4 ++--
->  tests/qemu-iotests/114.out |  1 +
->  5 files changed, 38 insertions(+), 4 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index 695decbfd7b7..6595683ac52a 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -6013,6 +6013,15 @@ void bdrv_img_create(const char *filename, const c=
-har *fmt,
->                                "Could not open backing image to determine=
- size.\n");
->              goto out;
->          } else {
-> +            if (!backing_fmt && !strstart(backing_file, "json:", NULL)) =
-{
-> +                backing_fmt =3D bs->drv->format_name;
-> +                qemu_opt_set(opts, BLOCK_OPT_BACKING_FMT, backing_fmt, N=
-ULL);
+> As for the future, I'd only make boards that support user configurable
+> ram size to accept "-m".
 
-We must never write the detected format into the overlay. Not even when
-we print a warning. This can legitimize a malicious file if the user
-mises the warning.
+Good cleanup.
+
+>=20
+> For fixed size boards -m/memdev is overkill and we need to decide what to=
+ do
+> with them. I see following options (in order of my preference):
+>    1. Non popular: error out if -m is specified (it used to work, but not
+>       anymore when check is added, i.e similar to size checks
+>       introduced in this series so users have to adapt their CLI).
+>       It can still use automatically created memdev but I'd ditch it on
+>       those boards and use plain memory_region_init_ram().
+>       This is matches well SoCs that have embedded RAM and don't really
+>       care about what user may specify with -m. It would simplify
+>       simple boards.
+
+LGTM.
+
+>=20
+>    2. a path of least resistance: continue support -m and generalize
+>       ram_size checks for such boards. This could use memdev since it
+>       comes for free with -m support. I don't expect complications
+>       with generalizing it (but one would only know for sure when
+>       it's coded)
+>=20
+> The next this I plan to do is to clean up ram_size global and
+> hopefully get rid of MachineState:ram_size as well.
+>=20
 
 
