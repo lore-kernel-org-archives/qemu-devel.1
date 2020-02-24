@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB74C38BE1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 18:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A2AC38BE0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA2C720836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 18:46:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03E6E2080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:01:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f28Hhs1c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA2C720836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g95+c+BP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E6E2080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6IkB-0005jM-Te
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 13:46:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60893)
+	id 1j6IzI-0001Au-3U
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:01:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34623)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6Ij4-0005AV-Pw
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 13:45:08 -0500
+ (envelope-from <david@redhat.com>) id 1j6Iyb-0000gs-8i
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6Ij3-0002ur-Ho
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 13:45:06 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46276
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j6IyY-0008Vp-OR
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31655
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6Ij3-0002tb-E3
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 13:45:05 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6IyY-0008TI-F9
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:01:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582569904;
+ s=mimecast20190719; t=1582570865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=A/PbljZBVDTKUBDWFPGZ035BCCij1285p54Jtf8h0qI=;
- b=f28Hhs1c+KJP+UBDoaLyURacAtNLaHzjHyHrOt6PALgZR1kCvITxo4x8BnaeIJlKZ7jOJx
- G+BPbuIx2kDWsda2xHHwxBOiznIKmJpVw4uZSyp2sJ7jtHzVRLebWfemZPM9KiH7m7g/7u
- FGCWCA3WHYpPPrmJ2iutgD12mt40PuI=
+ bh=zfMd2WMhwZJQ7H8rImltnLQJwqFzfJktU/DwmcD0VSQ=;
+ b=g95+c+BPjOOBi6rCA7T91CQOn7IxeRT9JxVKugCqiVPXD5q361A198NQUbnqiAEAdoITe8
+ Ty8yoMpbmdnh6dKaxNkaEb/N8mrIw/YqLhq1BbpeJSeCrkll754lwmpETzthhsVJD0zCwk
+ Ah2ARGYQjMbcO894yeLyipcXFIIqvgg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-Xf9espvCOHOuerSCjimRGA-1; Mon, 24 Feb 2020 13:45:03 -0500
-X-MC-Unique: Xf9espvCOHOuerSCjimRGA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-111-B7h8GBrqOpuBgp0jFK-KZw-1; Mon, 24 Feb 2020 13:59:26 -0500
+X-MC-Unique: B7h8GBrqOpuBgp0jFK-KZw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A85B13E2;
- Mon, 24 Feb 2020 18:45:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D995418B5F6A;
+ Mon, 24 Feb 2020 18:59:24 +0000 (UTC)
 Received: from [10.36.116.78] (ovpn-116-78.ams2.redhat.com [10.36.116.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9141F5C54A;
- Mon, 24 Feb 2020 18:44:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 34D481001B2C;
+ Mon, 24 Feb 2020 18:59:11 +0000 (UTC)
 Subject: Re: [PATCH v2 00/13] migrate/ram: Fix resizing RAM blocks while
  migrating
+From: David Hildenbrand <david@redhat.com>
 To: Peter Xu <peterx@redhat.com>
 References: <20200221164204.105570-1-david@redhat.com>
  <20200221180440.GE37727@xz-x1>
  <d10b53cc-89f3-042b-9889-d16ea7572f42@redhat.com>
  <20200224174515.GJ37727@xz-x1>
-From: David Hildenbrand <david@redhat.com>
+ <39ced494-023b-e020-e986-218919063af5@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -110,21 +111,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <39ced494-023b-e020-e986-218919063af5@redhat.com>
-Date: Mon, 24 Feb 2020 19:44:46 +0100
+Message-ID: <0ffb449a-84a3-3555-e0c1-0bc842977bb2@redhat.com>
+Date: Mon, 24 Feb 2020 19:59:10 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200224174515.GJ37727@xz-x1>
+In-Reply-To: <39ced494-023b-e020-e986-218919063af5@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -152,100 +153,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.02.20 18:45, Peter Xu wrote:
-> On Mon, Feb 24, 2020 at 10:09:19AM +0100, David Hildenbrand wrote:
->> On 21.02.20 19:04, Peter Xu wrote:
->>> On Fri, Feb 21, 2020 at 05:41:51PM +0100, David Hildenbrand wrote:
->>>> I was now able to actually test resizing while migrating. I am using t=
-he
->>>> prototype of virtio-mem to test (which also makes use of resizable
->>>> allocations). Things I was able to reproduce:
+On 24.02.20 19:44, David Hildenbrand wrote:
+> On 24.02.20 18:45, Peter Xu wrote:
+>> On Mon, Feb 24, 2020 at 10:09:19AM +0100, David Hildenbrand wrote:
+>>> On 21.02.20 19:04, Peter Xu wrote:
+>>>> On Fri, Feb 21, 2020 at 05:41:51PM +0100, David Hildenbrand wrote:
+>>>>> I was now able to actually test resizing while migrating. I am using the
+>>>>> prototype of virtio-mem to test (which also makes use of resizable
+>>>>> allocations). Things I was able to reproduce:
+>>>>
+>>>> The test cases cover quite a lot.  Thanks for doing that.
+>>>>
+>>>>> - Resize while still running on the migration source. Migration is canceled
+>>>>> -- Test case for "migraton/ram: Handle RAM block resizes during precopy"
+>>>>
+>>>>> - Resize (grow+shrink) on the migration target during postcopy migration
+>>>>>   (when syncing RAM blocks), while not yet running on the target
+>>>>> -- Test case for "migration/ram: Discard new RAM when growing RAM blocks
+>>>>>    and the VM is stopped", and overall RAM size synchronization. Seems to
+>>>>>    work just fine.
+>>>>
+>>>> This won't be able to trigger without virtio-mem, right?
 >>>
->>> The test cases cover quite a lot.  Thanks for doing that.
+>>> AFAIK all cases can also be triggered without virtio-mem (not just that
+>>> easily :) ). This case would be "RAM block is bigger on source than on
+>>> destination.".
 >>>
->>>> - Resize while still running on the migration source. Migration is can=
-celed
->>>> -- Test case for "migraton/ram: Handle RAM block resizes during precop=
-y"
+>>>>
+>>>> And I'm also curious on how to test this even with virtio-mem.  Is
+>>>> that a QMP command to extend/shrink virtio-mem?
 >>>
->>>> - Resize (grow+shrink) on the migration target during postcopy migrati=
-on
->>>>   (when syncing RAM blocks), while not yet running on the target
->>>> -- Test case for "migration/ram: Discard new RAM when growing RAM bloc=
-ks
->>>>    and the VM is stopped", and overall RAM size synchronization. Seems=
- to
->>>>    work just fine.
+>>> Currently, there is a single qom property that can be modifed via
+>>> QMP/HMP - "requested-size". With resizable resizable memory backends,
+>>> increasing the requested size will also implicitly grow the RAM block.
+>>> Shrinking the requested size will currently result in shrinking the RAM
+>>> block on the next reboot.
 >>>
->>> This won't be able to trigger without virtio-mem, right?
->>
->> AFAIK all cases can also be triggered without virtio-mem (not just that
->> easily :) ). This case would be "RAM block is bigger on source than on
->> destination.".
->>
+>>> So, to trigger growing of a RAM block (assuming requested-size was
+>>> smaller before, e.g., 1000M)
 >>>
->>> And I'm also curious on how to test this even with virtio-mem.  Is
->>> that a QMP command to extend/shrink virtio-mem?
+>>> echo "qom-set vm1 requested-size 6000M" | sudo nc -U $MON
+>>>
+>>> To trigger shrinking (assuming requested-size was bigger before)
+>>>
+>>> echo "qom-set vm1 requested-size 100M" | sudo nc -U $MON
+>>> echo 'system_reset' | sudo nc -U $MON
+>>>
+>>>
+>>> Placing these at the right spots during a migration allows to test this
+>>> very reliably.
 >>
->> Currently, there is a single qom property that can be modifed via
->> QMP/HMP - "requested-size". With resizable resizable memory backends,
->> increasing the requested size will also implicitly grow the RAM block.
->> Shrinking the requested size will currently result in shrinking the RAM
->> block on the next reboot.
+>> I see, thanks for the context.  The question was majorly about when
+>> you say "during postcopy migration (when syncing RAM blocks), while
+>> not yet running on the target" - it's not easy to do so imho, because:
+> 
+> This case is very easy to trigger, even with acpi. Simply have a ram
+> block on the source be bigger than one on the target. The sync code
+> (migration/ram.c:qemu_ram_resize()) will perform the resize during
+> precopy. Postcopy misses to discard the additional memory.
+> 
+> Maybe my description was confusing. But this really just triggers when
+> 
+> - Postcopy is advised and discards memory on all ram blocks
+> - Precopy grows the RAM block when syncing the RAM block sizes with the
+> source
+> 
+> Postcopy misses to discard the new RAM.
+> 
 >>
->> So, to trigger growing of a RAM block (assuming requested-size was
->> smaller before, e.g., 1000M)
+>>   - it's a very short transition period between precopy and postcopy,
+>>     so I was curious about how you made sure that the grow/shrink
+>>     happened exactly during that period
 >>
->> echo "qom-set vm1 requested-size 6000M" | sudo nc -U $MON
+>>   - during the period, IIUC it was still in the main thread, which
+>>     means logically QEMU should not be able to respond to any QMP/HMP
+>>     command at all...  So even if you send a command, I think it'll
+>>     only be executed later after the transition completes
 >>
->> To trigger shrinking (assuming requested-size was bigger before)
->>
->> echo "qom-set vm1 requested-size 100M" | sudo nc -U $MON
->> echo 'system_reset' | sudo nc -U $MON
->>
->>
->> Placing these at the right spots during a migration allows to test this
->> very reliably.
->=20
-> I see, thanks for the context.  The question was majorly about when
-> you say "during postcopy migration (when syncing RAM blocks), while
-> not yet running on the target" - it's not easy to do so imho, because:
+>>   - this I'm not sure, but ... even for virtio-mem, the resizing can
+>>     only happen after guest ack it, right?  During the precopy to
+>>     postcopy transition period, the VM is stopped, AFAICT, so
+>>     logically we can't trigger resizing during the transition
 
-This case is very easy to trigger, even with acpi. Simply have a ram
-block on the source be bigger than one on the target. The sync code
-(migration/ram.c:qemu_ram_resize()) will perform the resize during
-precopy. Postcopy misses to discard the additional memory.
+Regarding that question: Resizes will happen without guest interaction
+(e.g., during a reboot, or when increasing the requested size). In the
+future, there are theoretical plans to have resizes that can be
+triggered by guest interaction/request to some extend as well.
 
-Maybe my description was confusing. But this really just triggers when
-
-- Postcopy is advised and discards memory on all ram blocks
-- Precopy grows the RAM block when syncing the RAM block sizes with the
-source
-
-Postcopy misses to discard the new RAM.
-
->=20
->   - it's a very short transition period between precopy and postcopy,
->     so I was curious about how you made sure that the grow/shrink
->     happened exactly during that period
->=20
->   - during the period, IIUC it was still in the main thread, which
->     means logically QEMU should not be able to respond to any QMP/HMP
->     command at all...  So even if you send a command, I think it'll
->     only be executed later after the transition completes
->=20
->   - this I'm not sure, but ... even for virtio-mem, the resizing can
->     only happen after guest ack it, right?  During the precopy to
->     postcopy transition period, the VM is stopped, AFAICT, so
->     logically we can't trigger resizing during the transition
->=20
-> So it's really a question/matter of whether we still even need to
-> consider that transition period for resizing event for postcopy.
-> Maybe we don't even need to.
-
-It's synchronous and not a race. So it does matter very much :)
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
