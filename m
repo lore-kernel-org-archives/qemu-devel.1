@@ -2,93 +2,116 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 523AAC38BE2
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCBC2C38BE2
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25A2120836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:24:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A2120836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8985E20836
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 19:28:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="H472yfx/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8985E20836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6JLS-0000du-A0
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:24:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37264)
+	id 1j6JOz-00030c-PD
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 14:28:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j6JKc-0008BY-1s
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:23:55 -0500
+ (envelope-from <sunilmut@microsoft.com>) id 1j6JOI-0002aZ-Ba
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:27:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j6JKa-0000LG-JY
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:23:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18848)
+ (envelope-from <sunilmut@microsoft.com>) id 1j6JOG-00033c-Ft
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:27:41 -0500
+Received: from mail-bn8nam12on2123.outbound.protection.outlook.com
+ ([40.107.237.123]:2529 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6JKa-0000KG-Bc
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:23:52 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01OJL1mD124494
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:23:51 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yax381x7h-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 14:23:50 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Mon, 24 Feb 2020 19:23:48 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 24 Feb 2020 19:23:45 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01OJNi4v59179040
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 19:23:44 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 73F404C04A;
- Mon, 24 Feb 2020 19:23:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4C9464C044;
- Mon, 24 Feb 2020 19:23:44 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.1.90])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 24 Feb 2020 19:23:44 +0000 (GMT)
-Subject: [PATCH] spapr: Handle pending hot plug/unplug requests at CAS
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 24 Feb 2020 20:23:43 +0100
-User-Agent: StGit/unknown-version
+ (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
+ id 1j6JOG-00031D-2D
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 14:27:40 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z11pMtWFI9XPxDiynjdQ91y2d3ZOFgmCCKvYZrbkN3OcmDFA6hlEJ5nh6XLhGgeXfztr8wDlWQUWx1AkVSTqrAo+lyrJsj5NxOxRvnRYy2N7HQPTPI0a/X4vF13EuddS3UtzQJAnhEZwuBhDekxRsbiUx1iBz0UJ9k6/01rQO8yZyV0hMXPSPqyUAUgAvRF4tAJ4Zzr8rDPhfeJtK0LP7jXphqNLd17HkdAyoS/uvWjpsGC7D5srqJ0uQw8agzGBFddr6DdYOVCu051JhK9yAeVDg0a/xfXIMCn2SdTYzoPdyX7WuwgLkeGQDjz65UHkMvqY5X9hRWDaz8rnDPRYtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i3zXzOvJG42hTXPPxbAA40+uGANfr6OcKfdtWRkhDIE=;
+ b=nJE9l4FEIhM86gCZ+G18ft4OxZWaQoH9G3oVk8Vn7be+w936ZbZwa2W7DzQBH83cIPzhDT+OnbaJlQH9HlWh/fg7LHopwpHqzsesKXjcjR2hBESOqc/0qC1GWw6bKttQlgGhk3MgKVEj42RQDQ4th/PyybERo+1HlLJdohYToWKVNRt21RtzT7i8nqIVh/V2PrER4utjVMCXFdSWhLp0PZMpgV3+ZcJ/xgfDNCJEqRmIwbNJR0TTrvwwgQ4eB3Bn8uMDC5nbMPDSxYGqXljFnD439f/rUpuq/2Fv/vE7iSdhM+AJAxhgfJILW6yPeTPAw9PCsjD0VYoM+otOhMu5cA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i3zXzOvJG42hTXPPxbAA40+uGANfr6OcKfdtWRkhDIE=;
+ b=H472yfx/Za1yTHM+sRXeOa7xyW6lk0t7ZeofELuKS3SA9mq3UW2+ZvwflVl23gy09piAR+d0N8I7O92fJmUifQnp6ffR+uHQ3CboLx4V03qfqj/gz5SK+BKNvEBVTJe1I5wGj4UZBKwsnMywtwR19VnYL41vOPIZmGY+e9WqAHM=
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ (2603:10b6:803:51::33) by SN4PR2101MB0877.namprd21.prod.outlook.com
+ (2603:10b6:803:46::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.1; Mon, 24 Feb
+ 2020 19:27:38 +0000
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::15c9:bf73:c204:7cb7]) by SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::15c9:bf73:c204:7cb7%9]) with mapi id 15.20.2750.021; Mon, 24 Feb 2020
+ 19:27:38 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil
+ <sw@weilnetz.de>, "Justin Terry (SF)" <juterry@microsoft.com>
+Subject: [PATCH] WHPX: Use proper synchronization primitives while processing
+Thread-Topic: [PATCH] WHPX: Use proper synchronization primitives while
+ processing
+Thread-Index: AdXrRhI7Cc8PiKCvTlmOyf8oQX8z/g==
+Date: Mon, 24 Feb 2020 19:27:38 +0000
+Message-ID: <SN4PR2101MB0880A1C19D64131DE3D261B5C0EC0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sunilmut@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:9:5493:668f:681d:c7d6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a8231eb2-de00-4ecf-1bd7-08d7b95f9bd0
+x-ms-traffictypediagnostic: SN4PR2101MB0877:|SN4PR2101MB0877:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN4PR2101MB0877F2F31929B76C8009A66FC0EC0@SN4PR2101MB0877.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:102;
+x-forefront-prvs: 032334F434
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(39860400002)(136003)(346002)(376002)(396003)(366004)(199004)(189003)(76116006)(64756008)(66556008)(10290500003)(55016002)(186003)(54906003)(66446008)(66476007)(66946007)(33656002)(110136005)(478600001)(9686003)(6506007)(5660300002)(4326008)(7696005)(2906002)(86362001)(71200400001)(8936002)(52536014)(316002)(107886003)(8990500004)(8676002)(81166006)(81156014);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:SN4PR2101MB0877;
+ H:SN4PR2101MB0880.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UtrQzFCA0s+5dTgfo7efA5k5qQwTP7mL/l7YDyzKeSx5slvdROsYgcjnRrf0yq1wqVJzyvB946e1W2om1kDQuNU5JwyxTaAlsYr4JOBpHc39OJlCl0WBLXCso3Qra9UzadJidTg1+c6lJPZwplfAHqWLTRHSs8tQB9TSypkd3MLhZCpgjIIt2+mQJx7qIw7Jw8WI8Re99t9qEKe2YL71nW6nkjK3R+2VZd147EXZ3y93SpbTdptrOJbBfdNS4sAI0vmhiPdagmgN7C9VZn+10Rot6ORz08PNx+aGxeBm+H1xUr8zLTp8FqMunqv0P3oQ6AYgNwihVNavtp/kd/+XHgCHgYH54sJaoABcB7vSINcCTFJAn/jhElj8Bn884rCdGOZEhbTvY+Kb/YJDzCwZqO/SFI7g/iWIjrYXkDuHu140906C4rVNg2XcvA5nyGSo
+x-ms-exchange-antispam-messagedata: Gx4HWzypP8K9NU+9GvN5HVbD0EUEfftQ47vT4izMoJziop1cyKfFDK9UIUTkbsehjP/EqLIQBsj9uP6bB79Gx03+VHveojpebZdVITOGrq8xOJfGNhTesZMSEpoF61nL27FozulG+HKPv7CipFtVr06MYVWkz5rsx7w0nBoACHlL7UevdG5aKArmpEhRc/GCDMvcAltjbxIBK5Pv/rUDbw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20022419-0016-0000-0000-000002E9E1A7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022419-0017-0000-0000-0000334D0A74
-Message-Id: <158257222352.4102917.8984214333937947307.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-24_10:2020-02-21,
- 2020-02-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 impostorscore=0
- bulkscore=0 spamscore=0 suspectscore=2 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 clxscore=1034 phishscore=0 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002240141
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8231eb2-de00-4ecf-1bd7-08d7b95f9bd0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Feb 2020 19:27:38.1684 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Bdug7jmykqzAGD02TuEB6I2Kp/QC1foopfTPiwwQ4rFs1oDcHZ6HToOvrVm7C6Hh6PtKLRfwKW1f0/HmQwyALciLNL6b8Rnz0CoX0FobUA8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0877
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.237.123
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,115 +123,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a hot plug or unplug request is pending at CAS, we currently trigger
-a CAS reboot, which severely increases the guest boot time. This is
-because SLOF doesn't handle hot plug events and we had no way to fix
-the FDT that gets presented to the guest.
+WHPX wasn't using the proper synchronization primitives while
+processing async events, which can cause issues with SMP.
 
-We can do better thanks to recent changes in QEMU and SLOF:
-
-- we now return a full FDT to SLOF during CAS
-
-- SLOF was fixed to correctly detect any device that was either added or
-  removed since boot time and to update its internal DT accordingly.
-
-The right solution is to process all pending hot plug/unplug requests
-during CAS: convert hot plugged devices to cold plugged devices and
-remove the hot unplugged ones, which is exactly what spapr_drc_reset()
-does. Also clear all hot plug events that are currently queued since
-they're no longer relevant.
-
-Note that SLOF cannot currently populate hot plugged PCI bridges or PHBs
-at CAS. Until this limitation is lifted, SLOF will reset the machine when
-this scenario occurs : this will allow the FDT to be fully processed when
-SLOF is started again (ie. the same effect as the CAS reboot that would
-occur anyway without this patch).
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
 ---
- hw/ppc/spapr_events.c  |   13 +++++++++++++
- hw/ppc/spapr_hcall.c   |   11 +++++------
- include/hw/ppc/spapr.h |    1 +
- 3 files changed, 19 insertions(+), 6 deletions(-)
+ target/i386/whpx-all.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 8b32b7eea526..2afd1844e4d4 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -983,6 +983,19 @@ void spapr_clear_pending_events(SpaprMachineState *spapr)
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 35601b8176..868ade5fd0 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -841,9 +841,8 @@ static void whpx_vcpu_process_async_events(CPUState *cp=
+u)
+=20
+     if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
+         !(env->hflags & HF_SMM_MASK)) {
+-
++        whpx_cpu_synchronize_state(cpu);
+         do_cpu_init(x86_cpu);
+-        cpu->vcpu_dirty =3D true;
+         vcpu->interruptable =3D true;
      }
- }
- 
-+void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr)
-+{
-+    SpaprEventLogEntry *entry = NULL, *next_entry;
-+
-+    QTAILQ_FOREACH_SAFE(entry, &spapr->pending_events, next, next_entry) {
-+        if (spapr_event_log_entry_type(entry) == RTAS_LOG_TYPE_HOTPLUG) {
-+            QTAILQ_REMOVE(&spapr->pending_events, entry, next);
-+            g_free(entry->extended_log);
-+            g_free(entry);
-+        }
+=20
+@@ -859,17 +858,13 @@ static void whpx_vcpu_process_async_events(CPUState *=
+cpu)
+     }
+=20
+     if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
+-        if (!cpu->vcpu_dirty) {
+-            whpx_get_registers(cpu);
+-        }
++        whpx_cpu_synchronize_state(cpu);
+         do_cpu_sipi(x86_cpu);
+     }
+=20
+     if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
+         cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
+-        if (!cpu->vcpu_dirty) {
+-            whpx_get_registers(cpu);
+-        }
++        whpx_cpu_synchronize_state(cpu);
+         apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
+                                       env->tpr_access_type);
+     }
+@@ -1067,8 +1062,10 @@ static int whpx_vcpu_run(CPUState *cpu)
+=20
+ static void do_whpx_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data a=
+rg)
+ {
+-    whpx_get_registers(cpu);
+-    cpu->vcpu_dirty =3D true;
++    if (!cpu->vcpu_dirty) {
++        whpx_get_registers(cpu);
++        cpu->vcpu_dirty =3D true;
 +    }
-+}
-+
- void spapr_events_init(SpaprMachineState *spapr)
- {
-     int epow_irq = SPAPR_IRQ_EPOW;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 6db3dbde9c92..5992849c1664 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1640,7 +1640,7 @@ static uint32_t cas_check_pvr(SpaprMachineState *spapr, PowerPCCPU *cpu,
-     return best_compat;
  }
- 
--static bool spapr_transient_dev_before_cas(void)
-+static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spapr)
- {
-     Object *drc_container;
-     ObjectProperty *prop;
-@@ -1658,10 +1658,11 @@ static bool spapr_transient_dev_before_cas(void)
-                                                           prop->name, NULL));
- 
-         if (spapr_drc_transient(drc)) {
--            return true;
-+            spapr_drc_reset(drc);
-         }
-     }
--    return false;
-+
-+    spapr_clear_pending_hotplug_events(spapr);
- }
- 
- static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-@@ -1834,9 +1835,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
- 
-     spapr_irq_update_active_intc(spapr);
- 
--    if (spapr_transient_dev_before_cas()) {
--        spapr->cas_reboot = true;
--    }
-+    spapr_handle_transient_dev_before_cas(spapr);
- 
-     if (!spapr->cas_reboot) {
-         void *fdt;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 09110961a589..a4216935a148 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -824,6 +824,7 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
- void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
-                           Error **errp);
- void spapr_clear_pending_events(SpaprMachineState *spapr);
-+void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr);
- int spapr_max_server_number(SpaprMachineState *spapr);
- void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-                       uint64_t pte0, uint64_t pte1);
-
+=20
+ static void do_whpx_cpu_synchronize_post_reset(CPUState *cpu,
+--=20
+2.17.1
 
