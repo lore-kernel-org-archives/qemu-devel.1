@@ -2,127 +2,68 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2895DC3567B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A254C3567B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7E362080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:55:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mj9LjmXf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7E362080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D3B262080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:56:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B262080D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6BOH-0006YL-4H
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 05:55:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46396)
+	id 1j6BPf-0007bP-LZ
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 05:56:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6BNj-00066z-M2
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:54:36 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j6BOw-00077l-31
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6BNi-0002S4-Or
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:54:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24933
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6BNi-0002Ry-L3
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:54:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582541674;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rE1y+uIUw8txDSbdSHZg17OcTrw3lSHhokjzRmEmr0k=;
- b=Mj9LjmXfRi7gtWjZIs/O/D/9XpAdA8Zav69l5Oe2YUhXXvzVRCPNB+YKPDk7X6YDBSBvIH
- wOhyLBFOs9mXJ/MFaLMfvfIoAblKDp77nj3l9qfcNfTrb/RdPxyMTKcLJYSas6LNTiiZ2H
- oinflzZaaowQnxCtI1U/6sBbo95j2bs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-XCizXccYPiWpTTQ1Y7Vvjg-1; Mon, 24 Feb 2020 05:54:32 -0500
-X-MC-Unique: XCizXccYPiWpTTQ1Y7Vvjg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49284DBA3;
- Mon, 24 Feb 2020 10:54:31 +0000 (UTC)
-Received: from [10.36.118.193] (unknown [10.36.118.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 553EF5C21B;
- Mon, 24 Feb 2020 10:54:19 +0000 (UTC)
-Subject: Re: [PATCH v2 fixed 10/16] util/mmap-alloc: Factor out populating of
- memory to mmap_populate()
-To: Peter Xu <peterx@redhat.com>
-References: <20200212134254.11073-1-david@redhat.com>
- <20200212134254.11073-11-david@redhat.com> <20200219224925.GC42076@xz-x1>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <624ae7d7-49f2-f47a-bb60-d1cf1294d8bb@redhat.com>
-Date: Mon, 24 Feb 2020 11:54:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <no-reply@patchew.org>) id 1j6BOu-0002oy-GN
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:55:49 -0500
+Resent-Date: Mon, 24 Feb 2020 05:55:49 -0500
+Resent-Message-Id: <E1j6BOu-0002oy-GN@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21146)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j6BOu-0002oP-8u; Mon, 24 Feb 2020 05:55:48 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582541735; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=n7oVZPjgqliq9TJ/2LqssDQM7Z1ytfc6RzbGxB+D+ddpqxuPvyEwKY2f71cW2VBX1pwVM5R4L+YS4CrYDnruIOUh7cG6T+tEu4DxODzGjoZyh2hy7mP2zCfgh3g1tk5AsI9Seqhpays6t+6lcM/Z4wJPM7/fUiyboEmXVd65XIo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582541735;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=OR8C8oF/EXgMa0aOXdbMQH0hWoZ17l1ffDYvfaM3rNY=; 
+ b=fe3U4iI7U+RJCOPqB2PYfl2gZdqZPK+G9az582M1XMatWKmdHZtF/Fa8SuPxH0sgfwDQ2gRkYYNK5vvYD/7HZfbPIJiW7ssVNb0DXtSQAI3XgSr/UVN1cPS6wOP91Su2sN4TNBZ5MuH2seqR1pRAy04kCMRdNQ1DoDDqW5pbvzc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582541733814832.2648883516708;
+ Mon, 24 Feb 2020 02:55:33 -0800 (PST)
+In-Reply-To: <20200224103406.1894923-1-stefanha@redhat.com>
+Subject: Re: [PATCH 0/2] qemu/queue.h: clear linked list pointers on remove
+Message-ID: <158254173238.10132.7761755657862330006@a1bbccc8075a>
 MIME-Version: 1.0
-In-Reply-To: <20200219224925.GC42076@xz-x1>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Mon, 24 Feb 2020 02:55:33 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,49 +75,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, pbonzini@redhat.com, stefanha@redhat.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19.02.20 23:49, Peter Xu wrote:
-> On Wed, Feb 12, 2020 at 02:42:48PM +0100, David Hildenbrand wrote:
->> We want to populate memory within a reserved memory region. Let's factor
->> that out.
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
->> Cc: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Greg Kurz <groug@kaod.org>
->> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> The naming could be a bit misleading IMO, because we didn't populate
-> the memory and it's still serviced on demand.  However I don't have a
-> quick and better name of that either...
-
-Right, depends I would say. With enable_mlock it would get serviced
-right away. I also didn't find a better matching name ...
-
-Thanks!
-
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
--- 
-Thanks,
-
-David / dhildenb
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNDEwMzQwNi4xODk0
+OTIzLTEtc3RlZmFuaGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAvMl0gcWVtdS9xdWV1ZS5oOiBjbGVhciBs
+aW5rZWQgbGlzdCBwb2ludGVycyBvbiByZW1vdmUKTWVzc2FnZS1pZDogMjAyMDAyMjQxMDM0MDYu
+MTg5NDkyMy0xLXN0ZWZhbmhhQHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
+fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
+dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjU2YjY1Mjkg
+YWlvLXBvc2l4OiByZW1vdmUgY29uZnVzaW5nIFFMSVNUX1NBRkVfUkVNT1ZFKCkKZjkxM2IyNCBx
+ZW11L3F1ZXVlLmg6IGNsZWFyIGxpbmtlZCBsaXN0IHBvaW50ZXJzIG9uIHJlbW92ZQoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KMS8yIENoZWNraW5nIGNvbW1pdCBmOTEzYjI0MzBhZDMgKHFlbXUvcXVl
+dWUuaDogY2xlYXIgbGlua2VkIGxpc3QgcG9pbnRlcnMgb24gcmVtb3ZlKQpFUlJPUjogZG8gbm90
+IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojNjU6IEZJTEU6IGluY2x1ZGUvcWVtdS9x
+dWV1ZS5oOjMxNDoKKyAgICBpZiAoKChoZWFkKS0+c3FoX2ZpcnN0ID0gZWxtLT5maWVsZC5zcWVf
+bmV4dCkgPT0gTlVMTCkgICAgICAgICAgICAgIFwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgNTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8yIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CgoyLzIgQ2hlY2tpbmcgY29tbWl0IDU2YjY1MjliMTg5NCAoYWlvLXBvc2l4OiByZW1vdmUgY29u
+ZnVzaW5nIFFMSVNUX1NBRkVfUkVNT1ZFKCkpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjI0MTAzNDA2LjE4OTQ5MjMtMS1zdGVmYW5oYUBy
+ZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
