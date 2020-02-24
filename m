@@ -7,97 +7,92 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B7FC38BE2
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC2DC38BE2
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:12:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29CCC20CC7
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:11:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F7F820CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cykJKNqL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29CCC20CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FwzgAdqg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F7F820CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6L0a-0005TO-Ci
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:11:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50648)
+	id 1j6L1d-0007St-2n
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:12:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50507)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmV-00075f-7f
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:49 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j6KmO-0006oh-6V
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1j6KmT-0003XU-Bz
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:47 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:53504)
+ (envelope-from <jag.raman@oracle.com>) id 1j6KmN-0003PN-3z
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:40 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:44328)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1j6KmT-0003WI-2F
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:45 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKrnlt164218;
- Mon, 24 Feb 2020 20:56:40 GMT
+ id 1j6KmM-0003OT-Rb
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:56:39 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKsmt1033177;
+ Mon, 24 Feb 2020 20:56:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
- references : mime-version : content-type : content-transfer-encoding;
- s=corp-2020-01-29; bh=aocQH+1NHhM+rtmsJWLML75T23tu0x51c8jh12GV0c8=;
- b=cykJKNqLMgMBRyS3OFkw4VSIJJxeK2YzO2t7k/qm/dhsj/0cEZrxOxW/p1M7nH/6+Vqm
- FB7NhsijCMK2CZdvYZngowJGtVhimn+MXd+7VCBJmELtIyETSGHbPibNzpEplbaSuQej
- ck2VNcaEigLUDTdZvg4NKU0TLWyRx31dCSucBiC3nMqjjwEJ6Mq1UjX4APk5/WaTGAcD
- APeu5OjVK20MdujJ4GB5cevfgvmEoI2LAMs69aM2BgXyj05xxUhg7Bs/hAAedPJm1tMG
- DQQIxZiXaPQli/MHRlO859Abjf7vndjCOuDRgfitYyG1DtfhFkm858Qy72djkXf2ahPe jQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2120.oracle.com with ESMTP id 2ybvr4p967-1
+ references; s=corp-2020-01-29;
+ bh=zaDOAuNzb7bSFTKfgqg9CoM++Bom7NI1IY7I/uCiA4w=;
+ b=FwzgAdqgdq2oRBXSuKp0zYKIvSK3DY6vCFhHC0qJ2UWIyIdoXxraL/j4ev9Qao3/+HcU
+ geDT9O6Ow8qMm4RpZZlxHRQf+CFNqDcFI1aoFWm57Kl/caa+l8bPooc5Fu8X/up+rK/n
+ 5kmPJDSRECHN+RyRasFAVAXHyEhFp9FZaXWS3kuyNHztlrdOBt/OjD26Eq3UYTMgQ07F
+ lxz+piRCUGr623xUCJb4ky6umzf5xAeb7tZeAxNImNMZg1GAq3d1+P9h3DCtGEKJIOJm
+ IqJBwzOwAoWAiNgEQDecedFANyodEzLOBWEqCWyAk8rSZSWqnZ80y+cgDCES+JQX3Zix gA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2yauqua0mu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:39 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKudIV073056;
- Mon, 24 Feb 2020 20:56:39 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 2ybduv6da8-1
+ Mon, 24 Feb 2020 20:56:33 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01OKq5Vx171254;
+ Mon, 24 Feb 2020 20:56:33 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3030.oracle.com with ESMTP id 2ybdshks1v-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 24 Feb 2020 20:56:39 +0000
+ Mon, 24 Feb 2020 20:56:33 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKua2f028643;
- Mon, 24 Feb 2020 20:56:37 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01OKuW94028545;
+ Mon, 24 Feb 2020 20:56:32 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 24 Feb 2020 12:56:36 -0800
+ with ESMTP ; Mon, 24 Feb 2020 12:56:31 -0800
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 26/50] multi-process: refractor vl.c code
-Date: Mon, 24 Feb 2020 15:55:17 -0500
-Message-Id: <0487097d8961daab47bf9f31e5fa669642d5499c.1582576372.git.jag.raman@oracle.com>
+Subject: [PATCH v5 23/50] multi-process: remote: add create_done condition
+Date: Mon, 24 Feb 2020 15:55:14 -0500
+Message-Id: <40aa4a8ee828c39081dcec67c029bb665ec3f0d4.1582576372.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
 In-Reply-To: <cover.1582576372.git.jag.raman@oracle.com>
 References: <cover.1582576372.git.jag.raman@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- suspectscore=1
- mlxlogscore=999 malwarescore=0 mlxscore=0 spamscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240154
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ suspectscore=1 spamscore=0
+ malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002240153
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9541
  signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 suspectscore=1 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ bulkscore=0
+ clxscore=1015 malwarescore=0 impostorscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2002240153
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 01OKrnlt164218
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,387 +118,76 @@ Sender: "Qemu-devel"
 
 From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-To re-use for device initialization for remote emulated
-devices and parsing options for remote process.
+Do not allow BAR,MMIO handlers and irq setup to run before
+the configuration of the devices completes.
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- Makefile.objs        |   5 ++
- remote/Makefile.objs |   1 +
- softmmu/vl.c         | 109 +-----------------------------------------
- vl-parse.c           | 130 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- vl.h                 |  42 +++++++++++++++++
- 5 files changed, 179 insertions(+), 108 deletions(-)
- create mode 100644 vl-parse.c
- create mode 100644 vl.h
+ remote/remote-main.c | 27 ++++++++++++++++++---------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index aad33fc..689a722 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -96,6 +96,11 @@ qemu-seccomp.o-libs :=3D $(SECCOMP_LIBS)
-=20
- common-obj-$(CONFIG_FDT) +=3D device_tree.o
-=20
-+common-obj-y +=3D vl-parse.o
-+
-+#######################################################################
-+# qapi
-+
- common-obj-y +=3D qapi/
-=20
- endif # CONFIG_SOFTMMU
-diff --git a/remote/Makefile.objs b/remote/Makefile.objs
-index cbb3065..c1349ad 100644
---- a/remote/Makefile.objs
-+++ b/remote/Makefile.objs
-@@ -2,3 +2,4 @@ remote-pci-obj-$(CONFIG_MPQEMU) +=3D remote-main.o
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D pcihost.o
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D machine.o
- remote-pci-obj-$(CONFIG_MPQEMU) +=3D iohub.o
-+remote-pci-obj-$(CONFIG_MPQEMU) +=3D../vl-parse.o
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 79a286c..b277de3 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -40,6 +40,7 @@
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qjson.h"
- #include "qapi/qmp/qlist.h"
-+#include "vl.h"
-=20
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-@@ -975,20 +976,6 @@ static int cleanup_add_fd(void *opaque, QemuOpts *op=
-ts, Error **errp)
- /***********************************************************/
- /* QEMU Block devices */
-=20
--#define HD_OPTS "media=3Ddisk"
--#define CDROM_OPTS "media=3Dcdrom"
--#define FD_OPTS ""
--#define PFLASH_OPTS ""
--#define MTD_OPTS ""
--#define SD_OPTS ""
--
--static int drive_init_func(void *opaque, QemuOpts *opts, Error **errp)
--{
--    BlockInterfaceType *block_default_type =3D opaque;
--
--    return drive_new(opts, *block_default_type, errp) =3D=3D NULL;
--}
--
- static int drive_enable_snapshot(void *opaque, QemuOpts *opts, Error **e=
-rrp)
+diff --git a/remote/remote-main.c b/remote/remote-main.c
+index 455cfb6..ec1ce2c 100644
+--- a/remote/remote-main.c
++++ b/remote/remote-main.c
+@@ -55,6 +55,7 @@
+ 
+ static MPQemuLinkState *mpqemu_link;
+ PCIDevice *remote_pci_dev;
++bool create_done;
+ 
+ static void process_config_write(MPQemuMsg *msg)
  {
-     if (qemu_opt_get(opts, "snapshot") =3D=3D NULL) {
-@@ -1694,21 +1681,6 @@ static void help(int exitcode)
-     exit(exitcode);
- }
-=20
--#define HAS_ARG 0x0001
--
--typedef struct QEMUOption {
--    const char *name;
--    int flags;
--    int index;
--    uint32_t arch_mask;
--} QEMUOption;
--
--static const QEMUOption qemu_options[] =3D {
--    { "h", 0, QEMU_OPTION_h, QEMU_ARCH_ALL },
--#define QEMU_OPTIONS_GENERATE_OPTIONS
--#include "qemu-options-wrapper.h"
--    { NULL },
--};
-=20
- typedef struct VGAInterfaceInfo {
-     const char *opt_name;    /* option name */
-@@ -2070,45 +2042,6 @@ static int device_help_func(void *opaque, QemuOpts=
- *opts, Error **errp)
-     return qdev_device_help(opts);
- }
-=20
--#if defined(CONFIG_MPQEMU)
--static int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
--{
--    DeviceState *dev;
--
--    dev =3D qdev_remote_add(opts, errp);
--    if (!dev) {
--        error_setg(errp, "qdev_remote_add failed for device.");
--        return -1;
--    }
--    object_unref(OBJECT(dev));
--    return 0;
--}
--#endif
--
--static int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
--{
--    DeviceState *dev;
--
--#if defined(CONFIG_MPQEMU)
--    const char *remote;
--
--    remote =3D qemu_opt_get(opts, "remote");
--    if (remote) {
--        /* This will be a remote process */
--        return rdevice_init_func(opaque, opts, errp);
--    }
--#endif
--
--    dev =3D qdev_device_add(opts, errp);
--    if (!dev && *errp) {
--        error_report_err(*errp);
--        return -1;
--    } else if (dev) {
--        object_unref(OBJECT(dev));
--    }
--    return 0;
--}
--
- static int chardev_init_func(void *opaque, QemuOpts *opts, Error **errp)
- {
-     Error *local_err =3D NULL;
-@@ -2358,46 +2291,6 @@ static void qemu_unlink_pidfile(Notifier *n, void =
-*data)
-     }
- }
-=20
--static const QEMUOption *lookup_opt(int argc, char **argv,
--                                    const char **poptarg, int *poptind)
--{
--    const QEMUOption *popt;
--    int optind =3D *poptind;
--    char *r =3D argv[optind];
--    const char *optarg;
--
--    loc_set_cmdline(argv, optind, 1);
--    optind++;
--    /* Treat --foo the same as -foo.  */
--    if (r[1] =3D=3D '-')
--        r++;
--    popt =3D qemu_options;
--    for(;;) {
--        if (!popt->name) {
--            error_report("invalid option");
--            exit(1);
--        }
--        if (!strcmp(popt->name, r + 1))
--            break;
--        popt++;
--    }
--    if (popt->flags & HAS_ARG) {
--        if (optind >=3D argc) {
--            error_report("requires an argument");
--            exit(1);
--        }
--        optarg =3D argv[optind++];
--        loc_set_cmdline(argv, optind - 2, 2);
--    } else {
--        optarg =3D NULL;
--    }
--
--    *poptarg =3D optarg;
--    *poptind =3D optind;
--
--    return popt;
--}
--
- static MachineClass *select_machine(void)
- {
-     GSList *machines =3D object_class_get_list(TYPE_MACHINE, false);
-diff --git a/vl-parse.c b/vl-parse.c
-new file mode 100644
-index 0000000..b76bc95
---- /dev/null
-+++ b/vl-parse.c
-@@ -0,0 +1,130 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+#include "qemu/error-report.h"
-+#include "monitor/qdev.h"
-+#include "monitor/qdev.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/runstate.h"
-+#include "qemu/option.h"
-+#include "qemu-options.h"
-+#include "sysemu/blockdev.h"
-+
-+#include "chardev/char.h"
-+#include "monitor/monitor.h"
-+#include "qemu/config-file.h"
-+
-+#include "sysemu/arch_init.h"
-+
-+#include "vl.h"
-+
-+/***********************************************************/
-+/* QEMU Block devices */
-+
-+static const QEMUOption qemu_options[] =3D {
-+    { "h", 0, QEMU_OPTION_h, QEMU_ARCH_ALL },
-+#define QEMU_OPTIONS_GENERATE_OPTIONS
-+#include "qemu-options-wrapper.h"
-+    { NULL },
-+};
-+
-+const QEMUOption *lookup_opt(int argc, char **argv,
-+                                    const char **poptarg, int *poptind)
-+{
-+    const QEMUOption *popt;
-+    int optind =3D *poptind;
-+    char *r =3D argv[optind];
-+    const char *optarg;
-+
-+    loc_set_cmdline(argv, optind, 1);
-+    optind++;
-+    /* Treat --foo the same as -foo.  */
-+    if (r[1] =3D=3D '-') {
-+        r++;
-+    }
-+    popt =3D qemu_options;
-+    if (!popt) {
-+        error_report("Not valid qemu_options");
-+    }
-+    for (;;) {
-+        if (!popt->name) {
-+            error_report("invalid option*");
-+            exit(1);
-+            popt++;
-+            continue;
+@@ -332,21 +333,29 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+         process_get_pci_info_msg(remote_pci_dev, msg);
+         break;
+     case PCI_CONFIG_WRITE:
+-        process_config_write(msg);
++        if (create_done) {
++            process_config_write(msg);
 +        }
-+        if (!strcmp(popt->name, r + 1)) {
-+            break;
+         break;
+     case PCI_CONFIG_READ:
+-        process_config_read(msg);
++        if (create_done) {
++            process_config_read(msg);
 +        }
-+        popt++;
-+    }
-+    if (popt->flags & HAS_ARG) {
-+        if (optind >=3D argc) {
-+            error_report("optind %d, argc %d", optind, argc);
-+            error_report("requires an argument");
-+            exit(1);
-+        }
-+        optarg =3D argv[optind++];
-+        loc_set_cmdline(argv, optind - 2, 2);
-+    } else {
-+        optarg =3D NULL;
-+    }
-+
-+    *poptarg =3D optarg;
-+    *poptind =3D optind;
-+
-+    return popt;
-+}
-+
-+int drive_init_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    BlockInterfaceType *block_default_type =3D opaque;
-+
-+    if (!drive_new(opts, *block_default_type, errp)) {
-+        error_report_err(*errp);
-+    }
-+
-+    return 0;
-+}
-+
-+#if defined(CONFIG_MPQEMU)
-+int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    DeviceState *dev;
-+
-+    dev =3D qdev_remote_add(opts, errp);
-+    if (!dev) {
-+        error_setg(errp, "qdev_remote_add failed for device.");
-+        return -1;
-+    }
-+    return 0;
-+}
-+#endif
-+
-+int device_init_func(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    DeviceState *dev;
-+
-+#if defined(CONFIG_MPQEMU)
-+    const char *remote =3D qemu_opt_get(opts, "rid");
-+    if (remote) {
-+        return 0;
-+    }
-+#endif
-+
-+    dev =3D qdev_device_add(opts, errp);
-+    if (!dev) {
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
-+    return 0;
-+}
-diff --git a/vl.h b/vl.h
-new file mode 100644
-index 0000000..a171fab
---- /dev/null
-+++ b/vl.h
-@@ -0,0 +1,42 @@
-+/*
-+ * Copyright =C2=A9 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VL_H
-+#define VL_H
-+
-+/***********************************************************/
-+/* QEMU Block devices */
-+
-+#define HD_OPTS "media=3Ddisk"
-+#define CDROM_OPTS "media=3Dcdrom"
-+#define FD_OPTS ""
-+#define PFLASH_OPTS ""
-+#define MTD_OPTS ""
-+#define SD_OPTS ""
-+
-+
-+#define HAS_ARG 0x0001
-+typedef struct QEMUOption {
-+    const char *name;
-+    int flags;
-+    int index;
-+    uint32_t arch_mask;
-+} QEMUOption;
-+
-+const QEMUOption *lookup_opt(int argc, char **argv,
-+                                    const char **poptarg, int *poptind);
-+
-+int drive_init_func(void *opaque, QemuOpts *opts, Error **errp);
-+int device_init_func(void *opaque, QemuOpts *opts, Error **errp);
-+
-+#if defined(CONFIG_MPQEMU)
-+int rdevice_init_func(void *opaque, QemuOpts *opts, Error **errp);
-+#endif
-+
-+#endif /* VL_H */
-+
---=20
+         break;
+     case BAR_WRITE:
+-        process_bar_write(msg, &err);
+-        if (err) {
+-            goto finalize_loop;
++        if (create_done) {
++            process_bar_write(msg, &err);
++            if (err) {
++                error_report_err(err);
++            }
+         }
+         break;
+     case BAR_READ:
+-        process_bar_read(msg, &err);
+-        if (err) {
+-            goto finalize_loop;
++        if (create_done) {
++            process_bar_read(msg, &err);
++            if (err) {
++                error_report_err(err);
++            }
+         }
+         break;
+     case SYNC_SYSMEM:
+@@ -366,7 +375,7 @@ static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+         qemu_mutex_lock_iothread();
+         qemu_run_machine_init_done_notifiers();
+         qemu_mutex_unlock_iothread();
+-
++        create_done = true;
+         break;
+     case DEV_OPTS:
+         if (setup_device(msg, &err)) {
+-- 
 1.8.3.1
 
 
