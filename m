@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECFFC35DE4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E868EC35DE6
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49FF62084E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:41:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA4C92084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 23:42:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jyhHKcNj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49FF62084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KM+9D4os"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA4C92084E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NLQ-0004EX-Bm
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:41:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47209)
+	id 1j6NMb-0006ve-O9
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 18:42:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIP-0006VX-86
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIP-0006Vf-8X
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6NIO-000892-1P
+ (envelope-from <dgibson@ozlabs.org>) id 1j6NIN-00088p-VD
  for qemu-devel@nongnu.org; Mon, 24 Feb 2020 18:37:53 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:38821)
+Received: from ozlabs.org ([2401:3900:2:1::2]:43209)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6NIN-00083v-Mh; Mon, 24 Feb 2020 18:37:51 -0500
+ id 1j6NIN-00084M-Jw; Mon, 24 Feb 2020 18:37:51 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RJQ42Yjgz9sSM; Tue, 25 Feb 2020 10:37:31 +1100 (AEDT)
+ id 48RJQ44LF9z9sRt; Tue, 25 Feb 2020 10:37:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1582587452;
- bh=/E6r6c1U/O72mbX+roOccD8oy03Pdofs/lMnmoRwM/s=;
+ bh=/gYCLL/Jk6TTuPaJCqEEFdhUfEKdZ2BLlTEIKLhOQP8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=jyhHKcNjcjm4McK+vbaMJBjNoV9gyPZ+gU92OmjQ4fJM0C7EtYZiF42zVUyLCtlyH
- 3GBHzVUqlBpyWOBnrVn1MB2RCJ2yIuQ4iRIlOarM7+Bc1/vXUEWUKLBmo8d3dhZPmB
- XYwFFnCTFDRaX92I4A5/PrHkDQeMfYfqE8WLu5G8=
+ b=KM+9D4osvKZ9PLVeJwdJMyToWJJchiXsZHtgHGxqGQD3qyzQGIm6/080bP2wUsS+/
+ tJKx5+kPzBAK5eUc5auoEOxUdC8w/jiZzs5dicl4qCB7Pp619aG9obD8vIBO8c/bf4
+ 7QPbazSKfcRf/iziAgZvjhCFRRpE/1K9hRB2jOvI=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: [PATCH v6 10/18] target/ppc: Correct RMLS table
-Date: Tue, 25 Feb 2020 10:37:16 +1100
-Message-Id: <20200224233724.46415-11-david@gibson.dropbear.id.au>
+Subject: [PATCH v6 12/18] target/ppc: Don't store VRMA SLBE persistently
+Date: Tue, 25 Feb 2020 10:37:18 +1100
+Message-Id: <20200224233724.46415-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -81,47 +80,112 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The table of RMA limits based on the LPCR[RMLS] field is slightly wrong.
-We're missing the RMLS =3D=3D 0 =3D> 256 GiB RMA option, which is availab=
-le on
-POWER8, so add that.
+Currently, we construct the SLBE used for VRMA translations when the LPCR
+is written (which controls some bits in the SLBE), then use it later for
+translations.
 
-The comment that goes with the table is much more wrong.  We *don't* filt=
-er
-invalid RMLS values when writing the LPCR, and there's not really a
-sensible way to do so.  Furthermore, while in theory the set of RMLS valu=
-es
-is implementation dependent, it seems in practice the same set has been
-available since around POWER4+ up until POWER8, the last model which
-supports RMLS at all.  So, correct that as well.
+This is a bit complex and confusing - simplify it by simply constructing
+the SLBE directly from the LPCR when we need it.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/ppc/cpu.h        |  3 ---
+ target/ppc/mmu-hash64.c | 28 ++++++----------------------
+ 2 files changed, 6 insertions(+), 25 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index f9871b1233..5a55fb02bd 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1044,9 +1044,6 @@ struct CPUPPCState {
+     uint32_t flags;
+     uint64_t insns_flags;
+     uint64_t insns_flags2;
+-#if defined(TARGET_PPC64)
+-    ppc_slb_t vrma_slb;
+-#endif
+=20
+     int error_code;
+     uint32_t pending_interrupts;
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 4f082d775d..dd0df6fd01 100644
+index ac21c14f68..f8bf92aa2e 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -762,12 +762,12 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+@@ -825,6 +825,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
++    ppc_slb_t vrma_slbe;
+     ppc_slb_t *slb;
+     unsigned apshift;
+     hwaddr ptex;
+@@ -863,8 +864,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+             }
+         } else if (ppc_hash64_use_vrma(env)) {
+             /* Emulated VRMA mode */
+-            slb =3D &env->vrma_slb;
+-            if (!slb->sps) {
++            slb =3D &vrma_slbe;
++            if (build_vrma_slbe(cpu, slb) !=3D 0) {
+                 /* Invalid VRMA setup, machine check */
+                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
+                 env->error_code =3D 0;
+@@ -1012,6 +1013,7 @@ skip_slb_search:
+ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr=
+)
  {
      CPUPPCState *env =3D &cpu->env;
-     /*
--     * This is the full 4 bits encoding of POWER8. Previous
--     * CPUs only support a subset of these but the filtering
--     * is done when writing LPCR
-+     * In theory the meanings of RMLS values are implementation
-+     * dependent.  In practice, this seems to have been the set from
-+     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
-      */
-     const target_ulong rma_sizes[] =3D {
--        [0] =3D 0,
-+        [0] =3D 256 * GiB,
-         [1] =3D 16 * GiB,
-         [2] =3D 1 * GiB,
-         [3] =3D 64 * MiB,
++    ppc_slb_t vrma_slbe;
+     ppc_slb_t *slb;
+     hwaddr ptex, raddr;
+     ppc_hash_pte64_t pte;
+@@ -1033,8 +1035,8 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
+pu, target_ulong addr)
+             return raddr | env->spr[SPR_HRMOR];
+         } else if (ppc_hash64_use_vrma(env)) {
+             /* Emulated VRMA mode */
+-            slb =3D &env->vrma_slb;
+-            if (!slb->sps) {
++            slb =3D &vrma_slbe;
++            if (build_vrma_slbe(cpu, slb) !=3D 0) {
+                 return -1;
+             }
+         } else {
+@@ -1072,30 +1074,12 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, t=
+arget_ulong ptex,
+     cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_F=
+LUSH;
+ }
+=20
+-static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+-{
+-    CPUPPCState *env =3D &cpu->env;
+-    ppc_slb_t *slb =3D &env->vrma_slb;
+-
+-    /* Is VRMA enabled ? */
+-    if (ppc_hash64_use_vrma(env)) {
+-        if (build_vrma_slbe(cpu, slb) =3D=3D 0) {
+-            return;
+-        }
+-    }
+-
+-    /* Otherwise, clear it to indicate error */
+-    slb->esid =3D slb->vsid =3D 0;
+-    slb->sps =3D NULL;
+-}
+-
+ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+ {
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+     CPUPPCState *env =3D &cpu->env;
+=20
+     env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
+-    ppc_hash64_update_vrma(cpu);
+ }
+=20
+ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
 --=20
 2.24.1
 
