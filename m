@@ -6,71 +6,80 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB497C35671
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5550FC35671
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B760420836
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12AA12072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 13:35:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoD+S2Mj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B760420836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lyk7RH+L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12AA12072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Dlx-0004v2-Sj
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 08:27:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39627)
+	id 1j6DtG-0007Cy-Jw
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 08:35:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6DlF-0004Pw-HZ
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:27:02 -0500
+ (envelope-from <pkrempa@redhat.com>) id 1j6DsU-0006kw-IH
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6DlD-0007rC-Vb
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:27:01 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29227)
+ (envelope-from <pkrempa@redhat.com>) id 1j6DsS-0001yc-U6
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:34:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32108
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6DlD-0007qv-Rs
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:26:59 -0500
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1j6DsS-0001xm-PJ
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 08:34:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582550819;
+ s=mimecast20190719; t=1582551267;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LweV1LzNzThk3R4MiLdz3gS3KrTzFEgrb7NvsPgzhvc=;
- b=NoD+S2MjxZczZmVDDSJUPc+dsRfdwX5g3nkR1QVuOxQOp7UBbrveLgIzhA8DtSWjSPwGgp
- iOq/stCc/Gd0WU9x7uR4Kaq7PwMTxDCUhl2nTRKCkcSZjp6E3i2w0yMWRaOr8eCFL5rZi7
- tYxDMixWnoPUwmPeIpYrabxh9VgKWWc=
+ bh=IxoLkaPvvEx2r6pf1K5+07hx+EPfr4EXzYxCKEVjEnw=;
+ b=Lyk7RH+LPuF3T1EEZfVg7DmwksTf+YhtKSC2LKlreaZ8CVmdjBhzsUziJBX6s+flhd0DJB
+ Ohq9e82/Nt2t0ybgAHYHUfoCKsBcrSDmq1hloQ5lN0PyaB+op+PN3w/fqOeEjPIf8Me8im
+ wo85PhEXSZalCgw4lmMjkbkIcVuWfik=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-YJe6hq__MVqX2X5fwWj97w-1; Mon, 24 Feb 2020 08:26:56 -0500
-X-MC-Unique: YJe6hq__MVqX2X5fwWj97w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-179-6BCCBKISOZ-6QLqTqu8o2Q-1; Mon, 24 Feb 2020 08:34:24 -0500
+X-MC-Unique: 6BCCBKISOZ-6QLqTqu8o2Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B19A3801E66;
- Mon, 24 Feb 2020 13:26:54 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-134.ams2.redhat.com [10.36.117.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B6578C066;
- Mon, 24 Feb 2020 13:26:53 +0000 (UTC)
-Date: Mon, 24 Feb 2020 14:26:52 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Ring <stefanrin@gmail.com>
-Subject: Re: Strange data corruption issue with gluster (libgfapi) and ZFS
-Message-ID: <20200224132652.GA7088@linux.fritz.box>
-References: <CAAxjCEzHQz4cG_8m7S6=CwCBoN5daQs+KVyuU5GL5Tq3Bky1NA@mail.gmail.com>
- <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD0CB13F6
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 13:34:23 +0000 (UTC)
+Received: from andariel.pipo.sk (ovpn-204-29.brq.redhat.com [10.40.204.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DB165C554;
+ Mon, 24 Feb 2020 13:34:19 +0000 (UTC)
+Date: Mon, 24 Feb 2020 14:34:16 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 8/9] virStorageFileGetMetadataRecurse: Allow format
+ probing under special circumstances
+Message-ID: <20200224133416.GE3296@andariel.pipo.sk>
+References: <cover.1581959449.git.pkrempa@redhat.com>
+ <e6d268fcb8b2e92f2cf0c6b29bab3a9f645a7051.1581959449.git.pkrempa@redhat.com>
+ <ef597fda-4b3f-d270-824f-82df391ff223@redhat.com>
+ <20200219164034.GF1011498@angien.pipo.sk>
+ <fa77907b-1378-b4ed-3a40-fa19fe67f7cf@redhat.com>
+ <20200219185740.GA3423556@angien.pipo.sk>
+ <6d228d74-0b74-14e0-60cf-5c69dad2a65b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <6d228d74-0b74-14e0-60cf-5c69dad2a65b@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -87,115 +96,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: integration@gluster.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: libvir-list@redhat.com, Daniel Berrange <berrange@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 24.02.2020 um 13:35 hat Stefan Ring geschrieben:
-> On Thu, Feb 20, 2020 at 10:19 AM Stefan Ring <stefanrin@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > I have a very curious problem on an oVirt-like virtualization host
-> > whose storage lives on gluster (as qcow2).
-> >
-> > The problem is that of the writes done by ZFS, whose sizes according
-> > to blktrace are a mixture of 8, 16, 24, ... 256 (512 byte)
-> > blocks,sometimes the first 4KB or more, but at least the first 4KB,
-> > end up zeroed out when read back later from storage. To clarify: ZFS
-> > is only used in the guest. In my current test scenario, I write
-> > approx. 3GB to the guest machine, which takes roughly a minute.
-> > Actually it=E2=80=99s around 35 GB which gets compressed down to 3GB by=
- lz4.
-> > Within that, I end up with close to 100 data errors when I read it
-> > back from storage afterwards (zpool scrub).
-> >
-> > There are quite a few machines running on this host, and we have not
-> > experienced other problems so far. So right now, only ZFS is able to
-> > trigger this for some reason. The guest has 8 virtual cores. I also
-> > tried writing directly to the affected device from user space in
-> > patterns mimicking what I see in blktrace, but so far have been unable
-> > to trigger the same issue that way. Of the many ZFS knobs, I know at
-> > least one that makes a huge difference: When I set
-> > zfs_vdev_async_write_max_active to 1 (as opposed to 2 or 10), the
-> > error count goes through the roof (11.000).
+On Wed, Feb 19, 2020 at 13:12:53 -0600, Eric Blake wrote:
+> [adding qemu]
 
-Wait, that does this setting actually do? Does it mean that QEMU should
-never sees more than a single active write request at the same time?
-So if this makes the error a lot more prominent, does this mean that
-async I/O actually makes the problem _less_ likely to occur?
+Adding Daniel as he objected to qemu-img.
 
-This sounds weird, so probably I'm misunderstanding the setting?
-
-> > Curiously, when I switch
-> > off ZFS compression, the data amount written increases almost
-> > 10-fold,while the absolute error amount drops to close to, but not
-> > entirely,zero. Which I guess supports my suspicion that this must be
-> > somehow related to timing.
-> >
-> > Switching the guest storage driver between scsi and virtio does not
-> > make a difference.
-> >
-> > Switching the storage backend to file on glusterfs-fuse does make a
-> > difference, i.e. the problem disappears.
-> >
-> > Any hints? I'm still trying to investigate a few things, but what bugs
-> > me most that only ZFS seems to trigger this behavior, although I am
-> > almost sure that ZFS is not really at fault here.
-> >
-> > Software versions used:
-> >
-> > Host
-> > kernel 3.10.0-957.12.1.el7.x86_64
-> > qemu-kvm-ev-2.12.0-18.el7_6.3.1.x86_64
-> > glusterfs-api-5.6-1.el7.x86_64
-> >
-> > Guest
-> > kernel 3.10.0-1062.12.1.el7.x86_64
-> > kmod-zfs-0.8.3-1.el7.x86_64 (from the official ZoL binaries)
 >=20
-> I can actually reproduce this on my Fedora 31 home machine with 3 VMs.
+> On 2/19/20 12:57 PM, Peter Krempa wrote:
 
-This means QEMU 4.1.1, right?
+[...]
 
-> All 3 running CentOS 7.7. Two for glusterd, one for ZFS. Briefly, I
-> also got rid of the 2 glusterd VMs altogether, i.e. running glusterd
-> (the Fedora version) directly on the host, and it would still occur.
-> So my impression is that the server side of GlusterFS does not matter
-> much =E2=80=93 I=E2=80=99ve seen it happen on 4.x, 6.x, 7.2 and 7.3. Also=
-, as it
-> happens in the same way on a Fedora 31 qemu as well as a CentOS 7 one,
-> the qemu version is equally irrelevant.
+> > Additionally I think that we could just get rid of the copy of the imag=
+e
+> > detection copy in libvirt and replace it by invocation of qemu-img. Tha=
+t
+> > way we could avoid any discrepancies in the detection process in the
+> > first place.
 >=20
-> The main conclusion so far is that it has to do with growing the qcow2
-> image. With a fully pre-populated image, I cannot trigger it.
+> Now there's an interesting thought.  Since data corruption occurs when th=
+ere
+> is disagreement about which mode to use, getting libvirt out of the probi=
+ng
+> business by deferring all decisions to qemu-img info is a smart move - if
+> qemu says an image probes as qcow2 (in an environment where probing is
+> safe), then libvirt passing an explicit qcow2 to qemu for guest usage (in=
+ an
+> environment where probing is not safe) will at least see the same
+> guest-visible data.  Less code to maintain in libvirt, and no chance for =
+a
+> mismatch between the two projects on which format a probe should result i=
+n.
 
-Ok, that's a good data point.
+I raised the use of qemu-img to Daniel and he disagreed with use of
+qemu-img in libvirt for doing the probing on multiple reasons:
+ - qemu-img instantiates many data structures relevant to the format so
+   it has a huge attack surface
+ - performance of spawning extra processes would be way worse
 
-Is the corruption that you're seeing only in the guest data or is qcow2
-metadata also affected (does 'qemu-img check' report errors)?
+While at least from the point of view of VM startup both can be
+challenged this adds a complete new orthogonal dimension to the problem
+I'm attempting to fix.
 
-> I poked around a little in the glfs api integration, but trying to
-> make sense of two unknown asynchronous io systems (QEMU's and
-> GlusterFS's) interacting with each other is demanding a bit much for a
-> single weekend ;). The one thing I did verify so far is that there is
-> only one thread ever calling qemu_gluster_co_rw. As already stated in
-> the original post, the problem only occurs with multiple parallel
-> write requests happening.
->=20
-> What I plan to do next is look at the block ranges being written in
-> the hope of finding overlaps there.
+I'll reiterate the historical state of the problem because I think it's
+important:
 
-Either that, or other interesting patterns.
+Pre-blockdev:
+  - we internally assumed that if the image format of an backing image
+    was not present in the overlay it is 'raw'
+  - this influenced security labelling but not actually how qemu viewed
+    or probed the file. If it was qcow2 probed as qcow2 qemu opened it
+    as qcow2 possibly even including the backing file if selinux or
+    other mechanism didn't prevent it.
 
-Did you try to remove the guest from the equation? If you say that the
-problem is with multiple parallel requests, maybe 'qemu-img bench' can
-cause the same kind of corruption? (Though if it's only corruption in
-the content rather than qcow2 metadata, it may be hard to detect.
-Giving qemu-io an explicit list of requests could still be an option
-once we have a suspicion what pattern creates the problem.)
+post-blockdev:
+  - the assumption of 'raw' would now be expressed into the qemu
+    configuration. This assumption turned into data corruption since we
+    no longer allowed qemu to probe the format and forced it as raw.
+  - fix was to always require the format to be recorded in the overlay
+  - this made users unhappy who neglected to record the format into the
+    overlay when creating it manually
 
-Kevin
+Now since qemu didn't discourage the creation of overlays without format
+there still are many users which will inevitably hit this problem when
+used with libvirt.
+
+My proposal tries to mitigate the regressions in behaviour in the valid
+and secure use cases. (If the image whose format we detect doesn't have
+a backing image)
+
+This comes at a trade-off though. As Eric pointed out, if the format
+probed by libvirt's internal code disagrees with qemu's format we are
+getting into the image corruption region.
+
+As a mitigation to the above I suggested using qemu-img to probe but
+that's a complex change and as mentioned above not really welcome
+upstream.
+
+Now this adds an interresting dimension to this problem. If libvirt
+forces the users to specify the image format, and the users don't know
+it they will probe. So we are basically making this a problem of
+somebody else. [2] As you can see in that patch, it uses 'qemu-img'
+anyways and also additionally actually allows the chain to continue
+deeper! [3]
+
+A partial relief to the image detection problem is that qemu would
+refuse to start if an non-qcow2 image is used in qcow2, thus we really
+only run into problems if qcow2 is mis-detected as raw.
+
+This boils down to whether we want to accept some possibility of image
+corruption in trade for avoiding regression of behaviour in the secure
+cases as well as management apps and users not having to re-invent when
+probing an image is actually safe.
+
+Finally I think we should either decide to fix it in this release, or
+stick with the error message forever. Fixing it later will not make
+much sense as many users already fixed their scripts and we'd just add
+back the trade-off of possible image corruption.
+
+Peter
+
+[1] If e.g. the security subsystem of the host didn't forbid the use of
+the backing file such a qcow2 qemu would happily open it.
+
+[2] https://www.redhat.com/archives/libguestfs/2020-February/msg00013.html
+
+[3] As implemented in [2] the backing image is not checked whether it
+has a backing file or not but the format is probed, which way result
+into accessing the backing chain of the probed image.
+
+Prior to this detection, it would be prevented by sVirt or alternatively
+also by libvit itself in -blockdev mode when this patch would be
+accepted.
 
 
