@@ -2,78 +2,61 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 457C4C35679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD71C35679
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:39:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1311620661
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:38:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6p1YKVP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1311620661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 050BC20661
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:39:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 050BC20661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j69GB-0002dd-7I
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:38:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57374)
+	id 1j69GZ-0003Jb-5l
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:39:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j69FS-000291-FN
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:37:55 -0500
+ (envelope-from <gengdongjiu@huawei.com>) id 1j69Ft-0002RT-P5
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:38:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j69FR-0000qq-CT
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:37:54 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56424
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <gengdongjiu@huawei.com>) id 1j69Fs-0001CY-PD
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:38:21 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:48640 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j69FR-0000qe-8S
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:37:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582533472;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ximqjl6wzE6VBJRq59S74GmVSJzTYGk2aEABnEsZlWQ=;
- b=Q6p1YKVPgZdGTpLZQ4jawE+g8of4MTcU+6Dpte59cSY0r0+jp8VNnr9N9gDCuyE7lfB+JF
- WDkj0qSEcAykSCUNFzExgcpHJniUQG/o9nDscMpC0kZDey2pam+JBSGFCYLzcZ7YVs7Nms
- w4RQEWLIMAA/iSMOuiGFLKXvkugrlUA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-yNjDLBTUNKSGqjrxqByTKA-1; Mon, 24 Feb 2020 03:37:49 -0500
-X-MC-Unique: yNjDLBTUNKSGqjrxqByTKA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2198B13E2;
- Mon, 24 Feb 2020 08:37:48 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19D201001902;
- Mon, 24 Feb 2020 08:37:43 +0000 (UTC)
-Date: Mon, 24 Feb 2020 09:37:42 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v4 05/16] machine: Add SMP Sockets in CpuTopology
-Message-ID: <20200224093742.1749ad0b@redhat.com>
-In-Reply-To: <158161781807.48948.6804322747644119810.stgit@naples-babu.amd.com>
-References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
- <158161781807.48948.6804322747644119810.stgit@naples-babu.amd.com>
+ (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+ id 1j69Fq-00014d-8l; Mon, 24 Feb 2020 03:38:18 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 2F8C1EA6E341EB8B89D9;
+ Mon, 24 Feb 2020 16:38:09 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 24 Feb 2020
+ 16:38:02 +0800
+Subject: Re: [PATCH v24 00/10] Add ARMv8 RAS virtualization support in QEMU
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200217131248.28273-1-gengdongjiu@huawei.com>
+ <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <acd194e5-81d8-afa7-fb6d-6b7d744b5d81@huawei.com>
+Date: Mon, 24 Feb 2020 16:37:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,87 +68,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Fam Zheng <fam@euphon.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard
+ Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>, Igor
+ Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Feb 2020 12:16:58 -0600
-Babu Moger <babu.moger@amd.com> wrote:
-
-> Store the  smp sockets in CpuTopology. The socket information required to
-> build the apic id in EPYC mode. Right now socket information is not passed
-> to down when decoding the apic id. Add the socket information here.
+On 2020/2/21 22:09, Peter Maydell wrote:
+> On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>>
+>> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA) and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed information of guest, so it is expected that guest can do the recovery.
+>> For example, if an exception happens in a guest user-space application, host does
+>> not know which application encounters errors, only guest knows it.
+>>
+>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+>> After user space gets the notification, it will record the CPER into guest GHES
+>> buffer and inject an exception or IRQ to guest.
+>>
+>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+>> notification type after recording CPER into guest.
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> Hi; I have reviewed the remaining arm bit of this series (patch 9),
+> and made some comments on patch 1. Still to be reviewed are
+> patches 4, 5, 6, 8: I'm going to assume that Michael or Igor
+> will look at those.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Thanks very much for Peter's review.
+Michael/Igor, hope you can review patches 4, 5, 6, 8, thank you very much in advance.
 
-> ---
->  hw/core/machine.c   |    1 +
->  hw/i386/pc.c        |    1 +
->  include/hw/boards.h |    2 ++
->  vl.c                |    1 +
->  4 files changed, 5 insertions(+)
+
 > 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 023548b4f3..ea03c25565 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -789,6 +789,7 @@ static void smp_parse(MachineState *ms, QemuOpts *opts)
->          ms->smp.cpus = cpus;
->          ms->smp.cores = cores;
->          ms->smp.threads = threads;
-> +        ms->smp.sockets = sockets;
->      }
->  
->      if (ms->smp.cpus > 1) {
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 9803413dd9..f13721ac43 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -978,6 +978,7 @@ void pc_smp_parse(MachineState *ms, QemuOpts *opts)
->          ms->smp.cpus = cpus;
->          ms->smp.cores = cores;
->          ms->smp.threads = threads;
-> +        ms->smp.sockets = sockets;
->          x86ms->smp_dies = dies;
->      }
->  
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 24cbeecbae..a50a2d779e 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -256,12 +256,14 @@ typedef struct DeviceMemoryState {
->   * @cpus: the number of present logical processors on the machine
->   * @cores: the number of cores in one package
->   * @threads: the number of threads in one core
-> + * @sockets: the number of sockets on the machine
->   * @max_cpus: the maximum number of logical processors on the machine
->   */
->  typedef struct CpuTopology {
->      unsigned int cpus;
->      unsigned int cores;
->      unsigned int threads;
-> +    unsigned int sockets;
->      unsigned int max_cpus;
->  } CpuTopology;
->  
-> diff --git a/vl.c b/vl.c
-> index 94508300c3..3f6d396a95 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3819,6 +3819,7 @@ int main(int argc, char **argv, char **envp)
->      current_machine->smp.max_cpus = machine_class->default_cpus;
->      current_machine->smp.cores = 1;
->      current_machine->smp.threads = 1;
-> +    current_machine->smp.sockets = 1;
->  
->      machine_class->smp_parse(current_machine,
->          qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
+> thanks
+> -- PMM
 > 
+> .
 > 
 
 
