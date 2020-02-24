@@ -2,79 +2,127 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84175C35679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B55FDC3567B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:52:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CBE920828
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67BB12080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 10:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqDISD8T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CBE920828
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqzTKsoZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67BB12080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6B5m-0002kI-IR
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 05:36:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44076)
+	id 1j6BLD-0005Rd-Ip
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 05:51:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45748)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j6B4D-0000TC-6t
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:34:26 -0500
+ (envelope-from <david@redhat.com>) id 1j6BKF-0004h4-Jt
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:51:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j6B4C-0007m0-8A
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:34:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58790
+ (envelope-from <david@redhat.com>) id 1j6BKB-0000N3-IO
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:50:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58751
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j6B4C-0007lm-4z
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:34:24 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6BKB-0000Mp-EX
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 05:50:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582540463;
+ s=mimecast20190719; t=1582541454;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TUBsFZa5Km+NRvGWPPSzT5mjOSKWnAkAeFx7tI26nEM=;
- b=SqDISD8TzS5fRtFNjTqZ6+J1J42CGArYSMPJgISN3PYjXxbjk1j1EjSnw+NQ0cLoam3oBf
- 0+27XdAuYnvPTA7syc5AKMX0lNSvqHomH8WADPGmBvXXIUn8Y7X2PS8b7wKWEfT/SZViHF
- x/fM5qj90wdnIxFmtvrQexns/SVPwJQ=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=DE7KNReI41iKuKd/gVrSZKD4yt0LbacOfxWcwIH/AIw=;
+ b=gqzTKsoZiaVHaTwAb6vXJEuEsBED+vdqf2mHW0Ps6Mc34EAHtA6RIt0Lxqn8+hfdG+0WiB
+ rQqd0HVePGpWwlm1b8Pf1vOg/lVxotZDTf/0TaxtapETd23bwAbvj58st0vNEU23HgYxDK
+ CZc/0RTRKG4yqJSnXBZgVrej++QR7BQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-FXvQdUtIOuian3xrOq9dCQ-1; Mon, 24 Feb 2020 05:34:21 -0500
-X-MC-Unique: FXvQdUtIOuian3xrOq9dCQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-366-fFYvKpS9M9axUltZ9iN6oA-1; Mon, 24 Feb 2020 05:50:52 -0500
+X-MC-Unique: fFYvKpS9M9axUltZ9iN6oA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CAB7800D5B;
- Mon, 24 Feb 2020 10:34:20 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.58])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CA8B91851;
- Mon, 24 Feb 2020 10:34:16 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] aio-posix: remove confusing QLIST_SAFE_REMOVE()
-Date: Mon, 24 Feb 2020 10:34:06 +0000
-Message-Id: <20200224103406.1894923-3-stefanha@redhat.com>
-In-Reply-To: <20200224103406.1894923-1-stefanha@redhat.com>
-References: <20200224103406.1894923-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792B71088380;
+ Mon, 24 Feb 2020 10:50:51 +0000 (UTC)
+Received: from [10.36.118.193] (unknown [10.36.118.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B2EF10001BD;
+ Mon, 24 Feb 2020 10:50:39 +0000 (UTC)
+Subject: Re: [PATCH v2 fixed 08/16] util/mmap-alloc: Factor out calculation of
+ pagesize to mmap_pagesize()
+To: Peter Xu <peterx@redhat.com>
+References: <20200212134254.11073-1-david@redhat.com>
+ <20200212134254.11073-9-david@redhat.com> <20200219224616.GA42076@xz-x1>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <94b76367-4730-33a8-59ba-6b1c978ec2ea@redhat.com>
+Date: Mon, 24 Feb 2020 11:50:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200219224616.GA42076@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,26 +134,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UUxJU1RfU0FGRV9SRU1PVkUoKSBpcyBjb25mdXNpbmcgaGVyZSBiZWNhdXNlIHRoZSBub2RlIG11
-c3QgYmUgb24gdGhlCmxpc3QuICBXZSBhY3R1YWxseSBqdXN0IHdhbnRlZCB0byBjbGVhciB0aGUg
-bGlua2VkIGxpc3QgcG9pbnRlcnMgd2hlbgpyZW1vdmluZyBpdCBmcm9tIHRoZSBsaXN0LiAgUUxJ
-U1RfUkVNT1ZFKCkgbm93IGRvZXMgdGhpcywgc28gc3dpdGNoIHRvCml0LgoKU3VnZ2VzdGVkLWJ5
-OiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGVm
-YW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogdXRpbC9haW8tcG9zaXguYyB8
-IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQoKZGlm
-ZiAtLWdpdCBhL3V0aWwvYWlvLXBvc2l4LmMgYi91dGlsL2Fpby1wb3NpeC5jCmluZGV4IDdlNmM5
-ODM1YmIuLjAyNmMxZjUyODYgMTAwNjQ0Ci0tLSBhL3V0aWwvYWlvLXBvc2l4LmMKKysrIGIvdXRp
-bC9haW8tcG9zaXguYwpAQCAtNDkzLDcgKzQ5Myw3IEBAIHN0YXRpYyBib29sIGFpb19kaXNwYXRj
-aF9yZWFkeV9oYW5kbGVycyhBaW9Db250ZXh0ICpjdHgsCiAgICAgQWlvSGFuZGxlciAqbm9kZTsK
-IAogICAgIHdoaWxlICgobm9kZSA9IFFMSVNUX0ZJUlNUKHJlYWR5X2xpc3QpKSkgewotICAgICAg
-ICBRTElTVF9TQUZFX1JFTU9WRShub2RlLCBub2RlX3JlYWR5KTsKKyAgICAgICAgUUxJU1RfUkVN
-T1ZFKG5vZGUsIG5vZGVfcmVhZHkpOwogICAgICAgICBwcm9ncmVzcyA9IGFpb19kaXNwYXRjaF9o
-YW5kbGVyKGN0eCwgbm9kZSkgfHwgcHJvZ3Jlc3M7CiAgICAgfQogCi0tIAoyLjI0LjEKCg==
+On 19.02.20 23:46, Peter Xu wrote:
+> On Wed, Feb 12, 2020 at 02:42:46PM +0100, David Hildenbrand wrote:
+>> Factor it out and add a comment.
+>>
+>> Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+>> Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+>> Cc: Greg Kurz <groug@kaod.org>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  util/mmap-alloc.c | 21 ++++++++++++---------
+>>  1 file changed, 12 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>> index 27dcccd8ec..82f02a2cec 100644
+>> --- a/util/mmap-alloc.c
+>> +++ b/util/mmap-alloc.c
+>> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char *mem_path=
+)
+>>      return qemu_real_host_page_size;
+>>  }
+>> =20
+>> +static inline size_t mmap_pagesize(int fd)
+>> +{
+>> +#if defined(__powerpc64__) && defined(__linux__)
+>> +    /* Mappings in the same segment must share the same page size */
+>> +    return qemu_fd_getpagesize(fd);
+>> +#else
+>> +    return qemu_real_host_page_size;
+>> +#endif
+>> +}
+>=20
+> Pure question: This will return 4K even for huge pages on x86, is this
+> what we want?
+
+(was asking myself the same question) I *think* it's intended. It's
+mainly only used to allocate one additional guard page. The callers of
+qemu_ram_mmap() make sure that the size is properly aligned (e.g., to
+huge pages).
+
+Of course, a 4k guard page is sufficient - unless we can't use that
+(special case for ppc64 here).
+
+Thanks!
+
+--=20
+Thanks,
+
+David / dhildenb
 
 
