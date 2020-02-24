@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B494C38BF9
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BD6C38BFA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:34:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD8D92176D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:33:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D01C12084E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 21:34:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i6E+PNIq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD8D92176D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJAycAb0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D01C12084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6LLw-0002zF-WA
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:33:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51943)
+	id 1j6LNG-0005VO-Tj
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 16:34:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52065)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6Kof-0002n3-RK
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:02 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6Kos-0003Fl-Qj
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6Koe-0005VH-R1
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:01 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27195
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j6Kor-0005fU-R4
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47451
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Koe-0005Uc-Mp
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:00 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Kor-0005ex-Nc
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 15:59:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582577940;
+ s=mimecast20190719; t=1582577953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P3w8ivNIF4UpJrLwaBVmXn62pv0y3fxnEFqqunnHBT8=;
- b=i6E+PNIqZJ53z2wrj7vhj9+ZHzJUvWn14pM0iHtV+5TVqmTUDBtos43kF1G4VuBQGjKpo5
- I6ypgjr/FeCs49DHX9cAytF3eldmes/cM2qg94PaAv1YT0i/LGtxUeHHWv2Jx4elLO4OqK
- S3jWFNr8EZcN0mXuyJxDdPlGBK4KDRM=
+ bh=eENF83ZsU8Q/JST+/cnBMiYrotiX2pVY6D2cp7zhmT8=;
+ b=ZJAycAb0LUDPq5CoG703B+88A3uDWrRD2eY8xf0VSEfZ8bcrd/nlLFF1bK3L16wzljUes/
+ LztPnn+fjQ0nVjqWBmiMn2FHzIuxuPL4wgAtw10NyV87aAPciHsuxBfUjZ5SZMRseDg7jk
+ +7EwIlubx3KENDVF1i6xijGMB1jMaSg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-dY66F7eDPRuLuatE5Zg2QQ-1; Mon, 24 Feb 2020 15:58:56 -0500
-X-MC-Unique: dY66F7eDPRuLuatE5Zg2QQ-1
+ us-mta-279-2zt37Q_CPcWfs3VWnHI3yQ-1; Mon, 24 Feb 2020 15:59:11 -0500
+X-MC-Unique: 2zt37Q_CPcWfs3VWnHI3yQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7DA91005512;
- Mon, 24 Feb 2020 20:58:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 925A313F8;
+ Mon, 24 Feb 2020 20:59:07 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-162.brq.redhat.com [10.40.205.162])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AD7EE5C651;
- Mon, 24 Feb 2020 20:58:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46F675C54A;
+ Mon, 24 Feb 2020 20:58:53 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH RESEND v2 12/32] hw/riscv: Use memory_region_init_rom() with
+Subject: [PATCH RESEND v2 13/32] hw/sh4: Use memory_region_init_rom() with
  read-only regions
-Date: Mon, 24 Feb 2020 21:55:13 +0100
-Message-Id: <20200224205533.23798-13-philmd@redhat.com>
+Date: Mon, 24 Feb 2020 21:55:14 +0100
+Message-Id: <20200224205533.23798-14-philmd@redhat.com>
 In-Reply-To: <20200224205533.23798-1-philmd@redhat.com>
 References: <20200224205533.23798-1-philmd@redhat.com>
 MIME-Version: 1.0
@@ -74,7 +74,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,26 +122,23 @@ scripts/coccinelle/memory-region-housekeeping.cocci.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/riscv/sifive_e.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ hw/sh4/shix.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 8a6b0348df..6f6360a619 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -208,9 +208,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev=
-, Error **errp)
-         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+diff --git a/hw/sh4/shix.c b/hw/sh4/shix.c
+index 2fc2915428..56c7d29bf5 100644
+--- a/hw/sh4/shix.c
++++ b/hw/sh4/shix.c
+@@ -53,8 +53,7 @@ static void shix_init(MachineState *machine)
+     cpu =3D SUPERH_CPU(cpu_create(machine->cpu_type));
 =20
-     /* Flash memory */
--    memory_region_init_ram(&s->xip_mem, NULL, "riscv.sifive.e.xip",
--        memmap[SIFIVE_E_XIP].size, &error_fatal);
--    memory_region_set_readonly(&s->xip_mem, true);
-+    memory_region_init_rom(&s->xip_mem, NULL, "riscv.sifive.e.xip",
-+                           memmap[SIFIVE_E_XIP].size, &error_fatal);
-     memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
-         &s->xip_mem);
- }
+     /* Allocate memory space */
+-    memory_region_init_ram(rom, NULL, "shix.rom", 0x4000, &error_fatal);
+-    memory_region_set_readonly(rom, true);
++    memory_region_init_rom(rom, NULL, "shix.rom", 0x4000, &error_fatal);
+     memory_region_add_subregion(sysmem, 0x00000000, rom);
+     memory_region_init_ram(&sdram[0], NULL, "shix.sdram1", 0x01000000,
+                            &error_fatal);
 --=20
 2.21.1
 
