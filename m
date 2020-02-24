@@ -2,64 +2,73 @@ Return-Path: <SRS0=dYSx=4M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FD71C35679
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45BE8C3567B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:42:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 050BC20661
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:39:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 050BC20661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 12E1220661
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Feb 2020 08:42:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E1220661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j69GZ-0003Jb-5l
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:39:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57454)
+	id 1j69Je-0005hV-9H
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 03:42:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j69Ft-0002RT-P5
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:38:22 -0500
+ (envelope-from <bounces@canonical.com>) id 1j69If-00053e-Hk
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j69Fs-0001CY-PD
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:38:21 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48640 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j69Fq-00014d-8l; Mon, 24 Feb 2020 03:38:18 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 2F8C1EA6E341EB8B89D9;
- Mon, 24 Feb 2020 16:38:09 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 24 Feb 2020
- 16:38:02 +0800
-Subject: Re: [PATCH v24 00/10] Add ARMv8 RAS virtualization support in QEMU
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
- <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <acd194e5-81d8-afa7-fb6d-6b7d744b5d81@huawei.com>
-Date: Mon, 24 Feb 2020 16:37:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <bounces@canonical.com>) id 1j69Ie-0002zr-DV
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:41:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58382)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j69Ie-0002vV-7k
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 03:41:12 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j69Ia-00078q-1h
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 08:41:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0A05B2E806F
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 08:41:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 24 Feb 2020 08:29:37 -0000
+From: Rokas Kupstys <1846451@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: kraxel-redhat rokups th-huth
+X-Launchpad-Bug-Reporter: Rokas Kupstys (rokups)
+X-Launchpad-Bug-Modifier: Rokas Kupstys (rokups)
+References: <157008676845.21009.5220720197845563324.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158253297768.24383.16275002750338976808.malone@gac.canonical.com>
+Subject: [Bug 1846451] Re: K800 keyboard no longer works when attached to a VM
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="19413b719a8df7423ab1390528edadce9e0e4aca";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 52534a47aaebc4eaee96b0d3266a70522a5931c2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,49 +77,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- kvm-devel <kvm@vger.kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard
- Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>, Igor
- Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1846451 <1846451@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020/2/21 22:09, Peter Maydell wrote:
-> On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->>
->> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA) and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed information of guest, so it is expected that guest can do the recovery.
->> For example, if an exception happens in a guest user-space application, host does
->> not know which application encounters errors, only guest knows it.
->>
->> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
->> After user space gets the notification, it will record the CPER into guest GHES
->> buffer and inject an exception or IRQ to guest.
->>
->> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
->> treat it as a synchronous exception, and notify guest with ARMv8 SEA
->> notification type after recording CPER into guest.
-> 
-> Hi; I have reviewed the remaining arm bit of this series (patch 9),
-> and made some comments on patch 1. Still to be reviewed are
-> patches 4, 5, 6, 8: I'm going to assume that Michael or Igor
-> will look at those.
+It works with virsh device-attach. Thank you very much.
 
-Thanks very much for Peter's review.
-Michael/Igor, hope you can review patches 4, 5, 6, 8, thank you very much in advance.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846451
 
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+Title:
+  K800 keyboard no longer works when attached to a VM
 
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  I use Logitech K800 keyboard which is connected to a PC through
+  Logitech unifying receiver. In order to control my windows VM i attach
+  unifying receiver USB device to a VM using "virsh attach-device VM-
+  Name ./device.xml". Device ID as seen in lsusb is 046d:c52b.
+
+  As of v4.1.0 keyboard no longer works when attached to a windows VM.
+  When attached receiver is still at least partially functional.
+  Logitech pairing utility properly displays paired keyboard, pressing
+  buttons on the keyboard shows changing indicator icon in pairing
+  utility. Pairing and unpairing works. Pressing keys however fails to
+  register any key presses.
+
+  Downgrading to v4.0.0 fixes the issue.
+
+  device.xml used to attach USB device:
+  ```
+  <hostdev mode=3D'subsystem' type=3D'usb'>
+          <source>
+                  <vendor id=3D'0x046d'/>
+                  <product id=3D'0xc52b'/>
+          </source>
+  </hostdev>
+
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846451/+subscriptions
 
