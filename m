@@ -2,83 +2,107 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD5EC35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DF9C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0678B2051A
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 108812084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRH8S+bm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0678B2051A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWkIgl7M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108812084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6dPQ-0006Nk-8g
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:50:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43850)
+	id 1j6dRI-0008Gl-85
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:52:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j6dNX-000552-IW
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:48:21 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j6dQN-0007RQ-8d
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j6dNV-0000Nj-Mw
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:48:15 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47758
+ (envelope-from <mreitz@redhat.com>) id 1j6dQM-0001CT-Av
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:51:11 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55574
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j6dNR-0000M0-HW
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:48:10 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6dQM-0001CP-6E
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:51:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582649287;
+ s=mimecast20190719; t=1582649469;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5Y/0NxQCFiyrkPiGjm9Xt2HYrTAmkUy2RxXAEb6qEs4=;
- b=FRH8S+bmrIm5payFt7tbylsXXRHmA9VliUbufk28QvhFWi3JC19m9j1L8xYUuRtE3FSVvk
- qjRuIc4bxvh33OolvHErNRPXfI3H1YjwAbEwDpX0h0w15XAY2rgWsuzfP8epo6EenWNtok
- sBbAUe6SAfL68qyXd1YOK/KyvcTHqtk=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=D55gzuskg41PbBZQIIw3OomWbUKCfhCVp97674EFzJs=;
+ b=eWkIgl7MCu/An242dNsP4NOJTUH0TrU1FGrvDqJFhLEOCxmXZcPg3x9qYTpGqj+j7Hd8v2
+ m2PS6xmJSYoHlcvoaxKFpJthFW6wbs6XSsb87lyjfByo94DoS1+mPxb45Z2pcjLouSztCn
+ YRXtInBpyFTkystUa6lY6istxLH1ZtY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-230-JRTC82ZwO-qFGcU-cm-s4w-1; Tue, 25 Feb 2020 11:48:05 -0500
-X-MC-Unique: JRTC82ZwO-qFGcU-cm-s4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-298-mmq78bw7MomlRBSbznfxqg-1; Tue, 25 Feb 2020 11:51:07 -0500
+X-MC-Unique: mmq78bw7MomlRBSbznfxqg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E54B61005512;
- Tue, 25 Feb 2020 16:48:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 698876031E;
- Tue, 25 Feb 2020 16:48:04 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CFFF111386A6; Tue, 25 Feb 2020 17:48:02 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
- <ad92d470-7388-c419-f3fb-0bfd541b670b@redhat.com>
-Date: Tue, 25 Feb 2020 17:48:02 +0100
-In-Reply-To: <ad92d470-7388-c419-f3fb-0bfd541b670b@redhat.com> (Max Reitz's
- message of "Tue, 25 Feb 2020 13:15:29 +0100")
-Message-ID: <871rqid35p.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 566FE1088384;
+ Tue, 25 Feb 2020 16:51:06 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
+ [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8315D2718F;
+ Tue, 25 Feb 2020 16:51:04 +0000 (UTC)
+Subject: Re: [PATCH v5 1/2] block/nbd: extract the common cleanup code
+To: Eric Blake <eblake@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+ pannengyuan@huawei.com
+References: <1575517528-44312-1-git-send-email-pannengyuan@huawei.com>
+ <1575517528-44312-2-git-send-email-pannengyuan@huawei.com>
+ <20191205094259.r4qb4jxcrom76x7f@steredhat>
+ <d5ff2791-0171-404b-3c19-69159921586b@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <192ae73b-f9b9-3a25-c82d-6ef5b22a7f57@redhat.com>
+Date: Tue, 25 Feb 2020 17:51:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <d5ff2791-0171-404b-3c19-69159921586b@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="VQ8gla4Oxny3jb5mM7rzGq5giNhBnaSf5"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,131 +116,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, liyiting@huawei.com, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VQ8gla4Oxny3jb5mM7rzGq5giNhBnaSf5
+Content-Type: multipart/mixed; boundary="lQUKar4KQmp6Eu5fP3dkP7A5VvSr3RoVj"
 
-> On 15.02.20 15:51, Markus Armbruster wrote:
->> Review of this patch led to a lengthy QAPI schema design discussion.
->> Let me try to condense it into a concrete proposal.
->>=20
->> This is about the QAPI schema, and therefore about QMP.  The
->> human-friendly interface is out of scope.  Not because it's not
->> important (it clearly is!), only because we need to *focus* to have a
->> chance at success.
->>=20
->> I'm going to include a few design options.  I'll mark them "Option:".
->>=20
->> The proposed "amend" interface takes a specification of desired state,
->> and figures out how to get from here to there by itself.  LUKS keyslots
->> are one part of desired state.
->>=20
->> We commonly have eight LUKS keyslots.  Each keyslot is either active or
->> inactive.  An active keyslot holds a secret.
->>=20
->> Goal: a QAPI type for specifying desired state of LUKS keyslots.
->>=20
->> Proposal:
->>=20
->>     { 'enum': 'LUKSKeyslotState',
->>       'data': [ 'active', 'inactive' ] }
->>=20
->>     { 'struct': 'LUKSKeyslotActive',
->>       'data': { 'secret': 'str',
->>                 '*iter-time': 'int } }
->>=20
->>     { 'struct': 'LUKSKeyslotInactive',
->>       'data': { '*old-secret': 'str' } }
->>=20
->>     { 'union': 'LUKSKeyslotAmend',
->>       'base': { '*keyslot': 'int',
->>                 'state': 'LUKSKeyslotState' }
->>       'discriminator': 'state',
->>       'data': { 'active': 'LUKSKeyslotActive',
->>                 'inactive': 'LUKSKeyslotInactive' } }
->
-> Looks OK to me.  The only thing is that @old-secret kind of works as an
-> address, just like @keyslot,
+--lQUKar4KQmp6Eu5fP3dkP7A5VvSr3RoVj
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-It does.
+On 05.12.19 15:04, Eric Blake wrote:
+> On 12/5/19 3:42 AM, Stefano Garzarella wrote:
+>> Hi Pan,
+>>
+>> On Thu, Dec 05, 2019 at 11:45:27AM +0800, pannengyuan@huawei.com wrote:
+>>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>>>
+>>> The BDRVNBDState cleanup code is common in two places, add
+>>> nbd_clear_bdrvstate() function to do these cleanups.
+>>>
+>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>
+>> I only suggested this change, so I think is better to change it in:
+>> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>=20
+> Concur. I'll make that change while queuing this series through my NBD
+> tree for 5.0.
 
->                              so it might also make sense to me to put
-> @keyslot/@old-secret into a union in the base structure.
+Ping on that O:)
 
-I'm fine with state-specific extra adressing modes (I better be, I
-proposed them).
+(Just going through mails in my inbox)
 
-I'd also be fine with a single state-independent addressing mode, as
-long as we can come up with sane semantics.  Less flexible when adding
-states, but we almost certainly won't.
+Max
 
-Let's see how we could merge my two addressing modes into one.
 
-The two are
+--lQUKar4KQmp6Eu5fP3dkP7A5VvSr3RoVj--
 
-* active
+--VQ8gla4Oxny3jb5mM7rzGq5giNhBnaSf5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  keyslot     old-secret      slot(s) selected
-  absent      N/A             one inactive slot if exist, else error
-  present     N/A             the slot given by @keyslot
+-----BEGIN PGP SIGNATURE-----
 
-* inactive
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5VUHcACgkQ9AfbAGHV
+z0AKfQgAjOJOLgQHG+l4FwcfkUhWoN3Knc6NQW50cDRsNgmKRR9qlBKSeWm3ilNr
+AgskILqEdxdD5hwgcB17sSqCs1e2F9uL0ucNry5XuQtotq0FQGB7MIdBqtjzU2Vt
+rjrRav7evtlCgvq5uKspMXN+Ps7Tz5n3yliTIbb+tPAB1anGDNU0gaYaeWryi0js
+Zi5bAD6I/yX5jiaontBsyQ2XTU/c5tKMSShJgjbLu1sOp404gITc3cHynnkB0cCK
+EQcKO4u8U7Rs0nCqW3fBrOirtS0fM31EpX/oDKEzNvMmFe1PBCwOgX3KMz/Vjodp
+BfdfDTEwB5jE1G3x55ifLyq6x2jSZA==
+=u/P0
+-----END PGP SIGNATURE-----
 
-  keyslot     old-secret      slot(s) selected
-  absent      absent          all keyslots
-  present     absent          the slot given by @keyslot
-  absent      present         all active slots holding @old-secret
-  present     present         the slot given by @keyslot, error unless
-                              it's active holding @old-secret
-
-They conflict:
-
-> (One of the problems that come to mind with that approach is that not
-> specifying either of @old-secret or @keyslot has different meanings for
-> activating/inactivating a keyslot: When activating it, it means =E2=80=9C=
-The
-> first unused one=E2=80=9D; when deactivating it, it=E2=80=99s just an err=
-or because it
-> doesn=E2=80=99t really mean anything.)
->
-> *shrug*
-
-Note we we don't really care what "inactive, both absent" does.  My
-proposed semantics are just the most regular I could find.  We can
-therefore resolve the conflict by picking "active, both absent":
-
-  keyslot     old-secret      slot(s) selected
-  absent      absent          one inactive slot if exist, else error
-  present     absent          the slot given by @keyslot
-  absent      present         all active slots holding @old-secret
-  present     present         the slot given by @keyslot, error unless
-                              it's active holding @old-secret
-
-Changes:
-
-* inactive, both absent: changed; we select "one inactive slot" instead of
-  "all slots".
-
-  "All slots" is a no-op when the current state has no active keyslots,
-  else error.
-
-  "One inactive slot" is a no-op when the current state has one, else
-  error.  Thus, we no-op rather than error in some states.
-
-* active, keyslot absent or present, old-secret present: new; selects
-  active slot(s) holding @old-secret, no-op when old-secret =3D=3D secret,
-  else error (no in place update)
-
-Can do.  It's differently irregular, and has a few more combinations
-that are basically useless, which I find unappealing.  Matter of taste,
-I guess.
-
-Anyone got strong feelings here?
+--VQ8gla4Oxny3jb5mM7rzGq5giNhBnaSf5--
 
 
