@@ -2,126 +2,102 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA00C35DFB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC34C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:11:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99BCC21D7E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39AD521556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:11:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSxNqMx0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BCC21D7E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYcA9SDI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39AD521556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6XAW-0005ue-Qw
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:10:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58969)
+	id 1j6XBV-0006sa-FB
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:11:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6X5w-0000qD-8B
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:41 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6X7I-0002v0-Sw
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6X5v-0005BQ-80
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55099
+ (envelope-from <philmd@redhat.com>) id 1j6X7H-0006Hb-Nb
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:23907
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6X5v-0005Ax-2k
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:39 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6X7H-0006Fr-Jh
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582625138;
+ s=mimecast20190719; t=1582625223;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=B2CcX57TBFsGepX17jUCEYzU3zV9NBpQIyePX9Q7LRo=;
- b=MSxNqMx0Nz4nBPP0AU51RlXx7k0MDIZVnj/m3/UAKMiJTsZKXRKhvEZtkE2PcK7pC8F6sG
- 0hgwMnxTgx57tcFyBdJxYJ4RNQjP4Zw9o7YxUrUqqKno0goSJglIvpPIFkY9fljB8fAMGv
- CCwagygJhyH2HFjyiY3NAlyP+yeGjz0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292--y_gjAHLO1SvwbnOh7fuYQ-1; Tue, 25 Feb 2020 05:05:34 -0500
-X-MC-Unique: -y_gjAHLO1SvwbnOh7fuYQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F255107BAE4;
- Tue, 25 Feb 2020 10:05:33 +0000 (UTC)
-Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3EEDF5C21B;
- Tue, 25 Feb 2020 10:05:30 +0000 (UTC)
-Subject: Re: [PATCH v4 08/16] s390x: protvirt: Move STSI data over SIDAD
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200220125638.7241-1-frankja@linux.ibm.com>
- <20200220125638.7241-9-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <ad3542d2-4efc-599c-92d8-bf1f13389823@redhat.com>
-Date: Tue, 25 Feb 2020 11:05:29 +0100
+ in-reply-to:in-reply-to:references:references;
+ bh=aAVFyfs4g5GxcXuqRdZQLMND38l/oAcAlYf10NCJQR8=;
+ b=fYcA9SDIuTtr51dbEj9uwutYEJ3ouxL/SrMDt8s+z8CJeSzWq/M9Wr3Kg+nVEC0AXm+9Ht
+ TNsVKJnxts4lqsWs1M/lnOnIIOikP4RY9g/napDm5jJGnYKvNvvvANLclscYmvAEFNiLco
+ PIiPxPfbMhwmyCeZ3DeQ8lni3HvLOQQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-JrrLN1jiNWC_GxaU0EHR2Q-1; Tue, 25 Feb 2020 05:07:01 -0500
+X-MC-Unique: JrrLN1jiNWC_GxaU0EHR2Q-1
+Received: by mail-wr1-f72.google.com with SMTP id m15so7014609wrs.22
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 02:07:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hQGPjfoLLazHW3K7+BJ1ZENnkqspNGzw0HjTnAJXqEg=;
+ b=l4eB0IAY9tx0AMu26hRSfhfVUnuCD1DoajB2EYbE3BtPA8ZT7LkkU/fsJRVNwfuBPd
+ x563EA8zhycwhFXYGEPALb1qEmr2o2zdSRUOz5nWph5GipsRQN+2xqnzZ/36Tb8errZ4
+ bGCfDf276qRY4cM+SzcJIh+CpfPLzqBlGTOegVnu6ELw1LxpFpJjXLxAPGnx5qrbDn+E
+ HDlnkduE6s5dCRjvb6DYfjrakfV8B4QkeKprlqcldcm2oZojJKma6ytrUuEIjex5z1Wv
+ k/C7xbKj3dvnCBAXp1FJgFkQWwZJUkQ5K2B5Wp0hHNgOEYlccppEe26tuvZEYA+/Fenl
+ fufg==
+X-Gm-Message-State: APjAAAVlDi4JFBzadGdGQ/xFpRuq9f/vc3ef1uvr30wzawq6nBB4jFxi
+ 48erwViAp4oztUEriR2aWpqsW4DQDhB4Xj638/DdJj37QYajxYfDX2cQAn+9vMetCH4BIAkm7BC
+ Cf0SCIypM7nyqZvk=
+X-Received: by 2002:a1c:2089:: with SMTP id g131mr4173712wmg.63.1582625220262; 
+ Tue, 25 Feb 2020 02:07:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxLs/h8mAF1Op5pv4Ayz9cSffiHJ1ZoERiw+LFk22QlNcgChr+JwBfIroUj/z2+iIKIVjbOFA==
+X-Received: by 2002:a1c:2089:: with SMTP id g131mr4173615wmg.63.1582625219047; 
+ Tue, 25 Feb 2020 02:06:59 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id a13sm23608201wrp.93.2020.02.25.02.06.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Feb 2020 02:06:58 -0800 (PST)
+Subject: Re: [PATCH 0/2] qemu/queue.h: clear linked list pointers on remove
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200224103406.1894923-1-stefanha@redhat.com>
+ <158254173238.10132.7761755657862330006@a1bbccc8075a>
+ <20200224113903.GD1896567@stefanha-x1.localdomain>
+ <d3fa195d-d6cc-438f-517b-676b2642df71@redhat.com>
+ <20200225090534.GB4178@stefanha-x1.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <031a3ba8-eed0-834a-0b5c-5e77d0429f34@redhat.com>
+Date: Tue, 25 Feb 2020 11:06:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200220125638.7241-9-frankja@linux.ibm.com>
+In-Reply-To: <20200225090534.GB4178@stefanha-x1.localdomain>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,63 +109,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, cohuck@redhat.com
+Cc: fam@euphon.net, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.02.20 13:56, Janosch Frank wrote:
-> For protected guests, we need to put the STSI emulation results into
-> the SIDA, so SIE will write them into the guest at the next entry.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/kvm.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index f222836df5..3a5a5146e3 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1795,11 +1795,16 @@ static int handle_tsch(S390CPU *cpu)
->  
->  static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
->  {
-> +    CPUS390XState *env = &cpu->env;
->      SysIB_322 sysib;
->      int del;
->  
-> -    if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
-> -        return;
-> +    if (env->pv) {
-> +        s390_cpu_pv_mem_read(cpu, 0, &sysib, sizeof(sysib));
-> +    } else {
-> +        if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
-> +            return;
-> +        }
->      }
->      /* Shift the stack of Extended Names to prepare for our own data */
->      memmove(&sysib.ext_names[1], &sysib.ext_names[0],
-> @@ -1838,7 +1843,11 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
->      /* Insert UUID */
->      memcpy(sysib.vm[0].uuid, &qemu_uuid, sizeof(sysib.vm[0].uuid));
->  
-> -    s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
-> +    if (env->pv) {
-> +        s390_cpu_pv_mem_write(cpu, 0, &sysib, sizeof(sysib));
-> +    } else {
-> +        s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
-> +    }
->  }
->  
->  static int handle_stsi(S390CPU *cpu)
-> 
+On 2/25/20 10:05 AM, Stefan Hajnoczi wrote:
+> On Mon, Feb 24, 2020 at 12:54:37PM +0100, Philippe Mathieu-Daud=E9 wrote:
+>> On 2/24/20 12:39 PM, Stefan Hajnoczi wrote:
+>>> On Mon, Feb 24, 2020 at 02:55:33AM -0800, no-reply@patchew.org wrote:
+>>>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+>>>> 1/2 Checking commit f913b2430ad3 (qemu/queue.h: clear linked list poin=
+ters on remove)
+>>>> ERROR: do not use assignment in if condition
+>>>> #65: FILE: include/qemu/queue.h:314:
+>>>> +    if (((head)->sqh_first =3D elm->field.sqe_next) =3D=3D NULL)     =
+         \
+>>>>
+>>>> total: 1 errors, 0 warnings, 59 lines checked
+>>>
+>>> The same pattern is used elsewhere in this file.  This code comes from
+>>> BSD and doesn't comply with QEMU's coding style.
+>>
+>> Checkpatch is right, assigning out of the if statement makes the review
+>> easier, and we can avoid the 'elm' null deref:
+>=20
+> The rest of the file uses if ((a =3D b) =3D=3D NULL), so making it
+> inconsistent in this one instance isn't very satisfying.
+>=20
+>> #define QSIMPLEQ_REMOVE_HEAD(head, field) do { \
+>> -    if (((head)->sqh_first =3D (head)->sqh_first->field.sqe_next) =3D=
+=3D NULL)\
+>> +    typeof((head)->sqh_first) elm =3D (head)->sqh_first; \
+>> +    (head)->sqh_first =3D elm->field.sqe_next; \
+>> +    if (elm =3D=3D NULL) { \
+>=20
+> The previous line would have segfaulted if elm was NULL so this check
+> doesn't make sense.
+>=20
+> This macro assumes there is at least one element in the list.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+Ah good point, thanks.
 
--- 
-Thanks,
-
-David / dhildenb
+>=20
+> The point of the check is to fix up the sqh_last pointer in the head
+> when the final element is removed from the list.
+>=20
+>>           (head)->sqh_last =3D &(head)->sqh_first; \
+>> +    } else { \
+>> +        elm->field.sqe_next =3D NULL; \
+>> +    } \
+>>   } while (/*CONSTCOND*/0)
 
 
