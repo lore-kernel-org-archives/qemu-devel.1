@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5882C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44F9C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CC69218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:00:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F709218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:01:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ikbiwhwy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CC69218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/MPSC/S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F709218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Zoj-0001em-HN
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:00:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52559)
+	id 1j6ZqM-0003sv-O6
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:01:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0B-0003Zq-A1
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:55 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlV-0002NZ-9B
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0A-0003VS-7o
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:51 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:40833)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlU-0002IW-8t
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:41 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:40716)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Z0A-0003Ur-0c
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:50 -0500
-Received: by mail-wm1-x331.google.com with SMTP id t14so2884156wmi.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:07:49 -0800 (PST)
+ id 1j6YlU-0002Eo-1y
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:40 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id t14so2838119wmi.5
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=T3ISc51CQNGAqf+zLY8WMizzAxQ1TztanrLB+etFevc=;
- b=ikbiwhwyP8Kht6iBMgfXSR81pNVCuAKG5wA1w+N96NaluhCs8eHoCHWpJcxmO1YffR
- jKOofY3iRwUFYCdnqqXqsbVQGf4CdvL8OWtcIHVYgKkc7act8wGWPgMe/LZmsb4bZGAg
- hse4d6E3F6hmvBAJ9HfWgOEDy2AOsfs47hSuAV3UCZ1X8iVIqasHWiBJx/jU9k8TN2eN
- vwvNC0dGWDLur2lksGCAM/Y978Yaof2WkHOOmvW9Q7rmfPv72q0Z5iCtjfh7cErfmm/w
- COtOI+F7e+L2taxSc/jYnvNs8fZaBRGOq6uYvq5wUl/yfGwuAaWu0KhRlwWxwglHkkMZ
- l6pA==
+ bh=khYyWh5ZZESTsDhSwmW3NzZ5C/nmqjY42tMKoymp4Fc=;
+ b=a/MPSC/SEswGKwEuGJFOTIgpJiMWzbzf44N3Y71w3MuxxDO+8XjRf18Wu7hYsKkPDV
+ pF9O4G8pQmr/8av2u6X3aJQeL5L+BGzuHYcDpU9RKA7VGg0Yx9fuOkOdkm4P0pSNN3Ys
+ iHU7N6LrAXSCzqIzmvW85eOW/jWsWf5Fv5w9574IfLlhhrYFJsQxOEC1mjx29v8XzlOn
+ e7/TMfvPLd035rQHPAOX4G1E11XiR300XdWCq9AHThQYoukDG9YDzuA4Vj40GN/+7qRI
+ VADXVqKs2G6vdACYMAOyj9LGKh9dFsUmVnFeOZZmrPc6dSq+IoIXpSyp1lYVpZ5wVZDh
+ tZ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=T3ISc51CQNGAqf+zLY8WMizzAxQ1TztanrLB+etFevc=;
- b=pzKU+eNhBhX3prWyMwxg0c7AcN8yvzc5JuSSRH1z9TH6l+1JQ2wkIYEcpp0sXiiRr1
- sNkBm0laZPK5bJURnOA2Y41kpyKI3fnXDdp4KFaoSuVskIUkGB6zFpxS0vpc+5IIo1kc
- 2SbdOJDDksOyKfckL3O1fqF5V/6e5iWfIvFCrGtQwyTWpj13TZq510m1y1lKaJKcHbbs
- Ps2gVBUheLKjr4Ip8kyaszLiRkpXZ/HfSwv6aK8ZbCbb6ffWbVHywDWV+bpYSArEiAdj
- mO7uFhUcc30sKt2viZRpWyVRNgKCieBsz32ktXdQOtj5SOLoaUxHWYsBhf2ewWJ6OQL3
- OEVg==
-X-Gm-Message-State: APjAAAUqw64xeqXTbzlXOkvOy2yW1T9+9Fn6+qlL6VNaVOL9qGqYZWmN
- 3RUbQKrxk4Xor6oWRZrZJYccAIL+
-X-Google-Smtp-Source: APXvYqxnsBvkT+89JDTFi8xNYBC//3whv42YR/W7fSVSvx9GN1BsDMSoYEOtEVsk98CPhhzie5sHHg==
-X-Received: by 2002:a7b:cb93:: with SMTP id m19mr5270757wmi.128.1582632468690; 
- Tue, 25 Feb 2020 04:07:48 -0800 (PST)
+ bh=khYyWh5ZZESTsDhSwmW3NzZ5C/nmqjY42tMKoymp4Fc=;
+ b=qiS9ovlX2TmH5M2RaHXYDdZFJ1aOczbWnHWLG5rIr40pLlyfQA7cZ07Q+vrs4yv1/2
+ cPU3HIikq+JAkfYHniaYzwSERnnxkxep7+jjYEClIecp0rtw43NVy828TP/DOJHF1qOe
+ ufdDwVxKw//ClVSoN6aUgvVK4X0q/mVZ5ev2Ag9493UJodjNr2JZLz23002DEdKpSe6t
+ klSXfZ8YHPXt/PRua4zGeoZZTXlxft+jqfwbrqgBW7H/1wWah9EYhS6PLM6ZVGgJInIK
+ dlgDSHbj3/PZOdh3r4Gj/MqVBJabI6TimnKlL8lFfvbrZiuqJlf6x81DoMManNuJr0+0
+ m9Tg==
+X-Gm-Message-State: APjAAAUyYGL1zHSjTPHN6FV3+NgsHEdPzMpMSKx9Aush8gm097ppCEb6
+ WvjyrOJLLkZZ9cwgtKqhXd8vLtUh
+X-Google-Smtp-Source: APXvYqwnpir2BZi9chncLQyycA1EBEO0CKpmB4DJe5MJTUP81RrqTGDzHQVONi/DB9Giwl41D5GKqw==
+X-Received: by 2002:a7b:c851:: with SMTP id c17mr4851277wml.71.1582631558806; 
+ Tue, 25 Feb 2020 03:52:38 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.47
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.37
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 04:07:48 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:38 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 115/136] hw/ppc/ppc405: Use memory_region_init_rom() with
- read-only regions
-Date: Tue, 25 Feb 2020 13:07:13 +0100
-Message-Id: <1582632454-16491-13-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 100/136] memory: Simplify memory_region_init_rom_nomigrate() to
+ ease review
+Date: Tue, 25 Feb 2020 12:50:30 +0100
+Message-Id: <1582631466-13880-100-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,58 +101,43 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The scripts/coccinelle/memory-region-housekeeping.cocci reported:
-* TODO [[view:./hw/ppc/ppc405_boards.c::face=ovl-face1::linb=195::colb=8::cole=30][potential use of memory_region_init_rom*() in  ./hw/ppc/ppc405_boards.c::195]]
-* TODO [[view:./hw/ppc/ppc405_boards.c::face=ovl-face1::linb=464::colb=8::cole=30][potential use of memory_region_init_rom*() in  ./hw/ppc/ppc405_boards.c::464]]
-
-We can indeed replace the memory_region_init_ram() and
-memory_region_set_readonly() calls by memory_region_init_rom().
+memory_region_init_rom_nomigrate() has the same content than
+memory_region_init_ram_shared_nomigrate(), with setting the
+readonly mode. The code is easier to review as creating a
+readonly ram/shared/nomigrate region.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224205533.23798-18-philmd@redhat.com>
+Message-Id: <20200224205533.23798-3-philmd@redhat.com>
 Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/ppc/ppc405_boards.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ memory.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 1f721fe..5afe023 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -192,7 +192,7 @@ static void ref405ep_init(MachineState *machine)
- #endif
-     {
-         bios = g_new(MemoryRegion, 1);
--        memory_region_init_ram(bios, NULL, "ef405ep.bios", BIOS_SIZE,
-+        memory_region_init_rom(bios, NULL, "ef405ep.bios", BIOS_SIZE,
-                                &error_fatal);
+diff --git a/memory.c b/memory.c
+index ce11798..6a327a5 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1659,19 +1659,8 @@ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
+                                       uint64_t size,
+                                       Error **errp)
+ {
+-    Error *err = NULL;
+-    memory_region_init(mr, owner, name, size);
+-    mr->ram = true;
++    memory_region_init_ram_shared_nomigrate(mr, owner, name, size, false, errp);
+     mr->readonly = true;
+-    mr->terminates = true;
+-    mr->destructor = memory_region_destructor_ram;
+-    mr->ram_block = qemu_ram_alloc(size, false, mr, &err);
+-    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+-    if (err) {
+-        mr->size = int128_zero();
+-        object_unparent(OBJECT(mr));
+-        error_propagate(errp, err);
+-    }
+ }
  
-         if (bios_name == NULL)
-@@ -216,7 +216,6 @@ static void ref405ep_init(MachineState *machine)
-             /* Avoid an uninitialized variable warning */
-             bios_size = -1;
-         }
--        memory_region_set_readonly(bios, true);
-     }
-     /* Register FPGA */
-     ref405ep_fpga_init(sysmem, 0xF0300000);
-@@ -461,7 +460,7 @@ static void taihu_405ep_init(MachineState *machine)
-         if (bios_name == NULL)
-             bios_name = BIOS_FILENAME;
-         bios = g_new(MemoryRegion, 1);
--        memory_region_init_ram(bios, NULL, "taihu_405ep.bios", BIOS_SIZE,
-+        memory_region_init_rom(bios, NULL, "taihu_405ep.bios", BIOS_SIZE,
-                                &error_fatal);
-         filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-         if (filename) {
-@@ -479,7 +478,6 @@ static void taihu_405ep_init(MachineState *machine)
-             error_report("Could not load PowerPC BIOS '%s'", bios_name);
-             exit(1);
-         }
--        memory_region_set_readonly(bios, true);
-     }
-     /* Register Linux flash */
-     dinfo = drive_get(IF_PFLASH, 0, fl_idx);
+ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
 -- 
 1.8.3.1
 
