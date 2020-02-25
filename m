@@ -2,87 +2,75 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3DCC35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD529C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:06:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 748DA222C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB6F02084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:06:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZtrMbXU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748DA222C2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJbJZ3ku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB6F02084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Yyx-00013X-Hh
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:06:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49263)
+	id 1j6Yz1-0001EH-Pv
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:06:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkR-0000WT-CJ
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:39 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6Ykh-0000rs-RK
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkM-0006LM-LZ
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:35 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:40717)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YkM-0006Gh-Cs
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:30 -0500
-Received: by mail-wm1-x335.google.com with SMTP id t14so2834923wmi.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SqGH5UVJUY+AYsjLLLoFT/qFOANPsA6TdRit/hNJTY8=;
- b=IZtrMbXU2wiin/UeAyaPv1Jdeg4k5PlJNBAmmpz1BhPk0AcQYcmR1H9QOzztEz9/LP
- g9rc8J+/cwizyvbOOT7uHIh4/gzNkN50iirUAt0BYtIWKtAtVK8LkRWcpA5nO0WABarU
- rQ2bgXlTdVwM12yRdadlnloBAKORDP8Kdq/++OkPKRk5s4FQphH6nJe0Z5EPhHPc+2Dz
- waeahZ8YB4zaWapCLNsoxvgU0CzXXLeeMh44ydgfWeZtvA5FpiDRmAR+Aq/Nbssy9GPx
- G+TWey24njxI+udyXUFMpdJnYF+EmfzE9Rbf1N+f+ltnWdOsKT7EOjRTXiXUz0Ia6RnJ
- PK1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=SqGH5UVJUY+AYsjLLLoFT/qFOANPsA6TdRit/hNJTY8=;
- b=r03cmsxkYW3ZzM/fx6twqUC6auvVWUyo9LU50F/R3ErQGHrFfrXhkUcXCNcOi3RnEW
- 5hCZC+ESBJ0sDRJVyAkUUEKwodgKTd1g4lUTasdl1i2ZnX3ADu63yvW0Mn7ub4aIxKeI
- gZOS5cQCyvzAc5bDAMkLSGzmuhQ5TPFWhkC4B+lo6Zcg62C9tDq0Sg4jaSY4wvkHMgEk
- D3U0FtW+TO2Nc7VAZhpjN7qJVt9rdn4YI0aHy2u96Yg8tj0XQ00TsbjvInTHi08NClBX
- 6hUdfDSpme/zaEBVxTg4JCBC5AK4PxptDFaKWyN+2UwNQ7Gn3LyQzWcSf5uZAkHGFSVh
- uiMw==
-X-Gm-Message-State: APjAAAViofAulWsALE4vcee9n+bBHFHS757wx5zge4Mfzyz+4XSdnrKt
- 1zspaWCCtbp5KCzCx4brALs8CYeC
-X-Google-Smtp-Source: APXvYqyZ5K07uVxkfe5B5WTw2v8hwLxcO31wS5div1SOKgzz9p2BZ0l7gxu1dk/X22QLNTMgzNUzVQ==
-X-Received: by 2002:a05:600c:3d1:: with SMTP id
- z17mr5150560wmd.90.1582631488293; 
- Tue, 25 Feb 2020 03:51:28 -0800 (PST)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:27 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1j6Ykg-0007mY-Ic
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44796
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6Ykg-0007fj-EK
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582631509;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=NPFWnv/Ef9WwpSuw1jcfq/YK7QkVuPURI5RaLd84Zyc=;
+ b=MJbJZ3kuQq0xd2ZQIn3gRkSJ12Tnh9Cz1Op+njpXfvzaW1F7KOCWyJ20maUCotSTZc7LhK
+ EbAWL4vgQ6HQE/C2rC5Mb8V59jrUPAHDAvN8iwbr4ZGb1t0lYHxJ+rbORRD5BifkTZ4u9k
+ 76DorZocLmv88PWvZekyyYxvjo3T+30=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-pC-yLtEAOY-oAKrYQ58sEQ-1; Tue, 25 Feb 2020 06:51:48 -0500
+X-MC-Unique: pC-yLtEAOY-oAKrYQ58sEQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40A07800D5B;
+ Tue, 25 Feb 2020 11:51:46 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-195.brq.redhat.com [10.40.205.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B10A1001DC2;
+ Tue, 25 Feb 2020 11:51:42 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 023/136] arm/mps2: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:13 +0100
-Message-Id: <1582631466-13880-23-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
-References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] hw/nios2/boot: Remove dead code (big endian check)
+Date: Tue, 25 Feb 2020 12:51:40 +0100
+Message-Id: <20200225115140.10023-1-philmd@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,90 +82,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jenner <andrew@codesourcery.com>, qemu-trivial@nongnu.org,
+ Chris Wulff <crwulff@gmail.com>, Julian Brown <julian@codesourcery.com>,
+ Sandra Loosemore <sandra@codesourcery.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+We only build the little-endian softmmu configuration (all
+Nios II processors are only little endian). Checking for
+big endian is pointless, remove the unused code.
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
-
-PS:
- while at it add check for user supplied RAM size and error
- out if it mismatches board expected value.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200219160953.13771-24-imammedo@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/mps2.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/nios2/boot.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index d002b12..f246213 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -24,6 +24,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/arm/boot.h"
-@@ -55,7 +56,6 @@ typedef struct {
-     MachineState parent;
- 
-     ARMv7MState armv7m;
--    MemoryRegion psram;
-     MemoryRegion ssram1;
-     MemoryRegion ssram1_m;
-     MemoryRegion ssram23;
-@@ -118,6 +118,13 @@ static void mps2_common_init(MachineState *machine)
-         exit(1);
-     }
- 
-+    if (machine->ram_size != mc->default_ram_size) {
-+        char *sz = size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* The FPGA images have an odd combination of different RAMs,
-      * because in hardware they are different implementations and
-      * connected to different buses, giving varying performance/size
-@@ -146,9 +153,7 @@ static void mps2_common_init(MachineState *machine)
-      * This is of no use for QEMU so we don't implement it (as if
-      * zbt_boot_ctrl is always zero).
-      */
--    memory_region_allocate_system_memory(&mms->psram,
--                                         NULL, "mps.ram", 16 * MiB);
--    memory_region_add_subregion(system_memory, 0x21000000, &mms->psram);
-+    memory_region_add_subregion(system_memory, 0x21000000, machine->ram);
- 
-     switch (mmc->fpga_type) {
-     case FPGA_AN385:
-@@ -338,6 +343,8 @@ static void mps2_class_init(ObjectClass *oc, void *data)
- 
-     mc->init = mps2_common_init;
-     mc->max_cpus = 1;
-+    mc->default_ram_size = 16 * MiB;
-+    mc->default_ram_id = "mps.ram";
- }
- 
- static void mps2_an385_class_init(ObjectClass *oc, void *data)
--- 
-1.8.3.1
-
+diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
+index 88224aa84c..000f8205d6 100644
+--- a/hw/nios2/boot.c
++++ b/hw/nios2/boot.c
+@@ -140,16 +140,11 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base=
+,
+     if (kernel_filename) {
+         int kernel_size, fdt_size;
+         uint64_t entry, low, high;
+-        int big_endian =3D 0;
+-
+-#ifdef TARGET_WORDS_BIGENDIAN
+-        big_endian =3D 1;
+-#endif
+=20
+         /* Boots a kernel elf binary. */
+         kernel_size =3D load_elf(kernel_filename, NULL, NULL, NULL,
+                                &entry, &low, &high, NULL,
+-                               big_endian, EM_ALTERA_NIOS2, 0, 0);
++                               0, EM_ALTERA_NIOS2, 0, 0);
+         if ((uint32_t)entry =3D=3D 0xc0000000) {
+             /*
+              * The Nios II processor reference guide documents that the
+@@ -160,7 +155,7 @@ void nios2_load_kernel(Nios2CPU *cpu, hwaddr ddr_base,
+             kernel_size =3D load_elf(kernel_filename, NULL,
+                                    translate_kernel_address, NULL,
+                                    &entry, NULL, NULL, NULL,
+-                                   big_endian, EM_ALTERA_NIOS2, 0, 0);
++                                   0, EM_ALTERA_NIOS2, 0, 0);
+             boot_info.bootstrap_pc =3D ddr_base + 0xc0000000 +
+                 (entry & 0x07ffffff);
+         } else {
+--=20
+2.21.1
 
 
