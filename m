@@ -2,69 +2,61 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C62C35DEE
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1443AC35DF0
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E5A2176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:24:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E5A2176D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D2F5B227BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:34:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="F8VpGMZ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F5B227BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Pty-0006Xq-0i
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 21:24:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40718)
+	id 1j6Q38-0008PW-3d
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 21:34:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j6Pt1-00061K-Gk
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:23:52 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j6Q2V-0007w8-IP
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:33:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j6Psz-0005VH-UH
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:23:51 -0500
-Resent-Date: Mon, 24 Feb 2020 21:23:50 -0500
-Resent-Message-Id: <E1j6Psz-0005VH-UH@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21159)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j6Psz-0005UW-Mh
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:23:49 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1582597416; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=EgVD/qwqHHF/FB3/alvnQrGKx+nNyHBwU2Dt08deHYTBA84MWvUlVTbQOs0689FGYLk+7kBXXCCC2Tq/EGuXQpdLf2wsZji6Dh03wgyCVcAKqIQjeyg4AaUXGudywy8278Bxw/wEHjhVfTUsja6aR194zYXkEXotvW/C/by/sck=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1582597416;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=1MNww8/SamVoTkMRcJjZMBylaaAeW1On1/SqEqey4mQ=; 
- b=hlXwTSw/2EzbpV9ibtrACB8SPcopks6kSyeRdQAaLMui2ZRrWa8wZ6D9eWPRBf+v0TZARmBjfbgF29H3sny+EEiOES9bT18kXQFekjNc/OTVRpzCzlylsuDI8loFiUeG22WTtjOvp2/NPiBK5DWZjXiKUokY9NU0qS000knEZg0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1582597412902169.4800330993031;
- Mon, 24 Feb 2020 18:23:32 -0800 (PST)
-In-Reply-To: <20200225015026.940-1-miaoyubo@huawei.com>
-Subject: Re: [PATCH v4 0/3] pci_expander_brdige:acpi:Support pxb-pcie for ARM
-Message-ID: <158259741133.10132.8479282361387550826@a1bbccc8075a>
+ (envelope-from <dgibson@ozlabs.org>) id 1j6Q2T-0001J9-BI
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:33:39 -0500
+Received: from ozlabs.org ([203.11.71.1]:54191)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j6Q2S-0001Gg-Iw; Mon, 24 Feb 2020 21:33:37 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48RNK80NL0z9sQt; Tue, 25 Feb 2020 13:33:31 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1582598012;
+ bh=pfA0U7ghr86Mf28OFrqEpdJS6LwoMzPmLrYHU/8d5fc=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=F8VpGMZ1IGXKrfSd4UrChD0YWM3HXU6Ri+BzgyayxgptAfDsaeqCNKqY6Q3BvLRVE
+ akNgCisT/D15wx8Peysb0RTOSu90MWtv9l8XTqqsVJMWUEJ8qSTpf3f4sFCrg8hdBo
+ ln/dg1zaWAwQqbAdCNgdXVkhV2wAeeC37ouEzJuo=
+Date: Tue, 25 Feb 2020 11:55:54 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] spapr: Handle pending hot plug/unplug requests at CAS
+Message-ID: <20200225005554.GF41629@umbus.fritz.box>
+References: <158257222352.4102917.8984214333937947307.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: miaoyubo@huawei.com
-Date: Mon, 24 Feb 2020 18:23:32 -0800 (PST)
-X-ZohoMailClient: External
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Zs/RYxT/hKAHzkfQ"
+Content-Disposition: inline
+In-Reply-To: <158257222352.4102917.8984214333937947307.stgit@bahia.lan>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,50 +68,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, shannon.zhaosl@gmail.com,
- miaoyubo@huawei.com, imammedo@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNTAxNTAyNi45NDAt
-MS1taWFveXVib0BodWF3ZWkuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVzaW5nIGV4cGVjdGVkIGZpbGUg
-J3Rlc3RzL2RhdGEvYWNwaS92aXJ0L0RTRFQubWVtaHAnCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IC1k
-ZXZpY2UgcHhiLXBjaWUsYnVzX25yPTEyODogJ3B4Yi1wY2llJyBpcyBub3QgYSB2YWxpZCBkZXZp
-Y2UgbW9kZWwgbmFtZQpCcm9rZW4gcGlwZQpFUlJPUiAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBl
-Y3RlZCA0LCBnb3QgMykKL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3F0ZXN0L2xpYnF0ZXN0LmM6
-MTY2OiBraWxsX3FlbXUoKSB0cmllZCB0byB0ZXJtaW5hdGUgUUVNVSBwcm9jZXNzIGJ1dCBlbmNv
-dW50ZXJlZCBleGl0IHN0YXR1cyAxIChleHBlY3RlZCAwKQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0
-LWFhcmNoNjRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KICBURVNUICAgIGNoZWNrLXF0ZXN0LXg4Nl82NDogdGVzdHMvcXRlc3Qvdm1nZW5pZC10ZXN0
-CkNvdWxkIG5vdCBhY2Nlc3MgS1ZNIGtlcm5lbCBtb2R1bGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJl
-Y3RvcnkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
-cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
-cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPThiODNkOWYyNWQ2
-YjQxYzg5MmMwNjljOGI0ZGMwNWFkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAn
-c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywg
-J0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywg
-J0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAv
-Y2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTov
-dmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAteXo0
-YXh2dngvc3JjL2RvY2tlci1zcmMuMjAyMC0wMi0yNC0yMS4wOS4zMC44NjI2Oi92YXIvdG1wL3Fl
-bXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWlj
-ayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFi
-ZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD04YjgzZDlmMjVkNmI0MWM4OTJjMDY5YzhiNGRjMDVh
-ZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJl
-Y3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC15ejRheHZ2eC9zcmMnCm1ha2U6ICoq
-KiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTRtMS40
-OTlzCnVzZXIgICAgMG04Ljg3OHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMjI1MDE1MDI2Ljk0MC0xLW1pYW95dWJvQGh1YXdlaS5j
-b20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+--Zs/RYxT/hKAHzkfQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Feb 24, 2020 at 08:23:43PM +0100, Greg Kurz wrote:
+> If a hot plug or unplug request is pending at CAS, we currently trigger
+> a CAS reboot, which severely increases the guest boot time. This is
+> because SLOF doesn't handle hot plug events and we had no way to fix
+> the FDT that gets presented to the guest.
+>=20
+> We can do better thanks to recent changes in QEMU and SLOF:
+>=20
+> - we now return a full FDT to SLOF during CAS
+>=20
+> - SLOF was fixed to correctly detect any device that was either added or
+>   removed since boot time and to update its internal DT accordingly.
+>=20
+> The right solution is to process all pending hot plug/unplug requests
+> during CAS: convert hot plugged devices to cold plugged devices and
+> remove the hot unplugged ones, which is exactly what spapr_drc_reset()
+> does. Also clear all hot plug events that are currently queued since
+> they're no longer relevant.
+>=20
+> Note that SLOF cannot currently populate hot plugged PCI bridges or PHBs
+> at CAS. Until this limitation is lifted, SLOF will reset the machine when
+> this scenario occurs : this will allow the FDT to be fully processed when
+> SLOF is started again (ie. the same effect as the CAS reboot that would
+> occur anyway without this patch).
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+LGTM, applied to ppc-for-5.0.
+
+> ---
+>  hw/ppc/spapr_events.c  |   13 +++++++++++++
+>  hw/ppc/spapr_hcall.c   |   11 +++++------
+>  include/hw/ppc/spapr.h |    1 +
+>  3 files changed, 19 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 8b32b7eea526..2afd1844e4d4 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -983,6 +983,19 @@ void spapr_clear_pending_events(SpaprMachineState *s=
+papr)
+>      }
+>  }
+> =20
+> +void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr)
+> +{
+> +    SpaprEventLogEntry *entry =3D NULL, *next_entry;
+> +
+> +    QTAILQ_FOREACH_SAFE(entry, &spapr->pending_events, next, next_entry)=
+ {
+> +        if (spapr_event_log_entry_type(entry) =3D=3D RTAS_LOG_TYPE_HOTPL=
+UG) {
+> +            QTAILQ_REMOVE(&spapr->pending_events, entry, next);
+> +            g_free(entry->extended_log);
+> +            g_free(entry);
+> +        }
+> +    }
+> +}
+> +
+>  void spapr_events_init(SpaprMachineState *spapr)
+>  {
+>      int epow_irq =3D SPAPR_IRQ_EPOW;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 6db3dbde9c92..5992849c1664 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1640,7 +1640,7 @@ static uint32_t cas_check_pvr(SpaprMachineState *sp=
+apr, PowerPCCPU *cpu,
+>      return best_compat;
+>  }
+> =20
+> -static bool spapr_transient_dev_before_cas(void)
+> +static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spa=
+pr)
+>  {
+>      Object *drc_container;
+>      ObjectProperty *prop;
+> @@ -1658,10 +1658,11 @@ static bool spapr_transient_dev_before_cas(void)
+>                                                            prop->name, NU=
+LL));
+> =20
+>          if (spapr_drc_transient(drc)) {
+> -            return true;
+> +            spapr_drc_reset(drc);
+>          }
+>      }
+> -    return false;
+> +
+> +    spapr_clear_pending_hotplug_events(spapr);
+>  }
+> =20
+>  static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> @@ -1834,9 +1835,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+> =20
+>      spapr_irq_update_active_intc(spapr);
+> =20
+> -    if (spapr_transient_dev_before_cas()) {
+> -        spapr->cas_reboot =3D true;
+> -    }
+> +    spapr_handle_transient_dev_before_cas(spapr);
+> =20
+>      if (!spapr->cas_reboot) {
+>          void *fdt;
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 09110961a589..a4216935a148 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -824,6 +824,7 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+>  void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
+>                            Error **errp);
+>  void spapr_clear_pending_events(SpaprMachineState *spapr);
+> +void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr);
+>  int spapr_max_server_number(SpaprMachineState *spapr);
+>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>                        uint64_t pte0, uint64_t pte1);
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Zs/RYxT/hKAHzkfQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5UcJoACgkQbDjKyiDZ
+s5JkhQ/+P8jhAuoYyCjasXHgiCxR0qmo3lkso1fq31TIbk8u7qLldXF7n/zCQZ8z
+5lqq6MHOhGsVO/DxCcfYMUE5e8/exneOz9adu9eFA/Kn2XpRmPzGEPmt2yuhVrcu
+2lMYC1v+83AJc8cINpyBMKU6TxeYNqxQcFMV1D7fkyTvm5iwVrk8M2ye4Yo2kdxL
+BEWJ+0eDMYX2EHIUBx+nerze3WnZHtJsD+8wnHVl9YhmLK0GahZVrgUSdqOf15gD
+Pr5HvPZjGVRsRc7KU6OCwloJeR4fVZvJk9FaBj+3C+qeRhndghRKZFfwKcRKBoYn
+FK+JPntB70j7mHPiu2mRrTfCyfZETjZqB8gkGIyfSOdY2LKvwR33HU5bcigDj8GQ
+2cmvXFxxoU9bmSMbmtDAsa3KNLWRlU/cIV1ajN9MAHwtumSpB6Yhb7Q9Aoo6x7XH
+93xnSOD70Y+9kSa2ZzBAG9CmAMcqaMcrgJgqsYLrwhulyKtz+yEP+a4lwhoO2mZs
+bUWXmB5mUmGNvdu8Cxp2VinyyTAgzySAp2N2Hvujouq1ZWbg+HFGD+ww6nMdUpCw
+kZa+Ibm9xODPvzsCZK9jN6k99ZYjZscE+NM6AalcVvLOgsIE3NkK8tfg8Gm9UU9h
+fr6pBH2Okj/ICUFgAQW82V4fXs1XuOKrY5gebvFwkB3e47sxAK4=
+=hFLz
+-----END PGP SIGNATURE-----
+
+--Zs/RYxT/hKAHzkfQ--
 
