@@ -2,97 +2,63 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53007C4BA01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D48BC4BA00
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 22:01:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BBD020675
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:58:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOZHFM6u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBD020675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4B7CE20726
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 22:01:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B7CE20726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6iDt-0003fq-BZ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 16:58:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39753)
+	id 1j6iGQ-0004zt-H4
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 17:01:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6iCj-0003Az-V1
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:57:26 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j6iFK-0004QL-EO
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:00:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6iCi-0001zs-TR
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:57:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41994
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1j6iFI-00018e-E8
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:00:05 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:47467)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6iCi-0001y1-My
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:57:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582667844;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k8+dhKs6AsWaK6CsUzc51Cv3AgXh0aJ2T5G0xp7DUIw=;
- b=dOZHFM6uub4t4cRPJ4jiKihFeiXkfnpc/skgTlOgci8rZeaYQA0fabtEeJPgZksvhTztio
- yfniBX5YEbK6T+gGm2ky2Mdp5fAiYhzXbQIcuN5JYiQZrcZbH6Vy0CNRPWNegA9YlJ7NF1
- eEyv/V6EfiYiDsgxp8+2OhPA4HrtddI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-V5N9UeFhN3GR75yihL_ppg-1; Tue, 25 Feb 2020 16:57:18 -0500
-X-MC-Unique: V5N9UeFhN3GR75yihL_ppg-1
-Received: by mail-qt1-f197.google.com with SMTP id p12so1254704qtu.6
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 13:57:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=sQfQsxErc9iLVD/ni6ETNEoHbeJANcIbLc93FGh9aK8=;
- b=D/x5NDRpFN6YuWmYoK/Nl2iv3n4vPYcoNqZhGXvZWcpO2L6hKrEeGqmWXrlQ8yt9OY
- RmvF+mb17Xp/Yyk8i5d+65YkKYWpGDzJ7ZK105tNSARsX3t9ZpSQpbmGEGkebbTNQzZD
- Jj/mLGcB+qotS2b4+XpsTCJV6nOizdjUSQryF6GEoE9+FzIBa5sHt7vBzL35oK8v5iua
- 9o2J6ONUlQUaJI30XhPratplWbnDi42bex65wihTEA+74BiqQUEv/lJYfVWVeKNgU/X9
- R6qKk3WMeL7KjETIV+ZdRE/SXnG4QJ6PebS/RqXkRaTDr56pjwd5xRyJL6uV0SO1si7u
- fZFw==
-X-Gm-Message-State: APjAAAU3AyQFIq9tm1DNnjFJwFE8H0EtiR1Wzp9yGZTeBA5T9yWyRegZ
- X/sJChXTDJ3gLeqs+kn4WCSJHHDvwRKtYZZYUjW83gKc41IXm4cR6njSXUbSMF1EajyDJ+PS/4o
- FAq+cbzZwcSuUEEA=
-X-Received: by 2002:a0c:a281:: with SMTP id g1mr1254907qva.168.1582667837721; 
- Tue, 25 Feb 2020 13:57:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzEF5iwZszCsyrDybLfjlUifm+JXQcFyVVv7xrcru5VsJi7/9HT98isS13CeYNkXInFVycCoA==
-X-Received: by 2002:a0c:a281:: with SMTP id g1mr1254885qva.168.1582667837466; 
- Tue, 25 Feb 2020 13:57:17 -0800 (PST)
-Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
- by smtp.gmail.com with ESMTPSA id
- 65sm8120245qtc.4.2020.02.25.13.57.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 13:57:16 -0800 (PST)
-Date: Tue, 25 Feb 2020 16:57:12 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 00/32] virtio, pc: fixes, features
-Message-ID: <20200225165637-mutt-send-email-mst@kernel.org>
-References: <20200225151210.647797-1-mst@redhat.com>
- <CAFEAcA-eDYoyD-Hs6i7b3J+nt92DNUpFo9J+UZJtoxQ49R3i1w@mail.gmail.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j6iFH-0000u0-NG
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:00:04 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 74244747DFD;
+ Tue, 25 Feb 2020 23:00:01 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 192FD747DFA; Tue, 25 Feb 2020 23:00:01 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 14BD1747DF7;
+ Tue, 25 Feb 2020 23:00:01 +0100 (CET)
+Date: Tue, 25 Feb 2020 23:00:01 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: IDE IRQ problem after UDMA enabled (was: Re: Emulating Solaris
+ 10 on SPARC64 sun4u)
+In-Reply-To: <alpine.BSF.2.22.395.2002252041380.50551@zero.eik.bme.hu>
+Message-ID: <alpine.BSF.2.22.395.2002252251001.87116@zero.eik.bme.hu>
+References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
+ <20200205173326.GA3256@work-vm>
+ <LO2P123MB22710F9D590E023381119FAB831C0@LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM>
+ <alpine.BSF.2.22.395.2002080030360.88696@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2002101546080.56058@zero.eik.bme.hu>
+ <078a89dc-3e5f-2152-8783-1f22483c4603@redhat.com>
+ <alpine.BSF.2.22.395.2002252041380.50551@zero.eik.bme.hu>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-eDYoyD-Hs6i7b3J+nt92DNUpFo9J+UZJtoxQ49R3i1w@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,62 +70,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 04:47:31PM +0000, Peter Maydell wrote:
-> On Tue, 25 Feb 2020 at 15:12, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > The following changes since commit 9a8abceb5f01d1066d3a1ac5a33aabcbaeec=
-1860:
-> >
-> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-2020022=
-5' into staging (2020-02-25 11:03:47 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to afc37debf27ecf34d6bc1d4b52fa0918d0bd3f3c=
-:
-> >
-> >   Fixed assert in vhost_user_set_mem_table_postcopy (2020-02-25 08:47:4=
-7 -0500)
-> >
-> > ----------------------------------------------------------------
-> > virtio, pc: fixes, features
-> >
-> > New virtio iommu.
-> > Unrealize memory leaks.
-> > In-band kick/call support.
-> > Bugfixes, documentation all over the place.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->=20
-> Hi; this fails to build on OSX:
->=20
->   CC      contrib/libvhost-user/libvhost-user.o
-> /Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.c:27=
-:10:
-> fatal error: 'sys/eventfd.h' file not found
-> #include <sys/eventfd.h>
->          ^~~~~~~~~~~~~~~
-> In file included from
-> /Users/pm215/src/qemu-for-merges/contrib/vhost-user-bridge/main.c:37:
-> /Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.h:21=
-:10:
-> fatal error: 'linux/vhost.h' file not found
-> #include <linux/vhost.h>
->          ^~~~~~~~~~~~~~~
-> 1 error generated.
->=20
-> thanks
-> -- PMM
+On Tue, 25 Feb 2020, BALATON Zoltan wrote:
+> On Mon, 10 Feb 2020, John Snow wrote:
+>> It sounds like the real problem is either in the bmdma controller (or
+>> its unique interaction with hw/ide/core.c -- which is possible) or in
+>> the interrupt routing somewhere else.
+>> 
+>> If you have any IDE traces from a hang, feel free to throw them up on a
+>> pastebin for me to take a peek at; it might help for me to see the exact
+>> sequence that causes a hang in QEMU's IDE terms to see if I can't
+>> "reverse engineer" what the guest is hoping to have happen. Maybe I can
+>> trace this to a bad register value.
+>
+> I've got some traces from Linux and MorphOS (both on my work in progress 
+> pegasos2 emulation using via-ide where I can most easily reproduce this) but 
+> I'm not sure what to look for in these. MorphOS starts booting, so firmware 
+> can read ide-cd connected to via-ide as well as MorphOS can before enabling 
+> UDMA 5 mode but stops after that and cannot read the drive any more. Linux 
+> works even after enabling DMA. I've gathered some logs in 
+> https://osdn.net/projects/qmiga/ticket/38949 previously but now I try to list 
+> here the part in more detail where drive is detected, enabling DMA and first 
+> command after that in case you can spot something in these that could explain 
+> why it fails with MorphOS driver.
 
-OK this must be the move to contrib. Peter could you please try
-again now? New tag at c3744b57bb37cd1120acb621ce4683b1c8e8a1c6.
+Never mind, I've found a clue in NetBSD's driver:
 
+http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/pci/viaide.c?rev=1.89&content-type=text/x-cvsweb-markup&only_with_tag=MAIN
 
+which has a comment that says:
+
+/*
+  * At least under certain (mis)configurations (e.g. on the "Pegasos" board)
+  * the VT8231-IDE's native mode only works with irq 14/15, and cannot be
+  * programmed to use a single native PCI irq alone. So we install an interrupt
+  * handler for each channel, as in compatibility mode.
+  */
+
+If I change via-ide to use ISA IRQ14 and 15 and ignore what's programmed 
+in the PCI config reg then MorphOS works with UDMA so it expects that. 
+This change however breaks Linux which still boots after getting some 
+errors but maybe it downgrades to PIO mode then. I'll need to find out 
+more about how is this broken on real hardware and how can we emulate it.
+
+So you don't need to look at the logs unless you want to check why it sees 
+a non working ATA device after resetting the bus but logs in the ticket 
+above may be more useful for that as I did not include that part in this 
+email.
+
+Thank you,
+BALATON Zoltan
 
