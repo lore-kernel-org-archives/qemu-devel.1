@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B22DC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D91C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB85D2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 903722084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:10:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDYC5JFJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB85D2084E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/NJDvnN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 903722084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z2r-0008Fb-Pz
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:10:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49688)
+	id 1j6Z30-0008MN-PC
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:10:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49574)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl0-000189-NQ
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yko-0000vP-Oj
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Fx-4D
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:10 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:33058)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykh-0007t1-AR
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:55 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:39815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykx-00083L-E6
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
-Received: by mail-wr1-x432.google.com with SMTP id u6so14405702wrt.0
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:59 -0800 (PST)
+ id 1j6Ykg-0007iR-Nr
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
+Received: by mail-wr1-x431.google.com with SMTP id y17so5561475wrn.6
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ISYF8bE3wZBpQs6aEV6LAzqPTy+sOweNT5V9+csQXHc=;
- b=BDYC5JFJY1RnuY2XTnALpN+oGtOqR4RDxSLzjEfVGp5CiztULSJzZVSfC3m74nl1pR
- Rw6VNjCLu/YMMYnYPy/Hq+EL/rG4qAnbG/zWqeYgbDCxaroNkeoP6FWrnTqPnMYjOx8q
- aoPzGmcX6Q8ShmTyBms/xG+MkVOSrI8S7L5L1eFRyLaIXTHsGZ8pHHDwRhyqskyG1BLb
- 16ao/CcfFY/1xafuYnhOV8WbtdX0gy5+M3qLTsEVGBqlJI0TQdh7iv8l+u2wXVIalgLH
- ia4skAtK02VWN1/SW0sLESRsPi7m8m1x3oniHHSzpdoOUZCY46LZtc56BFnldFHoIcM0
- y6+g==
+ bh=Frd9kAdV84R9k9k/O1Hor30Emol0j6Z4RBCmBlmORMU=;
+ b=l/NJDvnN9q+AycqU81VHIqwkq9uJ81euJfxHlKaEKtUdHuYKS/itzl9NhK90GseOEb
+ TpLhKfXF47OOELTjGxfmJFZjgbRXL52ZF5hoCGw6pcKIPok/d+e4AJ7ASP68B14WqZcS
+ WBt3nHk5BURAjUVrDGBGjBsYFihJ5ozH94Zh58fLDSEFJAjlUAy+Sr2eBBTZzgzw2tHL
+ eHU/drqBVAZxhNQtrkZbczVa7KZEu3OuvNoM5MlKcwoSGjG+MrAvjqgXQQk/KphXTkys
+ I/PY4lbVFf79PysJ3rnZG60smgq+/sFA2spHO/CSR2SBbc62m/mYiY0Yfbzb96DghYFA
+ N54Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ISYF8bE3wZBpQs6aEV6LAzqPTy+sOweNT5V9+csQXHc=;
- b=MGe8UKntLy/wyIrQpKyxe51Jv359AmVhCZbOxrgA8XH3LXLkrnsB5JYiQCGjd07TKt
- HhIQEzv/qmOCVx1zM9TBXuyq6UYWmaqgLnuxINw89iGWnI6zVKG/gDXH3bSdG/7uGwOJ
- lJ+bTgZ92QnXrXGXsUo8nKG5zKDS2Lt+FqEVYZYlIqZV+9IR1p2IOZkIYNQkT6rowAhW
- GnAhJyrbsjIuM9GL9BPbLfRmDdIh5msmRBBYYhzEAgwn+VH2g5qj2KiPcU9qfbafaguk
- sZwrYR9JwlsaB5A4hKIR9pT59YL2N0ssIE85KUO93DS+dHfzrzg7k8T0DmhVrg8VsbNp
- Qnbw==
-X-Gm-Message-State: APjAAAWrVOrdN+tQnZuIxuMWmblTCVrgJ0NP5SGKL1b/olvLskRNH39F
- qfaT6oq3Mfzr1X/w+P6zG6xy5b3u
-X-Google-Smtp-Source: APXvYqySqvOYSZ/XmFVMhpyR3Icy3mPpYyEgAEugs4gU+23gOPSRM64zhxMkkio6vpUVHwGd6EDhFw==
-X-Received: by 2002:adf:ef8e:: with SMTP id d14mr14811813wro.316.1582631518787; 
- Tue, 25 Feb 2020 03:51:58 -0800 (PST)
+ bh=Frd9kAdV84R9k9k/O1Hor30Emol0j6Z4RBCmBlmORMU=;
+ b=qv/FzZmSYtVVehmWu7zDGUtqEnkGpRhKzm9qrDcIRSNimrDI63kBoEmVuLmtPMRtTF
+ B5PXtipzpth5gtk6KDbZQsM6OcVgYbB87ag2ARviZuBzifvBGiwWJI2QQKZxWrYnAUCM
+ +ot0E037oZh6MxaD/y4Q464R5XzyMb75hgbaYt+XT+L+zckQ1vpsE2Db8b+FC7205Ahc
+ JdcU+B7SGbBCcG5RvPEKxZ1VqY+VFSe6Lze7qSQnmy8v2AeDNw6NsdMq8qTtWPDAxWZg
+ JmXsZjfQtWPTXm0aRjXn8smntm2QDzw/VAQ539xCjArB1pOCWrbRsJv9kNxlBVhwJTeu
+ 67YA==
+X-Gm-Message-State: APjAAAV4lYHwbKUZqFEmr+FrgsAwIy//OQecu+01DsUJxy+zt285dpE8
+ YlNvtoEF1P0HTf4WZBOFAHIox8gq
+X-Google-Smtp-Source: APXvYqwKcaKFCchGuGi15U9oG4MDHLVBcEt9xdG/h8HsunTqVZbpKlLmWAen4jRqA6Rm44P1L0ABpw==
+X-Received: by 2002:adf:ef8e:: with SMTP id d14mr14810976wro.316.1582631509521; 
+ Tue, 25 Feb 2020 03:51:49 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.58
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.48
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:58 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:48 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 057/136] mips/mips_r4k: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:47 +0100
-Message-Id: <1582631466-13880-57-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 046/136] m68k/an5206: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:36 +0100
+Message-Id: <1582631466-13880-46-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,65 +109,44 @@ and using MachineState::ram instead of manually initializing
 RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200219160953.13771-58-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-47-imammedo@redhat.com>
 ---
- hw/mips/mips_r4k.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ hw/m68k/an5206.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index b2aec43..258cd91 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -171,13 +171,11 @@ static const int sector_len = 32 * KiB;
- static
- void mips_r4k_init(MachineState *machine)
- {
--    ram_addr_t ram_size = machine->ram_size;
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-     char *filename;
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index bed43a9..846f4e4 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -33,7 +33,6 @@ static void an5206_init(MachineState *machine)
+     uint64_t elf_entry;
+     hwaddr entry;
      MemoryRegion *address_space_mem = get_system_memory();
 -    MemoryRegion *ram = g_new(MemoryRegion, 1);
-     MemoryRegion *bios;
-     MemoryRegion *iomem = g_new(MemoryRegion, 1);
-     MemoryRegion *isa_io = g_new(MemoryRegion, 1);
-@@ -203,14 +201,12 @@ void mips_r4k_init(MachineState *machine)
-     qemu_register_reset(main_cpu_reset, reset_info);
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
  
-     /* allocate RAM */
--    if (ram_size > 256 * MiB) {
-+    if (machine->ram_size > 256 * MiB) {
-         error_report("Too much memory for this machine: %" PRId64 "MB,"
-                      " maximum 256MB", ram_size / MiB);
-         exit(1);
-     }
--    memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_size);
--
+     cpu = M68K_CPU(cpu_create(machine->cpu_type));
+@@ -46,8 +45,7 @@ static void an5206_init(MachineState *machine)
+     env->rambar0 = AN5206_RAMBAR_ADDR | 1;
+ 
+     /* DRAM at address zero */
+-    memory_region_allocate_system_memory(ram, NULL, "an5206.ram", ram_size);
 -    memory_region_add_subregion(address_space_mem, 0, ram);
 +    memory_region_add_subregion(address_space_mem, 0, machine->ram);
  
-     memory_region_init_io(iomem, NULL, &mips_qemu_ops,
-                           NULL, "mips-qemu", 0x10000);
-@@ -261,7 +257,7 @@ void mips_r4k_init(MachineState *machine)
-     g_free(filename);
- 
-     if (kernel_filename) {
--        loaderparams.ram_size = ram_size;
-+        loaderparams.ram_size = machine->ram_size;
-         loaderparams.kernel_filename = kernel_filename;
-         loaderparams.kernel_cmdline = kernel_cmdline;
-         loaderparams.initrd_filename = initrd_filename;
-@@ -316,7 +312,7 @@ static void mips_machine_init(MachineClass *mc)
- #else
-     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
- #endif
--
-+    mc->default_ram_id = "mips_r4k.ram";
+     /* Internal SRAM.  */
+     memory_region_init_ram(sram, NULL, "an5206.sram", 512, &error_fatal);
+@@ -89,6 +87,7 @@ static void an5206_machine_init(MachineClass *mc)
+     mc->desc = "Arnewsh 5206";
+     mc->init = an5206_init;
+     mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5206");
++    mc->default_ram_id = "an5206.ram";
  }
  
- DEFINE_MACHINE("mips", mips_machine_init)
+ DEFINE_MACHINE("an5206", an5206_machine_init)
 -- 
 1.8.3.1
 
