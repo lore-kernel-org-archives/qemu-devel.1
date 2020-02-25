@@ -2,89 +2,60 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D12C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6B0C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A055121744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uCZomt62"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A055121744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 820FE21744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 820FE21744
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6a2m-0007Lq-P9
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:14:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59196)
+	id 1j6a38-0007zz-La
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:14:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53025)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcR-0005TH-S5
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:25 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j6Z2J-0007jr-9G
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:10:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcQ-0007Et-Vf
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:23 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44006)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6ZcQ-0007E9-Nc
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:22 -0500
-Received: by mail-wr1-x442.google.com with SMTP id r11so14578166wrq.10
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:47:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tZ+q8+KjTsBsafkEv1L9oog5zVBd33ptYwGvTAYVmPc=;
- b=uCZomt62GTRNms/KFdYdUa9expV/lcusEpBK2bfj1LVOCRKElT2TzJ6BRtB3LFl5ZY
- DrUOc3ORBts+RiGmsdJ0PZaNt8zyRI1yuw0diQ0tF5sygAHW9WgNBVm5Y1IOwLDIh66Z
- mIAJ3ymrQqKQ6TDybDSsl7GP7joKU+NxILEqr8JQaBr9QQv6r0/r5w0insB9jm5URM4o
- gGFm6faDFBjWMSIZsuOoyoMcPD1QSAzXhHlENa1vRZVODKCWczYn8JL+TCLSNt+voqZb
- U3gxD6OJMfkHHFGuMN1VGViV7qZafyjMOZQXDS70LvlNox8UqZZOTiZ2JXJpTyCXb9Xh
- lOcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=tZ+q8+KjTsBsafkEv1L9oog5zVBd33ptYwGvTAYVmPc=;
- b=BooUwj6iIszZ5cbgesRF1xjxMJ3XJL75yPyOvxCuOrqbTl7pxUObeKsQPsQZY55Qvr
- sbT+0n/F04spDsvW8y19KZGLfny/2hDC07WNfRBva5Zczh79qY2yYllkn1/dHyU6cGv9
- lIT/6hPa9EqeTJuYsORLRH44pzKI64MaPu5MFCBNLSApJqQGNUoF5bW7gjiMa9sUmN14
- VMlQMKu73NF0pP5cuUaXuDfS9H98DTkZ1E31yrFDuf4SiauKTbWS4Lna2cDHIXi7ZpqG
- 5R6370ToqZfS1eb54ah7G4RxSzMm/QzTDT7Z9PAdSd2HafX4d6xqaHqWpPbLbSe/ibIk
- b7Nw==
-X-Gm-Message-State: APjAAAUJkSwUms+rRyU1FMLBvFnr40SHuPyJDM+a3Br4LxJM9bPuPD4Y
- TrFXjWMaFGsvuEQPaoG9hCqel8H/Kbg=
-X-Google-Smtp-Source: APXvYqzN5E1Uu9yjg885wODL/JepL8jrTLGzP2uEBsI6zN3ZzUOEcIHHTPZaHGG5ItzHoNwYBU6Xlg==
-X-Received: by 2002:a5d:63c7:: with SMTP id c7mr11142662wrw.115.1582634841265; 
- Tue, 25 Feb 2020 04:47:21 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q3sm3552540wrs.1.2020.02.25.04.47.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 04:47:15 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E1DCF1FF96;
- Tue, 25 Feb 2020 12:47:10 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 07/19] travis.yml: single-thread build-tcg stages
-Date: Tue, 25 Feb 2020 12:46:58 +0000
-Message-Id: <20200225124710.14152-8-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
-References: <20200225124710.14152-1-alex.bennee@linaro.org>
+ (envelope-from <balaton@eik.bme.hu>) id 1j6Z2H-0004oY-D1
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:10:02 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:14670)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j6Z2H-0004ie-6Z; Tue, 25 Feb 2020 07:10:01 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id A055E74637C;
+ Tue, 25 Feb 2020 13:09:49 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 7AE1E745953; Tue, 25 Feb 2020 13:09:49 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 78D6E74569F;
+ Tue, 25 Feb 2020 13:09:49 +0100 (CET)
+Date: Tue, 25 Feb 2020 13:09:49 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Programmingkid <programmingkidx@gmail.com>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-Reply-To: <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+Message-ID: <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+ <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,49 +67,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- marcandre.lureau@redhat.com, aaron@os.amperecomputing.com, cota@braap.org,
- stefanha@redhat.com, kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- aurelien@aurel32.net
+Cc: Paul Clarke <pc@us.ibm.com>, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-ppc@nongnu.org, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This still seems to be a problem for Travis.
+On Mon, 24 Feb 2020, Programmingkid wrote:
+> Intel Core i5-2500S CPU @ 2.70GHz.
+[...]
+> Ok, I did test on the G4, here are my results:
+>
+> Git commit: c1e667d2598b9b3ce62b8e89ed22dd38dfe9f57f
+> Mac OS 10.4.3 VM
+> -cpu G4
+> -USB audio device
+>
+> Hardfloat=false
+> Audio sounds bad when playing midi file.
+> Extraction rate: 1.5x
+> Converting rate: 0.7x
+> Total time: 7:24
+>
+> Hardfloat=true
+> Midi audio sounded perfect for about 30 seconds, then it went silent!
+> Extraction rate: 1.4x (slower with hard float)
+> Converting rate: 0.7x (same as without hardfloat)
+> Total time: 7:16 (faster time with hardfloat)
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- .travis.yml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+How is that extraction rate is slower but total time is less than without 
+hardfloat? There must be other factors here than just FP ops. Maybe a 
+better test is to not play the audio just save it to a file so other 
+issues with USB is not influencing the test.
 
-diff --git a/.travis.yml b/.travis.yml
-index 0612998958b..f4020dcc6c8 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -400,7 +400,7 @@ jobs:
-     - name: "GCC check-tcg (some-softmmu)"
-       env:
-         - CONFIG="--enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
--        - TEST_BUILD_CMD="make -j${JOBS} build-tcg"
-+        - TEST_BUILD_CMD="make build-tcg"
-         - TEST_CMD="make check-tcg"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
-@@ -409,7 +409,7 @@ jobs:
-     - name: "GCC plugins check-tcg (some-softmmu)"
-       env:
-         - CONFIG="--enable-plugins --enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
--        - TEST_BUILD_CMD="make -j${JOBS} build-tcg"
-+        - TEST_BUILD_CMD="make build-tcg"
-         - TEST_CMD="make check-tcg"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
- 
--- 
-2.20.1
+> When I played sound this second time I hard the same broken audio I 
+> usually hear with the USB audio device with hardfloat set to false. When 
+> playing the same midi file with hardfloat set to true, the audio played 
+> perfectly! It only played for 30 seconds before it went silent.
 
+So probably there are at least two problems: FPU emulation is not fast 
+enough to decode audio to fill buffer then there's also something with 
+usb-audio that jams it after a while? I don't think all of this is FPU 
+related.
+
+> I can give you the full testing suite if you like. I run it on Mac OS 
+> 10.4 but it should compile with gcc on Linux. I will send it to you in a 
+> separate email because it is big.
+
+Thanks, I'll have a look and see if I can make sense of it but not sure 
+when will I find time.
+
+> I have another idea on how to improve QEMU's performance. What if you 
+> enabled more CPUs for the PowerPC target? Mac OS 9, Mac OS X, and Linux 
+> support multiple CPUs. It might actually be easier to do this than to
+
+Have you tried if it works? I think MTTCG is enabled for PPC64 but not 
+sure about 32 bit PPC. The mac99 machine seems to init multiple CPUs but 
+not sure if they'll use MTTCG. But you could test it to see if it makes 
+any difference.
+
+> improve the FPU. I imagine the performance increase with multiple 
+> emulated CPUs would be much more noticeable.
+
+The Amiga like OSes I'm interested in don't use multiple cores so I'm 
+mainly interested in improving single core performance. Also I'm not sure 
+if (part of) your problem is slow FPU preventing fast enough audio 
+decoding then having multiple CPUs with slow FPU would help as this may 
+use a single thread anyway.
+
+Regards,
+BALATON Zoltan
 
