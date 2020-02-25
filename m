@@ -2,79 +2,86 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8342CC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903F4C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:25:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0991320CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:24:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 602B8218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:25:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t8iCH6Gq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0991320CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q8SbGL/n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 602B8218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZGj-0000ur-Vw
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:24:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51678)
+	id 1j6ZH2-0001bL-GA
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:25:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j6YvC-0003Ki-Vl
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:02:43 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykq-0000x0-9s
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j6YvA-0007lF-Sz
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:02:42 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:47080)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykj-00081R-LX
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:00 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33799)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j6YvA-0007i2-K0
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:02:40 -0500
-Received: by mail-ot1-x343.google.com with SMTP id g64so11785578otb.13
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:02:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OalDj38vAYtArGZEfUFVIwvsdCbBvjJMoAXbjYxn3eU=;
- b=t8iCH6GqFC3kuMAgqjoNXv2AGGVat1EMbI4K3BK4GeoFtaYMgGEd1DD+yrmrUqXnnd
- /KXcrUBlqwjbi7YwesROnT3j9YTnsvCu+PP2EZ7pEvweqLuo3ENskBFxWefimLt9OTpw
- 9JxsOwkJDdvJfyt7uNECy/IKqN9afDzhZz7tMeIIXF/SYLYr6tYvtA9RlJjlZFVxb+v6
- S5+IkC83dOGNo20497xerN3qWJ+z2SjQ3yd1q+TTrEoSHXhysDwsSuLDsYqSV+C1ONYO
- DXwcO8yZBr3+ilQvJZD4FnM4Em3nwz4TE+1Lxsqm0vJ0+vT5XLGD06sAuq/PJCdnaqRD
- 5GyQ==
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1j6Yki-0007wW-DQ
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:53 -0500
+Received: by mail-wr1-x435.google.com with SMTP id z15so6036860wrl.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=SgZvYL+Hn5j8x93NoxwcO2mgPavkLnr8s0tZPnErZBQ=;
+ b=q8SbGL/nQ3BnU35iSktqL7lprX0eVfksdIJCcIw4d+nDYroMKzBh4tXoG6af9Sar7B
+ tw1az3eJmZ6/ywK/ZiGRT6eYGoAX8sxM6dpB3F4Ig589FJ/oi/a7f0uxI1GLaZ6QS0j3
+ X3c9PncG82Ao6APAEXApgZTyL2fMYbXlcQStMW31hRkCa9I6sXcRhNUMgiHvEMfV5vyP
+ 7hCZrrxQdz9/6XOppyku2EZeq7b5NZzOS9weIO01+hlNfd0SGLMpjzsVgl0Zbl3uVSM3
+ tp6lkrHvY2E710f14ZomX0vaMu94fvXzbBaYwqLXI8S2Ox/dXwPsgzX0iiCIuhAXqRPp
+ 7qOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OalDj38vAYtArGZEfUFVIwvsdCbBvjJMoAXbjYxn3eU=;
- b=h2q7a/fm6Td6MGIcROvbzvGr1I9SLOhoM36P48NDMrervzY+ZWN4cpqK3qX/Eelj1S
- T/ZC3Pzzs+i95jillMVJqeHGsupAgZ7FikZ9+J/6drq9fKxGqlltExZ+4IByiHWhpZAA
- uWc5g+tp4GBqjaEW9bpjL/rre81aMci4AbNiFeMIic/PWG4+5Gl4F1006XB3s5kJltT0
- IDmUM2iZy87B3Lk2uH3OEzUfg5eEQRtZW7aP9D1CJLIfM8jkwLKA7kNzlgkjyie+S4mc
- O/uykswYbnzlsbU4BrR3Rt3brroZ86B9GCZgpONJLQXyQhwUjQWyIRX6Mv6DWtJkIIFO
- TZ6A==
-X-Gm-Message-State: APjAAAVsNJydf5R5niinkBBb/IhTjX2QapQt2vD4oUyPkGrzgE8+SH99
- xjlKrxF97gTHjtfvX/rPrDDyT9BV798GvmhrFjGMXg==
-X-Google-Smtp-Source: APXvYqwlR5vwE7Z2LfXeWVegK0lvEoYP1rv3WAQrrYnD7PdShTnN4/buvpJhrxxN+Lkw/MrPdtpvLNU6MFE6mNjODz4=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr42212075otq.221.1582632158436; 
- Tue, 25 Feb 2020 04:02:38 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=SgZvYL+Hn5j8x93NoxwcO2mgPavkLnr8s0tZPnErZBQ=;
+ b=TtUTtN+K+o+WXJGI8e/I+XAb8p3YNDxrrA2jmohIOb9Ra4+Z2dQOpbjW777RqlolIh
+ taDMP4SZ1hP6q1IHJl3Pwn7cz/2OYu3sCrUCV9YAAdulcGcXrS6E2FpYoMJkezoUhTTX
+ MU8mKZ5+jCiEMLaQNsYt5zrTE96JHwO32ooXzdnM1tV6grsMlwR/PczViYnOoHrorFM8
+ q8xNjtau/SJQNHGbYcYx5TEXgWEasolGTwsSNLjJP0DRDQsG+ePfFmIUM6B3RoobV1RA
+ 9lyfiipMPNwDK1aalclUMZtRf6J/c1m6Op4QmXFj/LdbF8KYU1o+9AxBFdEHdALoWMyU
+ 6dxw==
+X-Gm-Message-State: APjAAAWUZ6dM5ZPUPyWpG9jNDtJWz1jz/pmsrROjA1LivhfX2cGVYWFP
+ xFN+dSd++RT8Z8NSb3JQhyHdRXY5
+X-Google-Smtp-Source: APXvYqxxZbOUA1a2cAS4O26cJF06PfQm5n8nDL1AwzghcuS81aaf7lJQuIVWHobctSViWSbDGy8/yQ==
+X-Received: by 2002:a5d:6445:: with SMTP id d5mr72017348wrw.244.1582631511118; 
+ Tue, 25 Feb 2020 03:51:51 -0800 (PST)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.50
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Feb 2020 03:51:50 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 048/136] m68k/mcf5208: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:38 +0100
+Message-Id: <1582631466-13880-48-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20200218190958.745-1-richard.henderson@linaro.org>
-In-Reply-To: <20200218190958.745-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Feb 2020 12:02:27 +0000
-Message-ID: <CAFEAcA8qzoWxZ7ffqBaOqZ8Kicq7Zz43jRwxkyt7gTLy7kBEiQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/7] target/arm: Honor more HCR_EL2 traps
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,31 +93,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Feb 2020 at 19:10, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Based-on: 20200214175116.9164-1-peter.maydell@linaro.org
-> ("arm: ARMv8.1- and v8.4-PMU, ID reg cleanup, [H]ACTLR2")
->
-> Patch 1 is a latent error that I noticed while reviewing
-> Peter's patch set.
->
-> Patches 2 and 3 have already appeared separately on list,
-> with patch 2 bearing a v2.  Thus this patch set is labeled v3.
->
-> Patch 4 is dependant on Peter's [H]ACTLR2 fix, and the reason
-> for the Based-on tag.
+From: Igor Mammedov <imammedo@redhat.com>
 
-I've applied patch 1 to target-arm.next, but feel free
-to keep it in the series if you spin a v4 before I get
-round to doing the next arm pullreq. I've left review
-comments on the rest.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
-thanks
--- PMM
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200219160953.13771-49-imammedo@redhat.com>
+---
+ hw/m68k/mcf5208.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index a999c21..31622c7 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -234,7 +234,6 @@ static void mcf5208evb_init(MachineState *machine)
+     qemu_irq *pic;
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *rom = g_new(MemoryRegion, 1);
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
+ 
+     cpu = M68K_CPU(cpu_create(machine->cpu_type));
+@@ -249,8 +248,7 @@ static void mcf5208evb_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, 0x00000000, rom);
+ 
+     /* DRAM at 0x40000000 */
+-    memory_region_allocate_system_memory(ram, NULL, "mcf5208.ram", ram_size);
+-    memory_region_add_subregion(address_space_mem, 0x40000000, ram);
++    memory_region_add_subregion(address_space_mem, 0x40000000, machine->ram);
+ 
+     /* Internal SRAM.  */
+     memory_region_init_ram(sram, NULL, "mcf5208.sram", 16 * KiB, &error_fatal);
+@@ -354,6 +352,7 @@ static void mcf5208evb_machine_init(MachineClass *mc)
+     mc->init = mcf5208evb_init;
+     mc->is_default = 1;
+     mc->default_cpu_type = M68K_CPU_TYPE_NAME("m5208");
++    mc->default_ram_id = "mcf5208.ram";
+ }
+ 
+ DEFINE_MACHINE("mcf5208evb", mcf5208evb_machine_init)
+-- 
+1.8.3.1
+
+
 
