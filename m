@@ -2,107 +2,74 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AD2C35DFB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6172C35DF9
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88B7920714
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:24:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88B7920714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F1DE20714
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:26:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F1DE20714
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6XOW-0001Wy-On
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:24:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33747)
+	id 1j6XQS-0002ve-NX
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:26:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jjherne@linux.ibm.com>) id 1j6XNq-0000uE-3T
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:24:11 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6XPp-0002GI-5r
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jjherne@linux.ibm.com>) id 1j6XNn-0005VS-RO
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:24:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64822
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
- id 1j6XNn-0005UL-Ml; Tue, 25 Feb 2020 05:24:07 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01PAKFdS120316; Tue, 25 Feb 2020 05:24:05 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yaxt88fck-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 05:24:04 -0500
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01PAKNil121186;
- Tue, 25 Feb 2020 05:24:04 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yaxt88fa1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 05:24:04 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01PAA33j025288;
- Tue, 25 Feb 2020 10:23:58 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma03wdc.us.ibm.com with ESMTP id 2yaux6b24b-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 10:23:58 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01PANvpi49873384
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 25 Feb 2020 10:23:57 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 36EF56E054;
- Tue, 25 Feb 2020 10:23:57 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BEA276E04C;
- Tue, 25 Feb 2020 10:23:56 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.188.183])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 25 Feb 2020 10:23:56 +0000 (GMT)
-Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, cohuck@redhat.com
-References: <20200205182126.13010-1-jjherne@linux.ibm.com>
- <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
- <bf3f44b5-f0fe-59f4-9152-54edd8c9822e@linux.ibm.com>
- <941cc201-4c33-0ad3-ecc8-eab2709d350d@de.ibm.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-Message-ID: <91910082-ffeb-c588-7434-3de5fbfcbfa6@linux.ibm.com>
-Date: Tue, 25 Feb 2020 05:23:56 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6XPn-0006Gi-TG
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:26:13 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:39366 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j6XPk-0006ED-PB; Tue, 25 Feb 2020 05:26:09 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 92BFCEE6EE1832367D8B;
+ Tue, 25 Feb 2020 18:26:02 +0800 (CST)
+Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 25 Feb 2020 18:26:02 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
+ dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0439.000;
+ Tue, 25 Feb 2020 18:25:51 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org"
+ <qemu-trivial@nongnu.org>
+Subject: RE: [PATCH 09/13] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+Thread-Topic: [PATCH 09/13] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+Thread-Index: AQHV64DJX5oKQCUBD0CAP5e60Hgha6grIPsAgACILuD//4G4AIAAh5mQ
+Date: Tue, 25 Feb 2020 10:25:51 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B661C30@dggemm531-mbx.china.huawei.com>
+References: <20200225020937.25028-1-kuhn.chenqun@huawei.com>
+ <20200225020937.25028-10-kuhn.chenqun@huawei.com>
+ <6d31ac16-adc6-235e-8784-51bf86e33b72@redhat.com>
+ <7412CDE03601674DA8197E2EBD8937E83B661BD7@dggemm531-mbx.china.huawei.com>
+ <8ceb7ecc-8edc-0ced-8171-6200ded0dd05@redhat.com>
+In-Reply-To: <8ceb7ecc-8edc-0ced-8171-6200ded0dd05@redhat.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <941cc201-4c33-0ad3-ecc8-eab2709d350d@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-25_02:2020-02-21,
- 2020-02-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 mlxscore=0
- adultscore=0 phishscore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 bulkscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002250083
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id 01PAKFdS120316
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.255
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,99 +81,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: jjherne@linux.ibm.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/13/20 1:24 PM, Christian Borntraeger wrote:
-...
->>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.=
-c
->>> index da13c43cc0..8839226803 100644
->>> --- a/pc-bios/s390-ccw/jump2ipl.c
->>> +++ b/pc-bios/s390-ccw/jump2ipl.c
->>> @@ -18,6 +18,7 @@
->>>  =C2=A0 typedef struct ResetInfo {
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t ipl_psw;
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t ipl_continue;
->>> +=C2=A0=C2=A0=C2=A0 uint32_t pad;
->>>  =C2=A0 } ResetInfo;
->>>  =C2=A0 =C2=A0 static ResetInfo save;
->>>
->>>
->>> also work? If yes, both variants are valid. Either packed or explicit=
- padding.
->>>
->>
->> I don't believe this will work. I think the problem is that we're over=
-writing too much memory when we cast address 0 as a ResetInfo and then ov=
-erwrite it (*current =3D save). I think we need the struct to be sized at=
- 12-bytes instead of 16.
->>
->=20
-> The idea of the code is that we _save_ the original content from addres=
-s 0 to save and _restore_ it before jumping into final code. I do not yet=
- understand why this does not work.
->=20
-
-I've found the real problem here. Legacy operating systems that expect to=
- start
-in 32-bit addressing mode can fail if we leave junk in the high halves of=
- our
-64-bit registers. This is because some instructions (LA for example) are
-bi-modal and operate differently depending on the machine's current addre=
-ssing
-mode.
-
-In the case where we pack the struct, the compiler happens to use the mvc
-instruction to load/store the current/save memory areas.
-
-       *current =3D save;
-   1fc:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
-   202:	c0 20 00 00 00 00 	larl	%r2,202 <jump_to_IPL_2+0x32>
-			204: R_390_PC32DBL	.bss+0x2
-   208:	d2 0b 10 00 20 00 	mvc	0(12,%r1),0(%r2)
-
-Everything works as expected here, our legacy OS boots without issue.
-However, in the case where we've packed this struct the compiler optimize=
-s the
-code and uses lmg/stmg instead of mvc to copy the data:
-
-       *current =3D save;
-   1fc:	e3 10 b0 a8 00 04 	lg	%r1,168(%r11)
-   202:	c0 20 00 00 00 00 	larl	%r2,202 <jump_to_IPL_2+0x32>
-			204: R_390_PC32DBL	.bss+0x2
-   208:	eb 23 20 00 00 04 	lmg	%r2,%r3,0(%r2)
-   20e:	eb 23 10 00 00 24 	stmg	%r2,%r3,0(%r1)
-
-Depending on the data being copied, the high halves of the registers may =
-contain
-non-zero values. Example:
-
-     r2             0x108000080000780        74309395999098752
-     r3             0x601001800004368        432627142283510632
-
-So, by sheer luck of the generated assembler, the patch happens to "fix" =
-the
-problem.  A real fix might be to insert inline assembler that clears the =
-high
-halves of the registers before we call ipl() in jump_to_IPL_2(). Can we t=
-hink of
-a better way to do that than 15 LLGTR instructions? :) Let me know your
-thoughts.
-
-jump_to_IPL_2 for easy reference:
-     static void jump_to_IPL_2(void)
-     {
-         ResetInfo *current =3D 0;
-
-         void (*ipl)(void) =3D (void *) (uint64_t) current->ipl_continue;
-         *current =3D save;
-         ipl(); /* should not return */
-     }
-
-
---=20
--- Jason J. Herne (jjherne@linux.ibm.com)
+DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IFBoaWxpcHBlIE1hdGhpZXUt
+RGF1ZMOpIFttYWlsdG86cGhpbG1kQHJlZGhhdC5jb21dDQo+U2VudDogVHVlc2RheSwgRmVicnVh
+cnkgMjUsIDIwMjAgNjoxMiBQTQ0KPlRvOiBDaGVucXVuIChrdWhuKSA8a3Vobi5jaGVucXVuQGh1
+YXdlaS5jb20+OyBxZW11LQ0KPmRldmVsQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlhbEBub25nbnUu
+b3JnDQo+Q2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgWmhhbmdoYWlsaWFuZw0KPjx6aGFu
+Zy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpckBh
+bGlzdGFpcjIzLm1lPjsNCj5xZW11LWFybUBub25nbnUub3JnDQo+U3ViamVjdDogUmU6IFtQQVRD
+SCAwOS8xM10gZG1hL3hsbngtemRtYTogUmVtb3ZlIHJlZHVuZGFudCBzdGF0ZW1lbnQgaW4NCj56
+ZG1hX3dyaXRlX2RzdCgpDQo+DQo+T24gMi8yNS8yMCAxMTowMSBBTSwgQ2hlbnF1biAoa3Vobikg
+d3JvdGU6DQo+Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4+PiBGcm9tOiBQaGlsaXBw
+ZSBNYXRoaWV1LURhdWTDqSBbbWFpbHRvOnBoaWxtZEByZWRoYXQuY29tXQ0KPj4+IFNlbnQ6IFR1
+ZXNkYXksIEZlYnJ1YXJ5IDI1LCAyMDIwIDU6MzYgUE0NCj4+PiBUbzogQ2hlbnF1biAoa3Vobikg
+PGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPjsgcWVtdS0NCj5kZXZlbEBub25nbnUub3JnOw0KPj4+
+IHFlbXUtdHJpdmlhbEBub25nbnUub3JnDQo+Pj4gQ2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9y
+ZzsgWmhhbmdoYWlsaWFuZw0KPj4+IDx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBB
+bGlzdGFpciBGcmFuY2lzDQo+Pj4gPGFsaXN0YWlyQGFsaXN0YWlyMjMubWU+OyBxZW11LWFybUBu
+b25nbnUub3JnDQo+Pj4gU3ViamVjdDogUmU6IFtQQVRDSCAwOS8xM10gZG1hL3hsbngtemRtYTog
+UmVtb3ZlIHJlZHVuZGFudCBzdGF0ZW1lbnQNCj4+PiBpbg0KPj4+IHpkbWFfd3JpdGVfZHN0KCkN
+Cj4+Pg0KPj4+IE9uIDIvMjUvMjAgMzowOSBBTSwga3Vobi5jaGVucXVuQGh1YXdlaS5jb20gd3Jv
+dGU6DQo+Pj4+IEZyb206IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+Pj4N
+Cj4+Pj4gQ2xhbmcgc3RhdGljIGNvZGUgYW5hbHl6ZXIgc2hvdyB3YXJuaW5nOg0KPj4+PiBody9k
+bWEveGxueC16ZG1hLmM6Mzk5OjEzOiB3YXJuaW5nOiBWYWx1ZSBzdG9yZWQgdG8gJ2RzdF90eXBl
+JyBpcw0KPj4+PiBuZXZlcg0KPj4+IHJlYWQNCj4+Pj4gICAgICAgICAgICAgICBkc3RfdHlwZSA9
+IEZJRUxEX0VYMzIocy0+ZHNjX2RzdC53b3Jkc1szXSwNCj4+PiBaRE1BX0NIX0RTVF9EU0NSX1dP
+UkQzLA0KPj4+PiAgICAgICAgICAgICAgIF4NCj4+PiB+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+Pj4+DQo+Pj4+IFJlcG9ydGVkLWJ5OiBF
+dWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4+Pj4gU2lnbmVkLW9mZi1ieTog
+Q2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPj4+PiAtLS0NCj4+Pj4gQ2M6IEFs
+aXN0YWlyIEZyYW5jaXMgPGFsaXN0YWlyQGFsaXN0YWlyMjMubWU+DQo+Pj4+IENjOiAiRWRnYXIg
+RS4gSWdsZXNpYXMiIDxlZGdhci5pZ2xlc2lhc0BnbWFpbC5jb20+DQo+Pj4+IENjOiBQZXRlciBN
+YXlkZWxsIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+DQo+Pj4+IENjOiBxZW11LWFybUBub25n
+bnUub3JnDQo+Pj4+IC0tLQ0KPj4+PiAgICBody9kbWEveGxueC16ZG1hLmMgfCAyIC0tDQo+Pj4+
+ICAgIDEgZmlsZSBjaGFuZ2VkLCAyIGRlbGV0aW9ucygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0
+IGEvaHcvZG1hL3hsbngtemRtYS5jIGIvaHcvZG1hL3hsbngtemRtYS5jIGluZGV4DQo+Pj4+IDhm
+YjgzZjViMDcuLjQ1MzU1YzVkNTkgMTAwNjQ0DQo+Pj4+IC0tLSBhL2h3L2RtYS94bG54LXpkbWEu
+Yw0KPj4+PiArKysgYi9ody9kbWEveGxueC16ZG1hLmMNCj4+Pj4gQEAgLTM5Niw4ICszOTYsNiBA
+QCBzdGF0aWMgdm9pZCB6ZG1hX3dyaXRlX2RzdChYbG54WkRNQSAqcywgdWludDhfdA0KPj4+ICpi
+dWYsIHVpbnQzMl90IGxlbikNCj4+Pj4gICAgICAgICAgICAgICAgemRtYV9sb2FkX2Rlc2NyaXB0
+b3IocywgbmV4dCwgJnMtPmRzY19kc3QpOw0KPj4+PiAgICAgICAgICAgICAgICBkc3Rfc2l6ZSA9
+IEZJRUxEX0VYMzIocy0+ZHNjX2RzdC53b3Jkc1syXSwNCj4+PiBaRE1BX0NIX0RTVF9EU0NSX1dP
+UkQyLA0KPj4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU0laRSk7DQo+
+Pj4+IC0gICAgICAgICAgICBkc3RfdHlwZSA9IEZJRUxEX0VYMzIocy0+ZHNjX2RzdC53b3Jkc1sz
+XSwNCj4+PiBaRE1BX0NIX0RTVF9EU0NSX1dPUkQzLA0KPj4+PiAtICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFRZUEUpOw0KPj4+DQo+Pj4gTWF5YmUgbW92ZSBkc3RfdHlwZSB0byB0
+aGlzIGlmKCkgc3RhdGVtZW50IG5vdz8NCj4+Pg0KPj4gU29ycnksIEkgZG9uJ3QgZm9sbG93IHlv
+dS4gICBJIGRpZG4ndCBmaW5kIHdoZXJlIEkgY291bGQgbW92ZSBkc3RfdHlwZS4NCj4+IERvIHlv
+dSBtZWFuIHRvIG1vdmUgdGhlIGZpcnN0IGRzdF90eXBlIHRvIHRoZSBpZigpLg0KPj4gTW9kaWZ5
+IGl0IGxpa2UgdGhpczoNCj4+ICAgICAgd2hpbGUgKGxlbikgew0KPj4gICAgICAgICAgZHN0X3Np
+emUgPSBGSUVMRF9FWDMyKHMtPmRzY19kc3Qud29yZHNbMl0sDQo+WkRNQV9DSF9EU1RfRFNDUl9X
+T1JEMiwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBTSVpFKTsNCj4+ICAgICAg
+ICAgIGlmIChkc3Rfc2l6ZSA9PSAwICYmIHB0eXBlID09IFBUX01FTSkgew0KPj4gICAgICAgICAg
+ICAgIHVpbnQ2NF90IG5leHQ7DQo+PiAgICAgICAgICAgICAgZHN0X3R5cGUgPSBGSUVMRF9FWDMy
+KHMtPmRzY19kc3Qud29yZHNbM10sDQo+WkRNQV9DSF9EU1RfRFNDUl9XT1JEMywNCj4+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBUWVBFKTsNCj4+ICAgICAgICAgICAgICBuZXh0ID0g
+emRtYV91cGRhdGVfZGVzY3JfYWRkcihzLCBkc3RfdHlwZSwNCj4+ICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBSX1pETUFfQ0hfRFNUX0NVUl9EU0NSX0xTQik7DQo+
+PiAgICAgICAgICAgICAgemRtYV9sb2FkX2Rlc2NyaXB0b3IocywgbmV4dCwgJnMtPmRzY19kc3Qp
+Ow0KPj4gICAgICAgICAgICAgIGRzdF9zaXplID0gRklFTERfRVgzMihzLT5kc2NfZHN0LndvcmRz
+WzJdLA0KPlpETUFfQ0hfRFNUX0RTQ1JfV09SRDIsDQo+PiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIFNJWkUpOw0KPj4gICAgICAgICAgfQ0KPj4gICAgICAgICAuLi4NCj4+ICAg
+ICB9DQo+DQo+Tm8sIGxpa2UgdGhpczoNCj4NCj4tLSA+OCAtLQ0KPkBAIC0zNzMsNyArMzczLDcg
+QEAgc3RhdGljIHVpbnQ2NF90IHpkbWFfdXBkYXRlX2Rlc2NyX2FkZHIoWGxueFpETUENCj4qcywg
+Ym9vbCB0eXBlLA0KPiAgc3RhdGljIHZvaWQgemRtYV93cml0ZV9kc3QoWGxueFpETUEgKnMsIHVp
+bnQ4X3QgKmJ1ZiwgdWludDMyX3QgbGVuKQ0KPiAgew0KPiAgICAgIHVpbnQzMl90IGRzdF9zaXpl
+LCBkbGVuOw0KPi0gICAgYm9vbCBkc3RfaW50ciwgZHN0X3R5cGU7DQo+KyAgICBib29sIGRzdF9p
+bnRyOw0KPiAgICAgIHVuc2lnbmVkIGludCBwdHlwZSA9IEFSUkFZX0ZJRUxEX0VYMzIocy0+cmVn
+cywgWkRNQV9DSF9DVFJMMCwNCj5QT0lOVF9UWVBFKTsNCj4gICAgICB1bnNpZ25lZCBpbnQgcndf
+bW9kZSA9IEFSUkFZX0ZJRUxEX0VYMzIocy0+cmVncywgWkRNQV9DSF9DVFJMMCwNCj5NT0RFKTsN
+Cj4gICAgICB1bnNpZ25lZCBpbnQgYnVyc3RfdHlwZSA9IEFSUkFZX0ZJRUxEX0VYMzIocy0+cmVn
+cywNCj5aRE1BX0NIX0RBVEFfQVRUUiwgQEAgLTM4NywxNyArMzg3LDE3IEBAIHN0YXRpYyB2b2lk
+DQo+emRtYV93cml0ZV9kc3QoWGxueFpETUEgKnMsIHVpbnQ4X3QgKmJ1ZiwgdWludDMyX3QgbGVu
+KQ0KPiAgICAgIHdoaWxlIChsZW4pIHsNCj4gICAgICAgICAgZHN0X3NpemUgPSBGSUVMRF9FWDMy
+KHMtPmRzY19kc3Qud29yZHNbMl0sDQo+WkRNQV9DSF9EU1RfRFNDUl9XT1JEMiwNCj4gICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIFNJWkUpOw0KPi0gICAgICAgIGRzdF90eXBlID0gRklF
+TERfRVgzMihzLT5kc2NfZHN0LndvcmRzWzNdLA0KPlpETUFfQ0hfRFNUX0RTQ1JfV09SRDMsDQo+
+LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFRZUEUpOw0KPiAgICAgICAgICBpZiAoZHN0
+X3NpemUgPT0gMCAmJiBwdHlwZSA9PSBQVF9NRU0pIHsNCj4gICAgICAgICAgICAgIHVpbnQ2NF90
+IG5leHQ7DQo+KyAgICAgICAgICAgIGJvb2wgZHN0X3R5cGU7DQo+Kw0KPisgICAgICAgICAgICBk
+c3RfdHlwZSA9IEZJRUxEX0VYMzIocy0+ZHNjX2RzdC53b3Jkc1szXSwNCj5aRE1BX0NIX0RTVF9E
+U0NSX1dPUkQzLA0KPisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVFlQRSk7DQo+
+ICAgICAgICAgICAgICBuZXh0ID0gemRtYV91cGRhdGVfZGVzY3JfYWRkcihzLCBkc3RfdHlwZSwN
+Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFJfWkRNQV9DSF9E
+U1RfQ1VSX0RTQ1JfTFNCKTsNCj4gICAgICAgICAgICAgIHpkbWFfbG9hZF9kZXNjcmlwdG9yKHMs
+IG5leHQsICZzLT5kc2NfZHN0KTsNCj4gICAgICAgICAgICAgIGRzdF9zaXplID0gRklFTERfRVgz
+MihzLT5kc2NfZHN0LndvcmRzWzJdLA0KPlpETUFfQ0hfRFNUX0RTQ1JfV09SRDIsDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU0laRSk7DQo+LSAgICAgICAgICAgIGRzdF90
+eXBlID0gRklFTERfRVgzMihzLT5kc2NfZHN0LndvcmRzWzNdLA0KPlpETUFfQ0hfRFNUX0RTQ1Jf
+V09SRDMsDQo+LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBUWVBFKTsNCj4gICAg
+ICAgICAgfQ0KSG1tLCAgdGhpcyBpcyBiZXR0ZXIuIA0KSSB3aWxsIG1vZGlmeSBpdCBsYXRlciBp
+biBWMi4NCg0KVGhhbmtzLg0KPi0tLQ0KDQo=
 
