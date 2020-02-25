@@ -2,80 +2,100 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED02C35DEA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E25EC35DEA
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:13:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 297CB20732
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:11:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vXBzamBo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297CB20732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 711AD21927
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:13:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711AD21927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NoX-0004gv-9p
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 19:11:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50938)
+	id 1j6NrI-00066j-NX
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 19:13:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j6Nnl-00043z-75
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:10:19 -0500
+ (envelope-from <farosas@linux.ibm.com>) id 1j6NqY-0005Hh-Sw
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j6Nnj-0007cP-8O
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:10:17 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44928)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j6Nni-0007bl-RJ; Mon, 24 Feb 2020 19:10:15 -0500
-Received: by mail-lj1-x241.google.com with SMTP id q8so12045543ljj.11;
- Mon, 24 Feb 2020 16:10:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2CU5awjyWBi7wI0IEPR/D7QgQQ8EIg4J7okTZYOGlIg=;
- b=vXBzamBoABysVly6Fjb1iybYA5cyMfgOGHz5BNKgjq6pniLMnT91XG+YAwCLKich8n
- hV6o6gwKN9NdKkBfuf4oBRbgAQDK/PGQOzMAgP+4nmy5WvP5Dgc6YMYk0Bcm/zcm20Cp
- H4ld5n7mqw5odwqQnOhxO890hC6q/ILdOY0dz9wQEED6LWBv4dZhA983pwSqz9rLb1Uo
- IcXyc8PtlGXP9svMvKd4wKIstQE7/hewM+6iQsOKLXEHf0y4xMO3iMI7ktRNwaGNllZz
- 17fmhBSrSiOTMNBoxim3I0ImwzH1Q1Fua6ZtfAG6+xgvqvzeTvpax/GmqpWGM5GiyXph
- ku9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2CU5awjyWBi7wI0IEPR/D7QgQQ8EIg4J7okTZYOGlIg=;
- b=XDB2SHZHfSjYdEbON3g1/gCbSBnovT7qM1KNIYc7/WGhAWy2AkoK5o0QBPDwmoHsbP
- aPNgfSN6dEq5+3zCjeWq3aPNNpkL1dhum08PmacnIoOsW/Sg8DRLjs1VNsqY8uivRN2Y
- bCdXPIK9dJpEzZz6gRenGYyip+MhSWxsP6y5UkG1/X/KlC9XdzLQLPX5gaLYSsyNGtJA
- +PnPNck3oMBtd7U372QvmGky404wfgZGgK3NR5+88vKybKbqK+E8FNbPh7/gq27a0rZS
- A+mBI8CjiUlt40A/LUpjNOjK35WtBYqVHvLMd+Zk0CncLxSF8rurg0Q4LhY+J/d+JWYw
- I+Jg==
-X-Gm-Message-State: APjAAAVQc2/fmA03NkD/nUoXBiEdh5yBFa9dS7O9tB4YaEowt9lxOYEb
- OHUIzBXQhKKxRN8FERQdYvq+DDfGXqSoEU9nJqk=
-X-Google-Smtp-Source: APXvYqw2eIPhuI3fG0BPMlRQI9hqHsZcfrWDMyHbo/HwnI3w5d65Kthu+u50Uh+FewBw5JykheeMILfiJ597rEiYBj0=
-X-Received: by 2002:a2e:b4ac:: with SMTP id q12mr29876885ljm.285.1582589413132; 
- Mon, 24 Feb 2020 16:10:13 -0800 (PST)
+ (envelope-from <farosas@linux.ibm.com>) id 1j6NqW-00014E-Sg
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62012
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
+ id 1j6NqW-000144-Nw; Mon, 24 Feb 2020 19:13:08 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01P04Agc120189; Mon, 24 Feb 2020 19:13:00 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1as190w-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Feb 2020 19:13:00 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01P0D0AH137248;
+ Mon, 24 Feb 2020 19:13:00 -0500
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1as190k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Feb 2020 19:13:00 -0500
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01P09sct027505;
+ Tue, 25 Feb 2020 00:12:59 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma04wdc.us.ibm.com with ESMTP id 2yaux6qq90-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 25 Feb 2020 00:12:59 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01P0Cw1q56492404
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 25 Feb 2020 00:12:58 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 430A3C605D;
+ Tue, 25 Feb 2020 00:12:58 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 840E6C6059;
+ Tue, 25 Feb 2020 00:12:57 +0000 (GMT)
+Received: from localhost (unknown [9.85.139.151])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Tue, 25 Feb 2020 00:12:57 +0000 (GMT)
+From: Fabiano Rosas <farosas@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org,
+ qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Subject: Re: [PATCH v6 05/18] target/ppc: Introduce ppc_hash64_use_vrma()
+ helper
+In-Reply-To: <20200224233724.46415-6-david@gibson.dropbear.id.au>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-6-david@gibson.dropbear.id.au>
+Date: Mon, 24 Feb 2020 21:12:53 -0300
+Message-ID: <87o8tn5xtm.fsf@linux.ibm.com>
 MIME-Version: 1.0
-References: <20200224170301.246623-1-damien.hedde@greensocs.com>
- <20200224170301.246623-2-damien.hedde@greensocs.com>
-In-Reply-To: <20200224170301.246623-2-damien.hedde@greensocs.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 24 Feb 2020 16:02:38 -0800
-Message-ID: <CAKmqyKP1LR3e5TmUvNWKub21sA7q6u2fK=saEH93i64furcpTQ@mail.gmail.com>
-Subject: Re: [PATCH v7 1/9] hw/core/clock: introduce clock object
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-24_12:2020-02-21,
+ 2020-02-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 adultscore=0
+ phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0 spamscore=0
+ suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002240181
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,467 +107,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, paulus@samba.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 24, 2020 at 9:05 AM Damien Hedde <damien.hedde@greensocs.com> wrote:
+David Gibson <david@gibson.dropbear.id.au> writes:
+
+> When running guests under a hypervisor, the hypervisor obviously needs to
+> be protected from guest accesses even if those are in what the guest
+> considers real mode (translation off).  The POWER hardware provides two
+> ways of doing that: The old way has guest real mode accesses simply offset
+> and bounds checked into host addresses.  It works, but requires that a
+> significant chunk of the guest's memory - the RMA - be physically
+> contiguous in the host, which is pretty inconvenient.  The new way, known
+> as VRMA, has guest real mode accesses translated in roughly the normal way
+> but with some special parameters.
 >
-> This object may be used to represent a clock inside a clock tree.
+> In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes, b=
+ut
+> in POWER9 only VRMA mode is supported and LPCR[VPM0] no longer exists.  We
+> handle that difference in behaviour in ppc_hash64_set_isi().. but not in
+> other places that we blindly check LPCR[VPM0].
 >
-> A clock may be connected to another clock so that it receives update,
-> through a callback, whenever the source/parent clock is updated.
+> Correct those instances with a new helper to tell if we should be in VRMA
+> mode.
 >
-> Although only the root clock of a clock tree controls the values
-> (represented as periods) of all clocks in tree, each clock holds
-> a local state containing the current value so that it can be fetched
-> independently. It will allows us to fullfill migration requirements
-> by migrating each clock independently of others.
->
-> This is based on the original work of Frederic Konrad.
->
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> --
->
-> v7:
-> + merge ClockIn & ClockOut into a single type Clock
-> + switch clock state to a period with 2^-32ns unit
-> + add some Hz and ns helpers
-> + propagate clock period when setting the source so that
->   clocks with fixed period are easy to handle.
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+
 > ---
->  include/hw/clock.h    | 216 ++++++++++++++++++++++++++++++++++++++++++
->  hw/core/clock.c       | 131 +++++++++++++++++++++++++
->  hw/core/Makefile.objs |   2 +
->  hw/core/trace-events  |   7 ++
->  4 files changed, 356 insertions(+)
->  create mode 100644 include/hw/clock.h
->  create mode 100644 hw/core/clock.c
+>  target/ppc/mmu-hash64.c | 43 ++++++++++++++++++++---------------------
+>  1 file changed, 21 insertions(+), 22 deletions(-)
 >
-> diff --git a/include/hw/clock.h b/include/hw/clock.h
-> new file mode 100644
-> index 0000000000..30ac9a9946
-> --- /dev/null
-> +++ b/include/hw/clock.h
-> @@ -0,0 +1,216 @@
-> +/*
-> + * Hardware Clocks
-> + *
-> + * Copyright GreenSocs 2016-2020
-> + *
-> + * Authors:
-> + *  Frederic Konrad
-> + *  Damien Hedde
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef QEMU_HW_CLOCK_H
-> +#define QEMU_HW_CLOCK_H
-> +
-> +#include "qom/object.h"
-> +#include "qemu/queue.h"
-> +
-> +#define TYPE_CLOCK "clock"
-> +#define CLOCK(obj) OBJECT_CHECK(Clock, (obj), TYPE_CLOCK)
-> +
-> +typedef void ClockCallback(void *opaque);
-> +
-> +/*
-> + * clock store a value representing the clock's period in 2^-32ns unit.
-> + * It can represent:
-> + *  + periods from 2^-32ns up to 4seconds
-> + *  + frequency from ~0.25Hz 2e10Ghz
-> + * Resolution of frequency representation decreases with frequency:
-> + * + at 100MHz, resolution is ~2mHz
-> + * + at 1Ghz,   resolution is ~0.2Hz
-> + * + at 10Ghz,  resolution is ~20Hz
-> + */
-> +#define CLOCK_SECOND (1000000000llu << 32)
-> +
-> +/*
-> + * macro helpers to convert to hertz / nanosecond
-> + */
-> +#define CLOCK_PERIOD_FROM_NS(ns) ((ns) * (CLOCK_SECOND / 1000000000llu))
-> +#define CLOCK_PERIOD_TO_NS(per) ((per) / (CLOCK_SECOND / 1000000000llu))
-> +#define CLOCK_PERIOD_FROM_HZ(hz) (((hz) != 0) ? CLOCK_SECOND / (hz) : 0u)
-> +#define CLOCK_PERIOD_TO_HZ(per) (((per) != 0) ? CLOCK_SECOND / (per) : 0u)
-> +
-> +/**
-> + * Clock:
-> + * @parent_obj: parent class
-> + * @period: unsigned integer representing the period of the clock
-> + * @canonical_path: clock path string cache (used for trace purpose)
-> + * @callback: called when clock changes
-> + * @callback_opaque: argument for @callback
-> + * @source: source (or parent in clock tree) of the clock
-> + * @children: list of clocks connected to this one (it is their source)
-> + * @sibling: structure used to form a clock list
-> + */
-> +
-> +typedef struct Clock Clock;
-> +
-> +struct Clock {
-> +    /*< private >*/
-> +    Object parent_obj;
-> +
-> +    /* all fields are private and should not be modified directly */
-> +
-> +    /* fields */
-> +    uint64_t period;
-> +    char *canonical_path;
-> +    ClockCallback *callback;
-> +    void *callback_opaque;
-> +
-> +    /* Clocks are organized in a clock tree */
-> +    Clock *source;
-> +    QLIST_HEAD(, Clock) children;
-> +    QLIST_ENTRY(Clock) sibling;
-> +};
-> +
-> +/**
-> + * clock_setup_canonical_path:
-> + * @clk: clock
-> + *
-> + * compute the canonical path of the clock (used by log messages)
-> + */
-> +void clock_setup_canonical_path(Clock *clk);
-> +
-> +/**
-> + * clock_add_callback:
-
-s/clock_add_callback/clock_set_callback/g
-
-> + * @clk: the clock to register the callback into
-> + * @cb: the callback function
-> + * @opaque: the argument to the callback
-> + *
-> + * Register a callback called on every clock update.
-> + */
-> +void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque);
-> +
-> +/**
-> + * clock_clear_callback:
-> + * @clk: the clock to delete the callback from
-> + *
-> + * Unregister the callback registered with clock_set_callback.
-> + */
-> +void clock_clear_callback(Clock *clk);
-> +
-> +/**
-> + * clock_set_source:
-> + * @clk: the clock.
-> + * @src: the source clock
-> + *
-> + * Setup @src as the clock source of @clk. The current @src period
-> + * value is also copied to @clk and its subtree but not callback is
-
-s/not/no/g
-
-> + * called.
-> + * Further @src update will be propagated to @clk and its subtree.
-> + */
-> +void clock_set_source(Clock *clk, Clock *src);
-> +
-> +/**
-> + * clock_set:
-> + * @clk: the clock to initialize.
-> + * @value: the clock's value, 0 means unclocked
-> + *
-> + * Set the local cached period value of @clk to @value.
-> + */
-> +void clock_set(Clock *clk, uint64_t value);
-> +
-> +static inline void clock_set_hz(Clock *clk, unsigned hz)
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 392f90e0ae..e372c42add 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -668,6 +668,21 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU=
+ *cpu,
+>      return 0;
+>  }
+>=20=20
+> +static bool ppc_hash64_use_vrma(CPUPPCState *env)
 > +{
-> +    clock_set(clk, CLOCK_PERIOD_FROM_HZ(hz));
-> +}
+> +    switch (env->mmu_model) {
+> +    case POWERPC_MMU_3_00:
+> +        /*
+> +         * ISAv3.0 (POWER9) always uses VRMA, the VPM0 field and RMOR
+> +         * register no longer exist
+> +         */
+> +        return true;
 > +
-> +static inline void clock_set_ns(Clock *clk, unsigned ns)
-> +{
-> +    clock_set(clk, CLOCK_PERIOD_FROM_NS(ns));
-> +}
-> +
-> +/**
-> + * clock_propagate:
-> + * @clk: the clock
-> + *
-> + * Propagate the clock period that has been previsouly configured using
-
-s/previsouly/previously/g
-
-> + * @clock_set(). This will update recursively all connected clocks.
-> + * It is an error to call this function on a clock which has a source.
-> + * Note: this function must not be called during device inititialization
-> + * or migration.
-> + */
-> +void clock_propagate(Clock *clk);
-> +
-> +/**
-> + * clock_update:
-> + * @clk: the clock to update.
-> + * @value: the new clock's value, 0 means unclocked
-> + *
-> + * Update the @clk to the new @value. All connected clocks will be informed
-> + * of this update. This is equivalent to call @clock_set() then
-> + * @clock_propagate().
-> + */
-> +static inline void clock_update(Clock *clk, uint64_t value)
-> +{
-> +    clock_set(clk, value);
-> +    clock_propagate(clk);
-> +}
-> +
-> +static inline void clock_update_hz(Clock *clk, unsigned hz)
-> +{
-> +    clock_update(clk, CLOCK_PERIOD_FROM_HZ(hz));
-> +}
-> +
-> +static inline void clock_update_ns(Clock *clk, unsigned ns)
-> +{
-> +    clock_update(clk, CLOCK_PERIOD_FROM_NS(ns));
-> +}
-> +
-> +/**
-> + * clock_get:
-> + * @clk: the clk to fetch the clock
-> + *
-> + * @return: the current period.
-> + */
-> +static inline uint64_t clock_get(const Clock *clk)
-> +{
-> +    return clk->period;
-> +}
-> +
-> +static inline unsigned clock_get_hz(Clock *clk)
-> +{
-> +    return CLOCK_PERIOD_TO_HZ(clock_get(clk));
-> +}
-> +
-> +static inline unsigned clock_get_ns(Clock *clk)
-> +{
-> +    return CLOCK_PERIOD_TO_NS(clock_get(clk));
-> +}
-> +
-> +/**
-> + * clock_is_enabled:
-> + * @clk: a clock
-> + *
-> + * @return: true if the clock is running.
-> + */
-> +static inline bool clock_is_enabled(const Clock *clk)
-> +{
-> +    return clock_get(clk) != 0;
-> +}
-> +
-> +static inline void clock_init(Clock *clk, uint64_t value)
-> +{
-> +    clock_set(clk, value);
-> +}
-> +static inline void clock_init_hz(Clock *clk, uint64_t value)
-> +{
-> +    clock_set_hz(clk, value);
-> +}
-> +static inline void clock_init_ns(Clock *clk, uint64_t value)
-> +{
-> +    clock_set_ns(clk, value);
-> +}
-> +
-> +#endif /* QEMU_HW_CLOCK_H */
-> diff --git a/hw/core/clock.c b/hw/core/clock.c
-> new file mode 100644
-> index 0000000000..4ba5765b05
-> --- /dev/null
-> +++ b/hw/core/clock.c
-> @@ -0,0 +1,131 @@
-> +/*
-> + * Hardware Clocks
-> + *
-> + * Copyright GreenSocs 2016-2020
-> + *
-> + * Authors:
-> + *  Frederic Konrad
-> + *  Damien Hedde
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/clock.h"
-> +#include "trace.h"
-> +
-> +#define CLOCK_PATH(_clk) (_clk->canonical_path)
-> +
-> +void clock_setup_canonical_path(Clock *clk)
-> +{
-> +    g_free(clk->canonical_path);
-> +    clk->canonical_path = object_get_canonical_path(OBJECT(clk));
-> +}
-> +
-> +void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
-> +{
-> +    clk->callback = cb;
-> +    clk->callback_opaque = opaque;
-> +}
-> +
-> +void clock_clear_callback(Clock *clk)
-> +{
-> +    clock_set_callback(clk, NULL, NULL);
-> +}
-> +
-> +void clock_set(Clock *clk, uint64_t period)
-> +{
-> +    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_NS(clk->period),
-> +                    CLOCK_PERIOD_TO_NS(period));
-> +    clk->period = period;
-> +}
-> +
-> +static void clock_propagate_period(Clock *clk, bool call_callbacks)
-> +{
-> +    Clock *child;
-> +
-> +    QLIST_FOREACH(child, &clk->children, sibling) {
-> +        if (child->period != clk->period) {
-> +            child->period = clk->period;
-> +            trace_clock_update(CLOCK_PATH(child), CLOCK_PATH(clk),
-> +                               CLOCK_PERIOD_TO_NS(clk->period),
-> +                               call_callbacks);
-> +            if (call_callbacks && child->callback) {
-> +                child->callback(child->callback_opaque);
-> +            }
-> +            clock_propagate_period(child, call_callbacks);
-> +        }
+> +    default:
+> +        return !!(env->spr[SPR_LPCR] & LPCR_VPM0);
 > +    }
 > +}
 > +
-> +void clock_propagate(Clock *clk)
-> +{
-> +    assert(clk->source == NULL);
-> +    trace_clock_propagate(CLOCK_PATH(clk));
-> +    clock_propagate_period(clk, true);
-> +}
-> +
-> +void clock_set_source(Clock *clk, Clock *src)
-> +{
-> +    /* changing clock source is not supported */
-> +    assert(!clk->source);
-> +
-> +    trace_clock_set_source(CLOCK_PATH(clk), CLOCK_PATH(src));
-> +
-> +    clk->period = src->period;
-> +    QLIST_INSERT_HEAD(&src->children, clk, sibling);
-> +    clk->source = src;
-> +    clock_propagate_period(clk, false);
-> +}
-> +
-> +static void clock_disconnect(Clock *clk)
-> +{
-> +    if (clk->source == NULL) {
-> +        return;
-> +    }
-> +
-> +    trace_clock_disconnect(CLOCK_PATH(clk));
-> +
-> +    clk->source = NULL;
-> +    QLIST_REMOVE(clk, sibling);
-> +}
-> +
-> +static void clock_initfn(Object *obj)
-> +{
-> +    Clock *clk = CLOCK(obj);
-> +
-> +    QLIST_INIT(&clk->children);
-> +}
-> +
-> +static void clock_finalizefn(Object *obj)
-> +{
-> +    Clock *clk = CLOCK(obj);
-> +    Clock *child, *next;
-> +
-> +    /* clear our list of children */
-> +    QLIST_FOREACH_SAFE(child, &clk->children, sibling, next) {
-> +        clock_disconnect(child);
-> +    }
-> +
-> +    /* remove us from source's chidlren list */
-
-s/chidlren/children/g
-
-> +    clock_disconnect(clk);
-> +
-> +    g_free(clk->canonical_path);
-> +    clk->canonical_path = NULL;
-
-You shouldn't need to set this to NULL.
-
-> +}
-> +
-> +static const TypeInfo clock_info = {
-> +    .name              = TYPE_CLOCK,
-> +    .parent            = TYPE_OBJECT,
-> +    .instance_size     = sizeof(Clock),
-> +    .instance_init     = clock_initfn,
-> +    .instance_finalize = clock_finalizefn,
-> +};
-> +
-> +static void clock_register_types(void)
-> +{
-> +    type_register_static(&clock_info);
-> +}
-> +
-> +type_init(clock_register_types)
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index 6215e7c208..d7080edf89 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -7,10 +7,12 @@ common-obj-y += hotplug.o
->  common-obj-y += vmstate-if.o
->  # irq.o needed for qdev GPIO handling:
->  common-obj-y += irq.o
-> +common-obj-y += clock.o
->
->  common-obj-$(CONFIG_SOFTMMU) += reset.o
->  common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
->  common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
-> +common-obj-$(CONFIG_SOFTMMU) += hotplug.o
-
-I don't think this should be here.
-
-Alistair
-
->  common-obj-$(CONFIG_SOFTMMU) += nmi.o
->  common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
->  common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
-> diff --git a/hw/core/trace-events b/hw/core/trace-events
-> index aecd8e160e..39301621ce 100644
-> --- a/hw/core/trace-events
-> +++ b/hw/core/trace-events
-> @@ -27,3 +27,10 @@ resettable_phase_exit_begin(void *obj, const char *objtype, unsigned count, int
->  resettable_phase_exit_exec(void *obj, const char *objtype, int has_method) "obj=%p(%s) method=%d"
->  resettable_phase_exit_end(void *obj, const char *objtype, unsigned count) "obj=%p(%s) count=%d"
->  resettable_transitional_function(void *obj, const char *objtype) "obj=%p(%s)"
-> +
-> +# clock.c
-> +clock_set_source(const char *clk, const char *src) "'%s', src='%s'"
-> +clock_disconnect(const char *clk) "'%s'"
-> +clock_set(const char *clk, unsigned long long old, unsigned long long new) "'%s', ns=%llu->%llu"
-> +clock_propagate(const char *clk) "'%s'"
-> +clock_update(const char *clk, const char *src, unsigned long long val, int cb) "'%s', src='%s', ns=%llu, cb=%d"
-> --
-> 2.24.1
->
->
+>  static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
+>  {
+>      CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
+> @@ -676,15 +691,7 @@ static void ppc_hash64_set_isi(CPUState *cs, uint64_=
+t error_code)
+>      if (msr_ir) {
+>          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
+>      } else {
+> -        switch (env->mmu_model) {
+> -        case POWERPC_MMU_3_00:
+> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
+perv */
+> -            vpm =3D true;
+> -            break;
+> -        default:
+> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+> -            break;
+> -        }
+> +        vpm =3D ppc_hash64_use_vrma(env);
+>      }
+>      if (vpm && !msr_hv) {
+>          cs->exception_index =3D POWERPC_EXCP_HISI;
+> @@ -702,15 +709,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
+t dar, uint64_t dsisr)
+>      if (msr_dr) {
+>          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
+>      } else {
+> -        switch (env->mmu_model) {
+> -        case POWERPC_MMU_3_00:
+> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
+perv */
+> -            vpm =3D true;
+> -            break;
+> -        default:
+> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+> -            break;
+> -        }
+> +        vpm =3D ppc_hash64_use_vrma(env);
+>      }
+>      if (vpm && !msr_hv) {
+>          cs->exception_index =3D POWERPC_EXCP_HDSI;
+> @@ -799,7 +798,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+>              if (!(eaddr >> 63)) {
+>                  raddr |=3D env->spr[SPR_HRMOR];
+>              }
+> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +        } else if (ppc_hash64_use_vrma(env)) {
+>              /* Emulated VRMA mode */
+>              slb =3D &env->vrma_slb;
+>              if (!slb->sps) {
+> @@ -967,7 +966,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
+, target_ulong addr)
+>          } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
+>              /* In HV mode, add HRMOR if top EA bit is clear */
+>              return raddr | env->spr[SPR_HRMOR];
+> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +        } else if (ppc_hash64_use_vrma(env)) {
+>              /* Emulated VRMA mode */
+>              slb =3D &env->vrma_slb;
+>              if (!slb->sps) {
+> @@ -1056,8 +1055,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>      slb->sps =3D NULL;
+>=20=20
+>      /* Is VRMA enabled ? */
+> -    lpcr =3D env->spr[SPR_LPCR];
+> -    if (!(lpcr & LPCR_VPM0)) {
+> +    if (!ppc_hash64_use_vrma(env)) {
+>          return;
+>      }
+>=20=20
+> @@ -1065,6 +1063,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
+>       * Make one up. Mostly ignore the ESID which will not be needed
+>       * for translation
+>       */
+> +    lpcr =3D env->spr[SPR_LPCR];
+>      vsid =3D SLB_VSID_VRMA;
+>      vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
+>      vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
 
