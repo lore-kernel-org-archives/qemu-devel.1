@@ -2,87 +2,69 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CE0C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3017DC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:35:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D15ED218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:35:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOXAv+ho"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15ED218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 049C020CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:35:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 049C020CC7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZQX-0004EE-UE
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:35:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52491)
+	id 1j6ZRK-00060j-3l
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:35:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54063)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z08-0003RG-Df
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:49 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j6Z8i-0002LF-L5
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:16:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z07-0003Sp-BY
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:48 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:41247)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Z07-0003RE-42
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:47 -0500
-Received: by mail-wr1-x433.google.com with SMTP id v4so1568155wrs.8
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:07:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=JmVYAUKx6B4rcfz1Vmk6J2gsBKmOvTNh7f2tEhi9Rek=;
- b=FOXAv+hoW1Pd3+NWBe598EfNlATXYOAa1/rERLk4SEfQy9EsMGklE3YH1lVMzMikj1
- 16rw0GjiTWvNsws4M+AvRP5sW8T7sOG3Mw8L3LNIfMGhaS9tZowSb1KF7f3tgFl1hixm
- 80srAaJ+EGOnExjLMphtLhOGXlZOQgt8ivD9EN2rDUdu6a5lt7FNkR8PBvXUmx8rNq5U
- 4OW28fKDp/JRwerw1TCLBjRusPT5iOs2TMwjb9h8tkfqzxP/iTD35dkbRw3jt4HHglGA
- ZJPaPZF+Hw2dsRXACOajrIFEhbPLKA7EMELTZhIxjMdHn+9JjGP0vU1ecFJsJoViZWN4
- LEFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JmVYAUKx6B4rcfz1Vmk6J2gsBKmOvTNh7f2tEhi9Rek=;
- b=bEgx2wSizMwb6xft2r7i9rF1Zlwa/9V7BGhxaf0UM+R6ah922NAXvWldhe61QdV8Mu
- Rvt8/0ffVWv6OJJ85kvlI8uRGXQGbj5UScs94rhvb/bH9SFlz2D+gkp8DK0/fdFspqey
- zwXtNqgPs7vNodjhPM5A8vjlXLn+W150wXvjS1LSxwsoxqNuh9NoZjKouxHODRmL9knn
- LSJPUylIDagUFdH7kzpDEGyVUyxiM+c84i4DzJHLhbnYc9zhgNIlUYYjnpA6Z0RsBc/t
- 4VLiYi611jCRULRT10DW6BQuCFxqmC8xT/1acN1uVrwloSYmsyfGiyL9CHS8wKWoUqeV
- HoFQ==
-X-Gm-Message-State: APjAAAUxr9+x+XoV7ZB5bDh06z5Mk/odDZ3F/bPsY9kCxVR/WBisgwNQ
- tGdUUY91mAD6etTQStMBtN22lpQj
-X-Google-Smtp-Source: APXvYqxCFrilPWDeAc1Pn+tAIpRQY1PWLo/xRDsczKzQX1sCEuxYmMRDOqEm6vTzVgi/tU38B9qXrw==
-X-Received: by 2002:adf:ef4c:: with SMTP id c12mr74495277wrp.203.1582632463895; 
- Tue, 25 Feb 2020 04:07:43 -0800 (PST)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 04:07:43 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1j6Z8e-00019d-TU
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:16:40 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:37557)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j6Z8e-00017K-KV; Tue, 25 Feb 2020 07:16:36 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MWz4j-1ivO5B1Ckj-00XMhb; Tue, 25 Feb 2020 13:16:00 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 110/136] hw/riscv: Use memory_region_init_rom() with read-only
- regions
-Date: Tue, 25 Feb 2020 13:07:08 +0100
-Message-Id: <1582632454-16491-8-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
-References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v3 01/21] linux-user: introduce parameters to generate
+ syscall_nr.h
+Date: Tue, 25 Feb 2020 13:15:33 +0100
+Message-Id: <20200225121553.2191597-2-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200225121553.2191597-1-laurent@vivier.eu>
+References: <20200225121553.2191597-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Provags-ID: V03:K1:QSCc3TddwX3lly3KukqNvrBIJJMeoEt8mHTWB41vO9P0kwdnTaD
+ Rvof5GsoqtLMH+SEyfnfiuvB34iTpsNM056PQS6yOO1HmhkMf8NQCkmmpCRxvoyavaov7Z8
+ 7xWkdl7DzyxdhMgd3T3LbuNz+Bbjqu5XCk4VX2En8yo3phvFIXrNPg7WDbSI5Ggs2SuPJn0
+ cKy8QyvaOVZVzx3phcRtg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:40Go5ricSUU=:QUO7WR3fuGWny/tHWAbbLI
+ GM6/ZXaemgvDoGi2NXfaMeuVfmE027ZRXlrZ+41FetwkKeNjGmpVkdUZPfB8D8HQB+xifB7GR
+ G+JtIC1j+z+NHFaoZlSs4pFBnTJa3zOc+78WoUbErNLGWLPwvUF3qi9I9M3VrVJJtindxRYXR
+ /kdv0Z9BDvK3TawWbWfG/7JYRcNG9IQ2tKr6RmDpAOK24rkb2JOBBukKZKu/AS9mLKBM9Bis0
+ J3WBDx9W+8YXVBX10AOtdKLhZ4TKtJiKlQPdixAhP+pmaZ+clXQIjFxhkDJGlLlR6hMh23cGk
+ dKnecA1yQgmRYBjcgFXSsBzh4wzEL8FdoftDs+iP2TvpDzaJvdw3hk2bvLmjfPM22f3aPsFfT
+ pqH6gpxifZNThhxfZGth0/EevEPRSfNTRjrITS99zZrRsY4B72BaEr4asxSX4XsXrB1mdnhRH
+ W7acoQcrwvGLyn9Mrrx9Kj5upCpFuQeg+OzQfQGIBeQf5m9e+BUJsbLfTZk8H93N37ywOoKUA
+ 6odt7bVL7VzVXQLuTb/pBhgegcLJMat+nZ/hPqw+lt1Hb8GZadFDyQIm+X84iTIfJHh584fUe
+ KjMa+8qRBn/Qh0seHFUDi1j4VXz92Qt3ZcSezPlgOrns+mkhamC6bnF4XyfUaFIENqFcLQyqH
+ sa1O68HZckuF5SpkHre+6dXzd7zJ4J/gqkDkoM3wpvvB5BBIC+DX6G1FHKDkyy3k0ozlZA0oS
+ IqLnyY3rfhn91O5UlQ7gXsw9ljpnsFj4Vh+6gFiZVWKQzBEwCFWYP6ucDRpnVQ55//gRRWaTB
+ zebYyvJDHo0voQkMbNiVghqxYbUrnT/AG/HMjVZsTmpEOgr+azT6wHNzrBCn9mey62WO+fD
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,41 +76,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+This will be used when we'll import syscall.tbl from the kernel
 
-This commit was produced with the Coccinelle script
-scripts/coccinelle/memory-region-housekeeping.cocci.
+Add a script to remove all the dependencies to syscall_nr.h
+that point to source directory and not to the build directory.
+The list of arch will be update while the generated files are added.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224205533.23798-13-philmd@redhat.com>
-Supersedes: <20200221173049.18134-1-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/riscv/sifive_e.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ Makefile.target |  3 ++-
+ configure       | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 8a6b034..6f6360a 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -208,9 +208,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+diff --git a/Makefile.target b/Makefile.target
+index 6e61f607b14a..9babf2643e0b 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -128,7 +128,8 @@ ifdef CONFIG_LINUX_USER
  
-     /* Flash memory */
--    memory_region_init_ram(&s->xip_mem, NULL, "riscv.sifive.e.xip",
--        memmap[SIFIVE_E_XIP].size, &error_fatal);
--    memory_region_set_readonly(&s->xip_mem, true);
-+    memory_region_init_rom(&s->xip_mem, NULL, "riscv.sifive.e.xip",
-+                           memmap[SIFIVE_E_XIP].size, &error_fatal);
-     memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
-         &s->xip_mem);
- }
+ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
+              -I$(SRC_PATH)/linux-user/host/$(ARCH) \
+-             -I$(SRC_PATH)/linux-user
++             -I$(SRC_PATH)/linux-user \
++             -Ilinux-user/$(TARGET_ABI_DIR)
+ 
+ obj-y += linux-user/
+ obj-y += gdbstub.o thunk.o
+diff --git a/configure b/configure
+index d57261e3ad0c..c94161ced84f 100755
+--- a/configure
++++ b/configure
+@@ -1855,6 +1855,17 @@ fi
+ # Remove old dependency files to make sure that they get properly regenerated
+ rm -f */config-devices.mak.d
+ 
++# Remove syscall_nr.h to be sure they will be regenerated in the build
++# directory, not in the source directory
++for arch in ; do
++    # remove the file if it has been generated in the source directory
++    rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
++    # remove the dependency files
++    find . -name "*.d" \
++           -exec grep -q "${source_path}/linux-user/${arch}/syscall_nr.h" {} \; \
++           -exec rm {} \;
++done
++
+ if test -z "$python"
+ then
+     error_exit "Python not found. Use --python=/path/to/python"
+@@ -7849,6 +7860,9 @@ echo "TARGET_ABI_DIR=$TARGET_ABI_DIR" >> $config_target_mak
+ if [ "$HOST_VARIANT_DIR" != "" ]; then
+     echo "HOST_VARIANT_DIR=$HOST_VARIANT_DIR" >> $config_target_mak
+ fi
++if [ "$TARGET_SYSTBL_ABI" != "" ]; then
++    echo "TARGET_SYSTBL_ABI=$TARGET_SYSTBL_ABI" >> $config_target_mak
++fi
+ 
+ if supported_xen_target $target; then
+     echo "CONFIG_XEN=y" >> $config_target_mak
 -- 
-1.8.3.1
-
+2.24.1
 
 
