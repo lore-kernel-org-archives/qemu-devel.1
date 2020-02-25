@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE0CC35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 428C5C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:43:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16F382176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C12B20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfJjFa4s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16F382176D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWtuaNa+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C12B20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Whd-0007mR-9S
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:40:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54970)
+	id 1j6Wk3-0000Wy-6W
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:43:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6Wgw-00079P-5L
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:39:51 -0500
+ (envelope-from <david@redhat.com>) id 1j6WjQ-0008Um-VT
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:42:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6Wgv-0007UE-2z
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:39:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34736
+ (envelope-from <david@redhat.com>) id 1j6WjP-0000c4-WE
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:42:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32105
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6Wgu-0007U1-Vi
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:39:49 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6WjP-0000c0-T5
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:42:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582623588;
+ s=mimecast20190719; t=1582623743;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=H1xY2WSAfRnrbwSJEycBD7itd4MiJDfgY3ccuA9rrkk=;
- b=YfJjFa4svPsVc0al2oS5RB0W2UrnDQn4IDwKRu5UoZ92o4gBbZJHqZ+92l03K2qxDZ3aj0
- yxDkGAdiraBPb5bq3SOKd6jQr9MnhXfJxHUAthM1so1TcRXpqA/2RSYqxzDF5fzoNuH6RA
- H2PfON4cpYrbiszZmMVlnNASejzE+h4=
+ bh=vyPRyVIOk4TRU2RxG9xpbikJlsA4wWu2n5d1Vj2GvaM=;
+ b=GWtuaNa+TVAWoBv11P64TbIzgCSo1FPX7eH1TqpKuWNF8H+AMExk++yK/uoNooRCXHfNYa
+ xeJUkhDgvYzWOxbee8r0NsznGW5XMIXWr8XHdX2WYINMmVf5Mdqci7HCTVhuqASJ2+6ppf
+ p/6c7VsdjoSzs1scBvt79rW2c+yowbc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-Fc8i3K8rPMWx8vpDSUggyA-1; Tue, 25 Feb 2020 04:39:46 -0500
-X-MC-Unique: Fc8i3K8rPMWx8vpDSUggyA-1
+ us-mta-84-EQz7vRynOc2Mn3jZwWmllw-1; Tue, 25 Feb 2020 04:42:19 -0500
+X-MC-Unique: EQz7vRynOc2Mn3jZwWmllw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DC5518A550B;
- Tue, 25 Feb 2020 09:39:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 975791005514;
+ Tue, 25 Feb 2020 09:42:18 +0000 (UTC)
 Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A3F4B8C07A;
- Tue, 25 Feb 2020 09:39:41 +0000 (UTC)
-Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
-To: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200224150213.21253-1-pasic@linux.ibm.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68C8A620D8;
+ Tue, 25 Feb 2020 09:42:17 +0000 (UTC)
+Subject: Re: [PATCH v4 01/16] Sync pv
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200220125638.7241-1-frankja@linux.ibm.com>
+ <20200220125638.7241-2-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,18 +108,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
-Date: Tue, 25 Feb 2020 10:39:40 +0100
+Message-ID: <a88bf6bd-b697-ec4c-87a6-07e8ee6a2aaa@redhat.com>
+Date: Tue, 25 Feb 2020 10:42:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200224150213.21253-1-pasic@linux.ibm.com>
+In-Reply-To: <20200220125638.7241-2-frankja@linux.ibm.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -134,86 +133,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Viktor Mihajlovski <mihajlov@linux.ibm.com>,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.02.20 16:02, Halil Pasic wrote:
-> We expose loadparm as a r/w machine property, but if loadparm is set by
-> the guest via DIAG 308, we don't update the property. Having a
-> disconnect between the guest view and the QEMU property is not nice in
-> itself, but things get even worse for SCSI, where under certain
-> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-> expected" for details) we call s390_gen_initial_iplb() on resets
-> effectively overwriting the guest/user supplied loadparm with the stale
-> value.
->=20
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the machine"
-> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+On 20.02.20 13:56, Janosch Frank wrote:
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  hw/s390x/ipl.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 7773499d7f..97a279c1a5 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -538,6 +538,26 @@ static bool is_virtio_scsi_device(IplParameterBlock =
-*iplb)
->      return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
->  }
-> =20
-> +static void update_machine_ipl_properties(IplParameterBlock *iplb)
-> +{
-> +    Object *mo =3D qdev_get_machine();
+>  linux-headers/linux/kvm.h | 46 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 42 insertions(+), 4 deletions(-)
+> 
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index ec146bd52a..2e647f2d9b 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -474,8 +474,11 @@ struct kvm_s390_mem_op {
+>  	__u32 size;		/* amount of bytes */
+>  	__u32 op;		/* type of operation */
+>  	__u64 buf;		/* buffer in userspace */
+> -	__u8 ar;		/* the access register number */
+> -	__u8 reserved[31];	/* should be set to 0 */
+> +	union {
+> +		__u8 ar;	/* the access register number */
+> +		__u32 sida_offset; /* offset into the sida */
+> +		__u8 reserved[32]; /* should be set to 0 */
+> +	};
+>  };
+>  /* types for kvm_s390_mem_op->op */
+>  #define KVM_S390_MEMOP_LOGICAL_READ	0
+> @@ -1010,6 +1013,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_ARM_NISV_TO_USER 177
+>  #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+>  #define KVM_CAP_S390_VCPU_RESETS 179
+> +#define KVM_CAP_S390_PROTECTED 180
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1474,8 +1478,42 @@ struct kvm_enc_region {
+>  /* Available with KVM_CAP_ARM_SVE */
+>  #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
+>  
+> -#define KVM_S390_NORMAL_RESET	  _IO(KVMIO,  0xc3)
+> -#define KVM_S390_CLEAR_RESET	  _IO(KVMIO,  0xc4)
+> +/* Available with  KVM_CAP_S390_VCPU_RESETS */
+> +#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+> +#define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
 
-I'd just call this "machine".
+Looks unrelated, but if that's part of the sync ...
 
-> +
-> +    /* Sync loadparm */
-> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-> +        char ascii_loadparm[8];
-> +        uint8_t *ebcdic_loadparm =3D iplb->loadparm;
-> +        int i;
-> +
-> +        for (i =3D 0; i < 8 && ebcdic_loadparm[i]; i++) {
-> +            ascii_loadparm[i] =3D ebcdic2ascii[(uint8_t) ebcdic_loadparm=
-[i]];
-> +        }
-> +        ascii_loadparm[i] =3D 0;
-> +        object_property_set_str(mo, ascii_loadparm, "loadparm", NULL);
-> +    } else {
-> +        object_property_set_str(mo, "", "loadparm", NULL);
-> +    }
 
-&error_abort instead of NULL, we certainly want to know if this would
-ever surprisingly fail.
-
-> +}
-> +
->  void s390_ipl_update_diag308(IplParameterBlock *iplb)
->  {
->      S390IPLState *ipl =3D get_ipl_device();
-> @@ -545,6 +565,7 @@ void s390_ipl_update_diag308(IplParameterBlock *iplb)
->      ipl->iplb =3D *iplb;
->      ipl->iplb_valid =3D true;
->      ipl->netboot =3D is_virtio_net_device(iplb);
-> +    update_machine_ipl_properties(iplb);
->  }
-> =20
-
-Somewhat I dislike this manual syncing (and converting back and forth),
-but there seems to be no easy way around it.
-
---=20
+-- 
 Thanks,
 
 David / dhildenb
