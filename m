@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF453C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 622E7C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B3FD2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:08:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 305902084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpYaWrq2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B3FD2084E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ef2FNZ6A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 305902084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z17-0004cm-K0
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:08:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49330)
+	id 1j6Z1B-0004m4-82
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:08:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkU-0000ar-Rx
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:42 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yko-0000uT-Tr
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkP-0006Vs-HA
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:38 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:55316)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykf-0007ZG-1t
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:52 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:41096)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YkO-0006PZ-M8
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:33 -0500
-Received: by mail-wm1-x329.google.com with SMTP id q9so2664958wmj.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:32 -0800 (PST)
+ id 1j6Yke-0007Tk-QO
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:48 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id v4so1506065wrs.8
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ni7BFcmeIVVMnmuVlUkskdnbHjwGqcPCtd1ZdP9PuMY=;
- b=IpYaWrq2WJESeucZxY+GiwJ7SoMf5n/K3m5ft5uSJbYxXJw45Ey5VAqWIx0KTVMabM
- wkCeT5s7Lw0vGTUnxC9bUilY4ZXrtMtDPNAyFZRoYsmu09aCoTU2lacg5pET8UoBlzFi
- +SGJtyXxGseJLkJJj4BlnpL97j0KbRRhzQQ3uUOjrpdoP7T9+t7ropvx0Mj6El0ciZIa
- V+ZUaPWJn2MsCtWek+Z4gcL4vMbmnsfP/diT13WMTDvVC7VmMT/s/kCkYsD5299OLrZQ
- H5EEQtgPp9+Q0novGsKrjHWhKgAn9NuE1/mndyU7w8Wln2NkEwp94JZWv8f1Y48QWiYu
- NYKw==
+ bh=RflQQugqQD+TmG6zwoLNwhsZIRibctO8/AYIKjncmbQ=;
+ b=Ef2FNZ6AMBIBUVJDT4fQsPqOqhnU+CoHOVhn/FwuSzZPDYI1r+XZm5uGa+r0dRHLeg
+ UY1s7Ef4C31ZKMkUcdtg63+jNI9QSY9L9I8GCpYyL+rKpKDSLIcWTrMlcM4bUv+JmYKf
+ nAPvFjSju1SQV4ruIPrXqN5Fe5hfUF0wwjnBMcGg4XrqdeM3dlzVZsMQirFiZLxZTjTj
+ I6+aMgqQKAjdlcO0YOW2lvH6OSP4P1ECgpk3xgXZIzq8PNn3GlfjX1BZVNlM+UjbJ4rx
+ G5fpvVpwA+9vOT8b79M/HiX9xHp3ugmdkGwGLiE2WUludfRujjU4DvaMcLYS8atHjZ2C
+ C1aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Ni7BFcmeIVVMnmuVlUkskdnbHjwGqcPCtd1ZdP9PuMY=;
- b=ldPnI+255FWNreCfJKyDbHRwL2JCSsT+Crf+guTe/wIGymApgDJdOyag+SUADsaCDI
- BxsldONM/X2cPDrs7JpjZhdxF0eQFPVD18HTKMOBu1Hi+t111v5GT6eDSG34ZfUaH4SP
- D6fx4ZTOF+5KUlDjberxTwd4mSc2+c3AHqAxbBRXvJtuYnXF1EIs0GcQk3BG5s2vd0BB
- 0Ywsoyvt/MqaRGN25VbhyqfhCGpIG4UdRdANBhXQjAXY+e0lDjaK3tWYkY+njtZ5zVdb
- FwTrxExEoNf+r3yl/LFRXNQqiYqwhaVH44CwI94zDG21GA/5r4UQw4PS/Pup6IFoNpLj
- Y1Rg==
-X-Gm-Message-State: APjAAAUAoE77FLm2RwOb9M+PRmXaOfPGA/7mk/jTeJAnd4BqSe7ZuhTV
- b4xQVZrx32LI3ICJdmFUuLzWSDRh
-X-Google-Smtp-Source: APXvYqxzfOAYXlslJxURJXauk/MuVV3Deov1+VuGdOKJftHmYg27ZLag+R7zzGIMKMOFVcTw2+5mHA==
-X-Received: by 2002:a7b:cd8e:: with SMTP id y14mr5005624wmj.150.1582631491030; 
- Tue, 25 Feb 2020 03:51:31 -0800 (PST)
+ bh=RflQQugqQD+TmG6zwoLNwhsZIRibctO8/AYIKjncmbQ=;
+ b=CkbEqcsEKVWIInSJ4UMt9js0DaGFtVLtB76KFQHYKBVBlK97z+PXehN/w5VkaVxekq
+ CklXuEafA2WFh4cwE9WCnDN4NT5LmhhZ33PdBbz+axWXyZsQR8xCtMYuC1qusSFU503J
+ dyFmIGECXa1v4k5JVat3bIOyuSWFcjTc/TH7kjxfU1uIkPs4Saj7x8lHXwcmPlBAvOdD
+ FdtwbBr6BfZTi2qpwrEPBWahGmqm9akXyD8gnqUUb5W+es/BNkZ8EYg9zbbhUVPyHdt5
+ Od4reNGp6sO0KK3u2LrlSy5kTB6yjNmzVaDQNevYjtqfs+1Y4Q6z39z7IBRD9oSJ0WSV
+ GjUg==
+X-Gm-Message-State: APjAAAXMKoYwFVPFJTwnrei7IRYiMh88/RYm+3EC/rkLqFEFk7h8Z5/t
+ GDy8sqSiwytJ7DjDGzwD9SgUN+zT
+X-Google-Smtp-Source: APXvYqx6zVC9T3IQQSRFwTuMKgHyHvniGvHtSDXYvgdAimJE+z5v1P7cW8g+NB+ON/lmh/h4GEZwOA==
+X-Received: by 2002:a5d:4687:: with SMTP id u7mr70253391wrq.176.1582631507499; 
+ Tue, 25 Feb 2020 03:51:47 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.30
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.46
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:30 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:46 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 026/136] arm/omap_sx1: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:16 +0100
-Message-Id: <1582631466-13880-26-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 044/136] lm32/lm32_boards: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:34 +0100
+Message-Id: <1582631466-13880-44-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,39 +113,39 @@ PS:
  out if it mismatches board expected value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200219160953.13771-27-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-45-imammedo@redhat.com>
 ---
- hw/arm/omap_sx1.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ hw/lm32/lm32_boards.c | 39 ++++++++++++++++++++++++++-------------
+ 1 file changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index be24571..2bebab4 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -35,6 +35,7 @@
- #include "sysemu/qtest.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-+#include "qemu/cutils.h"
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index d1894ad..4e0a98c 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -19,6 +19,7 @@
  
- /*****************************************************************************/
- /* Siemens SX1 Cellphone V1 */
-@@ -102,8 +103,8 @@ static struct arm_boot_info sx1_binfo = {
- static void sx1_init(MachineState *machine, const int version)
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
++#include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ #include "cpu.h"
+ #include "hw/sysbus.h"
+@@ -75,22 +76,28 @@ static void main_cpu_reset(void *opaque)
+ 
+ static void lm32_evr_init(MachineState *machine)
  {
-     struct omap_mpu_state_s *mpu;
 +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-     MemoryRegion *address_space = get_system_memory();
--    MemoryRegion *dram = g_new(MemoryRegion, 1);
-     MemoryRegion *flash = g_new(MemoryRegion, 1);
-     MemoryRegion *cs = g_new(MemoryRegion, 4);
-     static uint32_t cs0val = 0x00213090;
-@@ -115,15 +116,20 @@ static void sx1_init(MachineState *machine, const int version)
-     uint32_t flash_size = flash0_size;
-     int be;
+     const char *kernel_filename = machine->kernel_filename;
+     LM32CPU *cpu;
+     CPULM32State *env;
+     DriveInfo *dinfo;
+     MemoryRegion *address_space_mem =  get_system_memory();
+-    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
+     qemu_irq irq[32];
+     ResetInfo *reset_info;
+     int i;
  
 +    if (machine->ram_size != mc->default_ram_size) {
 +        char *sz = size_to_str(mc->default_ram_size);
@@ -154,38 +154,116 @@ index be24571..2bebab4 100644
 +        exit(EXIT_FAILURE);
 +    }
 +
-     if (version == 2) {
-         flash_size = flash2_size;
-     }
+     /* memory map */
+     hwaddr flash_base  = 0x04000000;
+     size_t flash_sector_size       = 256 * KiB;
+     size_t flash_size              = 32 * MiB;
+     hwaddr ram_base    = 0x08000000;
+-    size_t ram_size                = 64 * MiB;
+     hwaddr timer0_base = 0x80002000;
+     hwaddr uart0_base  = 0x80006000;
+     hwaddr timer1_base = 0x8000a000;
+@@ -107,9 +114,7 @@ static void lm32_evr_init(MachineState *machine)
  
--    memory_region_allocate_system_memory(dram, NULL, "omap1.dram",
--                                         sx1_binfo.ram_size);
--    memory_region_add_subregion(address_space, OMAP_EMIFF_BASE, dram);
-+    memory_region_add_subregion(address_space, OMAP_EMIFF_BASE, machine->ram);
+     reset_info->flash_base = flash_base;
  
--    mpu = omap310_mpu_init(dram, machine->cpu_type);
-+    mpu = omap310_mpu_init(machine->ram, machine->cpu_type);
+-    memory_region_allocate_system_memory(phys_ram, NULL, "lm32_evr.sdram",
+-                                         ram_size);
+-    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
++    memory_region_add_subregion(address_space_mem, ram_base, machine->ram);
  
-     /* External Flash (EMIFS) */
-     memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
-@@ -223,6 +229,8 @@ static void sx1_machine_v2_class_init(ObjectClass *oc, void *data)
-     mc->init = sx1_init_v2;
-     mc->ignore_memory_transaction_failures = true;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("ti925t");
-+    mc->default_ram_size = sdram_size;
-+    mc->default_ram_id = "omap1.dram";
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     /* Spansion S29NS128P */
+@@ -144,7 +149,7 @@ static void lm32_evr_init(MachineState *machine)
+ 
+         if (kernel_size < 0) {
+             kernel_size = load_image_targphys(kernel_filename, ram_base,
+-                                              ram_size);
++                                              machine->ram_size);
+             reset_info->bootstrap_pc = ram_base;
+         }
+ 
+@@ -159,6 +164,7 @@ static void lm32_evr_init(MachineState *machine)
+ 
+ static void lm32_uclinux_init(MachineState *machine)
+ {
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -166,18 +172,23 @@ static void lm32_uclinux_init(MachineState *machine)
+     CPULM32State *env;
+     DriveInfo *dinfo;
+     MemoryRegion *address_space_mem =  get_system_memory();
+-    MemoryRegion *phys_ram = g_new(MemoryRegion, 1);
+     qemu_irq irq[32];
+     HWSetup *hw;
+     ResetInfo *reset_info;
+     int i;
+ 
++    if (machine->ram_size != mc->default_ram_size) {
++        char *sz = size_to_str(mc->default_ram_size);
++        error_report("Invalid RAM size, should be %s", sz);
++        g_free(sz);
++        exit(EXIT_FAILURE);
++    }
++
+     /* memory map */
+     hwaddr flash_base   = 0x04000000;
+     size_t flash_sector_size        = 256 * KiB;
+     size_t flash_size               = 32 * MiB;
+     hwaddr ram_base     = 0x08000000;
+-    size_t ram_size                 = 64 * MiB;
+     hwaddr uart0_base   = 0x80000000;
+     hwaddr timer0_base  = 0x80002000;
+     hwaddr timer1_base  = 0x80010000;
+@@ -200,9 +211,7 @@ static void lm32_uclinux_init(MachineState *machine)
+ 
+     reset_info->flash_base = flash_base;
+ 
+-    memory_region_allocate_system_memory(phys_ram, NULL,
+-                                         "lm32_uclinux.sdram", ram_size);
+-    memory_region_add_subregion(address_space_mem, ram_base, phys_ram);
++    memory_region_add_subregion(address_space_mem, ram_base, machine->ram);
+ 
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     /* Spansion S29NS128P */
+@@ -238,7 +247,7 @@ static void lm32_uclinux_init(MachineState *machine)
+ 
+         if (kernel_size < 0) {
+             kernel_size = load_image_targphys(kernel_filename, ram_base,
+-                                              ram_size);
++                                              machine->ram_size);
+             reset_info->bootstrap_pc = ram_base;
+         }
+ 
+@@ -252,7 +261,7 @@ static void lm32_uclinux_init(MachineState *machine)
+     hw = hwsetup_init();
+     hwsetup_add_cpu(hw, "LM32", 75000000);
+     hwsetup_add_flash(hw, "flash", flash_base, flash_size);
+-    hwsetup_add_ddr_sdram(hw, "ddr_sdram", ram_base, ram_size);
++    hwsetup_add_ddr_sdram(hw, "ddr_sdram", ram_base, machine->ram_size);
+     hwsetup_add_timer(hw, "timer0", timer0_base, timer0_irq);
+     hwsetup_add_timer(hw, "timer1_dev_only", timer1_base, timer1_irq);
+     hwsetup_add_timer(hw, "timer2_dev_only", timer2_base, timer2_irq);
+@@ -288,6 +297,8 @@ static void lm32_evr_class_init(ObjectClass *oc, void *data)
+     mc->init = lm32_evr_init;
+     mc->is_default = 1;
+     mc->default_cpu_type = LM32_CPU_TYPE_NAME("lm32-full");
++    mc->default_ram_size = 64 * MiB;
++    mc->default_ram_id = "lm32_evr.sdram";
  }
  
- static const TypeInfo sx1_machine_v2_type = {
-@@ -239,6 +247,8 @@ static void sx1_machine_v1_class_init(ObjectClass *oc, void *data)
-     mc->init = sx1_init_v1;
-     mc->ignore_memory_transaction_failures = true;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("ti925t");
-+    mc->default_ram_size = sdram_size;
-+    mc->default_ram_id = "omap1.dram";
+ static const TypeInfo lm32_evr_type = {
+@@ -304,6 +315,8 @@ static void lm32_uclinux_class_init(ObjectClass *oc, void *data)
+     mc->init = lm32_uclinux_init;
+     mc->is_default = 0;
+     mc->default_cpu_type = LM32_CPU_TYPE_NAME("lm32-full");
++    mc->default_ram_size = 64 * MiB;
++    mc->default_ram_id = "lm32_uclinux.sdram";
  }
  
- static const TypeInfo sx1_machine_v1_type = {
+ static const TypeInfo lm32_uclinux_type = {
 -- 
 1.8.3.1
 
