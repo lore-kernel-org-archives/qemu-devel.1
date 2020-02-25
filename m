@@ -2,87 +2,69 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F83C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A14C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ED18218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:57:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juGnR8O+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ED18218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33FB4218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:58:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FB4218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Zmd-0006QE-7x
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:57:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50166)
+	id 1j6Zn3-00078R-Cc
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:58:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlS-0002DU-Ch
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:40 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9M-0003Wv-7z
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlQ-00023I-E7
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:38 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36610)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YlQ-0001zr-5X
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:36 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z3so14386272wru.3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wtR+ce3Urlbs3edVC+Je524/wruoJldpKDJO53XFtbc=;
- b=juGnR8O+kZmMX25KlX69feU+0i0VuBepAxtVr5BzTxRMWY493KBE2mniFyxzmB4eE0
- WCzatwtmp58NqgYuC2GKyze82cL/mPFQbsX7EO9CzwZUWYqOE77vh5TUz5ET0rb6erEW
- tcZliu0s022Ah7Ahfqp5K/8Qf4d2chE5mOA1H4JQ+v7zSlDioAUKCCXJycKnFgiK2Db8
- ERvV6Q8MkSnrZ/t7xCYoYEUdqkjAKVWJNUBn0T5FI/dIdj+hurW/7+Xz7O7WM1hY0Vbw
- TOvD/GP7//NX93w1z9td7jktmHGs0h9R5Mc4B6zPFbUF+3g0+ikW/p636QrBIzSOW8RQ
- VoKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=wtR+ce3Urlbs3edVC+Je524/wruoJldpKDJO53XFtbc=;
- b=hPJGRhrmI0WuR2g4e3BeDeysGCfnYFjp/gQX0zo7YUFwzB1UaMGGPmPTCYrb57aJFg
- lyf6V8PgZCIwZiacbzmTpShSllyKApKFvp4hV/YctUPUY1UHCTMFDPvwwbUYO/bT2Aa/
- eIXV6ke65Il+/PmlK8DMIVRisLgPvLmGeqpPPEV6+m9ioe4cxpQfWxec78GtATpa7IEc
- CfclNQ98XsIqdfQqeHqmmugKnP+vWMndj2dwSDodgKaJFkbCvKWRf/hBBHnfuVYzapJ2
- e48iFVfqRsr6HwFiP+G3keOYb4cbia/9yaW5qou2gWeKELHp+9RJgyZhLC+1AjsXFaEt
- adnw==
-X-Gm-Message-State: APjAAAVyBE2sB/g2+BhKLfiRK17ZSp/zORy/5RNlHJlsRqjS1zGC037J
- TUhvJ/D0/288phVSywlnaCR9N+9W
-X-Google-Smtp-Source: APXvYqwhyMOsoY/2Rvz+EpAYP3gwHNLXh4D8yuxFDjbgPZe6camVPRMlBdiqyvPub7e8qJesJ9sxMA==
-X-Received: by 2002:adf:f10b:: with SMTP id r11mr73076054wro.307.1582631553464; 
- Tue, 25 Feb 2020 03:52:33 -0800 (PST)
-Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.32
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:32 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9J-0001kj-Oh
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:20 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:49987)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j6Z9E-0001fF-4J; Tue, 25 Feb 2020 07:17:12 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MCoYS-1jFOq92Sum-008ob8; Tue, 25 Feb 2020 13:16:25 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 094/136] Let address_space_rw() calls pass a boolean 'is_write'
- argument
-Date: Tue, 25 Feb 2020 12:50:24 +0100
-Message-Id: <1582631466-13880-94-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
-References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v3 19/21] linux-user: update syscall.tbl from linux
+ 0bf999f9c5e7
+Date: Tue, 25 Feb 2020 13:15:51 +0100
+Message-Id: <20200225121553.2191597-20-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200225121553.2191597-1-laurent@vivier.eu>
+References: <20200225121553.2191597-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Provags-ID: V03:K1:vObBgptd6osmoVq0remaPwcXPV5Xyiogc7h56/O0F6Sh1FHi9Gw
+ 4I0togjGlTbsxEvMUIo44Ya4KdwBuvv4lZcSAi3uGnIWmRsiQtH5/BLV58dQCi4SL3ot9nc
+ UdjS1T6q+a3wC3k6FRpQtdzRtqyyecoX2bTtDAo+ojA3BRCNqB4YypW2jeEgFXNy7d730bx
+ LnnZM7tvnzI8x4BjpFTTg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zZYNIeWekUs=:DhA4qmDRbNUQ5n5DpCZ/FB
+ K8LkonPy/NeW74VKhQogIpJScP3Gjjc5dWy9SuSaWJZ0iyR3bTAbguyFrQlQyE4HGQi7NoHoO
+ 59OAw8qM8fH8whU2wlFk1L0NnyR0IAXDAmZ3fNw9GMbZlyfYqJs8qpu/s1hTMeKXmqx3lm3Lj
+ 8NtMggDSIXHEeoyawTyKNHrVSB1VjIX6vugcZbgWr0Oi0FTQR/DVLBgjpqN1BqeMlyzncnnBF
+ X3cdzysgAj9rOL3bunAtHv86QeXfVowGnBklerE9GNZh2qNxPNFKh8SEMlFlgQ96kJohpy2yj
+ GUOFlxlJxmLW3JKj2iJUx8pGG1BqrvBZhEsRsAnrTlJPEtKJcEwKtAEj0C+BJvspac7fZLZMD
+ yGx1rNAkVstU9p0A6i0quXhZfSbjsYBJJ4r/1nzIVgqURs91JGWpOYptjS1l42ee4ir+ErB7W
+ +8L+33HNA76YFQd7dZbwc1YWNbft3XrcAEQBKCRNBJlTeetWnNIGc32v8tX1FSYK7AE/2wvSy
+ Oomgcj3EmqcpEvO9wJJbez9j3r2/2knn30N5Pz5LZDsEFlXnxr7wBzDZDsyuHVjD2YAr7Q+4W
+ kD7oB2oFsCTCorGY/3RIUb5fJbwUlUcOw5I2WxUfQIfC0l4tMXmLUwtOxsK60L50Lt0GMooY5
+ xop2Lbc1qsVKvctLbrghdwOHy3EMfqv8YhRrpdh/kRNf3BCGw1GLzExH3UWswJN+bt4zZCfeD
+ 6d+6lWeIbJVa/aSD0C+gx3mw6Q64nWCTkdGrcX5Z3Unt3EFs5xBjz7H9w757nf/naXK7iuTrT
+ znkirRX403rZWDr47/afPOFrgWgrtCEAFFMFLqULJiha9btukTdQuCD9ESyRMQyvcCXQeID
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,302 +76,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Run scripts/update-syscalltbl.sh with linux commit 0bf999f9c5e7
 
-Since its introduction in commit ac1970fbe8, address_space_rw()
-takes a boolean 'is_write' argument. Fix the codebase by using
-an explicit boolean type.
-
-This commit was produced with the included Coccinelle script
-scripts/coccinelle/exec_rw_const.
-
-Inspired-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- exec.c                                 |  4 ++--
- hw/net/dp8393x.c                       | 27 ++++++++++++++-------------
- hw/net/i82596.c                        | 11 ++++++-----
- hw/net/lasi_i82596.c                   |  4 ++--
- scripts/coccinelle/exec_rw_const.cocci | 12 ++++++++++++
- target/i386/hvf/vmx.h                  |  2 +-
- target/i386/hvf/x86_mmu.c              |  8 ++++----
- 7 files changed, 41 insertions(+), 27 deletions(-)
+ linux-user/arm/syscall.tbl        | 2 ++
+ linux-user/hppa/syscall.tbl       | 2 ++
+ linux-user/i386/syscall_32.tbl    | 2 ++
+ linux-user/m68k/syscall.tbl       | 4 +++-
+ linux-user/microblaze/syscall.tbl | 2 ++
+ linux-user/mips/syscall_o32.tbl   | 2 ++
+ linux-user/mips64/syscall_n32.tbl | 2 ++
+ linux-user/mips64/syscall_n64.tbl | 2 ++
+ linux-user/ppc/syscall.tbl        | 2 ++
+ linux-user/s390x/syscall.tbl      | 2 ++
+ linux-user/sh4/syscall.tbl        | 2 ++
+ linux-user/sparc/syscall.tbl      | 2 ++
+ linux-user/sparc64/syscall.tbl    | 2 ++
+ linux-user/x86_64/syscall_64.tbl  | 2 ++
+ linux-user/xtensa/syscall.tbl     | 2 ++
+ 15 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/exec.c b/exec.c
-index 239239d..90ac015 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3815,8 +3815,8 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-             address_space_write_rom(cpu->cpu_ases[asidx].as, phys_addr,
-                                     attrs, buf, l);
-         } else {
--            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr,
--                             attrs, buf, l, 0);
-+            address_space_rw(cpu->cpu_ases[asidx].as, phys_addr, attrs, buf,
-+                             l, false);
-         }
-         len -= l;
-         buf += l;
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index b461101..b4363e3 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -276,7 +276,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     while (s->regs[SONIC_CDC] & 0x1f) {
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
--                         MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                         MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-         s->cam[index][0] = dp8393x_get(s, width, 1) & 0xff;
-         s->cam[index][1] = dp8393x_get(s, width, 1) >> 8;
-         s->cam[index][2] = dp8393x_get(s, width, 2) & 0xff;
-@@ -294,7 +294,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+diff --git a/linux-user/arm/syscall.tbl b/linux-user/arm/syscall.tbl
+index 6da7dc4d79cc..4d1cf74a2caa 100644
+--- a/linux-user/arm/syscall.tbl
++++ b/linux-user/arm/syscall.tbl
+@@ -449,3 +449,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ 435	common	clone3				sys_clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/hppa/syscall.tbl b/linux-user/hppa/syscall.tbl
+index 285ff516150c..52a15f5cd130 100644
+--- a/linux-user/hppa/syscall.tbl
++++ b/linux-user/hppa/syscall.tbl
+@@ -433,3 +433,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ 435	common	clone3				sys_clone3_wrapper
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/i386/syscall_32.tbl b/linux-user/i386/syscall_32.tbl
+index 15908eb9b17e..c17cb77eb150 100644
+--- a/linux-user/i386/syscall_32.tbl
++++ b/linux-user/i386/syscall_32.tbl
+@@ -440,3 +440,5 @@
+ 433	i386	fspick			sys_fspick			__ia32_sys_fspick
+ 434	i386	pidfd_open		sys_pidfd_open			__ia32_sys_pidfd_open
+ 435	i386	clone3			sys_clone3			__ia32_sys_clone3
++437	i386	openat2			sys_openat2			__ia32_sys_openat2
++438	i386	pidfd_getfd		sys_pidfd_getfd			__ia32_sys_pidfd_getfd
+diff --git a/linux-user/m68k/syscall.tbl b/linux-user/m68k/syscall.tbl
+index a88a285a0e5f..f4f49fcb76d0 100644
+--- a/linux-user/m68k/syscall.tbl
++++ b/linux-user/m68k/syscall.tbl
+@@ -434,4 +434,6 @@
+ 432	common	fsmount				sys_fsmount
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+-# 435 reserved for clone3
++435	common	clone3				__sys_clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/microblaze/syscall.tbl b/linux-user/microblaze/syscall.tbl
+index 09b0cd7dab0a..4c67b11f9c9e 100644
+--- a/linux-user/microblaze/syscall.tbl
++++ b/linux-user/microblaze/syscall.tbl
+@@ -441,3 +441,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ 435	common	clone3				sys_clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/mips/syscall_o32.tbl b/linux-user/mips/syscall_o32.tbl
+index 353539ea4140..ac586774c980 100644
+--- a/linux-user/mips/syscall_o32.tbl
++++ b/linux-user/mips/syscall_o32.tbl
+@@ -423,3 +423,5 @@
+ 433	o32	fspick				sys_fspick
+ 434	o32	pidfd_open			sys_pidfd_open
+ 435	o32	clone3				__sys_clone3
++437	o32	openat2				sys_openat2
++438	o32	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/mips64/syscall_n32.tbl b/linux-user/mips64/syscall_n32.tbl
+index e7c5ab38e403..1f9e8ad636cc 100644
+--- a/linux-user/mips64/syscall_n32.tbl
++++ b/linux-user/mips64/syscall_n32.tbl
+@@ -374,3 +374,5 @@
+ 433	n32	fspick				sys_fspick
+ 434	n32	pidfd_open			sys_pidfd_open
+ 435	n32	clone3				__sys_clone3
++437	n32	openat2				sys_openat2
++438	n32	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/mips64/syscall_n64.tbl b/linux-user/mips64/syscall_n64.tbl
+index 13cd66581f3b..c0b9d802dbf6 100644
+--- a/linux-user/mips64/syscall_n64.tbl
++++ b/linux-user/mips64/syscall_n64.tbl
+@@ -350,3 +350,5 @@
+ 433	n64	fspick				sys_fspick
+ 434	n64	pidfd_open			sys_pidfd_open
+ 435	n64	clone3				__sys_clone3
++437	n64	openat2				sys_openat2
++438	n64	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/ppc/syscall.tbl b/linux-user/ppc/syscall.tbl
+index 43f736ed47f2..35b61bfc1b1a 100644
+--- a/linux-user/ppc/syscall.tbl
++++ b/linux-user/ppc/syscall.tbl
+@@ -517,3 +517,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ 435	nospu	clone3				ppc_clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/s390x/syscall.tbl b/linux-user/s390x/syscall.tbl
+index 3054e9c035a3..bd7bd3581a0f 100644
+--- a/linux-user/s390x/syscall.tbl
++++ b/linux-user/s390x/syscall.tbl
+@@ -438,3 +438,5 @@
+ 433  common	fspick			sys_fspick			sys_fspick
+ 434  common	pidfd_open		sys_pidfd_open			sys_pidfd_open
+ 435  common	clone3			sys_clone3			sys_clone3
++437  common	openat2			sys_openat2			sys_openat2
++438  common	pidfd_getfd		sys_pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/sh4/syscall.tbl b/linux-user/sh4/syscall.tbl
+index b5ed26c4c005..c7a30fcd135f 100644
+--- a/linux-user/sh4/syscall.tbl
++++ b/linux-user/sh4/syscall.tbl
+@@ -438,3 +438,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ # 435 reserved for clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/sparc/syscall.tbl b/linux-user/sparc/syscall.tbl
+index 8c8cc7537fb2..f13615ecdecc 100644
+--- a/linux-user/sparc/syscall.tbl
++++ b/linux-user/sparc/syscall.tbl
+@@ -481,3 +481,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ # 435 reserved for clone3
++437	common	openat2			sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/sparc64/syscall.tbl b/linux-user/sparc64/syscall.tbl
+index 8c8cc7537fb2..f13615ecdecc 100644
+--- a/linux-user/sparc64/syscall.tbl
++++ b/linux-user/sparc64/syscall.tbl
+@@ -481,3 +481,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ # 435 reserved for clone3
++437	common	openat2			sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/x86_64/syscall_64.tbl b/linux-user/x86_64/syscall_64.tbl
+index c29976eca4a8..44d510bc9b78 100644
+--- a/linux-user/x86_64/syscall_64.tbl
++++ b/linux-user/x86_64/syscall_64.tbl
+@@ -357,6 +357,8 @@
+ 433	common	fspick			__x64_sys_fspick
+ 434	common	pidfd_open		__x64_sys_pidfd_open
+ 435	common	clone3			__x64_sys_clone3/ptregs
++437	common	openat2			__x64_sys_openat2
++438	common	pidfd_getfd		__x64_sys_pidfd_getfd
  
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
--                     MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                     MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-     s->regs[SONIC_CE] = dp8393x_get(s, width, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
- 
-@@ -312,7 +312,7 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-     width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-     size = sizeof(uint16_t) * 4 * width;
-     address_space_rw(&s->as, dp8393x_rrp(s),
--                     MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                     MEMTXATTRS_UNSPECIFIED, s->data, size, false);
- 
-     /* Update SONIC registers */
-     s->regs[SONIC_CRBA0] = dp8393x_get(s, width, 0);
-@@ -427,7 +427,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TTDA] = s->regs[SONIC_CTDA];
-         DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
-         address_space_rw(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) * width,
--                         MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                         MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-         tx_len = 0;
- 
-         /* Update registers */
-@@ -452,7 +452,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 len = sizeof(s->tx_buffer) - tx_len;
-             }
-             address_space_rw(&s->as, dp8393x_tsa(s),
--                MEMTXATTRS_UNSPECIFIED, &s->tx_buffer[tx_len], len, 0);
-+                             MEMTXATTRS_UNSPECIFIED,
-+                             &s->tx_buffer[tx_len], len, false);
-             tx_len += len;
- 
-             i++;
-@@ -461,7 +462,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 size = sizeof(uint16_t) * 3 * width;
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
--                                 MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                                 MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-                 s->regs[SONIC_TSA0] = dp8393x_get(s, width, 0);
-                 s->regs[SONIC_TSA1] = dp8393x_get(s, width, 1);
-                 s->regs[SONIC_TFS] = dp8393x_get(s, width, 2);
-@@ -496,7 +497,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-                          dp8393x_ttda(s),
--                         MEMTXATTRS_UNSPECIFIED, s->data, size, 1);
-+                         MEMTXATTRS_UNSPECIFIED, s->data, size, true);
- 
-         if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
-             /* Read footer of packet */
-@@ -505,7 +506,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                              dp8393x_ttda(s) +
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
--                             MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                             MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-             s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
-             if (dp8393x_get(s, width, 0) & 0x1) {
-                 /* EOL detected */
-@@ -768,7 +769,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         size = sizeof(uint16_t) * 1 * width;
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
--                         s->data, size, 0);
-+                         s->data, size, false);
-         if (dp8393x_get(s, width, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-@@ -790,7 +791,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED, buf, rx_len);
-     address += rx_len;
-     address_space_rw(&s->as, address,
--                     MEMTXATTRS_UNSPECIFIED, &checksum, 4, 1);
-+                     MEMTXATTRS_UNSPECIFIED, &checksum, 4, true);
-     rx_len += 4;
-     s->regs[SONIC_CRBA1] = address >> 16;
-     s->regs[SONIC_CRBA0] = address & 0xffff;
-@@ -819,12 +820,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     dp8393x_put(s, width, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
--                     MEMTXATTRS_UNSPECIFIED, s->data, size, 1);
-+                     MEMTXATTRS_UNSPECIFIED, s->data, size, true);
- 
-     /* Move to next descriptor */
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
--                     MEMTXATTRS_UNSPECIFIED, s->data, size, 0);
-+                     MEMTXATTRS_UNSPECIFIED, s->data, size, false);
-     s->regs[SONIC_LLFA] = dp8393x_get(s, width, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-@@ -838,7 +839,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         }
-         s->data[0] = 0;
-         address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
--                         s->data, sizeof(uint16_t), 1);
-+                         s->data, sizeof(uint16_t), true);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-diff --git a/hw/net/i82596.c b/hw/net/i82596.c
-index a292984..11537f7 100644
---- a/hw/net/i82596.c
-+++ b/hw/net/i82596.c
-@@ -149,7 +149,7 @@ static void i82596_transmit(I82596State *s, uint32_t addr)
-         if (s->nic && len) {
-             assert(len <= sizeof(s->tx_buffer));
-             address_space_rw(&address_space_memory, tba,
--                MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len, 0);
-+                             MEMTXATTRS_UNSPECIFIED, s->tx_buffer, len, false);
-             DBG(PRINT_PKTHDR("Send", &s->tx_buffer));
-             DBG(printf("Sending %d bytes\n", len));
-             qemu_send_packet(qemu_get_queue(s->nic), s->tx_buffer, len);
-@@ -173,7 +173,7 @@ static void set_individual_address(I82596State *s, uint32_t addr)
-     nc = qemu_get_queue(s->nic);
-     m = s->conf.macaddr.a;
-     address_space_rw(&address_space_memory, addr + 8,
--        MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN, 0);
-+                     MEMTXATTRS_UNSPECIFIED, m, ETH_ALEN, false);
-     qemu_format_nic_info_str(nc, m);
-     trace_i82596_new_mac(nc->info_str);
- }
-@@ -192,7 +192,7 @@ static void set_multicast_list(I82596State *s, uint32_t addr)
-         uint8_t multicast_addr[ETH_ALEN];
-         address_space_rw(&address_space_memory,
-             addr + i * ETH_ALEN, MEMTXATTRS_UNSPECIFIED,
--            multicast_addr, ETH_ALEN, 0);
-+                         multicast_addr, ETH_ALEN, false);
-         DBG(printf("Add multicast entry " MAC_FMT "\n",
-                     MAC_ARG(multicast_addr)));
-         unsigned mcast_idx = (net_crc32(multicast_addr, ETH_ALEN) &
-@@ -261,7 +261,8 @@ static void command_loop(I82596State *s)
-             byte_cnt = MIN(byte_cnt, sizeof(s->config));
-             /* copy byte_cnt max. */
-             address_space_rw(&address_space_memory, s->cmd_p + 8,
--                MEMTXATTRS_UNSPECIFIED, s->config, byte_cnt, 0);
-+                             MEMTXATTRS_UNSPECIFIED, s->config, byte_cnt,
-+                             false);
-             /* config byte according to page 35ff */
-             s->config[2] &= 0x82; /* mask valid bits */
-             s->config[2] |= 0x40;
-@@ -647,7 +648,7 @@ ssize_t i82596_receive(NetClientState *nc, const uint8_t *buf, size_t sz)
-             len -= num;
-             if (len == 0) { /* copy crc */
-                 address_space_rw(&address_space_memory, rba - 4,
--                    MEMTXATTRS_UNSPECIFIED, crc_ptr, 4, 1);
-+                                 MEMTXATTRS_UNSPECIFIED, crc_ptr, 4, true);
-             }
- 
-             num |= 0x4000; /* set F BIT */
-diff --git a/hw/net/lasi_i82596.c b/hw/net/lasi_i82596.c
-index 427b3fb..8bff419 100644
---- a/hw/net/lasi_i82596.c
-+++ b/hw/net/lasi_i82596.c
-@@ -55,8 +55,8 @@ static void lasi_82596_mem_write(void *opaque, hwaddr addr,
-          * Provided for SeaBIOS only. Write MAC of Network card to addr @val.
-          * Needed for the PDC_LAN_STATION_ID_READ PDC call.
-          */
--        address_space_rw(&address_space_memory, val,
--            MEMTXATTRS_UNSPECIFIED, d->state.conf.macaddr.a, ETH_ALEN, 1);
-+        address_space_rw(&address_space_memory, val, MEMTXATTRS_UNSPECIFIED,
-+                         d->state.conf.macaddr.a, ETH_ALEN, true);
-         break;
-     }
- }
-diff --git a/scripts/coccinelle/exec_rw_const.cocci b/scripts/coccinelle/exec_rw_const.cocci
-index 9c14165..493d79c 100644
---- a/scripts/coccinelle/exec_rw_const.cocci
-+++ b/scripts/coccinelle/exec_rw_const.cocci
-@@ -9,6 +9,18 @@
-            --dir .
- */
- 
-+// Convert to boolean
-+@@
-+expression E1, E2, E3, E4, E5;
-+@@
-+(
-+- address_space_rw(E1, E2, E3, E4, E5, 0)
-++ address_space_rw(E1, E2, E3, E4, E5, false)
-+|
-+- address_space_rw(E1, E2, E3, E4, E5, 1)
-++ address_space_rw(E1, E2, E3, E4, E5, true)
-+)
-+
- // Use address_space_write instead of casting to non-const
- @@
- type T;
-diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index a115ca1..19af029 100644
---- a/target/i386/hvf/vmx.h
-+++ b/target/i386/hvf/vmx.h
-@@ -128,7 +128,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-         address_space_rw(&address_space_memory,
-                          rvmcs(vcpu, VMCS_GUEST_CR3) & ~0x1f,
-                          MEMTXATTRS_UNSPECIFIED,
--                         pdpte, 32, 0);
-+                         pdpte, 32, false);
-         /* Only set PDPTE when appropriate. */
-         for (i = 0; i < 4; i++) {
-             wvmcs(vcpu, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
-diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
-index 6a62064..451dcc9 100644
---- a/target/i386/hvf/x86_mmu.c
-+++ b/target/i386/hvf/x86_mmu.c
-@@ -89,7 +89,7 @@ static bool get_pt_entry(struct CPUState *cpu, struct gpt_translation *pt,
- 
-     index = gpt_entry(pt->gva, level, pae);
-     address_space_rw(&address_space_memory, gpa + index * pte_size(pae),
--                     MEMTXATTRS_UNSPECIFIED, &pte, pte_size(pae), 0);
-+                     MEMTXATTRS_UNSPECIFIED, &pte, pte_size(pae), false);
- 
-     pt->pte[level - 1] = pte;
- 
-@@ -238,8 +238,8 @@ void vmx_write_mem(struct CPUState *cpu, target_ulong gva, void *data, int bytes
-         if (!mmu_gva_to_gpa(cpu, gva, &gpa)) {
-             VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, gva);
-         } else {
--            address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
--                             data, copy, 1);
-+            address_space_rw(&address_space_memory, gpa,
-+                             MEMTXATTRS_UNSPECIFIED, data, copy, true);
-         }
- 
-         bytes -= copy;
-@@ -260,7 +260,7 @@ void vmx_read_mem(struct CPUState *cpu, void *data, target_ulong gva, int bytes)
-             VM_PANIC_EX("%s: mmu_gva_to_gpa %llx failed\n", __func__, gva);
-         }
-         address_space_rw(&address_space_memory, gpa, MEMTXATTRS_UNSPECIFIED,
--                         data, copy, 0);
-+                         data, copy, false);
- 
-         bytes -= copy;
-         gva += copy;
+ #
+ # x32-specific system call numbers start at 512 to avoid cache impact
+diff --git a/linux-user/xtensa/syscall.tbl b/linux-user/xtensa/syscall.tbl
+index 25f4de729a6d..85a9ab1bc04d 100644
+--- a/linux-user/xtensa/syscall.tbl
++++ b/linux-user/xtensa/syscall.tbl
+@@ -406,3 +406,5 @@
+ 433	common	fspick				sys_fspick
+ 434	common	pidfd_open			sys_pidfd_open
+ 435	common	clone3				sys_clone3
++437	common	openat2				sys_openat2
++438	common	pidfd_getfd			sys_pidfd_getfd
 -- 
-1.8.3.1
-
+2.24.1
 
 
