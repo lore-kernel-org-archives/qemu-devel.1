@@ -2,78 +2,89 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E1EC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D12C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4141F21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A055121744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQFZw+Z4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4141F21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uCZomt62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A055121744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6a2R-0006ti-Ec
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:14:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37110)
+	id 1j6a2m-0007Lq-P9
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:14:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ovoshcha@redhat.com>) id 1j6a1S-0005DX-4e
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:13:14 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6ZcR-0005TH-S5
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ovoshcha@redhat.com>) id 1j6a1R-0001NL-5K
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:13:14 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56971
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ovoshcha@redhat.com>) id 1j6a1R-0001Mx-1i
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:13:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582636392;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pIAxnqLbBPi8HGVHGPcFX+gvFTpwFK4hEINmy/jM51U=;
- b=bQFZw+Z4TxX1Yplnp7wXHdq+LaOur9NVPA5Qd2odOwSuOBhW5MZ06ZBwy5lC4U4gdQZ7uG
- 8BvBkFV3RpRDjYRzhsrjpBnm4uswGJV9+0lQX1Lb7XPp8eWnLBUy64LJ+S0ToeXJLwWP5P
- XhNzPs/SmLPv7oFs4S6ajgvi+qkMQUg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-SbleWzxIOaaT7WQ3gt7GDg-1; Tue, 25 Feb 2020 08:13:10 -0500
-X-MC-Unique: SbleWzxIOaaT7WQ3gt7GDg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BBE518AB2C3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 13:13:10 +0000 (UTC)
-Received: from kh066.redhat.com (ovpn-204-125.brq.redhat.com [10.40.204.125])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 84D0991840;
- Tue, 25 Feb 2020 13:13:08 +0000 (UTC)
-From: Oksana Vohchana <ovoshcha@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1j6ZcQ-0007Et-Vf
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:23 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44006)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6ZcQ-0007E9-Nc
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:22 -0500
+Received: by mail-wr1-x442.google.com with SMTP id r11so14578166wrq.10
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:47:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=tZ+q8+KjTsBsafkEv1L9oog5zVBd33ptYwGvTAYVmPc=;
+ b=uCZomt62GTRNms/KFdYdUa9expV/lcusEpBK2bfj1LVOCRKElT2TzJ6BRtB3LFl5ZY
+ DrUOc3ORBts+RiGmsdJ0PZaNt8zyRI1yuw0diQ0tF5sygAHW9WgNBVm5Y1IOwLDIh66Z
+ mIAJ3ymrQqKQ6TDybDSsl7GP7joKU+NxILEqr8JQaBr9QQv6r0/r5w0insB9jm5URM4o
+ gGFm6faDFBjWMSIZsuOoyoMcPD1QSAzXhHlENa1vRZVODKCWczYn8JL+TCLSNt+voqZb
+ U3gxD6OJMfkHHFGuMN1VGViV7qZafyjMOZQXDS70LvlNox8UqZZOTiZ2JXJpTyCXb9Xh
+ lOcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=tZ+q8+KjTsBsafkEv1L9oog5zVBd33ptYwGvTAYVmPc=;
+ b=BooUwj6iIszZ5cbgesRF1xjxMJ3XJL75yPyOvxCuOrqbTl7pxUObeKsQPsQZY55Qvr
+ sbT+0n/F04spDsvW8y19KZGLfny/2hDC07WNfRBva5Zczh79qY2yYllkn1/dHyU6cGv9
+ lIT/6hPa9EqeTJuYsORLRH44pzKI64MaPu5MFCBNLSApJqQGNUoF5bW7gjiMa9sUmN14
+ VMlQMKu73NF0pP5cuUaXuDfS9H98DTkZ1E31yrFDuf4SiauKTbWS4Lna2cDHIXi7ZpqG
+ 5R6370ToqZfS1eb54ah7G4RxSzMm/QzTDT7Z9PAdSd2HafX4d6xqaHqWpPbLbSe/ibIk
+ b7Nw==
+X-Gm-Message-State: APjAAAUJkSwUms+rRyU1FMLBvFnr40SHuPyJDM+a3Br4LxJM9bPuPD4Y
+ TrFXjWMaFGsvuEQPaoG9hCqel8H/Kbg=
+X-Google-Smtp-Source: APXvYqzN5E1Uu9yjg885wODL/JepL8jrTLGzP2uEBsI6zN3ZzUOEcIHHTPZaHGG5ItzHoNwYBU6Xlg==
+X-Received: by 2002:a5d:63c7:: with SMTP id c7mr11142662wrw.115.1582634841265; 
+ Tue, 25 Feb 2020 04:47:21 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q3sm3552540wrs.1.2020.02.25.04.47.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 04:47:15 -0800 (PST)
+Received: from zen.home.arpa (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E1DCF1FF96;
+ Tue, 25 Feb 2020 12:47:10 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] Acceptance test: adds param 'address' in _get_free_port
-Date: Tue, 25 Feb 2020 15:12:59 +0200
-Message-Id: <20200225131302.4792-2-ovoshcha@redhat.com>
-In-Reply-To: <20200225131302.4792-1-ovoshcha@redhat.com>
-References: <20200225131302.4792-1-ovoshcha@redhat.com>
+Subject: [PATCH  v3 07/19] travis.yml: single-thread build-tcg stages
+Date: Tue, 25 Feb 2020 12:46:58 +0000
+Message-Id: <20200225124710.14152-8-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
+References: <20200225124710.14152-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,38 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ovoshcha@redhat.com, philmd@redhat.com, wainersm@redhat.com,
- crosa@redhat.com
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
+ pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ marcandre.lureau@redhat.com, aaron@os.amperecomputing.com, cota@braap.org,
+ stefanha@redhat.com, kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the migration test function _get_free_port works only for localhost,
-but in the case to use migration through an RDMA we need to get a free port
-on the configured network RDMA-interface.
-This patch is the start for another migration option
+This still seems to be a problem for Travis.
 
-Signed-off-by: Oksana Vohchana <ovoshcha@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/acceptance/migration.py | 4 ++--
+ .travis.yml | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
-index a8367ca023..e4c39b85a1 100644
---- a/tests/acceptance/migration.py
-+++ b/tests/acceptance/migration.py
-@@ -52,8 +52,8 @@ class Migration(Test):
-         source_vm.qmp('migrate', uri=3Dsrc_uri)
-         self.assert_migration(source_vm, dest_vm)
-=20
--    def _get_free_port(self):
--        port =3D network.find_free_port()
-+    def _get_free_port(self, address=3D'localhost'):
-+        port =3D network.find_free_port(address=3Daddress)
-         if port is None:
-             self.cancel('Failed to find a free port')
-         return port
---=20
-2.21.1
+diff --git a/.travis.yml b/.travis.yml
+index 0612998958b..f4020dcc6c8 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -400,7 +400,7 @@ jobs:
+     - name: "GCC check-tcg (some-softmmu)"
+       env:
+         - CONFIG="--enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+-        - TEST_BUILD_CMD="make -j${JOBS} build-tcg"
++        - TEST_BUILD_CMD="make build-tcg"
+         - TEST_CMD="make check-tcg"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+@@ -409,7 +409,7 @@ jobs:
+     - name: "GCC plugins check-tcg (some-softmmu)"
+       env:
+         - CONFIG="--enable-plugins --enable-debug-tcg --target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+-        - TEST_BUILD_CMD="make -j${JOBS} build-tcg"
++        - TEST_BUILD_CMD="make build-tcg"
+         - TEST_CMD="make check-tcg"
+         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+ 
+-- 
+2.20.1
 
 
