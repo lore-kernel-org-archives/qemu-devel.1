@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDDA2C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F626C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99FFF218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 166592176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vGetfByx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FFF218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOUy6dlc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 166592176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z9T-00037X-Ni
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:17:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49447)
+	id 1j6ZAY-0005UW-2p
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:18:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykd-0000md-Dl
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlB-0001Wh-0i
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkZ-00071S-Gq
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:47 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:38654)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl7-0000WT-1A
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:20 -0500
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:42506)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YkZ-0006ul-9Z
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:43 -0500
-Received: by mail-wm1-x332.google.com with SMTP id a9so2847316wmj.3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:43 -0800 (PST)
+ id 1j6Yl5-0000Nf-Pm
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:16 -0500
+Received: by mail-wr1-x429.google.com with SMTP id p18so10723241wre.9
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=EF1xxDl20iyMhk1ftjp9b02tb0F6Nx8GjS3T9tHjvyw=;
- b=vGetfByxwgBaTrHblfZFuUYcGpdoyOdJUFxe0n8C6IrgIDpXQr4NC3Eel9rrNzV5+Z
- qfiC56z8sAPhlHo3NhnadunEizOpseZeHoRoMgobimnPAUHZjtR1FR7epEIEjWU9Tr+u
- kw1TahW6BWo8l7X0yxaGq+Y2qy2LcxgUe5EhoGZ5mSIHimeTe3NmSRHsCqxZc/Z0W3vS
- 32JnYZ7C9LpziwuUukohj0lsShYMtAb9c4VcYZhGnrJyx698VNTkyG6CLStBdABrHvLl
- rpN7E8JhVQ3Ub0zCnBGtooArLPwB4oKBDCzqz8IPS9BSj3BsmR9dnBbpUBwHWoKcU278
- 27aw==
+ bh=ck5X4vl1RGKGfpbpG5MISitEJJgkamTLoZojb/ILQQc=;
+ b=WOUy6dlc89fPR79czCKS4c0SNuzvd/UJVnIVeXs4o6Ofng1vyQPTROqTnuv0czFSfp
+ 02T4LTaUMcMvNqBN0USWe5EBisNzRejjb/MM4srcGVI0aUmF+NnldkeAUtOYpq7FL52/
+ UPJzQXUgTqc+iAh6jeuyzBREpyOR83w+ktDQz2u+lIroODhCwKBzSBiaw1KYWNTEFxVl
+ bmEOyi46iMTC2xGGrZm0iN2JU8Fmo6n+jVsVaEfkiItNFJ+JA8Q4dzzilUkNgPMaPDBL
+ pbymPFg3Tf7O6Hnvu4/uDIDES8LV7jzKCFqfU4mCxRcBqXuJEy+3rKm8cH/d5MbDxYE7
+ JyXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=EF1xxDl20iyMhk1ftjp9b02tb0F6Nx8GjS3T9tHjvyw=;
- b=JnuEAqDoR1odG7FmjfVapNSOCHd3lgxigbJ2p4SojAKzD5Y6DJRzRP8KXczN8gpzhn
- qFPeCc8ikAMzZjv0dGAdvEyNZe4Zm6iJ4TtwtGPg2G2XJSpe5MI/2Nk78ggvvcj1fcAc
- LFvr0lHjLcEotqIZCN55Box9ECNrNvAtp6s9mUDvKSA1d4poY3iA6gMAzsk0B1KzJqtq
- Xl+k4r3ZnIGURL0ko5HDw7Th0vfDFSTkYNeUoszVcgS7fmiyQ9e7Id2MVa+4ns1EIDoy
- ZYtwkQbFV3DsK+iWhRPPs1YL0v6iLSnGkHmXCVi9Lprl56cQXIpaj1loxWI5G8cDmpVd
- UHGg==
-X-Gm-Message-State: APjAAAWnbAbOk0k2KWz8NGDms0kvkucHEbB6IhHZMLFgCfYVvmyQqTBl
- 5bb9/LlV5VI9HAe6usT8+PhpfEeO
-X-Google-Smtp-Source: APXvYqyrz7+e11O0/5bVoICh0a/UKA9qof4SlHhGZUTkx761cDcK7TZfq1TxIMhZCCvkW3DNpRxWHA==
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr4830674wmi.14.1582631502111;
- Tue, 25 Feb 2020 03:51:42 -0800 (PST)
+ bh=ck5X4vl1RGKGfpbpG5MISitEJJgkamTLoZojb/ILQQc=;
+ b=a3IOHFXuJO+qiUw4uedvRRIx8/GWtCbtkydFHnJkpfvkd+ef2FTU/JUa7ayFX+4+9H
+ 9cK6kujEGmM7UXXVut+ktxxr35uQsGHcThBEHFVMBOnYwV3lmt1Eq478AOYTS7jdZ81B
+ k0GDaTUnzrFU9feMWAmJGTFb0J93cZ2lUo/HdF5fKwrfuLwXXVkrrmLYL/3i2lRwE32M
+ PaqrTfzIMrftUXuCxvAHh1jUp06aLr64VTNOzXSYMfaEWYsmXx7sznBZKiGxsdHA8GEm
+ px3RYuvQcmjCTHe66UcjfI6a3GgpMp5hZRZaQqgyga+4UnoFYzYcYtRZzgTY8tb0Khj2
+ mk3g==
+X-Gm-Message-State: APjAAAVC4c58U0n1IKnOEj7i28IdU2nbHgT3Ad4Fz4dBoQlZXlN2iI7S
+ mXPfUglUMDpmgmYLGStYFHX0mW/Z
+X-Google-Smtp-Source: APXvYqyRhIgoiWskYVIm5EjBcuvPIFBCB/ZX1GlrLav8F2Fj2EtBb2DSsR9I3892uPiA8LjFTQYUAQ==
+X-Received: by 2002:adf:de0b:: with SMTP id b11mr70961422wrm.89.1582631534457; 
+ Tue, 25 Feb 2020 03:52:14 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.41
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.13
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:41 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:13 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 038/136] s390x/s390-virtio-ccw: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:28 +0100
-Message-Id: <1582631466-13880-38-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 074/136] exec: drop bogus mem_path from qemu_ram_alloc_from_fd()
+Date: Tue, 25 Feb 2020 12:50:04 +0100
+Message-Id: <1582631466-13880-74-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::429
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,63 +100,51 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+Function will report error that will mention global mem_path,
+which was valid the only if legacy -mem-path was used and
+only in case of main RAM.
+
+However it doesn't work with hostmem backends
+(for example:
+"
+  qemu: -object memory-backend-file,id=ram0,size=128M,mem-path=foo:
+    backing store (null) size 0x200000 does not match 'size' option 0x8000000
+")
+and couldn't possibly work in general FD case the function
+is supposed to handle.
+
+Taking in account that main RAM was converted into
+memory-backend-foo object, there is no point in printing
+file name (from inappropriate place) as failing path is
+a part of backend's error message.
+
+Hence drop bogus mem_path usage from qemu_ram_alloc_from_fd(),
+it's a job of its user to add file name to error message if applicable.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Tested-by: Halil Pasic <pasic@linux.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-39-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-75-imammedo@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ exec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index e759eb5..a89cf4c 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -154,14 +154,12 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
+diff --git a/exec.c b/exec.c
+index d85a868..6ebff8b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2307,9 +2307,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+     size = HOST_PAGE_ALIGN(size);
+     file_size = get_file_size(fd);
+     if (file_size > 0 && file_size < size) {
+-        error_setg(errp, "backing store %s size 0x%" PRIx64
++        error_setg(errp, "backing store size 0x%" PRIx64
+                    " does not match 'size' option 0x" RAM_ADDR_FMT,
+-                   mem_path, file_size, size);
++                   file_size, size);
+         return NULL;
+     }
  
--static void s390_memory_init(ram_addr_t mem_size)
-+static void s390_memory_init(MemoryRegion *ram)
- {
-     MemoryRegion *sysmem = get_system_memory();
--    MemoryRegion *ram = g_new(MemoryRegion, 1);
-     Error *local_err = NULL;
- 
-     /* allocate RAM for core */
--    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
-     memory_region_add_subregion(sysmem, 0, ram);
- 
-     /*
-@@ -245,7 +243,7 @@ static void ccw_init(MachineState *machine)
- 
-     s390_sclp_init();
-     /* init memory + setup max page size. Required for the CPU model */
--    s390_memory_init(machine->ram_size);
-+    s390_memory_init(machine->ram);
- 
-     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
-     s390_init_cpus(machine);
-@@ -471,6 +469,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-     hc->plug = s390_machine_device_plug;
-     hc->unplug_request = s390_machine_device_unplug_request;
-     nc->nmi_monitor_handler = s390_nmi;
-+    mc->default_ram_id = "s390.ram";
- }
- 
- static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
 -- 
 1.8.3.1
 
