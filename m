@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7F4C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7983EC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:29:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B57272084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:29:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B57272084E
+	by mail.kernel.org (Postfix) with ESMTPS id 27CB82176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:29:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CB82176D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aHJ-00084w-V1
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:29:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54333)
+	id 1j6aHd-0000Cm-9m
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:29:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j6Z9G-0003Ia-Iw
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:21 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9Q-0003gJ-Tb
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j6Z9A-0001ci-Hz
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:14 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:57803)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9H-0001jG-T9
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:24 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:56023)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j6Z9A-0001bZ-2V; Tue, 25 Feb 2020 07:17:08 -0500
+ id 1j6Z93-0001XU-RS; Tue, 25 Feb 2020 07:17:02 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mmhs6-1joBxS1P1C-00jnF2; Tue, 25 Feb 2020 13:16:21 +0100
+ id 1MmyzH-1jnuyM1pvL-00k4Dx; Tue, 25 Feb 2020 13:16:02 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 15/21] linux-user,
- x86_64: add syscall table generation support
-Date: Tue, 25 Feb 2020 13:15:47 +0100
-Message-Id: <20200225121553.2191597-16-laurent@vivier.eu>
+Subject: [PATCH v3 02/21] linux-user,
+ alpha: add syscall table generation support
+Date: Tue, 25 Feb 2020 13:15:34 +0100
+Message-Id: <20200225121553.2191597-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200225121553.2191597-1-laurent@vivier.eu>
 References: <20200225121553.2191597-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:sTyoEy52nghlbgXVYFDzH5K9/eGUEJz5LsUd80mvGJF7V3ezHX7
- KQYoYXqeHNEDVnIpt8WubuGM+NbuJaxAA2QuNjvnLAjZBE24RD8GtAkvDI/GCsbX4CTTTqh
- mxcp10PdijmYOPkN88gA477ylGazhvRnS/KWcEyRCLM/QqmF/zZDtn2s6M8H2O/4nS0buu0
- Ac4ehKd3QB19MKdMQQbBA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lXoPUSWRStw=:6N/X4xeYwycXJRY+tye/1L
- mApJgdsBv80A+QLjRO8Mmjr1elYfHaMh+j+xmO5/u2INbo2aw8cl0KiEJSqVJT+3cLmfHZl+n
- HF6m2K/KE1yuxuwfV7IPneqhCkQw9RfjZj6jYu2Opo25jNTtEscJzYyjVuDSEjPpVf1C9fDb4
- sbTaZjB4RQyo6O/CtgOkMI9Z6T8sP2vYWjYc2Tp+aPHEomlD+nxrN13OnQTB6ijqJ8V/8Nk4u
- 0pJL+EOMnXPv46SrIYr1ANsgCWU1pnTTtBKzR9vBBb3wLHqdXQSzjk+KXH+wftyh0dlBQEwKA
- Xogr6Thf5z2gUrUww0zeMcN9rCJu9qShsIAro2yAlMHvI0cCAelBtNQbeWUCvVfdEL2eTFwAY
- 35oYMKOlNHde7NhG5CVjtFhuG3EQXUcaUC1AFRYIxUiwPgS+gTMCUcRHP+Uf4NdgvEKJagrYm
- ulx4zkgHQvJ6BnmS6SoGO3JZlz3GW/ckCt/OtlCTtahnrgtd6dCJyueA6+N5o7yVt+94NasAF
- Yun75Mn5b+KZbVcYACmQDaaKNYji57G+aRJ2a1yzi957QTeYdzll3TtePr/fig+fPmDspweWz
- wIFm7+fn9Umtqb86pJLQuP64Be3PfmaOx8NKcLiq2v5s3uG6JeAwT46ub5QGrZHQoU9ASVUyk
- 9mG5eORbpOFZN+ZoSDHgeXZMYdai9m8PHvKZ9mQjlYsUS6LPj5n7Vt13zXG6BMHn/4SlG5jPr
- naG1unzBAPbu2ZnDq1M1uUveranwni8h0Qq3DgPRxzwv3Iw/jON0w6C3FLyGxqhlPxIG3opcN
- FjtBmHj57NYIag+PDVLHRsSYzcvRQyGAvvgDHPIy2n7miB93aXfB6eGOLPP9D5a7nuHXLF5
+X-Provags-ID: V03:K1:DNBXpCrrZwDSK25eNWMelVInu1EJ4ic8UAwJlilycmP3tK1unWk
+ 2xfsNvcJAOz6PAHg6BRsKQQRtHBjBiRPkov0xnOmq+GJMarTskVKQv9nJHkGAlj8g7BqwRC
+ kVC5kLLlwI7PhO4lrCULqumnWWGHr0OlGx8TpNyLS9ImoUfeuryOLsYg+wvH1vOm6ra+4Ir
+ bdx4FNEi1H+54JFf+WwBA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zx5ePs55b6M=:DDyI5YLczVQMFWwQwKhasL
+ NSszpEoJt3vxBSFwvxur5Y+7mEYe+VYiEicR0iPBWBqgp9sfXh44hK4XqoREGcypQLKox8gFZ
+ 77BCA8kp4j/3eAHTrBgKGuHZmHgz09ViEugWfsbjwidKy1t+V4skN4YnjSPaFrVqBztURTQla
+ vkfd9l3H+YGYYM+IP8ceEJN2zqhOka7FGDk9FCSDhWvRWTnTS5mP8B9GoL0fymJxNlJXGABTU
+ f6/lIThN9dSkuJ+oGGwpLAOzEmBhIHiNxNFj+UoHDQR7wbc2i1fV/EmBdlGvDC7ZVEfSGVs20
+ 0IhdQWAYeHk6R++hrEPAChm55WqVs1ZGe3TBpvHIaUW9D/DFcd7MHitEefUxTDGSJd0A6d03v
+ nY9jyeabxJvyMPFA3T+DZuXQPE8VYz80btj70w3/ehTamHg+zXRlyi6j8lxYDh7fRiYiGDNnw
+ q8+MMu7qXTERvAQ0k/FwM6GhsS2hCt4Y74PGfowwoRq4ASJLa4EspLOcmZpDT7ODD/2RC0aIS
+ lWp/MfDS04QfetuuyrKULMzpQcWfWPIjmQquMU56Is0HLC9sLfeB6fxF47GnYb4+sRPdK189A
+ eCDw61fJ9J3ChzBYBo75saMhBxAMdVYlZIWJZxCy0xKlmljiy7qx3TpOsxNWXop6jD3NXJXX2
+ LYB6r1CFCK2AFzZDauxIuEKFj+2KdHoQfaofyrHMDswKgk9zQ/lnh/3apYSJEuY/GzMVBj+5F
+ uAVqv1HS/5qs859uacAPJgMH6BkxQqGAi5oeCtxi5QJpUTsgcqIMopkwMKlBjL7KTjWmc2Wyb
+ VDrmmoLu/6tMQFiWHsrMewt4/3WTIRodXJ6mlzR0tGS+Pm3EdkEyFzDvxJEGZZwKqCKgNGF
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,841 +85,1054 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Copy syscall_64.tbl and syscallhdr.sh from linux/arch/x86/kernel/syscalls v5.5
+Copy syscall.tbl and syscallhdr.sh from linux/arch/alpha/kernel/syscalls v5.5
 Update syscallhdr.sh to generate QEMU syscall_nr.h
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- configure                        |   3 +-
- linux-user/Makefile.objs         |   1 +
- linux-user/x86_64/Makefile.objs  |   5 +
- linux-user/x86_64/syscall_64.tbl | 402 +++++++++++++++++++++++++++++++
- linux-user/x86_64/syscall_nr.h   | 356 ---------------------------
- linux-user/x86_64/syscallhdr.sh  |  28 +++
- 6 files changed, 438 insertions(+), 357 deletions(-)
- create mode 100644 linux-user/x86_64/Makefile.objs
- create mode 100644 linux-user/x86_64/syscall_64.tbl
- delete mode 100644 linux-user/x86_64/syscall_nr.h
- create mode 100644 linux-user/x86_64/syscallhdr.sh
+ configure                      |   3 +-
+ linux-user/Makefile.objs       |   2 +
+ linux-user/alpha/Makefile.objs |   5 +
+ linux-user/alpha/syscall.tbl   | 479 ++++++++++++++++++++++++++++++++
+ linux-user/alpha/syscall_nr.h  | 492 ---------------------------------
+ linux-user/alpha/syscallhdr.sh |  32 +++
+ 6 files changed, 520 insertions(+), 493 deletions(-)
+ create mode 100644 linux-user/alpha/Makefile.objs
+ create mode 100644 linux-user/alpha/syscall.tbl
+ delete mode 100644 linux-user/alpha/syscall_nr.h
+ create mode 100644 linux-user/alpha/syscallhdr.sh
 
 diff --git a/configure b/configure
-index 16752a2422a8..3a6160b3569e 100755
+index c94161ced84f..e2b1c39b4774 100755
 --- a/configure
 +++ b/configure
-@@ -1858,7 +1858,7 @@ rm -f */config-devices.mak.d
+@@ -1857,7 +1857,7 @@ rm -f */config-devices.mak.d
+ 
  # Remove syscall_nr.h to be sure they will be regenerated in the build
  # directory, not in the source directory
- for arch in alpha hppa m68k xtensa sh4 microblaze arm ppc s390x sparc sparc64 \
--    i386 ; do
-+    i386 x86_64 ; do
+-for arch in ; do
++for arch in alpha ; do
      # remove the file if it has been generated in the source directory
      rm -f "${source_path}/linux-user/${arch}/syscall_nr.h"
      # remove the dependency files
-@@ -7710,6 +7710,7 @@ case "$target_name" in
+@@ -7713,6 +7713,7 @@ case "$target_name" in
    ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-+    TARGET_SYSTBL_ABI=common,64
+   alpha)
      mttcg="yes"
- 	gdb_xml_files="i386-64bit.xml"
++    TARGET_SYSTBL_ABI=common
    ;;
+   arm|armeb)
+     TARGET_ARCH=arm
 diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 720d9773b813..1791bc48cd17 100644
+index d2f33beb5e52..a1afb4d21f9f 100644
 --- a/linux-user/Makefile.objs
 +++ b/linux-user/Makefile.objs
-@@ -19,4 +19,5 @@ obj-$(TARGET_S390X) += s390x/
- obj-$(TARGET_SH4) += sh4/
- obj-$(TARGET_SPARC) += sparc/
- obj-$(TARGET_SPARC64) += $(TARGET_ABI_DIR)/
-+obj-$(TARGET_X86_64) += x86_64/
- obj-$(TARGET_XTENSA) += xtensa/
-diff --git a/linux-user/x86_64/Makefile.objs b/linux-user/x86_64/Makefile.objs
-new file mode 100644
-index 000000000000..2cef1d48becc
---- /dev/null
-+++ b/linux-user/x86_64/Makefile.objs
-@@ -0,0 +1,5 @@
-+generated-files-y += linux-user/x86_64/syscall_nr.h
+@@ -8,3 +8,5 @@ obj-$(TARGET_I386) += vm86.o
+ obj-$(TARGET_ARM) += arm/nwfpe/
+ obj-$(TARGET_ARM) += arm/semihost.o
+ obj-$(TARGET_AARCH64) += arm/semihost.o
 +
-+syshdr := $(SRC_PATH)/linux-user/x86_64/syscallhdr.sh
-+%/syscall_nr.h: $(SRC_PATH)/linux-user/x86_64/syscall_64.tbl $(syshdr)
-+	$(call quiet-command, sh $(syshdr) $< $@ $(TARGET_SYSTBL_ABI),"GEN","$@")
-diff --git a/linux-user/x86_64/syscall_64.tbl b/linux-user/x86_64/syscall_64.tbl
++obj-$(TARGET_ALPHA) += alpha/
+diff --git a/linux-user/alpha/Makefile.objs b/linux-user/alpha/Makefile.objs
 new file mode 100644
-index 000000000000..c29976eca4a8
+index 000000000000..d6397a70abb2
 --- /dev/null
-+++ b/linux-user/x86_64/syscall_64.tbl
-@@ -0,0 +1,402 @@
++++ b/linux-user/alpha/Makefile.objs
+@@ -0,0 +1,5 @@
++generated-files-y += linux-user/alpha/syscall_nr.h
++
++syshdr := $(SRC_PATH)/linux-user/alpha/syscallhdr.sh
++%/syscall_nr.h: $(SRC_PATH)/linux-user/alpha/syscall.tbl $(syshdr)
++	$(call quiet-command, sh $(syshdr) $< $@ $(TARGET_SYSTBL_ABI),"GEN","$@")
+diff --git a/linux-user/alpha/syscall.tbl b/linux-user/alpha/syscall.tbl
+new file mode 100644
+index 000000000000..36d42da7466a
+--- /dev/null
++++ b/linux-user/alpha/syscall.tbl
+@@ -0,0 +1,479 @@
++# SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note
 +#
-+# 64-bit system call numbers and entry vectors
++# system call numbers and entry vectors for alpha
 +#
 +# The format is:
 +# <number> <abi> <name> <entry point>
 +#
-+# The __x64_sys_*() stubs are created on-the-fly for sys_*() system calls
++# The <abi> is always "common" for this file
 +#
-+# The abi is "common", "64" or "x32" for this file.
-+#
-+0	common	read			__x64_sys_read
-+1	common	write			__x64_sys_write
-+2	common	open			__x64_sys_open
-+3	common	close			__x64_sys_close
-+4	common	stat			__x64_sys_newstat
-+5	common	fstat			__x64_sys_newfstat
-+6	common	lstat			__x64_sys_newlstat
-+7	common	poll			__x64_sys_poll
-+8	common	lseek			__x64_sys_lseek
-+9	common	mmap			__x64_sys_mmap
-+10	common	mprotect		__x64_sys_mprotect
-+11	common	munmap			__x64_sys_munmap
-+12	common	brk			__x64_sys_brk
-+13	64	rt_sigaction		__x64_sys_rt_sigaction
-+14	common	rt_sigprocmask		__x64_sys_rt_sigprocmask
-+15	64	rt_sigreturn		__x64_sys_rt_sigreturn/ptregs
-+16	64	ioctl			__x64_sys_ioctl
-+17	common	pread64			__x64_sys_pread64
-+18	common	pwrite64		__x64_sys_pwrite64
-+19	64	readv			__x64_sys_readv
-+20	64	writev			__x64_sys_writev
-+21	common	access			__x64_sys_access
-+22	common	pipe			__x64_sys_pipe
-+23	common	select			__x64_sys_select
-+24	common	sched_yield		__x64_sys_sched_yield
-+25	common	mremap			__x64_sys_mremap
-+26	common	msync			__x64_sys_msync
-+27	common	mincore			__x64_sys_mincore
-+28	common	madvise			__x64_sys_madvise
-+29	common	shmget			__x64_sys_shmget
-+30	common	shmat			__x64_sys_shmat
-+31	common	shmctl			__x64_sys_shmctl
-+32	common	dup			__x64_sys_dup
-+33	common	dup2			__x64_sys_dup2
-+34	common	pause			__x64_sys_pause
-+35	common	nanosleep		__x64_sys_nanosleep
-+36	common	getitimer		__x64_sys_getitimer
-+37	common	alarm			__x64_sys_alarm
-+38	common	setitimer		__x64_sys_setitimer
-+39	common	getpid			__x64_sys_getpid
-+40	common	sendfile		__x64_sys_sendfile64
-+41	common	socket			__x64_sys_socket
-+42	common	connect			__x64_sys_connect
-+43	common	accept			__x64_sys_accept
-+44	common	sendto			__x64_sys_sendto
-+45	64	recvfrom		__x64_sys_recvfrom
-+46	64	sendmsg			__x64_sys_sendmsg
-+47	64	recvmsg			__x64_sys_recvmsg
-+48	common	shutdown		__x64_sys_shutdown
-+49	common	bind			__x64_sys_bind
-+50	common	listen			__x64_sys_listen
-+51	common	getsockname		__x64_sys_getsockname
-+52	common	getpeername		__x64_sys_getpeername
-+53	common	socketpair		__x64_sys_socketpair
-+54	64	setsockopt		__x64_sys_setsockopt
-+55	64	getsockopt		__x64_sys_getsockopt
-+56	common	clone			__x64_sys_clone/ptregs
-+57	common	fork			__x64_sys_fork/ptregs
-+58	common	vfork			__x64_sys_vfork/ptregs
-+59	64	execve			__x64_sys_execve/ptregs
-+60	common	exit			__x64_sys_exit
-+61	common	wait4			__x64_sys_wait4
-+62	common	kill			__x64_sys_kill
-+63	common	uname			__x64_sys_newuname
-+64	common	semget			__x64_sys_semget
-+65	common	semop			__x64_sys_semop
-+66	common	semctl			__x64_sys_semctl
-+67	common	shmdt			__x64_sys_shmdt
-+68	common	msgget			__x64_sys_msgget
-+69	common	msgsnd			__x64_sys_msgsnd
-+70	common	msgrcv			__x64_sys_msgrcv
-+71	common	msgctl			__x64_sys_msgctl
-+72	common	fcntl			__x64_sys_fcntl
-+73	common	flock			__x64_sys_flock
-+74	common	fsync			__x64_sys_fsync
-+75	common	fdatasync		__x64_sys_fdatasync
-+76	common	truncate		__x64_sys_truncate
-+77	common	ftruncate		__x64_sys_ftruncate
-+78	common	getdents		__x64_sys_getdents
-+79	common	getcwd			__x64_sys_getcwd
-+80	common	chdir			__x64_sys_chdir
-+81	common	fchdir			__x64_sys_fchdir
-+82	common	rename			__x64_sys_rename
-+83	common	mkdir			__x64_sys_mkdir
-+84	common	rmdir			__x64_sys_rmdir
-+85	common	creat			__x64_sys_creat
-+86	common	link			__x64_sys_link
-+87	common	unlink			__x64_sys_unlink
-+88	common	symlink			__x64_sys_symlink
-+89	common	readlink		__x64_sys_readlink
-+90	common	chmod			__x64_sys_chmod
-+91	common	fchmod			__x64_sys_fchmod
-+92	common	chown			__x64_sys_chown
-+93	common	fchown			__x64_sys_fchown
-+94	common	lchown			__x64_sys_lchown
-+95	common	umask			__x64_sys_umask
-+96	common	gettimeofday		__x64_sys_gettimeofday
-+97	common	getrlimit		__x64_sys_getrlimit
-+98	common	getrusage		__x64_sys_getrusage
-+99	common	sysinfo			__x64_sys_sysinfo
-+100	common	times			__x64_sys_times
-+101	64	ptrace			__x64_sys_ptrace
-+102	common	getuid			__x64_sys_getuid
-+103	common	syslog			__x64_sys_syslog
-+104	common	getgid			__x64_sys_getgid
-+105	common	setuid			__x64_sys_setuid
-+106	common	setgid			__x64_sys_setgid
-+107	common	geteuid			__x64_sys_geteuid
-+108	common	getegid			__x64_sys_getegid
-+109	common	setpgid			__x64_sys_setpgid
-+110	common	getppid			__x64_sys_getppid
-+111	common	getpgrp			__x64_sys_getpgrp
-+112	common	setsid			__x64_sys_setsid
-+113	common	setreuid		__x64_sys_setreuid
-+114	common	setregid		__x64_sys_setregid
-+115	common	getgroups		__x64_sys_getgroups
-+116	common	setgroups		__x64_sys_setgroups
-+117	common	setresuid		__x64_sys_setresuid
-+118	common	getresuid		__x64_sys_getresuid
-+119	common	setresgid		__x64_sys_setresgid
-+120	common	getresgid		__x64_sys_getresgid
-+121	common	getpgid			__x64_sys_getpgid
-+122	common	setfsuid		__x64_sys_setfsuid
-+123	common	setfsgid		__x64_sys_setfsgid
-+124	common	getsid			__x64_sys_getsid
-+125	common	capget			__x64_sys_capget
-+126	common	capset			__x64_sys_capset
-+127	64	rt_sigpending		__x64_sys_rt_sigpending
-+128	64	rt_sigtimedwait		__x64_sys_rt_sigtimedwait
-+129	64	rt_sigqueueinfo		__x64_sys_rt_sigqueueinfo
-+130	common	rt_sigsuspend		__x64_sys_rt_sigsuspend
-+131	64	sigaltstack		__x64_sys_sigaltstack
-+132	common	utime			__x64_sys_utime
-+133	common	mknod			__x64_sys_mknod
-+134	64	uselib
-+135	common	personality		__x64_sys_personality
-+136	common	ustat			__x64_sys_ustat
-+137	common	statfs			__x64_sys_statfs
-+138	common	fstatfs			__x64_sys_fstatfs
-+139	common	sysfs			__x64_sys_sysfs
-+140	common	getpriority		__x64_sys_getpriority
-+141	common	setpriority		__x64_sys_setpriority
-+142	common	sched_setparam		__x64_sys_sched_setparam
-+143	common	sched_getparam		__x64_sys_sched_getparam
-+144	common	sched_setscheduler	__x64_sys_sched_setscheduler
-+145	common	sched_getscheduler	__x64_sys_sched_getscheduler
-+146	common	sched_get_priority_max	__x64_sys_sched_get_priority_max
-+147	common	sched_get_priority_min	__x64_sys_sched_get_priority_min
-+148	common	sched_rr_get_interval	__x64_sys_sched_rr_get_interval
-+149	common	mlock			__x64_sys_mlock
-+150	common	munlock			__x64_sys_munlock
-+151	common	mlockall		__x64_sys_mlockall
-+152	common	munlockall		__x64_sys_munlockall
-+153	common	vhangup			__x64_sys_vhangup
-+154	common	modify_ldt		__x64_sys_modify_ldt
-+155	common	pivot_root		__x64_sys_pivot_root
-+156	64	_sysctl			__x64_sys_sysctl
-+157	common	prctl			__x64_sys_prctl
-+158	common	arch_prctl		__x64_sys_arch_prctl
-+159	common	adjtimex		__x64_sys_adjtimex
-+160	common	setrlimit		__x64_sys_setrlimit
-+161	common	chroot			__x64_sys_chroot
-+162	common	sync			__x64_sys_sync
-+163	common	acct			__x64_sys_acct
-+164	common	settimeofday		__x64_sys_settimeofday
-+165	common	mount			__x64_sys_mount
-+166	common	umount2			__x64_sys_umount
-+167	common	swapon			__x64_sys_swapon
-+168	common	swapoff			__x64_sys_swapoff
-+169	common	reboot			__x64_sys_reboot
-+170	common	sethostname		__x64_sys_sethostname
-+171	common	setdomainname		__x64_sys_setdomainname
-+172	common	iopl			__x64_sys_iopl/ptregs
-+173	common	ioperm			__x64_sys_ioperm
-+174	64	create_module
-+175	common	init_module		__x64_sys_init_module
-+176	common	delete_module		__x64_sys_delete_module
-+177	64	get_kernel_syms
-+178	64	query_module
-+179	common	quotactl		__x64_sys_quotactl
-+180	64	nfsservctl
-+181	common	getpmsg
-+182	common	putpmsg
-+183	common	afs_syscall
-+184	common	tuxcall
-+185	common	security
-+186	common	gettid			__x64_sys_gettid
-+187	common	readahead		__x64_sys_readahead
-+188	common	setxattr		__x64_sys_setxattr
-+189	common	lsetxattr		__x64_sys_lsetxattr
-+190	common	fsetxattr		__x64_sys_fsetxattr
-+191	common	getxattr		__x64_sys_getxattr
-+192	common	lgetxattr		__x64_sys_lgetxattr
-+193	common	fgetxattr		__x64_sys_fgetxattr
-+194	common	listxattr		__x64_sys_listxattr
-+195	common	llistxattr		__x64_sys_llistxattr
-+196	common	flistxattr		__x64_sys_flistxattr
-+197	common	removexattr		__x64_sys_removexattr
-+198	common	lremovexattr		__x64_sys_lremovexattr
-+199	common	fremovexattr		__x64_sys_fremovexattr
-+200	common	tkill			__x64_sys_tkill
-+201	common	time			__x64_sys_time
-+202	common	futex			__x64_sys_futex
-+203	common	sched_setaffinity	__x64_sys_sched_setaffinity
-+204	common	sched_getaffinity	__x64_sys_sched_getaffinity
-+205	64	set_thread_area
-+206	64	io_setup		__x64_sys_io_setup
-+207	common	io_destroy		__x64_sys_io_destroy
-+208	common	io_getevents		__x64_sys_io_getevents
-+209	64	io_submit		__x64_sys_io_submit
-+210	common	io_cancel		__x64_sys_io_cancel
-+211	64	get_thread_area
-+212	common	lookup_dcookie		__x64_sys_lookup_dcookie
-+213	common	epoll_create		__x64_sys_epoll_create
-+214	64	epoll_ctl_old
-+215	64	epoll_wait_old
-+216	common	remap_file_pages	__x64_sys_remap_file_pages
-+217	common	getdents64		__x64_sys_getdents64
-+218	common	set_tid_address		__x64_sys_set_tid_address
-+219	common	restart_syscall		__x64_sys_restart_syscall
-+220	common	semtimedop		__x64_sys_semtimedop
-+221	common	fadvise64		__x64_sys_fadvise64
-+222	64	timer_create		__x64_sys_timer_create
-+223	common	timer_settime		__x64_sys_timer_settime
-+224	common	timer_gettime		__x64_sys_timer_gettime
-+225	common	timer_getoverrun	__x64_sys_timer_getoverrun
-+226	common	timer_delete		__x64_sys_timer_delete
-+227	common	clock_settime		__x64_sys_clock_settime
-+228	common	clock_gettime		__x64_sys_clock_gettime
-+229	common	clock_getres		__x64_sys_clock_getres
-+230	common	clock_nanosleep		__x64_sys_clock_nanosleep
-+231	common	exit_group		__x64_sys_exit_group
-+232	common	epoll_wait		__x64_sys_epoll_wait
-+233	common	epoll_ctl		__x64_sys_epoll_ctl
-+234	common	tgkill			__x64_sys_tgkill
-+235	common	utimes			__x64_sys_utimes
-+236	64	vserver
-+237	common	mbind			__x64_sys_mbind
-+238	common	set_mempolicy		__x64_sys_set_mempolicy
-+239	common	get_mempolicy		__x64_sys_get_mempolicy
-+240	common	mq_open			__x64_sys_mq_open
-+241	common	mq_unlink		__x64_sys_mq_unlink
-+242	common	mq_timedsend		__x64_sys_mq_timedsend
-+243	common	mq_timedreceive		__x64_sys_mq_timedreceive
-+244	64	mq_notify		__x64_sys_mq_notify
-+245	common	mq_getsetattr		__x64_sys_mq_getsetattr
-+246	64	kexec_load		__x64_sys_kexec_load
-+247	64	waitid			__x64_sys_waitid
-+248	common	add_key			__x64_sys_add_key
-+249	common	request_key		__x64_sys_request_key
-+250	common	keyctl			__x64_sys_keyctl
-+251	common	ioprio_set		__x64_sys_ioprio_set
-+252	common	ioprio_get		__x64_sys_ioprio_get
-+253	common	inotify_init		__x64_sys_inotify_init
-+254	common	inotify_add_watch	__x64_sys_inotify_add_watch
-+255	common	inotify_rm_watch	__x64_sys_inotify_rm_watch
-+256	common	migrate_pages		__x64_sys_migrate_pages
-+257	common	openat			__x64_sys_openat
-+258	common	mkdirat			__x64_sys_mkdirat
-+259	common	mknodat			__x64_sys_mknodat
-+260	common	fchownat		__x64_sys_fchownat
-+261	common	futimesat		__x64_sys_futimesat
-+262	common	newfstatat		__x64_sys_newfstatat
-+263	common	unlinkat		__x64_sys_unlinkat
-+264	common	renameat		__x64_sys_renameat
-+265	common	linkat			__x64_sys_linkat
-+266	common	symlinkat		__x64_sys_symlinkat
-+267	common	readlinkat		__x64_sys_readlinkat
-+268	common	fchmodat		__x64_sys_fchmodat
-+269	common	faccessat		__x64_sys_faccessat
-+270	common	pselect6		__x64_sys_pselect6
-+271	common	ppoll			__x64_sys_ppoll
-+272	common	unshare			__x64_sys_unshare
-+273	64	set_robust_list		__x64_sys_set_robust_list
-+274	64	get_robust_list		__x64_sys_get_robust_list
-+275	common	splice			__x64_sys_splice
-+276	common	tee			__x64_sys_tee
-+277	common	sync_file_range		__x64_sys_sync_file_range
-+278	64	vmsplice		__x64_sys_vmsplice
-+279	64	move_pages		__x64_sys_move_pages
-+280	common	utimensat		__x64_sys_utimensat
-+281	common	epoll_pwait		__x64_sys_epoll_pwait
-+282	common	signalfd		__x64_sys_signalfd
-+283	common	timerfd_create		__x64_sys_timerfd_create
-+284	common	eventfd			__x64_sys_eventfd
-+285	common	fallocate		__x64_sys_fallocate
-+286	common	timerfd_settime		__x64_sys_timerfd_settime
-+287	common	timerfd_gettime		__x64_sys_timerfd_gettime
-+288	common	accept4			__x64_sys_accept4
-+289	common	signalfd4		__x64_sys_signalfd4
-+290	common	eventfd2		__x64_sys_eventfd2
-+291	common	epoll_create1		__x64_sys_epoll_create1
-+292	common	dup3			__x64_sys_dup3
-+293	common	pipe2			__x64_sys_pipe2
-+294	common	inotify_init1		__x64_sys_inotify_init1
-+295	64	preadv			__x64_sys_preadv
-+296	64	pwritev			__x64_sys_pwritev
-+297	64	rt_tgsigqueueinfo	__x64_sys_rt_tgsigqueueinfo
-+298	common	perf_event_open		__x64_sys_perf_event_open
-+299	64	recvmmsg		__x64_sys_recvmmsg
-+300	common	fanotify_init		__x64_sys_fanotify_init
-+301	common	fanotify_mark		__x64_sys_fanotify_mark
-+302	common	prlimit64		__x64_sys_prlimit64
-+303	common	name_to_handle_at	__x64_sys_name_to_handle_at
-+304	common	open_by_handle_at	__x64_sys_open_by_handle_at
-+305	common	clock_adjtime		__x64_sys_clock_adjtime
-+306	common	syncfs			__x64_sys_syncfs
-+307	64	sendmmsg		__x64_sys_sendmmsg
-+308	common	setns			__x64_sys_setns
-+309	common	getcpu			__x64_sys_getcpu
-+310	64	process_vm_readv	__x64_sys_process_vm_readv
-+311	64	process_vm_writev	__x64_sys_process_vm_writev
-+312	common	kcmp			__x64_sys_kcmp
-+313	common	finit_module		__x64_sys_finit_module
-+314	common	sched_setattr		__x64_sys_sched_setattr
-+315	common	sched_getattr		__x64_sys_sched_getattr
-+316	common	renameat2		__x64_sys_renameat2
-+317	common	seccomp			__x64_sys_seccomp
-+318	common	getrandom		__x64_sys_getrandom
-+319	common	memfd_create		__x64_sys_memfd_create
-+320	common	kexec_file_load		__x64_sys_kexec_file_load
-+321	common	bpf			__x64_sys_bpf
-+322	64	execveat		__x64_sys_execveat/ptregs
-+323	common	userfaultfd		__x64_sys_userfaultfd
-+324	common	membarrier		__x64_sys_membarrier
-+325	common	mlock2			__x64_sys_mlock2
-+326	common	copy_file_range		__x64_sys_copy_file_range
-+327	64	preadv2			__x64_sys_preadv2
-+328	64	pwritev2		__x64_sys_pwritev2
-+329	common	pkey_mprotect		__x64_sys_pkey_mprotect
-+330	common	pkey_alloc		__x64_sys_pkey_alloc
-+331	common	pkey_free		__x64_sys_pkey_free
-+332	common	statx			__x64_sys_statx
-+333	common	io_pgetevents		__x64_sys_io_pgetevents
-+334	common	rseq			__x64_sys_rseq
-+# don't use numbers 387 through 423, add new calls after the last
-+# 'common' entry
-+424	common	pidfd_send_signal	__x64_sys_pidfd_send_signal
-+425	common	io_uring_setup		__x64_sys_io_uring_setup
-+426	common	io_uring_enter		__x64_sys_io_uring_enter
-+427	common	io_uring_register	__x64_sys_io_uring_register
-+428	common	open_tree		__x64_sys_open_tree
-+429	common	move_mount		__x64_sys_move_mount
-+430	common	fsopen			__x64_sys_fsopen
-+431	common	fsconfig		__x64_sys_fsconfig
-+432	common	fsmount			__x64_sys_fsmount
-+433	common	fspick			__x64_sys_fspick
-+434	common	pidfd_open		__x64_sys_pidfd_open
-+435	common	clone3			__x64_sys_clone3/ptregs
-+
-+#
-+# x32-specific system call numbers start at 512 to avoid cache impact
-+# for native 64-bit operation. The __x32_compat_sys stubs are created
-+# on-the-fly for compat_sys_*() compatibility system calls if X86_X32
-+# is defined.
-+#
-+512	x32	rt_sigaction		__x32_compat_sys_rt_sigaction
-+513	x32	rt_sigreturn		sys32_x32_rt_sigreturn
-+514	x32	ioctl			__x32_compat_sys_ioctl
-+515	x32	readv			__x32_compat_sys_readv
-+516	x32	writev			__x32_compat_sys_writev
-+517	x32	recvfrom		__x32_compat_sys_recvfrom
-+518	x32	sendmsg			__x32_compat_sys_sendmsg
-+519	x32	recvmsg			__x32_compat_sys_recvmsg
-+520	x32	execve			__x32_compat_sys_execve/ptregs
-+521	x32	ptrace			__x32_compat_sys_ptrace
-+522	x32	rt_sigpending		__x32_compat_sys_rt_sigpending
-+523	x32	rt_sigtimedwait		__x32_compat_sys_rt_sigtimedwait_time64
-+524	x32	rt_sigqueueinfo		__x32_compat_sys_rt_sigqueueinfo
-+525	x32	sigaltstack		__x32_compat_sys_sigaltstack
-+526	x32	timer_create		__x32_compat_sys_timer_create
-+527	x32	mq_notify		__x32_compat_sys_mq_notify
-+528	x32	kexec_load		__x32_compat_sys_kexec_load
-+529	x32	waitid			__x32_compat_sys_waitid
-+530	x32	set_robust_list		__x32_compat_sys_set_robust_list
-+531	x32	get_robust_list		__x32_compat_sys_get_robust_list
-+532	x32	vmsplice		__x32_compat_sys_vmsplice
-+533	x32	move_pages		__x32_compat_sys_move_pages
-+534	x32	preadv			__x32_compat_sys_preadv64
-+535	x32	pwritev			__x32_compat_sys_pwritev64
-+536	x32	rt_tgsigqueueinfo	__x32_compat_sys_rt_tgsigqueueinfo
-+537	x32	recvmmsg		__x32_compat_sys_recvmmsg_time64
-+538	x32	sendmmsg		__x32_compat_sys_sendmmsg
-+539	x32	process_vm_readv	__x32_compat_sys_process_vm_readv
-+540	x32	process_vm_writev	__x32_compat_sys_process_vm_writev
-+541	x32	setsockopt		__x32_compat_sys_setsockopt
-+542	x32	getsockopt		__x32_compat_sys_getsockopt
-+543	x32	io_setup		__x32_compat_sys_io_setup
-+544	x32	io_submit		__x32_compat_sys_io_submit
-+545	x32	execveat		__x32_compat_sys_execveat/ptregs
-+546	x32	preadv2			__x32_compat_sys_preadv64v2
-+547	x32	pwritev2		__x32_compat_sys_pwritev64v2
-diff --git a/linux-user/x86_64/syscall_nr.h b/linux-user/x86_64/syscall_nr.h
++0	common	osf_syscall			alpha_syscall_zero
++1	common	exit				sys_exit
++2	common	fork				alpha_fork
++3	common	read				sys_read
++4	common	write				sys_write
++5	common	osf_old_open			sys_ni_syscall
++6	common	close				sys_close
++7	common	osf_wait4			sys_osf_wait4
++8	common	osf_old_creat			sys_ni_syscall
++9	common	link				sys_link
++10	common	unlink				sys_unlink
++11	common	osf_execve			sys_ni_syscall
++12	common	chdir				sys_chdir
++13	common	fchdir				sys_fchdir
++14	common	mknod				sys_mknod
++15	common	chmod				sys_chmod
++16	common	chown				sys_chown
++17	common	brk				sys_osf_brk
++18	common	osf_getfsstat			sys_ni_syscall
++19	common	lseek				sys_lseek
++20	common	getxpid				sys_getxpid
++21	common	osf_mount			sys_osf_mount
++22	common	umount2				sys_umount
++23	common	setuid				sys_setuid
++24	common	getxuid				sys_getxuid
++25	common	exec_with_loader		sys_ni_syscall
++26	common	ptrace				sys_ptrace
++27	common	osf_nrecvmsg			sys_ni_syscall
++28	common	osf_nsendmsg			sys_ni_syscall
++29	common	osf_nrecvfrom			sys_ni_syscall
++30	common	osf_naccept			sys_ni_syscall
++31	common	osf_ngetpeername		sys_ni_syscall
++32	common	osf_ngetsockname		sys_ni_syscall
++33	common	access				sys_access
++34	common	osf_chflags			sys_ni_syscall
++35	common	osf_fchflags			sys_ni_syscall
++36	common	sync				sys_sync
++37	common	kill				sys_kill
++38	common	osf_old_stat			sys_ni_syscall
++39	common	setpgid				sys_setpgid
++40	common	osf_old_lstat			sys_ni_syscall
++41	common	dup				sys_dup
++42	common	pipe				sys_alpha_pipe
++43	common	osf_set_program_attributes	sys_osf_set_program_attributes
++44	common	osf_profil			sys_ni_syscall
++45	common	open				sys_open
++46	common	osf_old_sigaction		sys_ni_syscall
++47	common	getxgid				sys_getxgid
++48	common	osf_sigprocmask			sys_osf_sigprocmask
++49	common	osf_getlogin			sys_ni_syscall
++50	common	osf_setlogin			sys_ni_syscall
++51	common	acct				sys_acct
++52	common	sigpending			sys_sigpending
++54	common	ioctl				sys_ioctl
++55	common	osf_reboot			sys_ni_syscall
++56	common	osf_revoke			sys_ni_syscall
++57	common	symlink				sys_symlink
++58	common	readlink			sys_readlink
++59	common	execve				sys_execve
++60	common	umask				sys_umask
++61	common	chroot				sys_chroot
++62	common	osf_old_fstat			sys_ni_syscall
++63	common	getpgrp				sys_getpgrp
++64	common	getpagesize			sys_getpagesize
++65	common	osf_mremap			sys_ni_syscall
++66	common	vfork				alpha_vfork
++67	common	stat				sys_newstat
++68	common	lstat				sys_newlstat
++69	common	osf_sbrk			sys_ni_syscall
++70	common	osf_sstk			sys_ni_syscall
++71	common	mmap				sys_osf_mmap
++72	common	osf_old_vadvise			sys_ni_syscall
++73	common	munmap				sys_munmap
++74	common	mprotect			sys_mprotect
++75	common	madvise				sys_madvise
++76	common	vhangup				sys_vhangup
++77	common	osf_kmodcall			sys_ni_syscall
++78	common	osf_mincore			sys_ni_syscall
++79	common	getgroups			sys_getgroups
++80	common	setgroups			sys_setgroups
++81	common	osf_old_getpgrp			sys_ni_syscall
++82	common	setpgrp				sys_setpgid
++83	common	osf_setitimer			compat_sys_setitimer
++84	common	osf_old_wait			sys_ni_syscall
++85	common	osf_table			sys_ni_syscall
++86	common	osf_getitimer			compat_sys_getitimer
++87	common	gethostname			sys_gethostname
++88	common	sethostname			sys_sethostname
++89	common	getdtablesize			sys_getdtablesize
++90	common	dup2				sys_dup2
++91	common	fstat				sys_newfstat
++92	common	fcntl				sys_fcntl
++93	common	osf_select			sys_osf_select
++94	common	poll				sys_poll
++95	common	fsync				sys_fsync
++96	common	setpriority			sys_setpriority
++97	common	socket				sys_socket
++98	common	connect				sys_connect
++99	common	accept				sys_accept
++100	common	getpriority			sys_osf_getpriority
++101	common	send				sys_send
++102	common	recv				sys_recv
++103	common	sigreturn			sys_sigreturn
++104	common	bind				sys_bind
++105	common	setsockopt			sys_setsockopt
++106	common	listen				sys_listen
++107	common	osf_plock			sys_ni_syscall
++108	common	osf_old_sigvec			sys_ni_syscall
++109	common	osf_old_sigblock		sys_ni_syscall
++110	common	osf_old_sigsetmask		sys_ni_syscall
++111	common	sigsuspend			sys_sigsuspend
++112	common	osf_sigstack			sys_osf_sigstack
++113	common	recvmsg				sys_recvmsg
++114	common	sendmsg				sys_sendmsg
++115	common	osf_old_vtrace			sys_ni_syscall
++116	common	osf_gettimeofday		sys_osf_gettimeofday
++117	common	osf_getrusage			sys_osf_getrusage
++118	common	getsockopt			sys_getsockopt
++120	common	readv				sys_osf_readv
++121	common	writev				sys_osf_writev
++122	common	osf_settimeofday		sys_osf_settimeofday
++123	common	fchown				sys_fchown
++124	common	fchmod				sys_fchmod
++125	common	recvfrom			sys_recvfrom
++126	common	setreuid			sys_setreuid
++127	common	setregid			sys_setregid
++128	common	rename				sys_rename
++129	common	truncate			sys_truncate
++130	common	ftruncate			sys_ftruncate
++131	common	flock				sys_flock
++132	common	setgid				sys_setgid
++133	common	sendto				sys_sendto
++134	common	shutdown			sys_shutdown
++135	common	socketpair			sys_socketpair
++136	common	mkdir				sys_mkdir
++137	common	rmdir				sys_rmdir
++138	common	osf_utimes			sys_osf_utimes
++139	common	osf_old_sigreturn		sys_ni_syscall
++140	common	osf_adjtime			sys_ni_syscall
++141	common	getpeername			sys_getpeername
++142	common	osf_gethostid			sys_ni_syscall
++143	common	osf_sethostid			sys_ni_syscall
++144	common	getrlimit			sys_getrlimit
++145	common	setrlimit			sys_setrlimit
++146	common	osf_old_killpg			sys_ni_syscall
++147	common	setsid				sys_setsid
++148	common	quotactl			sys_quotactl
++149	common	osf_oldquota			sys_ni_syscall
++150	common	getsockname			sys_getsockname
++153	common	osf_pid_block			sys_ni_syscall
++154	common	osf_pid_unblock			sys_ni_syscall
++156	common	sigaction			sys_osf_sigaction
++157	common	osf_sigwaitprim			sys_ni_syscall
++158	common	osf_nfssvc			sys_ni_syscall
++159	common	osf_getdirentries		sys_osf_getdirentries
++160	common	osf_statfs			sys_osf_statfs
++161	common	osf_fstatfs			sys_osf_fstatfs
++163	common	osf_asynch_daemon		sys_ni_syscall
++164	common	osf_getfh			sys_ni_syscall
++165	common	osf_getdomainname		sys_osf_getdomainname
++166	common	setdomainname			sys_setdomainname
++169	common	osf_exportfs			sys_ni_syscall
++181	common	osf_alt_plock			sys_ni_syscall
++184	common	osf_getmnt			sys_ni_syscall
++187	common	osf_alt_sigpending		sys_ni_syscall
++188	common	osf_alt_setsid			sys_ni_syscall
++199	common	osf_swapon			sys_swapon
++200	common	msgctl				sys_old_msgctl
++201	common	msgget				sys_msgget
++202	common	msgrcv				sys_msgrcv
++203	common	msgsnd				sys_msgsnd
++204	common	semctl				sys_old_semctl
++205	common	semget				sys_semget
++206	common	semop				sys_semop
++207	common	osf_utsname			sys_osf_utsname
++208	common	lchown				sys_lchown
++209	common	shmat				sys_shmat
++210	common	shmctl				sys_old_shmctl
++211	common	shmdt				sys_shmdt
++212	common	shmget				sys_shmget
++213	common	osf_mvalid			sys_ni_syscall
++214	common	osf_getaddressconf		sys_ni_syscall
++215	common	osf_msleep			sys_ni_syscall
++216	common	osf_mwakeup			sys_ni_syscall
++217	common	msync				sys_msync
++218	common	osf_signal			sys_ni_syscall
++219	common	osf_utc_gettime			sys_ni_syscall
++220	common	osf_utc_adjtime			sys_ni_syscall
++222	common	osf_security			sys_ni_syscall
++223	common	osf_kloadcall			sys_ni_syscall
++224	common	osf_stat			sys_osf_stat
++225	common	osf_lstat			sys_osf_lstat
++226	common	osf_fstat			sys_osf_fstat
++227	common	osf_statfs64			sys_osf_statfs64
++228	common	osf_fstatfs64			sys_osf_fstatfs64
++233	common	getpgid				sys_getpgid
++234	common	getsid				sys_getsid
++235	common	sigaltstack			sys_sigaltstack
++236	common	osf_waitid			sys_ni_syscall
++237	common	osf_priocntlset			sys_ni_syscall
++238	common	osf_sigsendset			sys_ni_syscall
++239	common	osf_set_speculative		sys_ni_syscall
++240	common	osf_msfs_syscall		sys_ni_syscall
++241	common	osf_sysinfo			sys_osf_sysinfo
++242	common	osf_uadmin			sys_ni_syscall
++243	common	osf_fuser			sys_ni_syscall
++244	common	osf_proplist_syscall		sys_osf_proplist_syscall
++245	common	osf_ntp_adjtime			sys_ni_syscall
++246	common	osf_ntp_gettime			sys_ni_syscall
++247	common	osf_pathconf			sys_ni_syscall
++248	common	osf_fpathconf			sys_ni_syscall
++250	common	osf_uswitch			sys_ni_syscall
++251	common	osf_usleep_thread		sys_osf_usleep_thread
++252	common	osf_audcntl			sys_ni_syscall
++253	common	osf_audgen			sys_ni_syscall
++254	common	sysfs				sys_sysfs
++255	common	osf_subsys_info			sys_ni_syscall
++256	common	osf_getsysinfo			sys_osf_getsysinfo
++257	common	osf_setsysinfo			sys_osf_setsysinfo
++258	common	osf_afs_syscall			sys_ni_syscall
++259	common	osf_swapctl			sys_ni_syscall
++260	common	osf_memcntl			sys_ni_syscall
++261	common	osf_fdatasync			sys_ni_syscall
++300	common	bdflush				sys_bdflush
++301	common	sethae				sys_sethae
++302	common	mount				sys_mount
++303	common	old_adjtimex			sys_old_adjtimex
++304	common	swapoff				sys_swapoff
++305	common	getdents			sys_getdents
++306	common	create_module			sys_ni_syscall
++307	common	init_module			sys_init_module
++308	common	delete_module			sys_delete_module
++309	common	get_kernel_syms			sys_ni_syscall
++310	common	syslog				sys_syslog
++311	common	reboot				sys_reboot
++312	common	clone				alpha_clone
++313	common	uselib				sys_uselib
++314	common	mlock				sys_mlock
++315	common	munlock				sys_munlock
++316	common	mlockall			sys_mlockall
++317	common	munlockall			sys_munlockall
++318	common	sysinfo				sys_sysinfo
++319	common	_sysctl				sys_sysctl
++# 320 was sys_idle
++321	common	oldumount			sys_oldumount
++322	common	swapon				sys_swapon
++323	common	times				sys_times
++324	common	personality			sys_personality
++325	common	setfsuid			sys_setfsuid
++326	common	setfsgid			sys_setfsgid
++327	common	ustat				sys_ustat
++328	common	statfs				sys_statfs
++329	common	fstatfs				sys_fstatfs
++330	common	sched_setparam			sys_sched_setparam
++331	common	sched_getparam			sys_sched_getparam
++332	common	sched_setscheduler		sys_sched_setscheduler
++333	common	sched_getscheduler		sys_sched_getscheduler
++334	common	sched_yield			sys_sched_yield
++335	common	sched_get_priority_max		sys_sched_get_priority_max
++336	common	sched_get_priority_min		sys_sched_get_priority_min
++337	common	sched_rr_get_interval		sys_sched_rr_get_interval
++338	common	afs_syscall			sys_ni_syscall
++339	common	uname				sys_newuname
++340	common	nanosleep			sys_nanosleep
++341	common	mremap				sys_mremap
++342	common	nfsservctl			sys_ni_syscall
++343	common	setresuid			sys_setresuid
++344	common	getresuid			sys_getresuid
++345	common	pciconfig_read			sys_pciconfig_read
++346	common	pciconfig_write			sys_pciconfig_write
++347	common	query_module			sys_ni_syscall
++348	common	prctl				sys_prctl
++349	common	pread64				sys_pread64
++350	common	pwrite64			sys_pwrite64
++351	common	rt_sigreturn			sys_rt_sigreturn
++352	common	rt_sigaction			sys_rt_sigaction
++353	common	rt_sigprocmask			sys_rt_sigprocmask
++354	common	rt_sigpending			sys_rt_sigpending
++355	common	rt_sigtimedwait			sys_rt_sigtimedwait
++356	common	rt_sigqueueinfo			sys_rt_sigqueueinfo
++357	common	rt_sigsuspend			sys_rt_sigsuspend
++358	common	select				sys_select
++359	common	gettimeofday			sys_gettimeofday
++360	common	settimeofday			sys_settimeofday
++361	common	getitimer			sys_getitimer
++362	common	setitimer			sys_setitimer
++363	common	utimes				sys_utimes
++364	common	getrusage			sys_getrusage
++365	common	wait4				sys_wait4
++366	common	adjtimex			sys_adjtimex
++367	common	getcwd				sys_getcwd
++368	common	capget				sys_capget
++369	common	capset				sys_capset
++370	common	sendfile			sys_sendfile64
++371	common	setresgid			sys_setresgid
++372	common	getresgid			sys_getresgid
++373	common	dipc				sys_ni_syscall
++374	common	pivot_root			sys_pivot_root
++375	common	mincore				sys_mincore
++376	common	pciconfig_iobase		sys_pciconfig_iobase
++377	common	getdents64			sys_getdents64
++378	common	gettid				sys_gettid
++379	common	readahead			sys_readahead
++# 380 is unused
++381	common	tkill				sys_tkill
++382	common	setxattr			sys_setxattr
++383	common	lsetxattr			sys_lsetxattr
++384	common	fsetxattr			sys_fsetxattr
++385	common	getxattr			sys_getxattr
++386	common	lgetxattr			sys_lgetxattr
++387	common	fgetxattr			sys_fgetxattr
++388	common	listxattr			sys_listxattr
++389	common	llistxattr			sys_llistxattr
++390	common	flistxattr			sys_flistxattr
++391	common	removexattr			sys_removexattr
++392	common	lremovexattr			sys_lremovexattr
++393	common	fremovexattr			sys_fremovexattr
++394	common	futex				sys_futex
++395	common	sched_setaffinity		sys_sched_setaffinity
++396	common	sched_getaffinity		sys_sched_getaffinity
++397	common	tuxcall				sys_ni_syscall
++398	common	io_setup			sys_io_setup
++399	common	io_destroy			sys_io_destroy
++400	common	io_getevents			sys_io_getevents
++401	common	io_submit			sys_io_submit
++402	common	io_cancel			sys_io_cancel
++405	common	exit_group			sys_exit_group
++406	common	lookup_dcookie			sys_lookup_dcookie
++407	common	epoll_create			sys_epoll_create
++408	common	epoll_ctl			sys_epoll_ctl
++409	common	epoll_wait			sys_epoll_wait
++410	common	remap_file_pages		sys_remap_file_pages
++411	common	set_tid_address			sys_set_tid_address
++412	common	restart_syscall			sys_restart_syscall
++413	common	fadvise64			sys_fadvise64
++414	common	timer_create			sys_timer_create
++415	common	timer_settime			sys_timer_settime
++416	common	timer_gettime			sys_timer_gettime
++417	common	timer_getoverrun		sys_timer_getoverrun
++418	common	timer_delete			sys_timer_delete
++419	common	clock_settime			sys_clock_settime
++420	common	clock_gettime			sys_clock_gettime
++421	common	clock_getres			sys_clock_getres
++422	common	clock_nanosleep			sys_clock_nanosleep
++423	common	semtimedop			sys_semtimedop
++424	common	tgkill				sys_tgkill
++425	common	stat64				sys_stat64
++426	common	lstat64				sys_lstat64
++427	common	fstat64				sys_fstat64
++428	common	vserver				sys_ni_syscall
++429	common	mbind				sys_ni_syscall
++430	common	get_mempolicy			sys_ni_syscall
++431	common	set_mempolicy			sys_ni_syscall
++432	common	mq_open				sys_mq_open
++433	common	mq_unlink			sys_mq_unlink
++434	common	mq_timedsend			sys_mq_timedsend
++435	common	mq_timedreceive			sys_mq_timedreceive
++436	common	mq_notify			sys_mq_notify
++437	common	mq_getsetattr			sys_mq_getsetattr
++438	common	waitid				sys_waitid
++439	common	add_key				sys_add_key
++440	common	request_key			sys_request_key
++441	common	keyctl				sys_keyctl
++442	common	ioprio_set			sys_ioprio_set
++443	common	ioprio_get			sys_ioprio_get
++444	common	inotify_init			sys_inotify_init
++445	common	inotify_add_watch		sys_inotify_add_watch
++446	common	inotify_rm_watch		sys_inotify_rm_watch
++447	common	fdatasync			sys_fdatasync
++448	common	kexec_load			sys_kexec_load
++449	common	migrate_pages			sys_migrate_pages
++450	common	openat				sys_openat
++451	common	mkdirat				sys_mkdirat
++452	common	mknodat				sys_mknodat
++453	common	fchownat			sys_fchownat
++454	common	futimesat			sys_futimesat
++455	common	fstatat64			sys_fstatat64
++456	common	unlinkat			sys_unlinkat
++457	common	renameat			sys_renameat
++458	common	linkat				sys_linkat
++459	common	symlinkat			sys_symlinkat
++460	common	readlinkat			sys_readlinkat
++461	common	fchmodat			sys_fchmodat
++462	common	faccessat			sys_faccessat
++463	common	pselect6			sys_pselect6
++464	common	ppoll				sys_ppoll
++465	common	unshare				sys_unshare
++466	common	set_robust_list			sys_set_robust_list
++467	common	get_robust_list			sys_get_robust_list
++468	common	splice				sys_splice
++469	common	sync_file_range			sys_sync_file_range
++470	common	tee				sys_tee
++471	common	vmsplice			sys_vmsplice
++472	common	move_pages			sys_move_pages
++473	common	getcpu				sys_getcpu
++474	common	epoll_pwait			sys_epoll_pwait
++475	common	utimensat			sys_utimensat
++476	common	signalfd			sys_signalfd
++477	common	timerfd				sys_ni_syscall
++478	common	eventfd				sys_eventfd
++479	common	recvmmsg			sys_recvmmsg
++480	common	fallocate			sys_fallocate
++481	common	timerfd_create			sys_timerfd_create
++482	common	timerfd_settime			sys_timerfd_settime
++483	common	timerfd_gettime			sys_timerfd_gettime
++484	common	signalfd4			sys_signalfd4
++485	common	eventfd2			sys_eventfd2
++486	common	epoll_create1			sys_epoll_create1
++487	common	dup3				sys_dup3
++488	common	pipe2				sys_pipe2
++489	common	inotify_init1			sys_inotify_init1
++490	common	preadv				sys_preadv
++491	common	pwritev				sys_pwritev
++492	common	rt_tgsigqueueinfo		sys_rt_tgsigqueueinfo
++493	common	perf_event_open			sys_perf_event_open
++494	common	fanotify_init			sys_fanotify_init
++495	common	fanotify_mark			sys_fanotify_mark
++496	common	prlimit64			sys_prlimit64
++497	common	name_to_handle_at		sys_name_to_handle_at
++498	common	open_by_handle_at		sys_open_by_handle_at
++499	common	clock_adjtime			sys_clock_adjtime
++500	common	syncfs				sys_syncfs
++501	common	setns				sys_setns
++502	common	accept4				sys_accept4
++503	common	sendmmsg			sys_sendmmsg
++504	common	process_vm_readv		sys_process_vm_readv
++505	common	process_vm_writev		sys_process_vm_writev
++506	common	kcmp				sys_kcmp
++507	common	finit_module			sys_finit_module
++508	common	sched_setattr			sys_sched_setattr
++509	common	sched_getattr			sys_sched_getattr
++510	common	renameat2			sys_renameat2
++511	common	getrandom			sys_getrandom
++512	common	memfd_create			sys_memfd_create
++513	common	execveat			sys_execveat
++514	common	seccomp				sys_seccomp
++515	common	bpf				sys_bpf
++516	common	userfaultfd			sys_userfaultfd
++517	common	membarrier			sys_membarrier
++518	common	mlock2				sys_mlock2
++519	common	copy_file_range			sys_copy_file_range
++520	common	preadv2				sys_preadv2
++521	common	pwritev2			sys_pwritev2
++522	common	statx				sys_statx
++523	common	io_pgetevents			sys_io_pgetevents
++524	common	pkey_mprotect			sys_pkey_mprotect
++525	common	pkey_alloc			sys_pkey_alloc
++526	common	pkey_free			sys_pkey_free
++527	common	rseq				sys_rseq
++528	common	statfs64			sys_statfs64
++529	common	fstatfs64			sys_fstatfs64
++530	common	getegid				sys_getegid
++531	common	geteuid				sys_geteuid
++532	common	getppid				sys_getppid
++# all other architectures have common numbers for new syscall, alpha
++# is the exception.
++534	common	pidfd_send_signal		sys_pidfd_send_signal
++535	common	io_uring_setup			sys_io_uring_setup
++536	common	io_uring_enter			sys_io_uring_enter
++537	common	io_uring_register		sys_io_uring_register
++538	common	open_tree			sys_open_tree
++539	common	move_mount			sys_move_mount
++540	common	fsopen				sys_fsopen
++541	common	fsconfig			sys_fsconfig
++542	common	fsmount				sys_fsmount
++543	common	fspick				sys_fspick
++544	common	pidfd_open			sys_pidfd_open
++# 545 reserved for clone3
++547	common	openat2				sys_openat2
++548	common	pidfd_getfd			sys_pidfd_getfd
+diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
 deleted file mode 100644
-index e5d14eca223d..000000000000
---- a/linux-user/x86_64/syscall_nr.h
+index c29fc17722c5..000000000000
+--- a/linux-user/alpha/syscall_nr.h
 +++ /dev/null
-@@ -1,356 +0,0 @@
--#ifndef LINUX_USER_X86_64_SYSCALL_NR_H
--#define LINUX_USER_X86_64_SYSCALL_NR_H
+@@ -1,492 +0,0 @@
+-#ifndef LINUX_USER_ALPHA_SYSCALL_NR_H
+-#define LINUX_USER_ALPHA_SYSCALL_NR_H
 -
--#define TARGET_NR_read                                0
--#define TARGET_NR_write                               1
--#define TARGET_NR_open                                2
--#define TARGET_NR_close                               3
--#define TARGET_NR_stat                                4
--#define TARGET_NR_fstat                               5
--#define TARGET_NR_lstat                               6
--#define TARGET_NR_poll                                7
--#define TARGET_NR_lseek                               8
--#define TARGET_NR_mmap                                9
--#define TARGET_NR_mprotect                           10
--#define TARGET_NR_munmap                             11
--#define TARGET_NR_brk                                12
--#define TARGET_NR_rt_sigaction                       13
--#define TARGET_NR_rt_sigprocmask                     14
--#define TARGET_NR_rt_sigreturn                       15
--#define TARGET_NR_ioctl                              16
--#define TARGET_NR_pread64                            17
--#define TARGET_NR_pwrite64                           18
--#define TARGET_NR_readv                              19
--#define TARGET_NR_writev                             20
--#define TARGET_NR_access                             21
--#define TARGET_NR_pipe                               22
--#define TARGET_NR_select                             23
--#define TARGET_NR_sched_yield                        24
--#define TARGET_NR_mremap                             25
--#define TARGET_NR_msync                              26
--#define TARGET_NR_mincore                            27
--#define TARGET_NR_madvise                            28
--#define TARGET_NR_shmget                             29
--#define TARGET_NR_shmat                              30
--#define TARGET_NR_shmctl                             31
--#define TARGET_NR_dup                                32
--#define TARGET_NR_dup2                               33
--#define TARGET_NR_pause                              34
--#define TARGET_NR_nanosleep                          35
--#define TARGET_NR_getitimer                          36
--#define TARGET_NR_alarm                              37
--#define TARGET_NR_setitimer                          38
--#define TARGET_NR_getpid                             39
--#define TARGET_NR_sendfile                           40
--#define TARGET_NR_socket                             41
--#define TARGET_NR_connect                            42
--#define TARGET_NR_accept                             43
--#define TARGET_NR_sendto                             44
--#define TARGET_NR_recvfrom                           45
--#define TARGET_NR_sendmsg                            46
--#define TARGET_NR_recvmsg                            47
--#define TARGET_NR_shutdown                           48
--#define TARGET_NR_bind                               49
--#define TARGET_NR_listen                             50
--#define TARGET_NR_getsockname                        51
--#define TARGET_NR_getpeername                        52
--#define TARGET_NR_socketpair                         53
--#define TARGET_NR_setsockopt                         54
--#define TARGET_NR_getsockopt                         55
--#define TARGET_NR_clone                              56
--#define TARGET_NR_fork                               57
--#define TARGET_NR_vfork                              58
--#define TARGET_NR_execve                             59
--#define TARGET_NR_exit                               60
--#define TARGET_NR_wait4                              61
--#define TARGET_NR_kill                               62
--#define TARGET_NR_uname                              63
--#define TARGET_NR_semget                             64
--#define TARGET_NR_semop                              65
--#define TARGET_NR_semctl                             66
--#define TARGET_NR_shmdt                              67
--#define TARGET_NR_msgget                             68
--#define TARGET_NR_msgsnd                             69
--#define TARGET_NR_msgrcv                             70
--#define TARGET_NR_msgctl                             71
--#define TARGET_NR_fcntl                              72
--#define TARGET_NR_flock                              73
--#define TARGET_NR_fsync                              74
--#define TARGET_NR_fdatasync                          75
--#define TARGET_NR_truncate                           76
--#define TARGET_NR_ftruncate                          77
--#define TARGET_NR_getdents                           78
--#define TARGET_NR_getcwd                             79
--#define TARGET_NR_chdir                              80
--#define TARGET_NR_fchdir                             81
--#define TARGET_NR_rename                             82
--#define TARGET_NR_mkdir                              83
--#define TARGET_NR_rmdir                              84
--#define TARGET_NR_creat                              85
--#define TARGET_NR_link                               86
--#define TARGET_NR_unlink                             87
--#define TARGET_NR_symlink                            88
--#define TARGET_NR_readlink                           89
--#define TARGET_NR_chmod                              90
--#define TARGET_NR_fchmod                             91
--#define TARGET_NR_chown                              92
--#define TARGET_NR_fchown                             93
--#define TARGET_NR_lchown                             94
--#define TARGET_NR_umask                              95
--#define TARGET_NR_gettimeofday                       96
--#define TARGET_NR_getrlimit                          97
--#define TARGET_NR_getrusage                          98
--#define TARGET_NR_sysinfo                            99
--#define TARGET_NR_times                             100
--#define TARGET_NR_ptrace                            101
--#define TARGET_NR_getuid                            102
--#define TARGET_NR_syslog                            103
--#define TARGET_NR_getgid                            104
--#define TARGET_NR_setuid                            105
--#define TARGET_NR_setgid                            106
--#define TARGET_NR_geteuid                           107
--#define TARGET_NR_getegid                           108
--#define TARGET_NR_setpgid                           109
--#define TARGET_NR_getppid                           110
--#define TARGET_NR_getpgrp                           111
--#define TARGET_NR_setsid                            112
--#define TARGET_NR_setreuid                          113
--#define TARGET_NR_setregid                          114
--#define TARGET_NR_getgroups                         115
--#define TARGET_NR_setgroups                         116
--#define TARGET_NR_setresuid                         117
--#define TARGET_NR_getresuid                         118
--#define TARGET_NR_setresgid                         119
--#define TARGET_NR_getresgid                         120
--#define TARGET_NR_getpgid                           121
--#define TARGET_NR_setfsuid                          122
--#define TARGET_NR_setfsgid                          123
--#define TARGET_NR_getsid                            124
--#define TARGET_NR_capget                            125
--#define TARGET_NR_capset                            126
--#define TARGET_NR_rt_sigpending                     127
--#define TARGET_NR_rt_sigtimedwait                   128
--#define TARGET_NR_rt_sigqueueinfo                   129
--#define TARGET_NR_rt_sigsuspend                     130
--#define TARGET_NR_sigaltstack                       131
--#define TARGET_NR_utime                             132
--#define TARGET_NR_mknod                             133
--#define TARGET_NR_uselib                            134
--#define TARGET_NR_personality                       135
--#define TARGET_NR_ustat                             136
--#define TARGET_NR_statfs                            137
--#define TARGET_NR_fstatfs                           138
--#define TARGET_NR_sysfs                             139
--#define TARGET_NR_getpriority                       140
--#define TARGET_NR_setpriority                       141
--#define TARGET_NR_sched_setparam                    142
--#define TARGET_NR_sched_getparam                    143
--#define TARGET_NR_sched_setscheduler                144
--#define TARGET_NR_sched_getscheduler                145
--#define TARGET_NR_sched_get_priority_max            146
--#define TARGET_NR_sched_get_priority_min            147
--#define TARGET_NR_sched_rr_get_interval             148
--#define TARGET_NR_mlock                             149
--#define TARGET_NR_munlock                           150
--#define TARGET_NR_mlockall                          151
--#define TARGET_NR_munlockall                        152
--#define TARGET_NR_vhangup                           153
--#define TARGET_NR_modify_ldt                        154
--#define TARGET_NR_pivot_root                        155
--#define TARGET_NR__sysctl                           156
--#define TARGET_NR_prctl                             157
--#define TARGET_NR_arch_prctl                        158
--#define TARGET_NR_adjtimex                          159
--#define TARGET_NR_setrlimit                         160
--#define TARGET_NR_chroot                            161
--#define TARGET_NR_sync                              162
--#define TARGET_NR_acct                              163
--#define TARGET_NR_settimeofday                      164
--#define TARGET_NR_mount                             165
--#define TARGET_NR_umount2                           166
--#define TARGET_NR_swapon                            167
--#define TARGET_NR_swapoff                           168
--#define TARGET_NR_reboot                            169
--#define TARGET_NR_sethostname                       170
--#define TARGET_NR_setdomainname                     171
--#define TARGET_NR_iopl                              172
--#define TARGET_NR_ioperm                            173
--#define TARGET_NR_create_module                     174
--#define TARGET_NR_init_module                       175
--#define TARGET_NR_delete_module                     176
--#define TARGET_NR_get_kernel_syms                   177
--#define TARGET_NR_query_module                      178
--#define TARGET_NR_quotactl                          179
--#define TARGET_NR_nfsservctl                        180
--#define TARGET_NR_getpmsg                           181	/* reserved for LiS/STREAMS */
--#define TARGET_NR_putpmsg                           182	/* reserved for LiS/STREAMS */
--#define TARGET_NR_afs_syscall                       183	/* reserved for AFS */
--#define TARGET_NR_tuxcall      		184 /* reserved for tux */
--#define TARGET_NR_security			185
--#define TARGET_NR_gettid		186
--#define TARGET_NR_readahead		187
--#define TARGET_NR_setxattr		188
--#define TARGET_NR_lsetxattr		189
--#define TARGET_NR_fsetxattr		190
--#define TARGET_NR_getxattr		191
--#define TARGET_NR_lgetxattr		192
--#define TARGET_NR_fgetxattr		193
--#define TARGET_NR_listxattr		194
--#define TARGET_NR_llistxattr		195
--#define TARGET_NR_flistxattr		196
--#define TARGET_NR_removexattr	197
--#define TARGET_NR_lremovexattr	198
--#define TARGET_NR_fremovexattr	199
--#define TARGET_NR_tkill	200
--#define TARGET_NR_time      201
--#define TARGET_NR_futex     202
--#define TARGET_NR_sched_setaffinity    203
--#define TARGET_NR_sched_getaffinity     204
--#define TARGET_NR_set_thread_area	205
--#define TARGET_NR_io_setup	206
--#define TARGET_NR_io_destroy	207
--#define TARGET_NR_io_getevents	208
--#define TARGET_NR_io_submit	209
--#define TARGET_NR_io_cancel	210
--#define TARGET_NR_get_thread_area	211
--#define TARGET_NR_lookup_dcookie	212
--#define TARGET_NR_epoll_create	213
--#define TARGET_NR_epoll_ctl_old	214
--#define TARGET_NR_epoll_wait_old	215
--#define TARGET_NR_remap_file_pages	216
--#define TARGET_NR_getdents64	217
--#define TARGET_NR_set_tid_address	218
--#define TARGET_NR_restart_syscall	219
--#define TARGET_NR_semtimedop		220
--#define TARGET_NR_fadvise64		221
--#define TARGET_NR_timer_create		222
--#define TARGET_NR_timer_settime		223
--#define TARGET_NR_timer_gettime		224
--#define TARGET_NR_timer_getoverrun		225
--#define TARGET_NR_timer_delete	226
--#define TARGET_NR_clock_settime	227
--#define TARGET_NR_clock_gettime	228
--#define TARGET_NR_clock_getres	229
--#define TARGET_NR_clock_nanosleep	230
--#define TARGET_NR_exit_group		231
--#define TARGET_NR_epoll_wait		232
--#define TARGET_NR_epoll_ctl		233
--#define TARGET_NR_tgkill		234
--#define TARGET_NR_utimes		235
--#define TARGET_NR_vserver		236
--#define TARGET_NR_mbind 		237
--#define TARGET_NR_set_mempolicy 	238
--#define TARGET_NR_get_mempolicy 	239
--#define TARGET_NR_mq_open 		240
--#define TARGET_NR_mq_unlink 		241
--#define TARGET_NR_mq_timedsend 	242
--#define TARGET_NR_mq_timedreceive	243
--#define TARGET_NR_mq_notify 		244
--#define TARGET_NR_mq_getsetattr 	245
--#define TARGET_NR_kexec_load 	246
--#define TARGET_NR_waitid		247
--#define TARGET_NR_add_key		248
--#define TARGET_NR_request_key	249
--#define TARGET_NR_keyctl		250
--#define TARGET_NR_ioprio_set		251
--#define TARGET_NR_ioprio_get		252
--#define TARGET_NR_inotify_init	253
--#define TARGET_NR_inotify_add_watch	254
--#define TARGET_NR_inotify_rm_watch	255
--#define TARGET_NR_migrate_pages	256
--#define TARGET_NR_openat		257
--#define TARGET_NR_mkdirat		258
--#define TARGET_NR_mknodat		259
--#define TARGET_NR_fchownat		260
--#define TARGET_NR_futimesat		261
--#define TARGET_NR_newfstatat		262
--#define TARGET_NR_unlinkat		263
--#define TARGET_NR_renameat		264
--#define TARGET_NR_linkat		265
--#define TARGET_NR_symlinkat		266
--#define TARGET_NR_readlinkat		267
--#define TARGET_NR_fchmodat		268
--#define TARGET_NR_faccessat		269
--#define TARGET_NR_pselect6		270
--#define TARGET_NR_ppoll		271
--#define TARGET_NR_unshare		272
--#define TARGET_NR_set_robust_list	273
--#define TARGET_NR_get_robust_list	274
--#define TARGET_NR_splice		275
--#define TARGET_NR_tee		276
--#define TARGET_NR_sync_file_range	277
--#define TARGET_NR_vmsplice		278
--#define TARGET_NR_move_pages		279
--#define TARGET_NR_utimensat		280
--#define TARGET_NR_epoll_pwait	281
--#define TARGET_NR_signalfd		282
--#define TARGET_NR_timerfd_create	283
--#define TARGET_NR_eventfd		284
--#define TARGET_NR_fallocate		285
--#define TARGET_NR_timerfd_settime	286
--#define TARGET_NR_timerfd_gettime	287
--#define TARGET_NR_accept4		288
--#define TARGET_NR_signalfd4		289
--#define TARGET_NR_eventfd2		290
--#define TARGET_NR_epoll_create1	291
--#define TARGET_NR_dup3			292
--#define TARGET_NR_pipe2		293
--#define TARGET_NR_inotify_init1	294
--#define TARGET_NR_preadv                295
--#define TARGET_NR_pwritev               296
--#define TARGET_NR_rt_tgsigqueueinfo     297
--#define TARGET_NR_perf_event_open       298
--#define TARGET_NR_recvmmsg              299
--#define TARGET_NR_fanotify_init         300
--#define TARGET_NR_fanotify_mark         301
--#define TARGET_NR_prlimit64             302
--#define TARGET_NR_name_to_handle_at     303
--#define TARGET_NR_open_by_handle_at     304
--#define TARGET_NR_clock_adjtime         305
--#define TARGET_NR_syncfs                306
--#define TARGET_NR_sendmmsg              307
--#define TARGET_NR_setns                 308
--#define TARGET_NR_getcpu                309
--#define TARGET_NR_process_vm_readv      310
--#define TARGET_NR_process_vm_writev     311
--#define TARGET_NR_kcmp                  312
--#define TARGET_NR_finit_module          313
--#define TARGET_NR_sched_setattr         314
--#define TARGET_NR_sched_getattr         315
--#define TARGET_NR_renameat2             316
--#define TARGET_NR_seccomp               317
--#define TARGET_NR_getrandom             318
--#define TARGET_NR_memfd_create          319
--#define TARGET_NR_kexec_file_load       320
--#define TARGET_NR_bpf                   321
--#define TARGET_NR_execveat              322
--#define TARGET_NR_userfaultfd           323
--#define TARGET_NR_membarrier            324
--#define TARGET_NR_mlock2                325
--#define TARGET_NR_copy_file_range       326
--#define TARGET_NR_preadv2               327
--#define TARGET_NR_pwritev2              328
--#define TARGET_NR_pkey_mprotect         329
--#define TARGET_NR_pkey_alloc            330
--#define TARGET_NR_pkey_free             331
--#define TARGET_NR_statx                 332
--#define TARGET_NR_io_pgetevents         333
--#define TARGET_NR_rseq                  334
--/*
-- * don't use numbers 387 through 423, add new calls after the last
-- * 'common' entry
+-#define TARGET_NR_osf_syscall	  0	/* not implemented */
+-#define TARGET_NR_exit		  1
+-#define TARGET_NR_fork		  2
+-#define TARGET_NR_read		  3
+-#define TARGET_NR_write		  4
+-#define TARGET_NR_osf_old_open	  5	/* not implemented */
+-#define TARGET_NR_close		  6
+-#define TARGET_NR_osf_wait4		  7
+-#define TARGET_NR_osf_old_creat	  8	/* not implemented */
+-#define TARGET_NR_link		  9
+-#define TARGET_NR_unlink		 10
+-#define TARGET_NR_osf_execve		 11	/* not implemented */
+-#define TARGET_NR_chdir		 12
+-#define TARGET_NR_fchdir		 13
+-#define TARGET_NR_mknod		 14
+-#define TARGET_NR_chmod		 15
+-#define TARGET_NR_chown		 16
+-#define TARGET_NR_brk		 17
+-#define TARGET_NR_osf_getfsstat	 18	/* not implemented */
+-#define TARGET_NR_lseek		 19
+-#define TARGET_NR_getxpid		 20
+-#define TARGET_NR_osf_mount		 21
+-#define TARGET_NR_umount2		 22
+-#define TARGET_NR_setuid		 23
+-#define TARGET_NR_getxuid		 24
+-#define TARGET_NR_exec_with_loader	 25	/* not implemented */
+-#define TARGET_NR_ptrace		 26
+-#define TARGET_NR_osf_nrecvmsg	 27	/* not implemented */
+-#define TARGET_NR_osf_nsendmsg	 28	/* not implemented */
+-#define TARGET_NR_osf_nrecvfrom	 29	/* not implemented */
+-#define TARGET_NR_osf_naccept	 30	/* not implemented */
+-#define TARGET_NR_osf_ngetpeername	 31	/* not implemented */
+-#define TARGET_NR_osf_ngetsockname	 32	/* not implemented */
+-#define TARGET_NR_access		 33
+-#define TARGET_NR_osf_chflags	 34	/* not implemented */
+-#define TARGET_NR_osf_fchflags	 35	/* not implemented */
+-#define TARGET_NR_sync		 36
+-#define TARGET_NR_kill		 37
+-#define TARGET_NR_osf_old_stat	 38	/* not implemented */
+-#define TARGET_NR_setpgid		 39
+-#define TARGET_NR_osf_old_lstat	 40	/* not implemented */
+-#define TARGET_NR_dup		 41
+-#define TARGET_NR_pipe		 42
+-#define TARGET_NR_osf_set_program_attributes	43
+-#define TARGET_NR_osf_profil		 44	/* not implemented */
+-#define TARGET_NR_open		 45
+-#define TARGET_NR_osf_old_sigaction	 46	/* not implemented */
+-#define TARGET_NR_getxgid		 47
+-#define TARGET_NR_sigprocmask    48
+-#define TARGET_NR_osf_getlogin	 49	/* not implemented */
+-#define TARGET_NR_osf_setlogin	 50	/* not implemented */
+-#define TARGET_NR_acct		 51
+-#define TARGET_NR_sigpending		 52
+-
+-#define TARGET_NR_ioctl		 54
+-#define TARGET_NR_osf_reboot		 55	/* not implemented */
+-#define TARGET_NR_osf_revoke		 56	/* not implemented */
+-#define TARGET_NR_symlink		 57
+-#define TARGET_NR_readlink		 58
+-#define TARGET_NR_execve		 59
+-#define TARGET_NR_umask		 60
+-#define TARGET_NR_chroot		 61
+-#define TARGET_NR_osf_old_fstat	 62	/* not implemented */
+-#define TARGET_NR_getpgrp		 63
+-#define TARGET_NR_getpagesize	 64
+-#define TARGET_NR_osf_mremap		 65	/* not implemented */
+-#define TARGET_NR_vfork		 66
+-#define TARGET_NR_stat		 67
+-#define TARGET_NR_lstat		 68
+-#define TARGET_NR_osf_sbrk		 69	/* not implemented */
+-#define TARGET_NR_osf_sstk		 70	/* not implemented */
+-#define TARGET_NR_mmap		 71	/* OSF/1 mmap is superset of Linux */
+-#define TARGET_NR_osf_old_vadvise	 72	/* not implemented */
+-#define TARGET_NR_munmap		 73
+-#define TARGET_NR_mprotect		 74
+-#define TARGET_NR_madvise		 75
+-#define TARGET_NR_vhangup		 76
+-#define TARGET_NR_osf_kmodcall	 77	/* not implemented */
+-#define TARGET_NR_osf_mincore	 78	/* not implemented */
+-#define TARGET_NR_getgroups		 79
+-#define TARGET_NR_setgroups		 80
+-#define TARGET_NR_osf_old_getpgrp	 81	/* not implemented */
+-#define TARGET_NR_setpgrp		 82	/* BSD alias for setpgid */
+-#define TARGET_NR_osf_setitimer	 83
+-#define TARGET_NR_osf_old_wait	 84	/* not implemented */
+-#define TARGET_NR_osf_table		 85	/* not implemented */
+-#define TARGET_NR_osf_getitimer	 86
+-#define TARGET_NR_gethostname	 87
+-#define TARGET_NR_sethostname	 88
+-#define TARGET_NR_getdtablesize	 89
+-#define TARGET_NR_dup2		 90
+-#define TARGET_NR_fstat		 91
+-#define TARGET_NR_fcntl		 92
+-#define TARGET_NR_osf_select		 93
+-#define TARGET_NR_poll		 94
+-#define TARGET_NR_fsync		 95
+-#define TARGET_NR_setpriority	 96
+-#define TARGET_NR_socket		 97
+-#define TARGET_NR_connect		 98
+-#define TARGET_NR_accept		 99
+-#define TARGET_NR_getpriority	100
+-#define TARGET_NR_send		101
+-#define TARGET_NR_recv		102
+-#define TARGET_NR_sigreturn		103
+-#define TARGET_NR_bind		104
+-#define TARGET_NR_setsockopt		105
+-#define TARGET_NR_listen		106
+-#define TARGET_NR_osf_plock		107	/* not implemented */
+-#define TARGET_NR_osf_old_sigvec	108	/* not implemented */
+-#define TARGET_NR_osf_old_sigblock	109	/* not implemented */
+-#define TARGET_NR_osf_old_sigsetmask	110	/* not implemented */
+-#define TARGET_NR_sigsuspend		111
+-#define TARGET_NR_osf_sigstack	112
+-#define TARGET_NR_recvmsg		113
+-#define TARGET_NR_sendmsg		114
+-#define TARGET_NR_osf_old_vtrace	115	/* not implemented */
+-#define TARGET_NR_osf_gettimeofday	116
+-#define TARGET_NR_osf_getrusage	117
+-#define TARGET_NR_getsockopt		118
+-
+-#define TARGET_NR_readv		120
+-#define TARGET_NR_writev		121
+-#define TARGET_NR_osf_settimeofday	122
+-#define TARGET_NR_fchown		123
+-#define TARGET_NR_fchmod		124
+-#define TARGET_NR_recvfrom		125
+-#define TARGET_NR_setreuid		126
+-#define TARGET_NR_setregid		127
+-#define TARGET_NR_rename		128
+-#define TARGET_NR_truncate		129
+-#define TARGET_NR_ftruncate		130
+-#define TARGET_NR_flock		131
+-#define TARGET_NR_setgid		132
+-#define TARGET_NR_sendto		133
+-#define TARGET_NR_shutdown		134
+-#define TARGET_NR_socketpair		135
+-#define TARGET_NR_mkdir		136
+-#define TARGET_NR_rmdir		137
+-#define TARGET_NR_osf_utimes		138
+-#define TARGET_NR_osf_old_sigreturn	139	/* not implemented */
+-#define TARGET_NR_osf_adjtime	140	/* not implemented */
+-#define TARGET_NR_getpeername	141
+-#define TARGET_NR_osf_gethostid	142	/* not implemented */
+-#define TARGET_NR_osf_sethostid	143	/* not implemented */
+-#define TARGET_NR_getrlimit		144
+-#define TARGET_NR_setrlimit		145
+-#define TARGET_NR_osf_old_killpg	146	/* not implemented */
+-#define TARGET_NR_setsid		147
+-#define TARGET_NR_quotactl		148
+-#define TARGET_NR_osf_oldquota	149	/* not implemented */
+-#define TARGET_NR_getsockname	150
+-
+-#define TARGET_NR_osf_pid_block	153	/* not implemented */
+-#define TARGET_NR_osf_pid_unblock	154	/* not implemented */
+-
+-#define TARGET_NR_sigaction		156
+-#define TARGET_NR_osf_sigwaitprim	157	/* not implemented */
+-#define TARGET_NR_osf_nfssvc		158	/* not implemented */
+-#define TARGET_NR_osf_getdirentries	159
+-#define TARGET_NR_osf_statfs		160
+-#define TARGET_NR_osf_fstatfs	161
+-
+-#define TARGET_NR_osf_asynch_daemon	163	/* not implemented */
+-#define TARGET_NR_osf_getfh		164	/* not implemented */
+-#define TARGET_NR_osf_getdomainname	165
+-#define TARGET_NR_setdomainname	166
+-
+-#define TARGET_NR_osf_exportfs	169	/* not implemented */
+-
+-#define TARGET_NR_osf_alt_plock	181	/* not implemented */
+-
+-#define TARGET_NR_osf_getmnt		184	/* not implemented */
+-
+-#define TARGET_NR_osf_alt_sigpending	187	/* not implemented */
+-#define TARGET_NR_osf_alt_setsid	188	/* not implemented */
+-
+-#define TARGET_NR_osf_swapon		199
+-#define TARGET_NR_msgctl		200
+-#define TARGET_NR_msgget		201
+-#define TARGET_NR_msgrcv		202
+-#define TARGET_NR_msgsnd		203
+-#define TARGET_NR_semctl		204
+-#define TARGET_NR_semget		205
+-#define TARGET_NR_semop		206
+-#define TARGET_NR_osf_utsname	207
+-#define TARGET_NR_lchown		208
+-#define TARGET_NR_osf_shmat		209
+-/* this has the usual shmat semantics so give it the name syscall.c expects
+- * so that our support for it is enabled.
 - */
--#define TARGET_NR_pidfd_send_signal     424
--#define TARGET_NR_io_uring_setup        425
--#define TARGET_NR_io_uring_enter        426
--#define TARGET_NR_io_uring_register     427
--#define TARGET_NR_open_tree             428
--#define TARGET_NR_move_mount            429
--#define TARGET_NR_fsopen                430
--#define TARGET_NR_fsconfig              431
--#define TARGET_NR_fsmount               432
--#define TARGET_NR_fspick                433
--#define TARGET_NR_pidfd_open            434
--#define TARGET_NR_clone3                435
+-#define TARGET_NR_shmat TARGET_NR_osf_shmat
+-#define TARGET_NR_shmctl		210
+-#define TARGET_NR_shmdt		211
+-#define TARGET_NR_shmget		212
+-#define TARGET_NR_osf_mvalid		213	/* not implemented */
+-#define TARGET_NR_osf_getaddressconf	214	/* not implemented */
+-#define TARGET_NR_osf_msleep		215	/* not implemented */
+-#define TARGET_NR_osf_mwakeup	216	/* not implemented */
+-#define TARGET_NR_msync		217
+-#define TARGET_NR_osf_signal		218	/* not implemented */
+-#define TARGET_NR_osf_utc_gettime	219	/* not implemented */
+-#define TARGET_NR_osf_utc_adjtime	220	/* not implemented */
+-
+-#define TARGET_NR_osf_security	222	/* not implemented */
+-#define TARGET_NR_osf_kloadcall	223	/* not implemented */
+-
+-#define TARGET_NR_getpgid		233
+-#define TARGET_NR_getsid		234
+-#define TARGET_NR_sigaltstack	235
+-#define TARGET_NR_osf_waitid		236	/* not implemented */
+-#define TARGET_NR_osf_priocntlset	237	/* not implemented */
+-#define TARGET_NR_osf_sigsendset	238	/* not implemented */
+-#define TARGET_NR_osf_set_speculative	239	/* not implemented */
+-#define TARGET_NR_osf_msfs_syscall	240	/* not implemented */
+-#define TARGET_NR_osf_sysinfo	241
+-#define TARGET_NR_osf_uadmin		242	/* not implemented */
+-#define TARGET_NR_osf_fuser		243	/* not implemented */
+-#define TARGET_NR_osf_proplist_syscall    244
+-#define TARGET_NR_osf_ntp_adjtime	245	/* not implemented */
+-#define TARGET_NR_osf_ntp_gettime	246	/* not implemented */
+-#define TARGET_NR_osf_pathconf	247	/* not implemented */
+-#define TARGET_NR_osf_fpathconf	248	/* not implemented */
+-
+-#define TARGET_NR_osf_uswitch	250	/* not implemented */
+-#define TARGET_NR_osf_usleep_thread	251
+-#define TARGET_NR_osf_audcntl	252	/* not implemented */
+-#define TARGET_NR_osf_audgen		253	/* not implemented */
+-#define TARGET_NR_sysfs		254
+-#define TARGET_NR_osf_subsys_info	255	/* not implemented */
+-#define TARGET_NR_osf_getsysinfo	256
+-#define TARGET_NR_osf_setsysinfo	257
+-#define TARGET_NR_osf_afs_syscall	258	/* not implemented */
+-#define TARGET_NR_osf_swapctl	259	/* not implemented */
+-#define TARGET_NR_osf_memcntl	260	/* not implemented */
+-#define TARGET_NR_osf_fdatasync	261	/* not implemented */
+-
+-
+-/*
+- * Linux-specific system calls begin at 300
+- */
+-#define TARGET_NR_bdflush		300
+-#define TARGET_NR_sethae		301
+-#define TARGET_NR_mount		302
+-#define TARGET_NR_old_adjtimex	303
+-#define TARGET_NR_swapoff		304
+-#define TARGET_NR_getdents		305
+-#define TARGET_NR_create_module	306
+-#define TARGET_NR_init_module	307
+-#define TARGET_NR_delete_module	308
+-#define TARGET_NR_get_kernel_syms	309
+-#define TARGET_NR_syslog		310
+-#define TARGET_NR_reboot		311
+-#define TARGET_NR_clone		312
+-#define TARGET_NR_uselib		313
+-#define TARGET_NR_mlock		314
+-#define TARGET_NR_munlock		315
+-#define TARGET_NR_mlockall		316
+-#define TARGET_NR_munlockall		317
+-#define TARGET_NR_sysinfo		318
+-#define TARGET_NR__sysctl		319
+-/* 320 was sys_idle.  */
+-#define TARGET_NR_umount		321
+-#define TARGET_NR_swapon		322
+-#define TARGET_NR_times		323
+-#define TARGET_NR_personality	324
+-#define TARGET_NR_setfsuid		325
+-#define TARGET_NR_setfsgid		326
+-#define TARGET_NR_ustat		327
+-#define TARGET_NR_statfs		328
+-#define TARGET_NR_fstatfs		329
+-#define TARGET_NR_sched_setparam		330
+-#define TARGET_NR_sched_getparam		331
+-#define TARGET_NR_sched_setscheduler		332
+-#define TARGET_NR_sched_getscheduler		333
+-#define TARGET_NR_sched_yield		334
+-#define TARGET_NR_sched_get_priority_max	335
+-#define TARGET_NR_sched_get_priority_min	336
+-#define TARGET_NR_sched_rr_get_interval	337
+-#define TARGET_NR_afs_syscall		338
+-#define TARGET_NR_uname			339
+-#define TARGET_NR_nanosleep			340
+-#define TARGET_NR_mremap			341
+-#define TARGET_NR_nfsservctl			342
+-#define TARGET_NR_setresuid			343
+-#define TARGET_NR_getresuid			344
+-#define TARGET_NR_pciconfig_read		345
+-#define TARGET_NR_pciconfig_write		346
+-#define TARGET_NR_query_module		347
+-#define TARGET_NR_prctl			348
+-#define TARGET_NR_pread64			349
+-#define TARGET_NR_pwrite64			350
+-#define TARGET_NR_rt_sigreturn		351
+-#define TARGET_NR_rt_sigaction		352
+-#define TARGET_NR_rt_sigprocmask		353
+-#define TARGET_NR_rt_sigpending		354
+-#define TARGET_NR_rt_sigtimedwait		355
+-#define TARGET_NR_rt_sigqueueinfo		356
+-#define TARGET_NR_rt_sigsuspend		357
+-#define TARGET_NR_select			358
+-#define TARGET_NR_gettimeofday		359
+-#define TARGET_NR_settimeofday		360
+-#define TARGET_NR_getitimer			361
+-#define TARGET_NR_setitimer			362
+-#define TARGET_NR_utimes			363
+-#define TARGET_NR_getrusage			364
+-#define TARGET_NR_wait4			365
+-#define TARGET_NR_adjtimex			366
+-#define TARGET_NR_getcwd			367
+-#define TARGET_NR_capget			368
+-#define TARGET_NR_capset			369
+-#define TARGET_NR_sendfile			370
+-#define TARGET_NR_setresgid			371
+-#define TARGET_NR_getresgid			372
+-#define TARGET_NR_dipc			373
+-#define TARGET_NR_pivot_root			374
+-#define TARGET_NR_mincore			375
+-#define TARGET_NR_pciconfig_iobase		376
+-#define TARGET_NR_getdents64			377
+-#define TARGET_NR_gettid			378
+-#define TARGET_NR_readahead			379
+-/* 380 is unused */
+-#define TARGET_NR_tkill			381
+-#define TARGET_NR_setxattr			382
+-#define TARGET_NR_lsetxattr			383
+-#define TARGET_NR_fsetxattr			384
+-#define TARGET_NR_getxattr			385
+-#define TARGET_NR_lgetxattr			386
+-#define TARGET_NR_fgetxattr			387
+-#define TARGET_NR_listxattr			388
+-#define TARGET_NR_llistxattr			389
+-#define TARGET_NR_flistxattr			390
+-#define TARGET_NR_removexattr		391
+-#define TARGET_NR_lremovexattr		392
+-#define TARGET_NR_fremovexattr		393
+-#define TARGET_NR_futex			394
+-#define TARGET_NR_sched_setaffinity		395
+-#define TARGET_NR_sched_getaffinity		396
+-#define TARGET_NR_tuxcall			397
+-#define TARGET_NR_io_setup			398
+-#define TARGET_NR_io_destroy			399
+-#define TARGET_NR_io_getevents		400
+-#define TARGET_NR_io_submit			401
+-#define TARGET_NR_io_cancel			402
+-#define TARGET_NR_exit_group			405
+-#define TARGET_NR_lookup_dcookie		406
+-#define TARGET_NR_epoll_create          407
+-#define TARGET_NR_epoll_ctl             408
+-#define TARGET_NR_epoll_wait            409
+-#define TARGET_NR_remap_file_pages		410
+-#define TARGET_NR_set_tid_address		411
+-#define TARGET_NR_restart_syscall		412
+-#define TARGET_NR_fadvise64			413
+-#define TARGET_NR_timer_create		414
+-#define TARGET_NR_timer_settime		415
+-#define TARGET_NR_timer_gettime		416
+-#define TARGET_NR_timer_getoverrun		417
+-#define TARGET_NR_timer_delete		418
+-#define TARGET_NR_clock_settime		419
+-#define TARGET_NR_clock_gettime		420
+-#define TARGET_NR_clock_getres		421
+-#define TARGET_NR_clock_nanosleep		422
+-#define TARGET_NR_semtimedop			423
+-#define TARGET_NR_tgkill			424
+-#define TARGET_NR_stat64			425
+-#define TARGET_NR_lstat64			426
+-#define TARGET_NR_fstat64			427
+-#define TARGET_NR_vserver			428
+-#define TARGET_NR_mbind			429
+-#define TARGET_NR_get_mempolicy		430
+-#define TARGET_NR_set_mempolicy		431
+-#define TARGET_NR_mq_open			432
+-#define TARGET_NR_mq_unlink			433
+-#define TARGET_NR_mq_timedsend		434
+-#define TARGET_NR_mq_timedreceive		435
+-#define TARGET_NR_mq_notify			436
+-#define TARGET_NR_mq_getsetattr		437
+-#define TARGET_NR_waitid			438
+-#define TARGET_NR_add_key			439
+-#define TARGET_NR_request_key		440
+-#define TARGET_NR_keyctl			441
+-#define TARGET_NR_ioprio_set			442
+-#define TARGET_NR_ioprio_get			443
+-#define TARGET_NR_inotify_init		444
+-#define TARGET_NR_inotify_add_watch		445
+-#define TARGET_NR_inotify_rm_watch		446
+-#define TARGET_NR_fdatasync			447
+-#define TARGET_NR_kexec_load			448
+-#define TARGET_NR_migrate_pages		449
+-#define TARGET_NR_openat			450
+-#define TARGET_NR_mkdirat			451
+-#define TARGET_NR_mknodat			452
+-#define TARGET_NR_fchownat			453
+-#define TARGET_NR_futimesat			454
+-#define TARGET_NR_fstatat64			455
+-#define TARGET_NR_unlinkat			456
+-#define TARGET_NR_renameat			457
+-#define TARGET_NR_linkat			458
+-#define TARGET_NR_symlinkat			459
+-#define TARGET_NR_readlinkat			460
+-#define TARGET_NR_fchmodat			461
+-#define TARGET_NR_faccessat			462
+-#define TARGET_NR_pselect6			463
+-#define TARGET_NR_ppoll			464
+-#define TARGET_NR_unshare			465
+-#define TARGET_NR_set_robust_list		466
+-#define TARGET_NR_get_robust_list		467
+-#define TARGET_NR_splice			468
+-#define TARGET_NR_sync_file_range		469
+-#define TARGET_NR_tee			470
+-#define TARGET_NR_vmsplice			471
+-#define TARGET_NR_move_pages			472
+-#define TARGET_NR_getcpu			473
+-#define TARGET_NR_epoll_pwait		474
+-#define TARGET_NR_utimensat			475
+-#define TARGET_NR_signalfd			476
+-#define TARGET_NR_timerfd			477
+-#define TARGET_NR_eventfd			478
+-#define TARGET_NR_recvmmsg                      479
+-#define TARGET_NR_fallocate                     480
+-#define TARGET_NR_timerfd_create                481
+-#define TARGET_NR_timerfd_settime               482
+-#define TARGET_NR_timerfd_gettime               483
+-#define TARGET_NR_signalfd4                     484
+-#define TARGET_NR_eventfd2                      485
+-#define TARGET_NR_epoll_create1                 486
+-#define TARGET_NR_dup3                          487
+-#define TARGET_NR_pipe2                         488
+-#define TARGET_NR_inotify_init1                 489
+-#define TARGET_NR_preadv                        490
+-#define TARGET_NR_pwritev                       491
+-#define TARGET_NR_rt_tgsigqueueinfo             492
+-#define TARGET_NR_perf_event_open               493
+-#define TARGET_NR_fanotify_init                 494
+-#define TARGET_NR_fanotify_mark                 495
+-#define TARGET_NR_prlimit64                     496
+-#define TARGET_NR_name_to_handle_at             497
+-#define TARGET_NR_open_by_handle_at             498
+-#define TARGET_NR_clock_adjtime                 499
+-#define TARGET_NR_syncfs                        500
+-#define TARGET_NR_setns                         501
+-#define TARGET_NR_accept4                       502
+-#define TARGET_NR_sendmmsg                      503
+-#define TARGET_NR_process_vm_readv              504
+-#define TARGET_NR_process_vm_writev             505
+-#define TARGET_NR_kcmp                          506
+-#define TARGET_NR_finit_module                  507
+-#define TARGET_NR_sched_setattr                 508
+-#define TARGET_NR_sched_getattr                 509
+-#define TARGET_NR_renameat2                     510
+-#define TARGET_NR_getrandom                     511
+-#define TARGET_NR_memfd_create                  512
+-#define TARGET_NR_execveat                      513
+-#define TARGET_NR_seccomp                       514
+-#define TARGET_NR_bpf                           515
+-#define TARGET_NR_userfaultfd                   516
+-#define TARGET_NR_membarrier                    517
+-#define TARGET_NR_mlock2                        518
+-#define TARGET_NR_copy_file_range               519
+-#define TARGET_NR_preadv2                       520
+-#define TARGET_NR_pwritev2                      521
+-#define TARGET_NR_statx                         522
+-#define TARGET_NR_io_pgetevents                 523
+-#define TARGET_NR_pkey_mprotect                 524
+-#define TARGET_NR_pkey_alloc                    525
+-#define TARGET_NR_pkey_free                     526
+-#define TARGET_NR_rseq                          527
+-#define TARGET_NR_statfs64                      528
+-#define TARGET_NR_fstatfs64                     529
+-#define TARGET_NR_getegid                       530
+-#define TARGET_NR_geteuid                       531
+-#define TARGET_NR_getppid                       532
+-/*
+- * all other architectures have common numbers for new syscall, alpha
+- * is the exception.
+- */
+-#define TARGET_NR_pidfd_send_signal             534
+-#define TARGET_NR_io_uring_setup                535
+-#define TARGET_NR_io_uring_enter                536
+-#define TARGET_NR_io_uring_register             537
+-#define TARGET_NR_open_tree                     538
+-#define TARGET_NR_move_mount                    539
+-#define TARGET_NR_fsopen                        540
+-#define TARGET_NR_fsconfig                      541
+-#define TARGET_NR_fsmount                       542
+-#define TARGET_NR_fspick                        543
+-#define TARGET_NR_pidfd_open                    544
+-/* 545 reserved for clone3 */
 -
 -#endif
-diff --git a/linux-user/x86_64/syscallhdr.sh b/linux-user/x86_64/syscallhdr.sh
+diff --git a/linux-user/alpha/syscallhdr.sh b/linux-user/alpha/syscallhdr.sh
 new file mode 100644
-index 000000000000..182be52a74f5
+index 000000000000..55cafe6abf99
 --- /dev/null
-+++ b/linux-user/x86_64/syscallhdr.sh
-@@ -0,0 +1,28 @@
++++ b/linux-user/alpha/syscallhdr.sh
+@@ -0,0 +1,32 @@
 +#!/bin/sh
 +# SPDX-License-Identifier: GPL-2.0
 +
@@ -929,24 +1142,28 @@ index 000000000000..182be52a74f5
 +prefix="$4"
 +offset="$5"
 +
-+fileguard=LINUX_USER_X86_64_`basename "$out" | sed \
++fileguard=LINUX_USER_ALPHA_`basename "$out" | sed \
 +    -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/' \
 +    -e 's/[^A-Z0-9_]/_/g' -e 's/__/_/g'`
 +grep -E "^[0-9A-Fa-fXx]+[[:space:]]+${my_abis}" "$in" | sort -n | (
-+    echo "#ifndef ${fileguard}"
-+    echo "#define ${fileguard} 1"
-+    echo ""
++    printf "#ifndef %s\n" "${fileguard}"
++    printf "#define %s\n" "${fileguard}"
++    printf "\n"
 +
++    nxt=0
 +    while read nr abi name entry ; do
-+    if [ -z "$offset" ]; then
-+        echo "#define TARGET_NR_${prefix}${name} $nr"
-+    else
-+        echo "#define TARGET_NR_${prefix}${name} ($offset + $nr)"
++        if [ -z "$offset" ]; then
++            printf "#define TARGET_NR_%s%s\t%s\n" \
++                "${prefix}" "${name}" "${nr}"
++        else
++            printf "#define TARGET_NR_%s%s\t(%s + %s)\n" \
++                "${prefix}" "${name}" "${offset}" "${nr}"
 +        fi
++        nxt=$((nr+1))
 +    done
 +
-+    echo ""
-+    echo "#endif /* ${fileguard} */"
++    printf "\n"
++    printf "#endif /* %s */" "${fileguard}"
 +) > "$out"
 -- 
 2.24.1
