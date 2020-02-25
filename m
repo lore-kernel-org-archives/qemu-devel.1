@@ -2,78 +2,97 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E817BC35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A47C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B36492176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B3A721744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoNAJP4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B36492176D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QXtPqJGx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3A721744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6WAb-0004lD-Su
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:06:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50699)
+	id 1j6WCA-0006Gd-B7
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:08:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j6W9y-00049h-Tv
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:05:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6WBM-0005R4-Fi
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j6W9v-0006ML-6V
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:05:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54032
+ (envelope-from <philmd@redhat.com>) id 1j6WBL-0006xL-Kx
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:07:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35530
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j6W9v-0006LX-27
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:05:43 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6WBL-0006xA-Hj
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:07:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582621541;
+ s=mimecast20190719; t=1582621631;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wE3YDTP4ZAI7lx5XDaHgsudAf8AoP/jp7Ym3ICM+qJQ=;
- b=NoNAJP4L8YjhduUUZUelt/7v0Cz7hSHe/qLW+pGGgyMp7lBRnGzTbOGtj7I1vnvOn+DYNq
- zqen0Ma8/AGCp45tul+gfpxVgQcTcFB/0XhH/5gnkJ4WHBoUlKp+gN5UnLYx5TGTC4oA4A
- Nn+ByNyeeCoDm8NZbv5FDJ/2ngU77H8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-JfiZY-S_MneW3M6Dul26_g-1; Tue, 25 Feb 2020 04:05:38 -0500
-X-MC-Unique: JfiZY-S_MneW3M6Dul26_g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C69A51005512;
- Tue, 25 Feb 2020 09:05:36 +0000 (UTC)
-Received: from localhost (ovpn-117-159.ams2.redhat.com [10.36.117.159])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5ACC060BF7;
- Tue, 25 Feb 2020 09:05:36 +0000 (UTC)
-Date: Tue, 25 Feb 2020 09:05:34 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/2] qemu/queue.h: clear linked list pointers on remove
-Message-ID: <20200225090534.GB4178@stefanha-x1.localdomain>
-References: <20200224103406.1894923-1-stefanha@redhat.com>
- <158254173238.10132.7761755657862330006@a1bbccc8075a>
- <20200224113903.GD1896567@stefanha-x1.localdomain>
- <d3fa195d-d6cc-438f-517b-676b2642df71@redhat.com>
+ bh=LrjhG98Q2CfCLxqVlJJ0yczHQPVK9btkIwazK/tkAUE=;
+ b=QXtPqJGxeZ0gQhIQ35niLixwhQxquGUv9L7iNuinRL2EYN9oEJfta6D5JqBr+3O2bqJG9R
+ rsnBW5WcQs9SsuA8Ac7YwPmpQiMUUvE3Ts5hopPND3Iq8wxaFBZwBb6BVzRZFQa96+yRjV
+ 7SqK3nOM8GacoQ29gKgzP9K2g9ZvFT8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-VXxDVyoaN9aeFM4KO7Ferg-1; Tue, 25 Feb 2020 04:07:07 -0500
+X-MC-Unique: VXxDVyoaN9aeFM4KO7Ferg-1
+Received: by mail-ed1-f72.google.com with SMTP id t20so8610480eds.19
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 01:07:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CmRm8HTroD11NN0frkvSMHOgNvyBzdG2ZicM2ny0gFY=;
+ b=FC2TagAkMLaQ5adwH8KAtbESBKGxD02X5Ac+9jSz9BAPZmBGr2hDz4qLF4DHldqlCT
+ rZh0z6xW98ced9a2RvBcyUuG0ki0zKmr01xO8dQckVSGhEVAaFbe0DeDz1wbE+hNFj2U
+ bEXCdAJvS9OAKE3JPxxgCJONJKG/NXw0OkFkSz8/jtorCJwZSrIQZL1j1MUiupWNdCPR
+ 0YlybuALn03USyU00feMb9ujwVhCB2O460iimwUn26Sv8wUZFNEC/Ur9NfNTDodqBx19
+ IJPPkINIkyyEeYu18s1FN3RZttb+4Oo41UBKTlOIA0u8yI3LeLzWwAzrPZ6cXDWgzMae
+ kotA==
+X-Gm-Message-State: APjAAAU0F84GhOlmhjaSaS+LjTSXdgd53fIDFQTLsXRPy2qhUKBT5+H8
+ ue/+B1YH7/MPdGGFGrT3YS2Smemq+r24foUAZ+zbeEoUMT8fC6MAmbpHA7ZoYDQC+Zp+WwD1L+t
+ taEXQteXiTcSMfpc=
+X-Received: by 2002:aa7:d811:: with SMTP id v17mr49098192edq.277.1582621626601; 
+ Tue, 25 Feb 2020 01:07:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzOU/5nYOuUg1OoRX7f5ol2KCm0pPzQdYzldSaSh3aVFY8YA+v5foupe8LI3ivKILAx39h/tw==
+X-Received: by 2002:aa7:d811:: with SMTP id v17mr49098166edq.277.1582621626373; 
+ Tue, 25 Feb 2020 01:07:06 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id v2sm917343ejj.44.2020.02.25.01.07.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Feb 2020 01:07:05 -0800 (PST)
+Subject: Re: [PATCH 1/2] qxl: map rom r/o
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200225055920.17261-1-kraxel@redhat.com>
+ <20200225055920.17261-2-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2bdcbe5f-1fa0-386d-a9c4-f0d7c2bebca1@redhat.com>
+Date: Tue, 25 Feb 2020 10:07:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <d3fa195d-d6cc-438f-517b-676b2642df71@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200225055920.17261-2-kraxel@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="eAbsdosE1cNLO4uF"
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -88,75 +107,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, pbonzini@redhat.com
+Cc: sstabellini@kernel.org, pmatouse@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, mdroth@linux.vnet.ibm.com,
+ ppandit@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---eAbsdosE1cNLO4uF
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Feb 24, 2020 at 12:54:37PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 2/24/20 12:39 PM, Stefan Hajnoczi wrote:
-> > On Mon, Feb 24, 2020 at 02:55:33AM -0800, no-reply@patchew.org wrote:
-> > > =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> > > 1/2 Checking commit f913b2430ad3 (qemu/queue.h: clear linked list poi=
-nters on remove)
-> > > ERROR: do not use assignment in if condition
-> > > #65: FILE: include/qemu/queue.h:314:
-> > > +    if (((head)->sqh_first =3D elm->field.sqe_next) =3D=3D NULL)    =
-          \
-> > >=20
-> > > total: 1 errors, 0 warnings, 59 lines checked
-> >=20
-> > The same pattern is used elsewhere in this file.  This code comes from
-> > BSD and doesn't comply with QEMU's coding style.
+On 2/25/20 6:59 AM, Gerd Hoffmann wrote:
+> Map qxl rom read-only into the guest, so the guest can't tamper with the
+> content.  qxl has a shadow copy of the rom to deal with that, but the
+> shadow doesn't cover the mode list.  A privilidged user in the guest can
+> manipulate the mode list and that to trick qemu into oob reads, leading
+> to a DoS via segfault if that read access happens to hit unmapped memory.
 >=20
-> Checkpatch is right, assigning out of the if statement makes the review
-> easier, and we can avoid the 'elm' null deref:
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>   hw/display/qxl.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+> index 21a43a1d5ec2..227da69a50d9 100644
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -2136,7 +2136,7 @@ static void qxl_realize_common(PCIQXLDevice *qxl, E=
+rror **errp)
+>       pci_set_byte(&config[PCI_INTERRUPT_PIN], 1);
+>  =20
+>       qxl->rom_size =3D qxl_rom_size();
+> -    memory_region_init_ram(&qxl->rom_bar, OBJECT(qxl), "qxl.vrom",
+> +    memory_region_init_rom(&qxl->rom_bar, OBJECT(qxl), "qxl.vrom",
+>                              qxl->rom_size, &error_fatal);
+>       init_qxl_rom(qxl);
+>       init_qxl_ram(qxl);
+>=20
 
-The rest of the file uses if ((a =3D b) =3D=3D NULL), so making it
-inconsistent in this one instance isn't very satisfying.
-
-> #define QSIMPLEQ_REMOVE_HEAD(head, field) do { \
-> -    if (((head)->sqh_first =3D (head)->sqh_first->field.sqe_next) =3D=3D=
- NULL)\
-> +    typeof((head)->sqh_first) elm =3D (head)->sqh_first; \
-> +    (head)->sqh_first =3D elm->field.sqe_next; \
-> +    if (elm =3D=3D NULL) { \
-
-The previous line would have segfaulted if elm was NULL so this check
-doesn't make sense.
-
-This macro assumes there is at least one element in the list.
-
-The point of the check is to fix up the sqh_last pointer in the head
-when the final element is removed from the list.
-
->          (head)->sqh_last =3D &(head)->sqh_first; \
-> +    } else { \
-> +        elm->field.sqe_next =3D NULL; \
-> +    } \
->  } while (/*CONSTCOND*/0)
-
---eAbsdosE1cNLO4uF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5U414ACgkQnKSrs4Gr
-c8jSaQf/TEytwBmRh6/X154vUdBN5BetQxU49lWMuMq0eSJzBRrReuPGYSAu/A3Z
-PmrFWTRZr6Iqq49eQb0JVP/egO5RRm1mKfCaJZjz+rQlizTZI9QbO8ldW4CCsTi/
-E5sZ4udj8K+bsiC74TEfdgcTtXWSUZgY8u63h/gzVMKHDD8kuBv7muYx3CmQ+iBJ
-HEC/O49+jLkdGjUlk7Dz19vqKIGmSfl8bp1PqqF27Ih2FDPZtO1Ghvf542n/Eh32
-STa8TYAAOaJqO7YubPwrO746m8zXPNgEK56xxyt8AKR06Xs1oAvQHG/SIn07OFuw
-ZPQI08P4CtBZbfA5UdDWz8Unn1MDdA==
-=W537
------END PGP SIGNATURE-----
-
---eAbsdosE1cNLO4uF--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
