@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104F2C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75892C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF31420CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F83720CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HYRoj2i7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF31420CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SL2b0iRK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F83720CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZNY-0006Tn-VL
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:32:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52792)
+	id 1j6ZOJ-0008F7-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:32:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0S-0003wl-TU
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:09 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlD-0001b6-45
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0R-0003fP-Rz
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:08 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52956)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlC-0000zg-7Q
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:23 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:55329)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Z0R-0003eZ-K8
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:07 -0500
-Received: by mail-wm1-x336.google.com with SMTP id p9so2739626wmc.2
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:08:07 -0800 (PST)
+ id 1j6YlC-0000yO-0f
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:22 -0500
+Received: by mail-wm1-x330.google.com with SMTP id q9so2667847wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ketsX9szEN/yEwdCDikauA8vhBP8YwqgK84yBa4Gy64=;
- b=HYRoj2i7ddw6Dw98VO5bDlJQMY8g5khqD2AbIxBp1lpe0PwfzuxcwKbgOLk0Y9mxJ2
- sUsJVMQsKGnrIzXWN0Yg7mP/ahYdbpEpsbAl/vzvZsMHem7lZXdBnCBKMPoQQoRLi3Wm
- cMoC5itNQgMBhgFTZa0/8AOURuyTwNz+9jxNsMIlhoh8+mAHy5SaQ2vrlEwVVNe0Pox5
- MRwpVcatyeHMwfcMHFBFWyBBguxGG8IW+fXoQrogeyzA3ONopPzky8CY08xES6MQCxCT
- JSamgDNMTihs5lnioIfCoRED83whB3mM9U6nUxYiuIPrg4ei2qt4a+lkDnwWli02tLkA
- Ma/A==
+ bh=4vmp7Ik2Ty/GsDRbd5YaNqN8aD/hfUDWlirfLWtK1uk=;
+ b=SL2b0iRKR+uJktTD0kUh3Nawl2dH7a/IZ96DgQ2AWv4n1rCPIYPzXVC6qqUXOJ+EVj
+ m6zwxbE1v5BbDa2LHbpcnosH8mS5sFIu0W4380hyLu7XE3PisG5OGTSI6RYXzzObcblr
+ 4e55G5yRZg5KtKuAJZAqT9R2L8jG9sgfK7aXoBFIVccolCcr8RkLqPKUytCMsThovII/
+ C6sZ91aqz6xYzzJLztDELm7/yKFDs3yDev9fY3usRkAsjhDVgkCVbf36+fPmvLG7MTWN
+ ro8L8s6EPQQ+Rhxax6+w7HrnbDUaXnAwdVWuicCTG+FeaPIVDlvbvBCr2kHARuV9o72T
+ qkQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ketsX9szEN/yEwdCDikauA8vhBP8YwqgK84yBa4Gy64=;
- b=CHEaNiNNVC3b+NHiZdTyqRKU57kGmZz82unoGwXPigGP3gRcLKL78/hqFsCOYMYvjt
- iNVSgrodwBLeYgf8cFcJoX5/Cm8OYvhk3AOAe60TXXJjIJw7yu8nyL4lD2XJCxRSPtD0
- zX+zfyVoPeklXIbis0untHqb00ZpL1o0WGzRqRTZ6cyHhwp2JEx3u+5+BwU1y6tt6WFX
- 5BxMIw2rjtO21QvHrlyaJWmiuP5BZ8BgUtFOZPk7mj1eThmqlGbQ+RiHzEAAF6fLNtTL
- HouN00337yY0Y3yyctt/YNsm8y8sWaqistiZmdlWHuQQGvcGM+e8q05XP3vSfNVPVVvj
- gS9w==
-X-Gm-Message-State: APjAAAXxscXHTe8zabwDV+up9qWZnG6GRBiA99d+wMRFnMjRq6zy3HGJ
- wyyuctwoGlwS7nWOdcl5GsWCX09U
-X-Google-Smtp-Source: APXvYqzzwd/78vdfxRunoGHJ00bnzhcjsfwYuv8ueKn3YJiCik9me54bJdLhILKVjGq8emSA6NLhdA==
-X-Received: by 2002:a1c:6755:: with SMTP id b82mr4795907wmc.127.1582632482201; 
- Tue, 25 Feb 2020 04:08:02 -0800 (PST)
+ bh=4vmp7Ik2Ty/GsDRbd5YaNqN8aD/hfUDWlirfLWtK1uk=;
+ b=G84j6fxBEvL/n8yesR1FiQa+RNgQA4g/9JD9jbaX3coNwn5mg9gi8roTLD+tYA8k6C
+ mqo60yUT7t7u6wCABOnm5aMcQQFQF/uampqiDttUbatiPjU/r7Uw0SVJRibLOPVBEnYS
+ VKpMHe0uKoDV1VDXKckeusGINwUA4Y8gY7ucphGF0Mu0qCjSW0kUhefYdqbn6WRF50zF
+ coWeUUhOCwSnLLtGTzF1Q3wMmGHeqVn+Lm5fcX3RpSG/J2iORgxSmFQJfbD7lWk3TBlY
+ +eS136SLEfILqTyw0tWqm3Svvb2Iin2/TVBxedmNfhEfCB/wdIoPnmeYSrp1/RTAmwZT
+ hTDw==
+X-Gm-Message-State: APjAAAXnKS8ycwE+YQzgFUdXS53tcQG7a0EpKwKLg1q00JgUz1sR3Uu3
+ pl5PzZjJvLzkE26v5HGytDa1XTNX
+X-Google-Smtp-Source: APXvYqzmQiOK+nF39VHlztdXYgsg8x3t8rHp58Rls5yE94mh1roSH+78QYGgBreHj1t3iWFVZnaGQw==
+X-Received: by 2002:a1c:9a0d:: with SMTP id c13mr4835418wme.41.1582631540774; 
+ Tue, 25 Feb 2020 03:52:20 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.08.01
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.19
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 04:08:01 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:20 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 129/136] hw/net/milkymist-minimac2: Let devices own the
- MemoryRegion they create
-Date: Tue, 25 Feb 2020 13:07:27 +0100
-Message-Id: <1582632454-16491-27-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 080/136] scripts/git.orderfile: Display Cocci scripts before
+ code modifications
+Date: Tue, 25 Feb 2020 12:50:10 +0100
+Message-Id: <1582631466-13880-80-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,45 +101,29 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Avoid orphan memory regions being added in the /unattached QOM
-container.
-
-Note this change break the migration of the LM32 milkymist machine.
+When we use a Coccinelle semantic script to do automatic
+code modifications, it makes sense to look at the semantic
+patch first.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224205533.23798-32-philmd@redhat.com>
-Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/net/milkymist-minimac2.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/git.orderfile | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
-index 1ba0175..9582b5f 100644
---- a/hw/net/milkymist-minimac2.c
-+++ b/hw/net/milkymist-minimac2.c
-@@ -473,9 +473,9 @@ static void milkymist_minimac2_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(sbd, &s->regs_region);
+diff --git a/scripts/git.orderfile b/scripts/git.orderfile
+index 1f747b5..7cf22e0 100644
+--- a/scripts/git.orderfile
++++ b/scripts/git.orderfile
+@@ -22,6 +22,9 @@ Makefile*
+ qapi/*.json
+ qga/*.json
  
-     /* register buffers memory */
--    memory_region_init_ram_nomigrate(&s->buffers, OBJECT(dev), "milkymist-minimac2.buffers",
-+    memory_region_init_ram(&s->buffers, OBJECT(dev),
-+                           "milkymist-minimac2.buffers",
-                            buffers_size, &error_fatal);
--    vmstate_register_ram_global(&s->buffers);
-     s->rx0_buf = memory_region_get_ram_ptr(&s->buffers);
-     s->rx1_buf = s->rx0_buf + MINIMAC2_BUFFER_SIZE;
-     s->tx_buf = s->rx1_buf + MINIMAC2_BUFFER_SIZE;
-@@ -506,8 +506,8 @@ static const VMStateDescription vmstate_milkymist_minimac2_mdio = {
++# semantic patches
++*.cocci
++
+ # headers
+ *.h
  
- static const VMStateDescription vmstate_milkymist_minimac2 = {
-     .name = "milkymist-minimac2",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32_ARRAY(regs, MilkymistMinimac2State, R_MAX),
-         VMSTATE_UINT16_ARRAY(phy_regs, MilkymistMinimac2State, R_PHY_MAX),
 -- 
 1.8.3.1
 
