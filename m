@@ -2,113 +2,86 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FA5C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE1ABC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E0AE21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:09:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E0AE21744
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 7CDF52467A
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:09:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R1Y+mT6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CDF52467A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57195 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ata-0005xv-LW
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:09:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40862)
+	id 1j6atc-00063T-M3
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:09:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j6aQl-0001yF-Ry
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:39:27 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6ape-0006zL-3m
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j6aQh-0003xS-ND
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:39:23 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:51777)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j6aQh-0003wZ-DK; Tue, 25 Feb 2020 08:39:19 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MderZ-1jfe854921-00ZctR; Tue, 25 Feb 2020 14:39:09 +0100
-Subject: Re: [PATCH v2 0/2] linux-user: generate syscall_nr.sh for RISC-V
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1582586444.git.alistair.francis@wdc.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <306320d5-b305-1890-3185-05353363cce5@vivier.eu>
-Date: Tue, 25 Feb 2020 14:39:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j6apY-0005L9-Qe
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:06 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52849)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6apY-0005Kl-GT
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:00 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p9so3130891wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:05:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rfB6aFnyMDHV8qgUZJ4NYi9OqE7EgeqrDtxkONHm7eg=;
+ b=R1Y+mT6i3F9soc2z35ge1zpwd62tg6CtONy/C+oQn3kD+2wYAdEkTjc2lWzZ9yZtfy
+ vcH0t8AzGFln0aCPMhifQ1BpcJtlErSBxiJnx7sghHI+DamXK9R5Ef+h8mOeSSh3a90U
+ dnM2FIBaC3q3tSgOsdtLw8WfKtQTtPFW+w0epQTEXP3jGEN6ld8AqMpUBPxyaaJhaFpn
+ Rn1xYMGOV4cVbdB5wDBgWftNQagceITPIoRc4U/yAOV7epyjxfGqk0uZDvFZ4dWX+VQM
+ w+ixE3/wOBbRwdOTbrW/hXciowvtizqiqISAJtGcKhNjbkbc22HKS3Hyv77V4JpKB9JS
+ uwoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rfB6aFnyMDHV8qgUZJ4NYi9OqE7EgeqrDtxkONHm7eg=;
+ b=FwtWQWM90o4JuyBRPOTgmjGV26nF1PAeBRCC4/UVPxaEkScOhVfeZ8WNN2KlZRGPQs
+ gOF5pa+mNkxPpMcVj9g5FFChjxaTGyIrpJXbet8Xw1o0pi4aww48Gf9F5iOUIpGYWqGK
+ +X+qbzo/1vDfQ3Zb87mYweMVUDEoO+TUWdYNyPK+pIAV5+3usmJ2Yd9cXlonmF6gOoGp
+ 0O5OGTKvajJpizXblrJe+rsxKcK6tVxGQG4UfDqWZrwX3DISSFh+8xpY0Q2XDazYlBOf
+ GS4jBhQikXIkHVMbs273dTmW5qiAxC0N6ygsapJ540/RImhd+adQ52mywyocwcn72Vjz
+ bzKA==
+X-Gm-Message-State: APjAAAUN6yB0jjxapCSRti7lW24kt4d5wMeWf8SslZBbDCu1arP0XdKg
+ Qv16ZravHrRIQat9RLeIM+SwJqOQ6p06BA==
+X-Google-Smtp-Source: APXvYqyZe3AcuyxM45cBn0TdGnE54UI66LifqNIH3svq/Ktzb0lPjTadJWLN/9bvWc98rQVJtCbdLA==
+X-Received: by 2002:a05:600c:294a:: with SMTP id
+ n10mr5629957wmd.11.1582639498531; 
+ Tue, 25 Feb 2020 06:04:58 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f127sm4322136wma.4.2020.02.25.06.04.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 06:04:57 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 11/12] scripts/qapi: Remove texinfo generation support
+Date: Tue, 25 Feb 2020 14:04:36 +0000
+Message-Id: <20200225140437.20609-12-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200225140437.20609-1-peter.maydell@linaro.org>
+References: <20200225140437.20609-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1582586444.git.alistair.francis@wdc.com>
-Content-Type: multipart/mixed; boundary="------------17E998FEEABEE81D847F8E95"
-Content-Language: fr
-X-Provags-ID: V03:K1:yHakMpK4dNtICglTp42N0h0fWqZUfFufcCVceau3t769sYrpgng
- r6wewy0jrE6kFkttXR0ndnwOlDu1102nossA7RiRM450h0ZHMzTrNZouwBi98undB4UCtdA
- GmEr5UpW0/J455h2CElWtJwvq1xOMH6DDb8G6peaxCNOmCGbEq/J7QZWBEIW3LKw/RM0KV5
- xctCL/0euQTDhsEibASGg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:x2x6S7VRW7Q=:y/EJy8oOLW7Q4iqy4KYznE
- PveQNWtaqUr7uo9Yu6wS+AkkMLnCFV+95RH6TfV4MBg0k71Ishvy/1/LQyo+O43ShBpOiskZa
- KLDVFNVv43LYz4fX8IqZLy+JEORylgrLaAByZ1G4ypEGpQmsRzsJYZ7qXMRZrpHUzRxqKtvwm
- 5FND65cTivT9EfReWzxKOxVKTXYVazQ441FsDhRCVOOkeB6yEKkccIPzWPbAQEey18PyXceBa
- UzYiabeEOrdwUYY6i3dkLQWBJRAmAAQIXjSeCRh7XIFbC9HSJQvjCNFjshNV/SWCRpThMrnjR
- Cr6eVgQdUIfHLAxz1XbTRhWohhAFS+uXXBTjISIYhMtxL6H/2GqikfDF/oCDNXs+zCW5kTPSu
- vkz9ZQWA65Hm51PVvqJQ/n/SGvsNwt7nyUzLLhgT3kOvpPgp+4peHneiBZoaQkiYvCEp5czM8
- Ka3yJaqdNbr4eMpcgr4kA243udNSPlsXBrOlJhbBRv8LyuDETCK3HXs2dpKuxznWfpYzygezG
- 1eZOs7JoUhrYLBgnjlSBNOzNZffbAiqrMyP0uRUY69ljgJuyydh6XrJHNQO0xDS3cKQgxqiT/
- TwJBIfvRSDyjVg4fKQdIRpMd+qPQoB+O+x/lxz8lOL0Ak3XWYaYtfroeX0Kq8SUspM9ulEnHl
- 06MdCOJO3NYHMWVPhxOMMtJaOaf0tRIgpCZxKIcdktV4j2/8nHrZzIbCSzf84aXbqP5w5bRqL
- hebqhyPZ7JAxn9e5u0BeLMaBLik2SKs+8iwS7cdYcI3FHRCsCu0cGjBlGUqhs/Ep+3RfTkBSc
- +8MHHSCozBHh81rhY9LRXzf1LxcV06rEeeGGVcHpmTny39S8Sr2U4pZXyvhIoL1vNVTDZMF
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,100 +93,725 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@dabbelt.com
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------17E998FEEABEE81D847F8E95
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+We no longer use the generated texinfo format documentation,
+so delete the code that generates it, and the test case for
+the generation.
 
-Le 25/02/2020 à 00:21, Alistair Francis a écrit :
-> This series updates the RISC-V syscall_nr.sh based on the 5.5 kernel.
-> 
-> There are two parts to this. One is just adding the new syscalls, the
-> other part is updating the RV32 syscalls to match the fact that RV32 is
-> a 64-bit time_t architectures (y2038) safe.
-> 
-> we need to make some changes to syscall.c to avoid warnings/errors
-> during compliling with the new syscall.
-> 
-> I did some RV32 user space testing after applying these patches. I ran the
-> glibc testsuite in userspace and I don't see any regressions.
-> 
-> Alistair Francis (2):
->   linux-user: Protect more syscalls
->   linux-user/riscv: Update the syscall_nr's to the 5.5 kernel
-> 
->  linux-user/riscv/syscall32_nr.h | 314 ++++++++++++++++++++++++++++++++
->  linux-user/riscv/syscall64_nr.h | 303 ++++++++++++++++++++++++++++++
->  linux-user/riscv/syscall_nr.h   | 294 +-----------------------------
->  linux-user/strace.c             |   2 +
->  linux-user/syscall.c            |  20 ++
->  5 files changed, 641 insertions(+), 292 deletions(-)
->  create mode 100644 linux-user/riscv/syscall32_nr.h
->  create mode 100644 linux-user/riscv/syscall64_nr.h
-> 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ Makefile                        |   1 -
+ tests/Makefile.include          |  15 +-
+ scripts/qapi-gen.py             |   2 -
+ scripts/qapi/doc.py             | 302 --------------------------------
+ scripts/qapi/gen.py             |   7 -
+ tests/qapi-schema/doc-good.texi | 281 -----------------------------
+ 6 files changed, 1 insertion(+), 607 deletions(-)
+ delete mode 100644 scripts/qapi/doc.py
+ delete mode 100644 tests/qapi-schema/doc-good.texi
 
-I have written a shell script to generate the syscall_nr.h from the
-asm-generic, but as it uses a lot of cpp, tr, sed and grep, the result
-needs to be checked.
+diff --git a/Makefile b/Makefile
+index f6e7f500416..191fd7f6e3f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -611,7 +611,6 @@ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+ qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+ $(SRC_PATH)/scripts/qapi/commands.py \
+ $(SRC_PATH)/scripts/qapi/common.py \
+-$(SRC_PATH)/scripts/qapi/doc.py \
+ $(SRC_PATH)/scripts/qapi/error.py \
+ $(SRC_PATH)/scripts/qapi/events.py \
+ $(SRC_PATH)/scripts/qapi/expr.py \
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index edcbd475aa7..ee84107e1be 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -32,7 +32,6 @@ export SRC_PATH
+ qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+ $(SRC_PATH)/scripts/qapi/commands.py \
+ $(SRC_PATH)/scripts/qapi/common.py \
+-$(SRC_PATH)/scripts/qapi/doc.py \
+ $(SRC_PATH)/scripts/qapi/error.py \
+ $(SRC_PATH)/scripts/qapi/events.py \
+ $(SRC_PATH)/scripts/qapi/expr.py \
+@@ -488,16 +487,8 @@ tests/test-qapi-gen-timestamp: \
+ 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o tests -p "test-" $<, \
+ 		"GEN","$(@:%-timestamp=%)")
+-	@rm -f tests/test-qapi-doc.texi
+ 	@>$@
+ 
+-tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
+-	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+-		-o tests/qapi-schema -p "doc-good-" $<, \
+-		"GEN","$@")
+-	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
+-	@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-good-qmp-*.[ch]
+-
+ tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
+ tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
+ 	$(call quiet-command,$(GDBUS_CODEGEN) $< \
+@@ -849,10 +840,6 @@ check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-
+ 	  PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^, \
+ 	  TEST, check-qapi-schema)
+ 
+-.PHONY: check-tests/qapi-schema/doc-good.texi
+-check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+-	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
+-
+ .PHONY: check-decodetree
+ check-decodetree:
+ 	$(call quiet-command, \
+@@ -900,7 +887,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ # Consolidated targets
+ 
+ .PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean
+-check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
++check-qapi-schema: check-tests/qapi-schema/frontend
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ ifeq ($(CONFIG_TOOLS),y)
+ check-block: $(patsubst %,check-%, $(check-block-y))
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 4b03f7d53be..541e8c1f55d 100755
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -10,7 +10,6 @@ import re
+ import sys
+ 
+ from qapi.commands import gen_commands
+-from qapi.doc import gen_doc
+ from qapi.events import gen_events
+ from qapi.introspect import gen_introspect
+ from qapi.schema import QAPIError, QAPISchema
+@@ -51,7 +50,6 @@ def main(argv):
+     gen_commands(schema, args.output_dir, args.prefix)
+     gen_events(schema, args.output_dir, args.prefix)
+     gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+-    gen_doc(schema, args.output_dir, args.prefix)
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+deleted file mode 100644
+index 26cd1a1751e..00000000000
+--- a/scripts/qapi/doc.py
++++ /dev/null
+@@ -1,302 +0,0 @@
+-# QAPI texi generator
+-#
+-# This work is licensed under the terms of the GNU LGPL, version 2+.
+-# See the COPYING file in the top-level directory.
+-"""This script produces the documentation of a qapi schema in texinfo format"""
+-
+-import re
+-from qapi.gen import QAPIGenDoc, QAPISchemaVisitor
+-
+-
+-MSG_FMT = """
+-@deftypefn {type} {{}} {name}
+-
+-{body}{members}{features}{sections}
+-@end deftypefn
+-
+-""".format
+-
+-TYPE_FMT = """
+-@deftp {{{type}}} {name}
+-
+-{body}{members}{features}{sections}
+-@end deftp
+-
+-""".format
+-
+-EXAMPLE_FMT = """@example
+-{code}
+-@end example
+-""".format
+-
+-
+-def subst_strong(doc):
+-    """Replaces *foo* by @strong{foo}"""
+-    return re.sub(r'\*([^*\n]+)\*', r'@strong{\1}', doc)
+-
+-
+-def subst_emph(doc):
+-    """Replaces _foo_ by @emph{foo}"""
+-    return re.sub(r'\b_([^_\n]+)_\b', r'@emph{\1}', doc)
+-
+-
+-def subst_vars(doc):
+-    """Replaces @var by @code{var}"""
+-    return re.sub(r'@([\w-]+)', r'@code{\1}', doc)
+-
+-
+-def subst_braces(doc):
+-    """Replaces {} with @{ @}"""
+-    return doc.replace('{', '@{').replace('}', '@}')
+-
+-
+-def texi_example(doc):
+-    """Format @example"""
+-    # TODO: Neglects to escape @ characters.
+-    # We should probably escape them in subst_braces(), and rename the
+-    # function to subst_special() or subs_texi_special().  If we do that, we
+-    # need to delay it until after subst_vars() in texi_format().
+-    doc = subst_braces(doc).strip('\n')
+-    return EXAMPLE_FMT(code=doc)
+-
+-
+-def texi_format(doc):
+-    """
+-    Format documentation
+-
+-    Lines starting with:
+-    - |: generates an @example
+-    - =: generates @section
+-    - ==: generates @subsection
+-    - 1. or 1): generates an @enumerate @item
+-    - */-: generates an @itemize list
+-    """
+-    ret = ''
+-    doc = subst_braces(doc)
+-    doc = subst_vars(doc)
+-    doc = subst_emph(doc)
+-    doc = subst_strong(doc)
+-    inlist = ''
+-    lastempty = False
+-    for line in doc.split('\n'):
+-        line = line.strip()
+-        empty = line == ''
+-
+-        # FIXME: Doing this in a single if / elif chain is
+-        # problematic.  For instance, a line without markup terminates
+-        # a list if it follows a blank line (reaches the final elif),
+-        # but a line with some *other* markup, such as a = title
+-        # doesn't.
+-        #
+-        # Make sure to update section "Documentation markup" in
+-        # docs/devel/qapi-code-gen.txt when fixing this.
+-        if line.startswith('| '):
+-            line = EXAMPLE_FMT(code=line[2:])
+-        elif line.startswith('= '):
+-            line = '@section ' + line[2:]
+-        elif line.startswith('== '):
+-            line = '@subsection ' + line[3:]
+-        elif re.match(r'^([0-9]*\.) ', line):
+-            if not inlist:
+-                ret += '@enumerate\n'
+-                inlist = 'enumerate'
+-            ret += '@item\n'
+-            line = line[line.find(' ')+1:]
+-        elif re.match(r'^[*-] ', line):
+-            if not inlist:
+-                ret += '@itemize %s\n' % {'*': '@bullet',
+-                                          '-': '@minus'}[line[0]]
+-                inlist = 'itemize'
+-            ret += '@item\n'
+-            line = line[2:]
+-        elif lastempty and inlist:
+-            ret += '@end %s\n\n' % inlist
+-            inlist = ''
+-
+-        lastempty = empty
+-        ret += line + '\n'
+-
+-    if inlist:
+-        ret += '@end %s\n\n' % inlist
+-    return ret
+-
+-
+-def texi_body(doc):
+-    """Format the main documentation body"""
+-    return texi_format(doc.body.text)
+-
+-
+-def texi_if(ifcond, prefix='\n', suffix='\n'):
+-    """Format the #if condition"""
+-    if not ifcond:
+-        return ''
+-    return '%s@b{If:} @code{%s}%s' % (prefix, ', '.join(ifcond), suffix)
+-
+-
+-def texi_enum_value(value, desc, suffix):
+-    """Format a table of members item for an enumeration value"""
+-    return '@item @code{%s}\n%s%s' % (
+-        value.name, desc, texi_if(value.ifcond, prefix='@*'))
+-
+-
+-def texi_member(member, desc, suffix):
+-    """Format a table of members item for an object type member"""
+-    typ = member.type.doc_type()
+-    membertype = ': ' + typ if typ else ''
+-    return '@item @code{%s%s}%s%s\n%s%s' % (
+-        member.name, membertype,
+-        ' (optional)' if member.optional else '',
+-        suffix, desc, texi_if(member.ifcond, prefix='@*'))
+-
+-
+-def texi_members(doc, what, base=None, variants=None,
+-                 member_func=texi_member):
+-    """Format the table of members"""
+-    items = ''
+-    for section in doc.args.values():
+-        # TODO Drop fallbacks when undocumented members are outlawed
+-        if section.text:
+-            desc = texi_format(section.text)
+-        elif (variants and variants.tag_member == section.member
+-              and not section.member.type.doc_type()):
+-            values = section.member.type.member_names()
+-            members_text = ', '.join(['@t{"%s"}' % v for v in values])
+-            desc = 'One of ' + members_text + '\n'
+-        else:
+-            desc = 'Not documented\n'
+-        items += member_func(section.member, desc, suffix='')
+-    if base:
+-        items += '@item The members of @code{%s}\n' % base.doc_type()
+-    if variants:
+-        for v in variants.variants:
+-            when = ' when @code{%s} is @t{"%s"}%s' % (
+-                variants.tag_member.name, v.name, texi_if(v.ifcond, " (", ")"))
+-            if v.type.is_implicit():
+-                assert not v.type.base and not v.type.variants
+-                for m in v.type.local_members:
+-                    items += member_func(m, desc='', suffix=when)
+-            else:
+-                items += '@item The members of @code{%s}%s\n' % (
+-                    v.type.doc_type(), when)
+-    if not items:
+-        return ''
+-    return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
+-
+-
+-def texi_arguments(doc, boxed_arg_type):
+-    if boxed_arg_type:
+-        assert not doc.args
+-        return ('\n@b{Arguments:} the members of @code{%s}\n'
+-                % boxed_arg_type.name)
+-    return texi_members(doc, 'Arguments')
+-
+-
+-def texi_features(doc):
+-    """Format the table of features"""
+-    items = ''
+-    for section in doc.features.values():
+-        desc = texi_format(section.text)
+-        items += '@item @code{%s}\n%s' % (section.name, desc)
+-    if not items:
+-        return ''
+-    return '\n@b{Features:}\n@table @asis\n%s@end table\n' % (items)
+-
+-
+-def texi_sections(doc, ifcond):
+-    """Format additional sections following arguments"""
+-    body = ''
+-    for section in doc.sections:
+-        if section.name:
+-            # prefer @b over @strong, so txt doesn't translate it to *Foo:*
+-            body += '\n@b{%s:}\n' % section.name
+-        if section.name and section.name.startswith('Example'):
+-            body += texi_example(section.text)
+-        else:
+-            body += texi_format(section.text)
+-    body += texi_if(ifcond, suffix='')
+-    return body
+-
+-
+-def texi_type(typ, doc, ifcond, members):
+-    return TYPE_FMT(type=typ,
+-                    name=doc.symbol,
+-                    body=texi_body(doc),
+-                    members=members,
+-                    features=texi_features(doc),
+-                    sections=texi_sections(doc, ifcond))
+-
+-
+-def texi_msg(typ, doc, ifcond, members):
+-    return MSG_FMT(type=typ,
+-                   name=doc.symbol,
+-                   body=texi_body(doc),
+-                   members=members,
+-                   features=texi_features(doc),
+-                   sections=texi_sections(doc, ifcond))
+-
+-
+-class QAPISchemaGenDocVisitor(QAPISchemaVisitor):
+-    def __init__(self, prefix):
+-        self._prefix = prefix
+-        self._gen = QAPIGenDoc(self._prefix + 'qapi-doc.texi')
+-        self.cur_doc = None
+-
+-    def write(self, output_dir):
+-        self._gen.write(output_dir)
+-
+-    def visit_enum_type(self, name, info, ifcond, members, prefix):
+-        doc = self.cur_doc
+-        self._gen.add(texi_type('Enum', doc, ifcond,
+-                                texi_members(doc, 'Values',
+-                                             member_func=texi_enum_value)))
+-
+-    def visit_object_type(self, name, info, ifcond, base, members, variants,
+-                          features):
+-        doc = self.cur_doc
+-        if base and base.is_implicit():
+-            base = None
+-        self._gen.add(texi_type('Object', doc, ifcond,
+-                                texi_members(doc, 'Members', base, variants)))
+-
+-    def visit_alternate_type(self, name, info, ifcond, variants):
+-        doc = self.cur_doc
+-        self._gen.add(texi_type('Alternate', doc, ifcond,
+-                                texi_members(doc, 'Members')))
+-
+-    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+-                      success_response, boxed, allow_oob, allow_preconfig,
+-                      features):
+-        doc = self.cur_doc
+-        self._gen.add(texi_msg('Command', doc, ifcond,
+-                               texi_arguments(doc,
+-                                              arg_type if boxed else None)))
+-
+-    def visit_event(self, name, info, ifcond, arg_type, boxed):
+-        doc = self.cur_doc
+-        self._gen.add(texi_msg('Event', doc, ifcond,
+-                               texi_arguments(doc,
+-                                              arg_type if boxed else None)))
+-
+-    def symbol(self, doc, entity):
+-        if self._gen._body:
+-            self._gen.add('\n')
+-        self.cur_doc = doc
+-        entity.visit(self)
+-        self.cur_doc = None
+-
+-    def freeform(self, doc):
+-        assert not doc.args
+-        if self._gen._body:
+-            self._gen.add('\n')
+-        self._gen.add(texi_body(doc) + texi_sections(doc, None))
+-
+-
+-def gen_doc(schema, output_dir, prefix):
+-    vis = QAPISchemaGenDocVisitor(prefix)
+-    vis.visit_begin(schema)
+-    for doc in schema.docs:
+-        if doc.symbol:
+-            vis.symbol(doc, schema.lookup_entity(doc.symbol))
+-        else:
+-            vis.freeform(doc)
+-    vis.write(output_dir)
+diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+index 95afae0615a..7712d2d49f7 100644
+--- a/scripts/qapi/gen.py
++++ b/scripts/qapi/gen.py
+@@ -177,13 +177,6 @@ def ifcontext(ifcond, *args):
+         arg.end_if()
+ 
+ 
+-class QAPIGenDoc(QAPIGen):
+-
+-    def _top(self):
+-        return (QAPIGen._top(self)
+-                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
+-
+-
+ class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
+ 
+     def __init__(self, prefix, what, blurb, pydoc):
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+deleted file mode 100644
+index 1e8063c8579..00000000000
+--- a/tests/qapi-schema/doc-good.texi
++++ /dev/null
+@@ -1,281 +0,0 @@
+-@c AUTOMATICALLY GENERATED, DO NOT MODIFY
+-
+-@section Section
+-
+-@subsection Subsection
+-
+-@strong{strong} @emph{with emphasis}
+-@code{var} @{in braces@}
+-
+-@itemize @bullet
+-@item
+-List item one
+-@item
+-Two, multiple
+-lines
+-
+-@item
+-Three
+-Still in list
+-
+-@end itemize
+-
+-Not in list
+-
+-@itemize @minus
+-@item
+-Second list
+-Note: still in list
+-
+-@end itemize
+-
+-Note: not in list
+-
+-@enumerate
+-@item
+-Third list
+-is numbered
+-
+-@item
+-another item
+-
+-@end enumerate
+-
+-Returns: the King
+-Since: the first age
+-Notes:
+-
+-@enumerate
+-@item
+-Lorem ipsum dolor sit amet
+-
+-@item
+-Ut enim ad minim veniam
+-
+-@end enumerate
+-
+-Duis aute irure dolor
+-
+-Example:
+-
+--> in
+-<- out
+-Examples:
+-@itemize @minus
+-@item
+-@strong{verbatim}
+-@item
+-@{braces@}
+-@end itemize
+-
+-
+-
+-@deftp {Enum} Enum
+-
+-
+-
+-@b{Values:}
+-@table @asis
+-@item @code{one}
+-The @emph{one} @{and only@}
+-@*@b{If:} @code{defined(IFONE)}
+-@item @code{two}
+-Not documented
+-@end table
+-@code{two} is undocumented
+-
+-@b{If:} @code{defined(IFCOND)}
+-@end deftp
+-
+-
+-
+-@deftp {Object} Base
+-
+-
+-
+-@b{Members:}
+-@table @asis
+-@item @code{base1: Enum}
+-the first member
+-@end table
+-
+-@end deftp
+-
+-
+-
+-@deftp {Object} Variant1
+-
+-A paragraph
+-
+-Another paragraph (but no @code{var}: line)
+-
+-@b{Members:}
+-@table @asis
+-@item @code{var1: string}
+-Not documented
+-@*@b{If:} @code{defined(IFSTR)}
+-@end table
+-
+-@b{Features:}
+-@table @asis
+-@item @code{variant1-feat}
+-a feature
+-@end table
+-
+-@end deftp
+-
+-
+-
+-@deftp {Object} Variant2
+-
+-
+-
+-@end deftp
+-
+-
+-
+-@deftp {Object} Object
+-
+-
+-
+-@b{Members:}
+-@table @asis
+-@item The members of @code{Base}
+-@item The members of @code{Variant1} when @code{base1} is @t{"one"}
+-@item The members of @code{Variant2} when @code{base1} is @t{"two"} (@b{If:} @code{IFTWO})
+-@end table
+-
+-@end deftp
+-
+-
+-
+-@deftp {Object} SugaredUnion
+-
+-
+-
+-@b{Members:}
+-@table @asis
+-@item @code{type}
+-One of @t{"one"}, @t{"two"}
+-@item @code{data: Variant1} when @code{type} is @t{"one"}
+-@item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:} @code{IFTWO})
+-@end table
+-
+-@end deftp
+-
+-
+-
+-@deftp {Alternate} Alternate
+-
+-
+-
+-@b{Members:}
+-@table @asis
+-@item @code{i: int}
+-an integer
+-@code{b} is undocumented
+-@item @code{b: boolean}
+-Not documented
+-@end table
+-
+-@end deftp
+-
+-
+-@subsection Another subsection
+-
+-
+-@deftypefn Command {} cmd
+-
+-
+-
+-@b{Arguments:}
+-@table @asis
+-@item @code{arg1: int}
+-the first argument
+-@item @code{arg2: string} (optional)
+-the second
+-argument
+-@item @code{arg3: boolean}
+-Not documented
+-@end table
+-
+-@b{Features:}
+-@table @asis
+-@item @code{cmd-feat1}
+-a feature
+-@item @code{cmd-feat2}
+-another feature
+-@end table
+-
+-@b{Note:}
+-@code{arg3} is undocumented
+-
+-@b{Returns:}
+-@code{Object}
+-
+-@b{TODO:}
+-frobnicate
+-
+-@b{Notes:}
+-@itemize @minus
+-@item
+-Lorem ipsum dolor sit amet
+-@item
+-Ut enim ad minim veniam
+-
+-@end itemize
+-
+-Duis aute irure dolor
+-
+-@b{Example:}
+-@example
+--> in
+-<- out
+-@end example
+-
+-@b{Examples:}
+-@example
+-- *verbatim*
+-- @{braces@}
+-@end example
+-
+-@b{Since:}
+-2.10
+-
+-@end deftypefn
+-
+-
+-
+-@deftypefn Command {} cmd-boxed
+-
+-If you're bored enough to read this, go see a video of boxed cats
+-
+-@b{Arguments:} the members of @code{Object}
+-
+-@b{Features:}
+-@table @asis
+-@item @code{cmd-feat1}
+-a feature
+-@item @code{cmd-feat2}
+-another feature
+-@end table
+-
+-@b{Example:}
+-@example
+--> in
+-
+-<- out
+-@end example
+-
+-@end deftypefn
+-
+-
+-
+-@deftypefn Event {} EVT-BOXED
+-
+-
+-
+-@b{Arguments:} the members of @code{Object}
+-
+-@end deftypefn
+-
+-- 
+2.20.1
 
-If it can help, it is in attachment.
-
-Put it in scripts, and run it as:
-
-scripts/gensyscalls.sh /path/to/linux
-
-then check the result with something like "git diff -w"
-
-Thanks,
-Laurent
-
---------------17E998FEEABEE81D847F8E95
-Content-Type: application/x-shellscript;
- name="gensyscalls.sh"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="gensyscalls.sh"
-
-IyEvYmluL3NoCgpsaW51eD0iJDEiCm91dHB1dD0iJDIiCgpUTVA9JChta3RlbXAgLWQpCgpp
-ZiBbICIkbGludXgiID0gIiIgXSA7IHRoZW4KICAgIGVjaG8gIk5lZWRzIHBhdGggdG8gbGlu
-dXggc291cmNlIHRyZWUiIDE+JjIKICAgIGV4aXQgMQpmaQoKaWYgWyAiJG91dHB1dCIgPSAi
-IiBdIDsgdGhlbgogICAgb3V0cHV0PSIkUFdEIgpmaQoKdXBwZXIoKQp7CiAgICBlY2hvICIk
-MSIgfCB0ciAiWzpsb3dlcjpdIiAiWzp1cHBlcjpdIiB8IHRyICJbOnB1bmN0Ol0iICJfIgp9
-CgpxZW11X2FyY2goKQp7CiAgICBjYXNlICIkMSIgaW4KICAgIGFybTY0KQogICAgICAgIGVj
-aG8gImFhcmNoNjQiCiAgICAgICAgOzsKICAgICopCiAgICAgICAgdXBwZXIgIiQxIgogICAg
-ICAgIDs7CiAgICBlc2FjCn0KCnJlYWRfaW5jbHVkZXMoKQp7CiAgICBhcmNoPSQxCiAgICBi
-aXRzPSQyCgogICAgIGNwcCAtUCAtbm9zdGRpbmMgLWZkaXJlY3RpdmVzLW9ubHkgXAogICAg
-ICAgIC1EX1VBUElfQVNNXyQodXBwZXIgJHthcmNofSlfQklUU1BFUkxPTkdfSCBcCiAgICAg
-ICAgLURfX0JJVFNfUEVSX0xPTkc9JHtiaXRzfSBcCiAgICAgICAgLUkke2xpbnV4fS9hcmNo
-LyR7YXJjaH0vaW5jbHVkZS91YXBpLyBcCiAgICAgICAgLUkke2xpbnV4fS9pbmNsdWRlL3Vh
-cGkgXAogICAgICAgIC1JJHtUTVB9IFwKICAgICAgICAiJHtsaW51eH0vYXJjaC8ke2FyY2h9
-L2luY2x1ZGUvdWFwaS9hc20vdW5pc3RkLmgiCn0KCmZpbHRlcl9kZWZpbmVzKCkKewogICAg
-Z3JlcCAtZSAiI2RlZmluZSBfX05SXyIgLWUgIiNkZWZpbmUgX19OUjMyNjQiCn0KCnJlbmFt
-ZV9kZWZpbmVzKCkKewogICAgc2VkICJzLyBfX05SXy8gVEFSR0VUX05SXy9nO3MvKF9fTlJf
-LyhUQVJHRVRfTlJfL2ciCn0KCmV2YWx1YXRlX3ZhbHVlcygpCnsKICAgIHNlZCAicy8jZGVm
-aW5lIFRBUkdFVF9OUl8vUUVNVSBUQVJHRVRfTlJfLyIgfCBcCiAgICBjcHAgLVAgLW5vc3Rk
-aW5jIHwgXAogICAgc2VkICJzL15RRU1VIC8jZGVmaW5lIC8iCn0KCmdlbmVyYXRlX3N5c2Nh
-bGxfbnIoKQp7CiAgICBhcmNoPSQxCiAgICBiaXRzPSQyCiAgICBmaWxlPSIkMyIKICAgIGd1
-YXJkPSIkKHVwcGVyIExJTlVYX1VTRVJfJChxZW11X2FyY2ggJGFyY2gpXyQoYmFzZW5hbWUg
-IiRmaWxlIikpIgoKICAgIChlY2hvICIvKiIKICAgIGVjaG8gIiAqIFRoaXMgZmlsZSBjb250
-YWlucyB0aGUgc3lzdGVtIGNhbGwgbnVtYmVycy4iCiAgICBlY2hvICIgKi8iCiAgICBlY2hv
-ICIjaWZuZGVmICR7Z3VhcmR9IgogICAgZWNobyAiI2RlZmluZSAke2d1YXJkfSIKICAgIGVj
-aG8KICAgIHJlYWRfaW5jbHVkZXMgJGFyY2ggJGJpdHMgfCBmaWx0ZXJfZGVmaW5lcyB8IHJl
-bmFtZV9kZWZpbmVzIHwgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGV2YWx1
-YXRlX3ZhbHVlcyB8IHNvcnQgLW4gLWsgMwogICAgZWNobwogICAgZWNobyAiI2VuZGlmIC8q
-ICR7Z3VhcmR9ICovIgogICAgZWNobykgPiAiJGZpbGUiCn0KCm1rZGlyICIkVE1QL2FzbSIK
-PiAiJFRNUC9hc20vYml0c3BlcmxvbmcuaCIKCmdlbmVyYXRlX3N5c2NhbGxfbnIgYXJtNjQg
-NjQgIiRvdXRwdXQvbGludXgtdXNlci9hYXJjaDY0L3N5c2NhbGxfbnIuaCIKZ2VuZXJhdGVf
-c3lzY2FsbF9uciBuaW9zMiAzMiAiJG91dHB1dC9saW51eC11c2VyL25pb3MyL3N5c2NhbGxf
-bnIuaCIKZ2VuZXJhdGVfc3lzY2FsbF9uciBvcGVucmlzYyAzMiAiJG91dHB1dC9saW51eC11
-c2VyL29wZW5yaXNjL3N5c2NhbGxfbnIuaCIKCmdlbmVyYXRlX3N5c2NhbGxfbnIgcmlzY3Yg
-MzIgIiRvdXRwdXQvbGludXgtdXNlci9yaXNjdi9zeXNjYWxsMzJfbnIuaCIKZ2VuZXJhdGVf
-c3lzY2FsbF9uciByaXNjdiA2NCAiJG91dHB1dC9saW51eC11c2VyL3Jpc2N2L3N5c2NhbGw2
-NF9uci5oIgpybSAtZnIgIiRUTVAiCg==
---------------17E998FEEABEE81D847F8E95--
 
