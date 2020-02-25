@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFDAC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC156C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:22:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47CD720CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9AE320CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:22:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMv7FR9p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47CD720CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9rBDafh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9AE320CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54005 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZE4-0004G1-En
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:22:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49784)
+	id 1j6ZE8-0004SM-TQ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:22:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl3-0001Fu-F0
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:17 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl4-0001IF-7w
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008GC-7i
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:55322)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Ht-FS
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:14 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:52809)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykx-00085Y-Cj
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id q9so2666788wmj.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:04 -0800 (PST)
+ id 1j6Ykz-00084k-0r
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:09 -0500
+Received: by mail-wm1-x331.google.com with SMTP id p9so2680924wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vqmrNOvjCGW7erTAY2E+vByuvai3gyKtXKdjs6y5w2c=;
- b=cMv7FR9pW7mht8pIRvMsFJ0cn2NpGbjHERqfx1V5v7/AHJaUjq2UYeyYO/3zmlEywO
- VAx8wQGBuva/d08YdnmUUIJKoX6tAqABVgrciJO8eu5h93RxRtFqgIadzNc8S05/mqEE
- UaxbHJ0aRx4ABCXrm/gNsmrWXjuOsaQmtSBU2dw37hp4BXvi7VUw3vYzWhu4VS1VBT6U
- z6ekANer9EXIIYplPanf2RXc2lTkF3g/IjMqDImSSxUMkn6lWIeK6WGkmDngESEbgdz/
- IG1GQGRVIeMuGIctKs5kV8egyVdxChKrP+Z2eFMEq6u1gFGyL7LKTU0O+E9JWXExZxCJ
- 9/Tg==
+ bh=xma2+4S55weDzTQ3z96ys9FOf+xrE/zxwn4CakN0mJc=;
+ b=Z9rBDafhvdkikLz4WB6k2S1Kj/NoH0LGnbmP83jje5TTFaP3BOrKvQbZCKfJcrw0G0
+ K4E8LhrvrWJIAIzNBKHvNoA8TaIVVz+lwFsThhKFqpC4/vbND8Nso2qUYepO+qPWdd3Q
+ 99FariPwdkzjOomvIKTw5snEukoPPxGQSann/2l5MuONva3hG6X3W7MCzPNISKkk0BlR
+ HF8A06as7QbET8JqlD/95g6Bb4jKrQugJdDgjeo1QsLBasvCNKtGqc0erZxi55gWUHrI
+ Lqn2bUIYO0LUF+dd0csR/yOSh3+3ESKuN4uFVwMtNhnRBXi/U2teXd22rF1xEwqyyi9z
+ cKVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=vqmrNOvjCGW7erTAY2E+vByuvai3gyKtXKdjs6y5w2c=;
- b=kEyqm7FDUCZ3N6PWpdqKlXkwOKS6mKz+2p4rjrEVBm8UQwXw5N9csp3aJyo0UkYU5r
- PRV3yLX+5/VGiQmK/mJyB/gfQ76SGtxfJI50+vJd9u2mWRNl6RTDgr+WYQvcwShe5wbt
- Ye8wIIxQBIzbffjsE4m2ATizga08JItYg3Ap4j2daF0SLAFqYquVnUF3OWvzTJAFD9j2
- jCz4+9mVeh0hI5TTxNWh3KYlhZZWphg+AWiUk696OOion+6TTBk+EW3xVG9JJF3Z5mdM
- msEvlrnyYe4aTrUVEws5KgoI94hoMlsSSTNIfpzVPJnoY+SzHMk/5QLMITUbMc4ZkIGH
- rwyQ==
-X-Gm-Message-State: APjAAAUngTYk322I2LvZZ5UXxpxF0x8a+AXv2yxLiMck7/oyA5Rvx4B8
- NtX/tu5XDlXTqSfg96Y5qk/0HiYH
-X-Google-Smtp-Source: APXvYqxZQOzSg/NvUEV/vtSWfYiWfYxp76+Oz4XEMW9edJTs1CW8fWOKkjGhWSeAoQYadjrPR8rG7g==
-X-Received: by 2002:a7b:cf08:: with SMTP id l8mr4824393wmg.169.1582631522918; 
- Tue, 25 Feb 2020 03:52:02 -0800 (PST)
+ bh=xma2+4S55weDzTQ3z96ys9FOf+xrE/zxwn4CakN0mJc=;
+ b=poBWW2q9DYpk3DG7Z+i+XO15KvKy2kB1mdhRtd5TDohiptEtH3qdIYFinkjmJq0QD5
+ 3MqFC4oeJXiz00i5AbaH89reaCYGgY1jRD6x44piDgyax8CoKPX2z9lPJjwG9W+v3RJt
+ XVUzhlNcZ8Q/B/yMUgaz2b4LyQ55AtdQMoH1Kv1gSDmY5CJGmL59grWCITUnBKk4i+k2
+ ntoNXtGbHnsiLV8QDO+B8ixAZRBICQS94eOBJVZwEMIJcxyW1Qc5/wBQwDkBZZth4wCw
+ nrJzbj33q51GBlRSXJtg4+/WjQ7JR+bYb4uYqbP/e8ac16hvsVLitibXaSya3Wj3UtBz
+ SeTw==
+X-Gm-Message-State: APjAAAUKZ65fCNvuCV7FK4JNHbHn2dPc2n0zUb+tzJXIxcmRW+Ocmbwf
+ FNMqDwyrZ5Cq2lNcben7bPDn4h5w
+X-Google-Smtp-Source: APXvYqy+qqiwR4wh2iLICQ4MnFC6dygqgRBRnChaOcTsIUh9sCrrL8w24BpeiuYNbXLswmqrS0qP6w==
+X-Received: by 2002:a1c:9ed7:: with SMTP id h206mr4882964wme.67.1582631521240; 
+ Tue, 25 Feb 2020 03:52:01 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.02
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.00
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:02 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:00 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 062/136] ppc/pnv: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:52 +0100
-Message-Id: <1582631466-13880-62-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 060/136] ppc/mac_newworld: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:50 +0100
+Message-Id: <1582631466-13880-60-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,46 +110,45 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-63-imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200219160953.13771-61-imammedo@redhat.com>
 ---
- hw/ppc/pnv.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/ppc/mac_newworld.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 139c857..ea20a1d 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -690,7 +690,6 @@ static void pnv_init(MachineState *machine)
- {
-     PnvMachineState *pnv = PNV_MACHINE(machine);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
--    MemoryRegion *ram;
-     char *fw_filename;
-     long fw_size;
-     int i;
-@@ -702,11 +701,7 @@ static void pnv_init(MachineState *machine)
-     if (machine->ram_size < (1 * GiB)) {
-         warn_report("skiboot may not work with < 1GB of RAM");
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 464d012..b8189bf 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -118,7 +118,7 @@ static void ppc_core99_init(MachineState *machine)
+     char *filename;
+     IrqLines *openpic_irqs;
+     int linux_boot, i, j, k;
+-    MemoryRegion *ram = g_new(MemoryRegion, 1), *bios = g_new(MemoryRegion, 1);
++    MemoryRegion *bios = g_new(MemoryRegion, 1);
+     hwaddr kernel_base, initrd_base, cmdline_base = 0;
+     long kernel_size, initrd_size;
+     UNINHostState *uninorth_pci;
+@@ -152,8 +152,7 @@ static void ppc_core99_init(MachineState *machine)
      }
--
--    ram = g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram, NULL, "pnv.ram",
--                                         machine->ram_size);
+ 
+     /* allocate RAM */
+-    memory_region_allocate_system_memory(ram, NULL, "ppc_core99.ram", ram_size);
 -    memory_region_add_subregion(get_system_memory(), 0, ram);
 +    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
  
-     /*
-      * Create our simple PNOR device
-@@ -1976,6 +1971,7 @@ static void pnv_machine_class_init(ObjectClass *oc, void *data)
-      * enough to fit the maximum initrd size at it's load address
-      */
-     mc->default_ram_size = INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
-+    mc->default_ram_id = "pnv.ram";
-     ispc->print_info = pnv_pic_print_info;
- 
-     object_class_property_add_bool(oc, "hb-mode",
+     /* allocate and load BIOS */
+     memory_region_init_ram(bios, NULL, "ppc_core99.bios", BIOS_SIZE,
+@@ -586,6 +585,7 @@ static void core99_machine_class_init(ObjectClass *oc, void *data)
+ #else
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("7400_v2.9");
+ #endif
++    mc->default_ram_id = "ppc_core99.ram";
+     mc->ignore_boot_device_suffixes = true;
+     fwc->get_dev_path = core99_fw_dev_path;
+ }
 -- 
 1.8.3.1
 
