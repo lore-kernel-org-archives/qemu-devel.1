@@ -2,118 +2,149 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E7EC35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D7FC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BB0721556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:14:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB0721556
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+	by mail.kernel.org (Postfix) with ESMTPS id 698D721556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:15:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 698D721556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6YAK-0006A0-O1
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 06:14:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40455)
+	id 1j6YBJ-0007J8-LC
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 06:15:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jirislaby@gmail.com>) id 1j6Y9a-0005CZ-45
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:33 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6YA1-0005xE-Ih
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jirislaby@gmail.com>) id 1j6Y9W-00044y-CL
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:30 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55441)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jirislaby@gmail.com>) id 1j6Y9W-00040c-6D
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:26 -0500
-Received: by mail-wm1-f66.google.com with SMTP id q9so2547571wmj.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:13:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=wzb/3nww0AcI8OgbfGFcrhz8/ehPbcJx821qqME+Fhc=;
- b=Idyif8DcNNTnd8vxoNDD3PjoIjyIM/MMYb6bHYjtsj72FX+n2YyOVXFgJxFfaHjCFg
- v2gpM0j5GiK15yulxpXtrUrpfwsblAhzW8NF3Hb4LCc3psJyFYhbBsECgPTX2mG5JhgW
- 5Fzxv116wccfrKaCOfsaanaFY8FhI7AYSG46EGecmvSb1B6hPor6sUzhQKMr5IK37hBp
- hZsNw6Qajjz3xs4bJE4HGcLOYvAqaWcWfySH+ERxGd8pD/7dGRJJYuTJmanvEsbJmMVq
- BmIHJSgymKoflOqhCO0jweRxGczQ9X+O8NSnzU4Hv/ISdEoZxMynl9yGhwDzAFEf+k8m
- 9jHg==
-X-Gm-Message-State: APjAAAXNevTEmGt3j5DB14cKQuToh+cCz9mTaPtZDlIx5ZvjxN30siaW
- 0xfma+a9nbdctBEf/CefKGAjILlZVLM=
-X-Google-Smtp-Source: APXvYqxU9Ghix78TaqokvuvJk8SCCB0gR10RYti2dhV7ip+xtncDiQMPxFrvfXYJzW+NDbvJgfW3Sg==
-X-Received: by 2002:a1c:670a:: with SMTP id b10mr4672485wmc.2.1582629204741;
- Tue, 25 Feb 2020 03:13:24 -0800 (PST)
-Received: from [192.168.1.49] (185-219-167-24-static.vivo.cz. [185.219.167.24])
- by smtp.gmail.com with ESMTPSA id v131sm3860163wme.23.2020.02.25.03.13.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:13:24 -0800 (PST)
-Subject: Re: [PATCH] slirp: samba, set 'server min protocol' to NT1
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200225102758.21074-1-jslaby@suse.cz>
- <20200225104338.GC1148628@redhat.com>
-From: Jiri Slaby <jslaby@suse.cz>
-Autocrypt: addr=jslaby@suse.cz; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b723072f-6e83-c089-f16a-34fb84452046@suse.cz>
-Date: Tue, 25 Feb 2020 12:13:23 +0100
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6YA0-0005iS-9d
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44404
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1j6YA0-0005gS-4g
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:13:56 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01PBAFOT034598
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:13:55 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yb12byhnp-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:13:55 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 25 Feb 2020 11:13:53 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 25 Feb 2020 11:13:52 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01PBDpSX55705616
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 25 Feb 2020 11:13:51 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9049F4C040;
+ Tue, 25 Feb 2020 11:13:51 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5FDCD4C046;
+ Tue, 25 Feb 2020 11:13:51 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.219])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 25 Feb 2020 11:13:51 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
+To: jjherne@linux.ibm.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
+ cohuck@redhat.com
+References: <20200205182126.13010-1-jjherne@linux.ibm.com>
+ <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
+ <bf3f44b5-f0fe-59f4-9152-54edd8c9822e@linux.ibm.com>
+ <941cc201-4c33-0ad3-ecc8-eab2709d350d@de.ibm.com>
+ <91910082-ffeb-c588-7434-3de5fbfcbfa6@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 25 Feb 2020 12:13:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200225104338.GC1148628@redhat.com>
+In-Reply-To: <91910082-ffeb-c588-7434-3de5fbfcbfa6@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
+X-TM-AS-GCONF: 00
+x-cbid: 20022511-0020-0000-0000-000003AD6616
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022511-0021-0000-0000-000022057C0F
+Message-Id: <ab7de201-f466-b95d-50f0-e6f850eee3cd@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-25_03:2020-02-21,
+ 2020-02-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 bulkscore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ adultscore=0 malwarescore=0 impostorscore=0 phishscore=0 mlxlogscore=744
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002250091
+Content-Transfer-Encoding: base64
+X-MIME-Autoconverted: from 8bit to base64 by mx0a-001b2d01.pphosted.com id
+ 01PBAFOT034598
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,62 +156,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25. 02. 20, 11:43, Daniel P. Berrangé wrote:
-> On Tue, Feb 25, 2020 at 11:27:58AM +0100, Jiri Slaby wrote:
->> Samba changed the default of server min protocol from LANMAN1 (very old
->> protocol) to SMB2_02 (only Vista and newer) in commit 840b8501b436
->> (docs-xml: change "server min protocol" to SMB2_02).
->>
->> WXP guests cannot use the samba shares since then as it uses a protocol
->> newer than LANMAN1, but older than SMB2_02: NT1 protocol. So set 'server
->> min protocol' in the samba config used in qemu to NT1. This restores
->> support for WinNT and newer (WXP including).
->>
->> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
->> ---
->>  net/slirp.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/net/slirp.c b/net/slirp.c
->> index c4334ee876c7..b3bc4a2bded7 100644
->> --- a/net/slirp.c
->> +++ b/net/slirp.c
->> @@ -887,6 +887,7 @@ static int slirp_smb(SlirpState* s, const char *exported_dir,
->>              "printing = bsd\n"
->>              "disable spoolss = yes\n"
->>              "usershare max shares = 0\n"
->> +            "server min protocol = NT1\n"
->>              "[qemu]\n"
->>              "path=%s\n"
->>              "read only=no\n"
-> 
-> IIUC, the older protocol version has a number of downsides, both security
-> and performance related, which is why Samba has removed it from the
-> default config.
-
-Sure, but is it that relevant for a VM? I mean, it's "min" protocol,
-newer Win will negotiate the latest.
-
->  Do we really want to revert this defaults change that
-> Samba maintainers made, in order to cope with a guest OS which was
-> end-of-life 11 years ago ? It feels questionable to me.
-
-It's 6 years, Vista is 3. (The current default still allows Vista.)
-
-> Maybe QEMU's command line needs to include an option to set the min
-> protocol version, so that we don't need to hardcode this obsolete protocol
-> version in the source.
-
-That would be great. Though I have no idea how to add one :). Something
-like "-net user,smb=/home/smb,smbminproto=NT1" would be perfect by me.
-
-thanks,
--- 
-js
-suse labs
+DQoNCk9uIDI1LjAyLjIwIDExOjIzLCBKYXNvbiBKLiBIZXJuZSB3cm90ZToNCj4gT24gMi8x
+My8yMCAxOjI0IFBNLCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIgd3JvdGU6DQo+IC4uLg0KPj4+
+PiBkaWZmIC0tZ2l0IGEvcGMtYmlvcy9zMzkwLWNjdy9qdW1wMmlwbC5jIGIvcGMtYmlvcy9z
+MzkwLWNjdy9qdW1wMmlwbC5jDQo+Pj4+IGluZGV4IGRhMTNjNDNjYzAuLjg4MzkyMjY4MDMg
+MTAwNjQ0DQo+Pj4+IC0tLSBhL3BjLWJpb3MvczM5MC1jY3cvanVtcDJpcGwuYw0KPj4+PiAr
+KysgYi9wYy1iaW9zL3MzOTAtY2N3L2p1bXAyaXBsLmMNCj4+Pj4gQEAgLTE4LDYgKzE4LDcg
+QEANCj4+Pj4gwqDCoCB0eXBlZGVmIHN0cnVjdCBSZXNldEluZm8gew0KPj4+PiDCoMKgwqDC
+oMKgwqAgdWludDY0X3QgaXBsX3BzdzsNCj4+Pj4gwqDCoMKgwqDCoMKgIHVpbnQzMl90IGlw
+bF9jb250aW51ZTsNCj4+Pj4gK8KgwqDCoCB1aW50MzJfdCBwYWQ7DQo+Pj4+IMKgwqAgfSBS
+ZXNldEluZm87DQo+Pj4+IMKgwqAgwqAgc3RhdGljIFJlc2V0SW5mbyBzYXZlOw0KPj4+Pg0K
+Pj4+Pg0KPj4+PiBhbHNvIHdvcms/IElmIHllcywgYm90aCB2YXJpYW50cyBhcmUgdmFsaWQu
+IEVpdGhlciBwYWNrZWQgb3IgZXhwbGljaXQgcGFkZGluZy4NCj4+Pj4NCj4+Pg0KPj4+IEkg
+ZG9uJ3QgYmVsaWV2ZSB0aGlzIHdpbGwgd29yay4gSSB0aGluayB0aGUgcHJvYmxlbSBpcyB0
+aGF0IHdlJ3JlIG92ZXJ3cml0aW5nIHRvbyBtdWNoIG1lbW9yeSB3aGVuIHdlIGNhc3QgYWRk
+cmVzcyAwIGFzIGEgUmVzZXRJbmZvIGFuZCB0aGVuIG92ZXJ3cml0ZSBpdCAoKmN1cnJlbnQg
+PSBzYXZlKS4gSSB0aGluayB3ZSBuZWVkIHRoZSBzdHJ1Y3QgdG8gYmUgc2l6ZWQgYXQgMTIt
+Ynl0ZXMgaW5zdGVhZCBvZiAxNi4NCj4+Pg0KPj4NCj4+IFRoZSBpZGVhIG9mIHRoZSBjb2Rl
+IGlzIHRoYXQgd2UgX3NhdmVfIHRoZSBvcmlnaW5hbCBjb250ZW50IGZyb20gYWRkcmVzcyAw
+IHRvIHNhdmUgYW5kIF9yZXN0b3JlXyBpdCBiZWZvcmUganVtcGluZyBpbnRvIGZpbmFsIGNv
+ZGUuIEkgZG8gbm90IHlldCB1bmRlcnN0YW5kIHdoeSB0aGlzIGRvZXMgbm90IHdvcmsuDQo+
+Pg0KPiANCj4gSSd2ZSBmb3VuZCB0aGUgcmVhbCBwcm9ibGVtIGhlcmUuIExlZ2FjeSBvcGVy
+YXRpbmcgc3lzdGVtcyB0aGF0IGV4cGVjdCB0byBzdGFydA0KPiBpbiAzMi1iaXQgYWRkcmVz
+c2luZyBtb2RlIGNhbiBmYWlsIGlmIHdlIGxlYXZlIGp1bmsgaW4gdGhlIGhpZ2ggaGFsdmVz
+IG9mIG91cg0KPiA2NC1iaXQgcmVnaXN0ZXJzLiBUaGlzIGlzIGJlY2F1c2Ugc29tZSBpbnN0
+cnVjdGlvbnMgKExBIGZvciBleGFtcGxlKSBhcmUNCj4gYmktbW9kYWwgYW5kIG9wZXJhdGUg
+ZGlmZmVyZW50bHkgZGVwZW5kaW5nIG9uIHRoZSBtYWNoaW5lJ3MgY3VycmVudCBhZGRyZXNz
+aW5nDQo+IG1vZGUuDQo+IA0KPiBJbiB0aGUgY2FzZSB3aGVyZSB3ZSBwYWNrIHRoZSBzdHJ1
+Y3QsIHRoZSBjb21waWxlciBoYXBwZW5zIHRvIHVzZSB0aGUgbXZjDQo+IGluc3RydWN0aW9u
+IHRvIGxvYWQvc3RvcmUgdGhlIGN1cnJlbnQvc2F2ZSBtZW1vcnkgYXJlYXMuDQo+IA0KPiDC
+oMKgwqDCoMKgICpjdXJyZW50ID0gc2F2ZTsNCj4gwqAgMWZjOsKgwqDCoCBlMyAxMCBiMCBh
+OCAwMCAwNMKgwqDCoMKgIGxnwqDCoMKgICVyMSwxNjgoJXIxMSkNCj4gwqAgMjAyOsKgwqDC
+oCBjMCAyMCAwMCAwMCAwMCAwMMKgwqDCoMKgIGxhcmzCoMKgwqAgJXIyLDIwMiA8anVtcF90
+b19JUExfMisweDMyPg0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDIwNDogUl8zOTBfUEMz
+MkRCTMKgwqDCoCAuYnNzKzB4Mg0KPiDCoCAyMDg6wqDCoMKgIGQyIDBiIDEwIDAwIDIwIDAw
+wqDCoMKgwqAgbXZjwqDCoMKgIDAoMTIsJXIxKSwwKCVyMikNCj4gDQo+IEV2ZXJ5dGhpbmcg
+d29ya3MgYXMgZXhwZWN0ZWQgaGVyZSwgb3VyIGxlZ2FjeSBPUyBib290cyB3aXRob3V0IGlz
+c3VlLg0KPiBIb3dldmVyLCBpbiB0aGUgY2FzZSB3aGVyZSB3ZSd2ZSBwYWNrZWQgdGhpcyBz
+dHJ1Y3QgdGhlIGNvbXBpbGVyIG9wdGltaXplcyB0aGUNCj4gY29kZSBhbmQgdXNlcyBsbWcv
+c3RtZyBpbnN0ZWFkIG9mIG12YyB0byBjb3B5IHRoZSBkYXRhOg0KPiANCj4gwqDCoMKgwqDC
+oCAqY3VycmVudCA9IHNhdmU7DQo+IMKgIDFmYzrCoMKgwqAgZTMgMTAgYjAgYTggMDAgMDTC
+oMKgwqDCoCBsZ8KgwqDCoCAlcjEsMTY4KCVyMTEpDQo+IMKgIDIwMjrCoMKgwqAgYzAgMjAg
+MDAgMDAgMDAgMDDCoMKgwqDCoCBsYXJswqDCoMKgICVyMiwyMDIgPGp1bXBfdG9fSVBMXzIr
+MHgzMj4NCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAyMDQ6IFJfMzkwX1BDMzJEQkzCoMKg
+wqAgLmJzcysweDINCj4gwqAgMjA4OsKgwqDCoCBlYiAyMyAyMCAwMCAwMCAwNMKgwqDCoMKg
+IGxtZ8KgwqDCoCAlcjIsJXIzLDAoJXIyKQ0KPiDCoCAyMGU6wqDCoMKgIGViIDIzIDEwIDAw
+IDAwIDI0wqDCoMKgwqAgc3RtZ8KgwqDCoCAlcjIsJXIzLDAoJXIxKQ0KPiANCj4gRGVwZW5k
+aW5nIG9uIHRoZSBkYXRhIGJlaW5nIGNvcGllZCwgdGhlIGhpZ2ggaGFsdmVzIG9mIHRoZSBy
+ZWdpc3RlcnMgbWF5IGNvbnRhaW4NCj4gbm9uLXplcm8gdmFsdWVzLiBFeGFtcGxlOg0KPiAN
+Cj4gwqDCoMKgIHIywqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDB4MTA4MDAwMDgwMDAwNzgw
+wqDCoMKgwqDCoMKgwqAgNzQzMDkzOTU5OTkwOTg3NTINCj4gwqDCoMKgIHIzwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIDB4NjAxMDAxODAwMDA0MzY4wqDCoMKgwqDCoMKgwqAgNDMyNjI3
+MTQyMjgzNTEwNjMyDQo+IA0KPiBTbywgYnkgc2hlZXIgbHVjayBvZiB0aGUgZ2VuZXJhdGVk
+IGFzc2VtYmxlciwgdGhlIHBhdGNoIGhhcHBlbnMgdG8gImZpeCIgdGhlDQo+IHByb2JsZW0u
+wqAgQSByZWFsIGZpeCBtaWdodCBiZSB0byBpbnNlcnQgaW5saW5lIGFzc2VtYmxlciB0aGF0
+IGNsZWFycyB0aGUgaGlnaA0KPiBoYWx2ZXMgb2YgdGhlIHJlZ2lzdGVycyBiZWZvcmUgd2Ug
+Y2FsbCBpcGwoKSBpbiBqdW1wX3RvX0lQTF8yKCkuIENhbiB3ZSB0aGluayBvZg0KPiBhIGJl
+dHRlciB3YXkgdG8gZG8gdGhhdCB0aGFuIDE1IExMR1RSIGluc3RydWN0aW9ucz8gOikgTGV0
+IG1lIGtub3cgeW91cg0KPiB0aG91Z2h0cw0KDQpEb2VzIHNhbTMxIGJlZm9yZSB0aGUgaXBs
+KCkgd29yaz8NCg0KPiANCj4ganVtcF90b19JUExfMiBmb3IgZWFzeSByZWZlcmVuY2U6DQo+
+IMKgwqDCoCBzdGF0aWMgdm9pZCBqdW1wX3RvX0lQTF8yKHZvaWQpDQo+IMKgwqDCoCB7DQo+
+IMKgwqDCoMKgwqDCoMKgIFJlc2V0SW5mbyAqY3VycmVudCA9IDA7DQo+IA0KPiDCoMKgwqDC
+oMKgwqDCoCB2b2lkICgqaXBsKSh2b2lkKSA9ICh2b2lkICopICh1aW50NjRfdCkgY3VycmVu
+dC0+aXBsX2NvbnRpbnVlOw0KPiDCoMKgwqDCoMKgwqDCoCAqY3VycmVudCA9IHNhdmU7DQo+
+IMKgwqDCoMKgwqDCoMKgIGlwbCgpOyAvKiBzaG91bGQgbm90IHJldHVybiAqLw0KPiDCoMKg
+wqAgfQ0KPiANCj4gDQoNCg==
 
