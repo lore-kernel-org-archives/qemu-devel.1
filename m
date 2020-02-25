@@ -2,124 +2,81 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1BCC35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB344C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:45:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06CC820CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 702E52082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:45:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="AYtq8Pmm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06CC820CC7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ee10mmEu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 702E52082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6cO0-0000jY-6P
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:44:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34101)
+	id 1j6cOX-0001Zk-Kl
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:45:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1j6cLS-0004XN-OG
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:42:04 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6cNk-0000ff-Q3
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1j6cLR-0001H4-Ef
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:42:02 -0500
-Received: from mail-bn8nam11on2062.outbound.protection.outlook.com
- ([40.107.236.62]:61281 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1j6cLR-0001GI-5S
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:42:01 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CL0WcmXCCSFGhsRaSWA40M9v/8joY3tlVKqw93O0k7C+nAq7GBPtsGosF6vfCQbubKP62nnatPWN94Rkd7EdH3jDqFJYlrskluEm9uC52GAg0PQaZyiH6GbMPiwv3DPjsRhPpzNRC/Wmm28Mc+8n6vhL2nJ5BfdzlHJFra7somle7kZwJAYxqKs435HPTCduteoG/hJYNTEy2cU4qOVQ9e2B7mmP4UMUxKEE6p15ANvUncC1U9qhjVi4yr995RdqdcrpL421gM5nSbKhPmMGPiMNoeHVtclBc9jaU0yL6UgMXCC3lTHOTl3q79Bzrq4xHMvpTD5HtJHJHxiK4QkOaQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SnlttMfsLEeQ0/rypyHzRpavS8YXrS8ZpzrdTmuEjmE=;
- b=BoUqenNjRLulTzEN0J75jsWepAQMgkraItPcuCOr8gq0JfW687JJ+jxet65B7LVAqM3YBXrWLRuSZS3k7xIs+UKJPQI9FzMqyBdzXtqIBCBa4wCrV3/T3jaiQC9dZQZoBxcb4Z/Y5zLSV4gORhKkLLEX4eu+YWPu5ekSFmW10drQJDcRx75lPBsOsNQoFp4yOvuWrlLlvzSEouDPHc5M/rm+Opoy23N40ETFOHwEt50wgNEVHmYdE3S4LFLgrKdQZ0a/5/7fpK+xF4H0ZfP3bMerLsryqDVBpglxqKvGz9jCX9jXo3kZ76nYy/VT1m+lv6NorFFJ4uC5+bfq9LDKQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SnlttMfsLEeQ0/rypyHzRpavS8YXrS8ZpzrdTmuEjmE=;
- b=AYtq8Pmm1n2+/VEuocEVEVNlmI9dofDd6uWqJFhH+zQB0Vqa6pPcLnKfYfn5T0F5tHNz8pPQzcdcAYkrEtDAyZ2UySlrJ/D4SzsfHdCg/9y5Vo9W/RX7d4zth/4Mxvypmweut+RQJLvNzv2SfDdztXXkemter2KQBtVIUgVj3mc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2382.namprd12.prod.outlook.com (2603:10b6:802:2e::30)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21; Tue, 25 Feb
- 2020 15:41:59 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2008:df09:34a9:62fa]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::2008:df09:34a9:62fa%7]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
- 15:41:59 +0000
-Subject: Re: [PATCH v4 12/16] hw/i386: Use the apicid handlers from
- X86MachineState
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <158161767653.48948.10578064482878399556.stgit@naples-babu.amd.com>
- <158161786628.48948.1813866541108702762.stgit@naples-babu.amd.com>
- <20200224181903.19790bad@redhat.com>
- <1a7b1dae-9600-1d29-d4d4-4fdfb6832b6f@amd.com>
- <20200224223149.GF4440@habkost.net>
- <5931c329-79ea-1f9c-5df7-db06d930a0e4@amd.com>
- <20200225153223.GJ4440@habkost.net>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <3cc2ef5d-55b1-f4a4-d657-2f3728107af4@amd.com>
-Date: Tue, 25 Feb 2020 09:41:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200225153223.GJ4440@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR13CA0029.namprd13.prod.outlook.com
- (2603:10b6:3:7b::15) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (envelope-from <kwolf@redhat.com>) id 1j6cNi-0002Wg-8H
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:24 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28615
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6cNi-0002WJ-1k
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582645461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nAIYK6gxGX5f0Xg/mLEf5GoceGUEXW5z884ZP4AOmPY=;
+ b=ee10mmEuWcVlVonsvWXuTulczeo9ZW9Wdc0MZZXMqAXw3I92f47I4b+86sIgA0zTCxzWFP
+ fnDmoVIq6zbn3oPaIeUVePi39yQzHFSHnBqx7TbOWIA+3xEzx6bZTbhtOjMiC2qHrHGuUA
+ 4bqeMxAhGMl4fRi8X6kWfVAO9X79kFA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-8pJ55I9ZP8KXsUP2cXEqcg-1; Tue, 25 Feb 2020 10:44:18 -0500
+X-MC-Unique: 8pJ55I9ZP8KXsUP2cXEqcg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4D951078D63;
+ Tue, 25 Feb 2020 15:44:17 +0000 (UTC)
+Received: from linux.fritz.box (unknown [10.36.118.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EA64490A00;
+ Tue, 25 Feb 2020 15:44:13 +0000 (UTC)
+Date: Tue, 25 Feb 2020 16:44:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [PATCH v4 2/5] generic vhost user server
+Message-ID: <20200225154412.GC7632@linux.fritz.box>
+References: <20200218050711.8133-1-coiby.xu@gmail.com>
+ <20200218050711.8133-3-coiby.xu@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.87] (165.204.77.1) by
- DM5PR13CA0029.namprd13.prod.outlook.com (2603:10b6:3:7b::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.9 via Frontend Transport; Tue, 25 Feb 2020 15:41:57 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 2f0fa2b6-f209-4160-21db-08d7ba093fda
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2382:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2382C019F977DC63886EC7DC95ED0@SN1PR12MB2382.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 0324C2C0E2
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(366004)(136003)(376002)(346002)(396003)(39860400002)(189003)(199004)(81156014)(86362001)(81166006)(478600001)(186003)(8936002)(2616005)(52116002)(956004)(8676002)(31686004)(16526019)(44832011)(6916009)(53546011)(26005)(5660300002)(2906002)(16576012)(6486002)(4326008)(66946007)(31696002)(316002)(66556008)(36756003)(66476007);
- DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2382;
- H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sutcLpq0h4CCY85ixDAxgZvrZ7bK9mXUD3+sSA4F8s3WHKnCy9WwJHmKn4QoW2cBfI8tAjAUfQLhVcTHbLn+0ewfxRz8UADQPpDTnaVbG4ITmCIlbC6mNu8NwPamsT8eRlS624QO8B+/MX1y1rce3sI7FBAQHNgztyZRI02v40Q9Zz7PW0yvdecO3+AcuCJI88UK7hbibYJ6QitMo4yjz5VtKsFzKtDRo4DHMLKL6MZ5bCx67NCHegaBGsdtk3Hqn8PiLNN7VVIZd+r8ykIgM6Juyv+1A+63uPkI94qiFSDDfBuyVPm02cLfx5RMKHEbdQAJ7N8pzNEZsm7DxkDJr3RNP/ivKr85Kjm8FJNDlqXURmofMrhI0M9By53B3bWzQLKz+6ZvvZdu65hOWLBKvL7m3EFrX+Ze2oX2zlaXTH6HLmTfpw/jJaP4Z+uOE2xI
-X-MS-Exchange-AntiSpam-MessageData: AWUrJwodxuA0d4SscObveViC60Gmk4CbQ6SB4zrt+8rgu9KubJtpIlT2ZSPv8RyqlCqmUplF9cBXIhHcWo7P2Rt8IdpDGn3qWrWFwY6YBAHh1A7VdXZ8dt53LCA4gDzyKiXE1m0qMgqz5BqIfy34AA==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f0fa2b6-f209-4160-21db-08d7ba093fda
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2020 15:41:59.3211 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iC9RalGaVJyojeVUQcGUvJiwg1x/ylbaQBv5AQLA5dEb2dD1gDaWwLN37xnZFTPu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2382
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.236.62
+In-Reply-To: <20200218050711.8133-3-coiby.xu@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,94 +88,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 18.02.2020 um 06:07 hat Coiby Xu geschrieben:
+> Sharing QEMU devices via vhost-user protocol
+>=20
+> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+> ---
+>  util/Makefile.objs       |   3 +
+>  util/vhost-user-server.c | 427 +++++++++++++++++++++++++++++++++++++++
+>  util/vhost-user-server.h |  56 +++++
+>  3 files changed, 486 insertions(+)
+>  create mode 100644 util/vhost-user-server.c
+>  create mode 100644 util/vhost-user-server.h
+>=20
+> diff --git a/util/vhost-user-server.h b/util/vhost-user-server.h
+> new file mode 100644
+> index 0000000000..ff6d3145cd
+> --- /dev/null
+> +++ b/util/vhost-user-server.h
+> @@ -0,0 +1,56 @@
+> +#include "io/channel-socket.h"
+> +#include "io/channel-file.h"
+> +#include "io/net-listener.h"
+> +#include "contrib/libvhost-user/libvhost-user.h"
+> +#include "standard-headers/linux/virtio_blk.h"
+> +#include "qemu/error-report.h"
+> +
+> +typedef struct VuClient VuClient;
 
+I find the terminology a bit confusing here: VuClient is really the
+connection to a single client, but it's part of the server. The name
+gives the impression as if this were client-side code. (This is
+something that already tends to confuse me in the NBD code.)
 
-On 2/25/20 9:32 AM, Eduardo Habkost wrote:
-> On Mon, Feb 24, 2020 at 05:13:18PM -0600, Babu Moger wrote:
->>
->>
->> On 2/24/20 4:31 PM, Eduardo Habkost wrote:
->>> On Mon, Feb 24, 2020 at 11:58:09AM -0600, Babu Moger wrote:
->>>>
->>>>
->>>> On 2/24/20 11:19 AM, Igor Mammedov wrote:
->>>>> On Thu, 13 Feb 2020 12:17:46 -0600
->>>>> Babu Moger <babu.moger@amd.com> wrote:
->>>>>
->>>>>> Check and Load the apicid handlers from X86CPUDefinition if available.
->>>>>> Update the calling convention for the apicid handlers.
->>>>>
->>>>> Previous and this patch look too complicated for the task at the hand.
->>>>> In particular, cpu_x86_init_apicid_fns() from previous patch adds 1 more
->>>>> reference to Machine into i386/cpu.c (even though it's just a helper function)
->>>>> and I think un-necessary hooks to X86CPUDefinition (it's not really CPU's
->>>>> businesses to make up APIC-IDs).
->>>>>
->>>>> I'd rather do opposite and get rid of the last explicit dependency to
->>>>> ms->smp.cpus from cpu.c. But well, it's out of scope of this series,
->>>>> so for this series I'd just try to avoid adding more Machine dependencies.
->>>>>
->>>>> All 11/16 does is basically using hooks as a switch "I'm EPYC" to
->>>>> set epyc specific encoding topo routines.
->>>>>
->>>>> It could be accomplished by a simple Boolean flag like
->>>>>  X86CPUDefinition::use_epyc_apic_id_encoding
->>>>>
->>>>> and then cpu_x86_init_apicid_fns() could be replaced with trivial
->>>>> helper like:
->>>>>
->>>>>   x86_use_epyc_apic_id_encoding(char *cpu_type)
->>>>>   {
->>>>>       X86CPUClass *xcc = ... cpu_type ...
->>>>>       return xcc->model->cpudef->use_epyc_apic_id_encoding
->>>>>   }
->>>>>
->>>>> then machine could override default[1] hooks using this helper
->>>>> as the trigger
->>>>>   x86_cpus_init()
->>>>>   {
->>>>>       // no need in dedicated function as it's the only instance it's going to be called ever
->>>>>       if (x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
->>>>>             x86ms->apicid_from_cpu_idx = ...epyc...
->>>>>             x86ms->topo_ids_from_apicid = ...epyc...
->>>>>             x86ms->apicid_from_topo_ids = ...epyc...
->>>>>             x86ms->apicid_pkg_offset = ...epyc...
->>>>>       }
->>>>>   }
->>>>>
->>>>> That would be less invasive and won't create non necessary dependencies.
->>>>
->>>> Yes. We can achieve the task here with your approach mentioned above. But,
->>>> we still will have a scaling issue. In future if a "new cpu model" comes
->>>> up its own decoding, then we need to add another bolean flag use_new
->>>> _cpu_apic_id_encoding. And then do that same check again. In that sense,
->>>> the current approach is bit generic. Lets also hear from Eduardo.
->>>
->>> To be honest, I really hope the number of APIC ID initialization
->>> variations won't grow in the future.
->>>
->>> In either case, X86MachineState really doesn't seem to be the
->>> right place to save the function pointers.  Whether we choose a
->>> boolean flag or a collection of function pointers, model-specific
->>> information belong to x86CPUClass and/or X86CPUDefinition, not
->>> MachineState.
->>
->> My bad. I completely missed that part. Yes. You mentioned that earlier.
->> I can move the functions pointers to X86CPUClass and initialize the
->> pointers from X86CPUDefinition. Thanks
-> 
-> See my reply to Igor before doing that.
-> 
-> Summary is: if the function implementations are provided by the
-> CPU, the pointers belong to X86CPUClass.  If the APIC ID
-> calculation logic lives in pc.c, the pointers probably can stay
-> in X86MachineState.
-> 
-Ok. Sure. I will leave those pointers in X86MachineState.
+I'm not sure what a better name could be, though. Maybe
+VuServerConnevtion or VuExportClient or VuExportConnection?
+
+> +typedef struct VuServer {
+> +    QIONetListener *listener;
+> +    AioContext *ctx;
+> +    QTAILQ_HEAD(, VuClient) clients;
+> +    void (*device_panic_notifier)(struct VuClient *client) ;
+> +    int max_queues;
+> +    const VuDevIface *vu_iface;
+> +    /*
+> +     * @ptr_in_device: VuServer pointer memory location in vhost-user de=
+vice
+> +     * struct, so later container_of can be used to get device destruct
+> +     */
+> +    void *ptr_in_device;
+> +    bool close;
+> +} VuServer;
+> +
+> +typedef struct kick_info {
+> +    VuDev *vu_dev;
+
+I suppose this could specifically be VuClient?
+
+> +    int fd; /*kick fd*/
+> +    long index; /*queue index*/
+> +    QIOChannel *ioc; /*I/O channel for kick fd*/
+> +    QIOChannelFile *fioc; /*underlying data channel for kick fd*/
+> +    Coroutine *co;
+> +} kick_info;
+> +
+> +struct VuClient {
+> +    VuDev parent;
+> +    VuServer *server;
+> +    QIOChannel *ioc; /* The current I/O channel */
+> +    QIOChannelSocket *sioc; /* The underlying data channel */
+> +    Coroutine *co_trip;
+> +    struct kick_info *kick_info;
+
+If each struct kick_info (btw, QEMU coding style requires CamelCase) has
+exactly one VuClient and each VuClient has exactly on kick_info, should
+this be a single struct containing both?
+
+[ Coming back from reading the code below - it's because this is in
+fact an array. This should be made clear in the definition. ]
+
+> +    QTAILQ_ENTRY(VuClient) next;
+> +    bool closed;
+> +};
+> +
+> +
+> +VuServer *vhost_user_server_start(uint16_t max_queues,
+> +                                  SocketAddress *unix_socket,
+> +                                  AioContext *ctx,
+> +                                  void *server_ptr,
+> +                                  void *device_panic_notifier,
+> +                                  const VuDevIface *vu_iface,
+> +                                  Error **errp);
+> +
+> +void vhost_user_server_stop(VuServer *server);
+> +
+> +void change_vu_context(AioContext *ctx, VuServer *server);
+
+Let's call this vhost_user_server_set_aio_context() for consistency.
+
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index 11262aafaf..5e450e501c 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -36,6 +36,9 @@ util-obj-y +=3D readline.o
+>  util-obj-y +=3D rcu.o
+>  util-obj-$(CONFIG_MEMBARRIER) +=3D sys_membarrier.o
+>  util-obj-y +=3D qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io=
+.o
+> +ifdef CONFIG_LINUX
+> +util-obj-y +=3D vhost-user-server.o
+> +endif
+>  util-obj-y +=3D qemu-coroutine-sleep.o
+>  util-obj-y +=3D qemu-co-shared-resource.o
+>  util-obj-y +=3D coroutine-$(CONFIG_COROUTINE_BACKEND).o
+> diff --git a/util/vhost-user-server.c b/util/vhost-user-server.c
+> new file mode 100644
+> index 0000000000..70ff6d6701
+> --- /dev/null
+> +++ b/util/vhost-user-server.c
+> @@ -0,0 +1,427 @@
+> +/*
+> + * Sharing QEMU devices via vhost-user protocol
+> + *
+> + * Author: Coiby Xu <coiby.xu@gmail.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * later.  See the COPYING file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include <sys/eventfd.h>
+> +#include "qemu/main-loop.h"
+> +#include "vhost-user-server.h"
+> +
+> +static void vmsg_close_fds(VhostUserMsg *vmsg)
+> +{
+> +    int i;
+> +    for (i =3D 0; i < vmsg->fd_num; i++) {
+> +        close(vmsg->fds[i]);
+> +    }
+> +}
+> +
+> +static void vmsg_unblock_fds(VhostUserMsg *vmsg)
+> +{
+> +    int i;
+> +    for (i =3D 0; i < vmsg->fd_num; i++) {
+> +        qemu_set_nonblock(vmsg->fds[i]);
+> +    }
+> +}
+> +
+> +
+> +static void close_client(VuClient *client)
+> +{
+> +    vu_deinit(&client->parent);
+> +    client->sioc =3D NULL;
+> +    object_unref(OBJECT(client->ioc));
+> +    client->closed =3D true;
+> +
+> +}
+> +
+> +static void panic_cb(VuDev *vu_dev, const char *buf)
+> +{
+> +    if (buf) {
+> +        error_report("vu_panic: %s", buf);
+> +    }
+> +
+> +    VuClient *client =3D container_of(vu_dev, VuClient, parent);
+> +    VuServer *server =3D client->server;
+
+Please put declarations at the start of the block.
+
+> +    if (!client->closed) {
+> +        close_client(client);
+> +        QTAILQ_REMOVE(&server->clients, client, next);
+> +    }
+> +
+> +    if (server->device_panic_notifier) {
+> +        server->device_panic_notifier(client);
+> +    }
+> +}
+> +
+> +
+> +
+> +static bool coroutine_fn
+> +vu_message_read(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
+> +{
+> +    struct iovec iov =3D {
+> +        .iov_base =3D (char *)vmsg,
+> +        .iov_len =3D VHOST_USER_HDR_SIZE,
+> +    };
+> +    int rc, read_bytes =3D 0;
+> +    /*
+> +     * VhostUserMsg is a packed structure, gcc will complain about passi=
+ng
+> +     * pointer to a packed structure member if we pass &VhostUserMsg.fd_=
+num
+> +     * and &VhostUserMsg.fds directly when calling qio_channel_readv_ful=
+l,
+> +     * thus two temporary variables nfds and fds are used here.
+> +     */
+> +    size_t nfds =3D 0, nfds_t =3D 0;
+> +    int *fds =3D NULL, *fds_t =3D NULL;
+> +    VuClient *client =3D container_of(vu_dev, VuClient, parent);
+> +    QIOChannel *ioc =3D client->ioc;
+> +
+> +    Error *erp;
+
+The convention is to call this local_err. It should be initialised as
+NULL.
+
+> +    assert(qemu_in_coroutine());
+> +    do {
+> +        /*
+> +         * qio_channel_readv_full may have short reads, keeping calling =
+it
+> +         * until getting VHOST_USER_HDR_SIZE or 0 bytes in total
+> +         */
+> +        rc =3D qio_channel_readv_full(ioc, &iov, 1, &fds_t, &nfds_t, &er=
+p);
+> +        if (rc < 0) {
+> +            if (rc =3D=3D QIO_CHANNEL_ERR_BLOCK) {
+> +                qio_channel_yield(ioc, G_IO_IN);
+> +                continue;
+> +            } else {
+> +                error_report("Error while recvmsg: %s", strerror(errno))=
+;
+
+I don't think, qio_channel_*() promise anything about the value in
+errno. (They also don't promise to use recvmsg().)
+
+Instead, use error_report_err() because erp contains the real error
+message.
+
+> +                return false;
+> +            }
+> +        }
+> +        read_bytes +=3D rc;
+> +        fds =3D g_renew(int, fds_t, nfds + nfds_t);
+> +        memcpy(fds + nfds, fds_t, nfds_t);
+> +        nfds +=3D nfds_t;
+> +        if (read_bytes =3D=3D VHOST_USER_HDR_SIZE || rc =3D=3D 0) {
+> +            break;
+> +        }
+> +    } while (true);
+> +
+> +    vmsg->fd_num =3D nfds;
+> +    memcpy(vmsg->fds, fds, nfds * sizeof(int));
+> +    g_free(fds);
+> +    /* qio_channel_readv_full will make socket fds blocking, unblock the=
+m */
+> +    vmsg_unblock_fds(vmsg);
+> +    if (vmsg->size > sizeof(vmsg->payload)) {
+> +        error_report("Error: too big message request: %d, "
+> +                     "size: vmsg->size: %u, "
+> +                     "while sizeof(vmsg->payload) =3D %zu",
+> +                     vmsg->request, vmsg->size, sizeof(vmsg->payload));
+> +        goto fail;
+> +    }
+> +
+> +    struct iovec iov_payload =3D {
+> +        .iov_base =3D (char *)&vmsg->payload,
+> +        .iov_len =3D vmsg->size,
+> +    };
+> +    if (vmsg->size) {
+> +        rc =3D qio_channel_readv_all_eof(ioc, &iov_payload, 1, &erp);
+> +        if (rc =3D=3D -1) {
+> +            error_report("Error while reading: %s", strerror(errno));
+
+error_report_err() again.
+
+> +            goto fail;
+> +        }
+> +    }
+> +
+> +    return true;
+> +
+> +fail:
+> +    vmsg_close_fds(vmsg);
+> +
+> +    return false;
+> +}
+> +
+> +
+> +static coroutine_fn void vu_client_next_trip(VuClient *client);
+> +
+> +static coroutine_fn void vu_client_trip(void *opaque)
+> +{
+> +    VuClient *client =3D opaque;
+> +
+> +    vu_dispatch(&client->parent);
+> +    client->co_trip =3D NULL;
+> +    if (!client->closed) {
+> +        vu_client_next_trip(client);
+> +    }
+> +}
+
+The last part is very untypical coroutine code: It says that we want to
+spawn a new coroutine with vu_client_trip() as its entry point, and then
+terminates the current one.
+
+Why don't we just put the whole thing in a while (!client->closed) loop
+and stay in the same coroutine instead of terminating the old one and
+starting a new one all the time?
+
+> +static coroutine_fn void vu_client_next_trip(VuClient *client)
+> +{
+> +    if (!client->co_trip) {
+> +        client->co_trip =3D qemu_coroutine_create(vu_client_trip, client=
+);
+> +        aio_co_schedule(client->ioc->ctx, client->co_trip);
+> +    }
+> +}
+> +
+> +static void vu_client_start(VuClient *client)
+> +{
+> +    client->co_trip =3D qemu_coroutine_create(vu_client_trip, client);
+> +    aio_co_enter(client->ioc->ctx, client->co_trip);
+> +}
+
+This is essentially a duplicate of vu_client_next_trip(). The only
+place where it is called (vu_accept()) knows that client->co_trip is
+already NULL, so it could just call vu_client_next_trip().
+
+Or in fact, if vu_client_trip() gets turned into a loop, it's
+vu_client_next_trip() that becomes unnecessary.
+
+> +static void coroutine_fn vu_kick_cb_next(VuClient *client,
+> +                                          kick_info *data);
+> +
+> +static void coroutine_fn vu_kick_cb(void *opaque)
+> +{
+> +    kick_info *data =3D (kick_info *) opaque;
+> +    int index =3D data->index;
+> +    VuDev *dev =3D data->vu_dev;
+> +    VuClient *client;
+> +    client =3D container_of(dev, VuClient, parent);
+> +    VuVirtq *vq =3D &dev->vq[index];
+> +    int sock =3D vq->kick_fd;
+> +    if (sock =3D=3D -1) {
+> +        return;
+> +    }
+> +    assert(sock =3D=3D data->fd);
+> +    eventfd_t kick_data;
+> +    ssize_t rc;
+> +    /*
+> +     * When eventfd is closed, the revent is POLLNVAL (=3DG_IO_NVAL) and
+> +     * reading eventfd will return errno=3DEBADF (Bad file number).
+> +     * Calling qio_channel_yield(ioc, G_IO_IN) will set reading handler
+> +     * for QIOChannel, but aio_dispatch_handlers will only dispatch
+> +     * G_IO_IN | G_IO_HUP | G_IO_ERR revents while ignoring
+> +     * G_IO_NVAL (POLLNVAL) revents.
+> +     *
+> +     * Thus when eventfd is closed by vhost-user client, QEMU will ignor=
+e
+> +     * G_IO_NVAL and keeping polling by repeatedly calling qemu_poll_ns =
+which
+> +     * will lead to 100% CPU usage.
+> +     *
+> +     * To aovid this issue, make sure set_watch and remove_watch use the=
+ same
+
+s/aovid/avoid/
+
+> +     * AIOContext for QIOChannel. Thus remove_watch will eventually succ=
+efully
+> +     * remove eventfd from the set of file descriptors polled for
+> +     * corresponding GSource.
+> +     */
+> +    rc =3D read(sock, &kick_data, sizeof(eventfd_t));
+
+Why not a QIOChannel function like for vu_message_read() above?
+
+> +    if (rc !=3D sizeof(eventfd_t)) {
+> +        if (errno =3D=3D EAGAIN) {
+> +            qio_channel_yield(data->ioc, G_IO_IN);
+> +        } else if (errno !=3D EINTR) {
+> +            data->co =3D NULL;
+> +            return;
+> +        }
+> +    } else {
+> +        vq->handler(dev, index);
+> +    }
+> +    data->co =3D NULL;
+> +    vu_kick_cb_next(client, data);
+
+This can be a loop, too, instead of terminating the coroutine and
+starting a new one for the same function.
+
+> +}
+> +
+> +static void coroutine_fn vu_kick_cb_next(VuClient *client,
+> +                                          kick_info *cb_data)
+> +{
+> +    if (!cb_data->co) {
+> +        cb_data->co =3D qemu_coroutine_create(vu_kick_cb, cb_data);
+> +        aio_co_schedule(client->ioc->ctx, cb_data->co);
+> +    }
+> +}
+
+Kevin
+
 
