@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 654D6C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BBBC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:15:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3386D2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFC982176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbtYxlCn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3386D2084E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4zQS3jA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC982176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z6p-00077U-Bt
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:14:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49489)
+	id 1j6Z77-0007wT-Sk
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:15:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykf-0000pF-6F
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:52 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykd-0000lg-3W
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykb-00079Y-CS
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:49 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:32872)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkY-0006vc-SY
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:46 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:39093)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykb-00071y-2v
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:45 -0500
-Received: by mail-wm1-x335.google.com with SMTP id m10so2052467wmc.0
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:44 -0800 (PST)
+ id 1j6YkY-0006qJ-DU
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:42 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id c84so2833211wme.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JmXcr0W52fcISG0AOHtfcuEq+w+rjA6FgdcBQj6UTa4=;
- b=hbtYxlCn2YcTbLb+w+Ktom9yXnN9t7kFLoQj2zryuohemD8Z2Ileo9Wmg9Rt7kDKNH
- 4fo22fmnQ8rl99DuCEE6cbflcFmaizhGYSfKKSrDZgayaKrZIpkmCohcVYZzm5auzD8z
- McSk/SK7aLlRqRZWbrproN/m4VKw5b6afMVNG95Sl/U93t09xti1DiHMpr+o1JjfkoRk
- +7d5F2NSj2YZNyRQ+VEgYPMjsk2CkZJMbT+V4VbN8Nk2q7kV7fA0ZLKvYCnmdTdxwYwF
- VNjEdYy0SLBHVz/8Mb0h+AchXYahw/YFByjNSpAinKaP+5y13eaIQEKpj5//+Nb1fqPG
- aowg==
+ bh=+mJK3OqxktkOAWxnxWkaALqDjs9dEYFvgQPqxO7ZMJk=;
+ b=Z4zQS3jAv0bMtAO/gHwRsql1enZKoYoggDk80pJO3oQJ7sUCX1ZkqVhhB++UqYY+Mp
+ UYyE4fDHjt9U8qQQCMMTCh6D9RmNLiYBvxs7C2FtMn2d26pzkE8mSNaf5cnqNjA/hrwQ
+ YPKRqmZmO9K2m8BDifyZbwV4VEkQDRV8os+ddQAqxjU01zk8evTEubM91WMKau7JqrGA
+ nBxQQLaCs92gEeAitdVonPOB1/1Dm7H6nOtB/+0t+tJ6hkau2gMQHLa/BQINbFlQW9FC
+ ZAOztztOADVm2p+MarHQdClrXY3BtKFHoJdw17BwRIfkAqWutkLK0GWfE6ILIRhsUH6P
+ ioEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JmXcr0W52fcISG0AOHtfcuEq+w+rjA6FgdcBQj6UTa4=;
- b=Nre2PEzTrjyCXCrCbyNliMbzrGauvlsn+g3QVX1larsdyjty1I8KTlBPBVKS15Ips+
- /stW+vFdGHl4Ci3sE8140ULM63KhKQ3FrKZwLL8issEFooidwv4lqbtAIAGcUsME9frc
- 7nKXKFnwKgpJBSlt7ux2otKym/gpapBk0/p8Ec/97W9Khx4kz7yRzWAhdsNGajLc8FkN
- oZqzVcXk/dtBH+MMCkYj2Gew5ZZAQXc8M7KmTq/k1r/SRuFCuFQdz7TdXb/32PPqPq/t
- UKlv7yvqsy/7u8N7EWxnqEpBxElizDtIFmm1Pp6x4hPjoOItaFsJzbKlZf0a8TAX6TFv
- ix5w==
-X-Gm-Message-State: APjAAAUsvU2wRtO21ZZH0clBwpFkowuYa9P8aAo7l9fJNqbiLH6TQ3dz
- l9oKI33LCXTg/enFIoqiGdk97p7V
-X-Google-Smtp-Source: APXvYqwHfsG9TK82hodsLn7h8fd8QCQD+uH8nh2a1eqHwPiiLDTWf703uNsebZkRiKTUvGcFTzlPhQ==
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr5070173wmi.116.1582631502941; 
- Tue, 25 Feb 2020 03:51:42 -0800 (PST)
+ bh=+mJK3OqxktkOAWxnxWkaALqDjs9dEYFvgQPqxO7ZMJk=;
+ b=oQvk6uDk6Jq0syssWLx5lmnEQzNzuGFkMOvZep7MHujxDTTcasW9hlwcDOSpwG4Br6
+ odU84PNW9fMynSjeWdyUykAVoTCnECYcBxgjVHvD5f09omuoK0RdXiL1ZlGEhsySfPy2
+ 2pIU+oT4gRBSR/zWLEqQ0nY0a0JFrQbJg8Z29DWRLIOTvlHBshC4ncnpp8Qh/hqC2b/x
+ GUgQJZ5y5SUjfEk9E4nYttWVQ3uJeWuYOLXp/WqJNBug8Fv33gVOdVgGopj6GxHda2mR
+ JQHBHNzolFLNjW9nfZtKZ3jRjx6L0yQef5HmkNrBR8XOD4nTNi1vkuDmZR5rFMgBhUPu
+ 2+bg==
+X-Gm-Message-State: APjAAAXPFM3FdzIY7EuozWSXOGWfyq7gV0DThnZUolLPpZ4ZZCMe8BQe
+ p1m/r/r9q7CXCMmBxMxTCZAi1lZc
+X-Google-Smtp-Source: APXvYqz+d8ro9113LDhzyT7DR2cIy9YqI2lgtW9tiQnxMuJZhlL5MAb1P3EfzA4yYCO/Ska/h8FgMA==
+X-Received: by 2002:a1c:e488:: with SMTP id b130mr4772327wmh.108.1582631501237; 
+ Tue, 25 Feb 2020 03:51:41 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.42
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.40
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:42 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:40 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 039/136] null-machine: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:29 +0100
-Message-Id: <1582631466-13880-39-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 037/136] arm/xlnx-zcu102: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:27 +0100
+Message-Id: <1582631466-13880-37-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::335
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,38 +110,48 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-40-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-38-imammedo@redhat.com>
 ---
- hw/core/null-machine.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ hw/arm/xlnx-zcu102.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 1aa0a9a..cb47d9d 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -32,11 +32,8 @@ static void machine_none_init(MachineState *mch)
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 53cfe7c..bd645ad 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -28,7 +28,6 @@ typedef struct XlnxZCU102 {
+     MachineState parent_obj;
+ 
+     XlnxZynqMPState soc;
+-    MemoryRegion ddr_ram;
+ 
+     bool secure;
+     bool virt;
+@@ -87,13 +86,10 @@ static void xlnx_zcu102_init(MachineState *machine)
+                  ram_size);
      }
  
-     /* RAM at address zero */
--    if (mch->ram_size) {
--        MemoryRegion *ram = g_new(MemoryRegion, 1);
+-    memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
+-                                         ram_size);
 -
--        memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
--        memory_region_add_subregion(get_system_memory(), 0, ram);
-+    if (mch->ram) {
-+        memory_region_add_subregion(get_system_memory(), 0, mch->ram);
-     }
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
+                             TYPE_XLNX_ZYNQMP, &error_abort, NULL);
  
-     if (mch->kernel_filename) {
-@@ -52,6 +49,7 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->init = machine_none_init;
-     mc->max_cpus = 1;
-     mc->default_ram_size = 0;
-+    mc->default_ram_id = "ram";
+-    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
++    object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
+                          "ddr-ram", &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), s->secure, "secure",
+                              &error_fatal);
+@@ -211,6 +207,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+     mc->ignore_memory_transaction_failures = true;
+     mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+     mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
++    mc->default_ram_id = "ddr-ram";
  }
  
- DEFINE_MACHINE("none", machine_none_machine_init)
+ static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
 -- 
 1.8.3.1
 
