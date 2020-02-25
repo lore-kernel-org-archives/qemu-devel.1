@@ -2,82 +2,87 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F69C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104F2C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C48620CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF31420CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:32:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGvlDvA6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C48620CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HYRoj2i7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF31420CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZMb-0004xE-CW
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:31:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49781)
+	id 1j6ZNY-0006Tn-VL
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:32:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl3-0001FV-B2
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:17 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0S-0003wl-TU
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008GH-4B
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:33800)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0R-0003fP-Rz
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:08 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52956)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykx-00086Y-EK
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
-Received: by mail-wr1-x434.google.com with SMTP id z15so6037767wrl.1
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:06 -0800 (PST)
+ id 1j6Z0R-0003eZ-K8
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:07 -0500
+Received: by mail-wm1-x336.google.com with SMTP id p9so2739626wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:08:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=mIoNz+eT/hMyD9ZxJzAVhJ/FNd4za+ru1feUPkgFaJc=;
- b=jGvlDvA6PW09/hFk1cwJBZnJSQQdSCa8IqW08yo3Q5ySqftbt3Cbrcfj3ekgRzoE63
- qmVXOLS3JzCkglzXuN9SlIDChlQLgoCRuZeoG/8GC2RQAWj0YI8ZImCSgyURm0s7Aqzt
- 54x/N0DbWJjsPB0yM9CZ2hh+DJnQ0gTahcklb5oHLXnhthS3A+HbWy+Sjj9+GyVMKBaZ
- FWrQDP9Jzacedziafhbjn7ImYCY3VPvVGxKfw/MVojNnco+IHKARlRhYFNfkUQuDg+V+
- GxNuWtOLyG9FZVJIpkpE/+vEPvDZh2FnJD0tUEf+h1YCM1YbS9JF7/dsqkkI10MH1ctO
- 99pw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ketsX9szEN/yEwdCDikauA8vhBP8YwqgK84yBa4Gy64=;
+ b=HYRoj2i7ddw6Dw98VO5bDlJQMY8g5khqD2AbIxBp1lpe0PwfzuxcwKbgOLk0Y9mxJ2
+ sUsJVMQsKGnrIzXWN0Yg7mP/ahYdbpEpsbAl/vzvZsMHem7lZXdBnCBKMPoQQoRLi3Wm
+ cMoC5itNQgMBhgFTZa0/8AOURuyTwNz+9jxNsMIlhoh8+mAHy5SaQ2vrlEwVVNe0Pox5
+ MRwpVcatyeHMwfcMHFBFWyBBguxGG8IW+fXoQrogeyzA3ONopPzky8CY08xES6MQCxCT
+ JSamgDNMTihs5lnioIfCoRED83whB3mM9U6nUxYiuIPrg4ei2qt4a+lkDnwWli02tLkA
+ Ma/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=mIoNz+eT/hMyD9ZxJzAVhJ/FNd4za+ru1feUPkgFaJc=;
- b=pcZg6LgcvKgPm02dcoPdWb7AtMPLrDu5PVWlTf+xgZS4axySUXFxrEmv/j+KJL5X7b
- W9xpfIQRYouzJhf4nKr6gPn+zw01JSQMckQ37cKMc9nTAIHfHT6gKO244MtYfKxNbT0T
- pFxejgNl0i7fKnOf02GlchPjiNB2Fi3oKwQdN1L8Dtf/MjIXWkkYarKslKch9uSbYH5r
- V6ttgyASNX3FJ7bD1UUaTvz88CBo8arvp7IS9I084aMgQJ9QKlGqZQPqIctOxzb2PS2S
- QogcVooVu2ZkosN+shZrzgb1wHbQVEZCZA4ctBBECR46ljl+fU0z+FBlgZbzLqQrvbGD
- zJ9Q==
-X-Gm-Message-State: APjAAAUeDCU7FbM0wYQW53XG0Rtj4ZftKf0ageVnZqOuHRf2GqAGEQ6N
- MEYjLrQ/wpJKzfvQ/DHkq+iEesA/
-X-Google-Smtp-Source: APXvYqxA+m8qeDfqqY/WCKadw+456xDGvFPPGyFaqi4zsV5DYxBkoahpY0qDH7IoztK9BTGwKMmReg==
-X-Received: by 2002:a5d:484f:: with SMTP id n15mr72627138wrs.365.1582631523887; 
- Tue, 25 Feb 2020 03:52:03 -0800 (PST)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ketsX9szEN/yEwdCDikauA8vhBP8YwqgK84yBa4Gy64=;
+ b=CHEaNiNNVC3b+NHiZdTyqRKU57kGmZz82unoGwXPigGP3gRcLKL78/hqFsCOYMYvjt
+ iNVSgrodwBLeYgf8cFcJoX5/Cm8OYvhk3AOAe60TXXJjIJw7yu8nyL4lD2XJCxRSPtD0
+ zX+zfyVoPeklXIbis0untHqb00ZpL1o0WGzRqRTZ6cyHhwp2JEx3u+5+BwU1y6tt6WFX
+ 5BxMIw2rjtO21QvHrlyaJWmiuP5BZ8BgUtFOZPk7mj1eThmqlGbQ+RiHzEAAF6fLNtTL
+ HouN00337yY0Y3yyctt/YNsm8y8sWaqistiZmdlWHuQQGvcGM+e8q05XP3vSfNVPVVvj
+ gS9w==
+X-Gm-Message-State: APjAAAXxscXHTe8zabwDV+up9qWZnG6GRBiA99d+wMRFnMjRq6zy3HGJ
+ wyyuctwoGlwS7nWOdcl5GsWCX09U
+X-Google-Smtp-Source: APXvYqzzwd/78vdfxRunoGHJ00bnzhcjsfwYuv8ueKn3YJiCik9me54bJdLhILKVjGq8emSA6NLhdA==
+X-Received: by 2002:a1c:6755:: with SMTP id b82mr4795907wmc.127.1582632482201; 
+ Tue, 25 Feb 2020 04:08:02 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.02
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.08.01
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:03 -0800 (PST)
+ Tue, 25 Feb 2020 04:08:01 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 063/136] ppc/ppc405_boards: add RAM size checks
-Date: Tue, 25 Feb 2020 12:49:53 +0100
-Message-Id: <1582631466-13880-63-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 129/136] hw/net/milkymist-minimac2: Let devices own the
+ MemoryRegion they create
+Date: Tue, 25 Feb 2020 13:07:27 +0100
+Message-Id: <1582632454-16491-27-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,168 +94,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-If user provided non-sense RAM size, board will ignore it
-and continue running with fixed RAM size.
+Avoid orphan memory regions being added in the /unattached QOM
+container.
 
-Also RAM is going to be allocated by generic code, so it
-won't be possible for board to fix CLI.
+Note this change break the migration of the LM32 milkymist machine.
 
-Make it error message and exit to force user fix CLI,
-instead of accepting non-sense CLI values.
-
-PS:
-move fixed RAM size into mc->default_ram_size, so that
-generic code will know how much to allocate.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-64-imammedo@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200224205533.23798-32-philmd@redhat.com>
+Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/ppc/ppc405_boards.c | 39 ++++++++++++++++++++++++++-------------
- 1 file changed, 26 insertions(+), 13 deletions(-)
+ hw/net/milkymist-minimac2.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 1f721fe..057882a 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -40,6 +40,7 @@
- #include "qemu/error-report.h"
- #include "hw/loader.h"
- #include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
+diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
+index 1ba0175..9582b5f 100644
+--- a/hw/net/milkymist-minimac2.c
++++ b/hw/net/milkymist-minimac2.c
+@@ -473,9 +473,9 @@ static void milkymist_minimac2_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->regs_region);
  
- #define BIOS_FILENAME "ppc405_rom.bin"
- #define BIOS_SIZE (2 * MiB)
-@@ -137,7 +138,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, uint32_t base)
+     /* register buffers memory */
+-    memory_region_init_ram_nomigrate(&s->buffers, OBJECT(dev), "milkymist-minimac2.buffers",
++    memory_region_init_ram(&s->buffers, OBJECT(dev),
++                           "milkymist-minimac2.buffers",
+                            buffers_size, &error_fatal);
+-    vmstate_register_ram_global(&s->buffers);
+     s->rx0_buf = memory_region_get_ram_ptr(&s->buffers);
+     s->rx1_buf = s->rx0_buf + MINIMAC2_BUFFER_SIZE;
+     s->tx_buf = s->rx1_buf + MINIMAC2_BUFFER_SIZE;
+@@ -506,8 +506,8 @@ static const VMStateDescription vmstate_milkymist_minimac2_mdio = {
  
- static void ref405ep_init(MachineState *machine)
- {
--    ram_addr_t ram_size = machine->ram_size;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const char *kernel_filename = machine->kernel_filename;
-     const char *kernel_cmdline = machine->kernel_cmdline;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -161,15 +162,21 @@ static void ref405ep_init(MachineState *machine)
-     DriveInfo *dinfo;
-     MemoryRegion *sysmem = get_system_memory();
- 
-+    if (machine->ram_size != mc->default_ram_size) {
-+        char *sz = size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-+
-     /* XXX: fix this */
-     memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.ram",
--                                         0x08000000);
-+                                         machine->ram_size);
-     ram_bases[0] = 0;
--    ram_sizes[0] = 0x08000000;
-+    ram_sizes[0] = machine->ram_size;
-     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
-     ram_bases[1] = 0x00000000;
-     ram_sizes[1] = 0x00000000;
--    ram_size = 128 * MiB;
-     env = ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
-                         33333333, &pic, kernel_filename == NULL ? 0 : 1);
-     /* allocate SRAM */
-@@ -227,7 +234,7 @@ static void ref405ep_init(MachineState *machine)
-     if (linux_boot) {
-         memset(&bd, 0, sizeof(bd));
-         bd.bi_memstart = 0x00000000;
--        bd.bi_memsize = ram_size;
-+        bd.bi_memsize = machine->ram_size;
-         bd.bi_flashstart = -bios_size;
-         bd.bi_flashsize = -bios_size;
-         bd.bi_flashoffset = 0;
-@@ -255,7 +262,7 @@ static void ref405ep_init(MachineState *machine)
-         kernel_base = KERNEL_LOAD_ADDR;
-         /* now we can load the kernel */
-         kernel_size = load_image_targphys(kernel_filename, kernel_base,
--                                          ram_size - kernel_base);
-+                                          machine->ram_size - kernel_base);
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-@@ -266,7 +273,7 @@ static void ref405ep_init(MachineState *machine)
-         if (initrd_filename) {
-             initrd_base = INITRD_LOAD_ADDR;
-             initrd_size = load_image_targphys(initrd_filename, initrd_base,
--                                              ram_size - initrd_base);
-+                                              machine->ram_size - initrd_base);
-             if (initrd_size < 0) {
-                 error_report("could not load initial ram disk '%s'",
-                              initrd_filename);
-@@ -304,6 +311,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = "ref405ep";
-     mc->init = ref405ep_init;
-+    mc->default_ram_size = 0x08000000;
- }
- 
- static const TypeInfo ref405ep_type = {
-@@ -408,7 +416,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uint32_t base)
- 
- static void taihu_405ep_init(MachineState *machine)
- {
--    ram_addr_t ram_size = machine->ram_size;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const char *kernel_filename = machine->kernel_filename;
-     const char *initrd_filename = machine->initrd_filename;
-     char *filename;
-@@ -425,10 +433,14 @@ static void taihu_405ep_init(MachineState *machine)
-     int fl_idx;
-     DriveInfo *dinfo;
- 
--    /* RAM is soldered to the board so the size cannot be changed */
--    ram_size = 0x08000000;
-+    if (machine->ram_size != mc->default_ram_size) {
-+        char *sz = size_to_str(mc->default_ram_size);
-+        error_report("Invalid RAM size, should be %s", sz);
-+        g_free(sz);
-+        exit(EXIT_FAILURE);
-+    }
-     memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
--                                         ram_size);
-+                                         machine->ram_size);
- 
-     ram_bases[0] = 0;
-     ram_sizes[0] = 0x04000000;
-@@ -500,7 +512,7 @@ static void taihu_405ep_init(MachineState *machine)
-         kernel_base = KERNEL_LOAD_ADDR;
-         /* now we can load the kernel */
-         kernel_size = load_image_targphys(kernel_filename, kernel_base,
--                                          ram_size - kernel_base);
-+                                          machine->ram_size - kernel_base);
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'", kernel_filename);
-             exit(1);
-@@ -509,7 +521,7 @@ static void taihu_405ep_init(MachineState *machine)
-         if (initrd_filename) {
-             initrd_base = INITRD_LOAD_ADDR;
-             initrd_size = load_image_targphys(initrd_filename, initrd_base,
--                                              ram_size - initrd_base);
-+                                              machine->ram_size - initrd_base);
-             if (initrd_size < 0) {
-                 error_report("could not load initial ram disk '%s'",
-                              initrd_filename);
-@@ -533,6 +545,7 @@ static void taihu_class_init(ObjectClass *oc, void *data)
- 
-     mc->desc = "taihu";
-     mc->init = taihu_405ep_init;
-+    mc->default_ram_size = 0x08000000;
- }
- 
- static const TypeInfo taihu_type = {
+ static const VMStateDescription vmstate_milkymist_minimac2 = {
+     .name = "milkymist-minimac2",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32_ARRAY(regs, MilkymistMinimac2State, R_MAX),
+         VMSTATE_UINT16_ARRAY(phy_regs, MilkymistMinimac2State, R_PHY_MAX),
 -- 
 1.8.3.1
 
