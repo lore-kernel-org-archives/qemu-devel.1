@@ -2,104 +2,84 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35511C35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 18:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEACCC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 18:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D2E22082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 18:23:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D2E22082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9725D2082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 18:25:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SqXuYXG3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9725D2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ery-0003Mx-4j
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 13:23:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37708)
+	id 1j6etX-0004Ph-Lp
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 13:25:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1j6erC-0002wa-Uy
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 13:23:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6esr-0003tj-V7
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 13:24:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1j6erA-0001TJ-Vl
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 13:22:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13992
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1j6er8-0001Pr-ME; Tue, 25 Feb 2020 13:22:54 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01PILGBj040534; Tue, 25 Feb 2020 13:22:24 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1asvb85-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 13:22:24 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01PILuea043158;
- Tue, 25 Feb 2020 13:22:24 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1asvb7s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 13:22:24 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01PILZPN031896;
- Tue, 25 Feb 2020 18:22:23 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma03dal.us.ibm.com with ESMTP id 2yaux6dhpg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 18:22:23 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01PIMMCB15860720
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 25 Feb 2020 18:22:22 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 54EFBAE05C;
- Tue, 25 Feb 2020 18:22:22 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E59EBAE063;
- Tue, 25 Feb 2020 18:22:16 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 25 Feb 2020 18:22:16 +0000 (GMT)
-Subject: Re: [PATCH v3 08/19] tests/iotests: be a little more forgiving on the
- size test
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200225124710.14152-1-alex.bennee@linaro.org>
- <20200225124710.14152-9-alex.bennee@linaro.org>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <0c61c0d2-1ed2-0564-4374-db14511aca34@linux.ibm.com>
-Date: Tue, 25 Feb 2020 13:22:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j6esq-0003rx-Iv
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 13:24:41 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36187)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6esq-0003or-BH
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 13:24:40 -0500
+Received: by mail-wm1-x343.google.com with SMTP id p17so208575wma.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 10:24:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hlelqfIWVmI72/3gUGEctsr+NvJ/BDNB42f/K9zNjaU=;
+ b=SqXuYXG30MjayQimou0Dob2Aq+HcMKVWvxQLDs8XnHnebdZYDAhutN0Lk1IsflJleB
+ O/U7IzrRUijfCYTJCtvH7Ia1TquxohchnGW57hYfmqNMzYFxHMhE4NRUdBjY5CrMZBXy
+ xLOAY2X6gxJlr7/xDTZctLBORvmRMeCTetN1EH++iuah6VGriAE5nj+tk7tDEGHNnjkG
+ i3fodrKetr9/2z0e79vMDpAMCz0ymfqlJXRb2sfAxDK9tdfVv6NbOXNK4ykz02+lTvR0
+ UY95CX3CEhD0iP4d/5ferpVkuPjMbLlwnrDVDxiGHg8XHoXRyM6ocWjMURbWsewcMXrG
+ mnGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hlelqfIWVmI72/3gUGEctsr+NvJ/BDNB42f/K9zNjaU=;
+ b=WptFMaX+tC6yghVI4oP3N62S/ijQBF7Y5HAYOC/FDWMRY6WZnhvFGYXXH2fh15bG9W
+ p83wsGPYdSssD2uPRbJhMtUS0tzL2WinG3Q9mJ2r7RA5J7A97GGqxnCTDgv6UNk064rP
+ ZVi2m0yfA+EwLWVkqAmU2yyB1HYcYIbIgpiSx52hhkVQcUuXUG1tGTMM5HZWrL5zMpXo
+ sbPu3XuljJ+ls8Yf/Ydbj8jWvCmwztCS1QaCq8zeTNB2QJiAEO6oXPoxUDBCZepUKqal
+ MedTZFrJL2EYEhi6uM0D+Yf5nJowe6MTMJSdOcfb4jy2QI9Wjm5YkeKD7v6Npe9/zPpR
+ LO1Q==
+X-Gm-Message-State: APjAAAX5xA1k5MbdYz+V1wAxM4G3U5b7Yg5M2l3BT34o5B1RJvdze71z
+ 1p+2PUGuKtqtPOFy6b+xiCYfBA==
+X-Google-Smtp-Source: APXvYqyfyyy1VpfKJk90MVu3TLSOxoD4aJB4jC5m8PijJzuaoILKZ3L16OPX5iWdMYjBV36owPhAHA==
+X-Received: by 2002:a1c:7f0d:: with SMTP id a13mr479289wmd.182.1582655079012; 
+ Tue, 25 Feb 2020 10:24:39 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id c26sm4794560wmb.8.2020.02.25.10.24.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 10:24:38 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] hw/intc/arm_gic_kvm: Don't assume kernel can provide a GICv2
+Date: Tue, 25 Feb 2020 18:24:35 +0000
+Message-Id: <20200225182435.1131-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200225124710.14152-9-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-25_06:2020-02-25,
- 2020-02-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 adultscore=0
- phishscore=0 bulkscore=0 clxscore=1011 impostorscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002250130
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id 01PILGBj040534
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,53 +91,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>, berrange@redhat.com,
- robert.foley@linaro.org, pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
- Max Reitz <mreitz@redhat.com>, marcandre.lureau@redhat.com,
- aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- "open list:Block layer core" <qemu-block@nongnu.org>, aurelien@aurel32.net
+Cc: Marc Zyngier <maz@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/25/20 7:46 AM, Alex Benn=C3=A9e wrote:
-> At least on ZFS this was failing as 512 was less than or equal to 512.
-> I suspect the reason is additional compression done by ZFS and however
-> qemu-img gets the actual size.
->
-> Loosen the criteria to make sure after is not bigger than before and
-> also dump the values in the report.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   tests/qemu-iotests/214 | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
-> index 3500e0c47a2..6d1324cd157 100755
-> --- a/tests/qemu-iotests/214
-> +++ b/tests/qemu-iotests/214
-> @@ -125,9 +125,9 @@ $QEMU_IO -c "write -P 0xcc $offset $data_size" "jso=
-n:{\
->   sizeB=3D$($QEMU_IMG info --output=3Djson "$TEST_IMG" |
->           sed -n '/"actual-size":/ s/[^0-9]//gp')
->
-> -if [ $sizeA -le $sizeB ]
-> +if [ $sizeA -lt $sizeB ]
->   then
-> -    echo "Compression ERROR"
-> +    echo "Compression ERROR ($sizeA vs $sizeB)"
->   fi
+In our KVM GICv2 realize function, we try to cope with old kernels
+that don't provide the device control API (KVM_CAP_DEVICE_CTRL): we
+try to use the device control, and if that fails we fall back to
+assuming that the kernel has the old style KVM_CREATE_IRQCHIP and
+that it will provide a GICv2.
 
-Nit: $sizeA < $sizeB ?
+This doesn't cater for the possibility of a kernel and hardware which
+only provide a GICv3, which is very common now.  On that setup we
+will abort() later on in kvm_arm_pmu_set_irq() when we try to wire up
+an interrupt to the GIC we failed to create:
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: Invalid argument
+qemu-system-aarch64: failed to set irq for PMU
+Aborted
 
+If the kernel advertises KVM_CAP_DEVICE_CTRL we should trust it if it
+says it can't create a GICv2, rather than assuming it has one.  We
+can then produce a more helpful error message including a hint about
+the most probable reason for the failure.
 
+If the kernel doesn't advertise KVM_CAP_DEVICE_CTRL then it is truly
+ancient by this point but we might as well still fall back to a
+KVM_CREATE_IRQCHIP GICv2.
 
->   $QEMU_IMG check --output=3Djson "$TEST_IMG" |
+With this patch then the user misconfiguration which previously
+caused an abort now prints:
+qemu-system-aarch64: Initialization of device kvm-arm-gic failed: error creating in-kernel VGIC: No such device
+Perhaps the host CPU does not support GICv2?
 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I spent a while wondering if the PMU code was broken before Marc
+put me on the right track about what was going wrong (ie that
+I hadn't put "-machine gic-version=host" on the commandline).
+
+ hw/intc/arm_gic_kvm.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index 9deb15e7e69..d7df423a7a3 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -551,7 +551,16 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+                               KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true,
+                               &error_abort);
+         }
++    } else if (kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
++        error_setg_errno(errp, -ret, "error creating in-kernel VGIC");
++        error_append_hint(errp,
++                          "Perhaps the host CPU does not support GICv2?\n");
+     } else if (ret != -ENODEV && ret != -ENOTSUP) {
++        /*
++         * Very ancient kernel without KVM_CAP_DEVICE_CTRL: assume that
++         * ENODEV or ENOTSUP mean "can't create GICv2 with KVM_CREATE_DEVICE",
++         * and that we will get a GICv2 via KVM_CREATE_IRQCHIP.
++         */
+         error_setg_errno(errp, -ret, "error creating in-kernel VGIC");
+         return;
+     }
+-- 
+2.20.1
 
 
