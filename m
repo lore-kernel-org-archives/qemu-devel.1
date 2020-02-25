@@ -2,97 +2,85 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34663C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE3CC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1EF82084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 950882084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:07:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5ZuIO+l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1EF82084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kGKHyCSE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 950882084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6arp-0002Tv-1O
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:07:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37571)
+	id 1j6art-0002Wv-Q3
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:07:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6a2z-0008SO-Se
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:53 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6apZ-0006qP-4F
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6a2w-0002CP-7W
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:49 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20793
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6a2w-0002CH-1K
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582636485;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nWOgPUNM9ydOC7jW+BxD/QLDodYpiHiWwfzfnOjNX9U=;
- b=c5ZuIO+lVXlw2XpCnyROu2oHQBsfXsyqM6X0QUyGf8HK37yYwEMmopXM0mfCyg0iZ7BVDD
- F25OhCH/CK6a+teKCKkkJbHsMVMJndpIAiONMVzWdsYzQgLsFI8ekZGGN3IIyoyUW2162I
- oyEwHf/zJGSguA9fdkj/I13mFb8cdtw=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-Popxpqu6NPq6MZdwZmQDuw-1; Tue, 25 Feb 2020 08:14:43 -0500
-X-MC-Unique: Popxpqu6NPq6MZdwZmQDuw-1
-Received: by mail-qv1-f72.google.com with SMTP id k2so12806597qvu.22
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 05:14:43 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j6apU-0005JQ-5V
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:01 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:34026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6apT-0005Ip-Rk
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:04:56 -0500
+Received: by mail-wr1-x432.google.com with SMTP id z15so6544690wrl.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:04:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aSIfJos+oHjuy71lu00dahA+zgfTJLqV1cd5BBRK4rw=;
+ b=kGKHyCSEJbFZeEbaY5doJw7R6as5lwBPqQlIyKubMA7Z5rzbeFr1+kzY4fA6QECcL6
+ tjSJUfREZuGlEDq04xQC4KCLRHGdccNIhypdrraXmub7aycQNHtPPuDKV8uhCfhJdakO
+ 0sd42dcboPSEoIFeR68dq5sOKIp2LVjTBNXDlsTP/5HYw8EWVVKBYLtKpxcrwzvQxaY/
+ 3T4Eg7PXsPiklyUzx7khtnNbGRtvz5nSQjlZszLXGrDxOnXI5Ky92C/vjeV4WgZ5z95S
+ sMfKatvkvW5wNqu4bqxhJNOyDJlIVu47B9KM1LQWGTFWaLIhK/6n2NPviMhE9VtPg8ka
+ O6HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=edHHNehR64MnjZYjYoL7hkoPUd5pXkiBWEMDkddZqw0=;
- b=Zavblwzu88Wj6E9NMQuXurnOvaJLsB9b7YEe5PXg+biVVZzB8IZxK7oNr2cukUedFq
- ifk2DWzeuGPmTRnvcMgfrKPWeSTOiLSBc73+dtWXpbsqsGqc3p9ErLnCGoKSit8aS+w2
- dXamXCpL/sP++FKb8pldYqq2aMq+HhRlgPsi9qdTbO1ALD148rlUq+/KsrqrpsfH5e7Q
- BAAWNhYacrABpfFVEK3kCFasv4XNS+NqV6IPHR9yIo8zM3KKtcsaAljX6jlU3T8BtLm+
- dfvg3ETsvPK+0ihgQxVd0OtwqTAhjKErSxbwB+9d0jKbTwijgf5FgfYtlcNDjP8FoJ2y
- 7prQ==
-X-Gm-Message-State: APjAAAWyp5vplKWGs/8x5ihtehVsAjbxaFqNdj0/DcApaLH3wctfmnBx
- tNRIDC8d5epqy0fi3Yvy6tXIkRQDd8kkZu566y2vdhWzonXtrZXfIqdNIU8O8y5UKOtJqrhv9cK
- VHQglLJ5zflXaZX4=
-X-Received: by 2002:a05:620a:14b8:: with SMTP id
- x24mr31393145qkj.210.1582636481694; 
- Tue, 25 Feb 2020 05:14:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz1W5hNNFlpzw6iMohI1xlrr0poWX5FoB4FRoSTEN6gOGymuuGzeP2UORH6Eok+GAb6GvkGOA==
-X-Received: by 2002:a05:620a:14b8:: with SMTP id
- x24mr31393100qkj.210.1582636481335; 
- Tue, 25 Feb 2020 05:14:41 -0800 (PST)
-Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
- by smtp.gmail.com with ESMTPSA id
- u5sm2997895qkf.32.2020.02.25.05.14.38
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=aSIfJos+oHjuy71lu00dahA+zgfTJLqV1cd5BBRK4rw=;
+ b=m6/XmY45W9uRUR2NcCNP5YliIqbrNuYqoxWKPD0s2y/muc3C4D4dm9KSEHVOqijlf8
+ JHcVpbsnLpSh0oglmZ+PbQaDp7mWoy+phmTSAfFD3U9eoT9Iafi5ESuWCxZ1jkFoLYNq
+ 6nv3OuvCVKCO/HD89i6i7rwnTOmQKseT10cyDlAHsvsFWzkZspGMibSNYDEH25HqPm5a
+ jH1fOCcmjdl1i5qMSjariXCpYEmpqEXnyx619OMPVSvUJDzAPJCrh/bMCItzSIQbstWk
+ 8ZyvLDVDb2ORYiBDvBvmBHu1EL/oVf3HFVL943Afz8wcvpRw5+QbKh5a3i3g/SQTkV+Q
+ V9zg==
+X-Gm-Message-State: APjAAAWuz0G2XJqHgePk+5RWU6o1zjQpbmrPuE2yRClHYj6WtCeXGLq/
+ +L9T7RgD4/xrD1D80K5wMpEXaMg0IRNK0w==
+X-Google-Smtp-Source: APXvYqwMu1o+cEqxfoNZoCumaM0K2X3Rpv+p3riSsW5I73rAOF+fPgdJ/BK5lxcVDIbbc3z1pcWA/A==
+X-Received: by 2002:a5d:550f:: with SMTP id b15mr14671789wrv.19.1582639490827; 
+ Tue, 25 Feb 2020 06:04:50 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f127sm4322136wma.4.2020.02.25.06.04.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 05:14:40 -0800 (PST)
-Date: Tue, 25 Feb 2020 08:14:35 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yubo Miao <miaoyubo@huawei.com>
-Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Message-ID: <20200225081151-mutt-send-email-mst@kernel.org>
-References: <20200225015026.940-1-miaoyubo@huawei.com>
- <20200225015026.940-3-miaoyubo@huawei.com>
+ Tue, 25 Feb 2020 06:04:50 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 06/12] docs/sphinx: Add new qapi-doc Sphinx extension
+Date: Tue, 25 Feb 2020 14:04:31 +0000
+Message-Id: <20200225140437.20609-7-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200225140437.20609-1-peter.maydell@linaro.org>
+References: <20200225140437.20609-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200225015026.940-3-miaoyubo@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,252 +92,581 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, shannon.zhaosl@gmail.com, imammedo@redhat.com
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 09:50:25AM +0800, Yubo Miao wrote:
-> From: miaoyubo <miaoyubo@huawei.com>
->=20
-> Currently virt machine is not supported by pxb-pcie,
-> and only one main host bridge described in ACPI tables.
-> In this patch,PXB-PCIE is supproted by arm and certain
-> resource is allocated for each pxb-pcie in acpi table.
-> The resource for the main host bridge is also reallocated.
->=20
-> Signed-off-by: miaoyubo <miaoyubo@huawei.com>
-> ---
->  hw/arm/virt-acpi-build.c | 115 ++++++++++++++++++++++++++++++++++++---
->  hw/arm/virt.c            |   3 +
->  include/hw/arm/virt.h    |   7 +++
->  3 files changed, 118 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 37c34748a6..be1986c60d 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -49,6 +49,8 @@
->  #include "kvm_arm.h"
->  #include "migration/vmstate.h"
-> =20
-> +#include "hw/arm/virt.h"
-> +#include "hw/pci/pci_bus.h"
->  #define ARM_SPI_BASE 32
-> =20
->  static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
-> @@ -266,19 +268,116 @@ static void acpi_dsdt_add_pci_osc(Aml *dev, Aml *s=
-cope)
->  }
-> =20
->  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> -                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam)
-> +                              uint32_t irq, bool use_highmem, bool highm=
-em_ecam,
-> +                              VirtMachineState *vms)
->  {
->      int ecam_id =3D VIRT_ECAM_ID(highmem_ecam);
-> -    Aml *method, *crs;
-> +    Aml *method, *crs, *dev;
-> +    int count =3D 0;
->      hwaddr base_mmio =3D memmap[VIRT_PCIE_MMIO].base;
->      hwaddr size_mmio =3D memmap[VIRT_PCIE_MMIO].size;
->      hwaddr base_pio =3D memmap[VIRT_PCIE_PIO].base;
->      hwaddr size_pio =3D memmap[VIRT_PCIE_PIO].size;
->      hwaddr base_ecam =3D memmap[ecam_id].base;
->      hwaddr size_ecam =3D memmap[ecam_id].size;
-> +    /*
-> +     * 0x600000 would be enough for pxb device
+Some of our documentation is auto-generated from documentation
+comments in the JSON schema.
 
-It's not clear where does pxb come in here.
+For Sphinx, rather than creating a file to include, the most natural
+way to handle this is to have a small custom Sphinx extension which
+processes the JSON file and inserts documentation into the rST
+file being processed.
 
-> +     * if it is too small, there is no enough space
-> +     * for a pcie device plugged in a pcie-root port
-> +     */
-> +    hwaddr size_addr =3D 0x600000;
-> +    hwaddr size_io =3D 0x4000;
+This is the same approach that kerneldoc and hxtool use.
 
-Please explain how are memory and io partitioned.
-Looks like you are forcing a very specific layout here,
-but it's not documented anywhere, which
-can cause issues like running out of memory where
-we previously were ok.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ MAINTAINERS            |   1 +
+ docs/conf.py           |   6 +-
+ docs/sphinx/qapidoc.py | 504 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 510 insertions(+), 1 deletion(-)
+ create mode 100644 docs/sphinx/qapidoc.py
 
-
->      int nr_pcie_buses =3D size_ecam / PCIE_MMCFG_SIZE_MIN;
-> +    PCIBus *bus =3D VIRT_MACHINE(vms)->bus;
-> +
-> +    if (bus) {
-> +        QLIST_FOREACH(bus, &bus->child, sibling) {
-> +            uint8_t bus_num =3D pci_bus_num(bus);
-> +            uint8_t numa_node =3D pci_bus_numa_node(bus);
-> +
-> +            if (!pci_bus_is_root(bus)) {
-> +                continue;
-> +            }
-> +            /*
-> +             * Coded up the MIN of the busNr defined for pxb-pcie,
-> +             * the MIN - 1 would be the MAX bus number for the main
-> +             * host bridge.
-> +             */
-> +            if (bus_num < nr_pcie_buses) {
-> +                nr_pcie_buses =3D bus_num;
-> +            }
-> +            count++;
-> +            dev =3D aml_device("PC%.02X", bus_num);
-> +            aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08"))=
-);
-> +            aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03"))=
-);
-> +            aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> +            aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-> +            aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-> +            aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-> +            aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-> +            aml_append(dev, aml_name_decl("_STR", aml_unicode("pxb Devic=
-e")));
-
-how do you know it's a pxb device?
-
-> +            if (numa_node !=3D NUMA_NODE_UNASSIGNED) {
-> +                method =3D aml_method("_PXM", 0, AML_NOTSERIALIZED);
-> +                aml_append(method, aml_return(aml_int(numa_node)));
-> +                aml_append(dev, method);
-> +            }
-> +
-> +            acpi_dsdt_add_pci_route_table(dev, scope, irq);
-> +
-> +            method =3D aml_method("_CBA", 0, AML_NOTSERIALIZED);
-> +            aml_append(method, aml_return(aml_int(base_ecam)));
-> +            aml_append(dev, method);
-> +
-> +            method =3D aml_method("_CRS", 0, AML_NOTSERIALIZED);
-> +            Aml *rbuf =3D aml_resource_template();
-> +            aml_append(rbuf,
-> +                       aml_word_bus_number(AML_MIN_FIXED, AML_MAX_FIXED,
-> +                                           AML_POS_DECODE, 0x0000,
-> +                                           bus_num, bus_num + 1, 0x0000,
-> +                                           2));
-> +            aml_append(rbuf,
-> +                       aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-> +                                        AML_MAX_FIXED, AML_NON_CACHEABLE=
-,
-> +                                        AML_READ_WRITE, 0x0000,
-> +                                        base_mmio + size_mmio -
-> +                                        size_addr * count,
-> +                                        base_mmio + size_mmio - 1 -
-> +                                        size_addr * (count - 1),
-> +                                        0x0000, size_addr));
-> +            aml_append(rbuf,
-> +                       aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED,
-> +                       AML_POS_DECODE, AML_ENTIRE_RANGE,
-> +                       0x0000, size_pio - size_io * count,
-> +                       size_pio - 1 - size_io * (count - 1),
-> +                       base_pio, size_io));
-> +
-> +            if (use_highmem) {
-> +                hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].ba=
-se;
-> +                hwaddr size_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].si=
-ze;
-> +
-> +                aml_append(rbuf,
-> +                       aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED,
-> +                                        AML_MAX_FIXED, AML_NON_CACHEABLE=
-,
-> +                                        AML_READ_WRITE, 0x0000,
-> +                                        base_mmio_high + size_mmio_high =
--
-> +                                        size_addr * count,
-> +                                        base_mmio_high + size_mmio_high =
--
-> +                                        1 - size_addr * (count - 1),
-> +                                        0x0000, size_addr));
-> +            }
-> +
-> +            aml_append(method, aml_name_decl("RBUF", rbuf));
-> +            aml_append(method, aml_return(rbuf));
-> +            aml_append(dev, method);
-> +
-> +            acpi_dsdt_add_pci_osc(dev, scope);
-> +
-> +            aml_append(scope, dev);
-> +
-> +        }
-> +    }
-> =20
-> -    Aml *dev =3D aml_device("%s", "PCI0");
-> +    dev =3D aml_device("%s", "PCI0");
->      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0A08")));
->      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
->      aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-> @@ -302,11 +401,13 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
-MapEntry *memmap,
->      aml_append(rbuf,
->          aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
->                           AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base=
-_mmio,
-> -                         base_mmio + size_mmio - 1, 0x0000, size_mmio));
-> +                         base_mmio + size_mmio - 1 - size_addr * count,
-> +                         0x0000, size_mmio - size_addr * count));
->      aml_append(rbuf,
->          aml_dword_io(AML_MIN_FIXED, AML_MAX_FIXED, AML_POS_DECODE,
-> -                     AML_ENTIRE_RANGE, 0x0000, 0x0000, size_pio - 1, bas=
-e_pio,
-> -                     size_pio));
-> +                     AML_ENTIRE_RANGE, 0x0000, 0x0000,
-> +                     size_pio - 1 - size_io * count, base_pio,
-> +                     size_pio - size_io * count));
-> =20
->      if (use_highmem) {
->          hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
-> @@ -746,7 +847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
->      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANS=
-PORTS);
->      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
-> -                      vms->highmem, vms->highmem_ecam);
-> +                      vms->highmem, vms->highmem_ecam, vms);
->      if (vms->acpi_dev) {
->          build_ged_aml(scope, "\\_SB."GED_DEVICE,
->                        HOTPLUG_HANDLER(vms->acpi_dev),
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index f788fe27d6..6314928671 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1246,6 +1246,9 @@ static void create_pcie(VirtMachineState *vms)
->      }
-> =20
->      pci =3D PCI_HOST_BRIDGE(dev);
-> +
-> +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-> +
->      if (pci->bus) {
->          for (i =3D 0; i < nb_nics; i++) {
->              NICInfo *nd =3D &nd_table[i];
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 71508bf40c..90f10a1e46 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -140,6 +140,13 @@ typedef struct {
->      DeviceState *gic;
->      DeviceState *acpi_dev;
->      Notifier powerdown_notifier;
-> +    /*
-> +     * pointer to devices and objects
-> +     * Via going through the bus, all
-> +     * pci devices and related objectes
-> +     * could be gained.
-> +     */
-> +    PCIBus *bus;
->  } VirtMachineState;
-> =20
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> --=20
-> 2.19.1
->=20
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 195dd58cac1..ea93a69611b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2805,3 +2805,4 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ S: Maintained
+ F: docs/conf.py
+ F: docs/*/conf.py
++F: docs/sphinx/
+diff --git a/docs/conf.py b/docs/conf.py
+index 7588bf192ee..1ada0b8f427 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -51,7 +51,10 @@ except NameError:
+ # add these directories to sys.path here. If the directory is relative to the
+ # documentation root, use an absolute path starting from qemu_docdir.
+ #
++# Our extensions are in docs/sphinx; the qapidoc extension requires
++# the QAPI modules from scripts/.
+ sys.path.insert(0, os.path.join(qemu_docdir, "sphinx"))
++sys.path.insert(0, os.path.join(qemu_docdir, "../scripts"))
+ 
+ 
+ # -- General configuration ------------------------------------------------
+@@ -64,7 +67,7 @@ needs_sphinx = '1.3'
+ # Add any Sphinx extension module names here, as strings. They can be
+ # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+ # ones.
+-extensions = ['kerneldoc', 'qmp_lexer', 'hxtool']
++extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'qapidoc']
+ 
+ # Add any paths that contain templates here, relative to this directory.
+ templates_path = ['_templates']
+@@ -232,3 +235,4 @@ texinfo_documents = [
+ kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
+ kerneldoc_srctree = os.path.join(qemu_docdir, '..')
+ hxtool_srctree = os.path.join(qemu_docdir, '..')
++qapidoc_srctree = os.path.join(qemu_docdir, '..')
+diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
+new file mode 100644
+index 00000000000..d0dd6e93d4c
+--- /dev/null
++++ b/docs/sphinx/qapidoc.py
+@@ -0,0 +1,504 @@
++# coding=utf-8
++#
++# QEMU qapidoc QAPI file parsing extension
++#
++# Copyright (c) 2020 Linaro
++#
++# This work is licensed under the terms of the GNU GPLv2 or later.
++# See the COPYING file in the top-level directory.
++"""qapidoc is a Sphinx extension that implements the qapi-doc directive"""
++
++# The purpose of this extension is to read the documentation comments
++# in QAPI JSON schema files, and insert them all into the current document.
++# The conf.py file must set the qapidoc_srctree config value to
++# the root of the QEMU source tree.
++# Each qapi-doc:: directive takes one argument which is the
++# path of the .json file to process, relative to the source tree.
++
++import os
++import re
++
++from docutils import nodes
++from docutils.statemachine import ViewList
++from docutils.parsers.rst import directives, Directive
++from sphinx.errors import ExtensionError
++from sphinx.util.nodes import nested_parse_with_titles
++import sphinx
++from qapi.gen import QAPISchemaVisitor
++from qapi.schema import QAPIError, QAPISchema
++
++# Sphinx up to 1.6 uses AutodocReporter; 1.7 and later
++# use switch_source_input. Check borrowed from kerneldoc.py.
++Use_SSI = sphinx.__version__[:3] >= '1.7'
++if Use_SSI:
++    from sphinx.util.docutils import switch_source_input
++else:
++    from sphinx.ext.autodoc import AutodocReporter
++
++
++__version__ = '1.0'
++
++# Function borrowed from pydash, which is under the MIT license
++def intersperse(iterable, separator):
++    """Like join, but for arbitrary iterables, notably arrays"""
++    iterable = iter(iterable)
++    yield next(iterable)
++    for item in iterable:
++        yield separator
++        yield item
++
++class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
++    """A QAPI schema visitor which generates docutils/Sphinx nodes
++
++    This class builds up a tree of docutils/Sphinx nodes corresponding
++    to documentation for the various QAPI objects. To use it, first create
++    a QAPISchemaGenRSTVisitor object, and call its visit_begin() method.
++    Then you can call one of the two methods 'freeform' (to add documentation
++    for a freeform documentation chunk) or 'symbol' (to add documentation
++    for a QAPI symbol). These will cause the visitor to build up the
++    tree of document nodes. Once you've added all the documentation
++    via 'freeform' and 'symbol' method calls, you can call 'get_document_nodes'
++    to get the final list of document nodes (in a form suitable for returning
++    from a Sphinx directive's 'run' method).
++    """
++    def __init__(self, sphinx_directive):
++        self._cur_doc = None
++        self._sphinx_directive = sphinx_directive
++        self._top_node = nodes.section()
++        self._active_headings = [self._top_node]
++
++    def _serror(self, msg):
++        """Raise an exception giving a user-friendly syntax error message"""
++        file = self._cur_doc.info.fname
++        line = self._cur_doc.info.line
++        raise ExtensionError('%s line %d: syntax error: %s' % (file, line, msg))
++
++    def _make_dlitem(self, term, defn):
++        """Return a dlitem node with the specified term and definition.
++
++        term should be a list of Text and literal nodes.
++        defn should be one of:
++        - a string, which will be handed to _parse_text_into_node
++        - a list of Text and literal nodes, which will be put into
++          a paragraph node
++        """
++        dlitem = nodes.definition_list_item()
++        dlterm = nodes.term('', '', *term)
++        dlitem += dlterm
++        if defn:
++            dldef = nodes.definition()
++            if isinstance(defn, list):
++                dldef += nodes.paragraph('', '', *defn)
++            else:
++                self._parse_text_into_node(defn, dldef)
++            dlitem += dldef
++        return dlitem
++
++    def _make_section(self, title):
++        """Return a section node with optional title"""
++        section = nodes.section(ids=[self._sphinx_directive.new_serialno()])
++        if title:
++            section += nodes.title(title, title)
++        return section
++
++    def _nodes_for_ifcond(self, ifcond, with_if=True):
++        """Return list of Text, literal nodes for the ifcond
++
++        Return a list which gives text like ' (If: cond1, cond2, cond3)', where
++        the conditions are in literal-text and the commas are not.
++        If with_if is False, we don't return the "(If: " and ")".
++        """
++        condlist = intersperse([nodes.literal('', c) for c in ifcond],
++                               nodes.Text(', '))
++        if not with_if:
++            return condlist
++
++        nodelist = [nodes.Text(' ('), nodes.strong('', 'If: ')]
++        nodelist.extend(condlist)
++        nodelist.append(nodes.Text(')'))
++        return nodelist
++
++    def _nodes_for_one_member(self, member):
++        """Return list of Text, literal nodes for this member
++
++        Return a list of doctree nodes which give text like
++        'name: type (optional) (If: ...)' suitable for use as the
++        'term' part of a definition list item.
++        """
++        term = [nodes.literal('', member.name)]
++        if member.type.doc_type():
++            term.append(nodes.Text(': '))
++            term.append(nodes.literal('', member.type.doc_type()))
++        if member.optional:
++            term.append(nodes.Text(' (optional)'))
++        if member.ifcond:
++            term.extend(self._nodes_for_ifcond(member.ifcond))
++        return term
++
++    def _nodes_for_variant_when(self, variants, variant):
++        """Return list of Text, literal nodes for variant 'when' clause
++
++        Return a list of doctree nodes which give text like
++        'when tagname is variant (If: ...)' suitable for use in
++        the 'variants' part of a definition list.
++        """
++        term = [nodes.Text(' when '),
++                nodes.literal('', variants.tag_member.name),
++                nodes.Text(' is '),
++                nodes.literal('', '"%s"' % variant.name)]
++        if variant.ifcond:
++            term.extend(self._nodes_for_ifcond(variant.ifcond))
++        return term
++
++    def _nodes_for_members(self, doc, what, base=None, variants=None):
++        """Return doctree nodes for the table of members"""
++        dlnode = nodes.definition_list()
++        for section in doc.args.values():
++            term = self._nodes_for_one_member(section.member)
++            # TODO drop fallbacks when undocumented members are outlawed
++            if section.text:
++                defn = section.text
++            elif (variants and variants.tag_member == section.member
++                  and not section.member.type.doc_type()):
++                values = section.member.type.member_names()
++                defn = [nodes.Text('One of ')]
++                defn.extend(intersperse([nodes.literal('', v) for v in values],
++                                        nodes.Text(', ')))
++            else:
++                defn = [nodes.Text('Not documented')]
++
++            dlnode += self._make_dlitem(term, defn)
++
++        if base:
++            dlnode += self._make_dlitem([nodes.Text('The members of '),
++                                         nodes.literal('', base.doc_type())],
++                                        None)
++
++        if variants:
++            for v in variants.variants:
++                if v.type.is_implicit():
++                    assert not v.type.base and not v.type.variants
++                    for m in v.type.local_members:
++                        term = self._nodes_for_one_member(m)
++                        term.extend(self._nodes_for_variant_when(variants, v))
++                        dlnode += self._make_dlitem(term, None)
++                else:
++                    term = [nodes.Text('The members of '),
++                            nodes.literal('', v.type.doc_type())]
++                    term.extend(self._nodes_for_variant_when(variants, v))
++                    dlnode += self._make_dlitem(term, None)
++
++        if not dlnode.children:
++            return None
++
++        section = self._make_section(what)
++        section += dlnode
++        return section
++
++    def _nodes_for_enum_values(self, doc, what):
++        """Return doctree nodes for the table of enum values"""
++        seen_item = False
++        dlnode = nodes.definition_list()
++        for section in doc.args.values():
++            termtext = [nodes.literal('', section.member.name)]
++            if section.member.ifcond:
++                termtext.extend(self._nodes_for_ifcond(section.member.ifcond))
++            # TODO drop fallbacks when undocumented members are outlawed
++            if section.text:
++                defn = section.text
++            else:
++                defn = [nodes.Text('Not documented')]
++
++            dlnode += self._make_dlitem(termtext, defn)
++            seen_item = True
++
++        if not seen_item:
++            return None
++
++        section = self._make_section(what)
++        section += dlnode
++        return section
++
++    def _nodes_for_arguments(self, doc, boxed_arg_type):
++        """Return doctree nodes for the arguments section"""
++        if boxed_arg_type:
++            assert not doc.args
++            section = self._make_section('Arguments')
++            dlnode = nodes.definition_list()
++            dlnode += self._make_dlitem(
++                [nodes.Text('The members of '),
++                 nodes.literal('', boxed_arg_type.name)],
++                None)
++            section += dlnode
++            return section
++
++        return self._nodes_for_members(doc, 'Arguments')
++
++    def _nodes_for_features(self, doc):
++        """Return doctree nodes for the table of features"""
++        seen_item = False
++        dlnode = nodes.definition_list()
++        for section in doc.features.values():
++            dlnode += self._make_dlitem([nodes.literal('', section.name)],
++                                        section.text)
++            seen_item = True
++
++        if not seen_item:
++            return None
++
++        section = self._make_section('Features')
++        section += dlnode
++        return section
++
++    def _nodes_for_example(self, exampletext):
++        """Return doctree nodes for a code example snippet"""
++        return nodes.literal_block(exampletext, exampletext)
++
++    def _nodes_for_sections(self, doc, ifcond):
++        """Return doctree nodes for additional sections following arguments"""
++        nodelist = []
++        for section in doc.sections:
++            snode = self._make_section(section.name)
++            if section.name and section.name.startswith('Example'):
++                snode += self._nodes_for_example(section.text)
++            else:
++                self._parse_text_into_node(section.text, snode)
++            nodelist.append(snode)
++        if ifcond:
++            snode = self._make_section('If')
++            snode += self._nodes_for_ifcond(ifcond, with_if=False)
++            nodelist.append(snode)
++        if not nodelist:
++            return None
++        return nodelist
++
++    def _add_doc(self, typ, sections):
++        """Add documentation for a command/object/enum...
++
++        We assume we're documenting the thing defined in self._cur_doc.
++        typ is the type of thing being added ("Command", "Object", etc)
++
++        sections is a list of nodes for sections to add to the definition.
++        """
++
++        doc = self._cur_doc
++        snode = nodes.section(ids=[self._sphinx_directive.new_serialno()])
++        snode += nodes.title('', '', *[nodes.literal(doc.symbol, doc.symbol),
++                                       nodes.Text(' (' + typ + ')')])
++        self._parse_text_into_node(doc.body.text, snode)
++        for s in sections:
++            if s is not None:
++                snode += s
++        self._add_node_to_current_heading(snode)
++
++    def visit_enum_type(self, name, info, ifcond, members, prefix):
++        doc = self._cur_doc
++        self._add_doc('Enum',
++                      [self._nodes_for_enum_values(doc, 'Values'),
++                       self._nodes_for_features(doc),
++                       self._nodes_for_sections(doc, ifcond)])
++
++    def visit_object_type(self, name, info, ifcond, base, members, variants,
++                          features):
++        doc = self._cur_doc
++        if base and base.is_implicit():
++            base = None
++        self._add_doc('Object',
++                      [self._nodes_for_members(doc, 'Members', base, variants),
++                       self._nodes_for_features(doc),
++                       self._nodes_for_sections(doc, ifcond)])
++
++    def visit_alternate_type(self, name, info, ifcond, variants):
++        doc = self._cur_doc
++        self._add_doc('Alternate',
++                      [self._nodes_for_members(doc, 'Members'),
++                       self._nodes_for_features(doc),
++                       self._nodes_for_sections(doc, ifcond)])
++
++    def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
++                      success_response, boxed, allow_oob, allow_preconfig,
++                      features):
++        doc = self._cur_doc
++        self._add_doc('Command',
++                      [self._nodes_for_arguments(doc,
++                                                 arg_type if boxed else None),
++                       self._nodes_for_features(doc),
++                       self._nodes_for_sections(doc, ifcond)])
++
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
++        doc = self._cur_doc
++        self._add_doc('Event',
++                      [self._nodes_for_arguments(doc,
++                                                 arg_type if boxed else None),
++                       self._nodes_for_features(doc),
++                       self._nodes_for_sections(doc, ifcond)])
++
++    def symbol(self, doc, entity):
++        """Add documentation for one symbol to the document tree
++
++        This is the main entry point which causes us to add documentation
++        nodes for a symbol (which could be a 'command', 'object', 'event',
++        etc). We do this by calling 'visit' on the schema entity, which
++        will then call back into one of our visit_* methods, depending
++        on what kind of thing this symbol is.
++        """
++        self._cur_doc = doc
++        entity.visit(self)
++        self._cur_doc = None
++
++    def _start_new_heading(self, heading, level):
++        """Start a new heading at the specified heading level
++
++        Create a new section whose title is 'heading' and which is placed
++        in the docutils node tree as a child of the most recent level-1
++        heading. Subsequent document sections (commands, freeform doc chunks,
++        etc) will be placed as children of this new heading section.
++        """
++        if len(self._active_headings) < level:
++            self._serror('Level %d subheading found outside a level %d heading'
++                         % (level, level - 1))
++        snode = self._make_section(heading)
++        self._active_headings[level - 1] += snode
++        self._active_headings = self._active_headings[:level]
++        self._active_headings.append(snode)
++
++    def _add_node_to_current_heading(self, node):
++        """Add the node to whatever the current active heading is"""
++        self._active_headings[-1] += node
++
++    def freeform(self, doc):
++        """Add a piece of 'freeform' documentation to the document tree
++
++        A 'freeform' document chunk doesn't relate to any particular
++        symbol (for instance, it could be an introduction).
++
++        As a special case, if the freeform document is a single line
++        of the form '= Heading text' it is treated as a section or subsection
++        heading, with the heading level indicated by the number of '=' signs.
++        """
++
++        # QAPIDoc documentation says free-form documentation blocks
++        # must have only a body section, nothing else.
++        assert not doc.sections
++        assert not doc.args
++        assert not doc.features
++        self._cur_doc = doc
++
++        if re.match(r'=+ ', doc.body.text):
++            # Section or subsection heading: must be the only thing in the block
++            (heading, _, rest) = doc.body.text.partition('\n')
++            if rest != '':
++                raise ExtensionError('%s line %s: section or subsection heading'
++                                     ' must be in its own doc comment block'
++                                     % (doc.info.fname, doc.info.line))
++            (leader, _, heading) = heading.partition(' ')
++            self._start_new_heading(heading, len(leader))
++            return
++
++        node = self._make_section(None)
++        self._parse_text_into_node(doc.body.text, node)
++        self._add_node_to_current_heading(node)
++        self._cur_doc = None
++
++    def _parse_text_into_node(self, doctext, node):
++        """Parse a chunk of QAPI-doc-format text into the node
++
++        The doc comment can contain most inline rST markup, including
++        bulleted and enumerated lists.
++        As an extra permitted piece of markup, @var will be turned
++        into ``var``.
++        """
++
++        # Handle the "@var means ``var`` case
++        doctext = re.sub(r'@([\w-]+)', r'``\1``', doctext)
++
++        rstlist = ViewList()
++        for line in doctext.splitlines():
++            # The reported line number will always be that of the start line
++            # of the doc comment, rather than the actual location of the error.
++            # Being more precise would require overhaul of the QAPIDoc class
++            # to track lines more exactly within all the sub-parts of the doc
++            # comment, as well as counting lines here.
++            rstlist.append(line, self._cur_doc.info.fname,
++                           self._cur_doc.info.line)
++        self._sphinx_directive.do_parse(rstlist, node)
++
++    def get_document_nodes(self):
++        """Return the list of docutils nodes which make up the document"""
++        return self._top_node.children
++
++class QAPIDocDirective(Directive):
++    """Extract documentation from the specified QAPI .json file"""
++    required_argument = 1
++    optional_arguments = 1
++    option_spec = {
++        'qapifile': directives.unchanged_required
++    }
++    has_content = False
++
++    def new_serialno(self):
++        """Return a unique new ID string suitable for use as a node's ID"""
++        env = self.state.document.settings.env
++        return 'qapidoc-%d' % env.new_serialno('qapidoc')
++
++    def run(self):
++        env = self.state.document.settings.env
++        qapifile = env.config.qapidoc_srctree + '/' + self.arguments[0]
++
++        # Tell sphinx of the dependency
++        env.note_dependency(os.path.abspath(qapifile))
++
++        try:
++            schema = QAPISchema(qapifile)
++        except QAPIError as err:
++            # Launder QAPI parse errors into Sphinx extension errors
++            # so they are displayed nicely to the user
++            raise ExtensionError(str(err))
++
++        vis = QAPISchemaGenRSTVisitor(self)
++        vis.visit_begin(schema)
++        for doc in schema.docs:
++            if doc.symbol:
++                vis.symbol(doc, schema.lookup_entity(doc.symbol))
++            else:
++                vis.freeform(doc)
++
++        return vis.get_document_nodes()
++
++    def do_parse(self, rstlist, node):
++        """Parse rST source lines and add them to the specified node
++
++        Take the list of rST source lines rstlist, parse them as
++        rST, and add the resulting docutils nodes as children of node.
++        The nodes are parsed in a way that allows them to include
++        subheadings (titles) without confusing the rendering of
++        anything else.
++        """
++        # This is from kerneldoc.py -- it works around an API change in
++        # Sphinx between 1.6 and 1.7. Unlike kerneldoc.py, we use
++        # sphinx.util.nodes.nested_parse_with_titles() rather than the
++        # plain self.state.nested_parse(), and so we can drop the saving
++        # of title_styles and section_level that kerneldoc.py does,
++        # because nested_parse_with_titles() does that for us.
++        if Use_SSI:
++            with switch_source_input(self.state, rstlist):
++                nested_parse_with_titles(self.state, rstlist, node)
++        else:
++            save = self.state.memo.reporter
++            self.state.memo.reporter = AutodocReporter(rstlist,
++                                                       self.state.memo.reporter)
++            try:
++                nested_parse_with_titles(self.state, rstlist, node)
++            finally:
++                self.state.memo.reporter = save
++
++def setup(app):
++    """ Register qapi-doc directive with Sphinx"""
++    app.add_config_value('qapidoc_srctree', None, 'env')
++    app.add_directive('qapi-doc', QAPIDocDirective)
++
++    return dict(
++        version=__version__,
++        parallel_read_safe=True,
++        parallel_write_safe=True
++    )
+-- 
+2.20.1
 
 
