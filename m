@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF86C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A692C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 367C121556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E94EA21556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:52:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="acAq4T8W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 367C121556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q08y99wB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E94EA21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Zgt-0005d7-CP
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:51:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50087)
+	id 1j6Zhc-0006pq-V1
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:52:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52485)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlM-0001yK-F8
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:33 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z08-0003Qn-97
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlK-0001gI-FE
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:32 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:35428)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z07-0003SX-9W
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:48 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45812)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YlK-0001dF-8M
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:30 -0500
-Received: by mail-wm1-x334.google.com with SMTP id m3so2666589wmi.0
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:30 -0800 (PST)
+ id 1j6Z07-0003QU-1o
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:47 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g3so14386721wrs.12
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:07:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0BfDGmNNoS/7MbaiDYjxGfK5TfJo6+VifgJPDM0/QoI=;
- b=acAq4T8WakxRLCafQj4RYYEivz/U7JJ2KQLKoIPrdOKzCfmpDhazp+gHezoNdKloA9
- +hUTqYHIMzwB9EhvCymq8djOIbfyOuK7MjeM0vHI7H9cUGzlg81e3G5b3h6rkm9692P1
- aQyZu1nFG8Vgg6MFyPImDl1Xfg4FMd1C3Bc2M8T/U5FZdiovBUSPe0fZZ7/KGRuy1yZT
- jYsQQbougk0MPJW0vTwOPnNRDVxo3GElnEP1wKZwArkRi9NylFJVLyaP7kuRzmseNiDv
- OtqV7S6DpdlBHw52Wfg6VaHGsIJsiNO2MPXHjhWqj0amzPixtzW5Gfv8ADvy6dkzgYgk
- d43Q==
+ bh=Pa3Dg+0nydJXBH9NRO9g2c3Rg2CZEZxMnxi2NhPzuTw=;
+ b=q08y99wBshmVvJsx0lmLOBl1zEsji22MPSzM/fmSmRjVovDbMjEpeO1dDzQGqeN1kv
+ YS/2yoPchufKUQ/co+xK+KIpuurAmifZtaJ5PNaj48sWhtUt1ml3LoXS/Vs69yFnkbBs
+ df3CJyEfqMVKj/KL+L997X9wIcyfl4II1Dwf32AO7rWEzksN8E7aCbMR4WIXNQnOsQaK
+ jUOanDHCU6flWbvxPug1Qdwd7GgqYTzmtWY/fOWsNlh9Qy0eaUIWJzn0SqOPv6b/IZTH
+ Riru1goELMN0xZtdmAmgCB/1IaWXTmkENASbqiA1DoxN8DmNzBYRiJzIoVPtAdy4HyUs
+ dBag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=0BfDGmNNoS/7MbaiDYjxGfK5TfJo6+VifgJPDM0/QoI=;
- b=ZwshP15hLIuW+DFZtZWFSdtlcxsJsa5Oh5Lo9xMkVA32/F2PTYE8Ra0RARDBdd0Q4G
- M5j4oV3c9qSyaRgPHKiDB19TuucKmJKZQcIrVLkZIMKBCbksN283HiQekMZdOJfulC7C
- lRhs6YEj1B5Qgk/ILxaumwi56EE4xmCEiwqWgz8HEs8hpTqMygxf5cKaxeSoVJY1GkbM
- bj63ExOODQ6qIVldWq6QH9Wic3ij5+BxKK2Mpx1QiMNjBHiMQKywV7X6uqWWlufFhCtw
- IGGOpUXE1eZLIrUzpg+Vt3Qo2NxoIVWFxwk1WAQyknUe2GWBc+PUZlIjx7xGZN3tJ3Lb
- OYVg==
-X-Gm-Message-State: APjAAAVCW7Aj0eaOHYFCigVwJW2W16ZVFMsHzuM3TLi6bLY3Pu5e7391
- BTl8DUpj8nafURZdbylnv+S6K9Ck
-X-Google-Smtp-Source: APXvYqzq7n5JC4geFKVTE8Eub6Dh1+nNSr+PyByNblAkCXlkrCZJOFX5WHKmQ/loIY8GF7e6058U9Q==
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr5074395wmi.116.1582631549050; 
- Tue, 25 Feb 2020 03:52:29 -0800 (PST)
+ bh=Pa3Dg+0nydJXBH9NRO9g2c3Rg2CZEZxMnxi2NhPzuTw=;
+ b=KcZNxb7iEBUIBHdIJ9kH1TNr9pnF5a1IMNzNdc6EJO5ilU7pK8z8HB8MoCKVXONKeY
+ bbyNTrWGbxsGB6ga1D5JvRdk1QE3a98rLSkExA7LNlxBILehITbtLNZj0mkKB0a92pH9
+ /Mo3xjhMvLz1Lbl6Pnj1TEK30HeyiXOGjjXPgv3ZoeyUh/Klrgm+D5l7Lfs4jobZRzYq
+ AYbyZmwQBmfjqWXu7M6qgBmDNHpW6jkHyyBWfqRoUzpVyBQn8ivP0kVgK5goA+jxdLwc
+ F611PNbjmwQRHBvaSDQ8VM57zveT9OxnSUUk4O5fZdTxB6gGMFP/v16/ImKwmkajvtWv
+ 5IuQ==
+X-Gm-Message-State: APjAAAUpwS5XX268Z8xaq81yDjqzAkTr3yuMcmwUPTk2HwTj8looFt7Y
+ RYf497Iun4FKAKvpZ5/U/S20sREV
+X-Google-Smtp-Source: APXvYqy/DTH62VkIiU78vrCnwwMz5H/bQwP6zNzQLp1KVB/ZDeWSdJFQgfZbjjn5aFZOG8EYFRGqww==
+X-Received: by 2002:a5d:540f:: with SMTP id g15mr70071980wrv.86.1582632461988; 
+ Tue, 25 Feb 2020 04:07:41 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.28
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.41
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:28 -0800 (PST)
+ Tue, 25 Feb 2020 04:07:41 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 089/136] hw/ide/internal: Remove unused DMARestartFunc typedef
-Date: Tue, 25 Feb 2020 12:50:19 +0100
-Message-Id: <1582631466-13880-89-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 108/136] hw/pci-host: Use memory_region_init_rom() with
+ read-only regions
+Date: Tue, 25 Feb 2020 13:07:06 +0100
+Message-Id: <1582632454-16491-6-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,26 +101,32 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The IDE DMA restart callback has been removed in commit fe09c7c9f0.
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
-Fixes: fe09c7c9f0
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200224205533.23798-11-philmd@redhat.com>
+Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- include/hw/ide/internal.h | 1 -
- 1 file changed, 1 deletion(-)
+ hw/pci-host/prep.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 52ec197..ce766ac 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -326,7 +326,6 @@ typedef int DMAIntFunc(IDEDMA *, int);
- typedef int32_t DMAInt32Func(IDEDMA *, int32_t len);
- typedef void DMAu32Func(IDEDMA *, uint32_t);
- typedef void DMAStopFunc(IDEDMA *, bool);
--typedef void DMARestartFunc(void *, int, RunState);
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 1aff72b..1a02e9a 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -325,9 +325,8 @@ static void raven_realize(PCIDevice *d, Error **errp)
+     d->config[0x0D] = 0x10; // latency_timer
+     d->config[0x34] = 0x00; // capabilities_pointer
  
- struct unreported_events {
-     bool eject_request;
+-    memory_region_init_ram_nomigrate(&s->bios, OBJECT(s), "bios", BIOS_SIZE,
+-                           &error_fatal);
+-    memory_region_set_readonly(&s->bios, true);
++    memory_region_init_rom_nomigrate(&s->bios, OBJECT(s), "bios", BIOS_SIZE,
++                                     &error_fatal);
+     memory_region_add_subregion(get_system_memory(), (uint32_t)(-BIOS_SIZE),
+                                 &s->bios);
+     if (s->bios_name) {
 -- 
 1.8.3.1
 
