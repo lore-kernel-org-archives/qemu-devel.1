@@ -2,108 +2,69 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C23C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1172AC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:27:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CB5F20658
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:27:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB5F20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DBDC520658
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:27:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBDC520658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aFX-0005QG-PT
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:27:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34695)
+	id 1j6aFd-0005dP-2T
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:27:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jjherne@linux.ibm.com>) id 1j6Zmw-0007Np-Rt
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:58:16 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9K-0003Sb-OO
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jjherne@linux.ibm.com>) id 1j6Zmv-00078A-4q
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:58:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43974)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jjherne@linux.ibm.com>)
- id 1j6Zmu-00075E-Rx; Tue, 25 Feb 2020 07:58:13 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01PCrU3B051084; Tue, 25 Feb 2020 07:58:11 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yb1b8j88e-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 07:58:11 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01PCrhsV052281;
- Tue, 25 Feb 2020 07:58:11 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yb1b8j882-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 07:58:10 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01PCtIEJ014749;
- Tue, 25 Feb 2020 12:58:10 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma04dal.us.ibm.com with ESMTP id 2yaux6twb0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 12:58:10 +0000
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01PCw8VA60817902
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 25 Feb 2020 12:58:08 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9A52D6E050;
- Tue, 25 Feb 2020 12:58:08 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1C3C06E04C;
- Tue, 25 Feb 2020 12:58:08 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.188.183])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 25 Feb 2020 12:58:07 +0000 (GMT)
-Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org, cohuck@redhat.com
-References: <20200205182126.13010-1-jjherne@linux.ibm.com>
- <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
- <bf3f44b5-f0fe-59f4-9152-54edd8c9822e@linux.ibm.com>
- <941cc201-4c33-0ad3-ecc8-eab2709d350d@de.ibm.com>
- <91910082-ffeb-c588-7434-3de5fbfcbfa6@linux.ibm.com>
- <ab7de201-f466-b95d-50f0-e6f850eee3cd@de.ibm.com>
-From: "Jason J. Herne" <jjherne@linux.ibm.com>
-Organization: IBM
-Message-ID: <29aece69-3b53-6c46-f295-cbc4bf93ff95@linux.ibm.com>
-Date: Tue, 25 Feb 2020 07:58:07 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <laurent@vivier.eu>) id 1j6Z9H-0001io-JE
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:18 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:54075)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j6Z9H-0001hq-8k; Tue, 25 Feb 2020 07:17:15 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MtPzy-1jQ2KM3dU6-00ut5M; Tue, 25 Feb 2020 13:16:25 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 18/21] linux-user,
+ scripts: add a script to update syscall.tbl
+Date: Tue, 25 Feb 2020 13:15:50 +0100
+Message-Id: <20200225121553.2191597-19-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200225121553.2191597-1-laurent@vivier.eu>
+References: <20200225121553.2191597-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <ab7de201-f466-b95d-50f0-e6f850eee3cd@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-25_04:2020-02-21,
- 2020-02-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxscore=0
- malwarescore=0 phishscore=0 mlxlogscore=964 lowpriorityscore=0 bulkscore=0
- adultscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002250102
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 01PCrU3B051084
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Gdv/WPZYt1nmwfmKJpJEYbhhIw02ojTxT82IaD84fhmBs1O8vrc
+ 7smQbrZNRHgv9h92LYJEz7DpnAUUq/852eZBgQJltMbR2o5yRK8r+CvgP5VzIGFr3Rj/ZL2
+ qeBtBJykPrZahOWoTtjXfiBSt+IELLheBaNTc9fPcUiZilqyweclljnX2c7OfWy/8IFOLG5
+ UJmpXsL9sQXdWA2seiYsQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:g+d2sCVJW8k=:ZTZzaOlvE8kVeiPWx+RqzN
+ 39aJz3cChlvXVh6+PluuDq7WhR9FvCGPWs26GHq2cX7FqLS+h1UfzKYlh+hS9m7vnTqE1CK8N
+ bCFJEPcKx/1zoMgDmcgOWnf+j0tDSIATzzw7R4EoOuD/afckFlldgNQBpycIldOByILb4G/4G
+ Hu6J1UgIFkKtILzR/Y/7vOrFhpta9T83cdle5B48K2w58aag6vmbt8UdO9xTSEOmZr6/+O1ea
+ d030p1MqJ5VOZVBmZBC6JO4UpPKNbeUOj9Cca67luqUgt67Tc3RRk+AouqTXa5QRt90cRLg1S
+ 1bG33B7N5sl7OASCJH1wCuSZKOmiX8Xgen+ZZdtxRAUF4eRLAdpLFQLXupQP5gHEF2pxiHufI
+ cMfy4IR5DPkZlaL7d5T5PEhvqzkfkrNIfCGnzjH2JliRtszO1Fl408uSRNIrwIkSb90qhxM/V
+ poA8kVtje+7sGmpa4syLCcc1IQFva8p3Ab/nOtxhYO0iRgJz5KEOs5MdKM5EOyOSim4kw8XFL
+ K1urRTWg60dsielifNEz9Lusv0C3w2Vzsrq6oZvyt0wyL3f6LrYuYX/CuqnpsjTmiRhPcpAqG
+ U5ehwtoerE2XmcfMLZ+jYJ4Jk06sn9JR+8lZ7RMWyGKFLn47z4i7dWSIC6pDsMHiZUppN/f2r
+ 3kFtUj4uVPeFwa2IQEm8NUSA8Dn5fIFPRnUK65yobHKlTY/TGeQskZYvIjInWek0UZsUIVAap
+ +63oNqBwv9Ce4eKTy+N2y8lbWrSGYUKKjRzKoNogIwudoIjIhk4lMRx+buxGzKAsESo/2eHAr
+ wgklgCJPdhkJkF2rllCu/YJXvJk2J4EG1+97kDz3Cd+sd4C2Z7hMYYiGjUb9FbKLzuc3LAX
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,126 +76,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: jjherne@linux.ibm.com
+Cc: Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/25/20 6:13 AM, Christian Borntraeger wrote:
->=20
->=20
-> On 25.02.20 11:23, Jason J. Herne wrote:
->> On 2/13/20 1:24 PM, Christian Borntraeger wrote:
->> ...
->>>>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ip=
-l.c
->>>>> index da13c43cc0..8839226803 100644
->>>>> --- a/pc-bios/s390-ccw/jump2ipl.c
->>>>> +++ b/pc-bios/s390-ccw/jump2ipl.c
->>>>> @@ -18,6 +18,7 @@
->>>>>  =C2=A0=C2=A0 typedef struct ResetInfo {
->>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t ipl_psw;
->>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t ipl_continue;
->>>>> +=C2=A0=C2=A0=C2=A0 uint32_t pad;
->>>>>  =C2=A0=C2=A0 } ResetInfo;
->>>>>  =C2=A0=C2=A0 =C2=A0 static ResetInfo save;
->>>>>
->>>>>
->>>>> also work? If yes, both variants are valid. Either packed or explic=
-it padding.
->>>>>
->>>>
->>>> I don't believe this will work. I think the problem is that we're ov=
-erwriting too much memory when we cast address 0 as a ResetInfo and then =
-overwrite it (*current =3D save). I think we need the struct to be sized =
-at 12-bytes instead of 16.
->>>>
->>>
->>> The idea of the code is that we _save_ the original content from addr=
-ess 0 to save and _restore_ it before jumping into final code. I do not y=
-et understand why this does not work.
->>>
->>
->> I've found the real problem here. Legacy operating systems that expect=
- to start
->> in 32-bit addressing mode can fail if we leave junk in the high halves=
- of our
->> 64-bit registers. This is because some instructions (LA for example) a=
-re
->> bi-modal and operate differently depending on the machine's current ad=
-dressing
->> mode.
->>
->> In the case where we pack the struct, the compiler happens to use the =
-mvc
->> instruction to load/store the current/save memory areas.
->>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *current =3D save;
->>  =C2=A0 1fc:=C2=A0=C2=A0=C2=A0 e3 10 b0 a8 00 04=C2=A0=C2=A0=C2=A0=C2=A0=
- lg=C2=A0=C2=A0=C2=A0 %r1,168(%r11)
->>  =C2=A0 202:=C2=A0=C2=A0=C2=A0 c0 20 00 00 00 00=C2=A0=C2=A0=C2=A0=C2=A0=
- larl=C2=A0=C2=A0=C2=A0 %r2,202 <jump_to_IPL_2+0x32>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 20=
-4: R_390_PC32DBL=C2=A0=C2=A0=C2=A0 .bss+0x2
->>  =C2=A0 208:=C2=A0=C2=A0=C2=A0 d2 0b 10 00 20 00=C2=A0=C2=A0=C2=A0=C2=A0=
- mvc=C2=A0=C2=A0=C2=A0 0(12,%r1),0(%r2)
->>
->> Everything works as expected here, our legacy OS boots without issue.
->> However, in the case where we've packed this struct the compiler optim=
-izes the
->> code and uses lmg/stmg instead of mvc to copy the data:
->>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *current =3D save;
->>  =C2=A0 1fc:=C2=A0=C2=A0=C2=A0 e3 10 b0 a8 00 04=C2=A0=C2=A0=C2=A0=C2=A0=
- lg=C2=A0=C2=A0=C2=A0 %r1,168(%r11)
->>  =C2=A0 202:=C2=A0=C2=A0=C2=A0 c0 20 00 00 00 00=C2=A0=C2=A0=C2=A0=C2=A0=
- larl=C2=A0=C2=A0=C2=A0 %r2,202 <jump_to_IPL_2+0x32>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 20=
-4: R_390_PC32DBL=C2=A0=C2=A0=C2=A0 .bss+0x2
->>  =C2=A0 208:=C2=A0=C2=A0=C2=A0 eb 23 20 00 00 04=C2=A0=C2=A0=C2=A0=C2=A0=
- lmg=C2=A0=C2=A0=C2=A0 %r2,%r3,0(%r2)
->>  =C2=A0 20e:=C2=A0=C2=A0=C2=A0 eb 23 10 00 00 24=C2=A0=C2=A0=C2=A0=C2=A0=
- stmg=C2=A0=C2=A0=C2=A0 %r2,%r3,0(%r1)
->>
->> Depending on the data being copied, the high halves of the registers m=
-ay contain
->> non-zero values. Example:
->>
->>  =C2=A0=C2=A0=C2=A0 r2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 0x108000080000780=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 74309395999098752
->>  =C2=A0=C2=A0=C2=A0 r3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 0x601001800004368=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 432627142283510632
->>
->> So, by sheer luck of the generated assembler, the patch happens to "fi=
-x" the
->> problem.=C2=A0 A real fix might be to insert inline assembler that cle=
-ars the high
->> halves of the registers before we call ipl() in jump_to_IPL_2(). Can w=
-e think of
->> a better way to do that than 15 LLGTR instructions? :) Let me know you=
-r
->> thoughts
->=20
-> Does sam31 before the ipl() work?
-asm volatile ("sam31\n");
+scripts/update-syscalltbl.sh has the list of syscall.tbl to update and
+can copy them from the linux source directory
 
-Inserting the above right before ipl(); does not change the outcome, the =
-guest still fails.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ MAINTAINERS                  |  1 +
+ scripts/update-syscalltbl.sh | 49 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 50 insertions(+)
+ create mode 100755 scripts/update-syscalltbl.sh
 
-This allows the guest to boot.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1740a4fddc14..dac93f447544 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2422,6 +2422,7 @@ S: Maintained
+ F: linux-user/
+ F: default-configs/*-linux-user.mak
+ F: scripts/qemu-binfmt-conf.sh
++F: scripts/update-syscalltbl.sh
+ 
+ Tiny Code Generator (TCG)
+ -------------------------
+diff --git a/scripts/update-syscalltbl.sh b/scripts/update-syscalltbl.sh
+new file mode 100755
+index 000000000000..2d23e5680075
+--- /dev/null
++++ b/scripts/update-syscalltbl.sh
+@@ -0,0 +1,49 @@
++TBL_LIST="\
++arch/alpha/kernel/syscalls/syscall.tbl,linux-user/alpha/syscall.tbl \
++arch/arm/tools/syscall.tbl,linux-user/arm/syscall.tbl \
++arch/m68k/kernel/syscalls/syscall.tbl,linux-user/m68k/syscall.tbl \
++arch/microblaze/kernel/syscalls/syscall.tbl,linux-user/microblaze/syscall.tbl \
++arch/mips/kernel/syscalls/syscall_n32.tbl,linux-user/mips64/syscall_n32.tbl \
++arch/mips/kernel/syscalls/syscall_n64.tbl,linux-user/mips64/syscall_n64.tbl \
++arch/mips/kernel/syscalls/syscall_o32.tbl,linux-user/mips/syscall_o32.tbl \
++arch/parisc/kernel/syscalls/syscall.tbl,linux-user/hppa/syscall.tbl \
++arch/powerpc/kernel/syscalls/syscall.tbl,linux-user/ppc/syscall.tbl \
++arch/s390/kernel/syscalls/syscall.tbl,linux-user/s390x/syscall.tbl \
++arch/sh/kernel/syscalls/syscall.tbl,linux-user/sh4/syscall.tbl \
++arch/sparc/kernel/syscalls/syscall.tbl,linux-user/sparc64/syscall.tbl \
++arch/sparc/kernel/syscalls/syscall.tbl,linux-user/sparc/syscall.tbl \
++arch/x86/entry/syscalls/syscall_32.tbl,linux-user/i386/syscall_32.tbl \
++arch/x86/entry/syscalls/syscall_64.tbl,linux-user/x86_64/syscall_64.tbl \
++arch/xtensa/kernel/syscalls/syscall.tbl,linux-user/xtensa/syscall.tbl\
++"
++
++linux="$1"
++output="$2"
++
++if [ -z "$linux" ] || ! [ -d "$linux" ]; then
++    cat << EOF
++usage: update-syscalltbl.sh LINUX_PATH [OUTPUT_PATH]
++
++LINUX_PATH      Linux kernel directory to obtain the syscall.tbl from
++OUTPUT_PATH     output directory, usually the qemu source tree (default: $PWD)
++EOF
++    exit 1
++fi
++
++if [ -z "$output" ]; then
++    output="$PWD"
++fi
++
++for entry in $TBL_LIST; do
++    OFS="$IFS"
++    IFS=,
++    set $entry
++    src=$1
++    dst=$2
++    IFS="$OFS"
++    if ! cp "$linux/$src" "$output/$dst" ; then
++        echo "Cannot copy $linux/$src to $output/$dst" 1>&2
++        exit 1
++    fi
++done
++
+-- 
+2.24.1
 
-asm volatile ("llgtr %r2,%r2\n"
-               "llgtr %r3,%r3\n");
-
-My guess as to why sam31 does not work: The legacy OS is eventually doing=
- a sam64 and the=20
-high halves of the registers are not subsequently cleared before use. I c=
-ould be wrong=20
-about this though.
-
-
---=20
--- Jason J. Herne (jjherne@linux.ibm.com)
 
