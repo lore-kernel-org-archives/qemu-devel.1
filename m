@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D71C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 778C9C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:46:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92AD220726
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4384D20726
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jdFekw0P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92AD220726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QHCdvcjq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4384D20726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54555 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZbL-0002jH-OL
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:46:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52761)
+	id 1j6ZbY-0003Em-Bx
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:46:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0R-0003si-GT
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:08 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlG-0001iT-9y
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0O-0003eN-HP
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:07 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:53394)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlE-00019r-8t
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:26 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36611)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Z0O-0003dy-Aq
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:04 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id t79so1238133wmt.3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:08:04 -0800 (PST)
+ id 1j6YlE-00017O-2d
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:24 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p17so2861444wma.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Z8uveG+GzablkLGqKhKJxoWtKhLXhYYzRPcHZNEZWGM=;
- b=jdFekw0PQfaAR7FgWsCFeNR6thQiHbqV8H8+ZOt8fDoGoQhkfq+goeTEY1gcn3TOAU
- CfUiCfJtUsi7RrJ6/Qw5t2ZFRPMmzC/Yu4Dikj+W4zgsYYG9LenN5kggsBFgI7IHJBeP
- +4xr6ygbOh1IWOm2awmC1ckVR6AQU8vyDC0E4ycE6vG1M0HyXtW2+iJys87j/S2tlZmm
- rD8eVJ11G5l6X/byQ926mEb+5LBD/cXqr5jN3aN8z3QWseqFjfkMA+Q53OBpKWm2mBm3
- 5XLqD2VhyAqlxbfdyO0qkelC2K9HgOuaDAKaNkNkidW2c71JntnrVmJnT7Tqkrd7D88B
- jAYw==
+ bh=JImAuaX0wkn2tgnJiEdNQRpcHEBlhK4sGVLX4H6xCw8=;
+ b=QHCdvcjqY1H/UAXJAGfHofJE+Y/CnFahTQXE5EDRXE/WErwn4pjqoNWA81/p38b6uZ
+ dFxNZbNo1xEwVq3HVaIJb4fMQMvKbx9NAFdZw+4uhdRM9WCndnYSveIVHah0kmMwB9H8
+ P93Km4Grzqz5NMWy3qb7ttQTR4jljUDs961gEsiTWA3XRasrmDcYlwEVn28rqicxa821
+ 8mA2bYDYPXxYUeCWSMrhnNU5T4aRk70EtYq8dlQb0YwRICYvsFblI1tSgTOKtrWnKOZ/
+ 5zgNLMTOn9GgGUsNpAH4B65g3xBJ+hNKdKKs8uunVRJWofOaGVrE9lJ9JwTRc0f6sf9w
+ /3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Z8uveG+GzablkLGqKhKJxoWtKhLXhYYzRPcHZNEZWGM=;
- b=J/SyKxe1xH/l+nOVluXIVP2k1mJUGoGNzr30AqAkgbPfLoD4homTcguVpOh8igYxk9
- G+OCv+g3WEn/RGAM8aMBypD9mjZ6Y26sD9PU108EGi3QV/YSgAJywATXRtULJtG/mrKr
- FkGqFF+fMQxOoMBVXnjZema6KzCDrcU+JLKY1nlcOESRw3kr9RUPizKZrAc8xRnBshpV
- Fvj94f9vSRd6nwOSO099wHYSdI3aa7KFFGY8HkSfK4OOnP6tTFl1+q8QxUouYY5l9yft
- s5RALKI6TbjdmWcae2GosBJZKme1CSL8gNNvFfXZeguOrPc4SV7U92Jiuftu8WZGmF8J
- qlFg==
-X-Gm-Message-State: APjAAAUWhndzOsdk4OI9+ueq0TzAZ+kIH0Y3xXRzQjkUPca4U3psyj0n
- RHvaR1Lpw75AVhgii8B64n/1Evqh
-X-Google-Smtp-Source: APXvYqxJZ4f8SmFyDihGaWJ9/9CHjKOy2/inGj8+wnbCJPjU25B1yaznpGc5Vr3bRyXz/mxqoJ337A==
-X-Received: by 2002:a1c:48c1:: with SMTP id v184mr4966125wma.5.1582632482973; 
- Tue, 25 Feb 2020 04:08:02 -0800 (PST)
+ bh=JImAuaX0wkn2tgnJiEdNQRpcHEBlhK4sGVLX4H6xCw8=;
+ b=M6diK6eop6Gi4ICxVYh0XVcG8vMBExppPu1z8Q0h6d36haUSo2bJsPOfdXLQsXFxVR
+ WVekjLuhLl5X5gMzlk3LFvuAnR1TMD7bV++FrYg7/lVHifMvz+/NUEP+xh6u/743zPkQ
+ l6LmK5xvQy5chzSszn9NjQ7yLY7mfN/6l+PQgT2kmrkB24LBZsGCu6qty7AjCKqDhN7A
+ lVY+eK4ooTaEdOwoVbBfNg8bnU3g1xjbUlgto7WGl8HAjwZVJvsjljxYsLWqwwoL9Rc6
+ tOz+PBqhiXtrZ3a3gaFOadNhpLPzBynYh+TxgCHNb62QxzezQYpuN/oRhGW20haaAhIV
+ bPGw==
+X-Gm-Message-State: APjAAAX7QvuymOivKLy8W9028PUJJvNAEioU8plhUtf/+JM0kNCgON5U
+ zmxrTZiBJ4/e2vlDorpw/NUrcqkG
+X-Google-Smtp-Source: APXvYqxLVD/T6Vy7Q4Y6uLaGb/vp23ayxpXVpNX1BIuYEnxMWUYOIRcQkSDc0AoWuX3W5eiuWEBSog==
+X-Received: by 2002:a1c:67c3:: with SMTP id b186mr4889330wmc.36.1582631542612; 
+ Tue, 25 Feb 2020 03:52:22 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.08.02
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.21
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 04:08:02 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:21 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 130/136] hw/block/onenand: Let devices own the MemoryRegion
- they create
-Date: Tue, 25 Feb 2020 13:07:28 +0100
-Message-Id: <1582632454-16491-28-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 082/136] exec: Rename ram_ptr variable
+Date: Tue, 25 Feb 2020 12:50:12 +0100
+Message-Id: <1582631466-13880-82-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,44 +100,85 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Avoid orphan memory regions being added in the /unattached QOM
-container.
-
-Note this change break the migration of the nSeries machines.
+As we are going to use a different 'ptr' variable, rename the 'ram
+pointer' variable.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224205533.23798-33-philmd@redhat.com>
-Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/block/onenand.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ exec.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/block/onenand.c b/hw/block/onenand.c
-index 898ac56..f49db0b 100644
---- a/hw/block/onenand.c
-+++ b/hw/block/onenand.c
-@@ -173,8 +173,8 @@ static int onenand_post_load(void *opaque, int version_id)
+diff --git a/exec.c b/exec.c
+index 8e9cc3b..08a30f6 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3151,7 +3151,7 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+                                            hwaddr len, hwaddr addr1,
+                                            hwaddr l, MemoryRegion *mr)
+ {
+-    uint8_t *ptr;
++    uint8_t *ram_ptr;
+     uint64_t val;
+     MemTxResult result = MEMTX_OK;
+     bool release_lock = false;
+@@ -3167,8 +3167,8 @@ static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+                                                    size_memop(l), attrs);
+         } else {
+             /* RAM case */
+-            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+-            memcpy(ptr, buf, l);
++            ram_ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
++            memcpy(ram_ptr, buf, l);
+             invalidate_and_set_dirty(mr, addr1, l);
+         }
  
- static const VMStateDescription vmstate_onenand = {
-     .name = "onenand",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .pre_save = onenand_pre_save,
-     .post_load = onenand_post_load,
-     .fields = (VMStateField[]) {
-@@ -809,9 +809,8 @@ static void onenand_realize(DeviceState *dev, Error **errp)
-     }
-     s->otp = memset(g_malloc((64 + 2) << PAGE_SHIFT),
-                     0xff, (64 + 2) << PAGE_SHIFT);
--    memory_region_init_ram_nomigrate(&s->ram, OBJECT(s), "onenand.ram",
-+    memory_region_init_ram(&s->ram, OBJECT(s), "onenand.ram",
-                            0xc000 << s->shift, &error_fatal);
--    vmstate_register_ram_global(&s->ram);
-     ram = memory_region_get_ram_ptr(&s->ram);
-     s->boot[0] = ram + (0x0000 << s->shift);
-     s->boot[1] = ram + (0x8000 << s->shift);
+@@ -3215,7 +3215,7 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+                                    hwaddr len, hwaddr addr1, hwaddr l,
+                                    MemoryRegion *mr)
+ {
+-    uint8_t *ptr;
++    uint8_t *ram_ptr;
+     uint64_t val;
+     MemTxResult result = MEMTX_OK;
+     bool release_lock = false;
+@@ -3230,8 +3230,8 @@ MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
+             stn_he_p(buf, l, val);
+         } else {
+             /* RAM case */
+-            ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+-            memcpy(buf, ptr, l);
++            ram_ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
++            memcpy(buf, ram_ptr, l);
+         }
+ 
+         if (release_lock) {
+@@ -3329,7 +3329,7 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+                                                            enum write_rom_type type)
+ {
+     hwaddr l;
+-    uint8_t *ptr;
++    uint8_t *ram_ptr;
+     hwaddr addr1;
+     MemoryRegion *mr;
+ 
+@@ -3343,14 +3343,14 @@ static inline MemTxResult address_space_write_rom_internal(AddressSpace *as,
+             l = memory_access_size(mr, l, addr1);
+         } else {
+             /* ROM/RAM case */
+-            ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
++            ram_ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+             switch (type) {
+             case WRITE_DATA:
+-                memcpy(ptr, buf, l);
++                memcpy(ram_ptr, buf, l);
+                 invalidate_and_set_dirty(mr, addr1, l);
+                 break;
+             case FLUSH_CACHE:
+-                flush_icache_range((uintptr_t)ptr, (uintptr_t)ptr + l);
++                flush_icache_range((uintptr_t)ram_ptr, (uintptr_t)ram_ptr + l);
+                 break;
+             }
+         }
 -- 
 1.8.3.1
 
