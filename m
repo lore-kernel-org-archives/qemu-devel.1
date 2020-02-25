@@ -4,76 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 212A7C35E03
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA5CC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E189120658
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AB0920658
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hH9gCBc0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E189120658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHFfu+GS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB0920658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6bGO-0004OF-1m
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:32:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49135)
+	id 1j6bGT-0004Xu-6C
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:32:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j6bFR-0002qC-RP
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:31:49 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j6bFO-0008CR-56
+ (envelope-from <mreitz@redhat.com>) id 1j6bFQ-0002nI-0O
  for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:31:45 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49311
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <mreitz@redhat.com>) id 1j6bFO-0008D4-9Q
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:31:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41229
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6bFN-0008AG-Tq
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6bFO-0008Bb-4n
  for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:31:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582641100;
+ s=mimecast20190719; t=1582641101;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xRTsAP4sEyii5NTzDPqB0L9DG+RxCVYCepurkg2rPhc=;
- b=hH9gCBc0pXyH847/sDj83JiHrcqClvEzo1Pz0Uha5jD7Do3hrHQkpNmCPWQxxy/6sdNFDQ
- Rs9UDs7vgvMVeGrFX2fIrJMViyCtm2AM+L0iW/d+kmdEWBt51jrU9LPOJ1zfbJd+XA9S5b
- BnGflJfNCwWOdY24+8rEts3NdtYBsc0=
+ bh=WbiUQRXAwgj3sBgL9gakHEuoq4xLbmJQTNHL+oQM5JY=;
+ b=EHFfu+GS60KYcQvx/i1QReMo/V6bpecx1+644kdnRfomc2m2kQxMI0zUPenErnL1Ev4ngJ
+ XzYLzmUrWdj9vDU5SFWAvtsQQ3qjhyRcTXwPjL4xq9pMjoA6yIamFl3PszomIZ0FyvNpjh
+ ioRBXPqwdQ5UtTCFO00qqIxk8SyRAJ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-fIrDQ02ZOrGsqlp1Y4L0ow-1; Tue, 25 Feb 2020 09:31:35 -0500
-X-MC-Unique: fIrDQ02ZOrGsqlp1Y4L0ow-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-14-fT8xnsRUN9mpPEC1voALqw-1; Tue, 25 Feb 2020 09:31:37 -0500
+X-MC-Unique: fT8xnsRUN9mpPEC1voALqw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D1C7107ACCA;
- Tue, 25 Feb 2020 14:31:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A45FB108443B;
+ Tue, 25 Feb 2020 14:31:36 +0000 (UTC)
 Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 283B9385;
- Tue, 25 Feb 2020 14:31:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 465A45D9E5;
+ Tue, 25 Feb 2020 14:31:36 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 1/3] qcow2: Fix alloc_cluster_abort() for pre-existing clusters
-Date: Tue, 25 Feb 2020 15:31:28 +0100
-Message-Id: <20200225143130.111267-2-mreitz@redhat.com>
+Subject: [PATCH 2/3] iotests/026: Test EIO on preallocated zero cluster
+Date: Tue, 25 Feb 2020 15:31:29 +0100
+Message-Id: <20200225143130.111267-3-mreitz@redhat.com>
 In-Reply-To: <20200225143130.111267-1-mreitz@redhat.com>
 References: <20200225143130.111267-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,30 +90,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-handle_alloc() reuses preallocated zero clusters.  If anything goes
-wrong during the data write, we do not change their L2 entry, so we
-must not let qcow2_alloc_cluster_abort() free them.
+Test what happens when writing data to a preallocated zero cluster, but
+the data write fails.
 
-Fixes: 8b24cd141549b5b264baeddd4e72902cfb5de23b
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-cluster.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/026             | 21 +++++++++++++++++++++
+ tests/qemu-iotests/026.out         | 10 ++++++++++
+ tests/qemu-iotests/026.out.nocache | 10 ++++++++++
+ 3 files changed, 41 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 78c95dfa16..17f1363279 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1026,7 +1026,7 @@ err:
- void qcow2_alloc_cluster_abort(BlockDriverState *bs, QCowL2Meta *m)
- {
-     BDRVQcow2State *s =3D bs->opaque;
--    if (!has_data_file(bs)) {
-+    if (!has_data_file(bs) && !m->keep_old_clusters) {
-         qcow2_free_clusters(bs, m->alloc_offset,
-                             m->nb_clusters << s->cluster_bits,
-                             QCOW2_DISCARD_NEVER);
+diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
+index a4aa74764f..0c1273c339 100755
+--- a/tests/qemu-iotests/026
++++ b/tests/qemu-iotests/026
+@@ -218,6 +218,27 @@ _make_test_img 64M
+ $QEMU_IO -c "write 0 1M" -c "write 0 1M" "$BLKDBG_TEST_IMG" | _filter_qemu=
+_io
+ _check_test_img
+=20
++echo
++echo =3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=
+=3D
++echo
++
++cat > "$TEST_DIR/blkdebug.conf" <<EOF
++[inject-error]
++event =3D "write_aio"
++errno =3D "5"
++once =3D "on"
++EOF
++
++_make_test_img $CLUSTER_SIZE
++# Create a preallocated zero cluster
++$QEMU_IO -c "write 0 $CLUSTER_SIZE" -c "write -z 0 $CLUSTER_SIZE" "$TEST_I=
+MG" \
++    | _filter_qemu_io
++# Try to overwrite it (prompting an I/O error from blkdebug), thus
++# triggering the alloc abort code
++$QEMU_IO -c "write 0 $CLUSTER_SIZE" "$BLKDBG_TEST_IMG" | _filter_qemu_io
++
++_check_test_img
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/026.out b/tests/qemu-iotests/026.out
+index ff0817b6f2..83989996ff 100644
+--- a/tests/qemu-iotests/026.out
++++ b/tests/qemu-iotests/026.out
+@@ -643,4 +643,14 @@ write failed: Input/output error
+ wrote 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
++
++=3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++write failed: Input/output error
++No errors were found on the image.
+ *** done
+diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.ou=
+t.nocache
+index 495d013007..9359d26d7e 100644
+--- a/tests/qemu-iotests/026.out.nocache
++++ b/tests/qemu-iotests/026.out.nocache
+@@ -651,4 +651,14 @@ write failed: Input/output error
+ wrote 1048576/1048576 bytes at offset 0
+ 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ No errors were found on the image.
++
++=3D=3D=3D Avoid freeing preallocated zero clusters on failure =3D=3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1024
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++wrote 1024/1024 bytes at offset 0
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++write failed: Input/output error
++No errors were found on the image.
+ *** done
 --=20
 2.24.1
 
