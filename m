@@ -2,89 +2,62 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E50C35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EA6C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:30:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63A1E218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:30:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f1HrLPud"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A1E218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAD5320726
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:30:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD5320726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6XTU-00054n-K2
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:30:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34359)
+	id 1j6XUP-00069Y-0Y
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:30:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j6XSi-0004Kn-JS
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:29:13 -0500
+ (envelope-from <groug@kaod.org>) id 1j6XTW-0005Gj-1C
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:30:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j6XSh-0007nw-BV
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:29:12 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27014
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1j6XTR-00080H-Vb
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:30:01 -0500
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:35890)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j6XSh-0007nT-86
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:29:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582626550;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eshyn9fh7aNIDenEnNW/UIb6iPc/g8gyvLYT0vLExco=;
- b=f1HrLPudmyYmmj2yUXbzMd86lygNPvaTcZMSrFmOoiAya+NB40TnLQXDz4NGjBEcGXs+IU
- mDWljaGoLnFIL6SAbVqOlTNQ1qNkUZ10SL3pfgN0OMtk/9mnMEECUAa/TgAdiV3k4n7T+U
- SnHP2lEfIZIlBaZzZM+/7L9RvZ9Ncow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-iCOYz_zfOVOAoN148uEZCw-1; Tue, 25 Feb 2020 05:29:07 -0500
-X-MC-Unique: iCOYz_zfOVOAoN148uEZCw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE2D81005512;
- Tue, 25 Feb 2020 10:29:05 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E90FE5C1D6;
- Tue, 25 Feb 2020 10:29:00 +0000 (UTC)
-Subject: Re: [RFC v2 1/6] tpm: rename TPM_TIS into TPM_TIS_ISA
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- eric.auger.pro@gmail.com, stefanb@linux.ibm.com, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200214183704.14389-1-eric.auger@redhat.com>
- <20200214183704.14389-2-eric.auger@redhat.com>
- <29cc9864-a016-b251-506a-8c04b37efe28@redhat.com>
- <4dd1b4b0-7112-5a8a-9033-9c21eb01b8f9@redhat.com>
- <5eb51283-2bfd-bd02-3bbd-492961e842ff@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <adbefc50-c4d7-a9cf-41c7-1c2c252c184b@redhat.com>
-Date: Tue, 25 Feb 2020 11:28:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6XTR-0007zg-Oe
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:29:57 -0500
+Received: from player695.ha.ovh.net (unknown [10.108.57.178])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 594C81C803B
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 11:29:55 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player695.ha.ovh.net (Postfix) with ESMTPSA id 383DDF9F3C28;
+ Tue, 25 Feb 2020 10:29:36 +0000 (UTC)
+Date: Tue, 25 Feb 2020 11:29:33 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v6 04/18] target/ppc: Correct handling of real mode
+ accesses with vhyp on hash MMU
+Message-ID: <20200225112933.2261beae@bahia.home>
+In-Reply-To: <20200224233724.46415-5-david@gibson.dropbear.id.au>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-5-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <5eb51283-2bfd-bd02-3bbd-492961e842ff@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 17807795877882468838
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrledvgdduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 87.98.172.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,169 +69,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
+ Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Phil,
+On Tue, 25 Feb 2020 10:37:10 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 2/25/20 11:22 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/25/20 11:16 AM, Auger Eric wrote:
->> Hi Phil,
->>
->> On 2/14/20 7:55 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 2/14/20 7:36 PM, Eric Auger wrote:
->>>> As we plan to introduce a sysbus TPM_TIS, let's rename
->>>> TPM_TIS into TPM_TIS_ISA.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> ---
->>>> =C2=A0=C2=A0 hw/i386/acpi-build.c | 6 +++---
->>>> =C2=A0=C2=A0 hw/tpm/tpm_tis.c=C2=A0=C2=A0=C2=A0=C2=A0 | 4 ++--
->>>> =C2=A0=C2=A0 include/sysemu/tpm.h | 6 +++---
->>>> =C2=A0=C2=A0 3 files changed, 8 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>>> index 9c4e46fa74..26777f8828 100644
->>>> --- a/hw/i386/acpi-build.c
->>>> +++ b/hw/i386/acpi-build.c
->>>> @@ -2026,7 +2026,7 @@ build_dsdt(GArray *table_data, BIOSLinker
->>>> *linker,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0 -=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS(tpm_find())) {
->>>> +=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS_ISA(tpm_find())) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_appen=
-d(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TPM_TIS_ADDR_SIZE=
-, AML_READ_WRITE));
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> @@ -2197,7 +2197,7 @@ build_dsdt(GArray *table_data, BIOSLinker
->>>> *linker,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 /* Scan all PCI buses. Generate tables to support
->>>> hotplug. */
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 build_append_pci_bus_devices(scope, bus,
->>>> pm->pcihp_bridge_en);
->>>> =C2=A0=C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 if (TPM_IS_TIS(tpm)) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (TPM_IS_TIS_ISA(tpm)) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (misc->tpm_version =3D=3D TPM_VE=
-RSION_2_0) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev =3D aml=
-_device("TPM");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_append(=
-dev, aml_name_decl("_HID",
->>>> @@ -2304,7 +2304,7 @@ build_tpm2(GArray *table_data, BIOSLinker
->>>> *linker, GArray *tcpalog)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (char *)&=
-tpm2_ptr->log_area_start_address -
->>>> table_data->data;
->>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->platform_class =
-=3D
->>>> cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
->>>> -=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS(tpm_find())) {
->>>> +=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS_ISA(tpm_find())) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr-=
->control_area_address =3D cpu_to_le64(0);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr-=
->start_method =3D
->>>> cpu_to_le32(TPM2_START_METHOD_MMIO);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (TPM_IS_CRB(tpm_find())=
-) {
->>>> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
->>>> index 31facb896d..c609737272 100644
->>>> --- a/hw/tpm/tpm_tis.c
->>>> +++ b/hw/tpm/tpm_tis.c
->>>> @@ -91,7 +91,7 @@ typedef struct TPMState {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TPMPPI ppi;
->>>> =C2=A0=C2=A0 } TPMState;
->>>> =C2=A0=C2=A0 -#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_=
-TIS)
->>>> +#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
->>>> =C2=A0=C2=A0 =C2=A0 #define DEBUG_TIS 0
->>>> =C2=A0=C2=A0 @@ -1008,7 +1008,7 @@ static void tpm_tis_class_init(Obje=
-ctClass
->>>> *klass, void *data)
->>>> =C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0 =C2=A0 static const TypeInfo tpm_tis_info =3D {
->>>> -=C2=A0=C2=A0=C2=A0 .name =3D TYPE_TPM_TIS,
->>>> +=C2=A0=C2=A0=C2=A0 .name =3D TYPE_TPM_TIS_ISA,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .parent =3D TYPE_ISA_DEVICE,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(TPMStat=
-e),
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_init =3D tpm_tis_initfn=
-,
->>>> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
->>>> index 15979a3647..1691b92c28 100644
->>>> --- a/include/sysemu/tpm.h
->>>> +++ b/include/sysemu/tpm.h
->>>> @@ -43,12 +43,12 @@ typedef struct TPMIfClass {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enum TPMVersion (*get_version)(TP=
-MIf *obj);
->>>> =C2=A0=C2=A0 } TPMIfClass;
->>>> =C2=A0=C2=A0 -#define TYPE_TPM_TIS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-tis"
->>>> +#define TYPE_TPM_TIS_ISA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 "tpm-tis"
->>>
->>> It should be safe to rename this "tpm-tis-isa" in this patch.
->> This would change the name of the legacy ISA device and also the way we
->> instantiate it through the cmd line. To avoid breaking the compatibility
->> I kept the same name and used tpm-tis-device (?) for the new sysbus one.
+> On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
+> only model the non-hypervisor-privileged parts of the cpu.  Essentially we
+> model the hypervisor's behaviour from the point of view of a guest OS, but
+> we don't model the hypervisor's execution.
 >=20
-> I thought ISA devices were not user-creatable...
-
-See docs/specs/tpm.rst and the cmd line used for x86:
-
-    ../..
-    -chardev socket,id=3Dchrtpm,path=3D/tmp/mytpm1/swtpm-sock \
-    -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
-    -device tpm-tis,tpmdev=3Dtpm0 test.img
-
-Thanks
-
-Eric
+> In particular, in this mode, qemu's notion of target physical address is
+> a guest physical address from the vcpu's point of view.  So accesses in
+> guest real mode don't require translation.  If we were modelling the
+> hypervisor mode, we'd need to translate the guest physical address into
+> a host physical address.
 >=20
->>
->> Thanks
->>
->> Eric
->>>
->>> Regardless:
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>
->>>> =C2=A0=C2=A0 #define TYPE_TPM_CRB=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-crb"
->>>> =C2=A0=C2=A0 #define TYPE_TPM_SPAPR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-spapr"
->>>> =C2=A0=C2=A0 -#define TPM_IS_TIS(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->>>> -=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
->>>> +#define TPM_IS_TIS_ISA(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->>>> +=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
->>>> =C2=A0=C2=A0 #define TPM_IS_CRB(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), =
-TYPE_TPM_CRB)
->>>> =C2=A0=C2=A0 #define TPM_IS_SPAPR(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
->>>>
->>>
->>
+> Currently, we handle this sloppily: we rely on setting up the virtual LPCR
+> and RMOR registers so that GPAs are simply HPAs plus an offset, which we
+> set to zero.  This is already conceptually dubious, since the LPCR and RM=
+OR
+> registers don't exist in the non-hypervisor portion of the CPU.  It gets
+> worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
 >=20
+> Clean this up by explicitly handling the vhyp case.  While we're there,
+> remove some unnecessary nesting of if statements that made the logic to
+> select the correct real mode behaviour a bit less clear than it could be.
 >=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
+>  1 file changed, 35 insertions(+), 25 deletions(-)
+>=20
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index 3e0be4d55f..392f90e0ae 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr,
+>           */
+>          raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
+> =20
+> -        /* In HV mode, add HRMOR if top EA bit is clear */
+> -        if (msr_hv || !env->has_hv_mode) {
+> +        if (cpu->vhyp) {
+> +            /*
+> +             * In virtual hypervisor mode, there's nothing to do:
+> +             *   EA =3D=3D GPA =3D=3D qemu guest address
+> +             */
+> +        } else if (msr_hv || !env->has_hv_mode) {
+> +            /* In HV mode, add HRMOR if top EA bit is clear */
+>              if (!(eaddr >> 63)) {
+>                  raddr |=3D env->spr[SPR_HRMOR];
+>              }
+> -        } else {
+> -            /* Otherwise, check VPM for RMA vs VRMA */
+> -            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> -                slb =3D &env->vrma_slb;
+> -                if (slb->sps) {
+> -                    goto skip_slb_search;
+> -                }
+> -                /* Not much else to do here */
+> +        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +            /* Emulated VRMA mode */
+> +            slb =3D &env->vrma_slb;
+> +            if (!slb->sps) {
+> +                /* Invalid VRMA setup, machine check */
+>                  cs->exception_index =3D POWERPC_EXCP_MCHECK;
+>                  env->error_code =3D 0;
+>                  return 1;
+> -            } else if (raddr < env->rmls) {
+> -                /* RMA. Check bounds in RMLS */
+> -                raddr |=3D env->spr[SPR_RMOR];
+> -            } else {
+> -                /* The access failed, generate the approriate interrupt =
+*/
+> +            }
+> +
+> +            goto skip_slb_search;
+> +        } else {
+> +            /* Emulated old-style RMO mode, bounds check against RMLS */
+> +            if (raddr >=3D env->rmls) {
+>                  if (rwx =3D=3D 2) {
+>                      ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
+>                  } else {
+> @@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+>                  }
+>                  return 1;
+>              }
+> +
+> +            raddr |=3D env->spr[SPR_RMOR];
+>          }
+>          tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
+ASK,
+>                       PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
+> @@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
+pu, target_ulong addr)
+>          /* In real mode the top 4 effective address bits are ignored */
+>          raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
+> =20
+> -        /* In HV mode, add HRMOR if top EA bit is clear */
+> -        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
+> +        if (cpu->vhyp) {
+> +            /*
+> +             * In virtual hypervisor mode, there's nothing to do:
+> +             *   EA =3D=3D GPA =3D=3D qemu guest address
+> +             */
+> +            return raddr;
+> +        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
+> +            /* In HV mode, add HRMOR if top EA bit is clear */
+>              return raddr | env->spr[SPR_HRMOR];
+> -        }
+> -
+> -        /* Otherwise, check VPM for RMA vs VRMA */
+> -        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+> +            /* Emulated VRMA mode */
+>              slb =3D &env->vrma_slb;
+>              if (!slb->sps) {
+>                  return -1;
+>              }
+> -        } else if (raddr < env->rmls) {
+> -            /* RMA. Check bounds in RMLS */
+> -            return raddr | env->spr[SPR_RMOR];
+>          } else {
+> -            return -1;
+> +            /* Emulated old-style RMO mode, bounds check against RMLS */
+> +            if (raddr >=3D env->rmls) {
+> +                return -1;
+> +            }
+> +            return raddr | env->spr[SPR_RMOR];
+>          }
+>      } else {
+>          slb =3D slb_lookup(cpu, addr);
 
 
