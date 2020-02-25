@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70A6C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 17:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE982C35E04
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 17:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7163C20732
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 17:14:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C55020732
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 17:19:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QIbeqRdC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7163C20732
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsSeb+/L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C55020732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6dnB-0003QO-M7
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 12:14:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50526)
+	id 1j6drb-0005vd-NL
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 12:19:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j6dm6-0002r7-MP
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:13:39 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j6dps-00057B-FD
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j6dm4-00046N-Fd
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:13:37 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24274
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1j6dpr-00087T-81
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:17:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57123
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6dm4-00044h-50
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:13:36 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6dpr-00086W-2I
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 12:17:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582650815;
+ s=mimecast20190719; t=1582651050;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=l9bbP2Xs5BaqZH+8CYxCCWy/oNlJF3n8QFELH733H7c=;
- b=QIbeqRdCvBnDK68RFAdHBcay3anZxRxMsS0/f9eGus28zlu5prKSyNte/6uY8lGyM5RjR9
- ryxmtTkFmJ20Z3l3Crw5e8ENhuwRg7se3Q7q6var9oiRxCCV573Cex8h4k5pWWRP6vbLvs
- hzcIYtLl+7xIZG/5nTUHPGU8s9NUkYE=
+ bh=Rq7EM/OyU7V85AIMf5IfNv6pzLfo4WN27nkbQs5/0wg=;
+ b=YsSeb+/LXfJvgecNgm9X0+dewiKWUh4aHNmaqoW+nBSFAYJYNNY9TejSkuhRzJPLLkMVF/
+ NgSczlGQNaRgbmP2xVSeZwo6JOVB7hfzOPJAgbXQ2o1VSj323YUR5VwJQgW2EihdwbjB61
+ P6nRDv69knQWoSwAoDUhbvdPfiJT4G8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-rWDRzh5XPdCgz7zw-cRETQ-1; Tue, 25 Feb 2020 12:13:32 -0500
-X-MC-Unique: rWDRzh5XPdCgz7zw-cRETQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-71-eNv819cgMY6YiVWgv3CG5A-1; Tue, 25 Feb 2020 12:17:24 -0500
+X-MC-Unique: eNv819cgMY6YiVWgv3CG5A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8FFC8C65C8;
- Tue, 25 Feb 2020 17:13:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F31A107ACC5;
+ Tue, 25 Feb 2020 17:17:23 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
  [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 01D6D92963;
- Tue, 25 Feb 2020 17:13:29 +0000 (UTC)
-Subject: Re: [PATCH v3 1/2] block/curl: HTTP header fields allow whitespace
- around values
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DFE16031E;
+ Tue, 25 Feb 2020 17:17:22 +0000 (UTC)
+Subject: Re: [PATCH v3 2/2] block/curl: HTTP header field names are case
+ insensitive
 To: David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
 References: <20200224101310.101169-1-david.edmondson@oracle.com>
- <20200224101310.101169-2-david.edmondson@oracle.com>
+ <20200224101310.101169-3-david.edmondson@oracle.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -89,20 +89,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c2102acb-f906-299a-5a7e-b30b6e57a281@redhat.com>
-Date: Tue, 25 Feb 2020 18:13:28 +0100
+Message-ID: <5d21ac15-6fe5-291d-004b-1b2c20dd89fa@redhat.com>
+Date: Tue, 25 Feb 2020 18:17:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200224101310.101169-2-david.edmondson@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200224101310.101169-3-david.edmondson@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="u2CsShIbIFOnKb3oD490BWNPQETI86Qxx"
+ boundary="JcSDCWGsVUE94lgp9ftPAXQTodW2VEdxy"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,45 +121,45 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u2CsShIbIFOnKb3oD490BWNPQETI86Qxx
-Content-Type: multipart/mixed; boundary="cNDZLZXMzvFGaVGHFhZTzaFnxG2MYtGMa"
+--JcSDCWGsVUE94lgp9ftPAXQTodW2VEdxy
+Content-Type: multipart/mixed; boundary="dnln6qnbZr9Sx6EQjf7AVI3K3kCI9NHid"
 
---cNDZLZXMzvFGaVGHFhZTzaFnxG2MYtGMa
+--dnln6qnbZr9Sx6EQjf7AVI3K3kCI9NHid
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 24.02.20 11:13, David Edmondson wrote:
-> RFC 7230 section 3.2 indicates that whitespace is permitted between
-> the field name and field value and after the field value.
+> RFC 7230 section 3.2 indicates that HTTP header field names are case
+> insensitive.
 >=20
 > Signed-off-by: David Edmondson <david.edmondson@oracle.com>
 > ---
->  block/curl.c | 31 +++++++++++++++++++++++++++----
->  1 file changed, 27 insertions(+), 4 deletions(-)
+>  block/curl.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---cNDZLZXMzvFGaVGHFhZTzaFnxG2MYtGMa--
+--dnln6qnbZr9Sx6EQjf7AVI3K3kCI9NHid--
 
---u2CsShIbIFOnKb3oD490BWNPQETI86Qxx
+--JcSDCWGsVUE94lgp9ftPAXQTodW2VEdxy
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5VVbgACgkQ9AfbAGHV
-z0AMrwgAk7L2XstSUDKPYvpi19/vivO4d3cvxvfD9jaXqXSfdiAaImo1hIpM+spN
-bU/NR/N8XEdDwe9y757c82tS+6PYpvvfv3WY20fyIjO+CTK0vmx7NHHcwHFk5oTL
-PIsH316mdh+goKwVLU9XK15z3JPDLs63FGCucbgzJTiHCHOyrrWoUF9wi0FfUnMB
-TsvBRYKgR2R5/CjlDaN+N9PsJCVTcAz6dCvfvVRGwdYg44T0RO9RbU13Pg6xqgtJ
-JOpdS04IwbOU3yMd7K2omi6L6UA2bDsL/PNixOGuCMrxA4yiITG6ccWDyw32MlXA
-HdN01RWOPe1LRRsgv72RgKOHBTuDjA==
-=tjR1
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5VVqEACgkQ9AfbAGHV
+z0Dwxwf/bJLRZzLHsRoN4jaJBNLX7HVMORP3cKdzMCz8MzbZGCkDv2FqjfXobVdA
+qt1X+0Z2g6W9MVpIipRg7AVoKxkvhlloVDpM1FF6FNaFUOuwoeT0UQg1tkSGktjj
+d2OslSkYPV4R9PVNXhvY2WWGszZZynqFIHNarXKme9ie4EVp5DHccu+fcnXZruui
+p9xzo4FzhYxEmfu5LeqbdMwshSbJh4M2h9PXLvkWOC7DtHQwsOmvhCjeY6rUMmcE
+aeFIMXlJV4SLL8ghrU3GViFTB5wCqGLmNRPauW0npUAGjv5xfifbRyQYM3VZ0NrG
+TRknnxIbZucgm+djqgaFrWjtp9EhDQ==
+=9r3Y
 -----END PGP SIGNATURE-----
 
---u2CsShIbIFOnKb3oD490BWNPQETI86Qxx--
+--JcSDCWGsVUE94lgp9ftPAXQTodW2VEdxy--
 
 
