@@ -2,100 +2,85 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B126AC35E03
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34290C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:40:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 865BE21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:36:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 865BE21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 000BD218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:40:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nid8GJYA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 000BD218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6bKR-000841-LM
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:36:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49929)
+	id 1j6bNk-0001fF-59
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:40:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mihajlov@linux.ibm.com>) id 1j6bJs-0007cA-26
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:36:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6bMx-000178-AT
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:39:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mihajlov@linux.ibm.com>) id 1j6bJr-0002hx-26
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:36:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45432)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mihajlov@linux.ibm.com>)
- id 1j6bJq-0002ga-RB
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:36:19 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01PEYrRH124113
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 09:36:17 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yaygq21k8-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 09:35:55 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <mihajlov@linux.ibm.com>;
- Tue, 25 Feb 2020 14:35:52 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 25 Feb 2020 14:35:49 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01PEZmuJ50855986
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 25 Feb 2020 14:35:48 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 512D7AE051;
- Tue, 25 Feb 2020 14:35:48 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 042B3AE045;
- Tue, 25 Feb 2020 14:35:48 +0000 (GMT)
-Received: from oc6604088431.ibm.com (unknown [9.152.222.39])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 25 Feb 2020 14:35:47 +0000 (GMT)
-Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
-To: Halil Pasic <pasic@linux.ibm.com>, David Hildenbrand <david@redhat.com>
-References: <20200224150213.21253-1-pasic@linux.ibm.com>
- <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
- <20200225125641.72e8cc86.pasic@linux.ibm.com>
-From: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Date: Tue, 25 Feb 2020 15:35:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <peter.maydell@linaro.org>) id 1j6bMt-0005Wv-8g
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:39:31 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36949)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6bMt-0005VQ-1I
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:39:27 -0500
+Received: by mail-wr1-x442.google.com with SMTP id l5so10774913wrx.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CxC7+57klu/2mln+X9DRHhYMcaLTR/a8a6mDU1Kkwh0=;
+ b=nid8GJYAJPYBPm/sS1dx1DsWD7C33KyCs1UYpq/bGeHkJz2ohx55kYP6MoXAx/BfDD
+ z22K2c68MTFWY/PHKVJAo6uKWVPNnDe4TlnYTRiH0M8F+BJkj2Tt2JwgdsLZK0UBUL4y
+ 9szs8FDdtVH0lkl2VeGbZBA0PcgUkX28PklCZncEnqPnf4AAOXTFCKx27Hp25TWmwxi8
+ 3DNJ7H5WSOaBcVfqfb3cpORSUJ0UMlvDVMmpgnW5TLruY10o9kH+Z+AWlIHFYPTo5qIc
+ M3L1E7bXZXShVFoXfrzv7Qri7bMVL4+UTx7Y1qvRzd5WxYuHnt9kkiTuU1/k5v7ukUOq
+ XbeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CxC7+57klu/2mln+X9DRHhYMcaLTR/a8a6mDU1Kkwh0=;
+ b=bYE3SYhbGncOT6U6USjLquHjxHpDKEEWTdTYLOupI3u82MYNug+zcJ/6X4yz1N2A6v
+ ZqeInllLFi+4zqfQos82ReMXUgiOZNo2Taj0bKwxaVvYyEk07BKYM9g1DRQMY7G92nzN
+ 8YzW52EC3UuUbhGC+UpO2cRJcKFGhfD8oDKQMXif8T8GKKHMZiFQiIIAxYB7sJ1Jg8UT
+ zOts7CzsPzci5EMTkpTQSziThJVpWswuNUQL9ey4PiezdMMcijG4YaaHXnpM7AUbtxmD
+ 5960VkH/wVNPSf4WVJdzneggHuwcsG4k64nDr725m0Nh1K6R8ufaz10BeQKP3cv+VGu7
+ uM8w==
+X-Gm-Message-State: APjAAAWDIzyqMaaDk8Gdis1Dy2YMv4gNWTfYQcrxmV7HFIHFYag1ISX4
+ xbPdNxaqVRWZ0p6QxsaZkza5ZA==
+X-Google-Smtp-Source: APXvYqwU4yLh/xJKjVASihiQSNbsM8wOJz7/8WYgkpIVwqsMHUF+1qKnjy77ISI080QbkY4waVrv5g==
+X-Received: by 2002:adf:a50b:: with SMTP id i11mr1369390wrb.60.1582641565849; 
+ Tue, 25 Feb 2020 06:39:25 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id w8sm4388820wmm.0.2020.02.25.06.39.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 06:39:25 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH RISU] aarch64.risu: Add patterns for v8.3-RCPC and v8.4-RCPC
+ insns
+Date: Tue, 25 Feb 2020 14:39:23 +0000
+Message-Id: <20200225143923.22297-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200225125641.72e8cc86.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20022514-0020-0000-0000-000003AD76ED
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022514-0021-0000-0000-000022058DAE
-Message-Id: <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-25_05:2020-02-21,
- 2020-02-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 suspectscore=0
- bulkscore=0 malwarescore=0 adultscore=0 priorityscore=1501 spamscore=0
- phishscore=0 clxscore=1011 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002250114
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,78 +92,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add patterns for the new instructions in the v8.3-RCPC and
+v8.4-RCPC extensions.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This is what I used for testing the RCPC QEMU patches I sent out
+the other day. Did I get the @ section syntax here right?
 
 
-On 2/25/20 12:56 PM, Halil Pasic wrote:
-> On Tue, 25 Feb 2020 10:39:40 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 24.02.20 16:02, Halil Pasic wrote:
->>> We expose loadparm as a r/w machine property, but if loadparm is set by
->>> the guest via DIAG 308, we don't update the property. Having a
->>> disconnect between the guest view and the QEMU property is not nice in
->>> itself, but things get even worse for SCSI, where under certain
->>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
->>> expected" for details) we call s390_gen_initial_iplb() on resets
->>> effectively overwriting the guest/user supplied loadparm with the stale
->>> value.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->>> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the machine"
->>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
->>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->>> ---
->>>   hw/s390x/ipl.c | 21 +++++++++++++++++++++
->>>   1 file changed, 21 insertions(+)
->>>
->>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-[...]
->>> +
->>> +    /* Sync loadparm */
->>> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
->>> +        char ascii_loadparm[8];
->>> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
->>> +        int i;
->>> +
->>> +        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
->>> +            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
->>> +        }
->>> +        ascii_loadparm[i] = 0;
->>> +        object_property_set_str(mo, ascii_loadparm, "loadparm", NULL);
->>> +    } else {
->>> +        object_property_set_str(mo, "", "loadparm", NULL);
->>> +    }
->>
->> &error_abort instead of NULL, we certainly want to know if this would
->> ever surprisingly fail.
-> 
-> IMHO this is a typical assert() situation where one would like to have
-> a fast and obvious failure when testing, but not in production.
-> 
-> AFAIU the guest can trigger this code at any time, and crashing the
-> whole (production) system seems a bit heavy handed to me. The setter
-> should only fail if something is buggy.
-> 
-> But if the majority says &error_abort I can certainly do. Other opinions?
-> 
-We might consider to return 0x0402 (invalid parameter) from the diag308 
-"set", which is less drastic and would allow the OS to do whatever it 
-finds appropriate to deal with the failure. Not that Linux would care 
-about that today :-).
+ aarch64.risu | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-[...]
+diff --git a/aarch64.risu b/aarch64.risu
+index c4eda7a..8f08cd0 100644
+--- a/aarch64.risu
++++ b/aarch64.risu
+@@ -3019,3 +3019,35 @@ SM3TT2B A64_V 1100 1110 010 rm:5 10 imm:2 11 rn:5 rd:5
+ XAR A64_V 1100 1110 100 rm:5 imm:6 rn:5 rd:5
+ 
+ @
++
++# v8.3-RCPC instructions
++@v8_3_rcpc
++
++# LDAPR, LDAPRH, LDAPRB
++# As usual, the $rn != $rt constraint is risu-imposed, not architectural
++LDAPR A64 sz:2 111000 101 11111 1100 00 rn:5 rt:5 \
++!constraints { $rn != 31 && $rn != $rt } \
++!memory { align(1 << $sz); reg_plus_imm($rn, 0); }
++
++@
++
++# v8.4-RCPC instructions
++# As usual, the $rn != $rt constraint is risu-imposed, not architectural
++@v8_4_rcpc
++STLUR A64 sz:2 011001 00 0 imm:9 00 rn:5 rt:5 \
++!constraints { $rn != 31 && $rn != $rt } \
++!memory { align(1 << $sz); reg_plus_imm($rn, $imm); }
++
++LDAPUR A64 sz:2 011001 01 0 imm:9 00 rn:5 rt:5 \
++!constraints { $rn != 31 && $rn != $rt } \
++!memory { align(1 << $sz); reg_plus_imm($rn, $imm); }
++
++LDAPURS64 A64 sz:2 011001 10 0 imm:9 00 rn:5 rt:5 \
++!constraints { $rn != 31 && $rn != $rt && $sz != 3 } \
++!memory { align(1 << $sz); reg_plus_imm($rn, $imm); }
++
++LDAPURS32 A64 sz:2 011001 11 0 imm:9 00 rn:5 rt:5 \
++!constraints { $rn != 31 && $rn != $rt && $sz < 2 } \
++!memory { align(1 << $sz); reg_plus_imm($rn, $imm); }
++
++@
 -- 
-Kind Regards,
-    Viktor
+2.20.1
 
 
