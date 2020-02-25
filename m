@@ -6,64 +6,62 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAECC4BA01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91341C4BA01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:55:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC07320675
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43A3120675
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKThhy1P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC07320675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTSwoN27"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A3120675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6i7W-00013Y-62
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 16:52:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44696)
+	id 1j6iAi-0002TR-Ds
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 16:55:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56477)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j6i6V-0000HU-6v
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:51:00 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j6i9m-0001cq-Gr
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:54:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j6i6U-0004eG-6H
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:50:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42545
+ (envelope-from <jsnow@redhat.com>) id 1j6i9i-0006bv-RB
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:54:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30214
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j6i6T-0004Sl-3I
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:50:57 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j6i9i-0006YA-He
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:54:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582667451;
+ s=mimecast20190719; t=1582667658;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hWYIbn+7zCh3P/m4nY626klOUL4jGzKgIEdvHr6iJ2U=;
- b=CKThhy1PRiW8v3rLWion6jdnSSUcXPtPhDpAFvNS4qzKp2kzP9Ue68AW2B2IAIMGLG0w1r
- 77OecKwtcE69gOPyptBOgZ1+eby+YYLx6qreADjs5FcWhq6SKDfKtIYa8kC9/9k8ujxbOG
- UjpxgaUcNNPnA8v/eD7Fb7ewvz+c0a4=
+ bh=DbFIfQsTq+gBeQErT1zYz8z8gLeO3H/N+RLPGToXldk=;
+ b=bTSwoN271HkgeEiCqWJQBEEPUMu/sbGqIrt/HicAXGI0AW1TfyD1iSiiqk1jP47vfrY4Ui
+ oCBlDCCvcmXnO+8XdLtUR9FYAw0LxWOZuARTBII+FSAtDgvMBpYDbbr8YlZUpj+degqHi6
+ 1ONj5JHJcQlUH3svAAQOybpa++6eyO8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-467-oOjQeUfeNMeBdsSEpA_Yxw-1; Tue, 25 Feb 2020 16:50:49 -0500
-X-MC-Unique: oOjQeUfeNMeBdsSEpA_Yxw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-193-qtr-jcEKMqWoFPJwgG2XHA-1; Tue, 25 Feb 2020 16:54:13 -0500
+X-MC-Unique: qtr-jcEKMqWoFPJwgG2XHA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 274CE800D6C;
- Tue, 25 Feb 2020 21:50:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4ACB800D53;
+ Tue, 25 Feb 2020 21:54:12 +0000 (UTC)
 Received: from [10.18.17.182] (dhcp-17-182.bos.redhat.com [10.18.17.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 794D360C18;
- Tue, 25 Feb 2020 21:50:47 +0000 (UTC)
-Subject: Re: [PATCH v5 0/5] iotests: use python logging
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-References: <20190917234549.22910-1-jsnow@redhat.com>
- <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
- <afe4c6fd-985d-ec97-d18d-ec319adbd94a@redhat.com>
- <28681a1d-2a4a-dfba-82f8-cacae80e927a@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC9BD1001DC2;
+ Tue, 25 Feb 2020 21:54:11 +0000 (UTC)
+Subject: Re: [RFC qemu 0/6] mirror: implement incremental and bitmap modes
+To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>,
+ qemu-devel@nongnu.org
+References: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,18 +137,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <684b4b2b-9344-1887-9ed8-ee45a040ac3a@redhat.com>
-Date: Tue, 25 Feb 2020 16:50:46 -0500
+Message-ID: <57b3d155-148c-6eb4-c969-825aeb9ff293@redhat.com>
+Date: Tue, 25 Feb 2020 16:54:11 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <28681a1d-2a4a-dfba-82f8-cacae80e927a@redhat.com>
+In-Reply-To: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -165,33 +163,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2/24/20 6:15 AM, Max Reitz wrote:
-> On 12.10.19 01:39, John Snow wrote:
->> Just caught up with the discussion.
->>
->> It looks like Thomas took my 1/5; so I'll respin on top of his "[PATCH
->> 0/5] Enable more iotests during "make check-block" series to catch those
->> improvements as they stand.
-> 
-> Any updates on this? :)
-> 
-> Max
-> 
+On 2/18/20 5:07 AM, Fabian Gr=C3=BCnbichler wrote:
+> picking up on John's in-progress patch series from last summer, this is
+> a stab at rebasing and adding test cases for the low-hanging fruits:
+>=20
+> - bitmap mirror mode with always/on-success/never bitmap sync mode
+> - incremental mirror mode as sugar for bitmap + on-success
+>=20
+> Fabian Gr=C3=BCnbichler (4):
+>   mirror: add check for bitmap-mode without bitmap
+>   mirror: switch to bdrv_dirty_bitmap_merge_internal
+>   iotests: add test for bitmap mirror
+>   mirror: move some checks to QMP
+>=20
+> John Snow (2):
+>   drive-mirror: add support for sync=3Dbitmap mode=3Dnever
+>   drive-mirror: add support for conditional and always bitmap sync modes
+>=20
+>  include/block/block_int.h   |    4 +-
+>  block/mirror.c              |   96 +-
+>  blockdev.c                  |   71 +-
+>  tests/test-block-iothread.c |    4 +-
+>  qapi/block-core.json        |   29 +-
+>  tests/qemu-iotests/284      |  547 +++++++
+>  tests/qemu-iotests/284.out  | 2846 +++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group    |    1 +
+>  8 files changed, 3567 insertions(+), 31 deletions(-)
+>  create mode 100755 tests/qemu-iotests/284
+>  create mode 100644 tests/qemu-iotests/284.out
+>=20
 
-Nope.
+Hi Fabian! Thanks for picking this up. I'm a bit behind on my mail, but
+this on my list to look at.
 
-Well, except that I was working on job_run today and remembered that I
-needed to do this. I was waiting for that discussion to die down, and
-then forgetting took over.
+(Hint to other maintainers: It might be a while.)
 
-Will attempt to resuscitate.
+--js
 
 
