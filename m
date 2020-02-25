@@ -2,84 +2,108 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25381C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6CA0C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:18:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37EB2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F6842084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:18:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoyPPNDM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37EB2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqJZnvvR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6842084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ctM-0007HH-S1
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:17:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39682)
+	id 1j6cud-0008Ga-KJ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:18:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j6csD-0006d0-W8
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:15:58 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j6ctA-0007LF-SP
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:16:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j6cs9-0003ZU-TI
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:15:53 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46739)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j6cs9-0003ZA-LO; Tue, 25 Feb 2020 11:15:49 -0500
-Received: by mail-lj1-x241.google.com with SMTP id x14so14642346ljd.13;
- Tue, 25 Feb 2020 08:15:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=NzPOyzyLyH0k2YO7pwRMfVAMiuzgA+gJggVDYCtlzXY=;
- b=KoyPPNDMsaV6YCaBg9WkCNNY8PbA6hx8nFVxHOq8p/WZvob7eC4VHVHUwgjeFkEK5A
- 34krWD037peMcgDZiMICakOpMAUZRQioDiRORTisj8WzZsl6PCvZarKIzEl0fBbzYq8e
- ZHvcMYKAzreUSPZ1JSuhCNd1IbF3oQ67lxzqK1Grxdiz42F8T0KmVY/6fvmMduSfu/NU
- Vn8Uvpc8lYsAQIXp7UD1wyUA23W+gixyfacsM17HCcBGqjFz9MSzeVkfJOdITsjrrtAd
- MOOZNBK9zwGjXcRgCTTg4NFM7k/Aq7/vLy4Y6NsmhWoRlWxw5sSEVu4wyxPLFw4I4JRs
- 8U/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NzPOyzyLyH0k2YO7pwRMfVAMiuzgA+gJggVDYCtlzXY=;
- b=jyaDiACaoCZXNkzYL5qTvctnqZMgz8qlFDNj+pHF3JOs/8ObshqEskkLSfBwCx500y
- uG7wAGsJLJgfDOYK1RtpzUaOrArVylxvf3DGPX/tQWJgt+72QPPpF4lugKt2BS/4jqEg
- b0mY5D38l9mQ6BZBJQzmEorvpF4uXb8NekF6cip6e+zjmII8H8Dm5N0rb/H2oiuH+9YF
- 0aOLWcbYtheSnw7ajsJcfE4BCcXwp9H7+ndVRy0g+0qfFTYlXizQbz68ChhhGmfq9rts
- kEYMHyqLKKrbKFO74LOOsfF0BaxT3WVEIUAtE7WKAFvYI+BiLpFDP+eed39bAD0HeALV
- GDYg==
-X-Gm-Message-State: APjAAAXZYBmnieJ0qUhUWqJYaWjHKNgWaw0cOgRBCAVdDXeHw22FAaNF
- GMCV54SbC67lVucjUq9UHVhBCP96BiUbb+2W+LI=
-X-Google-Smtp-Source: APXvYqwrY+bO33WPOLLiu4ifSnrqXOhLRtDwl+CxvfNfU+bg1N7uHyNNIVgN9CXfeRfA5yJiGHCtP7dI3B0zBEZOtE4=
-X-Received: by 2002:a2e:a36a:: with SMTP id i10mr33008013ljn.107.1582647347518; 
- Tue, 25 Feb 2020 08:15:47 -0800 (PST)
+ (envelope-from <mreitz@redhat.com>) id 1j6ct9-00045E-OF
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:16:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27030
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6ct9-00044w-J8
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:16:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582647410;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=G6zIfJHBXs9Zx13cGpS95eW7MISgHbAIEToIZG2AKXY=;
+ b=SqJZnvvRtjt3PL2bGB/S1YOscNXgSYW/SXkIoBGUSOc0LgIgQO3KnvrHzI14QzRj4B7sk4
+ eFQmwDa8nvtc+YM7hlVeRrzprhs6nIpVlvR5wSxG8nMlx6fdTshmpPc8nKksDNxXsrnbIu
+ P3DvpzucH9Te/T6g5OygMa7+nzVDXQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-hLJmX7SsOoaQcaagAInipw-1; Tue, 25 Feb 2020 11:16:48 -0500
+X-MC-Unique: hLJmX7SsOoaQcaagAInipw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17234800EB5;
+ Tue, 25 Feb 2020 16:16:47 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
+ [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 393D560BF7;
+ Tue, 25 Feb 2020 16:16:44 +0000 (UTC)
+Subject: Re: [PATCH v3 0/3] Dump QCOW2 metadata
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1578990137-308222-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <fb4eb1a7-25f7-86ce-4c27-06bca430e97a@redhat.com>
+ <18dea012-49ff-fda5-7450-964c37a9ed1d@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <68f97545-0422-6b7c-ab1d-3cd895a1984c@redhat.com>
+Date: Tue, 25 Feb 2020 17:16:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200224204828.23167-1-philmd@redhat.com>
- <20200224204828.23167-6-philmd@redhat.com>
- <CAKmqyKPcWkN4fhu+kmU8d+wsPLt_4BJB74Tao-P7nJpBQa1jZA@mail.gmail.com>
- <62f0a8f5-82ff-e543-964a-a8759169e01f@redhat.com>
-In-Reply-To: <62f0a8f5-82ff-e543-964a-a8759169e01f@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 25 Feb 2020 08:15:20 -0800
-Message-ID: <CAKmqyKNPuQT2MSmOTHWGb4+X48vkbdt9DpQQ5RfMDxdeYLG6qQ@mail.gmail.com>
-Subject: Re: [PATCH v2 05/32] hw/arm: Use memory_region_init_rom() with
- read-only regions
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::241
+In-Reply-To: <18dea012-49ff-fda5-7450-964c37a9ed1d@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="K3luEQo9pgoVkEKb97w8hdFv6LsWVq2td"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,228 +115,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Qemu-block <qemu-block@nongnu.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Joel Stanley <joel@jms.id.au>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Alistair Francis <alistair@alistair23.me>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
- Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 2:02 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 2/24/20 10:20 PM, Alistair Francis wrote:
-> > On Mon, Feb 24, 2020 at 12:51 PM Philippe Mathieu-Daud=C3=A9
-> > <philmd@redhat.com> wrote:
-> >>
-> >> This commit was produced with the Coccinelle script
-> >> scripts/coccinelle/memory-region-housekeeping.cocci.
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> > This looks good for the ROM regions, for the flash regions this
-> > doesn't change the current functionality but I'm not sure it's any
-> > clearer.
->
-> Less code makes easier review.
->
-> These regions behave as ROM on the bus, any write to the address space
-> is illegal (they are programmable via I/O registers in another address
-> space).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--K3luEQo9pgoVkEKb97w8hdFv6LsWVq2td
+Content-Type: multipart/mixed; boundary="GpUEUtILe4IEMxi87uTP0x0e4qSWEcbck"
 
-Good point.
+--GpUEUtILe4IEMxi87uTP0x0e4qSWEcbck
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->
-> >
-> > Either way though:
-> >
-> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
-> Thanks, do you want me to improve the commit description?
+On 20.02.20 13:10, Vladimir Sementsov-Ogievskiy wrote:
+> 20.02.2020 14:58, Max Reitz wrote:
+>> On 14.01.20 09:22, Andrey Shinkevich wrote:
+>>> The information about QCOW2 metadata allocations in an image ELF-file i=
+s
+>>> helpful for finding issues with the image data integrity.
+>>
+>> Sorry that I=92m replying only so late =96 but I don=92t know why we nee=
+d this
+>> in qemu, and this cover letter doesn=92t provide a justification.=A0 I m=
+ean,
+>> it isn=92t too complex (from the diffstat), but wouldn=92t it be better =
+to
+>> just have a script for this?
+>>
+>> I suppose one reason to put it in qemu/qemu-img is that a script
+>> wouldn=92t be packaged by distributions.=A0 So if a user has a corrupted
+>> image, with this series we could tell them to run qemu-img check -M and
+>> put the output somewhere.=A0 With a script, we=92d first have to tell th=
+em
+>> to download the script.=A0 But then again, downloading a script (that
+>> should be part of the qemu repository) doesn=92t seem too much trouble t=
+o
+>> me either.
+>>
+>> So I=92m curious as to whether you had a specific reason in mind when yo=
+u
+>> decided to implement this as part of qemu itself?
+>>
+>> (I suppose the additional complexity is fully limited to the check
+>> infrastructure, so it wouldn=92t interfere with the rest of the qcow2
+>> driver.=A0 Hm.=A0 Fair enough.)
+>>
+>=20
+> Just not to parse qcow2 from scratch. Qemu already can read qcow2, and
+> it looks through all its structures during check, why not
+> to add an ability to represent these structures as a qobject?
 
-Nope, it's fine :)
+Because it=92d be code in qemu (i.e., a liability) that users are pretty
+much never going to use.
 
-Alistair
+Max
 
->
-> >
-> > Alistair
-> >
-> >> ---
-> >>   hw/arm/exynos4210.c | 3 +--
-> >>   hw/arm/mainstone.c  | 3 +--
-> >>   hw/arm/omap_sx1.c   | 6 ++----
-> >>   hw/arm/palm.c       | 3 +--
-> >>   hw/arm/spitz.c      | 3 +--
-> >>   hw/arm/stellaris.c  | 3 +--
-> >>   hw/arm/tosa.c       | 3 +--
-> >>   7 files changed, 8 insertions(+), 16 deletions(-)
-> >>
-> >> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-> >> index 59a27bdd68..3af6502a5e 100644
-> >> --- a/hw/arm/exynos4210.c
-> >> +++ b/hw/arm/exynos4210.c
-> >> @@ -311,9 +311,8 @@ static void exynos4210_realize(DeviceState *socdev=
-, Error **errp)
-> >>                                   &s->chipid_mem);
-> >>
-> >>       /* Internal ROM */
-> >> -    memory_region_init_ram(&s->irom_mem, NULL, "exynos4210.irom",
-> >> +    memory_region_init_rom(&s->irom_mem, NULL, "exynos4210.irom",
-> >>                              EXYNOS4210_IROM_SIZE, &error_fatal);
-> >> -    memory_region_set_readonly(&s->irom_mem, true);
-> >>       memory_region_add_subregion(system_mem, EXYNOS4210_IROM_BASE_ADD=
-R,
-> >>                                   &s->irom_mem);
-> >>       /* mirror of iROM */
-> >> diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-> >> index 6e64dfab50..05a806b422 100644
-> >> --- a/hw/arm/mainstone.c
-> >> +++ b/hw/arm/mainstone.c
-> >> @@ -125,9 +125,8 @@ static void mainstone_common_init(MemoryRegion *ad=
-dress_space_mem,
-> >>       /* Setup CPU & memory */
-> >>       mpu =3D pxa270_init(address_space_mem, mainstone_binfo.ram_size,
-> >>                         machine->cpu_type);
-> >> -    memory_region_init_ram(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-> >> +    memory_region_init_rom(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
-> >>                              &error_fatal);
-> >> -    memory_region_set_readonly(rom, true);
-> >>       memory_region_add_subregion(address_space_mem, 0, rom);
-> >>
-> >>   #ifdef TARGET_WORDS_BIGENDIAN
-> >> diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-> >> index be245714db..6c3fd1b271 100644
-> >> --- a/hw/arm/omap_sx1.c
-> >> +++ b/hw/arm/omap_sx1.c
-> >> @@ -126,9 +126,8 @@ static void sx1_init(MachineState *machine, const =
-int version)
-> >>       mpu =3D omap310_mpu_init(dram, machine->cpu_type);
-> >>
-> >>       /* External Flash (EMIFS) */
-> >> -    memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_si=
-ze,
-> >> +    memory_region_init_rom(flash, NULL, "omap_sx1.flash0-0", flash_si=
-ze,
-> >>                              &error_fatal);
-> >> -    memory_region_set_readonly(flash, true);
-> >>       memory_region_add_subregion(address_space, OMAP_CS0_BASE, flash)=
-;
-> >>
-> >>       memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val,
-> >> @@ -168,9 +167,8 @@ static void sx1_init(MachineState *machine, const =
-int version)
-> >>       if ((version =3D=3D 1) &&
-> >>               (dinfo =3D drive_get(IF_PFLASH, 0, fl_idx)) !=3D NULL) {
-> >>           MemoryRegion *flash_1 =3D g_new(MemoryRegion, 1);
-> >> -        memory_region_init_ram(flash_1, NULL, "omap_sx1.flash1-0",
-> >> +        memory_region_init_rom(flash_1, NULL, "omap_sx1.flash1-0",
-> >>                                  flash1_size, &error_fatal);
-> >> -        memory_region_set_readonly(flash_1, true);
-> >>           memory_region_add_subregion(address_space, OMAP_CS1_BASE, fl=
-ash_1);
-> >>
-> >>           memory_region_init_io(&cs[1], NULL, &static_ops, &cs1val,
-> >> diff --git a/hw/arm/palm.c b/hw/arm/palm.c
-> >> index 72eca8cc55..265d5891a6 100644
-> >> --- a/hw/arm/palm.c
-> >> +++ b/hw/arm/palm.c
-> >> @@ -206,9 +206,8 @@ static void palmte_init(MachineState *machine)
-> >>       mpu =3D omap310_mpu_init(dram, machine->cpu_type);
-> >>
-> >>       /* External Flash (EMIFS) */
-> >> -    memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
-> >> +    memory_region_init_rom(flash, NULL, "palmte.flash", flash_size,
-> >>                              &error_fatal);
-> >> -    memory_region_set_readonly(flash, true);
-> >>       memory_region_add_subregion(address_space_mem, OMAP_CS0_BASE, fl=
-ash);
-> >>
-> >>       memory_region_init_io(&cs[0], NULL, &static_ops, &cs0val, "palmt=
-e-cs0",
-> >> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-> >> index e001088103..1d27399721 100644
-> >> --- a/hw/arm/spitz.c
-> >> +++ b/hw/arm/spitz.c
-> >> @@ -924,8 +924,7 @@ static void spitz_common_init(MachineState *machin=
-e,
-> >>
-> >>       sl_flash_register(mpu, (model =3D=3D spitz) ? FLASH_128M : FLASH=
-_1024M);
-> >>
-> >> -    memory_region_init_ram(rom, NULL, "spitz.rom", SPITZ_ROM, &error_=
-fatal);
-> >> -    memory_region_set_readonly(rom, true);
-> >> +    memory_region_init_rom(rom, NULL, "spitz.rom", SPITZ_ROM, &error_=
-fatal);
-> >>       memory_region_add_subregion(address_space_mem, 0, rom);
-> >>
-> >>       /* Setup peripherals */
-> >> diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-> >> index 221a78674e..d136ba1a92 100644
-> >> --- a/hw/arm/stellaris.c
-> >> +++ b/hw/arm/stellaris.c
-> >> @@ -1300,9 +1300,8 @@ static void stellaris_init(MachineState *ms, ste=
-llaris_board_info *board)
-> >>       sram_size =3D ((board->dc0 >> 18) + 1) * 1024;
-> >>
-> >>       /* Flash programming is done via the SCU, so pretend it is ROM. =
- */
-> >> -    memory_region_init_ram(flash, NULL, "stellaris.flash", flash_size=
-,
-> >> +    memory_region_init_rom(flash, NULL, "stellaris.flash", flash_size=
-,
-> >>                              &error_fatal);
-> >> -    memory_region_set_readonly(flash, true);
-> >>       memory_region_add_subregion(system_memory, 0, flash);
-> >>
-> >>       memory_region_init_ram(sram, NULL, "stellaris.sram", sram_size,
-> >> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-> >> index 4d95a1f3e2..5dee2d76c6 100644
-> >> --- a/hw/arm/tosa.c
-> >> +++ b/hw/arm/tosa.c
-> >> @@ -226,8 +226,7 @@ static void tosa_init(MachineState *machine)
-> >>
-> >>       mpu =3D pxa255_init(address_space_mem, tosa_binfo.ram_size);
-> >>
-> >> -    memory_region_init_ram(rom, NULL, "tosa.rom", TOSA_ROM, &error_fa=
-tal);
-> >> -    memory_region_set_readonly(rom, true);
-> >> +    memory_region_init_rom(rom, NULL, "tosa.rom", TOSA_ROM, &error_fa=
-tal);
-> >>       memory_region_add_subregion(address_space_mem, 0, rom);
-> >>
-> >>       tmio =3D tc6393xb_init(address_space_mem, 0x10000000,
-> >> --
-> >> 2.21.1
-> >>
-> >>
-> >
->
+
+--GpUEUtILe4IEMxi87uTP0x0e4qSWEcbck--
+
+--K3luEQo9pgoVkEKb97w8hdFv6LsWVq2td
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5VSGsACgkQ9AfbAGHV
+z0ASxAf/UgmCg0URmm3uLOd5NULWJg79vNX0N57s6/Lo4/40B7sMW8nkSM0CqRlC
+M47m9A7jPAmRFC0n9vvxOWH5rfX38b7Pii+S4X001fmcioLMINkNCQ9PZ+YsTmE2
+BVo2okKwX6X4wC5gIEBAz3qTIov9l+iwe1bRHOYaXYEQKkT3+0AJe7/yI2DvVK8a
+M1w+Vb/mZzd5/RcKEYrfhKjmcGzxtbxJx/B9NV3DSoxNaO4C8TfdAciss+QydqDD
+vKcLtgPIhddkh64OR7TGbjoKPRLWCHVCb146atLqqxyUOH5YbwxpFaug8pc/svDj
+eYFrJoOLKECmRq+7j/18hUcqz1y8JQ==
+=PLeW
+-----END PGP SIGNATURE-----
+
+--K3luEQo9pgoVkEKb97w8hdFv6LsWVq2td--
+
 
