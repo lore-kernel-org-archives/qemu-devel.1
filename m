@@ -2,69 +2,126 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F9EC35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA00C35DFB
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:10:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDE5E21556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:08:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDE5E21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 99BCC21D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:10:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MSxNqMx0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BCC21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6X8Y-0004WA-3z
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:08:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59279)
+	id 1j6XAW-0005ue-Qw
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:10:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1j6X7j-0003VV-1b
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:32 -0500
+ (envelope-from <david@redhat.com>) id 1j6X5w-0000qD-8B
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j6X7h-0006Vu-B2
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:30 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:35408)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1j6X7g-0006Uo-Uv
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:29 -0500
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 5F51AC010D;
- Tue, 25 Feb 2020 13:07:26 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: <stefanha@redhat.com>,
-	<kwolf@redhat.com>
-References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
- <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
- <5891b48a131321be62a4a311253da44c@ispras.ru>
- <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
- <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
- <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
- <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
- <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
- <99ed3129-9460-dbad-0441-95bad08d5636@virtuozzo.com>
- <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
- <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
- <ac41c395f09a4101b7403e4116beba6a@ispras.ru>
- <e11be78b-9461-6068-969a-2f242ef5ada0@virtuozzo.com> 
-In-Reply-To: 
-Subject: RE: Race condition in overlayed qcow2?
-Date: Tue, 25 Feb 2020 13:07:27 +0300
-Message-ID: <004b01d5ebc3$626dc9d0$27495d70$@ru>
+ (envelope-from <david@redhat.com>) id 1j6X5v-0005BQ-80
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:40 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55099
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6X5v-0005Ax-2k
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:05:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582625138;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=B2CcX57TBFsGepX17jUCEYzU3zV9NBpQIyePX9Q7LRo=;
+ b=MSxNqMx0Nz4nBPP0AU51RlXx7k0MDIZVnj/m3/UAKMiJTsZKXRKhvEZtkE2PcK7pC8F6sG
+ 0hgwMnxTgx57tcFyBdJxYJ4RNQjP4Zw9o7YxUrUqqKno0goSJglIvpPIFkY9fljB8fAMGv
+ CCwagygJhyH2HFjyiY3NAlyP+yeGjz0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-292--y_gjAHLO1SvwbnOh7fuYQ-1; Tue, 25 Feb 2020 05:05:34 -0500
+X-MC-Unique: -y_gjAHLO1SvwbnOh7fuYQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F255107BAE4;
+ Tue, 25 Feb 2020 10:05:33 +0000 (UTC)
+Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3EEDF5C21B;
+ Tue, 25 Feb 2020 10:05:30 +0000 (UTC)
+Subject: Re: [PATCH v4 08/16] s390x: protvirt: Move STSI data over SIDAD
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200220125638.7241-1-frankja@linux.ibm.com>
+ <20200220125638.7241-9-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <ad3542d2-4efc-599c-92d8-bf1f13389823@redhat.com>
+Date: Tue, 25 Feb 2020 11:05:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-Content-Language: ru
-Thread-Index: AdXrvKYTDoJE5CcfR9OYxlMvrY2RZwAAEq2QAAF32FA=
+In-Reply-To: <20200220125638.7241-9-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 83.149.199.45
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,188 +133,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Vladimir Sementsov-Ogievskiy' <vsementsov@virtuozzo.com>,
- 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CC'ing Stefan due to the same question back in 2010:
+On 20.02.20 13:56, Janosch Frank wrote:
+> For protected guests, we need to put the STSI emulation results into
+> the SIDA, so SIE will write them into the guest at the next entry.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  target/s390x/kvm.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index f222836df5..3a5a5146e3 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -1795,11 +1795,16 @@ static int handle_tsch(S390CPU *cpu)
+>  
+>  static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+>  {
+> +    CPUS390XState *env = &cpu->env;
+>      SysIB_322 sysib;
+>      int del;
+>  
+> -    if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
+> -        return;
+> +    if (env->pv) {
+> +        s390_cpu_pv_mem_read(cpu, 0, &sysib, sizeof(sysib));
+> +    } else {
+> +        if (s390_cpu_virt_mem_read(cpu, addr, ar, &sysib, sizeof(sysib))) {
+> +            return;
+> +        }
+>      }
+>      /* Shift the stack of Extended Names to prepare for our own data */
+>      memmove(&sysib.ext_names[1], &sysib.ext_names[0],
+> @@ -1838,7 +1843,11 @@ static void insert_stsi_3_2_2(S390CPU *cpu, __u64 addr, uint8_t ar)
+>      /* Insert UUID */
+>      memcpy(sysib.vm[0].uuid, &qemu_uuid, sizeof(sysib.vm[0].uuid));
+>  
+> -    s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
+> +    if (env->pv) {
+> +        s390_cpu_pv_mem_write(cpu, 0, &sysib, sizeof(sysib));
+> +    } else {
+> +        s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, sizeof(sysib));
+> +    }
+>  }
+>  
+>  static int handle_stsi(S390CPU *cpu)
+> 
 
-https://lists.gnu.org/archive/html/qemu-devel/2010-09/msg01996.html
+Acked-by: David Hildenbrand <david@redhat.com>
 
-I also encountered this with Windows guest.
-E.g., there were the requests like:
+-- 
+Thanks,
 
-Read 2000 bytes:
-addr=3DA, size=3D1000
-addr=3DA, size=3D1000
-
-I.e. reading 1000 bytes in real, but the purpose of such request is =
-unclear.
-
-Pavel Dovgalyuk
-
-
-> -----Original Message-----
-> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
-> Sent: Tuesday, February 25, 2020 12:27 PM
-> To: 'kwolf@redhat.com'
-> Cc: 'qemu-devel@nongnu.org'; 'mreitz@redhat.com'; 'Vladimir =
-Sementsov-Ogievskiy'
-> Subject: RE: Race condition in overlayed qcow2?
->=20
-> Kevin, what do you think about it?
->=20
-> What guest is intended to receive, when it requests multiple reads to =
-the same buffer in a
-> single DMA transaction?
->=20
-> Should it be the first SG part? The last one?
-> Or just a random set of bytes? (Then why it is reading this data in =
-that case?)
->=20
-> Pavel Dovgalyuk
->=20
-> > -----Original Message-----
-> > From: Vladimir Sementsov-Ogievskiy [mailto:vsementsov@virtuozzo.com]
-> > Sent: Tuesday, February 25, 2020 12:19 PM
-> > To: dovgaluk
-> > Cc: qemu-devel@nongnu.org; mreitz@redhat.com; kwolf@redhat.com
-> > Subject: Re: Race condition in overlayed qcow2?
-> >
-> > 25.02.2020 10:56, dovgaluk wrote:
-> > > Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
-2020-02-25 10:27:
-> > >> 25.02.2020 8:58, dovgaluk wrote:
-> > >>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
-2020-02-21 16:23:
-> > >>>> 21.02.2020 15:35, dovgaluk wrote:
-> > >>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
-2020-02-21 13:09:
-> > >>>>>> 21.02.2020 12:49, dovgaluk wrote:
-> > >>>>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
-2020-02-20 12:36:
-> > >>>>>>
-> > >>>>>> So, preadv in file-posix.c returns different results for the =
-same
-> > >>>>>> offset, for file which is always opened in RO mode? Sounds =
-impossible
-> > >>>>>> :)
-> > >>>>>
-> > >>>>> True.
-> > >>>>> Maybe my logging is wrong?
-> > >>>>>
-> > >>>>> static ssize_t
-> > >>>>> qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t =
-offset)
-> > >>>>> {
-> > >>>>>      ssize_t res =3D preadv(fd, iov, nr_iov, offset);
-> > >>>>>      qemu_log("preadv %x %"PRIx64"\n", fd, (uint64_t)offset);
-> > >>>>>      int i;
-> > >>>>>      uint32_t sum =3D 0;
-> > >>>>>      int cnt =3D 0;
-> > >>>>>      for (i =3D 0 ; i < nr_iov ; ++i) {
-> > >>>>>          int j;
-> > >>>>>          for (j =3D 0 ; j < (int)iov[i].iov_len ; ++j)
-> > >>>>>          {
-> > >>>>>              sum +=3D ((uint8_t*)iov[i].iov_base)[j];
-> > >>>>>              ++cnt;
-> > >>>>>          }
-> > >>>>>      }
-> > >>>>>      qemu_log("size: %x sum: %x\n", cnt, sum);
-> > >>>>>      assert(cnt =3D=3D res);
-> > >>>>>      return res;
-> > >>>>> }
-> > >>>>>
-> > >>>>
-> > >>>> Hmm, I don't see any issues here..
-> > >>>>
-> > >>>> Are you absolutely sure, that all these reads are from backing =
-file,
-> > >>>> which is read-only and never changed (may be by other =
-processes)?
-> > >>>
-> > >>> Yes, I made a copy and compared the files with binwalk.
-> > >>>
-> > >>>> 2. guest modifies buffers during operation (you can catch it if
-> > >>>> allocate personal buffer for preadv, than calculate checksum, =
-then
-> > >>>> memcpy to guest buffer)
-> > >>>
-> > >>> I added the following to the qemu_preadv:
-> > >>>
-> > >>>      // do it again
-> > >>>      unsigned char *buf =3D g_malloc(cnt);
-> > >>>      struct iovec v =3D {buf, cnt};
-> > >>>      res =3D preadv(fd, &v, 1, offset);
-> > >>>      assert(cnt =3D=3D res);
-> > >>>      uint32_t sum2 =3D 0;
-> > >>>      for (i =3D 0 ; i < cnt ; ++i)
-> > >>>          sum2 +=3D buf[i];
-> > >>>      g_free(buf);
-> > >>>      qemu_log("--- sum2 =3D %x\n", sum2);
-> > >>>      assert(sum2 =3D=3D sum);
-> > >>>
-> > >>> These two reads give different results.
-> > >>> But who can modify the buffer while qcow2 workers filling it =
-with data from the disk?
-> > >>>
-> > >>
-> > >> As far as I know, it's guest's buffer, and guest may modify it =
-during
-> > >> the operation. So, it may be winxp :)
-> > >
-> > > True, but normally the guest won't do it.
-> > >
-> > > But I noticed that DMA operation which causes the problems has the =
-following set of the
-> > buffers:
-> > > dma read sg size 20000 offset: c000fe00
-> > > --- sg: base: 2eb1000 len: 1000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 2eb2000 len: 3000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 2eb5000 len: b000
-> > > --- sg: base: 3040000 len: 1000
-> > > --- sg: base: 2f41000 len: 3000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 2f44000 len: 4000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 2f48000 len: 2000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 3000000 len: 1000
-> > > --- sg: base: 3000000 len: 1000
-> > >
-> > >
-> > > It means that one DMA transaction performs multiple reads into the =
-same address.
-> > > And no races is possible, when there is only one qcow2 worker.
-> > > When there are many of them - they can fill this buffer =
-simultaneously.
-> > >
-> >
-> > Hmm, actually if guest start parallel reads into same buffer from =
-different offsets, races
-> are
-> > possible anyway, as different requests run in parallel even with one =
-worker, because
-> > MAX_WORKERS is per-request value, not total... But several workers =
-may increase probability
-> of
-> > races or introduce new ones.
-> >
-> > So, actually, several workers of one request can write to the same =
-buffer only if guest
-> > provides broken iovec, which references the same buffer several =
-times (if it is possible at
-> > all).
-> >
-> >
-> >
-> > --
-> > Best regards,
-> > Vladimir
+David / dhildenb
 
 
