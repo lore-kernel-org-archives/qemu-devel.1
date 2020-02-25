@@ -2,81 +2,62 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB344C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74864C35E04
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:49:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 702E52082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:45:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ee10mmEu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 702E52082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4944D2082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:49:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4944D2082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6cOX-0001Zk-Kl
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:45:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34505)
+	id 1j6cSn-00041o-Fg
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:49:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6cNk-0000ff-Q3
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:26 -0500
+ (envelope-from <groug@kaod.org>) id 1j6cSA-0003VL-RW
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:49:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6cNi-0002Wg-8H
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:24 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28615
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1j6cS9-0004NB-9d
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:48:58 -0500
+Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:44368)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6cNi-0002WJ-1k
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:44:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582645461;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nAIYK6gxGX5f0Xg/mLEf5GoceGUEXW5z884ZP4AOmPY=;
- b=ee10mmEuWcVlVonsvWXuTulczeo9ZW9Wdc0MZZXMqAXw3I92f47I4b+86sIgA0zTCxzWFP
- fnDmoVIq6zbn3oPaIeUVePi39yQzHFSHnBqx7TbOWIA+3xEzx6bZTbhtOjMiC2qHrHGuUA
- 4bqeMxAhGMl4fRi8X6kWfVAO9X79kFA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-8pJ55I9ZP8KXsUP2cXEqcg-1; Tue, 25 Feb 2020 10:44:18 -0500
-X-MC-Unique: 8pJ55I9ZP8KXsUP2cXEqcg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4D951078D63;
- Tue, 25 Feb 2020 15:44:17 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA64490A00;
- Tue, 25 Feb 2020 15:44:13 +0000 (UTC)
-Date: Tue, 25 Feb 2020 16:44:12 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v4 2/5] generic vhost user server
-Message-ID: <20200225154412.GC7632@linux.fritz.box>
-References: <20200218050711.8133-1-coiby.xu@gmail.com>
- <20200218050711.8133-3-coiby.xu@gmail.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6cS9-0004MI-4g
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:48:57 -0500
+Received: from player159.ha.ovh.net (unknown [10.110.103.177])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id BAF251FF35A
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 16:48:54 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player159.ha.ovh.net (Postfix) with ESMTPSA id CA9A2FBCB71D;
+ Tue, 25 Feb 2020 15:48:37 +0000 (UTC)
+Date: Tue, 25 Feb 2020 16:48:34 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v6 08/18] target/ppc: Use class fields to simplify LPCR
+ masking
+Message-ID: <20200225164834.745dc56a@bahia.home>
+In-Reply-To: <20200224233724.46415-9-david@gibson.dropbear.id.au>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-9-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200218050711.8133-3-coiby.xu@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+X-Ovh-Tracer-Id: 4748482860311878118
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrledvgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrudehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 87.98.139.208
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,407 +69,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
+ Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.02.2020 um 06:07 hat Coiby Xu geschrieben:
-> Sharing QEMU devices via vhost-user protocol
+On Tue, 25 Feb 2020 10:37:14 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> When we store the Logical Partitioning Control Register (LPCR) we have a
+> big switch statement to work out which are valid bits for the cpu model
+> we're emulating.
 >=20
-> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+> As well as being ugly, this isn't really conceptually correct, since it is
+> based on the mmu_model variable, whereas the LPCR isn't (only) about the
+> MMU, so mmu_model is basically just acting as a proxy for the cpu model.
+>=20
+> Handle this in a simpler way, by adding a suitable lpcr_mask to the QOM
+> class.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
->  util/Makefile.objs       |   3 +
->  util/vhost-user-server.c | 427 +++++++++++++++++++++++++++++++++++++++
->  util/vhost-user-server.h |  56 +++++
->  3 files changed, 486 insertions(+)
->  create mode 100644 util/vhost-user-server.c
->  create mode 100644 util/vhost-user-server.h
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  target/ppc/cpu-qom.h            |  1 +
+>  target/ppc/mmu-hash64.c         | 36 ++-------------------------------
+>  target/ppc/translate_init.inc.c | 27 +++++++++++++++++++++----
+>  3 files changed, 26 insertions(+), 38 deletions(-)
 >=20
-> diff --git a/util/vhost-user-server.h b/util/vhost-user-server.h
-> new file mode 100644
-> index 0000000000..ff6d3145cd
-> --- /dev/null
-> +++ b/util/vhost-user-server.h
-> @@ -0,0 +1,56 @@
-> +#include "io/channel-socket.h"
-> +#include "io/channel-file.h"
-> +#include "io/net-listener.h"
-> +#include "contrib/libvhost-user/libvhost-user.h"
-> +#include "standard-headers/linux/virtio_blk.h"
-> +#include "qemu/error-report.h"
-> +
-> +typedef struct VuClient VuClient;
-
-I find the terminology a bit confusing here: VuClient is really the
-connection to a single client, but it's part of the server. The name
-gives the impression as if this were client-side code. (This is
-something that already tends to confuse me in the NBD code.)
-
-I'm not sure what a better name could be, though. Maybe
-VuServerConnevtion or VuExportClient or VuExportConnection?
-
-> +typedef struct VuServer {
-> +    QIONetListener *listener;
-> +    AioContext *ctx;
-> +    QTAILQ_HEAD(, VuClient) clients;
-> +    void (*device_panic_notifier)(struct VuClient *client) ;
-> +    int max_queues;
-> +    const VuDevIface *vu_iface;
-> +    /*
-> +     * @ptr_in_device: VuServer pointer memory location in vhost-user de=
-vice
-> +     * struct, so later container_of can be used to get device destruct
-> +     */
-> +    void *ptr_in_device;
-> +    bool close;
-> +} VuServer;
-> +
-> +typedef struct kick_info {
-> +    VuDev *vu_dev;
-
-I suppose this could specifically be VuClient?
-
-> +    int fd; /*kick fd*/
-> +    long index; /*queue index*/
-> +    QIOChannel *ioc; /*I/O channel for kick fd*/
-> +    QIOChannelFile *fioc; /*underlying data channel for kick fd*/
-> +    Coroutine *co;
-> +} kick_info;
-> +
-> +struct VuClient {
-> +    VuDev parent;
-> +    VuServer *server;
-> +    QIOChannel *ioc; /* The current I/O channel */
-> +    QIOChannelSocket *sioc; /* The underlying data channel */
-> +    Coroutine *co_trip;
-> +    struct kick_info *kick_info;
-
-If each struct kick_info (btw, QEMU coding style requires CamelCase) has
-exactly one VuClient and each VuClient has exactly on kick_info, should
-this be a single struct containing both?
-
-[ Coming back from reading the code below - it's because this is in
-fact an array. This should be made clear in the definition. ]
-
-> +    QTAILQ_ENTRY(VuClient) next;
-> +    bool closed;
-> +};
-> +
-> +
-> +VuServer *vhost_user_server_start(uint16_t max_queues,
-> +                                  SocketAddress *unix_socket,
-> +                                  AioContext *ctx,
-> +                                  void *server_ptr,
-> +                                  void *device_panic_notifier,
-> +                                  const VuDevIface *vu_iface,
-> +                                  Error **errp);
-> +
-> +void vhost_user_server_stop(VuServer *server);
-> +
-> +void change_vu_context(AioContext *ctx, VuServer *server);
-
-Let's call this vhost_user_server_set_aio_context() for consistency.
-
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index 11262aafaf..5e450e501c 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -36,6 +36,9 @@ util-obj-y +=3D readline.o
->  util-obj-y +=3D rcu.o
->  util-obj-$(CONFIG_MEMBARRIER) +=3D sys_membarrier.o
->  util-obj-y +=3D qemu-coroutine.o qemu-coroutine-lock.o qemu-coroutine-io=
-.o
-> +ifdef CONFIG_LINUX
-> +util-obj-y +=3D vhost-user-server.o
-> +endif
->  util-obj-y +=3D qemu-coroutine-sleep.o
->  util-obj-y +=3D qemu-co-shared-resource.o
->  util-obj-y +=3D coroutine-$(CONFIG_COROUTINE_BACKEND).o
-> diff --git a/util/vhost-user-server.c b/util/vhost-user-server.c
-> new file mode 100644
-> index 0000000000..70ff6d6701
-> --- /dev/null
-> +++ b/util/vhost-user-server.c
-> @@ -0,0 +1,427 @@
-> +/*
-> + * Sharing QEMU devices via vhost-user protocol
-> + *
-> + * Author: Coiby Xu <coiby.xu@gmail.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or
-> + * later.  See the COPYING file in the top-level directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include <sys/eventfd.h>
-> +#include "qemu/main-loop.h"
-> +#include "vhost-user-server.h"
-> +
-> +static void vmsg_close_fds(VhostUserMsg *vmsg)
-> +{
-> +    int i;
-> +    for (i =3D 0; i < vmsg->fd_num; i++) {
-> +        close(vmsg->fds[i]);
-> +    }
-> +}
-> +
-> +static void vmsg_unblock_fds(VhostUserMsg *vmsg)
-> +{
-> +    int i;
-> +    for (i =3D 0; i < vmsg->fd_num; i++) {
-> +        qemu_set_nonblock(vmsg->fds[i]);
-> +    }
-> +}
-> +
-> +
-> +static void close_client(VuClient *client)
-> +{
-> +    vu_deinit(&client->parent);
-> +    client->sioc =3D NULL;
-> +    object_unref(OBJECT(client->ioc));
-> +    client->closed =3D true;
-> +
-> +}
-> +
-> +static void panic_cb(VuDev *vu_dev, const char *buf)
-> +{
-> +    if (buf) {
-> +        error_report("vu_panic: %s", buf);
-> +    }
-> +
-> +    VuClient *client =3D container_of(vu_dev, VuClient, parent);
-> +    VuServer *server =3D client->server;
-
-Please put declarations at the start of the block.
-
-> +    if (!client->closed) {
-> +        close_client(client);
-> +        QTAILQ_REMOVE(&server->clients, client, next);
-> +    }
-> +
-> +    if (server->device_panic_notifier) {
-> +        server->device_panic_notifier(client);
-> +    }
-> +}
-> +
-> +
-> +
-> +static bool coroutine_fn
-> +vu_message_read(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
-> +{
-> +    struct iovec iov =3D {
-> +        .iov_base =3D (char *)vmsg,
-> +        .iov_len =3D VHOST_USER_HDR_SIZE,
-> +    };
-> +    int rc, read_bytes =3D 0;
-> +    /*
-> +     * VhostUserMsg is a packed structure, gcc will complain about passi=
-ng
-> +     * pointer to a packed structure member if we pass &VhostUserMsg.fd_=
-num
-> +     * and &VhostUserMsg.fds directly when calling qio_channel_readv_ful=
-l,
-> +     * thus two temporary variables nfds and fds are used here.
-> +     */
-> +    size_t nfds =3D 0, nfds_t =3D 0;
-> +    int *fds =3D NULL, *fds_t =3D NULL;
-> +    VuClient *client =3D container_of(vu_dev, VuClient, parent);
-> +    QIOChannel *ioc =3D client->ioc;
-> +
-> +    Error *erp;
-
-The convention is to call this local_err. It should be initialised as
-NULL.
-
-> +    assert(qemu_in_coroutine());
-> +    do {
-> +        /*
-> +         * qio_channel_readv_full may have short reads, keeping calling =
-it
-> +         * until getting VHOST_USER_HDR_SIZE or 0 bytes in total
-> +         */
-> +        rc =3D qio_channel_readv_full(ioc, &iov, 1, &fds_t, &nfds_t, &er=
-p);
-> +        if (rc < 0) {
-> +            if (rc =3D=3D QIO_CHANNEL_ERR_BLOCK) {
-> +                qio_channel_yield(ioc, G_IO_IN);
-> +                continue;
-> +            } else {
-> +                error_report("Error while recvmsg: %s", strerror(errno))=
-;
-
-I don't think, qio_channel_*() promise anything about the value in
-errno. (They also don't promise to use recvmsg().)
-
-Instead, use error_report_err() because erp contains the real error
-message.
-
-> +                return false;
-> +            }
-> +        }
-> +        read_bytes +=3D rc;
-> +        fds =3D g_renew(int, fds_t, nfds + nfds_t);
-> +        memcpy(fds + nfds, fds_t, nfds_t);
-> +        nfds +=3D nfds_t;
-> +        if (read_bytes =3D=3D VHOST_USER_HDR_SIZE || rc =3D=3D 0) {
-> +            break;
-> +        }
-> +    } while (true);
-> +
-> +    vmsg->fd_num =3D nfds;
-> +    memcpy(vmsg->fds, fds, nfds * sizeof(int));
-> +    g_free(fds);
-> +    /* qio_channel_readv_full will make socket fds blocking, unblock the=
-m */
-> +    vmsg_unblock_fds(vmsg);
-> +    if (vmsg->size > sizeof(vmsg->payload)) {
-> +        error_report("Error: too big message request: %d, "
-> +                     "size: vmsg->size: %u, "
-> +                     "while sizeof(vmsg->payload) =3D %zu",
-> +                     vmsg->request, vmsg->size, sizeof(vmsg->payload));
-> +        goto fail;
-> +    }
-> +
-> +    struct iovec iov_payload =3D {
-> +        .iov_base =3D (char *)&vmsg->payload,
-> +        .iov_len =3D vmsg->size,
-> +    };
-> +    if (vmsg->size) {
-> +        rc =3D qio_channel_readv_all_eof(ioc, &iov_payload, 1, &erp);
-> +        if (rc =3D=3D -1) {
-> +            error_report("Error while reading: %s", strerror(errno));
-
-error_report_err() again.
-
-> +            goto fail;
-> +        }
-> +    }
-> +
-> +    return true;
-> +
-> +fail:
-> +    vmsg_close_fds(vmsg);
-> +
-> +    return false;
-> +}
-> +
-> +
-> +static coroutine_fn void vu_client_next_trip(VuClient *client);
-> +
-> +static coroutine_fn void vu_client_trip(void *opaque)
-> +{
-> +    VuClient *client =3D opaque;
-> +
-> +    vu_dispatch(&client->parent);
-> +    client->co_trip =3D NULL;
-> +    if (!client->closed) {
-> +        vu_client_next_trip(client);
-> +    }
-> +}
-
-The last part is very untypical coroutine code: It says that we want to
-spawn a new coroutine with vu_client_trip() as its entry point, and then
-terminates the current one.
-
-Why don't we just put the whole thing in a while (!client->closed) loop
-and stay in the same coroutine instead of terminating the old one and
-starting a new one all the time?
-
-> +static coroutine_fn void vu_client_next_trip(VuClient *client)
-> +{
-> +    if (!client->co_trip) {
-> +        client->co_trip =3D qemu_coroutine_create(vu_client_trip, client=
-);
-> +        aio_co_schedule(client->ioc->ctx, client->co_trip);
-> +    }
-> +}
-> +
-> +static void vu_client_start(VuClient *client)
-> +{
-> +    client->co_trip =3D qemu_coroutine_create(vu_client_trip, client);
-> +    aio_co_enter(client->ioc->ctx, client->co_trip);
-> +}
-
-This is essentially a duplicate of vu_client_next_trip(). The only
-place where it is called (vu_accept()) knows that client->co_trip is
-already NULL, so it could just call vu_client_next_trip().
-
-Or in fact, if vu_client_trip() gets turned into a loop, it's
-vu_client_next_trip() that becomes unnecessary.
-
-> +static void coroutine_fn vu_kick_cb_next(VuClient *client,
-> +                                          kick_info *data);
-> +
-> +static void coroutine_fn vu_kick_cb(void *opaque)
-> +{
-> +    kick_info *data =3D (kick_info *) opaque;
-> +    int index =3D data->index;
-> +    VuDev *dev =3D data->vu_dev;
-> +    VuClient *client;
-> +    client =3D container_of(dev, VuClient, parent);
-> +    VuVirtq *vq =3D &dev->vq[index];
-> +    int sock =3D vq->kick_fd;
-> +    if (sock =3D=3D -1) {
-> +        return;
-> +    }
-> +    assert(sock =3D=3D data->fd);
-> +    eventfd_t kick_data;
-> +    ssize_t rc;
-> +    /*
-> +     * When eventfd is closed, the revent is POLLNVAL (=3DG_IO_NVAL) and
-> +     * reading eventfd will return errno=3DEBADF (Bad file number).
-> +     * Calling qio_channel_yield(ioc, G_IO_IN) will set reading handler
-> +     * for QIOChannel, but aio_dispatch_handlers will only dispatch
-> +     * G_IO_IN | G_IO_HUP | G_IO_ERR revents while ignoring
-> +     * G_IO_NVAL (POLLNVAL) revents.
-> +     *
-> +     * Thus when eventfd is closed by vhost-user client, QEMU will ignor=
-e
-> +     * G_IO_NVAL and keeping polling by repeatedly calling qemu_poll_ns =
-which
-> +     * will lead to 100% CPU usage.
-> +     *
-> +     * To aovid this issue, make sure set_watch and remove_watch use the=
- same
-
-s/aovid/avoid/
-
-> +     * AIOContext for QIOChannel. Thus remove_watch will eventually succ=
-efully
-> +     * remove eventfd from the set of file descriptors polled for
-> +     * corresponding GSource.
-> +     */
-> +    rc =3D read(sock, &kick_data, sizeof(eventfd_t));
-
-Why not a QIOChannel function like for vu_message_read() above?
-
-> +    if (rc !=3D sizeof(eventfd_t)) {
-> +        if (errno =3D=3D EAGAIN) {
-> +            qio_channel_yield(data->ioc, G_IO_IN);
-> +        } else if (errno !=3D EINTR) {
-> +            data->co =3D NULL;
-> +            return;
-> +        }
-> +    } else {
-> +        vq->handler(dev, index);
-> +    }
-> +    data->co =3D NULL;
-> +    vu_kick_cb_next(client, data);
-
-This can be a loop, too, instead of terminating the coroutine and
-starting a new one for the same function.
-
-> +}
-> +
-> +static void coroutine_fn vu_kick_cb_next(VuClient *client,
-> +                                          kick_info *cb_data)
-> +{
-> +    if (!cb_data->co) {
-> +        cb_data->co =3D qemu_coroutine_create(vu_kick_cb, cb_data);
-> +        aio_co_schedule(client->ioc->ctx, cb_data->co);
-> +    }
-> +}
-
-Kevin
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index e499575dc8..15d6b54a7d 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -177,6 +177,7 @@ typedef struct PowerPCCPUClass {
+>      uint64_t insns_flags;
+>      uint64_t insns_flags2;
+>      uint64_t msr_mask;
+> +    uint64_t lpcr_mask;         /* Available bits in the LPCR */
+>      uint64_t lpcr_pm;           /* Power-saving mode Exit Cause Enable b=
+its */
+>      powerpc_mmu_t   mmu_model;
+>      powerpc_excp_t  excp_model;
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index caf47ad6fc..0ef330a614 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -1095,42 +1095,10 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cp=
+u)
+> =20
+>  void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+>  {
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+> -    uint64_t lpcr =3D 0;
+> =20
+> -    /* Filter out bits */
+> -    switch (env->mmu_model) {
+> -    case POWERPC_MMU_2_03: /* P5p */
+> -        lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
+> -                      LPCR_LPES0 | LPCR_LPES1 |
+> -                      LPCR_RMI | LPCR_HDICE);
+> -        break;
+> -    case POWERPC_MMU_2_06: /* P7 */
+> -        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
+> -                      LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+> -                      LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
+> -                      LPCR_MER | LPCR_TC |
+> -                      LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
+> -        break;
+> -    case POWERPC_MMU_2_07: /* P8 */
+> -        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
+> -                      LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+> -                      LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE=
+1 |
+> -                      LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
+> -                      LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE);
+> -        break;
+> -    case POWERPC_MMU_3_00: /* P9 */
+> -        lpcr =3D val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
+> -                      (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_A=
+IL |
+> -                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR=
+_LD |
+> -                      (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_=
+EEE |
+> -                      LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | LPC=
+R_TC |
+> -                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE);
+> -        break;
+> -    default:
+> -        g_assert_not_reached();
+> -    }
+> -    env->spr[SPR_LPCR] =3D lpcr;
+> +    env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
+>      ppc_hash64_update_rmls(cpu);
+>      ppc_hash64_update_vrma(cpu);
+>  }
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 925bc31ca5..5b7a5226e1 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -8476,6 +8476,8 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
+>                      (1ull << MSR_DR) |
+>                      (1ull << MSR_PMM) |
+>                      (1ull << MSR_RI);
+> +    pcc->lpcr_mask =3D LPCR_RMLS | LPCR_ILE | LPCR_LPES0 | LPCR_LPES1 |
+> +        LPCR_RMI | LPCR_HDICE;
+>      pcc->mmu_model =3D POWERPC_MMU_2_03;
+>  #if defined(CONFIG_SOFTMMU)
+>      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+> @@ -8653,6 +8655,12 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+>                      (1ull << MSR_PMM) |
+>                      (1ull << MSR_RI) |
+>                      (1ull << MSR_LE);
+> +    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
+> +        LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+> +        LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
+> +        LPCR_MER | LPCR_TC |
+> +        LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE;
+> +    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
+>      pcc->mmu_model =3D POWERPC_MMU_2_06;
+>  #if defined(CONFIG_SOFTMMU)
+>      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+> @@ -8669,7 +8677,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+>      pcc->l1_dcache_size =3D 0x8000;
+>      pcc->l1_icache_size =3D 0x8000;
+>      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+> -    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
+>  }
+> =20
+>  static void init_proc_POWER8(CPUPPCState *env)
+> @@ -8825,6 +8832,13 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+>                      (1ull << MSR_TS0) |
+>                      (1ull << MSR_TS1) |
+>                      (1ull << MSR_LE);
+> +    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
+> +        LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+> +        LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
+> +        LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
+> +        LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE;
+> +    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
+> +                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
+>      pcc->mmu_model =3D POWERPC_MMU_2_07;
+>  #if defined(CONFIG_SOFTMMU)
+>      pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+> @@ -8842,8 +8856,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+>      pcc->l1_dcache_size =3D 0x8000;
+>      pcc->l1_icache_size =3D 0x8000;
+>      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+> -    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
+> -                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
+>  }
+> =20
+>  #ifdef CONFIG_SOFTMMU
+> @@ -9036,6 +9048,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>                      (1ull << MSR_PMM) |
+>                      (1ull << MSR_RI) |
+>                      (1ull << MSR_LE);
+> +    pcc->lpcr_mask =3D LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
+> +        (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
+> +        LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR_LD |
+> +        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
+> +                             LPCR_DEE | LPCR_OEE))
+> +        | LPCR_MER | LPCR_GTSE | LPCR_TC |
+> +        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE;
+> +    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
+OEE;
+>      pcc->mmu_model =3D POWERPC_MMU_3_00;
+>  #if defined(CONFIG_SOFTMMU)
+>      pcc->handle_mmu_fault =3D ppc64_v3_handle_mmu_fault;
+> @@ -9055,7 +9075,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+>      pcc->l1_dcache_size =3D 0x8000;
+>      pcc->l1_icache_size =3D 0x8000;
+>      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+> -    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
+OEE;
+>  }
+> =20
+>  #ifdef CONFIG_SOFTMMU
 
 
