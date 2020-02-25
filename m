@@ -2,127 +2,72 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE40CC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDAFC35DF9
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:03:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B17B21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:02:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jkt8dhpN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B17B21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 320E121D7E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:03:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320E121D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6X2d-0005OT-Mz
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:02:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58259)
+	id 1j6X3x-0006ra-AE
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:03:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6X1i-0004Ok-Ru
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:01:23 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6X2J-0005Bd-6c
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6X1d-0002Eg-3s
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:01:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58464
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6X2E-0002vh-8P
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:01:55 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2451 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6X1c-0002Dq-Us
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:01:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582624871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=IaMlSMUEpfhUm67ZvUjQyzZrEyp5Phy68z1dRjffrlQ=;
- b=Jkt8dhpNxKNQwG2zHINw7O3kkTOymEtpj7Kj5a/PM8HchxOVvbGQhhUdn7RjlJaukOtk5u
- cwk/0dnn6p8jMZSXND5e5lt17o69Xrm3UQ9dLPndVl6GAG2VWG5q84F/Fefwfp4PLBP0E6
- IJXqS5NmeMcyE0H9LgFUStSvE2YYDuU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-RkuXGgUHODKmIlSq7WcKoA-1; Tue, 25 Feb 2020 05:01:09 -0500
-X-MC-Unique: RkuXGgUHODKmIlSq7WcKoA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24DB11005516;
- Tue, 25 Feb 2020 10:01:08 +0000 (UTC)
-Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E30355C578;
- Tue, 25 Feb 2020 10:01:04 +0000 (UTC)
-Subject: Re: [PATCH v4 06/16] s390x: protvirt: KVM intercept changes
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200220125638.7241-1-frankja@linux.ibm.com>
- <20200220125638.7241-7-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <2f1aabd4-426c-6314-0dd9-1817853adbc3@redhat.com>
-Date: Tue, 25 Feb 2020 11:01:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j6X2B-0002ru-GC; Tue, 25 Feb 2020 05:01:47 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id 42BDE44CDF6A51AB9C93;
+ Tue, 25 Feb 2020 18:01:43 +0800 (CST)
+Received: from DGGEMM422-HUB.china.huawei.com (10.1.198.39) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 25 Feb 2020 18:01:42 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
+ dggemm422-hub.china.huawei.com ([10.1.198.39]) with mapi id 14.03.0439.000;
+ Tue, 25 Feb 2020 18:01:35 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org"
+ <qemu-trivial@nongnu.org>
+Subject: RE: [PATCH 09/13] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+Thread-Topic: [PATCH 09/13] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+Thread-Index: AQHV64DJX5oKQCUBD0CAP5e60Hgha6grIPsAgACILuA=
+Date: Tue, 25 Feb 2020 10:01:35 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B661BD7@dggemm531-mbx.china.huawei.com>
+References: <20200225020937.25028-1-kuhn.chenqun@huawei.com>
+ <20200225020937.25028-10-kuhn.chenqun@huawei.com>
+ <6d31ac16-adc6-235e-8784-51bf86e33b72@redhat.com>
+In-Reply-To: <6d31ac16-adc6-235e-8784-51bf86e33b72@redhat.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20200220125638.7241-7-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,63 +79,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, cohuck@redhat.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.02.20 13:56, Janosch Frank wrote:
-> Secure guests no longer intercept with code 4 for an instruction
-> interception. Instead they have codes 104 and 108 for secure
-> instruction interception and secure instruction notification
-> respectively.
-> 
-> The 104 mirrors the 4 interception.
-> 
-> The 108 is a notification interception to let KVM and QEMU know that
-> something changed and we need to update tracking information or
-> perform specific tasks. It's currently taken for the following
-> instructions:
-> 
-> * stpx (To inform about the changed prefix location)
-> * sclp (On incorrect SCCB values, so we can inject a IRQ)
-> * sigp (All but "stop and store status")
-> * diag308 (Subcodes 0/1)
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/kvm.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 1d6fd6a27b..eec0b92479 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -115,6 +115,8 @@
->  #define ICPT_CPU_STOP                   0x28
->  #define ICPT_OPEREXC                    0x2c
->  #define ICPT_IO                         0x40
-> +#define ICPT_PV_INSTR                   0x68
-> +#define ICPT_PV_INSTR_NOTIFICATION      0x6c
->  
->  #define NR_LOCAL_IRQS 32
->  /*
-> @@ -1693,6 +1695,8 @@ static int handle_intercept(S390CPU *cpu)
->              (long)cs->kvm_run->psw_addr);
->      switch (icpt_code) {
->          case ICPT_INSTRUCTION:
-> +        case ICPT_PV_INSTR:
-> +        case ICPT_PV_INSTR_NOTIFICATION:
->              r = handle_instruction(cpu, run);
->              break;
->          case ICPT_PROGRAM:
-> 
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
-
+DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IFBoaWxpcHBlIE1hdGhpZXUt
+RGF1ZMOpIFttYWlsdG86cGhpbG1kQHJlZGhhdC5jb21dDQo+U2VudDogVHVlc2RheSwgRmVicnVh
+cnkgMjUsIDIwMjAgNTozNiBQTQ0KPlRvOiBDaGVucXVuIChrdWhuKSA8a3Vobi5jaGVucXVuQGh1
+YXdlaS5jb20+OyBxZW11LQ0KPmRldmVsQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlhbEBub25nbnUu
+b3JnDQo+Q2M6IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgWmhhbmdoYWlsaWFuZw0KPjx6aGFu
+Zy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpckBh
+bGlzdGFpcjIzLm1lPjsNCj5xZW11LWFybUBub25nbnUub3JnDQo+U3ViamVjdDogUmU6IFtQQVRD
+SCAwOS8xM10gZG1hL3hsbngtemRtYTogUmVtb3ZlIHJlZHVuZGFudCBzdGF0ZW1lbnQgaW4NCj56
+ZG1hX3dyaXRlX2RzdCgpDQo+DQo+T24gMi8yNS8yMCAzOjA5IEFNLCBrdWhuLmNoZW5xdW5AaHVh
+d2VpLmNvbSB3cm90ZToNCj4+IEZyb206IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNv
+bT4NCj4+DQo+PiBDbGFuZyBzdGF0aWMgY29kZSBhbmFseXplciBzaG93IHdhcm5pbmc6DQo+PiBo
+dy9kbWEveGxueC16ZG1hLmM6Mzk5OjEzOiB3YXJuaW5nOiBWYWx1ZSBzdG9yZWQgdG8gJ2RzdF90
+eXBlJyBpcyBuZXZlcg0KPnJlYWQNCj4+ICAgICAgICAgICAgICBkc3RfdHlwZSA9IEZJRUxEX0VY
+MzIocy0+ZHNjX2RzdC53b3Jkc1szXSwNCj5aRE1BX0NIX0RTVF9EU0NSX1dPUkQzLA0KPj4gICAg
+ICAgICAgICAgIF4NCj5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+DQo+Pg0KPj4gUmVwb3J0ZWQtYnk6IEV1bGVyIFJvYm90IDxldWxlci5yb2Jv
+dEBodWF3ZWkuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQ2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBo
+dWF3ZWkuY29tPg0KPj4gLS0tDQo+PiBDYzogQWxpc3RhaXIgRnJhbmNpcyA8YWxpc3RhaXJAYWxp
+c3RhaXIyMy5tZT4NCj4+IENjOiAiRWRnYXIgRS4gSWdsZXNpYXMiIDxlZGdhci5pZ2xlc2lhc0Bn
+bWFpbC5jb20+DQo+PiBDYzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+Pg0KPj4gQ2M6IHFlbXUtYXJtQG5vbmdudS5vcmcNCj4+IC0tLQ0KPj4gICBody9kbWEveGxueC16
+ZG1hLmMgfCAyIC0tDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGRlbGV0aW9ucygtKQ0KPj4NCj4+
+IGRpZmYgLS1naXQgYS9ody9kbWEveGxueC16ZG1hLmMgYi9ody9kbWEveGxueC16ZG1hLmMgaW5k
+ZXgNCj4+IDhmYjgzZjViMDcuLjQ1MzU1YzVkNTkgMTAwNjQ0DQo+PiAtLS0gYS9ody9kbWEveGxu
+eC16ZG1hLmMNCj4+ICsrKyBiL2h3L2RtYS94bG54LXpkbWEuYw0KPj4gQEAgLTM5Niw4ICszOTYs
+NiBAQCBzdGF0aWMgdm9pZCB6ZG1hX3dyaXRlX2RzdChYbG54WkRNQSAqcywgdWludDhfdA0KPipi
+dWYsIHVpbnQzMl90IGxlbikNCj4+ICAgICAgICAgICAgICAgemRtYV9sb2FkX2Rlc2NyaXB0b3Io
+cywgbmV4dCwgJnMtPmRzY19kc3QpOw0KPj4gICAgICAgICAgICAgICBkc3Rfc2l6ZSA9IEZJRUxE
+X0VYMzIocy0+ZHNjX2RzdC53b3Jkc1syXSwNCj5aRE1BX0NIX0RTVF9EU0NSX1dPUkQyLA0KPj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU0laRSk7DQo+PiAtICAgICAgICAg
+ICAgZHN0X3R5cGUgPSBGSUVMRF9FWDMyKHMtPmRzY19kc3Qud29yZHNbM10sDQo+WkRNQV9DSF9E
+U1RfRFNDUl9XT1JEMywNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVFlQ
+RSk7DQo+DQo+TWF5YmUgbW92ZSBkc3RfdHlwZSB0byB0aGlzIGlmKCkgc3RhdGVtZW50IG5vdz8N
+Cj4NClNvcnJ5LCBJIGRvbid0IGZvbGxvdyB5b3UuICAgSSBkaWRuJ3QgZmluZCB3aGVyZSBJIGNv
+dWxkIG1vdmUgZHN0X3R5cGUuDQpEbyB5b3UgbWVhbiB0byBtb3ZlIHRoZSBmaXJzdCBkc3RfdHlw
+ZSB0byB0aGUgaWYoKS4gIA0KTW9kaWZ5IGl0IGxpa2UgdGhpczoNCiAgICB3aGlsZSAobGVuKSB7
+DQogICAgICAgIGRzdF9zaXplID0gRklFTERfRVgzMihzLT5kc2NfZHN0LndvcmRzWzJdLCBaRE1B
+X0NIX0RTVF9EU0NSX1dPUkQyLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgU0laRSk7
+DQogICAgICAgIGlmIChkc3Rfc2l6ZSA9PSAwICYmIHB0eXBlID09IFBUX01FTSkgew0KICAgICAg
+ICAgICAgdWludDY0X3QgbmV4dDsNCiAgICAgICAgICAgIGRzdF90eXBlID0gRklFTERfRVgzMihz
+LT5kc2NfZHN0LndvcmRzWzNdLCBaRE1BX0NIX0RTVF9EU0NSX1dPUkQzLA0KICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgVFlQRSk7DQogICAgICAgICAgICBuZXh0ID0gemRtYV91cGRhdGVf
+ZGVzY3JfYWRkcihzLCBkc3RfdHlwZSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIFJfWkRNQV9DSF9EU1RfQ1VSX0RTQ1JfTFNCKTsNCiAgICAgICAgICAgIHpkbWFf
+bG9hZF9kZXNjcmlwdG9yKHMsIG5leHQsICZzLT5kc2NfZHN0KTsNCiAgICAgICAgICAgIGRzdF9z
+aXplID0gRklFTERfRVgzMihzLT5kc2NfZHN0LndvcmRzWzJdLCBaRE1BX0NIX0RTVF9EU0NSX1dP
+UkQyLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFNJWkUpOw0KICAgICAgICB9
+DQogICAgICAgLi4uDQogICB9DQoNClRoYW5rcy4NCj4+ICAgICAgICAgICB9DQo+Pg0KPj4gICAg
+ICAgICAgIC8qIE1hdGNoIHdoYXQgaGFyZHdhcmUgZG9lcyBieSBpZ25vcmluZyB0aGUgZHN0X3Np
+emUgYW5kDQo+PiBvbmx5IHVzaW5nDQo+Pg0KDQo=
 
