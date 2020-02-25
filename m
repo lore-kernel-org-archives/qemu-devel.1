@@ -7,84 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB6EC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40111C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:43:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48B512064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:43:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 105C32064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:43:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n+AbY7Um"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B512064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="wqG+5fnL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 105C32064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aUP-0007Z8-EQ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:43:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59170)
+	id 1j6aUc-0006wG-3c
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:43:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcQ-0005S2-UU
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:23 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6a2r-00089D-Vu
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcP-0007EE-NN
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:22 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:33564)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6ZcP-0007Dj-Hv
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:21 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id u6so14616759wrt.0
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:47:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mRJBG/zc2GQpI0clN99w+344ScpJbk+vuaXsTd83iMo=;
- b=n+AbY7Um9xYuIrtBkAFUKLevPWbgJZdXMshg6eU1D+SJb2q5SS0ezY9ImwPmFXDDGE
- 1H66VkJm8Tj6dDBmkT0AqOkDIjynUBnHOvJZaucKq/dJeik98xE0qfGEi70ojVcRwoFp
- ufRT2CJtSacs1507bXfuumLHfSFNNaExCNqqNw3Y8M2boF24OqCxpmCNvyet7RMFeh+A
- lpQBrriDjxLRZE2BJzkMRSb4nvzdUsj+tB6/IXSzSEhNFoEH0ESBakTAibcUEANw5//5
- qi5V3Optfzhu/J89MGQ/cN5imP3men8337MijfA3LUYG5LwkwexynFrI8b393kVAzKZs
- Cqxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mRJBG/zc2GQpI0clN99w+344ScpJbk+vuaXsTd83iMo=;
- b=MwAHJX6ylQylHvOf8NgfseMi4dcgT+wrp35mhyqLkp1+h6+T5XR4HyIbS3x+pxCGlr
- YAOwo3lmFI0JIbNUeHHs7Wc3HYmULrbuokYWS92bjS4xljuM4NHyMYquheO2eJt3fzxN
- 56tsBPAwL2xdXyJLE1RA+BZ5/rKA2JccNVifn7vx32LK8A8HQqLbqsoXCNJClR/TJqD9
- 7b5ZAZ/swXNpKYt8w++TOl7Qf+skVdNHIWyLF5Ft6W8QJ0ENJD6KnMqHIRMbrPBLFUGT
- nBVkdTV3wN5DlujVaw39bfvek6Sa4snGwjAAcdyCMNLzxMkTGe9hPdB3gEbbxuBDe0Np
- BesQ==
-X-Gm-Message-State: APjAAAWnU01p+uPh20eu9G+E7ZtSPJ99WaAXdwMVvoAc2QYjqtQiYMgu
- RSjwAZ4MGm/EUHathuIy3iqmCA==
-X-Google-Smtp-Source: APXvYqw5AsC1xNKe6C6Nm/qTuKXOUec0rvULELtvEqno5uTuMCWgdGodrihVZuR2z8udTUv0TwmMMw==
-X-Received: by 2002:adf:f091:: with SMTP id n17mr70531397wro.387.1582634840115; 
- Tue, 25 Feb 2020 04:47:20 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t10sm2666271wru.59.2020.02.25.04.47.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 04:47:14 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B726E1FF92;
- Tue, 25 Feb 2020 12:47:10 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6a2q-0002A8-Co
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:41 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:57274)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1j6a2m-00023D-MW; Tue, 25 Feb 2020 08:14:37 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 43BAC96F57;
+ Tue, 25 Feb 2020 13:14:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582636470;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dRPQZ/ZK2BoNEjn5Iae8tGrhXrd6S6a/K4s/XgUw0a8=;
+ b=wqG+5fnL1CDhHpdZN5to1M66ss5nJJ9V4wq4RxrjVx/S9HHh81Om+Oe5Gq8WPoAVYCM2k5
+ Trw7jW4VH42IHKDq3QJabQdn3IaqBaWJeqNqpsK4KbuUb5dePsGLIgvyNRZulbaNu83fK/
+ urCVCEzOVNxtuDR4thVLJ+lC01rcud4=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 05/19] travis.yml: Test the s390-ccw build, too
-Date: Tue, 25 Feb 2020 12:46:56 +0000
-Message-Id: <20200225124710.14152-6-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
-References: <20200225124710.14152-1-alex.bennee@linaro.org>
+Subject: [PATCH v8 8/9] hw/arm/xilinx_zynq: connect uart clocks to slcr
+Date: Tue, 25 Feb 2020 14:14:21 +0100
+Message-Id: <20200225131422.53368-9-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200225131422.53368-1-damien.hedde@greensocs.com>
+References: <20200225131422.53368-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582636470;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dRPQZ/ZK2BoNEjn5Iae8tGrhXrd6S6a/K4s/XgUw0a8=;
+ b=OcOMTevjEHmyYNLPDIvP6YIRGVwyhBGr2Q0iel9AoeIMk0uzLQeeUZum3VPHSJvk5nDqdX
+ Tz6orngak2UX0gLKg53iDI3oLxH7twY2iHepw4XyrIGEBtQre55FpmgzlwVpLlKPMCsAxM
+ uUjqhqvn8vDPS7lA5pxfePLKXJxvRzA=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582636470; a=rsa-sha256; cv=none;
+ b=1AkDBRjC572VUiL2K8brXzrsjisEpxxmlrSdb2+S5wyCnP72IQl27CMj25rHkIW/xk755n
+ zntEOenRCoMixKgR+rqDAj6qi9WAeJmTOsoaNQRA8gamxdfvkwkVm9wJ+9jymQxBaQ2w/v
+ sodxYGdg+EbkSlBc8g4mjDxWKVoK/qQ=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+X-Spam: Yes
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,59 +90,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- robert.foley@linaro.org, pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
- "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, richard.henderson@linaro.org,
- f4bug@amsat.org, robhenry@microsoft.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- marcandre.lureau@redhat.com, aaron@os.amperecomputing.com, cota@braap.org,
- stefanha@redhat.com, kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- aurelien@aurel32.net
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
+ alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+Add the connection between the slcr's output clocks and the uarts inputs.
 
-Since we can now use a s390x host on Travis, we can also build and
-test the s390-ccw bios images there. For this we have to make sure
-that roms/SLOF is checked out, too, and then move the generated *.img
-files to the right location before running the tests.
+Also add the main board clock 'ps_clk', which is hard-coded to 33.33MHz
+(the default frequency). This clock is used to feed the slcr's input
+clock.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200206202543.7085-1-thuth@redhat.com>
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+
 ---
- .travis.yml | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+v7
+ + update ClockIn/ClockOut types
+ + simplify the ps_clk frequency init
+---
+ hw/arm/xilinx_zynq.c | 57 +++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 49 insertions(+), 8 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 58870559515..ea13e071795 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -509,6 +509,16 @@ matrix:
-       env:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
-+      script:
-+        - ( cd ${SRC_DIR} ; git submodule update --init roms/SLOF )
-+        - BUILD_RC=0 && make -j${JOBS} || BUILD_RC=$?
-+        - |
-+          if [ "$BUILD_RC" -eq 0 ] ; then
-+              mv pc-bios/s390-ccw/*.img pc-bios/ ;
-+              ${TEST_CMD} ;
-+          else
-+              $(exit $BUILD_RC);
-+          fi
- 
-     # Release builds
-     # The make-release script expect a QEMU version, so our tag must start with a 'v'.
--- 
-2.20.1
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 3a0fa5b23f..261a1690a8 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -34,6 +34,15 @@
+ #include "hw/char/cadence_uart.h"
+ #include "hw/net/cadence_gem.h"
+ #include "hw/cpu/a9mpcore.h"
++#include "hw/qdev-clock.h"
++#include "sysemu/reset.h"
++
++#define TYPE_ZYNQ_MACHINE MACHINE_TYPE_NAME("xilinx-zynq-a9")
++#define ZYNQ_MACHINE(obj) \
++    OBJECT_CHECK(ZynqMachineState, (obj), TYPE_ZYNQ_MACHINE)
++
++/* board base frequency: 33.333333 MHz */
++#define PS_CLK_FREQUENCY (100 * 1000 * 1000 / 3)
+=20
+ #define NUM_SPI_FLASHES 4
+ #define NUM_QSPI_FLASHES 2
+@@ -74,6 +83,11 @@ static const int dma_irqs[8] =3D {
+     0xe3401000 + ARMV7_IMM16(extract32((val), 16, 16)), /* movt r1 ... *=
+/ \
+     0xe5801000 + (addr)
+=20
++typedef struct ZynqMachineState {
++    MachineState parent;
++    Clock *ps_clk;
++} ZynqMachineState;
++
+ static void zynq_write_board_setup(ARMCPU *cpu,
+                                    const struct arm_boot_info *info)
+ {
+@@ -158,12 +172,13 @@ static inline void zynq_init_spi_flashes(uint32_t b=
+ase_addr, qemu_irq irq,
+=20
+ static void zynq_init(MachineState *machine)
+ {
++    ZynqMachineState *zynq_machine =3D ZYNQ_MACHINE(machine);
+     ram_addr_t ram_size =3D machine->ram_size;
+     ARMCPU *cpu;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+     MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ocm_ram =3D g_new(MemoryRegion, 1);
+-    DeviceState *dev;
++    DeviceState *dev, *slcr;
+     SysBusDevice *busdev;
+     qemu_irq pic[64];
+     int n;
+@@ -208,9 +223,18 @@ static void zynq_init(MachineState *machine)
+                           1, 0x0066, 0x0022, 0x0000, 0x0000, 0x0555, 0x2=
+aa,
+                           0);
+=20
+-    dev =3D qdev_create(NULL, "xilinx,zynq_slcr");
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xF8000000);
++    /* Create slcr, keep a pointer to connect clocks */
++    slcr =3D qdev_create(NULL, "xilinx,zynq_slcr");
++    qdev_init_nofail(slcr);
++    sysbus_mmio_map(SYS_BUS_DEVICE(slcr), 0, 0xF8000000);
++
++    /* Create the main clock source, and feed slcr with it */
++    zynq_machine->ps_clk =3D CLOCK(object_new(TYPE_CLOCK));
++    object_property_add_child(OBJECT(zynq_machine), "ps_clk",
++                              OBJECT(zynq_machine->ps_clk), &error_abort=
+);
++    object_unref(OBJECT(zynq_machine->ps_clk));
++    clock_set_hz(zynq_machine->ps_clk, PS_CLK_FREQUENCY);
++    qdev_connect_clock_in(slcr, "ps_clk", zynq_machine->ps_clk);
+=20
+     dev =3D qdev_create(NULL, TYPE_A9MPCORE_PRIV);
+     qdev_prop_set_uint32(dev, "num-cpu", 1);
+@@ -231,8 +255,12 @@ static void zynq_init(MachineState *machine)
+     sysbus_create_simple("xlnx,ps7-usb", 0xE0002000, pic[53-IRQ_OFFSET])=
+;
+     sysbus_create_simple("xlnx,ps7-usb", 0xE0003000, pic[76-IRQ_OFFSET])=
+;
+=20
+-    cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
+-    cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
++    dev =3D cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial=
+_hd(0));
++    qdev_connect_clock_in(dev, "refclk",
++                          qdev_get_clock_out(slcr, "uart0_ref_clk"));
++    dev =3D cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial=
+_hd(1));
++    qdev_connect_clock_in(dev, "refclk",
++                          qdev_get_clock_out(slcr, "uart1_ref_clk"));
+=20
+     sysbus_create_varargs("cadence_ttc", 0xF8001000,
+             pic[42-IRQ_OFFSET], pic[43-IRQ_OFFSET], pic[44-IRQ_OFFSET], =
+NULL);
+@@ -310,8 +338,9 @@ static void zynq_init(MachineState *machine)
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &zynq_binfo);
+ }
+=20
+-static void zynq_machine_init(MachineClass *mc)
++static void zynq_machine_class_init(ObjectClass *oc, void *data)
+ {
++    MachineClass *mc =3D MACHINE_CLASS(oc);
+     mc->desc =3D "Xilinx Zynq Platform Baseboard for Cortex-A9";
+     mc->init =3D zynq_init;
+     mc->max_cpus =3D 1;
+@@ -320,4 +349,16 @@ static void zynq_machine_init(MachineClass *mc)
+     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a9");
+ }
+=20
+-DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
++static const TypeInfo zynq_machine_type =3D {
++    .name =3D TYPE_ZYNQ_MACHINE,
++    .parent =3D TYPE_MACHINE,
++    .class_init =3D zynq_machine_class_init,
++    .instance_size =3D sizeof(ZynqMachineState),
++};
++
++static void zynq_machine_register_types(void)
++{
++    type_register_static(&zynq_machine_type);
++}
++
++type_init(zynq_machine_register_types)
+--=20
+2.25.1
 
 
