@@ -2,89 +2,107 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035DAC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C930FC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3E8F21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:16:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9842221744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:16:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kfU8ao//"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3E8F21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSAE7Rbd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9842221744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6a4W-0002cS-VO
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:16:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59266)
+	id 1j6a4p-0003DI-Ph
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:16:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcY-0005cE-Lf
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:31 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j6Z7j-0000oc-QQ
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZcX-0007Hd-Lh
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:30 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36384)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6ZcW-0007Gp-I5
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:47:28 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z3so14595329wru.3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:47:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=na92kVuJJsjY30jm/AoUIfDqEYfGMWmCBB2a9Ak5rMc=;
- b=kfU8ao//sTxn2+jp/mewHRgcmNuhH0miGGE44IjK0/bzxtBF/uz3kNp8SEKkizaBWw
- zzijHh6nyX7B8Dsv8/fo4fWeKJupsAdc05OMp7dFCij0LXmbyFDTtxzuOvalkcgC4pmG
- xwH42zZmEf+kfeRzsCHOj0dqgnOCvEFOGvui3wjGwZ8Hi9wisoLNmMaXox88U/rV4hCR
- OnTz6HlRCZ8dDwkiSwFlWgTTS1wJZuQVicrEYNxNcs5itOIPVz/lYYN6s0KRg9Hpo+VW
- 5wyBQoy0c2upE4pQBS+sz2Tna33pxSKcGPWAlTQ4aY8TfCqVa1fLx79MGbLaC+Gqeg3M
- G7jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=na92kVuJJsjY30jm/AoUIfDqEYfGMWmCBB2a9Ak5rMc=;
- b=CLW2oXGGVbH3aYtFONHD9irMXVDqSbtKhJV9uLApUbyrBSmPmUtGK2BEN7c/kcE3Hg
- OwdoIHZ/nkfsDvtxLx+WLAr7Ta5yc/1FJkNUZUlDKH5vPNNFHkLRxQOhD/EQxWGoP9Lk
- u+n7WOxfryppL5htVFb0PKZTD++7Jha83/P9H/K9Aunm8nL44JUlMfjOx6WroEygyYcV
- iQdP6yt4dhK19Y4c+l86Dn76QuERM5DPuliXIbboSdWB+YJZPmDoNhjcCVzRiV4hygXf
- JWwwDEsI59D0H8Q2Pk8rqmLytwCwRXLecD2E93WtjeP/hjEjaUxNcTy+J5uD+UjlRKWD
- pX2A==
-X-Gm-Message-State: APjAAAWA32DlslTxNnXemYHh7HQrT35rv5h/C9AK1MmWt+Y5NnE5YkK+
- 79PisJ/6A0Kf2XFP0/BQkO761Q==
-X-Google-Smtp-Source: APXvYqzantn4UyHjGDRJMwcfpHqNT+AyG386KerVbvcQeeBptcKWGVcVU1Z++1zQ5GJRz4b5UDq1OA==
-X-Received: by 2002:a5d:4807:: with SMTP id l7mr7063342wrq.250.1582634847306; 
- Tue, 25 Feb 2020 04:47:27 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f8sm22586384wru.12.2020.02.25.04.47.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 04:47:22 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 426A41FF9B;
- Tue, 25 Feb 2020 12:47:11 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 11/19] plugins/core: add missing break in cb_to_tcg_flags
-Date: Tue, 25 Feb 2020 12:47:02 +0000
-Message-Id: <20200225124710.14152-12-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
-References: <20200225124710.14152-1-alex.bennee@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1j6Z7h-00005Y-Hu
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:15:39 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30097
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6Z7h-0008WU-Cn
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:15:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582632936;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9zLbsx1t9tJ+pIqteDEZBHygCyCv84fcRk6cFMou4k4=;
+ b=HSAE7RbdTuYLquDoZQ9I6vR6SNl46qBs/sLbTe7vrvcvwfy8nTY9+Qn14ohCudwJN3VNQw
+ sEMDUUuLX18DE1ev5Si0uvLb0Eo9vdFkpDJJUw50xnUdHvVETIwuq8CAAiimZ0ScQo2E3H
+ r4z9o+5bDwxd/i535/V+UYpJ7utD8vs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-92-dyQUTe9UPMS_76_vaIVw_w-1; Tue, 25 Feb 2020 07:15:34 -0500
+X-MC-Unique: dyQUTe9UPMS_76_vaIVw_w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20FDC1007268;
+ Tue, 25 Feb 2020 12:15:33 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-215.ams2.redhat.com
+ [10.36.117.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 73F2D1001B09;
+ Tue, 25 Feb 2020 12:15:30 +0000 (UTC)
+Subject: Re: QAPI schema for desired state of LUKS keyslots (was: [PATCH
+ 02/13] qcrypto-luks: implement encryption key management)
+To: Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
+References: <20200114193350.10830-1-mlevitsk@redhat.com>
+ <20200114193350.10830-3-mlevitsk@redhat.com>
+ <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ad92d470-7388-c419-f3fb-0bfd541b670b@redhat.com>
+Date: Tue, 25 Feb 2020 13:15:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="LJECeRsyP8Px3soF1mlvavszAPCKeG80c"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,44 +114,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
- pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
- qemu-stable@nongnu.org, marcandre.lureau@redhat.com,
- aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LJECeRsyP8Px3soF1mlvavszAPCKeG80c
+Content-Type: multipart/mixed; boundary="QbcUzDY5PvrejcTPXyAFOFddpXpHcN5NM"
 
-Fixes: 54cb65d8588
-Reported-by: Robert Henry <robhenry@microsoft.com>
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200105072940.32204-1-cota@braap.org>
-Cc: qemu-stable@nongnu.org
----
- plugins/core.c | 1 +
- 1 file changed, 1 insertion(+)
+--QbcUzDY5PvrejcTPXyAFOFddpXpHcN5NM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/plugins/core.c b/plugins/core.c
-index 9e1b9e7a915..ed863011baf 100644
---- a/plugins/core.c
-+++ b/plugins/core.c
-@@ -286,6 +286,7 @@ static inline uint32_t cb_to_tcg_flags(enum qemu_plugin_cb_flags flags)
-     switch (flags) {
-     case QEMU_PLUGIN_CB_RW_REGS:
-         ret = 0;
-+        break;
-     case QEMU_PLUGIN_CB_R_REGS:
-         ret = TCG_CALL_NO_WG;
-         break;
--- 
-2.20.1
+On 15.02.20 15:51, Markus Armbruster wrote:
+> Review of this patch led to a lengthy QAPI schema design discussion.
+> Let me try to condense it into a concrete proposal.
+>=20
+> This is about the QAPI schema, and therefore about QMP.  The
+> human-friendly interface is out of scope.  Not because it's not
+> important (it clearly is!), only because we need to *focus* to have a
+> chance at success.
+>=20
+> I'm going to include a few design options.  I'll mark them "Option:".
+>=20
+> The proposed "amend" interface takes a specification of desired state,
+> and figures out how to get from here to there by itself.  LUKS keyslots
+> are one part of desired state.
+>=20
+> We commonly have eight LUKS keyslots.  Each keyslot is either active or
+> inactive.  An active keyslot holds a secret.
+>=20
+> Goal: a QAPI type for specifying desired state of LUKS keyslots.
+>=20
+> Proposal:
+>=20
+>     { 'enum': 'LUKSKeyslotState',
+>       'data': [ 'active', 'inactive' ] }
+>=20
+>     { 'struct': 'LUKSKeyslotActive',
+>       'data': { 'secret': 'str',
+>                 '*iter-time': 'int } }
+>=20
+>     { 'struct': 'LUKSKeyslotInactive',
+>       'data': { '*old-secret': 'str' } }
+>=20
+>     { 'union': 'LUKSKeyslotAmend',
+>       'base': { '*keyslot': 'int',
+>                 'state': 'LUKSKeyslotState' }
+>       'discriminator': 'state',
+>       'data': { 'active': 'LUKSKeyslotActive',
+>                 'inactive': 'LUKSKeyslotInactive' } }
+
+Looks OK to me.  The only thing is that @old-secret kind of works as an
+address, just like @keyslot, so it might also make sense to me to put
+@keyslot/@old-secret into a union in the base structure.
+
+(One of the problems that come to mind with that approach is that not
+specifying either of @old-secret or @keyslot has different meanings for
+activating/inactivating a keyslot: When activating it, it means =E2=80=9CTh=
+e
+first unused one=E2=80=9D; when deactivating it, it=E2=80=99s just an error=
+ because it
+doesn=E2=80=99t really mean anything.)
+
+*shrug*
+
+Max
+
+
+--QbcUzDY5PvrejcTPXyAFOFddpXpHcN5NM--
+
+--LJECeRsyP8Px3soF1mlvavszAPCKeG80c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5VD+EACgkQ9AfbAGHV
+z0DvkAf9HDe11TywYs8WMrZ0TSYQLjN9vV6G1dEpM5q7zXdf+O+lLNSYd4vUXZWO
+6tcnajZt0LoQvL1naLlqJan8mQDx4afrMJYqz5ThLcBRoNezASAcscVEP+19pmfI
+cUg3i06w9Nvs03nntCRIhrhTl+tDKmoQ/JInNK+VCd23ZLZgJCbj6eO1Jaktpkde
+V3hh1yMALvRmheJq7CC7BJbK5oeG6l/V2eX+BHndjQePHLPz5pxVtHjcqm+NhZ8u
+loiptwPLtTkN2DuXxHeVK0KZWtur6OQoL8akfLOzg6w1lhOcpzhQcqGU3EOCt4Go
+y7sxyKVXYaQbDv3256KU09UR1rCrfw==
+=1fK3
+-----END PGP SIGNATURE-----
+
+--LJECeRsyP8Px3soF1mlvavszAPCKeG80c--
 
 
