@@ -2,95 +2,104 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE601C35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 029ECC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8883F2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C60782072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:02:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xDdUI7cQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8883F2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="MvMfIcjT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C60782072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ceN-0004l7-Od
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:01:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36890)
+	id 1j6cfd-0005sO-15
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:02:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j6cd4-0003mZ-96
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:00:15 -0500
+ (envelope-from <anthony.perard@citrix.com>) id 1j6cf2-0005Mq-BI
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:02:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j6cd1-0001FO-Ea
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:00:14 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37391)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j6cd1-0001Ex-7s
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:00:11 -0500
-Received: by mail-pl1-x641.google.com with SMTP id q4so1535304pls.4
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 08:00:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NIjEmlzIoxEX8wD0uwi1dC8f6hSj0pPSYViBz77H6iI=;
- b=xDdUI7cQUYEfPBoguUrgoNxcvN/SXWTJRfWR6DFhsCn8ssc3Q+v8pSHXuLtwvT/68p
- r7u/3Gq2L+ZXUwTf5A4mqIckSLfEdntyPH/s3jqC9bljQ/avSrsh5l6jzxe/ufOd2kVd
- 3ifFHMfIb4z5A37qoY+yBNMS8tkVy07E8dPSR5wVLIRiDqLQAmHnBvICeduMNZdTQ3Us
- OT9pMhJ0gfRhKiFMNXYgAgyv6B2Ujbj8ODRNgxYgEJG68ffgsyPfAcuTm+iBvbtY+PkS
- B3PMJT87N7rvbu2AY4+xVBEcnvATc032NlAskTx8XQJ4WgF8wxWlK/qTLq70DFp7BXhg
- d5UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NIjEmlzIoxEX8wD0uwi1dC8f6hSj0pPSYViBz77H6iI=;
- b=qbfO8NcQaSqhFqOCnd4WIjT3XLwHhgfOzcJ6iw8/c5l5jWXe1BvuvSLXYhMLpw+4pB
- tg0H/JtFk/uh6FnjA5NXnIuNGIJQq4VNfkGUwCYJLK+06t021bqPHAPnmewyETagDE9S
- rnmP5yFHvVqHDOBjhWFZrCHWJrmgWD+GVgWI5r0+vTafW+T9Bi8kEufByX0WfdnrBe5+
- VA7rZHV0Xy2JHDjJSMboUpP7XayO27Hw7YJKSCAJQV5JVPjm4OpxjzxXHpUyX8jOKzc8
- kDL9zzV53bkxkps2wP9qw/IKhBDEU6Z13dCSm7YjfRerwoFI/PvIk4i0Je+9LQsfzSb0
- 41Cg==
-X-Gm-Message-State: APjAAAW/fX1yLQI5BwIY7U4C+xqNn+spO1KS+rLRZxsu4C4Zs1xc99HB
- PF3jkADscQg/iF7pJvPSFkXYbQ==
-X-Google-Smtp-Source: APXvYqz0flc9GFx8Rv5U/Pk9W70j1zaiZ3wEjRogAVWXX9vuIVyJEqV+jFHTNWDRXTLysHE9SAsriQ==
-X-Received: by 2002:a17:902:740c:: with SMTP id
- g12mr58691845pll.166.1582646410160; 
- Tue, 25 Feb 2020 08:00:10 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- h10sm17476563pfo.181.2020.02.25.08.00.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Feb 2020 08:00:09 -0800 (PST)
-Subject: Re: [PATCH v2 05/17] target/arm: Improve ID_AA64PFR0 FP/SIMD
- validation
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200224222232.13807-1-richard.henderson@linaro.org>
- <20200224222232.13807-6-richard.henderson@linaro.org>
- <CAFEAcA9WZbZj_hPemTGr+Rkh--VmZt1eis189+ExuPVNipgo_A@mail.gmail.com>
- <49741058-7dbf-d20f-95ce-5bf9b5e5bdb2@linaro.org>
- <CAFEAcA9nZx0eCnQtjCdG2OZRK=pF-Afb9jtvGZ=dJTAbaVAL1Q@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ede96361-bc42-8ba3-4a63-fc37f02faa9e@linaro.org>
-Date: Tue, 25 Feb 2020 08:00:07 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <anthony.perard@citrix.com>) id 1j6cex-0002OY-E1
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:02:16 -0500
+Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:62268)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
+ id 1j6cex-0002Iq-1J
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:02:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1582646531;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=vrkm1pEDcoFOsLkuNzDV5ymO4VMUfcnMbepTVDMIEXY=;
+ b=MvMfIcjTO0g8q/aGEay1H4tj7kJLnPXG/h5OaMFngnp6xp4ru5EfM53b
+ zbadYF09/T64t+2QbSrOD9RmQWBXSBh46KxlkPsohetWFoBpxRp4OhjeD
+ 2uJwXBylQS53yJH06ntiNfv5KzqIPl3j+t3wd+adxwwnuJG9Z4QZe2TeL Q=;
+Authentication-Results: esa1.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none;
+ spf=None smtp.pra=anthony.perard@citrix.com;
+ spf=Pass smtp.mailfrom=anthony.perard@citrix.com;
+ spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ anthony.perard@citrix.com) identity=pra;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible
+Received-SPF: Pass (esa1.hc3370-68.iphmx.com: domain of
+ anthony.perard@citrix.com designates 162.221.158.21 as
+ permitted sender) identity=mailfrom;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="anthony.perard@citrix.com";
+ x-conformance=sidf_compatible; x-record-type="v=spf1";
+ x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+ ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+ ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+ ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83
+ ip4:168.245.78.127 ~all"
+Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
+ authenticity information available from domain of
+ postmaster@mail.citrix.com) identity=helo;
+ client-ip=162.221.158.21; receiver=esa1.hc3370-68.iphmx.com;
+ envelope-from="anthony.perard@citrix.com";
+ x-sender="postmaster@mail.citrix.com";
+ x-conformance=sidf_compatible
+IronPort-SDR: B716wH3cwf+8gj4NIwwksPXCjCuVqqLPy37MeCoJsJf14CmaoluLuUE22vkPq88F5e8YdHXjlN
+ uDWQviAsHEd9eUcwA2xzd3L+/4QZT2B5DdYy6rgWx39mVEPDFonyWiIIM/KRcq0yEdB8DB5E9b
+ qn9LDZWFvcY09Y/6fNpVgb0BiYUP//i1Dv2b28UIh+AzlJiPT3L6g5+gpE1Ew6FAwLXXIs85kn
+ vONAm3amILUSOzt7XQQaXFA+K7IR8qL/9EwALgJOVkVzyhKvusii8Zuwe7coC5BFGQkEGdTur+
+ P7I=
+X-SBRS: 2.7
+X-MesageID: 13160685
+X-Ironport-Server: esa1.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.70,484,1574139600"; d="scan'208";a="13160685"
+Date: Tue, 25 Feb 2020 16:02:03 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH] Memory: Only call ramblock_ptr when needed in
+ qemu_ram_writeback
+Message-ID: <20200225160203.GD2193@perard.uk.xensource.com>
+References: <20191219154214.GE1267@perard.uk.xensource.com>
+ <20191219154323.325255-1-anthony.perard@citrix.com>
+ <87immc190v.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9nZx0eCnQtjCdG2OZRK=pF-Afb9jtvGZ=dJTAbaVAL1Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87immc190v.fsf@trasno.org>
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.145.142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,20 +111,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Beata Michalska <beata.michalska@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/25/20 7:58 AM, Peter Maydell wrote:
->> Do you want me to add a tcg_enabled check, or shall we just drop the patch?
->> The existing test is good enough for just checking the command-line.
+On Thu, Dec 19, 2019 at 07:10:24PM +0100, Juan Quintela wrote:
+> Anthony PERARD <anthony.perard@citrix.com> wrote:
+> > It is possible that a ramblock doesn't have memory that QEMU can
+> > access, this is the case with the Xen hypervisor.
+> >
+> > In order to avoid to trigger an assert, only call ramblock_ptr() when
+> > needed in qemu_ram_writeback(). This should fix migration of Xen
+> > guests that was broken with bd108a44bc29 ("migration: ram: Switch to
+> > ram block writeback").
+> >
+> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
 > 
-> If it isn't a requirement for the rest of the series, let's just
-> drop the patch.
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> 
+> This is exec.c, nothing related to migration.
+> 
+> Paolo, are you taking this one?
+> It could even go through the trivial one.
 
-It isn't; there should be no conflict dropping it.
+Hi,
 
+I'm going to send a pull request for the xen queue with this patch.
+Unless that's an issue?
 
-r~
+Cheers,
+
+-- 
+Anthony PERARD
 
