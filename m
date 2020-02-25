@@ -7,82 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA771C35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1682C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B563B20658
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC58A20658
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KoCLNAk2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B563B20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Px6uYsCw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC58A20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6bxt-0006dP-Tp
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:17:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55335)
+	id 1j6by6-0007ES-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:17:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6btm-0007d9-0o
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:27 -0500
+ (envelope-from <mst@redhat.com>) id 1j6btT-000700-Tc
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6btk-00016d-Qy
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:25 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39469
+ (envelope-from <mst@redhat.com>) id 1j6btS-00011F-Sc
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26811
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6btk-00016K-Me
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:24 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6btS-00010x-Ny
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:13:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582643604;
+ s=mimecast20190719; t=1582643586;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GbXYhzT4HdCqyN2iskP5pyuuGP3IhftOdhWxCQdQeVU=;
- b=KoCLNAk21C1LLpIEYxyUpGeTOFLnXHVc8p38pIWh9LEp/3iQYx7B7buxqR+UNpPaO3PCBh
- gSUAthDQw5jvP6oHDK/bwFRVP8SEm459hJKS802o50cb716WBvYHbzc4sB46jlu0P34VFx
- M85QFDC+HKprgjAvIt76PvuXVqcpuxs=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-1pr1NmO4O4yHJ42nByxWhw-1; Tue, 25 Feb 2020 10:13:20 -0500
-X-MC-Unique: 1pr1NmO4O4yHJ42nByxWhw-1
-Received: by mail-qk1-f198.google.com with SMTP id q123so15343304qkb.1
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 07:13:20 -0800 (PST)
+ bh=5Sbkpo7K4fbQQabaezht/7HSdtDe1em0zHLb8IleaCg=;
+ b=Px6uYsCws0IIew7ni92wcOhkvXI3tnIGryZizBZFfW/K+UP/pqukDdrNAUJnDkwkDsEFok
+ 5f2mjWZTiMsPKWU8YelZoWALpr/Va1V55VkZg7vYUhFPtRNwgPJMdAmRQdexBn55cuyNZm
+ xX81Vl/8rAzSNJgT1vVOkZCHku6KsZ8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-LwIT6Wr3M7mzf3HeAQPe6g-1; Tue, 25 Feb 2020 10:13:03 -0500
+X-MC-Unique: LwIT6Wr3M7mzf3HeAQPe6g-1
+Received: by mail-qk1-f197.google.com with SMTP id c206so15297822qkg.6
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 07:13:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=XWpi8uIuYqDgAxSrNx/dNPfjKOUMUQTkfVlQ2qW7D7Y=;
- b=jTAEI3N322Z2O1oHsnrYi9vBQ07q9Eodyg0UekP0NOMlqgZ57tCzSU1fMJsQWJjar7
- mmn+cu+0mXrlBtLoGbexVr/Hxef+A9vABjt5954stoBnbC6kwTSRK42ISPDtEOjZ3V/8
- OIB2wSN/fNbYPsbKx2VGILvAKfoEIGMGIAXs9npQ3J52Ka1XRMO251WDzOMSo9LwAVDi
- wKV6s8RnS3sqjvwuRwRMWI1NA4h2BViBjfRPpA8VKYII6s3wV4xAMirZk4+Y6k5cHShg
- P0ZYF8z4pRpbGjJsiNRHLgdoMw7p3EUVnOR261DnOR7ztUwmqp4RP0lkH/ZAw4SinLUS
- x0aA==
-X-Gm-Message-State: APjAAAXPREH2K23o2BZnpBYE1nUdt3r5f6smLNLzre7b5wxHMfV6FEGI
- GfxVjTB5u1f2P3/nhZJsNi3O/4dNdNSWKg29VxgQRpo0A4dMKdN1FpslTLMZOGAlSw3raVObzvi
- sV8o7XKLg50sBbmU=
-X-Received: by 2002:a05:6214:1494:: with SMTP id
- bn20mr51323187qvb.43.1582643599414; 
- Tue, 25 Feb 2020 07:13:19 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwYrjURwrUF8SqAALIsRsrcflyHpX1TwEyCa35tge0RQnzsgo/Eo2WYpuxXb352YKUszu3SaA==
-X-Received: by 2002:a05:6214:1494:: with SMTP id
- bn20mr51323167qvb.43.1582643599203; 
- Tue, 25 Feb 2020 07:13:19 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=HQCVFXmC4HNrtLa78+UIIIU3F1sBdIpmGro+wxgLStc=;
+ b=HEC36zAgkN8m98c2hcAQG4026gUEJ7ZtQYqFhu7/RzDFcEnp9JeOTcHi2qiLsIFJlS
+ Uwd6iVNZ0WxlcEd/qWywthVen4hzzVoXtR8RfpX6RKoK5g/OIilzmWQ5QCBzBM3u9TN3
+ nsFGsf2kX7Yal6JsIG5Rl4zOqkewyTnn/wWAHVDJMNWYXjyM1q7+xqiAxpCj0JeZLVUF
+ PzSil542Jkw7FwlcZdsBn1scHKwG1LGL75YU4lgkFPcYhxXOVYlBshhOelVN4kmZ78J4
+ huFjD2HdoBKtVXjSUA2hO2oqDKyNCwpieMBrKmmyKxMbQ2RWFv7RiJ6D6WEV4oCsJ6kS
+ 4EPw==
+X-Gm-Message-State: APjAAAULieMT1CPN7IXClmBd1qdggsRi/miyDpMO7dFreSa8KdSQDLaZ
+ B4q6C3Rz10k0QF/x8HG+A6g5lzdpFRZmIT3ozC041Fm3oCCq6RYRmpPPL6SPQg/S9wvp8qzuO/h
+ skNOK7jI9COF8gZ0=
+X-Received: by 2002:ac8:7b4c:: with SMTP id m12mr162295qtu.387.1582643582998; 
+ Tue, 25 Feb 2020 07:13:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz1YDo7kjGJFWilPV4mKlxk3PPAchZLKewsrdOkSrp1Qt5Z9/pUYoWbE3+pManT7cmZ8kYWOA==
+X-Received: by 2002:ac8:7b4c:: with SMTP id m12mr162273qtu.387.1582643582790; 
+ Tue, 25 Feb 2020 07:13:02 -0800 (PST)
 Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
  by smtp.gmail.com with ESMTPSA id
- c45sm7795604qtd.43.2020.02.25.07.13.16
+ w2sm7679134qto.73.2020.02.25.07.13.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 07:13:18 -0800 (PST)
-Date: Tue, 25 Feb 2020 10:13:14 -0500
+ Tue, 25 Feb 2020 07:13:02 -0800 (PST)
+Date: Tue, 25 Feb 2020 10:12:58 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/32] vhost-user-blk: convert to new virtio_delete_queue
-Message-ID: <20200225151210.647797-11-mst@redhat.com>
+Subject: [PULL 07/32] virtio-pmem: do delete rq_vq in virtio_pmem_unrealize
+Message-ID: <20200225151210.647797-8-mst@redhat.com>
 References: <20200225151210.647797-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200225151210.647797-1-mst@redhat.com>
@@ -90,12 +89,11 @@ X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,106 +105,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Pan Nengyuan <pannengyuan@huawei.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Pan Nengyuan <pannengyuan@huawei.com>
 
-use the new virtio_delete_queue function to cleanup.
+Similar to other virtio-devices, rq_vq forgot to delete in
+virtio_pmem_unrealize, this patch fix it.  This device has already
+maintained a vq pointer, thus we use the new virtio_delete_queue
+function directly to do the cleanup.
 
+Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Message-Id: <20200224041336.30790-3-pannengyuan@huawei.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200225075554.10835-4-pannengyuan@huawei.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/vhost-user-blk.h |  3 ++-
- hw/block/vhost-user-blk.c          | 19 +++++++++++--------
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ hw/virtio/virtio-pmem.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-u=
-ser-blk.h
-index 108bfadeeb..05ea0ad183 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -36,7 +36,8 @@ typedef struct VHostUserBlk {
-     struct vhost_dev dev;
-     struct vhost_inflight *inflight;
-     VhostUserState vhost_user;
--    struct vhost_virtqueue *vqs;
-+    struct vhost_virtqueue *vhost_vqs;
-+    VirtQueue **virtqs;
-     guint watch;
-     bool connected;
- } VHostUserBlk;
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 2eba8b9db0..12925a47ec 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -306,7 +306,7 @@ static int vhost_user_blk_connect(DeviceState *dev)
-     s->connected =3D true;
+diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+index 97287e923b..43399522f5 100644
+--- a/hw/virtio/virtio-pmem.c
++++ b/hw/virtio/virtio-pmem.c
+@@ -130,6 +130,7 @@ static void virtio_pmem_unrealize(DeviceState *dev, Err=
+or **errp)
+     VirtIOPMEM *pmem =3D VIRTIO_PMEM(dev);
 =20
-     s->dev.nvqs =3D s->num_queues;
--    s->dev.vqs =3D s->vqs;
-+    s->dev.vqs =3D s->vhost_vqs;
-     s->dev.vq_index =3D 0;
-     s->dev.backend_features =3D 0;
-=20
-@@ -420,13 +420,14 @@ static void vhost_user_blk_device_realize(DeviceState=
- *dev, Error **errp)
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
-=20
-+    s->virtqs =3D g_new(VirtQueue *, s->num_queues);
-     for (i =3D 0; i < s->num_queues; i++) {
--        virtio_add_queue(vdev, s->queue_size,
--                         vhost_user_blk_handle_output);
-+        s->virtqs[i] =3D virtio_add_queue(vdev, s->queue_size,
-+                                        vhost_user_blk_handle_output);
-     }
-=20
-     s->inflight =3D g_new0(struct vhost_inflight, 1);
--    s->vqs =3D g_new0(struct vhost_virtqueue, s->num_queues);
-+    s->vhost_vqs =3D g_new0(struct vhost_virtqueue, s->num_queues);
-     s->watch =3D 0;
-     s->connected =3D false;
-=20
-@@ -458,11 +459,12 @@ reconnect:
-     return;
-=20
- virtio_err:
--    g_free(s->vqs);
-+    g_free(s->vhost_vqs);
-     g_free(s->inflight);
-     for (i =3D 0; i < s->num_queues; i++) {
--        virtio_del_queue(vdev, i);
-+        virtio_delete_queue(s->virtqs[i]);
-     }
-+    g_free(s->virtqs);
+     host_memory_backend_set_mapped(pmem->memdev, false);
++    virtio_delete_queue(pmem->rq_vq);
      virtio_cleanup(vdev);
-     vhost_user_cleanup(&s->vhost_user);
  }
-@@ -478,12 +480,13 @@ static void vhost_user_blk_device_unrealize(DeviceSta=
-te *dev, Error **errp)
-                              NULL, NULL, NULL, false);
-     vhost_dev_cleanup(&s->dev);
-     vhost_dev_free_inflight(s->inflight);
--    g_free(s->vqs);
-+    g_free(s->vhost_vqs);
-     g_free(s->inflight);
 =20
-     for (i =3D 0; i < s->num_queues; i++) {
--        virtio_del_queue(vdev, i);
-+        virtio_delete_queue(s->virtqs[i]);
-     }
-+    g_free(s->virtqs);
-     virtio_cleanup(vdev);
-     vhost_user_cleanup(&s->vhost_user);
- }
 --=20
 MST
 
