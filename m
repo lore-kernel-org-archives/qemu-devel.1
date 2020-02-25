@@ -2,81 +2,81 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A20F4C35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08FF2C35E03
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DA422064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:48:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7E552064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:50:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hc190EdT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA422064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EpQnIbxk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E552064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6bW2-0003vV-IE
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:48:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51837)
+	id 1j6bX8-0005DV-0v
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:50:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j6bVI-0003Sz-JY
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:09 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6bVv-0003wL-R8
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j6bVG-0004Jv-UV
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42689
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j6bVF-0004Iz-PA
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582642084;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dt8sAbNbRoJwVElkyjF1TwUhGRgiM4ixeDE8DWOKqns=;
- b=Hc190EdTupnHA9ojHNWtf0o7NbFMLg0Efw4nl9wgQj28Bk3UK7fILdXw5e0YGWq+Lt8czd
- Mm5zgvyJoYruahIm7yNrXAc7kNz4naa4wFypPeljBN79o1OWVDVh9L16OMj8nk1sKMFySS
- SziywHcW2EkXr+b7w+K/ARGwA2dzR8s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-Txe_mafxN5iMb6W0a-kGAg-1; Tue, 25 Feb 2020 09:48:00 -0500
-X-MC-Unique: Txe_mafxN5iMb6W0a-kGAg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26A5B800D53;
- Tue, 25 Feb 2020 14:47:57 +0000 (UTC)
-Received: from gondolin (dhcp-192-175.str.redhat.com [10.33.192.175])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B25498ED01;
- Tue, 25 Feb 2020 14:47:52 +0000 (UTC)
-Date: Tue, 25 Feb 2020 15:47:50 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/ipl: sync back loadparm
-Message-ID: <20200225154750.6bee1c52.cohuck@redhat.com>
-In-Reply-To: <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
-References: <20200224150213.21253-1-pasic@linux.ibm.com>
- <05f7dcf7-a0c7-8811-6b88-df86d5fa0974@redhat.com>
- <20200225125641.72e8cc86.pasic@linux.ibm.com>
- <853387e3-4425-731b-bb09-a7210ea6b299@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1j6bVu-0004no-J2
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:47 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35570)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6bVu-0004nL-CJ
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:48:46 -0500
+Received: by mail-oi1-x241.google.com with SMTP id b18so12780769oie.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:48:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2ie4cWTu6Mx+cx/dMKac3RUgHcpymotpqG8utSoK4mE=;
+ b=EpQnIbxkcZ5PLEEcBX0N6fl2kUpFjGYHN8wrzEJN+tY9uO5fs92Ut6cEe9o4gZTKcY
+ X0AQWJtPj7ZDJ2Gpkt9wHLXQCBCJFKth1iATx5sZRKwKriZrv0p+W8yiTkjJOhEFxy9i
+ Cbld7M/30A6L/UvEWDxBbV54yBVQkXpORfdOPctoTTgGRnJfIQMsqcUp25Yvu74BNy6F
+ L1UF+nJLW7DeOxDswgomSWxi/xymJlCi4tWQUVe5dgLMUHdy6x89EwYElHkwsaberMRL
+ 9aPRd2FXNRJiu/JGzTrNY/BRaiEuiw6lcve85+eb4NQ9KaZIXgAxGHHhzCR8FCFK5Dcx
+ 60tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2ie4cWTu6Mx+cx/dMKac3RUgHcpymotpqG8utSoK4mE=;
+ b=gox9mlX80rRTzljKZEhOdPfBKWehyozeIsRKk0HqEWD1idgkop2iqZW6trLvcght9c
+ Na8pjiN9sHboAuF1Oux/xL4ZFXO+YU6CNVfOIEgFcVPR4FNvyf9Jab2I2E1X3cLFyMQP
+ Kotso6uB4k/uJWiSTHZa8YCwhdrb1QAevVUzF91RhMl361BCuAETZeJJ7+H3fnnY9QiI
+ JHVw6O9sx3EyirjzaiyxytR+wOEpCL0omN6z3gHk+pcmu+73X7vOMtdE2xT+plc6V5yo
+ +x+jde9yrzc+lHugIE4/RKPnMBY64lxNTqvc9Nap74BZs6Deuu8OQhTBFLfj5iPdOkGJ
+ EGsA==
+X-Gm-Message-State: APjAAAXRg+3GAL/d+BZji+q+sf9fJGdyqy+bVWmemeHIkaCV6bMR008A
+ rXUEzSiExUJB5zfolBNbivbPKVj0F91bO0tXC0zj2w==
+X-Google-Smtp-Source: APXvYqzV8A4SPDqYsnOCbpsCQ4qvGFiT4r6AiZyKWJVQHUEoqQT9Owb55Nb6Xw2kpr3L8vbrTHFqLR9VRHhtjJDJOeQ=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr3768391oic.48.1582642125570; 
+ Tue, 25 Feb 2020 06:48:45 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <1582634771-26661-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1582634771-26661-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Feb 2020 14:48:34 +0000
+Message-ID: <CAFEAcA8C77V-kQ2auU26sLgCtTWSfZnLa3-veztr2xNFZoSZAw@mail.gmail.com>
+Subject: Re: [PULL v2 000/104] Misc patches for 2020-02-25 (refactoring and
+ Coccinelle edition)
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,84 +88,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Marc Hartmayer <mhartmay@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Feb 2020 15:35:47 +0100
-Viktor Mihajlovski <mihajlov@linux.ibm.com> wrote:
+On Tue, 25 Feb 2020 at 13:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit c1e667d2598b9b3ce62b8e89ed22dd38dfe9f57f:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2020-02-24 11:38:54 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 9e264985ff0bc86927b44b334bd504687f78659d:
+>
+>   Merge branch 'exec_rw_const_v4' of https://github.com/philmd/qemu into HEAD (2020-02-25 13:41:48 +0100)
+>
+> v1->v2: dropped patches 99-130
+>
+> ----------------------------------------------------------------
+>
+> * device_del fix (Julia)
+> * FXAM fix (myself)
+> * memdev refactoring (Igor)
+> * memory region API cleanups (Peter, Philippe)
+> * ioeventfd optimization (Stefan)
+> * new WHPX maintainer (Sunil)
+> * Large guest startup optimizations (Chen)
+>
 
-> On 2/25/20 12:56 PM, Halil Pasic wrote:
-> > On Tue, 25 Feb 2020 10:39:40 +0100
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 24.02.20 16:02, Halil Pasic wrote:  
-> >>> We expose loadparm as a r/w machine property, but if loadparm is set by
-> >>> the guest via DIAG 308, we don't update the property. Having a
-> >>> disconnect between the guest view and the QEMU property is not nice in
-> >>> itself, but things get even worse for SCSI, where under certain
-> >>> circumstances (see 789b5a401b "s390: Ensure IPL from SCSI works as
-> >>> expected" for details) we call s390_gen_initial_iplb() on resets
-> >>> effectively overwriting the guest/user supplied loadparm with the stale
-> >>> value.
-> >>>
-> >>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >>> Fixes: 7104bae9de "hw/s390x: provide loadparm property for the machine"
 
-Please use the format
+Applied, thanks.
 
-Fixes: <hash> ("subject")
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-> >>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> >>> Reviewed-by: Viktor Mihajlovski <mihajlov@linux.ibm.com>
-> >>> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> >>> ---
-> >>>   hw/s390x/ipl.c | 21 +++++++++++++++++++++
-> >>>   1 file changed, 21 insertions(+)
-> >>>
-> >>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c  
-> [...]
-> >>> +
-> >>> +    /* Sync loadparm */
-> >>> +    if (iplb->flags & DIAG308_FLAGS_LP_VALID) {
-> >>> +        char ascii_loadparm[8];
-> >>> +        uint8_t *ebcdic_loadparm = iplb->loadparm;
-> >>> +        int i;
-> >>> +
-> >>> +        for (i = 0; i < 8 && ebcdic_loadparm[i]; i++) {
-> >>> +            ascii_loadparm[i] = ebcdic2ascii[(uint8_t) ebcdic_loadparm[i]];
-> >>> +        }
-> >>> +        ascii_loadparm[i] = 0;
-> >>> +        object_property_set_str(mo, ascii_loadparm, "loadparm", NULL);
-> >>> +    } else {
-> >>> +        object_property_set_str(mo, "", "loadparm", NULL);
-> >>> +    }  
-> >>
-> >> &error_abort instead of NULL, we certainly want to know if this would
-> >> ever surprisingly fail.  
-> > 
-> > IMHO this is a typical assert() situation where one would like to have
-> > a fast and obvious failure when testing, but not in production.
-> > 
-> > AFAIU the guest can trigger this code at any time, and crashing the
-> > whole (production) system seems a bit heavy handed to me. The setter
-> > should only fail if something is buggy.
-> > 
-> > But if the majority says &error_abort I can certainly do. Other opinions?
-> >   
-> We might consider to return 0x0402 (invalid parameter) from the diag308 
-> "set", which is less drastic and would allow the OS to do whatever it 
-> finds appropriate to deal with the failure. Not that Linux would care 
-> about that today :-).
-
-I'm not sure if we could actually get there in any other way than via a
-QEMU coding error... not sure if I would trust QEMU to inject a return
-code if it already had a code logic fail right before that :)
-
+-- PMM
 
