@@ -2,61 +2,78 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1443AC35DF0
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDA3C35DEE
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2F5B227BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:34:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 993D924653
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 02:53:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="F8VpGMZ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F5B227BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="C3CGJGda"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993D924653
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Q38-0008PW-3d
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 21:34:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41545)
+	id 1j6QLb-0003tW-Ms
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 21:53:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j6Q2V-0007w8-IP
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:33:41 -0500
+ (envelope-from <danielcho@qnap.com>) id 1j6QL1-0003SF-U5
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:52:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j6Q2T-0001J9-BI
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:33:39 -0500
-Received: from ozlabs.org ([203.11.71.1]:54191)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j6Q2S-0001Gg-Iw; Mon, 24 Feb 2020 21:33:37 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48RNK80NL0z9sQt; Tue, 25 Feb 2020 13:33:31 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582598012;
- bh=pfA0U7ghr86Mf28OFrqEpdJS6LwoMzPmLrYHU/8d5fc=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=F8VpGMZ1IGXKrfSd4UrChD0YWM3HXU6Ri+BzgyayxgptAfDsaeqCNKqY6Q3BvLRVE
- akNgCisT/D15wx8Peysb0RTOSu90MWtv9l8XTqqsVJMWUEJ8qSTpf3f4sFCrg8hdBo
- ln/dg1zaWAwQqbAdCNgdXVkhV2wAeeC37ouEzJuo=
-Date: Tue, 25 Feb 2020 11:55:54 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] spapr: Handle pending hot plug/unplug requests at CAS
-Message-ID: <20200225005554.GF41629@umbus.fritz.box>
-References: <158257222352.4102917.8984214333937947307.stgit@bahia.lan>
+ (envelope-from <danielcho@qnap.com>) id 1j6QL0-0004AL-Cm
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:52:47 -0500
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:35897)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielcho@qnap.com>) id 1j6QL0-00049u-6t
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 21:52:46 -0500
+Received: by mail-yw1-xc42.google.com with SMTP id n184so6415513ywc.3
+ for <qemu-devel@nongnu.org>; Mon, 24 Feb 2020 18:52:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=IYzvqP7ygaHee3dmJBcMx/vXai2Do3cQlVKcWvnL7tU=;
+ b=C3CGJGdaCFAKOMFocpM9SQRjVAq+G6MgHGNliQPMNOageHL0TzwIfNQpKeb+6+A1zx
+ Cr7cBwK+TWGVywN3pg2qCkS2MfBBqFPamxKxlkemloFA9z/s3/FAo/OA32W9e6qKpRS6
+ 3sA48PEbUjFiWKfoncWQngGa1e62QJbkiKLaI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=IYzvqP7ygaHee3dmJBcMx/vXai2Do3cQlVKcWvnL7tU=;
+ b=Ud5zE/7Oul/xCS02ioD+CdsA8+0PDvtcOxUjhL54wqjy6/fgaGYnckNXlynJxPI92q
+ rQ8TFHH2P25Xjotzn8N4Rk3g3kWSUNwNLSI8MZET/vb8axl/cdGfIUsCoLhA8BjA8ATc
+ 8dzHowkyFNyZPkS4XbyhO4p91hTCEbpJcGNCqYSZ1ZFa2VsjH5pxqsZh1c8KNVnPE9dK
+ Bjx5K1Fj29/kV0PYoO3qRy4zt7sxSnE/hPTeBe5bLJvpNzfHqSEGd3oJJE7AB8AnQp1s
+ GMEgPbjXFssi6KGzZPU+swuLEkF93ykb5GE+g8RBRyP3Fqi6fyoPnqb7Gsv+TQrKwguj
+ HnxA==
+X-Gm-Message-State: APjAAAVolsUsXYQ4A3ZML31qJG/PeauZpI581cfuY8rayEuz5SQIS+Qy
+ cQK6roTU0pHZ7JwgfpWYTk4mqxznqURdFozopP7YZg==
+X-Google-Smtp-Source: APXvYqxyohAiRECn2nTznC31t5839XeA0Tn79SyeRkI8a4yp/1qrAVlvjqrh4o6m73wGE3QLraJAldPjcdwsgNNUwqM=
+X-Received: by 2002:a25:685:: with SMTP id 127mr30560568ybg.517.1582599165152; 
+ Mon, 24 Feb 2020 18:52:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Zs/RYxT/hKAHzkfQ"
-Content-Disposition: inline
-In-Reply-To: <158257222352.4102917.8984214333937947307.stgit@bahia.lan>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+References: <20200224065414.36524-1-zhang.zhanghailiang@huawei.com>
+ <20200224065414.36524-5-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <20200224065414.36524-5-zhang.zhanghailiang@huawei.com>
+From: Daniel Cho <danielcho@qnap.com>
+Date: Tue, 25 Feb 2020 10:52:31 +0800
+Message-ID: <CA+XQNE4+JnTxdROOpWo6ZjxL7k0R_5bAtUT=oOsurMM6Y9e61g@mail.gmail.com>
+Subject: Re: [PATCH V2 4/8] COLO: Optimize memory back-up process
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,160 +85,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Hailiang,
 
---Zs/RYxT/hKAHzkfQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+With version 2, the code in migration/ram.c
 
-On Mon, Feb 24, 2020 at 08:23:43PM +0100, Greg Kurz wrote:
-> If a hot plug or unplug request is pending at CAS, we currently trigger
-> a CAS reboot, which severely increases the guest boot time. This is
-> because SLOF doesn't handle hot plug events and we had no way to fix
-> the FDT that gets presented to the guest.
->=20
-> We can do better thanks to recent changes in QEMU and SLOF:
->=20
-> - we now return a full FDT to SLOF during CAS
->=20
-> - SLOF was fixed to correctly detect any device that was either added or
->   removed since boot time and to update its internal DT accordingly.
->=20
-> The right solution is to process all pending hot plug/unplug requests
-> during CAS: convert hot plugged devices to cold plugged devices and
-> remove the hot unplugged ones, which is exactly what spapr_drc_reset()
-> does. Also clear all hot plug events that are currently queued since
-> they're no longer relevant.
->=20
-> Note that SLOF cannot currently populate hot plugged PCI bridges or PHBs
-> at CAS. Until this limitation is lifted, SLOF will reset the machine when
-> this scenario occurs : this will allow the FDT to be fully processed when
-> SLOF is started again (ie. the same effect as the CAS reboot that would
-> occur anyway without this patch).
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
++            if (migration_incoming_colo_enabled()) {
++                if (migration_incoming_in_colo_state()) {
++                    /* In COLO stage, put all pages into cache temporarily=
+ */
++                    host =3D colo_cache_from_block_offset(block, addr);
++                } else {
++                   /*
++                    * In migration stage but before COLO stage,
++                    * Put all pages into both cache and SVM's memory.
++                    */
++                    host_bak =3D colo_cache_from_block_offset(block, addr)=
+;
++                }
+             }
+             if (!host) {
+                 error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+                 ret =3D -EINVAL;
+                 break;
+             }
 
-LGTM, applied to ppc-for-5.0.
+host =3D colo_cache_from_block_offset(block, addr);
+host_bak =3D colo_cache_from_block_offset(block, addr);
+Does it cause the "if(!host)" will go break if the condition goes
+"host_bak =3D colo_cache_from_block_offset(block, addr);" ?
 
+Best regards,
+Daniel Cho
+
+zhanghailiang <zhang.zhanghailiang@huawei.com> =E6=96=BC 2020=E5=B9=B42=E6=
+=9C=8824=E6=97=A5 =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=882:55=E5=AF=AB=E9=81=
+=93=EF=BC=9A
+>
+> This patch will reduce the downtime of VM for the initial process,
+> Privously, we copied all these memory in preparing stage of COLO
+> while we need to stop VM, which is a time-consuming process.
+> Here we optimize it by a trick, back-up every page while in migration
+> process while COLO is enabled, though it affects the speed of the
+> migration, but it obviously reduce the downtime of back-up all SVM'S
+> memory in COLO preparing stage.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > ---
->  hw/ppc/spapr_events.c  |   13 +++++++++++++
->  hw/ppc/spapr_hcall.c   |   11 +++++------
->  include/hw/ppc/spapr.h |    1 +
->  3 files changed, 19 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index 8b32b7eea526..2afd1844e4d4 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -983,6 +983,19 @@ void spapr_clear_pending_events(SpaprMachineState *s=
-papr)
->      }
->  }
-> =20
-> +void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr)
-> +{
-> +    SpaprEventLogEntry *entry =3D NULL, *next_entry;
+>  migration/colo.c |  3 +++
+>  migration/ram.c  | 68 +++++++++++++++++++++++++++++++++++-------------
+>  migration/ram.h  |  1 +
+>  3 files changed, 54 insertions(+), 18 deletions(-)
+>
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 93c5a452fb..44942c4e23 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -26,6 +26,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "qemu/rcu.h"
+>  #include "migration/failover.h"
+> +#include "migration/ram.h"
+>  #ifdef CONFIG_REPLICATION
+>  #include "replication.h"
+>  #endif
+> @@ -845,6 +846,8 @@ void *colo_process_incoming_thread(void *opaque)
+>       */
+>      qemu_file_set_blocking(mis->from_src_file, true);
+>
+> +    colo_incoming_start_dirty_log();
 > +
-> +    QTAILQ_FOREACH_SAFE(entry, &spapr->pending_events, next, next_entry)=
- {
-> +        if (spapr_event_log_entry_type(entry) =3D=3D RTAS_LOG_TYPE_HOTPL=
-UG) {
-> +            QTAILQ_REMOVE(&spapr->pending_events, entry, next);
-> +            g_free(entry->extended_log);
-> +            g_free(entry);
-> +        }
-> +    }
-> +}
+>      bioc =3D qio_channel_buffer_new(COLO_BUFFER_BASE_SIZE);
+>      fb =3D qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+>      object_unref(OBJECT(bioc));
+> diff --git a/migration/ram.c b/migration/ram.c
+> index ed23ed1c7c..ebf9e6ba51 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2277,6 +2277,7 @@ static void ram_list_init_bitmaps(void)
+>               * dirty_memory[DIRTY_MEMORY_MIGRATION] don't include the wh=
+ole
+>               * guest memory.
+>               */
 > +
->  void spapr_events_init(SpaprMachineState *spapr)
->  {
->      int epow_irq =3D SPAPR_IRQ_EPOW;
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 6db3dbde9c92..5992849c1664 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1640,7 +1640,7 @@ static uint32_t cas_check_pvr(SpaprMachineState *sp=
-apr, PowerPCCPU *cpu,
->      return best_compat;
->  }
-> =20
-> -static bool spapr_transient_dev_before_cas(void)
-> +static void spapr_handle_transient_dev_before_cas(SpaprMachineState *spa=
-pr)
->  {
->      Object *drc_container;
->      ObjectProperty *prop;
-> @@ -1658,10 +1658,11 @@ static bool spapr_transient_dev_before_cas(void)
->                                                            prop->name, NU=
-LL));
-> =20
->          if (spapr_drc_transient(drc)) {
-> -            return true;
-> +            spapr_drc_reset(drc);
+>              block->bmap =3D bitmap_new(pages);
+>              bitmap_set(block->bmap, 0, pages);
+>              block->clear_bmap_shift =3D shift;
+> @@ -2986,7 +2987,6 @@ int colo_init_ram_cache(void)
+>                  }
+>                  return -errno;
+>              }
+> -            memcpy(block->colo_cache, block->host, block->used_length);
 >          }
 >      }
-> -    return false;
-> +
-> +    spapr_clear_pending_hotplug_events(spapr);
+>
+> @@ -3000,19 +3000,36 @@ int colo_init_ram_cache(void)
+>
+>          RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+>              unsigned long pages =3D block->max_length >> TARGET_PAGE_BIT=
+S;
+> -
+>              block->bmap =3D bitmap_new(pages);
+> -            bitmap_set(block->bmap, 0, pages);
+>          }
+>      }
+> -    ram_state =3D g_new0(RAMState, 1);
+> -    ram_state->migration_dirty_pages =3D 0;
+> -    qemu_mutex_init(&ram_state->bitmap_mutex);
+> -    memory_global_dirty_log_start();
+>
+> +    ram_state_init(&ram_state);
+>      return 0;
 >  }
-> =20
->  static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-> @@ -1834,9 +1835,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
-> =20
->      spapr_irq_update_active_intc(spapr);
-> =20
-> -    if (spapr_transient_dev_before_cas()) {
-> -        spapr->cas_reboot =3D true;
-> -    }
-> +    spapr_handle_transient_dev_before_cas(spapr);
-> =20
->      if (!spapr->cas_reboot) {
->          void *fdt;
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 09110961a589..a4216935a148 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -824,6 +824,7 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
->  void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
->                            Error **errp);
->  void spapr_clear_pending_events(SpaprMachineState *spapr);
-> +void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr);
->  int spapr_max_server_number(SpaprMachineState *spapr);
->  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
->                        uint64_t pte0, uint64_t pte1);
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Zs/RYxT/hKAHzkfQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5UcJoACgkQbDjKyiDZ
-s5JkhQ/+P8jhAuoYyCjasXHgiCxR0qmo3lkso1fq31TIbk8u7qLldXF7n/zCQZ8z
-5lqq6MHOhGsVO/DxCcfYMUE5e8/exneOz9adu9eFA/Kn2XpRmPzGEPmt2yuhVrcu
-2lMYC1v+83AJc8cINpyBMKU6TxeYNqxQcFMV1D7fkyTvm5iwVrk8M2ye4Yo2kdxL
-BEWJ+0eDMYX2EHIUBx+nerze3WnZHtJsD+8wnHVl9YhmLK0GahZVrgUSdqOf15gD
-Pr5HvPZjGVRsRc7KU6OCwloJeR4fVZvJk9FaBj+3C+qeRhndghRKZFfwKcRKBoYn
-FK+JPntB70j7mHPiu2mRrTfCyfZETjZqB8gkGIyfSOdY2LKvwR33HU5bcigDj8GQ
-2cmvXFxxoU9bmSMbmtDAsa3KNLWRlU/cIV1ajN9MAHwtumSpB6Yhb7Q9Aoo6x7XH
-93xnSOD70Y+9kSa2ZzBAG9CmAMcqaMcrgJgqsYLrwhulyKtz+yEP+a4lwhoO2mZs
-bUWXmB5mUmGNvdu8Cxp2VinyyTAgzySAp2N2Hvujouq1ZWbg+HFGD+ww6nMdUpCw
-kZa+Ibm9xODPvzsCZK9jN6k99ZYjZscE+NM6AalcVvLOgsIE3NkK8tfg8Gm9UU9h
-fr6pBH2Okj/ICUFgAQW82V4fXs1XuOKrY5gebvFwkB3e47sxAK4=
-=hFLz
------END PGP SIGNATURE-----
-
---Zs/RYxT/hKAHzkfQ--
+>
+> +/* TODO: duplicated with ram_init_bitmaps */
+> +void colo_incoming_start_dirty_log(void)
+> +{
+> +    RAMBlock *block =3D NULL;
+> +    /* For memory_global_dirty_log_start below. */
+> +    qemu_mutex_lock_iothread();
+> +    qemu_mutex_lock_ramlist();
+> +
+> +    memory_global_dirty_log_sync();
+> +    WITH_RCU_READ_LOCK_GUARD() {
+> +        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+> +            ramblock_sync_dirty_bitmap(ram_state, block);
+> +            /* Discard this dirty bitmap record */
+> +            bitmap_zero(block->bmap, block->max_length >> TARGET_PAGE_BI=
+TS);
+> +        }
+> +        memory_global_dirty_log_start();
+> +    }
+> +    ram_state->migration_dirty_pages =3D 0;
+> +    qemu_mutex_unlock_ramlist();
+> +    qemu_mutex_unlock_iothread();
+> +}
+> +
+>  /* It is need to hold the global lock to call this helper */
+>  void colo_release_ram_cache(void)
+>  {
+> @@ -3032,9 +3049,7 @@ void colo_release_ram_cache(void)
+>              }
+>          }
+>      }
+> -    qemu_mutex_destroy(&ram_state->bitmap_mutex);
+> -    g_free(ram_state);
+> -    ram_state =3D NULL;
+> +    ram_state_cleanup(&ram_state);
+>  }
+>
+>  /**
+> @@ -3302,7 +3317,6 @@ static void colo_flush_ram_cache(void)
+>              ramblock_sync_dirty_bitmap(ram_state, block);
+>          }
+>      }
+> -
+>      trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
+>      WITH_RCU_READ_LOCK_GUARD() {
+>          block =3D QLIST_FIRST_RCU(&ram_list.blocks);
+> @@ -3348,7 +3362,7 @@ static int ram_load_precopy(QEMUFile *f)
+>
+>      while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+>          ram_addr_t addr, total_ram_bytes;
+> -        void *host =3D NULL;
+> +        void *host =3D NULL, *host_bak =3D NULL;
+>          uint8_t ch;
+>
+>          /*
+> @@ -3379,20 +3393,35 @@ static int ram_load_precopy(QEMUFile *f)
+>                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)=
+) {
+>              RAMBlock *block =3D ram_block_from_stream(f, flags);
+>
+> +            host =3D host_from_ram_block_offset(block, addr);
+>              /*
+> -             * After going into COLO, we should load the Page into colo_=
+cache.
+> +             * After going into COLO stage, we should not load the page
+> +             * into SVM's memory diretly, we put them into colo_cache fi=
+rstly.
+> +             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
+> +             * Privously, we copied all these memory in preparing stage =
+of COLO
+> +             * while we need to stop VM, which is a time-consuming proce=
+ss.
+> +             * Here we optimize it by a trick, back-up every page while =
+in
+> +             * migration process while COLO is enabled, though it affect=
+s the
+> +             * speed of the migration, but it obviously reduce the downt=
+ime of
+> +             * back-up all SVM'S memory in COLO preparing stage.
+>               */
+> -            if (migration_incoming_in_colo_state()) {
+> -                host =3D colo_cache_from_block_offset(block, addr);
+> -            } else {
+> -                host =3D host_from_ram_block_offset(block, addr);
+> +            if (migration_incoming_colo_enabled()) {
+> +                if (migration_incoming_in_colo_state()) {
+> +                    /* In COLO stage, put all pages into cache temporari=
+ly */
+> +                    host =3D colo_cache_from_block_offset(block, addr);
+> +                } else {
+> +                   /*
+> +                    * In migration stage but before COLO stage,
+> +                    * Put all pages into both cache and SVM's memory.
+> +                    */
+> +                    host_bak =3D colo_cache_from_block_offset(block, add=
+r);
+> +                }
+>              }
+>              if (!host) {
+>                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+>                  ret =3D -EINVAL;
+>                  break;
+>              }
+> -
+>              if (!migration_incoming_in_colo_state()) {
+>                  ramblock_recv_bitmap_set(block, host);
+>              }
+> @@ -3506,6 +3535,9 @@ static int ram_load_precopy(QEMUFile *f)
+>          if (!ret) {
+>              ret =3D qemu_file_get_error(f);
+>          }
+> +        if (!ret && host_bak) {
+> +            memcpy(host_bak, host, TARGET_PAGE_SIZE);
+> +        }
+>      }
+>
+>      ret |=3D wait_for_decompress_done();
+> diff --git a/migration/ram.h b/migration/ram.h
+> index a553d40751..5ceaff7cb4 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -66,5 +66,6 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock=
+ *rb);
+>  /* ram cache */
+>  int colo_init_ram_cache(void);
+>  void colo_release_ram_cache(void);
+> +void colo_incoming_start_dirty_log(void);
+>
+>  #endif
+> --
+> 2.21.0
+>
+>
 
