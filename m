@@ -2,83 +2,79 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 011DBC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29076C35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0D8E218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:54:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECBE8222C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:58:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="M8yNqi+R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D8E218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+XLYenn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBE8222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6afj-0007sD-QZ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:54:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37494)
+	id 1j6aiy-0002FA-69
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:58:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43655)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6a2r-00087I-Bp
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:42 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j6aiJ-0001Pc-GT
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:57:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6a2p-00029K-VY
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:41 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:57276)
+ (envelope-from <imammedo@redhat.com>) id 1j6aiH-0002k6-P5
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:57:30 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36229
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1j6a2m-00023e-NE; Tue, 25 Feb 2020 08:14:37 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id DABC796F58;
- Tue, 25 Feb 2020 13:14:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1582636471;
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j6aiH-0002jv-Gz
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:57:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582639048;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BY1+FZJ6Sc88VMCwdRv2dHSvQOitapgHxjmgcsZpkn8=;
- b=M8yNqi+RvEHXXXwjvfY1Wov13PFLjm2pa+fm8jYVC6pLe7bDyIs+HJh+hxHRPgGwL776s6
- 8hmf5SoHb1KiQj99hsXbsuj5kx6es4CqV4/Y6DZT+yq8OqVcSO5+5iArUN4Yo2SHaq3+5Z
- giY4o3Yr+0Ou9nXdHQIhLTja/jiM7qY=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 9/9] qdev-monitor: print the device's clock with info qtree
-Date: Tue, 25 Feb 2020 14:14:22 +0100
-Message-Id: <20200225131422.53368-10-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200225131422.53368-1-damien.hedde@greensocs.com>
-References: <20200225131422.53368-1-damien.hedde@greensocs.com>
+ bh=7u5oyKfwsQp27bsa1IAdlRDT3QgLdAO2qyRAcmzr55s=;
+ b=O+XLYenn4TAA/vBnZQYKFmarxIUjPp+RCV1vbUEwFcYy0PIoOa9PsL30dFStUAfS3LsTKz
+ q0HSRLuxORvO+dygZVZYzWpDCMvNxI6lt7ns6E8UkUsmj7tpBO6f6bTWUnY63iNlJnEaWo
+ KewKstdc/HfrzCnPfh1o+igTGzRIVms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-430-yqzhWlsOPaSQZmysm31UDA-1; Tue, 25 Feb 2020 08:57:24 -0500
+X-MC-Unique: yqzhWlsOPaSQZmysm31UDA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D649477;
+ Tue, 25 Feb 2020 13:57:21 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6582F65E80;
+ Tue, 25 Feb 2020 13:57:14 +0000 (UTC)
+Date: Tue, 25 Feb 2020 14:57:12 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v24 04/10] ACPI: Build related register address fields
+ via hardware error fw_cfg blob
+Message-ID: <20200225145712.4dd410d2@redhat.com>
+In-Reply-To: <20200225094804.3ae51b86@redhat.com>
+References: <20200217131248.28273-1-gengdongjiu@huawei.com>
+ <20200217131248.28273-5-gengdongjiu@huawei.com>
+ <20200225094804.3ae51b86@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1582636471;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BY1+FZJ6Sc88VMCwdRv2dHSvQOitapgHxjmgcsZpkn8=;
- b=EEDnW8UBwiQZD+e+/XYQpHeb/s9ZPlZTfyy4ZO5ZaNPCVy4Nmu0gQhuhs/rziLElWsJ3dl
- Sp0VM4mFArIjohO1ZyYtsOzVwe0ziwTYIHMdLXiFaS//FSj+MkxhuhBhOEhJ9OCYaIk4Ru
- kF2ybIvx6FG+q4FdalrsZPRvvygUhG8=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582636471; a=rsa-sha256; cv=none;
- b=pX5nhivfIYc00FbkaBWiQQJw+1evdMG1mBgssoNSe5OdoaBrsyx4BjAGAxG5qL4Jybd499
- FbHC3/laR+Yi/k9YnN5xpHOpOuE4ykYdjl1HAjVsX19xiOhc1KGTnph2QeyNOqTfJmfyoO
- qpurQ2hTu0qob50kSrWwhsu/Zpy/Cg8=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,94 +86,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
- alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
- marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, xiaoguangrong.eric@gmail.com,
+ kvm@vger.kernel.org, mst@redhat.com, mtosatti@redhat.com,
+ qemu-devel@nongnu.org, ehabkost@redhat.com, shannon.zhaosl@gmail.com,
+ zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
+ shameerali.kolothum.thodi@huawei.com, jonathan.cameron@huawei.com,
+ pbonzini@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This prints the clocks attached to a DeviceState when using
-"info qtree" monitor command. For every clock, it displays the
-direction, the name and if the clock is forwarded. For input clock,
-it displays also the frequency.
+On Tue, 25 Feb 2020 09:48:04 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-This is based on the original work of Frederic Konrad.
+> On Mon, 17 Feb 2020 21:12:42 +0800
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> 
+> > This patch builds error_block_address and read_ack_register fields
+> > in hardware errors table , the error_block_address points to Generic
+> > Error Status Block(GESB) via bios_linker. The max size for one GESB
+> > is 1kb in bytes, For more detailed information, please refer to  
+> 
+> s/1kb in bytes/1Kb/
+> 
+> > document: docs/specs/acpi_hest_ghes.rst
+> > 
+> > Now we only support one Error source, if necessary, we can extend to
+> > support more.
+> > 
+> > Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> > Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> > ---  
+>
 
-Here follows a sample of `info qtree` output on xilinx_zynq machine
-after linux boot with only one uart clocked:
-> bus: main-system-bus
->  type System
->  [...]
->  dev: cadence_uart, id ""
->    gpio-out "sysbus-irq" 1
->    clock-in "refclk" freq_hz=3D0.000000e+00
->    chardev =3D ""
->    mmio 00000000e0001000/0000000000001000
->  dev: cadence_uart, id ""
->    gpio-out "sysbus-irq" 1
->    clock-in "refclk" freq_hz=3D1.375661e+07
->    chardev =3D "serial0"
->    mmio 00000000e0000000/0000000000001000
->  [...]
->  dev: xilinx,zynq_slcr, id ""
->    clock-out "uart1_ref_clk" freq_hz=3D0.000000e+00
->    clock-out "uart0_ref_clk" freq_hz=3D1.375661e+07
->    clock-in "ps_clk" freq_hz=3D3.333333e+07
->    mmio 00000000f8000000/0000000000001000
+On the second glance,
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
 
-v7:
- + print output clocks frequencies too
- + add sample of qtree message above
- + display frequencies in floating-point
----
- qdev-monitor.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+[...]
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index bd5f771..6819fcf 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -48,6 +48,7 @@
+> >  #include "sysemu/reset.h"
+> >  #include "kvm_arm.h"
+> >  #include "migration/vmstate.h"
+> > +#include "hw/acpi/ghes.h"
+> >  
+> >  #define ARM_SPI_BASE 32
+> >  
+> > @@ -830,6 +831,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+> >      acpi_add_table(table_offsets, tables_blob);
+> >      build_spcr(tables_blob, tables->linker, vms);
+> >  
+> > +    if (vms->ras) {
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 8ce71a206b..1d84b4e416 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -38,6 +38,7 @@
- #include "migration/misc.h"
- #include "migration/migration.h"
- #include "qemu/cutils.h"
-+#include "hw/clock.h"
-=20
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -736,6 +737,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev=
-, int indent)
-     ObjectClass *class;
-     BusState *child;
-     NamedGPIOList *ngl;
-+    NamedClockList *ncl;
-=20
-     qdev_printf("dev: %s, id \"%s\"\n", object_get_typename(OBJECT(dev))=
-,
-                 dev->id ? dev->id : "");
-@@ -750,6 +752,13 @@ static void qdev_print(Monitor *mon, DeviceState *de=
-v, int indent)
-                         ngl->num_out);
-         }
-     }
-+    QLIST_FOREACH(ncl, &dev->clocks, node) {
-+        qdev_printf("clock-%s%s \"%s\" freq_hz=3D%e\n",
-+                    ncl->output ? "out" : "in",
-+                    ncl->alias ? " (alias)" : "",
-+                    ncl->name,
-+                    CLOCK_PERIOD_TO_HZ(1.0 * clock_get(ncl->clock)));
-+    }
-     class =3D object_get_class(OBJECT(dev));
-     do {
-         qdev_print_props(mon, dev, DEVICE_CLASS(class)->props_, indent);
---=20
-2.25.1
+> > +        acpi_add_table(table_offsets, tables_blob);
+that doesn't look right, it's for tables that  should be referenced
+from XSDT
+
+> > +        build_ghes_error_table(tables->hardware_errors, tables->linker);
+
+but this table isn't pointed by XSDT directly.
+
+I suggest to move acpi_add_table() to the patch that adds acpi_build_hest()
+
+> > +    }
+> > +
+> >      if (ms->numa_state->num_nodes > 0) {
+> >          acpi_add_table(table_offsets, tables_blob);
+> >          build_srat(tables_blob, tables->linker, vms);
+[...]
 
 
