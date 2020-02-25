@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF75DC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2383C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:54:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88C4E21556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:54:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A0D421556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:54:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmaou4/L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C4E21556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dsgxcJ1g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A0D421556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Zit-0000hS-N3
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:54:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50114)
+	id 1j6ZjY-0001hr-MI
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:54:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlN-000222-Ky
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:35 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z08-0003RB-CH
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlM-0001sq-Lc
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:33 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51094)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z07-0003Su-CO
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:48 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38101)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YlM-0001o3-Es
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:32 -0500
-Received: by mail-wm1-x342.google.com with SMTP id a5so2687321wmb.0
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:32 -0800 (PST)
+ id 1j6Z07-0003S0-5k
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:47 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id e8so14440703wrm.5
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:07:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=EwfVwWMRQy3bKwan4racLo4YHTVH0rGul3sJeJywNRc=;
- b=fmaou4/LDMQByqwePcjtxrgZClyk9zW3ZMIgiTKA2X3MfyVkBRG30//pYcePAX05Xc
- G6cYbLPQgohWb01iuMNKapBkcaQXvC9OI8aHMbA9SPNX5pewLOr0v8YDAVXGYIbdnY9O
- hhlD/D4wFNG8ZYtRZgynY75p336C74lbwyBlA6ro33hf73NBMNzgAFR+G8DKMzRarCH0
- bMocyxqBKP4qR8qhA5ClExerv3wk7m2dFGUd6wpIQsthezJAyXAKv5Omq2/wIfdAk/jL
- qKf2fSGR77eJ1rCcm0EHalwsXHtlRPQl+cHpy+SfrzUf7W9qhNVaWUSkDyUmBgu28d+g
- ez0Q==
+ bh=OifddG7eBEwuqFmuHehG7p0OX65v47ZqzFjv51Ba2gI=;
+ b=dsgxcJ1gT8on91f3jXNLVYVDzpvnOHek7S2i67C5NeX4HKQ7CNcfFiSUrPPow1BtEW
+ 5BPehJFvU6Qp2jbkTHOzwjuC40i3+GvSh0q6OGNS9KwAkA6f2sBgaQVQ/LkVrRuKd//P
+ lP97BG+f0yUi54fbEzWH0idPDM1uHWAizrTpUvSVF8cDpOaXZKjOb8lxyGMdgseJTD+i
+ j8BucknuILZnMZYqb3q7aDSYM/pNHt+YRksxMz8gN9Sfcq0WUG6W1EEX7lKqV6mb+czf
+ t7Z+ElzHpVqjVXWSD4s1lK/R5NvzREsezBP85wT6n4jE8YqPc2u+oPT5zQYncj07dvJo
+ kx8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=EwfVwWMRQy3bKwan4racLo4YHTVH0rGul3sJeJywNRc=;
- b=sSBOJiY7pTc6c8CaODxNDe8dw/KRUdy40SsoF+8vR8CTLSxJHHdM/Rgdt4gkWMFJNW
- eG/j6cmZtXYeJUk9tmhX+6kwKJTMHUFfELOljYwmz+rjmvvVJOVdH+Ors5bK02TeQ3rv
- 5CL86SfeIxoc5BX1t3E5JYWyDF9yHTTaARtQucai1vJqjyvO/07GIqFLLO8b5epvXNys
- KSm9G3FWOqE4KZi3uUSiq3R50J4Lvxw6YeIsfsacCV0hFU9QPnKZTV3fxU4wINZ3BRTm
- JtD0u5/WxGz5c5mjHMTsv9JTwOQ0uIQ7XzhzvG5luBZeJJ5+CDnzp+KdO5Dzc1lsTkvJ
- djZg==
-X-Gm-Message-State: APjAAAVBlhppET2w+/6CoXZlA1oPfZfb/iWd/86Qymw+ntpWEiv3R8UT
- WVPT9p206DSCe3y0cop+LJWblYKu
-X-Google-Smtp-Source: APXvYqxA0Te+YGuXBP01VemcxXF0YNnRJe+Wxtr02iS/KnV9qXz0bjotoA8cMgVTgqg2ZYPqAl7L1Q==
-X-Received: by 2002:a1c:3b09:: with SMTP id i9mr4865760wma.31.1582631550788;
- Tue, 25 Feb 2020 03:52:30 -0800 (PST)
+ bh=OifddG7eBEwuqFmuHehG7p0OX65v47ZqzFjv51Ba2gI=;
+ b=POwLICEr2l5fJuMHUn6UwnWEGht7j+FBYVLk8O678PvrsNktemGg6U6z3YIDso+e0d
+ ATXCAetItku/OJjGhPJjvCSaPxIvIgGYr6ChCjk7H37pzx0lD08+FSz6g+Ki2bFdEsLy
+ CyXCefd10+jm1AFdAbZEypknGuGa303iBMGurlvp/3vQNSHYs5ragb7InBJ4BNfTk2PS
+ hBIk67fs52fKvY+l1NalTxv86gTW3L05FzbbRDIjfW4pB76TCtS9wF2PY1Dp3P2ePRzN
+ hGrkvkQuK7zeby20FNOSjq53Hu3Mr45MmB6IdK6CWZtOaK4H7VSu8hDf1LBGBQcnnxEi
+ A4EQ==
+X-Gm-Message-State: APjAAAWwR8Zpv9aw4DKQn3rhjsQcvz2JsbUUP93dUnqJZL+sYM2qLyD0
+ W4bKtchn05UmN3QTwohctyBBG96n
+X-Google-Smtp-Source: APXvYqw63lfHfAxKO1ZfsrxqcjgpRbQnGOpe0h8OrWRoMc5EobIrutvCBaF/ZnDYkD4tjU9C+6UKWQ==
+X-Received: by 2002:adf:fe83:: with SMTP id l3mr76152236wrr.41.1582632465662; 
+ Tue, 25 Feb 2020 04:07:45 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.29
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.44
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:30 -0800 (PST)
+ Tue, 25 Feb 2020 04:07:45 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 091/136] hw/virtio: Let virtqueue_map_iovec() use a boolean
- 'is_write' argument
-Date: Tue, 25 Feb 2020 12:50:21 +0100
-Message-Id: <1582631466-13880-91-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 112/136] hw/sparc: Use memory_region_init_rom() with read-only
+ regions
+Date: Tue, 25 Feb 2020 13:07:10 +0100
+Message-Id: <1582632454-16491-10-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,39 +101,30 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The 'is_write' argument is either 0 or 1.
-Convert it to a boolean type.
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200224205533.23798-15-philmd@redhat.com>
+Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/virtio/virtio.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ hw/sparc/leon3.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 2c5410e..9d06dbe 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1293,7 +1293,7 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
+diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
+index f5a087d..23d0bdb 100644
+--- a/hw/sparc/leon3.c
++++ b/hw/sparc/leon3.c
+@@ -256,8 +256,7 @@ static void leon3_generic_hw_init(MachineState *machine)
  
- static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
-                                 hwaddr *addr, unsigned int num_sg,
--                                int is_write)
-+                                bool is_write)
- {
-     unsigned int i;
-     hwaddr len;
-@@ -1317,8 +1317,9 @@ static void virtqueue_map_iovec(VirtIODevice *vdev, struct iovec *sg,
+     /* Allocate BIOS */
+     prom_size = 8 * MiB;
+-    memory_region_init_ram(prom, NULL, "Leon3.bios", prom_size, &error_fatal);
+-    memory_region_set_readonly(prom, true);
++    memory_region_init_rom(prom, NULL, "Leon3.bios", prom_size, &error_fatal);
+     memory_region_add_subregion(address_space_mem, LEON3_PROM_OFFSET, prom);
  
- void virtqueue_map(VirtIODevice *vdev, VirtQueueElement *elem)
- {
--    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, elem->in_num, 1);
--    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, elem->out_num, 0);
-+    virtqueue_map_iovec(vdev, elem->in_sg, elem->in_addr, elem->in_num, true);
-+    virtqueue_map_iovec(vdev, elem->out_sg, elem->out_addr, elem->out_num,
-+                                                                        false);
- }
- 
- static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_num)
+     /* Load boot prom */
 -- 
 1.8.3.1
 
