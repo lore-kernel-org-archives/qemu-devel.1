@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F626C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B13AC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 166592176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 232712176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:18:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOUy6dlc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 166592176D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h2bdf3sU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232712176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZAY-0005UW-2p
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:18:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49948)
+	id 1j6ZAd-0005gA-5S
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:18:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlB-0001Wh-0i
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:24 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl0-00018M-QN
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl7-0000WT-1A
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:20 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:42506)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008FW-34
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:10 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:33054)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Yl5-0000Nf-Pm
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:16 -0500
-Received: by mail-wr1-x429.google.com with SMTP id p18so10723241wre.9
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:15 -0800 (PST)
+ id 1j6Ykx-00082e-Eu
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id u6so14405659wrt.0
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ck5X4vl1RGKGfpbpG5MISitEJJgkamTLoZojb/ILQQc=;
- b=WOUy6dlc89fPR79czCKS4c0SNuzvd/UJVnIVeXs4o6Ofng1vyQPTROqTnuv0czFSfp
- 02T4LTaUMcMvNqBN0USWe5EBisNzRejjb/MM4srcGVI0aUmF+NnldkeAUtOYpq7FL52/
- UPJzQXUgTqc+iAh6jeuyzBREpyOR83w+ktDQz2u+lIroODhCwKBzSBiaw1KYWNTEFxVl
- bmEOyi46iMTC2xGGrZm0iN2JU8Fmo6n+jVsVaEfkiItNFJ+JA8Q4dzzilUkNgPMaPDBL
- pbymPFg3Tf7O6Hnvu4/uDIDES8LV7jzKCFqfU4mCxRcBqXuJEy+3rKm8cH/d5MbDxYE7
- JyXg==
+ bh=wpeBDqm1mbqimPx7VSOh234xlVHfgBdHQ9PpJAIvLUw=;
+ b=h2bdf3sUPY1iPtAug7HLOX3+2Q1ElA/MOhaukzawcXac46IWY3CWFTmrl/VQryRLkS
+ 93NETpQISRj9owsrHCH8OVgYXFIo4+vQBrrAMTK/nvMGC85/DQhsQK+ny4kYhe+CtEvD
+ D14AeKxSkM3621l8r1zgWdo+XTsdql2sZmF1QB4kPGvX7TXderVCpEXwNe8JKn/VJRCI
+ iwYl4OrxII7gVkT7vERe0FVKGf7MnBTimPn6lIRbP+f529y3ZQ79dbKUFA7CZ8tzzgME
+ d1xVo8vw2i6QYjCjtd1LKy67aAZSVqjR12vZfkPL4YY445a3jf/h8eBn8cCG3W15cICD
+ amdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ck5X4vl1RGKGfpbpG5MISitEJJgkamTLoZojb/ILQQc=;
- b=a3IOHFXuJO+qiUw4uedvRRIx8/GWtCbtkydFHnJkpfvkd+ef2FTU/JUa7ayFX+4+9H
- 9cK6kujEGmM7UXXVut+ktxxr35uQsGHcThBEHFVMBOnYwV3lmt1Eq478AOYTS7jdZ81B
- k0GDaTUnzrFU9feMWAmJGTFb0J93cZ2lUo/HdF5fKwrfuLwXXVkrrmLYL/3i2lRwE32M
- PaqrTfzIMrftUXuCxvAHh1jUp06aLr64VTNOzXSYMfaEWYsmXx7sznBZKiGxsdHA8GEm
- px3RYuvQcmjCTHe66UcjfI6a3GgpMp5hZRZaQqgyga+4UnoFYzYcYtRZzgTY8tb0Khj2
- mk3g==
-X-Gm-Message-State: APjAAAVC4c58U0n1IKnOEj7i28IdU2nbHgT3Ad4Fz4dBoQlZXlN2iI7S
- mXPfUglUMDpmgmYLGStYFHX0mW/Z
-X-Google-Smtp-Source: APXvYqyRhIgoiWskYVIm5EjBcuvPIFBCB/ZX1GlrLav8F2Fj2EtBb2DSsR9I3892uPiA8LjFTQYUAQ==
-X-Received: by 2002:adf:de0b:: with SMTP id b11mr70961422wrm.89.1582631534457; 
- Tue, 25 Feb 2020 03:52:14 -0800 (PST)
+ bh=wpeBDqm1mbqimPx7VSOh234xlVHfgBdHQ9PpJAIvLUw=;
+ b=oIXLWudav61EdoW0s3Qst4wXlDs+dz9SstMN3AR56jxo77Ua4Mc/rCB1oL3owHI+lb
+ 9+8g4drHeppJ/m4le9x6BspffHCmIEyyDlSKOmNE15GMRPuBUZang/CVXNj6bJ8yqW9W
+ OOe9i2EsInKNyJmejo9fnivv3h9/B0Ero/T0HzBV0bJrp0/heGDBIzP//l4WYQdqK40T
+ baVDKx5fp5tY7J3TrEmHtHX3ALge/c3NP3XdxYG7mkpoMfvNvfYioH385oWH19GWnapG
+ 1C6zUads4g5SNm0FFBIf75EXFAeCC4NorSP7nUx8Mblay0cB9gT8bNSSKJRdzFpoztP2
+ IJIg==
+X-Gm-Message-State: APjAAAXMH3fN0pYjNI0MEq3/CpLPO60kgoDah3+vaSpti4kbASokkGYh
+ cs9xTPIWmg35hXAfpm/siG+fqDW3
+X-Google-Smtp-Source: APXvYqxREYLpCce/6USsD+d3+JF3d8noae7o4iz6qygv0JyvcyPPTsTkBZzmyw/+Oe8b7vJdr5xnbw==
+X-Received: by 2002:adf:f349:: with SMTP id e9mr10194252wrp.56.1582631518006; 
+ Tue, 25 Feb 2020 03:51:58 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.13
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.57
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:13 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:57 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 074/136] exec: drop bogus mem_path from qemu_ram_alloc_from_fd()
-Date: Tue, 25 Feb 2020 12:50:04 +0100
-Message-Id: <1582631466-13880-74-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 056/136] mips/mips_mipssim: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:46 +0100
+Message-Id: <1582631466-13880-56-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,51 +100,73 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Function will report error that will mention global mem_path,
-which was valid the only if legacy -mem-path was used and
-only in case of main RAM.
-
-However it doesn't work with hostmem backends
-(for example:
-"
-  qemu: -object memory-backend-file,id=ram0,size=128M,mem-path=foo:
-    backing store (null) size 0x200000 does not match 'size' option 0x8000000
-")
-and couldn't possibly work in general FD case the function
-is supposed to handle.
-
-Taking in account that main RAM was converted into
-memory-backend-foo object, there is no point in printing
-file name (from inappropriate place) as failing path is
-a part of backend's error message.
-
-Hence drop bogus mem_path usage from qemu_ram_alloc_from_fd(),
-it's a job of its user to add file name to error message if applicable.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-75-imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200219160953.13771-57-imammedo@redhat.com>
 ---
- exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/mips/mips_mipssim.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index d85a868..6ebff8b 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2307,9 +2307,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     size = HOST_PAGE_ALIGN(size);
-     file_size = get_file_size(fd);
-     if (file_size > 0 && file_size < size) {
--        error_setg(errp, "backing store %s size 0x%" PRIx64
-+        error_setg(errp, "backing store size 0x%" PRIx64
-                    " does not match 'size' option 0x" RAM_ADDR_FMT,
--                   mem_path, file_size, size);
-+                   file_size, size);
-         return NULL;
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index b934ca9..b2555dd 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -143,14 +143,12 @@ static void mipsnet_init(int base, qemu_irq irq, NICInfo *nd)
+ static void
+ mips_mipssim_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size = machine->ram_size;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+     char *filename;
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *isa = g_new(MemoryRegion, 1);
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     MIPSCPU *cpu;
+     CPUMIPSState *env;
+@@ -167,13 +165,11 @@ mips_mipssim_init(MachineState *machine)
+     qemu_register_reset(main_cpu_reset, reset_info);
+ 
+     /* Allocate RAM. */
+-    memory_region_allocate_system_memory(ram, NULL, "mips_mipssim.ram",
+-                                         ram_size);
+     memory_region_init_ram(bios, NULL, "mips_mipssim.bios", BIOS_SIZE,
+                            &error_fatal);
+     memory_region_set_readonly(bios, true);
+ 
+-    memory_region_add_subregion(address_space_mem, 0, ram);
++    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+ 
+     /* Map the BIOS / boot exception handler. */
+     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+@@ -200,7 +196,7 @@ mips_mipssim_init(MachineState *machine)
      }
  
+     if (kernel_filename) {
+-        loaderparams.ram_size = ram_size;
++        loaderparams.ram_size = machine->ram_size;
+         loaderparams.kernel_filename = kernel_filename;
+         loaderparams.kernel_cmdline = kernel_cmdline;
+         loaderparams.initrd_filename = initrd_filename;
+@@ -245,6 +241,7 @@ static void mips_mipssim_machine_init(MachineClass *mc)
+ #else
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
++    mc->default_ram_id = "mips_mipssim.ram";
+ }
+ 
+ DEFINE_MACHINE("mipssim", mips_mipssim_machine_init)
 -- 
 1.8.3.1
 
