@@ -7,81 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BBBC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F62C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC982176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 428972176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:16:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z4zQS3jA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC982176D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oWcy3rxT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428972176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z77-0007wT-Sk
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:15:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49441)
+	id 1j6Z8l-0001pW-Db
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:16:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykd-0000lg-3W
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlA-0001W1-Np
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkY-0006vc-SY
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:46 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:39093)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl6-0000Ut-QJ
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:20 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:39816)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YkY-0006qJ-DU
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:42 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id c84so2833211wme.4
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:42 -0800 (PST)
+ id 1j6Yl6-0000SN-Jk
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:16 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id y17so5563028wrn.6
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+mJK3OqxktkOAWxnxWkaALqDjs9dEYFvgQPqxO7ZMJk=;
- b=Z4zQS3jAv0bMtAO/gHwRsql1enZKoYoggDk80pJO3oQJ7sUCX1ZkqVhhB++UqYY+Mp
- UYyE4fDHjt9U8qQQCMMTCh6D9RmNLiYBvxs7C2FtMn2d26pzkE8mSNaf5cnqNjA/hrwQ
- YPKRqmZmO9K2m8BDifyZbwV4VEkQDRV8os+ddQAqxjU01zk8evTEubM91WMKau7JqrGA
- nBxQQLaCs92gEeAitdVonPOB1/1Dm7H6nOtB/+0t+tJ6hkau2gMQHLa/BQINbFlQW9FC
- ZAOztztOADVm2p+MarHQdClrXY3BtKFHoJdw17BwRIfkAqWutkLK0GWfE6ILIRhsUH6P
- ioEA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=OyeHkVRk+pDFOc+EaKWT1incM6J5ShZ/3FLqVMsrNwk=;
+ b=oWcy3rxTIKuEwInvJvYxNg5QJuqjUVCnXLFAui6zj5t9nDcULsaW7Gz4EF55TaO3jc
+ CELoh9QlmlncY5fdB5OIz3Ye9Wtw6k2CIe8pj19yi0BK/yaxft6k8CXq1iFj7JB8BIYi
+ cYmkjGLukMUQ1MD8YOGMbJVWiKlzmyhTCnD0rjgeLguWFNVM6lgwh0hYkcAXSd7rDp1u
+ zvMlGrKhUvPJQ41ivfNW6CoJimZumlKBx/ZEIcE8q+r2rvW4R1NZpYT2FSKG5X1BrLm7
+ yjhAQAhbDJcROMQbs5/jGnHj/FCQNOdMimhR9+f9GEHXy6JudydtLBwlo4YBhLsoNgH9
+ rW9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=+mJK3OqxktkOAWxnxWkaALqDjs9dEYFvgQPqxO7ZMJk=;
- b=oQvk6uDk6Jq0syssWLx5lmnEQzNzuGFkMOvZep7MHujxDTTcasW9hlwcDOSpwG4Br6
- odU84PNW9fMynSjeWdyUykAVoTCnECYcBxgjVHvD5f09omuoK0RdXiL1ZlGEhsySfPy2
- 2pIU+oT4gRBSR/zWLEqQ0nY0a0JFrQbJg8Z29DWRLIOTvlHBshC4ncnpp8Qh/hqC2b/x
- GUgQJZ5y5SUjfEk9E4nYttWVQ3uJeWuYOLXp/WqJNBug8Fv33gVOdVgGopj6GxHda2mR
- JQHBHNzolFLNjW9nfZtKZ3jRjx6L0yQef5HmkNrBR8XOD4nTNi1vkuDmZR5rFMgBhUPu
- 2+bg==
-X-Gm-Message-State: APjAAAXPFM3FdzIY7EuozWSXOGWfyq7gV0DThnZUolLPpZ4ZZCMe8BQe
- p1m/r/r9q7CXCMmBxMxTCZAi1lZc
-X-Google-Smtp-Source: APXvYqz+d8ro9113LDhzyT7DR2cIy9YqI2lgtW9tiQnxMuJZhlL5MAb1P3EfzA4yYCO/Ska/h8FgMA==
-X-Received: by 2002:a1c:e488:: with SMTP id b130mr4772327wmh.108.1582631501237; 
- Tue, 25 Feb 2020 03:51:41 -0800 (PST)
+ :in-reply-to:references;
+ bh=OyeHkVRk+pDFOc+EaKWT1incM6J5ShZ/3FLqVMsrNwk=;
+ b=E5wJZpfzUXeOmBIgWFc5vNnnPBg5pUTMPDyfZ2YpOlLqckhvFVpQOAGWjKx1q7f2KG
+ Min4GJVXdb9+RhgKxlJWWcp0Ij1cP1jdU1Dt0lo7N2WkIX7RNZ6hpE0Gl2TP0diWVGKB
+ IgygM2b1EQ1Z7NbkL2AweQumoiRPi6XtHwwTrE7Jp5wFLVn7mM0ssHFAMycXYivwf8zO
+ BPTacTLJ13G9BKtVXQGqmprP1Ep2A13RV9HuIk2iGWgwJY6I/n+gmRNG8T+t4lYh3zXl
+ IJhhdf2MBOdgEwboSYIDHvucDcjCAUi+NAmSDS15/FeyOLKrBYiY+E7n1/lbPqTYUO4y
+ Od9Q==
+X-Gm-Message-State: APjAAAXTzaAZK2YtfGQwNJjDv7kBgyFIj9AcLNvHllJAjP7FLQuNRNUJ
+ 3MzQtJfWsXIBxZxhmHJTVoxi5062
+X-Google-Smtp-Source: APXvYqzt7IoWRWXWz0m/Wyk85be+Ob+eADzFC7RLfjGzx790LTb1hpdaai7KO5rqqTclmjikOpDFyA==
+X-Received: by 2002:adf:f1c6:: with SMTP id z6mr69712879wro.279.1582631535488; 
+ Tue, 25 Feb 2020 03:52:15 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.40
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.14
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:40 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:14 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 037/136] arm/xlnx-zcu102: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:27 +0100
-Message-Id: <1582631466-13880-37-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 075/136] make mem_path local variable
+Date: Tue, 25 Feb 2020 12:50:05 +0100
+Message-Id: <1582631466-13880-75-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32c
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,58 +96,54 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-memory_region_allocate_system_memory() API is going away, so
-replace it with memdev allocated MemoryRegion. The later is
-initialized by generic code, so board only needs to opt in
-to memdev scheme by providing
-  MachineClass::default_ram_id
-and using MachineState::ram instead of manually initializing
-RAM memory region.
+It's no longer used anywhere beside main(),
+so make it local variable that is used for CLI compat
+purposes to keep -mem-path option working.
+
+Under hood QEMU will use it to create
+  memory-backend-file,mem-path=...
+backend and use its MemoryRegion as main RAM.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-38-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-76-imammedo@redhat.com>
 ---
- hw/arm/xlnx-zcu102.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ include/sysemu/sysemu.h | 1 -
+ vl.c                    | 2 +-
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index 53cfe7c..bd645ad 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -28,7 +28,6 @@ typedef struct XlnxZCU102 {
-     MachineState parent_obj;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index c0678c1..ae78b2a 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -50,7 +50,6 @@ extern uint8_t *boot_splash_filedata;
+ extern bool enable_mlock;
+ extern bool enable_cpu_pm;
+ extern QEMUClockType rtc_clock;
+-extern const char *mem_path;
+ extern int mem_prealloc;
  
-     XlnxZynqMPState soc;
--    MemoryRegion ddr_ram;
+ #define MAX_OPTION_ROMS 16
+diff --git a/vl.c b/vl.c
+index a7edcba..15cc5bd 100644
+--- a/vl.c
++++ b/vl.c
+@@ -140,7 +140,6 @@ enum vga_retrace_method vga_retrace_method = VGA_RETRACE_DUMB;
+ int display_opengl;
+ const char* keyboard_layout = NULL;
+ ram_addr_t ram_size;
+-const char *mem_path = NULL;
+ int mem_prealloc = 0; /* force preallocation of physical target memory */
+ bool enable_mlock = false;
+ bool enable_cpu_pm = false;
+@@ -2883,6 +2882,7 @@ int main(int argc, char **argv, char **envp)
+     Error *err = NULL;
+     bool list_data_dirs = false;
+     char *dir, **dirs;
++    const char *mem_path = NULL;
+     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+     QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
  
-     bool secure;
-     bool virt;
-@@ -87,13 +86,10 @@ static void xlnx_zcu102_init(MachineState *machine)
-                  ram_size);
-     }
- 
--    memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
--                                         ram_size);
--
-     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc),
-                             TYPE_XLNX_ZYNQMP, &error_abort, NULL);
- 
--    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
-+    object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
-                          "ddr-ram", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), s->secure, "secure",
-                              &error_fatal);
-@@ -211,6 +207,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
-     mc->ignore_memory_transaction_failures = true;
-     mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
-     mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
-+    mc->default_ram_id = "ddr-ram";
- }
- 
- static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
 -- 
 1.8.3.1
 
