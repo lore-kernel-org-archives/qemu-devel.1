@@ -2,63 +2,76 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_RHS_DOB
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA26DC4BA04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 22:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA07C4BA06
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD33E20732
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 22:48:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD33E20732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 903D42176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:08:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ntMIJPrS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 903D42176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6j0B-0007QZ-VG
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 17:48:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39347)
+	id 1j6jJp-0003WV-N0
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 18:08:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38403)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j6izX-0006uo-Qz
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:47:53 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j6jJD-00033I-25
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:08:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j6izV-0001oC-0F
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:47:50 -0500
-Received: from 5.mo3.mail-out.ovh.net ([87.98.178.36]:46706)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6izT-0001iS-LY
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 17:47:48 -0500
-Received: from player776.ha.ovh.net (unknown [10.108.35.122])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 5F5032443D9
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:47:44 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player776.ha.ovh.net (Postfix) with ESMTPSA id 64A80FD14E55;
- Tue, 25 Feb 2020 22:47:27 +0000 (UTC)
-Date: Tue, 25 Feb 2020 23:47:25 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v6 09/18] target/ppc: Streamline calculation of RMA
- limit from LPCR[RMLS]
-Message-ID: <20200225234725.22f268f1@bahia.home>
-In-Reply-To: <20200225180531.6551ce59@bahia.home>
-References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
- <20200224233724.46415-10-david@gibson.dropbear.id.au>
- <20200225180531.6551ce59@bahia.home>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j6jJB-00077B-Be
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:08:10 -0500
+Received: from mail-il1-x12f.google.com ([2607:f8b0:4864:20::12f]:34856)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j6jJB-00072n-21; Tue, 25 Feb 2020 18:08:09 -0500
+Received: by mail-il1-x12f.google.com with SMTP id g126so712322ilh.2;
+ Tue, 25 Feb 2020 15:08:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=uwhRSZ3g9ZtGSoenxD0eDfT6hiKCVQJkJGUCdxiEVdk=;
+ b=ntMIJPrSens1Mi3ojhL7iqksmCO22sYMoIIPVkxlmGSjqxeCleckXcE0L8wKOeMfG1
+ nNDkme4OvLTB++yOHEvQiHvhNrllteS4LCN6QrjQCtFUO6a9V1Zd7jmMI5pTp++4BGxP
+ jGGJGSeZ8P9IpiBGpEi79XzweFOTTEIyP89hhwB33+9VvyVvskGEhoqekjounLrOvhcJ
+ PE+LfL427nJNvC/zzBgBX98R6ZoHaRJQ5FECruq54pPcy2IWD3d9GM3oiAXZJ6Gzv7tS
+ R2RRhZy+e7yYWDXTjbscAH/ZfpihQCLJ05gWRbunbD8lQoEXoCsQ1xm78XimhihY4Ifx
+ ZshA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=uwhRSZ3g9ZtGSoenxD0eDfT6hiKCVQJkJGUCdxiEVdk=;
+ b=o3uU+C5q2YQ4T556LSvtQpM4JesrVZ5NvZMEMJgY+kWpU0XBwStgVDXmju9DhQx2Ww
+ r/E89KB+YO0OMBxoH8U66gMQU6U+rWKM8UHJERmVMp5o+i+ixBFqxLQtMKqgid/D5VQC
+ EZ/5Ynt2bB/h4Ihuite9oXuSRTvqicHWEfDbydxiqGjZG6XH5V8JNrDl4H9TcyB8By8N
+ AJrgotMT/RImBwhGu+FZO6/HMO2b/m9ajoe/Y6xvufAVR/7eVk1WUz2HMIWzD1+qIZmm
+ CGsKRql9WZTx34ibF5EJVnWrzzG2w1hqiRAhLJtLBQVbOezBxPTRytFJRlQhW1sZxf2q
+ NbcA==
+X-Gm-Message-State: APjAAAUIjsGVRazT8DhZw+c62EoOeLQcUK6mmIh2CzMjDrdyBi+f5KWq
+ e6K7y72FqKtk/cx6AdEMdEfrPXG+lFr0nxWE/bM=
+X-Google-Smtp-Source: APXvYqwHaC10jPI/fqXmkfmh3sv9IUhRghep6sOb3fHFBuRG/uHQkM0VBGBMv4in0/QKoLqmPfSQb8pxiW7w+yTP2xs=
+X-Received: by 2002:a92:d5cf:: with SMTP id d15mr1029773ilq.306.1582672086198; 
+ Tue, 25 Feb 2020 15:08:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 11821667548438239718
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrleefgddtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepghhnuhdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.178.36
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Wed, 26 Feb 2020 00:07:55 +0100
+Message-ID: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
+Subject: Sudden slowdown of ARM emulation in master
+To: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000007e6dbf059f6e8f0e"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::12f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,182 +83,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
- Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
- Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Feb 2020 18:05:31 +0100
-Greg Kurz <groug@kaod.org> wrote:
+--0000000000007e6dbf059f6e8f0e
+Content-Type: text/plain; charset="UTF-8"
 
-> On Tue, 25 Feb 2020 10:37:15 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > Currently we use a big switch statement in ppc_hash64_update_rmls() to =
-work
-> > out what the right RMA limit is based on the LPCR[RMLS] field.  There's=
- no
-> > formula for this - it's just an arbitrary mapping defined by the existi=
-ng
-> > CPU implementations - but we can make it a bit more readable by using a
-> > lookup table rather than a switch.  In addition we can use the MiB/GiB
-> > symbols to make it a bit clearer.
-> >=20
-> > While there we add a bit of clarity and rationale to the comment about
-> > what happens if the LPCR[RMLS] doesn't contain a valid value.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > ---
-> >  target/ppc/mmu-hash64.c | 71 ++++++++++++++++++++---------------------
-> >  1 file changed, 35 insertions(+), 36 deletions(-)
-> >=20
-> > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> > index 0ef330a614..4f082d775d 100644
-> > --- a/target/ppc/mmu-hash64.c
-> > +++ b/target/ppc/mmu-hash64.c
-> > @@ -18,6 +18,7 @@
-> >   * License along with this library; if not, see <http://www.gnu.org/li=
-censes/>.
-> >   */
-> >  #include "qemu/osdep.h"
-> > +#include "qemu/units.h"
-> >  #include "cpu.h"
-> >  #include "exec/exec-all.h"
-> >  #include "exec/helper-proto.h"This tool was originally developed to fi=
-x Linux CPU throttling issues affecting Lenovo T480 / T480s / X1C6 as descr=
-ibed here.
-> > @@ -757,6 +758,39 @@ static void ppc_hash64_set_c(PowerPCCPU *cpu, hwad=
-dr ptex, uint64_t pte1)
-> >      stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
-> >  }
-> > =20
-> > +static target_ulong rmls_limit(PowerPCCPU *cpu)
-> > +{
-> > +    CPUPPCState *env =3D &cpu->env;
-> > +    /*
-> > +     * This is the full 4 bits encoding of POWER8. Previous
-> > +     * CPUs only support a subset of these but the filtering
-> > +     * is done when writing LPCR
-> > +     */
-> > +    const target_ulong rma_sizes[] =3D {
-> > +        [0] =3D 0,
-> > +        [1] =3D 16 * GiB,
-> > +        [2] =3D 1 * GiB,
-> > +        [3] =3D 64 * MiB,
-> > +        [4] =3D 256 * MiB,
-> > +        [5] =3D 0,
-> > +        [6] =3D 0,
-> > +        [7] =3D 128 * MiB,
-> > +        [8] =3D 32 * MiB,
-> > +    };
-> > +    target_ulong rmls =3D (env->spr[SPR_LPCR] & LPCR_RMLS) >> LPCR_RML=
-S_SHIFT;
-> > +
-> > +    if (rmls < ARRAY_SIZE(rma_sizes)) {
->=20
-> This condition is always true since the RMLS field is 4-bit long...=20
+Hello Igor and Paolo,
 
-Oops my mistake, I was already thinking about the suggestion I have
-for something that was puzzling me. See below.
+Just now I was working on some small fixes for the cubieboard machine and
+rebasing my Allwinner H3 branches.
+While doing some testing, I noticed that suddenly the machines were much
+slower than before.
+I only see this happening when I rebase to this commit:
+   ca6155c0f2bd39b4b4162533be401c98bd960820 ("Merge tag 'patchew/
+20200219160953.13771-1-imammedo@redhat.com' of
+https://github.com/patchew-project/qemu into HEAD")
 
-> I guess you want to check that RMLS encodes a valid RMA size instead.
->=20
->     if (rma_sizes[rmls]) {
->=20
-> > +        return rma_sizes[rmls];
-> > +    } else {
-> > +        /*
-> > +         * Bad value, so the OS has shot itself in the foot.  Return a
-> > +         * 0-sized RMA which we expect to trigger an immediate DSI or
-> > +         * ISI
-> > +         */
+Also the avocado tests I'm running started to timeout:
 
-It seems a bit weird to differentiate the case where the value is bad
-because it happens to be bigger than the highest supported one, compared
-to values that are declared bad in rma_sizes[], like 0, 5 or 6. They're
-all basically the same case of values not used to encode a valid size...
++ AVOCADO_ALLOW_LARGE_STORAGE=yes avocado --show=app,console run -t
+machine:cubieboard tests/acceptance/boot_linux_console.py
+...
+(1/2)
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_cubieboard_initrd:
+|console: Uncompressing Linux... done, booting the kernel.
+|console: Booting Linux on physical CPU 0x0
+console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2.1
+20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
+console: CPU: ARMv7 Processor [410fc080] revision 0 (ARMv7), cr=50c5387d
+console: CPU: PIPT / VIPT nonaliasing data cache, VIPT nonaliasing
+instruction cache
+console: OF: fdt: Machine model: Cubietech Cubieboard
+...
+INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred: Timeout
+reached\n
+Original status: ERROR\n{'name':
+'1-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_cubieboard_initrd',
+'logdir': '/home/me/avocado/job-results/job-2020-02-25T23.58-d43884...
+(90.41 s)
+...
+console: random: crng init done
+/console: mount: mounting devtmpfs on /dev failed: Device or resource busy
+-console: EXT4-fs (sda): re-mounted. Opts:
+block_validity,barrier,user_xattr,acl
+/console: Starting logging: OK
+INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred: Timeout
+reached\nOriginal status: ERROR\n{'name':
+'2-tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_cubieboard_sata',
+'logdir': '/home/fox/avocado/job-results/job-2020-02-25T23.58-d438849/...
+(90.53 s)
+RESULTS    : PASS 0 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 2 |
+CANCEL 0
+JOB TIME   : 181.22 s
+ ....
 
-What about :
+Have you noticed a similar performance change?
+Do you have any clue if there may be something changed here that could
+cause a slowdown?
 
-    static const target_ulong rma_sizes[16] =3D {
-        [1] =3D 16 * GiB,
-        [2] =3D 1 * GiB,
-        [3] =3D 64 * MiB,
-        [4] =3D 256 * MiB,
-        [7] =3D 128 * MiB,
-        [8] =3D 32 * MiB,
-    };
+Regards,
+Niek
 
-?
 
-> > +        return 0;
-> > +    }
-> > +}
-> > +
-> >  int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-> >                                  int rwx, int mmu_idx)
-> >  {
-> > @@ -1006,41 +1040,6 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, =
-target_ulong ptex,
-> >      cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL=
-_FLUSH;
-> >  }
-> > =20
-> > -static void ppc_hash64_update_rmls(PowerPCCPU *cpu)
-> > -{
-> > -    CPUPPCState *env =3D &cpu->env;
-> > -    uint64_t lpcr =3D env->spr[SPR_LPCR];
-> > -
-> > -    /*
-> > -     * This is the full 4 bits encoding of POWER8. Previous
-> > -     * CPUs only support a subset of these but the filtering
-> > -     * is done when writing LPCR
-> > -     */
-> > -    switch ((lpcr & LPCR_RMLS) >> LPCR_RMLS_SHIFT) {
-> > -    case 0x8: /* 32MB */
-> > -        env->rmls =3D 0x2000000ull;
-> > -        break;
-> > -    case 0x3: /* 64MB */
-> > -        env->rmls =3D 0x4000000ull;
-> > -        break;
-> > -    case 0x7: /* 128MB */
-> > -        env->rmls =3D 0x8000000ull;
-> > -        break;
-> > -    case 0x4: /* 256MB */
-> > -        env->rmls =3D 0x10000000ull;
-> > -        break;
-> > -    case 0x2: /* 1GB */
-> > -        env->rmls =3D 0x40000000ull;
-> > -        break;
-> > -    case 0x1: /* 16GB */
-> > -        env->rmls =3D 0x400000000ull;
-> > -        break;
-> > -    default:
-> > -        /* What to do here ??? */
-> > -        env->rmls =3D 0;
-> > -    }
-> > -}
-> > -
-> >  static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-> >  {
-> >      CPUPPCState *env =3D &cpu->env;
-> > @@ -1099,7 +1098,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong=
- val)
-> >      CPUPPCState *env =3D &cpu->env;
-> > =20
-> >      env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
-> > -    ppc_hash64_update_rmls(cpu);
-> > +    env->rmls =3D rmls_limit(cpu);
-> >      ppc_hash64_update_vrma(cpu);
-> >  }
-> > =20
->=20
+-- 
+Niek Linnenbank
 
+--0000000000007e6dbf059f6e8f0e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hello Igor and Paolo,</div><div><br></div><div>Just n=
+ow I was working on some small fixes for the cubieboard machine and rebasin=
+g my Allwinner H3 branches.</div><div>While doing some testing, I noticed t=
+hat suddenly the machines were much slower than before.</div><div>I only se=
+e this happening when I rebase to this commit:</div><div>=C2=A0=C2=A0 ca615=
+5c0f2bd39b4b4162533be401c98bd960820 (&quot;Merge tag &#39;patchew/<a href=
+=3D"mailto:20200219160953.13771-1-imammedo@redhat.com">20200219160953.13771=
+-1-imammedo@redhat.com</a>&#39; of <a href=3D"https://github.com/patchew-pr=
+oject/qemu">https://github.com/patchew-project/qemu</a> into HEAD&quot;)</d=
+iv><div><br> </div><div>Also the avocado tests I&#39;m running started to t=
+imeout:</div><div><br></div><div>+ AVOCADO_ALLOW_LARGE_STORAGE=3Dyes avocad=
+o --show=3Dapp,console run -t machine:cubieboard tests/acceptance/boot_linu=
+x_console.py</div><div>...<br></div><div>(1/2) tests/acceptance/boot_linux_=
+console.py:BootLinuxConsole.test_arm_cubieboard_initrd: |console: Uncompres=
+sing Linux... done, booting the kernel.<br>|console: Booting Linux on physi=
+cal CPU 0x0<br>console: Linux version 4.20.7-sunxi (<a href=3D"mailto:root@=
+armbian.com">root@armbian.com</a>) (gcc version 7.2.1 20171011 (Linaro GCC =
+7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019<br>console: CPU: ARMv7 =
+Processor [410fc080] revision 0 (ARMv7), cr=3D50c5387d<br>console: CPU: PIP=
+T / VIPT nonaliasing data cache, VIPT nonaliasing instruction cache<br>cons=
+ole: OF: fdt: Machine model: Cubietech Cubieboard</div><div>...<br></div><d=
+iv>INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred: Timeout=
+ reached\n</div><div>Original status: ERROR\n{&#39;name&#39;: &#39;1-tests/=
+acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_cubieboard_initr=
+d&#39;, &#39;logdir&#39;: &#39;/home/me/avocado/job-results/job-2020-02-25T=
+23.58-d43884... (90.41 s)</div><div>...</div><div>console: random: crng ini=
+t done<br>/console: mount: mounting devtmpfs on /dev failed: Device or reso=
+urce busy<br>-console: EXT4-fs (sda): re-mounted. Opts: block_validity,barr=
+ier,user_xattr,acl<br>/console: Starting logging: OK<br>INTERRUPTED: Test i=
+nterrupted by SIGTERM\nRunner error occurred: Timeout reached\nOriginal sta=
+tus: ERROR\n{&#39;name&#39;: &#39;2-tests/acceptance/boot_linux_console.py:=
+BootLinuxConsole.test_arm_cubieboard_sata&#39;, &#39;logdir&#39;: &#39;/hom=
+e/fox/avocado/job-results/job-2020-02-25T23.58-d438849/... (90.53 s)<br>RES=
+ULTS =C2=A0 =C2=A0: PASS 0 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT=
+ 2 | CANCEL 0<br>JOB TIME =C2=A0 : 181.22 s</div><div>=C2=A0....</div><div>=
+<br></div><div>Have you noticed a similar performance change?<br></div><div=
+>Do you have any clue if there may be something changed here that could cau=
+se a slowdown?</div><div><br></div><div>Regards,</div><div>Niek<br></div><d=
+iv><br></div><div><br>-- <br><div dir=3D"ltr" class=3D"gmail_signature" dat=
+a-smartmail=3D"gmail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><b=
+r></div></div></div></div></div>
+
+--0000000000007e6dbf059f6e8f0e--
 
