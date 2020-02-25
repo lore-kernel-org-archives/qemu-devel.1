@@ -4,76 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878BFC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD396C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5339921556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76934218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:43:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFTNkrm/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5339921556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SziYyjow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76934218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZXz-0003aY-Ec
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:42:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49901)
+	id 1j6ZYI-0004Nd-Kq
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:43:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52653)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl8-0001QK-1P
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:21 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0L-0003hN-Gd
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl4-0000Ia-3w
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:17 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:40412)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0H-0003ZP-CB
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:01 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:39218)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Yl3-0000CA-R9
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:14 -0500
-Received: by mail-wr1-x430.google.com with SMTP id t3so14353565wru.7
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:13 -0800 (PST)
+ id 1j6Z0H-0003YQ-4f
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:07:57 -0500
+Received: by mail-wm1-x331.google.com with SMTP id c84so2883249wme.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:07:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=awROg0sihrj8MlohXF0L5tCYoOeGnX4c09j9x6n5rqA=;
- b=MFTNkrm/z3Az54zKcPpI0/i0ePSv5HdQLUl1/XOQaDDqCHZku5CJ4XNlVk5farFjt1
- sWJD42HWN3RHejwjbo96zXBSJ/9Qb4fZOUgFoDhUji5E6Ait6s72ItBisQv3tDmtp44x
- Qk4S0/hAcrJqZwfH1dRqoPsFbRo190snPiweM0E6OpA85copkxkbXbvQw0EXAlj6Bt+e
- nuH9seY1lbocfRjelksioldnpR5fgT4tynHDvBMZrhTQY69yaowVfqkVgXv8XIz6p156
- VP6UpswfqNOIFi19YcXE+VyNFeVh910mSLXqJUwNjLOGL20LGrWqYhoq2wH/ViTMCsF+
- hbIw==
+ bh=z+oRtC/n9wy+AzsoNa8bIYoHlANn/uzBMWqr8FqYh4M=;
+ b=SziYyjow/o0i4p2vup4j7busEqX07uiymHOG3oIS9Pbq5sb5ILq9VaYpTiYsj9sMFC
+ CRyl7e6Geq11nvX+InybCY9L9r8Ue8ODnuJRcxPuuO4LLG7LxYUyts60vscBSYUYy3st
+ qKxWlKnTzEHRQkaojt41jrvmeMtOPtCzcCa+pWZVVgrQk4QaKFEsisFhrCwLqCrZNjNf
+ Uk/cxYyc5D7j4RTstW2ism1/11Tl0jzfhoUcZ2GTvMhw3oomRsMGR6KWrYMh7esBpqZK
+ 8cx+omiP3wsT0BkJniu1YzjO6g+BQTjR4A5oVjVTf0pv6VO4+EMvYMlhbvFqnZUIl6/q
+ VHMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=awROg0sihrj8MlohXF0L5tCYoOeGnX4c09j9x6n5rqA=;
- b=pVinjtEYAodEHkb8QqAKpJmHMhWo7EOiYgFRwQfoOZKhCrbQzKyFLqkjxVf+EhDN04
- O0osgnhzEFWE/IBIsrfhp2zX1U0irb64tAHmWVn8W4NUEkTCQ9sypg4kJcAZUnradbdv
- ZRzyeLLpEqdeVLAfK8ZQtDtqV9PgNyY9rowbMmL2R4gVXjk1KaebMJrJ7NRrxsFlz2pT
- 8fGHTZWGgx5Ger+9n1OjvBoxttNCoMaYwD9+9+0/A9IAYBdwpLm+0qB2zUOxIkdHAfLv
- G6HoAzCWBkdqzw9MI1KcyNgMwpkc335Q53yLfMRsnPhzM17aKqSDfSavs8Tz4tnOGM82
- OQbw==
-X-Gm-Message-State: APjAAAXnSGSN304Yphb++9BhWqlFMidCjKH+4NZ6qqTodZbze+eQFOMq
- P1zm9H1ugoh60tFkzxsrqqgPjp6b
-X-Google-Smtp-Source: APXvYqzGL36V06YFzl05Q87unbHhvIzu1XzPKxN3dpNiInVH85GNdR4D32A2EVMxQjUGsgD/S1Jrsw==
-X-Received: by 2002:adf:f586:: with SMTP id f6mr69866750wro.46.1582631532476; 
- Tue, 25 Feb 2020 03:52:12 -0800 (PST)
+ bh=z+oRtC/n9wy+AzsoNa8bIYoHlANn/uzBMWqr8FqYh4M=;
+ b=Z1OHxUoQ93j2pjRBxNcNiAN6P5zgu58abkH3KPpLeRXEvGYuZnfktd+giD7S145k5o
+ GcaNP5Th/NmxahG9G4qfu1OFdjFDh1pqP5XUF7EeLlZLo7g/PEFF09vOpVPBQ+VZ+ho4
+ yqpbPTdjxEaBQ7yxHx64w4VArBkYPSmA56cDMTdtcP2kUDkwP0mjXa7LoRm4tF52gaOd
+ HmNYM8DIKU4knxf6d8BY2M+CzBZLqdqjGzslmH34dY7yoiEumA9GO445AYmBP2W1Noqw
+ AJnIY6C0Ch9Ak+INYxiEcsK6AEr4zSqwhOuZx81QTHraeflNBAxjkUjrb5VFToyXX3vd
+ TSzA==
+X-Gm-Message-State: APjAAAUmpSyqse2XaDJq2LktkutHf8Xksv4mtcNSFBMKA0sU0UbjMM0d
+ KIzkOlu1y6PAImYpLDLiVlGTaknK
+X-Google-Smtp-Source: APXvYqwIwW5slrriXg2+JRSHLxDrWvCBMyfS8Vg9mVNLfeyeO2a7RfKHmSs1R51Cl3gKGFzRqmj0ZQ==
+X-Received: by 2002:a7b:c4c3:: with SMTP id g3mr4885751wmk.131.1582632475620; 
+ Tue, 25 Feb 2020 04:07:55 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.11
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.54
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:12 -0800 (PST)
+ Tue, 25 Feb 2020 04:07:55 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 072/136] remove no longer used
- memory_region_allocate_system_memory()
-Date: Tue, 25 Feb 2020 12:50:02 +0100
-Message-Id: <1582631466-13880-72-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 122/136] hw/char: Let devices own the MemoryRegion they create
+Date: Tue, 25 Feb 2020 13:07:20 +0100
+Message-Id: <1582632454-16491-20-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,114 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-all boards were switched to using memdev backend for main RAM,
-so we can drop no longer used memory_region_allocate_system_memory()
+Avoid orphan memory regions being added in the /unattached QOM
+container.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200219160953.13771-73-imammedo@redhat.com>
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200224205533.23798-25-philmd@redhat.com>
+Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- hw/core/numa.c      | 34 ----------------------------------
- include/hw/boards.h | 32 --------------------------------
- 2 files changed, 66 deletions(-)
+ hw/char/serial.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index e6baf2c..316bc50 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -806,40 +806,6 @@ void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 9298881..2ab8b69 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -997,7 +997,7 @@ static void serial_io_realize(DeviceState *dev, Error **errp)
+         return;
      }
+ 
+-    memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
++    memory_region_init_io(&s->io, OBJECT(dev), &serial_io_ops, s, "serial", 8);
+     sysbus_init_mmio(SYS_BUS_DEVICE(sio), &s->io);
+     sysbus_init_irq(SYS_BUS_DEVICE(sio), &s->irq);
  }
+@@ -1106,8 +1106,9 @@ static void serial_mm_realize(DeviceState *dev, Error **errp)
+         return;
+     }
  
--static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
--                                           const char *name,
--                                           uint64_t ram_size)
--{
--    if (mem_path) {
--#ifdef __linux__
--        memory_region_init_ram_from_file(mr, owner, name, ram_size, 0, 0,
--                                         mem_path, &error_fatal);
--#else
--        fprintf(stderr, "-mem-path not supported on this host\n");
--        exit(1);
--#endif
--    } else {
--        memory_region_init_ram_nomigrate(mr, owner, name, ram_size, &error_fatal);
--    }
--    vmstate_register_ram_global(mr);
--}
--
--void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
--                                          const char *name,
--                                          uint64_t ram_size)
--{
--    MachineState *ms = MACHINE(qdev_get_machine());
--
--    if (ms->numa_state == NULL ||
--        ms->numa_state->num_nodes == 0 || numa_uses_legacy_mem()) {
--        allocate_system_memory_nonnuma(mr, owner, name, ram_size);
--        return;
--    }
--
--    memory_region_init(mr, owner, name, ram_size);
--    numa_init_memdev_container(ms, mr);
--}
--
- static void numa_stat_memory_devices(NumaNodeMem node_mem[])
- {
-     MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index ae2b60f..142b86d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -12,38 +12,6 @@
- #include "qom/object.h"
- #include "hw/core/cpu.h"
- 
--/**
-- * memory_region_allocate_system_memory - Allocate a board's main memory
-- * @mr: the #MemoryRegion to be initialized
-- * @owner: the object that tracks the region's reference count
-- * @name: name of the memory region
-- * @ram_size: size of the region in bytes
-- *
-- * This function allocates the main memory for a board model, and
-- * initializes @mr appropriately. It also arranges for the memory
-- * to be migrated (by calling vmstate_register_ram_global()).
-- *
-- * Memory allocated via this function will be backed with the memory
-- * backend the user provided using "-mem-path" or "-numa node,memdev=..."
-- * if appropriate; this is typically used to cause host huge pages to be
-- * used. This function should therefore be called by a board exactly once,
-- * for the primary or largest RAM area it implements.
-- *
-- * For boards where the major RAM is split into two parts in the memory
-- * map, you can deal with this by calling memory_region_allocate_system_memory()
-- * once to get a MemoryRegion with enough RAM for both parts, and then
-- * creating alias MemoryRegions via memory_region_init_alias() which
-- * alias into different parts of the RAM MemoryRegion and can be mapped
-- * into the memory map in the appropriate places.
-- *
-- * Smaller pieces of memory (display RAM, static RAMs, etc) don't need
-- * to be backed via the -mem-path memory backend and can simply
-- * be created via memory_region_init_ram().
-- */
--void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
--                                          const char *name,
--                                          uint64_t ram_size);
--
- #define TYPE_MACHINE_SUFFIX "-machine"
- 
- /* Machine class name that needs to be used for class-name-based machine
+-    memory_region_init_io(&s->io, NULL, &serial_mm_ops[smm->endianness], smm,
+-                          "serial", 8 << smm->regshift);
++    memory_region_init_io(&s->io, OBJECT(dev),
++                          &serial_mm_ops[smm->endianness], smm, "serial",
++                          8 << smm->regshift);
+     sysbus_init_mmio(SYS_BUS_DEVICE(smm), &s->io);
+     sysbus_init_irq(SYS_BUS_DEVICE(smm), &smm->serial.irq);
+ }
 -- 
 1.8.3.1
 
