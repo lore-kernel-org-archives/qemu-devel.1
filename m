@@ -2,102 +2,93 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8AAC35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E980C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87C752064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:36:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A7C52064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:36:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gijwGd+J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87C752064A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTIgqPID"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A7C52064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aOH-0005oy-Ox
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:36:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55769)
+	id 1j6aOO-00065f-K4
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:36:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6ZIv-00065b-O9
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:27:14 -0500
+ (envelope-from <pkrempa@redhat.com>) id 1j6a9d-0003dy-0f
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:21:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6ZIt-0007Hn-Tb
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:27:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58567
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pkrempa@redhat.com>) id 1j6a9b-0004jw-9A
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:21:40 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41337
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6ZIt-0007HP-9W
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:27:11 -0500
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1j6a9b-0004jJ-5D
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:21:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582633630;
+ s=mimecast20190719; t=1582636896;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZcTbypC42dQ6dlK/Lg2CQXYk/It2bCFrPSb5/e07vM8=;
- b=gijwGd+JUAf2vI2yfl25RERusyTt++TPpkNXALY/FSqJg5tUziufu43GbFwmECsut6WREh
- EMgRPOV9uDzQnYucoVIQBS6jzBiBPymrK4uwPYZdHIVIY1KGW19t2bh4f7SB4BGVnekfcw
- 6tueqSzt4MfqMpQd2CrJyAHwDodfWf8=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-157-6QgYLmWYNNuJtUdrsnd3CQ-1; Tue, 25 Feb 2020 07:27:09 -0500
-X-MC-Unique: 6QgYLmWYNNuJtUdrsnd3CQ-1
-Received: by mail-qk1-f198.google.com with SMTP id a10so9727736qkg.11
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:27:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=RwtvVoDDgmHjM+kCA/LjhUipmzBC2JpRU7IUD/wuCyY=;
- b=cVMdSVs4uvg8RkN1jKjagRYJn1t5BM+mbICwgD2u0/mdAJyFe1BamQ0zTkL2IMR5dQ
- Ga08pALoqkctvy/dqlUJwGYTCnTmPfJQrF70j20e1lw1oUEe7XPzl0WVpbvoNHaY6i2l
- Frc51YieF0JcqgtYRjq+VLRxJyKwgSXMkw+APAAI7WPWEztmUZTQY5tat3XpiO58wwCv
- Z0CfTFO/lq1vHjC10+aBKl6KxqT83Js/HJ+mHpjzqPgQuKY7dC6VvHjeVXRIydqoD+Lu
- wvTtf3I5fEmNTNyCHfAgq+6rJ6N2OUC77UodXehFkhJkU0omFSBzjZTdXphZvC0HYJw1
- UzXg==
-X-Gm-Message-State: APjAAAWTTedJzOK/F+XjewiNn6YCnJuXmOlNDFJZ/Z3fSKFKf9c1Eezy
- bPjsuhweYi8nPYF7+lX0Xx17s+2MUIxaEYKiIlCA/Z37NdQb2y85ipXocEBU6J65q+D3R39Zk0F
- szbwSvpnp/0X2coU=
-X-Received: by 2002:a05:620a:12a5:: with SMTP id
- x5mr56194392qki.478.1582633627060; 
- Tue, 25 Feb 2020 04:27:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw8Cmk7QiY5t1qEin3kff6670s5kqA82XnUIddNzGx3F8TjFvSKqtwWb3Yo1wfXQ43MCht96A==
-X-Received: by 2002:a05:620a:12a5:: with SMTP id
- x5mr56194371qki.478.1582633626813; 
- Tue, 25 Feb 2020 04:27:06 -0800 (PST)
-Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
- by smtp.gmail.com with ESMTPSA id
- p126sm7321512qkd.108.2020.02.25.04.27.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 04:27:06 -0800 (PST)
-Date: Tue, 25 Feb 2020 07:27:01 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: miaoyubo <miaoyubo@huawei.com>
-Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Message-ID: <20200225072522-mutt-send-email-mst@kernel.org>
-References: <20200225015026.940-1-miaoyubo@huawei.com>
- <20200225015026.940-3-miaoyubo@huawei.com>
- <3086f4a2-fb0a-d276-7c76-f06474befa35@redhat.com>
- <c4aa08df40a74dbd876b9acfbbb09809@huawei.com>
+ bh=7Xv/t6Zo0cGBtney6znCCDmF0+wveWYK2dAj4m2bjOs=;
+ b=MTIgqPIDPnJxX6WWKBXLiZJGwcpd9YV2yBJT5X5HfUTQZMSS8fwq0nv04czuPPonCeiwr/
+ UGCEnnf3y1X7f9tOVWdFZ+QAT+JAYxtefdUbXybiOGQJa6k/DuuO45pEAy9M3CV7yDktr3
+ lxQourJ20UtQ7tGsjPG1uHwlj3iKYn8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-163-bxQyWYwFOsKyZt_7tBrLcg-1; Tue, 25 Feb 2020 08:21:35 -0500
+X-MC-Unique: bxQyWYwFOsKyZt_7tBrLcg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D135DB61
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 13:21:32 +0000 (UTC)
+Received: from andariel.pipo.sk (ovpn-204-29.brq.redhat.com [10.40.204.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F4665DA2C;
+ Tue, 25 Feb 2020 13:21:28 +0000 (UTC)
+Date: Tue, 25 Feb 2020 14:21:25 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 8/9] virStorageFileGetMetadataRecurse: Allow format
+ probing under special circumstances
+Message-ID: <20200225132125.GH3296@andariel.pipo.sk>
+References: <e6d268fcb8b2e92f2cf0c6b29bab3a9f645a7051.1581959449.git.pkrempa@redhat.com>
+ <ef597fda-4b3f-d270-824f-82df391ff223@redhat.com>
+ <20200219164034.GF1011498@angien.pipo.sk>
+ <fa77907b-1378-b4ed-3a40-fa19fe67f7cf@redhat.com>
+ <20200219185740.GA3423556@angien.pipo.sk>
+ <6d228d74-0b74-14e0-60cf-5c69dad2a65b@redhat.com>
+ <20200224133416.GE3296@andariel.pipo.sk>
+ <20200224142415.GP635661@redhat.com>
+ <20200224171046.GA864377@angien.pipo.sk>
+ <20200225125021.GL1148628@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c4aa08df40a74dbd876b9acfbbb09809@huawei.com>
+In-Reply-To: <20200225125021.GL1148628@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,127 +100,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: libvir-list@redhat.com, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 12:12:12PM +0000, miaoyubo wrote:
->=20
-> > -----Original Message-----
-> > From: Philippe Mathieu-Daud=E9 [mailto:philmd@redhat.com]
-> > Sent: Tuesday, February 25, 2020 5:48 PM
-> > To: miaoyubo <miaoyubo@huawei.com>; peter.maydell@linaro.org;
-> > shannon.zhaosl@gmail.com
-> > Cc: berrange@redhat.com; mst@redhat.com; qemu-devel@nongnu.org;
-> > Xiexiangyou <xiexiangyou@huawei.com>; imammedo@redhat.com
-> > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for =
-arm
-> >=20
-> > On 2/25/20 2:50 AM, Yubo Miao wrote:
-> > > From: miaoyubo <miaoyubo@huawei.com>
-> > >
-> > > Currently virt machine is not supported by pxb-pcie, and only one mai=
-n
-> > > host bridge described in ACPI tables.
-> > > In this patch,PXB-PCIE is supproted by arm and certain
-> >=20
-> > Typos: "expander" in subject and "supported" here.
-> >=20
->=20
-> Thanks for your reply and sorry for the mistakes.
-> I will check all the subjects and comments.
->=20
-> > > resource is allocated for each pxb-pcie in acpi table.
-> > > The resource for the main host bridge is also reallocated.
-> > >
-> > > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
-> > > ---
-> > >   hw/arm/virt-acpi-build.c | 115
-> > ++++++++++++++++++++++++++++++++++++---
-> > >   hw/arm/virt.c            |   3 +
-> > >   include/hw/arm/virt.h    |   7 +++
-> > >   3 files changed, 118 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c inde=
-x
-> > > 37c34748a6..be1986c60d 100644
-> > > --- a/hw/arm/virt-acpi-build.c
-> > > +++ b/hw/arm/virt-acpi-build.c
-> > > @@ -49,6 +49,8 @@
-> > >   #include "kvm_arm.h"
-> > >   #include "migration/vmstate.h"
-> > >
-> > > +#include "hw/arm/virt.h"
-> > > +#include "hw/pci/pci_bus.h"
-> > >   #define ARM_SPI_BASE 32
-> > >
-> > >       if (use_highmem) {
-> > >           hwaddr base_mmio_high =3D memmap[VIRT_HIGH_PCIE_MMIO].base;
-> > @@
-> > > -746,7 +847,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-> > VirtMachineState *vms)
-> > >       acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-> > >                       (irqmap[VIRT_MMIO] + ARM_SPI_BASE),
-> > NUM_VIRTIO_TRANSPORTS);
-> > >       acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] +
-> > ARM_SPI_BASE),
-> > > -                      vms->highmem, vms->highmem_ecam);
-> > > +                      vms->highmem, vms->highmem_ecam, vms);
-> > >       if (vms->acpi_dev) {
-> > >           build_ged_aml(scope, "\\_SB."GED_DEVICE,
-> > >                         HOTPLUG_HANDLER(vms->acpi_dev), diff --git
-> > > a/hw/arm/virt.c b/hw/arm/virt.c index f788fe27d6..6314928671 100644
-> > > --- a/hw/arm/virt.c
-> > > +++ b/hw/arm/virt.c
-> > > @@ -1246,6 +1246,9 @@ static void create_pcie(VirtMachineState *vms)
-> > >       }
-> > >
-> > >       pci =3D PCI_HOST_BRIDGE(dev);
-> > > +
-> > > +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-> > > +
-> > >       if (pci->bus) {
-> > >           for (i =3D 0; i < nb_nics; i++) {
-> > >               NICInfo *nd =3D &nd_table[i]; diff --git
-> > > a/include/hw/arm/virt.h b/include/hw/arm/virt.h index
-> > > 71508bf40c..90f10a1e46 100644
-> > > --- a/include/hw/arm/virt.h
-> > > +++ b/include/hw/arm/virt.h
-> > > @@ -140,6 +140,13 @@ typedef struct {
-> > >       DeviceState *gic;
-> > >       DeviceState *acpi_dev;
-> > >       Notifier powerdown_notifier;
-> > > +    /*
-> > > +     * pointer to devices and objects
-> > > +     * Via going through the bus, all
-> > > +     * pci devices and related objectes
-> >=20
-> > Typo "objects", but I don't understand the comment well.
-> >=20
->=20
-> Sorry for any confusion caused ,I will rewrite the comment=20
-> /* point to the root bus, which is pcie.0 */
-> Does this comment make sense?
+On Tue, Feb 25, 2020 at 12:50:21 +0000, Daniel Berrange wrote:
+> On Mon, Feb 24, 2020 at 06:10:46PM +0100, Peter Krempa wrote:
+> > On Mon, Feb 24, 2020 at 14:24:15 +0000, Daniel Berrange wrote:
+> > > On Mon, Feb 24, 2020 at 02:34:16PM +0100, Peter Krempa wrote:
 
-Not really. E.g. it doesn't say what happens if there's more than one root.
+[...]
 
-> > > +     * could be gained.
-> > > +     */
-> > > +    PCIBus *bus;
-> > >   } VirtMachineState;
-> > >
-> > >   #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
-> > > VIRT_PCIE_ECAM)
-> > >
+> > > Would there be any downsides to this that did not already exist in th=
+e
+> > > non-blockdev days ?
+> >=20
+> > We can, but the price is that:
+> > 1) we won't allow blockjobs and anything blockdev-related because node
+> > name would be out of our control. This was possible in pre-blockdev era=
+.
 >=20
-> Regards,
-> Miao
+> Ok, that's not viable then. We can't switch one regression for a differen=
+t
+> regression.
+>=20
+> > 2) we will lose control of actually telling qemu to NOT open the backin=
+g
+> > file in that case. Distros using only unix permission still have
+> > arbitrary file access under permissions of the qemu process.
+>=20
+> True, but that is at least historically expected behaviour, which can
+> be fixed by setting <backingfile/> in the XML file IIUC.
+
+Yes, but if you specify any <backingStore> including the terminator you
+basically configure the image chain yourselves. The part which is
+configured explicitly will not undergo any form of detection, not even
+looking for the backing file.
+
+> > 3) weird special-case code, because we need to keep some metadata about
+> > the image to do security labelling
+> >=20
+> > > I don't think we can solve the regressions in behaviour of backing fi=
+les
+> > > by doing probing of the backing files in libvirt, because that only w=
+orks
+> > > for the case where libvirt can actually open the file. ie a local fil=
+e on
+> > > disk. We don't have logic for opening backing files on RBD, GlusterFS=
+,
+> > > iSCSI, HTTP, SSH, etc, and nor do we want todo that.
+> >=20
+> > Now we are back in the teritory where we actually do match what would
+> > happen with previously. We don't specify these on the command line with
+> > ehaviour matching what's described above, with the caveats as above.
+> >=20
+> > I kept this behaviour because we couldn't do better. This is in place
+> > even now if the last introspectable image has valid format specified.
+> >=20
+> > We can reconsider how to approach this but ideally separately.
+>=20
+> I'm a little lost as to exactly which scenarios are broken, and which
+> we're fixing.
+>=20
+>  1. file:top.qcow2 -> file:base.raw
+>=20
+>  2. file:top.qcow2 -> file:base.qcow2
+>=20
+>  3. file:top.qcow2 -> file:middle.qcow2 -> file:base.raw
+> =20
+>  4. file:top.qcow2 -> file:middle.qcow2 -> file:base.qcow2
+
+I assume you meant that none of the 'qcow2' files have format of the
+backing file recorded in the metadata.
+
+> IIUC, (1) is working before and now, (2) is working before but
+> broken now, and (3) and (4) were broken before and now.
+
+1) was working before, but is now forbidden
+2) was working before, and is now forbidden
+3,4) were possibly working (without sVirt), or would get permission
+denied reported by qemu during startup, currently they are forbidden by
+a libvirt error message
+
+After this patch:
+1) will be fixed by this patch
+2) will be fixed by this patch
+3, 4) will report a libvirt error rather than relying on sVirt or others
+
+> So (2) is the only one we /must/ to fix
+>=20
+> Am I right that by doing probing in libvirt as per this patch,
+> as well as fixing (2) though, we'll accidentally fix (3) and (4)
+> even though they were always broken before ?
+>
+> This all talks about qcow2 images on the file: protocol driver.
+> What is the situation for, say, the iscsi: protocol driver
+>=20
+>=20
+>  1. iscsi:top.qcow2 -> iscsi:base.raw
+>=20
+>  2. iscsi:top.qcow2 -> iscsi:base.qcow2
+>=20
+>  3. iscsi:top.qcow2 -> iscsi:middle.qcow2 -> iscsi:base.raw
+> =20
+>  4. iscsi:top.qcow2 -> iscsi:middle.qcow2 -> iscsi:base.qcow2
+>=20
+> What was the behaviour of this in the pre-blockdev days and
+> vs current git master ? Is it the same with (1) is working
+> before and now, (2) is working before but broken now, and
+> (3) and (4) were broken before and now.
+
+Pre-blockdev and post-blockdev every scenario of the above is working.
+We can't even inspect the top file for backing store so everything is
+just ignored.
+
+Now what partially changes is when we have something introspectable in
+the way:
+
+1,2) file:top.qcow2 -> iscsi:base.whatever
+
+The current code would report an error if the format was not recorded
+in the overlay (top.qcow2) and we can't introspect the backing file
+we'll reject it.
+
+This can be relaxed though.
+
+3,4) will work if top.qcow2 has the format but any subsequent don't since
+we don't introspect it
+
+> I'm assuming the libvirt probing cannot fix any case other
+> than file: protocol, or host-device: protocol, since we're
+> unable to open any other type of storage.
+
+It fixes also gluster since the backends for that are already
+implemented.
+
+I'll post another rebased version with some updated docs and one fix. We
+can continue there perhaps.
 
 
