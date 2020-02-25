@@ -2,82 +2,147 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C61BC35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B88ADC35E04
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC1CA21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:56:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqDgX6T+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC1CA21744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9128420CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:01:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9128420CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6bdc-0007TD-2A
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:56:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52905)
+	id 1j6bi6-0000b8-Qv
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:01:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6bcz-0006zj-4S
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:56:06 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6bhU-000081-BS
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6bcw-0001tS-Ul
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:56:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27027
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6bcw-0001s0-QI
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:56:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582642561;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ljkXlFVFJ54E7DivYAOSSraP5hdqjy29xTCua4oEVcg=;
- b=aqDgX6T+83l2FoRF918lU8Jb2+7fq37oyPCqTUPDDzGdYu69ilRneVIA+h2Qd7gnYbGvgU
- D48fimYUfobdl8WvYTmycwb4nY55T3Ppqr4tP9OUwcUjwYS7XsRGYuZMNGMXZCtoUavgOC
- hGgknc6XLFRNvquVq80XuGFIbXqZYW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-3iXnb4ejPuqnBqn5mUz5RA-1; Tue, 25 Feb 2020 09:55:59 -0500
-X-MC-Unique: 3iXnb4ejPuqnBqn5mUz5RA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D8FF8018B7;
- Tue, 25 Feb 2020 14:55:58 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF5D8909E9;
- Tue, 25 Feb 2020 14:55:54 +0000 (UTC)
-Date: Tue, 25 Feb 2020 15:55:53 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v4 1/5] extend libvhost to support IOThread and coroutine
-Message-ID: <20200225145553.GB7632@linux.fritz.box>
-References: <20200218050711.8133-1-coiby.xu@gmail.com>
- <20200218050711.8133-2-coiby.xu@gmail.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6bhS-0003tK-Uu
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:00:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19906)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1j6bhS-0003k9-N6
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:00:42 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01PExDKm095773
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 10:00:23 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yd4gqud6q-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 10:00:22 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 25 Feb 2020 15:00:19 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 25 Feb 2020 15:00:18 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01PF0Hcn49676312
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 25 Feb 2020 15:00:17 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8F5AA52082;
+ Tue, 25 Feb 2020 15:00:17 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.53.31])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 5C2E15204F;
+ Tue, 25 Feb 2020 15:00:17 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios/s390x: Pack ResetInfo struct
+To: jjherne@linux.ibm.com, qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
+ cohuck@redhat.com
+References: <20200205182126.13010-1-jjherne@linux.ibm.com>
+ <e3baa1e0-e1d3-d67c-cca9-a626d42c5489@de.ibm.com>
+ <bf3f44b5-f0fe-59f4-9152-54edd8c9822e@linux.ibm.com>
+ <941cc201-4c33-0ad3-ecc8-eab2709d350d@de.ibm.com>
+ <91910082-ffeb-c588-7434-3de5fbfcbfa6@linux.ibm.com>
+ <ab7de201-f466-b95d-50f0-e6f850eee3cd@de.ibm.com>
+ <29aece69-3b53-6c46-f295-cbc4bf93ff95@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 25 Feb 2020 16:00:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200218050711.8133-2-coiby.xu@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <29aece69-3b53-6c46-f295-cbc4bf93ff95@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20022515-0008-0000-0000-000003564FF3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022515-0009-0000-0000-00004A776BFC
+Message-Id: <3dad5712-686f-c05a-b085-d7ee4c389b3c@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-25_05:2020-02-21,
+ 2020-02-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0
+ clxscore=1015 impostorscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
+ bulkscore=0 mlxlogscore=831 lowpriorityscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002250118
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id 01PExDKm095773
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,314 +154,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bharatlkmlkvm@gmail.com, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.02.2020 um 06:07 hat Coiby Xu geschrieben:
-> Previously libvhost dispatch events in its own GMainContext. Now vhost-us=
-er
-> client's kick event can be dispatched in block device drive's AioContext
-> thus IOThread is supported. And also allow vu_message_read and
-> vu_kick_cb to be replaced so QEMU can run them as coroutines.
+
+
+On 25.02.20 13:58, Jason J. Herne wrote:
+> On 2/25/20 6:13 AM, Christian Borntraeger wrote:
+>>
+>>
+>> On 25.02.20 11:23, Jason J. Herne wrote:
+>>> On 2/13/20 1:24 PM, Christian Borntraeger wrote:
+>>> ...
+>>>>>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2i=
+pl.c
+>>>>>> index da13c43cc0..8839226803 100644
+>>>>>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>>>>>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>>>>>> @@ -18,6 +18,7 @@
+>>>>>> =C2=A0=C2=A0=C2=A0 typedef struct ResetInfo {
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint64_t ipl_psw;
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t ipl_continue;
+>>>>>> +=C2=A0=C2=A0=C2=A0 uint32_t pad;
+>>>>>> =C2=A0=C2=A0=C2=A0 } ResetInfo;
+>>>>>> =C2=A0=C2=A0=C2=A0 =C2=A0 static ResetInfo save;
+>>>>>>
+>>>>>>
+>>>>>> also work? If yes, both variants are valid. Either packed or expli=
+cit padding.
+>>>>>>
+>>>>>
+>>>>> I don't believe this will work. I think the problem is that we're o=
+verwriting too much memory when we cast address 0 as a ResetInfo and then=
+ overwrite it (*current =3D save). I think we need the struct to be sized=
+ at 12-bytes instead of 16.
+>>>>>
+>>>>
+>>>> The idea of the code is that we _save_ the original content from add=
+ress 0 to save and _restore_ it before jumping into final code. I do not =
+yet understand why this does not work.
+>>>>
+>>>
+>>> I've found the real problem here. Legacy operating systems that expec=
+t to start
+>>> in 32-bit addressing mode can fail if we leave junk in the high halve=
+s of our
+>>> 64-bit registers. This is because some instructions (LA for example) =
+are
+>>> bi-modal and operate differently depending on the machine's current a=
+ddressing
+>>> mode.
+>>>
+>>> In the case where we pack the struct, the compiler happens to use the=
+ mvc
+>>> instruction to load/store the current/save memory areas.
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *current =3D save;
+>>> =C2=A0=C2=A0 1fc:=C2=A0=C2=A0=C2=A0 e3 10 b0 a8 00 04=C2=A0=C2=A0=C2=A0=
+=C2=A0 lg=C2=A0=C2=A0=C2=A0 %r1,168(%r11)
+>>> =C2=A0=C2=A0 202:=C2=A0=C2=A0=C2=A0 c0 20 00 00 00 00=C2=A0=C2=A0=C2=A0=
+=C2=A0 larl=C2=A0=C2=A0=C2=A0 %r2,202 <jump_to_IPL_2+0x32>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 204: R_390_PC32DBL=C2=A0=C2=A0=C2=A0 .bss+0x2
+>>> =C2=A0=C2=A0 208:=C2=A0=C2=A0=C2=A0 d2 0b 10 00 20 00=C2=A0=C2=A0=C2=A0=
+=C2=A0 mvc=C2=A0=C2=A0=C2=A0 0(12,%r1),0(%r2)
+>>>
+>>> Everything works as expected here, our legacy OS boots without issue.
+>>> However, in the case where we've packed this struct the compiler opti=
+mizes the
+>>> code and uses lmg/stmg instead of mvc to copy the data:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *current =3D save;
+>>> =C2=A0=C2=A0 1fc:=C2=A0=C2=A0=C2=A0 e3 10 b0 a8 00 04=C2=A0=C2=A0=C2=A0=
+=C2=A0 lg=C2=A0=C2=A0=C2=A0 %r1,168(%r11)
+>>> =C2=A0=C2=A0 202:=C2=A0=C2=A0=C2=A0 c0 20 00 00 00 00=C2=A0=C2=A0=C2=A0=
+=C2=A0 larl=C2=A0=C2=A0=C2=A0 %r2,202 <jump_to_IPL_2+0x32>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 204: R_390_PC32DBL=C2=A0=C2=A0=C2=A0 .bss+0x2
+>>> =C2=A0=C2=A0 208:=C2=A0=C2=A0=C2=A0 eb 23 20 00 00 04=C2=A0=C2=A0=C2=A0=
+=C2=A0 lmg=C2=A0=C2=A0=C2=A0 %r2,%r3,0(%r2)
+>>> =C2=A0=C2=A0 20e:=C2=A0=C2=A0=C2=A0 eb 23 10 00 00 24=C2=A0=C2=A0=C2=A0=
+=C2=A0 stmg=C2=A0=C2=A0=C2=A0 %r2,%r3,0(%r1)
+>>>
+>>> Depending on the data being copied, the high halves of the registers =
+may contain
+>>> non-zero values. Example:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 r2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x108000080000780=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 74309395999098752
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 r3=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x601001800004368=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 432627142283510632
+>>>
+>>> So, by sheer luck of the generated assembler, the patch happens to "f=
+ix" the
+>>> problem.=C2=A0 A real fix might be to insert inline assembler that cl=
+ears the high
+>>> halves of the registers before we call ipl() in jump_to_IPL_2(). Can =
+we think of
+>>> a better way to do that than 15 LLGTR instructions? :) Let me know yo=
+ur
+>>> thoughts
+>>
+>> Does sam31 before the ipl() work?
+> asm volatile ("sam31\n");
 >=20
-> Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 54 ++++++++++++++++++++++++---
->  contrib/libvhost-user/libvhost-user.h | 38 ++++++++++++++++++-
->  2 files changed, 85 insertions(+), 7 deletions(-)
+> Inserting the above right before ipl(); does not change the outcome, th=
+e guest still fails.
 >=20
-> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-> index 5cb7708559..6aadeaa0f2 100644
-> --- a/contrib/libvhost-user/libvhost-user.h
-> +++ b/contrib/libvhost-user/libvhost-user.h
-> @@ -30,6 +30,8 @@
-> =20
->  #define VHOST_MEMORY_MAX_NREGIONS 8
-> =20
-> +#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
-> +
->  typedef enum VhostSetConfigType {
->      VHOST_SET_CONFIG_TYPE_MASTER =3D 0,
->      VHOST_SET_CONFIG_TYPE_MIGRATION =3D 1,
-> @@ -201,6 +203,7 @@ typedef uint64_t (*vu_get_features_cb) (VuDev *dev);
->  typedef void (*vu_set_features_cb) (VuDev *dev, uint64_t features);
->  typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
->                                    int *do_reply);
-> +typedef bool (*vu_read_msg_cb) (VuDev *dev, int sock, VhostUserMsg *vmsg=
-);
->  typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool star=
-ted);
->  typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx)=
-;
->  typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t l=
-en);
-> @@ -208,6 +211,20 @@ typedef int (*vu_set_config_cb) (VuDev *dev, const u=
-int8_t *data,
->                                   uint32_t offset, uint32_t size,
->                                   uint32_t flags);
-> =20
-> +typedef void (*vu_watch_cb_packed_data) (void *packed_data);
-> +
-> +typedef void (*vu_set_watch_cb_packed_data) (VuDev *dev, int fd, int con=
-dition,
-> +                                             vu_watch_cb_packed_data cb,
-> +                                             void *data);
-> +/*
-> + * allowing vu_read_msg_cb and kick_callback to be replaced so QEMU
-> + * can run them as coroutines
-> + */
-> +typedef struct CoIface {
-> +    vu_read_msg_cb read_msg;
-> +    vu_watch_cb_packed_data kick_callback;
-> +} CoIface;
-
-I think this should be part of VuDevIface, so that it becomes a properly
-integrated part of the design instead of an adapter hacked on top.
-
->  typedef struct VuDevIface {
->      /* called by VHOST_USER_GET_FEATURES to get the features bitmask */
->      vu_get_features_cb get_features;
-> @@ -372,7 +389,8 @@ struct VuDev {
->      /* @set_watch: add or update the given fd to the watch set,
->       * call cb when condition is met */
->      vu_set_watch_cb set_watch;
-> -
-> +    /* AIO dispatch will only one data pointer to callback function */
-> +    vu_set_watch_cb_packed_data set_watch_packed_data;
->      /* @remove_watch: remove the given fd from the watch set */
->      vu_remove_watch_cb remove_watch;
-> =20
-> @@ -380,7 +398,7 @@ struct VuDev {
->       * re-initialize */
->      vu_panic_cb panic;
->      const VuDevIface *iface;
-> -
-> +    const CoIface *co_iface;
->      /* Postcopy data */
->      int postcopy_ufd;
->      bool postcopy_listening;
-> @@ -417,6 +435,22 @@ bool vu_init(VuDev *dev,
->               const VuDevIface *iface);
-> =20
-> =20
-> +/**
-> + * vu_init_packed_data:
-> + * Same as vu_init except for set_watch_packed_data which will pack
-> + * two parameters into a struct
-
-Be specific: Which two parameters and which struct?
-
-I think it would be more helpful to name the function after the
-additional piece of information that it uses rather than the fact that
-it stores it internally in a struct.
-
-We have:
-
-typedef void (*vu_set_watch_cb) (VuDev *dev, int fd, int condition,
-                                 vu_watch_cb cb, void *data);
-typedef void (*vu_set_watch_cb_packed_data) (VuDev *dev, int fd, int condit=
-ion,
-                                             vu_watch_cb_packed_data cb,
-                                             void *data);
-
-Without looking at the implementation, they have the same set of
-parameters. I suspect that the difference is in the content of *data,
-but since it is declared void*, I suppose it's treated as an opaque data
-type and will only be passed unchanged (and uninspected) to cb.
-
-If so, there is no differene between both types.
-
-> thus QEMU aio_dispatch can pass the
-> + * required data to callback function.
-> + *
-> + * Returns: true on success, false on failure.
-> + **/
-> +bool vu_init_packed_data(VuDev *dev,
-> +                         uint16_t max_queues,
-> +                         int socket,
-> +                         vu_panic_cb panic,
-> +                         vu_set_watch_cb_packed_data set_watch_packed_da=
-ta,
-> +                         vu_remove_watch_cb remove_watch,
-> +                         const VuDevIface *iface,
-> +                         const CoIface *co_iface);
->  /**
->   * vu_deinit:
->   * @dev: a VuDev context
-> --=20
-> 2.25.0
+> This allows the guest to boot.
 >=20
-> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
-r/libvhost-user.c
-> index b89bf18501..f95664bb22 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -67,8 +67,6 @@
->  /* The version of inflight buffer */
->  #define INFLIGHT_VERSION 1
-> =20
-> -#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
-> -
->  /* The version of the protocol we support */
->  #define VHOST_USER_VERSION 1
->  #define LIBVHOST_USER_DEBUG 0
-> @@ -260,7 +258,7 @@ have_userfault(void)
->  }
-> =20
->  static bool
-> -vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-> +vu_message_read_(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+> asm volatile ("llgtr %r2,%r2\n"
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 "llgtr %r3,%r3\n");
+>=20
+> My guess as to why sam31 does not work: The legacy OS is eventually doi=
+ng a sam64 and the high halves of the registers are not subsequently clea=
+red before use. I could be wrong about this though.
 
-Just adding a trailing underscore isn't a good name. It doesn't tell the
-reader what the difference between vu_message_read_ and vu_message_read
-is.
+I think we should rewrite jump_to_IPL_2 is assembler as we cannot clear o=
+ut all registers
+with just inline assembly (we whould kill the stack and others that the c=
+ompiler might still want).
 
->  {
->      char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] =
-=3D { };
->      struct iovec iov =3D {
-> @@ -328,6 +326,17 @@ fail:
->      return false;
->  }
-> =20
-> +static bool vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
-> +{
-> +    vu_read_msg_cb read_msg;
-> +    if (dev->co_iface) {
-> +        read_msg =3D dev->co_iface->read_msg;
-> +    } else {
-> +        read_msg =3D vu_message_read_;
-> +    }
-> +    return read_msg(dev, conn_fd, vmsg);
-> +}
+Do the register clearing in there and then use something like
 
-If you change VuDevIface so that it contains the fields of CoIface
-directly, you can just initialise dev->iface->read_msg with what is
-called vu_message_read_() now for the non-QEMU case, and this whole
-wrapper becomes unnecessary because the code path is the same for both
-cases.
+static void jump_to_IPL_2(void)
+{
+    asm volatile(	....clearing...
+			"llgf 14,8\n"
+                	"br 14\n");
+}
 
->  static bool
->  vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
->  {
-> @@ -1075,9 +1084,14 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *v=
-msg)
->      }
-> =20
->      if (dev->vq[index].kick_fd !=3D -1 && dev->vq[index].handler) {
-> +        if (dev->set_watch_packed_data) {
-> +            dev->set_watch_packed_data(dev, dev->vq[index].kick_fd, VU_W=
-ATCH_IN,
-> +                                       dev->co_iface->kick_callback,
-> +                                       (void *)(long)index);
-> +        } else {
->          dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
->                         vu_kick_cb, (void *)(long)index);
-> -
-> +        }
-
-Indentation is off here.
-
-Also, this is almost exactly the same code for both cases. If you
-generalise things to have a dev->iface->kick_callback that can be
-initialised with vu_kick_cb in the non-QEMU case, you get rid of this
-duplication, too.
-
->          DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
->                 dev->vq[index].kick_fd, index);
->      }
-> @@ -1097,8 +1111,14 @@ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
->      vq->handler =3D handler;
->      if (vq->kick_fd >=3D 0) {
->          if (handler) {
-> +            if (dev->set_watch_packed_data) {
-> +                dev->set_watch_packed_data(dev, vq->kick_fd, VU_WATCH_IN=
-,
-> +                                           dev->co_iface->kick_callback,
-> +                                           (void *)(long)qidx);
-> +            } else {
->              dev->set_watch(dev, vq->kick_fd, VU_WATCH_IN,
->                             vu_kick_cb, (void *)(long)qidx);
-> +            }
-
-Same as above. (Indentation and duplicated code.)
-
->          } else {
->              dev->remove_watch(dev, vq->kick_fd);
->          }
-> @@ -1627,6 +1647,12 @@ vu_deinit(VuDev *dev)
->          }
-> =20
->          if (vq->kick_fd !=3D -1) {
-> +            /* remove watch for kick_fd
-> +             * When client process is running in gdb and
-> +             * quit command is run in gdb, QEMU will still dispatch the =
-event
-> +             * which will cause segment fault in the callback function
-> +             */
-
-Reformat this comment to use a consistent line width, maybe like this:
-
-            /*
-             * remove watch for kick_fd.
-             *
-             * When client process is running in gdb and quit command is
-             * run in gdb, QEMU will still dispatch the event which will
-             * cause segment fault in the callback function
-             */
-
-I'm not sure what the comment wants to tell me: Is this an existing
-problem in the code that we can run into segfaults, or do we remove the
-watch to avoid segfaults?
-
-> +            dev->remove_watch(dev, vq->kick_fd);
->              close(vq->kick_fd);
->              vq->kick_fd =3D -1;
->          }
-> @@ -1682,7 +1708,7 @@ vu_init(VuDev *dev,
-> =20
->      assert(max_queues > 0);
->      assert(socket >=3D 0);
-> -    assert(set_watch);
-> +    /* assert(set_watch); */
-
-Don't leave commented code around. Either leave it in, or remove it
-completely.
-
-I think this one should be left in. If you integrate CoIface into
-VuDevIface, the assertion will hold true again.
-
->      assert(remove_watch);
->      assert(iface);
->      assert(panic);
-> @@ -1715,6 +1741,24 @@ vu_init(VuDev *dev,
->      return true;
->  }
-> =20
-> +bool
-> +vu_init_packed_data(VuDev *dev,
-> +        uint16_t max_queues,
-> +        int socket,
-> +        vu_panic_cb panic,
-> +        vu_set_watch_cb_packed_data set_watch_packed_data,
-> +        vu_remove_watch_cb remove_watch,
-> +        const VuDevIface *iface,
-> +        const CoIface *co_iface)
-> +{
-> +    if (vu_init(dev, max_queues, socket, panic, NULL, remove_watch, ifac=
-e)) {
-> +        dev->set_watch_packed_data =3D set_watch_packed_data;
-> +        dev->co_iface =3D co_iface;
-> +        return true;
-> +    }
-> +    return false;
-> +}
-
-With the integrated VuDevIface, this wrapper becomes unnecessary.
-
-Kevin
 
 
