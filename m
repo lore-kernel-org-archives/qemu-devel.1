@@ -7,77 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E409C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB8BC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:20:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F134B2176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:20:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9FA12176D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PhWYQJvs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F134B2176D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijvVQeiV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9FA12176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZCQ-0000fB-2v
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:20:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49778)
+	id 1j6ZCV-0000uk-PZ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:20:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl3-0001F6-5v
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl3-0001G1-GA
  for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Fy-6p
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Fn-8T
  for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:36620)
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:34094)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykx-00084Y-FF
+ id 1j6Ykx-00085Q-DD
  for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id z3so14384161wru.3
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:02 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id i10so939791wmd.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ItI3fRDtU/zzNqxISOjM3JewIShkqFsorUHppZV+U1E=;
- b=PhWYQJvsnGSGvi3EAMg0tO5eKahr6Ld4lcnwq61cVrUJTXhnN8kmfs55bKzKMrXYys
- sLUWIUunkOU7IJH4T4qa/md+2tE9eroTK1DNZtLZZIW65O0xNE6z2Hmygr73FjJuHZ7K
- eFOWChlLPx7qYznbsw+OfH4gASE8ct1KQo2L8aj/OeMRuVa7i0Dp7niGnFOgPFbDufCi
- cyZ9qWE0dSGMXNVo4N/4bRikPiBXO4xxfuXeY6Khmw9j6bHpFf0IYeiUthHkMk6IIKpD
- UxV+wLBuAE3BPSlhHa8P6XssfZZN1Vwufnj7owJ7QDzDEWlct/zmlnDalFEvcmYXGeCh
- 8+jQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=mokEQf2xIZXyVf7hgVorPbcUdN09SIKwvfoY1oWCtGE=;
+ b=ijvVQeiV5eZM+Ragq6cDOHnMH5NGBxCvKdsg6NrQFxXKLrrTugEGrh8eNX1v7yoicW
+ NFdcTpieXP1P+UdAdaY9A0bdLkq6TJse+qZLO4JXQMlsGvmrqC/9TKt9JKrfwA9WVf0D
+ Yi8HOQlZFoAIxKnybrawhcTIQP96O+Kb81YYwYsG8COsBFpRb/2/x08+S+KWTjVnAlhQ
+ C2g+YXziVXhWtM0PshtKajxSmA9h9U4V+kmPDnWBUUG3Z1h25siQg00WLkpbAO7YklQc
+ 2uGy5Pmm4+GViw/W8SOIJwmg5IgyODVhJtXgfMYZwSb2DaGyB60S9nits/QPuY2HFPir
+ eujA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=ItI3fRDtU/zzNqxISOjM3JewIShkqFsorUHppZV+U1E=;
- b=LTEUBY7ochhu9gGjseIV8t7Q8I0GVQxrF4vuIfhmLOBIcJk4rIPvlpiO3zq4JCOMuZ
- Qvqd1rDL7r8Qc8eAk570DjBemHf0QP+quT0A1uqyX8zLr0kMYEIEVunydae95lWDHTqf
- 0ppozr/Ed68h7ldY8uOQMW5Y1wgboN6Cq6sWLoXaxpzOZHikAKgC1xln6AepmSBSBykW
- AD9igaXA/qCIEoglhc4m9Ic2b6ktL8z2jksQISF10vu3gl3Vo/PkYuatY2WIRxPWJoLX
- n8x8hbbUK5/mWG1NNc/xr4zCBllsO3jqU9XqMkPTHLW7nFDw9CuofJ5+MRGEg3lesSJP
- k4Dg==
-X-Gm-Message-State: APjAAAUeWW2SEtqs7fpwpPEEXrLB8lgZ0WJCYVSVS+w1FbXRxnt22iVo
- FaTMOp/SvbOnVA9YISVa0ezxttu5
-X-Google-Smtp-Source: APXvYqztmI+v60WCA4T11A7aw4X3XCZsJfa2byZ2Y38dnquZQ3h/Y86jQ75M9nyFAQVS6yeZSBhCwg==
-X-Received: by 2002:a5d:6284:: with SMTP id k4mr74676386wru.398.1582631520466; 
- Tue, 25 Feb 2020 03:52:00 -0800 (PST)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=mokEQf2xIZXyVf7hgVorPbcUdN09SIKwvfoY1oWCtGE=;
+ b=PBxgFTsD8Rw7tVLBF4YECKVw/3GraGOEG0sl8QndUy042GdYtF6gxpxGpI3gPLWVjK
+ OvhnOBkZIiMjgKoNR8bzsnM5Ke1ikLvkShK9EQnEuCHa/lJHmCbwmoM8cduAgIy5XzNd
+ EkQdRX0FlMzG4KnzZkJxlUhap2HG797P8fxhWggAGokO3yfR7jp1RB20MU3GtYgBCuq4
+ AGc12I6veeyk+XlptTI4+creZWO3etuKD8yM+w2V1axWx/FzWrT4iiBwHRm5qPAt5NYB
+ ow0hRanoJh2CjDZEMAFztWJRr96Oj0HvHaDSa6vGrCtovozUA5oAMPL395MvIBNUKbgo
+ ygAQ==
+X-Gm-Message-State: APjAAAXmKvmLi+uYyVNrYNsngVMinx0w76H4j1vAHLCNeopWGPs19NUD
+ daoiqC+RqV2pKwsskhHG7F4c0VOQ
+X-Google-Smtp-Source: APXvYqwGUhCq7peHmsXHhjixMGoXOFOxpidRSqziplRNM0Dukn5PlZQRK6v+Sn/QdaIobZJXe0Lgxg==
+X-Received: by 2002:a7b:c088:: with SMTP id r8mr4990037wmh.18.1582631522074;
+ Tue, 25 Feb 2020 03:52:02 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.59
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.01
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:59 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:01 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 059/136] ppc/e500: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:49 +0100
-Message-Id: <1582631466-13880-59-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 061/136] ppc/mac_oldworld: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:51 +0100
+Message-Id: <1582631466-13880-61-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,61 +110,45 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Acked-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-60-imammedo@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200219160953.13771-62-imammedo@redhat.com>
 ---
- hw/ppc/e500.c      | 5 +----
- hw/ppc/e500plat.c  | 1 +
- hw/ppc/mpc8544ds.c | 1 +
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ hw/ppc/mac_oldworld.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 960024b..d5dfe9f 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -831,7 +831,6 @@ static void ppce500_power_off(void *opaque, int line, int on)
- void ppce500_init(MachineState *machine)
- {
-     MemoryRegion *address_space_mem = get_system_memory();
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 7318d7e..66e434b 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -91,7 +91,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     CPUPPCState *env = NULL;
+     char *filename;
+     int linux_boot, i;
 -    MemoryRegion *ram = g_new(MemoryRegion, 1);
-     PPCE500MachineState *pms = PPCE500_MACHINE(machine);
-     const PPCE500MachineClass *pmc = PPCE500_MACHINE_GET_CLASS(machine);
-     PCIBus *pci_bus;
-@@ -912,9 +911,7 @@ void ppce500_init(MachineState *machine)
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+@@ -127,9 +126,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         exit(1);
      }
  
-     /* Register Memory */
--    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram",
--                                         machine->ram_size);
--    memory_region_add_subregion(address_space_mem, 0, ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+-    memory_region_allocate_system_memory(ram, NULL, "ppc_heathrow.ram",
+-                                         ram_size);
+-    memory_region_add_subregion(sysmem, 0, ram);
++    memory_region_add_subregion(sysmem, 0, machine->ram);
  
-     dev = qdev_create(NULL, "e500-ccsr");
-     object_property_add_child(qdev_get_machine(), "e500-ccsr",
-diff --git a/hw/ppc/e500plat.c b/hw/ppc/e500plat.c
-index 7078386..bddd5e7 100644
---- a/hw/ppc/e500plat.c
-+++ b/hw/ppc/e500plat.c
-@@ -97,6 +97,7 @@ static void e500plat_machine_class_init(ObjectClass *oc, void *data)
-     mc->init = e500plat_init;
-     mc->max_cpus = 32;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
-+    mc->default_ram_id = "mpc8544ds.ram";
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_ETSEC_COMMON);
-  }
- 
-diff --git a/hw/ppc/mpc8544ds.c b/hw/ppc/mpc8544ds.c
-index c2c5e11..8117750 100644
---- a/hw/ppc/mpc8544ds.c
-+++ b/hw/ppc/mpc8544ds.c
-@@ -55,6 +55,7 @@ static void e500plat_machine_class_init(ObjectClass *oc, void *data)
-     mc->init = mpc8544ds_init;
-     mc->max_cpus = 15;
-     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("e500v2_v30");
-+    mc->default_ram_id = "mpc8544ds.ram";
+     /* allocate and load BIOS */
+     memory_region_init_ram(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+@@ -446,6 +443,7 @@ static void heathrow_class_init(ObjectClass *oc, void *data)
+     mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("750_v3.1");
+     mc->default_display = "std";
+     mc->ignore_boot_device_suffixes = true;
++    mc->default_ram_id = "ppc_heathrow.ram";
+     fwc->get_dev_path = heathrow_fw_dev_path;
  }
  
- #define TYPE_MPC8544DS_MACHINE  MACHINE_TYPE_NAME("mpc8544ds")
 -- 
 1.8.3.1
 
