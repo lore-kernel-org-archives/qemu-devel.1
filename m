@@ -2,56 +2,65 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B9CC35DF8
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2155C35DF8
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D05B92082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:53:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D05B92082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 745D22082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745D22082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6V2E-0000vd-0C
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:53:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42640)
+	id 1j6V5R-00025F-QP
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:57:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1j6V1g-0000Va-8E
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:53:09 -0500
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6V4u-0001eC-RP
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:56:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1j6V1e-0008UP-T2
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:53:08 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3250 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1j6V1e-0008SM-IA
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:53:06 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id D58136A43795A35D16D8;
- Tue, 25 Feb 2020 15:52:59 +0800 (CST)
-Received: from linux-TFkxOR.huawei.com (10.175.104.212) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 25 Feb 2020 15:52:49 +0800
-From: Heyi Guo <guoheyi@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] hw/smbios: add options for type 4 max_speed and current_speed
-Date: Tue, 25 Feb 2020 15:50:46 +0800
-Message-ID: <20200225075046.30151-1-guoheyi@huawei.com>
-X-Mailer: git-send-email 2.19.1
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6V4s-0001KG-II
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:56:28 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:44672)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6V4s-0001JX-6M
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:56:26 -0500
+Received: from mail.ispras.ru (localhost [127.0.0.1])
+ by mail.ispras.ru (Postfix) with ESMTPSA id C054BC0101;
+ Tue, 25 Feb 2020 10:56:22 +0300 (MSK)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.212]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Tue, 25 Feb 2020 10:56:22 +0300
+From: dovgaluk <dovgaluk@ispras.ru>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: Race condition in overlayed qcow2?
+In-Reply-To: <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
+References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
+ <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
+ <5891b48a131321be62a4a311253da44c@ispras.ru>
+ <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
+ <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
+ <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
+ <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
+ <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
+ <99ed3129-9460-dbad-0441-95bad08d5636@virtuozzo.com>
+ <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
+ <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
+User-Agent: Roundcube Webmail/1.4.1
+Message-ID: <ac41c395f09a4101b7403e4116beba6a@ispras.ru>
+X-Sender: dovgaluk@ispras.ru
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 83.149.199.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,124 +72,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com,
- Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Common VM users sometimes care about CPU speed, so we add two new
-options to allow VM vendors to present CPU speed to their users.
-Normally these information can be fetched from host smbios.
-
-Strictly speaking, the "max speed" and "current speed" in type 4
-are not really for the max speed and current speed of processor, for
-"max speed" identifies a capability of the system, and "current speed"
-identifies the processor's speed at boot (see smbios spec), but some
-applications do not tell the differences.
-
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-
----
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
----
- hw/smbios/smbios.c | 22 +++++++++++++++++++---
- qemu-options.hx    |  3 ++-
- 2 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index ffd98727ee..1d5439643d 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -94,6 +94,8 @@ static struct {
+Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-25 10=
+:27:
+> 25.02.2020 8:58, dovgaluk wrote:
+>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21=
+ 16:23:
+>>> 21.02.2020 15:35, dovgaluk wrote:
+>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-=
+21 13:09:
+>>>>> 21.02.2020 12:49, dovgaluk wrote:
+>>>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-0=
+2-20 12:36:
+>>>>>=20
+>>>>> So, preadv in file-posix.c returns different results for the same
+>>>>> offset, for file which is always opened in RO mode? Sounds=20
+>>>>> impossible
+>>>>> :)
+>>>>=20
+>>>> True.
+>>>> Maybe my logging is wrong?
+>>>>=20
+>>>> static ssize_t
+>>>> qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t=20
+>>>> offset)
+>>>> {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 ssize_t res =3D preadv(fd, iov, nr_iov, off=
+set);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("preadv %x %"PRIx64"\n", fd, (uint=
+64_t)offset);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 int i;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 uint32_t sum =3D 0;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 int cnt =3D 0;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < nr_iov ; ++i) {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int j;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (j =3D 0 ; j < =
+(int)iov[i].iov_len ; ++j)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 sum +=3D ((uint8_t*)iov[i].iov_base)[j];
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ++cnt;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("size: %x sum: %x\n", cnt, sum);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 return res;
+>>>> }
+>>>>=20
+>>>=20
+>>> Hmm, I don't see any issues here..
+>>>=20
+>>> Are you absolutely sure, that all these reads are from backing file,
+>>> which is read-only and never changed (may be by other processes)?
+>>=20
+>> Yes, I made a copy and compared the files with binwalk.
+>>=20
+>>> 2. guest modifies buffers during operation (you can catch it if
+>>> allocate personal buffer for preadv, than calculate checksum, then
+>>> memcpy to guest buffer)
+>>=20
+>> I added the following to the qemu_preadv:
+>>=20
+>>  =C2=A0=C2=A0=C2=A0 // do it again
+>>  =C2=A0=C2=A0=C2=A0 unsigned char *buf =3D g_malloc(cnt);
+>>  =C2=A0=C2=A0=C2=A0 struct iovec v =3D {buf, cnt};
+>>  =C2=A0=C2=A0=C2=A0 res =3D preadv(fd, &v, 1, offset);
+>>  =C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
+>>  =C2=A0=C2=A0=C2=A0 uint32_t sum2 =3D 0;
+>>  =C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < cnt ; ++i)
+>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sum2 +=3D buf[i];
+>>  =C2=A0=C2=A0=C2=A0 g_free(buf);
+>>  =C2=A0=C2=A0=C2=A0 qemu_log("--- sum2 =3D %x\n", sum2);
+>>  =C2=A0=C2=A0=C2=A0 assert(sum2 =3D=3D sum);
+>>=20
+>> These two reads give different results.
+>> But who can modify the buffer while qcow2 workers filling it with data=
 =20
- static struct {
-     const char *sock_pfx, *manufacturer, *version, *serial, *asset, *par=
-t;
-+    uint32_t max_speed;
-+    uint32_t current_speed;
- } type4;
-=20
- static struct {
-@@ -272,6 +274,14 @@ static const QemuOptDesc qemu_smbios_type4_opts[] =3D=
- {
-         .name =3D "version",
-         .type =3D QEMU_OPT_STRING,
-         .help =3D "version number",
-+    },{
-+        .name =3D "max_speed",
-+        .type =3D QEMU_OPT_NUMBER,
-+        .help =3D "max speed in MHz",
-+    },{
-+        .name =3D "current_speed",
-+        .type =3D QEMU_OPT_NUMBER,
-+        .help =3D "speed at system boot in MHz",
-     },{
-         .name =3D "serial",
-         .type =3D QEMU_OPT_STRING,
-@@ -586,9 +596,8 @@ static void smbios_build_type_4_table(MachineState *m=
-s, unsigned instance)
-     SMBIOS_TABLE_SET_STR(4, processor_version_str, type4.version);
-     t->voltage =3D 0;
-     t->external_clock =3D cpu_to_le16(0); /* Unknown */
--    /* SVVP requires max_speed and current_speed to not be unknown. */
--    t->max_speed =3D cpu_to_le16(2000); /* 2000 MHz */
--    t->current_speed =3D cpu_to_le16(2000); /* 2000 MHz */
-+    t->max_speed =3D cpu_to_le16(type4.max_speed);
-+    t->current_speed =3D cpu_to_le16(type4.current_speed);
-     t->status =3D 0x41; /* Socket populated, CPU enabled */
-     t->processor_upgrade =3D 0x01; /* Other */
-     t->l1_cache_handle =3D cpu_to_le16(0xFFFF); /* N/A */
-@@ -1129,6 +1138,13 @@ void smbios_entry_add(QemuOpts *opts, Error **errp=
-)
-             save_opt(&type4.serial, opts, "serial");
-             save_opt(&type4.asset, opts, "asset");
-             save_opt(&type4.part, opts, "part");
-+            /*
-+             * SVVP requires max_speed and current_speed to not be unkno=
-wn, and
-+             * we set the default value to 2000MHz as we did before.
-+             */
-+            type4.max_speed =3D qemu_opt_get_number(opts, "max_speed", 2=
-000);
-+            type4.current_speed =3D qemu_opt_get_number(opts, "current_s=
-peed",
-+                                                      2000);
-             return;
-         case 11:
-             qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index ac315c1ac4..bc9ef0fda8 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2233,6 +2233,7 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
-     "                specify SMBIOS type 3 fields\n"
-     "-smbios type=3D4[,sock_pfx=3Dstr][,manufacturer=3Dstr][,version=3Ds=
-tr][,serial=3Dstr]\n"
-     "              [,asset=3Dstr][,part=3Dstr]\n"
-+    "              [,max_speed=3D%d][,current_speed=3D%d]\n"
-     "                specify SMBIOS type 4 fields\n"
-     "-smbios type=3D17[,loc_pfx=3Dstr][,bank=3Dstr][,manufacturer=3Dstr]=
-[,serial=3Dstr]\n"
-     "               [,asset=3Dstr][,part=3Dstr][,speed=3D%d]\n"
-@@ -2255,7 +2256,7 @@ Specify SMBIOS type 2 fields
- @item -smbios type=3D3[,manufacturer=3D@var{str}][,version=3D@var{str}][=
-,serial=3D@var{str}][,asset=3D@var{str}][,sku=3D@var{str}]
- Specify SMBIOS type 3 fields
-=20
--@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}]=
-[,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@=
-var{str}]
-+@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}]=
-[,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@=
-var{str}][,max_speed=3D@var{%d}][,current_speed=3D@var{%d}]
- Specify SMBIOS type 4 fields
-=20
- @item -smbios type=3D17[,loc_pfx=3D@var{str}][,bank=3D@var{str}][,manufa=
-cturer=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var=
-{str}][,speed=3D@var{%d}]
---=20
-2.19.1
+>> from the disk?
+>>=20
+>=20
+> As far as I know, it's guest's buffer, and guest may modify it during
+> the operation. So, it may be winxp :)
 
+True, but normally the guest won't do it.
+
+But I noticed that DMA operation which causes the problems has the=20
+following set of the buffers:
+dma read sg size 20000 offset: c000fe00
+--- sg: base: 2eb1000 len: 1000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 2eb2000 len: 3000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 2eb5000 len: b000
+--- sg: base: 3040000 len: 1000
+--- sg: base: 2f41000 len: 3000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 2f44000 len: 4000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 2f48000 len: 2000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 3000000 len: 1000
+--- sg: base: 3000000 len: 1000
+
+
+It means that one DMA transaction performs multiple reads into the same=20
+address.
+And no races is possible, when there is only one qcow2 worker.
+When there are many of them - they can fill this buffer simultaneously.
+
+Pavel Dovgalyuk
 
