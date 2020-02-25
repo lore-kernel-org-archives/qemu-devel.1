@@ -2,81 +2,86 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4660BC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4863FC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12BB621744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:10:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 181EB2072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 14:11:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vq6/v1KG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12BB621744
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JHu7Txlo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 181EB2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aux-0000il-7g
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:10:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38991)
+	id 1j6avQ-0001iK-8t
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 09:11:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j6aDS-00023R-OK
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:25:39 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6ape-0006zJ-3h
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j6aDR-0006Hj-Q4
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:25:38 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37643)
+ (envelope-from <peter.maydell@linaro.org>) id 1j6apa-0005Lv-6a
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:05 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44754)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j6aDR-0006HU-KU
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:25:37 -0500
-Received: by mail-ot1-x342.google.com with SMTP id b3so12030533otp.4
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 05:25:37 -0800 (PST)
+ id 1j6apZ-0005LU-VT
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 09:05:02 -0500
+Received: by mail-wr1-x444.google.com with SMTP id m16so14841249wrx.11
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 06:05:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PzMVoR91HswdwnauVZ684KVvcNe5IwZKVBtZwTajq84=;
- b=Vq6/v1KGVJEsPf8/2h2ExtDqo3KjTARcXNeTRaMDhdaLiJ/Gk5rWlUi13YDBYhYSkq
- yeq8VNZBKFFubhW+JviIEC3qGXiA+657zX7AHVLQs1HC4Ds0l8qHbyUMJ32X3JMF5EC1
- tTBaqIfRSTgxOi+CphAOuckKkncrFowxgOrtKupF6EhVTq0/QECqUHgoAsLhjWPc0bQo
- CqnMnLcX5tTSmGeQTqsiVw1lLir3+QTbOpDaRCKtHfG4xrpM6cTTkbFewYYaQp4R7fFu
- LJ/dlGReXgyZaGKk9DM+klg+BQRR46rIZA/etofaL7hnY2lWPKHyprj/YGPRWiLDmToI
- A4VQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=AtxEKrKRqNjfOrT9JbNHlMjgTudjr9VoMdnqfaiOYHo=;
+ b=JHu7TxloT3KX2waltLkIpVoEDenjAD2ztHiqiak6sYff8A1NSuntmGoDyLY8VDNhxc
+ 4UwNDAqo1k1E71E6CxWC0GRb7E3u/2Hfr+wD6em4VgkzgLrIjMrzCd5bA8ooBIZJ5qKt
+ a5vSxUdIzaALLCn21nTjk7t1PeOXzgIC6vxlUs4GGCAqTQlFSI/Qi18l3V1Ch9Svo2sj
+ iF+4pHYM57RHrdMK0SO3lhp5YhdQNyqVkKg5xeyq2LQYiaWidoeVZEVxf6qqfbTxz1Sa
+ 2ogrfof/hBcs6IZ/McLwAAnMn1kLlkZ7TnhsmJsQK21DUEpYa5VOqQ5Ow3NIk5HqKrit
+ dm6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PzMVoR91HswdwnauVZ684KVvcNe5IwZKVBtZwTajq84=;
- b=h7nJpPSHPF5xS8FQIqYV5GDr7Skqsz4kcXJEsAGbD93jQ9NwHVzvjDJ8uS9IFLqLOt
- l5zvJz0nXfxqyerHUAL0rvx4yRsmvbfj6ojVSb6g3X59HUbGYp1OOzc0aBVw1jdvxNZP
- zSWOdbeZyZm6rFn6IZ79N//litoUinZcB4asNPaWFKK/JkyoP5wD5HRaO8hKE53QBSTR
- X8Fv+cfNlLdW9CZwjKsMTqiNKV3NO7GkhWTFleDpJQVx2+1aIIMAjgPQS1BdQITdeVRk
- B/PQv2p5oZD6xaBn/OUKzSSkI/PfZP1DatdmbyZoo5D7lFMpuxPt27HQgDusAZHxWrAy
- BhYQ==
-X-Gm-Message-State: APjAAAU4VUt3NH8ByThNIJXjuMQqE83MVhlN39RV6Yad9llvHwMu/TLN
- cv8qUe5V/7XYLhSPlSeSPj/Koq5qvxDOc5vD0vCMMw==
-X-Google-Smtp-Source: APXvYqz+SQgDPQrznzdlMefi/OOH/89uTvSUCCqgFE5U3TLdhxPVo0DrlwxmXMXQJrqqNlR8NMBiWybVmfRlAZDFIVI=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr42522673otq.221.1582637136635; 
- Tue, 25 Feb 2020 05:25:36 -0800 (PST)
-MIME-Version: 1.0
-References: <20200224222232.13807-1-richard.henderson@linaro.org>
- <20200224222232.13807-10-richard.henderson@linaro.org>
-In-Reply-To: <20200224222232.13807-10-richard.henderson@linaro.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=AtxEKrKRqNjfOrT9JbNHlMjgTudjr9VoMdnqfaiOYHo=;
+ b=jnh4e30QNXxWWBO7ixlwGWux1yHvHuwfgFhWIjAXU9zYOsTjA370bTacGqzEyMDoI0
+ 5V7KJGB4xLat4apMSGVL/XDTbzfLjMTZymbEAUhJHtgrJmOlfmxkP9mh9N0YglZi7D32
+ i4hXz43zQL4+ONDcq+7PJepNWanMhsLcTa9r6mjAOcUX+L2+qvo6ZzBhkc4msvh9M7wE
+ l57ti+JxOwRUHng74Gttuk/jUpFnFFHoryKcZcjwbjjnbT2Ku/+Vxvt3w/7MWwPoefjf
+ gzKIX9ySOx+41AhtwFYcfX7Dafo8E5NLdhFSF1qpVH5Z0lL+VUUqqEywEhSyCUbbuULm
+ 3ZcQ==
+X-Gm-Message-State: APjAAAWxDtA0JLsIGxXDQZO7yQmi5/8Ph6EbEJJ2Sm5rEzPg4mT57dxf
+ zascV1tCCg6P75kinUS4xa7V7BHHAXURFA==
+X-Google-Smtp-Source: APXvYqwxBz9CYilHgzPbcZX+odzzljyG5lGCLx6LOAj69R07mXb2aiMRDjw8ebExs1QK/mJeUaMHEA==
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr75282963wru.398.1582639500247; 
+ Tue, 25 Feb 2020 06:05:00 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f127sm4322136wma.4.2020.02.25.06.04.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 06:04:59 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Feb 2020 13:25:25 +0000
-Message-ID: <CAFEAcA---ijYQjSGCU4o3Ju7DO2FDScPEJ+3hqRX-RKeXNPCJw@mail.gmail.com>
-Subject: Re: [PATCH v2 09/17] target/arm: Replace ARM_FEATURE_VFP4 with
- isar_feature_aa32_simdfmac
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 12/12] docs/devel/qapi-code-gen.txt: Update to new rST
+ backend conventions
+Date: Tue, 25 Feb 2020 14:04:37 +0000
+Message-Id: <20200225140437.20609-13-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200225140437.20609-1-peter.maydell@linaro.org>
+References: <20200225140437.20609-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,30 +93,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Feb 2020 at 22:22, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> All remaining tests for VFP4 are for fused multiply-add insns.
->
-> Since the MVFR1 field is used for both VFP and NEON, move its adjustment
-> from the !has_neon block to the (!has_vfp && !has_neon) block.
->
-> Test for vfp of the appropraite width alongside the test for simdfmac
+Update the documentation of QAPI document comment syntax to match
+the new rST backend requirements. The principal changes are:
+ * whitespace is now significant, and multiline definitions
+   must have their second and subsequent lines indented to
+   match the first line
+ * general rST format markup is permitted, not just the small
+   set of markup the old texinfo generator handled. For most
+   things (notably bulleted and itemized lists) the old format
+   is the same as rST was.
+ * Specific things that might trip people up:
+   - instead of *bold* and _italic_ rST has **bold** and *italic*
+   - lists need a preceding and following blank line
+   - a lone literal '*' will need to be backslash-escaped to
+     avoid a rST syntax error
+ * the old leading '|' for example (literal text) blocks is
+   replaced by the standard rST '::' literal block.
+ * headings and subheadings must now be in a freeform
+   documentation comment of their own
+ * we support arbitrary levels of sub- and sub-sub-heading, not
+   just a main and sub-heading like the old texinfo generator
 
-"appropriate"
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ docs/devel/qapi-code-gen.txt | 90 ++++++++++++++++++++++++------------
+ 1 file changed, 61 insertions(+), 29 deletions(-)
 
-> within translate-vfp.inc.c.  Within disas_neon_data_insn, we have
-> already tested for ARM_FEATURE_NEON.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 59d6973e1ec..688eb2a0237 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -795,21 +795,39 @@ See below for more on definition documentation.
+ Free-form documentation may be used to provide additional text and
+ structuring content.
+ 
++==== Headings and subheadings ====
++
++A free-form documentation comment containing a single line
++which starts with some '=' symbols and then a space defines
++a section heading:
++
++    ##
++    # = This is a top level heading
++    ##
++
++    ##
++    # This is a free-form comment which will go under the
++    # top level heading.
++    ##
++
++    ##
++    # == This is a second level heading
++    ##
++
++Section headings must always be correctly nested, so you can only
++define a third-level heading inside a second-level heading, and so
++on. The documentation generator will catch nesting mistakes and report
++a syntax error.
+ 
+ ==== Documentation markup ====
+ 
+-Comment text starting with '=' is a section title:
++Documentation comments can use most rST markup. In particular,
++a '::' literal block can be used for examples:
+ 
+-    # = Section title
+-
+-Double the '=' for a subsection title:
+-
+-    # == Subsection title
+-
+-'|' denotes examples:
+-
+-    # | Text of the example, may span
+-    # | multiple lines
++    # ::
++    #
++    #   Text of the example, may span
++    #   multiple lines
+ 
+ '*' starts an itemized list:
+ 
+@@ -825,37 +843,35 @@ A decimal number followed by '.' starts a numbered list:
+     #    multiple lines
+     # 2. Second item
+ 
+-The actual number doesn't matter.  You could even use '*' instead of
+-'2.' for the second item.
++The actual number doesn't matter.
+ 
+-Lists can't be nested.  Blank lines are currently not supported within
+-lists.
++Lists of either kind must be preceded and followed by a blank line.
++If a list item's text spans multiple lines, then the second and
++subsequent lines must be correctly indented to line up with the
++first character of the first line.
+ 
+-Additional whitespace between the initial '#' and the comment text is
+-permitted.
+-
+-*foo* and _foo_ are for strong and emphasis styles respectively (they
+-do not work over multiple lines).  @foo is used to reference a name in
+-the schema.
++The usual '**strong**', '*emphasised*' and '``literal``' markup should
++be used. If you need a single literal '*' you will need to backslash-escape it.
++As an extension beyond the usual rST syntax, you can also
++use '@foo' to reference a name in the schema; this is rendered
++the same way as '``foo``'.
+ 
+ Example:
+ 
+ ##
+-# = Section
+-# == Subsection
+-#
+-# Some text foo with *strong* and _emphasis_
++# Some text foo with **bol** and *emphasis*
+ # 1. with a list
+ # 2. like that
+ #
+ # And some code:
+-# | $ echo foo
+-# | -> do this
+-# | <- get that
+ #
++# ::
++#
++#   $ echo foo
++#   -> do this
++#   <- get that
+ ##
+ 
+-
+ ==== Definition documentation ====
+ 
+ Definition documentation, if present, must immediately precede the
+@@ -870,6 +886,12 @@ commands and events), member (for structs and unions), branch (for
+ alternates), or value (for enums), and finally optional tagged
+ sections.
+ 
++Descriptions of arguments can span multiple lines; if they
++do then the second and subsequent lines must be indented
++to line up with the first character of the first line of the
++description. The parser will report a syntax error if there
++is insufficient indentation.
++
+ FIXME: the parser accepts these things in almost any order.
+ FIXME: union branches should be described, too.
+ 
+@@ -883,6 +905,16 @@ The section ends with the start of a new section.
+ A 'Since: x.y.z' tagged section lists the release that introduced the
+ definition.
+ 
++The text of a section can start on a new line, in
++which case it must not be indented at all. It can also start
++on the same line as the 'Note:', 'Returns:', etc tag. In this
++case if it spans multiple lines then second and subsequent
++lines must be indented to match the first.
++
++An 'Example' or 'Examples' section is automatically rendered
++entirely as literal fixed-width text. In other sections,
++the text is formatted, and rST markup can be used.
++
+ For example:
+ 
+ ##
+-- 
+2.20.1
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
 
