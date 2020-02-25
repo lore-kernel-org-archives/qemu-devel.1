@@ -3,113 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518F4C35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 20:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E665DC35E0E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 20:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25DC920675
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 20:43:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DC920675
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id A736C20732
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 20:56:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A736C20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6h2o-00081V-7k
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 15:43:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38144)
+	id 1j6hFM-0002hg-P9
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 15:56:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j6h1p-0007BT-1v
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:42:06 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j6hEj-0002BH-L6
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j6h1l-0005GX-LC
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:42:03 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:37457)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1j6h1l-0005Bv-Bu
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:42:01 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M3UhO-1j7FB73qDa-000e8d; Tue, 25 Feb 2020 21:36:56 +0100
-Subject: Re: [PATCH v3 0/5] linux-user: Implement x86_64 vsyscalls
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200213032223.14643-1-richard.henderson@linaro.org>
- <01077c2a-e90f-5a91-6e41-2f08e3978789@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <bf0b00e1-b7f8-5095-53eb-9feb03d86e34@vivier.eu>
-Date: Tue, 25 Feb 2020 21:36:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <balaton@eik.bme.hu>) id 1j6hEe-00044r-VG
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:55:24 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:38818)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j6hEe-0003sq-I0
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 15:55:20 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id DD9FD74637F;
+ Tue, 25 Feb 2020 21:55:16 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 8ADA374637C; Tue, 25 Feb 2020 21:55:16 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 889F674569F;
+ Tue, 25 Feb 2020 21:55:16 +0100 (CET)
+Date: Tue, 25 Feb 2020 21:55:16 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: John Snow <jsnow@redhat.com>
+Subject: IDE IRQ problem after UDMA enabled (was: Re: Emulating Solaris 10
+ on SPARC64 sun4u)
+In-Reply-To: <078a89dc-3e5f-2152-8783-1f22483c4603@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2002252041380.50551@zero.eik.bme.hu>
+References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
+ <20200205173326.GA3256@work-vm>
+ <LO2P123MB22710F9D590E023381119FAB831C0@LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM>
+ <alpine.BSF.2.22.395.2002080030360.88696@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2002101546080.56058@zero.eik.bme.hu>
+ <078a89dc-3e5f-2152-8783-1f22483c4603@redhat.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <01077c2a-e90f-5a91-6e41-2f08e3978789@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iwTzM5u4xN79zT3M1VGZ9CWA7IDDcAuMurdeo8+mlaJsEavrjcx
- T71rJP1rrKp0tvZuB56Ve6Izxq2ypJG9mJR5131vN9eu3K1bsyU0i+dwJSZkfFHFIFKFu9V
- gcTs56+AhwTi9hi5iR8hfas2WT/SzQydI0l6oZ4BxzEeEScv8Ll78SE9xkk3gQ9U8U5tRmo
- LJyFjVNdj1QbYzyYUGqWg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NSMjOlJdxiw=:GyrLTGJyWEQuvCwYedSk79
- iwyl+zIemhFFnms+SwxISygZ7taJoxU48ZqIzNzJsdYQOsocfDkLid5WrpkiH/e2zAnTo0MFI
- 7Xmsdb9tuIIctzwQTz2I6Z+TbWfUDc0z+CD+EwHli21pE42wUgwyB3eP7b8RExN1apG1S3X9K
- 92KYIGGu1+rqylarCrtIRJ2qUmPR8TYdF0UxOaw7wdFUzxMnS3grBFwuQeOgyBfbJ1TBxP8dR
- jMWWImHxli0dPbGfwtPwGhZFCD8KL8rhm6Qllg69UXndYYbE5uJY+5g0dOb08yPgqWWF4OB/r
- SP6flSzE0s0c1lC3xF7AarWrOHF0AtShjaudPele6D/VEvVBQFXRkRHyNX8p2CZI+b7dKi9Ju
- lZUxoWi1qnv7r+IfmBAIHREkKUsKG5LkLZgWHkfY638CpNyIGq1C2BqGMh4ojBsNb0LOSChsS
- sStUQXC2SXBYFGDPMshRhys4So7xnGUq1opkGQKWNMe0V9MOBo7iohbya+Fs9BPpSuDw1g8Se
- Gz/rp/PVJoy7+aL7QyKCbv2Zx87pgGaY9Mw6joXBu3PBjkQPnItszAdyLgkrhnuZIpgWL9yBU
- 2T4a8hn00XRp6BJXJGgO+KK6Bx6Cu9hFwEPMTcVRnpXxUCnj4kfTxow3iJ/FRrxevAaLK3FR1
- oG4tvOVgCkK5Ws5lRSbX8OXBWWtg+NFLsdCKFZ+a7jC/cnpIZ0LKRrqD3piAGaibgTJ6OmfCF
- /Zl/Lymqc/SPey6f8/pc+UlLkZ+o7Sta/H/qAScwL9rUYuL/282d8Bn/ImZE2JIIiAtLmpG5q
- JXrpFtjOidpWb8ryU2EoV+IFrLfoMOvGtzD0sbQF/5pTRNXNNpuFaEobGbIEXI9xSxeo3Y5
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,25 +70,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/02/2020 à 20:59, Richard Henderson a écrit :
-> On 2/12/20 7:22 PM, Richard Henderson wrote:
->> Changes for v3:
->>
->>   * Add TARGET_VSYSCALL_PAGE define.
->>   * Move the sigsegv goto around.
->>
->> v2: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg03474.html
->> v1: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg02841.html
-> 
-> Ping?
+Hello,
 
-Applied to my linux-user branch.
-I've removed the trailing whitespace reported by checkpatch.pl
+On Mon, 10 Feb 2020, John Snow wrote:
+> It sounds like the real problem is either in the bmdma controller (or
+> its unique interaction with hw/ide/core.c -- which is possible) or in
+> the interrupt routing somewhere else.
+>
+> If you have any IDE traces from a hang, feel free to throw them up on a
+> pastebin for me to take a peek at; it might help for me to see the exact
+> sequence that causes a hang in QEMU's IDE terms to see if I can't
+> "reverse engineer" what the guest is hoping to have happen. Maybe I can
+> trace this to a bad register value.
 
-Thanks,
-Laurent
+I've got some traces from Linux and MorphOS (both on my work in progress 
+pegasos2 emulation using via-ide where I can most easily reproduce this) 
+but I'm not sure what to look for in these. MorphOS starts booting, so 
+firmware can read ide-cd connected to via-ide as well as MorphOS can 
+before enabling UDMA 5 mode but stops after that and cannot read the drive 
+any more. Linux works even after enabling DMA. I've gathered some logs in 
+https://osdn.net/projects/qmiga/ticket/38949 previously but now I try to 
+list here the part in more detail where drive is detected, enabling DMA 
+and first command after that in case you can spot something in these that 
+could explain why it fails with MorphOS driver.
+
+First the working Linux case:
+
+pci_cfg_read via-ide 12:1 @0x4 -> 0x87
+pci_cfg_read via-ide 12:1 @0x3d -> 0x1
+pci_cfg_read via-ide 12:1 @0x4 -> 0x87
+pci_cfg_read via-ide 12:1 @0x40 -> 0xb
+pci_cfg_read via-ide 12:1 @0x40 -> 0xb
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_read_via bmdma: readb 0x2 : 0x00
+pci_cfg_read via-ide 12:1 @0x4 -> 0x87
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x56229cb35600
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x00; bus 0x56229cb35600 IDEState 0x56229cb35a58
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_write_via bmdma: writeb 0x2 : 0x00
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x56229cb35ef0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_write_via bmdma: writeb 0x2 : 0x00
+pci_cfg_read via-ide 12:1 @0x9 -> 0x8f
+[    2.589547] scsi0 : pata_via
+[    2.590949] scsi1 : pata_via
+[    2.591488] ata1: PATA max UDMA/100 cmd 0x1000 ctl 0x100c bmdma 0x1020 irq 9
+[    2.591652] ata2: PATA max UDMA/100 cmd 0x1010 ctl 0x101c bmdma 0x1028 irq 9
+
+[...]
+
+[    2.938174] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+pci_cfg_read via-ide 12:1 @0x4c -> 0xaa
+pci_cfg_write via-ide 12:1 @0x4c <- 0xa2
+pci_cfg_write via-ide 12:1 @0x4e <- 0x31
+pci_cfg_write via-ide 12:1 @0x49 <- 0x31
+pci_cfg_read via-ide 12:1 @0x51 -> 0x17
+pci_cfg_write via-ide 12:1 @0x51 <- 0x17
+pci_cfg_read via-ide 12:1 @0x4c -> 0xa2
+pci_cfg_write via-ide 12:1 @0x4c <- 0xa2
+pci_cfg_write via-ide 12:1 @0x4e <- 0x31
+pci_cfg_write via-ide 12:1 @0x49 <- 0x31
+pci_cfg_read via-ide 12:1 @0x51 -> 0x17
+pci_cfg_write via-ide 12:1 @0x51 <- 0xf0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x56229cb35ef0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x03; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x45; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xef; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_exec_cmd IDE exec cmd: bus 0x56229cb35ef0; state 0x56229cb35f78; cmd 0xef
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x08; bus 0x56229cb35ef0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_write_via bmdma: writeb 0x2 : 0x00
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x1 (Error); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x45; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x3 (Sector Number); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x6 (Device/Head); val 0x20; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x56229cb35ef0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xa1; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_exec_cmd IDE exec cmd: bus 0x56229cb35ef0; state 0x56229cb35f78; cmd 0xa1
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x58; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x08; bus 0x56229cb35ef0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_write_via bmdma: writeb 0x2 : 0x00
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x1 (Error); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x3 (Sector Number); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x6 (Device/Head); val 0x20; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+[    2.953806] ata2.00: configured for UDMA/100
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xa0; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_exec_cmd IDE exec cmd: bus 0x56229cb35ef0; state 0x56229cb35f78; cmd 0xa0
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x58; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_atapi_cmd IDEState: 0x56229cb35f78; cmd: 0x00
+ide_atapi_cmd_packet IDEState: 0x56229cb35f78; limit=0x0 packet: 00 00 00 00 00 00 00 00 00 00 00 00
+mv64361_gpp_irq(0x56229c93a230, 31, 1) 80000000 80000000
+mv64361_update_irq(0x56229c93a230, 59, 1)
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+mv64361_gpp_irq(0x56229c93a230, 31, 0) 0
+mv64361_update_irq(0x56229c93a230, 59, 0)
+ide_status_read IDE PIO rd @ 0x4 (Alt Status); val 0x50; bus 0x56229cb35ef0; IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+bmdma_read_via bmdma: readb 0x2 : 0x04
+bmdma_write_via bmdma: writeb 0x2 : 0x04
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+ide_ioport_read IDE PIO rd @ 0x1 (Error); val 0x00; bus 0x56229cb35ef0 IDEState 0x56229cb35f78
+
+While MorphOS stops after enabling DMA:
+
+PCI ATA/ATAPI Driver-Driver_ScanBus@1: Identify succeed
+PCI ATA/ATAPI Driver-Driver_ScanBus@1: Signature 0x0
+PCI ATA/ATAPI Driver-Driver_ScanBus@1: Config 0x85c0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Type 0x4
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Capabilities 0x300
+PCI ATA/ATAPI Driver-Driver_SetParam@2: PIOMode 0x0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: ATAPI supports at least PioMode 3
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Old PIOMode 0x3 DMAMode 0x0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: New PIOMode/DMAMode fields are valid
+PCI ATA/ATAPI Driver-Driver_SetParam@2: PIOMask 0x3 DMAMask 0x7
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Supported PIOMode 4 DMAMode 2 UDMAMode 5
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Version 30 Revision 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: 12 byte cmds
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Max PIOMode 4
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Set PioMode 4
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: Code 0x3 SubCode 0xc
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x562c141a9840
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x03; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x0c; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xef; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_exec_cmd IDE exec cmd: bus 0x562c141a9840; state 0x562c141a98c8; cmd 0xef
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x0c; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x00; bus 0x562c141a9840
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: done
+PCI ATA/ATAPI Driver@2: PIO Mode 4
+pci_cfg_write via-ide 12:1 @0x49 <- 0x20
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Set DmaMode 2
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: Code 0x3 SubCode 0x22
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x562c141a9840
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x03; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x22; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xef; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_exec_cmd IDE exec cmd: bus 0x562c141a9840; state 0x562c141a98c8; cmd 0xef
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x22; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x00; bus 0x562c141a9840
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: done
+bmdma_read_via bmdma: readb 0x2 : 0x00
+bmdma_write_via bmdma: writeb 0x2 : 0x26
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Set UDmaMode 5
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: Code 0x3 SubCode 0x45
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x0a; bus 0x562c141a9840
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x03; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x45; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xef; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_exec_cmd IDE exec cmd: bus 0x562c141a9840; state 0x562c141a98c8; cmd 0xef
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x50; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x45; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x6 (Device/Head); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_cmd_write IDE PIO wr @ 0x4 (Device Control); val 0x00; bus 0x562c141a9840
+PCI ATA/ATAPI Driver-Driver_SetFeature@2: done
+PCI ATA/ATAPI Driver@2: UDMA Mode 5
+pci_cfg_write via-ide 12:1 @0x51 <- 0xe0
+bmdma_read_via bmdma: readb 0x2 : 0x20
+bmdma_write_via bmdma: writeb 0x2 : 0x26
+PCI ATA/ATAPI Driver-Driver_SetParam@2: CDROM..Set no WriteCache
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Cylinders 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Heads 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Sectors/Cyl 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: TotalSectors 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: TotalSectors48 0
+PCI ATA/ATAPI Driver-Driver_SetParam@2: Support.Flags 0x200003
+
+Then it tries to identify the phantom ATA drive that seems to be present 
+on other port but not working; this was discussed before. Finally tries to 
+read CD drive:
+[...]
+
+Dev_Inquiry@ide.device-2: DiskPort 0x140f8890
+Dev_Inquiry@ide.device-2: ATAPI
+Dev_InquirySCSI@ide.device-2:
+Dev_InquirySCSI@ide.device-2: Send TestDrive
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a9c98
+ide_ioport_write IDE PIO wr @ 0x1 (Features); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x2 (Sector Count); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x3 (Sector Number); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x5 (Cylinder High); val 0x80; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x6 (Device/Head); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_write IDE PIO wr @ 0x7 (Command); val 0xa0; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_exec_cmd IDE exec cmd: bus 0x562c141a9840; state 0x562c141a98c8; cmd 0xa0
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x2 (Sector Count); val 0x01; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x5 (Cylinder High); val 0x80; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x4 (Cylinder Low); val 0x00; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_ioport_read IDE PIO rd @ 0x7 (Status); val 0x58; bus 0x562c141a9840 IDEState 0x562c141a98c8
+ide_atapi_cmd IDEState: 0x562c141a98c8; cmd: 0x00
+ide_atapi_cmd_packet IDEState: 0x562c141a98c8; limit=0x8000 packet: 00 00 00 00 00 00 00 00 00 00 00 00
+mv64361_gpp_irq(0x562c13faea60, 31, 1) 80000000 80000000
+mv64361_update_irq(0x562c13faea60, 59, 1)
+mv64361_gpp_irq(0x562c13faea60, 31, 0) 0
+mv64361_update_irq(0x562c13faea60, 59, 0)
+mv64361_gpp_irq(0x562c13faea60, 31, 1) 80000000 80000000
+mv64361_update_irq(0x562c13faea60, 59, 1)
+mv64361_gpp_irq(0x562c13faea60, 31, 0) 0
+mv64361_update_irq(0x562c13faea60, 59, 0)
+
+Then it stucks here not sending any more ATAPI commands despite interrupt 
+is raised and lowered a few times afterwards but I don't see any more ide 
+commands issued so it seems it may not get the expected interrupt? Do you 
+see anything in the above logs that could explain this?
+
+Thank you,
+BALATON Zoltan
 
