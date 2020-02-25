@@ -2,68 +2,68 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 148B6C4BA01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAECC4BA01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4FC420675
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC07320675
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 21:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eM4GTVjs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4FC420675
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKThhy1P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC07320675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6i66-0008MT-0h
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 16:50:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40071)
+	id 1j6i7W-00013Y-62
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 16:52:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j6i5J-0007co-0d
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:49:45 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j6i6V-0000HU-6v
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j6i5H-0000Tf-Go
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:49:44 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39805
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1j6i6U-0004eG-6H
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:50:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42545
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j6i5H-0000P9-AK
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:49:43 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j6i6T-0004Sl-3I
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 16:50:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582667382;
+ s=mimecast20190719; t=1582667451;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+RNj6zVZGPdK8JvJlbiWuwyfPqk01ZmSG49JZnF3pQY=;
- b=eM4GTVjsYGQ3j9PmdYFByeFWHSPaoh0zBo89I3fvhXXpfuwm3uJflRV5jpKSgSkILUoeeP
- A4k+797/lTW209B8RApeHCDZBC/6Qk/xJb1iS+UwpIjnrtbwkDd2o7kvROizAQwNfIkcLA
- YWqBxNS1s501SjfxJMeeaiX7niR/js0=
+ bh=hWYIbn+7zCh3P/m4nY626klOUL4jGzKgIEdvHr6iJ2U=;
+ b=CKThhy1PRiW8v3rLWion6jdnSSUcXPtPhDpAFvNS4qzKp2kzP9Ue68AW2B2IAIMGLG0w1r
+ 77OecKwtcE69gOPyptBOgZ1+eby+YYLx6qreADjs5FcWhq6SKDfKtIYa8kC9/9k8ujxbOG
+ UjpxgaUcNNPnA8v/eD7Fb7ewvz+c0a4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-tqN0DKayM7yAim9fDMzJ2g-1; Tue, 25 Feb 2020 16:49:38 -0500
-X-MC-Unique: tqN0DKayM7yAim9fDMzJ2g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-467-oOjQeUfeNMeBdsSEpA_Yxw-1; Tue, 25 Feb 2020 16:50:49 -0500
+X-MC-Unique: oOjQeUfeNMeBdsSEpA_Yxw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F557107ACC5;
- Tue, 25 Feb 2020 21:49:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 274CE800D6C;
+ Tue, 25 Feb 2020 21:50:48 +0000 (UTC)
 Received: from [10.18.17.182] (dhcp-17-182.bos.redhat.com [10.18.17.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E97505C21B;
- Tue, 25 Feb 2020 21:49:35 +0000 (UTC)
-Subject: Re: [PATCH 01/13] block/stream: Remove redundant statement in
- stream_run()
-To: kuhn.chenqun@huawei.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <20200225020937.25028-1-kuhn.chenqun@huawei.com>
- <20200225020937.25028-2-kuhn.chenqun@huawei.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 794D360C18;
+ Tue, 25 Feb 2020 21:50:47 +0000 (UTC)
+Subject: Re: [PATCH v5 0/5] iotests: use python logging
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20190917234549.22910-1-jsnow@redhat.com>
+ <06a3a386-a8c0-84eb-f678-ea7168666367@redhat.com>
+ <afe4c6fd-985d-ec97-d18d-ec319adbd94a@redhat.com>
+ <28681a1d-2a4a-dfba-82f8-cacae80e927a@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,21 +139,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c0f26ff5-fee8-aa5a-a245-24f610be1ed0@redhat.com>
-Date: Tue, 25 Feb 2020 16:49:35 -0500
+Message-ID: <684b4b2b-9344-1887-9ed8-ee45a040ac3a@redhat.com>
+Date: Tue, 25 Feb 2020 16:50:46 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200225020937.25028-2-kuhn.chenqun@huawei.com>
+In-Reply-To: <28681a1d-2a4a-dfba-82f8-cacae80e927a@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -165,47 +165,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2/24/20 9:09 PM, kuhn.chenqun@huawei.com wrote:
-> From: Chen Qun <kuhn.chenqun@huawei.com>
+On 2/24/20 6:15 AM, Max Reitz wrote:
+> On 12.10.19 01:39, John Snow wrote:
+>> Just caught up with the discussion.
+>>
+>> It looks like Thomas took my 1/5; so I'll respin on top of his "[PATCH
+>> 0/5] Enable more iotests during "make check-block" series to catch those
+>> improvements as they stand.
 > 
-> Clang static code analyzer show warning:
->   block/stream.c:186:9: warning: Value stored to 'ret' is never read
->         ret = 0;
->         ^     ~
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
-> ---
->  block/stream.c | 1 -
->  1 file changed, 1 deletion(-)
+> Any updates on this? :)
 > 
-> diff --git a/block/stream.c b/block/stream.c
-> index 5562ccbf57..d78074ac80 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -183,7 +183,6 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
->                  break;
->              }
->          }
-> -        ret = 0;
->  
->          /* Publish progress */
->          job_progress_update(&s->common.job, n);
+> Max
 > 
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Nope.
+
+Well, except that I was working on job_run today and remembered that I
+needed to do this. I was waiting for that discussion to die down, and
+then forgetting took over.
+
+Will attempt to resuscitate.
 
 
