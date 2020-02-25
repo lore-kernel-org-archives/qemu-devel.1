@@ -2,77 +2,80 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89DDCC35E01
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0130C35E04
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 568292082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E28D2082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuBKbhBv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568292082F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/a22QBt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E28D2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6dWl-0004VW-Cc
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:57:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44504)
+	id 1j6dWw-0004fI-N8
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 11:57:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44527)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1j6dVZ-0003bj-Ae
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:34 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j6dVf-0003e5-OE
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1j6dVX-0002kA-GI
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49799
+ (envelope-from <kchamart@redhat.com>) id 1j6dVe-0002m4-0l
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35005
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j6dVX-0002jq-Ch
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:31 -0500
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j6dVd-0002ls-T1
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 11:56:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582649790;
+ s=mimecast20190719; t=1582649797;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=p+/VAiuEJpGpmCAUa1I1RYerUKwRIPwa4zwkr3N/80w=;
- b=EuBKbhBvBsme4f0sZYg4skFvaZRVX+nnKdAvsI5KWpeL7Qi4CEZYId0bQUQAiBEzXzBCUw
- 3yHr0dOzAcrn+4HODOJd62S8M2coD+PO4nm9E2sko3dRAZCpp6UxpyyVkXRzBqj05pA+UK
- 2mQyEC6crtzsKVY2ZeLWDVGienQl+h4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=noIQUvmu88Gj9chmSxQ6cb8p2IeY9lN+BsMm7RyT4EA=;
+ b=h/a22QBtlOs+JfEC92C1SIb+8T8d/54u9hdul8xOrhLHjvvRZs8cgraoeRgQS15qEdjrPH
+ m5BLhquJiVjpUgFmfXxDld5HOcowd/5TpZhq5Xd1Vt2RI1vJ2SMcoMsDChK9YtlLeMKNB9
+ px5b4XZVPY+OxABStLqzDA8NUf2VtE4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-hmTm-aakMqyauAaTYDHdtw-1; Tue, 25 Feb 2020 11:56:22 -0500
-X-MC-Unique: hmTm-aakMqyauAaTYDHdtw-1
+ us-mta-488-wdxD5feWMRquyUHk9bQNkA-1; Tue, 25 Feb 2020 11:56:29 -0500
+X-MC-Unique: wdxD5feWMRquyUHk9bQNkA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46026100726F;
- Tue, 25 Feb 2020 16:56:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D9BC1005512;
+ Tue, 25 Feb 2020 16:56:28 +0000 (UTC)
 Received: from paraplu.redhat.com (ovpn-117-203.ams2.redhat.com
  [10.36.117.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 353BF90535;
- Tue, 25 Feb 2020 16:56:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3525E90519;
+ Tue, 25 Feb 2020 16:56:24 +0000 (UTC)
 From: Kashyap Chamarthy <kchamart@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/2] qemu-cpu-models: Convert to rST;
- document other MSR bits
-Date: Tue, 25 Feb 2020 17:56:16 +0100
-Message-Id: <20200225165618.6571-1-kchamart@redhat.com>
+Subject: [PATCH v4 2/2] qemu-cpu-models.rst: Document -noTSX, mds-no, taa-no,
+ and tsx-ctrl
+Date: Tue, 25 Feb 2020 17:56:18 +0100
+Message-Id: <20200225165618.6571-3-kchamart@redhat.com>
+In-Reply-To: <20200225165618.6571-1-kchamart@redhat.com>
+References: <20200225165618.6571-1-kchamart@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,60 +94,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In v4:
- - Correctly use the 'define-man-page' rule for qemu-cpu-models.7
-   [pm215]
- - Fix author attribution as per the thread:
-   Message-ID:
-   <CAFEAcA8dTR6xkQnsf32HAo6aDXf5Z0UmkhL3+257KWLj1ES6Sw@mail.gmail.com>
-   [danpb, pm215]
- - Don't reverse the existing order of the list of CPU models [pm215]
- - Use rST "definition lists" consistently throughout the document.
- - Consistently capitalize the phrase: "The QEMU Project Developers"
- - Update the year of copyright to 2020 in docs/conf.py
+- Add the '-noTSX' variants for CascadeLake and SkyLake.
+
+- Document the three MSR bits: 'mds-no', 'taa-no', and 'tsx-ctrl'
+
+  Two confusing things about 'mds-no' (and the first point applies to
+  the other two MSRs too):
+
+  (1) The 'mds-no' bit will _not_ show up in the guest's /proc/cpuinfo.
+      Rather it is used to fill in the guest's sysfs:
+
+        /sys/devices/system/cpu/vulnerabilities/mds:Not affected
+
+      Paolo confirmed on IRC as such.
+
+  (2) There are _three_ variants[+] of CascadeLake CPUs, with different
+      stepping levels: 5, 6, and 7.  To quote wikichip.org[*]:
+
+        "note that while steppings 6 & 7 are fully mitigated, earlier
+        stepping 5 is not protected against MSBDS, MLPDS, nor MDSUM"
+
+      The above is also indicated in the Intel's document[+], as
+      indicated by "No" under the three columns of MFBDS, MSBDS, and
+      MLPDS.
+
+  I've expressed this in the docs without belabouring the details.
+
+      [+] https://software.intel.com/security-software-guidance/insights/pr=
+ocessors-affected-microarchitectural-data-sampling
+      [*] https://en.wikichip.org/wiki/intel/microarchitectures/cascade_lak=
+e#Key_changes_from_Skylake
+
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+---
+v4:
  - Fix two minor rST-related things [pbonzini]
+---
+ docs/system/qemu-cpu-models.rst | 57 +++++++++++++++++++++++++++++++--
+ 1 file changed, 55 insertions(+), 2 deletions(-)
 
-In v3:
- - Address the comments from Peter Maydell, from here:
-   https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg05155.html
-
-This small series does two things:
-
-(1) Convert the original qemu-cpu-models.texi to rST
-
-(2) In a separate patch, incorporate the additional new content from
-    this:
-    https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg06455.html
-    ([PATCH v3] qemu-cpu-models: Document -noTSX, mds-no, taa-no, and
-    tsx-ctrl)
-
-Sphinx rendering of v4:
-
-    https://kashyapc.fedorapeople.org/QEMU_v4.2.0-1858-gdb736e0437/system/q=
-emu-cpu-models.html
-
-        - - -
-
-(Note to self: The comma-separated list of CPU models are not terribly
-legible that they are all different CPU models.  Wonder if we should do
-something about it...)
-
-Kashyap Chamarthy (2):
-  docs: Convert qemu-cpu-models.texi to rST; related fixes
-  qemu-cpu-models.rst: Document -noTSX, mds-no, taa-no, and tsx-ctrl
-
- MAINTAINERS                     |   2 +-
- Makefile                        |  12 +-
- docs/conf.py                    |   2 +-
- docs/qemu-cpu-models.texi       | 677 --------------------------------
- docs/system/conf.py             |   5 +-
- docs/system/index.rst           |   1 +
- docs/system/qemu-cpu-models.rst | 535 +++++++++++++++++++++++++
- qemu-doc.texi                   |   5 -
- 8 files changed, 548 insertions(+), 691 deletions(-)
- delete mode 100644 docs/qemu-cpu-models.texi
- create mode 100644 docs/system/qemu-cpu-models.rst
-
+diff --git a/docs/system/qemu-cpu-models.rst b/docs/system/qemu-cpu-models.=
+rst
+index 2bf635ecab..6ad572c509 100644
+--- a/docs/system/qemu-cpu-models.rst
++++ b/docs/system/qemu-cpu-models.rst
+@@ -61,10 +61,15 @@ mixture of host CPU models between machines, if live mi=
+gration
+ compatibility is required, use the newest CPU model that is compatible
+ across all desired hosts.
+=20
+-``Skylake-Server``, ``Skylake-Server-IBRS``
++``Cascadelake-Server``, ``Cascadelake-Server-noTSX``
++    Intel Xeon Processor (Cascade Lake, 2019), with "stepping" levels 6
++    or 7 only.  (The Cascade Lake Xeon processor with *stepping 5 is
++    vulnerable to MDS variants*.)
++
++``Skylake-Server``, ``Skylake-Server-IBRS``, ``Skylake-Server-IBRS-noTSX``
+     Intel Xeon Processor (Skylake, 2016)
+=20
+-``Skylake-Client``, ``Skylake-Client-IBRS``
++``Skylake-Client``, ``Skylake-Client-IBRS``, ``Skylake-Client-noTSX-IBRS}`=
+`
+     Intel Core Processor (Skylake, 2015)
+=20
+ ``Broadwell``, ``Broadwell-IBRS``, ``Broadwell-noTSX``, ``Broadwell-noTSX-=
+IBRS``
+@@ -160,6 +165,54 @@ features are included if using "Host passthrough" or "=
+Host model".
+   Requires the host CPU microcode to support this feature before it
+   can be used for guest CPUs.
+=20
++``mds-no``
++  Recommended to inform the guest OS that the host is *not* vulnerable
++  to any of the MDS variants ([MFBDS] CVE-2018-12130, [MLPDS]
++  CVE-2018-12127, [MSBDS] CVE-2018-12126).
++
++  This is an MSR (Model-Specific Register) feature rather than a CPUID fea=
+ture,
++  so it will not appear in the Linux ``/proc/cpuinfo`` in the host or
++  guest.  Instead, the host kernel uses it to populate the MDS
++  vulnerability file in ``sysfs``.
++
++  So it should only be enabled for VMs if the host reports @code{Not
++  affected} in the ``/sys/devices/system/cpu/vulnerabilities/mds`` file.
++
++``taa-no``
++  Recommended to inform that the guest that the host is ``not``
++  vulnerable to CVE-2019-11135, TSX Asynchronous Abort (TAA).
++
++  This too is an MSR feature, so it does not show up in the Linux
++  ``/proc/cpuinfo`` in the host or guest.
++
++  It should only be enabled for VMs if the host reports ``Not affected``
++  in the ``/sys/devices/system/cpu/vulnerabilities/tsx_async_abort``
++  file.
++
++``tsx-ctrl``
++  Recommended to inform the guest that it can disable the Intel TSX
++  (Transactional Synchronization Extensions) feature; or, if the
++  processor is vulnerable, use the Intel VERW instruction (a
++  processor-level instruction that performs checks on memory access) as
++  a mitigation for the TAA vulnerability.  (For details, refer to
++  Intel's `deep dive into MDS
++  <https://software.intel.com/security-software-guidance/insights/deep-div=
+e-intel-analysis-microarchitectural-data-sampling>`_.)
++
++  Expose this to the guest OS if and only if: (a) the host has TSX
++  enabled; *and* (b) the guest has ``rtm`` CPU flag enabled.
++
++  By disabling TSX, KVM-based guests can avoid paying the price of
++  mitigating TSX-based attacks.
++
++  Note that ``tsx-ctrl`` too is an MSR feature, so it does not show
++  up in the Linux ``/proc/cpuinfo`` in the host or guest.
++
++  To validate that Intel TSX is indeed disabled for the guest, there are
++  two ways: (a) check for the *absence* of ``rtm`` in the guest's
++  ``/proc/cpuinfo``; or (b) the
++  ``/sys/devices/system/cpu/vulnerabilities/tsx_async_abort`` file in
++  the guest should report ``Mitigation: TSX disabled``.
++
+=20
+ Preferred CPU models for AMD x86 hosts
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 --=20
 2.21.0
 
