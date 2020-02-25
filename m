@@ -2,75 +2,93 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCCFC35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 826BDC35E04
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2358F2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F4052072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:57:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ya1sO0Xr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2358F2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sgynCbD6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4052072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ca7-00007W-8f
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:57:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36378)
+	id 1j6caa-0000xP-Fd
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:57:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j6cZP-0007K8-FD
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:56:28 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j6cYn-0006Hv-TG
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:55:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j6cZO-0007vE-DE
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:56:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27392
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6cZO-0007uu-AF
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:56:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582646185;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Zkpd81UshpASrqvXsuZBzG/W8uDh2jjXtDL2Qc4HYxY=;
- b=Ya1sO0XrdyCB1pvUr8wWkzxKhRFb14iq4BgoSTz7aOXmLSG44VP35D+bjoZ/1Hm9BJ+l29
- +Rc20g7R1kLlOtUULt6K1dP8UpCPalXcSwMr2Lz2MsXds5UXe/JeO9b7OLpgyScLqtL/Cr
- KCha6iCXtdickJjFuqyaO9d0wIb3Ep4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-NJUGdKVlPi62IxLe8R1sbQ-1; Tue, 25 Feb 2020 10:56:22 -0500
-X-MC-Unique: NJUGdKVlPi62IxLe8R1sbQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 171778017CC;
- Tue, 25 Feb 2020 15:56:21 +0000 (UTC)
-Received: from localhost (ovpn-117-215.ams2.redhat.com [10.36.117.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 929245D9E5;
- Tue, 25 Feb 2020 15:56:20 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH] block: Fix leak in bdrv_create_file_fallback()
-Date: Tue, 25 Feb 2020 16:56:18 +0100
-Message-Id: <20200225155618.133412-1-mreitz@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1j6cYm-0007dt-NN
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:55:49 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38596)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j6cYm-0007dI-F3
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:55:48 -0500
+Received: by mail-pl1-x644.google.com with SMTP id p7so1278345pli.5
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 07:55:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=5T4zoGkohe+BCUHPUlsCXWuDwV2ufiEtB/JT6ZKH1O4=;
+ b=sgynCbD6TrZO4f80YloovP9v2tHwlEzsWK1Wi/b3Up5KqhAyvM4YMVqIbl8HZ+RTo0
+ QK1HSsOvcVRFt9aPh+RWg42ESnFZo3Ydq2sojYJVME9dg4RowLa4b3j8ZEvKgDZo1af1
+ F7dedbOrtwOoDxyLQdMMHsRKZ59JWl1vu2SZLBpeZj1l2A0f4ZU9QeVCqpYImFoUKo9f
+ FlnnYF+EtHcxSODiJXP2dwmxCuxeJ/XakInc06hhI1OwuIDtdrZ6GaQBWRxTiO/SjKrM
+ 72iUgkB3DiLe3Ip4J6+EuCUjTzOHB9ib+JXAx21H62YdTpOr8a0Zv/f8hpkizwpBM8Al
+ D+tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5T4zoGkohe+BCUHPUlsCXWuDwV2ufiEtB/JT6ZKH1O4=;
+ b=A/wppUFO/nOWeRBgjnThFfy5B5sSuQlKlOhgDs5kjmf4T0mVWDaGJkRl0NjeY4R/kN
+ neR5m+8AL/arkrX1aOCRIxNvcRRRU0ap7WZWrz06Ao3dRibe9jbqQoB671xumiO8Bb7u
+ D15H2kK/yAGwFNOe5kRKxICf9z4U0uqX+6ABohR876NIX7EqAxO3MICO/DcM8+luCkab
+ ikFrbbXsOPUWwvJDIzDbNQQ6OQX6zZNEWFWN7up6GHo7j7AW2zKr4i/Es8LYFuwl87W9
+ J6jDIK25WDo9/v8fdKV6ctMloeVRX/upVFNgqnRB7qc9dQ5GpXe3cY9zxoc22OMyFvmg
+ Hhbw==
+X-Gm-Message-State: APjAAAW/0b/66wS6/GZu9tWuKvPKwMEQC1ByzTSOOHrgONUF+YrWHdg3
+ N4kaZbiPXmChuw1MDMy/yhMP+g==
+X-Google-Smtp-Source: APXvYqyF9vkfv8qwJ3Fc6dylrMHp8nTHAe/mL5HlXC3WylmZaX3GqTpbkpeKciqWk1ZVRkQw10QPdQ==
+X-Received: by 2002:a17:90a:f492:: with SMTP id
+ bx18mr6190570pjb.118.1582646146910; 
+ Tue, 25 Feb 2020 07:55:46 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ b3sm17873768pft.73.2020.02.25.07.55.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Feb 2020 07:55:46 -0800 (PST)
+Subject: Re: [PATCH v2 05/17] target/arm: Improve ID_AA64PFR0 FP/SIMD
+ validation
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200224222232.13807-1-richard.henderson@linaro.org>
+ <20200224222232.13807-6-richard.henderson@linaro.org>
+ <CAFEAcA9WZbZj_hPemTGr+Rkh--VmZt1eis189+ExuPVNipgo_A@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <49741058-7dbf-d20f-95ce-5bf9b5e5bdb2@linaro.org>
+Date: Tue, 25 Feb 2020 07:55:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <CAFEAcA9WZbZj_hPemTGr+Rkh--VmZt1eis189+ExuPVNipgo_A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,50 +100,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-@options is leaked by the first two return statements in this function.
+On 2/25/20 5:24 AM, Peter Maydell wrote:
+> This check is supposed to be "did the user accidentally specify
+> some incompatible settings on their '-cpu,+this,-that' option?".
+> By making it check the actual ID register values, you're turning
+> it into also a check on "does the implementation specify sane
+> ID register values", which (a) is useful for TCG but ought to
+> be an assert and (b) we shouldn't be checking for KVM in case
+> the h/w is giving us dubious ID values.
 
-Note that blk_new_open() takes the reference to @options even on
-failure, so all we need to do to fix the leak is to move the QDict
-allocation down to where we actually need it.
+Hmm.  Because kvm64 unconditionally set VFP and NEON, you're right.  It was
+only kvm32 that was examining id registers.
 
-Reported-by: Coverity (CID 1419884)
-Fixes: fd17146cd93d1704cd96d7c2757b325fc7aac6fd
-       ("block: Generic file creation fallback")
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The only consequence of kvm giving us dubious id values that I can see is if
+ADVSIMD is on, but FP is off, we won't migrate the register set.
 
-diff --git a/block.c b/block.c
-index 1bdb9c679d..876bd45182 100644
---- a/block.c
-+++ b/block.c
-@@ -600,7 +600,7 @@ static int bdrv_create_file_fallback(const char *filena=
-me, BlockDriver *drv,
-                                      QemuOpts *opts, Error **errp)
- {
-     BlockBackend *blk;
--    QDict *options =3D qdict_new();
-+    QDict *options;
-     int64_t size =3D 0;
-     char *buf =3D NULL;
-     PreallocMode prealloc;
-@@ -623,6 +623,7 @@ static int bdrv_create_file_fallback(const char *filena=
-me, BlockDriver *drv,
-         return -ENOTSUP;
-     }
-=20
-+    options =3D qdict_new();
-     qdict_put_str(options, "driver", drv->format_name);
-=20
-     blk =3D blk_new_open(filename, NULL, options,
---=20
-2.24.1
+Do you want me to add a tcg_enabled check, or shall we just drop the patch?
+The existing test is good enough for just checking the command-line.
 
+
+r~
 
