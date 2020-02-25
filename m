@@ -2,72 +2,86 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B0AC35DF9
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D77CC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FC0A21556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:13:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FC0A21556
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4861221927
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:17:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axzbp470"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4861221927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6XDK-0000Z3-3f
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:13:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59940)
+	id 1j6XHV-0002m6-BL
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:17:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60387)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6XCU-0007v3-U8
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:12:27 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j6XGH-00029J-P0
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:16:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6XCT-0000Aq-Mn
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:12:26 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:50774 helo=huawei.com)
+ (envelope-from <eric.auger@redhat.com>) id 1j6XGG-0001gL-H1
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:16:21 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60032
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1j6XCT-00008p-Cx; Tue, 25 Feb 2020 05:12:25 -0500
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id C208D19239E6CADF7304;
- Tue, 25 Feb 2020 18:12:19 +0800 (CST)
-Received: from DGGEMM422-HUB.china.huawei.com (10.1.198.39) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 25 Feb 2020 18:12:19 +0800
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
- dggemm422-hub.china.huawei.com ([10.1.198.39]) with mapi id 14.03.0439.000;
- Tue, 25 Feb 2020 18:12:09 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org"
- <qemu-trivial@nongnu.org>
-Subject: RE: [PATCH 13/13] monitor/hmp-cmds: Remove redundant statement in
- hmp_rocker_of_dpa_groups()
-Thread-Topic: [PATCH 13/13] monitor/hmp-cmds: Remove redundant statement in
- hmp_rocker_of_dpa_groups()
-Thread-Index: AQHV64DJGO7qJyDt3kiSwvqgJy15P6grIz2AgACK+hA=
-Date: Tue, 25 Feb 2020 10:12:09 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B661C02@dggemm531-mbx.china.huawei.com>
-References: <20200225020937.25028-1-kuhn.chenqun@huawei.com>
- <20200225020937.25028-14-kuhn.chenqun@huawei.com>
- <1f4c5308-4a6f-fe1f-3832-f1c762b4c4c2@redhat.com>
-In-Reply-To: <1f4c5308-4a6f-fe1f-3832-f1c762b4c4c2@redhat.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.205.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j6XGG-0001g3-Co
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:16:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582625780;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8C6VrUguRMvheJSefNuRDddaoqJve1CMALV2OfJicM8=;
+ b=axzbp470nktt1UZ70Hi3kUKK4DbS3CCwcNNoq7PsYvDd29t9/TwWyy78TTo7jZITIkS1+Z
+ b3C78TdbkyY94vf47kbxpQwjeYTkmBVk+ysasgWQauXvzGGEV6WDv5Vz3QyXR0AFjnXEix
+ Lpwbu+XWX9pl6gdOOes9ANyb3gzuok8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-_aAz08fzPKyS6lrBhPaySA-1; Tue, 25 Feb 2020 05:16:18 -0500
+X-MC-Unique: _aAz08fzPKyS6lrBhPaySA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41D7818AB2CB;
+ Tue, 25 Feb 2020 10:16:17 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AB8D19C58;
+ Tue, 25 Feb 2020 10:16:10 +0000 (UTC)
+Subject: Re: [RFC v2 1/6] tpm: rename TPM_TIS into TPM_TIS_ISA
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ eric.auger.pro@gmail.com, stefanb@linux.ibm.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+References: <20200214183704.14389-1-eric.auger@redhat.com>
+ <20200214183704.14389-2-eric.auger@redhat.com>
+ <29cc9864-a016-b251-506a-8c04b37efe28@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4dd1b4b0-7112-5a8a-9033-9c21eb01b8f9@redhat.com>
+Date: Tue, 25 Feb 2020 11:16:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <29cc9864-a016-b251-506a-8c04b37efe28@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.255
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,41 +93,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogUGhpbGlwcGUgTWF0aGlldS1EYXVk
-w6kgW21haWx0bzpwaGlsbWRAcmVkaGF0LmNvbV0NCj5TZW50OiBUdWVzZGF5LCBGZWJydWFyeSAy
-NSwgMjAyMCA1OjQ1IFBNDQo+VG86IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2Vp
-LmNvbT47IHFlbXUtDQo+ZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS10cml2aWFsQG5vbmdudS5vcmcN
-Cj5DYzogcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBaaGFuZ2hhaWxpYW5nDQo+PHpoYW5nLnpo
-YW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQNCj48ZGdpbGJl
-cnRAcmVkaGF0LmNvbT4NCj5TdWJqZWN0OiBSZTogW1BBVENIIDEzLzEzXSBtb25pdG9yL2htcC1j
-bWRzOiBSZW1vdmUgcmVkdW5kYW50DQo+c3RhdGVtZW50IGluIGhtcF9yb2NrZXJfb2ZfZHBhX2dy
-b3VwcygpDQo+DQo+T24gMi8yNS8yMCAzOjA5IEFNLCBrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbSB3
-cm90ZToNCj4+IEZyb206IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+DQo+
-PiBDbGFuZyBzdGF0aWMgY29kZSBhbmFseXplciBzaG93IHdhcm5pbmc6DQo+PiBtb25pdG9yL2ht
-cC1jbWRzLmM6Mjg2NzoxNzogd2FybmluZzogVmFsdWUgc3RvcmVkIHRvICdzZXQnIGlzIG5ldmVy
-IHJlYWQNCj4+ICAgICAgICAgICAgICAgICAgc2V0ID0gdHJ1ZTsNCj4+ICAgICAgICAgICAgICAg
-ICAgXiAgICAgfn5+fg0KPj4NCj4+IFJlcG9ydGVkLWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9i
-b3RAaHVhd2VpLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5A
-aHVhd2VpLmNvbT4NCj4+IC0tLQ0KPj4gQ2M6ICJEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IiA8ZGdp
-bGJlcnRAcmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4gICBtb25pdG9yL2htcC1jbWRzLmMgfCAxIC0N
-Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEv
-bW9uaXRvci9obXAtY21kcy5jIGIvbW9uaXRvci9obXAtY21kcy5jIGluZGV4DQo+PiA1M2JjM2Y3
-NmM0Li44NGY5NDY0N2NkIDEwMDY0NA0KPj4gLS0tIGEvbW9uaXRvci9obXAtY21kcy5jDQo+PiAr
-KysgYi9tb25pdG9yL2htcC1jbWRzLmMNCj4+IEBAIC0yODY0LDcgKzI4NjQsNiBAQCB2b2lkIGht
-cF9yb2NrZXJfb2ZfZHBhX2dyb3VwcyhNb25pdG9yICptb24sDQo+PiBjb25zdCBRRGljdCAqcWRp
-Y3QpDQo+Pg0KPj4gICAgICAgICAgIGlmIChncm91cC0+aGFzX3NldF9ldGhfZHN0KSB7DQo+PiAg
-ICAgICAgICAgICAgIGlmICghc2V0KSB7DQo+PiAtICAgICAgICAgICAgICAgIHNldCA9IHRydWU7
-DQo+PiAgICAgICAgICAgICAgICAgICBtb25pdG9yX3ByaW50Zihtb24sICIgc2V0Iik7DQo+PiAg
-ICAgICAgICAgICAgIH0NCj4+ICAgICAgICAgICAgICAgbW9uaXRvcl9wcmludGYobW9uLCAiIGRz
-dCAlcyIsIGdyb3VwLT5zZXRfZXRoX2RzdCk7DQo+Pg0KPg0KPkNhbiB5b3UgbW92ZSB0aGUgJ3Nl
-dCcgZGVjbGFyYXRpb24gdG8gdGhlIGZvcigpIHN0YXRlbWVudCBhbmQgYWxzbyByZW1vdmUgdGhl
-DQo+bGFzdCAic2V0ID0gZmFsc2U7Ij8NClllcywgIHlvdSBhcmUgcmlnaHQhICAgSXQgd2lsbCBi
-ZSBiZXR0ZXIhICAgIEkgd2lsbCBtb2RpZnkgaXQgbGF0ZXIgaW4gVjIuDQoNClRoYW5rcy4NCg0K
+Hi Phil,
+
+On 2/14/20 7:55 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 2/14/20 7:36 PM, Eric Auger wrote:
+>> As we plan to introduce a sysbus TPM_TIS, let's rename
+>> TPM_TIS into TPM_TIS_ISA.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>> =C2=A0 hw/i386/acpi-build.c | 6 +++---
+>> =C2=A0 hw/tpm/tpm_tis.c=C2=A0=C2=A0=C2=A0=C2=A0 | 4 ++--
+>> =C2=A0 include/sysemu/tpm.h | 6 +++---
+>> =C2=A0 3 files changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 9c4e46fa74..26777f8828 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -2026,7 +2026,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS(tpm_find())) {
+>> +=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS_ISA(tpm_find())) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_append(crs, a=
+ml_memory32_fixed(TPM_TIS_ADDR_BASE,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TPM_TIS_ADDR_SIZE, AML_REA=
+D_WRITE));
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> @@ -2197,7 +2197,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 /* Scan all PCI buses. Generate tables to support
+>> hotplug. */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 build_append_pci_bus_devices(scope, bus,
+>> pm->pcihp_bridge_en);
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (TPM_IS_TIS(tpm)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (=
+TPM_IS_TIS_ISA(tpm)) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (misc->tpm_version =3D=3D TPM_VERSION_2_0=
+) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev =3D aml_device("=
+TPM");
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aml_append(dev, aml_=
+name_decl("_HID",
+>> @@ -2304,7 +2304,7 @@ build_tpm2(GArray *table_data, BIOSLinker
+>> *linker, GArray *tcpalog)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (char *)&tpm2_ptr=
+->log_area_start_address - table_data->data;
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->platform_class =3D cpu_t=
+o_le16(TPM2_ACPI_CLASS_CLIENT);
+>> -=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS(tpm_find())) {
+>> +=C2=A0=C2=A0=C2=A0 if (TPM_IS_TIS_ISA(tpm_find())) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->control=
+_area_address =3D cpu_to_le64(0);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tpm2_ptr->start_m=
+ethod =3D cpu_to_le32(TPM2_START_METHOD_MMIO);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (TPM_IS_CRB(tpm_find())) {
+>> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+>> index 31facb896d..c609737272 100644
+>> --- a/hw/tpm/tpm_tis.c
+>> +++ b/hw/tpm/tpm_tis.c
+>> @@ -91,7 +91,7 @@ typedef struct TPMState {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 TPMPPI ppi;
+>> =C2=A0 } TPMState;
+>> =C2=A0 -#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
+>> +#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
+>> =C2=A0 =C2=A0 #define DEBUG_TIS 0
+>> =C2=A0 @@ -1008,7 +1008,7 @@ static void tpm_tis_class_init(ObjectClass
+>> *klass, void *data)
+>> =C2=A0 }
+>> =C2=A0 =C2=A0 static const TypeInfo tpm_tis_info =3D {
+>> -=C2=A0=C2=A0=C2=A0 .name =3D TYPE_TPM_TIS,
+>> +=C2=A0=C2=A0=C2=A0 .name =3D TYPE_TPM_TIS_ISA,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .parent =3D TYPE_ISA_DEVICE,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(TPMState),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_init =3D tpm_tis_initfn,
+>> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
+>> index 15979a3647..1691b92c28 100644
+>> --- a/include/sysemu/tpm.h
+>> +++ b/include/sysemu/tpm.h
+>> @@ -43,12 +43,12 @@ typedef struct TPMIfClass {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enum TPMVersion (*get_version)(TPMIf *obj=
+);
+>> =C2=A0 } TPMIfClass;
+>> =C2=A0 -#define TYPE_TPM_TIS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-tis"
+>> +#define TYPE_TPM_TIS_ISA=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "tpm-tis"
+>=20
+> It should be safe to rename this "tpm-tis-isa" in this patch.
+This would change the name of the legacy ISA device and also the way we
+instantiate it through the cmd line. To avoid breaking the compatibility
+I kept the same name and used tpm-tis-device (?) for the new sysbus one.
+
+Thanks
+
+Eric
+>=20
+> Regardless:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+>> =C2=A0 #define TYPE_TPM_CRB=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-crb"
+>> =C2=A0 #define TYPE_TPM_SPAPR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "tpm-spapr"
+>> =C2=A0 -#define TPM_IS_TIS(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
+>> -=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
+>> +#define TPM_IS_TIS_ISA(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
+>> +=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
+>> =C2=A0 #define TPM_IS_CRB(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_dynamic_cast(OBJECT(chr), TYPE_TPM=
+_CRB)
+>> =C2=A0 #define TPM_IS_SPAPR(chr)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \
+>>
+>=20
+
 
