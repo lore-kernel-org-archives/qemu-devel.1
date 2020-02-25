@@ -7,74 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE3EC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C00DCC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3093218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:06:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8925320CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:06:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dLZ+33xP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3093218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aeEU9KpW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8925320CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Zuk-0001tm-2Q
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:06:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50232)
+	id 1j6ZvM-0002xX-Hl
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:06:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlW-0002Pn-3M
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:43 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0M-0003l7-T3
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlV-0002Mc-22
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:42 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:40720)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0L-0003bq-N6
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:02 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51717)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YlU-0002IN-R1
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:41 -0500
-Received: by mail-wm1-x330.google.com with SMTP id t14so2838164wmi.5
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:40 -0800 (PST)
+ id 1j6Z0L-0003aW-Ey
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:01 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t23so2739957wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:08:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8TDYd04UA0rta6zGgONMidUyYq1Fh/peI3QjQAoJMVs=;
- b=dLZ+33xPr4HB9mTbNwBfP7thYSuTbJsdIoKRDLnPIpqkAqEooN+9BPx2T0oCq6Sg6S
- JHjeeGd0UjeZpw+hjLqckRbovEhmApURZRfAOnpp3PFzmRiaEP8nQ/YwEwsnjs0d0JoP
- PpH39rt21JkbFThhXAYpSWTm5Q+0BsLTHu5Rt+2oha3gyfQyPU1ssrqPoBy2Dv6hpO6a
- +TGNGoZ9A95q9nth183BjB8vR+aDhY01JT56SynvRpgh5pTlf1LlXoHWZW7fOldpZV7z
- 9Kjlr8EWO7UmiNamnMSRuGrW4g/Qk7BRy8LQ3olYxUEZD/Du9gYmZ0B+/+6EZ5jS/e5T
- oaQQ==
+ bh=0WVy/qKfZHTEAFFT6A0d/dDxv6phGfyMOW/7C/esSf8=;
+ b=aeEU9KpWidLyom7mr1zx+1xuVWC+cu7q4Nl5RuLNu5oJDXvAdJd2c6Oe5xrUumXjk5
+ hUD8hi4Aye9dbOfKJYQShTizFi42FwudgLwUkNDHpVP8/wUaV21z3IGHFAYH0XF2/emA
+ EhsCIB3JhngLnbOKQo0poYmLG+4WxUCoZemehlI32hnMdi+K+C2Nigvr5ngyjZI1TFIs
+ KjuP+ekxafg//m3OwLMRQAD6RY/vUmGxbJwBLhsp2mAjVghqwh/sEk+xF0KBSHmPVr3G
+ FrkPCMEHTOu8Yl1VUhI+NN/bCZxmtT9034kfvAiBSk6JlEQhEg4TK562pvuIQveIje6P
+ ZstA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=8TDYd04UA0rta6zGgONMidUyYq1Fh/peI3QjQAoJMVs=;
- b=tSskwsGXvh3QcaF1cDBJ5uQYyJSXWRkxmKLiwEf/MakGiGZAmWzIdH8ivvLBEbKCAA
- rX7Y4+9m/6rD7XY2XTrfmFpMoXb4AUfdRM1BJXNn3vmHfdIaI9sKr4Zf8U8sIYR9r5tD
- zNQcPfMDpv2IbRx7tRzb+jfORou1FFmHZQisnXu2y3LZohqp4TIl+D2NvwOcXsPbpcBM
- 1DRJDO1t2IPY05+WHD3ybuatvbYdHP+pnts7tyzNt1uAoMtX/BZycSKMrU78gM8kMllw
- uyzVy4R40e95Abh8n96nCB2oz2CvPVFWiHLig6PVwp7iC+xLr76EFB0ZMY/vhZkrMqZc
- owig==
-X-Gm-Message-State: APjAAAVq19LxCsBGV5LhC/lpmh+9lApSzn72NrbAtwG5jKxetMWh/CwV
- FZPnHOzgtDXavc7RswI7C/J3TRp4
-X-Google-Smtp-Source: APXvYqyzqVuQTAe5mO8QL/XLZGUUdjKlSNC9yVOICjHxQZko6NGdq7mbMwoY7rLF/ObR291YNPrm7Q==
-X-Received: by 2002:a05:600c:3d1:: with SMTP id
- z17mr5157071wmd.90.1582631559654; 
- Tue, 25 Feb 2020 03:52:39 -0800 (PST)
+ bh=0WVy/qKfZHTEAFFT6A0d/dDxv6phGfyMOW/7C/esSf8=;
+ b=UEBRXywj4ZuYDwGRMp4Z9QRM0YrdfAM9yopMGqjyC3eXMnIgPbtc36HM7J5ocbhHwO
+ xvjYfVt4rTAiKzP1rxWkocCtgPhBpTywA34sUPAa6JVSErrAukw4HALREZUMbL0b5jFK
+ tKEIX4rpkl8LAzf711SqkUvu9iUKnw+DxB6dSkGx9nrR/49ERR20ehM3y/4JlBrZJNNI
+ L/n0bU7O3iKPd9CZ3HFSTnMBurVXlvNpEmvEq+UL9PwCUkVpbIcHdQraAXj8alqGa7p2
+ BjbXTcGx7zUG+D+NEg6a5siy2Zc3JaegIY9Pz3Ojw9i/FBJoIBSN2NWYD0nfvWMi9Spe
+ HBTQ==
+X-Gm-Message-State: APjAAAVm0XHlZv7P4yLFvTCbY5heOT7bB+fsFrgZTfjJmqe4gfYuG0rW
+ qRZMUkugpb/o4iYNBNlYPjVC4SOt
+X-Google-Smtp-Source: APXvYqyHDHTFeS31XEGv1xzwbFHVArFlNdCycfzCFI1k8PUeZp2pmYNTsHEFTNfyNGHD2kwPdWPdxA==
+X-Received: by 2002:a1c:4857:: with SMTP id v84mr5038308wma.8.1582632479200;
+ Tue, 25 Feb 2020 04:07:59 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.38
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.07.58
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:39 -0800 (PST)
+ Tue, 25 Feb 2020 04:07:58 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 101/136] scripts/cocci: Rename memory-region-{init-ram ->
- housekeeping}
-Date: Tue, 25 Feb 2020 12:50:31 +0100
-Message-Id: <1582631466-13880-101-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 126/136] hw/riscv: Let devices own the MemoryRegion they create
+Date: Tue, 25 Feb 2020 13:07:24 +0100
+Message-Id: <1582632454-16491-24-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -83,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,56 +100,57 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-As we are going to add various semantic changes related to the memory
-region API, rename this script to be more generic.
-Add a 'usage' header, and an entry in MAINTAINERS to avoid checkpatch
-warning.
+Avoid orphan memory regions being added in the /unattached QOM
+container.
+
+This commit was produced with the Coccinelle script
+scripts/coccinelle/memory-region-housekeeping.cocci.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200224205533.23798-4-philmd@redhat.com>
+Message-Id: <20200224205533.23798-29-philmd@redhat.com>
 Supersedes: <20200221173049.18134-1-philmd@redhat.com>
 ---
- MAINTAINERS                                                 |  1 +
- ...gion-init-ram.cocci => memory-region-housekeeping.cocci} | 13 +++++++++++++
- 2 files changed, 14 insertions(+)
- rename scripts/coccinelle/{memory-region-init-ram.cocci => memory-region-housekeeping.cocci} (84%)
+ hw/riscv/sifive_e.c | 6 +++---
+ hw/riscv/sifive_u.c | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 195dd58..316a8ed 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1998,6 +1998,7 @@ F: include/exec/ramblock.h
- F: memory.c
- F: include/exec/memory-internal.h
- F: exec.c
-+F: scripts/coccinelle/memory-region-housekeeping.cocci
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 6f6360a..64eb8ce 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -145,8 +145,8 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+                             &error_abort);
  
- SPICE
- M: Gerd Hoffmann <kraxel@redhat.com>
-diff --git a/scripts/coccinelle/memory-region-init-ram.cocci b/scripts/coccinelle/memory-region-housekeeping.cocci
-similarity index 84%
-rename from scripts/coccinelle/memory-region-init-ram.cocci
-rename to scripts/coccinelle/memory-region-housekeeping.cocci
-index d290150..3699c10 100644
---- a/scripts/coccinelle/memory-region-init-ram.cocci
-+++ b/scripts/coccinelle/memory-region-housekeeping.cocci
-@@ -1,3 +1,16 @@
-+/*
-+  Usage:
-+
-+    spatch \
-+        --macro-file scripts/cocci-macro-file.h \
-+        --sp-file scripts/coccinelle/memory-region-housekeeping.cocci \
-+        --keep-comments \
-+        --in-place \
-+        --dir .
-+
-+*/
-+
-+
- // Replace by-hand memory_region_init_ram_nomigrate/vmstate_register_ram
- // code sequences with use of the new memory_region_init_ram function.
- // Similarly for the _rom and _rom_device functions.
+     /* Mask ROM */
+-    memory_region_init_rom(&s->mask_rom, NULL, "riscv.sifive.e.mrom",
+-        memmap[SIFIVE_E_MROM].size, &error_fatal);
++    memory_region_init_rom(&s->mask_rom, OBJECT(dev), "riscv.sifive.e.mrom",
++                           memmap[SIFIVE_E_MROM].size, &error_fatal);
+     memory_region_add_subregion(sys_mem,
+         memmap[SIFIVE_E_MROM].base, &s->mask_rom);
+ 
+@@ -208,7 +208,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
+         memmap[SIFIVE_E_PWM2].base, memmap[SIFIVE_E_PWM2].size);
+ 
+     /* Flash memory */
+-    memory_region_init_rom(&s->xip_mem, NULL, "riscv.sifive.e.xip",
++    memory_region_init_rom(&s->xip_mem, OBJECT(dev), "riscv.sifive.e.xip",
+                            memmap[SIFIVE_E_XIP].size, &error_fatal);
+     memory_region_add_subregion(sys_mem, memmap[SIFIVE_E_XIP].base,
+         &s->xip_mem);
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 0e12b3c..be7d438 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -497,7 +497,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+                              &error_abort);
+ 
+     /* boot rom */
+-    memory_region_init_rom(mask_rom, NULL, "riscv.sifive.u.mrom",
++    memory_region_init_rom(mask_rom, OBJECT(dev), "riscv.sifive.u.mrom",
+                            memmap[SIFIVE_U_MROM].size, &error_fatal);
+     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
+                                 mask_rom);
 -- 
 1.8.3.1
 
