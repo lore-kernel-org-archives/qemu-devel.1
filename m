@@ -2,57 +2,126 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DATE_IN_PAST_96_XX,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40084C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D076C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBBE218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:23:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBBE218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6697E222C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:28:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HMNLvPUl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6697E222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6UZP-0002KR-59
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:23:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39467)
+	id 1j6Udl-0003SP-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:28:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1j6UYf-0001tT-Om
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:23:11 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j6UdB-00033o-1o
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1j6UYd-0002Zd-G3
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:23:08 -0500
-Received: from [192.146.154.243] (port=30916 helo=mcp01.nutanix.com)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1j6UYd-0002XD-8O
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:23:07 -0500
-Received: from localhost.localdomain (unknown [10.40.36.165])
- by mcp01.nutanix.com (Postfix) with ESMTP id A5B7A1008443;
- Tue, 25 Feb 2020 07:23:03 +0000 (UTC)
-Date: Thu, 20 Feb 2020 02:03:08 -0500
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2 3/3] Lift max memory slots limit imposed by vhost-user
-Message-ID: <20200220070308.GA2215@localhost.localdomain>
-References: <1579143426-18305-1-git-send-email-raphael.norwitz@nutanix.com>
- <1579143426-18305-4-git-send-email-raphael.norwitz@nutanix.com>
- <20200206032332-mutt-send-email-mst@kernel.org>
- <20200209174335.GA15050@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200209174335.GA15050@localhost.localdomain>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j6Ud8-0005mV-Qy
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:48 -0500
+Received: from mail-eopbgr80112.outbound.protection.outlook.com
+ ([40.107.8.112]:57729 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j6Ud7-0005jH-Q1
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:46 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UJFwz28/SbnjPIodj6OSYh/JKBikq0EwZLjsJ3jTfwItpOMJ5/pwLXFlG1pZQtKlZRUgLHdKseYHx04VLyO0gYWmLbA/qwSjlycjVVARVqAZTqRN6B1bS8ZTJ0o6jvx/RDKtx9wc/UHsWbSWH24SMr1kq0dBzrgwnadb2JXwQsXFQrUKmlfLIFk6BBNhAAacbs2QEy6hWzj0T2NJDDZOOMgPMS5ZNwaMxqTk6CL0OF0Q7N7uPNwtgAdXDblCj8aByHXUJrpkYbnkbhuadO8WAaSTh5YUs83feGHPxyG+HK06HGdVlAnphjV9MY+BAijy+PvNFK1Zgbp+SFWVwWaQJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=00aQ17MsWtSeIZvHJjdeeSa9aYhkcVTrZDKsL/bpBTg=;
+ b=HQBpDN3Xp0j2usWdUsDQtHgWJVfRm3bXn4zBKHghWYrSDqWt4Zb/ZMChXnj0+8XfHlUJqfdDf8U/pSwliYQQyrb2BJlADlTXqNVxEx04WoxzkOsYp6PkMUO/GUGvRocD6F5ddAIsQE9g4stHSoAhhIiNF7oLGUA5y32zr/qmfmhHmN0qNxLqlyAA2HGyrmMNEXj0KDNzrGsMcYUWM0Jy+6hD3GkC1SGnfwXY5JQVAj5xNpQBM9ZEo6rp7b4cxyNs3OCIw4R6OL1udMRUZuDgZNWP64r7NLlNjKdc02hhFw3PxKKkO62RedvAxJ7F3rdiJf1M5BR+C5TW+z35801KRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=00aQ17MsWtSeIZvHJjdeeSa9aYhkcVTrZDKsL/bpBTg=;
+ b=HMNLvPUlwqOdc37hga9pPgi1kN+hUPMBBUW9Npyg/njs39n5QTTRwTwHgJJXKc3cHEtmBUaWJ/CeXCaTcNK7BKI8FxMf66DEAXzYqb5AZlo45G6x+Mm6xcsUGpT4EH8xfDya3z2E+7EC2NnTHSlcK3rYMCjlIQ+hxP2AKJyVPAc=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4197.eurprd08.prod.outlook.com (20.179.3.142) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21; Tue, 25 Feb 2020 07:27:40 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
+ 07:27:38 +0000
+Subject: Re: Race condition in overlayed qcow2?
+To: dovgaluk <dovgaluk@ispras.ru>
+References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
+ <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
+ <5891b48a131321be62a4a311253da44c@ispras.ru>
+ <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
+ <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
+ <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
+ <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
+ <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
+ <99ed3129-9460-dbad-0441-95bad08d5636@virtuozzo.com>
+ <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200225102735605
+Message-ID: <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
+Date: Tue, 25 Feb 2020 10:27:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 192.146.154.243
+X-ClientProxiedBy: HE1PR0301CA0009.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR0301CA0009.eurprd03.prod.outlook.com (2603:10a6:3:76::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.18 via Frontend Transport; Tue, 25 Feb 2020 07:27:37 +0000
+X-Tagtoolbar-Keys: D20200225102735605
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f6abbc7e-a0e8-4d31-f53b-08d7b9c430ec
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4197:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4197D0BE4134976AD26FF961C1ED0@AM6PR08MB4197.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0324C2C0E2
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(136003)(376002)(39850400004)(346002)(199004)(189003)(81156014)(81166006)(2616005)(956004)(8676002)(186003)(66556008)(16526019)(66476007)(16576012)(26005)(66946007)(36756003)(31686004)(8936002)(4326008)(6916009)(5660300002)(478600001)(52116002)(86362001)(6486002)(316002)(31696002)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4197;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bPidUfneYtij7wS0fWqTRos097vBDom3UJRx72Ufeq+xztgdQTxWs83Nn4q2DswRZJu+9Z2TMYIojjAdWmr70Zk2tPfaTYD4MI4wkGwreQdyTuINv68A3B8Dq5CVIHugLOuPIug7vXEI8M9SEfgTompva4Fh/Ovl/w0f5/IHj/IivOsEODcj6bnGcPepHlJCTY94xB5Q5egy75jSR9N5IGJcEYckmZlwzn/J6uDyg1SG/WO04r4gAS2qcX4rY/6yIzy5uvoXWqVuOPRzsFYuOiy6twQ1YMTZaGyEMr7f/7T38EpBso15TDNg+hbxb8WHdW/n1GXm/xbYcpNR5m2id3JqvTpbSI+w2ITT31ZGjsRjdzqPHG1f/tVTlUag6nn3l8jV1PznqsMKqZCiz8BCULFYJj7RjKhCpcRqrapaqYNOo5hMl8dt4UEHhp6ElXV9
+X-MS-Exchange-AntiSpam-MessageData: 57QZoWQ/cvdc+yv/d3GSx+uzjAaKr+XSAXf7bC/aK9H3sS6gP5pkfIeMwOBVE5KI4NlslIIztskuBN27TT5XIvb+2i51Dhr3ri2AZqPwVTZPwn4a4R9Cak3wn9uDrsz+ygJSHsPioZWG/x/kvGEebg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6abbc7e-a0e8-4d31-f53b-08d7b9c430ec
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2020 07:27:38.3627 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xk9RqEqbtX/hWGFN4h0/WxxWkuOz9fiSidxXZ07An9wQI09AfseMs8HLce7mxl+pYDkD8UPtoAYlLIBWsR9VCdDBjc0a1mCmkMl/KQY/Wp0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4197
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.112
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,186 +133,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+25.02.2020 8:58, dovgaluk wrote:
+> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21 16=
+:23:
+>> 21.02.2020 15:35, dovgaluk wrote:
+>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21 =
+13:09:
+>>>> 21.02.2020 12:49, dovgaluk wrote:
+>>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-2=
+0 12:36:
+>>>>>>>> 1 or 2 are ok, and 4 or 8 lead to the failures.
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> That is strange. I could think, that it was caused by the bugs in
+>>>>>>>> deterministic CPU execution, but the first difference in logs
+>>>>>>>> occur in READ operation (I dump read/write buffers in blk_aio_comp=
+lete).
+>>>>>>>>
+>>>>>>>
+>>>>>>> Aha, yes, looks strange.
+>>>>>>>
+>>>>>>> Then next steps:
+>>>>>>>
+>>>>>>> 1. Does problem hit into the same offset every time?
+>>>>>>> 2. Do we write to this region before this strange read?
+>>>>>>>
+>>>>>>> 2.1. If yes, we need to check that we read what we write.. You say =
+you dump buffers
+>>>>>>> in blk_aio_complete... I think it would be more reliable to dump at=
+ start of
+>>>>>>> bdrv_co_pwritev and at end of bdrv_co_preadv. Also, guest may modif=
+y its buffers
+>>>>>>> during operation which would be strange but possible.
+>>>>>>>
+>>>>>>> 2.2 If not, hmm...
+>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>> Another idea to check: use blkverify
+>>>>>
+>>>>> I added logging of file descriptor and discovered that different resu=
+lts are obtained
+>>>>> when reading from the backing file.
+>>>>> And even more - replay runs of the same recording produce different r=
+esults.
+>>>>> Logs show that there is a preadv race, but I can't figure out the sou=
+rce of the failure.
+>>>>>
+>>>>> Log1:
+>>>>> preadv c 30467e00
+>>>>> preadv c 30960000
+>>>>> --- sum =3D a2e1e
+>>>>> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 820=
+0
+>>>>> --- sum =3D 10cdee
+>>>>> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len: =
+ee00
+>>>>>
+>>>>> Log2:
+>>>>> preadv c 30467e00
+>>>>> --- sum =3D a2e1e
+>>>>> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 820=
+0
+>>>>> preadv c 30960000
+>>>>> --- sum =3D f094f
+>>>>> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len: =
+ee00
+>>>>>
+>>>>>
+>>>>> Checksum calculation was added to preadv in file-posix.c
+>>>>>
+>>>>
+>>>> So, preadv in file-posix.c returns different results for the same
+>>>> offset, for file which is always opened in RO mode? Sounds impossible
+>>>> :)
+>>>
+>>> True.
+>>> Maybe my logging is wrong?
+>>>
+>>> static ssize_t
+>>> qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t offset)
+>>> {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 ssize_t res =3D preadv(fd, iov, nr_iov, offset=
+);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("preadv %x %"PRIx64"\n", fd, (uint64_=
+t)offset);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 int i;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 uint32_t sum =3D 0;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 int cnt =3D 0;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < nr_iov ; ++i) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int j;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (j =3D 0 ; j < (in=
+t)iov[i].iov_len ; ++j)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 sum +=3D ((uint8_t*)iov[i].iov_base)[j];
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 ++cnt;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("size: %x sum: %x\n", cnt, sum);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 return res;
+>>> }
+>>>
+>>
+>> Hmm, I don't see any issues here..
+>>
+>> Are you absolutely sure, that all these reads are from backing file,
+>> which is read-only and never changed (may be by other processes)?
+>=20
+> Yes, I made a copy and compared the files with binwalk.
+>=20
+>> 2. guest modifies buffers during operation (you can catch it if
+>> allocate personal buffer for preadv, than calculate checksum, then
+>> memcpy to guest buffer)
+>=20
+> I added the following to the qemu_preadv:
+>=20
+>  =C2=A0=C2=A0=C2=A0 // do it again
+>  =C2=A0=C2=A0=C2=A0 unsigned char *buf =3D g_malloc(cnt);
+>  =C2=A0=C2=A0=C2=A0 struct iovec v =3D {buf, cnt};
+>  =C2=A0=C2=A0=C2=A0 res =3D preadv(fd, &v, 1, offset);
+>  =C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
+>  =C2=A0=C2=A0=C2=A0 uint32_t sum2 =3D 0;
+>  =C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < cnt ; ++i)
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sum2 +=3D buf[i];
+>  =C2=A0=C2=A0=C2=A0 g_free(buf);
+>  =C2=A0=C2=A0=C2=A0 qemu_log("--- sum2 =3D %x\n", sum2);
+>  =C2=A0=C2=A0=C2=A0 assert(sum2 =3D=3D sum);
+>=20
+> These two reads give different results.
+> But who can modify the buffer while qcow2 workers filling it with data fr=
+om the disk?
+>=20
 
-On Sun, Feb 09, 2020 at 12:43:35PM -0500, Raphael Norwitz wrote:
->=20
-> On Thu, Feb 06, 2020 at 03:32:38AM -0500, Michael S. Tsirkin wrote:
-> >=20
-> > On Wed, Jan 15, 2020 at 09:57:06PM -0500, Raphael Norwitz wrote:
-> > > The current vhost-user implementation in Qemu imposes a limit on th=
-e
-> > > maximum number of memory slots exposed to a VM using a vhost-user
-> > > device. This change provides a new protocol feature
-> > > VHOST_USER_F_CONFIGURE_SLOTS which, when enabled, lifts this limit =
-and
-> > > allows a VM with a vhost-user device to expose a configurable numbe=
-r of
-> > > memory slots, up to the ACPI defined maximum. Existing backends whi=
-ch
-> > > do not support this protocol feature are unaffected.
-> >=20
-> > Hmm ACPI maximum seems to be up to 512 - is this too much to fit in a
-> > single message?  So can't we just increase the number (after negotiat=
-ing
-> > with remote) and be done with it, instead of add/remove?  Or is there
-> > another reason to prefer add/remove?
-> >
->=20
-> As mentioned in my cover letter, we experimented with simply increasing=
- the
-> message size and it didn=E2=80=99t work on our setup. We debugged down =
-to the socket
-> layer and found that on the receiving end the messages were truncated a=
-t
-> around 512 bytes, or around 16 memory regions.=C2=A0To support 512 memo=
-ry regions
-> we would need a message size of around=C2=A0=C2=A032 <bytes per region>=
- * 512 <regions>
-> + 8 <bytes for padding and region count> ~=3D 16k packet size. That wou=
-ld be 64
-> times larger than the next largest message size. We thought it would be=
- cleaner
-> and more in line with the rest of the protocol to keep the message size=
-s
-> smaller. In particular, we thought memory regions should be treated lik=
-e the
-> rings, which are sent over one message at a time instead of in one larg=
-e message.
-> Whether or not such a large message size can be made to work in our cas=
-e,
-> separate messages will always work on Linux, and most likely all other =
-UNIX
-> platforms QEMU is used on.
->=20
+As far as I know, it's guest's buffer, and guest may modify it during the o=
+peration. So, it may be winxp :)
 
-> > >=20
-> > > This feature works by using three new messages,
-> > > VHOST_USER_GET_MAX_MEM_SLOTS, VHOST_USER_ADD_MEM_REG and
-> > > VHOST_USER_REM_MEM_REG. VHOST_USER_GET_MAX_MEM_SLOTS gets the
-> > > number of memory slots the backend is willing to accept when the
-> > > backend is initialized. Then, when the memory tables are set or upd=
-ated,
-> > > a series of VHOST_USER_ADD_MEM_REG and VHOST_USER_REM_MEM_REG messa=
-ges
-> > > are sent to transmit the regions to map and/or unmap instead of try=
-ing
-> > > to send all the regions in one fixed size VHOST_USER_SET_MEM_TABLE
-> > > message.
-> > >=20
-> > > The vhost_user struct maintains a shadow state of the VM=E2=80=99s =
-memory
-> > > regions. When the memory tables are modified, the
-> > > vhost_user_set_mem_table() function compares the new device memory =
-state
-> > > to the shadow state and only sends regions which need to be unmappe=
-d or
-> > > mapped in. The regions which must be unmapped are sent first, follo=
-wed
-> > > by the new regions to be mapped in. After all the messages have bee=
-n
-> > > sent, the shadow state is set to the current virtual device state.
-> > >=20
-> > > The current feature implementation does not work with postcopy migr=
-ation
-> > > and cannot be enabled if the VHOST_USER_PROTOCOL_F_REPLY_ACK featur=
-e has
-> > > also been negotiated.
-> >=20
-> > Hmm what would it take to lift the restrictions?
-> > conflicting features like this makes is very hard for users to make
-> > an informed choice what to support.
-> >
->=20
-> We would need a setup with a backend which supports these features (REP=
-LY_ACK
-> and postcopy migration). At first glance it looks like DPDK could work =
-but
-> I'm not sure how easy it will be to test postcopy migration with the re=
-sources
-> we have.
-> =20
 
-> > > Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-> > > Signed-off-by: Peter Turschmid <peter.turschm@nutanix.com>
-> > > Suggested-by: Mike Cui <cui@nutanix.com>
-> > > ---
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index af83fdd..fed6d02 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -35,11 +35,29 @@
-> > >  #include <linux/userfaultfd.h>
-> > >  #endif
-> > > =20
-> > > -#define VHOST_MEMORY_MAX_NREGIONS    8
-> > > +#define VHOST_MEMORY_LEGACY_NREGIONS    8
-> >=20
-> > Hardly legacy when this is intended to always be used e.g. with
-> > postcopy, right?
-> >
->=20
-> How about 'BASELINE'?
 
-> > > +    msg->hdr.size =3D sizeof(msg->payload.mem_reg.padding);
-> > > +    msg->hdr.size +=3D sizeof(VhostUserMemoryRegion);
-> > > +
-> > > +    /*
-> > > +     * Send VHOST_USER_REM_MEM_REG for memory regions in our shado=
-w state
-> > > +     * which are not found not in the device's memory state.
-> >=20
-> > double negation - could not parse this.
-> >
->=20
-> Apologies - typo here. It should say =E2=80=9CSend VHOST_USER_REM_MEM_R=
-EG for memory
-> regions in our shadow state which are not found in the device's memory =
-state.=E2=80=9D=20
-> i.e. send messages to remove regions in the shadow state but not in the=
- updated
-> device state.=20
-> =20
-> > > +     */
-> > > +    for (i =3D 0; i < u->num_shadow_regions; ++i) {
-> > > +        reg =3D dev->mem->regions;
-> > > +
-> > > +        for (j =3D 0; j < dev->mem->nregions; j++) {
-> > > +            reg =3D dev->mem->regions + j;
-> > > +
-> > > +            assert((uintptr_t)reg->userspace_addr =3D=3D reg->user=
-space_addr);
-> > > +            mr =3D memory_region_from_host((void *)(uintptr_t)reg-=
->userspace_addr,
-> > > +                                         &offset);
-> > > +            fd =3D memory_region_get_fd(mr);
-> > > +
-> > > +            if (reg_equal(&u->shadow_regions[i], reg)) {
-> > > +                matching =3D true;
-> > > +                found[j] =3D true;
-> > > +                break;
-> > > +            }
-> > > +        }
-> > > +
-> > > +        if (fd > 0 && !matching) {
-> > > +            msg->hdr.request =3D VHOST_USER_REM_MEM_REG;
-> > > +            msg->payload.mem_reg.region.userspace_addr =3D reg->us=
-erspace_addr;
-> > > +            msg->payload.mem_reg.region.memory_size =3D reg->memor=
-y_size;
-> > > +            msg->payload.mem_reg.region.guest_phys_addr =3D
-> > > +                reg->guest_phys_addr;
-> > > +            msg->payload.mem_reg.region.mmap_offset =3D offset;
-> > > +
-> > > +            if (vhost_user_write(dev, msg, &fd, 1) < 0) {
-> > > +                return -1;
-> > > +            }
-> > > +        }
-> > > +    }
-> > > +
+--=20
+Best regards,
+Vladimir
 
