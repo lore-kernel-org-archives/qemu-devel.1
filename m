@@ -2,116 +2,84 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9E6C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA17C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC1E022464
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:52:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC1E022464
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2D9B721556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 11:52:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWIS8ESx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D9B721556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Ylg-0002AX-4H
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 06:52:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48974)
+	id 1j6Ylh-0002Dx-E7
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 06:52:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j6Yjz-00009n-IR
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:11 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yk4-0000BD-Fe
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j6Yjv-00051I-VZ
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:07 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:58649)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j6Yjo-0004aT-9y; Tue, 25 Feb 2020 06:50:56 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MRmwM-1j0bPh3vhq-00TAxC; Tue, 25 Feb 2020 12:50:48 +0100
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1582586444.git.alistair.francis@wdc.com>
- <85f33856ee6f32125e5c81a9561346b28b340a3e.1582586444.git.alistair.francis@wdc.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH v2 2/2] linux-user/riscv: Update the syscall_nr's to the
- 5.5 kernel
-Message-ID: <24431d59-b535-97d4-95d7-fe4401e10787@vivier.eu>
-Date: Tue, 25 Feb 2020 12:50:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <85f33856ee6f32125e5c81a9561346b28b340a3e.1582586444.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:FIufnv1rhz7E1+H8VSn54aocjcTgXDaOpBotsU5jwu2uh7lvm8m
- lL9yiebAqYrb0ryRfwOmpVO4GR7dlJKWll/vYoLB7JMSn5XYSTWLDFEgba0u5sLajd7DrU0
- U8e3FTXpQmOdadHEzRf/rW+Smz/DE+xYhkq3ir9rshSiX4ztFS5VFkThK7v0AZpkP2vDid6
- 3mR/bvp2+t82UR+NdyWSw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PXXhXhA9HHc=:EYoqOO+PEUGfUhozqtRnHj
- uFtJ8A/WrNefTg8njqojVCbUKgDqlPlyPBU1BvAH7yO2IkWqOvGom5wgBMMIcOQEPVbzfWj/R
- GUKCF43xlIOmA701oinMntKi22L77z2EBRH5m5mW6ttr+Z2A2cxVCCBIac486c7b1Ao35KntX
- yqnkTlJJKlmvTIW4nwKFnJzH1pW6r1EXy/d82EtRcfKc5IVktxH1G1wGo5K9xAHw3dWvH6pn/
- RzuIZfY9NcrudIR8Y11czjs/s4m3mSkk2DIxjnaJh4oB1G/iCjL5ACSfESZc9GBX+6QK4t+9f
- gF0uzekRUl/ax1FSjuVl7DTshX8+1fFAaVXHFlTPCJy0JeLZFWeBIeTQGcK1fELNh+dMsQF2q
- cTrw3M7xzYgTNpDVCkIWbM14vBf28Scjumeuqx8WjLquP9ibv+Vm/M9sjRGZWUIEjvldn1xVV
- t/X2UNtQV9CBtPIfDdertlKbjqhKfUB6n7zVpSAgAj/bbjBzn3FmCTzCM8esg5on0hOYCqSzM
- AxA7L2BX+dyTIDXXC1Pq2tGfMDOgFWvoEHF6OKK4L6w/wvsQexW+YoC9QSJbi1KcdPJj+dSM7
- oTuM7er9WhWofIqbssDnvmnO2Tj3sX392PIXrI3TRSjb0rByVKp1li6H9nTuVZODxGxu/HsWC
- pTIc+kzV2tH3LKG+Ei45fZjIesYdDqICbJG3t3b3DxPhryGeUp1lkZhsCXHyoICbVV0K086aG
- lPsQcKAuKFlYVYOOXxBkW3Nj+xYP/0Ua9vbOPqCFDENbz7S5efwSPBmv6wqV2drDWqOuKMVgU
- mamMfsjoXXYCZX1t8/Gdyg1BESXm1/x2x17hh2jnuPHJPo1NrwCj/x+FkeGp+EpGDDxIzY+
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yk3-0005Jm-6m
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:12 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:39092)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1j6Yk2-0005Gd-Ut
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:11 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id c84so2831736wme.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=8dCAEQ3n3P+VCLpdHC3gGCW6UChRtkB4Jsl3UgbtDgs=;
+ b=LWIS8ESx2vDfz1XxAtn7AAMyqhWuW2dBM7kRimDxxn+7fR+NIxRldLdgZWDHO7Z58r
+ NfoL0OHc0wNUVqAuVwa/pfpV9apNfFQPeFLioFOpGSGIaerGzp3So5S64bxTZyV3rl6c
+ nmkds2RBnE9eJvGUVX8yQ+n3uzz9jO1YM5YjHQnVFIQR96RDTKfZlxeYildI85QMSW0n
+ I/U8wATZFTkLd1JFPK9xUFGQVAuHkpqrMIYTeolBX+G//Xi7w4T5eBlGDrHfNJ7UaIgp
+ lkiFEkOVdOj5+UVqzdu3iQgA+PSBNOgVpIIYJ72OJTyqgQ2WG+memPyeNVNV4bCK4k+F
+ 04Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=8dCAEQ3n3P+VCLpdHC3gGCW6UChRtkB4Jsl3UgbtDgs=;
+ b=X9OpDt5M7mHiR6Ovtpb5XuqC20Pp1ydcP8pBSXmlCC6idWj2GeM0tEyQ7zZwEajxto
+ MyUUZ6zykKlSjB1Ul774BjEL3I2ToIWR9NvJX6faC9/ScMe2csdU4OKEElnFT6zmyjDT
+ ggns86CxSxyBYIta+JE7kH9NGfrB9hQaPsyVt5L5pY8+Rc9siNfAsZ7aRxDfzDFtkZ2F
+ q3UJiDMurQ9UlUvXPO15+GA8LBBv+VGmS4hWJmQhWpeFT3hGI/+7clYjzueU+xcJdCI6
+ +vj/Rv8V+GD8oGJDP1h1rXvpTdvc6YWAB/j07HHHkoeODj08Pvgf3W/NWFJxIxW82Qd0
+ iDww==
+X-Gm-Message-State: APjAAAWrheS09lJoaWPCO6VfZtw+BATnmlyOsFfgaFKrMKFLXE2/TbPe
+ v4v9JvIzyT+F6pmIF2rS9/yfYk3f
+X-Google-Smtp-Source: APXvYqydUeEvydz9VfJHoVXpU5ngzUv+uTIvxWm9N6Yn/EEHEtMHL6mPwiTFohsDqNxtzQThycqW3Q==
+X-Received: by 2002:a05:600c:224a:: with SMTP id
+ a10mr4953426wmm.143.1582631469550; 
+ Tue, 25 Feb 2020 03:51:09 -0800 (PST)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.08
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Feb 2020 03:51:09 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 003/136] machine: alias -mem-path and -mem-prealloc into
+ memory-foo backend
+Date: Tue, 25 Feb 2020 12:48:53 +0100
+Message-Id: <1582631466-13880-3-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,209 +91,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@dabbelt.com
+Cc: Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/02/2020 à 00:21, Alistair Francis a écrit :
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  linux-user/riscv/syscall32_nr.h | 314 ++++++++++++++++++++++++++++++++
->  linux-user/riscv/syscall64_nr.h | 303 ++++++++++++++++++++++++++++++
->  linux-user/riscv/syscall_nr.h   | 294 +-----------------------------
->  3 files changed, 619 insertions(+), 292 deletions(-)
->  create mode 100644 linux-user/riscv/syscall32_nr.h
->  create mode 100644 linux-user/riscv/syscall64_nr.h
-> 
-> diff --git a/linux-user/riscv/syscall32_nr.h b/linux-user/riscv/syscall32_nr.h
-> new file mode 100644
-> index 0000000000..c3bf5930d0
-> --- /dev/null
-> +++ b/linux-user/riscv/syscall32_nr.h
-> @@ -0,0 +1,314 @@
-> +/*
-> + * Syscall numbers from asm-generic for RV32.
-> + */
-> +
-> +#ifndef LINUX_USER_RISCV_SYSCALL32_NR_H
-> +#define LINUX_USER_RISCV_SYSCALL32_NR_H
-> +
-> +#define TARGET_NR_io_setup 0
-> +#define TARGET_NR_io_destroy 1
-> +#define TARGET_NR_io_submit 2
-> +#define TARGET_NR_io_cancel 3
-> +#define TARGET_NR_setxattr 5
-> +#define TARGET_NR_lsetxattr 6
-> +#define TARGET_NR_fsetxattr 7
-> +#define TARGET_NR_getxattr 8
-> +#define TARGET_NR_lgetxattr 9
-> +#define TARGET_NR_fgetxattr 10
-> +#define TARGET_NR_listxattr 11
-> +#define TARGET_NR_llistxattr 12
-> +#define TARGET_NR_flistxattr 13
-> +#define TARGET_NR_removexattr 14
-> +#define TARGET_NR_lremovexattr 15
-> +#define TARGET_NR_fremovexattr 16
-> +#define TARGET_NR_getcwd 17
-> +#define TARGET_NR_lookup_dcookie 18
-> +#define TARGET_NR_eventfd2 19
-> +#define TARGET_NR_epoll_create1 20
-> +#define TARGET_NR_epoll_ctl 21
-> +#define TARGET_NR_epoll_pwait 22
-> +#define TARGET_NR_dup 23
-> +#define TARGET_NR_dup3 24
-> +#define TARGET_NR_fcntl64 25
-> +#define TARGET_NR_inotify_init1 26
-> +#define TARGET_NR_inotify_add_watch 27
-> +#define TARGET_NR_inotify_rm_watch 28
-> +#define TARGET_NR_ioctl 29
-> +#define TARGET_NR_ioprio_set 30
-> +#define TARGET_NR_ioprio_get 31
-> +#define TARGET_NR_flock 32
-> +#define TARGET_NR_mknodat 33
-> +#define TARGET_NR_mkdirat 34
-> +#define TARGET_NR_unlinkat 35
-> +#define TARGET_NR_symlinkat 36
-> +#define TARGET_NR_linkat 37
-> +#define TARGET_NR_umount2 39
-> +#define TARGET_NR_mount 40
-> +#define TARGET_NR_pivot_root 41
-> +#define TARGET_NR_nfsservctl 42
-> +#define TARGET_NR_statfs 43
-> +#define TARGET_NR_fstatfs 44
-> +#define TARGET_NR_truncate 45
-> +#define TARGET_NR_ftruncate 46
+From: Igor Mammedov <imammedo@redhat.com>
 
-For riscv32, it's the 64bit version name to use:
+Allow machine to opt in for hostmem backend based initial RAM
+even if user uses old -mem-path/prealloc options by providing
+  MachineClass::default_ram_id
+Follow up patches will incrementally convert machines to new API,
+by dropping memory_region_allocate_system_memory() and setting
+default_ram_id that board used to use before conversion to keep
+migration stream the same.
 
-#define TARGET_NR_statfs64 43
-#define TARGET_NR_fstatfs64 44
-#define TARGET_NR_truncate64 45
-#define TARGET_NR_ftruncate64 46
-(and below)
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200219160953.13771-4-imammedo@redhat.com>
+---
+ backends/hostmem-file.c  |  7 -------
+ backends/hostmem-ram.c   |  2 --
+ include/hw/boards.h      |  8 ++++++++
+ include/sysemu/hostmem.h | 16 ++++++++++++++++
+ vl.c                     | 25 +++++++++++++++++++++++++
+ 5 files changed, 49 insertions(+), 9 deletions(-)
 
-because:
+diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
+index be64020..cb319a9 100644
+--- a/backends/hostmem-file.c
++++ b/backends/hostmem-file.c
+@@ -18,13 +18,6 @@
+ #include "sysemu/sysemu.h"
+ #include "qom/object_interfaces.h"
+ 
+-/* hostmem-file.c */
+-/**
+- * @TYPE_MEMORY_BACKEND_FILE:
+- * name of backend that uses mmap on a file descriptor
+- */
+-#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
+-
+ #define MEMORY_BACKEND_FILE(obj) \
+     OBJECT_CHECK(HostMemoryBackendFile, (obj), TYPE_MEMORY_BACKEND_FILE)
+ 
+diff --git a/backends/hostmem-ram.c b/backends/hostmem-ram.c
+index 6aab8d3..5cc53e7 100644
+--- a/backends/hostmem-ram.c
++++ b/backends/hostmem-ram.c
+@@ -16,8 +16,6 @@
+ #include "qemu/module.h"
+ #include "qom/object_interfaces.h"
+ 
+-#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
+-
+ static void
+ ram_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
+ {
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 7b4b6b7..8e536ca 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -170,6 +170,13 @@ typedef struct {
+  *    false is returned, an error must be set to show the reason of
+  *    the rejection.  If the hook is not provided, all hotplug will be
+  *    allowed.
++ * @default_ram_id:
++ *    Specifies inital RAM MemoryRegion name to be used for default backend
++ *    creation if user explicitly hasn't specified backend with "memory-backend"
++ *    property.
++ *    It also will be used as a way to optin into "-m" option support.
++ *    If it's not set by board, '-m' will be ignored and generic code will
++ *    not create default RAM MemoryRegion.
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -226,6 +233,7 @@ struct MachineClass {
+     bool nvdimm_supported;
+     bool numa_mem_supported;
+     bool auto_enable_numa;
++    const char *default_ram_id;
+ 
+     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+                                            DeviceState *dev);
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 4dbdadd..5db0d66 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -27,6 +27,22 @@
+ #define MEMORY_BACKEND_CLASS(klass) \
+     OBJECT_CLASS_CHECK(HostMemoryBackendClass, (klass), TYPE_MEMORY_BACKEND)
+ 
++/* hostmem-ram.c */
++/**
++ * @TYPE_MEMORY_BACKEND_RAM:
++ * name of backend that uses mmap on the anonymous RAM
++ */
++
++#define TYPE_MEMORY_BACKEND_RAM "memory-backend-ram"
++
++/* hostmem-file.c */
++/**
++ * @TYPE_MEMORY_BACKEND_FILE:
++ * name of backend that uses mmap on a file descriptor
++ */
++#define TYPE_MEMORY_BACKEND_FILE "memory-backend-file"
++
++typedef struct HostMemoryBackend HostMemoryBackend;
+ typedef struct HostMemoryBackendClass HostMemoryBackendClass;
+ 
+ /**
+diff --git a/vl.c b/vl.c
+index 794f2e5..4dc4803 100644
+--- a/vl.c
++++ b/vl.c
+@@ -75,6 +75,7 @@ int main(int argc, char **argv)
+ #include "ui/input.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
++#include "sysemu/hostmem.h"
+ #include "exec/gdbstub.h"
+ #include "qemu/timer.h"
+ #include "chardev/char.h"
+@@ -2805,6 +2806,26 @@ static void configure_accelerators(const char *progname)
+     }
+ }
+ 
++static void create_default_memdev(MachineState *ms, const char *path,
++                                  bool prealloc)
++{
++    Object *obj;
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++
++    obj = object_new(path ? TYPE_MEMORY_BACKEND_FILE : TYPE_MEMORY_BACKEND_RAM);
++    if (path) {
++        object_property_set_str(obj, path, "mem-path", &error_fatal);
++    }
++    object_property_set_bool(obj, prealloc, "prealloc", &error_fatal);
++    object_property_set_int(obj, ms->ram_size, "size", &error_fatal);
++    object_property_add_child(object_get_objects_root(), mc->default_ram_id,
++                              obj, &error_fatal);
++    user_creatable_complete(USER_CREATABLE(obj), &error_fatal);
++    object_unref(obj);
++    object_property_set_str(OBJECT(ms), mc->default_ram_id, "memory-backend",
++                            &error_fatal);
++}
++
+ int main(int argc, char **argv, char **envp)
+ {
+     int i;
+@@ -4268,6 +4289,10 @@ int main(int argc, char **argv, char **envp)
+     }
+     parse_numa_opts(current_machine);
+ 
++    if (machine_class->default_ram_id && current_machine->ram_size &&
++        !current_machine->ram_memdev_id) {
++        create_default_memdev(current_machine, mem_path, mem_prealloc);
++    }
+     /* do monitor/qmp handling at preconfig state if requested */
+     main_loop();
+ 
+-- 
+1.8.3.1
 
-include/uapi/asm-generic/unistd.h
-
-#if __BITS_PER_LONG == 64 && !defined(__SYSCALL_COMPAT)
-...
-#else
-#define __NR_fcntl64 __NR3264_fcntl
-#define __NR_statfs64 __NR3264_statfs
-#define __NR_fstatfs64 __NR3264_fstatfs
-#define __NR_truncate64 __NR3264_truncate
-#define __NR_ftruncate64 __NR3264_ftruncate
-#define __NR_llseek __NR3264_lseek
-#define __NR_sendfile64 __NR3264_sendfile
-#if defined(__ARCH_WANT_NEW_STAT) || defined(__ARCH_WANT_STAT64)
-#define __NR_fstatat64 __NR3264_fstatat
-#define __NR_fstat64 __NR3264_fstat
-#endif
-...
-
-arch/riscv/include/uapi/asm/unistd.h
-#define __ARCH_WANT_NEW_STAT
-
-arch/riscv/include/uapi/asm/bitsperlong.h
-
-#define __BITS_PER_LONG (__SIZEOF_POINTER__ * 8)
-
-...
-> +#define TARGET_NR_getdents64 61
-> +#define TARGET_NR__llseek 62
-
-TARGET_NR_llseek
-
-> +#define TARGET_NR_read 63
-> +#define TARGET_NR_write 64
-> +#define TARGET_NR_readv 65
-> +#define TARGET_NR_writev 66
-> +#define TARGET_NR_pread64 67
-> +#define TARGET_NR_pwrite64 68
-> +#define TARGET_NR_preadv 69
-> +#define TARGET_NR_pwritev 70
-> +#define TARGET_NR_sendfile 71
-
-TARGET_NR_sendfile64
-
-> +#define TARGET_NR_signalfd4 74
-> +#define TARGET_NR_vmsplice 75
-> +#define TARGET_NR_splice 76
-> +#define TARGET_NR_tee 77
-> +#define TARGET_NR_readlinkat 78
-> +#define TARGET_NR_newfstatat 79
-> +#define TARGET_NR_fstat 80
-
-#define TARGET_NR_fstatat64 79
-#define TARGET_NR_fstat64 80
-
-...
-> +#define TARGET_NR_sethostname 161
-> +#define TARGET_NR_setdomainname 162
-
-#define TARGET_NR_getrlimit 163
-#define TARGET_NR_setrlimit 164
-
-because
-
-include/uapi/asm-generic/unistd.h
-
-#ifdef __ARCH_WANT_SET_GET_RLIMIT
-/* getrlimit and setrlimit are superseded with prlimit64 */
-#define __NR_getrlimit 163
-__SC_COMP(__NR_getrlimit, sys_getrlimit, compat_sys_getrlimit)
-#define __NR_setrlimit 164
-__SC_COMP(__NR_setrlimit, sys_setrlimit, compat_sys_setrlimit)
-#endif
-
-arch/riscv/include/uapi/asm/unistd.h
-
-#define __ARCH_WANT_SET_GET_RLIMIT
-
-...
-> +#define TARGET_NR_arch_specific_syscall 244
-> +#define TARGET_NR_riscv_flush_icache TARGET_NR_arch_specific_syscall + 15
-
-It should be good to keep parenthesis around the declaration:
-
-(TARGET_NR_arch_specific_syscall + 15)
-
-...
-
-I think you can remove following defintion as they should be translated
-by the target glibc.
-
-> +/*
-> + * Alias some of the older pre 64-bit time_t syscalls to the 64-bit
-> + * ones for RV32. This is based on the list used by glibc.
-> + */
-> +#define TARGET_NR_futex TARGET_NR_futex_time64
-> +#define TARGET_NR_rt_sigtimedwait TARGET_NR_rt_sigtimedwait_time64
-> +#define TARGET_NR_ppoll TARGET_NR_ppoll_time64
-> +#define TARGET_NR_utimensat TARGET_NR_utimensat_time64
-> +#define TARGET_NR_pselect6 TARGET_NR_pselect6_time64
-> +#define TARGET_NR_recvmmsg TARGET_NR_recvmmsg_time64
-> +#define TARGET_NR_semtimedop TARGET_NR_semtimedop_time64
-> +#define TARGET_NR_mq_timedreceive TARGET_NR_mq_timedreceive_time64
-> +#define TARGET_NR_mq_timedsend TARGET_NR_mq_timedsend_time64
-> +#define TARGET_NR_clock_getres TARGET_NR_clock_getres_time64
-> +#define TARGET_NR_timerfd_settime TARGET_NR_timerfd_settime64
-> +#define TARGET_NR_timerfd_gettime TARGET_NR_timerfd_gettime64
-> +#define TARGET_NR_sched_rr_get_interval TARGET_NR_sched_rr_get_interval_time64
-> +#define TARGET_NR_clock_adjtime TARGET_NR_clock_adjtime64
-> +
-> +#endif
-> diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
-> new file mode 100644
-> index 0000000000..b58364b570
-> --- /dev/null
-> +++ b/linux-user/riscv/syscall64_nr.h
-
-syscall64_nr.h is correct.
-
-Thanks,
-Laurent
 
 
