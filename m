@@ -2,60 +2,80 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6B0C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0AF8C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:15:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 820FE21744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:14:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 820FE21744
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id AC3CA21744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:15:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EFQ4IyAh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3CA21744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6a38-0007zz-La
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:14:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53025)
+	id 1j6a3E-0008Dx-Q9
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:15:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j6Z2J-0007jr-9G
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:10:04 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6YuM-0002TE-DI
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j6Z2H-0004oY-D1
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:10:02 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:14670)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j6Z2H-0004ie-6Z; Tue, 25 Feb 2020 07:10:01 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A055E74637C;
- Tue, 25 Feb 2020 13:09:49 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 7AE1E745953; Tue, 25 Feb 2020 13:09:49 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 78D6E74569F;
- Tue, 25 Feb 2020 13:09:49 +0100 (CET)
-Date: Tue, 25 Feb 2020 13:09:49 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Programmingkid <programmingkidx@gmail.com>
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-In-Reply-To: <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
-Message-ID: <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <peter.maydell@linaro.org>) id 1j6YuL-000798-9Q
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:01:50 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34346)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j6YuL-00075q-1o
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:01:49 -0500
+Received: by mail-oi1-x243.google.com with SMTP id l136so12282754oig.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:01:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1J7xOOcrZGCxuHJzVvyA3UwZSYQB/R1Hrc+5mY2Ikxg=;
+ b=EFQ4IyAh7kPUGzXPYO/c8I7bE0S2FNGyrtBqBB9s+aUc6YF0+HFJMlyC3xh9wRsxeK
+ qV32gLkdEe7c+Vfzao/fVEaohQrtpBhxYwjpsRDE0O8JE9CibD778cKvn6uLCBEGY7bG
+ 3hEaFsO3T1cM+xQp5uLtiw18I1Nc+aysKW1mRDtAXpdF7PRnLZ996U+i0aN7wh4Z7bUG
+ s4c+aFIJIvbyE9xFFa0Pe2UhHBZe4m64KL/wWwMuChtz8dd0VCluox7wOYYc8+lnB35d
+ E3HixOvYLjKfxCcfRBzG/g3WBfNOmEXrazImRpwUX2rKmWniQCSr6hmWYQ7mwk/By9f/
+ YgQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1J7xOOcrZGCxuHJzVvyA3UwZSYQB/R1Hrc+5mY2Ikxg=;
+ b=s128P0+t6sjghfSYMgwhmq+aeiGod5gRkKSqgthnMZWhXWq/phoJj0tU6U33O2GCky
+ VUfblmCbXO5j4+IYYoOPZlb9HcJo1tl+E47Nt4vaWdxKn008ly6NtpX3A4kF6RJhCTky
+ QBr4CjGbuMg5Q5EIDBBG/TLuQUqv+ruIai8bSik4eIMhl1ip3H4RHvDkLgVCOr2shhmP
+ hkUX0zCqhnCn1PHgavEvqMbpn1IQzESxsDWDv8wVxA/ikART5eFK91aC8kkDFbsDYVfZ
+ Sk3N8yJ5jmhiL6VMGSYyDKeALxZGiyCBmjs/FxHqnwss0tW+QDV4GEy/ie1PyFBspDAh
+ RReA==
+X-Gm-Message-State: APjAAAWIeUZMZB/G2KT1T3Z8PFOFWQiqhcuhoXjcaC/1h2y474LiRl+h
+ QSSxTs17yyGdk2nCeephvIEufmk0VFIvVry/LUuYAw==
+X-Google-Smtp-Source: APXvYqyGv7zpFxnTiw3Ch5Dpi8glCsLacLoWIl8z+xJj+HTd5OLWsWNa23pPMEJjkLE01R/eMHoWtfyg0Bt7lGH/WVg=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr3365366oiy.170.1582632104647; 
+ Tue, 25 Feb 2020 04:01:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+References: <20200218190958.745-1-richard.henderson@linaro.org>
+ <20200218190958.745-8-richard.henderson@linaro.org>
+In-Reply-To: <20200218190958.745-8-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Feb 2020 12:01:33 +0000
+Message-ID: <CAFEAcA_QHoRcfv0oLgxNsuEOaRJOoM9sQHqXZEP-tDeJrziVYw@mail.gmail.com>
+Subject: Re: [PATCH v3 7/7] target/arm: Honor the HCR_EL2.TTLB bit
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,75 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Clarke <pc@us.ibm.com>, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Feb 2020, Programmingkid wrote:
-> Intel Core i5-2500S CPU @ 2.70GHz.
-[...]
-> Ok, I did test on the G4, here are my results:
+On Tue, 18 Feb 2020 at 19:10, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Git commit: c1e667d2598b9b3ce62b8e89ed22dd38dfe9f57f
-> Mac OS 10.4.3 VM
-> -cpu G4
-> -USB audio device
+> This bit traps EL1 access to tlb maintenance insns.
 >
-> Hardfloat=false
-> Audio sounds bad when playing midi file.
-> Extraction rate: 1.5x
-> Converting rate: 0.7x
-> Total time: 7:24
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 85 +++++++++++++++++++++++++++++----------------
+>  1 file changed, 55 insertions(+), 30 deletions(-)
 >
-> Hardfloat=true
-> Midi audio sounded perfect for about 30 seconds, then it went silent!
-> Extraction rate: 1.4x (slower with hard float)
-> Converting rate: 0.7x (same as without hardfloat)
-> Total time: 7:16 (faster time with hardfloat)
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 21ee9cf7de..87c0cf4a96 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -563,6 +563,16 @@ static CPAccessResult access_tacr(CPUARMState *env, const ARMCPRegInfo *ri,
+>      return CP_ACCESS_OK;
+>  }
+>
+> +/* Check for traps from EL1 due to HCR_EL2.TTLB. */
+> +static CPAccessResult access_ttlb(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                                  bool isread)
+> +{
+> +    if (arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_TTLB)) {
+> +        return CP_ACCESS_TRAP_EL2;
+> +    }
+> +    return CP_ACCESS_OK;
+> +}
 
-How is that extraction rate is slower but total time is less than without 
-hardfloat? There must be other factors here than just FP ops. Maybe a 
-better test is to not play the audio just save it to a file so other 
-issues with USB is not influencing the test.
+The set of operations this traps differs when ARMv8.4-TLBI is
+implemented. It looks like you've applied this access fn to
+the wider with-v8.4-TLBI set? (eg TLBI_VMALLE1 is only trapped
+with ARMv8.4-TLBI, not without.)
 
-> When I played sound this second time I hard the same broken audio I 
-> usually hear with the USB audio device with hardfloat set to false. When 
-> playing the same midi file with hardfloat set to true, the audio played 
-> perfectly! It only played for 30 seconds before it went silent.
-
-So probably there are at least two problems: FPU emulation is not fast 
-enough to decode audio to fill buffer then there's also something with 
-usb-audio that jams it after a while? I don't think all of this is FPU 
-related.
-
-> I can give you the full testing suite if you like. I run it on Mac OS 
-> 10.4 but it should compile with gcc on Linux. I will send it to you in a 
-> separate email because it is big.
-
-Thanks, I'll have a look and see if I can make sense of it but not sure 
-when will I find time.
-
-> I have another idea on how to improve QEMU's performance. What if you 
-> enabled more CPUs for the PowerPC target? Mac OS 9, Mac OS X, and Linux 
-> support multiple CPUs. It might actually be easier to do this than to
-
-Have you tried if it works? I think MTTCG is enabled for PPC64 but not 
-sure about 32 bit PPC. The mac99 machine seems to init multiple CPUs but 
-not sure if they'll use MTTCG. But you could test it to see if it makes 
-any difference.
-
-> improve the FPU. I imagine the performance increase with multiple 
-> emulated CPUs would be much more noticeable.
-
-The Amiga like OSes I'm interested in don't use multiple cores so I'm 
-mainly interested in improving single core performance. Also I'm not sure 
-if (part of) your problem is slow FPU preventing fast enough audio 
-decoding then having multiple CPUs with slow FPU would help as this may 
-use a single thread anyway.
-
-Regards,
-BALATON Zoltan
+thanks
+-- PMM
 
