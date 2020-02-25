@@ -7,85 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50575C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011DBC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1832821744
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0D8E218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:54:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lLJD8/8U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1832821744
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="M8yNqi+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0D8E218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6adu-0006HI-8S
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:52:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34271)
+	id 1j6afj-0007sD-QZ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:54:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6Zka-0003xs-2F
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:49 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6a2r-00087I-Bp
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6ZkY-0004FZ-He
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:47 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37769)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6ZkY-0004Dy-99
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:46 -0500
-Received: by mail-wm1-x343.google.com with SMTP id a6so3052646wme.2
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:55:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=k4RkOSmwzwH2dQilc05ZWPR0LyOE7aaRoCCPjbXdJZE=;
- b=lLJD8/8U2pEK6tt9h1UuIe+5luto6aqJ7iVDNz+QI/kNbnb4rgqY30zuM5JMMqFIqw
- RlqsZOPlripJH8/V5WD7S+J8CYFOzQGEBx38zZP+jicQOjwEPdDYnht6SdsW/zonChG2
- A5FOYrBXqUhXcSPTJF9rGtzwO0mVfUcRRboL3ZuuzWcrDZdPAAQArTy22Q7M+JKm+wqZ
- r/Iid0+0lKGzjzAFPRE63b84lgoAybm5chwUaE3IJoYe+Dazz1RvU96UasH2YpQmHCy0
- UB331wPEAQh/67UJyiBGB2uHmPz6Kk2YPZWBdqoHaZPM6Fz+j5kx07YFmKho4tr9mNGs
- 7xLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=k4RkOSmwzwH2dQilc05ZWPR0LyOE7aaRoCCPjbXdJZE=;
- b=fQlTJEp4GbSRcGJu6bVUBPQ17nY4Cef9BE1y+/a7Ct6UbhVtGUo/je2SAW+xI/4Bna
- 1kYV5+ZF2OiE+os1DudvSlGyfRGpWkJCTtm2yQeLM31Hn3C1gMTTgTrdPBhkLYDSDUdC
- REs9QUz9+VyxCJQ8vuZy7OPLyW/LTKyD0kiAntvqZCGaitG68ZfeufVedV0vm3n/RjXg
- R2e9jwh7OTSDI2mGVDxRc83zheFrzK4CxWm/U63vuqLv6L+nvmDUST0gNdSGZLS7xnwO
- eS0+3T3MfMzaZgLY6s2HHgk++4jTwwoLjiih72q6jTwJYX+8LLxPGD5eGTfbM6fLQt9L
- DVMA==
-X-Gm-Message-State: APjAAAUnG/6p1Ya6BBEC5oI3WcTT+oiPbwN189ROZ3vSIG5F0pYSs6eQ
- S1PBPDgR7CeUPd8RX0RjbroDaQ==
-X-Google-Smtp-Source: APXvYqwJkJnbO9/aXL5DdiuIAX5GZT3q4YvEyjq3Ir/LRxRisDv2pXCpeK6xn/wBPArWRf2LBNaTDA==
-X-Received: by 2002:a1c:c208:: with SMTP id s8mr5282583wmf.30.1582635345203;
- Tue, 25 Feb 2020 04:55:45 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z19sm4022542wmi.35.2020.02.25.04.55.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 04:55:44 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 88E1C1FF9E;
- Tue, 25 Feb 2020 12:47:11 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <damien.hedde@greensocs.com>) id 1j6a2p-00029K-VY
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:14:41 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:57276)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1j6a2m-00023e-NE; Tue, 25 Feb 2020 08:14:37 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id DABC796F58;
+ Tue, 25 Feb 2020 13:14:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1582636471;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BY1+FZJ6Sc88VMCwdRv2dHSvQOitapgHxjmgcsZpkn8=;
+ b=M8yNqi+RvEHXXXwjvfY1Wov13PFLjm2pa+fm8jYVC6pLe7bDyIs+HJh+hxHRPgGwL776s6
+ 8hmf5SoHb1KiQj99hsXbsuj5kx6es4CqV4/Y6DZT+yq8OqVcSO5+5iArUN4Yo2SHaq3+5Z
+ giY4o3Yr+0Ou9nXdHQIhLTja/jiM7qY=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/19] target/riscv: progressively load the instruction
- during decode
-Date: Tue, 25 Feb 2020 12:47:05 +0000
-Message-Id: <20200225124710.14152-15-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
-References: <20200225124710.14152-1-alex.bennee@linaro.org>
+Subject: [PATCH v8 9/9] qdev-monitor: print the device's clock with info qtree
+Date: Tue, 25 Feb 2020 14:14:22 +0100
+Message-Id: <20200225131422.53368-10-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200225131422.53368-1-damien.hedde@greensocs.com>
+References: <20200225131422.53368-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1582636471;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BY1+FZJ6Sc88VMCwdRv2dHSvQOitapgHxjmgcsZpkn8=;
+ b=EEDnW8UBwiQZD+e+/XYQpHeb/s9ZPlZTfyy4ZO5ZaNPCVy4Nmu0gQhuhs/rziLElWsJ3dl
+ Sp0VM4mFArIjohO1ZyYtsOzVwe0ziwTYIHMdLXiFaS//FSj+MkxhuhBhOEhJ9OCYaIk4Ru
+ kF2ybIvx6FG+q4FdalrsZPRvvygUhG8=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582636471; a=rsa-sha256; cv=none;
+ b=pX5nhivfIYc00FbkaBWiQQJw+1evdMG1mBgssoNSe5OdoaBrsyx4BjAGAxG5qL4Jybd499
+ FbHC3/laR+Yi/k9YnN5xpHOpOuE4ykYdjl1HAjVsX19xiOhc1KGTnph2QeyNOqTfJmfyoO
+ qpurQ2hTu0qob50kSrWwhsu/Zpy/Cg8=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,179 +90,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Alistair Francis <Alistair.Francis@wdc.com>, kuhn.chenqun@huawei.com,
- stefanb@linux.vnet.ibm.com, aaron@os.amperecomputing.com, cota@braap.org,
- marcandre.lureau@redhat.com, robert.foley@linaro.org,
- richard.henderson@linaro.org, stefanha@redhat.com, peter.puhov@linaro.org,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, berrange@redhat.com,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, f4bug@amsat.org,
- robhenry@microsoft.com, Palmer Dabbelt <palmer@dabbelt.com>,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
+ berrange@redhat.com, ehabkost@redhat.com, pbonzini@redhat.com,
+ alistair@alistair23.me, mark.burton@greensocs.com, qemu-arm@nongnu.org,
+ marcandre.lureau@redhat.com, edgar.iglesias@gmail.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The plugin system would throw up a harmless warning when it detected
-that a disassembly of an instruction didn't use all it's bytes. Fix
-the riscv decoder to only load the instruction bytes it needs as it
-needs them.
+This prints the clocks attached to a DeviceState when using
+"info qtree" monitor command. For every clock, it displays the
+direction, the name and if the clock is forwarded. For input clock,
+it displays also the frequency.
 
-This drops opcode from the ctx in favour if passing the appropriately
-sized opcode down a few levels of the decode.
+This is based on the original work of Frederic Konrad.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Here follows a sample of `info qtree` output on xilinx_zynq machine
+after linux boot with only one uart clocked:
+> bus: main-system-bus
+>  type System
+>  [...]
+>  dev: cadence_uart, id ""
+>    gpio-out "sysbus-irq" 1
+>    clock-in "refclk" freq_hz=3D0.000000e+00
+>    chardev =3D ""
+>    mmio 00000000e0001000/0000000000001000
+>  dev: cadence_uart, id ""
+>    gpio-out "sysbus-irq" 1
+>    clock-in "refclk" freq_hz=3D1.375661e+07
+>    chardev =3D "serial0"
+>    mmio 00000000e0000000/0000000000001000
+>  [...]
+>  dev: xilinx,zynq_slcr, id ""
+>    clock-out "uart1_ref_clk" freq_hz=3D0.000000e+00
+>    clock-out "uart0_ref_clk" freq_hz=3D1.375661e+07
+>    clock-in "ps_clk" freq_hz=3D3.333333e+07
+>    mmio 00000000f8000000/0000000000001000
 
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-v2
-  - use extract16 for uint16_t opcodes
----
- target/riscv/instmap.h   |  8 ++++----
- target/riscv/translate.c | 40 +++++++++++++++++++++-------------------
- 2 files changed, 25 insertions(+), 23 deletions(-)
 
-diff --git a/target/riscv/instmap.h b/target/riscv/instmap.h
-index f8ad7d60fd5..40b6d2b64de 100644
---- a/target/riscv/instmap.h
-+++ b/target/riscv/instmap.h
-@@ -344,8 +344,8 @@ enum {
- #define GET_C_LW_IMM(inst)          ((extract32(inst, 6, 1) << 2) \
-                                     | (extract32(inst, 10, 3) << 3) \
-                                     | (extract32(inst, 5, 1) << 6))
--#define GET_C_LD_IMM(inst)          ((extract32(inst, 10, 3) << 3) \
--                                    | (extract32(inst, 5, 2) << 6))
-+#define GET_C_LD_IMM(inst)          ((extract16(inst, 10, 3) << 3) \
-+                                    | (extract16(inst, 5, 2) << 6))
- #define GET_C_J_IMM(inst)           ((extract32(inst, 3, 3) << 1) \
-                                     | (extract32(inst, 11, 1) << 4) \
-                                     | (extract32(inst, 2, 1) << 5) \
-@@ -363,7 +363,7 @@ enum {
- #define GET_C_RD(inst)              GET_RD(inst)
- #define GET_C_RS1(inst)             GET_RD(inst)
- #define GET_C_RS2(inst)             extract32(inst, 2, 5)
--#define GET_C_RS1S(inst)            (8 + extract32(inst, 7, 3))
--#define GET_C_RS2S(inst)            (8 + extract32(inst, 2, 3))
-+#define GET_C_RS1S(inst)            (8 + extract16(inst, 7, 3))
-+#define GET_C_RS2S(inst)            (8 + extract16(inst, 2, 3))
- 
- #endif
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 14dc71156be..d5de7f468a7 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -44,7 +44,6 @@ typedef struct DisasContext {
-     /* pc_succ_insn points to the instruction following base.pc_next */
-     target_ulong pc_succ_insn;
-     target_ulong priv_ver;
--    uint32_t opcode;
-     uint32_t mstatus_fs;
-     uint32_t misa;
-     uint32_t mem_idx;
-@@ -492,45 +491,45 @@ static void gen_set_rm(DisasContext *ctx, int rm)
-     tcg_temp_free_i32(t0);
- }
- 
--static void decode_RV32_64C0(DisasContext *ctx)
-+static void decode_RV32_64C0(DisasContext *ctx, uint16_t opcode)
- {
--    uint8_t funct3 = extract32(ctx->opcode, 13, 3);
--    uint8_t rd_rs2 = GET_C_RS2S(ctx->opcode);
--    uint8_t rs1s = GET_C_RS1S(ctx->opcode);
-+    uint8_t funct3 = extract16(opcode, 13, 3);
-+    uint8_t rd_rs2 = GET_C_RS2S(opcode);
-+    uint8_t rs1s = GET_C_RS1S(opcode);
- 
-     switch (funct3) {
-     case 3:
- #if defined(TARGET_RISCV64)
-         /* C.LD(RV64/128) -> ld rd', offset[7:3](rs1')*/
-         gen_load_c(ctx, OPC_RISC_LD, rd_rs2, rs1s,
--                 GET_C_LD_IMM(ctx->opcode));
-+                 GET_C_LD_IMM(opcode));
- #else
-         /* C.FLW (RV32) -> flw rd', offset[6:2](rs1')*/
-         gen_fp_load(ctx, OPC_RISC_FLW, rd_rs2, rs1s,
--                    GET_C_LW_IMM(ctx->opcode));
-+                    GET_C_LW_IMM(opcode));
- #endif
-         break;
-     case 7:
- #if defined(TARGET_RISCV64)
-         /* C.SD (RV64/128) -> sd rs2', offset[7:3](rs1')*/
-         gen_store_c(ctx, OPC_RISC_SD, rs1s, rd_rs2,
--                  GET_C_LD_IMM(ctx->opcode));
-+                  GET_C_LD_IMM(opcode));
- #else
-         /* C.FSW (RV32) -> fsw rs2', offset[6:2](rs1')*/
-         gen_fp_store(ctx, OPC_RISC_FSW, rs1s, rd_rs2,
--                     GET_C_LW_IMM(ctx->opcode));
-+                     GET_C_LW_IMM(opcode));
- #endif
-         break;
-     }
- }
- 
--static void decode_RV32_64C(DisasContext *ctx)
-+static void decode_RV32_64C(DisasContext *ctx, uint16_t opcode)
- {
--    uint8_t op = extract32(ctx->opcode, 0, 2);
-+    uint8_t op = extract16(opcode, 0, 2);
- 
-     switch (op) {
-     case 0:
--        decode_RV32_64C0(ctx);
-+        decode_RV32_64C0(ctx, opcode);
-         break;
-     }
- }
-@@ -709,22 +708,25 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
- /* Include the auto-generated decoder for 16 bit insn */
- #include "decode_insn16.inc.c"
- 
--static void decode_opc(DisasContext *ctx)
-+static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
- {
-     /* check for compressed insn */
--    if (extract32(ctx->opcode, 0, 2) != 3) {
-+    if (extract16(opcode, 0, 2) != 3) {
-         if (!has_ext(ctx, RVC)) {
-             gen_exception_illegal(ctx);
-         } else {
-             ctx->pc_succ_insn = ctx->base.pc_next + 2;
--            if (!decode_insn16(ctx, ctx->opcode)) {
-+            if (!decode_insn16(ctx, opcode)) {
-                 /* fall back to old decoder */
--                decode_RV32_64C(ctx);
-+                decode_RV32_64C(ctx, opcode);
-             }
-         }
-     } else {
-+        uint32_t opcode32 = opcode;
-+        opcode32 = deposit32(opcode32, 16, 16,
-+                             translator_lduw(env, ctx->base.pc_next + 2));
-         ctx->pc_succ_insn = ctx->base.pc_next + 4;
--        if (!decode_insn32(ctx, ctx->opcode)) {
-+        if (!decode_insn32(ctx, opcode32)) {
-             gen_exception_illegal(ctx);
+v7:
+ + print output clocks frequencies too
+ + add sample of qtree message above
+ + display frequencies in floating-point
+---
+ qdev-monitor.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 8ce71a206b..1d84b4e416 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -38,6 +38,7 @@
+ #include "migration/misc.h"
+ #include "migration/migration.h"
+ #include "qemu/cutils.h"
++#include "hw/clock.h"
+=20
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -736,6 +737,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev=
+, int indent)
+     ObjectClass *class;
+     BusState *child;
+     NamedGPIOList *ngl;
++    NamedClockList *ncl;
+=20
+     qdev_printf("dev: %s, id \"%s\"\n", object_get_typename(OBJECT(dev))=
+,
+                 dev->id ? dev->id : "");
+@@ -750,6 +752,13 @@ static void qdev_print(Monitor *mon, DeviceState *de=
+v, int indent)
+                         ngl->num_out);
          }
      }
-@@ -776,9 +778,9 @@ static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPURISCVState *env = cpu->env_ptr;
-+    uint16_t opcode16 = translator_lduw(env, ctx->base.pc_next);
- 
--    ctx->opcode = translator_ldl(env, ctx->base.pc_next);
--    decode_opc(ctx);
-+    decode_opc(env, ctx, opcode16);
-     ctx->base.pc_next = ctx->pc_succ_insn;
- 
-     if (ctx->base.is_jmp == DISAS_NEXT) {
--- 
-2.20.1
++    QLIST_FOREACH(ncl, &dev->clocks, node) {
++        qdev_printf("clock-%s%s \"%s\" freq_hz=3D%e\n",
++                    ncl->output ? "out" : "in",
++                    ncl->alias ? " (alias)" : "",
++                    ncl->name,
++                    CLOCK_PERIOD_TO_HZ(1.0 * clock_get(ncl->clock)));
++    }
+     class =3D object_get_class(OBJECT(dev));
+     do {
+         qdev_print_props(mon, dev, DEVICE_CLASS(class)->props_, indent);
+--=20
+2.25.1
 
 
