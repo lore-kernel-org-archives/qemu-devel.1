@@ -2,77 +2,77 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D9F3C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4001C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:14:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3C6E2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 712072084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:14:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r+xenE+a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3C6E2084E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uneqT1as"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712072084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Z5b-0004U9-3O
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:13:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49440)
+	id 1j6Z6f-0006mD-KD
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:14:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49745)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykd-0000lf-40
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl2-0001C9-3l
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YkY-0006rq-4W
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:46 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:37849)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Gl-AL
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:11 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:42507)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YkX-0006p3-Jj
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:42 -0500
-Received: by mail-wm1-x334.google.com with SMTP id a6so2847390wme.2
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:41 -0800 (PST)
+ id 1j6Yky-000823-Ke
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:09 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id p18so10722127wre.9
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GT6on3p8wEsQiTUGN/RebiRNVDY5uR81qXMFnwv9ZQs=;
- b=r+xenE+a8x511YTNUeQUYExOL+et//8flPpIQJ2xrE/gGGlxjFHS2q2ZUJ4/09+p5E
- V3TrF/PcHCkGo5BsPcpaLv38dohT4Y8J5XFY1yvQr+TKIQMxUqgG3kmx6lXMcwjy5K/o
- b4nKk9XPiSEn2B07ky93ZpG5TieuSuhywImNPp7U35IUVAjlqcMJKRqztCxGRxhKLelj
- 4NbCkH2qH+UnxdXbsXDxtsrycXYekPIhsuf8/z6EX/R3KnciW69vUTb8EDl5t0C+UOLN
- 9lhfSFtCZONIEnqI5LCCdBG7eMVACBW1SbX6/jsDij7eRdzMV2YIERAniKXSIi9g1tA3
- wZmg==
+ bh=HZbjw+zNbvyHHDi4Vl4rQmzRhVek9kp6hCCBPtDdrFY=;
+ b=uneqT1asALWacDMeWp8wx7zDL/mAXYZDBcQfX4V4Fb7ncUrmDkBP/yESPOXOev3tsf
+ wcyZhF+N8qLBxk4s4bGC+wqqFKIjVlkb62hsWU8vRHbYoPSHBEgY6ei6JcpY/mnK+Dtu
+ /w4C2dUpcXLrllKt6B3HFkuQbxnNlg0YhQe7v/e1tuhZt/0K571zUPqQp9PJv4twoU0Z
+ 6M5vrTcFslQWBwQk7ZR8S3y8BjtsMMQTQNpbkA+g3xFx6DrzXOWu0v3k6fobTmRjhFgZ
+ FTARsuIdPzHFatLfWeINBeHTrPtMnGGwN9uVuBzehhlL9BTseu45rnIJe/9aZWnok9mV
+ xk0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GT6on3p8wEsQiTUGN/RebiRNVDY5uR81qXMFnwv9ZQs=;
- b=LiconrgJtP7SAEIckU4XgccY9SC0RbaITRItbaUvDYLb/kY3P/69TJmxHTuIWPhJwF
- 0TowMaoHm/sq8q4JcF6iMeGpjk6TNYKVc4s0rgT8o+c7MCijnpMuFHdY5/JsWFfOs0+p
- EoUxIXZ6A5Gi/qMteP3GZtxpcYRkeLThXJv3KmXEawPOeri5DJ/+xUW2DnL7cdlaGaJs
- ICBPeVnSJX8S+XUm9VxJtXFiGy7bsOWmDQ/rwGt/LoZwlXtpUEhvZSvkrnfz4tOxY56Z
- ppsKpjkR59a6nf2/IYUrV27oEuOSn96tQVHd1uWYZ2pIHw2AZ6J0UHKdbsVRHUq2G5Kh
- Ww8Q==
-X-Gm-Message-State: APjAAAVKQAHYwxdozpkZDB0mGHv4WrlQ50u2DdTk6PZm0fM3X+NrG0PA
- 1IgL6uDMoA83UxLPUvyfewWauubW
-X-Google-Smtp-Source: APXvYqzoYzJu1BOsImkds560HbjfD4eTP5Y+oAtlPQbfWPwblVeEcVDO5jY4dUMPsbvj6RRul19oHg==
-X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr4939572wmf.124.1582631500365; 
- Tue, 25 Feb 2020 03:51:40 -0800 (PST)
+ bh=HZbjw+zNbvyHHDi4Vl4rQmzRhVek9kp6hCCBPtDdrFY=;
+ b=rErL9DuXzKZdwW9r571ACU2e7mRySwFA/X0/jqkILmolWVDbOaw2YNtAa6AVchriO2
+ KPcNxxrtGhSD4mkPeQH0YwBdVKx91Iweu/kMU0p8LTEDY02rGNtA+Yxx3b5kxLKCxQGH
+ UHa8aHrR1IKugSKRcbh5PdFrhJKT5kcaH6EIzWsqS3ZkbbE9J+v4Ltk7DiuVcTE58KqN
+ 1iKuZZwqYExWrDygOXes6BxqobISskINMvx/UAxUYx9jNv1HIrP0ToZ+yotiy5MC1Ztn
+ 4P4MS+fR3CKYkqyOxxqws7JBp44w3vUZNeX19/9HXaIo85tiCsbkM84ptFEXHusMRrWH
+ /gjw==
+X-Gm-Message-State: APjAAAX38i9qSnLlhaqAHDeqG1HIf2Q7542CbzZ+jqhBv8wKTVl4Uew/
+ 7kjNloKn7henqj9HvFUfoxngJU8u
+X-Google-Smtp-Source: APXvYqxPUUc8U2pK4lYYxQSYfCzZizT3mkLvKcdGGewgP75e1JfLVc6DT4NzmLF0XcrgUHp1eYihog==
+X-Received: by 2002:a5d:4687:: with SMTP id u7mr70254129wrq.176.1582631515454; 
+ Tue, 25 Feb 2020 03:51:55 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.39
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.54
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:39 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:54 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 036/136] arm/xlnx-versal-virt: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:26 +0100
-Message-Id: <1582631466-13880-36-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 053/136] mips/mips_jazz: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:43 +0100
+Message-Id: <1582631466-13880-53-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
@@ -81,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,47 +110,50 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200219160953.13771-37-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-54-imammedo@redhat.com>
 ---
- hw/arm/xlnx-versal-virt.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/mips/mips_jazz.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 462493c..c137ff4 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -30,7 +30,6 @@ typedef struct VersalVirt {
-     MachineState parent_obj;
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index 66fd4d8..85d49cf 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -159,7 +159,6 @@ static void mips_jazz_init(MachineState *machine,
+     ISABus *isa_bus;
+     ISADevice *pit;
+     DriveInfo *fds[MAX_FD];
+-    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     MemoryRegion *bios2 = g_new(MemoryRegion, 1);
+     SysBusESPState *sysbus_esp;
+@@ -191,9 +190,7 @@ static void mips_jazz_init(MachineState *machine,
+     cc->do_transaction_failed = mips_jazz_do_transaction_failed;
  
-     Versal soc;
--    MemoryRegion mr_ddr;
- 
-     void *fdt;
-     int fdt_size;
-@@ -414,12 +413,9 @@ static void versal_virt_init(MachineState *machine)
-         psci_conduit = QEMU_PSCI_CONDUIT_SMC;
-     }
- 
--    memory_region_allocate_system_memory(&s->mr_ddr, NULL, "ddr",
+     /* allocate RAM */
+-    memory_region_allocate_system_memory(ram, NULL, "mips_jazz.ram",
 -                                         machine->ram_size);
--
-     sysbus_init_child_obj(OBJECT(machine), "xlnx-ve", &s->soc,
-                           sizeof(s->soc), TYPE_XLNX_VERSAL);
--    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->mr_ddr),
-+    object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
-                              "ddr", &error_abort);
-     object_property_set_int(OBJECT(&s->soc), psci_conduit,
-                             "psci-conduit", &error_abort);
-@@ -473,6 +469,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->max_cpus = XLNX_VERSAL_NR_ACPUS;
-     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
-     mc->no_cdrom = true;
-+    mc->default_ram_id = "ddr";
+-    memory_region_add_subregion(address_space, 0, ram);
++    memory_region_add_subregion(address_space, 0, machine->ram);
+ 
+     memory_region_init_ram(bios, NULL, "mips_jazz.bios", MAGNUM_BIOS_SIZE,
+                            &error_fatal);
+@@ -393,6 +390,7 @@ static void mips_magnum_class_init(ObjectClass *oc, void *data)
+     mc->init = mips_magnum_init;
+     mc->block_default_type = IF_SCSI;
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("R4000");
++    mc->default_ram_id = "mips_jazz.ram";
  }
  
- static const TypeInfo versal_virt_machine_init_typeinfo = {
+ static const TypeInfo mips_magnum_type = {
+@@ -409,6 +407,7 @@ static void mips_pica61_class_init(ObjectClass *oc, void *data)
+     mc->init = mips_pica61_init;
+     mc->block_default_type = IF_SCSI;
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("R4000");
++    mc->default_ram_id = "mips_jazz.ram";
+ }
+ 
+ static const TypeInfo mips_pica61_type = {
 -- 
 1.8.3.1
 
