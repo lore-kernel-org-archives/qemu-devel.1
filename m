@@ -2,100 +2,83 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E25EC35DEA
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23726C35DEE
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:14:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 711AD21927
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:13:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 711AD21927
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id E213820838
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 00:14:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kacg/JqH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E213820838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6NrI-00066j-NX
-	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 19:13:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51122)
+	id 1j6NrZ-0006Lm-1w
+	for qemu-devel@archiver.kernel.org; Mon, 24 Feb 2020 19:14:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farosas@linux.ibm.com>) id 1j6NqY-0005Hh-Sw
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:12 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j6Nqi-0005R4-5W
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1j6NqW-00014E-Sg
- for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:10 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62012
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1j6NqW-000144-Nw; Mon, 24 Feb 2020 19:13:08 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01P04Agc120189; Mon, 24 Feb 2020 19:13:00 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1as190w-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 24 Feb 2020 19:13:00 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01P0D0AH137248;
- Mon, 24 Feb 2020 19:13:00 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yb1as190k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 24 Feb 2020 19:13:00 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01P09sct027505;
- Tue, 25 Feb 2020 00:12:59 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma04wdc.us.ibm.com with ESMTP id 2yaux6qq90-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 25 Feb 2020 00:12:59 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01P0Cw1q56492404
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 25 Feb 2020 00:12:58 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 430A3C605D;
- Tue, 25 Feb 2020 00:12:58 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 840E6C6059;
- Tue, 25 Feb 2020 00:12:57 +0000 (GMT)
-Received: from localhost (unknown [9.85.139.151])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Tue, 25 Feb 2020 00:12:57 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
-Subject: Re: [PATCH v6 05/18] target/ppc: Introduce ppc_hash64_use_vrma()
- helper
-In-Reply-To: <20200224233724.46415-6-david@gibson.dropbear.id.au>
-References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
- <20200224233724.46415-6-david@gibson.dropbear.id.au>
-Date: Mon, 24 Feb 2020 21:12:53 -0300
-Message-ID: <87o8tn5xtm.fsf@linux.ibm.com>
+ (envelope-from <alistair23@gmail.com>) id 1j6Nqg-00016t-Lu
+ for qemu-devel@nongnu.org; Mon, 24 Feb 2020 19:13:20 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41642)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1j6Nqg-00016Z-ET; Mon, 24 Feb 2020 19:13:18 -0500
+Received: by mail-lj1-x241.google.com with SMTP id h23so12085819ljc.8;
+ Mon, 24 Feb 2020 16:13:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Uz+5TqGYJX413m3vBqwUBxgi2mlKgOtQufLgjoZ7Z4A=;
+ b=kacg/JqHCIaMWGX8iYVb2u3lieLgEpHe9lNMN94eq6LbYWc6yFNcG/N84IkfngDxxT
+ tqDWJMqKmogzETsol1sbFFh6fuedVpZBuf3JC6bGIecpHWGZNshCY3BqhVQJfKvD7eNm
+ G7JAAb+/qBB6zBzpu8Ej18qw0a5/W906W9pOhAQQZO55AOFYUG5E4cYzIDFXdBhJSYzH
+ K/NQxkhwWsFZAghgQyHxjeqCTOuffRjYBM5uEVE679ebDaZl3QbGfBp83V/etp/nJ9n3
+ wqInlPWdYUfc2AEO872SwzwBhduWXEf8vbwVL37fVpsJAWNtUJoOgUXY+D3jP0910Q1A
+ f9iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Uz+5TqGYJX413m3vBqwUBxgi2mlKgOtQufLgjoZ7Z4A=;
+ b=ZuYAgyqvGboMnpX6XIn9fXp0/4IHscKfkpdg+P4G2dlsukWiOxYlIiJHG0CAjGJ/cq
+ VA+fSPFVq0sQSHNyx9CXLZEqq5hxk7NarOYuQiydP9/NZwDYiHu+hT5LNXj4BO2ngmZ3
+ M1OtbSaSQ75Kzw++0L6EsG83VMISX1v7aqC1+yMil7ivDNTHCjr3HJ3DimuvipuTkTlr
+ kqfRpDHlL2H4cj32Jdns0mzLaw5y4YQulV6Vzsk0CoienynHXQBDEOk+HHdJ6RbcUvDb
+ TrsLEUPlTpZIUmT2gcjamAXXL8OGmn2IgvEgK7YqEgyy1RjRZseE0fs8BBAKfCEA5PTv
+ f84Q==
+X-Gm-Message-State: APjAAAWLaft0qc6vZRrkzD0xOdwFgCLK80d/95ap08ZoFgI2TuUxaZC6
+ GzkXx6UphAj64B0nzGyM9WbbgNGLkOOFWZkBJRE=
+X-Google-Smtp-Source: APXvYqxAk8Bokmp5j59vg7nv3wSx8JCjwA4yQiOsKMpg4xLKeHjinMlHDKpi+VgnvisLnPqW4/CM1TJF+7S4zDaTT1Y=
+X-Received: by 2002:a2e:8119:: with SMTP id d25mr32336193ljg.76.1582589597254; 
+ Mon, 24 Feb 2020 16:13:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20200224170301.246623-1-damien.hedde@greensocs.com>
+ <20200224170301.246623-3-damien.hedde@greensocs.com>
+In-Reply-To: <20200224170301.246623-3-damien.hedde@greensocs.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Feb 2020 16:05:43 -0800
+Message-ID: <CAKmqyKPSgsU4pRZWK_RkZD8r2RTcMKBzA4=HLUg2QZVUZpE13g@mail.gmail.com>
+Subject: Re: [PATCH v7 2/9] hw/core/clock-vmstate: define a vmstate entry for
+ clock state
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-24_12:2020-02-21,
- 2020-02-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 adultscore=0
- phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0 spamscore=0
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002240181
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,146 +90,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, paulus@samba.org,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
-
-> When running guests under a hypervisor, the hypervisor obviously needs to
-> be protected from guest accesses even if those are in what the guest
-> considers real mode (translation off).  The POWER hardware provides two
-> ways of doing that: The old way has guest real mode accesses simply offset
-> and bounds checked into host addresses.  It works, but requires that a
-> significant chunk of the guest's memory - the RMA - be physically
-> contiguous in the host, which is pretty inconvenient.  The new way, known
-> as VRMA, has guest real mode accesses translated in roughly the normal way
-> but with some special parameters.
+On Mon, Feb 24, 2020 at 9:06 AM Damien Hedde <damien.hedde@greensocs.com> w=
+rote:
 >
-> In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes, b=
-ut
-> in POWER9 only VRMA mode is supported and LPCR[VPM0] no longer exists.  We
-> handle that difference in behaviour in ppc_hash64_set_isi().. but not in
-> other places that we blindly check LPCR[VPM0].
->
-> Correct those instances with a new helper to tell if we should be in VRMA
-> mode.
->
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
+Alistair
+
+> --
+>
+> v7: remove leading underscores in macro args
 > ---
->  target/ppc/mmu-hash64.c | 43 ++++++++++++++++++++---------------------
->  1 file changed, 21 insertions(+), 22 deletions(-)
+>  include/hw/clock.h      |  9 +++++++++
+>  hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
+>  hw/core/Makefile.objs   |  1 +
+>  3 files changed, 35 insertions(+)
+>  create mode 100644 hw/core/clock-vmstate.c
 >
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 392f90e0ae..e372c42add 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -668,6 +668,21 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU=
- *cpu,
->      return 0;
->  }
->=20=20
-> +static bool ppc_hash64_use_vrma(CPUPPCState *env)
-> +{
-> +    switch (env->mmu_model) {
-> +    case POWERPC_MMU_3_00:
-> +        /*
-> +         * ISAv3.0 (POWER9) always uses VRMA, the VPM0 field and RMOR
-> +         * register no longer exist
-> +         */
-> +        return true;
+> diff --git a/include/hw/clock.h b/include/hw/clock.h
+> index 30ac9a9946..8c191751a1 100644
+> --- a/include/hw/clock.h
+> +++ b/include/hw/clock.h
+> @@ -74,6 +74,15 @@ struct Clock {
+>      QLIST_ENTRY(Clock) sibling;
+>  };
+>
+> +/*
+> + * vmstate description entry to be added in device vmsd.
+> + */
+> +extern const VMStateDescription vmstate_clock;
+> +#define VMSTATE_CLOCK(field, state) \
+> +    VMSTATE_CLOCK_V(field, state, 0)
+> +#define VMSTATE_CLOCK_V(field, state, version) \
+> +    VMSTATE_STRUCT_POINTER_V(field, state, version, vmstate_clock, Clock=
+)
 > +
-> +    default:
-> +        return !!(env->spr[SPR_LPCR] & LPCR_VPM0);
+>  /**
+>   * clock_setup_canonical_path:
+>   * @clk: clock
+> diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
+> new file mode 100644
+> index 0000000000..260b13fc2c
+> --- /dev/null
+> +++ b/hw/core/clock-vmstate.c
+> @@ -0,0 +1,25 @@
+> +/*
+> + * Clock migration structure
+> + *
+> + * Copyright GreenSocs 2019-2020
+> + *
+> + * Authors:
+> + *  Damien Hedde
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "migration/vmstate.h"
+> +#include "hw/clock.h"
+> +
+> +const VMStateDescription vmstate_clock =3D {
+> +    .name =3D "clock",
+> +    .version_id =3D 0,
+> +    .minimum_version_id =3D 0,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(period, Clock),
+> +        VMSTATE_END_OF_LIST()
 > +    }
-> +}
-> +
->  static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
->  {
->      CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
-> @@ -676,15 +691,7 @@ static void ppc_hash64_set_isi(CPUState *cs, uint64_=
-t error_code)
->      if (msr_ir) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        switch (env->mmu_model) {
-> -        case POWERPC_MMU_3_00:
-> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
-> -            vpm =3D true;
-> -            break;
-> -        default:
-> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> -            break;
-> -        }
-> +        vpm =3D ppc_hash64_use_vrma(env);
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HISI;
-> @@ -702,15 +709,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
-t dar, uint64_t dsisr)
->      if (msr_dr) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        switch (env->mmu_model) {
-> -        case POWERPC_MMU_3_00:
-> -            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
-> -            vpm =3D true;
-> -            break;
-> -        default:
-> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> -            break;
-> -        }
-> +        vpm =3D ppc_hash64_use_vrma(env);
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HDSI;
-> @@ -799,7 +798,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
->              if (!(eaddr >> 63)) {
->                  raddr |=3D env->spr[SPR_HRMOR];
->              }
-> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +        } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
->              slb =3D &env->vrma_slb;
->              if (!slb->sps) {
-> @@ -967,7 +966,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
-, target_ulong addr)
->          } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
->              /* In HV mode, add HRMOR if top EA bit is clear */
->              return raddr | env->spr[SPR_HRMOR];
-> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +        } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
->              slb =3D &env->vrma_slb;
->              if (!slb->sps) {
-> @@ -1056,8 +1055,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
->      slb->sps =3D NULL;
->=20=20
->      /* Is VRMA enabled ? */
-> -    lpcr =3D env->spr[SPR_LPCR];
-> -    if (!(lpcr & LPCR_VPM0)) {
-> +    if (!ppc_hash64_use_vrma(env)) {
->          return;
->      }
->=20=20
-> @@ -1065,6 +1063,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
->       * Make one up. Mostly ignore the ESID which will not be needed
->       * for translation
->       */
-> +    lpcr =3D env->spr[SPR_LPCR];
->      vsid =3D SLB_VSID_VRMA;
->      vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
->      vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
+> +};
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index d7080edf89..e3d796fdd4 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -22,6 +22,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D null-machine.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D machine-hmp-cmds.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D numa.o
+> +common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+>  obj-$(CONFIG_SOFTMMU) +=3D machine-qmp-cmds.o
+>
+>  common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
+> --
+> 2.24.1
+>
+>
 
