@@ -4,81 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC87AC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4235DC35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99BDB20CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:34:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D45E20CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:34:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p1Pwr7pY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BDB20CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qrwWi4UX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D45E20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZQ2-0003ET-P0
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:34:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49989)
+	id 1j6ZQC-0003Of-70
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:34:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlD-0001cb-Js
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:25 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl4-0001Iv-FU
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6YlC-00010U-As
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:23 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:40410)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008Ia-Iu
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:14 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:51576)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6YlC-0000uK-39
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:22 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id t3so14354064wru.7
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:21 -0800 (PST)
+ id 1j6Ykz-000879-34
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:09 -0500
+Received: by mail-wm1-x335.google.com with SMTP id t23so2681163wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lSFQaFhN+qAp/G2LZxELsn5XyL1xck7wejFaofuOvhg=;
- b=p1Pwr7pY76jWtn+Wr7f0E0JOAGOpLaI6PACaTncFytOW977Sq4SvTe90sCbmLS1XJM
- 5XEcw6i3vXtHgzBeUd+DuEMpaXzeQKxOPRSg0ICk2t4mr7ZsSTGPNWpYFFx8SH3ups/q
- 2gfGJ73z2gOdVQiQHgG5Xjj4nqrQBCK96kBOD+CHrGE+ck/GUeiW1UOVeAdhO2T4pZfR
- phrojU2mg6gJnroZUA2BNesxN/yXrFIALAshs0B8XZjzfeMLSZXSkO+SzQV8ZomF/mlc
- pdJOsbrIZWQ5YhBIOR2jICaM8yEc0IWdZ0z1wiiNYwMoV848m8ueda+I2qQlzjWJs0x9
- mpRA==
+ bh=7HmcCPOMdMhr/kyGIt2JW8uV4wc8/OhGNTYl4tEX7pQ=;
+ b=qrwWi4UXABWyEew6OXdwaDO1dxPLd+ET+u94sqPyL+gR3osz5gpPja11qF6EmN7a42
+ iQn2HsKmxlJfNZ2H6LBFS1qEENkig/RuB6KCXhTSJPqtbGhCWv4aMSGEJ29XjSl8g6Oy
+ v9KePMcouPADGWpHTtrhXA5SLAOzElNvEhWGB27pFt7fDofH/qfyPLgsfeKCgIR2Ia/0
+ Bqb8a6G6BhXY5BdtvmGihonzNeWfXtosNzPihPts6BAZ0CWx9VbQk4qKM3lzuWk3wgOO
+ SpPtZ/9BBRoPU3dr6mhbWBf/K7Mo4ZPYmnc7Z+GYCZ/nW0qUN4nJ51TdNysvMhLmuzcL
+ cf1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=lSFQaFhN+qAp/G2LZxELsn5XyL1xck7wejFaofuOvhg=;
- b=c4VWBgox4Gp7j/6kxK3Tt4ffHZY45SHO1I+FtLrYrF/AUz3B41im8PmSgTJa5gqrxY
- LHLe3dVW63q0DyMO56rsmhpP3Bpj5/ipHpH0PuQ4gOiAZ9Z+YIiVzwaU2QLSJiJAt6Df
- gOsqTKO63lBimzMbBFiGthB8FIbIcMcIhFX4YnjDofqTcnKnjNgYKhcbdUS+UxyGj+wE
- gA5BFVzOjml6gLNRwkItCnC6nxwVrJbTyJgMWgDSTVkEaDWgzTfaHpNrNR4MFZt92IpC
- DiTOhH6YWhn2jNny6bc/LpxUDM/k3cR9az/QgF3cSfcduPPMSbeClLzyCGN8FVpMJUuu
- XRbg==
-X-Gm-Message-State: APjAAAVvuG4Iqj6FczxEK8E8b72vews6Y1fw2+kLagHFbImb5l2nFEW4
- OSZk76RU8ugyh80GSukTkpeHHpqk
-X-Google-Smtp-Source: APXvYqyrw4h296egFUS5wPqMe2FXyyLVRYGFthLM8TRreG8HpiOdL1AGqpg+GDO5rAx8cqcdozupqg==
-X-Received: by 2002:adf:f288:: with SMTP id k8mr76995394wro.301.1582631539819; 
- Tue, 25 Feb 2020 03:52:19 -0800 (PST)
+ bh=7HmcCPOMdMhr/kyGIt2JW8uV4wc8/OhGNTYl4tEX7pQ=;
+ b=IQ0oZlFgmwqhx1DDvagXzLx5NcAugPh0zXi+z92Robu4QGnf8SFcuM4Foss7JFBJxo
+ Z+AhiqAgyeZS24w+5dubF+DrGrkSATrNDED2D3Irfp0G3NKE+ztd2waX86kwH4QFrhFl
+ tX8Atx8WpdpjigqhoHwAqwzbAsB4Gwc/hfUExDNxNhBhmwkoDGFPiXmUi23qb8oFJpow
+ h+JAxzHVPmk+4qYz1fnarqt7w880McV1B+EalTEdzcEV2mrftuK2PcKyrFiHUIb9Zg1u
+ VmaXS5XQDUGBiQHc4Tg5ndwz9wEnrMC32XDZfeRZEo/CJKlOKgJPwTAuz1hLbv+xOK1o
+ 6a0g==
+X-Gm-Message-State: APjAAAV4hUCIrZqRBzhZE5rfh9Y1EWSkVS66GIkKDn1otMFK316qtyzj
+ HDY37iJvKH6py3m3pzLVSSOJhVuL
+X-Google-Smtp-Source: APXvYqysaD/fIWTMwT2YjbY96Vtx23jCq4B1dpqkzc+C5sVI1UJZ6JQ2GHg4yw0eBk4hpFSIAAJ5Ng==
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr4908727wmj.175.1582631524788; 
+ Tue, 25 Feb 2020 03:52:04 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.18
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.52.03
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:52:19 -0800 (PST)
+ Tue, 25 Feb 2020 03:52:04 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 079/136] tests:numa-test: use explicit memdev to specify node
- RAM
-Date: Tue, 25 Feb 2020 12:50:09 +0100
-Message-Id: <1582631466-13880-79-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 064/136] ppc/ppc405_boards: use memdev for RAM
+Date: Tue, 25 Feb 2020 12:49:54 +0100
+Message-Id: <1582631466-13880-64-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,125 +96,87 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Considering that legacy "mem" option is deprecated, use memdev
-in tests and add an additional test for legacy "mem" option
-on old machine type, to make sure it won't regress in the future.
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
+
+PS:
+in ref405ep alias RAM into ram_memories[] to avoid re-factoring
+its user ppc405ep_init(), which would be invasive and out of
+scope this patch.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200219160953.13771-80-imammedo@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200219160953.13771-65-imammedo@redhat.com>
 ---
- tests/qtest/numa-test.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ hw/ppc/ppc405_boards.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
-index 35999ea..2f9b7f6 100644
---- a/tests/qtest/numa-test.c
-+++ b/tests/qtest/numa-test.c
-@@ -25,9 +25,8 @@ static void test_mon_explicit(const void *data)
-     g_autofree char *s = NULL;
-     g_autofree char *cli = NULL;
- 
--    cli = make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=0,cpus=0-3 "
--                   "-numa node,nodeid=1,cpus=4-7 ");
-+    cli = make_cli(data, "-smp 8 -numa node,nodeid=0,memdev=ram,cpus=0-3 "
-+                         "-numa node,nodeid=1,cpus=4-7");
-     qts = qtest_init(cli);
- 
-     s = qtest_hmp(qts, "info numa");
-@@ -37,13 +36,13 @@ static void test_mon_explicit(const void *data)
-     qtest_quit(qts);
- }
- 
--static void test_mon_default(const void *data)
-+static void test_def_cpu_split(const void *data)
- {
-     QTestState *qts;
-     g_autofree char *s = NULL;
-     g_autofree char *cli = NULL;
- 
--    cli = make_cli(data, "-smp 8 -numa node -numa node");
-+    cli = make_cli(data, "-smp 8 -numa node,memdev=ram -numa node");
-     qts = qtest_init(cli);
- 
-     s = qtest_hmp(qts, "info numa");
-@@ -60,7 +59,7 @@ static void test_mon_partial(const void *data)
-     g_autofree char *cli = NULL;
- 
-     cli = make_cli(data, "-smp 8 "
--                   "-numa node,nodeid=0,cpus=0-1 "
-+                   "-numa node,nodeid=0,memdev=ram,cpus=0-1 "
-                    "-numa node,nodeid=1,cpus=4-5 ");
-     qts = qtest_init(cli);
- 
-@@ -87,7 +86,8 @@ static void test_query_cpus(const void *data)
-     QTestState *qts;
-     g_autofree char *cli = NULL;
- 
--    cli = make_cli(data, "-smp 8 -numa node,cpus=0-3 -numa node,cpus=4-7");
-+    cli = make_cli(data, "-smp 8 -numa node,memdev=ram,cpus=0-3 "
-+                         "-numa node,cpus=4-7");
-     qts = qtest_init(cli);
-     cpus = get_cpus(qts, &resp);
-     g_assert(cpus);
-@@ -125,7 +125,7 @@ static void pc_numa_cpu(const void *data)
-     g_autofree char *cli = NULL;
- 
-     cli = make_cli(data, "-cpu pentium -smp 8,sockets=2,cores=2,threads=2 "
--        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa node,nodeid=0,memdev=ram -numa node,nodeid=1 "
-         "-numa cpu,node-id=1,socket-id=0 "
-         "-numa cpu,node-id=0,socket-id=1,core-id=0 "
-         "-numa cpu,node-id=0,socket-id=1,core-id=1,thread-id=0 "
-@@ -178,7 +178,7 @@ static void spapr_numa_cpu(const void *data)
-     g_autofree char *cli = NULL;
- 
-     cli = make_cli(data, "-smp 4,cores=4 "
--        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa node,nodeid=0,memdev=ram -numa node,nodeid=1 "
-         "-numa cpu,node-id=0,core-id=0 "
-         "-numa cpu,node-id=0,core-id=1 "
-         "-numa cpu,node-id=0,core-id=2 "
-@@ -223,7 +223,7 @@ static void aarch64_numa_cpu(const void *data)
-     g_autofree char *cli = NULL;
- 
-     cli = make_cli(data, "-smp 2 "
--        "-numa node,nodeid=0 -numa node,nodeid=1 "
-+        "-numa node,nodeid=0,memdev=ram -numa node,nodeid=1 "
-         "-numa cpu,node-id=1,thread-id=0 "
-         "-numa cpu,node-id=0,thread-id=1");
-     qts = qtest_init(cli);
-@@ -270,7 +270,7 @@ static void pc_dynamic_cpu_cfg(const void *data)
- 
-     /* create 2 numa nodes */
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
--        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
-+        " 'arguments': { 'type': 'node', 'nodeid': 0, 'memdev': 'ram' } }")));
-     g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-         " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
- 
-@@ -542,13 +542,19 @@ int main(int argc, char **argv)
-     g_autoptr(GString) args = g_string_new(NULL);
-     const char *arch = qtest_get_arch();
- 
-+    if (g_str_equal(arch, "ppc64")) {
-+        g_string_append(args, " -object memory-backend-ram,id=ram,size=512M");
-+    } else {
-+        g_string_append(args, " -object memory-backend-ram,id=ram,size=128M");
-+    }
-+
-     if (g_str_equal(arch, "aarch64")) {
-         g_string_append(args, " -machine virt");
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 057882a..de93c40 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -170,8 +170,8 @@ static void ref405ep_init(MachineState *machine)
      }
  
-     g_test_init(&argc, &argv, NULL);
+     /* XXX: fix this */
+-    memory_region_allocate_system_memory(&ram_memories[0], NULL, "ef405ep.ram",
+-                                         machine->ram_size);
++    memory_region_init_alias(&ram_memories[0], NULL, "ef405ep.ram.alias",
++                             machine->ram, 0, machine->ram_size);
+     ram_bases[0] = 0;
+     ram_sizes[0] = machine->ram_size;
+     memory_region_init(&ram_memories[1], NULL, "ef405ep.ram1", 0);
+@@ -312,6 +312,7 @@ static void ref405ep_class_init(ObjectClass *oc, void *data)
+     mc->desc = "ref405ep";
+     mc->init = ref405ep_init;
+     mc->default_ram_size = 0x08000000;
++    mc->default_ram_id = "ef405ep.ram";
+ }
  
--    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
-+    qtest_add_data_func("/numa/mon/cpus/default", args, test_def_cpu_split);
-     qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit);
-     qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
-     qtest_add_data_func("/numa/qmp/cpus/query-cpus", args, test_query_cpus);
+ static const TypeInfo ref405ep_type = {
+@@ -424,7 +425,6 @@ static void taihu_405ep_init(MachineState *machine)
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *bios;
+     MemoryRegion *ram_memories = g_new(MemoryRegion, 2);
+-    MemoryRegion *ram = g_malloc0(sizeof(*ram));
+     hwaddr ram_bases[2], ram_sizes[2];
+     long bios_size;
+     target_ulong kernel_base, initrd_base;
+@@ -439,18 +439,16 @@ static void taihu_405ep_init(MachineState *machine)
+         g_free(sz);
+         exit(EXIT_FAILURE);
+     }
+-    memory_region_allocate_system_memory(ram, NULL, "taihu_405ep.ram",
+-                                         machine->ram_size);
+ 
+     ram_bases[0] = 0;
+     ram_sizes[0] = 0x04000000;
+     memory_region_init_alias(&ram_memories[0], NULL,
+-                             "taihu_405ep.ram-0", ram, ram_bases[0],
++                             "taihu_405ep.ram-0", machine->ram, ram_bases[0],
+                              ram_sizes[0]);
+     ram_bases[1] = 0x04000000;
+     ram_sizes[1] = 0x04000000;
+     memory_region_init_alias(&ram_memories[1], NULL,
+-                             "taihu_405ep.ram-1", ram, ram_bases[1],
++                             "taihu_405ep.ram-1", machine->ram, ram_bases[1],
+                              ram_sizes[1]);
+     ppc405ep_init(sysmem, ram_memories, ram_bases, ram_sizes,
+                   33333333, &pic, kernel_filename == NULL ? 0 : 1);
+@@ -546,6 +544,7 @@ static void taihu_class_init(ObjectClass *oc, void *data)
+     mc->desc = "taihu";
+     mc->init = taihu_405ep_init;
+     mc->default_ram_size = 0x08000000;
++    mc->default_ram_id = "taihu_405ep.ram";
+ }
+ 
+ static const TypeInfo taihu_type = {
 -- 
 1.8.3.1
 
