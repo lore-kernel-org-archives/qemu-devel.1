@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6050C35E04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAFFC35E01
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EDBC2082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 873C42082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 15:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mz9nCMeA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EDBC2082F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WpLMeaWk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873C42082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6cM2-0005Tf-Ly
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:42:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34014)
+	id 1j6cML-0006L2-N9
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 10:42:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j6cL4-0003Vw-75
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:42 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j6cKw-0003Fp-5P
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j6cKz-00010J-Fp
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:38 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:34195)
+ (envelope-from <peter.maydell@linaro.org>) id 1j6cKt-0000wE-V3
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:30 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34724)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j6cKz-0000za-48
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:33 -0500
-Received: by mail-wm1-x333.google.com with SMTP id i10so1373489wmd.1
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 07:41:33 -0800 (PST)
+ id 1j6cKt-0000vb-OF
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 10:41:27 -0500
+Received: by mail-wm1-x342.google.com with SMTP id i10so1373317wmd.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 07:41:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/aqK3PiUiSIY0RFooP1omMLKgnpTz3IbyIEP6Sfibv0=;
- b=mz9nCMeAWSKQnILWKeMi+K1EwSh4aVoH5XoKoHqlPoaNoU0dtF7uHNqkLG4RY10mGD
- KB86xnsbm6K3xSVX210X4K7g+uxe05JllfMYJ04oA6Xz8VRRKpsjyb6Pt8sj6Oc1N8RA
- vkQjDzpm9XP2yfwVyWqL2Gp2LBdy4ERvmiIVxqVkhkPB0bG9aHKfuAwZqySZnya7GWNM
- dhpgUbrPwL9VOwrLJSby/QG8gXC5f0gyp6iTm7jfA+iad1NO4J65S4lo6yINFwd4pYlr
- dj8Bk1nSaH5+JMUVlAe+9DW5VsGWXV1n3nBkRYO/PixzXO5mAZxIbifvfb8EInuo1oEG
- EniQ==
+ bh=+xQwySRNq9Q0V50hcZNj7lBkaorNu0H4nocAkxCMi8o=;
+ b=WpLMeaWkwtbvFRs46zP3fm9F/LI7R+/rbq+fEeNNn1BG+FhqutTQ+Aeacl00rdM/y5
+ UE8zgh5qP7TIwV1Ehuo4IMIbXPLP+2gQFCRawmN6GRdtUPbVMrvsrWj5PsekZa02vrJu
+ yRBbYs657HMotS7KF5e/XyvIWVpTh+GGnRVVA/JoUh7jDcfoRPFtX0sWxfRFEdVvxZai
+ NbgzoQ2/OKhGiJ/eyBo43GYO3DRdenzK4CZbrimlcJpYQHVAM/p8P+ZDTuJTFi6jnfd1
+ ErKkIVKy+Srbwy72SchPrAItwjMhTmAUVCO4yE8cBANw0ZcBONCIP7X7Ng6UmB339ToJ
+ hvAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/aqK3PiUiSIY0RFooP1omMLKgnpTz3IbyIEP6Sfibv0=;
- b=CfVKoEZs4sb9dEOfna+VPhIPu9rZX/baup08GyUrrp6DQ+LbaGvkv1h04hkzV9M31y
- 73J4Iz9kwrKjd3034Nn9xRZjK8OmRnrLKoibltAgq3VwTsYlepPGwuIsz2CRjI+IuCiD
- w+/E5J7Bqd5ZxRn021eLMDltDzjCns+XpkYXeWkuBDfGccwCry+SDJEP7tPn+WAtDtyG
- AZszs2IKQHzrhK7c4CRePvG9qGrPnmHWQxvnBMrkEy6ZZ+GjxtyKQw5zq9Z0GSxwPvJZ
- eAEfsj4jM/nDVmtjkdX6c2C6BEzpnCMqqpgcYltNzUic/B1hQgQSyAdoHacnxLJ5Sql0
- zxaA==
-X-Gm-Message-State: APjAAAW7GClBElH09DF1iwNcNfEow3dXFIY9/he3KpZo855RJElN5UXE
- HkAWty07ups3TN+KyVEpDqSMq2XbLvmm6A==
-X-Google-Smtp-Source: APXvYqyt0Cyi3TVWMbU7sY8rItevirIQDFkCqBRpK4yAFKrdix/AwGstdKLAfilvgd6cttJ+8Tz86Q==
-X-Received: by 2002:a05:600c:218b:: with SMTP id
- e11mr6020164wme.56.1582645289970; 
- Tue, 25 Feb 2020 07:41:29 -0800 (PST)
+ bh=+xQwySRNq9Q0V50hcZNj7lBkaorNu0H4nocAkxCMi8o=;
+ b=XvFWX0vSlx09+OaO04Cj5j7pvJOT7oFyYk64gIo3AOXrHSA9gWk/+c/AvyncFERe4z
+ /mqxwwJKw/7UgKhYmR/Hggqa06uGevoEJnNtKUnL85Gp7DlCAj7WXgNAa9sESB5d72X4
+ v4DwZkPGRk2Lm6OjVxwNHA7BFxAsvLvoIDddS4rxrBr7lGNTtflXhgSVg6+7hOwK2Cbq
+ zzSBgbVpRpZ/r3+Iv4zPUOT63+ZWgcDv6e2+iDRpVuWSYAMOyA4kOGhtdL+SCv+Hhd4M
+ NbqUqstwLw5SUvpniRZbL8tQ9fbX/sASwO2Exa3YjftrVugXCLhinIATrK2h0KNjGEi+
+ XqGQ==
+X-Gm-Message-State: APjAAAUtL5qI0LYIsQklrwMXgY6UF+FNH/NpznAwBQv/mFdDkr8q4fot
+ HDed9sOHLl9yyeLNOct566dE+BxFhrFimg==
+X-Google-Smtp-Source: APXvYqwGhlmO1Mhrj3Ey66IheZBkflNeQtS3oE7F4Bihg2k6pCOyRV8ilPPV0AsYfmTJ9iGyBKH3aA==
+X-Received: by 2002:a1c:9c87:: with SMTP id f129mr6218574wme.26.1582645285988; 
+ Tue, 25 Feb 2020 07:41:25 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c9sm24438604wrq.44.2020.02.25.07.41.28
+ by smtp.gmail.com with ESMTPSA id c9sm24438604wrq.44.2020.02.25.07.41.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 07:41:29 -0800 (PST)
+ Tue, 25 Feb 2020 07:41:24 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] docs: Convert qemu-deprecated.texi to rST
-Date: Tue, 25 Feb 2020 15:41:21 +0000
-Message-Id: <20200225154121.21116-5-peter.maydell@linaro.org>
+Subject: [PATCH 1/4] docs: Convert security.texi to rST format
+Date: Tue, 25 Feb 2020 15:41:18 +0000
+Message-Id: <20200225154121.21116-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200225154121.21116-1-peter.maydell@linaro.org>
 References: <20200225154121.21116-1-peter.maydell@linaro.org>
@@ -81,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,932 +97,236 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the documentation of deprecated features to rST.
-
-We put the whole of this document into the system manual, though
-technically a few parts of it apply to qemu-img or qemu-nbd which are
-otherwise documented in tools/.
-
-We only make formatting fixes, except for one use of 'appendix' which
-we change to 'section' because this isn't an appendix in the Sphinx
-manual.
+security.texi is included from qemu-doc.texi but is not used
+in the qemu.1 manpage. So we can do a straightforward conversion
+of the contents, which go into the system manual.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Makefile                   |   2 +-
- MAINTAINERS                |   2 +-
- docs/system/deprecated.rst | 446 +++++++++++++++++++++++++++++++++++++
- docs/system/index.rst      |   1 +
- qemu-deprecated.texi       | 386 --------------------------------
- qemu-doc.texi              |   4 -
- 6 files changed, 449 insertions(+), 392 deletions(-)
- create mode 100644 docs/system/deprecated.rst
- delete mode 100644 qemu-deprecated.texi
+ Makefile                                    |  2 +-
+ docs/system/index.rst                       |  1 +
+ docs/{security.texi => system/security.rst} | 82 +++++++++++----------
+ qemu-doc.texi                               |  3 -
+ 4 files changed, 46 insertions(+), 42 deletions(-)
+ rename docs/{security.texi => system/security.rst} (77%)
 
 diff --git a/Makefile b/Makefile
-index 28749d20401..ec4a4be8355 100644
+index aa9cc0b5847..5f0f803b471 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1115,7 +1115,7 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
- qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-options.texi \
- 	qemu-option-trace.texi \
--	qemu-deprecated.texi qemu-monitor.texi \
-+	qemu-monitor.texi \
+@@ -1117,7 +1117,7 @@ qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
+ 	qemu-tech.texi qemu-option-trace.texi \
+ 	qemu-deprecated.texi qemu-monitor.texi \
  	qemu-monitor-info.texi \
- 	docs/qemu-cpu-models.texi
+-	docs/qemu-cpu-models.texi docs/security.texi
++	docs/qemu-cpu-models.texi
  
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 195dd58cac1..546f2b83017 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2787,7 +2787,7 @@ F: contrib/gitdm/*
- 
- Incompatible changes
- R: libvir-list@redhat.com
--F: qemu-deprecated.texi
-+F: docs/system/deprecated.rst
- 
- Build System
- ------------
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-new file mode 100644
-index 00000000000..1eaa559079b
---- /dev/null
-+++ b/docs/system/deprecated.rst
-@@ -0,0 +1,446 @@
-+Deprecated features
-+===================
-+
-+In general features are intended to be supported indefinitely once
-+introduced into QEMU. In the event that a feature needs to be removed,
-+it will be listed in this section. The feature will remain functional
-+for 2 releases prior to actual removal. Deprecated features may also
-+generate warnings on the console when QEMU starts up, or if activated
-+via a monitor command, however, this is not a mandatory requirement.
-+
-+Prior to the 2.10.0 release there was no official policy on how
-+long features would be deprecated prior to their removal, nor
-+any documented list of which features were deprecated. Thus
-+any features deprecated prior to 2.10.0 will be treated as if
-+they were first deprecated in the 2.10.0 release.
-+
-+What follows is a list of all features currently marked as
-+deprecated.
-+
-+System emulator command line arguments
-+--------------------------------------
-+
-+``-machine enforce-config-section=on|off`` (since 3.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``enforce-config-section`` parameter is replaced by the
-+``-global migration.send-configuration={on|off}`` option.
-+
-+``-no-kvm`` (since 1.3.0)
-+'''''''''''''''''''''''''
-+
-+The ``-no-kvm`` argument is now a synonym for setting ``-accel tcg``.
-+
-+``-usbdevice`` (since 2.10.0)
-+'''''''''''''''''''''''''''''
-+
-+The ``-usbdevice DEV`` argument is now a synonym for setting
-+the ``-device usb-DEV`` argument instead. The deprecated syntax
-+would automatically enable USB support on the machine type.
-+If using the new syntax, USB support must be explicitly
-+enabled via the ``-machine usb=on`` argument.
-+
-+``-drive file=json:{...{'driver':'file'}}`` (since 3.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The 'file' driver for drives is no longer appropriate for character or host
-+devices and will only accept regular files (S_IFREG). The correct driver
-+for these file types is 'host_cdrom' or 'host_device' as appropriate.
-+
-+``-net ...,name=``\ *name* (since 3.1)
-+''''''''''''''''''''''''''''''''''''''
-+
-+The ``name`` parameter of the ``-net`` option is a synonym
-+for the ``id`` parameter, which should now be used instead.
-+
-+``-smp`` (invalid topologies) (since 3.1)
-+'''''''''''''''''''''''''''''''''''''''''
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs.
-+
-+However, historically it was possible to start QEMU with an incorrect topology
-+where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies will be removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+*sockets* * *cores* * *threads* = *maxcpus*.
-+
-+``-vnc acl`` (since 4.0.0)
-+''''''''''''''''''''''''''
-+
-+The ``acl`` option to the ``-vnc`` argument has been replaced
-+by the ``tls-authz`` and ``sasl-authz`` options.
-+
-+``QEMU_AUDIO_`` environment variables and ``-audio-help`` (since 4.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``-audiodev`` argument is now the preferred way to specify audio
-+backend settings instead of environment variables.  To ease migration to
-+the new format, the ``-audiodev-help`` option can be used to convert
-+the current values of the environment variables to ``-audiodev`` options.
-+
-+Creating sound card devices and vnc without ``audiodev=`` property (since 4.2)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+When not using the deprecated legacy audio config, each sound card
-+should specify an ``audiodev=`` property.  Additionally, when using
-+vnc, you should specify an ``audiodev=`` propery if you plan to
-+transmit audio through the VNC protocol.
-+
-+``-mon ...,control=readline,pretty=on|off`` (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``pretty=on|off`` switch has no effect for HMP monitors, but is
-+silently ignored. Using the switch with HMP monitors will become an
-+error in the future.
-+
-+``-realtime`` (since 4.1)
-+'''''''''''''''''''''''''
-+
-+The ``-realtime mlock=on|off`` argument has been replaced by the
-+``-overcommit mem-lock=on|off`` argument.
-+
-+``-numa node,mem=``\ *size* (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''
-+
-+The parameter ``mem`` of ``-numa node`` is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter ``memdev``, which does the same as ``mem`` and adds
-+means to actualy manage node RAM on the host side. Use parameter ``memdev``
-+with *memory-backend-ram* backend as an replacement for parameter ``mem``
-+to achieve the same fake NUMA effect or a properly configured
-+*memory-backend-file* backend to actually benefit from NUMA configuration.
-+In future new machine versions will not accept the option but it will still
-+work with old machine types. User can check QAPI schema to see if the legacy
-+option is supported by looking at MachineInfo::numa-mem-supported property.
-+
-+``-numa`` node (without memory specified) (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Splitting RAM by default between NUMA nodes has the same issues as ``mem``
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use ``memdev`` with *memory-backend-ram* backend or ``mem`` (if
-+it's supported by used machine type) to define mapping explictly instead.
-+
-+``-mem-path`` fallback to RAM (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''
-+
-+Currently if guest RAM allocation from file pointed by ``mem-path``
-+fails, QEMU falls back to allocating from RAM, which might result
-+in unpredictable behavior since the backing file specified by the user
-+is ignored. In the future, users will be responsible for making sure
-+the backing storage specified with ``-mem-path`` can actually provide
-+the guest RAM configured with ``-m`` and QEMU will fail to start up if
-+RAM allocation is unsuccessful.
-+
-+RISC-V ``-bios`` (since 4.1)
-+''''''''''''''''''''''''''''
-+
-+QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for the
-+RISC-V virt machine and sifive_u machine.
-+
-+QEMU 4.1 has no changes to the default behaviour to avoid breakages. This
-+default will change in a future QEMU release, so please prepare now. All users
-+of the virt or sifive_u machine must change their command line usage.
-+
-+QEMU 4.1 has three options, please migrate to one of these three:
-+ 1. ``-bios none`` - This is the current default behavior if no -bios option
-+      is included. QEMU will not automatically load any firmware. It is up
-+      to the user to load all the images they need.
-+ 2. ``-bios default`` - In a future QEMU release this will become the default
-+      behaviour if no -bios option is specified. This option will load the
-+      default OpenSBI firmware automatically. The firmware is included with
-+      the QEMU release and no user interaction is required. All a user needs
-+      to do is specify the kernel they want to boot with the -kernel option
-+ 3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
-+
-+``-tb-size`` option (since 5.0)
-+'''''''''''''''''''''''''''''''
-+
-+QEMU 5.0 introduced an alternative syntax to specify the size of the translation
-+block cache, ``-accel tcg,tb-size=``.  The new syntax deprecates the
-+previously available ``-tb-size`` option.
-+
-+``-show-cursor`` option (since 5.0)
-+'''''''''''''''''''''''''''''''''''
-+
-+Use ``-display sdl,show-cursor=on`` or
-+ ``-display gtk,show-cursor=on`` instead.
-+
-+QEMU Machine Protocol (QMP) commands
-+------------------------------------
-+
-+``change`` (since 2.5.0)
-+''''''''''''''''''''''''
-+
-+Use ``blockdev-change-medium`` or ``change-vnc-password`` instead.
-+
-+``migrate_set_downtime`` and ``migrate_set_speed`` (since 2.8.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Use ``migrate-set-parameters`` instead.
-+
-+``migrate-set-cache-size`` and ``query-migrate-cache-size`` (since 2.11.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Use ``migrate-set-parameters`` and ``query-migrate-parameters`` instead.
-+
-+``query-block`` result field ``dirty-bitmaps[i].status`` (since 4.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``status`` field of the ``BlockDirtyInfo`` structure, returned by
-+the query-block command is deprecated. Two new boolean fields,
-+``recording`` and ``busy`` effectively replace it.
-+
-+``query-block`` result field ``dirty-bitmaps`` (Since 4.2)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
-+the query-block command is itself now deprecated. The ``dirty-bitmaps``
-+field of the ``BlockDeviceInfo`` struct should be used instead, which is the
-+type of the ``inserted`` field in query-block replies, as well as the
-+type of array items in query-named-block-nodes.
-+
-+Since the ``dirty-bitmaps`` field is optionally present in both the old and
-+new locations, clients must use introspection to learn where to anticipate
-+the field if/when it does appear in command output.
-+
-+``query-cpus`` (since 2.12.0)
-+'''''''''''''''''''''''''''''
-+
-+The ``query-cpus`` command is replaced by the ``query-cpus-fast`` command.
-+
-+``query-cpus-fast`` ``arch`` output member (since 3.0.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``arch`` output member of the ``query-cpus-fast`` command is
-+replaced by the ``target`` output member.
-+
-+``cpu-add`` (since 4.0)
-+'''''''''''''''''''''''
-+
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional
-+details.
-+
-+``query-events`` (since 4.0)
-+''''''''''''''''''''''''''''
-+
-+The ``query-events`` command has been superseded by the more powerful
-+and accurate ``query-qmp-schema`` command.
-+
-+chardev client socket with ``wait`` option (since 4.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Character devices creating sockets in client mode should not specify
-+the 'wait' field, which is only applicable to sockets in server mode
-+
-+Human Monitor Protocol (HMP) commands
-+-------------------------------------
-+
-+The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (since 3.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
-+'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
-+
-+``cpu-add`` (since 4.0)
-+'''''''''''''''''''''''
-+
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional details.
-+
-+``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, ``acl_remove`` (since 4.0.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, and
-+``acl_remove`` commands are deprecated with no replacement. Authorization
-+for VNC should be performed using the pluggable QAuthZ objects.
-+
-+Guest Emulator ISAs
-+-------------------
-+
-+RISC-V ISA privledge specification version 1.09.1 (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
-+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
-+should be used instead of the 1.09.1 version.
-+
-+System emulator CPUS
-+--------------------
-+
-+RISC-V ISA CPUs (since 4.1)
-+'''''''''''''''''''''''''''
-+
-+The RISC-V cpus with the ISA version in the CPU name have been depcreated. The
-+four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
-+``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
-+option when using the ``rv32`` or ``rv64`` CPUs.
-+
-+RISC-V ISA CPUs (since 4.1)
-+'''''''''''''''''''''''''''
-+
-+The RISC-V no MMU cpus have been depcreated. The two CPUs: ``rv32imacu-nommu`` and
-+``rv64imacu-nommu`` should no longer be used. Instead the MMU status can be specified
-+via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
-+
-+System emulator devices
-+-----------------------
-+
-+``ide-drive`` (since 4.2)
-+'''''''''''''''''''''''''
-+
-+The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
-+'ide-cd' as appropriate to get an IDE hard disk or CD-ROM as needed.
-+
-+``scsi-disk`` (since 4.2)
-+'''''''''''''''''''''''''
-+
-+The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
-+'scsi-cd' as appropriate to get a SCSI hard disk or CD-ROM as needed.
-+
-+System emulator machines
-+------------------------
-+
-+mips ``r4k`` platform (since 5.0)
-+'''''''''''''''''''''''''''''''''
-+
-+This machine type is very old and unmaintained. Users should use the ``malta``
-+machine type instead.
-+
-+``pc-1.0``, ``pc-1.1``, ``pc-1.2`` and ``pc-1.3`` (since 5.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+These machine types are very old and likely can not be used for live migration
-+from old QEMU versions anymore. A newer machine type should be used instead.
-+
-+``spike_v1.9.1`` and ``spike_v1.10`` (since 4.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The version specific Spike machines have been deprecated in favour of the
-+generic ``spike`` machine. If you need to specify an older version of the RISC-V
-+spec you can use the ``-cpu rv64gcsu,priv_spec=v1.9.1`` command line argument.
-+
-+Device options
-+--------------
-+
-+Emulated device options
-+'''''''''''''''''''''''
-+
-+``-device virtio-blk,scsi=on|off`` (since 5.0.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The virtio-blk SCSI passthrough feature is a legacy VIRTIO feature.  VIRTIO 1.0
-+and later do not support it because the virtio-scsi device was introduced for
-+full SCSI support.  Use virtio-scsi instead when SCSI passthrough is required.
-+
-+Note this also applies to ``-device virtio-blk-pci,scsi=on|off``, which is an
-+alias.
-+
-+Block device options
-+''''''''''''''''''''
-+
-+``"backing": ""`` (since 2.12.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+In order to prevent QEMU from automatically opening an image's backing
-+chain, use ``"backing": null`` instead.
-+
-+``rbd`` keyvalue pair encoded filenames: ``""`` (since 3.1.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+Options for ``rbd`` should be specified according to its runtime options,
-+like other block drivers.  Legacy parsing of keyvalue pair encoded
-+filenames is useful to open images with the old format for backing files;
-+These image files should be updated to use the current format.
-+
-+Example of legacy encoding::
-+
-+  json:{"file.driver":"rbd", "file.filename":"rbd:rbd/name"}
-+
-+The above, converted to the current supported format::
-+
-+  json:{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"}
-+
-+Related binaries
-+----------------
-+
-+``qemu-img convert -n -o`` (since 4.2.0)
-+''''''''''''''''''''''''''''''''''''''''
-+
-+All options specified in ``-o`` are image creation options, so
-+they have no effect when used with ``-n`` to skip image creation.
-+Silently ignored options can be confusing, so this combination of
-+options will be made an error in future versions.
-+
-+Backwards compatibility
-+-----------------------
-+
-+Runnability guarantee of CPU models (since 4.1.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Previous versions of QEMU never changed existing CPU models in
-+ways that introduced additional host software or hardware
-+requirements to the VM.  This allowed management software to
-+safely change the machine type of an existing VM without
-+introducing new requirements ("runnability guarantee").  This
-+prevented CPU models from being updated to include CPU
-+vulnerability mitigations, leaving guests vulnerable in the
-+default configuration.
-+
-+The CPU model runnability guarantee won't apply anymore to
-+existing CPU models.  Management software that needs runnability
-+guarantees must resolve the CPU model aliases using te
-+``alias-of`` field returned by the ``query-cpu-definitions`` QMP
-+command.
-+
-+While those guarantees are kept, the return value of
-+``query-cpu-definitions`` will have existing CPU model aliases
-+point to a version that doesn't break runnability guarantees
-+(specifically, version 1 of those CPU models).  In future QEMU
-+versions, aliases will point to newer CPU model versions
-+depending on the machine type, so management software must
-+resolve CPU model aliases before starting a virtual machine.
-+
-+
-+Recently removed features
-+=========================
-+
-+What follows is a record of recently removed, formerly deprecated
-+features that serves as a record for users who have encountered
-+trouble after a recent upgrade.
-+
-+QEMU Machine Protocol (QMP) commands
-+------------------------------------
-+
-+``block-dirty-bitmap-add`` "autoload" parameter (since 4.2.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The "autoload" parameter has been ignored since 2.12.0. All bitmaps
-+are automatically loaded from qcow2 images.
-+
-+Related binaries
-+----------------
-+
-+``qemu-nbd --partition`` (removed in 5.0.0)
-+'''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``qemu-nbd --partition $digit`` code (also spelled ``-P``)
-+could only handle MBR partitions, and never correctly handled logical
-+partitions beyond partition 5.  Exporting a partition can still be
-+done by utilizing the ``--image-opts`` option with a raw blockdev
-+using the ``offset`` and ``size`` parameters layered on top of
-+any other existing blockdev. For example, if partition 1 is 100MiB
-+long starting at 1MiB, the old command::
-+
-+  qemu-nbd -t -P 1 -f qcow2 file.qcow2
-+
-+can be rewritten as::
-+
-+  qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2
+ docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
+     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
 diff --git a/docs/system/index.rst b/docs/system/index.rst
-index 887bef92f40..7d09abca954 100644
+index f66e6ea585c..794e5d8de03 100644
 --- a/docs/system/index.rst
 +++ b/docs/system/index.rst
-@@ -14,6 +14,7 @@ Contents:
- .. toctree::
+@@ -15,3 +15,4 @@ Contents:
     :maxdepth: 2
  
-+   deprecated
-    managed-startup
     qemu-block-drivers
-    security
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-deleted file mode 100644
-index 0671c26c806..00000000000
---- a/qemu-deprecated.texi
-+++ /dev/null
-@@ -1,386 +0,0 @@
--@node Deprecated features
--@appendix Deprecated features
--
--In general features are intended to be supported indefinitely once
--introduced into QEMU. In the event that a feature needs to be removed,
--it will be listed in this appendix. The feature will remain functional
--for 2 releases prior to actual removal. Deprecated features may also
--generate warnings on the console when QEMU starts up, or if activated
--via a monitor command, however, this is not a mandatory requirement.
--
--Prior to the 2.10.0 release there was no official policy on how
--long features would be deprecated prior to their removal, nor
--any documented list of which features were deprecated. Thus
--any features deprecated prior to 2.10.0 will be treated as if
--they were first deprecated in the 2.10.0 release.
--
--What follows is a list of all features currently marked as
--deprecated.
--
--@section System emulator command line arguments
--
--@subsection -machine enforce-config-section=on|off (since 3.1)
--
--The @option{enforce-config-section} parameter is replaced by the
--@option{-global migration.send-configuration=@var{on|off}} option.
--
--@subsection -no-kvm (since 1.3.0)
--
--The ``-no-kvm'' argument is now a synonym for setting ``-accel tcg''.
--
--@subsection -usbdevice (since 2.10.0)
--
--The ``-usbdevice DEV'' argument is now a synonym for setting
--the ``-device usb-DEV'' argument instead. The deprecated syntax
--would automatically enable USB support on the machine type.
--If using the new syntax, USB support must be explicitly
--enabled via the ``-machine usb=on'' argument.
--
--@subsection -drive file=json:@{...@{'driver':'file'@}@} (since 3.0)
--
--The 'file' driver for drives is no longer appropriate for character or host
--devices and will only accept regular files (S_IFREG). The correct driver
--for these file types is 'host_cdrom' or 'host_device' as appropriate.
--
--@subsection -net ...,name=@var{name} (since 3.1)
--
--The @option{name} parameter of the @option{-net} option is a synonym
--for the @option{id} parameter, which should now be used instead.
--
--@subsection -smp (invalid topologies) (since 3.1)
--
--CPU topology properties should describe whole machine topology including
--possible CPUs.
--
--However, historically it was possible to start QEMU with an incorrect topology
--where @math{@var{n} <= @var{sockets} * @var{cores} * @var{threads} < @var{maxcpus}},
--which could lead to an incorrect topology enumeration by the guest.
--Support for invalid topologies will be removed, the user must ensure
--topologies described with -smp include all possible cpus, i.e.
--  @math{@var{sockets} * @var{cores} * @var{threads} = @var{maxcpus}}.
--
--@subsection -vnc acl (since 4.0.0)
--
--The @code{acl} option to the @code{-vnc} argument has been replaced
--by the @code{tls-authz} and @code{sasl-authz} options.
--
--@subsection QEMU_AUDIO_ environment variables and -audio-help (since 4.0)
--
--The ``-audiodev'' argument is now the preferred way to specify audio
--backend settings instead of environment variables.  To ease migration to
--the new format, the ``-audiodev-help'' option can be used to convert
--the current values of the environment variables to ``-audiodev'' options.
--
--@subsection Creating sound card devices and vnc without audiodev= property (since 4.2)
--
--When not using the deprecated legacy audio config, each sound card
--should specify an @code{audiodev=} property.  Additionally, when using
--vnc, you should specify an @code{audiodev=} propery if you plan to
--transmit audio through the VNC protocol.
--
--@subsection -mon ...,control=readline,pretty=on|off (since 4.1)
--
--The @code{pretty=on|off} switch has no effect for HMP monitors, but is
--silently ignored. Using the switch with HMP monitors will become an
--error in the future.
--
--@subsection -realtime (since 4.1)
--
--The @code{-realtime mlock=on|off} argument has been replaced by the
--@code{-overcommit mem-lock=on|off} argument.
--
--@subsection -numa node,mem=@var{size} (since 4.1)
--
--The parameter @option{mem} of @option{-numa node} is used to assign a part of
--guest RAM to a NUMA node. But when using it, it's impossible to manage specified
--RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
--so guest end-ups with the fake NUMA configuration with suboptiomal performance.
--However since 2014 there is an alternative way to assign RAM to a NUMA node
--using parameter @option{memdev}, which does the same as @option{mem} and adds
--means to actualy manage node RAM on the host side. Use parameter @option{memdev}
--with @var{memory-backend-ram} backend as an replacement for parameter @option{mem}
--to achieve the same fake NUMA effect or a properly configured
--@var{memory-backend-file} backend to actually benefit from NUMA configuration.
--In future new machine versions will not accept the option but it will still
--work with old machine types. User can check QAPI schema to see if the legacy
--option is supported by looking at MachineInfo::numa-mem-supported property.
--
--@subsection -numa node (without memory specified) (since 4.1)
--
--Splitting RAM by default between NUMA nodes has the same issues as @option{mem}
--parameter described above with the difference that the role of the user plays
--QEMU using implicit generic or board specific splitting rule.
--Use @option{memdev} with @var{memory-backend-ram} backend or @option{mem} (if
--it's supported by used machine type) to define mapping explictly instead.
--
--@subsection -mem-path fallback to RAM (since 4.1)
--Currently if guest RAM allocation from file pointed by @option{mem-path}
--fails, QEMU falls back to allocating from RAM, which might result
--in unpredictable behavior since the backing file specified by the user
--is ignored. In the future, users will be responsible for making sure
--the backing storage specified with @option{-mem-path} can actually provide
--the guest RAM configured with @option{-m} and QEMU will fail to start up if
--RAM allocation is unsuccessful.
--
--@subsection RISC-V -bios (since 4.1)
--
--QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for the
--RISC-V virt machine and sifive_u machine.
--
--QEMU 4.1 has no changes to the default behaviour to avoid breakages. This
--default will change in a future QEMU release, so please prepare now. All users
--of the virt or sifive_u machine must change their command line usage.
--
--QEMU 4.1 has three options, please migrate to one of these three:
-- 1. ``-bios none`` - This is the current default behavior if no -bios option
--      is included. QEMU will not automatically load any firmware. It is up
--      to the user to load all the images they need.
-- 2. ``-bios default`` - In a future QEMU release this will become the default
--      behaviour if no -bios option is specified. This option will load the
--      default OpenSBI firmware automatically. The firmware is included with
--      the QEMU release and no user interaction is required. All a user needs
--      to do is specify the kernel they want to boot with the -kernel option
-- 3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
--
--@subsection -tb-size option (since 5.0)
--
--QEMU 5.0 introduced an alternative syntax to specify the size of the translation
--block cache, @option{-accel tcg,tb-size=}.  The new syntax deprecates the
--previously available @option{-tb-size} option.
--
--@subsection -show-cursor option (since 5.0)
--
--Use @option{-display sdl,show-cursor=on} or
-- @option{-display gtk,show-cursor=on} instead.
--
--@section QEMU Machine Protocol (QMP) commands
--
--@subsection change (since 2.5.0)
--
--Use ``blockdev-change-medium'' or ``change-vnc-password'' instead.
--
--@subsection migrate_set_downtime and migrate_set_speed (since 2.8.0)
--
--Use ``migrate-set-parameters'' instead.
--
--@subsection migrate-set-cache-size and query-migrate-cache-size (since 2.11.0)
--
--Use ``migrate-set-parameters'' and ``query-migrate-parameters'' instead.
--
--@subsection query-block result field dirty-bitmaps[i].status (since 4.0)
--
--The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
--the query-block command is deprecated. Two new boolean fields,
--``recording'' and ``busy'' effectively replace it.
--
--@subsection query-block result field dirty-bitmaps (Since 4.2)
--
--The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
--the query-block command is itself now deprecated. The ``dirty-bitmaps``
--field of the ``BlockDeviceInfo`` struct should be used instead, which is the
--type of the ``inserted`` field in query-block replies, as well as the
--type of array items in query-named-block-nodes.
--
--Since the ``dirty-bitmaps`` field is optionally present in both the old and
--new locations, clients must use introspection to learn where to anticipate
--the field if/when it does appear in command output.
--
--@subsection query-cpus (since 2.12.0)
--
--The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
--
--@subsection query-cpus-fast "arch" output member (since 3.0.0)
--
--The ``arch'' output member of the ``query-cpus-fast'' command is
--replaced by the ``target'' output member.
--
--@subsection cpu-add (since 4.0)
--
--Use ``device_add'' for hotplugging vCPUs instead of ``cpu-add''.  See
--documentation of ``query-hotpluggable-cpus'' for additional
--details.
--
--@subsection query-events (since 4.0)
--
--The ``query-events'' command has been superseded by the more powerful
--and accurate ``query-qmp-schema'' command.
--
--@subsection chardev client socket with 'wait' option (since 4.0)
--
--Character devices creating sockets in client mode should not specify
--the 'wait' field, which is only applicable to sockets in server mode
--
--@section Human Monitor Protocol (HMP) commands
--
--@subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (since 3.1)
--
--The @option{[hub_id name]} parameter tuple of the 'hostfwd_add' and
--'hostfwd_remove' HMP commands has been replaced by @option{netdev_id}.
--
--@subsection cpu-add (since 4.0)
--
--Use ``device_add'' for hotplugging vCPUs instead of ``cpu-add''.  See
--documentation of ``query-hotpluggable-cpus'' for additional details.
--
--@subsection acl_show, acl_reset, acl_policy, acl_add, acl_remove (since 4.0.0)
--
--The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
--``acl_remove'' commands are deprecated with no replacement. Authorization
--for VNC should be performed using the pluggable QAuthZ objects.
--
--@section Guest Emulator ISAs
--
--@subsection RISC-V ISA privledge specification version 1.09.1 (since 4.1)
--
--The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
--QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
--should be used instead of the 1.09.1 version.
--
--@section System emulator CPUS
--
--@subsection RISC-V ISA CPUs (since 4.1)
--
--The RISC-V cpus with the ISA version in the CPU name have been depcreated. The
--four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
--``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
--option when using the ``rv32`` or ``rv64`` CPUs.
--
--@subsection RISC-V ISA CPUs (since 4.1)
--
--The RISC-V no MMU cpus have been depcreated. The two CPUs: ``rv32imacu-nommu`` and
--``rv64imacu-nommu`` should no longer be used. Instead the MMU status can be specified
--via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
--
--@section System emulator devices
--
--@subsection ide-drive (since 4.2)
--
--The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
--'ide-cd' as appropriate to get an IDE hard disk or CD-ROM as needed.
--
--@subsection scsi-disk (since 4.2)
--
--The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
--'scsi-cd' as appropriate to get a SCSI hard disk or CD-ROM as needed.
--
--@section System emulator machines
--
--@subsection mips r4k platform (since 5.0)
--
--This machine type is very old and unmaintained. Users should use the 'malta'
--machine type instead.
--
--@subsection pc-1.0, pc-1.1, pc-1.2 and pc-1.3 (since 5.0)
--
--These machine types are very old and likely can not be used for live migration
--from old QEMU versions anymore. A newer machine type should be used instead.
--
--@subsection spike_v1.9.1 and spike_v1.10 (since 4.1)
--
--The version specific Spike machines have been deprecated in favour of the
--generic ``spike`` machine. If you need to specify an older version of the RISC-V
--spec you can use the ``-cpu rv64gcsu,priv_spec=v1.9.1`` command line argument.
--
--@section Device options
--
--@subsection Emulated device options
--
--@subsubsection -device virtio-blk,scsi=on|off (since 5.0.0)
--
--The virtio-blk SCSI passthrough feature is a legacy VIRTIO feature.  VIRTIO 1.0
--and later do not support it because the virtio-scsi device was introduced for
--full SCSI support.  Use virtio-scsi instead when SCSI passthrough is required.
--
--Note this also applies to ``-device virtio-blk-pci,scsi=on|off'', which is an
--alias.
--
--@subsection Block device options
--
--@subsubsection "backing": "" (since 2.12.0)
--
--In order to prevent QEMU from automatically opening an image's backing
--chain, use ``"backing": null'' instead.
--
--@subsubsection rbd keyvalue pair encoded filenames: "" (since 3.1.0)
--
--Options for ``rbd'' should be specified according to its runtime options,
--like other block drivers.  Legacy parsing of keyvalue pair encoded
--filenames is useful to open images with the old format for backing files;
--These image files should be updated to use the current format.
--
--Example of legacy encoding:
--
--@code{json:@{"file.driver":"rbd", "file.filename":"rbd:rbd/name"@}}
--
--The above, converted to the current supported format:
--
--@code{json:@{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"@}}
--
--@section Related binaries
--
--@subsection qemu-img convert -n -o (since 4.2.0)
--
--All options specified in @option{-o} are image creation options, so
--they have no effect when used with @option{-n} to skip image creation.
--Silently ignored options can be confusing, so this combination of
--options will be made an error in future versions.
--
--@section Backwards compatibility
--
--@subsection Runnability guarantee of CPU models (since 4.1.0)
--
--Previous versions of QEMU never changed existing CPU models in
--ways that introduced additional host software or hardware
--requirements to the VM.  This allowed management software to
--safely change the machine type of an existing VM without
--introducing new requirements ("runnability guarantee").  This
--prevented CPU models from being updated to include CPU
--vulnerability mitigations, leaving guests vulnerable in the
--default configuration.
--
--The CPU model runnability guarantee won't apply anymore to
--existing CPU models.  Management software that needs runnability
--guarantees must resolve the CPU model aliases using te
--``alias-of'' field returned by the ``query-cpu-definitions'' QMP
--command.
--
--While those guarantees are kept, the return value of
--``query-cpu-definitions'' will have existing CPU model aliases
--point to a version that doesn't break runnability guarantees
--(specifically, version 1 of those CPU models).  In future QEMU
--versions, aliases will point to newer CPU model versions
--depending on the machine type, so management software must
--resolve CPU model aliases before starting a virtual machine.
--
--
--@node Recently removed features
--@appendix Recently removed features
--
--What follows is a record of recently removed, formerly deprecated
--features that serves as a record for users who have encountered
--trouble after a recent upgrade.
--
--@section QEMU Machine Protocol (QMP) commands
--
--@subsection block-dirty-bitmap-add "autoload" parameter (since 4.2.0)
--
--The "autoload" parameter has been ignored since 2.12.0. All bitmaps
--are automatically loaded from qcow2 images.
--
--@section Related binaries
--
--@subsection qemu-nbd --partition (removed in 5.0.0)
--
--The ``qemu-nbd --partition $digit'' code (also spelled @option{-P})
--could only handle MBR partitions, and never correctly handled logical
--partitions beyond partition 5.  Exporting a partition can still be
--done by utilizing the @option{--image-opts} option with a raw blockdev
--using the @code{offset} and @code{size} parameters layered on top of
--any other existing blockdev. For example, if partition 1 is 100MiB
--long starting at 1MiB, the old command:
--
--@code{qemu-nbd -t -P 1 -f qcow2 file.qcow2}
--
--can be rewritten as:
--
--@code{qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2}
++   security
+diff --git a/docs/security.texi b/docs/system/security.rst
+similarity index 77%
+rename from docs/security.texi
+rename to docs/system/security.rst
+index 0d6b30edfc0..f2092c8768b 100644
+--- a/docs/security.texi
++++ b/docs/system/security.rst
+@@ -1,19 +1,22 @@
+-@node Security
+-@chapter Security
++Security
++========
+ 
+-@section Overview
++Overview
++--------
+ 
+ This chapter explains the security requirements that QEMU is designed to meet
+ and principles for securely deploying QEMU.
+ 
+-@section Security Requirements
++Security Requirements
++---------------------
+ 
+ QEMU supports many different use cases, some of which have stricter security
+ requirements than others.  The community has agreed on the overall security
+ requirements that users may depend on.  These requirements define what is
+ considered supported from a security perspective.
+ 
+-@subsection Virtualization Use Case
++Virtualization Use Case
++'''''''''''''''''''''''
+ 
+ The virtualization use case covers cloud and virtual private server (VPS)
+ hosting, as well as traditional data center and desktop virtualization.  These
+@@ -23,18 +26,17 @@ safely on the physical CPU at close-to-native speed.
+ The following entities are untrusted, meaning that they may be buggy or
+ malicious:
+ 
+-@itemize
+-@item Guest
+-@item User-facing interfaces (e.g. VNC, SPICE, WebSocket)
+-@item Network protocols (e.g. NBD, live migration)
+-@item User-supplied files (e.g. disk images, kernels, device trees)
+-@item Passthrough devices (e.g. PCI, USB)
+-@end itemize
++- Guest
++- User-facing interfaces (e.g. VNC, SPICE, WebSocket)
++- Network protocols (e.g. NBD, live migration)
++- User-supplied files (e.g. disk images, kernels, device trees)
++- Passthrough devices (e.g. PCI, USB)
+ 
+ Bugs affecting these entities are evaluated on whether they can cause damage in
+ real-world use cases and treated as security bugs if this is the case.
+ 
+-@subsection Non-virtualization Use Case
++Non-virtualization Use Case
++'''''''''''''''''''''''''''
+ 
+ The non-virtualization use case covers emulation using the Tiny Code Generator
+ (TCG).  In principle the TCG and device emulation code used in conjunction with
+@@ -47,12 +49,14 @@ Bugs affecting the non-virtualization use case are not considered security
+ bugs at this time.  Users with non-virtualization use cases must not rely on
+ QEMU to provide guest isolation or any security guarantees.
+ 
+-@section Architecture
++Architecture
++------------
+ 
+ This section describes the design principles that ensure the security
+ requirements are met.
+ 
+-@subsection Guest Isolation
++Guest Isolation
++'''''''''''''''
+ 
+ Guest isolation is the confinement of guest code to the virtual machine.  When
+ guest code gains control of execution on the host this is called escaping the
+@@ -71,7 +75,8 @@ malicious guest must not gain control of other guests or access their data.
+ Disk image files and network traffic must be protected from other guests unless
+ explicitly shared between them by the user.
+ 
+-@subsection Principle of Least Privilege
++Principle of Least Privilege
++''''''''''''''''''''''''''''
+ 
+ The principle of least privilege states that each component only has access to
+ the privileges necessary for its function.  In the case of QEMU this means that
+@@ -84,7 +89,7 @@ the guest.
+ 
+ Following the principle of least privilege immediately fulfills guest isolation
+ requirements.  For example, guest A only has access to its own disk image file
+-@code{a.img} and not guest B's disk image file @code{b.img}.
++``a.img`` and not guest B's disk image file ``b.img``.
+ 
+ In reality certain resources are inaccessible to the guest but must be
+ available to QEMU to perform its function.  For example, host system calls are
+@@ -95,7 +100,8 @@ New features must be designed to follow the principle of least privilege.
+ Should this not be possible for technical reasons, the security risk must be
+ clearly documented so users are aware of the trade-off of enabling the feature.
+ 
+-@subsection Isolation mechanisms
++Isolation mechanisms
++''''''''''''''''''''
+ 
+ Several isolation mechanisms are available to realize this architecture of
+ guest isolation and the principle of least privilege.  With the exception of
+@@ -105,46 +111,46 @@ described briefly for Linux here.
+ 
+ The fundamental isolation mechanism is that QEMU processes must run as
+ unprivileged users.  Sometimes it seems more convenient to launch QEMU as
+-root to give it access to host devices (e.g. @code{/dev/net/tun}) but this poses a
++root to give it access to host devices (e.g. ``/dev/net/tun``) but this poses a
+ huge security risk.  File descriptor passing can be used to give an otherwise
+ unprivileged QEMU process access to host devices without running QEMU as root.
+ It is also possible to launch QEMU as a non-root user and configure UNIX groups
+-for access to @code{/dev/kvm}, @code{/dev/net/tun}, and other device nodes.
++for access to ``/dev/kvm``, ``/dev/net/tun``, and other device nodes.
+ Some Linux distros already ship with UNIX groups for these devices by default.
+ 
+-@itemize
+-@item SELinux and AppArmor make it possible to confine processes beyond the
+-traditional UNIX process and file permissions model.  They restrict the QEMU
+-process from accessing processes and files on the host system that are not
+-needed by QEMU.
++- SELinux and AppArmor make it possible to confine processes beyond the
++  traditional UNIX process and file permissions model.  They restrict the QEMU
++  process from accessing processes and files on the host system that are not
++  needed by QEMU.
+ 
+-@item Resource limits and cgroup controllers provide throughput and utilization
+-limits on key resources such as CPU time, memory, and I/O bandwidth.
++- Resource limits and cgroup controllers provide throughput and utilization
++  limits on key resources such as CPU time, memory, and I/O bandwidth.
+ 
+-@item Linux namespaces can be used to make process, file system, and other system
+-resources unavailable to QEMU.  A namespaced QEMU process is restricted to only
+-those resources that were granted to it.
++- Linux namespaces can be used to make process, file system, and other system
++  resources unavailable to QEMU.  A namespaced QEMU process is restricted to only
++  those resources that were granted to it.
+ 
+-@item Linux seccomp is available via the QEMU @option{--sandbox} option.  It disables
+-system calls that are not needed by QEMU, thereby reducing the host kernel
+-attack surface.
+-@end itemize
++- Linux seccomp is available via the QEMU ``--sandbox`` option.  It disables
++  system calls that are not needed by QEMU, thereby reducing the host kernel
++  attack surface.
+ 
+-@section Sensitive configurations
++Sensitive configurations
++------------------------
+ 
+ There are aspects of QEMU that can have security implications which users &
+ management applications must be aware of.
+ 
+-@subsection Monitor console (QMP and HMP)
++Monitor console (QMP and HMP)
++'''''''''''''''''''''''''''''
+ 
+ The monitor console (whether used with QMP or HMP) provides an interface
+ to dynamically control many aspects of QEMU's runtime operation. Many of the
+ commands exposed will instruct QEMU to access content on the host file system
+ and/or trigger spawning of external processes.
+ 
+-For example, the @code{migrate} command allows for the spawning of arbitrary
++For example, the ``migrate`` command allows for the spawning of arbitrary
+ processes for the purpose of tunnelling the migration data stream. The
+-@code{blockdev-add} command instructs QEMU to open arbitrary files, exposing
++``blockdev-add`` command instructs QEMU to open arbitrary files, exposing
+ their content to the guest as a virtual disk.
+ 
+ Unless QEMU is otherwise confined using technologies such as SELinux, AppArmor,
 diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 7798e072a1c..6bb1fd54c03 100644
+index 33b9597b1dc..c11b1a5d5ad 100644
 --- a/qemu-doc.texi
 +++ b/qemu-doc.texi
-@@ -40,8 +40,6 @@
+@@ -40,7 +40,6 @@
  * QEMU System emulator for non PC targets::
  * QEMU User space emulator::
  * System requirements::
--* Deprecated features::
--* Recently removed features::
- * Supported build platforms::
- * License::
- * Index::
-@@ -2834,8 +2832,6 @@ added with Linux 4.5 which is supported by the major distros. And even
+-* Security::
+ * Implementation notes::
+ * Deprecated features::
+ * Recently removed features::
+@@ -2836,8 +2835,6 @@ added with Linux 4.5 which is supported by the major distros. And even
  if RHEL7 has kernel 3.10, KVM there has the required functionality there
  to make it close to a 4.5 or newer kernel.
  
--@include qemu-deprecated.texi
+-@include docs/security.texi
 -
- @node Supported build platforms
- @appendix Supported build platforms
+ @include qemu-tech.texi
  
+ @include qemu-deprecated.texi
 -- 
 2.20.1
 
