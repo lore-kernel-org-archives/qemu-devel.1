@@ -2,74 +2,86 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D32C35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FA4C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A14E20726
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:47:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A14E20726
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66FEA20726
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:48:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pk/3S4I5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66FEA20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZcY-00052P-5p
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:47:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58490)
+	id 1j6ZdI-0006Mo-HD
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:48:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1j6ZZY-00082y-Jz
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:44:25 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0V-00044n-LD
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1j6ZZX-0006Do-2X
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:44:24 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2069 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j6ZZW-0006C7-M0
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:44:23 -0500
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 14D79B96B6C6711EEAE4;
- Tue, 25 Feb 2020 20:44:16 +0800 (CST)
-Received: from dggeme708-chm.china.huawei.com (10.1.199.104) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 25 Feb 2020 20:44:15 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme708-chm.china.huawei.com (10.1.199.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Tue, 25 Feb 2020 20:44:15 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
- Tue, 25 Feb 2020 20:44:15 +0800
-From: miaoyubo <miaoyubo@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Thread-Topic: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Thread-Index: AQHV634DptZMLVW0EUqun9Ee8tGbGqgrJCyAgACsLcD//4BQgIAAiRsw
-Date: Tue, 25 Feb 2020 12:44:15 +0000
-Message-ID: <766375327e6f422bbf751174269f7570@huawei.com>
-References: <20200225015026.940-1-miaoyubo@huawei.com>
- <20200225015026.940-3-miaoyubo@huawei.com>
- <3086f4a2-fb0a-d276-7c76-f06474befa35@redhat.com>
- <c4aa08df40a74dbd876b9acfbbb09809@huawei.com>
- <20200225072522-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200225072522-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.29]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Z0R-0003fn-Vm
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:11 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54630)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1j6Z0R-0003em-Me
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:08:07 -0500
+Received: by mail-wm1-x341.google.com with SMTP id z12so2724207wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:08:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=HZHzP8N5auJ+8tEymgxdWqmFlBp/rJEHoVe8+UtDFwI=;
+ b=pk/3S4I5aGP52sJuap8cquvcTxBZUdm1CUMMyWfbDIPqo/d8UIjK5k0+50USSS2ZfI
+ DQjOFnpd2DjIpVvBM13kPOzZIyALfkZkjVXaDRg2dfWMQcKecvevTn0FWZbV9ApCqiuP
+ hyYANFUV2zUm2PtIe1ylKPEw7TaJXaY7hH5upNQTF5VlZXluFkjrhRAW1S945le705Dp
+ XXoJccrgb/Y/Nwcpc9VsmoDr2rt/xJNijNNMJQ4R3XRWxN//iTD0mk2Y1pZqWMVi2J8h
+ K/gTkFrqbmwngpIXD6GSmZhjOBom/7y5O0EqynczvUsjxEY5YCovcDDKE+XCCwVIClso
+ XtwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=HZHzP8N5auJ+8tEymgxdWqmFlBp/rJEHoVe8+UtDFwI=;
+ b=XwinuhvddDtNsYM0IXgP6NmTD8rgLJvIG95h4lsQDSJL23jDa020d7/vQsCtEmkyqR
+ IAlf/18+g8+6FBmxn2FJL1hNDWP6Z3TBkQ17LJ/7XepL0MqKNyhvjsvv69uWs8S7EhcP
+ 7To7kBIjeYvCc9VSZPXQI5ktk9f7gG45d9vGXHq5LNFRTepOM+qCsHiO1ySwj3q+0JYf
+ M7emsH8FQbsYAWgwDZznkYSAfyC7AXpB9S8Cqz69pq1DoXNptARwgMLyC8et9jiPicZt
+ C6M7kjkAzMRPfCxvf3E255zCw90nxlF2BSgZe5IGozcAt2Ctiv//GLcHzBy/NqJhu2Ma
+ HY2g==
+X-Gm-Message-State: APjAAAUa53CNNKs2fgNw/AdzhA3ChD3meoKP8CwosnXuA5/lfVNQkzr/
+ ZmG2jT9VPtN6oFoUiekgEDHXjWuw
+X-Google-Smtp-Source: APXvYqyayTP6cPETYG1uKpasiif4lUOlA8nAhroadBbC/OyHEOU7uMUabDFfALjYv5mBBPZe5hto0w==
+X-Received: by 2002:a1c:f60e:: with SMTP id w14mr4987825wmc.188.1582632485217; 
+ Tue, 25 Feb 2020 04:08:05 -0800 (PST)
+Received: from 640k.localdomain ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id h13sm22709423wrw.54.2020.02.25.04.08.04
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 25 Feb 2020 04:08:04 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 132/136] mem-prealloc: optimize large guest startup
+Date: Tue, 25 Feb 2020 13:07:30 +0100
+Message-Id: <1582632454-16491-30-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.189
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,156 +93,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: bauerchen <bauerchen@tencent.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: bauerchen <bauerchen@tencent.com>
+
+[desc]:
+    Large memory VM starts slowly when using -mem-prealloc, and
+    there are some areas to optimize in current method;
+
+    1、mmap will be used to alloc threads stack during create page
+    clearing threads, and it will attempt mm->mmap_sem for write
+    lock, but clearing threads have hold read lock, this competition
+    will cause threads createion very slow;
+
+    2、methods of calcuating pages for per threads is not well;if we use
+    64 threads to split 160 hugepage,63 threads clear 2page,1 thread
+    clear 34 page,so the entire speed is very slow;
+
+    to solve the first problem,we add a mutex in thread function,and
+    start all threads when all threads finished createion;
+    and the second problem, we spread remainder to other threads,in
+    situation that 160 hugepage and 64 threads, there are 32 threads
+    clear 3 pages,and 32 threads clear 2 pages.
+
+[test]:
+    320G 84c VM start time can be reduced to 10s
+    680G 84c VM start time can be reduced to 18s
+
+Signed-off-by: bauerchen <bauerchen@tencent.com>
+Reviewed-by: Pan Rui <ruippan@tencent.com>
+Reviewed-by: Ivan Ren <ivanren@tencent.com>
+[Simplify computation of the number of pages per thread. - Paolo]
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ util/oslib-posix.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
+
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index 5a291cc..897e8f3 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -76,6 +76,10 @@ static MemsetThread *memset_thread;
+ static int memset_num_threads;
+ static bool memset_thread_failed;
+ 
++static QemuMutex page_mutex;
++static QemuCond page_cond;
++static bool threads_created_flag;
++
+ int qemu_get_thread_id(void)
+ {
+ #if defined(__linux__)
+@@ -403,6 +407,17 @@ static void *do_touch_pages(void *arg)
+     MemsetThread *memset_args = (MemsetThread *)arg;
+     sigset_t set, oldset;
+ 
++    /*
++     * On Linux, the page faults from the loop below can cause mmap_sem
++     * contention with allocation of the thread stacks.  Do not start
++     * clearing until all threads have been created.
++     */
++    qemu_mutex_lock(&page_mutex);
++    while(!threads_created_flag){
++        qemu_cond_wait(&page_cond, &page_mutex);
++    }
++    qemu_mutex_unlock(&page_mutex);
++
+     /* unblock SIGBUS */
+     sigemptyset(&set);
+     sigaddset(&set, SIGBUS);
+@@ -451,27 +466,28 @@ static inline int get_memset_num_threads(int smp_cpus)
+ static bool touch_all_pages(char *area, size_t hpagesize, size_t numpages,
+                             int smp_cpus)
+ {
+-    size_t numpages_per_thread;
+-    size_t size_per_thread;
++    size_t numpages_per_thread, leftover;
+     char *addr = area;
+     int i = 0;
+ 
+     memset_thread_failed = false;
++    threads_created_flag = false;
+     memset_num_threads = get_memset_num_threads(smp_cpus);
+     memset_thread = g_new0(MemsetThread, memset_num_threads);
+-    numpages_per_thread = (numpages / memset_num_threads);
+-    size_per_thread = (hpagesize * numpages_per_thread);
++    numpages_per_thread = numpages / memset_num_threads;
++    leftover = numpages % memset_num_threads;
+     for (i = 0; i < memset_num_threads; i++) {
+         memset_thread[i].addr = addr;
+-        memset_thread[i].numpages = (i == (memset_num_threads - 1)) ?
+-                                    numpages : numpages_per_thread;
++        memset_thread[i].numpages = numpages_per_thread + (i < leftover);
+         memset_thread[i].hpagesize = hpagesize;
+         qemu_thread_create(&memset_thread[i].pgthread, "touch_pages",
+                            do_touch_pages, &memset_thread[i],
+                            QEMU_THREAD_JOINABLE);
+-        addr += size_per_thread;
+-        numpages -= numpages_per_thread;
++        addr += memset_thread[i].numpages * hpagesize;
+     }
++    threads_created_flag = true;
++    qemu_cond_broadcast(&page_cond);
++
+     for (i = 0; i < memset_num_threads; i++) {
+         qemu_thread_join(&memset_thread[i].pgthread);
+     }
+-- 
+1.8.3.1
 
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Tuesday, February 25, 2020 8:27 PM
-> To: miaoyubo <miaoyubo@huawei.com>
-> Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>;
-> peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> berrange@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
-> <xiexiangyou@huawei.com>; imammedo@redhat.com
-> Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for ar=
-m
->=20
-> On Tue, Feb 25, 2020 at 12:12:12PM +0000, miaoyubo wrote:
-> >
-> > > -----Original Message-----
-> > > From: Philippe Mathieu-Daud=E9 [mailto:philmd@redhat.com]
-> > > Sent: Tuesday, February 25, 2020 5:48 PM
-> > > To: miaoyubo <miaoyubo@huawei.com>; peter.maydell@linaro.org;
-> > > shannon.zhaosl@gmail.com
-> > > Cc: berrange@redhat.com; mst@redhat.com; qemu-devel@nongnu.org;
-> > > Xiexiangyou <xiexiangyou@huawei.com>; imammedo@redhat.com
-> > > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support
-> > > for arm
-> > >
-> > > On 2/25/20 2:50 AM, Yubo Miao wrote:
-> > > > From: miaoyubo <miaoyubo@huawei.com>
-> > > >
-> > > > Currently virt machine is not supported by pxb-pcie, and only one
-> > > > main host bridge described in ACPI tables.
-> > > > In this patch,PXB-PCIE is supproted by arm and certain
-> > >
-> > > Typos: "expander" in subject and "supported" here.
-> > >
-> >
-> > Thanks for your reply and sorry for the mistakes.
-> > I will check all the subjects and comments.
-> >
-> > > > resource is allocated for each pxb-pcie in acpi table.
-> > > > The resource for the main host bridge is also reallocated.
-> > > >
-> > > > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
-> > > > ---
-> > > >   hw/arm/virt-acpi-build.c | 115
-> > > ++++++++++++++++++++++++++++++++++++---
-> > > >   hw/arm/virt.c            |   3 +
-> > > >   include/hw/arm/virt.h    |   7 +++
-> > > >   3 files changed, 118 insertions(+), 7 deletions(-)
-> > > >
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 37c34748a6..be1986c60d 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -49,6 +49,8 @@
-> > > >   #include "kvm_arm.h"
-> > > >   #include "migration/vmstate.h"
-> > > >
-> > > > +#include "hw/arm/virt.h"
-> > > > +#include "hw/pci/pci_bus.h"
-> > > >   #define ARM_SPI_BASE 32
-> > > >
-> > > >       if (use_highmem) {
-> > > >           hwaddr base_mmio_high =3D
-> > > > memmap[VIRT_HIGH_PCIE_MMIO].base;
-> > > @@
-> > > > -746,7 +847,7 @@ build_dsdt(GArray *table_data, BIOSLinker
-> > > > *linker,
-> > > VirtMachineState *vms)
-> > > >       acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-> > > >                       (irqmap[VIRT_MMIO] + ARM_SPI_BASE),
-> > > NUM_VIRTIO_TRANSPORTS);
-> > > >       acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] +
-> > > ARM_SPI_BASE),
-> > > > -                      vms->highmem, vms->highmem_ecam);
-> > > > +                      vms->highmem, vms->highmem_ecam, vms);
-> > > >       if (vms->acpi_dev) {
-> > > >           build_ged_aml(scope, "\\_SB."GED_DEVICE,
-> > > >                         HOTPLUG_HANDLER(vms->acpi_dev), diff --git
-> > > > a/hw/arm/virt.c b/hw/arm/virt.c index f788fe27d6..6314928671
-> > > > 100644
-> > > > --- a/hw/arm/virt.c
-> > > > +++ b/hw/arm/virt.c
-> > > > @@ -1246,6 +1246,9 @@ static void create_pcie(VirtMachineState
-> *vms)
-> > > >       }
-> > > >
-> > > >       pci =3D PCI_HOST_BRIDGE(dev);
-> > > > +
-> > > > +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-> > > > +
-> > > >       if (pci->bus) {
-> > > >           for (i =3D 0; i < nb_nics; i++) {
-> > > >               NICInfo *nd =3D &nd_table[i]; diff --git
-> > > > a/include/hw/arm/virt.h b/include/hw/arm/virt.h index
-> > > > 71508bf40c..90f10a1e46 100644
-> > > > --- a/include/hw/arm/virt.h
-> > > > +++ b/include/hw/arm/virt.h
-> > > > @@ -140,6 +140,13 @@ typedef struct {
-> > > >       DeviceState *gic;
-> > > >       DeviceState *acpi_dev;
-> > > >       Notifier powerdown_notifier;
-> > > > +    /*
-> > > > +     * pointer to devices and objects
-> > > > +     * Via going through the bus, all
-> > > > +     * pci devices and related objectes
-> > >
-> > > Typo "objects", but I don't understand the comment well.
-> > >
-> >
-> > Sorry for any confusion caused ,I will rewrite the comment
-> > /* point to the root bus, which is pcie.0 */ Does this comment make
-> > sense?
->=20
-> Not really. E.g. it doesn't say what happens if there's more than one roo=
-t.
->=20
-
-If there's more than one root, like pcie.0 and pcie.1, it still point to pc=
-ie.0.
-In docs/pci_expander_bridge.txt, it points out pxb could be placed only
-on bus 0 (pci.0). Therfore, the structure still could help us to find all p=
-xb devices.
-/* point to the bus 0, which is pcie.0
-  * pxb devices could only be placed on bus 0.
-  */
-Is this ok?
-
-> > > > +     * could be gained.
-> > > > +     */
-> > > > +    PCIBus *bus;
-> > > >   } VirtMachineState;
-> > > >
-> > > >   #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
-> > > > VIRT_PCIE_ECAM)
-> > > >
-> >
-> > Regards,
-> > Miao
-
-Regards,
-Miao
 
