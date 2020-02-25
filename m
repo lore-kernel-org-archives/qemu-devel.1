@@ -7,78 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67038C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C8AC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:24:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 334A020CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:23:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 407DC20CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 12:24:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbL7zgj3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334A020CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cd+ZMBtO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407DC20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ZFC-0006Ui-BL
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:23:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49571)
+	id 1j6ZFr-0007cT-Dr
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 07:24:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yko-0000vI-H7
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:02 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Yl4-0001Hg-1p
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykh-0007wZ-Py
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:56 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44812)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6Ykz-0008GS-8C
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:13 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:36617)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6Ykh-0007pg-G5
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:51:51 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id m16so14332067wrx.11
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:51:51 -0800 (PST)
+ id 1j6Ykx-00083p-D5
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 06:52:08 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id z3so14384082wru.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 03:52:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Az21PqxcFj5PLmHVscAimd//RXYfOGb+OM1gvJEZv5A=;
- b=kbL7zgj3T27BQ1MOVLNHYVEtNY/KeXgEIuNMyTxEowEkH8u742x8k51l/vRVqdCK8c
- uCwz60o18Udgwwzn5e2FRs45UMAeWrOYhHEUIbsQ1IjVg9gVBKWWMSt413a8poSHiJ+t
- Ncax4wHtgLYMnGyCsN76CYZl0Wr6IFsONag0gvjdYMYKDE4XgzGZVdmXWgj0wzP/4Uxo
- 3dIPLc0DsiDeAH0L2+ncs1hjdX7T1wXB96mbAowiz8GvQbt1sHKWYospvWvq1W8Tz8LG
- ZWWTdIKz4ub8EHP4mAhxm1XMMsTywKr738XIo7ZdxicpTb5Hch2rRCowSADZdH+hGpYR
- OjFQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=vPqLsmgksx1vqy9WuZ6jPM/E+F8HlA4FUDvGLVEw7hk=;
+ b=Cd+ZMBtOki0dX8w+vrs+TnxgJJ24sjoQxXdXzMD3DvEfF5T36zHMyq6OXHkAsShsSf
+ J8SD5Mff5n5kqdEdbbEg0Gnq8qtTiMd7qkVWrscXw9z+qNfcgtyy4+TqpYYGi9vv1DAu
+ PcPwpExoMLhmjPDags47lOdpkKTWPAaoHSMYd5y9/zRFgGmloX3z64UUL06/aNmD7xjX
+ uLVlF3qruiqjSUMx/lfNl1eMOTxvqkm1pVCq0Tb+VXUhmtPP2yRGHW1UuF/41wxKQOwo
+ 77bOhW8HeuKGaB1OhRyQw7t4VAM9RU3mQp669eaEzontm6VP5wUHWRjHf3Dd7WLYO4UI
+ yIGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Az21PqxcFj5PLmHVscAimd//RXYfOGb+OM1gvJEZv5A=;
- b=t0XwBSoRrTcPCOXy0agD9r4Y9jEtK+O/md7HvthL1YuwUB1R3famhrq3VJrWblGE4p
- wCVRwWXfOq+qTZTEmC8YzyMlvOIa0xL4R78KEPE3kEFEQNykjG7AGMK1eufDg4zuZd3J
- /RWpca1Y90vFwLueCUJ6iVTsG9T0ymXSWkCn5leDhOuqitRpqXY6i0AIb6pJZrQsFRVG
- H1S+xMW6m9F4OR7oya7Rzmx30Vmma78s9mwzHts81kDc/6P7OYhD1FFWHZDGSHuAjbse
- tM2USKUTGVgXf8+/J1Wrh4K6WWEDn/49JkmnFxi/YHvkTaxHCscS02+YecXyGHen2dJL
- 7EwQ==
-X-Gm-Message-State: APjAAAVFupgCQ8oq1Bsob9Ln7jZaNu2Wmk1CkBUtWjwzMHkK1bb65CNk
- y2Kgbd3M5mDwdVgUrhOUaXVzzCto
-X-Google-Smtp-Source: APXvYqwUjGsPZW2wjNUXNlJL/o8DcU9F4Rhm66rXgP75wveZ81iMlAizCiD4RjrNsDh6Ko/NgoOO3A==
-X-Received: by 2002:adf:e546:: with SMTP id z6mr647241wrm.423.1582631510334;
- Tue, 25 Feb 2020 03:51:50 -0800 (PST)
+ :in-reply-to:references;
+ bh=vPqLsmgksx1vqy9WuZ6jPM/E+F8HlA4FUDvGLVEw7hk=;
+ b=p6di2VsZGS1J18HgyLsjtHd2dUK25OWTqIBuw48JZG/nvmLGT2BHeQgohJoP++89NG
+ MgvqQUQJbbfhlu6fjxhHw0/euPGL3y44yifyqCjm5geM2846EJhbjvFPf7dc0pWGhvM9
+ tNPw1fYlonixuRsud8BRSXGxBbgyGcBURvKA1t0wwXbzjALNQuniR7We46ECW609S2wH
+ eu0/hzra6Js93q9Gs+jUJzdd7CYEtXPUP7IFRHk7m6rK9ABWsS+YRvKOVVN4cwcr/z3I
+ dZtDbdVU6m4qMYpzPXf0PyppIb6+GOvtVIE9GrfIA2UvlxhA9T+OywUhv2n4cSZpCScv
+ VjVQ==
+X-Gm-Message-State: APjAAAVnqB1KC+6hHOZ+2163f1c7m/SSsYVa6yUfnuz12uZOKlyciEbO
+ 1KqIJ9wQKHJLcV3ECn+rDJBZeDuI
+X-Google-Smtp-Source: APXvYqyvveM+Xq76a/FV0js3V6obkcsc1AIVRe06WfLibrPrXhcnkSHbG6ILs2XvvcUiz2w8PkXWXg==
+X-Received: by 2002:adf:e546:: with SMTP id z6mr648129wrm.423.1582631519600;
+ Tue, 25 Feb 2020 03:51:59 -0800 (PST)
 Received: from 640k.localdomain ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.49
+ by smtp.gmail.com with ESMTPSA id b67sm3922326wmc.38.2020.02.25.03.51.58
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 25 Feb 2020 03:51:49 -0800 (PST)
+ Tue, 25 Feb 2020 03:51:59 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 047/136] m68k/q800: use memdev for RAM
-Date: Tue, 25 Feb 2020 12:49:37 +0100
-Message-Id: <1582631466-13880-47-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 058/136] ppc/e500: drop RAM size fixup
+Date: Tue, 25 Feb 2020 12:49:48 +0100
+Message-Id: <1582631466-13880-58-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
 References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::42b
@@ -100,51 +96,75 @@ Sender: "Qemu-devel"
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Switch to using generic main RAM allocation. To do this set
-MachineClass::default_ram_id to m68k_mac.ram and use
-MachineState::ram instead of manually initializing
-RAM memory region.
+If user provided non-sense RAM size, board will complain and
+continue running with max RAM size supported.
+Also RAM is going to be allocated by generic code, so it won't be
+possible for board to fix things up for user.
+
+Make it error message and exit to force user fix CLI,
+instead of accepting non-sense CLI values.
+
+While at it, replace usage of global ram_size with
+machine->ram_size
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200219160953.13771-48-imammedo@redhat.com>
+Message-Id: <20200219160953.13771-59-imammedo@redhat.com>
 ---
- hw/m68k/q800.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/ppc/e500.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index 1e32363..a4c4bc1 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -160,7 +160,6 @@ static void q800_init(MachineState *machine)
-     ram_addr_t initrd_base;
-     int32_t initrd_size;
-     MemoryRegion *rom;
--    MemoryRegion *ram;
-     MemoryRegion *io;
-     const int io_slice_nb = (IO_SIZE / IO_SLICE) - 1;
-     int i;
-@@ -194,9 +193,7 @@ static void q800_init(MachineState *machine)
-     qemu_register_reset(main_cpu_reset, cpu);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 886442e..960024b 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -906,12 +906,14 @@ void ppce500_init(MachineState *machine)
  
-     /* RAM */
--    ram = g_malloc(sizeof(*ram));
--    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
--    memory_region_add_subregion(get_system_memory(), 0, ram);
-+    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
+     env = firstenv;
  
-     /*
-      * Memory from IO_BASE to IO_BASE + IO_SLICE is repeated
-@@ -443,6 +440,7 @@ static void q800_machine_class_init(ObjectClass *oc, void *data)
-     mc->max_cpus = 1;
-     mc->is_default = 0;
-     mc->block_default_type = IF_SCSI;
-+    mc->default_ram_id = "m68k_mac.ram";
- }
+-    /* Fixup Memory size on a alignment boundary */
+-    ram_size &= ~(RAM_SIZES_ALIGN - 1);
+-    machine->ram_size = ram_size;
++    if (!QEMU_IS_ALIGNED(machine->ram_size, RAM_SIZES_ALIGN)) {
++        error_report("RAM size must be multiple of %" PRIu64, RAM_SIZES_ALIGN);
++        exit(EXIT_FAILURE);
++    }
  
- static const TypeInfo q800_machine_typeinfo = {
+     /* Register Memory */
+-    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram", ram_size);
++    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram",
++                                         machine->ram_size);
+     memory_region_add_subregion(address_space_mem, 0, ram);
+ 
+     dev = qdev_create(NULL, "e500-ccsr");
+@@ -1083,7 +1085,7 @@ void ppce500_init(MachineState *machine)
+         kernel_base = cur_base;
+         kernel_size = load_image_targphys(machine->kernel_filename,
+                                           cur_base,
+-                                          ram_size - cur_base);
++                                          machine->ram_size - cur_base);
+         if (kernel_size < 0) {
+             error_report("could not load kernel '%s'",
+                          machine->kernel_filename);
+@@ -1097,7 +1099,7 @@ void ppce500_init(MachineState *machine)
+     if (machine->initrd_filename) {
+         initrd_base = (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
+         initrd_size = load_image_targphys(machine->initrd_filename, initrd_base,
+-                                          ram_size - initrd_base);
++                                          machine->ram_size - initrd_base);
+ 
+         if (initrd_size < 0) {
+             error_report("could not load initial ram disk '%s'",
+@@ -1115,7 +1117,7 @@ void ppce500_init(MachineState *machine)
+      * ensures enough space between kernel and initrd.
+      */
+     dt_base = (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
+-    if (dt_base + DTB_MAX_SIZE > ram_size) {
++    if (dt_base + DTB_MAX_SIZE > machine->ram_size) {
+             error_report("not enough memory for device tree");
+             exit(1);
+     }
 -- 
 1.8.3.1
 
