@@ -2,98 +2,89 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF78DC35DE1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93808C35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:51:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA5FA2176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E6A221744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:51:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+4VDCDF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA5FA2176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wlc/hzHX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6A221744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6acK-0003V7-Ts
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:51:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39882)
+	id 1j6aca-0003vr-K0
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:51:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6aJa-0004L2-VX
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:32:02 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6ZkW-0003pC-HL
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6aJX-0001TH-Ei
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:31:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20435
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6aJX-0001Rd-9z
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 08:31:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582637514;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uTsJ/8+pgAJA8aCEg9n/FH0oFAs/lK8brgom/Sq5Y68=;
- b=Q+4VDCDFZI/82btVxKjX7Abz6myGpx6wTagDLkRSyAlqNGbpA59jO2e1a0x22nH5luY4tQ
- iY8hFe9ZeiNh4RRf2iUTB2yaf+dF2X1p2Y08YZ89KgYSYNTPzy9ol27DiYVygr2rJP6dtp
- TEAjxPau4dP8XpuoXjm+Y30bwKhcfO8=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-ilsNRPbbPeO2tmxaGBArsw-1; Tue, 25 Feb 2020 08:31:51 -0500
-X-MC-Unique: ilsNRPbbPeO2tmxaGBArsw-1
-Received: by mail-qv1-f72.google.com with SMTP id cp3so12886375qvb.8
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 05:31:51 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1j6ZkV-0004A9-F8
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:44 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42110)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6ZkV-00048g-77
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:55:43 -0500
+Received: by mail-wr1-x443.google.com with SMTP id p18so10963749wre.9
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 04:55:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=EBaGCMW6W6S2Wg/FY9JiNSNkk1jY3/TyEWd55UX+4ek=;
+ b=Wlc/hzHXbGUzouldUtC2d3w93tY3tBXwVYf7DnxH2x1Ww7rQwpHCNMwF46GPpJ/kxf
+ QcJZpGIWgur4DasbTEOcFuWzjjwUDfVUX13yv+OOdsoXT9w9eDh2jtq+cQ78wyLkZqwF
+ kszseq0rmPJnqbCWWJpBIY4UsrEB8togkUpuUdCVjDV+dlCYD7zc37kZIDXBrikVd8gd
+ I6kEy1i+g6Jg243zPs3roeM6ysSfofsvIkn4tIDvt4tYrwJlQ3N8Ac7fTR3kNnngMAin
+ oIbqmzQylyOlfGHQM0DrDTNfffS2u11OJ8/Um/PGtd8ATfkGH82TavfAMTA8JEruFzX/
+ svUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=bdDMtQeb45LkMtjpYYrGARJmB+J3Cf2I9ttM8Mqc1LA=;
- b=X0yT+PqNqoB30wCjmCri3MF43zqeq+pEvYRJ6VfLGAM97XTRomYgP/x4rrKQJ/FVCe
- vb11y7z9ndB8cBWJ0N89t/+PjGEpv492IXqmaAG8H389or9v2SJDrJdmYyKC77SUP+KV
- KOuWcpNkPucEqaIbzknipL9TX6cSp2aDVVAiBr/u1J7nWUR8ab4VNQkcQSeUk6/IO21d
- i90DOttnjAnPZ/DCTZTkFoaj31kh/BX6vi2ZYz/7mpKfoQevgRpfpnqSdTLjcojsjaK2
- JJhZmN9WTsarkjSMNRPhaRpOa5TbUGVfQuqeffvpMXxgxYTQCT2kMacYGzXJ2IM/9ML6
- Iuyw==
-X-Gm-Message-State: APjAAAXhF4qxx0Hwx+M8Jan8w0W27NSwOI1w0DILubwfATsoQQHTFaTC
- pB+xHjw2iHLPYBWuUdIaGYoROHztfInLkvgrJXVdZzowfKuZKpqxwmksYwfBWpOJ6o1fLeww5OP
- QlDgcdz/YrxKq2gs=
-X-Received: by 2002:a05:6214:38c:: with SMTP id
- l12mr50614390qvy.224.1582637511171; 
- Tue, 25 Feb 2020 05:31:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyE+xzwFNoH8U60ZdPkEe7q9JnNVz0eZkP1aFKf03/+dH5f6d3W27+/p2/nFzOlVApD0Wnnzw==
-X-Received: by 2002:a05:6214:38c:: with SMTP id
- l12mr50614367qvy.224.1582637510971; 
- Tue, 25 Feb 2020 05:31:50 -0800 (PST)
-Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
- by smtp.gmail.com with ESMTPSA id
- t37sm7793929qth.0.2020.02.25.05.31.48
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=EBaGCMW6W6S2Wg/FY9JiNSNkk1jY3/TyEWd55UX+4ek=;
+ b=tlJeHupX/Fo+alj3eg3SMML0m5O36XJRxiQECuGSNmz8R7ZvNp2mYjB94pXu/Q1HBa
+ nUXKoGroRiSC7YxrsS7G4NU/rBn4e3ZYlxFPgwzD+wjD3OQ3coBaU4IWWwAsqzHAGzYS
+ ysmGKwW64hFWEf3PAhi6M5pcZb1wAxam1jHkoanKrqKuDofd3DE9d5fj+0ZPxpMqc6b5
+ w26hxGwmyunGdLP1q+86QiS5gFesN4towrlg4YaEo/bUAkNiryVlhrMdEzmSZggahUR+
+ 2JLs1tIT2bKpGS0bc+lIz3ADuNQj1CzB8y74lTXKRlyf1u1GJxPB5F4l1b76Vxg6CkN5
+ nSvg==
+X-Gm-Message-State: APjAAAUmTh4ezTEfQBMJBusKBvrfPuqpcO13r4n+S/0jNZKMLpT/NqnG
+ e0FaH6pihmCabpsJSl5DeVuJUA==
+X-Google-Smtp-Source: APXvYqxKmpx+NcYJEQZfvMqGSjgBhUfvDVxPbOXA3ZI+qNbeuqQAqGcuMU77aHy01/2sOonnetE/fw==
+X-Received: by 2002:adf:f18e:: with SMTP id h14mr14710204wro.51.1582635342188; 
+ Tue, 25 Feb 2020 04:55:42 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v16sm3964669wml.11.2020.02.25.04.55.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 05:31:50 -0800 (PST)
-Date: Tue, 25 Feb 2020 08:31:46 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: pannengyuan@huawei.com
-Subject: Re: [PATCH 2/2] vhost-use-blk: convert to new virtio_delete_queue
-Message-ID: <20200225083133-mutt-send-email-mst@kernel.org>
-References: <20200213012807.45552-1-pannengyuan@huawei.com>
- <20200213012807.45552-3-pannengyuan@huawei.com>
+ Tue, 25 Feb 2020 04:55:37 -0800 (PST)
+Received: from zen.home.arpa (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CE1961FFA6;
+ Tue, 25 Feb 2020 12:47:11 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v3 17/19] tcg: save vaddr temp for plugin usage
+Date: Tue, 25 Feb 2020 12:47:08 +0000
+Message-Id: <20200225124710.14152-18-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
+References: <20200225124710.14152-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200213012807.45552-3-pannengyuan@huawei.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,83 +96,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
+ pbonzini@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, robhenry@microsoft.com,
+ qemu-stable@nongnu.org, marcandre.lureau@redhat.com,
+ aaron@os.amperecomputing.com, cota@braap.org, stefanha@redhat.com,
+ kuhn.chenqun@huawei.com, peter.puhov@linaro.org, aurelien@aurel32.net,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 09:28:07AM +0800, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
->=20
-> use the new virtio_delete_queue function to cleanup.
->=20
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-typo in subject use-blk->user-blk
+While do_gen_mem_cb does copy (via extu_tl_i64) vaddr into a new temp
+this won't help if the vaddr temp gets clobbered by the actual
+load/store op. To avoid this clobbering we explicitly copy vaddr
+before the op to ensure it is live my the time we do the
+instrumentation.
 
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Cc: qemu-stable@nongnu.org
+---
+ tcg/tcg-op.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-> ---
->  hw/block/vhost-user-blk.c          | 11 +++++++----
->  include/hw/virtio/vhost-user-blk.h |  1 +
->  2 files changed, 8 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 2eba8b9db0..ed6a5cc03b 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -420,9 +420,10 @@ static void vhost_user_blk_device_realize(DeviceStat=
-e *dev, Error **errp)
->      virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
->                  sizeof(struct virtio_blk_config));
-> =20
-> +    s->virtqs =3D g_new0(VirtQueue *, s->num_queues);
->      for (i =3D 0; i < s->num_queues; i++) {
-> -        virtio_add_queue(vdev, s->queue_size,
-> -                         vhost_user_blk_handle_output);
-> +        s->virtqs[i] =3D virtio_add_queue(vdev, s->queue_size,
-> +                                        vhost_user_blk_handle_output);
->      }
-> =20
->      s->inflight =3D g_new0(struct vhost_inflight, 1);
-> @@ -461,8 +462,9 @@ virtio_err:
->      g_free(s->vqs);
->      g_free(s->inflight);
->      for (i =3D 0; i < s->num_queues; i++) {
-> -        virtio_del_queue(vdev, i);
-> +        virtio_delete_queue(s->virtqs[i]);
->      }
-> +    g_free(s->virtqs);
->      virtio_cleanup(vdev);
->      vhost_user_cleanup(&s->vhost_user);
->  }
-> @@ -482,8 +484,9 @@ static void vhost_user_blk_device_unrealize(DeviceSta=
-te *dev, Error **errp)
->      g_free(s->inflight);
-> =20
->      for (i =3D 0; i < s->num_queues; i++) {
-> -        virtio_del_queue(vdev, i);
-> +        virtio_delete_queue(s->virtqs[i]);
->      }
-> +    g_free(s->virtqs);
->      virtio_cleanup(vdev);
->      vhost_user_cleanup(&s->vhost_user);
->  }
-> diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost=
--user-blk.h
-> index 108bfadeeb..f68911f6f0 100644
-> --- a/include/hw/virtio/vhost-user-blk.h
-> +++ b/include/hw/virtio/vhost-user-blk.h
-> @@ -37,6 +37,7 @@ typedef struct VHostUserBlk {
->      struct vhost_inflight *inflight;
->      VhostUserState vhost_user;
->      struct vhost_virtqueue *vqs;
-> +    VirtQueue **virtqs;
->      guint watch;
->      bool connected;
->  } VHostUserBlk;
-> --=20
-> 2.21.0.windows.1
->=20
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 7d782002e3f..e2e25ebf7db 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2794,13 +2794,26 @@ static void tcg_gen_req_mo(TCGBar type)
+     }
+ }
+ 
++static inline TCGv plugin_prep_mem_callbacks(TCGv vaddr)
++{
++#ifdef CONFIG_PLUGIN
++    if (tcg_ctx->plugin_insn != NULL) {
++        /* Save a copy of the vaddr for use after a load.  */
++        TCGv temp = tcg_temp_new();
++        tcg_gen_mov_tl(temp, vaddr);
++        return temp;
++    }
++#endif
++    return vaddr;
++}
++
+ static inline void plugin_gen_mem_callbacks(TCGv vaddr, uint16_t info)
+ {
+ #ifdef CONFIG_PLUGIN
+-    if (tcg_ctx->plugin_insn == NULL) {
+-        return;
++    if (tcg_ctx->plugin_insn != NULL) {
++        plugin_gen_empty_mem_callback(vaddr, info);
++        tcg_temp_free(vaddr);
+     }
+-    plugin_gen_empty_mem_callback(vaddr, info);
+ #endif
+ }
+ 
+@@ -2822,6 +2835,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+         }
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2868,6 +2882,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+         memop &= ~MO_BSWAP;
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2905,6 +2920,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+         }
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2967,6 +2983,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+         memop &= ~MO_BSWAP;
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+-- 
+2.20.1
 
 
