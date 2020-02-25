@@ -2,83 +2,143 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A401C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 969FEC35DF9
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:18:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0193C218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EB4D21744
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 09:18:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGA5+F20"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0193C218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="wbRnbXOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EB4D21744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6WLa-00029W-4E
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:17:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52310)
+	id 1j6WM3-0002zI-JX
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 04:18:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1j6WKH-0001NF-DE
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:16:26 -0500
+ (envelope-from <thanos.makatos@nutanix.com>) id 1j6WL8-0001wC-Oo
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:17:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1j6WKF-0003d8-FI
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:16:24 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30369
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j6WKF-0003cl-9z
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:16:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582622182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BzD+Ed0wtNrwv4nNWW/7jcUHVb/XdPkOFyMTny7i9rg=;
- b=fGA5+F20OktxszVTa36HZXFtp3kJMwmNGGa3qlhwUQuO1gE9csOzdI6eBrlLymePd936un
- oY2RD3YdhMOkaRo7UrRhakAmTVK7LOJXiCRzScJ7jnFdjrc/IzvVQjqAU1hQBwoRYLyOzZ
- Z1YRcs4GH43hBkJuEvlGkg0XQCfdN9E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-469-oPC5FVDKMAS-206B4lJ2xQ-1; Tue, 25 Feb 2020 04:16:15 -0500
-X-MC-Unique: oPC5FVDKMAS-206B4lJ2xQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 270D6107ACC5;
- Tue, 25 Feb 2020 09:16:14 +0000 (UTC)
-Received: from paraplu.localdomain (unknown [10.36.118.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AAF9F8C069;
- Tue, 25 Feb 2020 09:16:13 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id A2F463E04FA; Tue, 25 Feb 2020 10:16:11 +0100 (CET)
-Date: Tue, 25 Feb 2020 10:16:11 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 1/2] docs: Convert qemu-cpu-models.texi to rST
-Message-ID: <20200225091611.GF24572@paraplu>
-References: <20200220142001.20774-1-kchamart@redhat.com>
- <20200220142001.20774-2-kchamart@redhat.com>
- <CAFEAcA9_tDWLxBrsw42uxs7E_QmA5XzsMs6zwmzpckv=B0ksuw@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9_tDWLxBrsw42uxs7E_QmA5XzsMs6zwmzpckv=B0ksuw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <thanos.makatos@nutanix.com>) id 1j6WL5-0003w5-Vv
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:17:17 -0500
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:59768)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thanos.makatos@nutanix.com>)
+ id 1j6WL5-0003vD-Cj
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 04:17:15 -0500
+Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01P9Alcd020434; Tue, 25 Feb 2020 01:16:49 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=proofpoint20171006;
+ bh=n1JH8WoNJkF85mn6v+ZeTrc0nHlW4HQWDybksjAMlAk=;
+ b=wbRnbXOoJfQr0SwlPLpllWEUZOqvBo9Hzvd/sZXTPuLgtQIPNIXm+nbV0FlpvacbwQgW
+ DbwN+TxSdHX7PKktOOB3+eV/QiKKdWyokOb6LzrCM7ZfnM1DlMy05FUptYHEXuMPg3Pa
+ 8QcM2Vl0XXmk/Qk5Y4eO+/W1noGvJq1I60u1VDeDSVk8ajVc0ByMBXrhNhQq6TmFWdvY
+ bbXAjocjzacwBPaXoynxXi7kSyLeXDXzDFhTJlJh8w8E4DDrKtNobj9Tw6av8AqjnuSp
+ IdMevmtpGgSTagcMIKGVdFcpm1+fQmhzYPdF3SaxxjSWDDby1eM8Fw12dIL+/IJHBphN fQ== 
+Received: from nam10-bn7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10lp2108.outbound.protection.outlook.com [104.47.70.108])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2yb2qedvgw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 25 Feb 2020 01:16:48 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dU8pK3hIiLirLiaJ3PCiSpGrhExJLy1rbT3zG/9FX/D4fz1XI1wL7gZA7bAMfOqx/THIGpB4FdT+SCjiDZi+MNYO7Ps+rijWRQ5nOoCKAHOWKNEU31qIlBt6IoQ5DonG5Ky1jg93RzbE2fGC7Rk/XtzjoS+1roqWo47Dyu9W2ILHSCqNqizMEw+1Xc8vDeLSelAbahvv31MfjyPHZXGbtBr2ArHl/Vx5JsumheUbtzalZW2oPYrYBAHfnHVm+IPZam7wiqXa2IeDFBvBFmBxczOQB/wm/rwyI2pS9UythrftObcwvZsUAtVxhBKeXLqVDKECiTiJrnNbDOCHIT18aQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n1JH8WoNJkF85mn6v+ZeTrc0nHlW4HQWDybksjAMlAk=;
+ b=izbbo/+yS7YoWAsRJcY9wbOSN/9907145d3Nz61eJTjOgipzbznLz+v4SjK20YpI6CD6h/YfdtEICKu+NjivjSr750a+DilMaOU6V/xyJrGmoNTrjYRX1JAP85twuplrxS7/7NWgG48cA686Tg7rgFLiNYH7Xb6WAtuqCzaUwFdh90S3Z17cqQaZyUqFijEcuGXkJ8vjO1NxqIEsJ9K+Cl9CK9GWHqxKn8XXqfIWUn5vYqFASo/hGWTQWwpBieUPnFoO+sg/9PZKMDX3aqORmlqdrCcLOu+JRZ8wFZ0iK129QeRA3Ey7Hoea4d+O++Mw7RHJSO5+IWK2/hJArH2AXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MN2PR02MB6205.namprd02.prod.outlook.com (2603:10b6:208:1bf::17)
+ by MN2PR02MB6366.namprd02.prod.outlook.com (2603:10b6:208:1bc::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21; Tue, 25 Feb
+ 2020 09:16:46 +0000
+Received: from MN2PR02MB6205.namprd02.prod.outlook.com
+ ([fe80::b05b:f3e9:4d12:f4a9]) by MN2PR02MB6205.namprd02.prod.outlook.com
+ ([fe80::b05b:f3e9:4d12:f4a9%5]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
+ 09:16:45 +0000
+From: Thanos Makatos <thanos.makatos@nutanix.com>
+To: Alex Williamson <alex.williamson@redhat.com>, Felipe Franciosi
+ <felipe@nutanix.com>
+Subject: RE: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
+ status update
+Thread-Topic: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
+ status update
+Thread-Index: AQHVryXIg/uKp1+E6Uq+iMIQmMM9NKe35WUAgAVPdACAAAL2AIABWUMAgABrS4CAAmvVgIAACnqAgAAGGACAAV3YAIAAAQkAgABJqYCAABPwAIBo5G+w
+Date: Tue, 25 Feb 2020 09:16:44 +0000
+Message-ID: <MN2PR02MB62051138ADD8C35156229EAC8BED0@MN2PR02MB6205.namprd02.prod.outlook.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <20191210064716.GA6401@flaka>
+ <20191213104116.GB1180977@stefanha-x1.localdomain>
+ <20191216194655.GA5922@flaka>
+ <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
+ <20191217163316.GB1333385@stefanha-x1.localdomain>
+ <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
+ <20191219115545.GD1624084@stefanha-x1.localdomain>
+ <772D9CF3-D15D-42D1-B9CF-1279619D7C20@nutanix.com>
+ <20191219125504.GI1190276@redhat.com>
+ <20191220094712.GA1635864@stefanha-x1.localdomain>
+ <bfaf0b42-513c-08f2-2d4f-d99437b7041d@redhat.com>
+ <9540FF2A-FC7E-40AE-9259-46EF431ED65F@nutanix.com>
+ <20191220082554.0c1bc63a@x1.home>
+In-Reply-To: <20191220082554.0c1bc63a@x1.home>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5e014110-580c-4031-4af6-08d7b9d36f83
+x-ms-traffictypediagnostic: MN2PR02MB6366:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR02MB6366FE6AA2DCAA8667E8A4D68BED0@MN2PR02MB6366.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0324C2C0E2
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(366004)(136003)(39860400002)(346002)(396003)(189003)(199004)(316002)(66446008)(33656002)(86362001)(4326008)(66476007)(66946007)(54906003)(110136005)(64756008)(2906002)(66556008)(76116006)(71200400001)(478600001)(7416002)(26005)(9686003)(7696005)(44832011)(81156014)(8936002)(55016002)(8676002)(52536014)(4744005)(6506007)(186003)(81166006)(5660300002)(6636002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR02MB6366;
+ H:MN2PR02MB6205.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1tWduPH0J+gR93P8NbVNHRJ7Iy7jPQMC9XkBxIie6wASacCzw1x/nYdOsOaG8dPaxHNpVI3mOwxb9lKsxixsLOLALzINafmmb4dinkg89YAUeipHBdkNF8kq1VprrVfgFyk3qLmdboDMYkJ+GwOcSotXt/aC+x1S/1hh8fHhlT9CMW1JPv/l2xJ7kvE2dayDmKhPt+RCceLcrKvLz464CS2gRySlmLgCp4Z2v29ixhiPVh3FTkbKH11Ybbvap+3HWZs6C4YTF+K0cxA8RQwcy05TaDDfFxcXfTWKP6ZEfIu9WbgTrj2dZPRQJQ5oj3em4ZvtkedRfBYQyT3JEvtfdyDz+dQnvkALzfTpHONmoDrOxj8ec51IRXq4NzX8mfu+0p5ohiqBAIitB/GQvCrHqFSiOiwYYyw5hICzHYLFLsh2TmvOXUru9VRALNiebaisn5fwysJJGj9m6jPotiT4k4w2VTO8N7vLVDlEkVqGIwkKfzVbO8ptBRKiKwn06NzMrF69YO/CfU5yg0HCtiALwQ==
+x-ms-exchange-antispam-messagedata: Rm/n9jwUFy87OAz2LDRS8zfICr6xdcw4ryfBjmnVsWZXhGwAemu0bK2AuXh7/he/xlYh+cB5MqpuW91R/fDE5CIlv7UUdBX4l6L++PuJB/IFKdNTr+qQJjUE+RZ/JgXpWxrq3dRiSBUJ62llLTGH4g==
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e014110-580c-4031-4af6-08d7b9d36f83
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2020 09:16:45.3109 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 228Y7l+Xomni/jHbBQ8afQBW3LK79dfgQjYBhO0k8bT1HAY2VUNxLEJWUr+9YNFfa0uZGnyIUohuJGXY2D+QI95vM7IaALF0LCYoTXRKsO4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6366
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-25_02:2020-02-21,
+ 2020-02-25 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,151 +150,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Walker,
+ Benjamin" <benjamin.walker@intel.com>, "kraxel@redhat.com" <kraxel@redhat.com>,
+ "jag.raman@oracle.com" <jag.raman@oracle.com>, "Harris,
+ James R" <james.r.harris@intel.com>,
+ "quintela@redhat.com" <quintela@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "liran.alon@oracle.com" <liran.alon@oracle.com>,
+ "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ =?iso-8859-1?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+ "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 21, 2020 at 03:16:29PM +0000, Peter Maydell wrote:
-> On Thu, 20 Feb 2020 at 14:20, Kashyap Chamarthy <kchamart@redhat.com> wro=
-te:
-
-[...]
-
-> > @@ -1056,6 +1055,8 @@ $(call define-manpage-rule,interop,\
-> >
-> >  $(call define-manpage-rule,system,qemu-block-drivers.7)
-> >
-> > +$(call define-manpage-rule,system,qemu-cpu-models.7)
+> > 3) Muser.ko pins the pages (in get_dma_map(), called from below)
+> > (https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
+> 3A__github.com_nutanix_muser_blob_master_kmod_muser.c-
+> 23L711&d=3DDwICAg&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6ogtt
+> i46atk736SI4vgsJiUKIyDE&m=3DC8rTp4SZoy4YNcZWntiROp3otxCyKbLoQXBw8O
+> SB0TM&s=3DG2JfW1GcVNc_iph7C4hE285sTZM8JrR4dYXgmcyAZPE&e=3D )
 >=20
-> The new manpage should be added to the existing define-manpage-rule
-> invocation for the system manual: the last argument is a space
-> separated list of all the manpages in the manual, like this:
->=20
-> $(call define-manpage-rule,system,qemu-block-drivers.7 qemu-cpu-models.7)
+> Yikes, it pins every page??  vfio_pin_pages() intends for the vendor
+> driver to be much smarter than this :-\  Thanks,
 
-Ah, will fix.
-
-[...]
-
-> > +++ b/docs/system/conf.py
-> > @@ -18,5 +18,8 @@ html_theme_options['description'] =3D u'System Emulat=
-ion User''s Guide'
-> >  man_pages =3D [
-> >      ('qemu-block-drivers', 'qemu-block-drivers',
-> >       u'QEMU block drivers reference',
-> > +     ['Fabrice Bellard and the QEMU Project developers'], 7),
-> > +    ('qemu-cpu-models', 'qemu-cpu-models',
-> > +     u'QEMU CPU Models',
-> >       ['Fabrice Bellard and the QEMU Project developers'], 7)
-> >  ]
->=20
-> The old manpage/documentation credits Dan as the author,
-> so that's what we should specify in the conf.py line,
-> rather than 'Fabrice and the project devs' (which we
-> use for qemu-block-drivers.7 because that's what the
-> old texi version of that file specified as the authors).
-
-Yeah, I first felt strange adding "Fabrice and the QEMU Project
-developers".  But as you've guessed I just picked what you used for
-'qemu-block-drivers.7'.  That's why I mentioned Dan and his original
-commit ID in my commit message, for clear posterity.
-
-As Dan says in his follow-up, a file indeed usually gets modified over
-time.  And given the follow-up interaction between you and Dan, in the
-next iteration, I'll change it to: "The QEMU Project developers".
-
-(While I agree that we should be careful to not mix attribution changes
-with the noise of rST conversion, maybe in this case a seperate commit
-is an overkill; hope it is okay if I call it out in the commit message.)
-
-> > +Preferred CPU models for Intel x86 hosts
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +
-> > +The following CPU models are preferred for use on Intel hosts.
-> > +Administrators / applications are recommended to use the CPU model tha=
-t
-> > +matches the generation of the host CPUs in use. In a deployment with a
-> > +mixture of host CPU models between machines, if live migration
-> > +compatibility is required, use the newest CPU model that is compatible
-> > +across all desired hosts.
-> > +
-> > +* Intel Xeon Processor (Skylake, 2016)
-> > +
-> > +  * ``Skylake-Server``
-> > +  * ``Skylake-Server-IBRS``
->=20
-> This reverses the old ordering of these lists, which consistently
-> had the QEMU CPU model names as the 'term' and the explanations
-> as the 'definition' of a definition-list. Now we have the
-> 'explanation' first and the 'terms' second...
-
-Yeah, as you guessed, I was trying to wrangle with rST syntax.
-
-> > +* AMD EPYC Processor (2017)
-> > +
-> > +  * ``EPYC``
-> > +  * ``EPYC-IBPB``
-> > +
-> > +* ``Opteron_G5`` =E2=80=93 AMD Opteron 63xx class CPU (2012)
-> > +
-> > +* ``Opteron_G4`` =E2=80=93 AMD Opteron 62xx class CPU (2011)
-> > +
-> > +* ``Opteron_G3`` =E2=80=93 AMD Opteron 23xx (Gen 3 Class Opteron, 2009=
-)
-> > +
-> > +* ``Opteron_G2`` =E2=80=93 AMD Opteron 22xx (Gen 2 Class Opteron, 2006=
-)
-> > +
-> > +* ``Opteron_G1`` =E2=80=93 AMD Opteron 240 (Gen 1 Class Opteron, 2004)
->=20
-> ...but here we become inconsistent, switching back to
-> term first and explanation second. I think the
-> term-first approach of the original texi makes more sense,
-> as we're trying to document the behaviour of the various
-> CPU models QEMU supports.
-
-True, I'll stick with the term-first approach, and get rid of the
-inconsistency.
-
-> rST is not a fan of having multiple definition list items
-> sharing a definition, which is probably why you ended up with
-> the list approach you did, but we can do:
->=20
-> ``Skylake-Server``, ``Skylake-Server-IBRS``
->     Intel Xeon Processor (Skylake, 2016)
->=20
-> ``Skylake-Client``, ``Skylake-Client-IBRS``
->     Intel Core Processor (Skylake, 2015)
->=20
-> Or we can actually document what the difference is between
-> a "Skylake-Server" and a "Skylake-Server-IBRS", rather than
-> leaving the user to guess :-), in which case we could write
-
-> ``Skylake-Server``
->     Intel Xeon Processor (Skylake, 2016)
-> ``Skylake-Server-IBRS``
->     Like ``Skylake-Server`` but with extra magic
->=20
-> (or whatever the difference is...)
-
-(The difference is the -IBRS models have 'spec-ctrl' CPU flag baked in.)
-
-And yes, I like the latter approach =E2=80=94 explicitly spelling it out re=
-duces
-cogntive load for the readers.
-
-> Regardless of how we format this, we should be consistent
-> in using the same format throughout the document.
-
-Agree, will fix.  Thanks for the eagle eyes, as usual. :-)
-
-[...]
-
-
---=20
-/kashyap
-
+We no longer have to pin pages at all. Instead we grab the fd backing the V=
+MA
+and inject it in libmuser, and then request it to mmap that file. This also
+solves a few other problems and is far simpler to implement.
 
