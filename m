@@ -2,74 +2,168 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3B2C4BA04
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C68C4BA06
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 145D021927
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:51:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145D021927
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 277022075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 23:58:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="0+42hZQf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277022075D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6jys-0004iD-5J
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 18:51:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57937)
+	id 1j6k6J-0006Jh-Aj
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 18:58:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44037)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j6jyK-0004JH-2w
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:50:41 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1j6k5f-0005lx-4T
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j6jyI-0005r0-Kf
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:50:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36998)
+ (envelope-from <aik@ozlabs.ru>) id 1j6k5d-0000GR-Ay
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:58:14 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:39814)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j6jyI-0005n2-Dm
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:50:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j6jyH-0003Ns-2u
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1356E2E80C7
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:50:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1j6k5c-0000BP-Po
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 18:58:13 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id e9so453306pjr.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 15:58:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=jX07gwWeW/4BAeME7XDi+8/AApGXKgj1BsgffHYTabY=;
+ b=0+42hZQfLJB0NXnJLxQeU/I5MchsQ4Ln3+lv93KYvJ48YoGs/9fIi732G+gRfBoHpK
+ n2T+FQr1M0YsFN7rAeBF50GDyCbc+vS5KtcdrCFHDGfL0xLd0aH4SviAuTFL4FttEHrz
+ UBsxIRjoh0Kt7hZmAc9R3vtWF1QjTtSrHDAFg7NRBNAOoS30MnhdMZhTpXklpVGNqLC9
+ /9uUgvx1qfEII9wGIig5hG8lPI0E5PudUlgUCH9JwotJC1A5c3iqoHsTduvJabYfw2uJ
+ 6vxIPXZskA+OiYAiUEw8kg27b7yhk/19Xk4eC1GohkCLHAUOUCLRR9m0tzL2x9C7pIN/
+ dDDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=jX07gwWeW/4BAeME7XDi+8/AApGXKgj1BsgffHYTabY=;
+ b=JPdYPKHyXvlF9vcKbb8kiBHx1sY6Ip+p6RFghrw4wk4TFOj5zWVOTCCMlw1Q9IpYIW
+ fpzkRSiHL8ooKE+Yhy8Uk+GuRlL4ZhRcAdCsadRZBocPrek7wLle1e20Ll9GtzKLIIuH
+ Pw3JeMVjI73n8+ARTURWIHJueklRr0rOC4Krf/4Cj8/52HemRKtKXZ0ZY6448lIe7ZSr
+ jdBVMKWsGYgQeVgsLIAZLY8hStG2YRPJy9eDJoD6YkWboQHwgluqClCsqpYV9W+IgyUV
+ vL7/pS/1HyitFeLrEXfh6wudOnLgei4dQZqxE7dPAUtgcFXxqrGRTXVu4WeImG180mye
+ MU+A==
+X-Gm-Message-State: APjAAAU+pHEyfWb/XZm6DhIeyCdG62YOUPkvdFv2GQgD4VoeCYF+B4/R
+ 4Eo1lLZHirhlPO7Dc45Bc7ThLQ==
+X-Google-Smtp-Source: APXvYqzPzBcHbuXwxffTmvxNrGXzBroYeKxiXIhdLFT+qFwajGOrNQclAvVmZPrMCqNHW+lIY1RYwA==
+X-Received: by 2002:a17:90a:f0c1:: with SMTP id
+ fa1mr1822046pjb.129.1582675091465; 
+ Tue, 25 Feb 2020 15:58:11 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id e6sm213777pfh.32.2020.02.25.15.58.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Feb 2020 15:58:10 -0800 (PST)
+Subject: Re: [PATCH qemu v7 0/5] spapr: Kill SLOF
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200220061622.15064-1-aik@ozlabs.ru>
+ <db675fc6-9d07-1780-134d-6a9279328b29@redhat.com>
+ <68b71292-48db-e2ec-5f22-fe4580c2938e@ozlabs.ru>
+ <4109357e-0912-9633-20ad-28269efb2422@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <9fc15711-5d06-e73a-798c-6f7c9ee05884@ozlabs.ru>
+Date: Wed, 26 Feb 2020 10:58:07 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 25 Feb 2020 23:40:46 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier xiaoxing-fang
-X-Launchpad-Bug-Reporter: Xiaoxing Fang (xiaoxing-fang)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <158266147970.14929.12590183127375701795.malonedeb@wampee.canonical.com>
-Message-Id: <158267404692.18796.11868805424384979986.malone@chaenomeles.canonical.com>
-Subject: [Bug 1864704] Re: No compatible -machine option in qemu-system-ppc64
- for e6500 core
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: c2b261d4ab7c44c989814f0a1db19a535116af5b
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <4109357e-0912-9633-20ad-28269efb2422@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,76 +172,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1864704 <1864704@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Try "-M ppce500 -cpu e6500"
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1864704
+On 21/02/2020 19:27, Paolo Bonzini wrote:
+> On 21/02/20 01:18, Alexey Kardashevskiy wrote:
+>> I am not quite sure I understood the request.  Write my own small
+>> firmware and replace GRUB with it? The firmware from 5/5 reads first 2
+>> sectors and the entire PReP, I could add there stuff if that helps (I
+>> have "work in progress" patch for the firmware with printk/etc borrowed
+>> from SLOF).
+> 
+> Okay, that's great!  I'll take a look next week.
 
-Title:
-  No compatible -machine option in qemu-system-ppc64 for e6500 core
 
-Status in QEMU:
-  New
+Just to make sure I understood - you'll take a look on this series, you
+do not expect other patches on top, right?
 
-Bug description:
-  Hi,
 
-  I'm trying to use qemu-system-ppc64 for emulating a QorIQ T2080 (with e65=
-00 cores). =
 
-  However, I couldn't find any -machine option that matches -cpu e6500 opti=
-on, which are listed below:
+ps. while I have your attention, what was the practical reason for
+including capstone to QEMU? Thanks,
 
-  C:\Program Files\qemu>qemu-system-ppc64 -machine help
-  Supported machines are:
-  40p                  IBM RS/6000 7020 (40p)
-  bamboo               bamboo
-  g3beige              Heathrow based PowerMAC
-  mac99                Mac99 based PowerMAC
-  mpc8544ds            mpc8544ds
-  none                 empty machine
-  powernv8             IBM PowerNV (Non-Virtualized) POWER8
-  powernv              IBM PowerNV (Non-Virtualized) POWER9 (alias of power=
-nv9)
-  powernv9             IBM PowerNV (Non-Virtualized) POWER9
-  ppce500              generic paravirt e500 platform
-  prep                 PowerPC PREP platform (deprecated)
-  pseries-2.1          pSeries Logical Partition (PAPR compliant)
-  pseries-2.10         pSeries Logical Partition (PAPR compliant)
-  pseries-2.11         pSeries Logical Partition (PAPR compliant)
-  pseries-2.12         pSeries Logical Partition (PAPR compliant)
-  pseries-2.12-sxxm    pSeries Logical Partition (PAPR compliant)
-  pseries-2.2          pSeries Logical Partition (PAPR compliant)
-  pseries-2.3          pSeries Logical Partition (PAPR compliant)
-  pseries-2.4          pSeries Logical Partition (PAPR compliant)
-  pseries-2.5          pSeries Logical Partition (PAPR compliant)
-  pseries-2.6          pSeries Logical Partition (PAPR compliant)
-  pseries-2.7          pSeries Logical Partition (PAPR compliant)
-  pseries-2.8          pSeries Logical Partition (PAPR compliant)
-  pseries-2.9          pSeries Logical Partition (PAPR compliant)
-  pseries-3.0          pSeries Logical Partition (PAPR compliant)
-  pseries-3.1          pSeries Logical Partition (PAPR compliant)
-  pseries-4.0          pSeries Logical Partition (PAPR compliant)
-  pseries-4.1          pSeries Logical Partition (PAPR compliant)
-  pseries              pSeries Logical Partition (PAPR compliant) (alias of=
- pseries-4.2)
-  pseries-4.2          pSeries Logical Partition (PAPR compliant) (default)
-  ref405ep             ref405ep
-  sam460ex             aCube Sam460ex
-  taihu                taihu
-  virtex-ml507         Xilinx Virtex ML507 reference design
 
-  I am wondering if anyone knows that is if any of them can be selected
-  for such emulation? Thank you!
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1864704/+subscriptions
+> 
+> Thanks,
+> 
+> Paolo
+> 
+>>>  (Also, I lost the pointer to your super-minimal
+>>> pSeries firmware).
+>>
+>> It is incorporated into these patches under /pc-bios/vof - 4/5 has the
+>> minimum (may be even too much), 5/5 has MBR+GPT+ELF.
+> 
+> 
+
+-- 
+Alexey
 
