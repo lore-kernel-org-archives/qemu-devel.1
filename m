@@ -3,125 +3,126 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D076C35DF5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D76C35DF5
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:30:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6697E222C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:28:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEAF3222C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 07:29:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HMNLvPUl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6697E222C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJumWALl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAF3222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6Udl-0003SP-Kr
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:28:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39831)
+	id 1j6UfH-0004OQ-4O
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 02:29:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39955)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j6UdB-00033o-1o
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:50 -0500
+ (envelope-from <david@redhat.com>) id 1j6UeH-0003vW-7g
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:29:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j6Ud8-0005mV-Qy
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:48 -0500
-Received: from mail-eopbgr80112.outbound.protection.outlook.com
- ([40.107.8.112]:57729 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j6Ud7-0005jH-Q1
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:27:46 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UJFwz28/SbnjPIodj6OSYh/JKBikq0EwZLjsJ3jTfwItpOMJ5/pwLXFlG1pZQtKlZRUgLHdKseYHx04VLyO0gYWmLbA/qwSjlycjVVARVqAZTqRN6B1bS8ZTJ0o6jvx/RDKtx9wc/UHsWbSWH24SMr1kq0dBzrgwnadb2JXwQsXFQrUKmlfLIFk6BBNhAAacbs2QEy6hWzj0T2NJDDZOOMgPMS5ZNwaMxqTk6CL0OF0Q7N7uPNwtgAdXDblCj8aByHXUJrpkYbnkbhuadO8WAaSTh5YUs83feGHPxyG+HK06HGdVlAnphjV9MY+BAijy+PvNFK1Zgbp+SFWVwWaQJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=00aQ17MsWtSeIZvHJjdeeSa9aYhkcVTrZDKsL/bpBTg=;
- b=HQBpDN3Xp0j2usWdUsDQtHgWJVfRm3bXn4zBKHghWYrSDqWt4Zb/ZMChXnj0+8XfHlUJqfdDf8U/pSwliYQQyrb2BJlADlTXqNVxEx04WoxzkOsYp6PkMUO/GUGvRocD6F5ddAIsQE9g4stHSoAhhIiNF7oLGUA5y32zr/qmfmhHmN0qNxLqlyAA2HGyrmMNEXj0KDNzrGsMcYUWM0Jy+6hD3GkC1SGnfwXY5JQVAj5xNpQBM9ZEo6rp7b4cxyNs3OCIw4R6OL1udMRUZuDgZNWP64r7NLlNjKdc02hhFw3PxKKkO62RedvAxJ7F3rdiJf1M5BR+C5TW+z35801KRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=00aQ17MsWtSeIZvHJjdeeSa9aYhkcVTrZDKsL/bpBTg=;
- b=HMNLvPUlwqOdc37hga9pPgi1kN+hUPMBBUW9Npyg/njs39n5QTTRwTwHgJJXKc3cHEtmBUaWJ/CeXCaTcNK7BKI8FxMf66DEAXzYqb5AZlo45G6x+Mm6xcsUGpT4EH8xfDya3z2E+7EC2NnTHSlcK3rYMCjlIQ+hxP2AKJyVPAc=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4197.eurprd08.prod.outlook.com (20.179.3.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Tue, 25 Feb 2020 07:27:40 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
- 07:27:38 +0000
-Subject: Re: Race condition in overlayed qcow2?
-To: dovgaluk <dovgaluk@ispras.ru>
-References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
- <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
- <5891b48a131321be62a4a311253da44c@ispras.ru>
- <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
- <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
- <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
- <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
- <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
- <99ed3129-9460-dbad-0441-95bad08d5636@virtuozzo.com>
- <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200225102735605
-Message-ID: <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
-Date: Tue, 25 Feb 2020 10:27:35 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR0301CA0009.eurprd03.prod.outlook.com
- (2603:10a6:3:76::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <david@redhat.com>) id 1j6UeF-0006VZ-77
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:28:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53790
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6UeE-0006Um-UL
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 02:28:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582615733;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=L39lK3oWXaiWoVX7Qh3nzxFe3Oc4ieZsZ0vruPMbxcE=;
+ b=RJumWALlY4vpFDfvOTlJccaCN5UZahRxDycLnJkywT+D7dUbgzK75ExgfPT3a/N0lZGmtM
+ 0x/CcWiu1W7AmvYEfJWbmJJp/oIcDUO28LwD27hmQM1bujeO6l/KBAta/Dqpd+8+EcIpY3
+ JfxZcSQ78IXDR+egy+K3GfjEGtuSQiw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-hJpmIWz4Nj-IF6cSr0buvg-1; Tue, 25 Feb 2020 02:28:52 -0500
+X-MC-Unique: hJpmIWz4Nj-IF6cSr0buvg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDFC3800EB4;
+ Tue, 25 Feb 2020 07:28:50 +0000 (UTC)
+Received: from [10.36.117.12] (ovpn-117-12.ams2.redhat.com [10.36.117.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7D03485F13;
+ Tue, 25 Feb 2020 07:28:43 +0000 (UTC)
+Subject: Re: [PATCH v2 10/13] migration/ram: Handle RAM block resizes during
+ postcopy
+To: Peter Xu <peterx@redhat.com>
+References: <20200221164204.105570-1-david@redhat.com>
+ <20200221164204.105570-11-david@redhat.com> <20200224222618.GA113102@xz-x1>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <0a89700f-f93c-d276-6b50-87e98023a84d@redhat.com>
+Date: Tue, 25 Feb 2020 08:28:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0301CA0009.eurprd03.prod.outlook.com (2603:10a6:3:76::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.18 via Frontend Transport; Tue, 25 Feb 2020 07:27:37 +0000
-X-Tagtoolbar-Keys: D20200225102735605
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f6abbc7e-a0e8-4d31-f53b-08d7b9c430ec
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4197:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4197D0BE4134976AD26FF961C1ED0@AM6PR08MB4197.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-Forefront-PRVS: 0324C2C0E2
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(366004)(396003)(136003)(376002)(39850400004)(346002)(199004)(189003)(81156014)(81166006)(2616005)(956004)(8676002)(186003)(66556008)(16526019)(66476007)(16576012)(26005)(66946007)(36756003)(31686004)(8936002)(4326008)(6916009)(5660300002)(478600001)(52116002)(86362001)(6486002)(316002)(31696002)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4197;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bPidUfneYtij7wS0fWqTRos097vBDom3UJRx72Ufeq+xztgdQTxWs83Nn4q2DswRZJu+9Z2TMYIojjAdWmr70Zk2tPfaTYD4MI4wkGwreQdyTuINv68A3B8Dq5CVIHugLOuPIug7vXEI8M9SEfgTompva4Fh/Ovl/w0f5/IHj/IivOsEODcj6bnGcPepHlJCTY94xB5Q5egy75jSR9N5IGJcEYckmZlwzn/J6uDyg1SG/WO04r4gAS2qcX4rY/6yIzy5uvoXWqVuOPRzsFYuOiy6twQ1YMTZaGyEMr7f/7T38EpBso15TDNg+hbxb8WHdW/n1GXm/xbYcpNR5m2id3JqvTpbSI+w2ITT31ZGjsRjdzqPHG1f/tVTlUag6nn3l8jV1PznqsMKqZCiz8BCULFYJj7RjKhCpcRqrapaqYNOo5hMl8dt4UEHhp6ElXV9
-X-MS-Exchange-AntiSpam-MessageData: 57QZoWQ/cvdc+yv/d3GSx+uzjAaKr+XSAXf7bC/aK9H3sS6gP5pkfIeMwOBVE5KI4NlslIIztskuBN27TT5XIvb+2i51Dhr3ri2AZqPwVTZPwn4a4R9Cak3wn9uDrsz+ygJSHsPioZWG/x/kvGEebg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6abbc7e-a0e8-4d31-f53b-08d7b9c430ec
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2020 07:27:38.3627 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xk9RqEqbtX/hWGFN4h0/WxxWkuOz9fiSidxXZ07An9wQI09AfseMs8HLce7mxl+pYDkD8UPtoAYlLIBWsR9VCdDBjc0a1mCmkMl/KQY/Wp0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4197
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.112
+In-Reply-To: <20200224222618.GA113102@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,152 +134,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Shannon Zhao <shannon.zhao@linaro.org>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-25.02.2020 8:58, dovgaluk wrote:
-> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21 16=
-:23:
->> 21.02.2020 15:35, dovgaluk wrote:
->>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-21 =
-13:09:
->>>> 21.02.2020 12:49, dovgaluk wrote:
->>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB 2020-02-2=
-0 12:36:
->>>>>>>> 1 or 2 are ok, and 4 or 8 lead to the failures.
->>>>>>>>
->>>>>>>>
->>>>>>>> That is strange. I could think, that it was caused by the bugs in
->>>>>>>> deterministic CPU execution, but the first difference in logs
->>>>>>>> occur in READ operation (I dump read/write buffers in blk_aio_comp=
-lete).
->>>>>>>>
->>>>>>>
->>>>>>> Aha, yes, looks strange.
->>>>>>>
->>>>>>> Then next steps:
->>>>>>>
->>>>>>> 1. Does problem hit into the same offset every time?
->>>>>>> 2. Do we write to this region before this strange read?
->>>>>>>
->>>>>>> 2.1. If yes, we need to check that we read what we write.. You say =
-you dump buffers
->>>>>>> in blk_aio_complete... I think it would be more reliable to dump at=
- start of
->>>>>>> bdrv_co_pwritev and at end of bdrv_co_preadv. Also, guest may modif=
-y its buffers
->>>>>>> during operation which would be strange but possible.
->>>>>>>
->>>>>>> 2.2 If not, hmm...
->>>>>>>
->>>>>>>
->>>>>>
->>>>>> Another idea to check: use blkverify
->>>>>
->>>>> I added logging of file descriptor and discovered that different resu=
-lts are obtained
->>>>> when reading from the backing file.
->>>>> And even more - replay runs of the same recording produce different r=
-esults.
->>>>> Logs show that there is a preadv race, but I can't figure out the sou=
-rce of the failure.
->>>>>
->>>>> Log1:
->>>>> preadv c 30467e00
->>>>> preadv c 30960000
->>>>> --- sum =3D a2e1e
->>>>> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 820=
-0
->>>>> --- sum =3D 10cdee
->>>>> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len: =
-ee00
->>>>>
->>>>> Log2:
->>>>> preadv c 30467e00
->>>>> --- sum =3D a2e1e
->>>>> bdrv_co_preadv_part complete offset: 30467e00 qiov_offset: 0 len: 820=
-0
->>>>> preadv c 30960000
->>>>> --- sum =3D f094f
->>>>> bdrv_co_preadv_part complete offset: 30960000 qiov_offset: 8200 len: =
-ee00
->>>>>
->>>>>
->>>>> Checksum calculation was added to preadv in file-posix.c
->>>>>
->>>>
->>>> So, preadv in file-posix.c returns different results for the same
->>>> offset, for file which is always opened in RO mode? Sounds impossible
->>>> :)
->>>
->>> True.
->>> Maybe my logging is wrong?
->>>
->>> static ssize_t
->>> qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t offset)
->>> {
->>> =C2=A0=C2=A0=C2=A0=C2=A0 ssize_t res =3D preadv(fd, iov, nr_iov, offset=
-);
->>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("preadv %x %"PRIx64"\n", fd, (uint64_=
-t)offset);
->>> =C2=A0=C2=A0=C2=A0=C2=A0 int i;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 uint32_t sum =3D 0;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 int cnt =3D 0;
->>> =C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < nr_iov ; ++i) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int j;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (j =3D 0 ; j < (in=
-t)iov[i].iov_len ; ++j)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 sum +=3D ((uint8_t*)iov[i].iov_base)[j];
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 ++cnt;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0 qemu_log("size: %x sum: %x\n", cnt, sum);
->>> =C2=A0=C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
->>> =C2=A0=C2=A0=C2=A0=C2=A0 return res;
->>> }
->>>
->>
->> Hmm, I don't see any issues here..
->>
->> Are you absolutely sure, that all these reads are from backing file,
->> which is read-only and never changed (may be by other processes)?
+On 24.02.20 23:26, Peter Xu wrote:
+> On Fri, Feb 21, 2020 at 05:42:01PM +0100, David Hildenbrand wrote:
 >=20
-> Yes, I made a copy and compared the files with binwalk.
+> [...]
 >=20
->> 2. guest modifies buffers during operation (you can catch it if
->> allocate personal buffer for preadv, than calculate checksum, then
->> memcpy to guest buffer)
+>> @@ -3160,7 +3160,13 @@ static int ram_load_postcopy(QEMUFile *f)
+>>                  break;
+>>              }
+>> =20
+>> -            if (!offset_in_ramblock(block, addr)) {
+>> +            /*
+>> +             * Relying on used_length is racy and can result in false p=
+ositives.
+>> +             * We might place pages beyond used_length in case RAM was =
+shrunk
+>> +             * while in postcopy, which is fine - trying to place via
+>> +             * UFFDIO_COPY/UFFDIO_ZEROPAGE will never segfault.
+>> +             */
+>> +            if (!block->host || addr >=3D block->postcopy_length) {
 >=20
-> I added the following to the qemu_preadv:
->=20
->  =C2=A0=C2=A0=C2=A0 // do it again
->  =C2=A0=C2=A0=C2=A0 unsigned char *buf =3D g_malloc(cnt);
->  =C2=A0=C2=A0=C2=A0 struct iovec v =3D {buf, cnt};
->  =C2=A0=C2=A0=C2=A0 res =3D preadv(fd, &v, 1, offset);
->  =C2=A0=C2=A0=C2=A0 assert(cnt =3D=3D res);
->  =C2=A0=C2=A0=C2=A0 uint32_t sum2 =3D 0;
->  =C2=A0=C2=A0=C2=A0 for (i =3D 0 ; i < cnt ; ++i)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sum2 +=3D buf[i];
->  =C2=A0=C2=A0=C2=A0 g_free(buf);
->  =C2=A0=C2=A0=C2=A0 qemu_log("--- sum2 =3D %x\n", sum2);
->  =C2=A0=C2=A0=C2=A0 assert(sum2 =3D=3D sum);
->=20
-> These two reads give different results.
-> But who can modify the buffer while qcow2 workers filling it with data fr=
-om the disk?
->=20
+> I'm thinking whether we can even avoid the -ENOENT failure of
+> UFFDIO_COPY.  With the postcopy_length you introduced, I think it's
+> the case when addr >=3D used_length && addr < postcopy_length, right?
+> Can we skip those?
 
-As far as I know, it's guest's buffer, and guest may modify it during the o=
-peration. So, it may be winxp :)
+1. Recall that any check against used_length is completely racy. So no,
+it's not that easy. There is no trusting on used_length at all. It
+should never be access from asynchronous postcopy code.
+
+2. There is one theoretical case with resizable allocations: Assume you
+first shrink and then grow again. You would have some addr < used_length
+where you cannot (and don't want to) place.
 
 
+Note: Before discovering the nice -ENOENT handling, I had a second
+variable postcopy_place_length stored in RAM blocks that would be
+
+- Initialized to postcopy_length
+- Synchronized by a mutex
+- Changed inside the resize callback on any resizes to
+-- postcopy_place_length =3D min(postcopy_place_length, newsize)
+
+But TBH, I find using -ENOENT much more elegant. It was designed to
+handle mmap changes like this.
 
 --=20
-Best regards,
-Vladimir
+Thanks,
+
+David / dhildenb
+
 
