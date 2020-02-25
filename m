@@ -2,85 +2,69 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9E7C35DF5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F9EC35DF9
 	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6914A21556
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:08:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="OHuXAw84"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6914A21556
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id DDE5E21556
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 10:08:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDE5E21556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6X8Y-0003gu-E0
+	id 1j6X8Y-0004WA-3z
 	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 05:08:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58739)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59279)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6X4n-00083O-H0
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:04:31 -0500
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6X7j-0003VV-1b
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1j6X4l-0004Wj-9a
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:04:29 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:48270)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1j6X4f-0004TB-VH; Tue, 25 Feb 2020 05:04:22 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 84FF296EF0;
- Tue, 25 Feb 2020 10:04:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1582625060;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YgaLBBks5ZZzQWh7Jd7y4AZEYDqrZCF2hZEPy/kawew=;
- b=OHuXAw8489CyVxGLWwqLv7lDmtjtqpLBYSfCZiCKgVh7RwjD5a6w2CUXk6R4chccFxjMlg
- 2sWO2uFDaaMtHBA1yQRh7ZPRSrgf5M8NE8OxfJLrwdN4b3qvwtW3HyI8xjYsfMcVn7nIp0
- jaiySwH8F4luYAq3LnwWNapnhp36TVs=
-Subject: Re: [PATCH v7 3/9] qdev: add clock input&output support to devices.
-To: Alistair Francis <alistair23@gmail.com>
-References: <20200224170301.246623-1-damien.hedde@greensocs.com>
- <20200224170301.246623-4-damien.hedde@greensocs.com>
- <CAKmqyKPe5Y7zH6-WpnCmcoVqvBJu5m5hynHVcfWy7qb9iWHGzA@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <0288f1bb-7272-a78a-1872-2ca13a1e12a3@greensocs.com>
-Date: Tue, 25 Feb 2020 11:04:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6X7h-0006Vu-B2
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:30 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:35408)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1j6X7g-0006Uo-Uv
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 05:07:29 -0500
+Received: from PASHAISP (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 5F51AC010D;
+ Tue, 25 Feb 2020 13:07:26 +0300 (MSK)
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+To: <stefanha@redhat.com>,
+	<kwolf@redhat.com>
+References: <2fb9fb4840d5aa92a716487f83ceb36c@ispras.ru>
+ <0afe41fc-cc09-5682-a667-574c44fd6da3@virtuozzo.com>
+ <5891b48a131321be62a4a311253da44c@ispras.ru>
+ <af246719-910b-1394-2f18-b88e3daa9c81@virtuozzo.com>
+ <0cbd2c7a-44e1-272f-9995-1ff7e2fb9e36@virtuozzo.com>
+ <b3405d429e42bdf03177db1b8f7531ee@ispras.ru>
+ <b5811027-388a-98db-fe73-93230b5e29ae@virtuozzo.com>
+ <5fe1747e6e7b818d93fd9a7fd0434bed@ispras.ru>
+ <99ed3129-9460-dbad-0441-95bad08d5636@virtuozzo.com>
+ <796f18ec7246b8d07ac5d6bb59dca71f@ispras.ru>
+ <b408733f-a0d7-62ab-8862-8d70d7148e5f@virtuozzo.com>
+ <ac41c395f09a4101b7403e4116beba6a@ispras.ru>
+ <e11be78b-9461-6068-969a-2f242ef5ada0@virtuozzo.com> 
+In-Reply-To: 
+Subject: RE: Race condition in overlayed qcow2?
+Date: Tue, 25 Feb 2020 13:07:27 +0300
+Message-ID: <004b01d5ebc3$626dc9d0$27495d70$@ru>
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKPe5Y7zH6-WpnCmcoVqvBJu5m5hynHVcfWy7qb9iWHGzA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1582625060;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YgaLBBks5ZZzQWh7Jd7y4AZEYDqrZCF2hZEPy/kawew=;
- b=AcNavXmCrhi1oRtkaOWBWuHBo34woszMYuU2Ispua/OvN2UdRWSIk5/7VLt+1jJGQmQtr1
- 4I9Yk+FCYGHotut8ZiqI8lVceWTq0OBWIHvWAziru/+IZ5w2JLfohoMDaVkOwre6tvblkW
- x8wIOJZkDn8E4zugL+qq90E2XfFg0ws=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1582625060; a=rsa-sha256; cv=none;
- b=YpN7PhHvpZanR733uXINLfN8vWKWoloBI5Ys+wihVA5c3rVAnsaQKU3mstl7WZjCwKUWg6
- ng2Be/b0wrbKHqR9tOXKl9m708iWWLZZLh2VBOYvBWSGZNBxAPQM7YpMTpCsFn2YONqPC7
- ah00l0SCpT0kkC6yEjXYHi4dFd6UAlE=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Office Outlook 12.0
+Content-Language: ru
+Thread-Index: AdXrvKYTDoJE5CcfR9OYxlMvrY2RZwAAEq2QAAF32FA=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
+ [fuzzy]
+X-Received-From: 83.149.199.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,478 +76,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Edgar Iglesias <edgar.iglesias@gmail.com>
+Cc: 'Vladimir Sementsov-Ogievskiy' <vsementsov@virtuozzo.com>,
+ 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+CC'ing Stefan due to the same question back in 2010:
+
+https://lists.gnu.org/archive/html/qemu-devel/2010-09/msg01996.html
+
+I also encountered this with Windows guest.
+E.g., there were the requests like:
+
+Read 2000 bytes:
+addr=3DA, size=3D1000
+addr=3DA, size=3D1000
+
+I.e. reading 1000 bytes in real, but the purpose of such request is =
+unclear.
+
+Pavel Dovgalyuk
 
 
-On 2/25/20 2:27 AM, Alistair Francis wrote:
-> /On Mon, Feb 24, 2020 at 9:12 AM Damien Hedde <damien.hedde@greensocs.com> wrote
->>
->> Add functions to easily handle clocks with devices.
->> Clock inputs and outputs should be used to handle clock propagation
->> between devices.
->> The API is very similar the GPIO API.
->>
->> This is based on the original work of Frederic Konrad.
->>
->> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->> ---
->>
->> I did not changed the constness of @name pointer field in
->> NamedClockList structure.
->> There is no obstacle to do it but the fact that we need to free the
->> allocated data it points to. It is possible to make it const and
->> hack/remove the const to call g_free but I don't know if its
->> allowed in qemu.
->>
->> v7:
->> + update ClockIn/Out types
->> + qdev_connect_clock_out function removed / qdev_connect_clock_in added
->>   instead
->> + qdev_pass_clock renamed to qdev_alias_clock
->> + various small fixes (typos, comment, asserts) (Peter)
->> + move device's instance_finalize code related to clock in qdev-clock.c
->> ---
->>  include/hw/qdev-clock.h | 105 +++++++++++++++++++++++++
->>  include/hw/qdev-core.h  |  12 +++
->>  hw/core/qdev-clock.c    | 169 ++++++++++++++++++++++++++++++++++++++++
->>  hw/core/qdev.c          |  12 +++
->>  hw/core/Makefile.objs   |   2 +-
->>  tests/Makefile.include  |   1 +
->>  6 files changed, 300 insertions(+), 1 deletion(-)
->>  create mode 100644 include/hw/qdev-clock.h
->>  create mode 100644 hw/core/qdev-clock.c
->>
->> diff --git a/include/hw/qdev-clock.h b/include/hw/qdev-clock.h
->> new file mode 100644
->> index 0000000000..899a95ca6a
->> --- /dev/null
->> +++ b/include/hw/qdev-clock.h
->> @@ -0,0 +1,105 @@
->> +/*
->> + * Device's clock input and output
->> + *
->> + * Copyright GreenSocs 2016-2020
->> + *
->> + * Authors:
->> + *  Frederic Konrad
->> + *  Damien Hedde
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#ifndef QDEV_CLOCK_H
->> +#define QDEV_CLOCK_H
->> +
->> +#include "hw/clock.h"
->> +
->> +/**
->> + * qdev_init_clock_in:
->> + * @dev: the device to add an input clock to
->> + * @name: the name of the clock (can't be NULL).
->> + * @callback: optional callback to be called on update or NULL.
->> + * @opaque: argument for the callback
->> + * @returns: a pointer to the newly added clock
->> + *
->> + * Add an input clock to device @dev as a clock named @name.
->> + * This adds a child<> property.
->> + * The callback will be called with @opaque as opaque parameter.
->> + */
->> +Clock *qdev_init_clock_in(DeviceState *dev, const char *name,
->> +                          ClockCallback *callback, void *opaque);
->> +
->> +/**
->> + * qdev_init_clock_out:
->> + * @dev: the device to add an output clock to
->> + * @name: the name of the clock (can't be NULL).
->> + * @callback: optional callback to be called on update or NULL.
-> 
-> qdev_init_clock_out() doesn't have a callback.
-> 
->> + * @returns: a pointer to the newly added clock
-> 
->> + *
->> + * Add an output clock to device @dev as a clock named @name.
->> + * This adds a child<> property.
->> + */
->> +Clock *qdev_init_clock_out(DeviceState *dev, const char *name);
->> +
->> +/**
->> + * qdev_get_clock_in:
->> + * @dev: the device which has the clock
->> + * @name: the name of the clock (can't be NULL).
->> + * @returns: a pointer to the clock
->> + *
->> + * Get the input clock @name from @dev or NULL if does not exist.
->> + */
->> +Clock *qdev_get_clock_in(DeviceState *dev, const char *name);
->> +
->> +/**
->> + * qdev_get_clock_out:
->> + * @dev: the device which has the clock
->> + * @name: the name of the clock (can't be NULL).
->> + * @returns: a pointer to the clock
->> + *
->> + * Get the output clock @name from @dev or NULL if does not exist.
->> + */
->> +Clock *qdev_get_clock_out(DeviceState *dev, const char *name);
->> +
->> +/**
->> + * qdev_connect_clock_in:
->> + * @dev: a device
->> + * @name: the name of an input clock in @dev
->> + * @source: the source clock (an output clock of another device for example)
->> + *
->> + * Set the source clock of input clock @name of device @dev to @source.
->> + * @source period update will be propagated to @name clock.
->> + */
->> +static inline void qdev_connect_clock_in(DeviceState *dev, const char *name,
->> +                                         Clock *source)
->> +{
->> +    clock_set_source(qdev_get_clock_in(dev, name), source);
->> +}
->> +
->> +/**
->> + * qdev_alias_clock:
->> + * @dev: the device which has the clock
->> + * @name: the name of the clock in @dev (can't be NULL)
->> + * @alias_dev: the device to add the clock
->> + * @alias_name: the name of the clock in @container
->> + * @returns: a pointer to the clock
->> + *
->> + * Add a clock @alias_name in @alias_dev which is an alias of the clock @name
->> + * in @dev. The direction _in_ or _out_ will the same as the original.
->> + * An alias clock must not be modified or used by @alias_dev and should
->> + * typically be only only for device composition purpose.
->> + */
->> +Clock *qdev_alias_clock(DeviceState *dev, const char *name,
->> +                        DeviceState *alias_dev, const char *alias_name);
->> +
->> +/**
->> + * qdev_finalize_clocklist:
->> + * @dev: the device being finalize
-> 
-> It probably should be:
-> 
-> @dev: the device being finalized
-> 
->> + *
->> + * Clear the clocklist from @dev. Only used internally in qdev.
->> + */
->> +void qdev_finalize_clocklist(DeviceState *dev);
->> +
->> +#endif /* QDEV_CLOCK_H */
->> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
->> index 1405b8a990..d87d989e72 100644
->> --- a/include/hw/qdev-core.h
->> +++ b/include/hw/qdev-core.h
->> @@ -149,6 +149,17 @@ struct NamedGPIOList {
->>      QLIST_ENTRY(NamedGPIOList) node;
->>  };
->>
->> +typedef struct Clock Clock;
->> +typedef struct NamedClockList NamedClockList;
->> +
->> +struct NamedClockList {
->> +    char *name;
->> +    Clock *clock;
->> +    bool output;
->> +    bool alias;
->> +    QLIST_ENTRY(NamedClockList) node;
->> +};
->> +
->>  /**
->>   * DeviceState:
->>   * @realized: Indicates whether the device has been fully constructed.
->> @@ -171,6 +182,7 @@ struct DeviceState {
->>      bool allow_unplug_during_migration;
->>      BusState *parent_bus;
->>      QLIST_HEAD(, NamedGPIOList) gpios;
->> +    QLIST_HEAD(, NamedClockList) clocks;
->>      QLIST_HEAD(, BusState) child_bus;
->>      int num_child_bus;
->>      int instance_id_alias;
->> diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
->> new file mode 100644
->> index 0000000000..9af0159517
->> --- /dev/null
->> +++ b/hw/core/qdev-clock.c
->> @@ -0,0 +1,169 @@
->> +/*
->> + * Device's clock input and output
->> + *
->> + * Copyright GreenSocs 2016-2020
->> + *
->> + * Authors:
->> + *  Frederic Konrad
->> + *  Damien Hedde
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/qdev-clock.h"
->> +#include "hw/qdev-core.h"
->> +#include "qapi/error.h"
->> +
->> +/*
->> + * qdev_init_clocklist:
->> + * Add a new clock in a device
->> + */
->> +static NamedClockList *qdev_init_clocklist(DeviceState *dev, const char *name,
->> +                                           bool output, Clock *clk)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    /*
->> +     * Clock must be added before realize() so that we can compute the
->> +     * clock's canonical path durint device_realize().
-> 
-> s/durint/during/g
-> 
->> +     */
->> +    assert(!dev->realized);
->> +
->> +    /*
->> +     * The ncl structure is freed by qdev_finalize_clocklist() which will
->> +     * be called during @dev's device_finalize().
->> +     */
->> +    ncl = g_new0(NamedClockList, 1);
->> +    ncl->name = g_strdup(name);
->> +    ncl->output = output;
->> +    ncl->alias = (clk != NULL);
->> +
->> +    /*
->> +     * Trying to create a clock whose name clashes with some other
->> +     * clock or property is a bug in the caller and we will abort().
->> +     */
->> +    if (clk == NULL) {
->> +        clk = CLOCK(object_new(TYPE_CLOCK));
->> +        object_property_add_child(OBJECT(dev), name, OBJECT(clk), &error_abort);
->> +        if (output) {
->> +            /*
->> +             * Remove object_new()'s initial reference.
->> +             * Note that for inputs, the reference created by object_new()
->> +             * will be deleted in qdev_finalize_clocklist().
->> +             */
->> +            object_unref(OBJECT(clk));
->> +        }
->> +    } else {
->> +        object_property_add_link(OBJECT(dev), name,
->> +                                 object_get_typename(OBJECT(clk)),
->> +                                 (Object **) &ncl->clock,
->> +                                 NULL, OBJ_PROP_LINK_STRONG, &error_abort);
->> +    }
->> +
->> +    ncl->clock = clk;
->> +
->> +    QLIST_INSERT_HEAD(&dev->clocks, ncl, node);
->> +    return ncl;
->> +}
->> +
->> +void qdev_finalize_clocklist(DeviceState *dev)
->> +{
->> +    /* called by @dev's device_finalize() */
->> +    NamedClockList *ncl, *ncl_next;
->> +>> +    return NULL;
->> +}
->> +
->> +Clock *qdev_get_clock_in(DeviceState *dev, const char *name)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    assert(name);
->> +
->> +    ncl = qdev_get_clocklist(dev, name);
->> +    assert(!ncl->output);
->> +
->> +    return ncl->clock;
->> +}
->> +
->> +Clock *qdev_get_clock_out(DeviceState *dev, const char *name)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    assert(name);
->> +
->> +    ncl = qdev_get_clocklist(dev, name);
->> +    assert(ncl->output);
->> +
->> +    return ncl->clock;
->> +}
->> +
->> +Clock *qdev_alias_clock(DeviceState *dev, const char *name,
->> +                        DeviceState *alias_dev, const char *alias_name)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    assert(name && alias_name);
->> +
->> +    ncl = qdev_get_clocklist(dev, name);
->> +
->> +    qdev_init_clocklist(alias_dev, alias_name, ncl->output, ncl->clock);
->> +
->> +    return ncl->clock;
->> +}
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index 3937d1eb1a..f390697348 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -37,6 +37,7 @@
->>  #include "hw/qdev-properties.h"
->>  #include "hw/boards.h"
->>  #include "hw/sysbus.h"
->> +#include "hw/qdev-clock.h"
->>  #include "migration/vmstate.h"
->>  #include "trace.h"
->>
->> @@ -855,6 +856,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
->>      HotplugHandler *hotplug_ctrl;
->>      BusState *bus;
->> +    NamedClockList *ncl;
->>      Error *local_err = NULL;
->>      bool unattached_parent = false;
->>      static int unattached_count;
->> @@ -902,6 +904,13 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
->>           */
->>          g_free(dev->canonical_path);
->>          dev->canonical_path = object_get_canonical_path(OBJECT(dev));
->> +        QLIST_FOREACH(ncl, &dev->clocks, node) {
->> +            if (ncl->alias) {
->> +                continue;
->> +            } else {
->> +                clock_setup_canonical_path(ncl->clock);
->> +            }
->> +        }
->>
->>          if (qdev_get_vmsd(dev)) {
->>              if (vmstate_register_with_alias_id(VMSTATE_IF(dev),
->> @@ -1025,6 +1034,7 @@ static void device_initfn(Object *obj)
->>      dev->allow_unplug_during_migration = false;
->>
->>      QLIST_INIT(&dev->gpios);
->> +    QLIST_INIT(&dev->clocks);
->>  }
->>
->>  static void device_post_init(Object *obj)
->> @@ -1054,6 +1064,8 @@ static void device_finalize(Object *obj)
->>           */
->>      }
->>
->> +    qdev_finalize_clocklist(dev);
->> +
->>      /* Only send event if the device had been completely realized */
->>      if (dev->pending_deleted_event) {
->>          g_assert(dev->canonical_path);
->> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
->> index e3d796fdd4..2fdcb7dd00 100644
->> --- a/hw/core/Makefile.objs
->> +++ b/hw/core/Makefile.objs
->> @@ -7,7 +7,7 @@ common-obj-y += hotplug.o
->>  common-obj-y += vmstate-if.o
->>  # irq.o needed for qdev GPIO handling:
->>  common-obj-y += irq.o
->> -common-obj-y += clock.o
->> +common-obj-y += clock.o qdev-clock.o
->>
->>  common-obj-$(CONFIG_SOFTMMU) += reset.o
->>  common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index edcbd475aa..5a4511a86f 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -436,6 +436,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
->>         hw/core/fw-path-provider.o \
->>         hw/core/reset.o \
->>         hw/core/vmstate-if.o \
->> +       hw/core/clock.o hw/core/qdev-clock.o \
->>         $(test-qapi-obj-y)
->>  tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
->>         migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
->> --
->> 2.24.1
->>
->>
->> +    QLIST_FOREACH_SAFE(ncl, &dev->clocks, node, ncl_next) {
->> +        QLIST_REMOVE(ncl, node);
->> +        if (!ncl->output && !ncl->alias) {
->> +            /*
->> +             * We kept a reference on the input clock to ensure it lives up to
->> +             * this point so we can safely remove the callback.
->> +             * It avoids having a callback to a deleted object if ncl->clock
->> +             * is still referenced somewhere else (eg: by a clock output).
->> +             */
->> +            clock_clear_callback(ncl->clock);
->> +            object_unref(OBJECT(ncl->clock));
->> +        }
->> +        g_free(ncl->name);
->> +        g_free(ncl);
->> +    }
->> +}
->> +
->> +Clock *qdev_init_clock_out(DeviceState *dev, const char *name)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    assert(name);
->> +
->> +    ncl = qdev_init_clocklist(dev, name, true, NULL);
->> +
->> +    return ncl->clock;
->> +}
->> +
->> +Clock *qdev_init_clock_in(DeviceState *dev, const char *name,
->> +                            ClockCallback *callback, void *opaque)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    assert(name);
->> +
->> +    ncl = qdev_init_clocklist(dev, name, false, NULL);
->> +
->> +    if (callback) {
->> +        clock_set_callback(ncl->clock, callback, opaque);
->> +    }
->> +    return ncl->clock;
->> +}
->> +
->> +static NamedClockList *qdev_get_clocklist(DeviceState *dev, const char *name)
->> +{
->> +    NamedClockList *ncl;
->> +
->> +    QLIST_FOREACH(ncl, &dev->clocks, node) {
->> +        if (strcmp(name, ncl->name) == 0) {
->> +            return ncl;
->> +        }
->> +    }
->> +
->> +    assert(false);
-> 
-> Remove this.
-You're right, It will fail right after anyway if we get there.
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> Sent: Tuesday, February 25, 2020 12:27 PM
+> To: 'kwolf@redhat.com'
+> Cc: 'qemu-devel@nongnu.org'; 'mreitz@redhat.com'; 'Vladimir =
+Sementsov-Ogievskiy'
+> Subject: RE: Race condition in overlayed qcow2?
+>=20
+> Kevin, what do you think about it?
+>=20
+> What guest is intended to receive, when it requests multiple reads to =
+the same buffer in a
+> single DMA transaction?
+>=20
+> Should it be the first SG part? The last one?
+> Or just a random set of bytes? (Then why it is reading this data in =
+that case?)
+>=20
+> Pavel Dovgalyuk
+>=20
+> > -----Original Message-----
+> > From: Vladimir Sementsov-Ogievskiy [mailto:vsementsov@virtuozzo.com]
+> > Sent: Tuesday, February 25, 2020 12:19 PM
+> > To: dovgaluk
+> > Cc: qemu-devel@nongnu.org; mreitz@redhat.com; kwolf@redhat.com
+> > Subject: Re: Race condition in overlayed qcow2?
+> >
+> > 25.02.2020 10:56, dovgaluk wrote:
+> > > Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
+2020-02-25 10:27:
+> > >> 25.02.2020 8:58, dovgaluk wrote:
+> > >>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
+2020-02-21 16:23:
+> > >>>> 21.02.2020 15:35, dovgaluk wrote:
+> > >>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
+2020-02-21 13:09:
+> > >>>>>> 21.02.2020 12:49, dovgaluk wrote:
+> > >>>>>>> Vladimir Sementsov-Ogievskiy =D0=BF=D0=B8=D1=81=D0=B0=D0=BB =
+2020-02-20 12:36:
+> > >>>>>>
+> > >>>>>> So, preadv in file-posix.c returns different results for the =
+same
+> > >>>>>> offset, for file which is always opened in RO mode? Sounds =
+impossible
+> > >>>>>> :)
+> > >>>>>
+> > >>>>> True.
+> > >>>>> Maybe my logging is wrong?
+> > >>>>>
+> > >>>>> static ssize_t
+> > >>>>> qemu_preadv(int fd, const struct iovec *iov, int nr_iov, off_t =
+offset)
+> > >>>>> {
+> > >>>>>      ssize_t res =3D preadv(fd, iov, nr_iov, offset);
+> > >>>>>      qemu_log("preadv %x %"PRIx64"\n", fd, (uint64_t)offset);
+> > >>>>>      int i;
+> > >>>>>      uint32_t sum =3D 0;
+> > >>>>>      int cnt =3D 0;
+> > >>>>>      for (i =3D 0 ; i < nr_iov ; ++i) {
+> > >>>>>          int j;
+> > >>>>>          for (j =3D 0 ; j < (int)iov[i].iov_len ; ++j)
+> > >>>>>          {
+> > >>>>>              sum +=3D ((uint8_t*)iov[i].iov_base)[j];
+> > >>>>>              ++cnt;
+> > >>>>>          }
+> > >>>>>      }
+> > >>>>>      qemu_log("size: %x sum: %x\n", cnt, sum);
+> > >>>>>      assert(cnt =3D=3D res);
+> > >>>>>      return res;
+> > >>>>> }
+> > >>>>>
+> > >>>>
+> > >>>> Hmm, I don't see any issues here..
+> > >>>>
+> > >>>> Are you absolutely sure, that all these reads are from backing =
+file,
+> > >>>> which is read-only and never changed (may be by other =
+processes)?
+> > >>>
+> > >>> Yes, I made a copy and compared the files with binwalk.
+> > >>>
+> > >>>> 2. guest modifies buffers during operation (you can catch it if
+> > >>>> allocate personal buffer for preadv, than calculate checksum, =
+then
+> > >>>> memcpy to guest buffer)
+> > >>>
+> > >>> I added the following to the qemu_preadv:
+> > >>>
+> > >>>      // do it again
+> > >>>      unsigned char *buf =3D g_malloc(cnt);
+> > >>>      struct iovec v =3D {buf, cnt};
+> > >>>      res =3D preadv(fd, &v, 1, offset);
+> > >>>      assert(cnt =3D=3D res);
+> > >>>      uint32_t sum2 =3D 0;
+> > >>>      for (i =3D 0 ; i < cnt ; ++i)
+> > >>>          sum2 +=3D buf[i];
+> > >>>      g_free(buf);
+> > >>>      qemu_log("--- sum2 =3D %x\n", sum2);
+> > >>>      assert(sum2 =3D=3D sum);
+> > >>>
+> > >>> These two reads give different results.
+> > >>> But who can modify the buffer while qcow2 workers filling it =
+with data from the disk?
+> > >>>
+> > >>
+> > >> As far as I know, it's guest's buffer, and guest may modify it =
+during
+> > >> the operation. So, it may be winxp :)
+> > >
+> > > True, but normally the guest won't do it.
+> > >
+> > > But I noticed that DMA operation which causes the problems has the =
+following set of the
+> > buffers:
+> > > dma read sg size 20000 offset: c000fe00
+> > > --- sg: base: 2eb1000 len: 1000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 2eb2000 len: 3000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 2eb5000 len: b000
+> > > --- sg: base: 3040000 len: 1000
+> > > --- sg: base: 2f41000 len: 3000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 2f44000 len: 4000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 2f48000 len: 2000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 3000000 len: 1000
+> > > --- sg: base: 3000000 len: 1000
+> > >
+> > >
+> > > It means that one DMA transaction performs multiple reads into the =
+same address.
+> > > And no races is possible, when there is only one qcow2 worker.
+> > > When there are many of them - they can fill this buffer =
+simultaneously.
+> > >
+> >
+> > Hmm, actually if guest start parallel reads into same buffer from =
+different offsets, races
+> are
+> > possible anyway, as different requests run in parallel even with one =
+worker, because
+> > MAX_WORKERS is per-request value, not total... But several workers =
+may increase probability
+> of
+> > races or introduce new ones.
+> >
+> > So, actually, several workers of one request can write to the same =
+buffer only if guest
+> > provides broken iovec, which references the same buffer several =
+times (if it is possible at
+> > all).
+> >
+> >
+> >
+> > --
+> > Best regards,
+> > Vladimir
 
-> 
-> Otherwise it looks good.
-> 
-> Alistair
-> 
-
-Thanks,
-Damien
 
