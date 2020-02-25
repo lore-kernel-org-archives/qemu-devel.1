@@ -2,68 +2,73 @@ Return-Path: <SRS0=OzdF=4N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3D2C35E03
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A0CC35DE1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:34:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A57A72467E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:34:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57A72467E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B30EB2467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Feb 2020 13:34:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30EB2467D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6aLe-0008Sv-Re
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:34:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54490)
+	id 1j6aLo-0000Kb-Rj
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 08:34:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j6Z9P-0003dg-Qj
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:28 -0500
+ (envelope-from <miaoyubo@huawei.com>) id 1j6ZHa-0003CL-PB
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j6Z9K-0001lP-VI
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:17:23 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:32847)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j6Z9K-0001kd-Hg; Tue, 25 Feb 2020 07:17:18 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MSI6i-1j04uY1PGi-00Sfrq; Tue, 25 Feb 2020 13:16:27 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 20/21] linux-user,mips: move content of mips_syscall_args
-Date: Tue, 25 Feb 2020 13:15:52 +0100
-Message-Id: <20200225121553.2191597-21-laurent@vivier.eu>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200225121553.2191597-1-laurent@vivier.eu>
-References: <20200225121553.2191597-1-laurent@vivier.eu>
+ (envelope-from <miaoyubo@huawei.com>) id 1j6ZHZ-0006Mk-1Q
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:25:50 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2504 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j6ZHX-0006Jg-RH
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 07:25:48 -0500
+Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 1C03BAE976CE32B78D09;
+ Tue, 25 Feb 2020 20:25:41 +0800 (CST)
+Received: from dggeme708-chm.china.huawei.com (10.1.199.104) by
+ DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 25 Feb 2020 20:25:40 +0800
+Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
+ dggeme708-chm.china.huawei.com (10.1.199.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 25 Feb 2020 20:25:40 +0800
+Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
+ dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
+ Tue, 25 Feb 2020 20:25:40 +0800
+From: miaoyubo <miaoyubo@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: [PATCH v4 3/3] ACPI/unit-test: Add a new test for pxb-pcie for arm
+Thread-Topic: [PATCH v4 3/3] ACPI/unit-test: Add a new test for pxb-pcie for
+ arm
+Thread-Index: AQHV634D1GQZIb6UqUu+euvnfaaE36grP0SAgACTdIA=
+Date: Tue, 25 Feb 2020 12:25:40 +0000
+Message-ID: <518693ae75ed4c07ba6d31435ef11221@huawei.com>
+References: <20200225015026.940-1-miaoyubo@huawei.com>
+ <20200225015026.940-4-miaoyubo@huawei.com>
+ <20200225062154-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200225062154-mutt-send-email-mst@kernel.org>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.173.221.29]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/j8/moYR2zh1LlLwjmmd3tfcXjn0tjRRxx2+qX1os1Bswhh9Tjk
- bLUpI7uOpaJd1MIjbNHtLo5bbZAb/qv809U6QNcdImgxYdxw9nCGgzoOAgoU+HDfej6uSTn
- Q81CS5wSikyTVMYegS5UTKUtbxW8c8tgp31J0xYqKj6rYITh65AXOWNIdCVwsEXSLLEw8U/
- wcdLhRgtOkG4AJn7FfPbw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5EieK8/j/a8=:5mLhPwUSJIWFaMqdxqHl9N
- SGx3kyybpiLktgVR5/gJ/8H8YioN45q5r3QQ9tDPKEoAL0LHMH+Ef07zECLKxtzsv9Znm9QRB
- 4A9feU7TEH+++Tf8KrpiwckemhJcYzvvh0egOS9EcDRw9l/jpGZR2Fndybrs0vn7YCC7NRhq3
- i3N2yz1QvQqmj3+RuiMgH8U5IY7ws2PcYuR+54oVVeMz2C+iF/An01qJCIiwvS42uEu428lFg
- 6Op0C6LiSjsCaJEh6UiYCcesHTz4jCu6HXISZuF5Ml27rl+v7o9kAXJhjDnRdaJNQuZUwLRE0
- EycEOwkK8d4NIvpXLFXBNcANMfOGfHeG7+1W7TGOFT05LY4g/muXBKEcQ/xWibvuVIuaLhA+C
- W6hi7c38qfALkYiTpN+v5Eh57u54q3P3ILYUapg+FSAu/ryerGuKPms7M65IhzDEUeIWaQv6u
- UDDvVA3ek4RmzqBNLM+N7bP7ch2HVyfVSv3OaoeVrqmu13iczHR0GSQWgL6hfJn0MEEn5Dke6
- 5cb375IQqZv6+HDVSHmijYgzB5SCtqxiXSmKpelp9MgWAORHw9KFPN31x8/rIngJ5DQWH/98s
- ZwFysTEDA93/Nm0oTzhrUaWv1lyksJ6n70rU/Rrhq+WZhMG88LvWn44S8aJAY4pey8AUYTl0X
- 4klLxNkZgggjUEyd29GmvE348cgIQDMs0YsY9kg2J8/O2eBmrRAR2rSQUSqPpIfhKiebYtaug
- 2RdyODi0UD8B52Yc0SMYPWDRNJWexgEw+l0gH3HK/vHhuBN639fjHIPB0PeIaBipzBprA3Vt0
- +IawzB/gamZvtqWbhgc3IijU006mBZnzCjnTVAuzm0/RqiQBCKm0RdCU7aOLxHnKJ2VwKxP
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
+ [fuzzy]
+X-Received-From: 45.249.212.188
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,923 +80,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Cornelia Huck <cohuck@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-s390x@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Xiexiangyou <xiexiangyou@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move content of mips_syscall_args to mips-syscall-args-o32.c.inc to
-ease automatic update. No functionnal change
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/mips/cpu_loop.c             | 440 +------------------------
- linux-user/mips/syscall-args-o32.c.inc | 438 ++++++++++++++++++++++++
- 2 files changed, 439 insertions(+), 439 deletions(-)
- create mode 100644 linux-user/mips/syscall-args-o32.c.inc
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Tuesday, February 25, 2020 7:25 PM
+> To: miaoyubo <miaoyubo@huawei.com>
+> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; Xiexiangyou
+> <xiexiangyou@huawei.com>; imammedo@redhat.com; qemu-
+> devel@nongnu.org; berrange@redhat.com
+> Subject: Re: [PATCH v4 3/3] ACPI/unit-test: Add a new test for pxb-pcie f=
+or
+> arm
+>=20
+> On Tue, Feb 25, 2020 at 09:50:26AM +0800, Yubo Miao wrote:
+> > From: miaoyubo <miaoyubo@huawei.com>
+> >
+> > Currently, pxb-pcie could be defined by the cmdline like
+> >     --device pxb-pcie,id=3Dpci.9,bus_nr=3D128 However pxb-pcie is not
+> > described in acpi tables for arm.
+> >
+> > The formal two patches support pxb-pcie for arm, escpcially the
+> > specification for pxb-pcie in DSDT table.
+>=20
+>=20
+> especially? Pls spell-check comments and commit log, it's not hard to do.
+>=20
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 396367d81d8d..553e8ca7f576 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -26,447 +26,9 @@
- 
- # ifdef TARGET_ABI_MIPSO32
- #  define MIPS_SYSCALL_NUMBER_UNUSED -1
--#  define MIPS_SYS(name, args) args,
- static const int8_t mips_syscall_args[] = {
--        MIPS_SYS(sys_syscall    , 8)    /* 4000 */
--        MIPS_SYS(sys_exit       , 1)
--        MIPS_SYS(sys_fork       , 0)
--        MIPS_SYS(sys_read       , 3)
--        MIPS_SYS(sys_write      , 3)
--        MIPS_SYS(sys_open       , 3)    /* 4005 */
--        MIPS_SYS(sys_close      , 1)
--        MIPS_SYS(sys_waitpid    , 3)
--        MIPS_SYS(sys_creat      , 2)
--        MIPS_SYS(sys_link       , 2)
--        MIPS_SYS(sys_unlink     , 1)    /* 4010 */
--        MIPS_SYS(sys_execve     , 0)
--        MIPS_SYS(sys_chdir      , 1)
--        MIPS_SYS(sys_time       , 1)
--        MIPS_SYS(sys_mknod      , 3)
--        MIPS_SYS(sys_chmod      , 2)    /* 4015 */
--        MIPS_SYS(sys_lchown     , 3)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_stat */
--        MIPS_SYS(sys_lseek      , 3)
--        MIPS_SYS(sys_getpid     , 0)    /* 4020 */
--        MIPS_SYS(sys_mount      , 5)
--        MIPS_SYS(sys_umount     , 1)
--        MIPS_SYS(sys_setuid     , 1)
--        MIPS_SYS(sys_getuid     , 0)
--        MIPS_SYS(sys_stime      , 1)    /* 4025 */
--        MIPS_SYS(sys_ptrace     , 4)
--        MIPS_SYS(sys_alarm      , 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_fstat */
--        MIPS_SYS(sys_pause      , 0)
--        MIPS_SYS(sys_utime      , 2)    /* 4030 */
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_access     , 2)
--        MIPS_SYS(sys_nice       , 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* 4035 */
--        MIPS_SYS(sys_sync       , 0)
--        MIPS_SYS(sys_kill       , 2)
--        MIPS_SYS(sys_rename     , 2)
--        MIPS_SYS(sys_mkdir      , 2)
--        MIPS_SYS(sys_rmdir      , 1)    /* 4040 */
--        MIPS_SYS(sys_dup                , 1)
--        MIPS_SYS(sys_pipe       , 0)
--        MIPS_SYS(sys_times      , 1)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_brk                , 1)    /* 4045 */
--        MIPS_SYS(sys_setgid     , 1)
--        MIPS_SYS(sys_getgid     , 0)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was signal(2) */
--        MIPS_SYS(sys_geteuid    , 0)
--        MIPS_SYS(sys_getegid    , 0)    /* 4050 */
--        MIPS_SYS(sys_acct       , 0)
--        MIPS_SYS(sys_umount2    , 2)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_ioctl      , 3)
--        MIPS_SYS(sys_fcntl      , 3)    /* 4055 */
--        MIPS_SYS(sys_ni_syscall , 2)
--        MIPS_SYS(sys_setpgid    , 2)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_olduname   , 1)
--        MIPS_SYS(sys_umask      , 1)    /* 4060 */
--        MIPS_SYS(sys_chroot     , 1)
--        MIPS_SYS(sys_ustat      , 2)
--        MIPS_SYS(sys_dup2       , 2)
--        MIPS_SYS(sys_getppid    , 0)
--        MIPS_SYS(sys_getpgrp    , 0)    /* 4065 */
--        MIPS_SYS(sys_setsid     , 0)
--        MIPS_SYS(sys_sigaction  , 3)
--        MIPS_SYS(sys_sgetmask   , 0)
--        MIPS_SYS(sys_ssetmask   , 1)
--        MIPS_SYS(sys_setreuid   , 2)    /* 4070 */
--        MIPS_SYS(sys_setregid   , 2)
--        MIPS_SYS(sys_sigsuspend , 0)
--        MIPS_SYS(sys_sigpending , 1)
--        MIPS_SYS(sys_sethostname        , 2)
--        MIPS_SYS(sys_setrlimit  , 2)    /* 4075 */
--        MIPS_SYS(sys_getrlimit  , 2)
--        MIPS_SYS(sys_getrusage  , 2)
--        MIPS_SYS(sys_gettimeofday, 2)
--        MIPS_SYS(sys_settimeofday, 2)
--        MIPS_SYS(sys_getgroups  , 2)    /* 4080 */
--        MIPS_SYS(sys_setgroups  , 2)
--        MIPS_SYS(sys_ni_syscall , 0)    /* old_select */
--        MIPS_SYS(sys_symlink    , 2)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_lstat */
--        MIPS_SYS(sys_readlink   , 3)    /* 4085 */
--        MIPS_SYS(sys_uselib     , 1)
--        MIPS_SYS(sys_swapon     , 2)
--        MIPS_SYS(sys_reboot     , 3)
--        MIPS_SYS(old_readdir    , 3)
--        MIPS_SYS(old_mmap       , 6)    /* 4090 */
--        MIPS_SYS(sys_munmap     , 2)
--        MIPS_SYS(sys_truncate   , 2)
--        MIPS_SYS(sys_ftruncate  , 2)
--        MIPS_SYS(sys_fchmod     , 2)
--        MIPS_SYS(sys_fchown     , 3)    /* 4095 */
--        MIPS_SYS(sys_getpriority        , 2)
--        MIPS_SYS(sys_setpriority        , 3)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_statfs     , 2)
--        MIPS_SYS(sys_fstatfs    , 2)    /* 4100 */
--        MIPS_SYS(sys_ni_syscall , 0)    /* was ioperm(2) */
--        MIPS_SYS(sys_socketcall , 2)
--        MIPS_SYS(sys_syslog     , 3)
--        MIPS_SYS(sys_setitimer  , 3)
--        MIPS_SYS(sys_getitimer  , 2)    /* 4105 */
--        MIPS_SYS(sys_newstat    , 2)
--        MIPS_SYS(sys_newlstat   , 2)
--        MIPS_SYS(sys_newfstat   , 2)
--        MIPS_SYS(sys_uname      , 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* 4110 was iopl(2) */
--        MIPS_SYS(sys_vhangup    , 0)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_idle() */
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_vm86 */
--        MIPS_SYS(sys_wait4      , 4)
--        MIPS_SYS(sys_swapoff    , 1)    /* 4115 */
--        MIPS_SYS(sys_sysinfo    , 1)
--        MIPS_SYS(sys_ipc                , 6)
--        MIPS_SYS(sys_fsync      , 1)
--        MIPS_SYS(sys_sigreturn  , 0)
--        MIPS_SYS(sys_clone      , 6)    /* 4120 */
--        MIPS_SYS(sys_setdomainname, 2)
--        MIPS_SYS(sys_newuname   , 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* sys_modify_ldt */
--        MIPS_SYS(sys_adjtimex   , 1)
--        MIPS_SYS(sys_mprotect   , 3)    /* 4125 */
--        MIPS_SYS(sys_sigprocmask        , 3)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was create_module */
--        MIPS_SYS(sys_init_module        , 5)
--        MIPS_SYS(sys_delete_module, 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* 4130 was get_kernel_syms */
--        MIPS_SYS(sys_quotactl   , 0)
--        MIPS_SYS(sys_getpgid    , 1)
--        MIPS_SYS(sys_fchdir     , 1)
--        MIPS_SYS(sys_bdflush    , 2)
--        MIPS_SYS(sys_sysfs      , 3)    /* 4135 */
--        MIPS_SYS(sys_personality        , 1)
--        MIPS_SYS(sys_ni_syscall , 0)    /* for afs_syscall */
--        MIPS_SYS(sys_setfsuid   , 1)
--        MIPS_SYS(sys_setfsgid   , 1)
--        MIPS_SYS(sys_llseek     , 5)    /* 4140 */
--        MIPS_SYS(sys_getdents   , 3)
--        MIPS_SYS(sys_select     , 5)
--        MIPS_SYS(sys_flock      , 2)
--        MIPS_SYS(sys_msync      , 3)
--        MIPS_SYS(sys_readv      , 3)    /* 4145 */
--        MIPS_SYS(sys_writev     , 3)
--        MIPS_SYS(sys_cacheflush , 3)
--        MIPS_SYS(sys_cachectl   , 3)
--        MIPS_SYS(sys_sysmips    , 4)
--        MIPS_SYS(sys_ni_syscall , 0)    /* 4150 */
--        MIPS_SYS(sys_getsid     , 1)
--        MIPS_SYS(sys_fdatasync  , 0)
--        MIPS_SYS(sys_sysctl     , 1)
--        MIPS_SYS(sys_mlock      , 2)
--        MIPS_SYS(sys_munlock    , 2)    /* 4155 */
--        MIPS_SYS(sys_mlockall   , 1)
--        MIPS_SYS(sys_munlockall , 0)
--        MIPS_SYS(sys_sched_setparam, 2)
--        MIPS_SYS(sys_sched_getparam, 2)
--        MIPS_SYS(sys_sched_setscheduler, 3)     /* 4160 */
--        MIPS_SYS(sys_sched_getscheduler, 1)
--        MIPS_SYS(sys_sched_yield        , 0)
--        MIPS_SYS(sys_sched_get_priority_max, 1)
--        MIPS_SYS(sys_sched_get_priority_min, 1)
--        MIPS_SYS(sys_sched_rr_get_interval, 2)  /* 4165 */
--        MIPS_SYS(sys_nanosleep, 2)
--        MIPS_SYS(sys_mremap     , 5)
--        MIPS_SYS(sys_accept     , 3)
--        MIPS_SYS(sys_bind       , 3)
--        MIPS_SYS(sys_connect    , 3)    /* 4170 */
--        MIPS_SYS(sys_getpeername        , 3)
--        MIPS_SYS(sys_getsockname        , 3)
--        MIPS_SYS(sys_getsockopt , 5)
--        MIPS_SYS(sys_listen     , 2)
--        MIPS_SYS(sys_recv       , 4)    /* 4175 */
--        MIPS_SYS(sys_recvfrom   , 6)
--        MIPS_SYS(sys_recvmsg    , 3)
--        MIPS_SYS(sys_send       , 4)
--        MIPS_SYS(sys_sendmsg    , 3)
--        MIPS_SYS(sys_sendto     , 6)    /* 4180 */
--        MIPS_SYS(sys_setsockopt , 5)
--        MIPS_SYS(sys_shutdown   , 2)
--        MIPS_SYS(sys_socket     , 3)
--        MIPS_SYS(sys_socketpair , 4)
--        MIPS_SYS(sys_setresuid  , 3)    /* 4185 */
--        MIPS_SYS(sys_getresuid  , 3)
--        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_query_module */
--        MIPS_SYS(sys_poll       , 3)
--        MIPS_SYS(sys_nfsservctl , 3)
--        MIPS_SYS(sys_setresgid  , 3)    /* 4190 */
--        MIPS_SYS(sys_getresgid  , 3)
--        MIPS_SYS(sys_prctl      , 5)
--        MIPS_SYS(sys_rt_sigreturn, 0)
--        MIPS_SYS(sys_rt_sigaction, 4)
--        MIPS_SYS(sys_rt_sigprocmask, 4) /* 4195 */
--        MIPS_SYS(sys_rt_sigpending, 2)
--        MIPS_SYS(sys_rt_sigtimedwait, 4)
--        MIPS_SYS(sys_rt_sigqueueinfo, 3)
--        MIPS_SYS(sys_rt_sigsuspend, 0)
--        MIPS_SYS(sys_pread64    , 6)    /* 4200 */
--        MIPS_SYS(sys_pwrite64   , 6)
--        MIPS_SYS(sys_chown      , 3)
--        MIPS_SYS(sys_getcwd     , 2)
--        MIPS_SYS(sys_capget     , 2)
--        MIPS_SYS(sys_capset     , 2)    /* 4205 */
--        MIPS_SYS(sys_sigaltstack        , 2)
--        MIPS_SYS(sys_sendfile   , 4)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_mmap2      , 6)    /* 4210 */
--        MIPS_SYS(sys_truncate64 , 4)
--        MIPS_SYS(sys_ftruncate64        , 4)
--        MIPS_SYS(sys_stat64     , 2)
--        MIPS_SYS(sys_lstat64    , 2)
--        MIPS_SYS(sys_fstat64    , 2)    /* 4215 */
--        MIPS_SYS(sys_pivot_root , 2)
--        MIPS_SYS(sys_mincore    , 3)
--        MIPS_SYS(sys_madvise    , 3)
--        MIPS_SYS(sys_getdents64 , 3)
--        MIPS_SYS(sys_fcntl64    , 3)    /* 4220 */
--        MIPS_SYS(sys_ni_syscall , 0)
--        MIPS_SYS(sys_gettid     , 0)
--        MIPS_SYS(sys_readahead  , 5)
--        MIPS_SYS(sys_setxattr   , 5)
--        MIPS_SYS(sys_lsetxattr  , 5)    /* 4225 */
--        MIPS_SYS(sys_fsetxattr  , 5)
--        MIPS_SYS(sys_getxattr   , 4)
--        MIPS_SYS(sys_lgetxattr  , 4)
--        MIPS_SYS(sys_fgetxattr  , 4)
--        MIPS_SYS(sys_listxattr  , 3)    /* 4230 */
--        MIPS_SYS(sys_llistxattr , 3)
--        MIPS_SYS(sys_flistxattr , 3)
--        MIPS_SYS(sys_removexattr        , 2)
--        MIPS_SYS(sys_lremovexattr, 2)
--        MIPS_SYS(sys_fremovexattr, 2)   /* 4235 */
--        MIPS_SYS(sys_tkill      , 2)
--        MIPS_SYS(sys_sendfile64 , 5)
--        MIPS_SYS(sys_futex      , 6)
--        MIPS_SYS(sys_sched_setaffinity, 3)
--        MIPS_SYS(sys_sched_getaffinity, 3)      /* 4240 */
--        MIPS_SYS(sys_io_setup   , 2)
--        MIPS_SYS(sys_io_destroy , 1)
--        MIPS_SYS(sys_io_getevents, 5)
--        MIPS_SYS(sys_io_submit  , 3)
--        MIPS_SYS(sys_io_cancel  , 3)    /* 4245 */
--        MIPS_SYS(sys_exit_group , 1)
--        MIPS_SYS(sys_lookup_dcookie, 3)
--        MIPS_SYS(sys_epoll_create, 1)
--        MIPS_SYS(sys_epoll_ctl  , 4)
--        MIPS_SYS(sys_epoll_wait , 3)    /* 4250 */
--        MIPS_SYS(sys_remap_file_pages, 5)
--        MIPS_SYS(sys_set_tid_address, 1)
--        MIPS_SYS(sys_restart_syscall, 0)
--        MIPS_SYS(sys_fadvise64_64, 7)
--        MIPS_SYS(sys_statfs64   , 3)    /* 4255 */
--        MIPS_SYS(sys_fstatfs64  , 2)
--        MIPS_SYS(sys_timer_create, 3)
--        MIPS_SYS(sys_timer_settime, 4)
--        MIPS_SYS(sys_timer_gettime, 2)
--        MIPS_SYS(sys_timer_getoverrun, 1)       /* 4260 */
--        MIPS_SYS(sys_timer_delete, 1)
--        MIPS_SYS(sys_clock_settime, 2)
--        MIPS_SYS(sys_clock_gettime, 2)
--        MIPS_SYS(sys_clock_getres, 2)
--        MIPS_SYS(sys_clock_nanosleep, 4)        /* 4265 */
--        MIPS_SYS(sys_tgkill     , 3)
--        MIPS_SYS(sys_utimes     , 2)
--        MIPS_SYS(sys_mbind      , 4)
--        MIPS_SYS(sys_ni_syscall , 0)    /* sys_get_mempolicy */
--        MIPS_SYS(sys_ni_syscall , 0)    /* 4270 sys_set_mempolicy */
--        MIPS_SYS(sys_mq_open    , 4)
--        MIPS_SYS(sys_mq_unlink  , 1)
--        MIPS_SYS(sys_mq_timedsend, 5)
--        MIPS_SYS(sys_mq_timedreceive, 5)
--        MIPS_SYS(sys_mq_notify  , 2)    /* 4275 */
--        MIPS_SYS(sys_mq_getsetattr, 3)
--        MIPS_SYS(sys_ni_syscall , 0)    /* sys_vserver */
--        MIPS_SYS(sys_waitid     , 4)
--        MIPS_SYS(sys_ni_syscall , 0)    /* available, was setaltroot */
--        MIPS_SYS(sys_add_key    , 5)
--        MIPS_SYS(sys_request_key, 4)
--        MIPS_SYS(sys_keyctl     , 5)
--        MIPS_SYS(sys_set_thread_area, 1)
--        MIPS_SYS(sys_inotify_init, 0)
--        MIPS_SYS(sys_inotify_add_watch, 3) /* 4285 */
--        MIPS_SYS(sys_inotify_rm_watch, 2)
--        MIPS_SYS(sys_migrate_pages, 4)
--        MIPS_SYS(sys_openat, 4)
--        MIPS_SYS(sys_mkdirat, 3)
--        MIPS_SYS(sys_mknodat, 4)        /* 4290 */
--        MIPS_SYS(sys_fchownat, 5)
--        MIPS_SYS(sys_futimesat, 3)
--        MIPS_SYS(sys_fstatat64, 4)
--        MIPS_SYS(sys_unlinkat, 3)
--        MIPS_SYS(sys_renameat, 4)       /* 4295 */
--        MIPS_SYS(sys_linkat, 5)
--        MIPS_SYS(sys_symlinkat, 3)
--        MIPS_SYS(sys_readlinkat, 4)
--        MIPS_SYS(sys_fchmodat, 3)
--        MIPS_SYS(sys_faccessat, 3)      /* 4300 */
--        MIPS_SYS(sys_pselect6, 6)
--        MIPS_SYS(sys_ppoll, 5)
--        MIPS_SYS(sys_unshare, 1)
--        MIPS_SYS(sys_splice, 6)
--        MIPS_SYS(sys_sync_file_range, 7) /* 4305 */
--        MIPS_SYS(sys_tee, 4)
--        MIPS_SYS(sys_vmsplice, 4)
--        MIPS_SYS(sys_move_pages, 6)
--        MIPS_SYS(sys_set_robust_list, 2)
--        MIPS_SYS(sys_get_robust_list, 3) /* 4310 */
--        MIPS_SYS(sys_kexec_load, 4)
--        MIPS_SYS(sys_getcpu, 3)
--        MIPS_SYS(sys_epoll_pwait, 6)
--        MIPS_SYS(sys_ioprio_set, 3)
--        MIPS_SYS(sys_ioprio_get, 2)
--        MIPS_SYS(sys_utimensat, 4)
--        MIPS_SYS(sys_signalfd, 3)
--        MIPS_SYS(sys_ni_syscall, 0)     /* was timerfd */
--        MIPS_SYS(sys_eventfd, 1)
--        MIPS_SYS(sys_fallocate, 6)      /* 4320 */
--        MIPS_SYS(sys_timerfd_create, 2)
--        MIPS_SYS(sys_timerfd_gettime, 2)
--        MIPS_SYS(sys_timerfd_settime, 4)
--        MIPS_SYS(sys_signalfd4, 4)
--        MIPS_SYS(sys_eventfd2, 2)       /* 4325 */
--        MIPS_SYS(sys_epoll_create1, 1)
--        MIPS_SYS(sys_dup3, 3)
--        MIPS_SYS(sys_pipe2, 2)
--        MIPS_SYS(sys_inotify_init1, 1)
--        MIPS_SYS(sys_preadv, 5)         /* 4330 */
--        MIPS_SYS(sys_pwritev, 5)
--        MIPS_SYS(sys_rt_tgsigqueueinfo, 4)
--        MIPS_SYS(sys_perf_event_open, 5)
--        MIPS_SYS(sys_accept4, 4)
--        MIPS_SYS(sys_recvmmsg, 5)       /* 4335 */
--        MIPS_SYS(sys_fanotify_init, 2)
--        MIPS_SYS(sys_fanotify_mark, 6)
--        MIPS_SYS(sys_prlimit64, 4)
--        MIPS_SYS(sys_name_to_handle_at, 5)
--        MIPS_SYS(sys_open_by_handle_at, 3) /* 4340 */
--        MIPS_SYS(sys_clock_adjtime, 2)
--        MIPS_SYS(sys_syncfs, 1)
--        MIPS_SYS(sys_sendmmsg, 4)
--        MIPS_SYS(sys_setns, 2)
--        MIPS_SYS(sys_process_vm_readv, 6) /* 345 */
--        MIPS_SYS(sys_process_vm_writev, 6)
--        MIPS_SYS(sys_kcmp, 5)
--        MIPS_SYS(sys_finit_module, 3)
--        MIPS_SYS(sys_sched_setattr, 2)
--        MIPS_SYS(sys_sched_getattr, 3)  /* 350 */
--        MIPS_SYS(sys_renameat2, 5)
--        MIPS_SYS(sys_seccomp, 3)
--        MIPS_SYS(sys_getrandom, 3)
--        MIPS_SYS(sys_memfd_create, 2)
--        MIPS_SYS(sys_bpf, 3)            /* 355 */
--        MIPS_SYS(sys_execveat, 5)
--        MIPS_SYS(sys_userfaultfd, 1)
--        MIPS_SYS(sys_membarrier, 2)
--        MIPS_SYS(sys_mlock2, 3)
--        MIPS_SYS(sys_copy_file_range, 6) /* 360 */
--        MIPS_SYS(sys_preadv2, 6)
--        MIPS_SYS(sys_pwritev2, 6)
--        MIPS_SYS(sys_pkey_mprotect, 4)
--        MIPS_SYS(sys_pkey_alloc, 2)
--        MIPS_SYS(sys_pkey_free, 1)                 /* 365 */
--        MIPS_SYS(sys_statx, 5)
--        MIPS_SYS(sys_rseq, 4)
--        MIPS_SYS(sys_io_pgetevents, 6)
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 370 */
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 375 */
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 380 */
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 385 */
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 390 */
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYSCALL_NUMBER_UNUSED,
--        MIPS_SYS(sys_semget, 3)
--        MIPS_SYS(sys_semctl, 4)
--        MIPS_SYS(sys_shmget, 3)                    /* 395 */
--        MIPS_SYS(sys_shmctl, 3)
--        MIPS_SYS(sys_shmat, 3)
--        MIPS_SYS(sys_shmdt, 1)
--        MIPS_SYS(sys_msgget, 2)
--        MIPS_SYS(sys_msgsnd, 4)                    /* 400 */
--        MIPS_SYS(sys_msgrcv, 5)
--        MIPS_SYS(sys_msgctl, 3)
--        MIPS_SYS(sys_clock_gettime64, 2)
--        MIPS_SYS(sys_clock_settime64, 2)
--        MIPS_SYS(sys_clock_adjtime64, 2)           /* 405 */
--        MIPS_SYS(sys_clock_getres_time64, 2)
--        MIPS_SYS(sys_clock_nanosleep_time64, 4)
--        MIPS_SYS(sys_timer_gettime64, 2)
--        MIPS_SYS(sys_timer_settime64, 4)
--        MIPS_SYS(sys_timerfd_gettime64, 2)         /* 410 */
--        MIPS_SYS(sys_timerfd_settime64, 4)
--        MIPS_SYS(sys_utimensat_time64, 4)
--        MIPS_SYS(sys_pselect6_time64, 6)
--        MIPS_SYS(sys_ppoll_time64, 5)
--        MIPS_SYSCALL_NUMBER_UNUSED,                /* 415 */
--        MIPS_SYS(sys_io_pgetevents_time64, 6)
--        MIPS_SYS(sys_recvmmsg_time64, 5)
--        MIPS_SYS(sys_mq_timedsend_time64, 5)
--        MIPS_SYS(sys_mq_timedreceive_time64, 5)
--        MIPS_SYS(sys_semtimedop_time64, 4)         /* 420 */
--        MIPS_SYS(sys_rt_sigtimedwait_time64, 4)
--        MIPS_SYS(sys_futex_time64, 6)
--        MIPS_SYS(sys_sched_rr_get_interval_time64, 2)
--        MIPS_SYS(sys_pidfd_send_signal, 4)
--        MIPS_SYS(sys_io_uring_setup, 2)            /* 425 */
--        MIPS_SYS(sys_io_uring_enter, 6)
--        MIPS_SYS(sys_io_uring_register, 4)
--        MIPS_SYS(sys_open_tree, 3)
--        MIPS_SYS(sys_move_mount, 5)
--        MIPS_SYS(sys_fsopen, 2)                    /* 430 */
--        MIPS_SYS(sys_fsconfig, 5)
--        MIPS_SYS(sys_fsmount, 3)
--        MIPS_SYS(sys_fspick, 3)
--        MIPS_SYS(sys_pidfd_open, 2)
--        MIPS_SYS(sys_clone3, 2)                    /* 435 */
--
-+#include "syscall-args-o32.c.inc"
- };
--#  undef MIPS_SYS
- # endif /* O32 */
- 
- /* Break codes */
-diff --git a/linux-user/mips/syscall-args-o32.c.inc b/linux-user/mips/syscall-args-o32.c.inc
-new file mode 100644
-index 000000000000..f060b061441a
---- /dev/null
-+++ b/linux-user/mips/syscall-args-o32.c.inc
-@@ -0,0 +1,438 @@
-+#  define MIPS_SYS(name, args) args,
-+        MIPS_SYS(sys_syscall    , 8)    /* 4000 */
-+        MIPS_SYS(sys_exit       , 1)
-+        MIPS_SYS(sys_fork       , 0)
-+        MIPS_SYS(sys_read       , 3)
-+        MIPS_SYS(sys_write      , 3)
-+        MIPS_SYS(sys_open       , 3)    /* 4005 */
-+        MIPS_SYS(sys_close      , 1)
-+        MIPS_SYS(sys_waitpid    , 3)
-+        MIPS_SYS(sys_creat      , 2)
-+        MIPS_SYS(sys_link       , 2)
-+        MIPS_SYS(sys_unlink     , 1)    /* 4010 */
-+        MIPS_SYS(sys_execve     , 0)
-+        MIPS_SYS(sys_chdir      , 1)
-+        MIPS_SYS(sys_time       , 1)
-+        MIPS_SYS(sys_mknod      , 3)
-+        MIPS_SYS(sys_chmod      , 2)    /* 4015 */
-+        MIPS_SYS(sys_lchown     , 3)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_stat */
-+        MIPS_SYS(sys_lseek      , 3)
-+        MIPS_SYS(sys_getpid     , 0)    /* 4020 */
-+        MIPS_SYS(sys_mount      , 5)
-+        MIPS_SYS(sys_umount     , 1)
-+        MIPS_SYS(sys_setuid     , 1)
-+        MIPS_SYS(sys_getuid     , 0)
-+        MIPS_SYS(sys_stime      , 1)    /* 4025 */
-+        MIPS_SYS(sys_ptrace     , 4)
-+        MIPS_SYS(sys_alarm      , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_fstat */
-+        MIPS_SYS(sys_pause      , 0)
-+        MIPS_SYS(sys_utime      , 2)    /* 4030 */
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_access     , 2)
-+        MIPS_SYS(sys_nice       , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* 4035 */
-+        MIPS_SYS(sys_sync       , 0)
-+        MIPS_SYS(sys_kill       , 2)
-+        MIPS_SYS(sys_rename     , 2)
-+        MIPS_SYS(sys_mkdir      , 2)
-+        MIPS_SYS(sys_rmdir      , 1)    /* 4040 */
-+        MIPS_SYS(sys_dup                , 1)
-+        MIPS_SYS(sys_pipe       , 0)
-+        MIPS_SYS(sys_times      , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_brk                , 1)    /* 4045 */
-+        MIPS_SYS(sys_setgid     , 1)
-+        MIPS_SYS(sys_getgid     , 0)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was signal(2) */
-+        MIPS_SYS(sys_geteuid    , 0)
-+        MIPS_SYS(sys_getegid    , 0)    /* 4050 */
-+        MIPS_SYS(sys_acct       , 0)
-+        MIPS_SYS(sys_umount2    , 2)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_ioctl      , 3)
-+        MIPS_SYS(sys_fcntl      , 3)    /* 4055 */
-+        MIPS_SYS(sys_ni_syscall , 2)
-+        MIPS_SYS(sys_setpgid    , 2)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_olduname   , 1)
-+        MIPS_SYS(sys_umask      , 1)    /* 4060 */
-+        MIPS_SYS(sys_chroot     , 1)
-+        MIPS_SYS(sys_ustat      , 2)
-+        MIPS_SYS(sys_dup2       , 2)
-+        MIPS_SYS(sys_getppid    , 0)
-+        MIPS_SYS(sys_getpgrp    , 0)    /* 4065 */
-+        MIPS_SYS(sys_setsid     , 0)
-+        MIPS_SYS(sys_sigaction  , 3)
-+        MIPS_SYS(sys_sgetmask   , 0)
-+        MIPS_SYS(sys_ssetmask   , 1)
-+        MIPS_SYS(sys_setreuid   , 2)    /* 4070 */
-+        MIPS_SYS(sys_setregid   , 2)
-+        MIPS_SYS(sys_sigsuspend , 0)
-+        MIPS_SYS(sys_sigpending , 1)
-+        MIPS_SYS(sys_sethostname        , 2)
-+        MIPS_SYS(sys_setrlimit  , 2)    /* 4075 */
-+        MIPS_SYS(sys_getrlimit  , 2)
-+        MIPS_SYS(sys_getrusage  , 2)
-+        MIPS_SYS(sys_gettimeofday, 2)
-+        MIPS_SYS(sys_settimeofday, 2)
-+        MIPS_SYS(sys_getgroups  , 2)    /* 4080 */
-+        MIPS_SYS(sys_setgroups  , 2)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* old_select */
-+        MIPS_SYS(sys_symlink    , 2)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_lstat */
-+        MIPS_SYS(sys_readlink   , 3)    /* 4085 */
-+        MIPS_SYS(sys_uselib     , 1)
-+        MIPS_SYS(sys_swapon     , 2)
-+        MIPS_SYS(sys_reboot     , 3)
-+        MIPS_SYS(old_readdir    , 3)
-+        MIPS_SYS(old_mmap       , 6)    /* 4090 */
-+        MIPS_SYS(sys_munmap     , 2)
-+        MIPS_SYS(sys_truncate   , 2)
-+        MIPS_SYS(sys_ftruncate  , 2)
-+        MIPS_SYS(sys_fchmod     , 2)
-+        MIPS_SYS(sys_fchown     , 3)    /* 4095 */
-+        MIPS_SYS(sys_getpriority        , 2)
-+        MIPS_SYS(sys_setpriority        , 3)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_statfs     , 2)
-+        MIPS_SYS(sys_fstatfs    , 2)    /* 4100 */
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was ioperm(2) */
-+        MIPS_SYS(sys_socketcall , 2)
-+        MIPS_SYS(sys_syslog     , 3)
-+        MIPS_SYS(sys_setitimer  , 3)
-+        MIPS_SYS(sys_getitimer  , 2)    /* 4105 */
-+        MIPS_SYS(sys_newstat    , 2)
-+        MIPS_SYS(sys_newlstat   , 2)
-+        MIPS_SYS(sys_newfstat   , 2)
-+        MIPS_SYS(sys_uname      , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* 4110 was iopl(2) */
-+        MIPS_SYS(sys_vhangup    , 0)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_idle() */
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_vm86 */
-+        MIPS_SYS(sys_wait4      , 4)
-+        MIPS_SYS(sys_swapoff    , 1)    /* 4115 */
-+        MIPS_SYS(sys_sysinfo    , 1)
-+        MIPS_SYS(sys_ipc                , 6)
-+        MIPS_SYS(sys_fsync      , 1)
-+        MIPS_SYS(sys_sigreturn  , 0)
-+        MIPS_SYS(sys_clone      , 6)    /* 4120 */
-+        MIPS_SYS(sys_setdomainname, 2)
-+        MIPS_SYS(sys_newuname   , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* sys_modify_ldt */
-+        MIPS_SYS(sys_adjtimex   , 1)
-+        MIPS_SYS(sys_mprotect   , 3)    /* 4125 */
-+        MIPS_SYS(sys_sigprocmask        , 3)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was create_module */
-+        MIPS_SYS(sys_init_module        , 5)
-+        MIPS_SYS(sys_delete_module, 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* 4130 was get_kernel_syms */
-+        MIPS_SYS(sys_quotactl   , 0)
-+        MIPS_SYS(sys_getpgid    , 1)
-+        MIPS_SYS(sys_fchdir     , 1)
-+        MIPS_SYS(sys_bdflush    , 2)
-+        MIPS_SYS(sys_sysfs      , 3)    /* 4135 */
-+        MIPS_SYS(sys_personality        , 1)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* for afs_syscall */
-+        MIPS_SYS(sys_setfsuid   , 1)
-+        MIPS_SYS(sys_setfsgid   , 1)
-+        MIPS_SYS(sys_llseek     , 5)    /* 4140 */
-+        MIPS_SYS(sys_getdents   , 3)
-+        MIPS_SYS(sys_select     , 5)
-+        MIPS_SYS(sys_flock      , 2)
-+        MIPS_SYS(sys_msync      , 3)
-+        MIPS_SYS(sys_readv      , 3)    /* 4145 */
-+        MIPS_SYS(sys_writev     , 3)
-+        MIPS_SYS(sys_cacheflush , 3)
-+        MIPS_SYS(sys_cachectl   , 3)
-+        MIPS_SYS(sys_sysmips    , 4)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* 4150 */
-+        MIPS_SYS(sys_getsid     , 1)
-+        MIPS_SYS(sys_fdatasync  , 0)
-+        MIPS_SYS(sys_sysctl     , 1)
-+        MIPS_SYS(sys_mlock      , 2)
-+        MIPS_SYS(sys_munlock    , 2)    /* 4155 */
-+        MIPS_SYS(sys_mlockall   , 1)
-+        MIPS_SYS(sys_munlockall , 0)
-+        MIPS_SYS(sys_sched_setparam, 2)
-+        MIPS_SYS(sys_sched_getparam, 2)
-+        MIPS_SYS(sys_sched_setscheduler, 3)     /* 4160 */
-+        MIPS_SYS(sys_sched_getscheduler, 1)
-+        MIPS_SYS(sys_sched_yield        , 0)
-+        MIPS_SYS(sys_sched_get_priority_max, 1)
-+        MIPS_SYS(sys_sched_get_priority_min, 1)
-+        MIPS_SYS(sys_sched_rr_get_interval, 2)  /* 4165 */
-+        MIPS_SYS(sys_nanosleep, 2)
-+        MIPS_SYS(sys_mremap     , 5)
-+        MIPS_SYS(sys_accept     , 3)
-+        MIPS_SYS(sys_bind       , 3)
-+        MIPS_SYS(sys_connect    , 3)    /* 4170 */
-+        MIPS_SYS(sys_getpeername        , 3)
-+        MIPS_SYS(sys_getsockname        , 3)
-+        MIPS_SYS(sys_getsockopt , 5)
-+        MIPS_SYS(sys_listen     , 2)
-+        MIPS_SYS(sys_recv       , 4)    /* 4175 */
-+        MIPS_SYS(sys_recvfrom   , 6)
-+        MIPS_SYS(sys_recvmsg    , 3)
-+        MIPS_SYS(sys_send       , 4)
-+        MIPS_SYS(sys_sendmsg    , 3)
-+        MIPS_SYS(sys_sendto     , 6)    /* 4180 */
-+        MIPS_SYS(sys_setsockopt , 5)
-+        MIPS_SYS(sys_shutdown   , 2)
-+        MIPS_SYS(sys_socket     , 3)
-+        MIPS_SYS(sys_socketpair , 4)
-+        MIPS_SYS(sys_setresuid  , 3)    /* 4185 */
-+        MIPS_SYS(sys_getresuid  , 3)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* was sys_query_module */
-+        MIPS_SYS(sys_poll       , 3)
-+        MIPS_SYS(sys_nfsservctl , 3)
-+        MIPS_SYS(sys_setresgid  , 3)    /* 4190 */
-+        MIPS_SYS(sys_getresgid  , 3)
-+        MIPS_SYS(sys_prctl      , 5)
-+        MIPS_SYS(sys_rt_sigreturn, 0)
-+        MIPS_SYS(sys_rt_sigaction, 4)
-+        MIPS_SYS(sys_rt_sigprocmask, 4) /* 4195 */
-+        MIPS_SYS(sys_rt_sigpending, 2)
-+        MIPS_SYS(sys_rt_sigtimedwait, 4)
-+        MIPS_SYS(sys_rt_sigqueueinfo, 3)
-+        MIPS_SYS(sys_rt_sigsuspend, 0)
-+        MIPS_SYS(sys_pread64    , 6)    /* 4200 */
-+        MIPS_SYS(sys_pwrite64   , 6)
-+        MIPS_SYS(sys_chown      , 3)
-+        MIPS_SYS(sys_getcwd     , 2)
-+        MIPS_SYS(sys_capget     , 2)
-+        MIPS_SYS(sys_capset     , 2)    /* 4205 */
-+        MIPS_SYS(sys_sigaltstack        , 2)
-+        MIPS_SYS(sys_sendfile   , 4)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_mmap2      , 6)    /* 4210 */
-+        MIPS_SYS(sys_truncate64 , 4)
-+        MIPS_SYS(sys_ftruncate64        , 4)
-+        MIPS_SYS(sys_stat64     , 2)
-+        MIPS_SYS(sys_lstat64    , 2)
-+        MIPS_SYS(sys_fstat64    , 2)    /* 4215 */
-+        MIPS_SYS(sys_pivot_root , 2)
-+        MIPS_SYS(sys_mincore    , 3)
-+        MIPS_SYS(sys_madvise    , 3)
-+        MIPS_SYS(sys_getdents64 , 3)
-+        MIPS_SYS(sys_fcntl64    , 3)    /* 4220 */
-+        MIPS_SYS(sys_ni_syscall , 0)
-+        MIPS_SYS(sys_gettid     , 0)
-+        MIPS_SYS(sys_readahead  , 5)
-+        MIPS_SYS(sys_setxattr   , 5)
-+        MIPS_SYS(sys_lsetxattr  , 5)    /* 4225 */
-+        MIPS_SYS(sys_fsetxattr  , 5)
-+        MIPS_SYS(sys_getxattr   , 4)
-+        MIPS_SYS(sys_lgetxattr  , 4)
-+        MIPS_SYS(sys_fgetxattr  , 4)
-+        MIPS_SYS(sys_listxattr  , 3)    /* 4230 */
-+        MIPS_SYS(sys_llistxattr , 3)
-+        MIPS_SYS(sys_flistxattr , 3)
-+        MIPS_SYS(sys_removexattr        , 2)
-+        MIPS_SYS(sys_lremovexattr, 2)
-+        MIPS_SYS(sys_fremovexattr, 2)   /* 4235 */
-+        MIPS_SYS(sys_tkill      , 2)
-+        MIPS_SYS(sys_sendfile64 , 5)
-+        MIPS_SYS(sys_futex      , 6)
-+        MIPS_SYS(sys_sched_setaffinity, 3)
-+        MIPS_SYS(sys_sched_getaffinity, 3)      /* 4240 */
-+        MIPS_SYS(sys_io_setup   , 2)
-+        MIPS_SYS(sys_io_destroy , 1)
-+        MIPS_SYS(sys_io_getevents, 5)
-+        MIPS_SYS(sys_io_submit  , 3)
-+        MIPS_SYS(sys_io_cancel  , 3)    /* 4245 */
-+        MIPS_SYS(sys_exit_group , 1)
-+        MIPS_SYS(sys_lookup_dcookie, 3)
-+        MIPS_SYS(sys_epoll_create, 1)
-+        MIPS_SYS(sys_epoll_ctl  , 4)
-+        MIPS_SYS(sys_epoll_wait , 3)    /* 4250 */
-+        MIPS_SYS(sys_remap_file_pages, 5)
-+        MIPS_SYS(sys_set_tid_address, 1)
-+        MIPS_SYS(sys_restart_syscall, 0)
-+        MIPS_SYS(sys_fadvise64_64, 7)
-+        MIPS_SYS(sys_statfs64   , 3)    /* 4255 */
-+        MIPS_SYS(sys_fstatfs64  , 2)
-+        MIPS_SYS(sys_timer_create, 3)
-+        MIPS_SYS(sys_timer_settime, 4)
-+        MIPS_SYS(sys_timer_gettime, 2)
-+        MIPS_SYS(sys_timer_getoverrun, 1)       /* 4260 */
-+        MIPS_SYS(sys_timer_delete, 1)
-+        MIPS_SYS(sys_clock_settime, 2)
-+        MIPS_SYS(sys_clock_gettime, 2)
-+        MIPS_SYS(sys_clock_getres, 2)
-+        MIPS_SYS(sys_clock_nanosleep, 4)        /* 4265 */
-+        MIPS_SYS(sys_tgkill     , 3)
-+        MIPS_SYS(sys_utimes     , 2)
-+        MIPS_SYS(sys_mbind      , 4)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* sys_get_mempolicy */
-+        MIPS_SYS(sys_ni_syscall , 0)    /* 4270 sys_set_mempolicy */
-+        MIPS_SYS(sys_mq_open    , 4)
-+        MIPS_SYS(sys_mq_unlink  , 1)
-+        MIPS_SYS(sys_mq_timedsend, 5)
-+        MIPS_SYS(sys_mq_timedreceive, 5)
-+        MIPS_SYS(sys_mq_notify  , 2)    /* 4275 */
-+        MIPS_SYS(sys_mq_getsetattr, 3)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* sys_vserver */
-+        MIPS_SYS(sys_waitid     , 4)
-+        MIPS_SYS(sys_ni_syscall , 0)    /* available, was setaltroot */
-+        MIPS_SYS(sys_add_key    , 5)
-+        MIPS_SYS(sys_request_key, 4)
-+        MIPS_SYS(sys_keyctl     , 5)
-+        MIPS_SYS(sys_set_thread_area, 1)
-+        MIPS_SYS(sys_inotify_init, 0)
-+        MIPS_SYS(sys_inotify_add_watch, 3) /* 4285 */
-+        MIPS_SYS(sys_inotify_rm_watch, 2)
-+        MIPS_SYS(sys_migrate_pages, 4)
-+        MIPS_SYS(sys_openat, 4)
-+        MIPS_SYS(sys_mkdirat, 3)
-+        MIPS_SYS(sys_mknodat, 4)        /* 4290 */
-+        MIPS_SYS(sys_fchownat, 5)
-+        MIPS_SYS(sys_futimesat, 3)
-+        MIPS_SYS(sys_fstatat64, 4)
-+        MIPS_SYS(sys_unlinkat, 3)
-+        MIPS_SYS(sys_renameat, 4)       /* 4295 */
-+        MIPS_SYS(sys_linkat, 5)
-+        MIPS_SYS(sys_symlinkat, 3)
-+        MIPS_SYS(sys_readlinkat, 4)
-+        MIPS_SYS(sys_fchmodat, 3)
-+        MIPS_SYS(sys_faccessat, 3)      /* 4300 */
-+        MIPS_SYS(sys_pselect6, 6)
-+        MIPS_SYS(sys_ppoll, 5)
-+        MIPS_SYS(sys_unshare, 1)
-+        MIPS_SYS(sys_splice, 6)
-+        MIPS_SYS(sys_sync_file_range, 7) /* 4305 */
-+        MIPS_SYS(sys_tee, 4)
-+        MIPS_SYS(sys_vmsplice, 4)
-+        MIPS_SYS(sys_move_pages, 6)
-+        MIPS_SYS(sys_set_robust_list, 2)
-+        MIPS_SYS(sys_get_robust_list, 3) /* 4310 */
-+        MIPS_SYS(sys_kexec_load, 4)
-+        MIPS_SYS(sys_getcpu, 3)
-+        MIPS_SYS(sys_epoll_pwait, 6)
-+        MIPS_SYS(sys_ioprio_set, 3)
-+        MIPS_SYS(sys_ioprio_get, 2)
-+        MIPS_SYS(sys_utimensat, 4)
-+        MIPS_SYS(sys_signalfd, 3)
-+        MIPS_SYS(sys_ni_syscall, 0)     /* was timerfd */
-+        MIPS_SYS(sys_eventfd, 1)
-+        MIPS_SYS(sys_fallocate, 6)      /* 4320 */
-+        MIPS_SYS(sys_timerfd_create, 2)
-+        MIPS_SYS(sys_timerfd_gettime, 2)
-+        MIPS_SYS(sys_timerfd_settime, 4)
-+        MIPS_SYS(sys_signalfd4, 4)
-+        MIPS_SYS(sys_eventfd2, 2)       /* 4325 */
-+        MIPS_SYS(sys_epoll_create1, 1)
-+        MIPS_SYS(sys_dup3, 3)
-+        MIPS_SYS(sys_pipe2, 2)
-+        MIPS_SYS(sys_inotify_init1, 1)
-+        MIPS_SYS(sys_preadv, 5)         /* 4330 */
-+        MIPS_SYS(sys_pwritev, 5)
-+        MIPS_SYS(sys_rt_tgsigqueueinfo, 4)
-+        MIPS_SYS(sys_perf_event_open, 5)
-+        MIPS_SYS(sys_accept4, 4)
-+        MIPS_SYS(sys_recvmmsg, 5)       /* 4335 */
-+        MIPS_SYS(sys_fanotify_init, 2)
-+        MIPS_SYS(sys_fanotify_mark, 6)
-+        MIPS_SYS(sys_prlimit64, 4)
-+        MIPS_SYS(sys_name_to_handle_at, 5)
-+        MIPS_SYS(sys_open_by_handle_at, 3) /* 4340 */
-+        MIPS_SYS(sys_clock_adjtime, 2)
-+        MIPS_SYS(sys_syncfs, 1)
-+        MIPS_SYS(sys_sendmmsg, 4)
-+        MIPS_SYS(sys_setns, 2)
-+        MIPS_SYS(sys_process_vm_readv, 6) /* 345 */
-+        MIPS_SYS(sys_process_vm_writev, 6)
-+        MIPS_SYS(sys_kcmp, 5)
-+        MIPS_SYS(sys_finit_module, 3)
-+        MIPS_SYS(sys_sched_setattr, 2)
-+        MIPS_SYS(sys_sched_getattr, 3)  /* 350 */
-+        MIPS_SYS(sys_renameat2, 5)
-+        MIPS_SYS(sys_seccomp, 3)
-+        MIPS_SYS(sys_getrandom, 3)
-+        MIPS_SYS(sys_memfd_create, 2)
-+        MIPS_SYS(sys_bpf, 3)            /* 355 */
-+        MIPS_SYS(sys_execveat, 5)
-+        MIPS_SYS(sys_userfaultfd, 1)
-+        MIPS_SYS(sys_membarrier, 2)
-+        MIPS_SYS(sys_mlock2, 3)
-+        MIPS_SYS(sys_copy_file_range, 6) /* 360 */
-+        MIPS_SYS(sys_preadv2, 6)
-+        MIPS_SYS(sys_pwritev2, 6)
-+        MIPS_SYS(sys_pkey_mprotect, 4)
-+        MIPS_SYS(sys_pkey_alloc, 2)
-+        MIPS_SYS(sys_pkey_free, 1)                 /* 365 */
-+        MIPS_SYS(sys_statx, 5)
-+        MIPS_SYS(sys_rseq, 4)
-+        MIPS_SYS(sys_io_pgetevents, 6)
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 370 */
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 375 */
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 380 */
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 385 */
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 390 */
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYSCALL_NUMBER_UNUSED,
-+        MIPS_SYS(sys_semget, 3)
-+        MIPS_SYS(sys_semctl, 4)
-+        MIPS_SYS(sys_shmget, 3)                    /* 395 */
-+        MIPS_SYS(sys_shmctl, 3)
-+        MIPS_SYS(sys_shmat, 3)
-+        MIPS_SYS(sys_shmdt, 1)
-+        MIPS_SYS(sys_msgget, 2)
-+        MIPS_SYS(sys_msgsnd, 4)                    /* 400 */
-+        MIPS_SYS(sys_msgrcv, 5)
-+        MIPS_SYS(sys_msgctl, 3)
-+        MIPS_SYS(sys_clock_gettime64, 2)
-+        MIPS_SYS(sys_clock_settime64, 2)
-+        MIPS_SYS(sys_clock_adjtime64, 2)           /* 405 */
-+        MIPS_SYS(sys_clock_getres_time64, 2)
-+        MIPS_SYS(sys_clock_nanosleep_time64, 4)
-+        MIPS_SYS(sys_timer_gettime64, 2)
-+        MIPS_SYS(sys_timer_settime64, 4)
-+        MIPS_SYS(sys_timerfd_gettime64, 2)         /* 410 */
-+        MIPS_SYS(sys_timerfd_settime64, 4)
-+        MIPS_SYS(sys_utimensat_time64, 4)
-+        MIPS_SYS(sys_pselect6_time64, 6)
-+        MIPS_SYS(sys_ppoll_time64, 5)
-+        MIPS_SYSCALL_NUMBER_UNUSED,                /* 415 */
-+        MIPS_SYS(sys_io_pgetevents_time64, 6)
-+        MIPS_SYS(sys_recvmmsg_time64, 5)
-+        MIPS_SYS(sys_mq_timedsend_time64, 5)
-+        MIPS_SYS(sys_mq_timedreceive_time64, 5)
-+        MIPS_SYS(sys_semtimedop_time64, 4)         /* 420 */
-+        MIPS_SYS(sys_rt_sigtimedwait_time64, 4)
-+        MIPS_SYS(sys_futex_time64, 6)
-+        MIPS_SYS(sys_sched_rr_get_interval_time64, 2)
-+        MIPS_SYS(sys_pidfd_send_signal, 4)
-+        MIPS_SYS(sys_io_uring_setup, 2)            /* 425 */
-+        MIPS_SYS(sys_io_uring_enter, 6)
-+        MIPS_SYS(sys_io_uring_register, 4)
-+        MIPS_SYS(sys_open_tree, 3)
-+        MIPS_SYS(sys_move_mount, 5)
-+        MIPS_SYS(sys_fsopen, 2)                    /* 430 */
-+        MIPS_SYS(sys_fsconfig, 5)
-+        MIPS_SYS(sys_fsmount, 3)
-+        MIPS_SYS(sys_fspick, 3)
-+        MIPS_SYS(sys_pidfd_open, 2)
-+        MIPS_SYS(sys_clone3, 2)                    /* 435 */
-+#  undef MIPS_SYS
--- 
-2.24.1
+Thanks for pointing out and sorry for the mistakes,=20
+I will check all the comments and commit log.
 
+> > Add a testcase to make sure the ACPI table is correct for guest.
+> >
+> > The following table need to be added for this test:
+> >     tests/data/acpi/virt/DSDT.pxb
+> > Since the ASL diff has 1000+ lines, it would be presented in commit
+> > log with the simply diff. the diff are:
+> >     Device (PC80) is presented in DSDT.
+> >     Resources allocated for Device (PCI0) is changed.
+> >
+> >   * Disassembling to symbolic ASL+ operators
+> >   *
+> > - * Disassembly of /home/DSDT, Mon Feb 24 19:35:28 2020
+> > + * Disassembly of /home/DSDT.pxb, Mon Feb 24 19:33:38 2020
+> >   *
+> >   * Original Table Header:
+> >   *     Signature        "DSDT"
+> > - *     Length           0x000014BB (5307)
+> > + *     Length           0x00001F70 (8048)
+> >   *     Revision         0x02
+> > - *     Checksum         0xD1
+> > + *     Checksum         0xCF
+> >   *     OEM ID           "BOCHS "
+> >   *     OEM Table ID     "BXPCDSDT"
+> >   *     OEM Revision     0x00000001 (1)
+> >              })
+> >          }
+> >
+> >          {
+> >              Name (_HID, "PNP0A08" /* PCI Express Bus */)  // _HID: Har=
+dware
+> ID
+> >                      WordBusNumber (ResourceProducer, MinFixed, MaxFixe=
+d,
+> PosDecode,
+> >                          0x0000,             // Granularity
+> >                          0x0000,             // Range Minimum
+> > -                        0x00FF,             // Range Maximum
+> > +                        0x007F,             // Range Maximum
+> >                          0x0000,             // Translation Offset
+> > -                        0x0100,             // Length
+> > +                        0x0080,             // Length
+> >                          ,, )
+> >                      DWordMemory (ResourceProducer, PosDecode, MinFixed=
+,
+> MaxFixed, NonCacheable, ReadWrite,
+> >                          0x00000000,         // Granularity
+> >                          0x10000000,         // Range Minimum
+> > -                        0x3EFEFFFF,         // Range Maximum
+> > +                        0x3E9EFFFF,         // Range Maximum
+> >                          0x00000000,         // Translation Offset
+> > -                        0x2EFF0000,         // Length
+> > +                        0x2E9F0000,         // Length
+> >                          ,, , AddressRangeMemory, TypeStatic)
+> >                      DWordIO (ResourceProducer, MinFixed, MaxFixed, Pos=
+Decode,
+> EntireRange,
+> >                          0x00000000,         // Granularity
+> >                          0x00000000,         // Range Minimum
+> > -                        0x0000FFFF,         // Range Maximum
+> > +                        0x0000BFFF,         // Range Maximum
+> >                          0x3EFF0000,         // Translation Offset
+> > -                        0x00010000,         // Length
+> > +                        0x0000C000,         // Length
+> >                          ,, , TypeStatic, DenseTranslation)
+> >                      QWordMemory (ResourceProducer, PosDecode, MinFixed=
+,
+> MaxFixed, NonCacheable, ReadWrite,
+> >                          0x0000000000000000, // Granularity
+> >
+> > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+>=20
+>=20
+> Seems to fail in patchew.
+>=20
+
+The failure is due to CONFIG_PXB is not configured.
+Since it is not configured by default, I will add ifdef CONFIG_PXB
+before the pxb unit test to solve this problem.=20
+
+> > ---
+> >  tests/data/acpi/virt/DSDT.pxb               | Bin 0 -> 8048 bytes
+> >  tests/qtest/bios-tables-test-allowed-diff.h |   1 +
+> >  tests/qtest/bios-tables-test.c              |  54 +++++++++++++++++---
+> >  3 files changed, 49 insertions(+), 6 deletions(-)  create mode 100644
+> > tests/data/acpi/virt/DSDT.pxb
+>=20
+> This needs to be in a separate patch.
+> See instructions in ./tests/qtest/bios-tables-test.c.
+>=20
+>=20
+
+Alright, I would separate this patch into three patches.
+1. tests/qtest/bios-tables-test-allowed-diff.h
+2. Changes made to the unit tests (tests/qtest/bios-tables-test.c)
+3. The binary file and clear tests/qtest/bios-tables-test-allowed-diff.h
+
+> > new file mode 100644
+> > index
+> >
+> 0000000000000000000000000000000000000000..6ac0b5212db49513c27ef50da
+> 838
+> > 240826c2deb7
+> > GIT binary patch
+> > literal 8048
+> >
+> >  static void test_acpi_tcg_acpi_hmat(const char *machine)  {
+> >      test_data data;
+> > @@ -1052,6 +1093,7 @@ int main(int argc, char *argv[])
+> >          qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+> >          qtest_add_func("acpi/virt/numamem",
+> test_acpi_virt_tcg_numamem);
+> >          qtest_add_func("acpi/virt/memhp", test_acpi_virt_tcg_memhp);
+> > +        qtest_add_func("acpi/virt/pxb", test_acpi_virt_tcg_pxb);
+> >      }
+> >      ret =3D g_test_run();
+> >      boot_sector_cleanup(disk);
+> > --
+> > 2.19.1
+> >
+
+Regards,
+Miao
 
