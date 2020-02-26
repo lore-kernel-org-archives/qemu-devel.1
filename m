@@ -2,76 +2,80 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE76C4BA24
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 21:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E73C4BA21
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 21:02:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 108CF21D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 21:01:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1C6C21D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 21:02:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MpbbY2j5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108CF21D7E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JM+MipJF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C6C21D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j73oG-0008F7-6o
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 16:01:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45570)
+	id 1j73oe-0000Eb-W9
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 16:02:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j73ml-0006MA-JU
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:05 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j73mt-0006Yl-MG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j73mj-00024x-9J
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39704
+ (envelope-from <eric.auger@redhat.com>) id 1j73mr-0002Hr-PE
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56556
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j73mj-000240-0o
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:01 -0500
+ id 1j73mr-0002Ge-KW
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 16:00:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582750800;
+ s=mimecast20190719; t=1582750809;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=0YKMlyGuoIcwWg/c6bXsYuxY7W4Gnue7WrH8sG32TrY=;
- b=MpbbY2j5UrnXnTIuUYs/ggJc80RfUK/VeIm2nL/27qKP7vFvCg7W9a0E21PDH+qRM5FGjk
- IS2Af8djBsPo4y4ZgKzGR0Ai2vpAv3iNld1G5HvMMwQzm64WckAm1/V2vKGWBkbrefWCgY
- TiehG/mHs46Mp4szfoy/LDhX/bQVPi4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YFQsQNXchQWvEhIUKL68xgrbUrLVhIX+sOsWFYDRARU=;
+ b=JM+MipJFp5Mt6xbrjuPhZ6uW7iUehYQBxtNVjdT4QQlxwNbXbIbqi8t68KMmuIUdYnUWTy
+ G7ib3Wm1OeQu+yTGTQrjqA1V4DapHkW++hh3lrDOsD5lov5PDj1WLxWM0ytjCJ9ZVSj6vr
+ dbefmkeq9TNoPHdr4hsbYPn8YxAbThU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-E3tT7AL8M7GgzTNvOlWObQ-1; Wed, 26 Feb 2020 15:59:57 -0500
-X-MC-Unique: E3tT7AL8M7GgzTNvOlWObQ-1
+ us-mta-193-IHwq6UDcNOew5o5fh9AP-Q-1; Wed, 26 Feb 2020 16:00:07 -0500
+X-MC-Unique: IHwq6UDcNOew5o5fh9AP-Q-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90BC6800D5A;
- Wed, 26 Feb 2020 20:59:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C1DF8017DF;
+ Wed, 26 Feb 2020 21:00:06 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D6605C578;
- Wed, 26 Feb 2020 20:59:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 81F975C545;
+ Wed, 26 Feb 2020 21:00:00 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Subject: [PATCH v4 00/10] vTPM for aarch64
-Date: Wed, 26 Feb 2020 21:59:32 +0100
-Message-Id: <20200226205942.11424-1-eric.auger@redhat.com>
+Subject: [PATCH v4 02/10] tpm: Use TPMState as a common struct
+Date: Wed, 26 Feb 2020 21:59:34 +0100
+Message-Id: <20200226205942.11424-3-eric.auger@redhat.com>
+In-Reply-To: <20200226205942.11424-1-eric.auger@redhat.com>
+References: <20200226205942.11424-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,130 +93,324 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series adds the capability to instantiate an MMIO TPM TIS
-in ARM virt. It is candidate to qemu 5.0.
+As we plan to introduce a SysBus TPM TIS device, let's
+make the TPMState a common struct usable by both the
+ISADevice and the SysBusDevice. TPMStateISA embeds the
+struct and inherits from the ISADevice.
 
-The existing TPM TIS code is reshuffled into a generic part,
-the ISA device and the sysbus device. The sysbus TPM-TIS
-device gets dynamically instantiated in machvirt on the
-platform bus.
+The prototype of functions bound to be used by both
+the ISA and SysBus devices is changed to take TPMState
+handle.
 
-ACPI boot is not yet supported on ARM. Note that the UEFI
-firmware is itself a consumer of the DT description, so we
-need the DT related changes regardless of whether the VM
-boots in DT or ACPI mode.
+A bunch of structs also are renamed to be specialized
+for the ISA device. Besides those transformations, no
+functional change is expected.
 
-Related qtests are reshuffled to allow the reuse of existing
-tests for both the ISA and the sysbus devices: Adaption
-consists in changing the qemu command line (change in the
-device name and provide explicit machine options) and adapt
-to the relocation of the TPM-TIS device in the memory map.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-The series was tested with the swtpm/libtpms emulator.
-Automatic guest LUKS volume unlocking (tpm2) was successful.
-EDK2 support is under development [3]. Thanks to Ard
-for supporting me when setting up the test environment.
+---
 
-Best Regards
+v2 -> v3:
+- Added Stefan's R-b
+---
+ hw/tpm/tpm_tis.c | 146 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 91 insertions(+), 55 deletions(-)
 
-Eric
-
-Testing:
-
-mkdir /tmp/tpm
-swtpm socket \
---tpm2 \
--t -d \
---tpmstate dir=3D/tmp/tpm \
---ctrl type=3Dunixio,path=3D/tmp/swtpm-sock
-
-qemu command line must be augmented with the following options:
-
--chardev socket,id=3Dchrtpm,path=3D/tmp/swtpm-sock \
--tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
--device tpm-tis-device,tpmdev=3Dtpm0 \
-
-References:
-[1] libtpms: https://github.com/stefanberger/libtpms/wiki
-[2] swtpm: https://github.com/stefanberger/swtpm/wiki
-[3] [PATCH v3 0/9] ArmVirtPkg: implement measured boot for ArmVirtQemu
-
-This series can be found at:
-https://github.com/eauger/qemu/tree/v4.2.0-tpm-patch-v4
-
-History:
-
-v3 -> v4:
-- collect additional R-b's
-- add 'Not used but needed for linking' mention related to
-  tpm_tis_base_addr in CRB test files
-- fix comment style
-
-RFCv2 -> PATCH v3:
-- Updated the doc for ARM
-- Adapted existing tests for ARM
-- use qemu_fdt_setprop_string in add_tpm_tis_fdt_node
-- Collected R-b's
-- Comments not taken into account:
-  - I have kept the tpm-tis-device name for now despite Stefan's
-    suggestion to rename it into tpm-tis-sysbus. This is not
-    frozen though
-  - Common state still is not a QOM object (no double inheritence)
-
-RFC v1 -> RFC v2:
-- restructure the existing code with common, ISA and sysbus part.
-- both ARM and x86 integration were tested.
-
-Eric Auger (10):
-  tpm: rename TPM_TIS into TPM_TIS_ISA
-  tpm: Use TPMState as a common struct
-  tpm: Separate tpm_tis common functions from isa code
-  tpm: Separate TPM_TIS and TPM_TIS_ISA configs
-  tpm: Add the SysBus TPM TIS device
-  hw/arm/virt: vTPM support
-  docs/specs/tpm: Document TPM_TIS sysbus device for ARM
-  test: tpm: pass optional machine options to swtpm test functions
-  test: tpm-tis: Get prepared to share tests between ISA and sysbus
-    devices
-  test: tpm-tis: Add Sysbus TPM-TIS device test
-
- default-configs/i386-softmmu.mak        |   2 +-
- docs/specs/tpm.rst                      |  25 +-
- hw/arm/Kconfig                          |   1 +
- hw/arm/sysbus-fdt.c                     |  33 ++
- hw/arm/virt.c                           |   7 +
- hw/i386/Kconfig                         |   2 +-
- hw/i386/acpi-build.c                    |   6 +-
- hw/tpm/Kconfig                          |  12 +-
- hw/tpm/Makefile.objs                    |   4 +-
- hw/tpm/tpm_tis.h                        |  91 +++++
- hw/tpm/{tpm_tis.c =3D> tpm_tis_common.c}  | 181 +---------
- hw/tpm/tpm_tis_isa.c                    | 170 +++++++++
- hw/tpm/tpm_tis_sysbus.c                 | 159 +++++++++
- include/sysemu/tpm.h                    |   7 +-
- tests/qtest/Makefile.include            |  11 +-
- tests/qtest/tpm-crb-swtpm-test.c        |   9 +-
- tests/qtest/tpm-crb-test.c              |   3 +
- tests/qtest/tpm-tests.c                 |  10 +-
- tests/qtest/tpm-tests.h                 |   5 +-
- tests/qtest/tpm-tis-device-swtpm-test.c |  76 ++++
- tests/qtest/tpm-tis-device-test.c       |  87 +++++
- tests/qtest/tpm-tis-swtpm-test.c        |   8 +-
- tests/qtest/tpm-tis-test.c              | 414 +---------------------
- tests/qtest/tpm-tis-util.c              | 451 ++++++++++++++++++++++++
- tests/qtest/tpm-tis-util.h              |  23 ++
- tests/qtest/tpm-util.c                  |  11 +-
- tests/qtest/tpm-util.h                  |   8 +-
- 27 files changed, 1207 insertions(+), 609 deletions(-)
- create mode 100644 hw/tpm/tpm_tis.h
- rename hw/tpm/{tpm_tis.c =3D> tpm_tis_common.c} (85%)
- create mode 100644 hw/tpm/tpm_tis_isa.c
- create mode 100644 hw/tpm/tpm_tis_sysbus.c
- create mode 100644 tests/qtest/tpm-tis-device-swtpm-test.c
- create mode 100644 tests/qtest/tpm-tis-device-test.c
- create mode 100644 tests/qtest/tpm-tis-util.c
- create mode 100644 tests/qtest/tpm-tis-util.h
-
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index c609737272..fc6d7ca579 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -65,7 +65,6 @@ typedef struct TPMLocality {
+ } TPMLocality;
+=20
+ typedef struct TPMState {
+-    ISADevice busdev;
+     MemoryRegion mmio;
+=20
+     unsigned char buffer[TPM_TIS_BUFFER_MAX];
+@@ -91,7 +90,15 @@ typedef struct TPMState {
+     TPMPPI ppi;
+ } TPMState;
+=20
+-#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
++typedef struct TPMStateISA {
++    /*< private >*/
++    ISADevice parent_obj;
++
++    /*< public >*/
++    TPMState state; /* not a QOM object */
++} TPMStateISA;
++
++#define TPM_TIS_ISA(obj) OBJECT_CHECK(TPMStateISA, (obj), TYPE_TPM_TIS_ISA=
+)
+=20
+ #define DEBUG_TIS 0
+=20
+@@ -281,9 +288,8 @@ static void tpm_tis_prep_abort(TPMState *s, uint8_t loc=
+ty, uint8_t newlocty)
+ /*
+  * Callback from the TPM to indicate that the response was received.
+  */
+-static void tpm_tis_request_completed(TPMIf *ti, int ret)
++static void tpm_tis_request_completed(TPMState *s, int ret)
+ {
+-    TPMState *s =3D TPM(ti);
+     uint8_t locty =3D s->cmd.locty;
+     uint8_t l;
+=20
+@@ -338,7 +344,7 @@ static uint32_t tpm_tis_data_read(TPMState *s, uint8_t =
+locty)
+ }
+=20
+ #ifdef DEBUG_TIS
+-static void tpm_tis_dump_state(void *opaque, hwaddr addr)
++static void tpm_tis_dump_state(TPMState *s, hwaddr addr)
+ {
+     static const unsigned regs[] =3D {
+         TPM_TIS_REG_ACCESS,
+@@ -353,7 +359,6 @@ static void tpm_tis_dump_state(void *opaque, hwaddr add=
+r)
+     int idx;
+     uint8_t locty =3D tpm_tis_locality_from_addr(addr);
+     hwaddr base =3D addr & ~0xfff;
+-    TPMState *s =3D opaque;
+=20
+     printf("tpm_tis: active locality      : %d\n"
+            "tpm_tis: state of locality %d : %d\n"
+@@ -363,7 +368,7 @@ static void tpm_tis_dump_state(void *opaque, hwaddr add=
+r)
+=20
+     for (idx =3D 0; regs[idx] !=3D 0xfff; idx++) {
+         printf("tpm_tis: 0x%04x : 0x%08x\n", regs[idx],
+-               (int)tpm_tis_mmio_read(opaque, base + regs[idx], 4));
++               (int)tpm_tis_mmio_read(s, base + regs[idx], 4));
+     }
+=20
+     printf("tpm_tis: r/w offset    : %d\n"
+@@ -488,7 +493,7 @@ static uint64_t tpm_tis_mmio_read(void *opaque, hwaddr =
+addr,
+         break;
+ #ifdef DEBUG_TIS
+     case TPM_TIS_REG_DEBUG:
+-        tpm_tis_dump_state(opaque, addr);
++        tpm_tis_dump_state(s, addr);
+         break;
+ #endif
+     }
+@@ -835,10 +840,8 @@ static const MemoryRegionOps tpm_tis_memory_ops =3D {
+ /*
+  * Get the TPMVersion of the backend device being used
+  */
+-static enum TPMVersion tpm_tis_get_tpm_version(TPMIf *ti)
++static enum TPMVersion tpm_tis_get_tpm_version(TPMState *s)
+ {
+-    TPMState *s =3D TPM(ti);
+-
+     if (tpm_backend_had_startup_error(s->be_driver)) {
+         return TPM_VERSION_UNSPEC;
+     }
+@@ -850,9 +853,8 @@ static enum TPMVersion tpm_tis_get_tpm_version(TPMIf *t=
+i)
+  * This function is called when the machine starts, resets or due to
+  * S3 resume.
+  */
+-static void tpm_tis_reset(DeviceState *dev)
++static void tpm_tis_reset(TPMState *s)
+ {
+-    TPMState *s =3D TPM(dev);
+     int c;
+=20
+     s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
+@@ -896,15 +898,14 @@ static void tpm_tis_reset(DeviceState *dev)
+=20
+ /* persistent state handling */
+=20
+-static int tpm_tis_pre_save(void *opaque)
++static int tpm_tis_pre_save(TPMState *s)
+ {
+-    TPMState *s =3D opaque;
+     uint8_t locty =3D s->active_locty;
+=20
+     trace_tpm_tis_pre_save(locty, s->rw_offset);
+=20
+     if (DEBUG_TIS) {
+-        tpm_tis_dump_state(opaque, 0);
++        tpm_tis_dump_state(s, 0);
+     }
+=20
+     /*
+@@ -929,34 +930,78 @@ static const VMStateDescription vmstate_locty =3D {
+     }
+ };
+=20
+-static const VMStateDescription vmstate_tpm_tis =3D {
++/* ISA */
++
++static int tpm_tis_pre_save_isa(void *opaque)
++{
++    TPMStateISA *isadev =3D opaque;
++
++    return tpm_tis_pre_save(&isadev->state);
++}
++
++static const VMStateDescription vmstate_tpm_tis_isa =3D {
+     .name =3D "tpm-tis",
+     .version_id =3D 0,
+-    .pre_save  =3D tpm_tis_pre_save,
++    .pre_save  =3D tpm_tis_pre_save_isa,
+     .fields =3D (VMStateField[]) {
+-        VMSTATE_BUFFER(buffer, TPMState),
+-        VMSTATE_UINT16(rw_offset, TPMState),
+-        VMSTATE_UINT8(active_locty, TPMState),
+-        VMSTATE_UINT8(aborting_locty, TPMState),
+-        VMSTATE_UINT8(next_locty, TPMState),
++        VMSTATE_BUFFER(state.buffer, TPMStateISA),
++        VMSTATE_UINT16(state.rw_offset, TPMStateISA),
++        VMSTATE_UINT8(state.active_locty, TPMStateISA),
++        VMSTATE_UINT8(state.aborting_locty, TPMStateISA),
++        VMSTATE_UINT8(state.next_locty, TPMStateISA),
+=20
+-        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 0,
++        VMSTATE_STRUCT_ARRAY(state.loc, TPMStateISA, TPM_TIS_NUM_LOCALITIE=
+S, 0,
+                              vmstate_locty, TPMLocality),
+=20
+         VMSTATE_END_OF_LIST()
+     }
+ };
+=20
+-static Property tpm_tis_properties[] =3D {
+-    DEFINE_PROP_UINT32("irq", TPMState, irq_num, TPM_TIS_IRQ),
+-    DEFINE_PROP_TPMBE("tpmdev", TPMState, be_driver),
+-    DEFINE_PROP_BOOL("ppi", TPMState, ppi_enabled, true),
++static void tpm_tis_isa_request_completed(TPMIf *ti, int ret)
++{
++    TPMStateISA *isadev =3D TPM_TIS_ISA(ti);
++    TPMState *s =3D &isadev->state;
++
++    tpm_tis_request_completed(s, ret);
++}
++
++static enum TPMVersion tpm_tis_isa_get_tpm_version(TPMIf *ti)
++{
++    TPMStateISA *isadev =3D TPM_TIS_ISA(ti);
++    TPMState *s =3D &isadev->state;
++
++    return tpm_tis_get_tpm_version(s);
++}
++
++static void tpm_tis_isa_reset(DeviceState *dev)
++{
++    TPMStateISA *isadev =3D TPM_TIS_ISA(dev);
++    TPMState *s =3D &isadev->state;
++
++    return tpm_tis_reset(s);
++}
++
++static Property tpm_tis_isa_properties[] =3D {
++    DEFINE_PROP_UINT32("irq", TPMStateISA, state.irq_num, TPM_TIS_IRQ),
++    DEFINE_PROP_TPMBE("tpmdev", TPMStateISA, state.be_driver),
++    DEFINE_PROP_BOOL("ppi", TPMStateISA, state.ppi_enabled, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+-static void tpm_tis_realizefn(DeviceState *dev, Error **errp)
++static void tpm_tis_isa_initfn(Object *obj)
+ {
+-    TPMState *s =3D TPM(dev);
++    TPMStateISA *isadev =3D TPM_TIS_ISA(obj);
++    TPMState *s =3D &isadev->state;
++
++    memory_region_init_io(&s->mmio, obj, &tpm_tis_memory_ops,
++                          s, "tpm-tis-mmio",
++                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT=
+);
++}
++
++static void tpm_tis_isa_realizefn(DeviceState *dev, Error **errp)
++{
++    TPMStateISA *isadev =3D TPM_TIS_ISA(dev);
++    TPMState *s =3D &isadev->state;
+=20
+     if (!tpm_find()) {
+         error_setg(errp, "at most one TPM device is permitted");
+@@ -973,55 +1018,46 @@ static void tpm_tis_realizefn(DeviceState *dev, Erro=
+r **errp)
+         return;
+     }
+=20
+-    isa_init_irq(&s->busdev, &s->irq, s->irq_num);
++    isa_init_irq(ISA_DEVICE(dev), &s->irq, s->irq_num);
+=20
+     memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
+                                 TPM_TIS_ADDR_BASE, &s->mmio);
+=20
+     if (s->ppi_enabled) {
+         tpm_ppi_init(&s->ppi, isa_address_space(ISA_DEVICE(dev)),
+-                     TPM_PPI_ADDR_BASE, OBJECT(s));
++                     TPM_PPI_ADDR_BASE, OBJECT(dev));
+     }
+ }
+=20
+-static void tpm_tis_initfn(Object *obj)
+-{
+-    TPMState *s =3D TPM(obj);
+-
+-    memory_region_init_io(&s->mmio, OBJECT(s), &tpm_tis_memory_ops,
+-                          s, "tpm-tis-mmio",
+-                          TPM_TIS_NUM_LOCALITIES << TPM_TIS_LOCALITY_SHIFT=
+);
+-}
+-
+-static void tpm_tis_class_init(ObjectClass *klass, void *data)
++static void tpm_tis_isa_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     TPMIfClass *tc =3D TPM_IF_CLASS(klass);
+=20
+-    dc->realize =3D tpm_tis_realizefn;
+-    device_class_set_props(dc, tpm_tis_properties);
+-    dc->reset =3D tpm_tis_reset;
+-    dc->vmsd  =3D &vmstate_tpm_tis;
++    device_class_set_props(dc, tpm_tis_isa_properties);
++    dc->vmsd  =3D &vmstate_tpm_tis_isa;
+     tc->model =3D TPM_MODEL_TPM_TIS;
+-    tc->get_version =3D tpm_tis_get_tpm_version;
+-    tc->request_completed =3D tpm_tis_request_completed;
++    dc->realize =3D tpm_tis_isa_realizefn;
++    dc->reset =3D tpm_tis_isa_reset;
++    tc->request_completed =3D tpm_tis_isa_request_completed;
++    tc->get_version =3D tpm_tis_isa_get_tpm_version;
+ }
+=20
+-static const TypeInfo tpm_tis_info =3D {
++static const TypeInfo tpm_tis_isa_info =3D {
+     .name =3D TYPE_TPM_TIS_ISA,
+     .parent =3D TYPE_ISA_DEVICE,
+-    .instance_size =3D sizeof(TPMState),
+-    .instance_init =3D tpm_tis_initfn,
+-    .class_init  =3D tpm_tis_class_init,
++    .instance_size =3D sizeof(TPMStateISA),
++    .instance_init =3D tpm_tis_isa_initfn,
++    .class_init  =3D tpm_tis_isa_class_init,
+     .interfaces =3D (InterfaceInfo[]) {
+         { TYPE_TPM_IF },
+         { }
+     }
+ };
+=20
+-static void tpm_tis_register(void)
++static void tpm_tis_isa_register(void)
+ {
+-    type_register_static(&tpm_tis_info);
++    type_register_static(&tpm_tis_isa_info);
+ }
+=20
+-type_init(tpm_tis_register)
++type_init(tpm_tis_isa_register)
 --=20
 2.20.1
 
