@@ -2,89 +2,81 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A53C9C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FD3C4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:38:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ABAB24673
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ABAB24673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 39D5F24673
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:38:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C1i/7S0h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39D5F24673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6u4U-0001o8-Ma
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:37:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58175)
+	id 1j6u5H-0002pe-DP
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:38:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58527)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j6u3q-0000kb-6C
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:03 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j6u4Y-000238-09
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j6u3p-0004A2-47
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:02 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:44054
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j6u3m-0003wH-Mq; Wed, 26 Feb 2020 05:36:58 -0500
-Received: from [86.188.254.49] (helo=[172.30.1.185])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j6u40-0006Ew-A5; Wed, 26 Feb 2020 10:37:15 +0000
-To: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
-References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
- <20200226101948.786be4b0@redhat.com>
- <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <0ac17424-2992-7182-ec22-6670ce9cf132@ilande.co.uk>
-Date: Wed, 26 Feb 2020 10:36:43 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <kwolf@redhat.com>) id 1j6u4W-0005aX-Ta
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44842
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6u4W-0005ZD-Q1
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582713464;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GSrt+wsCwr+Z1oSW3pPS8cnoNQwJTnGW1E41pZcz65M=;
+ b=C1i/7S0h0S5JS05L8CsyPbvhiInRI9nDNz9bdMS3uy3vTx6AfvgZTX/eaOgrq/xAyiNo3+
+ IruYJwj7oO8bkwuo1hTAT44OaaDZ9K/nVIsUCsuHKgPwXKf9CmXkObtGZaXOcG/Zm0AXNc
+ nAY5gEBbzW5YIMxXZoRL7jBDtlNZaLg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-p9-0q3nHOR27i7LoFdgkmA-1; Wed, 26 Feb 2020 05:37:40 -0500
+X-MC-Unique: p9-0q3nHOR27i7LoFdgkmA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58235800D53;
+ Wed, 26 Feb 2020 10:37:39 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-170.ams2.redhat.com [10.36.117.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A7BF78681F;
+ Wed, 26 Feb 2020 10:37:37 +0000 (UTC)
+Date: Wed, 26 Feb 2020 11:37:36 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: kuhn.chenqun@huawei.com
+Subject: Re: [PATCH v2 03/13] block/file-posix: Remove redundant statement in
+ raw_handle_perm_lock()
+Message-ID: <20200226103736.GD6096@linux.fritz.box>
+References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
+ <20200226084647.20636-4-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.188.254.49
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: Sudden slowdown of ARM emulation in master
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+In-Reply-To: <20200226084647.20636-4-kuhn.chenqun@huawei.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,49 +88,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/02/2020 10:03, Peter Maydell wrote:
+Am 26.02.2020 um 09:46 hat kuhn.chenqun@huawei.com geschrieben:
+> From: Chen Qun <kuhn.chenqun@huawei.com>
+>=20
+> Clang static code analyzer show warning:
+>   block/file-posix.c:891:9: warning: Value stored to 'op' is never read
+>         op =3D RAW_PL_ABORT;
+>         ^    ~~~~~~~~~~~~
+>=20
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 
->> On Wed, 26 Feb 2020 00:07:55 +0100
->> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
->>
->>> Hello Igor and Paolo,
->>
->> does following hack solves issue?
->>
->> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
->> index a08ab11f65..ab2448c5aa 100644
->> --- a/accel/tcg/translate-all.c
->> +++ b/accel/tcg/translate-all.c
->> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
->>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
->>             static buffer, we could size this on RESERVED_VA, on the text
->>             segment size of the executable, or continue to use the default.  */
->> -        tb_size = (unsigned long)(ram_size / 4);
->> +        tb_size = MAX_CODE_GEN_BUFFER_SIZE;
->>  #endif
->>      }
->>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
-> 
-> Cc'ing Richard to ask: does it still make sense for TCG
-> to pick a codegen buffer size based on the guest RAM size?
-> (We should fix the regression anyway, but it surprised me
-> slightly to find a config detail of the guest machine being
-> used here.)
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
-FWIW the NetBSD guys have been running their QEMU-based CI for some time now with an
-extra -tb-size parameter to improve performance: http://gnats.netbsd.org/52184.
-
-
-ATB,
-
-Mark.
 
