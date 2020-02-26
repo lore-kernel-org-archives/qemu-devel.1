@@ -2,91 +2,91 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 794A2C4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A02C4BA10
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4530C2467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 410692467B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:16:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TiU4WHtD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4530C2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HqTl5J/u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410692467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xRz-0001dr-Gi
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:14:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38087)
+	id 1j6xU0-0002nW-GJ
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:16:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6xR9-00012F-7r
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:20 -0500
+ (envelope-from <frasse.iglesias@gmail.com>) id 1j6xT2-0002GI-LI
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6xR5-0000nv-Kn
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:18 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50261)
+ (envelope-from <frasse.iglesias@gmail.com>) id 1j6xT1-0006Pq-LQ
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:15:16 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39256)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6xR5-0000kO-Bj
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:15 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a5so3243990wmb.0
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 06:13:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=q/vX08qXyPKR9hdS5IWeoNkVAVG21O2AzKW+3FKHvgQ=;
- b=TiU4WHtDsl1xt0Aoh2AIG3tFoC+2QPPcrxOsxdzf2euK6AOM2PX7tKKzkFqq8cHMsw
- 8wZa0YTOfHx/Agu62/qcFYi22kj4mNDUFknxVVKa9i7KQBoKA1B2dHw14ke3P4i4hTqR
- lJlDZoQcj/sZdGju91ESbJ8TIGHeStMI8ojd7iwg3WmJvwbopNHpUtL+BQrhUSc7G5Xm
- IsuxbAXviAgGjFLs+eDNsOIzoSxJClFsBcbYY3aoXPglyzneyAHQYlyFDwAP3rEhtdT6
- j59xl5av41NJThsMbtMlQ5hNkwgDNt+/lOhHtLZdBu/nAZa4iIwzJ1kp0iuzNWi1Wb7b
- 8Bvw==
+ (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
+ id 1j6xT1-0006M7-Ck; Wed, 26 Feb 2020 09:15:15 -0500
+Received: by mail-lj1-x242.google.com with SMTP id o15so3269726ljg.6;
+ Wed, 26 Feb 2020 06:15:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=NoslDEA1NYRcm1J+wN+Jn1HI8r/5R/eVtS142rhhQFs=;
+ b=HqTl5J/uPPcs0qaM5njuye4hzxOdSC1vWGrvpjs0BhvN5EWTxf3R10eK8PcouY19Yv
+ gdTYtsNHZBoB+EQy++X8VbK05yJkPd2jgptcG1Lz/N+OzvIwF8RMwQFvB8hpy7Sy2oK7
+ QS7y4eg7KxaKWPfTgKxdFA5ra+t2tTTBUOyfc8YYhG7BPOHsbioGpCESwPBF75Zj/Sfv
+ RoTP0AqCbK5K11y214nwpwMsGnQzkwaO0w2kPTkuefYAugs9T/X9OQXKM4ttYcyWK5Tz
+ mgThrUsGTMDkuVqCbJ5g7WOqnvVG5jQ6GElfquwPY+52nZQb2jlkHOUIahHFJaa1oHWn
+ o9/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=q/vX08qXyPKR9hdS5IWeoNkVAVG21O2AzKW+3FKHvgQ=;
- b=rq+6t915AhOLql9N6x8KbBRErQQ60n2nTSi5vBMxqzWgigSXNrBnX2xkgYlODtx2wh
- jbNrnPFvKXTm/Zp9cJQUHgKfFp5oxSo3bXeWUdaaSeQS18Ik9lMRIDBHOhRba1tMciRG
- x9/pno/RIUoFgwViN6KZKy98TEqgup9973BoM8NL5oSOKIEk2B75s2d1CeKq18jKQrtD
- vUmOG4bFL+NFKD7a+BZUvynUdoDY0IGboDoj+ceNJAvVioVLKgepp2Gt2blUjIPU1TIj
- QbamzcOquqDVjcde15STyC/WfRw92EKCIWh39ss9s0OztoBTU79SdVcQo1c+0jvRQ1xa
- Y4PA==
-X-Gm-Message-State: APjAAAUmk3Gu3kxdT1f4rcQe8x6Os3bwoSkNTiGFigbgdZ/IW/8unarR
- JvSKIJ8bDtAgcHJrLJoSYKiLww==
-X-Google-Smtp-Source: APXvYqz3MlqwpEBnPvIDlYL1K1FGtjNMBfkS3ZZQLVgXwq23GbNGVaKvPW/OgNmiAubEfffrSKwaZA==
-X-Received: by 2002:a05:600c:290e:: with SMTP id
- i14mr5691745wmd.24.1582726393543; 
- Wed, 26 Feb 2020 06:13:13 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e8sm3421973wrr.69.2020.02.26.06.13.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 06:13:12 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 751801FF87;
- Wed, 26 Feb 2020 14:13:11 +0000 (GMT)
-References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
- <20200226101948.786be4b0@redhat.com>
- <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
-User-agent: mu4e 1.3.8; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Sudden slowdown of ARM emulation in master
-In-reply-to: <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
-Date: Wed, 26 Feb 2020 14:13:11 +0000
-Message-ID: <87k149xwqw.fsf@linaro.org>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=NoslDEA1NYRcm1J+wN+Jn1HI8r/5R/eVtS142rhhQFs=;
+ b=lbInv0OOtpGuPs8l8QssE1d9BAjmTqmmdqBiTVV5ho6dh4iBHY3aAhk7rPidNVzVKa
+ K1FmgfT7vN/wYsKpAFix3Yt4a8T72UvmryV6w8gBH2rpzcGRE/KyFSj5hO8K93jB52xq
+ U6JG4pvU5F0pdzYy7aF0izENevGrbuWzaeiXSfaOO52jzrPkx3bNKbut4AdjheoaxmFR
+ pdSXlgQDukujOl/xbOLTeVCUsTZK1ClJl8qGu3G3IljwLF2ZhqUpJS35Tf4+Inb/C/Sr
+ yHkWo7ncn4nNbm2pTlsS9Cwe5n7SSx4vS2iTd1V7U3PVCKqE2K75iheT7Ca/sKrdsa02
+ j+Xg==
+X-Gm-Message-State: ANhLgQ3Ih163Ovk73ZEK/flwl5dioveMHCAwoRRR5R8pTzY8P9tZ/LM6
+ 33210sdDL+MHcj8Nrvaq2UM=
+X-Google-Smtp-Source: ADFU+vtljQR17EBpwj1G4m2tKaU9Ndw06+2ySLjKbkAE/iEcWtDTkn468EwTzGv445HNY9AkcZBGEw==
+X-Received: by 2002:a2e:9e55:: with SMTP id g21mr3218379ljk.245.1582726513738; 
+ Wed, 26 Feb 2020 06:15:13 -0800 (PST)
+Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
+ by smtp.gmail.com with ESMTPSA id
+ l7sm1068670lfc.80.2020.02.26.06.15.11
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 26 Feb 2020 06:15:12 -0800 (PST)
+Date: Wed, 26 Feb 2020 15:15:10 +0100
+From: Francisco Iglesias <frasse.iglesias@gmail.com>
+To: kuhn.chenqun@huawei.com
+Subject: Re: [PATCH v2 09/13] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+Message-ID: <20200226141509.6kg3eyrexv73mgop@fralle-msi>
+References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
+ <20200226084647.20636-10-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200226084647.20636-10-kuhn.chenqun@huawei.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,77 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>,
+ qemu-devel@nongnu.org, Euler Robot <euler.robot@huawei.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On [2020 Feb 26] Wed 16:46:43, kuhn.chenqun@huawei.com wrote:
+> From: Chen Qun <kuhn.chenqun@huawei.com>
+> 
+> Clang static code analyzer show warning:
+> hw/dma/xlnx-zdma.c:399:13: warning: Value stored to 'dst_type' is never read
+>             dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
+>             ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
 
-> On Wed, 26 Feb 2020 at 09:19, Igor Mammedov <imammedo@redhat.com> wrote:
->>
->> On Wed, 26 Feb 2020 00:07:55 +0100
->> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
->>
->> > Hello Igor and Paolo,
->>
->> does following hack solves issue?
->>
->> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
->> index a08ab11f65..ab2448c5aa 100644
->> --- a/accel/tcg/translate-all.c
->> +++ b/accel/tcg/translate-all.c
->> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t tb_=
-size)
->>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
->>             static buffer, we could size this on RESERVED_VA, on the text
->>             segment size of the executable, or continue to use the defau=
-lt.  */
->> -        tb_size =3D (unsigned long)(ram_size / 4);
->> +        tb_size =3D MAX_CODE_GEN_BUFFER_SIZE;
->>  #endif
->>      }
->>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
->
-> Cc'ing Richard to ask: does it still make sense for TCG
-> to pick a codegen buffer size based on the guest RAM size?
-
-Arguably you would never get more than ram_size * tcg gen overhead of
-active TBs at any one point although you can come up with pathological
-patterns where only a subset of pages are flushed in and out at a time.
-
-However the backing for the code is mmap'ed anyway so surely the kernel
-can work out the kinks here. We will never allocate more than the code
-generator can generate jumps for anyway.
-
-Looking at the SoftMMU version of alloc_code_gen_buffer it looks like
-everything now falls under the:
-
-  # if defined(__PIE__) || defined(__PIC__)
-
-leg so there is a bunch of code to be deleted there. The remaining
-question is what to do for linux-user because there is a bit more logic
-to deal with some corner cases on the static code generation buffer.
-
-I'd be tempted to rename DEFAULT_CODE_GEN_BUFFER_SIZE to
-SMALL_CODE_GEN_BUFFER_SIZE and only bother with a static allocation for
-32 bit linux-user hosts. Otherwise why not default to
-MAX_CODE_GEN_BUFFER_SIZE on 64 bit systems and let the kernel deal with
-it?
-
-> (We should fix the regression anyway, but it surprised me
-> slightly to find a config detail of the guest machine being
-> used here.)
->
-> thanks
-> -- PMM
-
-
---=20
-Alex Benn=C3=A9e
+> ---
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+> 
+> v1->v2: move the 'dst_type' declaration.(Base on Philippe's suggestion).
+> ---
+>  hw/dma/xlnx-zdma.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 8fb83f5b07..eeacad59ce 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
+>  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
+>  {
+>      uint32_t dst_size, dlen;
+> -    bool dst_intr, dst_type;
+> +    bool dst_intr;
+>      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
+>      unsigned int rw_mode = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MODE);
+>      unsigned int burst_type = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_ATTR,
+> @@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
+>      while (len) {
+>          dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
+>                                SIZE);
+> -        dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
+> -                              TYPE);
+>          if (dst_size == 0 && ptype == PT_MEM) {
+>              uint64_t next;
+> +            bool dst_type = FIELD_EX32(s->dsc_dst.words[3],
+> +                                       ZDMA_CH_DST_DSCR_WORD3,
+> +                                       TYPE);
+> +
+>              next = zdma_update_descr_addr(s, dst_type,
+>                                            R_ZDMA_CH_DST_CUR_DSCR_LSB);
+>              zdma_load_descriptor(s, next, &s->dsc_dst);
+>              dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
+>                                    SIZE);
+> -            dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
+> -                                  TYPE);
+>          }
+>  
+>          /* Match what hardware does by ignoring the dst_size and only using
+> -- 
+> 2.23.0
+> 
+> 
+> 
 
