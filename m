@@ -2,86 +2,84 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE127C4BA11
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB32C4BA10
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 856D224685
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4460F24685
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LT8gRpUm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 856D224685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lOGyY2Qg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4460F24685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6v4D-0007Bq-GK
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:41:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52914)
+	id 1j6v4B-0007BC-DB
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:41:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53784)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6uu2-0001A6-JN
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:31:01 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6uwA-0004QA-CX
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6utz-00078m-8y
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:58 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39362)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6uw6-00071q-9y
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:10 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41706)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6uty-00072i-Tm
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:55 -0500
-Received: by mail-wm1-x343.google.com with SMTP id c84so2638034wme.4
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:30:54 -0800 (PST)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j6uw6-0006ww-3Y
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:06 -0500
+Received: by mail-oi1-x243.google.com with SMTP id i1so2668710oie.8
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:33:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=DvH/hwbc52f9y/hSLLZgDpNon3UYB/InCyPExjWeA94=;
- b=LT8gRpUmRg88IVJWhhL1Ekvg69XTlOQkxT5ktE51ZIX7YO8jqsWEldrruQVmUw59rk
- zOUGY72ZNl4Cm8sRGhFec+6jP+GIH9H+74PlH9jC/eMoCsZDC2MiRNgPd4YTCGQ08YRw
- C9iV0NDhNN85R9SwOJZuGpDu/C2pdEF4uc27peJ2UNtIzAQxcSnYUWm5t4hSyuMQ+wru
- B1u/hkbVZvd1jGwXVGoBBvJI6r0ybT0Wr+AhGCuf43+7DS6exyH0qA46hzbh2s8vEVsY
- ALMLjMlZdCWa+okBIfFJyvHHScHFfKjOgDFIGog4qPUzWReROuVDr9hpct8wGoj5iY5o
- 3ycw==
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=PwUpGkJnbPW07PC5FnVKpnq3qviosIVPIxfK34xtJ4Y=;
+ b=lOGyY2Qg90XgAOZJAV+4yDNJtahj2Ot6mmqhSvWI3lieV0xlbihuv/yQOuKZD00wV+
+ x3t7D3fYW6PLkvW90Ea2aJu0HaMBvzs7Dnexiv2VpV74s0u8Pnv/a0m7171w3ccXguMz
+ Y20dDo14ud8thTt/SCuoQ78D+O2FRI2S800RbH+fA7yrx/im9YyEFgpb3uWWtw531rzL
+ GZ5WFFhLlOTEG4ciSn9S9lMG7ZL3yyeuG+YaoGpvroF8C69rLUHgMWVJ7b73HoTARQXU
+ TAQxEEDdVMXS+g5+82w6XMRRNioDJNlM59iWebkzWtBvw9B5JmZPnw0vF7w2Zvp0VoTe
+ 637g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=DvH/hwbc52f9y/hSLLZgDpNon3UYB/InCyPExjWeA94=;
- b=S+S6O2FeTy9Ah+p8VfdKJEXY7lxOWXoN3KZNT3pNJ6ZSXB0TAdQ5ry07l8LQXxY4Lc
- /KzELSS/gaVWM0dij78BFI+P3AGaOGDy2udPFEI6u6j2cEskHBSQwcYASgeTBxIo/RMC
- 0e9t4d1ByKucA9L8HEHrWlJW8jhSobxV20eOKmiwJkpuKe61XZoqWofw5zG2KUtg7OdZ
- anPvYA69lWPo9mAnVVNnSAbeME70fzkGUVML0mB5sjFKEfi/eaFOn6xUQ0KUBVmN2QDy
- jKLwsyPQYrQNu7kmBelkTkv+pvM+K7Y6y6Hln0oOGX2Swc+4DGxrZFFfXWvfnwu1CvHV
- tUuw==
-X-Gm-Message-State: APjAAAXWlzn9ywsSFB6ACXnWEVYMU8NE2M3RF8NDsthZHAl3NmMCA6oR
- wCngWlExp/g0HESEYfoh5RfKznPN
-X-Google-Smtp-Source: APXvYqyphLSLRBkcrOqR6rtPLIdrvmDOZxqqRmXfsYoDf+WQUKCI5FjVFBtDCBAcTMTDMMJGRb2fLQ==
-X-Received: by 2002:a7b:c957:: with SMTP id i23mr5225493wml.174.1582716652529; 
- Wed, 26 Feb 2020 03:30:52 -0800 (PST)
-Received: from donizetti.lan ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
- by smtp.gmail.com with ESMTPSA id h128sm2628154wmh.33.2020.02.26.03.30.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 03:30:51 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 17/18] docs/system: convert the documentation of deprecated
- features to rST.
-Date: Wed, 26 Feb 2020 12:30:33 +0100
-Message-Id: <20200226113034.6741-18-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200226113034.6741-1-pbonzini@redhat.com>
-References: <20200226113034.6741-1-pbonzini@redhat.com>
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=PwUpGkJnbPW07PC5FnVKpnq3qviosIVPIxfK34xtJ4Y=;
+ b=XIrDBxAhDEegYG6GcMy91PfD5pFucO0mP1bQr9iFLmYZtyVbQ/08o8+9sc8v8R1oqh
+ dqGIOqqB6PNCucFnQNB0g13y+n5kpyaEYsNX+Yrn0D9QhsFrBhqz6eXgNfgpjrzOUTju
+ N0Se8U1u145FDN1lBJ2hqG8/Y+fvC15Ly6t8Is9AF0BYvYQ/+w3eMfmaFgQoo4+jvN+W
+ iadojXb6K1LXeba5gKF7qSspBDllVRahIujMD1f2l7zoCavD4XrstEV5hzdxpqugZhLa
+ ZqX5jSclGXQ6IYPKg/TTtwrIJfpr7RhGDZJSxpHB/wLip4oncS9i1kHLqOVpAvaJBSJg
+ tLzg==
+X-Gm-Message-State: APjAAAW79B0HKzyTUFiEClw5Fsy+2Fax1TFdt4z+CKPyNsk+u+5X6eYg
+ scszXZ5R1lCyHpFId8547EXpCMVzBdxNP51Ndys=
+X-Google-Smtp-Source: APXvYqzRgJnweowczKsHPFSR0x3PT9A0JNBdyCUtldC0VFzC9BQZFLH0MDqB3kunEaAYTSaKbMET6OfGNzdz8ibVUvc=
+X-Received: by 2002:aca:4ece:: with SMTP id c197mr2679620oib.53.1582716784996; 
+ Wed, 26 Feb 2020 03:33:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Wed, 26 Feb 2020 03:33:04 -0800 (PST)
+In-Reply-To: <20200225154121.21116-3-peter.maydell@linaro.org>
+References: <20200225154121.21116-1-peter.maydell@linaro.org>
+ <20200225154121.21116-3-peter.maydell@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 26 Feb 2020 12:33:04 +0100
+Message-ID: <CAL1e-=gQd7Xb1LZR5nGtjraAFz1AUsHy+_76CZbtL8TuBXX3rQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] docs: Remove the "CPU emulation" part of the
+ "Implementation notes"
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000bff4ef059f78f742"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,492 +91,449 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+--000000000000bff4ef059f78f742
+Content-Type: text/plain; charset="UTF-8"
 
-We put the whole of this document into the system manual, though
-technically a few parts of it apply to qemu-img or qemu-nbd which are
-otherwise documented in tools/.
+On Tuesday, February 25, 2020, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-We only make formatting fixes, except for one use of 'appendix' which
-we change to 'section' because this isn't an appendix in the Sphinx
-manual.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- docs/system/deprecated.rst | 446 +++++++++++++++++++++++++++++++++++++
- docs/system/index.rst      |   1 +
- 2 files changed, 447 insertions(+)
- create mode 100644 docs/system/deprecated.rst
-
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-new file mode 100644
-index 0000000000..1eaa559079
---- /dev/null
-+++ b/docs/system/deprecated.rst
-@@ -0,0 +1,446 @@
-+Deprecated features
-+===================
-+
-+In general features are intended to be supported indefinitely once
-+introduced into QEMU. In the event that a feature needs to be removed,
-+it will be listed in this section. The feature will remain functional
-+for 2 releases prior to actual removal. Deprecated features may also
-+generate warnings on the console when QEMU starts up, or if activated
-+via a monitor command, however, this is not a mandatory requirement.
-+
-+Prior to the 2.10.0 release there was no official policy on how
-+long features would be deprecated prior to their removal, nor
-+any documented list of which features were deprecated. Thus
-+any features deprecated prior to 2.10.0 will be treated as if
-+they were first deprecated in the 2.10.0 release.
-+
-+What follows is a list of all features currently marked as
-+deprecated.
-+
-+System emulator command line arguments
-+--------------------------------------
-+
-+``-machine enforce-config-section=on|off`` (since 3.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``enforce-config-section`` parameter is replaced by the
-+``-global migration.send-configuration={on|off}`` option.
-+
-+``-no-kvm`` (since 1.3.0)
-+'''''''''''''''''''''''''
-+
-+The ``-no-kvm`` argument is now a synonym for setting ``-accel tcg``.
-+
-+``-usbdevice`` (since 2.10.0)
-+'''''''''''''''''''''''''''''
-+
-+The ``-usbdevice DEV`` argument is now a synonym for setting
-+the ``-device usb-DEV`` argument instead. The deprecated syntax
-+would automatically enable USB support on the machine type.
-+If using the new syntax, USB support must be explicitly
-+enabled via the ``-machine usb=on`` argument.
-+
-+``-drive file=json:{...{'driver':'file'}}`` (since 3.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The 'file' driver for drives is no longer appropriate for character or host
-+devices and will only accept regular files (S_IFREG). The correct driver
-+for these file types is 'host_cdrom' or 'host_device' as appropriate.
-+
-+``-net ...,name=``\ *name* (since 3.1)
-+''''''''''''''''''''''''''''''''''''''
-+
-+The ``name`` parameter of the ``-net`` option is a synonym
-+for the ``id`` parameter, which should now be used instead.
-+
-+``-smp`` (invalid topologies) (since 3.1)
-+'''''''''''''''''''''''''''''''''''''''''
-+
-+CPU topology properties should describe whole machine topology including
-+possible CPUs.
-+
-+However, historically it was possible to start QEMU with an incorrect topology
-+where *n* <= *sockets* * *cores* * *threads* < *maxcpus*,
-+which could lead to an incorrect topology enumeration by the guest.
-+Support for invalid topologies will be removed, the user must ensure
-+topologies described with -smp include all possible cpus, i.e.
-+*sockets* * *cores* * *threads* = *maxcpus*.
-+
-+``-vnc acl`` (since 4.0.0)
-+''''''''''''''''''''''''''
-+
-+The ``acl`` option to the ``-vnc`` argument has been replaced
-+by the ``tls-authz`` and ``sasl-authz`` options.
-+
-+``QEMU_AUDIO_`` environment variables and ``-audio-help`` (since 4.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``-audiodev`` argument is now the preferred way to specify audio
-+backend settings instead of environment variables.  To ease migration to
-+the new format, the ``-audiodev-help`` option can be used to convert
-+the current values of the environment variables to ``-audiodev`` options.
-+
-+Creating sound card devices and vnc without ``audiodev=`` property (since 4.2)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+When not using the deprecated legacy audio config, each sound card
-+should specify an ``audiodev=`` property.  Additionally, when using
-+vnc, you should specify an ``audiodev=`` propery if you plan to
-+transmit audio through the VNC protocol.
-+
-+``-mon ...,control=readline,pretty=on|off`` (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``pretty=on|off`` switch has no effect for HMP monitors, but is
-+silently ignored. Using the switch with HMP monitors will become an
-+error in the future.
-+
-+``-realtime`` (since 4.1)
-+'''''''''''''''''''''''''
-+
-+The ``-realtime mlock=on|off`` argument has been replaced by the
-+``-overcommit mem-lock=on|off`` argument.
-+
-+``-numa node,mem=``\ *size* (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''
-+
-+The parameter ``mem`` of ``-numa node`` is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter ``memdev``, which does the same as ``mem`` and adds
-+means to actualy manage node RAM on the host side. Use parameter ``memdev``
-+with *memory-backend-ram* backend as an replacement for parameter ``mem``
-+to achieve the same fake NUMA effect or a properly configured
-+*memory-backend-file* backend to actually benefit from NUMA configuration.
-+In future new machine versions will not accept the option but it will still
-+work with old machine types. User can check QAPI schema to see if the legacy
-+option is supported by looking at MachineInfo::numa-mem-supported property.
-+
-+``-numa`` node (without memory specified) (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Splitting RAM by default between NUMA nodes has the same issues as ``mem``
-+parameter described above with the difference that the role of the user plays
-+QEMU using implicit generic or board specific splitting rule.
-+Use ``memdev`` with *memory-backend-ram* backend or ``mem`` (if
-+it's supported by used machine type) to define mapping explictly instead.
-+
-+``-mem-path`` fallback to RAM (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''
-+
-+Currently if guest RAM allocation from file pointed by ``mem-path``
-+fails, QEMU falls back to allocating from RAM, which might result
-+in unpredictable behavior since the backing file specified by the user
-+is ignored. In the future, users will be responsible for making sure
-+the backing storage specified with ``-mem-path`` can actually provide
-+the guest RAM configured with ``-m`` and QEMU will fail to start up if
-+RAM allocation is unsuccessful.
-+
-+RISC-V ``-bios`` (since 4.1)
-+''''''''''''''''''''''''''''
-+
-+QEMU 4.1 introduced support for the -bios option in QEMU for RISC-V for the
-+RISC-V virt machine and sifive_u machine.
-+
-+QEMU 4.1 has no changes to the default behaviour to avoid breakages. This
-+default will change in a future QEMU release, so please prepare now. All users
-+of the virt or sifive_u machine must change their command line usage.
-+
-+QEMU 4.1 has three options, please migrate to one of these three:
-+ 1. ``-bios none`` - This is the current default behavior if no -bios option
-+      is included. QEMU will not automatically load any firmware. It is up
-+      to the user to load all the images they need.
-+ 2. ``-bios default`` - In a future QEMU release this will become the default
-+      behaviour if no -bios option is specified. This option will load the
-+      default OpenSBI firmware automatically. The firmware is included with
-+      the QEMU release and no user interaction is required. All a user needs
-+      to do is specify the kernel they want to boot with the -kernel option
-+ 3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
-+
-+``-tb-size`` option (since 5.0)
-+'''''''''''''''''''''''''''''''
-+
-+QEMU 5.0 introduced an alternative syntax to specify the size of the translation
-+block cache, ``-accel tcg,tb-size=``.  The new syntax deprecates the
-+previously available ``-tb-size`` option.
-+
-+``-show-cursor`` option (since 5.0)
-+'''''''''''''''''''''''''''''''''''
-+
-+Use ``-display sdl,show-cursor=on`` or
-+ ``-display gtk,show-cursor=on`` instead.
-+
-+QEMU Machine Protocol (QMP) commands
-+------------------------------------
-+
-+``change`` (since 2.5.0)
-+''''''''''''''''''''''''
-+
-+Use ``blockdev-change-medium`` or ``change-vnc-password`` instead.
-+
-+``migrate_set_downtime`` and ``migrate_set_speed`` (since 2.8.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Use ``migrate-set-parameters`` instead.
-+
-+``migrate-set-cache-size`` and ``query-migrate-cache-size`` (since 2.11.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Use ``migrate-set-parameters`` and ``query-migrate-parameters`` instead.
-+
-+``query-block`` result field ``dirty-bitmaps[i].status`` (since 4.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``status`` field of the ``BlockDirtyInfo`` structure, returned by
-+the query-block command is deprecated. Two new boolean fields,
-+``recording`` and ``busy`` effectively replace it.
-+
-+``query-block`` result field ``dirty-bitmaps`` (Since 4.2)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
-+the query-block command is itself now deprecated. The ``dirty-bitmaps``
-+field of the ``BlockDeviceInfo`` struct should be used instead, which is the
-+type of the ``inserted`` field in query-block replies, as well as the
-+type of array items in query-named-block-nodes.
-+
-+Since the ``dirty-bitmaps`` field is optionally present in both the old and
-+new locations, clients must use introspection to learn where to anticipate
-+the field if/when it does appear in command output.
-+
-+``query-cpus`` (since 2.12.0)
-+'''''''''''''''''''''''''''''
-+
-+The ``query-cpus`` command is replaced by the ``query-cpus-fast`` command.
-+
-+``query-cpus-fast`` ``arch`` output member (since 3.0.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``arch`` output member of the ``query-cpus-fast`` command is
-+replaced by the ``target`` output member.
-+
-+``cpu-add`` (since 4.0)
-+'''''''''''''''''''''''
-+
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional
-+details.
-+
-+``query-events`` (since 4.0)
-+''''''''''''''''''''''''''''
-+
-+The ``query-events`` command has been superseded by the more powerful
-+and accurate ``query-qmp-schema`` command.
-+
-+chardev client socket with ``wait`` option (since 4.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Character devices creating sockets in client mode should not specify
-+the 'wait' field, which is only applicable to sockets in server mode
-+
-+Human Monitor Protocol (HMP) commands
-+-------------------------------------
-+
-+The ``hub_id`` parameter of ``hostfwd_add`` / ``hostfwd_remove`` (since 3.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``[hub_id name]`` parameter tuple of the 'hostfwd_add' and
-+'hostfwd_remove' HMP commands has been replaced by ``netdev_id``.
-+
-+``cpu-add`` (since 4.0)
-+'''''''''''''''''''''''
-+
-+Use ``device_add`` for hotplugging vCPUs instead of ``cpu-add``.  See
-+documentation of ``query-hotpluggable-cpus`` for additional details.
-+
-+``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, ``acl_remove`` (since 4.0.0)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``acl_show``, ``acl_reset``, ``acl_policy``, ``acl_add``, and
-+``acl_remove`` commands are deprecated with no replacement. Authorization
-+for VNC should be performed using the pluggable QAuthZ objects.
-+
-+Guest Emulator ISAs
-+-------------------
-+
-+RISC-V ISA privledge specification version 1.09.1 (since 4.1)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The RISC-V ISA privledge specification version 1.09.1 has been deprecated.
-+QEMU supports both the newer version 1.10.0 and the ratified version 1.11.0, these
-+should be used instead of the 1.09.1 version.
-+
-+System emulator CPUS
-+--------------------
-+
-+RISC-V ISA CPUs (since 4.1)
-+'''''''''''''''''''''''''''
-+
-+The RISC-V cpus with the ISA version in the CPU name have been depcreated. The
-+four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
-+``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
-+option when using the ``rv32`` or ``rv64`` CPUs.
-+
-+RISC-V ISA CPUs (since 4.1)
-+'''''''''''''''''''''''''''
-+
-+The RISC-V no MMU cpus have been depcreated. The two CPUs: ``rv32imacu-nommu`` and
-+``rv64imacu-nommu`` should no longer be used. Instead the MMU status can be specified
-+via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
-+
-+System emulator devices
-+-----------------------
-+
-+``ide-drive`` (since 4.2)
-+'''''''''''''''''''''''''
-+
-+The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
-+'ide-cd' as appropriate to get an IDE hard disk or CD-ROM as needed.
-+
-+``scsi-disk`` (since 4.2)
-+'''''''''''''''''''''''''
-+
-+The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
-+'scsi-cd' as appropriate to get a SCSI hard disk or CD-ROM as needed.
-+
-+System emulator machines
-+------------------------
-+
-+mips ``r4k`` platform (since 5.0)
-+'''''''''''''''''''''''''''''''''
-+
-+This machine type is very old and unmaintained. Users should use the ``malta``
-+machine type instead.
-+
-+``pc-1.0``, ``pc-1.1``, ``pc-1.2`` and ``pc-1.3`` (since 5.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+These machine types are very old and likely can not be used for live migration
-+from old QEMU versions anymore. A newer machine type should be used instead.
-+
-+``spike_v1.9.1`` and ``spike_v1.10`` (since 4.1)
-+''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The version specific Spike machines have been deprecated in favour of the
-+generic ``spike`` machine. If you need to specify an older version of the RISC-V
-+spec you can use the ``-cpu rv64gcsu,priv_spec=v1.9.1`` command line argument.
-+
-+Device options
-+--------------
-+
-+Emulated device options
-+'''''''''''''''''''''''
-+
-+``-device virtio-blk,scsi=on|off`` (since 5.0.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The virtio-blk SCSI passthrough feature is a legacy VIRTIO feature.  VIRTIO 1.0
-+and later do not support it because the virtio-scsi device was introduced for
-+full SCSI support.  Use virtio-scsi instead when SCSI passthrough is required.
-+
-+Note this also applies to ``-device virtio-blk-pci,scsi=on|off``, which is an
-+alias.
-+
-+Block device options
-+''''''''''''''''''''
-+
-+``"backing": ""`` (since 2.12.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+In order to prevent QEMU from automatically opening an image's backing
-+chain, use ``"backing": null`` instead.
-+
-+``rbd`` keyvalue pair encoded filenames: ``""`` (since 3.1.0)
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+Options for ``rbd`` should be specified according to its runtime options,
-+like other block drivers.  Legacy parsing of keyvalue pair encoded
-+filenames is useful to open images with the old format for backing files;
-+These image files should be updated to use the current format.
-+
-+Example of legacy encoding::
-+
-+  json:{"file.driver":"rbd", "file.filename":"rbd:rbd/name"}
-+
-+The above, converted to the current supported format::
-+
-+  json:{"file.driver":"rbd", "file.pool":"rbd", "file.image":"name"}
-+
-+Related binaries
-+----------------
-+
-+``qemu-img convert -n -o`` (since 4.2.0)
-+''''''''''''''''''''''''''''''''''''''''
-+
-+All options specified in ``-o`` are image creation options, so
-+they have no effect when used with ``-n`` to skip image creation.
-+Silently ignored options can be confusing, so this combination of
-+options will be made an error in future versions.
-+
-+Backwards compatibility
-+-----------------------
-+
-+Runnability guarantee of CPU models (since 4.1.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+Previous versions of QEMU never changed existing CPU models in
-+ways that introduced additional host software or hardware
-+requirements to the VM.  This allowed management software to
-+safely change the machine type of an existing VM without
-+introducing new requirements ("runnability guarantee").  This
-+prevented CPU models from being updated to include CPU
-+vulnerability mitigations, leaving guests vulnerable in the
-+default configuration.
-+
-+The CPU model runnability guarantee won't apply anymore to
-+existing CPU models.  Management software that needs runnability
-+guarantees must resolve the CPU model aliases using te
-+``alias-of`` field returned by the ``query-cpu-definitions`` QMP
-+command.
-+
-+While those guarantees are kept, the return value of
-+``query-cpu-definitions`` will have existing CPU model aliases
-+point to a version that doesn't break runnability guarantees
-+(specifically, version 1 of those CPU models).  In future QEMU
-+versions, aliases will point to newer CPU model versions
-+depending on the machine type, so management software must
-+resolve CPU model aliases before starting a virtual machine.
-+
-+
-+Recently removed features
-+=========================
-+
-+What follows is a record of recently removed, formerly deprecated
-+features that serves as a record for users who have encountered
-+trouble after a recent upgrade.
-+
-+QEMU Machine Protocol (QMP) commands
-+------------------------------------
-+
-+``block-dirty-bitmap-add`` "autoload" parameter (since 4.2.0)
-+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The "autoload" parameter has been ignored since 2.12.0. All bitmaps
-+are automatically loaded from qcow2 images.
-+
-+Related binaries
-+----------------
-+
-+``qemu-nbd --partition`` (removed in 5.0.0)
-+'''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``qemu-nbd --partition $digit`` code (also spelled ``-P``)
-+could only handle MBR partitions, and never correctly handled logical
-+partitions beyond partition 5.  Exporting a partition can still be
-+done by utilizing the ``--image-opts`` option with a raw blockdev
-+using the ``offset`` and ``size`` parameters layered on top of
-+any other existing blockdev. For example, if partition 1 is 100MiB
-+long starting at 1MiB, the old command::
-+
-+  qemu-nbd -t -P 1 -f qcow2 file.qcow2
-+
-+can be rewritten as::
-+
-+  qemu-nbd -t --image-opts driver=raw,offset=1M,size=100M,file.driver=qcow2,file.file.driver=file,file.file.filename=file.qcow2
-diff --git a/docs/system/index.rst b/docs/system/index.rst
-index b2263b70d8..467cda3e72 100644
---- a/docs/system/index.rst
-+++ b/docs/system/index.rst
-@@ -15,3 +15,4 @@ Contents:
-    :maxdepth: 2
-    managed-startup
-    security
-+   deprecated
--- 
-2.21.1
+> The "CPU emulation" part of the "Implementation notes" in
+> qemu-tech.texi looks like it is documenting what features of various
+> CPUs we do or don't emulate.  However:
+>  * it covers only six of our 21 guest architectures
+>  * the last time anybody updated it for actual content was in
+>    2011/2012 for Xtensa; the content for the other five
+>    architectures is even older, being from 2008 or before!
+>
+> What we have is out of date, misleading and incomplete.
+> Just delete this part of the document rather than trying to
+> convert it to rST.
+>
+> (It would be nice eventually to have documentation of the
+> scope and limitations of our emulation; but we will want to
+> separate out the generic "system emulation" information from
+> the parts that are specific to linux-user anyway, as they will
+> be in different manuals.)
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
 
+I agree with the intent and the outcome of this patch, including the last
+paragraph in braces.
+
+FWIW:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+
+ qemu-tech.texi | 153 -------------------------------------------------
+>  1 file changed, 153 deletions(-)
+>
+> diff --git a/qemu-tech.texi b/qemu-tech.texi
+> index 0380de77b62..35da6a40af1 100644
+> --- a/qemu-tech.texi
+> +++ b/qemu-tech.texi
+> @@ -2,162 +2,9 @@
+>  @appendix Implementation notes
+>
+>  @menu
+> -* CPU emulation::
+>  * Managed start up options::
+>  @end menu
+>
+> -@node CPU emulation
+> -@section CPU emulation
+> -
+> -@menu
+> -* x86::     x86 and x86-64 emulation
+> -* ARM::     ARM emulation
+> -* MIPS::    MIPS emulation
+> -* PPC::     PowerPC emulation
+> -* SPARC::   Sparc32 and Sparc64 emulation
+> -* Xtensa::  Xtensa emulation
+> -@end menu
+> -
+> -@node x86
+> -@subsection x86 and x86-64 emulation
+> -
+> -QEMU x86 target features:
+> -
+> -@itemize
+> -
+> -@item The virtual x86 CPU supports 16 bit and 32 bit addressing with
+> segmentation.
+> -LDT/GDT and IDT are emulated. VM86 mode is also supported to run
+> -DOSEMU. There is some support for MMX/3DNow!, SSE, SSE2, SSE3, SSSE3,
+> -and SSE4 as well as x86-64 SVM.
+> -
+> -@item Support of host page sizes bigger than 4KB in user mode emulation.
+> -
+> -@item QEMU can emulate itself on x86.
+> -
+> -@item An extensive Linux x86 CPU test program is included
+> @file{tests/test-i386}.
+> -It can be used to test other x86 virtual CPUs.
+> -
+> -@end itemize
+> -
+> -Current QEMU limitations:
+> -
+> -@itemize
+> -
+> -@item Limited x86-64 support.
+> -
+> -@item IPC syscalls are missing.
+> -
+> -@item The x86 segment limits and access rights are not tested at every
+> -memory access (yet). Hopefully, very few OSes seem to rely on that for
+> -normal use.
+> -
+> -@end itemize
+> -
+> -@node ARM
+> -@subsection ARM emulation
+> -
+> -@itemize
+> -
+> -@item Full ARM 7 user emulation.
+> -
+> -@item NWFPE FPU support included in user Linux emulation.
+> -
+> -@item Can run most ARM Linux binaries.
+> -
+> -@end itemize
+> -
+> -@node MIPS
+> -@subsection MIPS emulation
+> -
+> -@itemize
+> -
+> -@item The system emulation allows full MIPS32/MIPS64 Release 2 emulation,
+> -including privileged instructions, FPU and MMU, in both little and big
+> -endian modes.
+> -
+> -@item The Linux userland emulation can run many 32 bit MIPS Linux
+> binaries.
+> -
+> -@end itemize
+> -
+> -Current QEMU limitations:
+> -
+> -@itemize
+> -
+> -@item Self-modifying code is not always handled correctly.
+> -
+> -@item 64 bit userland emulation is not implemented.
+> -
+> -@item The system emulation is not complete enough to run real firmware.
+> -
+> -@item The watchpoint debug facility is not implemented.
+> -
+> -@end itemize
+> -
+> -@node PPC
+> -@subsection PowerPC emulation
+> -
+> -@itemize
+> -
+> -@item Full PowerPC 32 bit emulation, including privileged instructions,
+> -FPU and MMU.
+> -
+> -@item Can run most PowerPC Linux binaries.
+> -
+> -@end itemize
+> -
+> -@node SPARC
+> -@subsection Sparc32 and Sparc64 emulation
+> -
+> -@itemize
+> -
+> -@item Full SPARC V8 emulation, including privileged
+> -instructions, FPU and MMU. SPARC V9 emulation includes most privileged
+> -and VIS instructions, FPU and I/D MMU. Alignment is fully enforced.
+> -
+> -@item Can run most 32-bit SPARC Linux binaries, SPARC32PLUS Linux
+> binaries and
+> -some 64-bit SPARC Linux binaries.
+> -
+> -@end itemize
+> -
+> -Current QEMU limitations:
+> -
+> -@itemize
+> -
+> -@item IPC syscalls are missing.
+> -
+> -@item Floating point exception support is buggy.
+> -
+> -@item Atomic instructions are not correctly implemented.
+> -
+> -@item There are still some problems with Sparc64 emulators.
+> -
+> -@end itemize
+> -
+> -@node Xtensa
+> -@subsection Xtensa emulation
+> -
+> -@itemize
+> -
+> -@item Core Xtensa ISA emulation, including most options: code density,
+> -loop, extended L32R, 16- and 32-bit multiplication, 32-bit division,
+> -MAC16, miscellaneous operations, boolean, FP coprocessor, coprocessor
+> -context, debug, multiprocessor synchronization,
+> -conditional store, exceptions, relocatable vectors, unaligned exception,
+> -interrupts (including high priority and timer), hardware alignment,
+> -region protection, region translation, MMU, windowed registers, thread
+> -pointer, processor ID.
+> -
+> -@item Not implemented options: data/instruction cache (including cache
+> -prefetch and locking), XLMI, processor interface. Also options not
+> -covered by the core ISA (e.g. FLIX, wide branches) are not implemented.
+> -
+> -@item Can run most Xtensa Linux binaries.
+> -
+> -@item New core configuration that requires no additional instructions
+> -may be created from overlay with minimal amount of hand-written code.
+> -
+> -@end itemize
+> -
+>  @node Managed start up options
+>  @section Managed start up options
+>
+> --
+> 2.20.1
+>
+>
+>
+
+--000000000000bff4ef059f78f742
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, February 25, 2020, Peter Maydell &lt;<a href=3D"mailto:=
+peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">The &quot;CPU emulation&quot; part of the &quot;Im=
+plementation notes&quot; in<br>
+qemu-tech.texi looks like it is documenting what features of various<br>
+CPUs we do or don&#39;t emulate.=C2=A0 However:<br>
+=C2=A0* it covers only six of our 21 guest architectures<br>
+=C2=A0* the last time anybody updated it for actual content was in<br>
+=C2=A0 =C2=A02011/2012 for Xtensa; the content for the other five<br>
+=C2=A0 =C2=A0architectures is even older, being from 2008 or before!<br>
+<br>
+What we have is out of date, misleading and incomplete.<br>
+Just delete this part of the document rather than trying to<br>
+convert it to rST.<br>
+<br>
+(It would be nice eventually to have documentation of the<br>
+scope and limitations of our emulation; but we will want to<br>
+separate out the generic &quot;system emulation&quot; information from<br>
+the parts that are specific to linux-user anyway, as they will<br>
+be in different manuals.)<br>
+<br>
+Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
+">peter.maydell@linaro.org</a>&gt;<br>
+---</blockquote><div><br></div><div>I agree with the intent and the outcome=
+ of this patch, including the last paragraph in braces.</div><div>=C2=A0</d=
+iv><div>FWIW:</div><div><br></div><div>Reviewed-by: Aleksandar Markovic &lt=
+;<a href=3D"mailto:amarkovic@wavecomp.com">amarkovic@wavecomp.com</a>&gt;</=
+div><div><br></div><div><br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+=C2=A0qemu-tech.texi | 153 ------------------------------<wbr>-------------=
+------<br>
+=C2=A01 file changed, 153 deletions(-)<br>
+<br>
+diff --git a/qemu-tech.texi b/qemu-tech.texi<br>
+index 0380de77b62..35da6a40af1 100644<br>
+--- a/qemu-tech.texi<br>
++++ b/qemu-tech.texi<br>
+@@ -2,162 +2,9 @@<br>
+=C2=A0@appendix Implementation notes<br>
+<br>
+=C2=A0@menu<br>
+-* CPU emulation::<br>
+=C2=A0* Managed start up options::<br>
+=C2=A0@end menu<br>
+<br>
+-@node CPU emulation<br>
+-@section CPU emulation<br>
+-<br>
+-@menu<br>
+-* x86::=C2=A0 =C2=A0 =C2=A0x86 and x86-64 emulation<br>
+-* ARM::=C2=A0 =C2=A0 =C2=A0ARM emulation<br>
+-* MIPS::=C2=A0 =C2=A0 MIPS emulation<br>
+-* PPC::=C2=A0 =C2=A0 =C2=A0PowerPC emulation<br>
+-* SPARC::=C2=A0 =C2=A0Sparc32 and Sparc64 emulation<br>
+-* Xtensa::=C2=A0 Xtensa emulation<br>
+-@end menu<br>
+-<br>
+-@node x86<br>
+-@subsection x86 and x86-64 emulation<br>
+-<br>
+-QEMU x86 target features:<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item The virtual x86 CPU supports 16 bit and 32 bit addressing with segme=
+ntation.<br>
+-LDT/GDT and IDT are emulated. VM86 mode is also supported to run<br>
+-DOSEMU. There is some support for MMX/3DNow!, SSE, SSE2, SSE3, SSSE3,<br>
+-and SSE4 as well as x86-64 SVM.<br>
+-<br>
+-@item Support of host page sizes bigger than 4KB in user mode emulation.<b=
+r>
+-<br>
+-@item QEMU can emulate itself on x86.<br>
+-<br>
+-@item An extensive Linux x86 CPU test program is included @file{tests/test=
+-i386}.<br>
+-It can be used to test other x86 virtual CPUs.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Current QEMU limitations:<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Limited x86-64 support.<br>
+-<br>
+-@item IPC syscalls are missing.<br>
+-<br>
+-@item The x86 segment limits and access rights are not tested at every<br>
+-memory access (yet). Hopefully, very few OSes seem to rely on that for<br>
+-normal use.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-@node ARM<br>
+-@subsection ARM emulation<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Full ARM 7 user emulation.<br>
+-<br>
+-@item NWFPE FPU support included in user Linux emulation.<br>
+-<br>
+-@item Can run most ARM Linux binaries.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-@node MIPS<br>
+-@subsection MIPS emulation<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item The system emulation allows full MIPS32/MIPS64 Release 2 emulation,<=
+br>
+-including privileged instructions, FPU and MMU, in both little and big<br>
+-endian modes.<br>
+-<br>
+-@item The Linux userland emulation can run many 32 bit MIPS Linux binaries=
+.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Current QEMU limitations:<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Self-modifying code is not always handled correctly.<br>
+-<br>
+-@item 64 bit userland emulation is not implemented.<br>
+-<br>
+-@item The system emulation is not complete enough to run real firmware.<br=
+>
+-<br>
+-@item The watchpoint debug facility is not implemented.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-@node PPC<br>
+-@subsection PowerPC emulation<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Full PowerPC 32 bit emulation, including privileged instructions,<br=
+>
+-FPU and MMU.<br>
+-<br>
+-@item Can run most PowerPC Linux binaries.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-@node SPARC<br>
+-@subsection Sparc32 and Sparc64 emulation<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Full SPARC V8 emulation, including privileged<br>
+-instructions, FPU and MMU. SPARC V9 emulation includes most privileged<br>
+-and VIS instructions, FPU and I/D MMU. Alignment is fully enforced.<br>
+-<br>
+-@item Can run most 32-bit SPARC Linux binaries, SPARC32PLUS Linux binaries=
+ and<br>
+-some 64-bit SPARC Linux binaries.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Current QEMU limitations:<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item IPC syscalls are missing.<br>
+-<br>
+-@item Floating point exception support is buggy.<br>
+-<br>
+-@item Atomic instructions are not correctly implemented.<br>
+-<br>
+-@item There are still some problems with Sparc64 emulators.<br>
+-<br>
+-@end itemize<br>
+-<br>
+-@node Xtensa<br>
+-@subsection Xtensa emulation<br>
+-<br>
+-@itemize<br>
+-<br>
+-@item Core Xtensa ISA emulation, including most options: code density,<br>
+-loop, extended L32R, 16- and 32-bit multiplication, 32-bit division,<br>
+-MAC16, miscellaneous operations, boolean, FP coprocessor, coprocessor<br>
+-context, debug, multiprocessor synchronization,<br>
+-conditional store, exceptions, relocatable vectors, unaligned exception,<b=
+r>
+-interrupts (including high priority and timer), hardware alignment,<br>
+-region protection, region translation, MMU, windowed registers, thread<br>
+-pointer, processor ID.<br>
+-<br>
+-@item Not implemented options: data/instruction cache (including cache<br>
+-prefetch and locking), XLMI, processor interface. Also options not<br>
+-covered by the core ISA (e.g. FLIX, wide branches) are not implemented.<br=
+>
+-<br>
+-@item Can run most Xtensa Linux binaries.<br>
+-<br>
+-@item New core configuration that requires no additional instructions<br>
+-may be created from overlay with minimal amount of hand-written code.<br>
+-<br>
+-@end itemize<br>
+-<br>
+=C2=A0@node Managed start up options<br>
+=C2=A0@section Managed start up options<br>
+=C2=A0<br>
+-- <br>
+2.20.1<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000bff4ef059f78f742--
 
