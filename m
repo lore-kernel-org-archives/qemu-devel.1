@@ -2,74 +2,79 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88248C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CA8C4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 581E5222C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B281621556
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvSUnfJI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581E5222C2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSOtY/IB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B281621556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6z1Q-0003yp-GB
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:54:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33884)
+	id 1j6z1R-000420-Pn
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:54:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6z08-0002Qc-KM
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:53:34 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6z07-0002G8-8q
+ (envelope-from <david@redhat.com>) id 1j6z06-0002QV-Px
  for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:53:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22905
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <david@redhat.com>) id 1j6z04-0002Ed-Jg
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:53:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39644
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6z07-0002Fs-5C
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:53:31 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6z04-0002Dg-9U
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:53:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582732410;
+ s=mimecast20190719; t=1582732407;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Vl2hCVippo1INZegASPeZHcaHQ5Tuv+1R5+bAXmxp68=;
- b=fvSUnfJIl6KN4uQ1n7OK2t7DTyKvMaK2ud2Hp1OmAhIi1mNjsyU1Ww0WOM84JY4MI5Cr64
- oSDiLhkKGT0EyWbejd/d/YtobKfAGHzOmNJM73f0mfvk3RAT2g0S39iRJWwzmLcyocxQ8N
- fjNGrd8oGlalPvvGzDkQ9nJ1RCPOq4s=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4OCFmF6ltN/CWDF6D+mlr5dH63y+a50VJFncESwHm6I=;
+ b=QSOtY/IB/9FY+BeJqUKJzCVaFIzP5MipblaMpi1lg3WV2w14/yF7cgKo8nMmQSj+D6ad6g
+ IcQDStMPZesQE6qkA8Wy/tHm07vnyQs6ph6DBBWj6aSHe3jKflbWLl7a+HXlyP6A0XWygo
+ x4P16itpEUBasjuTC12qKMy/jsiXaao=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-dq4OQj2uPQ-4Uki2HnBtlQ-1; Wed, 26 Feb 2020 10:53:23 -0500
-X-MC-Unique: dq4OQj2uPQ-4Uki2HnBtlQ-1
+ us-mta-39-k2EybYVRPi6n97NCc--TLw-1; Wed, 26 Feb 2020 10:53:25 -0500
+X-MC-Unique: k2EybYVRPi6n97NCc--TLw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A44F100A5F1;
- Wed, 26 Feb 2020 15:53:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67BFF190B2B7;
+ Wed, 26 Feb 2020 15:53:24 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-117-196.ams2.redhat.com [10.36.117.196])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9581B1001DC0;
- Wed, 26 Feb 2020 15:53:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8D72101D482;
+ Wed, 26 Feb 2020 15:53:21 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/13] migrate/ram: Fix resizing RAM blocks while migrating
-Date: Wed, 26 Feb 2020 16:52:51 +0100
-Message-Id: <20200226155304.60219-1-david@redhat.com>
+Subject: [PATCH v3 01/13] util: vfio-helpers: Factor out and fix processing of
+ existing ram blocks
+Date: Wed, 26 Feb 2020 16:52:52 +0100
+Message-Id: <20200226155304.60219-2-david@redhat.com>
+In-Reply-To: <20200226155304.60219-1-david@redhat.com>
+References: <20200226155304.60219-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,127 +86,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrea Arcangeli <aarcange@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, David Hildenbrand <david@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paul Durrant <paul@xen.org>, Alex Williamson <alex.williamson@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the follow up of
-    "[PATCH RFC] memory: Don't allow to resize RAM while migrating" [1]
+Factor it out into common code when a new notifier is registered, just
+as done with the memory region notifier. This allows us to have the
+logic about how to process existing ram blocks at a central place (which
+will be extended soon).
 
-This series contains some (slightly modified) patches also contained in:
-    "[PATCH v2 fixed 00/16] Ram blocks with resizable anonymous allocations
-     under POSIX" [2]
-That series will be based on this series. The last patch (#13) in this
-series could be moved to the other series, but I decided to include it in
-here for now (similar context).
+Just like when adding a new ram block, we have to register the max_length
+for now. We don't have a way to get notified about resizes yet, and some
+memory would not be mapped when growing the ram block.
 
-I realized that resizing RAM blocks while the guest is being migrated
-(precopy: resize while still running on the source, postcopy: resize
- while already running on the target) is buggy. In case of precopy, we
-can simply cancel migration. Postcopy handling is more involved. Resizing
-can currently happen during a guest reboot, triggered by ACPI rebuilds.
+Note: Currently, ram blocks are only "fake resized". All memory
+(max_length) is accessible.
 
-Along with the fixes, some cleanups.
+We can get rid of a bunch of functions in stubs/ram-block.c . Print the
+warning from inside qemu_vfio_ram_block_added().
 
-[1] https://lkml.kernel.org/r/20200213172016.196609-1-david@redhat.com
-[2] https://lkml.kernel.org/r/20200212134254.11073-1-david@redhat.com
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ exec.c                    |  5 +++++
+ hw/core/numa.c            | 14 ++++++++++++++
+ include/exec/cpu-common.h |  1 +
+ util/vfio-helpers.c       | 29 ++++++++---------------------
+ 4 files changed, 28 insertions(+), 21 deletions(-)
 
-I am using the prototype of virtio-mem to test (which also makes use of
-resizable allocations). Things I was able to reproduce:
-- Resize while still running on the migration source. Migration is canceled
--- Test case for "migraton/ram: Handle RAM block resizes during precopy"
-- Resize (grow+shrink) on the migration target during postcopy migration
-  in the precopy stage (when syncing RAM blocks).
--- Test case for "migration/ram: Discard RAM when growing RAM blocks after
-   ram_postcopy_incoming_init()" and overall RAM size synchronization in
-   the precopy stage.
-- Resize (grow+shrink) on the migration tagret during postcopy migration
-  while already running on the target.
--- Test case for "migration/ram: Handle RAM block resizes during postcopy"
--- Test case for "migration/ram: Tolerate partially changed mappings in
-   postcopy code" - I can see that -ENOENT is actually triggered and that
-   migration succeeds. Migration seems to work just fine.
-
-In addition I run avocado-vt migration tests + usual QEMU checks.
-
-v2 -> v3:
-- Rebased on current master
-- Added RBs
-- "migration/ram: Tolerate partially changed mappings in postcopy code"
--- Extended the comment for the uffdio unregister part.
-
-v1 -> v2:
-- "util: vfio-helpers: Factor out and fix processing of existing ram
-   blocks"
--- Stringify error
-- "migraton/ram: Handle RAM block resizes during precopy"
--- Simplified check if we're migrating on the source
-- "exec: Relax range check in ram_block_discard_range()"
--- Added to make discard during resizes actually work
-- "migration/ram: Discard new RAM when growing RAM blocks after
-   ram_postcopy_incoming_init()"
--- Better checks if in the right postcopy mode.
--- Better patch subject/description/comments
-- "migration/ram: Handle RAM block resizes during postcopy"
--- Better comments
--- Adapt to changed postcopy checks
-- "migrate/ram: Get rid of "place_source" in ram_load_postcopy()"
--- Dropped, as broken
-- "migration/ram: Tolerate partially changed mappings in postcopy code"
--- Better comment / description. Clarify that no implicit wakeup will
-   happen
--- Warn on EINVAL (older kernels)
--- Wake up any waiter explicitly
-
-David Hildenbrand (13):
-  util: vfio-helpers: Factor out and fix processing of existing ram
-    blocks
-  stubs/ram-block: Remove stubs that are no longer needed
-  numa: Teach ram block notifiers about resizeable ram blocks
-  numa: Make all callbacks of ram block notifiers optional
-  migration/ram: Handle RAM block resizes during precopy
-  exec: Relax range check in ram_block_discard_range()
-  migration/ram: Discard RAM when growing RAM blocks after
-    ram_postcopy_incoming_init()
-  migration/ram: Simplify host page handling in ram_load_postcopy()
-  migration/ram: Consolidate variable reset after placement in
-    ram_load_postcopy()
-  migration/ram: Handle RAM block resizes during postcopy
-  migration/multifd: Print used_length of memory block
-  migration/ram: Use offset_in_ramblock() in range checks
-  migration/ram: Tolerate partially changed mappings in postcopy code
-
- exec.c                     |  27 +++++--
- hw/core/numa.c             |  41 +++++++++--
- hw/i386/xen/xen-mapcache.c |   7 +-
- include/exec/cpu-common.h  |   1 +
- include/exec/memory.h      |  10 +--
- include/exec/ramblock.h    |  10 +++
- include/exec/ramlist.h     |  13 ++--
- migration/migration.c      |   9 ++-
- migration/migration.h      |   1 +
- migration/multifd.c        |   2 +-
- migration/postcopy-ram.c   |  54 +++++++++++++-
- migration/ram.c            | 144 ++++++++++++++++++++++++++++---------
- stubs/ram-block.c          |  20 ------
- target/i386/hax-mem.c      |   5 +-
- target/i386/sev.c          |  18 ++---
- util/vfio-helpers.c        |  41 ++++-------
- 16 files changed, 285 insertions(+), 118 deletions(-)
-
+diff --git a/exec.c b/exec.c
+index 231d6e5641..b2a65b793f 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1965,6 +1965,11 @@ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb)
+     return rb->used_length;
+ }
+=20
++ram_addr_t qemu_ram_get_max_length(RAMBlock *rb)
++{
++    return rb->max_length;
++}
++
+ bool qemu_ram_is_shared(RAMBlock *rb)
+ {
+     return rb->flags & RAM_SHARED;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 316bc50d75..dc5e5b4046 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -854,9 +854,23 @@ void query_numa_node_mem(NumaNodeMem node_mem[], Machi=
+neState *ms)
+     }
+ }
+=20
++static int ram_block_notify_add_single(RAMBlock *rb, void *opaque)
++{
++    const ram_addr_t max_size =3D qemu_ram_get_max_length(rb);
++    void *host =3D qemu_ram_get_host_addr(rb);
++    RAMBlockNotifier *notifier =3D opaque;
++
++    if (host) {
++        notifier->ram_block_added(notifier, host, max_size);
++    }
++    return 0;
++}
++
+ void ram_block_notifier_add(RAMBlockNotifier *n)
+ {
+     QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
++    /* Notify about all existing ram blocks. */
++    qemu_ram_foreach_block(ram_block_notify_add_single, n);
+ }
+=20
+ void ram_block_notifier_remove(RAMBlockNotifier *n)
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index b47e5630e7..09decb8d93 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -59,6 +59,7 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+ void *qemu_ram_get_host_addr(RAMBlock *rb);
+ ram_addr_t qemu_ram_get_offset(RAMBlock *rb);
+ ram_addr_t qemu_ram_get_used_length(RAMBlock *rb);
++ram_addr_t qemu_ram_get_max_length(RAMBlock *rb);
+ bool qemu_ram_is_shared(RAMBlock *rb);
+ bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+ void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index ddd9a96e76..260570ae19 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -376,8 +376,14 @@ static void qemu_vfio_ram_block_added(RAMBlockNotifier=
+ *n,
+                                       void *host, size_t size)
+ {
+     QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
++    int ret;
++
+     trace_qemu_vfio_ram_block_added(s, host, size);
+-    qemu_vfio_dma_map(s, host, size, false, NULL);
++    ret =3D qemu_vfio_dma_map(s, host, size, false, NULL);
++    if (ret) {
++        error_report("qemu_vfio_dma_map(%p, %zu) failed: %s", host, size,
++                     strerror(-ret));
++    }
+ }
+=20
+ static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
+@@ -390,33 +396,14 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotif=
+ier *n,
+     }
+ }
+=20
+-static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
+-{
+-    void *host_addr =3D qemu_ram_get_host_addr(rb);
+-    ram_addr_t length =3D qemu_ram_get_used_length(rb);
+-    int ret;
+-    QEMUVFIOState *s =3D opaque;
+-
+-    if (!host_addr) {
+-        return 0;
+-    }
+-    ret =3D qemu_vfio_dma_map(s, host_addr, length, false, NULL);
+-    if (ret) {
+-        fprintf(stderr, "qemu_vfio_init_ramblock: failed %p %" PRId64 "\n"=
+,
+-                host_addr, (uint64_t)length);
+-    }
+-    return 0;
+-}
+-
+ static void qemu_vfio_open_common(QEMUVFIOState *s)
+ {
+     qemu_mutex_init(&s->lock);
+     s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
+     s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed;
+-    ram_block_notifier_add(&s->ram_notifier);
+     s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
+     s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
+-    qemu_ram_foreach_block(qemu_vfio_init_ramblock, s);
++    ram_block_notifier_add(&s->ram_notifier);
+ }
+=20
+ /**
 --=20
 2.24.1
 
