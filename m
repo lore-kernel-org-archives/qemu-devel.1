@@ -2,87 +2,89 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC1CC4BA0A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3ACC4BA0A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 259D521D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6870321556
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDr4SaYZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 259D521D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CtWcg8dE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6870321556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6rTP-0001o9-9b
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:51:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53463)
+	id 1j6rTs-0002Q0-Ip
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:51:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j6rSg-0000r6-AT
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:31 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6rO6-0003XY-4F
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:45:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j6rSf-0004CQ-9j
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43930
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j6rSf-0004Bg-5l
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582703428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+tY0oUojW+2EZr6GZQKwp8RRahDHKrA6+NzUrOrkaF4=;
- b=SDr4SaYZf7V9Z2JRlDGKDMwhW1GaugJMI8HbLLq6xyY9axyb3tSo4KxClbrr4I8aO2EfxQ
- ht1NbiymsItljya+COGYXj6fp+nnPKLQg3d+f9H+zRI8A/bb7c5PXpvqf9AY9Us1sMkp3G
- p2T+bKGI3/V4GYh5NPW30sNAanpKQEo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-vEMZ8NhEPxCgypuTeI6JMg-1; Wed, 26 Feb 2020 02:50:26 -0500
-X-MC-Unique: vEMZ8NhEPxCgypuTeI6JMg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54E64189F763;
- Wed, 26 Feb 2020 07:50:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AA378C06A;
- Wed, 26 Feb 2020 07:50:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 01C9F11386A6; Wed, 26 Feb 2020 08:50:20 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 0/4] docs: Miscellaneous rST conversions
-References: <20200225154121.21116-1-peter.maydell@linaro.org>
- <5a6757cb-fda2-ba3f-6c24-f09829faf4ab@redhat.com>
- <CAFEAcA-C0o_u8VABdRky7GUCvyiWhkn74cT1UYAtEAAFjGBLAA@mail.gmail.com>
- <6ed08bea-4fcb-08dc-417c-a0f534173a31@redhat.com>
- <CAFEAcA9KmsHS4fnYWvpMMa5SLLUBjiPcOsfmGOHcWopd11M3+g@mail.gmail.com>
-Date: Wed, 26 Feb 2020 08:50:20 +0100
-In-Reply-To: <CAFEAcA9KmsHS4fnYWvpMMa5SLLUBjiPcOsfmGOHcWopd11M3+g@mail.gmail.com>
- (Peter Maydell's message of "Tue, 25 Feb 2020 17:59:33 +0000")
-Message-ID: <874kvdaitf.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1j6rO4-0005dw-AU
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:45:45 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52413)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6rO3-0005a1-3N
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:45:43 -0500
+Received: by mail-wm1-x332.google.com with SMTP id p9so1817131wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:45:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=SKIVM/nv6pvrBs0kbqjR1dcnk9jHgbZ0MPB1gDBk62c=;
+ b=CtWcg8dEkhnd0+Y5sXJjEWQmwy5kebfuQzeFRbn+bEcd8p4TF65H3IOBPij1UOpYms
+ LL7R8RDnMUpym+Zy89ZHo3S/SDD921qeqxhO+7aIOrLs7F09WQbnZx6bedwWvGmKO/UC
+ I67y8CuK0FAFAeCdiJP9OWnQzV8XPK/NlJr2yAaIfxx8cEVoe/FCwAxadz953LKd4aqD
+ bU1nzwR/9ym+am9ptJl1SGcZvjwVTHelos/LoBZBA1BA82WgdEFszbEq0ovw/JWoXcPM
+ kMvR6NfDTHA/y0I2ZscSS8EOdLTv+jHXgIRytf0khKDoFBc/Zop2DzxMBCxNYGjqwVGB
+ GONQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=SKIVM/nv6pvrBs0kbqjR1dcnk9jHgbZ0MPB1gDBk62c=;
+ b=kjfrXMxwlVotB94p2R1LBKovMP1Q7akgsagDDawoE1+dzEjKgdvPnAmhy4cEeTHaJR
+ yhQpOorxidvyoAw6hhWaAcmj1CVrCusrYTAhI922u/1O/gHEJSH0JIwo+d8vwmLmZVrZ
+ 0xKsGWghpDIgJr4xzsCd/0cU8rFbstBdzAeMYNFiGWllK/4WLjFrktO/b81uKooN5wi5
+ 5ujdXWjdMKpBv1Ak6ILFDFVVpXTev1iIQ+1AGzMVQjUMv47nyXtNtwu3A1mjFWpDthwq
+ FGcUVeCSomFYv3Qz97c+0ykBqzAEIJosB1/oBEv7jZ5ci0hESIe0hkviUIPLcUn6FCTx
+ Khkg==
+X-Gm-Message-State: APjAAAUJc5nYb811WLMckEz1pt+DQLfYAnnyHcCN8LHJ9e1iYSbKKxYp
+ anIfm6l3rLi5eQoaftt7oYrV0g==
+X-Google-Smtp-Source: APXvYqwGj8EMfBArgKcs2UlK1QAOjSRAFfe+pcxxPQUfRxsbf+a5PMZnZzXgU8YNeGh/i78DPkMHbA==
+X-Received: by 2002:a7b:cb97:: with SMTP id m23mr3640772wmi.37.1582703141998; 
+ Tue, 25 Feb 2020 23:45:41 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t131sm1861721wmb.13.2020.02.25.23.45.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Feb 2020 23:45:40 -0800 (PST)
+Received: from zen.home.arpa (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 920C01FF9F;
+ Wed, 26 Feb 2020 07:39:30 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 15/19] tests/plugins: make howvec clean-up after itself.
+Date: Wed, 26 Feb 2020 07:39:25 +0000
+Message-Id: <20200226073929.28237-16-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200226073929.28237-1-alex.bennee@linaro.org>
+References: <20200226073929.28237-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,46 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+TCG plugins are responsible for their own memory usage and although
+the plugin_exit is tied to the end of execution in this case it is
+still poor practice. Ensure we delete the hash table and related data
+when we are done to be a good plugin citizen.
 
-> On Tue, 25 Feb 2020 at 17:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 25/02/20 18:11, Peter Maydell wrote:
->> >> I assume these are not meant to be applied now, except patch 2?
->> > No, I intended them to be reviewable and applied now. Why
->> > do you think we should wait?
->>
->> Because they remove information from qemu-doc.texi.  I think it's
->> feasible to do a mass conversion quite soon, within a single pull
->> request, the only important part that is missing is the hxtool conversio=
-n.
->
-> My assumption was that we would attack this by:
->  * converting chunks of the documentation which are in qemu-doc.texi
->    but which aren't in the qemu.1 manpage (basically in the way this
->    series is doing)
->  * get the qapidoc generation conversion reviewed and into
->    master (since at the moment it outputs into files included
->    from qemu-doc)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Not true.  QAPI doc comments go into *separate* manuals, the "QEMU QMP
-reference" (docs/interop/qemu-qmp-ref.*), and the "QEMU Guest Agent
-protocol reference" (docs/interop/qemu-ga-ref.*).
+Message-Id: <20200225124710.14152-16-alex.bennee@linaro.org>
 
-In more detail: scripts/qapi-gen.py generates
-docs/interop/qemu-qmp-qapi.texi from qapi/qapi-schema.json, and
-docs/interop/qemu-ga-qapi.texi from qga/qapi-schema.json.  These are
-included into docs/interop/qemu-qmp-ref.texi and
-docs/interop/qemu-ga-ref.texi, respectively.
-
->  * convert the manpage parts; we have the machinery for dealing
->    with the hxtool files, it just needs a little more work
-[...]
+diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
+index 4ca555e1239..3b9a6939f23 100644
+--- a/tests/plugin/howvec.c
++++ b/tests/plugin/howvec.c
+@@ -163,6 +163,13 @@ static gint cmp_exec_count(gconstpointer a, gconstpointer b)
+     return ea->count > eb->count ? -1 : 1;
+ }
+ 
++static void free_record(gpointer data)
++{
++    InsnExecCount *rec = (InsnExecCount *) data;
++    g_free(rec->insn);
++    g_free(rec);
++}
++
+ static void plugin_exit(qemu_plugin_id_t id, void *p)
+ {
+     g_autoptr(GString) report = g_string_new("Instruction Classes:\n");
+@@ -195,30 +202,31 @@ static void plugin_exit(qemu_plugin_id_t id, void *p)
+ 
+     counts = g_hash_table_get_values(insns);
+     if (counts && g_list_next(counts)) {
+-        GList *it;
+-
+         g_string_append_printf(report,"Individual Instructions:\n");
++        counts = g_list_sort(counts, cmp_exec_count);
+ 
+-        it = g_list_sort(counts, cmp_exec_count);
+-
+-        for (i = 0; i < limit && it->next; i++, it = it->next) {
+-            InsnExecCount *rec = (InsnExecCount *) it->data;
+-            g_string_append_printf(report, "Instr: %-24s\t(%ld hits)\t(op=%#08x/%s)\n",
++        for (i = 0; i < limit && g_list_next(counts);
++             i++, counts = g_list_next(counts)) {
++            InsnExecCount *rec = (InsnExecCount *) counts->data;
++            g_string_append_printf(report,
++                                   "Instr: %-24s\t(%ld hits)\t(op=%#08x/%s)\n",
+                                    rec->insn,
+                                    rec->count,
+                                    rec->opcode,
+                                    rec->class ?
+                                    rec->class->class : "un-categorised");
+         }
+-        g_list_free(it);
++        g_list_free(counts);
+     }
+ 
++    g_hash_table_destroy(insns);
++
+     qemu_plugin_outs(report->str);
+ }
+ 
+ static void plugin_init(void)
+ {
+-    insns = g_hash_table_new(NULL, g_direct_equal);
++    insns = g_hash_table_new_full(NULL, g_direct_equal, NULL, &free_record);
+ }
+ 
+ static void vcpu_insn_exec_before(unsigned int cpu_index, void *udata)
+-- 
+2.20.1
 
 
