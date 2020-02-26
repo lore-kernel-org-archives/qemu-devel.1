@@ -2,69 +2,112 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA8AC4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F272CC4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:39:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00E4B24684
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:33:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E4B24684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id BE0A321927
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:39:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="G4iJXJz4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0A321927
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6vsJ-0005pp-6n
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 07:33:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59065)
+	id 1j6vyR-00080G-TG
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 07:39:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j6vnK-0007na-RW
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:28:08 -0500
+ (envelope-from <saipava@xilinx.com>) id 1j6vxY-0007SK-94
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j6vnE-0007Th-Uc
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:28:06 -0500
-Received: from mail-yw1-f65.google.com ([209.85.161.65]:41400)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1j6vnC-00075r-0e; Wed, 26 Feb 2020 07:27:58 -0500
-Received: by mail-yw1-f65.google.com with SMTP id h6so167628ywc.8;
- Wed, 26 Feb 2020 04:27:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zXiBwlFgIMdrvUdeU+34KHi9Vw3Mcx+YL09TYworXoE=;
- b=ow2G4LRfwt+hd6wAJPTdxi751UPCEzmbmdmMNGin1d4r8rzdc2Zyyl9AUMwBSDjcFR
- 9YcPrCcEi+wEMMFgPT2IfLjnnEfH7ERqeOIUlMH93PkJVhbNA67ZbqNvdrtKvuH1Y6Sk
- qDWq05iKkKOOHSWREzEh6+/4a1HB4h2RPR4nM/txCoZUEIFg867V+ornGTVLBICdOmU8
- coss8Qd01Yvw5rSOxTIde+aaPBvYL041h/DxdtH8WOLkZ9b40UrxgxEjYUUp5EXVO5rx
- OhHpwETsPSSgg4F0SzqVdlIzqH25NvXQ/+sHQqk8NcQ6cp/s2A+HU7ZKxkp13ZCmaP9C
- +V9g==
-X-Gm-Message-State: APjAAAW+lUlmieuBk12e/SEj2y1XfVex+l1hscQS1sviDlWsMzgYR8cs
- bzX9FhR9RR6h+cKSVwnoQ17ifKo2LernnQiAPGI=
-X-Google-Smtp-Source: APXvYqz3W1RispGXdoXDFeIO25cige6S8PSd9tmPRFO4FmAqcnFqpanaAwFYQ87+wgoYcqksP4zaF8lM3dO1t/5u+KQ=
-X-Received: by 2002:a81:8443:: with SMTP id u64mr3323124ywf.443.1582720076891; 
- Wed, 26 Feb 2020 04:27:56 -0800 (PST)
+ (envelope-from <saipava@xilinx.com>) id 1j6vxW-0007p0-OF
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:38:39 -0500
+Received: from mail-bn8nam12on2061.outbound.protection.outlook.com
+ ([40.107.237.61]:6035 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1j6vxW-0007hI-EV
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:38:38 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SEbG3HrcHbaBTPJaJIN2+Xh60/86yMdtlFYhjzEAohSNRyEe5Mv9Kq84Eh6cPyLTniVMROoFQH90e9OMXf9ud8dmS9LdtWUXhTrlVSN8Kh7heDu0RN7Iggv0T3KY/2bgQi2LBGH7QoyHrCcwjgtMHCAhokbSXvuxh9pSyxYKtBoGmWAQZeWeXkUJ+uFOxxn79Qi+0w+V35yqE/8UQ5okN6EZVe/z19a4I5uDk/2haTPH3/MiWNoYaXzFjBkQtwII0HNaMUqKze4HmD4IaNvpWgce4e1LS2c4dCvpXUUQtxNhcXvva5Rv3GYx/eNx/HaNs3dIMadCfcBx3FUaVo6j9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y/9vZFYY99EQJp3ch4psNK4UgYMbvlT/qDAANJwH+hg=;
+ b=h98sB/kePGIosIu0+RAVTX2hBAQZdd54+kFEtzs+38HXSlA9Aq79TioQGgXM/6ka8ejURkWyG6u3Wpy3bYu0Xvm5MkSFtVp+3p6S8KuEfGM+qgEf+bSpdLQlXnkO4CzI01lI94D0XeXmE/dTQXHlt7i/t1numF4Rk39N7OUsPjUM0NviBdniTLNvmzsu3UpLwbEXdlSuAl0i3vUsydGSDYlrioSIbF8enGnMaF3uhTWSr+RC42vY1mNcLi5vcl236R6G/M4gT/z9OWBku8fYLZWS0qLQ0w+Tl6U9TLodQWIQ+ycCOIviv7lRAIHT/7deQ5JRn4fN61tvskcT304gcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y/9vZFYY99EQJp3ch4psNK4UgYMbvlT/qDAANJwH+hg=;
+ b=G4iJXJz4blQSMeW13pDZhOznfJe8kERucR3kjnCyAXEmzOZQnjydqPUeAEZBlasfkoQtz6Us1J7/PMe7IaUji6N8R6O1csCDLlJAia0DLcecUg/SgoL5YLXsPRrzTrMX6Dmkk7hQakIzyQDSWEHUcdZZ0Evv483xtVGsgCJyZLg=
+Received: from MN2PR02MB5935.namprd02.prod.outlook.com (2603:10b6:208:111::23)
+ by MN2PR02MB7055.namprd02.prod.outlook.com (2603:10b6:208:202::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2750.21; Wed, 26 Feb
+ 2020 12:38:35 +0000
+Received: from MN2PR02MB5935.namprd02.prod.outlook.com
+ ([fe80::7161:a3a3:c491:10cd]) by MN2PR02MB5935.namprd02.prod.outlook.com
+ ([fe80::7161:a3a3:c491:10cd%4]) with mapi id 15.20.2750.021; Wed, 26 Feb 2020
+ 12:38:35 +0000
+From: Sai Pavan Boddu <saipava@xilinx.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, Peter Maydell
+ <peter.maydell@linaro.org>
+Subject: Implementing IOMMU support for SDHCI 
+Thread-Topic: Implementing IOMMU support for SDHCI 
+Thread-Index: AdXsoAgJBAmayeg8R/u0QxshP3edDA==
+Date: Wed, 26 Feb 2020 12:38:35 +0000
+Message-ID: <MN2PR02MB5935836FBB0AC02F56278FE3CAEA0@MN2PR02MB5935.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=saipava@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: bb443f9b-3487-4795-c2ae-08d7bab8cbf5
+x-ms-traffictypediagnostic: MN2PR02MB7055:|MN2PR02MB7055:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR02MB7055696659EB9C7F6F979CF6CAEA0@MN2PR02MB7055.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0325F6C77B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(199004)(189003)(76116006)(6506007)(86362001)(55016002)(9686003)(4744005)(7696005)(8936002)(52536014)(26005)(33656002)(8676002)(81156014)(81166006)(71200400001)(186003)(66446008)(107886003)(66556008)(54906003)(4743002)(110136005)(66946007)(5660300002)(4326008)(498600001)(66476007)(2906002)(64756008);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:MN2PR02MB7055;
+ H:MN2PR02MB5935.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: QiUxd1MTYDJNZ4VM/g97p4IIV0/80nx9FblgX9StYkf/6tEQ4txmOCiBTKfLsgHxTWPgzHZYXVQ4bmyX8hTAoeTL7hPmDcGhcwAQQcfRVT8CPLCRFlJwURNkwCRaLqoUtq/wLM7AM7eUZHE/WuTaCAtMf7zxOhb7NQkzyMb8srlnk1r8uiSm2bjaC6361B9FfGFZ4f4oAFQ3vm9Kp3scvK3HJJFJfkHdP1/vWwfLQTZI1LFrGkSs4EmbQ93OvqDOsZNwr4AKD9IrXuEpmoNi+H0VA3vcLw/kRZYTzrzKZgPb0xD2u1uks9TX53qQc2eodhiZEUsp5qkeNK7qDScTB+HgdsknQOc1VBGg//c9ohXIgmiBna8oDbd4tJfOvlYsXw+KnNQjwwvqpUIkJSMbQrgHP2cg+ISsZoPl3x0m7JFUvrvHv3Cv4EEw0z0WHmH9
+x-ms-exchange-antispam-messagedata: XBXG8IT82NxsNybtSeyCIVZg65mxF2IDlzT2ATusDNLErXpEqBuhtiyj/Qca9EiiMhHrsF1JvYrqV3mzroJBDgf3aTAj6tMoko10RnpVgikjnUlowJ1oY9tcf2O29Jo+/AN9il02oomfa29NHQhfFQ==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <158271897341.44994.2741557659975232894.stgit@lep8c.aus.stglabs.ibm.com>
-In-Reply-To: <158271897341.44994.2741557659975232894.stgit@lep8c.aus.stglabs.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 26 Feb 2020 13:27:45 +0100
-Message-ID: <CAAdtpL5gYr9ZRhSdqfhKMVQ41BUUZqYbbFGyMLTPaROfazW8cA@mail.gmail.com>
-Subject: Re: [PATCH] spapr: Fix Coverity warning while validating nvdimm
- options
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Content-Type: multipart/alternative; boundary="000000000000f6497d059f79bb9b"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb443f9b-3487-4795-c2ae-08d7bab8cbf5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2020 12:38:35.3405 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zbJQ3YSWh7/YWN5BNDYr0Us81/5fLzc2SBd7pn2ymDuSDUgeF4GrwXmYJBm8RVR8+E7kX5UUIXWlL6OadjKjaQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB7055
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 209.85.161.65
+X-Received-From: 40.107.237.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,135 +119,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Edgar Iglesias <edgari@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f6497d059f79bb9b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Poalo/Peter,
 
-Le mer. 26 f=C3=A9vr. 2020 13:11, Shivaprasad G Bhat <sbhat@linux.ibm.com> =
-a
-=C3=A9crit :
+We are trying to add SMMU support for dma's used in SD controller on ZynqMP=
+ boards. In order to do that we need a clean way to assign MemTxAttrs to ea=
+ch device(i.e all devices which connect to smmu) via "object_add_link_prope=
+rty/ object_set_link_property "  functions.
 
-> Fixes Coverity issue,
->       CID 1419883:  Error handling issues  (CHECKED_RETURN)
->            Calling "qemu_uuid_parse" without checking return value
->
-> nvdimm_set_uuid() already verifies if the user provided uuid is valid or
-> not. So, need to check for the validity during pre-plug validation again.
->
-> As this a false positive in this case, assert if not valid to be safe.
->
-> Reported-by: Coverity (CID 1419883)
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-> ---
->  hw/ppc/spapr_nvdimm.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-> index 74eeb8bb74..051727536e 100644
-> --- a/hw/ppc/spapr_nvdimm.c
-> +++ b/hw/ppc/spapr_nvdimm.c
-> @@ -44,7 +44,7 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm,
-> uint64_t size,
->      }
->
->      uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP=
-,
-> NULL);
-> -    qemu_uuid_parse(uuidstr, &uuid);
-> +    g_assert(qemu_uuid_parse(uuidstr, &uuid) =3D=3D 0);
->
+But in order to do that, first we may need to convert MemTxAttrs as QOM obj=
+ect. I just need some feedback, if its advisable to do so ?
 
-From https://developer.gnome.org/glib/stable/glib-Testing.html#g-assert
+Thanks & Regards,
+Sai Pavan
 
-The macro can be turned off in final releases of code by defining
-G_DISABLE_ASSERT when compiling the application, so code must not depend on
-any side effects from expr.
-
-This looks like bad pattern example.
-
-     g_free(uuidstr);
->
->      if (qemu_uuid_is_null(&uuid)) {
->
->
->
-
---000000000000f6497d059f79bb9b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Le mer. 26 f=C3=A9vr. 2020 13:11, Shivaprasad G Bhat &lt;<a hr=
-ef=3D"mailto:sbhat@linux.ibm.com" target=3D"_blank" rel=3D"noreferrer">sbha=
-t@linux.ibm.com</a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"g=
-mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
-eft:1ex">Fixes Coverity issue,<br>
-=C2=A0 =C2=A0 =C2=A0 CID 1419883:=C2=A0 Error handling issues=C2=A0 (CHECKE=
-D_RETURN)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Calling &quot;qemu_uuid_parse&quot=
-; without checking return value<br>
-<br>
-nvdimm_set_uuid() already verifies if the user provided uuid is valid or<br=
->
-not. So, need to check for the validity during pre-plug validation again.<b=
-r>
-<br>
-As this a false positive in this case, assert if not valid to be safe.<br>
-<br>
-Reported-by: Coverity (CID 1419883)<br>
-Signed-off-by: Shivaprasad G Bhat &lt;<a href=3D"mailto:sbhat@linux.ibm.com=
-" rel=3D"noreferrer noreferrer" target=3D"_blank">sbhat@linux.ibm.com</a>&g=
-t;<br>
----<br>
-=C2=A0hw/ppc/spapr_nvdimm.c |=C2=A0 =C2=A0 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c<br>
-index 74eeb8bb74..051727536e 100644<br>
---- a/hw/ppc/spapr_nvdimm.c<br>
-+++ b/hw/ppc/spapr_nvdimm.c<br>
-@@ -44,7 +44,7 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uin=
-t64_t size,<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVD=
-IMM_UUID_PROP, NULL);<br>
--=C2=A0 =C2=A0 qemu_uuid_parse(uuidstr, &amp;uuid);<br>
-+=C2=A0 =C2=A0 g_assert(qemu_uuid_parse(uuidstr, &amp;uuid) =3D=3D 0);<br><=
-/blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">From =
-<a href=3D"https://developer.gnome.org/glib/stable/glib-Testing.html#g-asse=
-rt" target=3D"_blank" rel=3D"noreferrer">https://developer.gnome.org/glib/s=
-table/glib-Testing.html#g-assert</a><br></div><div dir=3D"auto"><br></div><=
-div dir=3D"auto"><span style=3D"color:rgb(85,85,85);font-family:cantarell,&=
-#39;droid sans&#39;,ubuntu,&#39;dejavu sans&#39;,arial,sans-serif;font-size=
-:14px;background-color:rgb(255,255,255)">The macro can be turned off in fin=
-al releases of code by defining=C2=A0</span><code style=3D"margin:0px;paddi=
-ng:1px;border:0px;font-size:14px;vertical-align:baseline;color:rgb(85,85,85=
-);background:rgba(0,0,0,0.0980392)">G_DISABLE_ASSERT</code><span style=3D"c=
-olor:rgb(85,85,85);font-family:cantarell,&#39;droid sans&#39;,ubuntu,&#39;d=
-ejavu sans&#39;,arial,sans-serif;font-size:14px;background-color:rgb(255,25=
-5,255)">=C2=A0when compiling the application, so code must not depend on an=
-y side effects from expr.</span><br></div><div dir=3D"auto"><span style=3D"=
-color:rgb(85,85,85);font-family:cantarell,&#39;droid sans&#39;,ubuntu,&#39;=
-dejavu sans&#39;,arial,sans-serif;font-size:14px;background-color:rgb(255,2=
-55,255)"><br></span></div><div dir=3D"auto">This looks like bad pattern exa=
-mple.=C2=A0</div><div dir=3D"auto"><br></div><div dir=3D"auto"><div class=
-=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8=
-ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0g_free(uuidstr);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (qemu_uuid_is_null(&amp;uuid)) {<br>
-<br>
-<br>
-</blockquote></div></div></div>
-
---000000000000f6497d059f79bb9b--
 
