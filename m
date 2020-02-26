@@ -2,92 +2,155 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4056DC4BA1E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79115C4BA18
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:59:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1053024656
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:58:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45DF124656
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:59:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DednwtJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1053024656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLSKJRba"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45DF124656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j70x6-00063L-AG
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:58:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33597)
+	id 1j70yK-0007Fa-He
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:59:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j70wL-0005XF-NM
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:46 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j70xM-0006Uz-Ub
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:58:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j70wK-0004nF-PA
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:45 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32531
+ (envelope-from <jsnow@redhat.com>) id 1j70xL-0007vB-MS
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:58:48 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56404
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j70wK-0004lt-Kb
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:44 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j70xL-0007u4-Ig
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:58:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582739862;
+ s=mimecast20190719; t=1582739927;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sebDUYLrDxN15HjxAKvkmNDKIlwQORdu5M9DKS14gEc=;
- b=DednwtJf1sS1nB3tqgY/hhlW65IJmkZTvBoJEKJPJrWeyPEhiIhhMLIABQQUu4hqNA0bGl
- YlEVtYslVZjmaxJSK/FSJN612aJjxtT7JskfWnapvTAPSubq4+0h3xyIcuEBQWhiON5i43
- 7eXuw5K9w3UWXY+UIHHzEfngiIS20C0=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-HBLgXMBgOAuzxQcc99dsow-1; Wed, 26 Feb 2020 12:57:40 -0500
-X-MC-Unique: HBLgXMBgOAuzxQcc99dsow-1
-Received: by mail-qk1-f197.google.com with SMTP id s189so183886qke.5
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:57:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=zIyV6cYTxtRMRBEZz9p+gZhtydpVS4YQXL45UhS0xXI=;
- b=C66t7zrpfbi+WI5tzL5d22ESShoW7E5QWaTYkthPpr2EDAC64JRdX3UVOb25y0Bzt2
- xNryBzIP6hXOV4nMTCx7tCIcGztRzENQq8UiK5GQw1fnh8z9TXsg3ayOB4DHboP/BMXa
- 1xFQdMVon5zzc9D/azRo+ayjzKQwYYaMXlS+q9SnHeTznSrfsF9monpSpZd2Fi6vGtR2
- ookXn5ddSXkLGcFpGnWwmwJKuQ5W1vcwEpG82nUy+EjD3yU0TCS7czJHqFCG9qiCJ/wi
- qklwwoFOrxeiwkHdMZh6Z1YCWKaEUx+fJuRWSB4aBQbfnfx5jXbtI1/+Gj6QF0r/SP2e
- yjfA==
-X-Gm-Message-State: APjAAAVWdMhVYPHMt3VvkM+xWcCwR2OCcCDoOJezoMmQBFOBVjQ+ZSYP
- sD5n9Q0u7S7rxWxFG7ohUEg1tsN7CNqq7J8Q5pDYz6HbGGnjygp5VImxvvFU5hjBMLxysqIlVXH
- Hbrvn1WWpXTLeQu8=
-X-Received: by 2002:a0c:e408:: with SMTP id o8mr284432qvl.236.1582739860029;
- Wed, 26 Feb 2020 09:57:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwMmG/mZ0Fg9vDt+tAGd/Khs641RvsSkOEZG/qyP3trSwBOPv44DOBy30bJA1EwtYbYpEMy4Q==
-X-Received: by 2002:a0c:e408:: with SMTP id o8mr284407qvl.236.1582739859731;
- Wed, 26 Feb 2020 09:57:39 -0800 (PST)
-Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
- [72.137.123.47])
- by smtp.gmail.com with ESMTPSA id r37sm1463731qtj.44.2020.02.26.09.57.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 09:57:38 -0800 (PST)
-Date: Wed, 26 Feb 2020 12:57:37 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH] hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
-Message-ID: <20200226175737.GE140200@xz-x1>
-References: <20200226172628.17449-1-eric.auger@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CNmgQwzaqrKMk68Ms54GrLKJTu13V8LDDkWd90PS0ek=;
+ b=eLSKJRbaESAktlkwsr/7R4Am0NT0K85ORrf4y2URgGTMG9FlyMMcZSfXtLr2EMYeYijP+1
+ MXo3kA+pAcxuOXLlLut54eUSeEmqxuOWTp5Avboz30nBGXBkkrYX1lM3MEZp9TVSMpzezp
+ ziDUXkuaEa/KtcxGFwpvfdu9JZ5apNg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-ZoJiCe4nM2GrXYrbHndrcQ-1; Wed, 26 Feb 2020 12:58:45 -0500
+X-MC-Unique: ZoJiCe4nM2GrXYrbHndrcQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12FDF1005514;
+ Wed, 26 Feb 2020 17:58:44 +0000 (UTC)
+Received: from [10.10.123.58] (ovpn-123-58.rdu2.redhat.com [10.10.123.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6225327180;
+ Wed, 26 Feb 2020 17:58:43 +0000 (UTC)
+Subject: Re: [PATCH 1/2] iotests: add JobRunner class
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200226004425.1303-1-jsnow@redhat.com>
+ <20200226004425.1303-2-jsnow@redhat.com>
+ <689f4a10-b1f2-14f9-c759-13e7447bd5b3@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <92f0a28b-8fb9-13d1-7fd4-27f36c977902@redhat.com>
+Date: Wed, 26 Feb 2020 12:58:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226172628.17449-1-eric.auger@redhat.com>
+In-Reply-To: <689f4a10-b1f2-14f9-c759-13e7447bd5b3@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,24 +164,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- eric.auger.pro@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 26, 2020 at 06:26:28PM +0100, Eric Auger wrote:
-> Make sure a null SMMUPciBus is returned in case we were
-> not able to identify a pci bus matching the @bus_num.
->=20
-> This matches the fix done on intel iommu in commit:
-> a2e1cd41ccfe796529abfd1b6aeb1dd4393762a2
->=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
 
---=20
-Peter Xu
+On 2/26/20 6:18 AM, Max Reitz wrote:
+> On 26.02.20 01:44, John Snow wrote:
+>> The idea is that instead of increasing the arguments to job_run all the
+>> time, create a more general-purpose job runner that can be subclassed to
+>> do interesting things with.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/255        |   9 +-
+>>  tests/qemu-iotests/257        |  12 ++-
+>>  tests/qemu-iotests/287        |  19 +++-
+>>  tests/qemu-iotests/iotests.py | 176 ++++++++++++++++++++++++----------
+>>  4 files changed, 158 insertions(+), 58 deletions(-)
+>=20
+> I like it!
+>=20
+
+High praise!
+
+> [...]
+>=20
+>> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
+>> index 0ab58dc011..f06e6ff084 100755
+>> --- a/tests/qemu-iotests/287
+>> +++ b/tests/qemu-iotests/287
+>> @@ -165,13 +165,22 @@ def test_bitmap_populate(config):
+>>                  if not config.disabled:
+>>                      ebitmap.dirty_group(2)
+>> =20
+>> +
+>> +        class TestJobRunner(iotests.JobRunner):
+>> +            def on_pending(self, event):
+>> +                if config.mid_writes:
+>> +                    perform_writes(drive0, 2)
+>> +                    if not config.disabled:
+>> +                        ebitmap.dirty_group(2)
+>=20
+> I actually prefer inlining the pre_finalize() functions (over calling
+> the existing one), but then we can also remove the original function. :)
+>=20
+
+Not sure I understand you correctly. You're saying you prefer this
+strategy where I inline the logic vs others where I call out to a function?
+
+If so, I agree if only for purity -- the function looks and acts like a
+callback instead of a callback-that-calls-another-callback.
+
+>> +                super().on_pending(event)
+>> +
+>>          job =3D populate(drive0, 'target', 'bitpop0')
+>>          assert job['return'] =3D=3D {'return': {}}
+>> -        vm.run_job(job['id'],
+>> -                   auto_dismiss=3Djob['auto-dismiss'],
+>> -                   auto_finalize=3Djob['auto-finalize'],
+>> -                   pre_finalize=3Dpre_finalize,
+>> -                   cancel=3Dconfig.cancel)
+>> +        job_runner =3D TestJobRunner(vm, job['id'],
+>> +                                   auto_dismiss=3Djob['auto-dismiss'],
+>> +                                   auto_finalize=3Djob['auto-finalize']=
+,
+>> +                                   cancel=3Dconfig.cancel)
+>> +        job_runner.run()
+>>          log('')
+>> =20
+>> =20
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.=
+py
+>> index 3390fab021..37a8b4d649 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
+>> @@ -460,6 +460,130 @@ def remote_filename(path):
+>>      else:
+>>          raise Exception("Protocol %s not supported" % (imgproto))
+>> =20
+>> +
+>> +class JobRunner:
+>=20
+> [...]
+>=20
+>> +    def on_ready(self, event):
+>> +        if self.logging:
+>> +            self._vm.qmp_log('job-complete', id=3Dself._id)
+>> +        else:
+>> +            self._vm.qmp('job-complete', id=3Dself._id)
+>=20
+> I suppose this is a bug fix.  (The old version always called qmp_log.)
+>=20
+
+Technically yes. It was needed for 040.
+
+> But what about adding a do_qmp method to JobRunner that does the
+> =E2=80=9Cif self.logging { self._vm.qmp_log() } else { self._vm.qmp }=E2=
+=80=9D part so
+> we don=E2=80=99t have to inline that everywhere?
+>=20
+> Max
+>=20
+
+I'll just clean up the logging series I had to do it at a more
+fundamental level.
+
+Just testing the temperature of the water.
+
+--js
 
 
