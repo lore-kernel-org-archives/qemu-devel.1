@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9447C4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 873F4C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:51:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCA25206E6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:51:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA25206E6
+	by mail.kernel.org (Postfix) with ESMTPS id 5E8502072D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:51:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8502072D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6sPF-0005nd-TV
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:51:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44575)
+	id 1j6sPM-00064F-HJ
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:51:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6sM6-0000Ov-4L
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:47:47 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6sM7-0000Q3-5r
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:47:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6sM5-0007Uj-0f
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:47:46 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59038 helo=huawei.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6sM6-0007ZW-0a
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:47:47 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3167 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1j6sM4-0007Nj-Ks; Wed, 26 Feb 2020 03:47:44 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 69975A471B758272973D;
+ id 1j6sM5-0007Nh-KP; Wed, 26 Feb 2020 03:47:45 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 890FFA42264ED9080070;
  Wed, 26 Feb 2020 16:47:42 +0800 (CST)
 Received: from huawei.com (10.133.205.93) by DGGEMS411-HUB.china.huawei.com
  (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Feb 2020
- 16:47:35 +0800
+ 16:47:33 +0800
 From: <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v2 08/13] display/blizzard: Remove redundant statement in
- blizzard_draw_line16_32()
-Date: Wed, 26 Feb 2020 16:46:42 +0800
-Message-ID: <20200226084647.20636-9-kuhn.chenqun@huawei.com>
+Subject: [PATCH v2 06/13] display/pxa2xx_lcd: Remove redundant statement in
+ pxa2xx_palette_parse()
+Date: Wed, 26 Feb 2020 16:46:40 +0800
+Message-ID: <20200226084647.20636-7-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
 References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
@@ -54,7 +54,7 @@ X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,31 +75,33 @@ Sender: "Qemu-devel"
 From: Chen Qun <kuhn.chenqun@huawei.com>
 
 Clang static code analyzer show warning:
-  hw/display/blizzard.c:940:9: warning: Value stored to 'data' is never r=
-ead
-        data >>=3D 5;
+hw/display/pxa2xx_lcd.c:596:9: warning: Value stored to 'format' is never=
+ read
+        format =3D 0;
         ^        ~
+
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
 Cc: Andrzej Zaborowski <balrogg@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/blizzard.c | 1 -
+ hw/display/pxa2xx_lcd.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/hw/display/blizzard.c b/hw/display/blizzard.c
-index 359e399c2a..62517bdf75 100644
---- a/hw/display/blizzard.c
-+++ b/hw/display/blizzard.c
-@@ -937,7 +937,6 @@ static void blizzard_draw_line16_32(uint32_t *dest,
-         g =3D (data & 0x3f) << 2;
-         data >>=3D 6;
-         r =3D (data & 0x1f) << 3;
--        data >>=3D 5;
-         *dest++ =3D rgb_to_pixel32(r, g, b);
+diff --git a/hw/display/pxa2xx_lcd.c b/hw/display/pxa2xx_lcd.c
+index 05f5f84671..464e93161a 100644
+--- a/hw/display/pxa2xx_lcd.c
++++ b/hw/display/pxa2xx_lcd.c
+@@ -593,7 +593,6 @@ static void pxa2xx_palette_parse(PXA2xxLCDState *s, i=
+nt ch, int bpp)
+         n =3D 256;
+         break;
+     default:
+-        format =3D 0;
+         return;
      }
- }
+=20
 --=20
 2.23.0
 
