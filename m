@@ -2,93 +2,66 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 252D8C4BA2D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29D74C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3D612072D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:51:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GqHhXS03"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3D612072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF1052072D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:52:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1052072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j75Ws-0001r8-4O
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:51:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38269)
+	id 1j75Xe-00033a-6l
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:52:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38569)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j75VY-00007a-3g
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:50:25 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j75WJ-0001cM-PU
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j75VX-0001qO-0W
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:50:23 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41338)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j75VW-0001pk-Px
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:50:22 -0500
-Received: by mail-pf1-x441.google.com with SMTP id j9so521590pfa.8
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 14:50:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=CQMLeLQ/bkVIYCJZJZncIzXsdZ5tgDqx/ndr2z64TIA=;
- b=GqHhXS03bWEZ2jMlgcrBFaJgAHXzdqWTTv/o6xiITr0dcDZD89coyzGKyXtTEYB5WA
- 8Oc3W1wjLGpoTGySKQBAKqMVsRSkG8hz1eJmqbyc16zheI95e50MtLlMJeH2fVUOmVTY
- ns6SlMZPpj+kZbImVOwdXTQSxWyV/lMF/mKuBB1UImHtsgZJZmaTcKfbRFRgJdetJNar
- ftDEEnDfFgJerT4DWswu0mQ9nj12jiiWv51haLQltdOteAPHvIAkpctauJpLPKXzGzmV
- +B565pvd+Lhcx6HNmsaLYM+SRJPWb7iorxJL2ll55RRzOmL0mOvK3Abo24M6AMwcfW3Z
- 1ghA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CQMLeLQ/bkVIYCJZJZncIzXsdZ5tgDqx/ndr2z64TIA=;
- b=U1EpH5/qlYeVkXQVwlUPPfA2IdUI7x06Udo/A4p0sHXu/X9AYN44rFYmByLvKPmm5d
- I81ua2HoGFsBmG9Rf1g53S0GCsEZkwDRjNbLd892xo+cMOQfX2/nqgxm2Eue2LeNNJXp
- t6hM/ODTsLUb1DeMeywvJnXZ1t6MP19ZoEqVv8vqVHESwk9C06Iwhte/zjyx7V4ppteD
- +PRtqWlrl51lGvv6Upd2qLqSPUxSLAPxS+gznCSncNEndXzU0zQM6FwtJyjlOfDESRx2
- yLRa7sm4Ag32ByFTQ4+x7z1HQYmATdVqzVBB6F0t0baaNLuwAU+5FkH6a1HlqhJuVQyF
- vpfg==
-X-Gm-Message-State: APjAAAUItC9a00Ym9Q1FHY0/ifzGq7OrM8qhdcEjr3npXkxJjz6fnfTR
- 25uWMRagQmqhtnT7MK1gZbP1Eg==
-X-Google-Smtp-Source: APXvYqz7HC5Yf7shVDwSYUQ+HEgeqbJZZQiy3tL/xzCZrCSvqK3DZ5Dxnioo6zT7S04CRtv6xjYwMA==
-X-Received: by 2002:a63:a062:: with SMTP id u34mr1100295pgn.286.1582757421918; 
- Wed, 26 Feb 2020 14:50:21 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- i27sm3750169pgn.76.2020.02.26.14.50.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Feb 2020 14:50:21 -0800 (PST)
-Subject: Re: [PATCH v1 2/4] accel/tcg: remove link between guest ram and TCG
- cache size
-To: Niek Linnenbank <nieklinnenbank@gmail.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200226181020.19592-1-alex.bennee@linaro.org>
- <20200226181020.19592-3-alex.bennee@linaro.org>
- <CAPan3WrD5kpnyNM_TqKOZP4GG4E0npaEqbJe6KidqJW2toAe6A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a14cb6f2-01b2-187a-64f5-0ee62d237971@linaro.org>
-Date: Wed, 26 Feb 2020 14:50:19 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <balaton@eik.bme.hu>) id 1j75WI-0003Lm-0J
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:51:11 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:42890)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j75WH-00038g-Pn; Wed, 26 Feb 2020 17:51:09 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id BF4AC74637D;
+ Wed, 26 Feb 2020 23:51:05 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 98BA37461AE; Wed, 26 Feb 2020 23:51:05 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 96A3E74569F;
+ Wed, 26 Feb 2020 23:51:05 +0100 (CET)
+Date: Wed, 26 Feb 2020 23:51:05 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-Reply-To: <87eeuhxw0y.fsf@linaro.org>
+Message-ID: <alpine.BSF.2.22.395.2002262311370.39102@zero.eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+ <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+ <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+ <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
+ <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
+ <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87eeuhxw0y.fsf@linaro.org>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <CAPan3WrD5kpnyNM_TqKOZP4GG4E0npaEqbJe6KidqJW2toAe6A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed;
+ boundary="3866299591-1146421166-1582757465=:39102"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,30 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
+ Dino Papararo <skizzato73@msn.com>, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/26/20 2:26 PM, Niek Linnenbank wrote:
-> Hi Alex,
-> 
-> On Wed, Feb 26, 2020 at 7:10 PM Alex Bennée <alex.bennee@linaro.org
-> <mailto:alex.bennee@linaro.org>> wrote:
-> 
->     Basing the TB cache size on the ram_size was always a little heuristic
->     and was broken by a1b18df9a4 which caused ram_size not to be fully
->     realised at the time we initialise the TCG translation cache.
-> 
-> 
-> Now I'm beginning to understand the issue better. So without this patch, the
-> TCG translation
-> cache effectively was disabled, causing the slowdown, correct?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Yes.
+--3866299591-1146421166-1582757465=:39102
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, 26 Feb 2020, Alex Benn=C3=A9e wrote:
+> That's the wrong way around. We have regression tests for a reason. I'l=
+l
+> happily accept patches to turn on hardfloat for PPC if:
+>
+> a) they don't cause regressions in our fairly extensive floating point
+> tests
 
-r~
+Where are these tests and how to run them? I'm not aware of such tests so=
+=20
+I've only tried running simple guest code to test changes but if there ar=
+e=20
+more extensive FP tests I'd better use those.
+
+> b) the PPC maintainers are happy with the new performance profile
+>
+> The way forward would be to:
+>
+> 1. patch to drop #if defined(TARGET_PPC) || defined(__FAST_MATH__)
+
+This is simple but I've found that while it seems to make some vector=20
+instructions faster it also makes most simple FP ops slower because it=20
+will go thorugh checking if it can use hardfloat but never can because th=
+e=20
+fp_status is cleared before every FP op. That's why I've set inexact bit=20
+to let it use hardfloat and be able to test if it would work at all.=20
+That's all my RFC patch did, I've had a 2nd version trying to avoid slow=20
+down with above #if defined() dropped but hardfloat=3Dfalse so it only us=
+es=20
+softfloat as before but it did not worked out too well, some tests said v=
+2=20
+was even slower. Maybe to avoid overhead we should add a variable instead=
+=20
+of the QEMU_NO_HARDFLOAT define that can be set during runtime but=20
+probably that won't be faster either. Thus it seems there's no way to=20
+enable hardfloat for PPC and not have slower performance for most FP ops=20
+without also doing some of the other points below (even if it's beneficia=
+l=20
+for vector ops).
+
+> 2. audit target/ppc/fpu_helper.c w.r.t chip manual and fix any unneeded
+> splatting of flags (if any)
+
+This would either need someone who knows PPC FPU or someone who can take=20
+the time to learn and go through the code. Not sure I want to volunteer=20
+for that. But I think the clearing of the flags is mainly to emulate FI=20
+bit which is an non-sticky inexact bit that should show the inexact statu=
+s=20
+of last FP op. (There's another simliar bit for fraction rounded as well=20
+but that does not disable hardfloat.) Question is if we really want to=20
+accurately emulate these bits? Are there any software we care about=20
+relying on these? If we can live with not having correct FI bit emulation=
+=20
+(which was the case for a long time until these were fixed) then we could=
+=20
+have an easy way to enable hardfloat without more extensive changes. If w=
+e=20
+want to accurately emulate also these bits then we probably will need=20
+changes to softfloat to allow registering FP exception handlers so we=20
+don't have to clear and check bits but can get an exception from FPU and=20
+then can set those bits but I have no idea how to do that.
+
+Regards,
+BALATON Zoltan
+--3866299591-1146421166-1582757465=:39102--
 
