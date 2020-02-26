@@ -2,84 +2,86 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB32C4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC26C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:42:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4460F24685
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 151AF24685
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:42:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lOGyY2Qg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4460F24685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oiZb/YJ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 151AF24685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6v4B-0007BC-DB
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:41:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53784)
+	id 1j6v50-0000Ja-8w
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:42:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52820)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6uwA-0004QA-CX
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:14 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6utx-0000xL-2h
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6uw6-00071q-9y
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:10 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41706)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6utq-0006QR-Pi
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:52 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37931)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j6uw6-0006ww-3Y
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:33:06 -0500
-Received: by mail-oi1-x243.google.com with SMTP id i1so2668710oie.8
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:33:06 -0800 (PST)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1j6utq-0006In-Aa
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:46 -0500
+Received: by mail-wr1-x444.google.com with SMTP id e8so2554302wrm.5
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:30:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=PwUpGkJnbPW07PC5FnVKpnq3qviosIVPIxfK34xtJ4Y=;
- b=lOGyY2Qg90XgAOZJAV+4yDNJtahj2Ot6mmqhSvWI3lieV0xlbihuv/yQOuKZD00wV+
- x3t7D3fYW6PLkvW90Ea2aJu0HaMBvzs7Dnexiv2VpV74s0u8Pnv/a0m7171w3ccXguMz
- Y20dDo14ud8thTt/SCuoQ78D+O2FRI2S800RbH+fA7yrx/im9YyEFgpb3uWWtw531rzL
- GZ5WFFhLlOTEG4ciSn9S9lMG7ZL3yyeuG+YaoGpvroF8C69rLUHgMWVJ7b73HoTARQXU
- TAQxEEDdVMXS+g5+82w6XMRRNioDJNlM59iWebkzWtBvw9B5JmZPnw0vF7w2Zvp0VoTe
- 637g==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=huTPPBoARu+fPbSL7slWSJsTxMuwpMghcO3zep6kJHQ=;
+ b=oiZb/YJ0hUwju1/ckK18MbMn1JqLwkn1oV2jd12yS+xb9P0/2WbNf+fK+QKO38ySwV
+ +BH7q+h5vTp8uTV2DhCGABKKbIP1sGcjAg5o6D4nZyeamwdAG3f2zv1ZGwxC4k3nUXkl
+ vBBFZ+x6w/ZzEVIbfSjyWH7OM/OUd6qjXR3rg0wMSs/wcdcaN/uTXEz2kmWKMVtYP3Im
+ XX0n0w35MxkFqOtfZAiz+6w18mq1bE3MN06Q5BxFDHYzecBmuUFr7PO/BWUOfLaiTRph
+ qdCQ1dJ10P7sHE7byMznWvr3jjhKPNSq4EXo8T+pFkT0nk7gXT0yhjCXFC8JZChnSiVd
+ //jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=PwUpGkJnbPW07PC5FnVKpnq3qviosIVPIxfK34xtJ4Y=;
- b=XIrDBxAhDEegYG6GcMy91PfD5pFucO0mP1bQr9iFLmYZtyVbQ/08o8+9sc8v8R1oqh
- dqGIOqqB6PNCucFnQNB0g13y+n5kpyaEYsNX+Yrn0D9QhsFrBhqz6eXgNfgpjrzOUTju
- N0Se8U1u145FDN1lBJ2hqG8/Y+fvC15Ly6t8Is9AF0BYvYQ/+w3eMfmaFgQoo4+jvN+W
- iadojXb6K1LXeba5gKF7qSspBDllVRahIujMD1f2l7zoCavD4XrstEV5hzdxpqugZhLa
- ZqX5jSclGXQ6IYPKg/TTtwrIJfpr7RhGDZJSxpHB/wLip4oncS9i1kHLqOVpAvaJBSJg
- tLzg==
-X-Gm-Message-State: APjAAAW79B0HKzyTUFiEClw5Fsy+2Fax1TFdt4z+CKPyNsk+u+5X6eYg
- scszXZ5R1lCyHpFId8547EXpCMVzBdxNP51Ndys=
-X-Google-Smtp-Source: APXvYqzRgJnweowczKsHPFSR0x3PT9A0JNBdyCUtldC0VFzC9BQZFLH0MDqB3kunEaAYTSaKbMET6OfGNzdz8ibVUvc=
-X-Received: by 2002:aca:4ece:: with SMTP id c197mr2679620oib.53.1582716784996; 
- Wed, 26 Feb 2020 03:33:04 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=huTPPBoARu+fPbSL7slWSJsTxMuwpMghcO3zep6kJHQ=;
+ b=MT44z8VVFUB0s+S2rc1Hi5VAdoUsTOEG23poAPtHRCEcQEsgSLB4zOwFFUv8Q8Yvd7
+ Hj/7T7P589GjP4/AWLfUG2VDaCg9RaxqTlNy12tTUNXpQRRkBrwbzZjrFz0izkgTWua6
+ F2Zpn7IpL3lq7lsQpFv6V2W5Y/OqqthpIclXqY9d818Ri9KLYaOInHidi85GK+9hzzvw
+ 1TWTOhAaWHpZkW5qAv/Thq2IeIrMP8wSm14TIKy37A/2C018zJuKxAh7vEIklcQojfpF
+ cn5S2nIsQW8HpedSV44FZiqojp7LapyX8ttb1+PZ5mQrL5h3Eb0LMGk/G7yhzazBUpg4
+ PX7w==
+X-Gm-Message-State: APjAAAUvQDGu64wagulNhMKpHlakV8wFNGzL6I9ysVE+hOiEdB0Vw6nu
+ LUPaM+0LksogaAzrbdWIsHNZdf2X
+X-Google-Smtp-Source: APXvYqzP3rrl9rrxUgdTcU66ERvhLprd/2+y/R1CBBmCLQ88zU9UfmDU0eGnuyoMXlHTGQgCDrSAYw==
+X-Received: by 2002:adf:ed8e:: with SMTP id c14mr5119275wro.80.1582716642686; 
+ Wed, 26 Feb 2020 03:30:42 -0800 (PST)
+Received: from donizetti.lan ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
+ by smtp.gmail.com with ESMTPSA id h128sm2628154wmh.33.2020.02.26.03.30.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 03:30:42 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 08/18] qemu-doc: split target sections to separate files
+Date: Wed, 26 Feb 2020 12:30:24 +0100
+Message-Id: <20200226113034.6741-9-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200226113034.6741-1-pbonzini@redhat.com>
+References: <20200226113034.6741-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Wed, 26 Feb 2020 03:33:04 -0800 (PST)
-In-Reply-To: <20200225154121.21116-3-peter.maydell@linaro.org>
-References: <20200225154121.21116-1-peter.maydell@linaro.org>
- <20200225154121.21116-3-peter.maydell@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 26 Feb 2020 12:33:04 +0100
-Message-ID: <CAL1e-=gQd7Xb1LZR5nGtjraAFz1AUsHy+_76CZbtL8TuBXX3rQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] docs: Remove the "CPU emulation" part of the
- "Implementation notes"
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000bff4ef059f78f742"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,449 +93,1814 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000bff4ef059f78f742
-Content-Type: text/plain; charset="UTF-8"
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ docs/system/target-arm.texi     | 264 ++++++++++
+ docs/system/target-i386.texi    |  92 ++++
+ docs/system/target-m68k.texi    |  46 ++
+ docs/system/target-mips.texi    | 152 ++++++
+ docs/system/target-ppc.texi     |  78 +++
+ docs/system/target-sparc.texi   |  96 ++++
+ docs/system/target-sparc64.texi |  61 +++
+ docs/system/target-xtensa.texi  |  56 ++
+ qemu-doc.texi                   | 873 +-------------------------------
+ 9 files changed, 853 insertions(+), 865 deletions(-)
+ create mode 100644 docs/system/target-arm.texi
+ create mode 100644 docs/system/target-i386.texi
+ create mode 100644 docs/system/target-m68k.texi
+ create mode 100644 docs/system/target-mips.texi
+ create mode 100644 docs/system/target-ppc.texi
+ create mode 100644 docs/system/target-sparc.texi
+ create mode 100644 docs/system/target-sparc64.texi
+ create mode 100644 docs/system/target-xtensa.texi
 
-On Tuesday, February 25, 2020, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+diff --git a/docs/system/target-arm.texi b/docs/system/target-arm.texi
+new file mode 100644
+index 0000000000..040d77b5e0
+--- /dev/null
++++ b/docs/system/target-arm.texi
+@@ -0,0 +1,264 @@
++@node ARM System emulator
++@section ARM System emulator
++@cindex system emulation (ARM)
++
++Use the executable @file{qemu-system-arm} to simulate a ARM
++machine. The ARM Integrator/CP board is emulated with the following
++devices:
++
++@itemize @minus
++@item
++ARM926E, ARM1026E, ARM946E, ARM1136 or Cortex-A8 CPU
++@item
++Two PL011 UARTs
++@item
++SMC 91c111 Ethernet adapter
++@item
++PL110 LCD controller
++@item
++PL050 KMI with PS/2 keyboard and mouse.
++@item
++PL181 MultiMedia Card Interface with SD card.
++@end itemize
++
++The ARM Versatile baseboard is emulated with the following devices:
++
++@itemize @minus
++@item
++ARM926E, ARM1136 or Cortex-A8 CPU
++@item
++PL190 Vectored Interrupt Controller
++@item
++Four PL011 UARTs
++@item
++SMC 91c111 Ethernet adapter
++@item
++PL110 LCD controller
++@item
++PL050 KMI with PS/2 keyboard and mouse.
++@item
++PCI host bridge.  Note the emulated PCI bridge only provides access to
++PCI memory space.  It does not provide access to PCI IO space.
++This means some devices (eg. ne2k_pci NIC) are not usable, and others
++(eg. rtl8139 NIC) are only usable when the guest drivers use the memory
++mapped control registers.
++@item
++PCI OHCI USB controller.
++@item
++LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices.
++@item
++PL181 MultiMedia Card Interface with SD card.
++@end itemize
++
++Several variants of the ARM RealView baseboard are emulated,
++including the EB, PB-A8 and PBX-A9.  Due to interactions with the
++bootloader, only certain Linux kernel configurations work out
++of the box on these boards.
++
++Kernels for the PB-A8 board should have CONFIG_REALVIEW_HIGH_PHYS_OFFSET
++enabled in the kernel, and expect 512M RAM.  Kernels for The PBX-A9 board
++should have CONFIG_SPARSEMEM enabled, CONFIG_REALVIEW_HIGH_PHYS_OFFSET
++disabled and expect 1024M RAM.
++
++The following devices are emulated:
++
++@itemize @minus
++@item
++ARM926E, ARM1136, ARM11MPCore, Cortex-A8 or Cortex-A9 MPCore CPU
++@item
++ARM AMBA Generic/Distributed Interrupt Controller
++@item
++Four PL011 UARTs
++@item
++SMC 91c111 or SMSC LAN9118 Ethernet adapter
++@item
++PL110 LCD controller
++@item
++PL050 KMI with PS/2 keyboard and mouse
++@item
++PCI host bridge
++@item
++PCI OHCI USB controller
++@item
++LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices
++@item
++PL181 MultiMedia Card Interface with SD card.
++@end itemize
++
++The XScale-based clamshell PDA models ("Spitz", "Akita", "Borzoi"
++and "Terrier") emulation includes the following peripherals:
++
++@itemize @minus
++@item
++Intel PXA270 System-on-chip (ARM V5TE core)
++@item
++NAND Flash memory
++@item
++IBM/Hitachi DSCM microdrive in a PXA PCMCIA slot - not in "Akita"
++@item
++On-chip OHCI USB controller
++@item
++On-chip LCD controller
++@item
++On-chip Real Time Clock
++@item
++TI ADS7846 touchscreen controller on SSP bus
++@item
++Maxim MAX1111 analog-digital converter on I@math{^2}C bus
++@item
++GPIO-connected keyboard controller and LEDs
++@item
++Secure Digital card connected to PXA MMC/SD host
++@item
++Three on-chip UARTs
++@item
++WM8750 audio CODEC on I@math{^2}C and I@math{^2}S busses
++@end itemize
++
++The Palm Tungsten|E PDA (codename "Cheetah") emulation includes the
++following elements:
++
++@itemize @minus
++@item
++Texas Instruments OMAP310 System-on-chip (ARM 925T core)
++@item
++ROM and RAM memories (ROM firmware image can be loaded with -option-rom)
++@item
++On-chip LCD controller
++@item
++On-chip Real Time Clock
++@item
++TI TSC2102i touchscreen controller / analog-digital converter / Audio
++CODEC, connected through MicroWire and I@math{^2}S busses
++@item
++GPIO-connected matrix keypad
++@item
++Secure Digital card connected to OMAP MMC/SD host
++@item
++Three on-chip UARTs
++@end itemize
++
++Nokia N800 and N810 internet tablets (known also as RX-34 and RX-44 / 48)
++emulation supports the following elements:
++
++@itemize @minus
++@item
++Texas Instruments OMAP2420 System-on-chip (ARM 1136 core)
++@item
++RAM and non-volatile OneNAND Flash memories
++@item
++Display connected to EPSON remote framebuffer chip and OMAP on-chip
++display controller and a LS041y3 MIPI DBI-C controller
++@item
++TI TSC2301 (in N800) and TI TSC2005 (in N810) touchscreen controllers
++driven through SPI bus
++@item
++National Semiconductor LM8323-controlled qwerty keyboard driven
++through I@math{^2}C bus
++@item
++Secure Digital card connected to OMAP MMC/SD host
++@item
++Three OMAP on-chip UARTs and on-chip STI debugging console
++@item
++Mentor Graphics "Inventra" dual-role USB controller embedded in a TI
++TUSB6010 chip - only USB host mode is supported
++@item
++TI TMP105 temperature sensor driven through I@math{^2}C bus
++@item
++TI TWL92230C power management companion with an RTC on I@math{^2}C bus
++@item
++Nokia RETU and TAHVO multi-purpose chips with an RTC, connected
++through CBUS
++@end itemize
++
++The Luminary Micro Stellaris LM3S811EVB emulation includes the following
++devices:
++
++@itemize @minus
++@item
++Cortex-M3 CPU core.
++@item
++64k Flash and 8k SRAM.
++@item
++Timers, UARTs, ADC and I@math{^2}C interface.
++@item
++OSRAM Pictiva 96x16 OLED with SSD0303 controller on I@math{^2}C bus.
++@end itemize
++
++The Luminary Micro Stellaris LM3S6965EVB emulation includes the following
++devices:
++
++@itemize @minus
++@item
++Cortex-M3 CPU core.
++@item
++256k Flash and 64k SRAM.
++@item
++Timers, UARTs, ADC, I@math{^2}C and SSI interfaces.
++@item
++OSRAM Pictiva 128x64 OLED with SSD0323 controller connected via SSI.
++@end itemize
++
++The Freecom MusicPal internet radio emulation includes the following
++elements:
++
++@itemize @minus
++@item
++Marvell MV88W8618 ARM core.
++@item
++32 MB RAM, 256 KB SRAM, 8 MB flash.
++@item
++Up to 2 16550 UARTs
++@item
++MV88W8xx8 Ethernet controller
++@item
++MV88W8618 audio controller, WM8750 CODEC and mixer
++@item
++128×64 display with brightness control
++@item
++2 buttons, 2 navigation wheels with button function
++@end itemize
++
++The Siemens SX1 models v1 and v2 (default) basic emulation.
++The emulation includes the following elements:
++
++@itemize @minus
++@item
++Texas Instruments OMAP310 System-on-chip (ARM 925T core)
++@item
++ROM and RAM memories (ROM firmware image can be loaded with -pflash)
++V1
++1 Flash of 16MB and 1 Flash of 8MB
++V2
++1 Flash of 32MB
++@item
++On-chip LCD controller
++@item
++On-chip Real Time Clock
++@item
++Secure Digital card connected to OMAP MMC/SD host
++@item
++Three on-chip UARTs
++@end itemize
++
++A Linux 2.6 test image is available on the QEMU web site. More
++information is available in the QEMU mailing-list archive.
++
++@c man begin OPTIONS
++
++The following options are specific to the ARM emulation:
++
++@table @option
++
++@item -semihosting
++Enable semihosting syscall emulation.
++
++On ARM this implements the "Angel" interface.
++
++Note that this allows guest direct access to the host filesystem,
++so should only be used with trusted guest OS.
++
++@end table
++
++@c man end
++
+diff --git a/docs/system/target-i386.texi b/docs/system/target-i386.texi
+new file mode 100644
+index 0000000000..49ab6dbafc
+--- /dev/null
++++ b/docs/system/target-i386.texi
+@@ -0,0 +1,92 @@
++@node x86 (PC) System emulator
++@section x86 (PC) System emulator
++@cindex system emulation (PC)
++
++@menu
++* pcsys_devices::      Peripherals
++* cpu_models_x86::     CPU models
++* pcsys_req::          OS requirements
++@end menu
++
++@node pcsys_devices
++@subsection Peripherals
++
++@c man begin DESCRIPTION
++
++The QEMU PC System emulator simulates the following peripherals:
++
++@itemize @minus
++@item
++i440FX host PCI bridge and PIIX3 PCI to ISA bridge
++@item
++Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
++extensions (hardware level, including all non standard modes).
++@item
++PS/2 mouse and keyboard
++@item
++2 PCI IDE interfaces with hard disk and CD-ROM support
++@item
++Floppy disk
++@item
++PCI and ISA network adapters
++@item
++Serial ports
++@item
++IPMI BMC, either and internal or external one
++@item
++Creative SoundBlaster 16 sound card
++@item
++ENSONIQ AudioPCI ES1370 sound card
++@item
++Intel 82801AA AC97 Audio compatible sound card
++@item
++Intel HD Audio Controller and HDA codec
++@item
++Adlib (OPL2) - Yamaha YM3812 compatible chip
++@item
++Gravis Ultrasound GF1 sound card
++@item
++CS4231A compatible sound card
++@item
++PCI UHCI, OHCI, EHCI or XHCI USB controller and a virtual USB-1.1 hub.
++@end itemize
++
++SMP is supported with up to 255 CPUs.
++
++QEMU uses the PC BIOS from the Seabios project and the Plex86/Bochs LGPL
++VGA BIOS.
++
++QEMU uses YM3812 emulation by Tatsuyuki Satoh.
++
++QEMU uses GUS emulation (GUSEMU32 @url{http://www.deinmeister.de/gusemu/})
++by Tibor "TS" Schütz.
++
++Note that, by default, GUS shares IRQ(7) with parallel ports and so
++QEMU must be told to not have parallel ports to have working GUS.
++
++@example
++@value{qemu_system_x86} dos.img -soundhw gus -parallel none
++@end example
++
++Alternatively:
++@example
++@value{qemu_system_x86} dos.img -device gus,irq=5
++@end example
++
++Or some other unclaimed IRQ.
++
++CS4231A is the chip used in Windows Sound System and GUSMAX products
++
++@c man end
++
++@lowersections
++@include docs/system/cpu-models-x86.texi
++@raisesections
++
++@node pcsys_req
++@subsection OS requirements
++
++On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
++require the host to be running Linux v4.5 or newer.  Red Hat Enterprise Linux
++7 is also supported, since the required functionality was backported.
++
+diff --git a/docs/system/target-m68k.texi b/docs/system/target-m68k.texi
+new file mode 100644
+index 0000000000..b5bc9df40a
+--- /dev/null
++++ b/docs/system/target-m68k.texi
+@@ -0,0 +1,46 @@
++@node ColdFire System emulator
++@section ColdFire System emulator
++@cindex system emulation (ColdFire)
++@cindex system emulation (M68K)
++
++Use the executable @file{qemu-system-m68k} to simulate a ColdFire machine.
++The emulator is able to boot a uClinux kernel.
++
++The M5208EVB emulation includes the following devices:
++
++@itemize @minus
++@item
++MCF5208 ColdFire V2 Microprocessor (ISA A+ with EMAC).
++@item
++Three Two on-chip UARTs.
++@item
++Fast Ethernet Controller (FEC)
++@end itemize
++
++The AN5206 emulation includes the following devices:
++
++@itemize @minus
++@item
++MCF5206 ColdFire V2 Microprocessor.
++@item
++Two on-chip UARTs.
++@end itemize
++
++@c man begin OPTIONS
++
++The following options are specific to the ColdFire emulation:
++
++@table @option
++
++@item -semihosting
++Enable semihosting syscall emulation.
++
++On M68K this implements the "ColdFire GDB" interface used by libgloss.
++
++Note that this allows guest direct access to the host filesystem,
++so should only be used with trusted guest OS.
++
++@end table
++
++@c man end
++
+diff --git a/docs/system/target-mips.texi b/docs/system/target-mips.texi
+new file mode 100644
+index 0000000000..f722c00912
+--- /dev/null
++++ b/docs/system/target-mips.texi
+@@ -0,0 +1,152 @@
++@node MIPS System emulator
++@section MIPS System emulator
++@cindex system emulation (MIPS)
++
++@menu
++* recommendations_cpu_models_MIPS:: Supported CPU model configurations on MIPS hosts
++* nanoMIPS System emulator ::
++@end menu
++
++Four executables cover simulation of 32 and 64-bit MIPS systems in
++both endian options, @file{qemu-system-mips}, @file{qemu-system-mipsel}
++@file{qemu-system-mips64} and @file{qemu-system-mips64el}.
++Five different machine types are emulated:
++
++@itemize @minus
++@item
++A generic ISA PC-like machine "mips"
++@item
++The MIPS Malta prototype board "malta"
++@item
++An ACER Pica "pica61". This machine needs the 64-bit emulator.
++@item
++MIPS emulator pseudo board "mipssim"
++@item
++A MIPS Magnum R4000 machine "magnum". This machine needs the 64-bit emulator.
++@end itemize
++
++The generic emulation is supported by Debian 'Etch' and is able to
++install Debian into a virtual disk image. The following devices are
++emulated:
++
++@itemize @minus
++@item
++A range of MIPS CPUs, default is the 24Kf
++@item
++PC style serial port
++@item
++PC style IDE disk
++@item
++NE2000 network card
++@end itemize
++
++The Malta emulation supports the following devices:
++
++@itemize @minus
++@item
++Core board with MIPS 24Kf CPU and Galileo system controller
++@item
++PIIX4 PCI/USB/SMbus controller
++@item
++The Multi-I/O chip's serial device
++@item
++PCI network cards (PCnet32 and others)
++@item
++Malta FPGA serial device
++@item
++Cirrus (default) or any other PCI VGA graphics card
++@end itemize
++
++The Boston board emulation supports the following devices:
++
++@itemize @minus
++@item
++Xilinx FPGA, which includes a PCIe root port and an UART
++@item
++Intel EG20T PCH connects the I/O peripherals, but only the SATA bus is emulated
++@end itemize
++
++The ACER Pica emulation supports:
++
++@itemize @minus
++@item
++MIPS R4000 CPU
++@item
++PC-style IRQ and DMA controllers
++@item
++PC Keyboard
++@item
++IDE controller
++@end itemize
++
++The MIPS Magnum R4000 emulation supports:
++
++@itemize @minus
++@item
++MIPS R4000 CPU
++@item
++PC-style IRQ controller
++@item
++PC Keyboard
++@item
++SCSI controller
++@item
++G364 framebuffer
++@end itemize
++
++The Fulong 2E emulation supports:
++
++@itemize @minus
++@item
++Loongson 2E CPU
++@item
++Bonito64 system controller as North Bridge
++@item
++VT82C686 chipset as South Bridge
++@item
++RTL8139D as a network card chipset
++@end itemize
++
++The mipssim pseudo board emulation provides an environment similar
++to what the proprietary MIPS emulator uses for running Linux.
++It supports:
++
++@itemize @minus
++@item
++A range of MIPS CPUs, default is the 24Kf
++@item
++PC style serial port
++@item
++MIPSnet network emulation
++@end itemize
++
++@lowersections
++@include docs/system/cpu-models-mips.texi
++@raisesections
++
++@node nanoMIPS System emulator
++@subsection nanoMIPS System emulator
++@cindex system emulation (nanoMIPS)
++
++Executable @file{qemu-system-mipsel} also covers simulation of
++32-bit nanoMIPS system in little endian mode:
++
++@itemize @minus
++@item
++nanoMIPS I7200 CPU
++@end itemize
++
++Example of @file{qemu-system-mipsel} usage for nanoMIPS is shown below:
++
++Download @code{<disk_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/buildroot/index.html}.
++
++Download @code{<kernel_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/index.html}.
++
++Start system emulation of Malta board with nanoMIPS I7200 CPU:
++@example
++qemu-system-mipsel -cpu I7200 -kernel @code{<kernel_image_file>} \
++    -M malta -serial stdio -m @code{<memory_size>} -hda @code{<disk_image_file>} \
++    -append "mem=256m@@0x0 rw console=ttyS0 vga=cirrus vesa=0x111 root=/dev/sda"
++@end example
++
++
+diff --git a/docs/system/target-ppc.texi b/docs/system/target-ppc.texi
+new file mode 100644
+index 0000000000..c2c254d3d2
+--- /dev/null
++++ b/docs/system/target-ppc.texi
+@@ -0,0 +1,78 @@
++@node PowerPC System emulator
++@section PowerPC System emulator
++@cindex system emulation (PowerPC)
++
++Use the executable @file{qemu-system-ppc} to simulate a complete 40P (PREP)
++or PowerMac PowerPC system.
++
++QEMU emulates the following PowerMac peripherals:
++
++@itemize @minus
++@item
++UniNorth or Grackle PCI Bridge
++@item
++PCI VGA compatible card with VESA Bochs Extensions
++@item
++2 PMAC IDE interfaces with hard disk and CD-ROM support
++@item
++NE2000 PCI adapters
++@item
++Non Volatile RAM
++@item
++VIA-CUDA with ADB keyboard and mouse.
++@end itemize
++
++QEMU emulates the following 40P (PREP) peripherals:
++
++@itemize @minus
++@item
++PCI Bridge
++@item
++PCI VGA compatible card with VESA Bochs Extensions
++@item
++2 IDE interfaces with hard disk and CD-ROM support
++@item
++Floppy disk
++@item
++PCnet network adapters
++@item
++Serial port
++@item
++PREP Non Volatile RAM
++@item
++PC compatible keyboard and mouse.
++@end itemize
++
++Since version 0.9.1, QEMU uses OpenBIOS @url{https://www.openbios.org/}
++for the g3beige and mac99 PowerMac and the 40p machines. OpenBIOS is a free
++(GPL v2) portable firmware implementation. The goal is to implement a 100%
++IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
++
++@c man begin OPTIONS
++
++The following options are specific to the PowerPC emulation:
++
++@table @option
++
++@item -g @var{W}x@var{H}[x@var{DEPTH}]
++
++Set the initial VGA graphic mode. The default is 800x600x32.
++
++@item -prom-env @var{string}
++
++Set OpenBIOS variables in NVRAM, for example:
++
++@example
++qemu-system-ppc -prom-env 'auto-boot?=false' \
++ -prom-env 'boot-device=hd:2,\yaboot' \
++ -prom-env 'boot-args=conf=hd:2,\yaboot.conf'
++@end example
++
++@end table
++
++@c man end
++
++
++More information is available at
++@url{http://perso.magic.fr/l_indien/qemu-ppc/}.
++
+diff --git a/docs/system/target-sparc.texi b/docs/system/target-sparc.texi
+new file mode 100644
+index 0000000000..7fe0aec9c3
+--- /dev/null
++++ b/docs/system/target-sparc.texi
+@@ -0,0 +1,96 @@
++@node Sparc32 System emulator
++@section Sparc32 System emulator
++@cindex system emulation (Sparc32)
++
++Use the executable @file{qemu-system-sparc} to simulate the following
++Sun4m architecture machines:
++@itemize @minus
++@item
++SPARCstation 4
++@item
++SPARCstation 5
++@item
++SPARCstation 10
++@item
++SPARCstation 20
++@item
++SPARCserver 600MP
++@item
++SPARCstation LX
++@item
++SPARCstation Voyager
++@item
++SPARCclassic
++@item
++SPARCbook
++@end itemize
++
++The emulation is somewhat complete. SMP up to 16 CPUs is supported,
++but Linux limits the number of usable CPUs to 4.
++
++QEMU emulates the following sun4m peripherals:
++
++@itemize @minus
++@item
++IOMMU
++@item
++TCX or cgthree Frame buffer
++@item
++Lance (Am7990) Ethernet
++@item
++Non Volatile RAM M48T02/M48T08
++@item
++Slave I/O: timers, interrupt controllers, Zilog serial ports, keyboard
++and power/reset logic
++@item
++ESP SCSI controller with hard disk and CD-ROM support
++@item
++Floppy drive (not on SS-600MP)
++@item
++CS4231 sound device (only on SS-5, not working yet)
++@end itemize
++
++The number of peripherals is fixed in the architecture.  Maximum
++memory size depends on the machine type, for SS-5 it is 256MB and for
++others 2047MB.
++
++Since version 0.8.2, QEMU uses OpenBIOS
++@url{https://www.openbios.org/}. OpenBIOS is a free (GPL v2) portable
++firmware implementation. The goal is to implement a 100% IEEE
++1275-1994 (referred to as Open Firmware) compliant firmware.
++
++A sample Linux 2.6 series kernel and ram disk image are available on
++the QEMU web site. There are still issues with NetBSD and OpenBSD, but
++most kernel versions work. Please note that currently older Solaris kernels
++don't work probably due to interface issues between OpenBIOS and
++Solaris.
++
++@c man begin OPTIONS
++
++The following options are specific to the Sparc32 emulation:
++
++@table @option
++
++@item -g @var{W}x@var{H}x[x@var{DEPTH}]
++
++Set the initial graphics mode. For TCX, the default is 1024x768x8 with the
++option of 1024x768x24. For cgthree, the default is 1024x768x8 with the option
++of 1152x900x8 for people who wish to use OBP.
++
++@item -prom-env @var{string}
++
++Set OpenBIOS variables in NVRAM, for example:
++
++@example
++qemu-system-sparc -prom-env 'auto-boot?=false' \
++ -prom-env 'boot-device=sd(0,2,0):d' -prom-env 'boot-args=linux single'
++@end example
++
++@item -M [SS-4|SS-5|SS-10|SS-20|SS-600MP|LX|Voyager|SPARCClassic] [|SPARCbook]
++
++Set the emulated machine type. Default is SS-5.
++
++@end table
++
++@c man end
++
+diff --git a/docs/system/target-sparc64.texi b/docs/system/target-sparc64.texi
+new file mode 100644
+index 0000000000..9e7a27de0c
+--- /dev/null
++++ b/docs/system/target-sparc64.texi
+@@ -0,0 +1,61 @@
++@node Sparc64 System emulator
++@section Sparc64 System emulator
++@cindex system emulation (Sparc64)
++
++Use the executable @file{qemu-system-sparc64} to simulate a Sun4u
++(UltraSPARC PC-like machine), Sun4v (T1 PC-like machine), or generic
++Niagara (T1) machine. The Sun4u emulator is mostly complete, being
++able to run Linux, NetBSD and OpenBSD in headless (-nographic) mode. The
++Sun4v emulator is still a work in progress.
++
++The Niagara T1 emulator makes use of firmware and OS binaries supplied in the S10image/ directory
++of the OpenSPARC T1 project @url{http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2}
++and is able to boot the disk.s10hw2 Solaris image.
++@example
++qemu-system-sparc64 -M niagara -L /path-to/S10image/ \
++                    -nographic -m 256 \
++                    -drive if=pflash,readonly=on,file=/S10image/disk.s10hw2
++@end example
++
++
++QEMU emulates the following peripherals:
++
++@itemize @minus
++@item
++UltraSparc IIi APB PCI Bridge
++@item
++PCI VGA compatible card with VESA Bochs Extensions
++@item
++PS/2 mouse and keyboard
++@item
++Non Volatile RAM M48T59
++@item
++PC-compatible serial ports
++@item
++2 PCI IDE interfaces with hard disk and CD-ROM support
++@item
++Floppy disk
++@end itemize
++
++@c man begin OPTIONS
++
++The following options are specific to the Sparc64 emulation:
++
++@table @option
++
++@item -prom-env @var{string}
++
++Set OpenBIOS variables in NVRAM, for example:
++
++@example
++qemu-system-sparc64 -prom-env 'auto-boot?=false'
++@end example
++
++@item -M [sun4u|sun4v|niagara]
++
++Set the emulated machine type. The default is sun4u.
++
++@end table
++
++@c man end
++
+diff --git a/docs/system/target-xtensa.texi b/docs/system/target-xtensa.texi
+new file mode 100644
+index 0000000000..08b0b36299
+--- /dev/null
++++ b/docs/system/target-xtensa.texi
+@@ -0,0 +1,56 @@
++@node Xtensa System emulator
++@section Xtensa System emulator
++@cindex system emulation (Xtensa)
++
++Two executables cover simulation of both Xtensa endian options,
++@file{qemu-system-xtensa} and @file{qemu-system-xtensaeb}.
++Two different machine types are emulated:
++
++@itemize @minus
++@item
++Xtensa emulator pseudo board "sim"
++@item
++Avnet LX60/LX110/LX200 board
++@end itemize
++
++The sim pseudo board emulation provides an environment similar
++to one provided by the proprietary Tensilica ISS.
++It supports:
++
++@itemize @minus
++@item
++A range of Xtensa CPUs, default is the DC232B
++@item
++Console and filesystem access via semihosting calls
++@end itemize
++
++The Avnet LX60/LX110/LX200 emulation supports:
++
++@itemize @minus
++@item
++A range of Xtensa CPUs, default is the DC232B
++@item
++16550 UART
++@item
++OpenCores 10/100 Mbps Ethernet MAC
++@end itemize
++
++@c man begin OPTIONS
++
++The following options are specific to the Xtensa emulation:
++
++@table @option
++
++@item -semihosting
++Enable semihosting syscall emulation.
++
++Xtensa semihosting provides basic file IO calls, such as open/read/write/seek/select.
++Tensilica baremetal libc for ISS and linux platform "sim" use this interface.
++
++Note that this allows guest direct access to the host filesystem,
++so should only be used with trusted guest OS.
++
++@end table
++
++@c man end
++
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index dcf7281a00..f702dce455 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -176,874 +176,17 @@ various targets are mentioned in the following sections.
+ * MIPS System emulator::
+ * ARM System emulator::
+ * ColdFire System emulator::
+-* Cris System emulator::
+-* Microblaze System emulator::
+-* SH4 System emulator::
+ * Xtensa System emulator::
+ @end menu
+ 
+-@node x86 (PC) System emulator
+-@section x86 (PC) System emulator
+-@cindex system emulation (PC)
+-
+-@menu
+-* pcsys_devices::      Peripherals
+-* cpu_models_x86::     Supported CPU model configurations on x86 hosts
+-* pcsys_req::          OS requirements
+-@end menu
+-
+-@node pcsys_devices
+-@subsection Peripherals
+-
+-@c man begin DESCRIPTION
+-
+-The QEMU PC System emulator simulates the following peripherals:
+-
+-@itemize @minus
+-@item
+-i440FX host PCI bridge and PIIX3 PCI to ISA bridge
+-@item
+-Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
+-extensions (hardware level, including all non standard modes).
+-@item
+-PS/2 mouse and keyboard
+-@item
+-2 PCI IDE interfaces with hard disk and CD-ROM support
+-@item
+-Floppy disk
+-@item
+-PCI and ISA network adapters
+-@item
+-Serial ports
+-@item
+-IPMI BMC, either and internal or external one
+-@item
+-Creative SoundBlaster 16 sound card
+-@item
+-ENSONIQ AudioPCI ES1370 sound card
+-@item
+-Intel 82801AA AC97 Audio compatible sound card
+-@item
+-Intel HD Audio Controller and HDA codec
+-@item
+-Adlib (OPL2) - Yamaha YM3812 compatible chip
+-@item
+-Gravis Ultrasound GF1 sound card
+-@item
+-CS4231A compatible sound card
+-@item
+-PCI UHCI, OHCI, EHCI or XHCI USB controller and a virtual USB-1.1 hub.
+-@end itemize
+-
+-SMP is supported with up to 255 CPUs.
+-
+-QEMU uses the PC BIOS from the Seabios project and the Plex86/Bochs LGPL
+-VGA BIOS.
+-
+-QEMU uses YM3812 emulation by Tatsuyuki Satoh.
+-
+-QEMU uses GUS emulation (GUSEMU32 @url{http://www.deinmeister.de/gusemu/})
+-by Tibor "TS" Schütz.
+-
+-Note that, by default, GUS shares IRQ(7) with parallel ports and so
+-QEMU must be told to not have parallel ports to have working GUS.
+-
+-@example
+-@value{qemu_system_x86} dos.img -soundhw gus -parallel none
+-@end example
+-
+-Alternatively:
+-@example
+-@value{qemu_system_x86} dos.img -device gus,irq=5
+-@end example
+-
+-Or some other unclaimed IRQ.
+-
+-CS4231A is the chip used in Windows Sound System and GUSMAX products
+-
+-@c man end
+-
+-@lowersections
+-@include docs/system/cpu-models-x86.texi
+-@raisesections
+-
+-@node pcsys_req
+-@subsection OS requirements
+-
+-On x86_64 hosts, the default set of CPU features enabled by the KVM accelerator
+-require the host to be running Linux v4.5 or newer.  Red Hat Enterprise Linux
+-7 is also supported, since the required functionality was backported.
+-
+-@node PowerPC System emulator
+-@section PowerPC System emulator
+-@cindex system emulation (PowerPC)
+-
+-Use the executable @file{qemu-system-ppc} to simulate a complete 40P (PREP)
+-or PowerMac PowerPC system.
+-
+-QEMU emulates the following PowerMac peripherals:
+-
+-@itemize @minus
+-@item
+-UniNorth or Grackle PCI Bridge
+-@item
+-PCI VGA compatible card with VESA Bochs Extensions
+-@item
+-2 PMAC IDE interfaces with hard disk and CD-ROM support
+-@item
+-NE2000 PCI adapters
+-@item
+-Non Volatile RAM
+-@item
+-VIA-CUDA with ADB keyboard and mouse.
+-@end itemize
+-
+-QEMU emulates the following 40P (PREP) peripherals:
+-
+-@itemize @minus
+-@item
+-PCI Bridge
+-@item
+-PCI VGA compatible card with VESA Bochs Extensions
+-@item
+-2 IDE interfaces with hard disk and CD-ROM support
+-@item
+-Floppy disk
+-@item
+-PCnet network adapters
+-@item
+-Serial port
+-@item
+-PREP Non Volatile RAM
+-@item
+-PC compatible keyboard and mouse.
+-@end itemize
+-
+-Since version 0.9.1, QEMU uses OpenBIOS @url{https://www.openbios.org/}
+-for the g3beige and mac99 PowerMac and the 40p machines. OpenBIOS is a free
+-(GPL v2) portable firmware implementation. The goal is to implement a 100%
+-IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the PowerPC emulation:
+-
+-@table @option
+-
+-@item -g @var{W}x@var{H}[x@var{DEPTH}]
+-
+-Set the initial VGA graphic mode. The default is 800x600x32.
+-
+-@item -prom-env @var{string}
+-
+-Set OpenBIOS variables in NVRAM, for example:
+-
+-@example
+-qemu-system-ppc -prom-env 'auto-boot?=false' \
+- -prom-env 'boot-device=hd:2,\yaboot' \
+- -prom-env 'boot-args=conf=hd:2,\yaboot.conf'
+-@end example
+-
+-@end table
+-
+-@c man end
+-
+-
+-More information is available at
+-@url{http://perso.magic.fr/l_indien/qemu-ppc/}.
+-
+-@node Sparc32 System emulator
+-@section Sparc32 System emulator
+-@cindex system emulation (Sparc32)
+-
+-Use the executable @file{qemu-system-sparc} to simulate the following
+-Sun4m architecture machines:
+-@itemize @minus
+-@item
+-SPARCstation 4
+-@item
+-SPARCstation 5
+-@item
+-SPARCstation 10
+-@item
+-SPARCstation 20
+-@item
+-SPARCserver 600MP
+-@item
+-SPARCstation LX
+-@item
+-SPARCstation Voyager
+-@item
+-SPARCclassic
+-@item
+-SPARCbook
+-@end itemize
+-
+-The emulation is somewhat complete. SMP up to 16 CPUs is supported,
+-but Linux limits the number of usable CPUs to 4.
+-
+-QEMU emulates the following sun4m peripherals:
+-
+-@itemize @minus
+-@item
+-IOMMU
+-@item
+-TCX or cgthree Frame buffer
+-@item
+-Lance (Am7990) Ethernet
+-@item
+-Non Volatile RAM M48T02/M48T08
+-@item
+-Slave I/O: timers, interrupt controllers, Zilog serial ports, keyboard
+-and power/reset logic
+-@item
+-ESP SCSI controller with hard disk and CD-ROM support
+-@item
+-Floppy drive (not on SS-600MP)
+-@item
+-CS4231 sound device (only on SS-5, not working yet)
+-@end itemize
+-
+-The number of peripherals is fixed in the architecture.  Maximum
+-memory size depends on the machine type, for SS-5 it is 256MB and for
+-others 2047MB.
+-
+-Since version 0.8.2, QEMU uses OpenBIOS
+-@url{https://www.openbios.org/}. OpenBIOS is a free (GPL v2) portable
+-firmware implementation. The goal is to implement a 100% IEEE
+-1275-1994 (referred to as Open Firmware) compliant firmware.
+-
+-A sample Linux 2.6 series kernel and ram disk image are available on
+-the QEMU web site. There are still issues with NetBSD and OpenBSD, but
+-most kernel versions work. Please note that currently older Solaris kernels
+-don't work probably due to interface issues between OpenBIOS and
+-Solaris.
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the Sparc32 emulation:
+-
+-@table @option
+-
+-@item -g @var{W}x@var{H}x[x@var{DEPTH}]
+-
+-Set the initial graphics mode. For TCX, the default is 1024x768x8 with the
+-option of 1024x768x24. For cgthree, the default is 1024x768x8 with the option
+-of 1152x900x8 for people who wish to use OBP.
+-
+-@item -prom-env @var{string}
+-
+-Set OpenBIOS variables in NVRAM, for example:
+-
+-@example
+-qemu-system-sparc -prom-env 'auto-boot?=false' \
+- -prom-env 'boot-device=sd(0,2,0):d' -prom-env 'boot-args=linux single'
+-@end example
+-
+-@item -M [SS-4|SS-5|SS-10|SS-20|SS-600MP|LX|Voyager|SPARCClassic] [|SPARCbook]
+-
+-Set the emulated machine type. Default is SS-5.
+-
+-@end table
+-
+-@c man end
+-
+-@node Sparc64 System emulator
+-@section Sparc64 System emulator
+-@cindex system emulation (Sparc64)
+-
+-Use the executable @file{qemu-system-sparc64} to simulate a Sun4u
+-(UltraSPARC PC-like machine), Sun4v (T1 PC-like machine), or generic
+-Niagara (T1) machine. The Sun4u emulator is mostly complete, being
+-able to run Linux, NetBSD and OpenBSD in headless (-nographic) mode. The
+-Sun4v emulator is still a work in progress.
+-
+-The Niagara T1 emulator makes use of firmware and OS binaries supplied in the S10image/ directory
+-of the OpenSPARC T1 project @url{http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2}
+-and is able to boot the disk.s10hw2 Solaris image.
+-@example
+-qemu-system-sparc64 -M niagara -L /path-to/S10image/ \
+-                    -nographic -m 256 \
+-                    -drive if=pflash,readonly=on,file=/S10image/disk.s10hw2
+-@end example
+-
+-
+-QEMU emulates the following peripherals:
+-
+-@itemize @minus
+-@item
+-UltraSparc IIi APB PCI Bridge
+-@item
+-PCI VGA compatible card with VESA Bochs Extensions
+-@item
+-PS/2 mouse and keyboard
+-@item
+-Non Volatile RAM M48T59
+-@item
+-PC-compatible serial ports
+-@item
+-2 PCI IDE interfaces with hard disk and CD-ROM support
+-@item
+-Floppy disk
+-@end itemize
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the Sparc64 emulation:
+-
+-@table @option
+-
+-@item -prom-env @var{string}
+-
+-Set OpenBIOS variables in NVRAM, for example:
+-
+-@example
+-qemu-system-sparc64 -prom-env 'auto-boot?=false'
+-@end example
+-
+-@item -M [sun4u|sun4v|niagara]
+-
+-Set the emulated machine type. The default is sun4u.
+-
+-@end table
+-
+-@c man end
+-
+-@node MIPS System emulator
+-@section MIPS System emulator
+-@cindex system emulation (MIPS)
+-
+-@menu
+-* recommendations_cpu_models_MIPS:: Supported CPU model configurations on MIPS hosts
+-* nanoMIPS System emulator ::
+-@end menu
+-
+-Four executables cover simulation of 32 and 64-bit MIPS systems in
+-both endian options, @file{qemu-system-mips}, @file{qemu-system-mipsel}
+-@file{qemu-system-mips64} and @file{qemu-system-mips64el}.
+-Five different machine types are emulated:
+-
+-@itemize @minus
+-@item
+-A generic ISA PC-like machine "mips"
+-@item
+-The MIPS Malta prototype board "malta"
+-@item
+-An ACER Pica "pica61". This machine needs the 64-bit emulator.
+-@item
+-MIPS emulator pseudo board "mipssim"
+-@item
+-A MIPS Magnum R4000 machine "magnum". This machine needs the 64-bit emulator.
+-@end itemize
+-
+-The generic emulation is supported by Debian 'Etch' and is able to
+-install Debian into a virtual disk image. The following devices are
+-emulated:
+-
+-@itemize @minus
+-@item
+-A range of MIPS CPUs, default is the 24Kf
+-@item
+-PC style serial port
+-@item
+-PC style IDE disk
+-@item
+-NE2000 network card
+-@end itemize
+-
+-The Malta emulation supports the following devices:
+-
+-@itemize @minus
+-@item
+-Core board with MIPS 24Kf CPU and Galileo system controller
+-@item
+-PIIX4 PCI/USB/SMbus controller
+-@item
+-The Multi-I/O chip's serial device
+-@item
+-PCI network cards (PCnet32 and others)
+-@item
+-Malta FPGA serial device
+-@item
+-Cirrus (default) or any other PCI VGA graphics card
+-@end itemize
+-
+-The Boston board emulation supports the following devices:
+-
+-@itemize @minus
+-@item
+-Xilinx FPGA, which includes a PCIe root port and an UART
+-@item
+-Intel EG20T PCH connects the I/O peripherals, but only the SATA bus is emulated
+-@end itemize
+-
+-The ACER Pica emulation supports:
+-
+-@itemize @minus
+-@item
+-MIPS R4000 CPU
+-@item
+-PC-style IRQ and DMA controllers
+-@item
+-PC Keyboard
+-@item
+-IDE controller
+-@end itemize
+-
+-The MIPS Magnum R4000 emulation supports:
+-
+-@itemize @minus
+-@item
+-MIPS R4000 CPU
+-@item
+-PC-style IRQ controller
+-@item
+-PC Keyboard
+-@item
+-SCSI controller
+-@item
+-G364 framebuffer
+-@end itemize
+-
+-The Fulong 2E emulation supports:
+-
+-@itemize @minus
+-@item
+-Loongson 2E CPU
+-@item
+-Bonito64 system controller as North Bridge
+-@item
+-VT82C686 chipset as South Bridge
+-@item
+-RTL8139D as a network card chipset
+-@end itemize
+-
+-The mipssim pseudo board emulation provides an environment similar
+-to what the proprietary MIPS emulator uses for running Linux.
+-It supports:
+-
+-@itemize @minus
+-@item
+-A range of MIPS CPUs, default is the 24Kf
+-@item
+-PC style serial port
+-@item
+-MIPSnet network emulation
+-@end itemize
+-
+-@lowersections
+-@include docs/system/cpu-models-mips.texi
+-@raisesections
+-
+-@node nanoMIPS System emulator
+-@subsection nanoMIPS System emulator
+-@cindex system emulation (nanoMIPS)
+-
+-Executable @file{qemu-system-mipsel} also covers simulation of
+-32-bit nanoMIPS system in little endian mode:
+-
+-@itemize @minus
+-@item
+-nanoMIPS I7200 CPU
+-@end itemize
+-
+-Example of @file{qemu-system-mipsel} usage for nanoMIPS is shown below:
+-
+-Download @code{<disk_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/buildroot/index.html}.
+-
+-Download @code{<kernel_image_file>} from @url{https://mipsdistros.mips.com/LinuxDistro/nanomips/kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/index.html}.
+-
+-Start system emulation of Malta board with nanoMIPS I7200 CPU:
+-@example
+-qemu-system-mipsel -cpu I7200 -kernel @code{<kernel_image_file>} \
+-    -M malta -serial stdio -m @code{<memory_size>} -hda @code{<disk_image_file>} \
+-    -append "mem=256m@@0x0 rw console=ttyS0 vga=cirrus vesa=0x111 root=/dev/sda"
+-@end example
+-
+-
+-@node ARM System emulator
+-@section ARM System emulator
+-@cindex system emulation (ARM)
+-
+-Use the executable @file{qemu-system-arm} to simulate a ARM
+-machine. The ARM Integrator/CP board is emulated with the following
+-devices:
+-
+-@itemize @minus
+-@item
+-ARM926E, ARM1026E, ARM946E, ARM1136 or Cortex-A8 CPU
+-@item
+-Two PL011 UARTs
+-@item
+-SMC 91c111 Ethernet adapter
+-@item
+-PL110 LCD controller
+-@item
+-PL050 KMI with PS/2 keyboard and mouse.
+-@item
+-PL181 MultiMedia Card Interface with SD card.
+-@end itemize
+-
+-The ARM Versatile baseboard is emulated with the following devices:
+-
+-@itemize @minus
+-@item
+-ARM926E, ARM1136 or Cortex-A8 CPU
+-@item
+-PL190 Vectored Interrupt Controller
+-@item
+-Four PL011 UARTs
+-@item
+-SMC 91c111 Ethernet adapter
+-@item
+-PL110 LCD controller
+-@item
+-PL050 KMI with PS/2 keyboard and mouse.
+-@item
+-PCI host bridge.  Note the emulated PCI bridge only provides access to
+-PCI memory space.  It does not provide access to PCI IO space.
+-This means some devices (eg. ne2k_pci NIC) are not usable, and others
+-(eg. rtl8139 NIC) are only usable when the guest drivers use the memory
+-mapped control registers.
+-@item
+-PCI OHCI USB controller.
+-@item
+-LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices.
+-@item
+-PL181 MultiMedia Card Interface with SD card.
+-@end itemize
+-
+-Several variants of the ARM RealView baseboard are emulated,
+-including the EB, PB-A8 and PBX-A9.  Due to interactions with the
+-bootloader, only certain Linux kernel configurations work out
+-of the box on these boards.
+-
+-Kernels for the PB-A8 board should have CONFIG_REALVIEW_HIGH_PHYS_OFFSET
+-enabled in the kernel, and expect 512M RAM.  Kernels for The PBX-A9 board
+-should have CONFIG_SPARSEMEM enabled, CONFIG_REALVIEW_HIGH_PHYS_OFFSET
+-disabled and expect 1024M RAM.
+-
+-The following devices are emulated:
+-
+-@itemize @minus
+-@item
+-ARM926E, ARM1136, ARM11MPCore, Cortex-A8 or Cortex-A9 MPCore CPU
+-@item
+-ARM AMBA Generic/Distributed Interrupt Controller
+-@item
+-Four PL011 UARTs
+-@item
+-SMC 91c111 or SMSC LAN9118 Ethernet adapter
+-@item
+-PL110 LCD controller
+-@item
+-PL050 KMI with PS/2 keyboard and mouse
+-@item
+-PCI host bridge
+-@item
+-PCI OHCI USB controller
+-@item
+-LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM devices
+-@item
+-PL181 MultiMedia Card Interface with SD card.
+-@end itemize
+-
+-The XScale-based clamshell PDA models ("Spitz", "Akita", "Borzoi"
+-and "Terrier") emulation includes the following peripherals:
+-
+-@itemize @minus
+-@item
+-Intel PXA270 System-on-chip (ARM V5TE core)
+-@item
+-NAND Flash memory
+-@item
+-IBM/Hitachi DSCM microdrive in a PXA PCMCIA slot - not in "Akita"
+-@item
+-On-chip OHCI USB controller
+-@item
+-On-chip LCD controller
+-@item
+-On-chip Real Time Clock
+-@item
+-TI ADS7846 touchscreen controller on SSP bus
+-@item
+-Maxim MAX1111 analog-digital converter on I@math{^2}C bus
+-@item
+-GPIO-connected keyboard controller and LEDs
+-@item
+-Secure Digital card connected to PXA MMC/SD host
+-@item
+-Three on-chip UARTs
+-@item
+-WM8750 audio CODEC on I@math{^2}C and I@math{^2}S busses
+-@end itemize
+-
+-The Palm Tungsten|E PDA (codename "Cheetah") emulation includes the
+-following elements:
+-
+-@itemize @minus
+-@item
+-Texas Instruments OMAP310 System-on-chip (ARM 925T core)
+-@item
+-ROM and RAM memories (ROM firmware image can be loaded with -option-rom)
+-@item
+-On-chip LCD controller
+-@item
+-On-chip Real Time Clock
+-@item
+-TI TSC2102i touchscreen controller / analog-digital converter / Audio
+-CODEC, connected through MicroWire and I@math{^2}S busses
+-@item
+-GPIO-connected matrix keypad
+-@item
+-Secure Digital card connected to OMAP MMC/SD host
+-@item
+-Three on-chip UARTs
+-@end itemize
+-
+-Nokia N800 and N810 internet tablets (known also as RX-34 and RX-44 / 48)
+-emulation supports the following elements:
+-
+-@itemize @minus
+-@item
+-Texas Instruments OMAP2420 System-on-chip (ARM 1136 core)
+-@item
+-RAM and non-volatile OneNAND Flash memories
+-@item
+-Display connected to EPSON remote framebuffer chip and OMAP on-chip
+-display controller and a LS041y3 MIPI DBI-C controller
+-@item
+-TI TSC2301 (in N800) and TI TSC2005 (in N810) touchscreen controllers
+-driven through SPI bus
+-@item
+-National Semiconductor LM8323-controlled qwerty keyboard driven
+-through I@math{^2}C bus
+-@item
+-Secure Digital card connected to OMAP MMC/SD host
+-@item
+-Three OMAP on-chip UARTs and on-chip STI debugging console
+-@item
+-Mentor Graphics "Inventra" dual-role USB controller embedded in a TI
+-TUSB6010 chip - only USB host mode is supported
+-@item
+-TI TMP105 temperature sensor driven through I@math{^2}C bus
+-@item
+-TI TWL92230C power management companion with an RTC on I@math{^2}C bus
+-@item
+-Nokia RETU and TAHVO multi-purpose chips with an RTC, connected
+-through CBUS
+-@end itemize
+-
+-The Luminary Micro Stellaris LM3S811EVB emulation includes the following
+-devices:
+-
+-@itemize @minus
+-@item
+-Cortex-M3 CPU core.
+-@item
+-64k Flash and 8k SRAM.
+-@item
+-Timers, UARTs, ADC and I@math{^2}C interface.
+-@item
+-OSRAM Pictiva 96x16 OLED with SSD0303 controller on I@math{^2}C bus.
+-@end itemize
+-
+-The Luminary Micro Stellaris LM3S6965EVB emulation includes the following
+-devices:
+-
+-@itemize @minus
+-@item
+-Cortex-M3 CPU core.
+-@item
+-256k Flash and 64k SRAM.
+-@item
+-Timers, UARTs, ADC, I@math{^2}C and SSI interfaces.
+-@item
+-OSRAM Pictiva 128x64 OLED with SSD0323 controller connected via SSI.
+-@end itemize
+-
+-The Freecom MusicPal internet radio emulation includes the following
+-elements:
+-
+-@itemize @minus
+-@item
+-Marvell MV88W8618 ARM core.
+-@item
+-32 MB RAM, 256 KB SRAM, 8 MB flash.
+-@item
+-Up to 2 16550 UARTs
+-@item
+-MV88W8xx8 Ethernet controller
+-@item
+-MV88W8618 audio controller, WM8750 CODEC and mixer
+-@item
+-128×64 display with brightness control
+-@item
+-2 buttons, 2 navigation wheels with button function
+-@end itemize
+-
+-The Siemens SX1 models v1 and v2 (default) basic emulation.
+-The emulation includes the following elements:
+-
+-@itemize @minus
+-@item
+-Texas Instruments OMAP310 System-on-chip (ARM 925T core)
+-@item
+-ROM and RAM memories (ROM firmware image can be loaded with -pflash)
+-V1
+-1 Flash of 16MB and 1 Flash of 8MB
+-V2
+-1 Flash of 32MB
+-@item
+-On-chip LCD controller
+-@item
+-On-chip Real Time Clock
+-@item
+-Secure Digital card connected to OMAP MMC/SD host
+-@item
+-Three on-chip UARTs
+-@end itemize
+-
+-A Linux 2.6 test image is available on the QEMU web site. More
+-information is available in the QEMU mailing-list archive.
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the ARM emulation:
+-
+-@table @option
+-
+-@item -semihosting
+-Enable semihosting syscall emulation.
+-
+-On ARM this implements the "Angel" interface.
+-
+-Note that this allows guest direct access to the host filesystem,
+-so should only be used with trusted guest OS.
+-
+-@end table
+-
+-@c man end
+-
+-@node ColdFire System emulator
+-@section ColdFire System emulator
+-@cindex system emulation (ColdFire)
+-@cindex system emulation (M68K)
+-
+-Use the executable @file{qemu-system-m68k} to simulate a ColdFire machine.
+-The emulator is able to boot a uClinux kernel.
+-
+-The M5208EVB emulation includes the following devices:
+-
+-@itemize @minus
+-@item
+-MCF5208 ColdFire V2 Microprocessor (ISA A+ with EMAC).
+-@item
+-Three Two on-chip UARTs.
+-@item
+-Fast Ethernet Controller (FEC)
+-@end itemize
+-
+-The AN5206 emulation includes the following devices:
+-
+-@itemize @minus
+-@item
+-MCF5206 ColdFire V2 Microprocessor.
+-@item
+-Two on-chip UARTs.
+-@end itemize
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the ColdFire emulation:
+-
+-@table @option
+-
+-@item -semihosting
+-Enable semihosting syscall emulation.
+-
+-On M68K this implements the "ColdFire GDB" interface used by libgloss.
+-
+-Note that this allows guest direct access to the host filesystem,
+-so should only be used with trusted guest OS.
+-
+-@end table
+-
+-@c man end
+-
+-@node Cris System emulator
+-@section Cris System emulator
+-@cindex system emulation (Cris)
+-
+-TODO
+-
+-@node Microblaze System emulator
+-@section Microblaze System emulator
+-@cindex system emulation (Microblaze)
+-
+-TODO
+-
+-@node SH4 System emulator
+-@section SH4 System emulator
+-@cindex system emulation (SH4)
+-
+-TODO
+-
+-@node Xtensa System emulator
+-@section Xtensa System emulator
+-@cindex system emulation (Xtensa)
+-
+-Two executables cover simulation of both Xtensa endian options,
+-@file{qemu-system-xtensa} and @file{qemu-system-xtensaeb}.
+-Two different machine types are emulated:
+-
+-@itemize @minus
+-@item
+-Xtensa emulator pseudo board "sim"
+-@item
+-Avnet LX60/LX110/LX200 board
+-@end itemize
+-
+-The sim pseudo board emulation provides an environment similar
+-to one provided by the proprietary Tensilica ISS.
+-It supports:
+-
+-@itemize @minus
+-@item
+-A range of Xtensa CPUs, default is the DC232B
+-@item
+-Console and filesystem access via semihosting calls
+-@end itemize
+-
+-The Avnet LX60/LX110/LX200 emulation supports:
+-
+-@itemize @minus
+-@item
+-A range of Xtensa CPUs, default is the DC232B
+-@item
+-16550 UART
+-@item
+-OpenCores 10/100 Mbps Ethernet MAC
+-@end itemize
+-
+-@c man begin OPTIONS
+-
+-The following options are specific to the Xtensa emulation:
+-
+-@table @option
+-
+-@item -semihosting
+-Enable semihosting syscall emulation.
+-
+-Xtensa semihosting provides basic file IO calls, such as open/read/write/seek/select.
+-Tensilica baremetal libc for ISS and linux platform "sim" use this interface.
+-
+-Note that this allows guest direct access to the host filesystem,
+-so should only be used with trusted guest OS.
+-
+-@end table
+-
+-@c man end
++@include docs/system/target-i386.texi
++@include docs/system/target-ppc.texi
++@include docs/system/target-sparc.texi
++@include docs/system/target-sparc64.texi
++@include docs/system/target-mips.texi
++@include docs/system/target-arm.texi
++@include docs/system/target-m68k.texi
++@include docs/system/target-xtensa.texi
+ 
+ @include docs/security.texi
+ 
+-- 
+2.21.1
 
-> The "CPU emulation" part of the "Implementation notes" in
-> qemu-tech.texi looks like it is documenting what features of various
-> CPUs we do or don't emulate.  However:
->  * it covers only six of our 21 guest architectures
->  * the last time anybody updated it for actual content was in
->    2011/2012 for Xtensa; the content for the other five
->    architectures is even older, being from 2008 or before!
->
-> What we have is out of date, misleading and incomplete.
-> Just delete this part of the document rather than trying to
-> convert it to rST.
->
-> (It would be nice eventually to have documentation of the
-> scope and limitations of our emulation; but we will want to
-> separate out the generic "system emulation" information from
-> the parts that are specific to linux-user anyway, as they will
-> be in different manuals.)
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
 
-
-I agree with the intent and the outcome of this patch, including the last
-paragraph in braces.
-
-FWIW:
-
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-
- qemu-tech.texi | 153 -------------------------------------------------
->  1 file changed, 153 deletions(-)
->
-> diff --git a/qemu-tech.texi b/qemu-tech.texi
-> index 0380de77b62..35da6a40af1 100644
-> --- a/qemu-tech.texi
-> +++ b/qemu-tech.texi
-> @@ -2,162 +2,9 @@
->  @appendix Implementation notes
->
->  @menu
-> -* CPU emulation::
->  * Managed start up options::
->  @end menu
->
-> -@node CPU emulation
-> -@section CPU emulation
-> -
-> -@menu
-> -* x86::     x86 and x86-64 emulation
-> -* ARM::     ARM emulation
-> -* MIPS::    MIPS emulation
-> -* PPC::     PowerPC emulation
-> -* SPARC::   Sparc32 and Sparc64 emulation
-> -* Xtensa::  Xtensa emulation
-> -@end menu
-> -
-> -@node x86
-> -@subsection x86 and x86-64 emulation
-> -
-> -QEMU x86 target features:
-> -
-> -@itemize
-> -
-> -@item The virtual x86 CPU supports 16 bit and 32 bit addressing with
-> segmentation.
-> -LDT/GDT and IDT are emulated. VM86 mode is also supported to run
-> -DOSEMU. There is some support for MMX/3DNow!, SSE, SSE2, SSE3, SSSE3,
-> -and SSE4 as well as x86-64 SVM.
-> -
-> -@item Support of host page sizes bigger than 4KB in user mode emulation.
-> -
-> -@item QEMU can emulate itself on x86.
-> -
-> -@item An extensive Linux x86 CPU test program is included
-> @file{tests/test-i386}.
-> -It can be used to test other x86 virtual CPUs.
-> -
-> -@end itemize
-> -
-> -Current QEMU limitations:
-> -
-> -@itemize
-> -
-> -@item Limited x86-64 support.
-> -
-> -@item IPC syscalls are missing.
-> -
-> -@item The x86 segment limits and access rights are not tested at every
-> -memory access (yet). Hopefully, very few OSes seem to rely on that for
-> -normal use.
-> -
-> -@end itemize
-> -
-> -@node ARM
-> -@subsection ARM emulation
-> -
-> -@itemize
-> -
-> -@item Full ARM 7 user emulation.
-> -
-> -@item NWFPE FPU support included in user Linux emulation.
-> -
-> -@item Can run most ARM Linux binaries.
-> -
-> -@end itemize
-> -
-> -@node MIPS
-> -@subsection MIPS emulation
-> -
-> -@itemize
-> -
-> -@item The system emulation allows full MIPS32/MIPS64 Release 2 emulation,
-> -including privileged instructions, FPU and MMU, in both little and big
-> -endian modes.
-> -
-> -@item The Linux userland emulation can run many 32 bit MIPS Linux
-> binaries.
-> -
-> -@end itemize
-> -
-> -Current QEMU limitations:
-> -
-> -@itemize
-> -
-> -@item Self-modifying code is not always handled correctly.
-> -
-> -@item 64 bit userland emulation is not implemented.
-> -
-> -@item The system emulation is not complete enough to run real firmware.
-> -
-> -@item The watchpoint debug facility is not implemented.
-> -
-> -@end itemize
-> -
-> -@node PPC
-> -@subsection PowerPC emulation
-> -
-> -@itemize
-> -
-> -@item Full PowerPC 32 bit emulation, including privileged instructions,
-> -FPU and MMU.
-> -
-> -@item Can run most PowerPC Linux binaries.
-> -
-> -@end itemize
-> -
-> -@node SPARC
-> -@subsection Sparc32 and Sparc64 emulation
-> -
-> -@itemize
-> -
-> -@item Full SPARC V8 emulation, including privileged
-> -instructions, FPU and MMU. SPARC V9 emulation includes most privileged
-> -and VIS instructions, FPU and I/D MMU. Alignment is fully enforced.
-> -
-> -@item Can run most 32-bit SPARC Linux binaries, SPARC32PLUS Linux
-> binaries and
-> -some 64-bit SPARC Linux binaries.
-> -
-> -@end itemize
-> -
-> -Current QEMU limitations:
-> -
-> -@itemize
-> -
-> -@item IPC syscalls are missing.
-> -
-> -@item Floating point exception support is buggy.
-> -
-> -@item Atomic instructions are not correctly implemented.
-> -
-> -@item There are still some problems with Sparc64 emulators.
-> -
-> -@end itemize
-> -
-> -@node Xtensa
-> -@subsection Xtensa emulation
-> -
-> -@itemize
-> -
-> -@item Core Xtensa ISA emulation, including most options: code density,
-> -loop, extended L32R, 16- and 32-bit multiplication, 32-bit division,
-> -MAC16, miscellaneous operations, boolean, FP coprocessor, coprocessor
-> -context, debug, multiprocessor synchronization,
-> -conditional store, exceptions, relocatable vectors, unaligned exception,
-> -interrupts (including high priority and timer), hardware alignment,
-> -region protection, region translation, MMU, windowed registers, thread
-> -pointer, processor ID.
-> -
-> -@item Not implemented options: data/instruction cache (including cache
-> -prefetch and locking), XLMI, processor interface. Also options not
-> -covered by the core ISA (e.g. FLIX, wide branches) are not implemented.
-> -
-> -@item Can run most Xtensa Linux binaries.
-> -
-> -@item New core configuration that requires no additional instructions
-> -may be created from overlay with minimal amount of hand-written code.
-> -
-> -@end itemize
-> -
->  @node Managed start up options
->  @section Managed start up options
->
-> --
-> 2.20.1
->
->
->
-
---000000000000bff4ef059f78f742
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Tuesday, February 25, 2020, Peter Maydell &lt;<a href=3D"mailto:=
-peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br><block=
-quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
- solid;padding-left:1ex">The &quot;CPU emulation&quot; part of the &quot;Im=
-plementation notes&quot; in<br>
-qemu-tech.texi looks like it is documenting what features of various<br>
-CPUs we do or don&#39;t emulate.=C2=A0 However:<br>
-=C2=A0* it covers only six of our 21 guest architectures<br>
-=C2=A0* the last time anybody updated it for actual content was in<br>
-=C2=A0 =C2=A02011/2012 for Xtensa; the content for the other five<br>
-=C2=A0 =C2=A0architectures is even older, being from 2008 or before!<br>
-<br>
-What we have is out of date, misleading and incomplete.<br>
-Just delete this part of the document rather than trying to<br>
-convert it to rST.<br>
-<br>
-(It would be nice eventually to have documentation of the<br>
-scope and limitations of our emulation; but we will want to<br>
-separate out the generic &quot;system emulation&quot; information from<br>
-the parts that are specific to linux-user anyway, as they will<br>
-be in different manuals.)<br>
-<br>
-Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
-">peter.maydell@linaro.org</a>&gt;<br>
----</blockquote><div><br></div><div>I agree with the intent and the outcome=
- of this patch, including the last paragraph in braces.</div><div>=C2=A0</d=
-iv><div>FWIW:</div><div><br></div><div>Reviewed-by: Aleksandar Markovic &lt=
-;<a href=3D"mailto:amarkovic@wavecomp.com">amarkovic@wavecomp.com</a>&gt;</=
-div><div><br></div><div><br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0qemu-tech.texi | 153 ------------------------------<wbr>-------------=
-------<br>
-=C2=A01 file changed, 153 deletions(-)<br>
-<br>
-diff --git a/qemu-tech.texi b/qemu-tech.texi<br>
-index 0380de77b62..35da6a40af1 100644<br>
---- a/qemu-tech.texi<br>
-+++ b/qemu-tech.texi<br>
-@@ -2,162 +2,9 @@<br>
-=C2=A0@appendix Implementation notes<br>
-<br>
-=C2=A0@menu<br>
--* CPU emulation::<br>
-=C2=A0* Managed start up options::<br>
-=C2=A0@end menu<br>
-<br>
--@node CPU emulation<br>
--@section CPU emulation<br>
--<br>
--@menu<br>
--* x86::=C2=A0 =C2=A0 =C2=A0x86 and x86-64 emulation<br>
--* ARM::=C2=A0 =C2=A0 =C2=A0ARM emulation<br>
--* MIPS::=C2=A0 =C2=A0 MIPS emulation<br>
--* PPC::=C2=A0 =C2=A0 =C2=A0PowerPC emulation<br>
--* SPARC::=C2=A0 =C2=A0Sparc32 and Sparc64 emulation<br>
--* Xtensa::=C2=A0 Xtensa emulation<br>
--@end menu<br>
--<br>
--@node x86<br>
--@subsection x86 and x86-64 emulation<br>
--<br>
--QEMU x86 target features:<br>
--<br>
--@itemize<br>
--<br>
--@item The virtual x86 CPU supports 16 bit and 32 bit addressing with segme=
-ntation.<br>
--LDT/GDT and IDT are emulated. VM86 mode is also supported to run<br>
--DOSEMU. There is some support for MMX/3DNow!, SSE, SSE2, SSE3, SSSE3,<br>
--and SSE4 as well as x86-64 SVM.<br>
--<br>
--@item Support of host page sizes bigger than 4KB in user mode emulation.<b=
-r>
--<br>
--@item QEMU can emulate itself on x86.<br>
--<br>
--@item An extensive Linux x86 CPU test program is included @file{tests/test=
--i386}.<br>
--It can be used to test other x86 virtual CPUs.<br>
--<br>
--@end itemize<br>
--<br>
--Current QEMU limitations:<br>
--<br>
--@itemize<br>
--<br>
--@item Limited x86-64 support.<br>
--<br>
--@item IPC syscalls are missing.<br>
--<br>
--@item The x86 segment limits and access rights are not tested at every<br>
--memory access (yet). Hopefully, very few OSes seem to rely on that for<br>
--normal use.<br>
--<br>
--@end itemize<br>
--<br>
--@node ARM<br>
--@subsection ARM emulation<br>
--<br>
--@itemize<br>
--<br>
--@item Full ARM 7 user emulation.<br>
--<br>
--@item NWFPE FPU support included in user Linux emulation.<br>
--<br>
--@item Can run most ARM Linux binaries.<br>
--<br>
--@end itemize<br>
--<br>
--@node MIPS<br>
--@subsection MIPS emulation<br>
--<br>
--@itemize<br>
--<br>
--@item The system emulation allows full MIPS32/MIPS64 Release 2 emulation,<=
-br>
--including privileged instructions, FPU and MMU, in both little and big<br>
--endian modes.<br>
--<br>
--@item The Linux userland emulation can run many 32 bit MIPS Linux binaries=
-.<br>
--<br>
--@end itemize<br>
--<br>
--Current QEMU limitations:<br>
--<br>
--@itemize<br>
--<br>
--@item Self-modifying code is not always handled correctly.<br>
--<br>
--@item 64 bit userland emulation is not implemented.<br>
--<br>
--@item The system emulation is not complete enough to run real firmware.<br=
->
--<br>
--@item The watchpoint debug facility is not implemented.<br>
--<br>
--@end itemize<br>
--<br>
--@node PPC<br>
--@subsection PowerPC emulation<br>
--<br>
--@itemize<br>
--<br>
--@item Full PowerPC 32 bit emulation, including privileged instructions,<br=
->
--FPU and MMU.<br>
--<br>
--@item Can run most PowerPC Linux binaries.<br>
--<br>
--@end itemize<br>
--<br>
--@node SPARC<br>
--@subsection Sparc32 and Sparc64 emulation<br>
--<br>
--@itemize<br>
--<br>
--@item Full SPARC V8 emulation, including privileged<br>
--instructions, FPU and MMU. SPARC V9 emulation includes most privileged<br>
--and VIS instructions, FPU and I/D MMU. Alignment is fully enforced.<br>
--<br>
--@item Can run most 32-bit SPARC Linux binaries, SPARC32PLUS Linux binaries=
- and<br>
--some 64-bit SPARC Linux binaries.<br>
--<br>
--@end itemize<br>
--<br>
--Current QEMU limitations:<br>
--<br>
--@itemize<br>
--<br>
--@item IPC syscalls are missing.<br>
--<br>
--@item Floating point exception support is buggy.<br>
--<br>
--@item Atomic instructions are not correctly implemented.<br>
--<br>
--@item There are still some problems with Sparc64 emulators.<br>
--<br>
--@end itemize<br>
--<br>
--@node Xtensa<br>
--@subsection Xtensa emulation<br>
--<br>
--@itemize<br>
--<br>
--@item Core Xtensa ISA emulation, including most options: code density,<br>
--loop, extended L32R, 16- and 32-bit multiplication, 32-bit division,<br>
--MAC16, miscellaneous operations, boolean, FP coprocessor, coprocessor<br>
--context, debug, multiprocessor synchronization,<br>
--conditional store, exceptions, relocatable vectors, unaligned exception,<b=
-r>
--interrupts (including high priority and timer), hardware alignment,<br>
--region protection, region translation, MMU, windowed registers, thread<br>
--pointer, processor ID.<br>
--<br>
--@item Not implemented options: data/instruction cache (including cache<br>
--prefetch and locking), XLMI, processor interface. Also options not<br>
--covered by the core ISA (e.g. FLIX, wide branches) are not implemented.<br=
->
--<br>
--@item Can run most Xtensa Linux binaries.<br>
--<br>
--@item New core configuration that requires no additional instructions<br>
--may be created from overlay with minimal amount of hand-written code.<br>
--<br>
--@end itemize<br>
--<br>
-=C2=A0@node Managed start up options<br>
-=C2=A0@section Managed start up options<br>
-=C2=A0<br>
--- <br>
-2.20.1<br>
-<br>
-<br>
-</blockquote>
-
---000000000000bff4ef059f78f742--
 
