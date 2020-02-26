@@ -2,72 +2,101 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EE2C4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5757FC4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:07:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 792652084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:06:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 792652084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 22EC92084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:07:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XthpVrTG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22EC92084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6seU-0003oq-NM
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:06:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58340)
+	id 1j6sem-0004T8-Aj
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:07:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58535)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j6sdV-0002wM-Jv
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:05:49 -0500
+ (envelope-from <mst@redhat.com>) id 1j6sds-0003GJ-S8
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j6sdR-0006TO-Rz
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:05:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59324)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j6sdR-0006SF-Kk
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:05:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j6sdP-0000kX-W1
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:05:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EDEA32E8025
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:05:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Feb 2020 08:54:20 -0000
-From: Peter Vegh <1864814@bugs.launchpad.net>
+ (envelope-from <mst@redhat.com>) id 1j6sdo-0006lf-0T
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:06:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39635
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6sdn-0006kP-Sr
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:06:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582707963;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5Sbkpo7K4fbQQabaezht/7HSdtDe1em0zHLb8IleaCg=;
+ b=XthpVrTGcCRci7yavTpg32xCbHcPORxC9tuDLDqb+wSNw+mmcQTIaeh8LMOYrES8nazVbV
+ caAPgIfcMYqgJApR+SCTYblDXecfU8VtOp07FbNMUh+XG0gc59N4x/ivTZgdmfYfcu/85X
+ DYohfAOX/75dNcs7nc68PdIJWu6rWTo=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-Z9riQ2-8NAe2PXDxiuCylA-1; Wed, 26 Feb 2020 04:06:01 -0500
+X-MC-Unique: Z9riQ2-8NAe2PXDxiuCylA-1
+Received: by mail-qv1-f71.google.com with SMTP id f17so3074966qvi.6
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 01:06:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=HQCVFXmC4HNrtLa78+UIIIU3F1sBdIpmGro+wxgLStc=;
+ b=IeJayRzSUBQ6cEtyTHZXqvW1YdB+3aXVMvnMlHqdne9SXA+zhbL3gxiEjgiCk2rSw9
+ fW7tiUSeU8S8YRza2joZ/iuwBws3XUjKl8aqgutLLBk0CD9vUW6yROSnLPRQmoSWnXdC
+ akOkYrwvqAEwgi0y2fe4oHO0hbJt5hOsyUmtvvcgxKulzIDz4XUiIirbCGG27Fb+Dr58
+ wAE0DqICgMl7T0F1YZNJZFIdcTUd/GSv8LEDjW/CPvan10ISGuEVkFnXG84SRtHBgnof
+ YwMRl21yVUyCcoG9PedV6g2sK1fnGN8ThO/xgyfydcoLbupOP2Xg6ieJ/TEqdJ/A75Uf
+ PXyg==
+X-Gm-Message-State: APjAAAWx2I1ccOD5gk3qh915El9hlfoF4gtgJnPPw5KejRDD5nPh03kI
+ 0bTxPUPK39tg5rmM4KIQec/me/lGF34klmte35+Lje9C3kB4ERki0kSepRJqB12fdPLSebIynbM
+ YEXrhYUafCiYJbbQ=
+X-Received: by 2002:ac8:42de:: with SMTP id g30mr4106860qtm.195.1582707960708; 
+ Wed, 26 Feb 2020 01:06:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy1QkWk7My2SwC62w1LQ6SDOyzhpUJKG+7jW51YBG5mGQALUAUK4aMdAZaU/qH85Z05CBwmLQ==
+X-Received: by 2002:ac8:42de:: with SMTP id g30mr4106833qtm.195.1582707960500; 
+ Wed, 26 Feb 2020 01:06:00 -0800 (PST)
+Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
+ by smtp.gmail.com with ESMTPSA id
+ o3sm786655qkk.87.2020.02.26.01.05.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 01:05:59 -0800 (PST)
+Date: Wed, 26 Feb 2020 04:01:34 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pbuntu1
-X-Launchpad-Bug-Reporter: Peter Vegh (pbuntu1)
-X-Launchpad-Bug-Modifier: Peter Vegh (pbuntu1)
-Message-Id: <158270726043.14146.8926447072185498744.malonedeb@wampee.canonical.com>
-Subject: [Bug 1864814] [NEW] Improve UX for macOS when launching from a
- fullscreen app
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a6659bf9503a55c970afb363ace5ab971cf4f322
+Subject: [PULL v2 07/30] virtio-pmem: do delete rq_vq in virtio_pmem_unrealize
+Message-ID: <20200226090010.708934-8-mst@redhat.com>
+References: <20200226090010.708934-1-mst@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20200226090010.708934-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,79 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1864814 <1864814@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-System/setup:
-* MacBook Pro, macOS (any version from the last 2 years), external monitor.
-* IDE on the laptop, emulator is used on the external monitor.
+Similar to other virtio-devices, rq_vq forgot to delete in
+virtio_pmem_unrealize, this patch fix it.  This device has already
+maintained a vq pointer, thus we use the new virtio_delete_queue
+function directly to do the cleanup.
 
-Currently, when starting the emulator from e.g. Android Studio or
-IntelliJ IDEA, which is set to fullscreen mode on the laptop, which is
-like it's own virtual desktop (Space) in macOS, what happens is this:
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Message-Id: <20200225075554.10835-4-pannengyuan@huawei.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio-pmem.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-1. The virtual desktop (Space) on the laptop screen is switched because of =
-#2. The reason is that only one window can be shown in Fullscreen this way.
-2. The qemu splashscreen is shown for a few seconds, then it disappears. Th=
-is is the reason for the virtual desktop switch. This splashscreen seems ac=
-tually unnecessary to me, it has no value and it causes problems.
-3. The actual emulator is shown, in my case on the external monitor (correc=
-tly). I guess if the splashscreen would not be shown, the virtual desktop s=
-witch would not happen, because the emulator would happen on the correct sc=
-reen directly.
+diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+index 97287e923b..43399522f5 100644
+--- a/hw/virtio/virtio-pmem.c
++++ b/hw/virtio/virtio-pmem.c
+@@ -130,6 +130,7 @@ static void virtio_pmem_unrealize(DeviceState *dev, Err=
+or **errp)
+     VirtIOPMEM *pmem =3D VIRTIO_PMEM(dev);
+=20
+     host_memory_backend_set_mapped(pmem->memdev, false);
++    virtio_delete_queue(pmem->rq_vq);
+     virtio_cleanup(vdev);
+ }
+=20
+--=20
+MST
 
-So maybe the splashscreen and the emulator window should be the same window=
-, so that the OS can remember it's position being the same as the emulator?
-Or maybe the splash could be disabled (by default? otherwise an update to I=
-DEs would be necessary for the improved behavior?)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1864814
-
-Title:
-  Improve UX for macOS when launching from a fullscreen app
-
-Status in QEMU:
-  New
-
-Bug description:
-  System/setup:
-  * MacBook Pro, macOS (any version from the last 2 years), external monito=
-r.
-  * IDE on the laptop, emulator is used on the external monitor.
-
-  Currently, when starting the emulator from e.g. Android Studio or
-  IntelliJ IDEA, which is set to fullscreen mode on the laptop, which is
-  like it's own virtual desktop (Space) in macOS, what happens is this:
-
-  1. The virtual desktop (Space) on the laptop screen is switched because o=
-f #2. The reason is that only one window can be shown in Fullscreen this wa=
-y.
-  2. The qemu splashscreen is shown for a few seconds, then it disappears. =
-This is the reason for the virtual desktop switch. This splashscreen seems =
-actually unnecessary to me, it has no value and it causes problems.
-  3. The actual emulator is shown, in my case on the external monitor (corr=
-ectly). I guess if the splashscreen would not be shown, the virtual desktop=
- switch would not happen, because the emulator would happen on the correct =
-screen directly.
-
-  So maybe the splashscreen and the emulator window should be the same wind=
-ow, so that the OS can remember it's position being the same as the emulato=
-r?
-  Or maybe the splash could be disabled (by default? otherwise an update to=
- IDEs would be necessary for the improved behavior?)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1864814/+subscriptions
 
