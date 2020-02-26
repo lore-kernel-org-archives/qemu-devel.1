@@ -2,101 +2,82 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F78C4BA24
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16785C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:46:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86F8820658
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:45:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F8820658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D40BA20658
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:46:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n91aUiDr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40BA20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j75Qk-0005P1-NA
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:45:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36634)
+	id 1j75Ry-0006oy-3G
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:46:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1j75Pk-0004pw-UY
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:44:26 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j75Qj-0005ZJ-8z
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:45:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1j75Pj-0004q4-J7
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:44:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35703)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1j75Pg-0004aa-7r; Wed, 26 Feb 2020 17:44:20 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QMfnj7156416; Wed, 26 Feb 2020 17:44:17 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydh91mx2v-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 17:44:17 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01QMgRwT157720;
- Wed, 26 Feb 2020 17:44:16 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydh91mx2h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 17:44:16 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01QMeYZE028220;
- Wed, 26 Feb 2020 22:44:15 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma05wdc.us.ibm.com with ESMTP id 2ydcmkrm0n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 22:44:15 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01QMiEZY48300340
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 22:44:14 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CE73728059;
- Wed, 26 Feb 2020 22:44:14 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B8AD828058;
- Wed, 26 Feb 2020 22:44:14 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 22:44:14 +0000 (GMT)
-Subject: Re: [PATCH v4 00/10] vTPM for aarch64
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200226205942.11424-1-eric.auger@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <4fb16117-f9d3-61af-9198-931590a46e3d@linux.ibm.com>
-Date: Wed, 26 Feb 2020 17:44:14 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j75Qh-0006qJ-QI
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:45:25 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:34471)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j75Qh-0006nI-KY; Wed, 26 Feb 2020 17:45:23 -0500
+Received: by mail-io1-xd41.google.com with SMTP id 13so1043276iou.1;
+ Wed, 26 Feb 2020 14:45:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5d1CV6r8BklASQY1Jw4Nc/D3ajahverohW7nU9wCTOk=;
+ b=n91aUiDrlq6g4XBz8gLfsch1Sdv0yb/AxWVYPvsZfFrAioQumPPxE6SRR1Pdd8hOHV
+ SIygIrQ3bM3uuoqr10vKef+XWFrPndPSkdpmeIrX3ZR2QlLmbne+ZtabsH4EZB15WYg7
+ WOM0hWGp8AFXdaR0XTBAyh7XZ5QPOQhkotgOpncNaxFjlDXYLBx2fPpm1tZjvFwVJ94+
+ p1bAsCuUsSXZxy/6bDhnYkUpges7GeaKZJ7VjMUcygaKC+e6XEnbc1ZOHRPOHrIyashs
+ YL3tZIzHw+AXIlNi3ODLlttWCImseRcsLWJVwxMm8QX6VcvecMttxVeEN5GVlFjEBNU6
+ daXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5d1CV6r8BklASQY1Jw4Nc/D3ajahverohW7nU9wCTOk=;
+ b=jQ7DtDW2/KpxFyZ+lsG0QRrjlF6DERL+JRd9NwiC32j8H0tfeI4zX65qgC+/SA6ary
+ dzPF/8hMaVzCI6vpyEpeKsfwK/F4dbJ6pvx9fsREA6VZErXd+qPGYPL72c6z2laaKQxq
+ 2AvwUy9gf7PVlYXC1Hs8eU1SDsd7mvfYm5JAimAYNBl57MKnBlYpTIDVuJCbTgT1ZQcF
+ AJVx7xg8tGD1bUIsob9UnHJAGnTKL7PBf+SMErYeXdpK6iU7g+28mKhnb+x/zHd54Rwn
+ u+KA5kDFxgS5b+FaVm27ZZW53McG9rcbzmVxhMrk3fS2hJ1D1OIvX34Ao1ZHKITRtVXO
+ 80DA==
+X-Gm-Message-State: APjAAAWdWKRUManBxoKq3gjpqwTt4V0A9q82FHfd0JNg3APnMCUnkPCJ
+ aL8cBig4O3092mUMyZYAScQ0XzCubSa7JY5eXcs=
+X-Google-Smtp-Source: APXvYqys2shB5B44WqTI79gVgZGmWe6rf78IBGLvPcwvI5LpvV5z93EFK5WmZ4RQvmt7Lvt5FcIZkW43Onx3AtBA0yU=
+X-Received: by 2002:a05:6602:158e:: with SMTP id
+ e14mr993421iow.217.1582757122279; 
+ Wed, 26 Feb 2020 14:45:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200226205942.11424-1-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-26_09:2020-02-26,
- 2020-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0
- malwarescore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002260135
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id 01QMfnj7156416
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+References: <20200226181020.19592-1-alex.bennee@linaro.org>
+ <20200226181020.19592-5-alex.bennee@linaro.org>
+In-Reply-To: <20200226181020.19592-5-alex.bennee@linaro.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Wed, 26 Feb 2020 23:45:11 +0100
+Message-ID: <CAPan3WqTdC9+Vc3SvUEs+KUW7Ow-MuyJ0PewUH6aPNs44LdJsg@mail.gmail.com>
+Subject: Re: [PATCH v1 4/4] accel/tcg: increase default code gen buffer size
+ for 64 bit
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000000a3d9f059f825cf4"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,149 +89,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
- philmd@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/26/20 3:59 PM, Eric Auger wrote:
-> This series adds the capability to instantiate an MMIO TPM TIS
-> in ARM virt. It is candidate to qemu 5.0.
+--0000000000000a3d9f059f825cf4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I queued it now here:=20
-https://github.com/stefanberger/qemu-tpm/commits/tpm-next
+Hi Alex,
 
-I will send the PR within a few days. Thanks!
+On Wed, Feb 26, 2020 at 7:13 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
 
-Cheers,
-
- =C2=A0=C2=A0 Stefan
-
-
-
->
-> The existing TPM TIS code is reshuffled into a generic part,
-> the ISA device and the sysbus device. The sysbus TPM-TIS
-> device gets dynamically instantiated in machvirt on the
-> platform bus.
->
-> ACPI boot is not yet supported on ARM. Note that the UEFI
-> firmware is itself a consumer of the DT description, so we
-> need the DT related changes regardless of whether the VM
-> boots in DT or ACPI mode.
->
-> Related qtests are reshuffled to allow the reuse of existing
-> tests for both the ISA and the sysbus devices: Adaption
-> consists in changing the qemu command line (change in the
-> device name and provide explicit machine options) and adapt
-> to the relocation of the TPM-TIS device in the memory map.
->
-> The series was tested with the swtpm/libtpms emulator.
-> Automatic guest LUKS volume unlocking (tpm2) was successful.
-> EDK2 support is under development [3]. Thanks to Ard
-> for supporting me when setting up the test environment.
->
-> Best Regards
->
-> Eric
->
-> Testing:
->
-> mkdir /tmp/tpm
-> swtpm socket \
-> --tpm2 \
-> -t -d \
-> --tpmstate dir=3D/tmp/tpm \
-> --ctrl type=3Dunixio,path=3D/tmp/swtpm-sock
->
-> qemu command line must be augmented with the following options:
->
-> -chardev socket,id=3Dchrtpm,path=3D/tmp/swtpm-sock \
-> -tpmdev emulator,id=3Dtpm0,chardev=3Dchrtpm \
-> -device tpm-tis-device,tpmdev=3Dtpm0 \
->
-> References:
-> [1] libtpms: https://github.com/stefanberger/libtpms/wiki
-> [2] swtpm: https://github.com/stefanberger/swtpm/wiki
-> [3] [PATCH v3 0/9] ArmVirtPkg: implement measured boot for ArmVirtQemu
->
-> This series can be found at:
-> https://github.com/eauger/qemu/tree/v4.2.0-tpm-patch-v4
->
-> History:
->
-> v3 -> v4:
-> - collect additional R-b's
-> - add 'Not used but needed for linking' mention related to
->    tpm_tis_base_addr in CRB test files
-> - fix comment style
->
-> RFCv2 -> PATCH v3:
-> - Updated the doc for ARM
-> - Adapted existing tests for ARM
-> - use qemu_fdt_setprop_string in add_tpm_tis_fdt_node
-> - Collected R-b's
-> - Comments not taken into account:
->    - I have kept the tpm-tis-device name for now despite Stefan's
->      suggestion to rename it into tpm-tis-sysbus. This is not
->      frozen though
->    - Common state still is not a QOM object (no double inheritence)
->
-> RFC v1 -> RFC v2:
-> - restructure the existing code with common, ISA and sysbus part.
-> - both ARM and x86 integration were tested.
->
-> Eric Auger (10):
->    tpm: rename TPM_TIS into TPM_TIS_ISA
->    tpm: Use TPMState as a common struct
->    tpm: Separate tpm_tis common functions from isa code
->    tpm: Separate TPM_TIS and TPM_TIS_ISA configs
->    tpm: Add the SysBus TPM TIS device
->    hw/arm/virt: vTPM support
->    docs/specs/tpm: Document TPM_TIS sysbus device for ARM
->    test: tpm: pass optional machine options to swtpm test functions
->    test: tpm-tis: Get prepared to share tests between ISA and sysbus
->      devices
->    test: tpm-tis: Add Sysbus TPM-TIS device test
->
->   default-configs/i386-softmmu.mak        |   2 +-
->   docs/specs/tpm.rst                      |  25 +-
->   hw/arm/Kconfig                          |   1 +
->   hw/arm/sysbus-fdt.c                     |  33 ++
->   hw/arm/virt.c                           |   7 +
->   hw/i386/Kconfig                         |   2 +-
->   hw/i386/acpi-build.c                    |   6 +-
->   hw/tpm/Kconfig                          |  12 +-
->   hw/tpm/Makefile.objs                    |   4 +-
->   hw/tpm/tpm_tis.h                        |  91 +++++
->   hw/tpm/{tpm_tis.c =3D> tpm_tis_common.c}  | 181 +---------
->   hw/tpm/tpm_tis_isa.c                    | 170 +++++++++
->   hw/tpm/tpm_tis_sysbus.c                 | 159 +++++++++
->   include/sysemu/tpm.h                    |   7 +-
->   tests/qtest/Makefile.include            |  11 +-
->   tests/qtest/tpm-crb-swtpm-test.c        |   9 +-
->   tests/qtest/tpm-crb-test.c              |   3 +
->   tests/qtest/tpm-tests.c                 |  10 +-
->   tests/qtest/tpm-tests.h                 |   5 +-
->   tests/qtest/tpm-tis-device-swtpm-test.c |  76 ++++
->   tests/qtest/tpm-tis-device-test.c       |  87 +++++
->   tests/qtest/tpm-tis-swtpm-test.c        |   8 +-
->   tests/qtest/tpm-tis-test.c              | 414 +---------------------
->   tests/qtest/tpm-tis-util.c              | 451 +++++++++++++++++++++++=
-+
->   tests/qtest/tpm-tis-util.h              |  23 ++
->   tests/qtest/tpm-util.c                  |  11 +-
->   tests/qtest/tpm-util.h                  |   8 +-
->   27 files changed, 1207 insertions(+), 609 deletions(-)
->   create mode 100644 hw/tpm/tpm_tis.h
->   rename hw/tpm/{tpm_tis.c =3D> tpm_tis_common.c} (85%)
->   create mode 100644 hw/tpm/tpm_tis_isa.c
->   create mode 100644 hw/tpm/tpm_tis_sysbus.c
->   create mode 100644 tests/qtest/tpm-tis-device-swtpm-test.c
->   create mode 100644 tests/qtest/tpm-tis-device-test.c
->   create mode 100644 tests/qtest/tpm-tis-util.c
->   create mode 100644 tests/qtest/tpm-tis-util.h
+> While 32mb is certainly usable a full system boot ends up flushing the
+> codegen buffer nearly 100 times. Increase the default on 64 bit hosts
+> to take advantage of all that spare memory. After this change I can
+> boot my tests system without any TB flushes.
 >
 
+That great, with this change I'm seeing a performance improvement when
+running the avocado tests for cubieboard.
+It runs about 4-5 seconds faster. My host is Ubuntu 18.04 on 64-bit.
+
+I don't know much about the internals of TCG nor how it actually uses the
+cache,
+but it seems logical to me that increasing the cache size would improve
+performance.
+
+What I'm wondering is: will this also result in TCG translating larger
+chunks in one shot, so potentially
+taking more time to do the translation? If so, could it perhaps affect more
+latency sensitive code?
+
+
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+
+
+> ---
+>  accel/tcg/translate-all.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 4ce5d1b3931..f7baa512059 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -929,7 +929,11 @@ static void page_lock_pair(PageDesc **ret_p1,
+> tb_page_addr_t phys1,
+>  # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+>  #endif
+>
+> +#if TCG_TARGET_REG_BITS =3D=3D 32
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)
+> +#else
+> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (2 * GiB)
+> +#endif
+>
+
+The qemu process now takes up more virtual memory, about ~2.5GiB in my
+test, which can be expected with this change.
+
+Is it very likely that the TCG cache will be filled quickly and completely?
+I'm asking because I also use Qemu to do automated testing
+where the nodes are 64-bit but each have only 2GiB physical RAM.
+
+Regards,
+Niek
+
+
+>
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE \
+>    (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
+> --
+> 2.20.1
+>
+>
+>
+
+--=20
+Niek Linnenbank
+
+--0000000000000a3d9f059f825cf4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi Alex,<br></div><br><div class=3D"gmail_quote"><div=
+ dir=3D"ltr" class=3D"gmail_attr">On Wed, Feb 26, 2020 at 7:13 PM Alex Benn=
+=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.or=
+g</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+>While 32mb is certainly usable a full system boot ends up flushing the<br>
+codegen buffer nearly 100 times. Increase the default on 64 bit hosts<br>
+to take advantage of all that spare memory. After this change I can<br>
+boot my tests system without any TB flushes.<br></blockquote><div><br></div=
+><div>That great, with this change I&#39;m seeing a performance improvement=
+ when running the avocado tests for cubieboard.</div><div>It runs about 4-5=
+ seconds faster. My host is Ubuntu 18.04 on 64-bit.</div><div><br></div><di=
+v>I don&#39;t know much about the internals of TCG nor how it actually uses=
+ the cache,</div><div>but it seems logical to me that increasing the cache =
+size would improve performance.</div><div><br></div><div>What I&#39;m wonde=
+ring is: will this also result in TCG translating larger chunks in one shot=
+, so potentially</div><div>taking more time to do the translation? If so, c=
+ould it perhaps affect more latency sensitive code?</div><div>=C2=A0</div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
+eft:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
+g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br></blockquote><div>Te=
+sted-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">ni=
+eklinnenbank@gmail.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0accel/tcg/translate-all.c | 4 ++++<br>
+=C2=A01 file changed, 4 insertions(+)<br>
+<br>
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
+index 4ce5d1b3931..f7baa512059 100644<br>
+--- a/accel/tcg/translate-all.c<br>
++++ b/accel/tcg/translate-all.c<br>
+@@ -929,7 +929,11 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_=
+addr_t phys1,<br>
+=C2=A0# define MAX_CODE_GEN_BUFFER_SIZE=C2=A0 ((size_t)-1)<br>
+=C2=A0#endif<br>
+<br>
++#if TCG_TARGET_REG_BITS =3D=3D 32<br>
+=C2=A0#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)<br>
++#else<br>
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (2 * GiB)<br>
++#endif<br></blockquote><div><br></div><div><div>The qemu process now takes=
+ up more virtual memory, about ~2.5GiB in my test, which can be expected wi=
+th this change.</div><div><br></div><div>Is it very likely that the TCG cac=
+he will be filled quickly and completely? I&#39;m asking because I also use=
+ Qemu to do automated testing</div><div>where the nodes are 64-bit but each=
+ have only 2GiB physical RAM.</div><div><br></div><div>Regards,</div><div>N=
+iek<br></div></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">
+<br>
+=C2=A0#define DEFAULT_CODE_GEN_BUFFER_SIZE \<br>
+=C2=A0 =C2=A0(DEFAULT_CODE_GEN_BUFFER_SIZE_1 &lt; MAX_CODE_GEN_BUFFER_SIZE =
+\<br>
+-- <br>
+2.20.1<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--0000000000000a3d9f059f825cf4--
 
