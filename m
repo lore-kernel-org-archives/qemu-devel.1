@@ -1,88 +1,82 @@
 Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEF5C4BA18
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D94DC4BA18
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:06:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B54620801
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28E7C206E6
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:06:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NaOJCMMs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B54620801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmaCMbrv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E7C206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j708P-0005Xf-DZ
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:06:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38412)
+	id 1j708v-0006ds-BS
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:06:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <programmingkidx@gmail.com>) id 1j7070-0004Rk-Ns
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:04:44 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j707q-0005AZ-75
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <programmingkidx@gmail.com>) id 1j706y-0007ab-TH
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:04:42 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39182)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
- id 1j706y-0007Md-Dn; Wed, 26 Feb 2020 12:04:40 -0500
-Received: by mail-lj1-x242.google.com with SMTP id o15so3944605ljg.6;
- Wed, 26 Feb 2020 09:04:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9g9JAEFBabOEuVsE3+Aj/EUGVTXQuPQ10SJm3NYyXnQ=;
- b=NaOJCMMs1+EJczm681cR0ldqEXr3NsEkKdQZB5j/5MeL6g2dq8jgp3Ubl1BNtJqOEj
- 0ygucQWzC2/xTc2UygYel9Fgpp0HNSwoTSPxrptF9rR3Ibp137paOmJZq/m/GArRW4BW
- ZtaXqdDIGH7GLk5l6JRdUkMJFuNbey44PK6koFbGHwYZ89V+L4KU52BQTrbmGV/Hggb8
- J8lDItVY04ptXZBUKI+EoTH7i4shImh8fIlRzpFxr7iknRSnw+hHnzNRFjauS/YUARfM
- RAXgbnoKRdVR9M4Y1xwTETAxK6oqAFFAY9gdpt64SNMPQo3M94iAYBeyLZsM4uTh0ZTT
- Vxyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9g9JAEFBabOEuVsE3+Aj/EUGVTXQuPQ10SJm3NYyXnQ=;
- b=EC4+HzwEQYLDQ30FCAFmsJgHl5o5RrXpmu0Nh/weoEf4+ARPuKWHSVpVCW2S9lYWKt
- BOZPhSlpzIANPll0ac/F6G86pMilVsGOVGH04N3coMG2suOkB3zLjR/fbCOKEnkUFdzT
- uhOviVvsGjk+BQbt+9mZHb00IMXSQEqeT2tuIsARCIVujSccqu7gjSNMESHn5AWy7fJ4
- AT/OjYXDja71Uj8uOXzqWVfM5OpSa5e1OUccw4aQgZwyfCgpE4H7/auXMUYb2k0ZH1aL
- xrfQ/zTMe3Ng4ziD0/47LkHzGjTBE097Y3AXo5RXaM2DFpW0Jk3pp/stBwirJ48mUGpX
- X32g==
-X-Gm-Message-State: ANhLgQ1zcZyagrd7shuCZqc80PieXkWQnxlj9Sf3cOAp4WfApgQ15LGQ
- fvfEb550tSiFQNXq6048OKh2PMpVbZEtMaAQrw0=
-X-Google-Smtp-Source: APXvYqyOEvTPF4fh/Poe0eR/NcetdtXlqpyNdpKPE/2yQply2O8QxVy5vSUMlwqsDfTFBUegajuFfRV5BM5zHdRevug=
-X-Received: by 2002:a2e:99c5:: with SMTP id l5mr3490883ljj.88.1582736678436;
- Wed, 26 Feb 2020 09:04:38 -0800 (PST)
+ (envelope-from <eric.auger@redhat.com>) id 1j707o-0003GX-Il
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:05:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40222
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j707k-0003CK-BN
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:05:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582736727;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fiMsdSkcu0d/zaxBgsd4aL2q7dO5OqlYmsSRAPcXRGk=;
+ b=OmaCMbrvU3slUD/4EAsl6xaTmSPYmVTgH0gPPszjyo776XegdV3T04Y9E6PlBZrTpCdD/e
+ JOxSgiozDHeZ2iISNhgfst+f+gkeKvW28pNTB9X5s1ir0fJ00MPFE+85aG0yTef0wTZ1w+
+ eTMCq3ArPMBXgoLAb1tmPwb05DuwU0s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-qg8SwqGVMLuiPFbyRemx8A-1; Wed, 26 Feb 2020 12:05:25 -0500
+X-MC-Unique: qg8SwqGVMLuiPFbyRemx8A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F9CF800D55;
+ Wed, 26 Feb 2020 17:05:19 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 24A0861069;
+ Wed, 26 Feb 2020 17:05:13 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+Subject: [RFC 1/2] target/arm/kvm: Let kvm_arm_vgic_probe() return a bitmap
+Date: Wed, 26 Feb 2020 18:04:59 +0100
+Message-Id: <20200226170500.17028-2-eric.auger@redhat.com>
+In-Reply-To: <20200226170500.17028-1-eric.auger@redhat.com>
+References: <20200226170500.17028-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87eeuhxw0y.fsf@linaro.org>
- <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
-In-Reply-To: <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, 26 Feb 2020 12:04:26 -0500
-Message-ID: <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
-Subject: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000007dc369059f7d9997"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,186 +88,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
- Dino Papararo <skizzato73@msn.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: maz@kernel.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007dc369059f7d9997
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Let convert kvm_arm_vgic_probe() so that it returns a
+bitmap of supported VGIC versions. This allows to expose
+the case where the host GICv3 also supports GICv2 emulation.
 
-Accuracy is an important part of the IEEE 754 floating point standard. The
-whole purpose of this standard is to ensure floating point calculations are
-consistent across multiple CPUs. I believe referring to this patch as
-inaccurate is itself inaccurate. That gives the impression that this patch
-produces calculations that are not inline with established standards. This
-is not true. The only part of this patch that will produce incorrect values
-are the flags. There *may* be a program or two out there that depend on
-these flags, but for the majority of programs that only care about basic
-floating point arithmetic this patch will produce correct values. Currently
-the emulated PowerPC's FPU already produces wrong values for the flags.
-This patch does set the Inexact flag (which I don't like), but since I have
-never encountered any source code that cares for this flag, I can let it
-go. I think giving the user the ability to decide which option to use is
-the best thing to do.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ hw/arm/virt.c        | 11 +++++++++--
+ target/arm/kvm.c     | 14 ++++++++------
+ target/arm/kvm_arm.h |  3 +++
+ 3 files changed, 20 insertions(+), 8 deletions(-)
 
-On Wed, Feb 26, 2020 at 10:51 AM Aleksandar Markovic <
-aleksandar.m.mail@gmail.com> wrote:
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e591a126e7..a196bbf0d5 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1540,11 +1540,18 @@ static void machvirt_init(MachineState *machine)
+                 vms->gic_version =3D 3;
+             }
+         } else {
+-            vms->gic_version =3D kvm_arm_vgic_probe();
+-            if (!vms->gic_version) {
++            int probe_bitmap =3D kvm_arm_vgic_probe();
++
++            if (!probe_bitmap) {
+                 error_report(
+                     "Unable to determine GIC version supported by host");
+                 exit(1);
++            } else {
++                if (probe_bitmap & KVM_ARM_VGIC_V3) {
++                    vms->gic_version =3D 3;
++                } else {
++                    vms->gic_version =3D 2;
++                }
+             }
+         }
+     }
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 85860e6f95..390077c518 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -874,15 +874,17 @@ int kvm_arch_irqchip_create(KVMState *s)
+=20
+ int kvm_arm_vgic_probe(void)
+ {
++    int val =3D 0;
++
+     if (kvm_create_device(kvm_state,
+                           KVM_DEV_TYPE_ARM_VGIC_V3, true) =3D=3D 0) {
+-        return 3;
+-    } else if (kvm_create_device(kvm_state,
+-                                 KVM_DEV_TYPE_ARM_VGIC_V2, true) =3D=3D 0)=
+ {
+-        return 2;
+-    } else {
+-        return 0;
++        val |=3D KVM_ARM_VGIC_V3;
+     }
++    if (kvm_create_device(kvm_state,
++                          KVM_DEV_TYPE_ARM_VGIC_V2, true) =3D=3D 0) {
++        val |=3D KVM_ARM_VGIC_V2;
++    }
++    return val;
+ }
+=20
+ int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level)
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index ae9e075d75..48bf5e16d5 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -15,6 +15,9 @@
+ #include "exec/memory.h"
+ #include "qemu/error-report.h"
+=20
++#define KVM_ARM_VGIC_V2   (1 << 0)
++#define KVM_ARM_VGIC_V3   (1 << 1)
++
+ /**
+  * kvm_arm_vcpu_init:
+  * @cs: CPUState
+--=20
+2.20.1
 
->
->
-> On Wed, Feb 26, 2020 at 3:29 PM Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> wrote:
-> >
-> >
-> > Dino Papararo <skizzato73@msn.com> writes:
-> >
-> > > Please let's go with hardfloat pps support, it's really a good featur=
-e
-> to implement.
-> > > Even if in a first step it could lead to inaccuracy results, later it
-> > > could solved with other patches.
-> >
-> > That's the wrong way around. We have regression tests for a reason.
->
-> I tend to agree with Alex here, and additionally want to expand more on
-> this topic.
->
-> In my view: (that I think is at least very close to the community
-> consensus)
->
-> This is *not* a ppc-specific issue. There exist a principle across all
-> targets
-> that QEMU FPU calculation must be accurate - exactly as specified in any
-> applicable particular ISA document. Any discrepancy is an outright bug.
->
-> We even recently had several patches for FPU in ppc target that handled
-> some fairly obscure cases of inaccuracies, I believe they were authored
-> by Paul Clarke, so there are people in ppc community that care about
-> FPU accuracy (as I guess is the case for any target).
->
-> There shouldn't be a target that decides by itself and within itself
-> "ok, we don't need accuracy, let's trade it for speed". This violates
-> the architecture of QEMU. Please allow that for any given software
-> project, there is an architecture that should be respected.
->
-> This doesn't mean that anybody's experimentation is discouraged. No-one
-> can stop anybody from forking from QEMU upstream tree and do whatever
-> is wanted.
->
-> But, this doesn't mean such experimentation will be upstreamed. QEMU
-> upstream should be collecting place for the best ideas and implementation=
-s,
-> not for arbitrary experimentations.
->
-> Best regards,
-> Aleksandar
->
->
-> > I'll happily accept patches to turn on hardfloat for PPC if:
-> >
-> >  a) they don't cause regressions in our fairly extensive floating point
-> >  tests
-> >  b) the PPC maintainers are happy with the new performance profile
-> >
-> > The way forward would be to:
-> >
-> >  1. patch to drop #if defined(TARGET_PPC) || defined(__FAST_MATH__)
-> >  2. audit target/ppc/fpu_helper.c w.r.t chip manual and fix any unneede=
-d
-> >  splatting of flags (if any)
-> >  3. measure the before/after performance effect and decide if on balanc=
-e
-> >  it's worth keeping
-> >
-> > > I think it's important for qemu to as global as possible and don't
-> > > target only recent hardware.
-> >
-> > Are you referring to guests or hosts? For guests we will always favour
-> > accuracy of speed of emulation. For hosts we need to have IEEE complian=
-t
-> > FPU HW to even stand a chance of using hardfloat.
-> >
-> > --
-> > Alex Benn=C3=A9e
-> >
->
-
---0000000000007dc369059f7d9997
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Accuracy is an important part of the IEEE 754 floatin=
-g point standard. The whole purpose of this standard is to ensure floating =
-point calculations are consistent across multiple CPUs. I believe referring=
- to this patch as inaccurate is itself inaccurate. That gives the impressio=
-n that this patch produces calculations that are not inline with establishe=
-d standards. This is not true. The only part of this patch that will produc=
-e incorrect values are the flags. There *may* be a program or two out there=
- that depend on these flags, but for the majority of programs that only car=
-e about basic floating point arithmetic this patch will produce correct val=
-ues. Currently the emulated PowerPC&#39;s FPU already produces wrong values=
- for the flags. This patch does set the Inexact flag (which I don&#39;t lik=
-e), but since I have never encountered any source code that cares for this =
-flag, I can let it go. I think giving the user the ability to decide which =
-option to use is the best thing to do.<br></div></div><br><div class=3D"gma=
-il_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Feb 26, 2020 at 10:=
-51 AM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com=
-">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"=
-gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
-4,204,204);padding-left:1ex"><div dir=3D"ltr"><br><br>On Wed, Feb 26, 2020 =
-at 3:29 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org" t=
-arget=3D"_blank">alex.bennee@linaro.org</a>&gt; wrote:<br>&gt;<br>&gt;<br>&=
-gt; Dino Papararo &lt;<a href=3D"mailto:skizzato73@msn.com" target=3D"_blan=
-k">skizzato73@msn.com</a>&gt; writes:<br>&gt;<br>&gt; &gt; Please let&#39;s=
- go with hardfloat pps support, it&#39;s really a good feature to implement=
-.<br>&gt; &gt; Even if in a first step it could lead to inaccuracy results,=
- later it<br>&gt; &gt; could solved with other patches.<br>&gt;<br><div>&gt=
-; That&#39;s the wrong way around. We have regression tests for a reason.</=
-div><div><br></div><div>I tend to agree with Alex here, and additionally wa=
-nt to expand more on</div><div>this topic.</div><div><br></div><div>In my v=
-iew: (that I think is at least very close to the community consensus)<br></=
-div><div><br></div><div>This is *not* a ppc-specific issue. There exist a p=
-rinciple across all targets</div><div>that QEMU FPU calculation must be acc=
-urate - exactly as specified in any</div><div>applicable particular ISA doc=
-ument. Any discrepancy is an outright bug.</div><div><br></div><div>We even=
- recently had several patches for FPU in ppc target that handled</div><div>=
-some fairly obscure cases of inaccuracies, I believe they were authored</di=
-v><div>by Paul Clarke, so there are people in ppc community that care about=
-</div><div>FPU accuracy (as I guess is the case for any target).<br></div><=
-div><br></div><div>There shouldn&#39;t be a target that decides by itself a=
-nd within itself</div><div>&quot;ok, we don&#39;t need accuracy, let&#39;s =
-trade it for speed&quot;. This violates</div><div>the architecture of QEMU.=
- Please allow that for any given software</div><div>project, there is an ar=
-chitecture that should be respected.<br></div><div><br></div><div>This does=
-n&#39;t mean that anybody&#39;s experimentation is discouraged. No-one</div=
-><div>can stop anybody from forking from QEMU upstream tree and do whatever=
-</div><div>is wanted.</div><div><br></div><div>But, this doesn&#39;t mean s=
-uch experimentation will be upstreamed. QEMU</div><div>upstream should be c=
-ollecting place for the best ideas and implementations,</div><div>not for a=
-rbitrary experimentations.</div><div><br></div><div>Best regards,</div><div=
->Aleksandar<br></div><div><br></div><div><br></div><div></div>&gt;  I&#39;l=
-l happily accept patches to turn on hardfloat for PPC if:<br>&gt;<br>&gt; =
-=C2=A0a) they don&#39;t cause regressions in our fairly extensive floating =
-point<br>&gt; =C2=A0tests<br>&gt; =C2=A0b) the PPC maintainers are happy wi=
-th the new performance profile<br>&gt;<br>&gt; The way forward would be to:=
-<br>&gt;<br>&gt; =C2=A01. patch to drop #if defined(TARGET_PPC) || defined(=
-__FAST_MATH__)<br>&gt; =C2=A02. audit target/ppc/fpu_helper.c w.r.t chip ma=
-nual and fix any unneeded<br>&gt; =C2=A0splatting of flags (if any)<br>&gt;=
- =C2=A03. measure the before/after performance effect and decide if on bala=
-nce<br>&gt; =C2=A0it&#39;s worth keeping<br>&gt;<br>&gt; &gt; I think it&#3=
-9;s important for qemu to as global as possible and don&#39;t<br>&gt; &gt; =
-target only recent hardware.<br>&gt;<br>&gt; Are you referring to guests or=
- hosts? For guests we will always favour<br>&gt; accuracy of speed of emula=
-tion. For hosts we need to have IEEE compliant<br>&gt; FPU HW to even stand=
- a chance of using hardfloat.<br>&gt;<br>&gt; --<br>&gt; Alex Benn=C3=A9e<b=
-r>&gt;<br></div>
-</blockquote></div>
-
---0000000000007dc369059f7d9997--
 
