@@ -2,69 +2,83 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3A9C4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD41C4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:51:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E25524685
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:50:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E25524685
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emindsoft.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 97C6524656
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:51:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGopWnmS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C6524656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6vCt-0001zj-N5
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:50:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
+	id 1j6vEI-0003qI-R7
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:51:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chengang@emindsoft.com.cn>) id 1j6v1s-0003pd-Na
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:39:08 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6vBk-0000ko-0k
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:49:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chengang@emindsoft.com.cn>) id 1j6v1n-0002E4-Ij
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:39:03 -0500
-Received: from lucky1.263xmail.com ([211.157.147.132]:44106)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chengang@emindsoft.com.cn>)
- id 1j6v1k-00020N-5q
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:38:57 -0500
-Received: from localhost (unknown [192.168.167.13])
- by lucky1.263xmail.com (Postfix) with ESMTP id EC7929F176;
- Wed, 26 Feb 2020 19:38:46 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-ABS-CHECKED: 0
-Received: from localhost.localdomain (unknown [223.72.76.204])
- by smtp.263.net (postfix) whith ESMTP id
- P15418T139869026223872S1582717122829966_; 
- Wed, 26 Feb 2020 19:38:47 +0800 (CST)
-X-UNIQUE-TAG: <7f7ccd07e8e2b96430f123414bb6acde>
-X-RL-SENDER: chengang@emindsoft.com.cn
-X-SENDER: chengang@emindsoft.com.cn
-X-LOGIN-NAME: chengang@emindsoft.com.cn
-X-FST-TO: riku.voipio@iki.fi
-X-SENDER-IP: 223.72.76.204
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-From: chengang@emindsoft.com.cn
-To: riku.voipio@iki.fi,
-	laurent@vivier.eu
-Subject: [PATCH] linux-user: syscall: ioctls: support DRM_IOCTL_VERSION
-Date: Wed, 26 Feb 2020 19:38:34 +0800
-Message-Id: <20200226113834.26404-1-chengang@emindsoft.com.cn>
-X-Mailer: git-send-email 2.24.0.308.g228f53135a
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j6vBg-0007im-MG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:49:14 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33131)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j6vBf-0007hV-5K
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:49:12 -0500
+Received: by mail-oi1-x241.google.com with SMTP id q81so2764487oig.0
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:49:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=Q8ccGq2qe+FnJi7qjSHYyMnZWwVvcnEgtsBRMT2Rp7w=;
+ b=YGopWnmSPS4w9eH0KA85oGuSgzwixfnp0gCWZnlC7zAVJIwSZrX1DSkIBvng94wXPc
+ kk+hy0eSSvUqTxTUxYhT5aWVE0zbFZJDwMX3BQrG6nvSUgBFwndrKNCYzxCJKMPoIfny
+ PQ+pi5kOE85cf/W3oKNQ2puLtrJaDa2wJVQZIcWYY3flg7Cw97lTNYCE4Gm2eB4yXpmI
+ 9lphNeGbJY4JnhWO9iZnDdL24DorR0T68rZiCn/ChEZRAAP0k7CzFOPLyQfKVTEMYGyW
+ /OzqqMJqpR72NHTUj0eKuOnBrC+jUJxHKVRRvcojtniE0D6fjSMmWQxLtZeNQKNkj9Et
+ ecgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=Q8ccGq2qe+FnJi7qjSHYyMnZWwVvcnEgtsBRMT2Rp7w=;
+ b=HdgGKwJDoPj0K3UCl/K+tnnIEJMi7wUnPG1ptkguf2/H9BoHP5GgT6vgdOHYnWAOGY
+ AXMNSaRLu7M0DyM3DPI9pCEf2HBEbestUlyQPaloAI2MtHwL9Tk/mht7+WM6tTDuGYK9
+ UZWEwjQhlXrPnH3VMeGganmvg4bFLK5p0zAiwZqtZr+LIw6oi2vAn/2zMpxLtoHr3xrN
+ k2/mrLCbCNdHAY9I2LExyWS6tXANMwTkCB8/SldXbnguP3JsT4bogGwDhKP8b+R08Ll+
+ NvxrHuTxoV4zEtjxp+FLRW0d7aVeH3AWdduGgiF6jlcdV54vgzIJEZ8OoubeKmcqjdG1
+ I9pA==
+X-Gm-Message-State: APjAAAUF1YGYlAJwK/BWOgYweTyY4JKTZ9a5lVOrJf9HyGB9kX9EICzZ
+ gFmIHcBdFQlYSx9esPJkmAgTy3GMqZYUYub03Xs=
+X-Google-Smtp-Source: APXvYqw6lDJKghCRcq5TZq/NJUwBSEMynqODXMAah7/h2qR/PoBoy5FU3Ov0KauNLZniTDrLMUDNU4w9g8hzjZq+E7g=
+X-Received: by 2002:aca:c514:: with SMTP id v20mr2758293oif.62.1582717750374; 
+ Wed, 26 Feb 2020 03:49:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Wed, 26 Feb 2020 03:49:09 -0800 (PST)
+In-Reply-To: <20200225154121.21116-4-peter.maydell@linaro.org>
+References: <20200225154121.21116-1-peter.maydell@linaro.org>
+ <20200225154121.21116-4-peter.maydell@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 26 Feb 2020 12:49:09 +0100
+Message-ID: <CAL1e-=hsLKTEpEw+xFog+9VDVFgkYyGRpAAVwzsK3LkfN=2h7Q@mail.gmail.com>
+Subject: Re: [PATCH 3/4] docs: Convert 'managed start up options' docs to rST
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000004a78e6059f7931a7"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 211.157.147.132
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,252 +90,404 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: chengang@emindsoft.com.cn, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
+--0000000000004a78e6059f7931a7
+Content-Type: text/plain; charset="UTF-8"
 
-The other DRM_IOCTL_* commands will be done later.
+On Tuesday, February 25, 2020, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
----
- linux-user/ioctls.h        |   3 +
- linux-user/syscall.c       | 134 +++++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  |  16 +++++
- linux-user/syscall_types.h |  12 ++++
- 4 files changed, 165 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0defa1d8c1..c2294b48a0 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -574,6 +574,9 @@
-   IOCTL_SPECIAL(SIOCDELRT, IOC_W, do_ioctl_rt,
-                 MK_PTR(MK_STRUCT(STRUCT_rtentry)))
-=20
-+  IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_version)))
-+
- #ifdef TARGET_TIOCSTART
-   IOCTL_IGNORE(TIOCSTART)
-   IOCTL_IGNORE(TIOCSTOP)
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8d27d10807..1f5d48a0b0 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -112,6 +112,7 @@
- #include <linux/if_alg.h>
- #include <linux/rtc.h>
- #include <sound/asound.h>
-+#include <libdrm/drm.h>
- #include "linux_loop.h"
- #include "uname.h"
-=20
-@@ -5196,6 +5197,139 @@ static abi_long do_ioctl_tiocgptpeer(const IOCTLE=
-ntry *ie, uint8_t *buf_temp,
- }
- #endif
-=20
-+static inline void free_drmversion(struct drm_version *host)
-+{
-+    if (!host) {
-+        return;
-+    }
-+    if (host->name) {
-+        free(host->name);
-+    }
-+    if (host->date) {
-+        free(host->date);
-+    }
-+    if (host->desc) {
-+        free(host->desc);
-+    }
-+}
-+
-+static inline bool t2h_drmversion_str(unsigned long *hlen,
-+                                      char **h, abi_ulong *glen)
-+{
-+    __get_user(*hlen, glen);
-+    if (*hlen) {
-+        *h =3D malloc(*hlen + 1);
-+        if (!*h) {
-+            return false;
-+        }
-+        (*h)[*hlen] =3D '\0';
-+    } else {
-+        *h =3D NULL;
-+    }
-+    return true;
-+}
-+
-+static inline abi_long target_to_host_drmversion(struct drm_version *hos=
-t_ver,
-+                                                abi_long target_addr)
-+{
-+    struct target_drm_version *target_ver;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_ver, target_addr, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+    __get_user(host_ver->name_len, &target_ver->name_len);
-+    if (!t2h_drmversion_str(&host_ver->name_len,
-+                            &host_ver->name, &target_ver->name_len)) {
-+        goto err;
-+    }
-+    if (!t2h_drmversion_str(&host_ver->date_len,
-+                            &host_ver->date, &target_ver->date_len)) {
-+        goto err;
-+    }
-+    if (!t2h_drmversion_str(&host_ver->desc_len,
-+                            &host_ver->desc, &target_ver->desc_len)) {
-+        goto err;
-+    }
-+    unlock_user_struct(target_ver, target_addr, 0);
-+    return 0;
-+
-+err:
-+    free_drmversion(host_ver);
-+    return -TARGET_ENOMEM;
-+}
-+
-+static inline bool h2t_drmversion_str(int hlen, char *h,
-+                                      abi_ulong *glen, abi_ulong g)
-+{
-+    char *target_str;
-+
-+    if ((hlen > 0) && h) {
-+        target_str =3D lock_user(VERIFY_WRITE, g, hlen, 0);
-+        if (!target_str) {
-+            return false;
-+        }
-+        memcpy(target_str, h, hlen);
-+        unlock_user(target_str, g, hlen);
-+    }
-+    __put_user(hlen, glen);
-+    return true;
-+}
-+
-+static inline abi_long host_to_target_drmversion(abi_ulong target_addr,
-+                                                 struct drm_version *hos=
-t_ver)
-+{
-+    struct target_drm_version *target_ver;
-+
-+    if (!lock_user_struct(VERIFY_WRITE, target_ver, target_addr, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+    __put_user(host_ver->version_major, &target_ver->version_major);
-+    __put_user(host_ver->version_minor, &target_ver->version_minor);
-+    __put_user(host_ver->version_patchlevel, &target_ver->version_patchl=
-evel);
-+    if (!h2t_drmversion_str(host_ver->name_len, host_ver->name,
-+                            &target_ver->name_len, target_ver->name)) {
-+        return -TARGET_EFAULT;
-+    }
-+    if (!h2t_drmversion_str(host_ver->date_len, host_ver->date,
-+                            &target_ver->date_len, target_ver->date)) {
-+        return -TARGET_EFAULT;
-+    }
-+    if (!h2t_drmversion_str(host_ver->desc_len, host_ver->desc,
-+                            &target_ver->desc_len, target_ver->desc)) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    unlock_user_struct(target_ver, target_addr, 0);
-+    return 0;
-+}
-+
-+static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                             int fd, int cmd, abi_long arg)
-+{
-+    struct drm_version *ver;
-+    abi_long ret;
-+
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_VERSION:
-+        ver =3D (struct drm_version *)buf_temp;
-+        memset(ver, 0, sizeof(*ver));
-+        ret =3D target_to_host_drmversion(ver, arg);
-+        if (is_error(ret)) {
-+            return ret;
-+        }
-+        ret =3D get_errno(safe_ioctl(fd, ie->host_cmd, ver));
-+        if (is_error(ret)) {
-+            free_drmversion(ver);
-+            return ret;
-+        }
-+        ret =3D host_to_target_drmversion(arg, ver);
-+        free_drmversion(ver);
-+        return ret;
-+        break;
-+    }
-+    return -TARGET_EFAULT;
-+}
-+
- static IOCTLEntry ioctl_entries[] =3D {
- #define IOCTL(cmd, access, ...) \
-     { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 152ec637cb..5e455a32af 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1167,6 +1167,9 @@ struct target_rtc_pll_info {
- #define TARGET_DM_TARGET_MSG          TARGET_IOWRU(0xfd, 0x0e)
- #define TARGET_DM_DEV_SET_GEOMETRY    TARGET_IOWRU(0xfd, 0x0f)
-=20
-+/* drm ioctls */
-+#define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
-+
- /* from asm/termbits.h */
-=20
- #define TARGET_NCC 8
-@@ -2598,6 +2602,18 @@ struct target_mq_attr {
-     abi_long mq_curmsgs;
- };
-=20
-+struct target_drm_version {
-+    int version_major;
-+    int version_minor;
-+    int version_patchlevel;
-+    abi_ulong name_len;
-+    abi_ulong name;
-+    abi_ulong date_len;
-+    abi_ulong date;
-+    abi_ulong desc_len;
-+    abi_ulong desc;
-+};
-+
- #include "socket.h"
-=20
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e12c1661e..52a031ad35 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -292,6 +292,18 @@ STRUCT(dm_target_versions,
- STRUCT(dm_target_msg,
-        TYPE_ULONGLONG) /* sector */
-=20
-+/* TODO: use #ifdef 32 bit #else 64 bit, next */
-+STRUCT(drm_version,
-+       TYPE_INT, /* version_major */
-+       TYPE_INT, /* version_minor */
-+       TYPE_INT, /* version_patchlevel */
-+       TYPE_ULONG, /* name_len */
-+       TYPE_PTRVOID, /* name */
-+       TYPE_ULONG, /* date_len */
-+       TYPE_PTRVOID, /* date */
-+       TYPE_ULONG, /* desc_len */
-+       TYPE_PTRVOID) /* desc */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
---=20
-2.24.0.308.g228f53135a
+> The only remaining content in qemu-tech.texi is a few paragraphs
+> about managed start up options; move them to a new rST document
+> in the system manual.
+>
+> In the process we fix one typo and format more option and
+> command names as literal text, but make no significant
+> changes to the content.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
 
 
+FWIW:
 
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+
+>  Makefile                        |  2 +-
+>  docs/system/index.rst           |  1 +
+>  docs/system/managed-startup.rst | 35 +++++++++++++++++++++++++++
+>  qemu-doc.texi                   |  3 ---
+>  qemu-tech.texi                  | 42 ---------------------------------
+>  5 files changed, 37 insertions(+), 46 deletions(-)
+>  create mode 100644 docs/system/managed-startup.rst
+>  delete mode 100644 qemu-tech.texi
+>
+> diff --git a/Makefile b/Makefile
+> index 5f0f803b471..28749d20401 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1114,7 +1114,7 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt
+> docs/interop/qemu-ga-ref.txt
+>
+>  qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
+>         qemu-options.texi \
+> -       qemu-tech.texi qemu-option-trace.texi \
+> +       qemu-option-trace.texi \
+>         qemu-deprecated.texi qemu-monitor.texi \
+>         qemu-monitor-info.texi \
+>         docs/qemu-cpu-models.texi
+> diff --git a/docs/system/index.rst b/docs/system/index.rst
+> index 794e5d8de03..887bef92f40 100644
+> --- a/docs/system/index.rst
+> +++ b/docs/system/index.rst
+> @@ -14,5 +14,6 @@ Contents:
+>  .. toctree::
+>     :maxdepth: 2
+>
+> +   managed-startup
+>     qemu-block-drivers
+>     security
+> diff --git a/docs/system/managed-startup.rst
+> b/docs/system/managed-startup.rst
+> new file mode 100644
+> index 00000000000..9bcf98ea790
+> --- /dev/null
+> +++ b/docs/system/managed-startup.rst
+> @@ -0,0 +1,35 @@
+> +Managed start up options
+> +========================
+> +
+> +In system mode emulation, it's possible to create a VM in a paused
+> +state using the ``-S`` command line option. In this state the machine
+> +is completely initialized according to command line options and ready
+> +to execute VM code but VCPU threads are not executing any code. The VM
+> +state in this paused state depends on the way QEMU was started. It
+> +could be in:
+> +
+> +- initial state (after reset/power on state)
+> +- with direct kernel loading, the initial state could be amended to
+> execute
+> +  code loaded by QEMU in the VM's RAM and with incoming migration
+> +- with incoming migration, initial state will be amended with the migrated
+> +  machine state after migration completes
+> +
+> +This paused state is typically used by users to query machine state and/or
+> +additionally configure the machine (by hotplugging devices) in runtime
+> before
+> +allowing VM code to run.
+> +
+> +However, at the ``-S`` pause point, it's impossible to configure options
+> +that affect initial VM creation (like: ``-smp``/``-m``/``-numa`` ...) or
+> +cold plug devices. The experimental ``--preconfig`` command line option
+> +allows pausing QEMU before the initial VM creation, in a "preconfig"
+> state,
+> +where additional queries and configuration can be performed via QMP
+> +before moving on to the resulting configuration startup. In the
+> +preconfig state, QEMU only allows a limited set of commands over the
+> +QMP monitor, where the commands do not depend on an initialized
+> +machine, including but not limited to:
+> +
+> +- ``qmp_capabilities``
+> +- ``query-qmp-schema``
+> +- ``query-commands``
+> +- ``query-status``
+> +- ``x-exit-preconfig``
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index c11b1a5d5ad..7798e072a1c 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -40,7 +40,6 @@
+>  * QEMU System emulator for non PC targets::
+>  * QEMU User space emulator::
+>  * System requirements::
+> -* Implementation notes::
+>  * Deprecated features::
+>  * Recently removed features::
+>  * Supported build platforms::
+> @@ -2835,8 +2834,6 @@ added with Linux 4.5 which is supported by the major
+> distros. And even
+>  if RHEL7 has kernel 3.10, KVM there has the required functionality there
+>  to make it close to a 4.5 or newer kernel.
+>
+> -@include qemu-tech.texi
+> -
+>  @include qemu-deprecated.texi
+>
+>  @node Supported build platforms
+> diff --git a/qemu-tech.texi b/qemu-tech.texi
+> deleted file mode 100644
+> index 35da6a40af1..00000000000
+> --- a/qemu-tech.texi
+> +++ /dev/null
+> @@ -1,42 +0,0 @@
+> -@node Implementation notes
+> -@appendix Implementation notes
+> -
+> -@menu
+> -* Managed start up options::
+> -@end menu
+> -
+> -@node Managed start up options
+> -@section Managed start up options
+> -
+> -In system mode emulation, it's possible to create a VM in a paused state
+> using
+> -the -S command line option. In this state the machine is completely
+> initialized
+> -according to command line options and ready to execute VM code but VCPU
+> threads
+> -are not executing any code. The VM state in this paused state depends on
+> the way
+> -QEMU was started. It could be in:
+> -@table @asis
+> -@item initial state (after reset/power on state)
+> -@item with direct kernel loading, the initial state could be amended to
+> execute
+> -code loaded by QEMU in the VM's RAM and with incoming migration
+> -@item with incoming migration, initial state will by amended with the
+> migrated
+> -machine state after migration completes.
+> -@end table
+> -
+> -This paused state is typically used by users to query machine state and/or
+> -additionally configure the machine (by hotplugging devices) in runtime
+> before
+> -allowing VM code to run.
+> -
+> -However, at the -S pause point, it's impossible to configure options that
+> affect
+> -initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. The
+> -experimental --preconfig command line option  allows pausing QEMU
+> -before the initial VM creation, in a ``preconfig'' state, where additional
+> -queries and configuration can be performed via QMP before moving on to
+> -the resulting configuration startup. In the preconfig state, QEMU only
+> allows
+> -a limited set of commands over the QMP monitor, where the commands do not
+> -depend on an initialized machine, including but not limited to:
+> -@table @asis
+> -@item qmp_capabilities
+> -@item query-qmp-schema
+> -@item query-commands
+> -@item query-status
+> -@item x-exit-preconfig
+> -@end table
+> --
+> 2.20.1
+>
+>
+>
+
+--0000000000004a78e6059f7931a7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, February 25, 2020, Peter Maydell &lt;<a href=3D"mailto:=
+peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">The only remaining content in qemu-tech.texi is a =
+few paragraphs<br>
+about managed start up options; move them to a new rST document<br>
+in the system manual.<br>
+<br>
+In the process we fix one typo and format more option and<br>
+command names as literal text, but make no significant<br>
+changes to the content.<br>
+<br>
+Signed-off-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org=
+">peter.maydell@linaro.org</a>&gt;<br>
+---</blockquote><div><br></div><div>FWIW:</div><div><br></div><div>Reviewed=
+-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com">amar=
+kovic@wavecomp.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
+eft:1ex">
+=C2=A0Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-<br>
+=C2=A0docs/system/index.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0=
+ 1 +<br>
+=C2=A0docs/system/managed-startup.<wbr>rst | 35 +++++++++++++++++++++++++++=
+<br>
+=C2=A0qemu-doc.texi=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0|=C2=A0 3 ---<br>
+=C2=A0qemu-tech.texi=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 | 42 ------------------------------<wbr>---<br>
+=C2=A05 files changed, 37 insertions(+), 46 deletions(-)<br>
+=C2=A0create mode 100644 docs/system/managed-startup.<wbr>rst<br>
+=C2=A0delete mode 100644 qemu-tech.texi<br>
+<br>
+diff --git a/Makefile b/Makefile<br>
+index 5f0f803b471..28749d20401 100644<br>
+--- a/Makefile<br>
++++ b/Makefile<br>
+@@ -1114,7 +1114,7 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/=
+interop/qemu-ga-ref.txt<br>
+<br>
+=C2=A0qemu-doc.html <a href=3D"http://qemu-doc.info" target=3D"_blank">qemu=
+-doc.info</a> qemu-doc.pdf qemu-doc.txt: \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu-options.texi \<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0qemu-tech.texi qemu-option-trace.texi \<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0qemu-option-trace.texi \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu-deprecated.texi qemu-monitor.texi \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu-monitor-info.texi \<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 docs/qemu-cpu-models.texi<br>
+diff --git a/docs/system/index.rst b/docs/system/index.rst<br>
+index 794e5d8de03..887bef92f40 100644<br>
+--- a/docs/system/index.rst<br>
++++ b/docs/system/index.rst<br>
+@@ -14,5 +14,6 @@ Contents:<br>
+=C2=A0.. toctree::<br>
+=C2=A0 =C2=A0 :maxdepth: 2<br>
+<br>
++=C2=A0 =C2=A0managed-startup<br>
+=C2=A0 =C2=A0 qemu-block-drivers<br>
+=C2=A0 =C2=A0 security<br>
+diff --git a/docs/system/managed-startup.<wbr>rst b/docs/system/managed-sta=
+rtup.<wbr>rst<br>
+new file mode 100644<br>
+index 00000000000..9bcf98ea790<br>
+--- /dev/null<br>
++++ b/docs/system/managed-startup.<wbr>rst<br>
+@@ -0,0 +1,35 @@<br>
++Managed start up options<br>
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D<b=
+r>
++<br>
++In system mode emulation, it&#39;s possible to create a VM in a paused<br>
++state using the ``-S`` command line option. In this state the machine<br>
++is completely initialized according to command line options and ready<br>
++to execute VM code but VCPU threads are not executing any code. The VM<br>
++state in this paused state depends on the way QEMU was started. It<br>
++could be in:<br>
++<br>
++- initial state (after reset/power on state)<br>
++- with direct kernel loading, the initial state could be amended to execut=
+e<br>
++=C2=A0 code loaded by QEMU in the VM&#39;s RAM and with incoming migration=
+<br>
++- with incoming migration, initial state will be amended with the migrated=
+<br>
++=C2=A0 machine state after migration completes<br>
++<br>
++This paused state is typically used by users to query machine state and/or=
+<br>
++additionally configure the machine (by hotplugging devices) in runtime bef=
+ore<br>
++allowing VM code to run.<br>
++<br>
++However, at the ``-S`` pause point, it&#39;s impossible to configure optio=
+ns<br>
++that affect initial VM creation (like: ``-smp``/``-m``/``-numa`` ...) or<b=
+r>
++cold plug devices. The experimental ``--preconfig`` command line option<br=
+>
++allows pausing QEMU before the initial VM creation, in a &quot;preconfig&q=
+uot; state,<br>
++where additional queries and configuration can be performed via QMP<br>
++before moving on to the resulting configuration startup. In the<br>
++preconfig state, QEMU only allows a limited set of commands over the<br>
++QMP monitor, where the commands do not depend on an initialized<br>
++machine, including but not limited to:<br>
++<br>
++- ``qmp_capabilities``<br>
++- ``query-qmp-schema``<br>
++- ``query-commands``<br>
++- ``query-status``<br>
++- ``x-exit-preconfig``<br>
+diff --git a/qemu-doc.texi b/qemu-doc.texi<br>
+index c11b1a5d5ad..7798e072a1c 100644<br>
+--- a/qemu-doc.texi<br>
++++ b/qemu-doc.texi<br>
+@@ -40,7 +40,6 @@<br>
+=C2=A0* QEMU System emulator for non PC targets::<br>
+=C2=A0* QEMU User space emulator::<br>
+=C2=A0* System requirements::<br>
+-* Implementation notes::<br>
+=C2=A0* Deprecated features::<br>
+=C2=A0* Recently removed features::<br>
+=C2=A0* Supported build platforms::<br>
+@@ -2835,8 +2834,6 @@ added with Linux 4.5 which is supported by the major =
+distros. And even<br>
+=C2=A0if RHEL7 has kernel 3.10, KVM there has the required functionality th=
+ere<br>
+=C2=A0to make it close to a 4.5 or newer kernel.<br>
+<br>
+-@include qemu-tech.texi<br>
+-<br>
+=C2=A0@include qemu-deprecated.texi<br>
+<br>
+=C2=A0@node Supported build platforms<br>
+diff --git a/qemu-tech.texi b/qemu-tech.texi<br>
+deleted file mode 100644<br>
+index 35da6a40af1..00000000000<br>
+--- a/qemu-tech.texi<br>
++++ /dev/null<br>
+@@ -1,42 +0,0 @@<br>
+-@node Implementation notes<br>
+-@appendix Implementation notes<br>
+-<br>
+-@menu<br>
+-* Managed start up options::<br>
+-@end menu<br>
+-<br>
+-@node Managed start up options<br>
+-@section Managed start up options<br>
+-<br>
+-In system mode emulation, it&#39;s possible to create a VM in a paused sta=
+te using<br>
+-the -S command line option. In this state the machine is completely initia=
+lized<br>
+-according to command line options and ready to execute VM code but VCPU th=
+reads<br>
+-are not executing any code. The VM state in this paused state depends on t=
+he way<br>
+-QEMU was started. It could be in:<br>
+-@table @asis<br>
+-@item initial state (after reset/power on state)<br>
+-@item with direct kernel loading, the initial state could be amended to ex=
+ecute<br>
+-code loaded by QEMU in the VM&#39;s RAM and with incoming migration<br>
+-@item with incoming migration, initial state will by amended with the migr=
+ated<br>
+-machine state after migration completes.<br>
+-@end table<br>
+-<br>
+-This paused state is typically used by users to query machine state and/or=
+<br>
+-additionally configure the machine (by hotplugging devices) in runtime bef=
+ore<br>
+-allowing VM code to run.<br>
+-<br>
+-However, at the -S pause point, it&#39;s impossible to configure options t=
+hat affect<br>
+-initial VM creation (like: -smp/-m/-numa ...) or cold plug devices. The<br=
+>
+-experimental --preconfig command line option=C2=A0 allows pausing QEMU<br>
+-before the initial VM creation, in a ``preconfig&#39;&#39; state, where ad=
+ditional<br>
+-queries and configuration can be performed via QMP before moving on to<br>
+-the resulting configuration startup. In the preconfig state, QEMU only all=
+ows<br>
+-a limited set of commands over the QMP monitor, where the commands do not<=
+br>
+-depend on an initialized machine, including but not limited to:<br>
+-@table @asis<br>
+-@item qmp_capabilities<br>
+-@item query-qmp-schema<br>
+-@item query-commands<br>
+-@item query-status<br>
+-@item x-exit-preconfig<br>
+-@end table<br>
+-- <br>
+2.20.1<br>
+<br>
+<br>
+</blockquote>
+
+--0000000000004a78e6059f7931a7--
 
