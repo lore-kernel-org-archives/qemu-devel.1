@@ -2,65 +2,63 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24A1C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 861ECC4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:20:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8949220726
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:14:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 486112467D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:20:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fGg4qZPc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8949220726
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQLoElIE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 486112467D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6wVu-0006s2-M9
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:14:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53938)
+	id 1j6wbb-0000Jv-CP
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:20:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j6wV6-0006I0-OR
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:13:21 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j6wav-0007wc-Sm
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:19:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j6wV5-0002QK-Jd
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:13:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35391
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1j6wau-0000LC-GS
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:19:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51367)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6wV5-0002Q4-G5
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:13:19 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j6wau-0000Jz-Bi
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:19:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582722799;
+ s=mimecast20190719; t=1582723159;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=wWP0VhpugEUlUlUG86NwKJQi5tdFcYQxTXNjF/WZYhg=;
- b=fGg4qZPcxMJTPx3xCiG1K3IOJxUT6ZRvV0vXrWAHMspoJ+6Hmrkd46ltwE5UYWLrfG1bn5
- 5zs8W9qVi9jul8v/HJ+TKqqhNA+OMzZh9ZcdRSeMdqRbm0SEN9ezOJTjIXsZkeJ5oE9FBX
- 8BJUNpiUzDVVsIbPFtCnvGaq2Gl5dSc=
+ bh=iXeMu9cT3hpnUKMA3r9qp4p35J+sthiE+0yBZtSfT7I=;
+ b=RQLoElIEs5Db6dgcdeltUYZy5iLU93UJAlg9of3UW1CJHHgKyIoRSoQghoSZ+pxcjbfDh1
+ pjw0BeafmXrcUmMwbZrE1gjhesKe3eIVcmwNAgsXglosRZNzXmuqvnnDr5SOnPdlspYhWu
+ A90gKPdMQeDVbjZD0CprkvGew5OGCmg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-S4Ra6WD_OaOfEXsmpJuR-Q-1; Wed, 26 Feb 2020 08:13:14 -0500
-X-MC-Unique: S4Ra6WD_OaOfEXsmpJuR-Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-6-gdhvyybRNcaTuQEG6N0Uhg-1; Wed, 26 Feb 2020 08:19:11 -0500
+X-MC-Unique: gdhvyybRNcaTuQEG6N0Uhg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8D0E18B9FC1;
- Wed, 26 Feb 2020 13:13:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 152481088389;
+ Wed, 26 Feb 2020 13:19:10 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.36.118.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CCF925C28E;
- Wed, 26 Feb 2020 13:13:11 +0000 (UTC)
-Subject: Re: [PATCH v4 00/10] Further bitmaps improvements
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200205112041.6003-1-vsementsov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A7271CB;
+ Wed, 26 Feb 2020 13:19:08 +0000 (UTC)
+Subject: Re: [PATCH v2] iotests: Fix nonportable use of od --endian
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200226125424.481840-1-eblake@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,21 +84,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4cf33f31-cdbb-cee4-a1b4-4053c88a002e@redhat.com>
-Date: Wed, 26 Feb 2020 14:13:10 +0100
+Message-ID: <9cf31f83-1965-0f43-bd3e-30dcb1be9ece@redhat.com>
+Date: Wed, 26 Feb 2020 14:19:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200205112041.6003-1-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200226125424.481840-1-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="6bFydxBoS0kro7mD5J10ATgZSMUiS8I6W"
+ boundary="2vs2S2o7QTlJG7siIS8nXCrUki6tq9Saa"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,54 +109,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, andrey.shinkevich@virtuozzo.com,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6bFydxBoS0kro7mD5J10ATgZSMUiS8I6W
-Content-Type: multipart/mixed; boundary="2ncYS8sIZYeiQN9SsCFzXgVx2wESPhzrr"
+--2vs2S2o7QTlJG7siIS8nXCrUki6tq9Saa
+Content-Type: multipart/mixed; boundary="CZFKQi5kDRO8zo23LzM2ZL8rPEHdC4Pz0"
 
---2ncYS8sIZYeiQN9SsCFzXgVx2wESPhzrr
-Content-Type: text/plain; charset=windows-1252
+--CZFKQi5kDRO8zo23LzM2ZL8rPEHdC4Pz0
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 05.02.20 12:20, Vladimir Sementsov-Ogievskiy wrote:
-> Hi!
+On 26.02.20 13:54, Eric Blake wrote:
+> Tests 261 and 272 fail on RHEL 7 with coreutils 8.22, since od
+> --endian was not added until coreutils 8.23.  Fix this by manually
+> constructing the final value one byte at a time.
 >=20
-> The main feature here is improvement of _next_dirty_area API, which I'm
-> going to use then for backup / block-copy.
+> Fixes: fc8ba423
+> Reported-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> ---
 >=20
-> Somehow, I thought that it was merged, but seems I even forgot to send
-> v4.
+> In v2: s/i/byte/, add Max's R-b
+>=20
+>  tests/qemu-iotests/common.rc | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
 
-The changes from v3 look good to me, but I=92d prefer a review from Eric
-on patch 8.
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 Max
 
 
---2ncYS8sIZYeiQN9SsCFzXgVx2wESPhzrr--
+--CZFKQi5kDRO8zo23LzM2ZL8rPEHdC4Pz0--
 
---6bFydxBoS0kro7mD5J10ATgZSMUiS8I6W
+--2vs2S2o7QTlJG7siIS8nXCrUki6tq9Saa
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5WbuYACgkQ9AfbAGHV
-z0DCKQf+LbCRIb9nPw+GULrkGyzVqkpOIBrk7WTfCX3/TBFyiaUlKFOvtXSG4ZOF
-k8KQW/1ld8B2pjc37adg7wr7BKzI9zfHgC93XS0EWuimOAWZJOUCkY2YLrN60YHg
-1injND25+julwlx4fQed9E6r9qf+P2uPJmLwKJmcapa6AfOPbhmF+s6jdXtoF3OU
-K3rqEvvQlb0nZI0MLbsxsKUbhGOBsGPZIzfD9VD/w8wTRlQS02egtvU9ZJ0L3AMO
-X8kLDGCV7fx9fMe4Zk8gmyIq+YbXfz4Vs12mKglppJkuFvKkzrVh7RuOHh/Tb+A+
-79fjzEb50gmobr8j4VweMbDjkFKC2g==
-=+StL
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5WcEoACgkQ9AfbAGHV
+z0DN5QgAuVyT/hEVAsOZuPTaP4pbyXkdFDRubEjQAhGKb/DOy5WYbfbZxvILbghA
+3EW83XPqd2uJFkqAGueA4Xkil7c49uaT51zfWTtPeVWMquJkHruZAORJlpd/3AFA
+f9BT+q9Ae/PUo/uB022jd1VCiHr72EMrfMhco6kXD6IkReJys2d+H4tN//GUluIz
+lOhH6HXjYL5HsTqhS4nNkcRW/vlyL12u3/MgDJu+D7RZC/Vb6nXp7D4nl25SD1j7
+jvtN2eHSR22iEd+CQcbqUtBJ3VACzvdD252qssnpG47wTJWbc7vq7+RhduRxFUe3
+JydTC4SQKxOJE/ozZ01zP3l/PSgaVw==
+=m85a
 -----END PGP SIGNATURE-----
 
---6bFydxBoS0kro7mD5J10ATgZSMUiS8I6W--
+--2vs2S2o7QTlJG7siIS8nXCrUki6tq9Saa--
 
 
