@@ -2,76 +2,87 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AA5C4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD36C4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53F6D21D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:22:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1482B21D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:28:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJMCpS6Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53F6D21D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UJ07rjUF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1482B21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6yVd-0003TT-Ig
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:22:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46136)
+	id 1j6ybn-000637-7u
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:28:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j6yUx-00031q-AL
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:21:23 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6yaq-0005Tv-03
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:27:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j6yUt-0008T9-1r
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:21:19 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52749
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j6yUs-0008SG-Uk
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:21:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582730474;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=PefAQTZ2aPgt1bUnb8k1qGmCM3QHWOMtEjj+e6heTrs=;
- b=QJMCpS6YfhHhQE0jrtvhANMqqtryGnRaF3oRpOWzUBavcDvLxsrvcZfZ24k3SVGFfRZY+L
- 3EwQqQWm6z+1ZWvZjuo/gBABhCzao2hMYBrM2e7bMCVJT2hEoYiAfKMVwgiib5IBNBxu0z
- pSNctoz1DJZwAnOh4gcOP0v+wvzansM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-sErtrNW7PZeyD0m4LPM2Rw-1; Wed, 26 Feb 2020 10:21:00 -0500
-X-MC-Unique: sErtrNW7PZeyD0m4LPM2Rw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC6CD10CE780
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 15:20:59 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.47])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D83821001902;
- Wed, 26 Feb 2020 15:20:56 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1j6yao-0001Om-Hv
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:27:23 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38194)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6yao-0001L6-9V
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:27:22 -0500
+Received: by mail-wr1-x443.google.com with SMTP id e8so3555224wrm.5
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 07:27:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dv7Dxwk2EOL91ONyIJ37RrEIbEVFccpjybkrT6dJ72Y=;
+ b=UJ07rjUFRGvGcyMu9AQxaPZ1BnIJpc2ZfcjNIZ0pHVPxQbfD9tLLi1XbZ6lUahctkl
+ TFlEdUmrQ9TYpqfgHYO8Z8LJitQE/+M8PrNJO3t1W8oZnPq/AQRIBHSgWoFXbUc5p18R
+ bLIyQlrr7IHVkyTKjiuNwIyCwGJ1FM7Ve8g/0EQk9MS35KxeIJBDTRX9mlv9iq4qcDgO
+ KYtX1hl2fwmvzbYdHb/TdEgnIlSGhbjMS0Mt0h+9Q41Rg0zUsVBT7rYIB2j11l4vMPfA
+ fVD3aZOGM68WvCxe28xCzH776XkC2gvh4tqxPmKHAhESOw/Q4LQLv/IXvrHmjCInPUmG
+ v7Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=dv7Dxwk2EOL91ONyIJ37RrEIbEVFccpjybkrT6dJ72Y=;
+ b=QBdw+YQLeh6ZE64X6g6c2wh1BXPPFpDsII8oUS41NCCwrB7G2SZ0G64Kv2SQHlbFkM
+ oE6+wVQHwBgn0fVRPTuF+qv9kvfIJL/A3CkLoHNGutNIq6Qgyql809WiREIW7eaqIEaS
+ VWEKXpoWAw0qab+SD1jzJ4jlX+giYrqdwDRkLO718Xfxa76qLDBLQuAMyOpb+6dlJ1hk
+ NBDoAJzgM94VzlPHmFET1qT3TpE9GDmt1uNU2dsYUSCz17rzott74zC87VKTn3s4FSAT
+ rLlsCiLTQWr5am1XdG2fvKPbIZb2SRvx/PQ2MR2NfqGS1ukHC2b6sf0rYAuUH38VKyyo
+ sawg==
+X-Gm-Message-State: APjAAAVQlM9YWxrQl9vAaoGNB+G0pIH2Uada7Kn5BocW1pYdVfrbCTdd
+ sies7ZEnpwroFOi80N18p1VslQ==
+X-Google-Smtp-Source: APXvYqwpkVY/FUk3n9JcVqzz8llkdGMlQq6CLJtDAnfzqseq9kGjNJ9LCJCN94rLH7GcpjTC+kJEzA==
+X-Received: by 2002:adf:b19e:: with SMTP id q30mr325777wra.163.1582730840869; 
+ Wed, 26 Feb 2020 07:27:20 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j12sm3697753wrt.35.2020.02.26.07.27.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 07:27:19 -0800 (PST)
+Received: from zen.home.arpa (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id ACD9C1FF87;
+ Wed, 26 Feb 2020 15:27:18 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH] Add GSoC 2020 announcement to blog
-Date: Wed, 26 Feb 2020 15:20:55 +0000
-Message-Id: <20200226152055.75190-1-stefanha@redhat.com>
+Subject: [PATCH] accel/tcg: remove link between guest ram and TCG cache size
+Date: Wed, 26 Feb 2020 15:27:10 +0000
+Message-Id: <20200226152710.31751-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,45 +94,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: f4bug@amsat.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
+ qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TGV0IHBlb3BsZSBrbm93IHRoYXQgd2UgYXJlIHBhcnRpY2lwYXRpbmcgaW4gR29vZ2xlIFN1bW1l
-ciBvZiBDb2RlIGFnYWluCnRoaXMgeWVhci4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6
-aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiAuLi4tZ29vZ2xlLXN1bW1lci1vZi1jb2RlLWlu
-dGVybnNoaXBzLTIwMjAubWQgfCAyNyArKysrKysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdl
-ZCwgMjcgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0IF9wb3N0cy8yMDIwLTAyLTI2
-LWdvb2dsZS1zdW1tZXItb2YtY29kZS1pbnRlcm5zaGlwcy0yMDIwLm1kCgpkaWZmIC0tZ2l0IGEv
-X3Bvc3RzLzIwMjAtMDItMjYtZ29vZ2xlLXN1bW1lci1vZi1jb2RlLWludGVybnNoaXBzLTIwMjAu
-bWQgYi9fcG9zdHMvMjAyMC0wMi0yNi1nb29nbGUtc3VtbWVyLW9mLWNvZGUtaW50ZXJuc2hpcHMt
-MjAyMC5tZApuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi41MWM3NjRiCi0tLSAv
-ZGV2L251bGwKKysrIGIvX3Bvc3RzLzIwMjAtMDItMjYtZ29vZ2xlLXN1bW1lci1vZi1jb2RlLWlu
-dGVybnNoaXBzLTIwMjAubWQKQEAgLTAsMCArMSwyNyBAQAorLS0tCitsYXlvdXQ6IHBvc3QKK3Rp
-dGxlOiAgIkFubm91bmNpbmcgR29vZ2xlIFN1bW1lciBvZiBDb2RlIDIwMjAgaW50ZXJuc2hpcHMi
-CitkYXRlOiAgIDIwMjAtMDItMjYgMDc6MDA6MDAgKzAwMDAKK2NhdGVnb3JpZXM6IFtnc29jLCBp
-bnRlcm5zaGlwc10KKy0tLQorUUVNVSBpcyBwYXJ0aWNpcGF0aW5nIGluIFtHb29nbGUgU3VtbWVy
-IG9mIENvZGUKKzIwMjBdKGh0dHBzOi8vc3VtbWVyb2Zjb2RlLndpdGhnb29nbGUuY29tLykgYWdh
-aW4gdGhpcyB5ZWFyISAgR29vZ2xlIFN1bW1lciBvZgorQ29kZSAoR1NvQykgaXMgYW4gaW50ZXJu
-c2hpcCBwcm9ncmFtIHRoYXQgYnJpbmdzIHN0dWRlbnRzIGludG8gb3BlbiBzb3VyY2UKK2RldmVs
-b3BtZW50LiAgR1NvQyBvZmZlcnMgZnVsbC10aW1lIHJlbW90ZSB3b3JrIG9wcG9ydHVuaXRpZXMg
-Zm9yIHRhbGVudGVkIG5ldworZGV2ZWxvcGVycyB3aXNoaW5nIHRvIGdldCBpbnZvbHZlZCBpbiBv
-dXIgY29tbXVuaXR5LgorCitFYWNoIGludGVybiB3b3JrcyB3aXRoIG9uZSBvciBtb3JlIG1lbnRv
-cnMgd2hvIHN1cHBvcnQgdGhlbSBpbiB0aGVpciBwcm9qZWN0LgorQ29kZSBpcyBzdWJtaXR0ZWQg
-dGhyb3VnaCBRRU1VJ3Mgb3BlbiBzb3VyY2UgZGV2ZWxvcG1lbnQgcHJvY2VzcywgZ2l2aW5nIHRo
-ZQoraW50ZXJuIGV4cGVyaWVuY2UgaW4gb3BlbiBzb3VyY2Ugc29mdHdhcmUgZGV2ZWxvcG1lbnQu
-CisKK0lmIHlvdSBhcmUgaW50ZXJlc3RlZCBpbiBjb250cmlidXRpbmcgdG8gUUVNVSB0aHJvdWdo
-IGEgcGFpZCAxMi13ZWVrIGludGVybnNoaXAKK2Zyb20gTWF5IHRvIEF1Z3VzdCwgdGFrZSBhIGxv
-b2sgYXQgW291ciBwcm9qZWN0CitpZGVhc10oaHR0cHM6Ly93aWtpLnFlbXUub3JnL0dvb2dsZV9T
-dW1tZXJfb2ZfQ29kZV8yMDIwKSBmb3IgbW9yZSBpbmZvcm1hdGlvbi4KK0FwcGxpY2F0aW9ucyBh
-cmUgb3BlbiBNYXJjaCAxNi0zMSwgMjAyMC4KKworUGxlYXNlIHJldmlldyB0aGUgW2VsaWdpYmls
-aXR5Citjcml0ZXJpYV0oaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vb3Blbi1zb3VyY2Uv
-Z3NvYy9mYXEjd2hhdF9hcmVfdGhlX2VsaWdpYmlsaXR5X3JlcXVpcmVtZW50c19mb3JfcGFydGlj
-aXBhdGlvbikgYmVmb3JlIGFwcGx5aW5nLgorCitRRU1VIGlzIGFsc28gcGFydGljaXBhdGluZyBp
-biB0aGUgW091dHJlYWNoeSBpbnRlcm5zaGlwCitwcm9ncmFtXShodHRwczovL3d3dy5vdXRyZWFj
-aHkub3JnL2FwcGx5L3Byb2plY3Qtc2VsZWN0aW9uLyNxZW11KSwgc28gYmUgc3VyZQordG8gY2hl
-Y2sgdGhhdCBvdXQgYXMgd2VsbCEKLS0gCjIuMjQuMQoK
+Basing the TB cache size on the ram_size was always a little heuristic
+and was broken by a1b18df9a4 which caused ram_size not to be fully
+realised at the time we initialise the TCG translation cache.
+
+At the same time the default code generation size seems mainly set to
+deal with the fact we use a static code buffer for CONFIG_USER to
+avoid mmap allocation problems on constrained systems. So we:
+
+  - only use a static code buffer on 32 bit systems
+  - up the default buffer size for bigger systems
+  - ignore the ram_size and just go with the default
+  - document the fact tb-size is ignored for 32 bit linux-user
+
+The could potentially slow down softmmu emulation on 32 bit systems
+with lots (3gb?) of spare memory. Those users can still manually up
+the tb-size via the command line if they do in fact exist.
+
+Fixes: a1b18df9a4
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Niek Linnenbank <nieklinnenbank@gmail.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+---
+ accel/tcg/translate-all.c | 23 ++++++++++-------------
+ qemu-options.hx           |  3 ++-
+ 2 files changed, 12 insertions(+), 14 deletions(-)
+
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index a08ab11f657..cdfa2db7c56 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -891,11 +891,12 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+     }
+ }
+ 
+-#if defined(CONFIG_USER_ONLY)
+-/* Currently it is not recommended to allocate big chunks of data in
+-   user mode. It will change when a dedicated libc will be used.  */
+-/* ??? 64-bit hosts ought to have no problem mmaping data outside the
+-   region in which the guest needs to run.  Revisit this.  */
++#if defined(CONFIG_USER_ONLY) && TCG_TARGET_REG_BITS == 32
++/*
++ * For user mode on smaller 32 bit systems we may run into trouble
++ * allocating big chunks of data in the right place. On these systems
++ * we utilise a static code generation buffer directly in the binary.
++ */
+ #define USE_STATIC_CODE_GEN_BUFFER
+ #endif
+ 
+@@ -927,7 +928,11 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+ # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+ #endif
+ 
++#if TCG_TARGET_REG_BITS == 32
+ #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32u * 1024 * 1024)
++#else
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (2ul * 1024 * 1024 * 1024)
++#endif
+ 
+ #define DEFAULT_CODE_GEN_BUFFER_SIZE \
+   (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
+@@ -937,15 +942,7 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
+ {
+     /* Size the buffer.  */
+     if (tb_size == 0) {
+-#ifdef USE_STATIC_CODE_GEN_BUFFER
+         tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
+-#else
+-        /* ??? Needs adjustments.  */
+-        /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
+-           static buffer, we could size this on RESERVED_VA, on the text
+-           segment size of the executable, or continue to use the default.  */
+-        tb_size = (unsigned long)(ram_size / 4);
+-#endif
+     }
+     if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
+         tb_size = MIN_CODE_GEN_BUFFER_SIZE;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index ac315c1ac45..0a4bbdb8eb9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -139,7 +139,8 @@ irqchip completely is not recommended except for debugging purposes.
+ @item kvm-shadow-mem=size
+ Defines the size of the KVM shadow MMU.
+ @item tb-size=@var{n}
+-Controls the size (in MiB) of the TCG translation block cache.
++Controls the size (in MiB) of the TCG translation block cache. It has no effect on
++32 bit linux-user binaries.
+ @item thread=single|multi
+ Controls number of TCG threads. When the TCG is multi-threaded there will be one
+ thread per vCPU therefor taking advantage of additional host cores. The default
+-- 
+2.20.1
 
 
