@@ -2,99 +2,61 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE790C4BA14
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E15C4BA16
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B817624683
+	by mail.kernel.org (Postfix) with ESMTPS id D56DE24685
 	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:33:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B817624683
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D56DE24685
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6wop-0007dq-04
+	id 1j6woo-0007el-WA
 	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:33:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36229)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36317)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1j6wnb-0006Wm-G9
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:32:29 -0500
+ (envelope-from <groug@kaod.org>) id 1j6wnn-0006cY-Jg
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1j6wnZ-0002Ps-EI
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:32:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24168)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1j6wnV-0002Gd-Ss; Wed, 26 Feb 2020 08:32:22 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QDU7Ck078693; Wed, 26 Feb 2020 08:32:19 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydkf95c93-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 08:32:19 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01QDUIm7080171;
- Wed, 26 Feb 2020 08:32:15 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydkf95c84-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 08:32:15 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01QDUOgN017870;
- Wed, 26 Feb 2020 13:32:14 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma04dal.us.ibm.com with ESMTP id 2ydcmkpw2y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 13:32:14 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
- [9.57.199.106])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01QDWDkE35848684
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 13:32:13 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4702828059;
- Wed, 26 Feb 2020 13:32:13 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3695A28058;
- Wed, 26 Feb 2020 13:32:13 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 13:32:13 +0000 (GMT)
-Subject: Re: [PATCH v3 00/10] vTPM for aarch64
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200226102549.12158-1-eric.auger@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <31e81f4b-ef00-692e-540f-ef3d9be5bb9a@linux.ibm.com>
-Date: Wed, 26 Feb 2020 08:32:13 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <groug@kaod.org>) id 1j6wnl-0002iK-NG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:32:39 -0500
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:60103)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6wng-0002du-In
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:32:37 -0500
+Received: from player729.ha.ovh.net (unknown [10.110.115.195])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 266DF1B2AF0
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 14:32:29 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player729.ha.ovh.net (Postfix) with ESMTPSA id D2E59FEF2A3E;
+ Wed, 26 Feb 2020 13:32:11 +0000 (UTC)
+Date: Wed, 26 Feb 2020 14:32:09 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v6 13/18] spapr: Don't use weird units for MIN_RMA_SLOF
+Message-ID: <20200226143209.1f23e719@bahia.home>
+In-Reply-To: <20200224233724.46415-14-david@gibson.dropbear.id.au>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-14-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200226102549.12158-1-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-26_04:2020-02-26,
- 2020-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 mlxlogscore=920
- suspectscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
- lowpriorityscore=0 clxscore=1015 bulkscore=0 adultscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002260100
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Ovh-Tracer-Id: 8317304090605492710
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrleeggdehhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedvledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.60.232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,18 +68,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
- philmd@redhat.com
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
+ Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/26/20 5:25 AM, Eric Auger wrote:
-> This series adds the capability to instantiate an MMIO TPM TIS
-> in ARM virt. It is candidate to qemu 5.0.
+On Tue, 25 Feb 2020 10:37:19 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Looks good. Can you run the checkpatch script over the patches and 
-address the warnings?
+> MIN_RMA_SLOF records the minimum about of RMA that the SLOF firmware
+> requires.  It lets us give a meaningful error if the RMA ends up too small,
+> rather than just letting SLOF crash.
+> 
+> It's currently stored as a number of megabytes, which is strange for global
+> constants.  Move that megabyte scaling into the definition of the constant
+> like most other things use.
+> 
+> Change from M to MiB in the associated message while we're at it.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 828e2cc135..272a270b7a 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -103,7 +103,7 @@
+>  #define FW_OVERHEAD             0x2800000
+>  #define KERNEL_LOAD_ADDR        FW_MAX_SIZE
+>  
+> -#define MIN_RMA_SLOF            128UL
+> +#define MIN_RMA_SLOF            (128 * MiB)
+>  
+>  #define PHANDLE_INTC            0x00001111
+>  
+> @@ -2959,10 +2959,10 @@ static void spapr_machine_init(MachineState *machine)
+>          }
+>      }
+>  
+> -    if (spapr->rma_size < (MIN_RMA_SLOF * MiB)) {
+> +    if (spapr->rma_size < MIN_RMA_SLOF) {
+>          error_report(
+> -            "pSeries SLOF firmware requires >= %ldM guest RMA (Real Mode Area memory)",
+> -            MIN_RMA_SLOF);
+> +            "pSeries SLOF firmware requires >= %ldMiB guest RMA (Real Mode Area memory)",
+> +            MIN_RMA_SLOF / MiB);
+>          exit(1);
+>      }
+>  
 
 
