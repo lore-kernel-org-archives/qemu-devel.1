@@ -2,93 +2,94 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C3EC4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BCBC4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D98520732
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:57:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C923120732
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:57:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B4N4Xe/v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D98520732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nr34XaMI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C923120732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6sVO-0000wF-68
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:57:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48232)
+	id 1j6sVi-0001ja-1e
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:57:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6sQh-0000eU-J1
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6sPL-0006ZH-SE
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:51:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6sQg-0002m4-CU
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57420
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j6sPK-0008W6-K3
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:51:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56831
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6sQg-0002l1-5X
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:30 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6sPK-0008Us-Ej
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:51:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582707148;
+ s=mimecast20190719; t=1582707066;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W1xNCtymxtj6oq1AZIuwVUL0tbu7yr3DTKwTvuS6YDg=;
- b=B4N4Xe/vteSqsWxZhCqJMIfAmRhEAYvFnU5j/kbpsnXuNXMbK1rHHUyYNn53av+Vd8p2aH
- nT9VOAxRSf08j+2hX2QH3fg1IxLOxAnelwCwXSEAXY8bvqEWri3GgMuoRThY+qSRxXTMKh
- O44qzxztYR8yuUC/91wI1RpfUy9S4s4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-qYFG_y6QNUS73S3hBeF4YQ-1; Wed, 26 Feb 2020 03:52:27 -0500
-X-MC-Unique: qYFG_y6QNUS73S3hBeF4YQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s13so1166400wru.7
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 00:52:27 -0800 (PST)
+ bh=EQpZlTFOpCQdcAfmaVjhCvGpQBYYpPhdmTp1WoVfG9Y=;
+ b=Nr34XaMIylP8pIqrBzKwxCUSkwFi6JWhnbH8pennb6bTRhkPqjqSohYj4wV6x/wCFfNywF
+ F4dtGt9KcIDhDsomcfWAI2jnbxEv0qdMXxYQWDI8ETEXe9u6cc/PjkLcuKGmoU8xYLQbk1
+ a1wKAjbsjNiIyEqn3B05B/0JcejZg0E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-gIXmF9k_Md-wOQvh5_B9hw-1; Wed, 26 Feb 2020 03:51:04 -0500
+X-MC-Unique: gIXmF9k_Md-wOQvh5_B9hw-1
+Received: by mail-wm1-f72.google.com with SMTP id p2so442822wmi.8
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 00:51:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=+n9w1MLBMJGohIcxOdLeECKJqC7Wx8SbYRANQglwFl0=;
- b=KxEKNDZ0F64yAECWEmSAr1GCY17vtgrqD/G7k/PqBYFwHLjGBhQS7WHUyukIIEyMCv
- xzrrIOVYaXefL2i11dEByvFuUxHcnfFVc39Km42La69bAkcHKSbsnVgoTiwH6Xx7T6s5
- YLJeoxLk+Pz4r21vuN2znEu0Ujnswhh0qdQJTFxq+V/INtZC0vPlu33RFHjOhw3Upvqc
- eQ1lUV23aX9Tnaoi4NcMhcxkj5hYdeTDbug2F/UW+8NM9lcL0ep+QB2GUy0hWZRzzrPR
- V0vmGj5oOhJ2Ju0lfiPNih+DU3OaZ70Fcvy0zyXbaJi9cHDAAFvj4OZnm3MhZDyKG4tM
- HA4w==
-X-Gm-Message-State: APjAAAVXum19Kv+RYw8DHDl3Bgxwa57wOLZycdDABsNAgzaRzZknMdUa
- +HOknM4nqehrcJA91whRdQkchl2zSsbFWdjci7oJ0qd5YA63WX9oSrPKW5Q5SI6lYSJCdSIiJ2/
- I7WVoSfpVsvB9Hgc=
-X-Received: by 2002:a5d:6284:: with SMTP id k4mr4329932wru.398.1582707146249; 
- Wed, 26 Feb 2020 00:52:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRBojHao0j2iVhjOC5b2oSR+bHRRgtH0gUVwYC9Qt9n4b4NKP8OV3FYhlqKo5aHh71JeHNSg==
-X-Received: by 2002:a5d:6284:: with SMTP id k4mr4329893wru.398.1582707145857; 
- Wed, 26 Feb 2020 00:52:25 -0800 (PST)
+ bh=Erw3p9ZDh3qQ0G03wAN100FaGTX0pQtWBoXwxb6hOoc=;
+ b=fRT7MdTnDj2eGSJuW2R1D4811ftnfvcEiW7m151c30gRLLQb3IRupA3KOpIqlAU8pT
+ nIWrm8WThacwqZaE/nifoU+9Rw8vqjnVwecNk2QXFH7DBVFLeqSC/lBU8I2GeOFt6/2K
+ 4yGO+hTmkWesE84rD8+xcFftsgYY4gLlMTax1esIYN5GX3vDggC6MluemH33mOgqpEDV
+ Z1Hg5EF3g3uKhCk3G0A8egr59etCXsvxCHBB5NrDp4P81Agj6+3JT1cdt8G9Kog+K+kX
+ 4qcyQC39Lb7vrMpbw3ApbYsw/jXJZX8DmtzYgu59TROjhko2muqwz3C6V0+d/o29fDRw
+ eOgg==
+X-Gm-Message-State: APjAAAXCwM4PaKGn10+pT4FBiYiNDg9JmsGexkqXIgLnx7398g+lpIH9
+ 0KGgtcl2Bj7xvsfMvswhgU9S20ccKFLrrbl9UgYFVVdOUopUZQOy7TXU0kEMtw9joRl/Cx6i9fl
+ 6iAqqKzgY226jluo=
+X-Received: by 2002:a7b:c109:: with SMTP id w9mr4122382wmi.14.1582707063002;
+ Wed, 26 Feb 2020 00:51:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwv5/UML2h5UyHyqalu7CncLN+RMN8Uuj73kpJ0mlRsPQfgQBSDxP5VZ+fJU20NePATDFSOlQ==
+X-Received: by 2002:a7b:c109:: with SMTP id w9mr4122353wmi.14.1582707062761;
+ Wed, 26 Feb 2020 00:51:02 -0800 (PST)
 Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
  [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id f1sm2303350wro.85.2020.02.26.00.52.25
+ by smtp.gmail.com with ESMTPSA id u62sm2051825wmu.17.2020.02.26.00.51.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Feb 2020 00:52:25 -0800 (PST)
-Subject: Re: [PATCH v2 13/13] monitor/hmp-cmds: Remove redundant statement in
- hmp_rocker_of_dpa_groups()
-To: kuhn.chenqun@huawei.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-14-kuhn.chenqun@huawei.com>
+ Wed, 26 Feb 2020 00:51:02 -0800 (PST)
+Subject: Re: Sudden slowdown of ARM emulation in master
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
+ <CAFEAcA_azGqyzbxegpK8ch_bums6Wtd=U7cNxvM=bAJ-Ld2DDA@mail.gmail.com>
+ <ffa87cab-e85c-c381-289a-fdf1ef07b45a@redhat.com>
+ <CAFEAcA-32ddJW0ULWzGDDwLcvPGnXOatRHy73Agh0NRajfnRCQ@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <8452ca98-a729-77c2-d79e-dcf0018f1836@redhat.com>
-Date: Wed, 26 Feb 2020 09:52:24 +0100
+Message-ID: <99625cab-71ff-a925-fbed-28120f046f0c@redhat.com>
+Date: Wed, 26 Feb 2020 09:51:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226084647.20636-14-kuhn.chenqun@huawei.com>
+In-Reply-To: <CAFEAcA-32ddJW0ULWzGDDwLcvPGnXOatRHy73Agh0NRajfnRCQ@mail.gmail.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
@@ -108,74 +109,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/26/20 9:46 AM, kuhn.chenqun@huawei.com wrote:
-> From: Chen Qun <kuhn.chenqun@huawei.com>
+On 2/26/20 9:48 AM, Peter Maydell wrote:
+> On Wed, 26 Feb 2020 at 08:44, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+com> wrote:
+>>
+>> On 2/26/20 9:41 AM, Peter Maydell wrote:
+>>> On Tue, 25 Feb 2020 at 23:08, Niek Linnenbank <nieklinnenbank@gmail.com=
+> wrote:
+>>>
+>>>> Just now I was working on some small fixes for the cubieboard machine =
+and rebasing my Allwinner H3 branches.
+>>>> While doing some testing, I noticed that suddenly the machines were mu=
+ch slower than before.
+>>>> I only see this happening when I rebase to this commit:
+>>>>      ca6155c0f2bd39b4b4162533be401c98bd960820 ("Merge tag 'patchew/202=
+00219160953.13771-1-imammedo@redhat.com' of https://github.com/patchew-proj=
+ect/qemu into HEAD")
+>>>
+>>> Yeah, I noticed a slowdown yesterday as well, but haven't tracked it do=
+wn
+>>> as yet. The first thing would be to do a git bisect to try to narrow
+>>> down what commit caused it.
+>>
+>> My guess: biggest chunk of memory is the DRAM, registered as "fast RAM"
+>> by QEMU, but the SoCs provide SRAM which is supposed to be faster. Not
+>> anymore with QEMU. And Linux try to use the SRAM when possible.
 >=20
-> Clang static code analyzer show warning:
-> monitor/hmp-cmds.c:2867:17: warning: Value stored to 'set' is never read
->                  set =3D true;
->                  ^     ~~~~
+> Doesn't sound very likely to me: generally Linux doesn't use random small
+> lumps of SRAM, it just goes for whatever the dtb says is the main RAM,
+> usually DRAM. And I thought that all RAM blocks within QEMU performed
+> the same?
 >=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> v1->v2: move the 'set' declaration to the for() statement(Base on Philipp=
-e's suggestion).
-> ---
->   monitor/hmp-cmds.c | 5 +----
->   1 file changed, 1 insertion(+), 4 deletions(-)
->=20
-> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-> index 53bc3f76c4..c6b0495822 100644
-> --- a/monitor/hmp-cmds.c
-> +++ b/monitor/hmp-cmds.c
-> @@ -2808,7 +2808,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const Q=
-Dict *qdict)
->       const char *name =3D qdict_get_str(qdict, "name");
->       uint8_t type =3D qdict_get_try_int(qdict, "type", 9);
->       Error *err =3D NULL;
-> -    bool set =3D false;
->  =20
->       list =3D qmp_query_rocker_of_dpa_groups(name, type !=3D 9, type, &e=
-rr);
->       if (err !=3D NULL) {
-> @@ -2820,6 +2819,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const Q=
-Dict *qdict)
->  =20
->       for (g =3D list; g; g =3D g->next) {
->           RockerOfDpaGroup *group =3D g->value;
-> +        bool set =3D false;
->  =20
->           monitor_printf(mon, "0x%08x", group->id);
->  =20
-> @@ -2864,14 +2864,11 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const=
- QDict *qdict)
->  =20
->           if (group->has_set_eth_dst) {
->               if (!set) {
-> -                set =3D true;
->                   monitor_printf(mon, " set");
->               }
->               monitor_printf(mon, " dst %s", group->set_eth_dst);
->           }
->  =20
-> -        set =3D false;
-> -
->           if (group->has_ttl_check && group->ttl_check) {
->               monitor_printf(mon, " check TTL");
->           }
->=20
+>  From the commit that Howard tracked down as the cause it looks like
+> an ordering-of-actions issue in vl.c where something that was assuming
+> memory-size-related stuff was set up is now running before those
+> variables/fields are set correctly rather than after ?
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Yes, I just saw Howard's email and was going to reply to my own "I'm=20
+probably wrong since the mac99 machine doesn't use SRAM".
 
 
