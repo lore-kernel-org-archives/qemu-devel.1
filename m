@@ -2,81 +2,62 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C78C4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42DD1C4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:49:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B025121D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:46:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfyGLRA2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B025121D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19F6C21D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:49:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F6C21D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xx9-00038I-Uz
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:46:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52002)
+	id 1j6xzm-0004cq-9F
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:49:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1j6xwR-0002YZ-6A
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:40 -0500
+ (envelope-from <groug@kaod.org>) id 1j6xz6-000452-2n
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:48:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1j6xwN-0004kr-4y
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28156
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1j6xz4-0003fP-Sf
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:48:24 -0500
+Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:53070)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j6xwN-0004hw-1d
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582728334;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qlVXF2tk1qgD8ay0foIDoyXWCm75nANb9zMd0kEiJDc=;
- b=cfyGLRA2hcU/peZmgfmvn8jMd/txnj7gMCroM3Kv+0M2ikxVg+KmRrQ6tMEWuzUAZpH11n
- FMQ8dWAwGnqOr30aqsiQVW5gmd6/xjysDeRTkjYlcMWn3k3QOy6oNZLG7XaqHJ3xMRliry
- i14W1ceg01KUsuM5u1B+MvyLEMnhgD4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-sXoOkyq4M4OKUo4ufgTqQg-1; Wed, 26 Feb 2020 09:45:30 -0500
-X-MC-Unique: sXoOkyq4M4OKUo4ufgTqQg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EA0418A5517;
- Wed, 26 Feb 2020 14:45:29 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 451D18C086;
- Wed, 26 Feb 2020 14:45:27 +0000 (UTC)
-Date: Wed, 26 Feb 2020 15:45:25 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
-Subject: Re: Sudden slowdown of ARM emulation in master
-Message-ID: <20200226154525.5c4c0ac9@redhat.com>
-In-Reply-To: <87k149xwqw.fsf@linaro.org>
-References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
- <20200226101948.786be4b0@redhat.com>
- <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
- <87k149xwqw.fsf@linaro.org>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6xz4-0003bS-NJ
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:48:22 -0500
+Received: from player791.ha.ovh.net (unknown [10.110.208.83])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id BA6CB121BCD
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 15:48:19 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player791.ha.ovh.net (Postfix) with ESMTPSA id A6D3FFBF011F;
+ Wed, 26 Feb 2020 14:47:56 +0000 (UTC)
+Date: Wed, 26 Feb 2020 15:47:53 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v6 18/18] spapr: Fold spapr_node0_size() into its only
+ caller
+Message-ID: <20200226154753.31782c90@bahia.home>
+In-Reply-To: <20200224233724.46415-19-david@gibson.dropbear.id.au>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-19-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 9598015234245171686
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrleeggdejtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeluddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.37.72
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,89 +69,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
+ Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
+ Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Feb 2020 14:13:11 +0000
-Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+On Tue, 25 Feb 2020 10:37:24 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
-> > On Wed, 26 Feb 2020 at 09:19, Igor Mammedov <imammedo@redhat.com> wrote=
-: =20
-> >>
-> >> On Wed, 26 Feb 2020 00:07:55 +0100
-> >> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
-> >> =20
-> >> > Hello Igor and Paolo, =20
-> >>
-> >> does following hack solves issue?
-> >>
-> >> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> >> index a08ab11f65..ab2448c5aa 100644
-> >> --- a/accel/tcg/translate-all.c
-> >> +++ b/accel/tcg/translate-all.c
-> >> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t t=
-b_size)
-> >>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use =
-the
-> >>             static buffer, we could size this on RESERVED_VA, on the t=
-ext
-> >>             segment size of the executable, or continue to use the def=
-ault.  */
-> >> -        tb_size =3D (unsigned long)(ram_size / 4);
-> >> +        tb_size =3D MAX_CODE_GEN_BUFFER_SIZE;
-> >>  #endif
-> >>      }
-> >>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) { =20
-> >
-> > Cc'ing Richard to ask: does it still make sense for TCG
-> > to pick a codegen buffer size based on the guest RAM size? =20
->=20
-> Arguably you would never get more than ram_size * tcg gen overhead of
-> active TBs at any one point although you can come up with pathological
-> patterns where only a subset of pages are flushed in and out at a time.
->=20
-> However the backing for the code is mmap'ed anyway so surely the kernel
-> can work out the kinks here. We will never allocate more than the code
-> generator can generate jumps for anyway.
->=20
-> Looking at the SoftMMU version of alloc_code_gen_buffer it looks like
-> everything now falls under the:
->=20
->   # if defined(__PIE__) || defined(__PIC__)
->=20
-> leg so there is a bunch of code to be deleted there. The remaining
-> question is what to do for linux-user because there is a bit more logic
-> to deal with some corner cases on the static code generation buffer.
->=20
-> I'd be tempted to rename DEFAULT_CODE_GEN_BUFFER_SIZE to
-> SMALL_CODE_GEN_BUFFER_SIZE and only bother with a static allocation for
-> 32 bit linux-user hosts. Otherwise why not default to
-> MAX_CODE_GEN_BUFFER_SIZE on 64 bit systems and let the kernel deal with
-> it?
+> The Real Mode Area (RMA) needs to fit within the NUMA node owning memory
+> at address 0.  That's usually node 0, but can be a later one if there are
+> some nodes which have no memory (only CPUs).
+> 
+> This is currently handled by the spapr_node0_size() helper.  It has only
+> one caller, so there's not a lot of point splitting it out.  It's also
+> extremely easy to misread the code as clamping to the size of the smallest
+> node rather than the first node with any memory.
+> 
+> So, fold it into the caller, and add some commentary to make it a bit
+> clearer exactly what it's doing.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c | 37 +++++++++++++++++++++----------------
+>  1 file changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f0354b699d..9ba645c9cb 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -296,20 +296,6 @@ static void spapr_populate_pa_features(SpaprMachineState *spapr,
+>      _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_size)));
+>  }
+>  
+> -static hwaddr spapr_node0_size(MachineState *machine)
+> -{
+> -    if (machine->numa_state->num_nodes) {
+> -        int i;
+> -        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+> -            if (machine->numa_state->nodes[i].node_mem) {
+> -                return MIN(pow2floor(machine->numa_state->nodes[i].node_mem),
+> -                           machine->ram_size);
+> -            }
+> -        }
+> -    }
+> -    return machine->ram_size;
+> -}
+> -
+>  static void add_str(GString *s, const gchar *s1)
+>  {
+>      g_string_append_len(s, s1, strlen(s1) + 1);
+> @@ -2652,10 +2638,24 @@ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
+>  {
+>      MachineState *machine = MACHINE(spapr);
+>      hwaddr rma_size = machine->ram_size;
+> -    hwaddr node0_size = spapr_node0_size(machine);
+>  
+>      /* RMA has to fit in the first NUMA node */
+> -    rma_size = MIN(rma_size, node0_size);
+> +    if (machine->numa_state->num_nodes) {
+> +        /*
+> +         * It's possible for there to be some zero-memory nodes first
+> +         * in the list.  We need the RMA to fit inside the memory of
+> +         * the first node which actually has some memory.
+> +         */
+> +        int i;
+> +
+> +        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+> +            if (machine->numa_state->nodes[i].node_mem != 0) {
+> +                rma_size = MIN(rma_size,
+> +                               machine->numa_state->nodes[i].node_mem);
+> +                break;
+> +            }
+> +        }
+> +    }
+>  
+>      /*
+>       * VRMA access is via a special 1TiB SLB mapping, so the RMA can
+> @@ -2672,6 +2672,11 @@ static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
+>          spapr->rma_size = MIN(spapr->rma_size, smc->rma_limit);
+>      }
+>  
+> +    /*
+> +     * RMA size must be a power of 2
+> +     */
+> +    rma_size = pow2floor(rma_size);
+> +
 
-*-user call
-  tcg_exec_init(0);
-which in in the end results in
-  DEFAULT_CODE_GEN_BUFFER_SIZE -> DEFAULT_CODE_GEN_BUFFER_SIZE_1
+This slightly changes semantics. In a scenario without NUMA,
+we used to get:
 
-so for *-user cases we can just always call
-   code_gen_alloc(DEFAULT_CODE_GEN_BUFFER_SIZE)
+    rma_size == machine->ram_size
 
-> > (We should fix the regression anyway, but it surprised me
-> > slightly to find a config detail of the guest machine being
-> > used here.)
-> >
-> > thanks
-> > -- PMM =20
->=20
->=20
+but with this patch we now get:
+
+    rma_size == pow2floor(machine->ram_size)
+
+Maybe mention it in the changelog ?
+
+Anyway,
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>      if (rma_size < (MIN_RMA_SLOF * MiB)) {
+>          error_setg(errp,
+>  "pSeries SLOF firmware requires >= %ldMiB guest RMA (Real Mode Area)",
 
 
