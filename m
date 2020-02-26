@@ -2,95 +2,95 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11F9C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8124C4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A550420838
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:31:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A550420838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93BD820838
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 12:32:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kSlC6bz4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93BD820838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43667 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6vqg-00041J-Oz
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 07:31:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53821)
+	id 1j6vrq-00057c-Q6
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 07:32:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j6vgn-0003LM-Ez
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:21:22 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6vnp-0008QE-2N
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:28:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j6vgm-0000Sa-5J
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:21:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40856)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j6vgl-0008Lq-TT
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:21:20 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QCL7AE064910
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 07:21:09 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydcntmq3e-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 07:21:08 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 26 Feb 2020 12:20:59 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 26 Feb 2020 12:20:58 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01QCKvIa54263870
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 12:20:57 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ACE2C11C05C;
- Wed, 26 Feb 2020 12:20:57 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EA57F11C04C;
- Wed, 26 Feb 2020 12:20:56 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.152.224.212])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 12:20:56 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 13/18] s390x: protvirt: Move diag 308 data over SIDAD
-Date: Wed, 26 Feb 2020 07:20:33 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200226122038.61481-1-frankja@linux.ibm.com>
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1j6vnm-0000lU-Q4
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:28:36 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37220)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6vnl-0000gS-J3
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 07:28:33 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a141so2058429wme.2
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 04:28:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=GebF3YCAUV6iq6BoBFA5/3vZx76lWoG1RufaLzGRksA=;
+ b=kSlC6bz4T+MbNACHpKHLxmIHh1WGc8lSST+gd+lGhF0MzYvs7s8WJxYfdC4ubPD2/f
+ bVh5CbZ8e28Kq68nDMcqPwifhBursQD7+9Vs490qHqp55nKIxD1QDXbOxFOu0WGFMg0k
+ evWrQhDPDU049ROL91Y7qaRrd0/HrLL2LvtRcc5yQb9zM7rpN6XAEKaaor14gLVbvn1v
+ 8e7nC+vDHFm/XDULygZIAoF7oDbOqQb7iE5/dNaD0fSSyHQtf25CyWdLuGW+Tc36npHl
+ 3EVHMzWq4ESif4R7o/TlJ+vRu1puqbpDvH8K/XeuKYazwJ39Urc1RkHHz8+qfUX0cu5b
+ BZPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=GebF3YCAUV6iq6BoBFA5/3vZx76lWoG1RufaLzGRksA=;
+ b=dEKAneCaKpERXSPl4o4zo6bnC9bK54p8Qczzlgz/hDlgKkEl5qTAME2pqDUWaaxcx1
+ kDkLasov3CXq87ot4qRNMOrbPLbpMT4e5CMQ2h2YlW9uE5xeGSJwWdOxmsNGkZeNVsRe
+ t+XjYcx1PuBjJV7E2ptkEgMg8naXQn62QOmYDNLTJ5BrKTRvzZWu0tPsO6MQcXl6SrtS
+ hoXiXlsyeF4NOU2poXUSDYSwLRsQsvlhl3O4lr97z1VuQeD4DtM2Wpf3Ls6incxZNutW
+ rjoBaVF4VZocE+z7TWKkTab0UdihNQSwRMUR0Id6MD/lhhB3DEiegOaCMBWW9pub7Dy/
+ 0ZAw==
+X-Gm-Message-State: APjAAAVhBVwcHeKv2w9qHwIO0pjkfmbsdcXXYJcbYWyjeix//Nocv7q3
+ JR4LScEiNRUYKFrlBQgi3NwN1g==
+X-Google-Smtp-Source: APXvYqygh02oNUgmHFYo6q1TXKu1zcASlSz2R/V5AAez2z2qCQkb5NabqRUpgdr8sTU+JfUs8nWVyg==
+X-Received: by 2002:a05:600c:34b:: with SMTP id
+ u11mr5348522wmd.69.1582720111972; 
+ Wed, 26 Feb 2020 04:28:31 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d7sm2592694wmc.6.2020.02.26.04.28.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 04:28:30 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id EA8441FF87;
+ Wed, 26 Feb 2020 12:28:29 +0000 (GMT)
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <d9d4fba7-2dcf-8f09-8f3a-7e0408c297b6@linaro.org>
+ <alpine.BSF.2.22.395.2002211643480.45267@zero.eik.bme.hu>
+ <CAFEAcA-teH7KXACL=5m0-X+g692EXKtqOy9d_uGjw6XA8S3vzA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2002211807380.69986@zero.eik.bme.hu>
+ <CAFEAcA9-VzUXij1_vFr+d7KuMOw+Tdv0hvxW2WmfGxt=fAKvjg@mail.gmail.com>
+ <alpine.BSF.2.22.395.2002212034570.8472@zero.eik.bme.hu>
+User-agent: mu4e 1.3.8; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+In-reply-to: <alpine.BSF.2.22.395.2002212034570.8472@zero.eik.bme.hu>
+Date: Wed, 26 Feb 2020 12:28:29 +0000
+Message-ID: <87mu95y1le.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20022612-0008-0000-0000-000003569645
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022612-0009-0000-0000-00004A77B510
-Message-Id: <20200226122038.61481-14-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-26_04:2020-02-26,
- 2020-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=3 spamscore=0
- bulkscore=0 mlxlogscore=791 clxscore=1015 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 impostorscore=0 phishscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002260092
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,91 +102,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- david@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ John Arbuckle <programmingkidx@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paul Clarke <pc@us.ibm.com>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For protected guests the IPIB is written/read to/from the satellite
-block, so we need those accesses to go through
-s390_cpu_pv_mem_read/write().
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- target/s390x/diag.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index 840335d40a..266ac78b83 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -88,6 +88,7 @@ static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
- void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- {
-     CPUState *cs = env_cpu(env);
-+    S390CPU *cpu = S390_CPU(cs);
-     uint64_t addr =  env->regs[r1];
-     uint64_t subcode = env->regs[r3];
-     IplParameterBlock *iplb;
-@@ -119,13 +120,22 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
-             return;
-         }
-         iplb = g_new0(IplParameterBlock, 1);
--        cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
-+        if (!env->pv) {
-+            cpu_physical_memory_read(addr, iplb, sizeof(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_read(cpu, 0, iplb, sizeof(iplb->len));
-+        }
-+
-         if (!iplb_valid_len(iplb)) {
-             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
-             goto out;
-         }
- 
--        cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
-+        if (!env->pv) {
-+            cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len));
-+        }
- 
-         if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
-             !(iplb_valid_pv(iplb) && !s390_ipl_pv_check_components(iplb))) {
-@@ -137,7 +147,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
-         env->regs[r1 + 1] = DIAG_308_RC_OK;
- out:
-         g_free(iplb);
--        return;
-+        break;
-     case DIAG308_STORE:
-     case DIAG308_PV_STORE:
-         if (diag308_parm_check(env, r1, addr, ra, true)) {
-@@ -148,12 +158,18 @@ out:
-         } else {
-             iplb = s390_ipl_get_iplb();
-         }
--        if (iplb) {
--            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
--            env->regs[r1 + 1] = DIAG_308_RC_OK;
--        } else {
-+        if (!iplb) {
-             env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
-+            return;
-         }
-+
-+        if (!env->pv) {
-+            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
-+        } else {
-+            s390_cpu_pv_mem_write(cpu, 0, iplb, be32_to_cpu(iplb->len));
-+        }
-+
-+        env->regs[r1 + 1] = DIAG_308_RC_OK;
-         break;
-     case DIAG308_PV_START:
-         iplb = s390_ipl_get_iplb_secure();
--- 
-2.20.1
+> On Fri, 21 Feb 2020, Peter Maydell wrote:
+>> On Fri, 21 Feb 2020 at 18:04, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>>> On Fri, 21 Feb 2020, Peter Maydell wrote:
+>>>> I think that is the wrong approach. Enabling use of the host
+>>>> FPU should not affect the accuracy of the emulation, which
+>>>> should remain bitwise-correct. We should only be using the
+>>>> host FPU to the extent that we can do that without discarding
+>>>> accuracy. As far as I'm aware that's how the hardfloat support
+>>>> for other guest CPUs that use it works.
 
+Correct - we only use hardfloat when we know it will give the same
+result which is broadly when the inexact flag is already set and we are
+dealing with normal floating point numbers.
+
+We added a whole bunch of testing to ensure we maintain accuracy when
+the code went in.
+
+<snip>
+>>
+>> I don't know much about PPC, but if you can't emulate the
+>> guest architecture accurately with the host FPU, then
+>> don't use the host FPU. We used to have a kind of 'hardfloat'
+>
+> I don't know if it's possible or not to emulate these accurately and
+> use the FPU but nobody did it for QEMU so far. But if someone knows a
+> way please speak up then we can try to implement it. Unfortunately
+> this would require more detailed knowledge about different FPU
+> implementations (at least X86_64, ARM and PPC that are the mostly used
+> platforms) than what I have or willing to spend time to learn.
+>
+>> support that was fast but inaccurate, but it was a mess
+>> because it meant that most guest code sort of worked but
+>> some guest code would confusingly misbehave. Deliberately
+>> not correctly emulating the guest CPU/FPU behaviour is not
+>> something I want us to return to.
+>>
+>> You're right that sometimes you can't get both speed
+>> and accuracy; other emulators (and especially ones
+>> which are trying to emulate games consoles) may choose
+>> to prefer speed over accuracy. For QEMU we prefer to
+>> choose accuracy over speed in this area.
+>
+> OK, then how about keeping the default accurate but allow to opt in to
+> use FPU even if it's known to break some bits for workloads where
+> users would need speed over accuracy and would be happy to live with
+> the limitation.
+
+About the only comparison I can think of is the thread=3Dsingle:multi
+flags for TCG which is mostly there to help developers eliminate causes
+of bugs. The default for MTTCG is it is enabled when it's safe. If you
+enable it via the command line where QEMU hasn't defaulted it on you
+will get lots of loud warnings about potential instability. The most
+commonly used case is thread=3Dsingle when you want to check it's not a
+MTTCG bug.
+
+I'm as cautious as Peter here about adding a "faster but broken" command
+line flag because users will invariably read up to the "faster" and then
+spend a lot of time scratching their heads when things break.
+
+> Note that i've found that just removing the define
+> that disables hardfloat for PPC target makes VMX vector instructions
+> faster while normal FPU is a little slower without any other changes
+> so disabling hardfloat already limits performance for guests using VMX
+> even when not using the FPU for cases when it would cause inaccuracy.
+> If you say we want accuracy and don't care about speed, then just
+> don't disable hardfloat as it helps at least VMX and then we can add
+> option to allow the user to say we can use hardfloat even if it's
+> inaccurate then they can test their workload and decide for
+> themselves.
+>
+> Regards,
+> BALATON Zoltan
+
+
+--=20
+Alex Benn=C3=A9e
 
