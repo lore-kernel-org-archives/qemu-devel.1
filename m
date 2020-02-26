@@ -6,138 +6,140 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BADD6C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6B1C4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:09:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9437121927
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:06:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9437121927
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 341FF2467B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:09:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341FF2467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xKm-0006H3-R2
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:06:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33976)
+	id 1j6xMz-0007WQ-CR
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:09:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1j6xK8-0005rb-SD
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:06:05 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j6xMQ-00074g-An
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1j6xK4-0008H7-2j
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:06:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2818)
+ (envelope-from <frankja@linux.ibm.com>) id 1j6xMP-0006WW-5P
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:26 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4452
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1j6xK3-0008E2-Rb
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:06:00 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1j6xMO-0006Vi-VV
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:25 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QE3dLC025487
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:05:58 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydcp4rka2-1
+ 01QE4RcL025630
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:08:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ydqfup2ak-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:05:58 -0500
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:08:24 -0500
 Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Wed, 26 Feb 2020 14:05:56 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 26 Feb 2020 14:08:22 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 26 Feb 2020 14:05:52 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01QE5pDW65208566
+ Wed, 26 Feb 2020 14:08:19 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 01QE8IbM31719700
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 14:05:51 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 88BE14C040;
- Wed, 26 Feb 2020 14:05:51 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 50A354C04A;
- Wed, 26 Feb 2020 14:05:51 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.219])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 14:05:51 +0000 (GMT)
+ Wed, 26 Feb 2020 14:08:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 126F2AE056;
+ Wed, 26 Feb 2020 14:08:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D815CAE059;
+ Wed, 26 Feb 2020 14:08:17 +0000 (GMT)
+Received: from dyn-9-152-224-212.boeblingen.de.ibm.com (unknown
+ [9.152.224.212])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 26 Feb 2020 14:08:17 +0000 (GMT)
 Subject: Re: [PATCH v5 05/18] s390x: protvirt: Add migration blocker
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
 References: <20200226122038.61481-1-frankja@linux.ibm.com>
  <20200226122038.61481-6-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Wed, 26 Feb 2020 15:05:51 +0100
+ <a2aeac24-ae5e-7949-5174-a98fbe8e9b17@de.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Wed, 26 Feb 2020 15:08:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200226122038.61481-6-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <a2aeac24-ae5e-7949-5174-a98fbe8e9b17@de.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl"
 X-TM-AS-GCONF: 00
-x-cbid: 20022614-0012-0000-0000-0000038A7A78
+x-cbid: 20022614-0028-0000-0000-000003DE3081
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022614-0013-0000-0000-000021C72092
-Message-Id: <a2aeac24-ae5e-7949-5174-a98fbe8e9b17@de.ibm.com>
+x-cbparentid: 20022614-0029-0000-0000-000024A34C88
+Message-Id: <16b8205e-6e90-fb36-5687-3e41d4011739@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-02-26_04:2020-02-26,
  2020-02-26 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  spamscore=0 clxscore=1015
- adultscore=0 bulkscore=0 mlxscore=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=869 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002260105
+ malwarescore=0 suspectscore=3 priorityscore=1501 phishscore=0 adultscore=0
+ bulkscore=0 impostorscore=0 lowpriorityscore=0 mlxlogscore=973 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002260105
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,47 +156,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl
+Content-Type: multipart/mixed; boundary="pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM"
+
+--pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 2/26/20 3:05 PM, Christian Borntraeger wrote:
+>=20
+>=20
+> On 26.02.20 13:20, Janosch Frank wrote:
+>> Migration is not yet supported.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c | 28 ++++++++++++++++++++++------
+>>  1 file changed, 22 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index e506dd65ed..79f472c309 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -42,6 +42,9 @@
+>>  #include "hw/s390x/tod.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "hw/s390x/pv.h"
+>> +#include "migration/blocker.h"
+>> +
+>> +static Error *pv_mig_blocker;
+>> =20
+>>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>>  {
+>> @@ -325,18 +328,30 @@ static void s390_machine_unprotect(S390CcwMachin=
+eState *ms)
+>>  {
+>>      CPUState *t;
+>> =20
+>> -    s390_pv_vm_disable();
+>> -    CPU_FOREACH(t) {
+>> -        S390_CPU(t)->env.pv =3D false;
+>> +    if (ms->pv) {
+>> +        s390_pv_vm_disable();
+>> +        CPU_FOREACH(t) {
+>> +            S390_CPU(t)->env.pv =3D false;
+>> +        }
+>> +        ms->pv =3D false;
+>>      }
+>> -    ms->pv =3D false;
+>>  }
+>=20
+> Shouldnt that hunk go into the previous patch?
+>=20
+>=20
+
+Yes, something went wrong
 
 
-On 26.02.20 13:20, Janosch Frank wrote:
-> Migration is not yet supported.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 28 ++++++++++++++++++++++------
->  1 file changed, 22 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index e506dd65ed..79f472c309 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -42,6 +42,9 @@
->  #include "hw/s390x/tod.h"
->  #include "sysemu/sysemu.h"
->  #include "hw/s390x/pv.h"
-> +#include "migration/blocker.h"
-> +
-> +static Error *pv_mig_blocker;
->  
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -325,18 +328,30 @@ static void s390_machine_unprotect(S390CcwMachineState *ms)
->  {
->      CPUState *t;
->  
-> -    s390_pv_vm_disable();
-> -    CPU_FOREACH(t) {
-> -        S390_CPU(t)->env.pv = false;
-> +    if (ms->pv) {
-> +        s390_pv_vm_disable();
-> +        CPU_FOREACH(t) {
-> +            S390_CPU(t)->env.pv = false;
-> +        }
-> +        ms->pv = false;
->      }
-> -    ms->pv = false;
->  }
+--pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM--
 
-Shouldnt that hunk go into the previous patch?
+--kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5We9EACgkQ41TmuOI4
+ufiOgg/+JKWPkprs/85R8lFrhFR/szvFQx1kDfAPN9qVTH+bFOd3jOlRZdzH88Vj
+QxevUIVtIqiiqS0zWzSPM7yHhOOqNP6QRmI8u+/gSL3jhHilzS14VxNDQW7AWeR1
+pB19ShmfDWEU0GSOnNRlCqxxVw8zAgNdU3L/qb7u7IwQ0SCCffEmOdS5DtGlw89f
+5vIKFu06PFSM0o5TF+NIjXTG+7Ws/9POV0KfU1lsvhp0OuUeugIl0q8p29f3M80h
+h3OUoaL2CcmhFClwg0X7KOVZZxmR6z0DzbUZit8SrBxipWTSMi2zlhsO7zPSNYNF
+gr2zaFtbmvn74ay161QNwWZ6g5w0KOuQHXbf9uEG5pWgEGpZJ59baw9Je+VZFAh3
+7Z9C4IkRjedFahrkSAC9I9FwC9aYBN5rchfrLGTpeu3PmxLCfZsm6yU8dXFrcqja
+Z9CNKQQW3xnI4BG7qX0aYNaOTk+6J/4tS9qUE6yfmpmEXbZtKjifIpsEyVwh6qS1
+Q2E1jWTePd5TqsSdT0DKiHQkuCB3Of+aJiXJp3SVvSD2CNRWhPs8WGLnXp0o+1ES
+3KElFW+zskJ61UMO2sP7zEYF3/RbWR7EDIWmVH1mRCS4p/K8YoHaRNiELr8w/GuZ
+nPm97Hvl/aF7V35ip7nFEbxcO/lkoJiWFuPmg3RmZjYJ7Dx3CVA=
+=QPnQ
+-----END PGP SIGNATURE-----
+
+--kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl--
 
 
