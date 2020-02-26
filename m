@@ -2,83 +2,64 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7ECC4BA09
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 00:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD872C4BA06
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 01:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F14E821927
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 00:51:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9088120658
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 01:28:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTeANuid"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14E821927
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nxGe+gRt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9088120658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6kvK-0000oX-Uc
-	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 19:51:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56778)
+	id 1j6lUv-0006RH-Mt
+	for qemu-devel@archiver.kernel.org; Tue, 25 Feb 2020 20:28:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60810)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j6kui-0000M9-5a
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 19:51:01 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j6lTy-0005WI-QR
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 20:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j6kug-0003Ih-Si
- for qemu-devel@nongnu.org; Tue, 25 Feb 2020 19:51:00 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42110)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j6kug-0003GO-JD; Tue, 25 Feb 2020 19:50:58 -0500
-Received: by mail-lj1-x243.google.com with SMTP id d10so965549ljl.9;
- Tue, 25 Feb 2020 16:50:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0DYAnu0qFK+bImu9vbQy4oZ3OX5QIv6i/7PEutObbk0=;
- b=FTeANuidsptqgb/S1bYvsl5BTsWVRp0TZtj6OsyH35iZ7ggkh0wPEjuhKFp/qEkTwx
- FBRtnLm5KTTmQXCg1fPbIuiL7LJcWhQ3VKw+ETaFaJfdMJufjGV87zh62OFDmPQnKleT
- 6CGyk8t3v4g1EPB7013SELruFkFy34j7amJ7NNl5sDMZReoekwlVB7ZRiNs3f4v2qmsa
- 03AM9qZmJR041pkrPZnDkBQEOUukd7Hxg4lMLUXbfAZIgO5QjgIm9QwkWShI4VXL54cX
- bBj1F5Hyn2q7KRU+hVcdhRZpfylcQ8mBfr5NQ631CTQrYGLWHdPeZ9r9+XxT/5u74JBa
- 77KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0DYAnu0qFK+bImu9vbQy4oZ3OX5QIv6i/7PEutObbk0=;
- b=U/7pZ7cPyjr/2R9h6r6csGQZKKF2+NGmsuKOnKd9jOYEacnh0592hF4SsfGfDwc80Z
- jP6jsLxco/p3RyCP2p8P9WsfXO5CmKkjPwthIP9Zon+fiV9/bXBDS77WM7avfi+e2Zy8
- Hjks5czmxul8d9AyrQN29kLZoT3/4biyN+puPlkuyPpesKI9MQVqAUWL2F299l1yNC+N
- L6pN4RRYCdoe/PdbRHaQviXmEt1zGrI9AQRcdn3Lu5nB0gu8epWQ2VD1Kkg8o2zc10IA
- EB93joAZyRoJa3p3joUiWXSNvF4bCaGKk3L3xh+A8aE7ual9TVAMJPXPEdmaMNNZGktB
- GNLQ==
-X-Gm-Message-State: APjAAAU84qH989gYhiYjYrRYoodYyojyuzjNEjdHL/5JkvkCsGaRW/Sx
- XAPYrGzVKugAt8I5oLs89D/YhgxzXkEQDW2mPHw=
-X-Google-Smtp-Source: APXvYqxDWONWEZ+A+F8vsHyRKPtZzzZn0cXlZlwO4y0TUxMUx3h11iVoxSfqKch58uu0bMkSM9wAl1edL1J6lbeQ2g0=
-X-Received: by 2002:a2e:b0db:: with SMTP id g27mr991055ljl.74.1582678256988;
- Tue, 25 Feb 2020 16:50:56 -0800 (PST)
+ (envelope-from <dgibson@ozlabs.org>) id 1j6lTx-0001TK-EM
+ for qemu-devel@nongnu.org; Tue, 25 Feb 2020 20:27:26 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59007 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j6lTw-0001Bf-SV; Tue, 25 Feb 2020 20:27:25 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48Ryp96l8yz9sRJ; Wed, 26 Feb 2020 12:27:13 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1582680433;
+ bh=kRQ8kNbq/1ROJcL+oCuqAQo8AQZVh+uUJ6uY0lNjb70=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=nxGe+gRtOC/6hrZoPslLMNHsVIXk9oTxZCRfnvh2r4yi20n6vOQ6AkYGiorZ3YnSC
+ s9gf6xGAmzMq07K+xRqpjSKyUurDdJvso80cAWijBeJNq8j/A7tUVhuBh4ID/lddfH
+ G+lk56EjjolSdc1SGOauoGC9Vi+ihpJGkbgjSH/c=
+Date: Wed, 26 Feb 2020 12:00:41 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v6 06/18] spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+Message-ID: <20200226010041.GG41629@umbus.fritz.box>
+References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
+ <20200224233724.46415-7-david@gibson.dropbear.id.au>
+ <20200225122900.0fe0780b@bahia.home>
+ <20200225165801.14cba74c@bahia.home>
 MIME-Version: 1.0
-References: <cover.1582586444.git.alistair.francis@wdc.com>
- <205d84c5c51c54c8bb6a4a2927b7e1729fe42cdd.1582586444.git.alistair.francis@wdc.com>
- <4d5ad27a-0655-4c15-123a-8ae7ed6bedf2@vivier.eu>
-In-Reply-To: <4d5ad27a-0655-4c15-123a-8ae7ed6bedf2@vivier.eu>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 25 Feb 2020 16:43:21 -0800
-Message-ID: <CAKmqyKO82EVS-LGJrbbuNLDEAFYxn5ueJJS2DYy=9BtAk93YnQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] linux-user: Protect more syscalls
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5UGlQXeG3ziZS81+"
+Content-Disposition: inline
+In-Reply-To: <20200225165801.14cba74c@bahia.home>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,73 +71,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 3:59 AM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 25/02/2020 =C3=A0 00:21, Alistair Francis a =C3=A9crit :
-> > New y2038 safe 32-bit architectures (like RISC-V) don't support old
-> > syscalls with a 32-bit time_t. The kernel defines new *_time64 versions
-> > of these syscalls. Add some more #ifdefs to syscall.c in linux-user to
-> > allow us to compile without these old syscalls.
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> >  linux-user/strace.c  |  2 ++
-> >  linux-user/syscall.c | 20 ++++++++++++++++++++
-> >  2 files changed, 22 insertions(+)
-> >
-> > diff --git a/linux-user/strace.c b/linux-user/strace.c
-> > index 4f7130b2ff..6420ccd97b 100644
-> > --- a/linux-user/strace.c
-> > +++ b/linux-user/strace.c
-> > @@ -775,6 +775,7 @@ print_syscall_ret_newselect(const struct syscallnam=
-e *name, abi_long ret)
-> >  #define TARGET_TIME_OOP      3   /* leap second in progress */
-> >  #define TARGET_TIME_WAIT     4   /* leap second has occurred */
-> >  #define TARGET_TIME_ERROR    5   /* clock not synchronized */
-> > +#ifdef TARGET_NR_adjtimex
-> >  static void
-> >  print_syscall_ret_adjtimex(const struct syscallname *name, abi_long re=
-t)
-> >  {
-> > @@ -813,6 +814,7 @@ print_syscall_ret_adjtimex(const struct syscallname=
- *name, abi_long ret)
-> >
-> >      qemu_log("\n");
-> >  }
-> > +#endif
-> >
-> >  UNUSED static struct flags access_flags[] =3D {
-> >      FLAG_GENERIC(F_OK),
-> > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> > index 8d27d10807..5a2156f95a 100644
-> > --- a/linux-user/syscall.c
-> > +++ b/linux-user/syscall.c
-> > @@ -742,8 +742,10 @@ safe_syscall3(ssize_t, read, int, fd, void *, buff=
-, size_t, count)
-> >  safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, cou=
-nt)
-> >  safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
-> >                int, flags, mode_t, mode)
-> > +#if defined(TARGET_NR_wait4)
-> >  safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
-> >                struct rusage *, rusage)
->
-> safe_wait4 is also used in TARGET_NR_waitpid
 
-Fixed!
+--5UGlQXeG3ziZS81+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
+On Tue, Feb 25, 2020 at 04:58:01PM +0100, Greg Kurz wrote:
+> On Tue, 25 Feb 2020 12:29:00 +0100
+> Greg Kurz <groug@kaod.org> wrote:
+>=20
+> > On Tue, 25 Feb 2020 10:37:12 +1100
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >=20
+> > > For the "pseries" machine, we use "virtual hypervisor" mode where we
+> > > only model the CPU in non-hypervisor privileged mode.  This means that
+> > > we need guest physical addresses within the modelled cpu to be treated
+> > > as absolute physical addresses.
+> > >=20
+> > > We used to do that by clearing LPCR[VPM0] and setting LPCR[RMLS] to a=
+ high
+> > > limit so that the old offset based translation for guest mode applied,
+> > > which does what we need.  However, POWER9 has removed support for that
+> > > translation mode, which meant we had some ugly hacks to keep it worki=
+ng.
+> > >=20
+> > > We now explicitly handle this sort of translation for virtual hypervi=
+sor
+> > > mode, so the hacks aren't necessary.  We don't need to set VPM0 and R=
+MLS
+> > > from the machine type code - they're now ignored in vhyp mode.  On th=
+e cpu
+> > > side we don't need to allow LPCR[RMLS] to be set on POWER9 in vhyp mo=
+de -
+> > > that was only there to allow the hack on the machine side.
+> > >=20
+> > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+> > > ---
+> >=20
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> >=20
+>=20
+> Ah wait...
+>=20
+> > >  hw/ppc/spapr_cpu_core.c | 6 +-----
+> > >  target/ppc/mmu-hash64.c | 8 --------
+> > >  2 files changed, 1 insertion(+), 13 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > > index d09125d9af..ea5e11f1d9 100644
+> > > --- a/hw/ppc/spapr_cpu_core.c
+> > > +++ b/hw/ppc/spapr_cpu_core.c
+> > > @@ -58,14 +58,10 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+> > >       * we don't get spurious wakups before an RTAS start-cpu call.
+> > >       * For the same reason, set PSSCR_EC.
+> > >       */
+> > > -    lpcr &=3D ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->l=
+pcr_pm);
+> > > +    lpcr &=3D ~(LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_pm);
+>=20
+> ... a few lines above, we have a comment that should be dropped as well.
+>=20
+>      * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
+>      * real mode accesses, which thankfully defaults to 0 and isn't
+>      * accessible in guest mode.
 
->
-> Thanks,
-> Laurent
+Removed, thanks.
+
+>=20
+> My R-b tag stands anyway.
+>=20
+> > >      lpcr |=3D LPCR_LPES0 | LPCR_LPES1;
+> > >      env->spr[SPR_PSSCR] |=3D PSSCR_EC;
+> > > =20
+> > > -    /* Set RMLS to the max (ie, 16G) */
+> > > -    lpcr &=3D ~LPCR_RMLS;
+> > > -    lpcr |=3D 1ull << LPCR_RMLS_SHIFT;
+> > > -
+> > >      ppc_store_lpcr(cpu, lpcr);
+> > > =20
+> > >      /* Set a full AMOR so guest can use the AMR as it sees fit */
+> > > diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> > > index e372c42add..caf47ad6fc 100644
+> > > --- a/target/ppc/mmu-hash64.c
+> > > +++ b/target/ppc/mmu-hash64.c
+> > > @@ -1126,14 +1126,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ul=
+ong val)
+> > >                        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | L=
+PCR_EEE |
+> > >                        LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE |=
+ LPCR_TC |
+> > >                        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDI=
+CE);
+> > > -        /*
+> > > -         * If we have a virtual hypervisor, we need to bring back RM=
+LS. It
+> > > -         * doesn't exist on an actual P9 but that's all we know how =
+to
+> > > -         * configure with softmmu at the moment
+> > > -         */
+> > > -        if (cpu->vhyp) {
+> > > -            lpcr |=3D (val & LPCR_RMLS);
+> > > -        }
+> > >          break;
+> > >      default:
+> > >          g_assert_not_reached();
+> >=20
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--5UGlQXeG3ziZS81+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5VwzcACgkQbDjKyiDZ
+s5IVnw/7Bqc/IFZxnRt7Os2kmwmqzu+TY2zcJZ78chSQeJYC8TR84/APwFJf/pv4
+4PWAopEeNxtwMEwa9paczpm87seepMOopj9mDBiejJHb54hJbk9EVXoIH7TMmRYy
+PUKWg6Xrybf0A3HgpY0Jfb1hYo767rG7+ncTW9ufuT+7LN/fs7BR40j+1XNDoFu7
+53mVlGe5ddUhxxlGDYLLSx2nOz2H7OF3kqKAWdDWgcfjwfP5xfiCQ95KtUexO4sd
+KSWIUltRq+LVnrzB6rejZzDtU1wpyIc78dRtSz7G7nOsZ16avAjtt5REEUkS/wQS
+6KFBkvex9N/LWhhUrEPLpYY2eDknjFp9jDEKACFMZXyzd+WVr/Tisz15kZY4BsN6
+yIrxh+YpLvr84bNSO+2hUWPgObYasxRKBkjuZUk/HCB9vV2zICkiqEzbRXLbW0He
+rGpSg+nqj07yB2fmXMomeM4rGeK/+isXfcPY12h6E9Cq9JQQ3Y6jk8BigivO0KsJ
+GRwJd6J6jiCxsa1SCGamUBV/UKx+bDm+vtpchQ+NRzkJ6c41BTkMEx4fSqlNxPkn
+iacBQPbEC9dV3OgGc2IKAC8tqjLwmmpfbHL8/5XiwL1EAz1tG061tx+J77+Yixmq
+fR0R0enQCzwHfeMER18/QWvFOPJFHdS9GCYvcFNOsxHsUCiT9Lc=
+=kGTY
+-----END PGP SIGNATURE-----
+
+--5UGlQXeG3ziZS81+--
 
