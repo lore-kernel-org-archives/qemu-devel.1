@@ -2,72 +2,76 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD07FC4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803A8C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:43:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85DDB24673
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85DDB24673
+	by mail.kernel.org (Postfix) with ESMTPS id 52EBC24673
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:43:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52EBC24673
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6u8X-0004GK-Ok
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:41:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60128)
+	id 1j6u9o-0005PG-Iv
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:43:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60568)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6u7w-0003iV-RE
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:41:17 -0500
+ (envelope-from <miaoyubo@huawei.com>) id 1j6u9E-0004rf-Q1
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j6u7v-0004nv-D4
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:41:16 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:42098 helo=huawei.com)
+ (envelope-from <miaoyubo@huawei.com>) id 1j6u9D-00076v-8J
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:36 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2071 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1j6u7v-0004kA-2d; Wed, 26 Feb 2020 05:41:15 -0500
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 7148DECA367947E9CA2D;
- Wed, 26 Feb 2020 18:41:11 +0800 (CST)
-Received: from DGGEMM421-HUB.china.huawei.com (10.1.198.38) by
- DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 26 Feb 2020 18:41:10 +0800
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
- dggemm421-hub.china.huawei.com ([10.1.198.38]) with mapi id 14.03.0439.000;
- Wed, 26 Feb 2020 18:41:00 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: RE: [PATCH v2 01/13] block/stream: Remove redundant statement in
- stream_run()
-Thread-Topic: [PATCH v2 01/13] block/stream: Remove redundant statement in
- stream_run()
-Thread-Index: AQHV7IFlUj7vrN4bEEyjDb3dOy8EkKgstWMAgACNqjD//37wAIAAht+A
-Date: Wed, 26 Feb 2020 10:41:00 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B662BF9@dggemm531-mbx.china.huawei.com>
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-2-kuhn.chenqun@huawei.com>
- <20200226095102.GA6096@linux.fritz.box>
- <7412CDE03601674DA8197E2EBD8937E83B662BBF@dggemm531-mbx.china.huawei.com>
- <20200226103608.GC6096@linux.fritz.box>
-In-Reply-To: <20200226103608.GC6096@linux.fritz.box>
+ (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j6u9C-0006xg-ME
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:35 -0500
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 67A814133FB5CD0D5424;
+ Wed, 26 Feb 2020 18:42:27 +0800 (CST)
+Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 26 Feb 2020 18:42:27 +0800
+Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
+ dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Wed, 26 Feb 2020 18:42:26 +0800
+Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
+ dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
+ Wed, 26 Feb 2020 18:42:26 +0800
+From: miaoyubo <miaoyubo@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: RE: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
+Thread-Topic: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
+Thread-Index: AQHV634DptZMLVW0EUqun9Ee8tGbGqgrJCyAgACsLcD//4BQgIAAiRsw//+DXwCAAeyBoA==
+Date: Wed, 26 Feb 2020 10:42:26 +0000
+Message-ID: <f8e49df0209149808e55b6cef7f2ff05@huawei.com>
+References: <20200225015026.940-1-miaoyubo@huawei.com>
+ <20200225015026.940-3-miaoyubo@huawei.com>
+ <3086f4a2-fb0a-d276-7c76-f06474befa35@redhat.com>
+ <c4aa08df40a74dbd876b9acfbbb09809@huawei.com>
+ <20200225072522-mutt-send-email-mst@kernel.org>
+ <766375327e6f422bbf751174269f7570@huawei.com>
+ <20200225080529-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200225080529-mutt-send-email-mst@kernel.org>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.205.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-originating-ip: [10.173.221.29]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.255
+X-Received-From: 45.249.212.189
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,67 +84,188 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max
- Reitz <mreitz@redhat.com>, Euler Robot <euler.robot@huawei.com>,
- John Snow <jsnow@redhat.com>
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Xiexiangyou <xiexiangyou@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogS2V2aW4gV29sZiBbbWFpbHRvOmt3
-b2xmQHJlZGhhdC5jb21dDQo+U2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSAyNiwgMjAyMCA2OjM2
-IFBNDQo+VG86IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj5DYzog
-Sm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11
-LQ0KPnRyaXZpYWxAbm9uZ251Lm9yZzsgcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBaaGFuZ2hh
-aWxpYW5nDQo+PHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47IEV1bGVyIFJvYm90DQo+
-PGV1bGVyLnJvYm90QGh1YXdlaS5jb20+OyBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0K
-PlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDEvMTNdIGJsb2NrL3N0cmVhbTogUmVtb3ZlIHJlZHVu
-ZGFudCBzdGF0ZW1lbnQgaW4NCj5zdHJlYW1fcnVuKCkNCj4NCj5BbSAyNi4wMi4yMDIwIHVtIDEx
-OjIxIGhhdCBDaGVucXVuIChrdWhuKSBnZXNjaHJpZWJlbjoNCj4+DQo+Pg0KPj4gPi0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tDQo+PiA+RnJvbTogS2V2aW4gV29sZiBbbWFpbHRvOmt3b2xmQHJl
-ZGhhdC5jb21dDQo+PiA+U2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSAyNiwgMjAyMCA1OjUxIFBN
-DQo+PiA+VG86IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+ID5D
-YzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LXRyaXZpYWxAbm9uZ251Lm9yZzsNCj4+ID5w
-ZXRlci5tYXlkZWxsQGxpbmFyby5vcmc7IFpoYW5naGFpbGlhbmcNCj4+ID48emhhbmcuemhhbmdo
-YWlsaWFuZ0BodWF3ZWkuY29tPjsgRXVsZXIgUm9ib3QNCj4+ID48ZXVsZXIucm9ib3RAaHVhd2Vp
-LmNvbT47IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNvbT47IE1heCBSZWl0eg0KPj4gPjxtcmVp
-dHpAcmVkaGF0LmNvbT4NCj4+ID5TdWJqZWN0OiBSZTogW1BBVENIIHYyIDAxLzEzXSBibG9jay9z
-dHJlYW06IFJlbW92ZSByZWR1bmRhbnQNCj4+ID5zdGF0ZW1lbnQgaW4NCj4+ID5zdHJlYW1fcnVu
-KCkNCj4+ID4NCj4+ID5BbSAyNi4wMi4yMDIwIHVtIDA5OjQ2IGhhdCBrdWhuLmNoZW5xdW5AaHVh
-d2VpLmNvbSBnZXNjaHJpZWJlbjoNCj4+ID4+IEZyb206IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5A
-aHVhd2VpLmNvbT4NCj4+ID4+DQo+PiA+PiBDbGFuZyBzdGF0aWMgY29kZSBhbmFseXplciBzaG93
-IHdhcm5pbmc6DQo+PiA+PiAgIGJsb2NrL3N0cmVhbS5jOjE4Njo5OiB3YXJuaW5nOiBWYWx1ZSBz
-dG9yZWQgdG8gJ3JldCcgaXMgbmV2ZXIgcmVhZA0KPj4gPj4gICAgICAgICByZXQgPSAwOw0KPj4g
-Pj4gICAgICAgICBeICAgICB+DQo+PiA+PiBSZXBvcnRlZC1ieTogRXVsZXIgUm9ib3QgPGV1bGVy
-LnJvYm90QGh1YXdlaS5jb20+DQo+PiA+PiBTaWduZWQtb2ZmLWJ5OiBDaGVuIFF1biA8a3Vobi5j
-aGVucXVuQGh1YXdlaS5jb20+DQo+PiA+PiBSZXZpZXdlZC1ieTogSm9obiBTbm93IDxqc25vd0By
-ZWRoYXQuY29tPg0KPj4gPg0KPj4gPkxldCdzIG1lbnRpb24gdGhhdCB0aGlzIGlzIHVubmVjZXNz
-YXJ5IHNpbmNlIGNvbW1pdCAxZDgwOTA5OGFhOS4NCj4+ID4NCj4+ID5TaW5jZSB0aGUgc2FtZSBj
-b21taXQsIHRoZSBpbml0aWFsaXNhdGlvbiAnaW50IHJldCA9IDA7JyBpcw0KPj4gPnVubmVjZXNz
-YXJ5IGJlY2F1c2Ugd2UgbmV2ZXIgcmVhZCByZXQgYmVmb3JlIG92ZXJ3cml0aW5nIHRoZSBpbml0
-aWFsDQo+PiA+dmFsdWUuIFdlIGNvdWxkIGNsZWFuIHRoaXMgdXAgaW4gdGhlIHNhbWUgcGF0Y2gu
-DQo+Pg0KPj4gWWVzLCB3ZSBjYW4gY2xlYW4gaXQgYW5kIG1vdmUgJ3JldCcgIGRlY2xhcmF0aW9u
-IHRvIHRoZSBmb3IoKSBzdGF0ZW1lbnQuDQo+Pg0KPj4gTW9kaWZ5IGp1c3QgTGlrZSB0aGlz77ya
-DQo+PiBbLi4uXQ0KPg0KPkdvZGQgcG9pbnQsIG1ha2VzIHNlbnNlIHRvIG1lLiBQbGVhc2Uga2Vl
-cCBteSBSLWIgaWYgeW91IG1ha2UgdGhpcyBjaGFuZ2UuDQpPSywgbm8gcHJvYmxlbe+8gQ0KDQpU
-aGFua3MuDQo+DQo+S2V2aW4NCj4NCj4+IEBAIC0xMTQsNyArMTE0LDYgQEAgc3RhdGljIGludCBj
-b3JvdXRpbmVfZm4gc3RyZWFtX3J1bihKb2IgKmpvYiwgRXJyb3INCj4qKmVycnApDQo+PiAgICAg
-IGludDY0X3Qgb2Zmc2V0ID0gMDsNCj4+ICAgICAgdWludDY0X3QgZGVsYXlfbnMgPSAwOw0KPj4g
-ICAgICBpbnQgZXJyb3IgPSAwOw0KPj4gLSAgICBpbnQgcmV0ID0gMDsNCj4+ICAgICAgaW50NjRf
-dCBuID0gMDsgLyogYnl0ZXMgKi8NCj4+DQo+PiAgICAgIGlmIChicyA9PSBzLT5ib3R0b20pIHsN
-Cj4+IEBAIC0xMzksNiArMTM4LDcgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gc3RyZWFtX3J1
-bihKb2IgKmpvYiwgRXJyb3INCj4+ICoqZXJycCkNCj4+DQo+PiAgICAgIGZvciAoIDsgb2Zmc2V0
-IDwgbGVuOyBvZmZzZXQgKz0gbikgew0KPj4gICAgICAgICAgYm9vbCBjb3B5Ow0KPj4gKyAgICAg
-ICAgaW50IHJldDsNCj4+DQo+PiAgICAgICAgICAvKiBOb3RlIHRoYXQgZXZlbiB3aGVuIG5vIHJh
-dGUgbGltaXQgaXMgYXBwbGllZCB3ZSBuZWVkIHRvIHlpZWxkDQo+PiAgICAgICAgICAgKiB3aXRo
-IG5vIHBlbmRpbmcgSS9PIGhlcmUgc28gdGhhdCBiZHJ2X2RyYWluX2FsbCgpIHJldHVybnMuDQo+
-PiBAQCAtMTgzLDcgKzE4Myw2IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIHN0cmVhbV9ydW4o
-Sm9iICpqb2IsIEVycm9yDQo+KiplcnJwKQ0KPj4gICAgICAgICAgICAgICAgICBicmVhazsNCj4+
-ICAgICAgICAgICAgICB9DQo+PiAgICAgICAgICB9DQo+PiAtICAgICAgICByZXQgPSAwOw0KPj4N
-Cj4+ICAgICAgICAgIC8qIFB1Ymxpc2ggcHJvZ3Jlc3MgKi8NCj4+ICAgICAgICAgIGpvYl9wcm9n
-cmVzc191cGRhdGUoJnMtPmNvbW1vbi5qb2IsIG4pOw0KPj4NCj4+ID4NCj4+ID5XaXRoIG9yIHdp
-dGhvdXQgdGhlIGNoYW5nZXM6DQo+PiA+DQo+PiA+UmV2aWV3ZWQtYnk6IEtldmluIFdvbGYgPGt3
-b2xmQHJlZGhhdC5jb20+DQo+Pg0KDQo=
+
+> -----Original Message-----
+> From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> Sent: Tuesday, February 25, 2020 9:12 PM
+> To: miaoyubo <miaoyubo@huawei.com>
+> Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>;
+> peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+> berrange@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
+> <xiexiangyou@huawei.com>; imammedo@redhat.com
+> Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for ar=
+m
+>=20
+> On Tue, Feb 25, 2020 at 12:44:15PM +0000, miaoyubo wrote:
+> >
+> >
+> > > -----Original Message-----
+> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > Sent: Tuesday, February 25, 2020 8:27 PM
+> > > To: miaoyubo <miaoyubo@huawei.com>
+> > > Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>;
+> > > peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
+> > > berrange@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
+> > > <xiexiangyou@huawei.com>; imammedo@redhat.com
+> > > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support
+> > > for arm
+> > >
+> > > On Tue, Feb 25, 2020 at 12:12:12PM +0000, miaoyubo wrote:
+> > > >
+> > > > > -----Original Message-----
+> > > > > From: Philippe Mathieu-Daud=E9 [mailto:philmd@redhat.com]
+> > > > > Sent: Tuesday, February 25, 2020 5:48 PM
+> > > > > To: miaoyubo <miaoyubo@huawei.com>; peter.maydell@linaro.org;
+> > > > > shannon.zhaosl@gmail.com
+> > > > > Cc: berrange@redhat.com; mst@redhat.com; qemu-
+> devel@nongnu.org;
+> > > > > Xiexiangyou <xiexiangyou@huawei.com>; imammedo@redhat.com
+> > > > > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb
+> > > > > support for arm
+> > > > >
+> > > > > On 2/25/20 2:50 AM, Yubo Miao wrote:
+> > > > > > From: miaoyubo <miaoyubo@huawei.com>
+> > > > > >
+> > > > > > Currently virt machine is not supported by pxb-pcie, and only
+> > > > > > one main host bridge described in ACPI tables.
+> > > > > > In this patch,PXB-PCIE is supproted by arm and certain
+> > > > >
+> > > > > Typos: "expander" in subject and "supported" here.
+> > > > >
+> > > >
+> > > > Thanks for your reply and sorry for the mistakes.
+> > > > I will check all the subjects and comments.
+> > > >
+> > > > > > resource is allocated for each pxb-pcie in acpi table.
+> > > > > > The resource for the main host bridge is also reallocated.
+> > > > > >
+> > > > > > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
+> > > > > > ---
+> > > > > >   hw/arm/virt-acpi-build.c | 115
+> > > > > ++++++++++++++++++++++++++++++++++++---
+> > > > > >   hw/arm/virt.c            |   3 +
+> > > > > >   include/hw/arm/virt.h    |   7 +++
+> > > > > >   3 files changed, 118 insertions(+), 7 deletions(-)
+> > > > > >
+> > > > > > diff --git a/hw/arm/virt-acpi-build.c
+> > > > > > b/hw/arm/virt-acpi-build.c index 37c34748a6..be1986c60d 100644
+> > > > > > --- a/hw/arm/virt-acpi-build.c
+> > > > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > > > @@ -49,6 +49,8 @@
+> > > > > >   #include "kvm_arm.h"
+> > > > > >   #include "migration/vmstate.h"
+> > > > > >
+> > > > > > +#include "hw/arm/virt.h"
+> > > > > > +#include "hw/pci/pci_bus.h"
+> > > > > >   #define ARM_SPI_BASE 32
+> > > > > >
+> > > > > >       if (use_highmem) {
+> > > > > >           hwaddr base_mmio_high =3D
+> > > > > > memmap[VIRT_HIGH_PCIE_MMIO].base;
+> > > > > @@
+> > > > > > -746,7 +847,7 @@ build_dsdt(GArray *table_data, BIOSLinker
+> > > > > > *linker,
+> > > > > VirtMachineState *vms)
+> > > > > >       acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+> > > > > >                       (irqmap[VIRT_MMIO] + ARM_SPI_BASE),
+> > > > > NUM_VIRTIO_TRANSPORTS);
+> > > > > >       acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] +
+> > > > > ARM_SPI_BASE),
+> > > > > > -                      vms->highmem, vms->highmem_ecam);
+> > > > > > +                      vms->highmem, vms->highmem_ecam, vms);
+> > > > > >       if (vms->acpi_dev) {
+> > > > > >           build_ged_aml(scope, "\\_SB."GED_DEVICE,
+> > > > > >                         HOTPLUG_HANDLER(vms->acpi_dev), diff
+> > > > > > --git a/hw/arm/virt.c b/hw/arm/virt.c index
+> > > > > > f788fe27d6..6314928671
+> > > > > > 100644
+> > > > > > --- a/hw/arm/virt.c
+> > > > > > +++ b/hw/arm/virt.c
+> > > > > > @@ -1246,6 +1246,9 @@ static void create_pcie(VirtMachineState
+> > > *vms)
+> > > > > >       }
+> > > > > >
+> > > > > >       pci =3D PCI_HOST_BRIDGE(dev);
+> > > > > > +
+> > > > > > +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
+> > > > > > +
+> > > > > >       if (pci->bus) {
+> > > > > >           for (i =3D 0; i < nb_nics; i++) {
+> > > > > >               NICInfo *nd =3D &nd_table[i]; diff --git
+> > > > > > a/include/hw/arm/virt.h b/include/hw/arm/virt.h index
+> > > > > > 71508bf40c..90f10a1e46 100644
+> > > > > > --- a/include/hw/arm/virt.h
+> > > > > > +++ b/include/hw/arm/virt.h
+> > > > > > @@ -140,6 +140,13 @@ typedef struct {
+> > > > > >       DeviceState *gic;
+> > > > > >       DeviceState *acpi_dev;
+> > > > > >       Notifier powerdown_notifier;
+> > > > > > +    /*
+> > > > > > +     * pointer to devices and objects
+> > > > > > +     * Via going through the bus, all
+> > > > > > +     * pci devices and related objectes
+> > > > >
+> > > > > Typo "objects", but I don't understand the comment well.
+> > > > >
+> > > >
+> > > > Sorry for any confusion caused ,I will rewrite the comment
+> > > > /* point to the root bus, which is pcie.0 */ Does this comment
+> > > > make sense?
+> > >
+> > > Not really. E.g. it doesn't say what happens if there's more than one=
+ root.
+> > >
+> >
+> > If there's more than one root, like pcie.0 and pcie.1, it still point t=
+o pcie.0.
+> > In docs/pci_expander_bridge.txt, it points out pxb could be placed
+> > only on bus 0 (pci.0). Therfore, the structure still could help us to f=
+ind all
+> pxb devices.
+> > /* point to the bus 0, which is pcie.0
+> >   * pxb devices could only be placed on bus 0.
+> >   */
+> > Is this ok?
+>=20
+> All this needs more comments in the code constructing the tables.
+>=20
+
+Thanks for replying, I will add more comments in the table construction.
+
+> Also, instead of trying to store bus and spreading logic around like this=
+, how
+> about just using object_resolve_path_type?
+>=20
+>=20
+
+Thanks for the suggestion, using object_resolve_path_type  seems to be bett=
+er.=20
+
+> > > > > > +     * could be gained.
+> > > > > > +     */
+> > > > > > +    PCIBus *bus;
+> > > > > >   } VirtMachineState;
+> > > > > >
+> > > > > >   #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
+> > > > > > VIRT_PCIE_ECAM)
+> > > > > >
+> > > >
+> > > > Regards,
+> > > > Miao
+> >
+> > Regards,
+> > Miao
+
+Regards,
+Miao
 
