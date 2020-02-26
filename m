@@ -2,92 +2,93 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2CE3C4BA21
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 18:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0808CC4BA24
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 19:00:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC6B42465D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 18:53:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7ccIPB9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC6B42465D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CFCC120578
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 19:00:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFCC120578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j71oD-0001XI-Vi
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 13:53:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35058)
+	id 1j71vB-0003SD-11
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 14:00:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j71md-0000P7-Nh
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 13:51:53 -0500
+ (envelope-from <groug@kaod.org>) id 1j71uR-0002w4-HF
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 13:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j71mc-0007U6-1k
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 13:51:47 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35381)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j71mb-0007RT-SL; Wed, 26 Feb 2020 13:51:45 -0500
-Received: by mail-oi1-x241.google.com with SMTP id b18so605884oie.2;
- Wed, 26 Feb 2020 10:51:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=yDF1hnCrfNGayvyXqcyqGUj5djCxuR4JcjvlqtA5400=;
- b=b7ccIPB9cpw3SCRsEbKlbrQg+fXBCLwd1cLYQJ+9p2RA5oBfp1dSq9Ylir1SIKiM11
- 8JbxpNUy4TTukgRyCgJ5SBJ8DHeGGJ0r+gVR/EQG0ZDpXwPMmZq1q3B5qoe0rlKrsG9/
- Fys500A8TZJxR/Ay1eahq3Hmwyy0v9sAPqEONdJI/U6W3x+lvU5I/mxr/O+LwG2GL1VY
- keJWtsoKbyK5md7pj5Ix/OsJm+Gks8A0aC20tR33velPEln+teBZ1dn9A6ItVGVp0vNy
- LKEWl2+bN+1qk6OoZdW0XQI1kKO+Evo3KnPNY1rYQD0CksbgdYY94Qu9M09Fpdc4SaT6
- 2wXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=yDF1hnCrfNGayvyXqcyqGUj5djCxuR4JcjvlqtA5400=;
- b=lT4y+TiekcVCgWPp+kF5q7AC0IP1u2v1/JJ5ENLXsXfL+UBCMvRnGLF9Opypxras+n
- Z9cNg5luurFKT+08SIkmcuOsW9pikSBw7DXe3X4pzUVchtMgNePvhCSDmBAx5rqbMStV
- oQy1/tPsD8o/a+kbFvxRFeuoEtZae8BaGuTz/wyMw4arhDALkovAC7OICCYkSPhDl/0Q
- 987WYkzArNkgXeQQqGSfR7o2isGfsEeasrhMIoxK1S/pxYrGcmKfyYuZuhcUt5E+LT3h
- azy2nHa1ncDFxg2pWgYNl+9fB2aUkTCXammmKtJ1rw4AlBNekKc4JJVmp1/6CUdZEtXe
- Ihwg==
-X-Gm-Message-State: APjAAAVZVcfCV1YSNUQtdnS0twA5ljh++foqt+j6znkjtuLi2IzWUhUF
- M3nUkvbXnP/12XiXTQl002TKNoKxR1l4jMO5CUc=
-X-Google-Smtp-Source: APXvYqzeqNSMTve6UEyD/NNAWTWFMTeJJR6dqTybM3jX+mGBdb0b11QtX9TzjCyS23G/2mxI63vQhHxD0V7WOEccdfw=
-X-Received: by 2002:aca:5844:: with SMTP id m65mr349608oib.136.1582743104955; 
- Wed, 26 Feb 2020 10:51:44 -0800 (PST)
+ (envelope-from <groug@kaod.org>) id 1j71uP-0007e6-4s
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 13:59:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30132)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j71uO-0007bF-Sw
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 13:59:49 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01QIoqoJ038384
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 13:59:47 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ydq6wh07n-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 13:59:46 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 26 Feb 2020 18:59:44 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 26 Feb 2020 18:59:41 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 01QIxftw48824424
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Feb 2020 18:59:41 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 020624C044;
+ Wed, 26 Feb 2020 18:59:41 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 71DAB4C04A;
+ Wed, 26 Feb 2020 18:59:40 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.89.213])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 26 Feb 2020 18:59:40 +0000 (GMT)
+Subject: [PATCH] ppc: Officially deprecate the CPU "compat" property
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 26 Feb 2020 19:59:38 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87eeuhxw0y.fsf@linaro.org>
- <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
- <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
- <CAL1e-=hhhw4x4H24DWg6pTp9DmjyfwM6GFMOmWasKC66x5tR4Q@mail.gmail.com>
- <AM4PR07MB350693B43AE3987D317948ADCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-In-Reply-To: <AM4PR07MB350693B43AE3987D317948ADCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 26 Feb 2020 19:51:33 +0100
-Message-ID: <CAL1e-=iiL8r0P0smAYfU=Fo0yj4QsHjC7OpDFQ-7BhTryEhPnQ@mail.gmail.com>
-Subject: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: Dino Papararo <skizzato73@msn.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022618-0020-0000-0000-000003ADDDEF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022618-0021-0000-0000-00002205F9FC
+Message-Id: <158274357799.140275.12263135811731647490.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-26_07:2020-02-26,
+ 2020-02-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 spamscore=0
+ mlxlogscore=999 clxscore=1034 mlxscore=0 adultscore=0 impostorscore=0
+ phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2001150001 definitions=main-2002260118
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,163 +100,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>, "cota@braap.org" <cota@braap.org>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 26, 2020 at 7:14 PM Dino Papararo <skizzato73@msn.com> wrote:
->
-> I think we all agree the best solution is to resolve powerpc issues about=
- hardfloat current implementation.
-> I think also powerpc is an important branch of qemu, for hystorical, pres=
-ent and (why not?) future reasons, and it must NOT be left behind.
-> So I would invite best Qemu community's skilled programmers to work on th=
-is and solve the issue maybe in few days.
-> The same group who worked on recent altivec optimizations is able to make=
- a good patch even for this.
->
-> In a subordinate way I'd like to implement anyway hardfloat support for p=
-owerpc, advising users about inaccurancy of results/flags and letting them =
-choose.
+Server class POWER CPUs have a "compat" property, which was obsoleted
+by commit 7843c0d60d and replaced by a "max-cpu-compat" property on the
+pseries machine type. A hack was introduced so that passing "compat" to
+-cpu would still produce the desired effect, for the sake of backward
+compatibility : it strips the "compat" option from the CPU properties
+and applies internally it to the pseries machine. The accessors of the
+"compat" property were updated to do nothing but warn the user about the
+deprecated status when doing something like:
 
-Just to be clear, concluding from your surrounding sentences, you don't
-mean here to implement "hardfloat support for powerpc", but something
-like "improve performance of ppc FPU emulation by misusing hardfloat
-support and giving up accuracy". I think we have to be honest between
-ourselves.
+$ qemu-system-ppc64 -global POWER9-family-powerpc64-cpu.compat=power9
+qemu-system-ppc64: warning: CPU 'compat' property is deprecated and has no
+ effect; use max-cpu-compat machine property instead
 
-Regards,
-Aleksandar
+This was merged during the QEMU 2.10 timeframe, a few weeks before we
+formalized our deprecation process. As a consequence, the "compat"
+property fell through the cracks and was never listed in the officialy
+deprecated features.
 
-> Of course I understand, and in part agree, on all your objections.
-> Simply I prefer have always a choice.
->
-> Best Regards,
-> Dino Papararo
->
-> -----Messaggio originale-----
-> Da: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> Inviato: mercoled=C3=AC 26 febbraio 2020 18:27
-> A: G 3 <programmingkidx@gmail.com>
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>; Dino Papararo <skizzato73@=
-msn.com>; QEMU Developers <qemu-devel@nongnu.org>; qemu-ppc@nongnu.org; How=
-ard Spoelstra <hsp.cat7@gmail.com>; luigi burdo <intermediadc@hotmail.com>;=
- David Gibson <david@gibson.dropbear.id.au>
-> Oggetto: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
->
-> On Wed, Feb 26, 2020 at 6:04 PM G 3 <programmingkidx@gmail.com> wrote:
-> >
-> > Accuracy is an important part of the IEEE 754 floating point standard. =
-The whole purpose of this standard is to ensure floating point calculations=
- are consistent across multiple CPUs. I believe referring to this patch as =
-inaccurate is itself inaccurate. That gives the impression that this patch =
-produces calculations that are not inline with established standards. This =
-is not true. The only part of this patch that will produce incorrect values=
- are the flags. There *may* be a program or two out there that depend on th=
-ese flags, but for the majority of programs that only care about basic floa=
-ting point arithmetic this patch will produce correct values. Currently the=
- emulated PowerPC's FPU already produces wrong values for the flags. This p=
-atch does set the Inexact flag (which I don't like), but since I have never=
- encountered any source code that cares for this flag, I can let it go. I t=
-hink giving the user the ability to decide which option to use is the best =
-thing to do.
-> >
->
-> From the experiments described above, the patch in question changes the b=
-ehavior of applications (for example, sound is different with and without t=
-he patch), which is in contradiction with your claim that you "never encoun=
-tered any source code that cares for this flag" and that "the only part of =
-this patch that will produce incorrect values are the flags".
->
-> In other words, and playing further with them:
->
-> The claim that "referring to this patch as inaccurate is itself inaccurat=
-e" is itself inaccurate.
->
-> Best regards,
-> Aleksandar
->
->
-> > On Wed, Feb 26, 2020 at 10:51 AM Aleksandar Markovic <aleksandar.m.mail=
-@gmail.com> wrote:
-> >>
-> >>
-> >>
-> >> On Wed, Feb 26, 2020 at 3:29 PM Alex Benn=C3=A9e <alex.bennee@linaro.o=
-rg> wrote:
-> >> >
-> >> >
-> >> > Dino Papararo <skizzato73@msn.com> writes:
-> >> >
-> >> > > Please let's go with hardfloat pps support, it's really a good fea=
-ture to implement.
-> >> > > Even if in a first step it could lead to inaccuracy results,
-> >> > > later it could solved with other patches.
-> >> >
-> >> > That's the wrong way around. We have regression tests for a reason.
-> >>
-> >> I tend to agree with Alex here, and additionally want to expand more
-> >> on this topic.
-> >>
-> >> In my view: (that I think is at least very close to the community
-> >> consensus)
-> >>
-> >> This is *not* a ppc-specific issue. There exist a principle across
-> >> all targets that QEMU FPU calculation must be accurate - exactly as
-> >> specified in any applicable particular ISA document. Any discrepancy i=
-s an outright bug.
-> >>
-> >> We even recently had several patches for FPU in ppc target that
-> >> handled some fairly obscure cases of inaccuracies, I believe they
-> >> were authored by Paul Clarke, so there are people in ppc community
-> >> that care about FPU accuracy (as I guess is the case for any target).
-> >>
-> >> There shouldn't be a target that decides by itself and within itself
-> >> "ok, we don't need accuracy, let's trade it for speed". This violates
-> >> the architecture of QEMU. Please allow that for any given software
-> >> project, there is an architecture that should be respected.
-> >>
-> >> This doesn't mean that anybody's experimentation is discouraged.
-> >> No-one can stop anybody from forking from QEMU upstream tree and do
-> >> whatever is wanted.
-> >>
-> >> But, this doesn't mean such experimentation will be upstreamed. QEMU
-> >> upstream should be collecting place for the best ideas and
-> >> implementations, not for arbitrary experimentations.
-> >>
-> >> Best regards,
-> >> Aleksandar
-> >>
-> >>
-> >> > I'll happily accept patches to turn on hardfloat for PPC if:
-> >> >
-> >> >  a) they don't cause regressions in our fairly extensive floating
-> >> > point  tests
-> >> >  b) the PPC maintainers are happy with the new performance profile
-> >> >
-> >> > The way forward would be to:
-> >> >
-> >> >  1. patch to drop #if defined(TARGET_PPC) || defined(__FAST_MATH__)
-> >> > 2. audit target/ppc/fpu_helper.c w.r.t chip manual and fix any
-> >> > unneeded  splatting of flags (if any)  3. measure the before/after
-> >> > performance effect and decide if on balance  it's worth keeping
-> >> >
-> >> > > I think it's important for qemu to as global as possible and
-> >> > > don't target only recent hardware.
-> >> >
-> >> > Are you referring to guests or hosts? For guests we will always
-> >> > favour accuracy of speed of emulation. For hosts we need to have
-> >> > IEEE compliant FPU HW to even stand a chance of using hardfloat.
-> >> >
-> >> > --
-> >> > Alex Benn=C3=A9e
-> >> >
+We are now eight QEMU versions later, it is largely time to mention it
+in qemu-deprecated.texi. Also, since -global XXX-powerpc64-cpu.compat=
+has been emitting warnings since QEMU 2.10 and the usual way of setting
+CPU properties is with -cpu, completely remove the "compat" property.
+Keep the hack so that -cpu XXX,compat= stays functional some more time,
+as required by our deprecation process.
+
+The now empty powerpc_servercpu_properties[] list which was introduced
+for "compat" and never had any other use is removed on the way. We can
+re-add it in the future if the need for a server class POWER CPU specific
+property arises again.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ qemu-deprecated.texi            |    6 +++++
+ target/ppc/translate_init.inc.c |   44 ++-------------------------------------
+ 2 files changed, 8 insertions(+), 42 deletions(-)
+
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 66eca3a1dede..56a69400c14a 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -242,6 +242,12 @@ The RISC-V no MMU cpus have been depcreated. The two CPUs: ``rv32imacu-nommu`` a
+ ``rv64imacu-nommu`` should no longer be used. Instead the MMU status can be specified
+ via the CPU ``mmu`` option when using the ``rv32`` or ``rv64`` CPUs.
+ 
++@subsection ``compat`` property of server class POWER CPUs (since 5.0)
++
++The ``compat`` property used to set backwards compatibility modes for
++the processor has been deprecated. The ``max-cpu-compat`` property of
++the ``pseries`` machine type should be used instead.
++
+ @section System emulator devices
+ 
+ @subsection ide-drive (since 4.2)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 53995f62eab2..2f7125c51f35 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8492,44 +8492,6 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
+     pcc->l1_icache_size = 0x10000;
+ }
+ 
+-/*
+- * The CPU used to have a "compat" property which set the
+- * compatibility mode PVR.  However, this was conceptually broken - it
+- * only makes sense on the pseries machine type (otherwise the guest
+- * owns the PCR and can control the compatibility mode itself).  It's
+- * been replaced with the 'max-cpu-compat' property on the pseries
+- * machine type.  For backwards compatibility, pseries specially
+- * parses the -cpu parameter and converts old compat= parameters into
+- * the appropriate machine parameters.  This stub implementation of
+- * the parameter catches any uses on explicitly created CPUs.
+- */
+-static void getset_compat_deprecated(Object *obj, Visitor *v, const char *name,
+-                                     void *opaque, Error **errp)
+-{
+-    QNull *null = NULL;
+-
+-    if (!qtest_enabled()) {
+-        warn_report("CPU 'compat' property is deprecated and has no effect; "
+-                    "use max-cpu-compat machine property instead");
+-    }
+-    visit_type_null(v, name, &null, NULL);
+-    qobject_unref(null);
+-}
+-
+-static const PropertyInfo ppc_compat_deprecated_propinfo = {
+-    .name = "str",
+-    .description = "compatibility mode (deprecated)",
+-    .get = getset_compat_deprecated,
+-    .set = getset_compat_deprecated,
+-};
+-static Property powerpc_servercpu_properties[] = {
+-    {
+-        .name = "compat",
+-        .info = &ppc_compat_deprecated_propinfo,
+-    },
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void init_proc_POWER7(CPUPPCState *env)
+ {
+     /* Common Registers */
+@@ -8611,7 +8573,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+ 
+     dc->fw_name = "PowerPC,POWER7";
+     dc->desc = "POWER7";
+-    device_class_set_props(dc, powerpc_servercpu_properties);
+     pcc->pvr_match = ppc_pvr_match_power7;
+     pcc->pcr_mask = PCR_VEC_DIS | PCR_VSX_DIS | PCR_COMPAT_2_05;
+     pcc->pcr_supported = PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+@@ -8776,7 +8737,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+ 
+     dc->fw_name = "PowerPC,POWER8";
+     dc->desc = "POWER8";
+-    device_class_set_props(dc, powerpc_servercpu_properties);
+     pcc->pvr_match = ppc_pvr_match_power8;
+     pcc->pcr_mask = PCR_TM_DIS | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+     pcc->pcr_supported = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
+@@ -8988,7 +8948,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+ 
+     dc->fw_name = "PowerPC,POWER9";
+     dc->desc = "POWER9";
+-    device_class_set_props(dc, powerpc_servercpu_properties);
+     pcc->pvr_match = ppc_pvr_match_power9;
+     pcc->pcr_mask = PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_07;
+     pcc->pcr_supported = PCR_COMPAT_3_00 | PCR_COMPAT_2_07 | PCR_COMPAT_2_06 |
+@@ -9198,7 +9157,6 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data)
+ 
+     dc->fw_name = "PowerPC,POWER10";
+     dc->desc = "POWER10";
+-    device_class_set_props(dc, powerpc_servercpu_properties);
+     pcc->pvr_match = ppc_pvr_match_power10;
+     pcc->pcr_mask = PCR_COMPAT_2_05 | PCR_COMPAT_2_06 | PCR_COMPAT_2_07 |
+                     PCR_COMPAT_3_00;
+@@ -10486,6 +10444,8 @@ static void ppc_cpu_parse_featurestr(const char *type, char *features,
+         *s = '\0';
+         for (i = 0; inpieces[i]; i++) {
+             if (g_str_has_prefix(inpieces[i], "compat=")) {
++                warn_report_once("CPU 'compat' property is deprecated; "
++                    "use max-cpu-compat machine property instead");
+                 compat_str = inpieces[i];
+                 continue;
+             }
+
 
