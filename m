@@ -2,85 +2,85 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13904C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6EDC4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:16:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF99121556
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:16:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 447E32084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:16:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3uMEY4I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF99121556
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ManOfGkk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447E32084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6snr-0006DO-0k
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:16:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59100)
+	id 1j6soC-0006tj-BY
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:16:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6set-00057v-Qb
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:13 -0500
+ (envelope-from <mst@redhat.com>) id 1j6sfm-0006sP-UP
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:08:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6ses-00004x-GJ
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35516
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1j6sfl-0001E3-TG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:08:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36391
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6ses-0008Vw-8v
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:10 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6sfl-0001Dh-OX
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:08:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582708029;
+ s=mimecast20190719; t=1582708084;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zqQOGMqpF8zLfZoLuq6v/gKM+lP+WgY9/qrFc0P3cXk=;
- b=H3uMEY4Iy4ymq/+0lzwRQjV+8IfazLf2iTJdDh5iwgoxba4+Xn+5EeeF7DlfNB8VKNUGMc
- X49X0SPfCIeRJIGYuIWC7DWSYlbLgDoFOcKhTu5eRu2ll+zzY6j3aFyZQPmKprdH1aIpkB
- wNifIyGs/8Y01Gpnqs83Axnm7pa90dA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-194-Q2SzfxyNO8ym1wPEc4gwiA-1; Wed, 26 Feb 2020 04:07:07 -0500
-X-MC-Unique: Q2SzfxyNO8ym1wPEc4gwiA-1
-Received: by mail-wm1-f72.google.com with SMTP id m4so645899wmi.5
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 01:07:07 -0800 (PST)
+ bh=FMRhQ/mUb+ufDOWEKs47dVntkMzI4SGR916thXkoGdQ=;
+ b=ManOfGkkGqxWvqUPP/n27+IX/arj7IEP34It5ZrDWxcsFf9MSI+Oe9myoSgpwjcLsyfDmO
+ 3GLhvMWZ4HNulv0zhkmHqa52BfZllQ5ScjSHf0PuUuOJL+WooIikWo+kS4l0r6oMgCYIXN
+ EWxThknpluoLJzt0Vk820kVj64lMI+k=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-j6eg36cfNguRSqCo1E9lfA-1; Wed, 26 Feb 2020 04:08:02 -0500
+X-MC-Unique: j6eg36cfNguRSqCo1E9lfA-1
+Received: by mail-wm1-f71.google.com with SMTP id w12so466826wmc.3
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 01:08:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=RR/ShafzTvz59NAOcgecA6nlXnHQkJaS9Z0Tyemhwi0=;
- b=AWqJBFE5CWu8exkEtpNTvcfN3Mge+3lbucYK8lKl/KTWhvU6iyetEU2pn3ISZac94C
- 6L5PKTO32QrfFVbFYHJIi0QMcYV1e/LTHw/R3buMC5batUMyQp6Wptg6v6Pu96tQ1npX
- 3Pgt+K1sSm9/cUqBHoteanUk2njgak7eB1fIcxHparQfYRIEn7D0XRyN0MF0MnWy2K95
- APBjRUlRXOz/zbuB1J9nw8axSJZ4pLvfoxi1vVki/mAYrsZDg35QiXSnjfuabLeuTeak
- VtG+sue7qd3zYanAiQf09BKIn+eaK02OHhU3SsQMALvzACj2V+EEm/LDio4ZdWC5Nfkk
- nh8w==
-X-Gm-Message-State: APjAAAVyqeO65roTy66e8NvVtVxFggz5ko+O1p+qv8bqUTK56ryxoyS2
- FUUwRGxU5E2LerK9R+YqsqDWOmJFXMzigK2RMQRZ/xsixUwDs3tyikHI6SGAsDiolGU65BLQVlW
- YD9EizogJ2CFg0F8=
-X-Received: by 2002:a5d:5183:: with SMTP id k3mr4205292wrv.414.1582708026146; 
- Wed, 26 Feb 2020 01:07:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx3B/EOxX4tMQ9olTgTrl+lzDpdCsGfGwxVxUkopLRM2ag54bne/prqZo0mLpyDm/QPG6q9dA==
-X-Received: by 2002:a5d:5183:: with SMTP id k3mr4205270wrv.414.1582708025931; 
- Wed, 26 Feb 2020 01:07:05 -0800 (PST)
+ bh=9KYoAzz21glog7o+enMMiTE7eLNGzgQi6YqNld1TBIY=;
+ b=JufJ0aJiz1e1jzb66AziOWrZonOqQHToYEBD1ZkFz7XFsL3//iJT9fX2x9lFtf5TTo
+ HT1UjutTgjA9Crx2Jn5gnqL7rDwqSK1Z5O113HuAmedvYp7UWh/IN4xhsXy2hmgtEUFA
+ V8r4DXiukW/FG17jAoql4rV8biPT3oM2ejiC/iM/T4LRG7Ktl46TU9EdX5dSRwdeV0PD
+ Rr4SeC8nSSUigJn8Rrwb9IG5u12fEP2MGeJW/PiQxTMQtlYeyqiQZDtRrG+mJfhQrQUj
+ w2MUdG8ZiPD1hU7+1M5l05d6aLtTtJ9mNaZkCCsOpts7PVfQK4WQUhqOWlXddZITDaiw
+ RpKg==
+X-Gm-Message-State: APjAAAX3GVQ1wOhyaS0Dh7dWMvvY/luSP28/dQetI/1sP6qI1VlOuKnV
+ JrQqWxTWkGdtmLGZDZyzSc5K3MY7JN7cCKRKPBFsUhX6fIovBrlCSuIiRRwWGT7dQzddHw5p2zg
+ RZ+mG7CQcVoAJH/8=
+X-Received: by 2002:a1c:4e03:: with SMTP id g3mr4289961wmh.22.1582708080899;
+ Wed, 26 Feb 2020 01:08:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxCMgnntrAoJONFZvZ8fIefwD9iP9gxxAUmPi9PAmaon0bwu82CFU9XOBfj8bo4VsCSCD8f1Q==
+X-Received: by 2002:a1c:4e03:: with SMTP id g3mr4289942wmh.22.1582708080712;
+ Wed, 26 Feb 2020 01:08:00 -0800 (PST)
 Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
  by smtp.gmail.com with ESMTPSA id
- s139sm2135778wme.35.2020.02.26.01.07.04
+ c74sm2154172wmd.26.2020.02.26.01.07.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 01:07:05 -0800 (PST)
-Date: Wed, 26 Feb 2020 04:07:04 -0500
+ Wed, 26 Feb 2020 01:07:59 -0800 (PST)
+Date: Wed, 26 Feb 2020 04:07:58 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 18/30] virtio-iommu: Support migration
-Message-ID: <20200226090010.708934-19-mst@redhat.com>
+Subject: [PULL v2 29/30] vhost-user: only set slave channel for first vq
+Message-ID: <20200226090010.708934-30-mst@redhat.com>
 References: <20200226090010.708934-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200226090010.708934-1-mst@redhat.com>
@@ -92,7 +92,8 @@ Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,161 +106,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>,
- Eric Auger <eric.auger@redhat.com>
+ Adrian Moreno <amorenoz@redhat.com>, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Adrian Moreno <amorenoz@redhat.com>
 
-Add Migration support. We rely on recently added gtree and qlist
-migration. We only migrate the domain gtree. The endpoint gtree
-is re-constructed in a post-load operation.
+When multiqueue is enabled, a vhost_dev is created for each queue
+pair. However, only one slave channel is needed.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-Message-Id: <20200214132745.23392-8-eric.auger@redhat.com>
+Fixes: 4bbeeba023f2 (vhost-user: add slave-req-fd support)
+Cc: marcandre.lureau@redhat.com
+Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+Message-Id: <20200121214553.28459-1-amorenoz@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu.c | 109 +++++++++++++++++++++++++++++++++++----
- 1 file changed, 99 insertions(+), 10 deletions(-)
+ hw/virtio/vhost-user.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 8509f64004..4cee8083bc 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -643,16 +643,6 @@ static uint64_t virtio_iommu_get_features(VirtIODevice=
- *vdev, uint64_t f,
-     return f;
- }
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 2e81f5514f..35baf4f347 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -1458,9 +1458,11 @@ static int vhost_user_backend_init(struct vhost_dev =
+*dev, void *opaque)
+                    "VHOST_USER_PROTOCOL_F_LOG_SHMFD feature.");
+     }
 =20
--/*
-- * Migration is not yet supported: most of the state consists
-- * of balanced binary trees which are not yet ready for getting
-- * migrated
-- */
--static const VMStateDescription vmstate_virtio_iommu_device =3D {
--    .name =3D "virtio-iommu-device",
--    .unmigratable =3D 1,
--};
--
- static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
- {
-     guint ua =3D GPOINTER_TO_UINT(a);
-@@ -736,9 +726,108 @@ static void virtio_iommu_instance_init(Object *obj)
- {
- }
+-    err =3D vhost_setup_slave_channel(dev);
+-    if (err < 0) {
+-        return err;
++    if (dev->vq_index =3D=3D 0) {
++        err =3D vhost_setup_slave_channel(dev);
++        if (err < 0) {
++            return err;
++        }
+     }
 =20
-+#define VMSTATE_INTERVAL                               \
-+{                                                      \
-+    .name =3D "interval",                                \
-+    .version_id =3D 1,                                   \
-+    .minimum_version_id =3D 1,                           \
-+    .fields =3D (VMStateField[]) {                       \
-+        VMSTATE_UINT64(low, VirtIOIOMMUInterval),      \
-+        VMSTATE_UINT64(high, VirtIOIOMMUInterval),     \
-+        VMSTATE_END_OF_LIST()                          \
-+    }                                                  \
-+}
-+
-+#define VMSTATE_MAPPING                               \
-+{                                                     \
-+    .name =3D "mapping",                                \
-+    .version_id =3D 1,                                  \
-+    .minimum_version_id =3D 1,                          \
-+    .fields =3D (VMStateField[]) {                      \
-+        VMSTATE_UINT64(phys_addr, VirtIOIOMMUMapping),\
-+        VMSTATE_UINT32(flags, VirtIOIOMMUMapping),    \
-+        VMSTATE_END_OF_LIST()                         \
-+    },                                                \
-+}
-+
-+static const VMStateDescription vmstate_interval_mapping[2] =3D {
-+    VMSTATE_MAPPING,   /* value */
-+    VMSTATE_INTERVAL   /* key   */
-+};
-+
-+static int domain_preload(void *opaque)
-+{
-+    VirtIOIOMMUDomain *domain =3D opaque;
-+
-+    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
-+                                       NULL, g_free, g_free);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_endpoint =3D {
-+    .name =3D "endpoint",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUEndpoint),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static const VMStateDescription vmstate_domain =3D {
-+    .name =3D "domain",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .pre_load =3D domain_preload,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, VirtIOIOMMUDomain),
-+        VMSTATE_GTREE_V(mappings, VirtIOIOMMUDomain, 1,
-+                        vmstate_interval_mapping,
-+                        VirtIOIOMMUInterval, VirtIOIOMMUMapping),
-+        VMSTATE_QLIST_V(endpoint_list, VirtIOIOMMUDomain, 1,
-+                        vmstate_endpoint, VirtIOIOMMUEndpoint, next),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static gboolean reconstruct_endpoints(gpointer key, gpointer value,
-+                                      gpointer data)
-+{
-+    VirtIOIOMMU *s =3D (VirtIOIOMMU *)data;
-+    VirtIOIOMMUDomain *d =3D (VirtIOIOMMUDomain *)value;
-+    VirtIOIOMMUEndpoint *iter;
-+
-+    QLIST_FOREACH(iter, &d->endpoint_list, next) {
-+        iter->domain =3D d;
-+        g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
-+    }
-+    return false; /* continue the domain traversal */
-+}
-+
-+static int iommu_post_load(void *opaque, int version_id)
-+{
-+    VirtIOIOMMU *s =3D opaque;
-+
-+    g_tree_foreach(s->domains, reconstruct_endpoints, s);
-+    return 0;
-+}
-+
-+static const VMStateDescription vmstate_virtio_iommu_device =3D {
-+    .name =3D "virtio-iommu-device",
-+    .minimum_version_id =3D 1,
-+    .version_id =3D 1,
-+    .post_load =3D iommu_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_GTREE_DIRECT_KEY_V(domains, VirtIOIOMMU, 1,
-+                                   &vmstate_domain, VirtIOIOMMUDomain),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_virtio_iommu =3D {
-     .name =3D "virtio-iommu",
-     .minimum_version_id =3D 1,
-+    .priority =3D MIG_PRI_IOMMU,
-     .version_id =3D 1,
-     .fields =3D (VMStateField[]) {
-         VMSTATE_VIRTIO_DEVICE,
+     u->postcopy_notifier.notify =3D vhost_user_postcopy_notifier;
 --=20
 MST
 
