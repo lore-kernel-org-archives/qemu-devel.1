@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334BDC4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB2DC4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 005B521D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:48:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 391E421D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YTiBBSkS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005B521D7E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vi+IjzEM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391E421D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6rQi-0007C2-5X
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:48:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46293)
+	id 1j6rSB-0000Ff-FK
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:49:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6rIO-00013L-Is
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:53 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6rIQ-00019M-NG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6rIN-0002vm-8w
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:52 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:38944)
+ (envelope-from <alex.bennee@linaro.org>) id 1j6rIP-00031E-Fq
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:54 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:40695)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6rIN-0002uW-1U
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:51 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id c84so1840678wme.4
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:39:50 -0800 (PST)
+ id 1j6rIP-0002zQ-8a
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:53 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id t3so1657236wru.7
+ for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:39:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=kDf62Cq3SJaj+O7BFzF/D+1wJBPHwNV0aNRu09HEVs4=;
- b=YTiBBSkS40uIrltuUklpXCQubhJo4ikWPs2XC3h2XFByKQSRBWc3c+lBlPXwZkvmQ8
- np1I1ZACVy4dbQGXV5ZUjtapUW+HQsSoiWa59M2lWw7JqX04i3jlassDAad4MujawdDo
- IXC5ibNngxwBCkIle3HGBKvEFENwwXvb1uIs+ipfMKhcnDQYLT7Z4cDEf6LUnCg2djgN
- /NT6TCP2MYpG+mUTDCoWItl8wJTuZZkEdC9W3u4LIh2s6PLasRBVigVI7tW6XGTdUxWP
- uhsWEySBWMbLmbRyoieTZdZLZoq/a/b4b27UKevjhfBA1uXjkyJJujlUwLMlXlEFIUWk
- mekw==
+ bh=yA0pga7V3rNc2E3Kn75tRyKVD9rdhZJ6PsuYJbKRcmo=;
+ b=Vi+IjzEMj0mRrqQgsLvPFHxXM421sRNy+ESIcb1eIYmsIqOyUbk6MkDo2BP5ObByvu
+ 6zm7OmVGPg/Q3BGJKCrho470SvpTS2lKaDASvrR+35zGs0+CoTcncFmGN7oEeIcgiUHH
+ FKRQm0kd8jMmQgMDscpvW8ZuUxVl8xSp5Q2fq81hc7jzREkZFiUwMtczobEJnnINmbVv
+ Td9Xzgqg1eX2EIeohM+bbvUoSS4TIOcta/OI+KRsgaQFyX58iUDpkWtCep1M44IpadOK
+ /cXds15qNpOJgGeKi0oNM/AppSibpUXf++ujbnDvyf9zAD/aEZeBOtFFZcPP69h5zI8E
+ gJhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kDf62Cq3SJaj+O7BFzF/D+1wJBPHwNV0aNRu09HEVs4=;
- b=Ootg+zETwWFRNLOVzWlSCW8sxdnfcK72/SIBKnHvGNuT1PN7c+Cx1VKDB1dcddOndI
- J91JtCs00ZJzfHz3vljZCqCmqj+ZyggejBy5kKclyVq9JHqam5mMbuLF1UU8LCI05Yly
- xIr2i8lTUi3cmxIDZcTarm5TiNYBE2fa/XhWBWrlxqZAJ0oONBNe+GKKX45EOSISWA3/
- 8mqezGDa1pd+VLb4osle7r+/U3suTCtrYrEfCo91S9FqBfyOxUwt7m7C0wfTUo1mIBf2
- DojqyxeDsJ4KdcgHR28BqQUwYkCpoU/ofdj/Q1Wg/KRfnEN/+RYQW2p6UHhuLeEfAb4T
- oOqQ==
-X-Gm-Message-State: APjAAAVF9qOqZOSRJCBKLuEm+yCWoptBEsfzsb+wCuzDz//qaQJr3A84
- GF65MEeshqDA8MVRFDDBRfciPQ==
-X-Google-Smtp-Source: APXvYqxqCrSJ3FoF1bGHG8KHM8+AhoYWV70u0G8729rvyinOQ0bHUKOwltK6qZ8/l8hGtG5jl+y2Mg==
-X-Received: by 2002:a7b:c7d2:: with SMTP id z18mr3851636wmk.160.1582702789980; 
- Tue, 25 Feb 2020 23:39:49 -0800 (PST)
+ bh=yA0pga7V3rNc2E3Kn75tRyKVD9rdhZJ6PsuYJbKRcmo=;
+ b=rGhsUbtD6M1UMsJ66n5rY+DI7QTrv08GUr1Zwpajf5GKjX36uYNFNYy03CwKoPePXK
+ bN857Hyx0uG6Mi+NRfxXT52S+5Lcr3Q48lhFN3pB8in9IyzfYjHMKI1biknkVGA+STE0
+ k8glZWAm3xzxxIHK1eSLakjFb52H3EXc5mlp8ch1/dw3rfyuLhHOc184/ck/NkgPDirC
+ LNOFxLCn/QDNTlSYL7WhVlo/EV92ywMqlOb8C4kPQEdZFYDkcRRUdiWKdFRiMKpqV0Am
+ DJTTXoKJ3XxnDEsVnjC+zyjvaLIUaoUdxpcwg0jIPrafJ2rcDI+CnGbl2Bxc54hMHLBB
+ oz+w==
+X-Gm-Message-State: APjAAAWQFwOXhJJAbQerPExs8U2Gj3nxKWZXk4sjHRBMecQKQpibGpNy
+ 2u+UbP7mQTseiO/qaoyf95DSiw==
+X-Google-Smtp-Source: APXvYqxV0AvHMN85MFGtO8f65KnoaSPzjGsG2NP3GZu+XwWL07vTFygWuCFNom5rTCzL9wgN6jW9wQ==
+X-Received: by 2002:adf:8084:: with SMTP id 4mr4040547wrl.201.1582702792233;
+ Tue, 25 Feb 2020 23:39:52 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d17sm1700621wmb.36.2020.02.25.23.39.38
+ by smtp.gmail.com with ESMTPSA id g7sm2064272wrq.21.2020.02.25.23.39.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 23:39:45 -0800 (PST)
+ Tue, 25 Feb 2020 23:39:48 -0800 (PST)
 Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 678D41FF9D;
+ by zen.linaroharston (Postfix) with ESMTP id BA1D01FFA6;
  Wed, 26 Feb 2020 07:39:30 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 13/19] qemu/bitops.h: Add extract8 and extract16
-Date: Wed, 26 Feb 2020 07:39:23 +0000
-Message-Id: <20200226073929.28237-14-alex.bennee@linaro.org>
+Subject: [PULL 17/19] tcg: save vaddr temp for plugin usage
+Date: Wed, 26 Feb 2020 07:39:27 +0000
+Message-Id: <20200226073929.28237-18-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200226073929.28237-1-alex.bennee@linaro.org>
 References: <20200226073929.28237-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,74 +96,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org, "Emilio G . Cota" <cota@braap.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+While do_gen_mem_cb does copy (via extu_tl_i64) vaddr into a new temp
+this won't help if the vaddr temp gets clobbered by the actual
+load/store op. To avoid this clobbering we explicitly copy vaddr
+before the op to ensure it is live my the time we do the
+instrumentation.
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200212130311.127515-3-ysato@users.sourceforge.jp>
-Message-Id: <20200225124710.14152-14-alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
+Cc: qemu-stable@nongnu.org
+Message-Id: <20200225124710.14152-18-alex.bennee@linaro.org>
 
-diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
-index 02c1ce6a5d4..f55ce8b320b 100644
---- a/include/qemu/bitops.h
-+++ b/include/qemu/bitops.h
-@@ -301,6 +301,44 @@ static inline uint32_t extract32(uint32_t value, int start, int length)
-     return (value >> start) & (~0U >> (32 - length));
+diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
+index 7d782002e3f..e2e25ebf7db 100644
+--- a/tcg/tcg-op.c
++++ b/tcg/tcg-op.c
+@@ -2794,13 +2794,26 @@ static void tcg_gen_req_mo(TCGBar type)
+     }
  }
  
-+/**
-+ * extract8:
-+ * @value: the value to extract the bit field from
-+ * @start: the lowest bit in the bit field (numbered from 0)
-+ * @length: the length of the bit field
-+ *
-+ * Extract from the 8 bit input @value the bit field specified by the
-+ * @start and @length parameters, and return it. The bit field must
-+ * lie entirely within the 8 bit word. It is valid to request that
-+ * all 8 bits are returned (ie @length 8 and @start 0).
-+ *
-+ * Returns: the value of the bit field extracted from the input value.
-+ */
-+static inline uint8_t extract8(uint8_t value, int start, int length)
++static inline TCGv plugin_prep_mem_callbacks(TCGv vaddr)
 +{
-+    assert(start >= 0 && length > 0 && length <= 8 - start);
-+    return extract32(value, start, length);
++#ifdef CONFIG_PLUGIN
++    if (tcg_ctx->plugin_insn != NULL) {
++        /* Save a copy of the vaddr for use after a load.  */
++        TCGv temp = tcg_temp_new();
++        tcg_gen_mov_tl(temp, vaddr);
++        return temp;
++    }
++#endif
++    return vaddr;
 +}
 +
-+/**
-+ * extract16:
-+ * @value: the value to extract the bit field from
-+ * @start: the lowest bit in the bit field (numbered from 0)
-+ * @length: the length of the bit field
-+ *
-+ * Extract from the 16 bit input @value the bit field specified by the
-+ * @start and @length parameters, and return it. The bit field must
-+ * lie entirely within the 16 bit word. It is valid to request that
-+ * all 16 bits are returned (ie @length 16 and @start 0).
-+ *
-+ * Returns: the value of the bit field extracted from the input value.
-+ */
-+static inline uint16_t extract16(uint16_t value, int start, int length)
-+{
-+    assert(start >= 0 && length > 0 && length <= 16 - start);
-+    return extract32(value, start, length);
-+}
-+
- /**
-  * extract64:
-  * @value: the value to extract the bit field from
+ static inline void plugin_gen_mem_callbacks(TCGv vaddr, uint16_t info)
+ {
+ #ifdef CONFIG_PLUGIN
+-    if (tcg_ctx->plugin_insn == NULL) {
+-        return;
++    if (tcg_ctx->plugin_insn != NULL) {
++        plugin_gen_empty_mem_callback(vaddr, info);
++        tcg_temp_free(vaddr);
+     }
+-    plugin_gen_empty_mem_callback(vaddr, info);
+ #endif
+ }
+ 
+@@ -2822,6 +2835,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+         }
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2868,6 +2882,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
+         memop &= ~MO_BSWAP;
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2905,6 +2920,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+         }
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
+@@ -2967,6 +2983,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
+         memop &= ~MO_BSWAP;
+     }
+ 
++    addr = plugin_prep_mem_callbacks(addr);
+     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
+     plugin_gen_mem_callbacks(addr, info);
+ 
 -- 
 2.20.1
 
