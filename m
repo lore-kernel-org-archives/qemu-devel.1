@@ -2,100 +2,129 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAA5C4BA18
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF0FC4BA18
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B2B520801
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:38:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6706020801
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:38:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jk3iHgqa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2B520801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjORjSAF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6706020801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j70dV-00076H-4h
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:38:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52912)
+	id 1j70dZ-0007DY-HS
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:38:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52542)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j70cj-00063N-L6
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:37:30 -0500
+ (envelope-from <david@redhat.com>) id 1j70c3-0005Gg-RY
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:36:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j70ci-0002Xq-Hw
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:37:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34387
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j70c1-0000h5-F0
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:36:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32459
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j70ci-0002VR-Cb
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:37:28 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j70c1-0000cN-3d
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:36:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582738647;
+ s=mimecast20190719; t=1582738603;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XTU2pN4ffXUG7OkrmHSdQ/hb5L4r0rRvF2zRZkH1X80=;
- b=Jk3iHgqale2vPYaZdh3tBy6k/9DR4PZME+Q4W9++B5qL90Q/HmiiQNuMEsJFHXPzqpfQES
- 8vVh5Bprj1bybPmO5CjaaV0xklYY50Qoxl2cxDUpURZPHccXcoW7ZEx8nly9/G0PeLdle+
- 2YjOfqk2iS9EfF4cTu+46dh/rd4Gyfg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-5uYdU4h7ORCLryjcdT3Gog-1; Wed, 26 Feb 2020 12:37:26 -0500
-X-MC-Unique: 5uYdU4h7ORCLryjcdT3Gog-1
-Received: by mail-wm1-f72.google.com with SMTP id j130so968131wmj.9
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:37:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XTU2pN4ffXUG7OkrmHSdQ/hb5L4r0rRvF2zRZkH1X80=;
- b=JKfQC4zD3V12urfavC3YwWt2X6a3ibjYNukPVvMHiKVzR0GFMdP1RmiTfvjGZrHIQq
- dalnsfdLc49fhGTnfP2ptr2zeY0P+V6hukM1xDLOjrOOuLOiNXq7vDqTRmoHGM+/TzKg
- umk8tpeOi96G8wu6KPtT+QVEJ4W0xaJuAXTojeC4i0aJGdJAQC3woxBNsLejPioAVwPZ
- 1bFiUV1NtHx5ERJHP5ouAmHRE7dnnV9qzXZve75ibdK65+L85ia+Nn3pM4lYEqpSrxw7
- CB6tyv6aNae6awPQjcwxPFCZi7qrw1oH9zrPBNxXBSPSEkwxIwCpSqOv4ZcIqa8jTKUk
- rEVg==
-X-Gm-Message-State: APjAAAVX3VaXyKoPNvC1TVfAye54yxnTvlOjtSYejvYTcGqCRKU4gzXS
- RN/rcCkM4McB6xi83o5M5pKmRIsrdbxP9y8xjOkro2trKbGQcLw/87k+qbHP/3nG1g9OGLuEEQS
- 1JHH9sWkY3E1thBM=
-X-Received: by 2002:adf:90cb:: with SMTP id i69mr6764658wri.205.1582738645093; 
- Wed, 26 Feb 2020 09:37:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyjUkWMMglgN5xkf16vjjJ3GUhons5WW6ybowSLcka82B0vWVZQgpAQ6dMppAlNcSYmgQjLEQ==
-X-Received: by 2002:adf:90cb:: with SMTP id i69mr6764623wri.205.1582738644683; 
- Wed, 26 Feb 2020 09:37:24 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id s15sm4138759wrp.4.2020.02.26.09.37.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Feb 2020 09:37:24 -0800 (PST)
-Subject: Re: [PATCH] hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org,
- peterx@redhat.com
-References: <20200226172628.17449-1-eric.auger@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6f82ec7a-fb74-a47a-100b-325d5de36a7d@redhat.com>
-Date: Wed, 26 Feb 2020 18:37:23 +0100
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=26tE8L9QSFILIIYm9uKIiXafn2ct+G1xRtZrXYbRzpw=;
+ b=FjORjSAFZQpgXo0/5FdPLv5yrJ1eI/QKLqRTQ9gOduqpNvpo4uBZZOy7xTOOPwpMa799bs
+ 8toPYUodYNAD2RGtS7vz9ofhT3oVl0Emip0YBPCWNviljoudgD+mIBnkLn+pYf9jNZgBmj
+ vtQ+Fnc5vu4G0NvZ2KSVZGtF3rEWvD8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-qWpGGY8-MeiOtCU7dYh82g-1; Wed, 26 Feb 2020 12:36:40 -0500
+X-MC-Unique: qWpGGY8-MeiOtCU7dYh82g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6581190B2A5;
+ Wed, 26 Feb 2020 17:36:38 +0000 (UTC)
+Received: from [10.36.117.196] (ovpn-117-196.ams2.redhat.com [10.36.117.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E52C82718C;
+ Wed, 26 Feb 2020 17:36:30 +0000 (UTC)
+Subject: Re: [PATCH v2 fixed 08/16] util/mmap-alloc: Factor out calculation of
+ pagesize to mmap_pagesize()
+To: =?UTF-8?Q?Murilo_Opsfelder_Ara=c3=bajo?= <muriloo@linux.ibm.com>
+References: <20200212134254.11073-1-david@redhat.com>
+ <94b76367-4730-33a8-59ba-6b1c978ec2ea@redhat.com>
+ <7252629e-6290-5709-ea3c-d215622975ed@redhat.com>
+ <3378805.CNlBlhNnSm@kermit.br.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <fa7ed75b-6818-e421-5629-44ec2babb7fa@redhat.com>
+Date: Wed, 26 Feb 2020 18:36:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200226172628.17449-1-eric.auger@redhat.com>
+In-Reply-To: <3378805.CNlBlhNnSm@kermit.br.ibm.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,104 +136,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
+On 24.02.20 15:16, Murilo Opsfelder Ara=FAjo wrote:
+> On Monday, February 24, 2020 7:57:03 AM -03 David Hildenbrand wrote:
+>> On 24.02.20 11:50, David Hildenbrand wrote:
+>>> On 19.02.20 23:46, Peter Xu wrote:
+>>>> On Wed, Feb 12, 2020 at 02:42:46PM +0100, David Hildenbrand wrote:
+>>>>> Factor it out and add a comment.
+>>>>>
+>>>>> Reviewed-by: Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>
+>>>>> Acked-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+>>>>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>>> Cc: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+>>>>> Cc: Greg Kurz <groug@kaod.org>
+>>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>>>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>
+>>>>>  util/mmap-alloc.c | 21 ++++++++++++---------
+>>>>>  1 file changed, 12 insertions(+), 9 deletions(-)
+>>>>>
+>>>>> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+>>>>> index 27dcccd8ec..82f02a2cec 100644
+>>>>> --- a/util/mmap-alloc.c
+>>>>> +++ b/util/mmap-alloc.c
+>>>>> @@ -82,17 +82,27 @@ size_t qemu_mempath_getpagesize(const char
+>>>>> *mem_path)
+>>>>>
+>>>>>      return qemu_real_host_page_size;
+>>>>>
+>>>>>  }
+>>>>>
+>>>>> +static inline size_t mmap_pagesize(int fd)
+>>>>> +{
+>>>>> +#if defined(__powerpc64__) && defined(__linux__)
+>>>>> +    /* Mappings in the same segment must share the same page size */
+>>>>> +    return qemu_fd_getpagesize(fd);
+>>>>> +#else
+>>>>> +    return qemu_real_host_page_size;
+>>>>> +#endif
+>>>>> +}
+>>>>
+>>>> Pure question: This will return 4K even for huge pages on x86, is this
+>>>> what we want?
+>>>
+>>> (was asking myself the same question) I *think* it's intended. It's
+>>> mainly only used to allocate one additional guard page. The callers of
+>>> qemu_ram_mmap() make sure that the size is properly aligned (e.g., to
+>>> huge pages).
+>>>
+>>> Of course, a 4k guard page is sufficient - unless we can't use that
+>>> (special case for ppc64 here).
+>>>
+>>> Thanks!
+>>
+>> We could rename the function to mmap_guard_pagesize(), thoughts?
+>=20
+> The existing qemu_fd_getpagesize() already returns qemu_real_host_page_si=
+ze for
+> non-anonymous mappings (when fd =3D=3D -1).  I think this new mmap_pagesi=
+ze() could
+> be dropped in favor of qemu_fd_getpagesize().
+>=20
+> A side effect of this change would be guard page using a bit more memory =
+for
+> non-anonymous mapping.  Could that be a problem?
+>=20
+> What do you think?
 
-On 2/26/20 6:26 PM, Eric Auger wrote:
-> Make sure a null SMMUPciBus is returned in case we were
-> not able to identify a pci bus matching the @bus_num.
-> 
-> This matches the fix done on intel iommu in commit:
-> a2e1cd41ccfe796529abfd1b6aeb1dd4393762a2
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->   hw/arm/smmu-common.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 0f2573f004..67d7b2d0fd 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -301,6 +301,7 @@ SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num)
->                   return smmu_pci_bus;
->               }
->           }
-> +        smmu_pci_bus = NULL;
->       }
->       return smmu_pci_bus;
->   }
-> 
+So, I'll stick to mmap_guard_pagesize() for now, but use the actual page
+size (via qemu_fd_getpagesize()) in the new size asserts.
 
-Patch is easy to review but code not. By inverting the if() statement I 
-find the code easier to review. The patch isn't however:
+Thanks!
 
--- >8 --
-@@ -284,25 +284,27 @@ inline int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t 
-iova, IOMMUAccessFlags perm,
-  /**
-   * The bus number is used for lookup when SID based invalidation occurs.
-   * In that case we lazily populate the SMMUPciBus array from the bus hash
-   * table. At the time the SMMUPciBus is created (smmu_find_add_as), 
-the bus
-   * numbers may not be always initialized yet.
-   */
-  SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num)
-  {
-      SMMUPciBus *smmu_pci_bus = s->smmu_pcibus_by_bus_num[bus_num];
-+    GHashTableIter iter;
+--=20
+Thanks,
 
--    if (!smmu_pci_bus) {
--        GHashTableIter iter;
-+    if (smmu_pci_bus) {
-+        return smmu_pci_bus;
-+    }
-
--        g_hash_table_iter_init(&iter, s->smmu_pcibus_by_busptr);
--        while (g_hash_table_iter_next(&iter, NULL, (void 
-**)&smmu_pci_bus)) {
--            if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
--                s->smmu_pcibus_by_bus_num[bus_num] = smmu_pci_bus;
--                return smmu_pci_bus;
--            }
-+    g_hash_table_iter_init(&iter, s->smmu_pcibus_by_busptr);
-+    while (g_hash_table_iter_next(&iter, NULL, (void **)&smmu_pci_bus)) {
-+        if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
-+            s->smmu_pcibus_by_bus_num[bus_num] = smmu_pci_bus;
-+            return smmu_pci_bus;
-          }
-      }
--    return smmu_pci_bus;
-+
-+    return NULL;
-  }
----
-
-The code is easier although:
-
-SMMUPciBus *smmu_find_smmu_pcibus(SMMUState *s, uint8_t bus_num)
-{
-     SMMUPciBus *smmu_pci_bus = s->smmu_pcibus_by_bus_num[bus_num];
-     GHashTableIter iter;
-
-     if (smmu_pci_bus) {
-         return smmu_pci_bus;
-     }
-
-     g_hash_table_iter_init(&iter, s->smmu_pcibus_by_busptr);
-     while (g_hash_table_iter_next(&iter, NULL, (void **)&smmu_pci_bus)) {
-         if (pci_bus_num(smmu_pci_bus->bus) == bus_num) {
-             s->smmu_pcibus_by_bus_num[bus_num] = smmu_pci_bus;
-             return smmu_pci_bus;
-         }
-     }
-
-     return NULL;
-}
-
-What do you think?
+David / dhildenb
 
 
