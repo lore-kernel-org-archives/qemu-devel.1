@@ -2,63 +2,92 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B90AC4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 16:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2003EC4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 16:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0A88206E6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 16:36:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0A88206E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE0D20656
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 16:37:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wx8DZSfu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE0D20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6zfR-0006Bw-3h
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 11:36:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55205)
+	id 1j6zgd-0007On-AY
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 11:37:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1j6zeV-0005Qg-Ui
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 11:35:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j6zfi-0006Up-UH
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 11:36:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1j6zeU-00022h-Tg
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 11:35:15 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3170 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1j6zeR-0001Mg-4O; Wed, 26 Feb 2020 11:35:11 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id A81A06B3A77E2ABFB80C;
- Thu, 27 Feb 2020 00:34:59 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Thu, 27 Feb 2020
- 00:34:53 +0800
-Subject: Re: [PATCH v24 00/10] Add ARMv8 RAS virtualization support in QEMU
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200217131248.28273-1-gengdongjiu@huawei.com>
- <CAFEAcA9xd8fHiigZFFM7Symh0Mkm-jQ_aGJ7ifRCrXZvFY4DqQ@mail.gmail.com>
- <acd194e5-81d8-afa7-fb6d-6b7d744b5d81@huawei.com>
- <20200225175918.5a81506f@redhat.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <5bceff96-8681-e33e-8edd-70fd121c055a@huawei.com>
-Date: Thu, 27 Feb 2020 00:34:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <richard.henderson@linaro.org>) id 1j6zfh-0004Wm-PN
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 11:36:30 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35574)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j6zfh-0004UY-HY
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 11:36:29 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g6so1499673plt.2
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 08:36:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=XGxBi06S5twoQRPY3oVf8T/EbZFE6lieZGOKgkJPxs0=;
+ b=Wx8DZSfuUI5EjLOlSbiFPvrD52GfYflKhIwm7j5vn0fyRmzXEqzUNzDWA0PkvqXG++
+ uAK3lUF7ZaF9iTIyMRc2J7vOqDIZ5sF+1k58VOReNfutHLi2c7aOE10BDsI7Ixjh2BBe
+ zkZrMBanPvMCN4j+M3FtsufdcsYK66CPw60kTwho2Bgkg3MFuXcz+O6Km2DEQUyNk1GL
+ N8hgK4xoGONbEgohAavdRCT3LTHX9Dsq6+TXF31Nnl2cmyr22DT2RJjIml9QGprgo7Ok
+ oE4T6HGd6kKL6gpXmmGnC4+s927CLg4c6mHJvoDOpUf/Dtq/AuTs9n5bs6X7CujwayWX
+ ArGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XGxBi06S5twoQRPY3oVf8T/EbZFE6lieZGOKgkJPxs0=;
+ b=MuPfGH2wnZYg3ms7KLsYEOr3KToxI+MTFPbTWycTv+QIYiSodJS0g5LUzKopCGSAj5
+ PCu9mAWFDq1KChRwSxgkB/Qm+eH/stJCvEwb9WsgYs4bSSDmc/XOIbIzba6c8A8UAUWu
+ 4OGxnK5lbSyD03oTNM+3NGtvxnUCrId8nVs8lhQMIFqAxCMwrUaAGr57x3YwGPFS+hlP
+ Gxlok4HACDZHqTau8X4bBH0csu6PCaCUJ1dhqteogkguK0wWq85K8wvfDfQX7pVtfVyB
+ gMyWyJfObDjwP5zj2baFw/HlZTuYkJMqEap17c0iC6Qk+twEF2hLrP7A2FxypCUseTqb
+ wdqA==
+X-Gm-Message-State: APjAAAUH7OfG5N8ihEPEqD8mZDta7VC/rG7/hT058UttzlPxNfnPWAml
+ McP6+uY1DFW+O29MRemL1D7glw==
+X-Google-Smtp-Source: APXvYqzioFTGSliesVsb31cQs30ZB86onewShqJTg+5NwnP3dr5YnwVYFjgG8KTWi9GAomA/tGpgJA==
+X-Received: by 2002:a17:90a:7f93:: with SMTP id
+ m19mr5953784pjl.92.1582734986819; 
+ Wed, 26 Feb 2020 08:36:26 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ s124sm4051236pfc.57.2020.02.26.08.36.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Feb 2020 08:36:25 -0800 (PST)
+Subject: Re: [PATCH] accel/tcg: remove link between guest ram and TCG cache
+ size
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200226152710.31751-1-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bac7a5a4-c4c4-5102-4fe8-097ab15af29f@linaro.org>
+Date: Wed, 26 Feb 2020 08:36:23 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200225175918.5a81506f@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200226152710.31751-1-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,64 +99,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Zheng Xiang <zhengxiang9@huawei.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: f4bug@amsat.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 2/26/20 7:27 AM, Alex Bennée wrote:
+> Basing the TB cache size on the ram_size was always a little heuristic
+> and was broken by a1b18df9a4 which caused ram_size not to be fully
+> realised at the time we initialise the TCG translation cache.
+> 
+> At the same time the default code generation size seems mainly set to
+> deal with the fact we use a static code buffer for CONFIG_USER to
+> avoid mmap allocation problems on constrained systems. So we:
+> 
+>   - only use a static code buffer on 32 bit systems
+>   - up the default buffer size for bigger systems
+>   - ignore the ram_size and just go with the default
+>   - document the fact tb-size is ignored for 32 bit linux-user
+> 
+> The could potentially slow down softmmu emulation on 32 bit systems
+> with lots (3gb?) of spare memory. Those users can still manually up
+> the tb-size via the command line if they do in fact exist.
+> 
+> Fixes: a1b18df9a4
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Cc: Niek Linnenbank <nieklinnenbank@gmail.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> ---
+...
+> -#if defined(CONFIG_USER_ONLY)
+> -/* Currently it is not recommended to allocate big chunks of data in
+> -   user mode. It will change when a dedicated libc will be used.  */
+> -/* ??? 64-bit hosts ought to have no problem mmaping data outside the
+> -   region in which the guest needs to run.  Revisit this.  */
+> +#if defined(CONFIG_USER_ONLY) && TCG_TARGET_REG_BITS == 32
+> +/*
+> + * For user mode on smaller 32 bit systems we may run into trouble
+> + * allocating big chunks of data in the right place. On these systems
+> + * we utilise a static code generation buffer directly in the binary.
+> + */
+>  #define USE_STATIC_CODE_GEN_BUFFER
+>  #endif
+>  
+> @@ -927,7 +928,11 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+>  # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+>  #endif
+>  
+> +#if TCG_TARGET_REG_BITS == 32
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32u * 1024 * 1024)
+> +#else
+> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (2ul * 1024 * 1024 * 1024)
+> +#endif
+
+As Igor notes, there is no -tb-size X or -accel tcg,tb-size=Y option for
+linux-user.  Therefore I'd prefer this patch merely fix the default for softmmu
+and not change linux-user at all.
+
+I agree it is somewhat silly to use the static code gen buffer on a 64-bit
+host, but let's leave that to a separate patch.
 
 
-On 2020/2/26 0:59, Igor Mammedov wrote:
-> On Mon, 24 Feb 2020 16:37:44 +0800
-> gengdongjiu <gengdongjiu@huawei.com> wrote:
-> 
->> On 2020/2/21 22:09, Peter Maydell wrote:
->>> On Mon, 17 Feb 2020 at 13:10, Dongjiu Geng <gengdongjiu@huawei.com> wrote:  
->>>>
->>>> In the ARMv8 platform, the CPU error types includes synchronous external abort(SEA) and SError Interrupt (SEI). If exception happens in guest, host does not know the detailed information of guest, so it is expected that guest can do the recovery.
->>>> For example, if an exception happens in a guest user-space application, host does
->>>> not know which application encounters errors, only guest knows it.
->>>>
->>>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
->>>> After user space gets the notification, it will record the CPER into guest GHES
->>>> buffer and inject an exception or IRQ to guest.
->>>>
->>>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
->>>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
->>>> notification type after recording CPER into guest.  
->>>
->>> Hi; I have reviewed the remaining arm bit of this series (patch 9),
->>> and made some comments on patch 1. Still to be reviewed are
->>> patches 4, 5, 6, 8: I'm going to assume that Michael or Igor
->>> will look at those.  
->>
->> Thanks very much for Peter's review.
->> Michael/Igor, hope you can review patches 4, 5, 6, 8, thank you very much in advance.
-> 
-> done
-
-Thanks a lot, do you think whether it is ready to merge if the comments that you mentioned are fixed?
-If there are some other places that still needs to modify, hope you can pointed it out, so that in next patch series it can be ready to merge. thanks.
-
-> 
->>>
->>> thanks
->>> -- PMM
->>>
->>> .
->>>   
->>
-> 
-> .
-> 
-
+r~
 
