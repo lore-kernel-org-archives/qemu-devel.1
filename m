@@ -2,61 +2,69 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FDFC4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85235C4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:39:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DDB72467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:39:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DDB72467B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5EFD524683
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:39:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EFD524683
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6wu5-0002TR-8p
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:39:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41331)
+	id 1j6wuN-0002nr-Hw
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:39:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j6wtF-0001Zn-3d
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:38:18 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j6wsb-0000rE-3l
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:37:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j6wtD-00012a-Tq
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:38:17 -0500
-Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:46679)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j6wtC-0000ri-5r
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:38:15 -0500
-Received: from player699.ha.ovh.net (unknown [10.110.103.225])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id BE3401FCDE2
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 14:38:11 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id 65397FC5092F;
- Wed, 26 Feb 2020 13:37:52 +0000 (UTC)
-Date: Wed, 26 Feb 2020 14:37:51 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v6 17/18] spapr: Clean up RMA size calculation
-Message-ID: <20200226143751.17b4bfa4@bahia.home>
-In-Reply-To: <20200224233724.46415-18-david@gibson.dropbear.id.au>
-References: <20200224233724.46415-1-david@gibson.dropbear.id.au>
- <20200224233724.46415-18-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <no-reply@patchew.org>) id 1j6wsY-0008Cn-Er
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:37:36 -0500
+Resent-Date: Wed, 26 Feb 2020 08:37:36 -0500
+Resent-Message-Id: <E1j6wsY-0008Cn-Er@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21116)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j6wsY-00088j-8J
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:37:34 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1582724204; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=UjiZLBTE7rBHtLQgnlHLzR5jjGa6KNhZGrZSJpqIwr7JKMBZcX6FcqiD9Dv8CwJThEDTa6702jKiwRw81dj+lCzhun8hVEswOpkOS/6OMEE0gwq8OnbEcPr9W1Ws3Snx++LUh9hah4Do7dXy3kk3Gt7UY/u/I3/8m3rytVJ4RWE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1582724204;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=4/fvKGfOQLX5DOSutG9NHLI8jCjRaIwXFeDRjX5YLRo=; 
+ b=mXKlMxilBACleBhlKXaIxKRQzkgwDre5CoxPNsMM+xyxRap53ZDjUmpy/+ih06F1e+lHIfNgWw02Sn1ZhggASj3guY0nLeOtwR1r8WF8GKGnjmBK8p/iy6dPeIWSr2Fj8eFoTDLHuSVcgS0Uo003Wz7EG5bIlJrjRjPEhVWtffM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1582724202331354.7124927823487;
+ Wed, 26 Feb 2020 05:36:42 -0800 (PST)
+In-Reply-To: <20200225124710.14152-1-alex.bennee@linaro.org>
+Subject: Re: [PATCH  v3 00/19] testing & plugin updates
+Message-ID: <158272420017.10809.5229262189231713307@a1bbccc8075a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 8413568531551656422
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrleeggdehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Wed, 26 Feb 2020 05:36:42 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.32.125.228
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,134 +76,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, aik@ozlabs.ru, farosas@linux.ibm.com,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, qemu-ppc@nongnu.org, clg@kaod.org,
- Paolo Bonzini <pbonzini@redhat.com>, "Edgar E.
- Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
+Reply-To: qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, robert.foley@linaro.org,
+ kuhn.chenqun@huawei.com, stefanb@linux.vnet.ibm.com, peter.puhov@linaro.org,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, robhenry@microsoft.com,
+ f4bug@amsat.org, aaron@os.amperecomputing.com, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ alex.bennee@linaro.org, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Feb 2020 10:37:23 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Move the calculation of the Real Mode Area (RMA) size into a helper
-> function.  While we're there clean it up and correct it in a few ways:
->   * Add comments making it clearer where the various constraints come from
->   * Remove a pointless check that the RMA fits within Node 0 (we've just
->     clamped it so that it does)
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr.c | 59 ++++++++++++++++++++++++++++++--------------------
->  1 file changed, 35 insertions(+), 24 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 6e9f15f64d..f0354b699d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2648,6 +2648,40 @@ static PCIHostState *spapr_create_default_phb(void)
->      return PCI_HOST_BRIDGE(dev);
->  }
-> =20
-> +static hwaddr spapr_rma_size(SpaprMachineState *spapr, Error **errp)
-> +{
-> +    MachineState *machine =3D MACHINE(spapr);
-> +    hwaddr rma_size =3D machine->ram_size;
-> +    hwaddr node0_size =3D spapr_node0_size(machine);
-> +
-> +    /* RMA has to fit in the first NUMA node */
-> +    rma_size =3D MIN(rma_size, node0_size);
-> +
-> +    /*
-> +     * VRMA access is via a special 1TiB SLB mapping, so the RMA can
-> +     * never exceed that
-> +     */
-> +    rma_size =3D MIN(rma_size, TiB);
-> +
-> +    /*
-> +     * Clamp the RMA size based on machine type.  This is for
-> +     * migration compatibility with older qemu versions, which limited
-> +     * the RMA size for complicated and mostly bad reasons.
-> +     */
-> +    if (smc->rma_limit) {
-
-/home/greg/Work/qemu/qemu-ppc/hw/ppc/spapr.c: In function =E2=80=98spapr_rm=
-a_size=E2=80=99:
-/home/greg/Work/qemu/qemu-ppc/hw/ppc/spapr.c:2671:9: error: =E2=80=98smc=E2=
-=80=99 undeclared (first use in this function)
-     if (smc->rma_limit) {
-
-> +        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
-> +    }
-> +
-> +    if (rma_size < (MIN_RMA_SLOF * MiB)) {
-> +        error_setg(errp,
-> +"pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real Mode Area)",
-> +                   MIN_RMA_SLOF);
-> +        return -1;
-> +    }
-> +
-> +    return rma_size;
-> +}
-> +
->  /* pSeries LPAR / sPAPR hardware init */
->  static void spapr_machine_init(MachineState *machine)
->  {
-> @@ -2660,7 +2694,6 @@ static void spapr_machine_init(MachineState *machin=
-e)
->      int i;
->      MemoryRegion *sysmem =3D get_system_memory();
->      MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> -    hwaddr node0_size =3D spapr_node0_size(machine);
->      long load_limit, fw_size;
->      char *filename;
->      Error *resize_hpt_err =3D NULL;
-> @@ -2700,22 +2733,7 @@ static void spapr_machine_init(MachineState *machi=
-ne)
->          exit(1);
->      }
-> =20
-> -    spapr->rma_size =3D node0_size;
-> -
-> -    /*
-> -     * Clamp the RMA size based on machine type.  This is for
-> -     * migration compatibility with older qemu versions, which limited
-> -     * the RMA size for complicated and mostly bad reasons.
-> -     */
-> -    if (smc->rma_limit) {
-> -        spapr->rma_size =3D MIN(spapr->rma_size, smc->rma_limit);
-> -    }
-> -
-> -    if (spapr->rma_size > node0_size) {
-> -        error_report("Numa node 0 has to span the RMA (%#08"HWADDR_PRIx"=
-)",
-> -                     spapr->rma_size);
-> -        exit(1);
-> -    }
-> +    spapr->rma_size =3D spapr_rma_size(spapr, &error_fatal);
-> =20
->      /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
-*/
->      load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
-> @@ -2954,13 +2972,6 @@ static void spapr_machine_init(MachineState *machi=
-ne)
->          }
->      }
-> =20
-> -    if (spapr->rma_size < MIN_RMA_SLOF) {
-> -        error_report(
-> -            "pSeries SLOF firmware requires >=3D %ldMiB guest RMA (Real =
-Mode Area memory)",
-> -            MIN_RMA_SLOF / MiB);
-> -        exit(1);
-> -    }
-> -
->      if (kernel_filename) {
->          uint64_t lowaddr =3D 0;
-> =20
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDIyNTEyNDcxMC4xNDE1
+Mi0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAgdjMgMDAvMTldIHRlc3RpbmcgJiBwbHVn
+aW4gdXBkYXRlcwpNZXNzYWdlLWlkOiAyMDIwMDIyNTEyNDcxMC4xNDE1Mi0xLWFsZXguYmVubmVl
+QGxpbmFyby5vcmcKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICBwYXRjaGV3LzE1ODI3MTg5NzM0MS40NDk5NC4yNzQxNTU3NjU5OTc1MjMyODk0LnN0
+Z2l0QGxlcDhjLmF1cy5zdGdsYWJzLmlibS5jb20gLT4gcGF0Y2hldy8xNTgyNzE4OTczNDEuNDQ5
+OTQuMjc0MTU1NzY1OTk3NTIzMjg5NC5zdGdpdEBsZXA4Yy5hdXMuc3RnbGFicy5pYm0uY29tCiAt
+IFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDAyMDUxMTIwNDEuNjAwMy0xLXZzZW1lbnRz
+b3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzIwMjAwMjA1MTEyMDQxLjYwMDMtMS12c2VtZW50
+c292QHZpcnR1b3p6by5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDIyNjA5
+NDM1Ny4yNTA2MS0xLWphc293YW5nQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDIyNjA5NDM1
+Ny4yNTA2MS0xLWphc293YW5nQHJlZGhhdC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hl
+dy8yMDIwMDIyNjEwMjU0OS4xMjE1OC0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbSAtPiBwYXRjaGV3
+LzIwMjAwMjI2MTAyNTQ5LjEyMTU4LTEtZXJpYy5hdWdlckByZWRoYXQuY29tCiAqIFtuZXcgdGFn
+XSAgICAgICAgIHBhdGNoZXcvMjAyMDAyMjYxMjIwNTQuMzY2YjljZGFAdGFibGUubG9jYWxkb21h
+aW4gLT4gcGF0Y2hldy8yMDIwMDIyNjEyMjA1NC4zNjZiOWNkYUB0YWJsZS5sb2NhbGRvbWFpbgog
+KiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwMjI2MTI1NDI0LjQ4MTg0MC0xLWVibGFr
+ZUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDAyMjYxMjU0MjQuNDgxODQwLTEtZWJsYWtlQHJl
+ZGhhdC5jb20KQXV0byBwYWNraW5nIHRoZSByZXBvc2l0b3J5IGZvciBvcHRpbXVtIHBlcmZvcm1h
+bmNlLiBZb3UgbWF5IGFsc28KcnVuICJnaXQgZ2MiIG1hbnVhbGx5LiBTZWUgImdpdCBoZWxwIGdj
+IiBmb3IgbW9yZSBpbmZvcm1hdGlvbi4KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpm
+NWEzNmJkIHRlc3RzL3RjZzogdGFrZSBpbnRvIGFjY291bnQgZXhwZWN0ZWQgY2xhc2hlcyBwYXV0
+aC00CmE5MTIxMjAgdGVzdHMvdGNnOiBmaXggdHlwbyBpbiBjb25maWd1cmUuc2ggdGVzdCBmb3Ig
+djguMwo0NjA5MjJhIHRjZzogc2F2ZSB2YWRkciB0ZW1wIGZvciBwbHVnaW4gdXNhZ2UKNzY1ZWZh
+YSB0ZXN0cy90Y2c6IGdpdmUgZGVidWcgYnVpbGRzIGEgbGl0dGxlIGJpdCBsb25nZXIKM2VmOGEx
+MCB0ZXN0cy9wbHVnaW5zOiBtYWtlIGhvd3ZlYyBjbGVhbi11cCBhZnRlciBpdHNlbGYuCjIyNzQ0
+YjYgdGFyZ2V0L3Jpc2N2OiBwcm9ncmVzc2l2ZWx5IGxvYWQgdGhlIGluc3RydWN0aW9uIGR1cmlu
+ZyBkZWNvZGUKOGFlNzM4YSBxZW11L2JpdG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3Qx
+NgpkMmExMjAzIHRlc3RzL3BsdWdpbjogcHJldmVudCB1bmluaXRpYWxpemVkIHdhcm5pbmcKYjFh
+NTM4NyBwbHVnaW5zL2NvcmU6IGFkZCBtaXNzaW5nIGJyZWFrIGluIGNiX3RvX3RjZ19mbGFncwoz
+NDg5M2EyIGRvY3MvZGV2ZWw6IGRvY3VtZW50IHF1ZXJ5IGhhbmRsZSBsaWZldGltZXMKYTE1ZjQ1
+OCB0cmFjaW5nOiBvbmx5IGFsbG93IC10cmFjZSB0byBvdmVycmlkZSAtRCBpZiBzZXQKYTQ5NjNk
+NSB0ZXN0cy9pb3Rlc3RzOiBiZSBhIGxpdHRsZSBtb3JlIGZvcmdpdmluZyBvbiB0aGUgc2l6ZSB0
+ZXN0CmM4OGIwNzEgdHJhdmlzLnltbDogc2luZ2xlLXRocmVhZCBidWlsZC10Y2cgc3RhZ2VzCjE0
+NWFhZDIgdHJhdmlzLnltbDogRml4IFRyYXZpcyBZQU1MIGNvbmZpZ3VyYXRpb24gd2FybmluZ3MK
+Mjk0NGI4NyB0cmF2aXMueW1sOiBUZXN0IHRoZSBzMzkwLWNjdyBidWlsZCwgdG9vCjkwMWJmZGYg
+dGVzdHMvcmN1dG9ydHVyZTogbWlsZCBkb2N1bWVudGluZyByZWZhY3RvciBvZiB1cGRhdGUgdGhy
+ZWFkCjM4ZDFmMGIgdGVzdHMvcmN1dG9ydHVyZTogYmV0dGVyIGRvY3VtZW50IGxvY2tpbmcgb2Yg
+c3RhdHMKNTQ5Y2JiMyB0ZXN0cy9yY3V0b3J0dXJlOiB1cGRhdGUgdXNhZ2UgaGludAozOTUzNWY5
+IHRlc3RzL3RjZzogaW5jbHVkZSBhIHNraXAgcnVubmVyIGZvciBwYXV0aDMgd2l0aCBwbHVnaW5z
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE5IENoZWNraW5nIGNvbW1pdCAzOTUzNWY5YjdhMDkg
+KHRlc3RzL3RjZzogaW5jbHVkZSBhIHNraXAgcnVubmVyIGZvciBwYXV0aDMgd2l0aCBwbHVnaW5z
+KQoyLzE5IENoZWNraW5nIGNvbW1pdCA1NDljYmIzMDE2MDIgKHRlc3RzL3JjdXRvcnR1cmU6IHVw
+ZGF0ZSB1c2FnZSBoaW50KQozLzE5IENoZWNraW5nIGNvbW1pdCAzOGQxZjBiNDk1MWUgKHRlc3Rz
+L3JjdXRvcnR1cmU6IGJldHRlciBkb2N1bWVudCBsb2NraW5nIG9mIHN0YXRzKQo0LzE5IENoZWNr
+aW5nIGNvbW1pdCA5MDFiZmRmYWE1MTQgKHRlc3RzL3JjdXRvcnR1cmU6IG1pbGQgZG9jdW1lbnRp
+bmcgcmVmYWN0b3Igb2YgdXBkYXRlIHRocmVhZCkKNS8xOSBDaGVja2luZyBjb21taXQgMjk0NGI4
+Nzk4NDM5ICh0cmF2aXMueW1sOiBUZXN0IHRoZSBzMzkwLWNjdyBidWlsZCwgdG9vKQo2LzE5IENo
+ZWNraW5nIGNvbW1pdCAxNDVhYWQyOWUwMDQgKHRyYXZpcy55bWw6IEZpeCBUcmF2aXMgWUFNTCBj
+b25maWd1cmF0aW9uIHdhcm5pbmdzKQo3LzE5IENoZWNraW5nIGNvbW1pdCBjODhiMDcxOGNjZGYg
+KHRyYXZpcy55bWw6IHNpbmdsZS10aHJlYWQgYnVpbGQtdGNnIHN0YWdlcykKOC8xOSBDaGVja2lu
+ZyBjb21taXQgYTQ5NjNkNTliMGE1ICh0ZXN0cy9pb3Rlc3RzOiBiZSBhIGxpdHRsZSBtb3JlIGZv
+cmdpdmluZyBvbiB0aGUgc2l6ZSB0ZXN0KQo5LzE5IENoZWNraW5nIGNvbW1pdCBhMTVmNDU4OTc2
+YjUgKHRyYWNpbmc6IG9ubHkgYWxsb3cgLXRyYWNlIHRvIG92ZXJyaWRlIC1EIGlmIHNldCkKMTAv
+MTkgQ2hlY2tpbmcgY29tbWl0IDM0ODkzYTI4ZjdmYyAoZG9jcy9kZXZlbDogZG9jdW1lbnQgcXVl
+cnkgaGFuZGxlIGxpZmV0aW1lcykKMTEvMTkgQ2hlY2tpbmcgY29tbWl0IGIxYTUzODdjNDVhNSAo
+cGx1Z2lucy9jb3JlOiBhZGQgbWlzc2luZyBicmVhayBpbiBjYl90b190Y2dfZmxhZ3MpCjEyLzE5
+IENoZWNraW5nIGNvbW1pdCBkMmExMjAzYmJkMDkgKHRlc3RzL3BsdWdpbjogcHJldmVudCB1bmlu
+aXRpYWxpemVkIHdhcm5pbmcpCjEzLzE5IENoZWNraW5nIGNvbW1pdCA4YWU3MzhhNTc0ZjcgKHFl
+bXUvYml0b3BzLmg6IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2KQoxNC8xOSBDaGVja2luZyBj
+b21taXQgMjI3NDRiNjJmZDEyICh0YXJnZXQvcmlzY3Y6IHByb2dyZXNzaXZlbHkgbG9hZCB0aGUg
+aW5zdHJ1Y3Rpb24gZHVyaW5nIGRlY29kZSkKMTUvMTkgQ2hlY2tpbmcgY29tbWl0IDNlZjhhMTBh
+MzJiNyAodGVzdHMvcGx1Z2luczogbWFrZSBob3d2ZWMgY2xlYW4tdXAgYWZ0ZXIgaXRzZWxmLikK
+MTYvMTkgQ2hlY2tpbmcgY29tbWl0IDc2NWVmYWFlMGM4MCAodGVzdHMvdGNnOiBnaXZlIGRlYnVn
+IGJ1aWxkcyBhIGxpdHRsZSBiaXQgbG9uZ2VyKQoxNy8xOSBDaGVja2luZyBjb21taXQgNDYwOTIy
+YTU1MjQwICh0Y2c6IHNhdmUgdmFkZHIgdGVtcCBmb3IgcGx1Z2luIHVzYWdlKQoxOC8xOSBDaGVj
+a2luZyBjb21taXQgYTkxMjEyMDBlZjE0ICh0ZXN0cy90Y2c6IGZpeCB0eXBvIGluIGNvbmZpZ3Vy
+ZS5zaCB0ZXN0IGZvciB2OC4zKQoxOS8xOSBDaGVja2luZyBjb21taXQgZjVhMzZiZDljZTgxICh0
+ZXN0cy90Y2c6IHRha2UgaW50byBhY2NvdW50IGV4cGVjdGVkIGNsYXNoZXMgcGF1dGgtNCkKV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzYyOiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9wYXV0aC00LmM6MjU6CisgICAgICAgICAgICA6
+IC8qIG91dCAqLyAiPXIiKHgpLCAiPXIiKHkpCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2Ug
+YSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNjM6IEZJTEU6IHRlc3RzL3RjZy9hYXJj
+aDY0L3BhdXRoLTQuYzoyNjoKKyAgICAgICAgICAgIDogLyogaW4gKi8gW2luXSAiciIgKGluKQoK
+RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiM2
+MzogRklMRTogdGVzdHMvdGNnL2FhcmNoNjQvcGF1dGgtNC5jOjI2OgorICAgICAgICAgICAgOiAv
+KiBpbiAqLyBbaW5dICJyIiAoaW4pCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgYSBsZWFk
+aW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojNjQ6IEZJTEU6IHRlc3RzL3RjZy9hYXJjaDY0L3Bh
+dXRoLTQuYzoyNzoKKyAgICAgICAgICAgIDogLyogY2xvYmJlcnMgKi8pOwoKdG90YWw6IDEgZXJy
+b3JzLCAzIHdhcm5pbmdzLCA2MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOS8xOSBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNo
+ZXcub3JnL2xvZ3MvMjAyMDAyMjUxMjQ3MTAuMTQxNTItMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3Jn
+L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
+dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
