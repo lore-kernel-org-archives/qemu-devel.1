@@ -2,84 +2,89 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D31C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53C9C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E89820714
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0tjG6Bq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E89820714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7ABAB24673
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:37:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ABAB24673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6u3r-0000dH-FP
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:37:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57785)
+	id 1j6u4U-0001o8-Ma
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:37:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58175)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j6u38-0000Ar-FX
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:36:19 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j6u3q-0000kb-6C
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j6u36-00025K-7r
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:36:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57775
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j6u36-00021v-3M
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:36:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582713374;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ODLEvxrJOLvP0jliU5YyCcs7Etg2vs0tTEaqV0F4UJk=;
- b=f0tjG6BqadUUH9s+5BKxXiL0COVGvY4LyME6LAtYXZhb4T9Jh02tY7cnFGdBDKNsIxB5Sp
- iAupN/NUagGCvAiFGfV4ehbvernWbhhZRekyqZd5MZbwRwYh+eckGCt0jwmdGp6kywbAm5
- s5MC2VcUfeEPKQVsC96oZY6Oa4chv8k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-jtTEHQgoOwa87HA6dTQocw-1; Wed, 26 Feb 2020 05:36:13 -0500
-X-MC-Unique: jtTEHQgoOwa87HA6dTQocw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B27BE2F60;
- Wed, 26 Feb 2020 10:36:11 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-170.ams2.redhat.com [10.36.117.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08ACA60BE2;
- Wed, 26 Feb 2020 10:36:09 +0000 (UTC)
-Date: Wed, 26 Feb 2020 11:36:08 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH v2 01/13] block/stream: Remove redundant statement in
- stream_run()
-Message-ID: <20200226103608.GC6096@linux.fritz.box>
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-2-kuhn.chenqun@huawei.com>
- <20200226095102.GA6096@linux.fritz.box>
- <7412CDE03601674DA8197E2EBD8937E83B662BBF@dggemm531-mbx.china.huawei.com>
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j6u3p-0004A2-47
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:37:02 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:44054
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j6u3m-0003wH-Mq; Wed, 26 Feb 2020 05:36:58 -0500
+Received: from [86.188.254.49] (helo=[172.30.1.185])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j6u40-0006Ew-A5; Wed, 26 Feb 2020 10:37:15 +0000
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>
+References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
+ <20200226101948.786be4b0@redhat.com>
+ <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <0ac17424-2992-7182-ec22-6670ce9cf132@ilande.co.uk>
+Date: Wed, 26 Feb 2020 10:36:43 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B662BBF@dggemm531-mbx.china.huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.188.254.49
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: Sudden slowdown of ARM emulation in master
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,92 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, John Snow <jsnow@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 26.02.2020 um 11:21 hat Chenqun (kuhn) geschrieben:
->=20
->=20
-> >-----Original Message-----
-> >From: Kevin Wolf [mailto:kwolf@redhat.com]
-> >Sent: Wednesday, February 26, 2020 5:51 PM
-> >To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>
-> >Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org;
-> >peter.maydell@linaro.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>=
-;
-> >Euler Robot <euler.robot@huawei.com>; John Snow <jsnow@redhat.com>;
-> >Max Reitz <mreitz@redhat.com>
-> >Subject: Re: [PATCH v2 01/13] block/stream: Remove redundant statement i=
-n
-> >stream_run()
-> >
-> >Am 26.02.2020 um 09:46 hat kuhn.chenqun@huawei.com geschrieben:
-> >> From: Chen Qun <kuhn.chenqun@huawei.com>
-> >>
-> >> Clang static code analyzer show warning:
-> >>   block/stream.c:186:9: warning: Value stored to 'ret' is never read
-> >>         ret =3D 0;
-> >>         ^     ~
-> >> Reported-by: Euler Robot <euler.robot@huawei.com>
-> >> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> >> Reviewed-by: John Snow <jsnow@redhat.com>
-> >
-> >Let's mention that this is unnecessary since commit 1d809098aa9.
-> >
-> >Since the same commit, the initialisation 'int ret =3D 0;' is unnecessar=
-y because
-> >we never read ret before overwriting the initial value. We could clean t=
-his up
-> >in the same patch.
->=20
-> Yes, we can clean it and move 'ret'  declaration to the for() statement.
->=20
-> Modify just Like this=EF=BC=9A
-> [...]
+On 26/02/2020 10:03, Peter Maydell wrote:
 
-Godd point, makes sense to me. Please keep my R-b if you make this
-change.
+>> On Wed, 26 Feb 2020 00:07:55 +0100
+>> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
+>>
+>>> Hello Igor and Paolo,
+>>
+>> does following hack solves issue?
+>>
+>> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+>> index a08ab11f65..ab2448c5aa 100644
+>> --- a/accel/tcg/translate-all.c
+>> +++ b/accel/tcg/translate-all.c
+>> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
+>>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
+>>             static buffer, we could size this on RESERVED_VA, on the text
+>>             segment size of the executable, or continue to use the default.  */
+>> -        tb_size = (unsigned long)(ram_size / 4);
+>> +        tb_size = MAX_CODE_GEN_BUFFER_SIZE;
+>>  #endif
+>>      }
+>>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
+> 
+> Cc'ing Richard to ask: does it still make sense for TCG
+> to pick a codegen buffer size based on the guest RAM size?
+> (We should fix the regression anyway, but it surprised me
+> slightly to find a config detail of the guest machine being
+> used here.)
 
-Kevin
+FWIW the NetBSD guys have been running their QEMU-based CI for some time now with an
+extra -tb-size parameter to improve performance: http://gnats.netbsd.org/52184.
 
-> @@ -114,7 +114,6 @@ static int coroutine_fn stream_run(Job *job, Error **=
-errp)
->      int64_t offset =3D 0;
->      uint64_t delay_ns =3D 0;
->      int error =3D 0;
-> -    int ret =3D 0;
->      int64_t n =3D 0; /* bytes */
->=20
->      if (bs =3D=3D s->bottom) {
-> @@ -139,6 +138,7 @@ static int coroutine_fn stream_run(Job *job, Error **=
-errp)
->=20
->      for ( ; offset < len; offset +=3D n) {
->          bool copy;
-> +        int ret;
->=20
->          /* Note that even when no rate limit is applied we need to yield
->           * with no pending I/O here so that bdrv_drain_all() returns.
-> @@ -183,7 +183,6 @@ static int coroutine_fn stream_run(Job *job, Error **=
-errp)
->                  break;
->              }
->          }
-> -        ret =3D 0;
->=20
->          /* Publish progress */
->          job_progress_update(&s->common.job, n);
->=20
-> >
-> >With or without the changes:
-> >
-> >Reviewed-by: Kevin Wolf <kwolf@redhat.com>
->=20
 
+ATB,
+
+Mark.
 
