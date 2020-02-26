@@ -2,120 +2,133 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3024BC4BA0A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 05:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29DF0C4BA0A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 05:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD5AB21556
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 05:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8CE821927
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 05:24:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TtnIzczp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5AB21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=bt.com header.i=@bt.com header.b="gdti89rh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CE821927
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6ovY-00075w-3U
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 00:08:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45585)
+	id 1j6pB7-0000wx-4H
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 00:24:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j6oup-0006Zl-6L
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 00:07:25 -0500
+ (envelope-from <jasper.lowell@bt.com>) id 1j6pA3-0000V3-1B
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 00:23:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j6ouk-00089u-Sz
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 00:07:23 -0500
-Received: from mail-vi1eur05on2091.outbound.protection.outlook.com
- ([40.107.21.91]:42613 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <jasper.lowell@bt.com>) id 1j6pA0-0003gJ-2u
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 00:23:06 -0500
+Received: from smtpe1.intersmtp.com ([62.239.224.237]:6422)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j6oue-0007tj-Oo; Wed, 26 Feb 2020 00:07:13 -0500
+ (Exim 4.71) (envelope-from <jasper.lowell@bt.com>)
+ id 1j6p9z-0003WV-A3
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 00:23:04 -0500
+Received: from tpw09926dag08f.domain1.systemhost.net (10.9.202.39) by
+ RDW083A010ED66.bt.com (10.187.98.36) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Wed, 26 Feb 2020 05:21:44 +0000
+Received: from tpw09926dag04h.domain1.systemhost.net (10.9.202.31) by
+ tpw09926dag08f.domain1.systemhost.net (10.9.202.39) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Wed, 26 Feb 2020 05:22:58 +0000
+Received: from bwp09926076.bt.com (10.36.82.107) by
+ tpw09926dag04h.domain1.systemhost.net (10.9.202.31) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4 via Frontend Transport; Wed, 26 Feb 2020 05:22:58
+ +0000
+Received: from GBR01-CWL-obe.outbound.protection.outlook.com (104.47.20.52) by
+ smtpe1.intersmtp.com (10.36.82.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id
+ 15.1.1713.5; Wed, 26 Feb 2020 05:22:43 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fZtvSIO8wm41vBbatDBqOo8JGW61qJSY27DqFtFUYif8QfvO3GjBO9Dt6WClJXt6Z+qKgq98ziXGBZiltlfUfcqYaXE1eVnSr+1quQthBeAzVj1+xLpu15AQprPO+k7Ijc4xCtIfgoAfX0CzzAfsTem1skmI/D+FZdW7uHth5fFfsMJg8j3vZL2saEKEUOR8OLKQzYyU4CfexMP60r9m+luw4t0oKn9HM1OBreY0hzNcpNO3YvJXK4Y20eQ4oLaT8LvzYpnH0UYIF59bQgFKwyEH8I8ETqvEVet3l5yJwraydvMoBJnfUmf7yh/k3HSdDrOLyWroDrVS1FdzhPc6pg==
+ b=DlUPCRPNh2BBg883m2HV1+joud9leI9P5oZc5aOQDf+1QIPDRp1z1ZJTk0Xf7X0mjRzTeyS0cncmuZkUgK+wI0+2MpAYN5yT/hNtOsNWBXur1hm5eLMYOjduKqaUp0QeZe9mH5ZSGxymtMZavd0Aa8kWcjy2igtbYggvvLIo0Asp+dPKGV6Q+jsedBr5brP7ZGcO18PNTEuSoqMcFklVgtgvmyPnPm3ltfWLjShPhI7m9s1TO6H2Ddo1rDDdpXNqzn3g+Xhx6Caqn/MYU+EyeYUHLwJhwIIl6ouwyNOnsDPGab9lqWOedMrua3z4UUs50jCM48UrmAr74tiyYksjCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lBwgHNRz/9zNSsPzpAFr2FL1Cmqr+j73GSQQ9sNgwMA=;
- b=SNc9QHOOe0//Qd0mYLbQUGo6R+/pp1xuT/5FamsMwqX7L2synTaK2GBQK0H+GMEWtRaxdCLb6bAcildL1KfRjyaCThdt1Mg/QDNTLzKcK8I7Jb8sUvMi8zF1rMpddtVRgJHPxpmC17K1H7wj1YKD90mmTx6hCFSy06xCppMSWGZXJYtfsGxjIhzSN6vCk8nZeBp6X3ldzfbI9dMRmuY7SbHE+A0Oww16+mLbR9SVAB3W/4Cuq/ILeUYU73RXgcGS3bGKsceqhKB7ESSBunrutTfCG73s8xIAGA8bRo3eeGvmgFeB0AhdnXT3IHGhCWZda8G344LJKngeT5Yn7TFVVg==
+ bh=+rhz8P8H0rtpuoD7LUbizrIg34pj+Tt4ECDASRHURh4=;
+ b=N1g0vKYjiMaU+VlHBDXfOTIzkduv3W1mliwMaNJ+B4e3jEE8QCnN80MmXoslqREhQPtuYg0NDNivLmcsRGyKxE00zzxffRVJzSDmSrzWAL0C0rSgodGSP0sEnxvREUlS9TPwnw8y81mAv38uCSgqGnQLuAPMme5ue5j7+zogn5cNZ/YxXGId8+/qghdkP/GCytE+CMZE9IWV+talpCsp6RB5o8FS2g/X8MBgWa2xsyoFXJD8QnfB7wtgyQrLXWONx/3/qVQ9JLttI1ipsOVBc8EflLJuXFHRrvb+L969DPsgL+sx9cqNZw+cuv0hYig6KCC1rh/qx77NsdjVDrqVQQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
+ smtp.mailfrom=bt.com; dmarc=pass action=none header.from=bt.com; dkim=pass
+ header.d=bt.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bt.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lBwgHNRz/9zNSsPzpAFr2FL1Cmqr+j73GSQQ9sNgwMA=;
- b=TtnIzczpHFFxlc8iucdoHZcTiPeKXtwoRE+A73/Xk1VM9KJPVBmKTnNhSIJfCvo51ZRsGsK8b7s8qGtIp7V85E/F6hu0QdRZsU7BCSZScUcrNhOHztXwtTelzzOSrTggikBzqlnTSFO2cF+MqDR7rEqz7rbogLD6G67Opkb0Uos=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4625.eurprd08.prod.outlook.com (10.255.98.142) with Microsoft SMTP
+ bh=+rhz8P8H0rtpuoD7LUbizrIg34pj+Tt4ECDASRHURh4=;
+ b=gdti89rh+T5Frqf6fe4zvErJiQG4zXHHrsLkJqJ0mh02nGo9v4syXf49M4/kSdUxu0njA38rHujnMZKjYrOo7CER8Q1xmljUyMMF/Ksd21UTAm2kNzg+av8IfuNaowjek5/Gw7h4lsuvXIbYF0j1pL5oSupBcKS/ikpz2njLb0o=
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM (20.176.154.209) by
+ LO2P123MB1760.GBRP123.PROD.OUTLOOK.COM (20.176.158.81) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Wed, 26 Feb 2020 05:07:09 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2750.021; Wed, 26 Feb 2020
- 05:07:09 +0000
-Subject: Re: [PATCH 1/6] block: add bitmap-populate job
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200225005641.5478-1-jsnow@redhat.com>
- <20200225005641.5478-2-jsnow@redhat.com>
- <ede1d2b6-0af9-0002-dc33-b82aa870119f@virtuozzo.com>
- <5c03a2b5-7cba-b347-da80-f9d9acaccb6e@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200226080706984
-Message-ID: <d462c95f-a616-1ddb-f0fd-650be113c384@virtuozzo.com>
-Date: Wed, 26 Feb 2020 08:07:07 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <5c03a2b5-7cba-b347-da80-f9d9acaccb6e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ 15.20.2750.21; Wed, 26 Feb 2020 05:22:55 +0000
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5]) by LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5%4]) with mapi id 15.20.2750.021; Wed, 26 Feb 2020
+ 05:22:55 +0000
+From: <jasper.lowell@bt.com>
+To: <balaton@eik.bme.hu>
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+Thread-Topic: [PATCH] hw/ide: Remove status register read side effect
+Thread-Index: AQHV6IMztk0nS91QXUSAhbuFxp1TiagnnJkAgAADjoCAAAXGgIAAvUiAgACESgCAAmZZAIAAvBaAgADuooA=
+Date: Wed, 26 Feb 2020 05:22:55 +0000
+Message-ID: <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
+References: <20200221065015.337915-1-jasper.lowell@bt.com>
+ <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+ <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
+ <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
+ <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
+ <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
+ <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
+ <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: HE1PR02CA0090.eurprd02.prod.outlook.com
- (2603:10a6:7:29::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR02CA0090.eurprd02.prod.outlook.com (2603:10a6:7:29::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21 via Frontend Transport; Wed, 26 Feb 2020 05:07:08 +0000
-X-Tagtoolbar-Keys: D20200226080706984
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7558af35-3fe7-4b7f-a4d5-08d7ba79bb54
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4625:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB46252A93A03A22D5DEF157B1C1EA0@AM6PR08MB4625.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-Forefront-PRVS: 0325F6C77B
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(396003)(136003)(376002)(39850400004)(189003)(199004)(52116002)(66556008)(54906003)(53546011)(7416002)(8676002)(66476007)(31696002)(81156014)(86362001)(16576012)(81166006)(66946007)(6486002)(8936002)(2906002)(316002)(956004)(5660300002)(26005)(36756003)(30864003)(186003)(16526019)(4326008)(478600001)(31686004)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4625;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jasper.lowell@bt.com; 
+x-originating-ip: [217.138.204.84]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e70dce07-c706-45bb-90f1-08d7ba7bef54
+x-ms-traffictypediagnostic: LO2P123MB1760:
+x-microsoft-antispam-prvs: <LO2P123MB17601E1B6A4E3CB6841A634383EA0@LO2P123MB1760.GBRP123.PROD.OUTLOOK.COM>
+x-antispam-2: 1
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0325F6C77B
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(136003)(376002)(366004)(346002)(39860400002)(396003)(199004)(189003)(2906002)(36756003)(6916009)(2616005)(186003)(6506007)(4326008)(6512007)(26005)(6486002)(66446008)(64756008)(86362001)(5660300002)(76116006)(91956017)(54906003)(81166006)(66556008)(66946007)(8936002)(316002)(71200400001)(478600001)(81156014)(66476007)(966005)(8676002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:LO2P123MB1760;
+ H:LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: bt.com does not designate
  permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eAs09OGLE176Hz6CRIbMvTS0IqOtfvljE9AQrDL1wWWZedaV0tDKqaelcJuPVUWs3139rFL1r26uyTYcEvQn7njSWpVPYdEIRYSEJchhCdT7uJJiqMy1zVOK4BoGcEeiN2AX1wPkelLnJdci89p9WvqGNGvTHz2Q68ndxwJ+k+/m6uIT198eji9Z6zbVrUd2oBxH+RG4EVkqegI9XHhW/4Y0aMIPfyjahssbr7BRkEqkUPJ3mCcpm6XaTHlinKfGzPrLnn8V4ZfC/xhCXoUWfpB7J9rq5y6JdwSWyg3C9yb+9MsLVUKqaanW2TtyQni9tRl2Rc+c7GvoBAmydOQaNKzr1rByP24rrZ+paQwKX/GBWTkFHjmOzw0p5qhP8tt7N+sUSSiTGrmhsQr68rTPS4kRCv1zKSIirWIMbZDrRxODveAJiX4oveKmh92NBQQ8
-X-MS-Exchange-AntiSpam-MessageData: SoIkk8s9+eh0wfv9h2g5UIz3lNJNtCRqbCjmJc1ju1E56IE7u93RbI1kLz7ikKImZF0ePeQP5Zfq5hH5inO9tcWtrLo1eONL7JrJNIbqXKm5ECwKKrZyUOjZf67em9x24u5pULH3blPPJ9qAYFEk0Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7558af35-3fe7-4b7f-a4d5-08d7ba79bb54
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2020 05:07:09.5039 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GQdCnsiu9o7PiwcvKaDHAUD4cwk3sI9gbaKj8rhlPQ/S7Xtxy0EvdSMjefobsWkPTfLhO/qAkevz9GFAkNHfyu4xW3P1DtvuECXQIc56+O8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4625
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.21.91
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GIath+h7G9EGYkFFfksPaXTMlPZKFyD66ZPqDy08skIIsqrT5+itqc0TF9jNdt6MM1CN5KNnBxBxzgHxB94PTmCST2vvBiCRrwdOIzAgiU3H3nqGpBvyNkIWtpr50MAIIcPZ9zMK3BULN+t32q/qpAmbU/dG9xB940IYApfeWldNWUmTlILAeFvavr9ZtIBtbdpvwjwCu7k6EWOs4NMQa/NAFJtIYoQmHa2Ju93z5iuK4zrY96IkdeiRbhtFTyiDbNZmQwfOE9pPK3HTmVH6OcqgAiq+g+JrIMMJQrdr57yVO5ptGam9efCbN/KOJZu5vzHoaB6ZX5cQ0nJJY6re1dOncDV/qws8Xm9SNPcagbR+gRNyOnQr40jFJJHGf0xk3YvHgWKZJOpNJXoVXATXGyLwf2juTyR7bA2E4yKLSH0n96TWjqg0ZnzqNHq+zhO1qlTvkUwXyUWa4h1BNRjSNvWDUie5lr0rJQg0/LTL9DqPDdIZjjwZAbOVSlhgWwUUEnpKKfWsv6oxjEDKJ8I5qA==
+x-ms-exchange-antispam-messagedata: 7vPotLbfSLJc6683W69mTedyzA+m9Fd0YauuoMjVgwyYqGqWn4DFcN7IFuRsCOWfPD0mbkLZN1dkMR9iJF9zp21C6O36tIY/VrqqbshCZnuCI6zzq58sMEBHRqLoMtm7rG7Wv1Gm7t/iVh7kBp198A==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <39DCEE88767A6E4EA386D804C0242226@GBRP123.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: e70dce07-c706-45bb-90f1-08d7ba7bef54
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2020 05:22:55.4455 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7f35688-9c00-4d5e-ba41-29f146377ab0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yikFor3OLYBocOHcIBJQSH8Eu97HhbroFmPbv2XirFR+I8xgV7L5A9OKdZ2J/kW3Z+UNat0vnyuJhvaIFhHhZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P123MB1760
+X-OriginatorOrg: bt.com
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.237
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,637 +140,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: jsnow@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-25.02.2020 23:41, John Snow wrote:
->=20
->=20
-> On 2/25/20 11:04 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 25.02.2020 3:56, John Snow wrote:
->>> This job copies the allocation map into a bitmap. It's a job because
->>> there's no guarantee that allocation interrogation will be quick (or
->>> won't hang), so it cannot be retrofit into block-dirty-bitmap-merge.
->>>
->>> It was designed with different possible population patterns in mind,
->>> but only top layer allocation was implemented for now.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  =C2=A0 qapi/block-core.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 48 +=
-++++++++
->>>  =C2=A0 qapi/job.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +-
->>>  =C2=A0 include/block/block_int.h |=C2=A0 21 ++++
->>>  =C2=A0 block/bitmap-alloc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 207 ++++++=
-++++++++++++++++++++++++++++++++
->>>  =C2=A0 blockjob.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 3 +-
->>>  =C2=A0 block/Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
-=C2=A0 1 +
->>>  =C2=A0 6 files changed, 280 insertions(+), 2 deletions(-)
->>>  =C2=A0 create mode 100644 block/bitmap-alloc.c
->>>
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index 85e27bb61f..df1797681a 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -2245,6 +2245,54 @@
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { 'command': 'block-dirty-b=
-itmap-merge',
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'data': 'BlockD=
-irtyBitmapMerge' }
->>>  =C2=A0 +##
->>> +# @BitmapPattern:
->>> +#
->>> +# An enumeration of possible patterns that can be written into a bitma=
-p.
->>> +#
->>> +# @allocation-top: The allocation status of the top layer
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 of the attached storage node.
->>> +#
->>> +# Since: 5.0
->>> +##
->>> +{ 'enum': 'BitmapPattern',
->>> +=C2=A0 'data': ['allocation-top'] }
->>> +
->>> +##
->>> +# @BlockDirtyBitmapPopulate:
->>> +#
->>> +# @job-id: identifier for the newly-created block job.
->>> +#
->>> +# @pattern: What pattern should be written into the bitmap?
->>> +#
->>> +# @on-error: the action to take if an error is encountered on a bitmap=
-'s
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 at=
-tached node, default 'report'.
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 's=
-top' and 'enospc' can only be used if the block device
->>> supports
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 io=
--status (see BlockInfo).
->>> +#
->>> +# @auto-finalize: When false, this job will wait in a PENDING state
->>> after it has
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 finished its work, waiting for @block-job-final=
-ize
->>> before
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 making any block graph changes.
->>
->> sounds a bit strange in context of bitmap-population job
->>
->=20
-> Yeah, you're right. Copy-pasted for "consistency".
->=20
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 When true, this job will automatically
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 perform its abort or commit actions.
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 Defaults to true.
->>> +#
->>> +# @auto-dismiss: When false, this job will wait in a CONCLUDED state
->>> after it
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 has completely ceased all work, and awaits
->>> @block-job-dismiss.
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 When true, this job will automatically disappear
->>> from the query
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 list without user intervention.
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 Defaults to true.
->>> +#
->>> +# Since: 5.0
->>> +##
->>> +{ 'struct': 'BlockDirtyBitmapPopulate',
->>> +=C2=A0 'base': 'BlockDirtyBitmap',
->>> +=C2=A0 'data': { 'job-id': 'str',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'pa=
-ttern': 'BitmapPattern',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*o=
-n-error': 'BlockdevOnError',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*a=
-uto-finalize': 'bool',
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*a=
-uto-dismiss': 'bool' } }
->>> +
->>>  =C2=A0 ##
->>>  =C2=A0 # @BlockDirtyBitmapSha256:
->>>  =C2=A0 #
->>> diff --git a/qapi/job.json b/qapi/job.json
->>> index 5e658281f5..5f496d4630 100644
->>> --- a/qapi/job.json
->>> +++ b/qapi/job.json
->>> @@ -22,7 +22,7 @@
->>>  =C2=A0 # Since: 1.7
->>>  =C2=A0 ##
->>>  =C2=A0 { 'enum': 'JobType',
->>> -=C2=A0 'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
->>> +=C2=A0 'data': ['commit', 'stream', 'mirror', 'backup', 'create',
->>> 'bitmap-populate'] }
->>>  =C2=A0 =C2=A0 ##
->>>  =C2=A0 # @JobStatus:
->>> diff --git a/include/block/block_int.h b/include/block/block_int.h
->>> index 6f9fd5e20e..a5884b597e 100644
->>> --- a/include/block/block_int.h
->>> +++ b/include/block/block_int.h
->>> @@ -1215,6 +1215,27 @@ BlockJob *backup_job_create(const char *job_id,
->>> BlockDriverState *bs,
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockCompletionFunc *cb, void *opaque,
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 JobTxn *txn, Error **errp);
->>>  =C2=A0 +/*
->>> + * bitpop_job_create: Create a new bitmap population job.
->>> + *
->>> + * @job_id: The id of the newly-created job.
->>> + * @bs: Block device associated with the @target_bitmap.
->>> + * @target_bitmap: The bitmap to populate.
->>> + * @on_error: What to do if an error on @bs is encountered.
->>> + * @creation_flags: Flags that control the behavior of the Job lifetim=
-e.
->>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 See @BlockJobCreateFlags
->>> + * @cb: Completion function for the job.
->>> + * @opaque: Opaque pointer value passed to @cb.
->>> + * @txn: Transaction that this job is part of (may be NULL).
->>> + */
->>> +BlockJob *bitpop_job_create(const char *job_id, BlockDriverState *bs,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *target_bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 BitmapPattern pattern,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 BlockdevOnError on_error,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 int creation_flags,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 BlockCompletionFunc *cb, void *opaque,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 JobTxn *txn, Error **errp);
->>> +
->>>  =C2=A0 void hmp_drive_add_node(Monitor *mon, const char *optstr);
->>>  =C2=A0 =C2=A0 BdrvChild *bdrv_root_attach_child(BlockDriverState *chil=
-d_bs,
->>> diff --git a/block/bitmap-alloc.c b/block/bitmap-alloc.c
->>> new file mode 100644
->>> index 0000000000..47d542dc12
->>> --- /dev/null
->>> +++ b/block/bitmap-alloc.c
->>> @@ -0,0 +1,207 @@
->>> +/*
->>> + * Async Dirty Bitmap Populator
->>> + *
->>> + * Copyright (C) 2020 Red Hat, Inc.
->>> + *
->>> + * Authors:
->>> + *=C2=A0 John Snow <jsnow@redhat.com>
->>> + *
->>> + * This work is licensed under the terms of the GNU GPL, version 2 or
->>> later.
->>> + * See the COPYING file in the top-level directory.
->>> + *
->>> + */
->>> +
->>> +#include "qemu/osdep.h"
->>> +
->>> +#include "trace.h"
->>> +#include "block/block.h"
->>> +#include "block/block_int.h"
->>> +#include "block/blockjob_int.h"
->>> +#include "block/block_backup.h"
->>> +#include "block/block-copy.h"
->>
->> I hope, not all includes are needed :)
->=20
-> Whoops, no, of course not. I copied the skeleton from backup, as you can
-> tell ;)
->=20
->>
->>> +#include "qapi/error.h"
->>> +#include "qapi/qmp/qerror.h"
->>> +#include "qemu/ratelimit.h"
->>> +#include "qemu/cutils.h"
->>> +#include "sysemu/block-backend.h"
->>> +#include "qemu/bitmap.h"
->>> +#include "qemu/error-report.h"
->>> +
->>> +typedef struct BitpopBlockJob {
->>> +=C2=A0=C2=A0=C2=A0 BlockJob common;
->>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
->>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *target_bitmap;
->>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *new_bitmap;
->>> +=C2=A0=C2=A0=C2=A0 BlockdevOnError on_error;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t len;
->>> +} BitpopBlockJob;
->>> +
->>> +static const BlockJobDriver bitpop_job_driver;
->>> +
->>> +static void bitpop_commit(Job *job)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BitpopBlockJob *s =3D container_of(job, BitpopBlock=
-Job, common.job);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_merge_internal(s->target_bitmap, =
-s->new_bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NU=
-LL, true);
->>
->> Hmm, so you populate new_bitmap, and then merge to target. Why can't we
->> work
->> directly with target bitmap? The most probable case is that libvirt will
->> create bitmap specifically to use as target in this operation, or not?
->>
->=20
-> Most likely case, yes. Odds are very good it will be a brand new bitmap.
->=20
-> However, we already have a creation command -- I didn't want to make a
-> second job-version of the command and then maintain two interfaces, so I
-> made it a "merge into existing" style command instead.
->=20
->> Hmm, just to make it possible to cancel the job and keep the target
->> bitmap in
->> original state? Is it really needed? I think on failure target bitmap
->> will be
->> removed anyway..
->>
->=20
-> You caught me being *lazy*. I copy the bitmap so I can unconditionally
-> enable it to catch in-flight writes without having to create block graph
-> modifications.
->=20
-> But, yes, to undo changes if we cancel.
->=20
-> I didn't want to make a job that was not able to be canceled. The
-> alternative is pursuing the design where we allow new bitmaps only --
-> because then on cancel we can just delete them.
-
-On backup job (and any other) we can't rollback target changes on cancel.
-So, I think it would be OK to take same semantics for the new job, keeping =
-in
-mind that it would be most probable usage case and no sense in creating
-additional bitmaps. And if caller needs to use existent non-empty bitmap as
-target and wants correct cancel, it always can create additional bitmap by
-itself and then merge it to actual target.
-
-And why new? It's up to user, what to use as target. And user knows, that o=
-n
-failure or cancel target becomes invalid and will workaround this if needed=
-.
-
->=20
->>> +}
->>> +
->>> +/* no abort needed; just clean without committing. */
->>> +
->>> +static void bitpop_clean(Job *job)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BitpopBlockJob *s =3D container_of(job, BitpopBlock=
-Job, common.job);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 bdrv_release_dirty_bitmap(s->new_bitmap);
->>> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_set_busy(s->target_bitmap, false)=
-;
->>> +}
->>> +
->>> +static BlockErrorAction bitpop_error_action(BitpopBlockJob *job, int
->>> error)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 return block_job_error_action(&job->common, job->on=
-_error, true,
->>> error);
->>> +}
->>> +
->>> +static bool coroutine_fn yield_and_check(Job *job)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 if (job_is_cancelled(job)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return true;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 job_sleep_ns(job, 0);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (job_is_cancelled(job)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return true;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return false;
->>> +}
->>> +
->>> +static int coroutine_fn bitpop_run(Job *job, Error **errp)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BitpopBlockJob *s =3D container_of(job, BitpopBlock=
-Job, common.job);
->>> +=C2=A0=C2=A0=C2=A0 int ret =3D 0;
->>> +=C2=A0=C2=A0=C2=A0 int64_t offset;
->>> +=C2=A0=C2=A0=C2=A0 int64_t count;
->>> +=C2=A0=C2=A0=C2=A0 int64_t bytes;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 for (offset =3D 0; offset < s->len; ) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (yield_and_check(job)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D -ECANCELED;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bytes =3D s->len - offset;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_is_allocated(s=
-->bs, offset, bytes, &count);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(bitpop_error_action(s, -ret) =3D=3D
->>> BLOCK_ERROR_ACTION_REPORT) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 break;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 con=
-tinue;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!count) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D 0;
->>
->> Hmm, I think it's impossible case.. If so, better to make an assertion
->> or ignore..
->>
->=20
-> OK, agreed.
->=20
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bre=
-ak;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdr=
-v_set_dirty_bitmap(s->new_bitmap, offset, count);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D 0;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_progress_update(job, co=
-unt);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 offset +=3D count;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return ret;
->>> +}
->>> +
->>> +static const BlockJobDriver bitpop_job_driver =3D {
->>> +=C2=A0=C2=A0=C2=A0 .job_driver =3D {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D sizeof(BitpopBlockJob),
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .job_type=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D JOB_=
-TYPE_BITMAP_POPULATE,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .free=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 =3D block_job_free,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .user_resume=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D block_job_user_resu=
-me,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .run=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 =3D bitpop_run,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .commit=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 =3D bitpop_commit,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .clean=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D bitpop_clean,
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +};
->>> +
->>> +
->>> +BlockJob *bitpop_job_create(
->>> +=C2=A0=C2=A0=C2=A0 const char *job_id,
->>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs,
->>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *target_bitmap,
->>> +=C2=A0=C2=A0=C2=A0 BitmapPattern pattern,
->>> +=C2=A0=C2=A0=C2=A0 BlockdevOnError on_error,
->>> +=C2=A0=C2=A0=C2=A0 int creation_flags,
->>> +=C2=A0=C2=A0=C2=A0 BlockCompletionFunc *cb,
->>> +=C2=A0=C2=A0=C2=A0 void *opaque,
->>> +=C2=A0=C2=A0=C2=A0 JobTxn *txn,
->>> +=C2=A0=C2=A0=C2=A0 Error **errp)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 int64_t len;
->>> +=C2=A0=C2=A0=C2=A0 BitpopBlockJob *job =3D NULL;
->>> +=C2=A0=C2=A0=C2=A0 int64_t cluster_size;
->>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *new_bitmap =3D NULL;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 assert(bs);
->>> +=C2=A0=C2=A0=C2=A0 assert(target_bitmap);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (!bdrv_is_inserted(bs)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Device is=
- not inserted: %s",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_get_device_name(bs));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>
->> Why this?
->>
->=20
-> I assumed there was nothing to read the allocation map *of* if there
-> wasn't a media present.
->=20
-> Am I mistaken?
-
-is_inserted checks existing of bs->drv, but bitmap operations actually
-doesn't need any drv.. Hmm. I'm not against this check anyway.
-
->=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_BACKUP_SOU=
-RCE, errp)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>
->> and this?
->>
->=20
-> Copy-paste: I don't understand if I want a new op blocker, to re-use an
-> op-blocker, or to have no op blocker.
->=20
-> Genuinely I have no idea. I should left a review comment here, I forgot
-> about this part, sorry.
-
-I'm for no op blocker. As I understand, op-blockers are old and should be
-replaced by permissions and frozen children. So, if we don't know, do we
-need any blocking here, better go on without it. Also, op-blockers can't
-block forbidden usage through filters anyway.
-
->=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (bdrv_dirty_bitmap_check(target_bitmap, BDRV_BIT=
-MAP_DEFAULT,
->>> errp)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (pattern !=3D BITMAP_PATTERN_ALLOCATION_TOP) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Unrecogni=
-zed bitmap pattern");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 len =3D bdrv_getlength(bs);
->>> +=C2=A0=C2=A0=C2=A0 if (len < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -len=
-, "unable to get length for '%s'",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- bdrv_get_device_name(bs));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* NB: new bitmap is anonymous and enabled */
->>> +=C2=A0=C2=A0=C2=A0 cluster_size =3D bdrv_dirty_bitmap_granularity(targ=
-et_bitmap);
->>> +=C2=A0=C2=A0=C2=A0 new_bitmap =3D bdrv_create_dirty_bitmap(bs, cluster=
-_size, NULL, errp);
->>> +=C2=A0=C2=A0=C2=A0 if (!new_bitmap) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /* Take ownership; we reserve the right to write in=
-to this
->>> on-commit. */
->>> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_set_busy(target_bitmap, true);
->>
->> Honestly, I still have bad understanding about how should we use dirty
->> bitmap mutex,
->> but note that bdrv_dirty_bitmap_set_busy locks the mutex. And it is (may
->> be) possible,
->> that busy status of the bitmap is changed after bdrv_dirty_bitmap_check
->> but before
->> bdrv_dirty_bitmap_set_busy.=C2=A0 So, more correct would be do both oper=
-ation
->> under one
->> critical section. Still, I don't know is the situation possible.
->>
->=20
-> Aren't we under the BQL here? Can we be pre-empted? :(
-
-Seems we are. But, as it's said above dirty_bitmap_mutex declaration:
-
-     /* Writing to the list requires the BQL _and_ the dirty_bitmap_mutex.
-      * Reading from the list can be done with either the BQL or the
-      * dirty_bitmap_mutex.  Modifying a bitmap only requires
-      * dirty_bitmap_mutex.  */
-
-It means, that another thread may modify bitmap (for example its 'busy' fie=
-ld)
-taking only dirty_bitmap_mutex, which will lead to the case I described.
-
->=20
->>> +
->>> +=C2=A0=C2=A0=C2=A0 job =3D block_job_create(job_id, &bitpop_job_driver=
-, txn, bs,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 BLK_PERM_CONSISTENT_READ,
->>
->> Do we need it? We are not going to read..
->>
->=20
-> Copy-paste / leftover from an earlier draft where I was trying to
-> achieve atomicity. It can be removed if we don't want the stricter
-> atomicity.
->=20
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 BLK_PERM_ALL & ~BLK_PERM_RESIZE,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 0, creation_flags,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 cb, opaque, errp);
->>> +=C2=A0=C2=A0=C2=A0 if (!job) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_set_busy(=
-target_bitmap, false);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_release_dirty_bitmap(n=
-ew_bitmap);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 job->bs =3D bs;
->>> +=C2=A0=C2=A0=C2=A0 job->on_error =3D on_error;
->>> +=C2=A0=C2=A0=C2=A0 job->target_bitmap =3D target_bitmap;
->>> +=C2=A0=C2=A0=C2=A0 job->new_bitmap =3D new_bitmap;
->>> +=C2=A0=C2=A0=C2=A0 job->len =3D len;
->>> +=C2=A0=C2=A0=C2=A0 job_progress_set_remaining(&job->common.job, job->l=
-en);
->>> +
->>> +=C2=A0=C2=A0=C2=A0 return &job->common;
->>> +}
->>> diff --git a/blockjob.c b/blockjob.c
->>> index 5d63b1e89d..7e450372bd 100644
->>> --- a/blockjob.c
->>> +++ b/blockjob.c
->>> @@ -56,7 +56,8 @@ static bool is_block_job(Job *job)
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return job_type(job) =3D=3D JOB_TYPE_BA=
-CKUP ||
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 job_type(job) =3D=3D JOB_TYPE_COMMIT ||
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 job_type(job) =3D=3D JOB_TYPE_MIRROR ||
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_type(=
-job) =3D=3D JOB_TYPE_STREAM;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_type(=
-job) =3D=3D JOB_TYPE_STREAM ||
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_type(=
-job) =3D=3D JOB_TYPE_BITMAP_POPULATE;
->>>  =C2=A0 }
->>>  =C2=A0 =C2=A0 BlockJob *block_job_next(BlockJob *bjob)
->>> diff --git a/block/Makefile.objs b/block/Makefile.objs
->>> index 3bcb35c81d..f3cfc89d90 100644
->>> --- a/block/Makefile.objs
->>> +++ b/block/Makefile.objs
->>> @@ -36,6 +36,7 @@ block-obj-$(CONFIG_LIBSSH) +=3D ssh.o
->>>  =C2=A0 block-obj-y +=3D accounting.o dirty-bitmap.o
->>>  =C2=A0 block-obj-y +=3D write-threshold.o
->>>  =C2=A0 block-obj-y +=3D backup.o
->>> +block-obj-y +=3D bitmap-alloc.o
->>>  =C2=A0 block-obj-$(CONFIG_REPLICATION) +=3D replication.o
->>>  =C2=A0 block-obj-y +=3D throttle.o copy-on-read.o
->>>  =C2=A0 block-obj-y +=3D block-copy.o
->>>
->>
->>
->=20
-> Thanks for the review. I'll start making changes, but won't send V2 just
-> yet.
->=20
-> --js
->=20
-
-
---=20
-Best regards,
-Vladimir
+PiBQcm9ibGVtIHdpdGggdGhhdCBwYXRjaCBpcyB0aGF0IGl0IHJlbW92ZXMgdGhpcyBjbGVhcmlu
+ZyBmcm9tIHRoZQ0KPiBmdW5jIA0KPiB0aGF0J3MgYWxzbyB1c2VkIHRvIGVtdWxhdGUgSVNBIElE
+RSBpb3BvcnRzIHdoaWNoIGFjY29yZGluZyB0byB0aGVpcg0KPiBzcGVjIA0KPiBzaG91bGQgY2xl
+YXIgaXJxIG9uIHJlYWQgc28gdGhhdCBmdW5jdGlvbiBzaG91bGQgYmUgT0sgYnV0IG1heWJlDQo+
+IHNob3VsZCANCj4gbm90IGJlIGNhbGxlZCBieSBQQ0kgSURFIGNvZGU/DQoNClRoaXMgbWlnaHQg
+YmUgaXQuDQoNClRoZSBwYXRjaCBJIHByb3ZpZGVkIGlzIGRlZmluaXRlbHkgaW5jb3JyZWN0IGFu
+ZCBkZXZpYXRlcyBmcm9tIHRoZQ0Kc3BlY2lmaWNhdGlvbiBhcyBNYXJrIG1lbnRpb25lZCBlYXJs
+aWVyLiBJIG1pc3VuZGVyc3Rvb2Qgd2hhdA0KaWRlX2lvcG9ydF9yZWFkL3dyaXRlIHdlcmUgZm9y
+IGFuZCBoYXZlbid0IGJlZW4gdGhpbmtpbmcgYWJvdXQgbGVnYWN5DQptb2RlLiANCg0KVGhlIGJ1
+ZyB0aGF0IEkgYmVsaWV2ZSBleGlzdHMgaXMgcHJlc2VudCB3aGVuIHRoZSBDTUQ2NDYgaXMgb3Bl
+cmF0aW5nDQppbiBQQ0kgbmF0aXZlIG1vZGUuIFllYWgsIEkgdGhpbmsgYSBwb3NzaWJsZSBzb2x1
+dGlvbiBtaWdodCBiZSB0byBhdm9pZA0KdXNpbmcgdGhlIGlvcG9ydF9yZWFkL3dyaXRlIGZ1bmN0
+aW9ucyBmcm9tIHRoZSBQQ0kgY29kZSBpZiB0aGV5IGhhdmUNCnNpZGUgZWZmZWN0cyB0aGF0IGFz
+c3VtZSB0aGUgZGV2aWNlIGlzIGluIGxlZ2FjeSBtb2RlLiBJJ2xsIGhhdmUgdG8NCnNwZW5kIG1v
+cmUgdGltZSByZWFkaW5nIHRocm91Z2ggdGhlIGNvZGUgYW5kIGRvY3VtZW50YXRpb24uDQoNCj4g
+RXhjZXB0IHRoZSBsZWdhY3kgSURFIHNwZWMgdGhhdCBkb2VzIHNheSByZWFkaW5nIHN0YXR1cyBp
+cyBjbGVhcmluZw0KPiBJUlEgDQo+IGJ1dCBub3Qgc3VyZSBQQ0kgbmF0aXZlIG1vZGUgc2hvdWxk
+IGRvIHRoZSBzYW1lIGJ1dCBpdCBzZWVtcyB0byB1c2UNCj4gdGhlIA0KPiBzYW1lIGZ1bmN0aW9u
+IGluIFFFTVUgc28gaXQgd2lsbCBjbGVhciBJUlEgYXMgaW4gbGVnYWN5IElERSBtb2RlLg0KDQpB
+Y2NvcmRpbmcgdG8gdGhlIENNRDY0NlUyIHNwZWNpZmljYXRpb246DQoiV2hlbiBhbiBJREUgcG9y
+dCBpcyBpbiBQQ0kgSURFIExlZ2FjeSBNb2RlLCB0aGUgUENJNjQ2VTIgaXMgY29tcGF0aWJsZQ0K
+d2l0aCBzdGFuZGFyZCBJU0EgSURFLiBUaGUgSURFIHRhc2sgZmlsZSByZWdpc3RlcnMgYXJlIG1h
+cHBlZCB0byB0aGUNCnN0YW5kYXJkIElTQSBwb3J0IGFkZHJlc3NlcywgYW5kIElERSBkcml2ZSBp
+bnRlcnJ1cHRzIG9jY3VyIGF0IElSUTE0DQoocHJpbWFyeSkgb3IgSVJRMTUgKHNlY29uZGFyeSku
+Ig0KDQpJbiBsZWdhY3kgbW9kZSwgSVJRMTQgYW5kIElSUTE1IG1pcnJvciB0aGUgc3RhdGUgb2Yg
+SU5UUlEgb24gZWFjaCBvZg0KdGhlIHNlbGVjdGVkIElERSBkZXZpY2VzLiBRRU1VIGFwcGVhcnMg
+dG8gZW11bGF0ZSB0aGlzIGNvcnJlY3RseS4NCg0KSW4gUENJIG5hdGl2ZSBtb2RlLCBJTlRSUSBp
+cyBub3QgbWlycm9yZWQgb3IgZ2l2ZW4gYSBzaW5nbGUgSVJRLg0KSW50ZXJydXB0cyBhcmUgcHJv
+dmlkZWQgYnkgdGhlIFBDSSBJREUgY29udHJvbGxlciBkZXBlbmRpbmcgb24gdGhlDQpjb250cm9s
+bGVyJ3MgbG9naWMuIEZvciBpbnN0YW5jZSwgYW4gSURFIGRldmljZSBjYW4gcmFpc2UgYW4gaW50
+ZXJydXB0DQpidXQgdGhlIENNRDY0NiBtYXkgbm90IHByb3BhZ2F0ZSB0aGF0IGludGVycnVwdCBp
+ZiBNUkRNT0RFIGhhcyBjZXJ0YWluDQpiaXRzIHNldC4gSSdtIHRoaW5raW5nIHRoYXQgbWF5YmUg
+dGhlIGNvbnRyb2xsZXIgZG9lcyBub3QgaGF2ZSBsb2dpYyB0bw0KdW5zZXQgdGhlIGludGVycnVw
+dCBiaXRzIGluIENGUiBhbmQgQVJUVElNMjMgd2hlbiB0aGUgSURFIGRldmljZSBsb3dlcnMNCklO
+VFJRLiBUaGlzIG1pZ2h0IG1lYW4gdGhhdCB0aGUgY29udHJvbGxlciB3aWxsIGNvbnRpbnVlIHRv
+IGFzc2VydCBhbg0KaW50ZXJydXB0IHdoaWxlIGJpdHMgaW4gQ0ZSIGFuZCBBUlRUSU0yMyByZW1h
+aW4gc2V0LCBldmVuIGlmIHRoZSBJREUNCmRldmljZSBsb3dlcnMgSU5UUlEuIFRoaXMgd291bGQg
+ZXhwbGFpbiB3aHkgdGhlIENNRDY0NiBkb2N1bWVudGF0aW9uDQppbnN0cnVjdHMgZGV2ZWxvcGVy
+cyB0byBsb3dlciB0aGVtIGV4cGxpY2l0bHkuDQoNCj4gRXhjZXB0IHRoZSBsZWdhY3kgSURFIHNw
+ZWMgdGhhdCBkb2VzIHNheSByZWFkaW5nIHN0YXR1cyBpcyBjbGVhcmluZw0KPiBJUlEgDQo+IGJ1
+dCBub3Qgc3VyZSBQQ0kgbmF0aXZlIG1vZGUgc2hvdWxkIGRvIHRoZSBzYW1lIGJ1dCBpdCBzZWVt
+cyB0byB1c2UNCj4gdGhlIA0KPiBzYW1lIGZ1bmN0aW9uIGluIFFFTVUgc28gaXQgd2lsbCBjbGVh
+ciBJUlEgYXMgaW4gbGVnYWN5IElERSBtb2RlLiBCdXQNCj4gdGhpcyANCj4gTGludXggZHJpdmVy
+IHNheXMgSVJRIGlzIGNsZWFyZWQgb24gcmVhZCBmb3IgUENJIGFzIHdlbGw6DQo+IA0KPiANCmh0
+dHBzOi8vZ2l0aHViLmNvbS90b3J2YWxkcy9saW51eC9ibG9iL21hc3Rlci9kcml2ZXJzL2F0YS9s
+aWJhdGEtc2ZmLmMNCj4gDQo+IGFzIGRvZXMgdGhlIENNRDY0NiBkcml2ZXI6DQo+IA0KPiANCmh0
+dHBzOi8vZ2l0aHViLmNvbS90b3J2YWxkcy9saW51eC9ibG9iL21hc3Rlci9kcml2ZXJzL2F0YS9w
+YXRhX2NtZDY0eC5jDQo+IA0KPiBpbiBjbWQ2NHhfc2ZmX2lycV9jaGVjaygpIGFsdGhvdWdoIGZv
+ciBkaWZmZXJlbnQgY2hpcCByZXZpc2lvbnMgaXQNCj4gdXNlcyANCj4gY21kNjQ4X3NmZl9pcnFf
+KiBmdW5jdGlvbnMgd2hpY2ggZG9lcyB0aGlzIGRpZmZlcmVudGx5IGFuZCBhdm9pZHMNCj4gcmVh
+ZGluZyANCj4gc3RhdHVzIHJlZyBhbmQgY2xlYXJzIGlycSBleHBsaWNpdGVseS4gSXQgYWxzbyBo
+YXMgYSB3YXJuaW5nIGF0IHRoZSANCj4gYmVnaW5uaW5nIHRoYXQgVURNQSBtb2RlIGlzIGJyb2tl
+biBvbiBtb3N0IG9mIHRoZXNlIGNoaXBzIHNvIGl0IHdvbid0DQo+IHRyeSANCj4gdG8gdXNlIGl0
+IG9uIGFueXRoaW5nIGJlbG93IENNRDY0NlUyIHNvIHRoaXMgc3VnZ2VzdHMgbWF5YmUgdGhlcmUn
+cw0KPiBhIA0KPiBwcm9ibGVtIHdpdGggY2xlYXJpbmcgSVJRcyBvbiBhdCBsZWFzdCBzb21lIENN
+RDY0NiBjaGlwIHJldmlzaW9ucy4gSQ0KPiB0aGluayANCj4gdGhlIFN1biBVbHRyYSAxMCB1c2Vk
+IENNRDY0NlUgYnV0IG5vdCBzdXJlIHdoYXQgdGhlIFNvbGFyaXMgZHJpdmVyDQo+IGV4cGVjdHMg
+DQo+IGFuZCBpZiBpdCBjYW4gd29yayB3aXRoIGxhdGVyIGNoaXAgcmV2aXNpb25zLiBNYXliZSB3
+ZSBzaG91bGQgZWl0aGVyIA0KPiBlbXVsYXRlIHRoZSBjaGlwIGJ1Z3Mgb3IgY2hhbmdlIHNvbWV0
+aGluZyB0byBpZGVudGlmeSBhcyBDTUQ2NDZVMg0KPiB3aGljaCANCj4gc2hvdWxkIGJlaGF2ZSBt
+b3JlIGxpa2Ugc3RhZGFyZCBQQ0kgSURFIGNvbnRyb2xsZXJzPyBBbHRob3VnaCBpZiBJDQo+IGdv
+dCANCj4gdGhhdCBjb3JyZWN0bHkgTGludXggdGhpbmtzIHJldmlzaW9ucyBvdmVyIDUgYXJlIE9L
+IGFuZCBRRU1VIGhhcyA3Lg0KDQpJJ20gbm90IHN1cmUgd2hhdCBpdCBleHBlY3RzLiBJZiB0aGUg
+U3VuIFVsdHJhIDEwIHNoaXBwZWQgd2l0aCB0aGUNCkNNRDY0NlUsIEkgcmVhc29uIHRoYXQgU29s
+YXJpcyAxMCBlaXRoZXIgZXhwZWN0cyBpdCBvciBoYXMgc3VwcG9ydCBmb3INCml0Lg0KDQpUaGUg
+TGludXggZHJpdmVyIGNvZGUgYXBwZWFycyB0byBiZSBjb25zaXN0ZW50IHdpdGggdGhlIGJlaGF2
+aW91ciB0aGF0DQpJJ20gc2VlaW5nIGZyb20gU29sYXJpcyAxMC4NCg0KVGhlIGZvbGxvd2luZyBh
+cHBlYXJzIHRvIGJlIHVzZWQgdG8gaW5pdGlhbGlzZSB0aGUgQ01ENjQ2VS4NCg0KewkvKiBDTUQg
+NjQ2VSB3aXRoIGJyb2tlbiBVRE1BICovDQoJLmZsYWdzID0gQVRBX0ZMQUdfU0xBVkVfUE9TUywN
+CgkucGlvX21hc2sgPSBBVEFfUElPNCwNCgkubXdkbWFfbWFzayA9IEFUQV9NV0RNQTIsDQoJLnBv
+cnRfb3BzID0gJmNtZDY0NnIzX3BvcnRfb3BzDQp9LA0KDQpUaGUgcG9ydCBvcGVyYXRpb25zIGl0
+IHVzZXMgYXJlIGRlZmluZWQgYXMgc286DQoNCnN0YXRpYyBzdHJ1Y3QgYXRhX3BvcnRfb3BlcmF0
+aW9ucyBjbWQ2NDZyM19wb3J0X29wcyA9IHsNCgkuaW5oZXJpdHMJPSAmY21kNjR4X2Jhc2Vfb3Bz
+LA0KCS5zZmZfaXJxX2NoZWNrCT0gY21kNjQ4X3NmZl9pcnFfY2hlY2ssDQoJLnNmZl9pcnFfY2xl
+YXIJPSBjbWQ2NDhfc2ZmX2lycV9jbGVhciwNCgkuY2FibGVfZGV0ZWN0CT0gYXRhX2NhYmxlXzQw
+d2lyZSwNCn0NCg0KQXMgeW91IG1lbnRpb24sIGNtZDY0OF9zZmZfaXJxX2NsZWFyIGNsZWFycyBp
+bnRlcnJ1cHRzIGV4cGxpY2l0bHkgYnkNCnNldHRpbmcgYml0cyBpbiBNUkRNT0RFIC0gY29uc2lz
+dGVudCB3aXRoIHRoZSBDTUQ2NDZVMiBkb2N1bWVudGF0aW9uLg0KVGhpcyBiZWhhdmlvdXIgaXMg
+dmVyeSBzaW1pbGFyIHRvIFNvbGFyaXMgMTAuDQoNCj4gQWx0aG91Z2ggaWYgSSBnb3QgDQo+IHRo
+YXQgY29ycmVjdGx5IExpbnV4IHRoaW5rcyByZXZpc2lvbnMgb3ZlciA1IGFyZSBPSyBhbmQgUUVN
+VSBoYXMgNy4NCg0KSSdtIG5vdCBzdXJlIGhvdyByZXZpc2lvbiBudW1iZXJzIHdvcmsgd2l0aCB0
+aGVzZSBjaGlwcy4gRG8gQ01ENjQ2IGFuZA0KQ01ENjQ2VTIgcmVmZXIgdG8gZGlmZmVyZW50IHJl
+dmlzaW9ucyBvZiB0aGUgQ01ENjQ2IGNoaXA/DQoNClRoYW5rcywNCkphc3BlciBMb3dlbGwuDQoN
+Cg0KT24gVHVlLCAyMDIwLTAyLTI1IGF0IDE2OjA4ICswMTAwLCBCQUxBVE9OIFpvbHRhbiB3cm90
+ZToNCj4gT24gVHVlLCAyNSBGZWIgMjAyMCwgamFzcGVyLmxvd2VsbEBidC5jb20gd3JvdGU6DQpJ
+IGRvbid0IGJlbGlldmUgdGhlDQo+IHF1aWNrIGludGVycnVwdCBoZXJlIGlzIHRoZSBwcm9ibGVt
+LiBTb2xhcmlzIDEwDQp3aWxsIHNwaW4gZm9yIGEgc2hvcnQNCj4gdGltZSB3aGlsZSB3YWl0aW5n
+IGZvciB0aGUgaW50ZXJydXB0IGJpdCB0byBiZQ0Kc2V0IGJlZm9yZSBjb250aW51aW5nDQo+IHdp
+dGggaXRzIHJvdXRpbmUuIElmIGl0IGRvZXNuJ3Qgc2VlIHRoZSBpbnRlcnJ1cHQNCmJpdCBpcyBz
+ZXQgYmVmb3JlDQo+IHNvbWUgdGltZW91dCwgaXQgd2lsbCBwcmludCBhbiBlcnJvciBhYm91dCB0
+aGUNCm1pc3NpbmcgaW50ZXJydXB0IGFuZA0KPiBnaXZlIHVwIGxvYWRpbmcgdGhlIGRyaXZlci4N
+Cg0KSSBkb24ndCB0aGluayBtaXNzaW5nIGRlbGF5IHNob3VsZCBjYXVzZSBhbnkgcHJvYmxlbSBl
+aXRoZXIganVzdA0KcG9pbnRlZCANCnRoaXMgb3V0IGFzIGEgZGlmZmVyZW5jZSBmcm9tIHJlYWwg
+Y29udHJvbGxlciB3aGljaCBtYXkgaGF2ZSBhbg0KZWZmZWN0IGJ1dCANCkkgYWdyZWUgdGhpcyBp
+cyBwcm9iYWJseSBub3QgYSBwcm9ibGVtLg0KDQpwY2lfY2ZnX3JlYWQgNTMuMjMxIHBpZD0xNDcw
+MzAgZGV2PWInY21kNjQ2LWlkZScgZGV2aWQ9MHgzDQpmbmlkPTB4MA0Kb2Zmcz0weDUwIHZhbD0w
+eDQNCmlkZV9pb3BvcnRfcmVhZCAzNS41NzcgcGlkPTE0NzAzMCBhZGRyPTB4NyByZWc9YidTdGF0
+dXMnDQp2YWw9MHg1MA0KYnVzPTB4NTViNzdmOTIyZDEwIHM9MHg1NWI3N2Y5MjJkOTgNCmlkZV9p
+b3BvcnRfcmVhZCAyOS4wOTUgcGlkPTE0NzAzMCBhZGRyPTB4NyByZWc9YidTdGF0dXMnDQp2YWw9
+MHg1MA0KYnVzPTB4NTViNzdmOTIyZDEwIHM9MHg1NWI3N2Y5MjJkOTgNCg0KU28gdGhlc2UgaWRl
+X2lvcG9ydF9yZWFkIGNhbGxzIGNsZWFyIHRoZSBpcnEgYml0Li4uDQoNClRoYXQncyByaWdodC4g
+VGhlIGxpbmUgdGhhdCBJIHByb3Bvc2VkIHJlbW92aW5nIGluIHRoZSBwYXRjaCBjbGVhcnMNCkNG
+R19JTlRSX0NIMCBvbiBpZGVfaW9wb3J0X3JlYWQuDQoNClByb2JsZW0gd2l0aCB0aGF0IHBhdGNo
+IGlzIHRoYXQgaXQgcmVtb3ZlcyB0aGlzIGNsZWFyaW5nIGZyb20gdGhlDQpmdW5jIA0KdGhhdCdz
+IGFsc28gdXNlZCB0byBlbXVsYXRlIElTQSBJREUgaW9wb3J0cyB3aGljaCBhY2NvcmRpbmcgdG8g
+dGhlaXINCnNwZWMgDQpzaG91bGQgY2xlYXIgaXJxIG9uIHJlYWQgc28gdGhhdCBmdW5jdGlvbiBz
+aG91bGQgYmUgT0sgYnV0IG1heWJlDQpzaG91bGQgDQpub3QgYmUgY2FsbGVkIGJ5IFBDSSBJREUg
+Y29kZT8NCg0KaWRlX2lvcG9ydF93cml0ZSAxOS4xNDYgcGlkPTE0NzAzMCBhZGRyPTB4NiByZWc9
+YidEZXZpY2UvSGVhZCcNCnZhbD0weGUwIGJ1cz0weDU1Yjc3ZjkyMmQxMCBzPTB4NTViNzdmOTIy
+ZDk4DQpwY2lfY2ZnX3JlYWQgOS40NjggcGlkPTE0NzAzMCBkZXY9YidjbWQ2NDYtaWRlJyBkZXZp
+ZD0weDMNCmZuaWQ9MHgwDQpvZmZzPTB4NTAgdmFsPTB4MA0KcGNpX2NmZ19yZWFkIDEyNy43MTIg
+cGlkPTE0NzAzMCBkZXY9YidjbWQ2NDYtaWRlJyBkZXZpZD0weDMNCmZuaWQ9MHgwIG9mZnM9MHg1
+MCB2YWw9MHgwDQpwY2lfY2ZnX3JlYWQgMTAxLjk0MiBwaWQ9MTQ3MDMwIGRldj1iJ2NtZDY0Ni1p
+ZGUnIGRldmlkPTB4Mw0KZm5pZD0weDAgb2Zmcz0weDUwIHZhbD0weDANCg0KLi4udGhhdCB3b3Vs
+ZCBiZSBjaGVja2VkIGhlcmU/DQoNClRoYXQncyByaWdodC4NCg0KU29sYXJpcyBpcyBwZXJmb3Jt
+aW5nIHBjaV9jZmdfcmVhZCBvbiBvZmZzPTB4NTAgdW50aWwgaXQgZWl0aGVyDQpzZWVzDQp0aGUg
+aW50ZXJydXB0IGJpdCBzZXQgb3IgdGltZXMgb3V0LiBJZiBpdCB0aW1lcyBvdXQsIHlvdSBnZXQg
+YQ0KZmF0YWwNCmVycm9yIGZvciB0aGUgZHJpdmVyLiBUaGUgYmVoYXZpb3VyIGlzIG5vdCBleHBl
+Y3RlZCBhbmQNCmFnZ3Jlc3NpdmVseQ0KY2hlY2tlZCBhZ2FpbnN0IGJ5IHRoZSBTb2xhcmlzIGtl
+cm5lbC4gRnJvbSB3aGF0IEkgY2FuIHRlbGwsIExpbnV4DQphbmQNCk9wZW5CU0QgZG9uJ3QgY2hl
+Y2sgaWYgdGhlIGJpdCBpcyBzZXQgYmVmb3JlIGNsZWFyaW5nIGl0Lg0KDQpXaGF0IEkgZG9uJ3Qg
+Z2V0IGlzIHdoeSBpZGVfaW9wb3J0X3JlYWQgaXMgY2FsbGVkIGF0IGFsbCBhbmQgZnJvbQ0Kd2hl
+cmUgDQppZiB0aGF0J3MgbWVhbnQgdG8gZW11bGF0ZSBsZWdhY3kgaWRlIElTQSBpb3BvcnQgcmVh
+ZHMgYW5kIHdlDQpoYXZlIGEgDQpQQ0kgZGV2aWNlIGFjY2Vzc2VkIHZpYSBQQ0kgcmVncz8NCg0K
+V2hhdCBJIG1lYW50IHdhcyB3aGVyZSBpcyBpZGVfaW9wb3J0X3JlYWQoKSBpcyBjYWxsZWQgaW4g
+dGhpcyBjYXNlDQp3aGVuIHdlIA0KaGF2ZSBhIFBDSSBJREUgY29udHJvbGxlcj8gU2VhcmNoaW5n
+IGZvciBpdCBJIHRoaW5rIGl0IG1heSBjb21lIGZyb20gDQpwY2lfaWRlX2RhdGFfcmVhZCgpIGlu
+IGh3L2lkZS9wY2kuYy4gVGhpcyBkb2N1bWVudDoNCg0KaHR0cDovL3d3dy5ic3dkLmNvbS9wY2lp
+ZGUucGRmDQoNCmhhcyBzb21lIGluZm8gb24gdGhpcyBhbmQgdGhlcmUgYXJlIG1lbnRpb25zIG9m
+IHN0YXR1cyB1c2luZw0KQWx0ZXJuYXRlIA0KU3RhdHVzICh3aGljaCBkb2VzIG5vdCBjbGVhciBp
+bnRlcnJ1cHQgYml0KSBidXQgSSB0aGluayB0aGF0DQpjb3JyZXNwb25kcyANCnRvIHBjaV9pZGVf
+Y21kX3JlYWQoKSB3aGljaCBhbHJlYWR5IHVzZXMgaWRlX3N0YXR1c19yZWFkKCkgc28gdGhhdA0K
+c2VlbXMgDQpjb3JyZWN0LiBJIGRpZCBub3QgZmluZCBhbnl0aGluZyBhYm91dCBjb250ZW50cyBv
+ZiB0aGUgQ29tbWFuZCBCbG9jaw0KaW4gDQp0aGlzIGRvYyB3aGljaCB0aGUgZnVuY3Rpb24gd2l0
+aCBpZGVfaW9wb3J0X3JlYWQgY2FsbCBpbXBsZW1lbnRzIHNvDQpub3QgDQpzdXJlIGlmIHRoYXQn
+cyBleHBlY3RlZCB0byBjbGVhciBpbnRlcnJ1cHQgaW4gUENJIG5hdGl2ZSBtb2RlIG9yDQpzaG91
+bGQgd2UgDQpjaGFuZ2UgcGNpX2lkZV9kYXRhX3JlYWQoKSB0byBhdm9pZCB0aGF0Lg0KDQptZW50
+aW9uIGlycSBpbiBhIGxvdCBvZiByZWdzIChhbGwgc2F5IHdyaXRlIHRvIGNsZWFyKSBidXQgSSBk
+b24ndA0KdW5kZXJzdGFuZCB0aGVpciByZWxhdGlvbiB0byBlYWNoIG90aGVyIGFuZCBpcnEgcmFp
+c2VkIGJ5IHRoZQ0KZHJpdmUuDQoNCkkgYWdyZWUgYW5kIEkgdGhpbmsgdGhhdCdzIHBhcnQgb2Yg
+dGhlIHByb2JsZW0uIFRoZSBkb2N1bWVudGF0aW9uDQpkb2VzDQpub3QgZXhwbGljaXRseSBtZW50
+aW9uIHRoZWlyIHJlbGF0aW9uIHRvIGVhY2ggb3RoZXIuIEkgY2FuJ3Qgc2VlDQphbnl0aGluZyB0
+aGF0IHN1Z2dlc3RzIHRoYXQgcmVhZGluZyB0aGUgc3RhdHVzIHJlZ2lzdGVyIG9uIHRoZQ0KZHJp
+dmUNCndpbGwgdW5zZXQgYml0cyBpbiB0aGUgcGNpIGNvbmZpZ3VyYXRpb24gc3BhY2Ugb2YgdGhl
+IGNvbnRyb2xsZXIuDQpUaGV5DQphcmUgc2VwZXJhdGUgZGV2aWNlcy4NCg0KRXhjZXB0IHRoZSBs
+ZWdhY3kgSURFIHNwZWMgdGhhdCBkb2VzIHNheSByZWFkaW5nIHN0YXR1cyBpcyBjbGVhcmluZw0K
+SVJRIA0KYnV0IG5vdCBzdXJlIFBDSSBuYXRpdmUgbW9kZSBzaG91bGQgZG8gdGhlIHNhbWUgYnV0
+IGl0IHNlZW1zIHRvIHVzZQ0KdGhlIA0Kc2FtZSBmdW5jdGlvbiBpbiBRRU1VIHNvIGl0IHdpbGwg
+Y2xlYXIgSVJRIGFzIGluIGxlZ2FjeSBJREUgbW9kZS4gQnV0DQp0aGlzIA0KTGludXggZHJpdmVy
+IHNheXMgSVJRIGlzIGNsZWFyZWQgb24gcmVhZCBmb3IgUENJIGFzIHdlbGw6DQoNCmh0dHBzOi8v
+Z2l0aHViLmNvbS90b3J2YWxkcy9saW51eC9ibG9iL21hc3Rlci9kcml2ZXJzL2F0YS9saWJhdGEt
+c2ZmLmMNCg0KYXMgZG9lcyB0aGUgQ01ENjQ2IGRyaXZlcjoNCg0KaHR0cHM6Ly9naXRodWIuY29t
+L3RvcnZhbGRzL2xpbnV4L2Jsb2IvbWFzdGVyL2RyaXZlcnMvYXRhL3BhdGFfY21kNjR4LmMNCg0K
+aW4gY21kNjR4X3NmZl9pcnFfY2hlY2soKSBhbHRob3VnaCBmb3IgZGlmZmVyZW50IGNoaXAgcmV2
+aXNpb25zIGl0DQp1c2VzIA0KY21kNjQ4X3NmZl9pcnFfKiBmdW5jdGlvbnMgd2hpY2ggZG9lcyB0
+aGlzIGRpZmZlcmVudGx5IGFuZCBhdm9pZHMNCnJlYWRpbmcgDQpzdGF0dXMgcmVnIGFuZCBjbGVh
+cnMgaXJxIGV4cGxpY2l0ZWx5LiBJdCBhbHNvIGhhcyBhIHdhcm5pbmcgYXQgdGhlIA0KYmVnaW5u
+aW5nIHRoYXQgVURNQSBtb2RlIGlzIGJyb2tlbiBvbiBtb3N0IG9mIHRoZXNlIGNoaXBzIHNvIGl0
+IHdvbid0DQp0cnkgDQp0byB1c2UgaXQgb24gYW55dGhpbmcgYmVsb3cgQ01ENjQ2VTIgc28gdGhp
+cyBzdWdnZXN0cyBtYXliZSB0aGVyZSdzDQphIA0KcHJvYmxlbSB3aXRoIGNsZWFyaW5nIElSUXMg
+b24gYXQgbGVhc3Qgc29tZSBDTUQ2NDYgY2hpcCByZXZpc2lvbnMuIEkNCnRoaW5rIA0KdGhlIFN1
+biBVbHRyYSAxMCB1c2VkIENNRDY0NlUgYnV0IG5vdCBzdXJlIHdoYXQgdGhlIFNvbGFyaXMgZHJp
+dmVyDQpleHBlY3RzIA0KYW5kIGlmIGl0IGNhbiB3b3JrIHdpdGggbGF0ZXIgY2hpcCByZXZpc2lv
+bnMuIE1heWJlIHdlIHNob3VsZCBlaXRoZXIgDQplbXVsYXRlIHRoZSBjaGlwIGJ1Z3Mgb3IgY2hh
+bmdlIHNvbWV0aGluZyB0byBpZGVudGlmeSBhcyBDTUQ2NDZVMg0Kd2hpY2ggDQpzaG91bGQgYmVo
+YXZlIG1vcmUgbGlrZSBzdGFkYXJkIFBDSSBJREUgY29udHJvbGxlcnM/IEFsdGhvdWdoIGlmIEkN
+CmdvdCANCnRoYXQgY29ycmVjdGx5IExpbnV4IHRoaW5rcyByZXZpc2lvbnMgb3ZlciA1IGFyZSBP
+SyBhbmQgUUVNVSBoYXMgNy4NCg0KSSB0aGluayB3ZSBuZWVkIGFkdmljZSBmcm9tIHNvbWVvbmUg
+bW9yZSBrbm93bGVkZ2VhYmxlIGFib3V0IHJlYWwNCmhhcmR3YXJlIA0Kb24gdGhpcy4NCg0KUmVn
+YXJkcywNCkJBTEFUT04gWm9sdGFuDQo=
 
