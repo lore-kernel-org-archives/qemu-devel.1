@@ -2,95 +2,81 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F420C4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C78C4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:46:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FCFA2467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:29:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B025121D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:46:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hWfdMf6C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCFA2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfyGLRA2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B025121D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xgr-0007R6-K2
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:29:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45099)
+	id 1j6xx9-00038I-Uz
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:46:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6xg9-0006Wn-KT
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:50 -0500
+ (envelope-from <imammedo@redhat.com>) id 1j6xwR-0002YZ-6A
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6xg8-0003QP-GR
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:49 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36893)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6xg8-0003Q4-8h
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:48 -0500
-Received: by mail-wm1-x341.google.com with SMTP id a141so2552845wme.2
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 06:28:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=XDmPZZy1+OtCumfJwoDCbHz71zet+3fA3q72iAo9Jk4=;
- b=hWfdMf6CmN7p27mGSGIjK6IUDH43c5Xbi6WE0wV6sQOQuLehHfRASq/o8ownV66dCL
- A6k9Hi9WXB15QBnDnFqDiDvn299RSr9ijLP+Er3JjGtE9BQAXVcr5m08ivT1M6DtIFL5
- z0YVRZyXxSx9Lde/nKBNYU7XUJX0lmFRZTlftG570p0o1byNSdP/gVLyoxTbYEohlClz
- Apy2g0MfjNTXfy+eAER7Q2R2Ng7nFJeWgHPyX51jgcmiIwco0ljVBmPXFxUvU6gS64OD
- m0KWAwJbktNrE5Uw+zXfIFC4BZkXRQVUFNDSYHvrNR6Y8KVE2+gAS/erXLZLpMFXpdDD
- kYlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=XDmPZZy1+OtCumfJwoDCbHz71zet+3fA3q72iAo9Jk4=;
- b=GND1AsQX7RZDICC2do05YV2zu3Olv51C0/Jz5h6T/t7o2iSULMzBImpolx2XGHzwMJ
- NTQMgTxeQ2k/B+oYSzMadwDtQOfsb6A/SZmcG8LJq/2B5zquOFSzccZCjvH0O4My68oV
- sGLkJBZeoxRhoKAyqVKKMhoBsQMrodPJKbYCzmWlOGjaeg0Il4We2kmIjYHIOAFb9vrW
- mLzjFeO1B9fIum9066jhJFeezIhr6HfkrDKyffoRVuBjv5j/4/uM3EijTsaVvsOscMZe
- kZEHI7tu0y2C0BMlE1GjrTypkA8bjXMih5SwlptZXrHpAwSLxcDx8MYYdD8xeR/F98Pt
- INaw==
-X-Gm-Message-State: APjAAAVM5hU0M/Te/TZfbUylagimTvEkGmeQ2c1s+vnAxq6ysCv14VwP
- 734i2p44wydqlWPpezNJjTew/g==
-X-Google-Smtp-Source: APXvYqxpWw9qETRptqUb7iW032n3TKWGTivSw/wAlmU/qxXcE0yCWBMeu3d/nfiHY3kxNYPHTVyINA==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr5791221wmk.15.1582727326836; 
- Wed, 26 Feb 2020 06:28:46 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r6sm3400772wrq.92.2020.02.26.06.28.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 06:28:45 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 170BD1FF87;
- Wed, 26 Feb 2020 14:28:45 +0000 (GMT)
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-User-agent: mu4e 1.3.8; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Dino Papararo <skizzato73@msn.com>
-Subject: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-In-reply-to: <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
-Date: Wed, 26 Feb 2020 14:28:45 +0000
-Message-ID: <87eeuhxw0y.fsf@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1j6xwN-0004kr-4y
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:39 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28156
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1j6xwN-0004hw-1d
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:45:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582728334;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qlVXF2tk1qgD8ay0foIDoyXWCm75nANb9zMd0kEiJDc=;
+ b=cfyGLRA2hcU/peZmgfmvn8jMd/txnj7gMCroM3Kv+0M2ikxVg+KmRrQ6tMEWuzUAZpH11n
+ FMQ8dWAwGnqOr30aqsiQVW5gmd6/xjysDeRTkjYlcMWn3k3QOy6oNZLG7XaqHJ3xMRliry
+ i14W1ceg01KUsuM5u1B+MvyLEMnhgD4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-sXoOkyq4M4OKUo4ufgTqQg-1; Wed, 26 Feb 2020 09:45:30 -0500
+X-MC-Unique: sXoOkyq4M4OKUo4ufgTqQg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EA0418A5517;
+ Wed, 26 Feb 2020 14:45:29 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 451D18C086;
+ Wed, 26 Feb 2020 14:45:27 +0000 (UTC)
+Date: Wed, 26 Feb 2020 15:45:25 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Subject: Re: Sudden slowdown of ARM emulation in master
+Message-ID: <20200226154525.5c4c0ac9@redhat.com>
+In-Reply-To: <87k149xwqw.fsf@linaro.org>
+References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
+ <20200226101948.786be4b0@redhat.com>
+ <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
+ <87k149xwqw.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,44 +88,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 26 Feb 2020 14:13:11 +0000
+Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
 
-Dino Papararo <skizzato73@msn.com> writes:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+> > On Wed, 26 Feb 2020 at 09:19, Igor Mammedov <imammedo@redhat.com> wrote=
+: =20
+> >>
+> >> On Wed, 26 Feb 2020 00:07:55 +0100
+> >> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
+> >> =20
+> >> > Hello Igor and Paolo, =20
+> >>
+> >> does following hack solves issue?
+> >>
+> >> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> >> index a08ab11f65..ab2448c5aa 100644
+> >> --- a/accel/tcg/translate-all.c
+> >> +++ b/accel/tcg/translate-all.c
+> >> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t t=
+b_size)
+> >>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use =
+the
+> >>             static buffer, we could size this on RESERVED_VA, on the t=
+ext
+> >>             segment size of the executable, or continue to use the def=
+ault.  */
+> >> -        tb_size =3D (unsigned long)(ram_size / 4);
+> >> +        tb_size =3D MAX_CODE_GEN_BUFFER_SIZE;
+> >>  #endif
+> >>      }
+> >>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) { =20
+> >
+> > Cc'ing Richard to ask: does it still make sense for TCG
+> > to pick a codegen buffer size based on the guest RAM size? =20
+>=20
+> Arguably you would never get more than ram_size * tcg gen overhead of
+> active TBs at any one point although you can come up with pathological
+> patterns where only a subset of pages are flushed in and out at a time.
+>=20
+> However the backing for the code is mmap'ed anyway so surely the kernel
+> can work out the kinks here. We will never allocate more than the code
+> generator can generate jumps for anyway.
+>=20
+> Looking at the SoftMMU version of alloc_code_gen_buffer it looks like
+> everything now falls under the:
+>=20
+>   # if defined(__PIE__) || defined(__PIC__)
+>=20
+> leg so there is a bunch of code to be deleted there. The remaining
+> question is what to do for linux-user because there is a bit more logic
+> to deal with some corner cases on the static code generation buffer.
+>=20
+> I'd be tempted to rename DEFAULT_CODE_GEN_BUFFER_SIZE to
+> SMALL_CODE_GEN_BUFFER_SIZE and only bother with a static allocation for
+> 32 bit linux-user hosts. Otherwise why not default to
+> MAX_CODE_GEN_BUFFER_SIZE on 64 bit systems and let the kernel deal with
+> it?
 
-> Please let's go with hardfloat pps support, it's really a good feature to=
- implement.
-> Even if in a first step it could lead to inaccuracy results, later it
-> could solved with other patches.
+*-user call
+  tcg_exec_init(0);
+which in in the end results in
+  DEFAULT_CODE_GEN_BUFFER_SIZE -> DEFAULT_CODE_GEN_BUFFER_SIZE_1
 
-That's the wrong way around. We have regression tests for a reason. I'll
-happily accept patches to turn on hardfloat for PPC if:
+so for *-user cases we can just always call
+   code_gen_alloc(DEFAULT_CODE_GEN_BUFFER_SIZE)
 
- a) they don't cause regressions in our fairly extensive floating point
- tests
- b) the PPC maintainers are happy with the new performance profile
+> > (We should fix the regression anyway, but it surprised me
+> > slightly to find a config detail of the guest machine being
+> > used here.)
+> >
+> > thanks
+> > -- PMM =20
+>=20
+>=20
 
-The way forward would be to:
-
- 1. patch to drop #if defined(TARGET_PPC) || defined(__FAST_MATH__)
- 2. audit target/ppc/fpu_helper.c w.r.t chip manual and fix any unneeded
- splatting of flags (if any)
- 3. measure the before/after performance effect and decide if on balance
- it's worth keeping
-
-> I think it's important for qemu to as global as possible and don't
-> target only recent hardware.
-
-Are you referring to guests or hosts? For guests we will always favour
-accuracy of speed of emulation. For hosts we need to have IEEE compliant
-FPU HW to even stand a chance of using hardfloat.
-
---=20
-Alex Benn=C3=A9e
 
