@@ -6,75 +6,77 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D757C4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AF8C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C53424676
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A254C20801
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:29:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch+Cy7Hj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C53424676
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eaETiD+o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A254C20801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6tvs-0000b0-6d
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:28:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51978)
+	id 1j6twI-0001bU-SY
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:29:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j6ttO-0004AS-Rq
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:16 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j6ttm-00052S-2f
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j6ttN-0003Kx-Mx
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:14 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54779
+ (envelope-from <eric.auger@redhat.com>) id 1j6ttk-0004GJ-Fu
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:37 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44437
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j6ttN-0003KU-JI
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:13 -0500
+ id 1j6ttk-0004Ec-CQ
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:26:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582712772;
+ s=mimecast20190719; t=1582712796;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dczexdrzKnZ7PKgnzotlQQq1ZEpy0uEpqYyknsl6HD4=;
- b=ch+Cy7HjTIxuN54OawWbTFBIstCHB0WDLRPgxgEAlo9wL0JgmZ/jPW4d/oI2Fy6LVQVlER
- +cvkbLFj4Hdwy7AIJB4VogKxTLTR+pZh2awkQr926WH/QJltd7e2ejjZbzGsrdAaEiDQlH
- KNO9W0ohgGBwKdHRyw+9hweMBsF9W/8=
+ bh=7Wf4euxvQqm184X5l9kHBAJdIyr0XaU63xoKs35+NVo=;
+ b=eaETiD+oT//9HOIGbGL7w0KmYmMycqnNk2M9QZ2O+Kow3yPhzojxbWRHig3M1nC1kpfS2k
+ MQZckLzjFR4DV6IH6wbdPXXSGDQmWtuRSWs9qYnaaGTS8LhVZSJgDWDuAJfFu19p6gmQKI
+ z01uuU+MDYgZj/fRCJn4TN4eRFfFN0U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-heVrupBnO3iOb6I5zH8k1A-1; Wed, 26 Feb 2020 05:26:09 -0500
-X-MC-Unique: heVrupBnO3iOb6I5zH8k1A-1
+ us-mta-325-gnuYjmESM9-Dk6HUZl00HA-1; Wed, 26 Feb 2020 05:26:34 -0500
+X-MC-Unique: gnuYjmESM9-Dk6HUZl00HA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 223FB1882CCC;
- Wed, 26 Feb 2020 10:26:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC377108442E;
+ Wed, 26 Feb 2020 10:26:32 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A5ECE60BE1;
- Wed, 26 Feb 2020 10:26:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 83DB460BE1;
+ Wed, 26 Feb 2020 10:26:30 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, stefanb@linux.ibm.com,
  qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Subject: [PATCH v3 01/10] tpm: rename TPM_TIS into TPM_TIS_ISA
-Date: Wed, 26 Feb 2020 11:25:40 +0100
-Message-Id: <20200226102549.12158-2-eric.auger@redhat.com>
+Subject: [PATCH v3 08/10] test: tpm: pass optional machine options to swtpm
+ test functions
+Date: Wed, 26 Feb 2020 11:25:47 +0100
+Message-Id: <20200226102549.12158-9-eric.auger@redhat.com>
 In-Reply-To: <20200226102549.12158-1-eric.auger@redhat.com>
 References: <20200226102549.12158-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,98 +94,193 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we plan to introduce a sysbus TPM_TIS, let's rename
-TPM_TIS into TPM_TIS_ISA.
+We plan to use swtpm test functions on ARM for testing the
+sysbus TPM-TIS device. However on ARM there is no default machine
+type. So we need to explictly pass some machine options on startup.
+Let's allow this by adding a new parameter to both swtpm test
+functions and update all call sites.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
 ---
+ tests/qtest/tpm-crb-swtpm-test.c |  5 +++--
+ tests/qtest/tpm-tests.c          | 10 ++++++----
+ tests/qtest/tpm-tests.h          |  5 +++--
+ tests/qtest/tpm-tis-swtpm-test.c |  5 +++--
+ tests/qtest/tpm-util.c           |  8 ++++++--
+ tests/qtest/tpm-util.h           |  3 ++-
+ 6 files changed, 23 insertions(+), 13 deletions(-)
 
-RFC v2 -> PATCH:
-- added Philippe and Stefan's R-b
----
- hw/i386/acpi-build.c | 6 +++---
- hw/tpm/tpm_tis.c     | 4 ++--
- include/sysemu/tpm.h | 6 +++---
- 3 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9c4e46fa74..26777f8828 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2026,7 +2026,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         }
-     }
+diff --git a/tests/qtest/tpm-crb-swtpm-test.c b/tests/qtest/tpm-crb-swtpm-t=
+est.c
+index 2c4fb8ae29..5228cb7af4 100644
+--- a/tests/qtest/tpm-crb-swtpm-test.c
++++ b/tests/qtest/tpm-crb-swtpm-test.c
+@@ -29,7 +29,8 @@ static void tpm_crb_swtpm_test(const void *data)
+ {
+     const TestState *ts =3D data;
 =20
--    if (TPM_IS_TIS(tpm_find())) {
-+    if (TPM_IS_TIS_ISA(tpm_find())) {
-         aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
-                    TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
-     }
-@@ -2197,7 +2197,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             /* Scan all PCI buses. Generate tables to support hotplug. */
-             build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-=20
--            if (TPM_IS_TIS(tpm)) {
-+            if (TPM_IS_TIS_ISA(tpm)) {
-                 if (misc->tpm_version =3D=3D TPM_VERSION_2_0) {
-                     dev =3D aml_device("TPM");
-                     aml_append(dev, aml_name_decl("_HID",
-@@ -2304,7 +2304,7 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GA=
-rray *tcpalog)
-         (char *)&tpm2_ptr->log_area_start_address - table_data->data;
-=20
-     tpm2_ptr->platform_class =3D cpu_to_le16(TPM2_ACPI_CLASS_CLIENT);
--    if (TPM_IS_TIS(tpm_find())) {
-+    if (TPM_IS_TIS_ISA(tpm_find())) {
-         tpm2_ptr->control_area_address =3D cpu_to_le64(0);
-         tpm2_ptr->start_method =3D cpu_to_le32(TPM2_START_METHOD_MMIO);
-     } else if (TPM_IS_CRB(tpm_find())) {
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 31facb896d..c609737272 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -91,7 +91,7 @@ typedef struct TPMState {
-     TPMPPI ppi;
- } TPMState;
-=20
--#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-+#define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS_ISA)
-=20
- #define DEBUG_TIS 0
-=20
-@@ -1008,7 +1008,7 @@ static void tpm_tis_class_init(ObjectClass *klass, vo=
-id *data)
+-    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_crb_transfer, "tpm-crb"=
+);
++    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_crb_transfer,
++                        "tpm-crb", NULL);
  }
 =20
- static const TypeInfo tpm_tis_info =3D {
--    .name =3D TYPE_TPM_TIS,
-+    .name =3D TYPE_TPM_TIS_ISA,
-     .parent =3D TYPE_ISA_DEVICE,
-     .instance_size =3D sizeof(TPMState),
-     .instance_init =3D tpm_tis_initfn,
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 15979a3647..1691b92c28 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -43,12 +43,12 @@ typedef struct TPMIfClass {
-     enum TPMVersion (*get_version)(TPMIf *obj);
- } TPMIfClass;
+ static void tpm_crb_swtpm_migration_test(const void *data)
+@@ -37,7 +38,7 @@ static void tpm_crb_swtpm_migration_test(const void *data=
+)
+     const TestState *ts =3D data;
 =20
--#define TYPE_TPM_TIS                "tpm-tis"
-+#define TYPE_TPM_TIS_ISA            "tpm-tis"
- #define TYPE_TPM_CRB                "tpm-crb"
- #define TYPE_TPM_SPAPR              "tpm-spapr"
+     tpm_test_swtpm_migration_test(ts->src_tpm_path, ts->dst_tpm_path, ts->=
+uri,
+-                                  tpm_util_crb_transfer, "tpm-crb");
++                                  tpm_util_crb_transfer, "tpm-crb", NULL);
+ }
 =20
--#define TPM_IS_TIS(chr)                             \
--    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
-+#define TPM_IS_TIS_ISA(chr)                         \
-+    object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS_ISA)
- #define TPM_IS_CRB(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
- #define TPM_IS_SPAPR(chr)                           \
+ int main(int argc, char **argv)
+diff --git a/tests/qtest/tpm-tests.c b/tests/qtest/tpm-tests.c
+index 6e45a0ba85..a2f2838e15 100644
+--- a/tests/qtest/tpm-tests.c
++++ b/tests/qtest/tpm-tests.c
+@@ -30,7 +30,7 @@ tpm_test_swtpm_skip(void)
+ }
+=20
+ void tpm_test_swtpm_test(const char *src_tpm_path, tx_func *tx,
+-                         const char *ifmodel)
++                         const char *ifmodel, const char *machine_options)
+ {
+     char *args =3D NULL;
+     QTestState *s;
+@@ -47,10 +47,11 @@ void tpm_test_swtpm_test(const char *src_tpm_path, tx_f=
+unc *tx,
+     g_assert_true(succ);
+=20
+     args =3D g_strdup_printf(
++        "%s "
+         "-chardev socket,id=3Dchr,path=3D%s "
+         "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+         "-device %s,tpmdev=3Ddev",
+-        addr->u.q_unix.path, ifmodel);
++        machine_options ? : "", addr->u.q_unix.path, ifmodel);
+=20
+     s =3D qtest_start(args);
+     g_free(args);
+@@ -78,7 +79,8 @@ void tpm_test_swtpm_test(const char *src_tpm_path, tx_fun=
+c *tx,
+ void tpm_test_swtpm_migration_test(const char *src_tpm_path,
+                                    const char *dst_tpm_path,
+                                    const char *uri, tx_func *tx,
+-                                   const char *ifmodel)
++                                   const char *ifmodel,
++                                   const char *machine_options)
+ {
+     gboolean succ;
+     GPid src_tpm_pid, dst_tpm_pid;
+@@ -100,7 +102,7 @@ void tpm_test_swtpm_migration_test(const char *src_tpm_=
+path,
+=20
+     tpm_util_migration_start_qemu(&src_qemu, &dst_qemu,
+                                   src_tpm_addr, dst_tpm_addr, uri,
+-                                  ifmodel);
++                                  ifmodel, machine_options);
+=20
+     tpm_util_startup(src_qemu, tx);
+     tpm_util_pcrextend(src_qemu, tx);
+diff --git a/tests/qtest/tpm-tests.h b/tests/qtest/tpm-tests.h
+index b97688fe75..a5df35ab5b 100644
+--- a/tests/qtest/tpm-tests.h
++++ b/tests/qtest/tpm-tests.h
+@@ -16,11 +16,12 @@
+ #include "tpm-util.h"
+=20
+ void tpm_test_swtpm_test(const char *src_tpm_path, tx_func *tx,
+-                         const char *ifmodel);
++                         const char *ifmodel, const char *machine_options)=
+;
+=20
+ void tpm_test_swtpm_migration_test(const char *src_tpm_path,
+                                    const char *dst_tpm_path,
+                                    const char *uri, tx_func *tx,
+-                                   const char *ifmodel);
++                                   const char *ifmodel,
++                                   const char *machine_options);
+=20
+ #endif /* TESTS_TPM_TESTS_H */
+diff --git a/tests/qtest/tpm-tis-swtpm-test.c b/tests/qtest/tpm-tis-swtpm-t=
+est.c
+index 9f58a3a92b..9470f15751 100644
+--- a/tests/qtest/tpm-tis-swtpm-test.c
++++ b/tests/qtest/tpm-tis-swtpm-test.c
+@@ -29,7 +29,8 @@ static void tpm_tis_swtpm_test(const void *data)
+ {
+     const TestState *ts =3D data;
+=20
+-    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_tis_transfer, "tpm-tis"=
+);
++    tpm_test_swtpm_test(ts->src_tpm_path, tpm_util_tis_transfer,
++                        "tpm-tis", NULL);
+ }
+=20
+ static void tpm_tis_swtpm_migration_test(const void *data)
+@@ -37,7 +38,7 @@ static void tpm_tis_swtpm_migration_test(const void *data=
+)
+     const TestState *ts =3D data;
+=20
+     tpm_test_swtpm_migration_test(ts->src_tpm_path, ts->dst_tpm_path, ts->=
+uri,
+-                                  tpm_util_tis_transfer, "tpm-tis");
++                                  tpm_util_tis_transfer, "tpm-tis", NULL);
+ }
+=20
+ int main(int argc, char **argv)
+diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
+index e08b137651..7ecdae2fc6 100644
+--- a/tests/qtest/tpm-util.c
++++ b/tests/qtest/tpm-util.c
+@@ -258,23 +258,27 @@ void tpm_util_migration_start_qemu(QTestState **src_q=
+emu,
+                                    SocketAddress *src_tpm_addr,
+                                    SocketAddress *dst_tpm_addr,
+                                    const char *miguri,
+-                                   const char *ifmodel)
++                                   const char *ifmodel,
++                                   const char *machine_options)
+ {
+     char *src_qemu_args, *dst_qemu_args;
+=20
+     src_qemu_args =3D g_strdup_printf(
++        "%s "
+         "-chardev socket,id=3Dchr,path=3D%s "
+         "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+         "-device %s,tpmdev=3Ddev ",
+-        src_tpm_addr->u.q_unix.path, ifmodel);
++        machine_options ? : "", src_tpm_addr->u.q_unix.path, ifmodel);
+=20
+     *src_qemu =3D qtest_init(src_qemu_args);
+=20
+     dst_qemu_args =3D g_strdup_printf(
++        "%s "
+         "-chardev socket,id=3Dchr,path=3D%s "
+         "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+         "-device %s,tpmdev=3Ddev "
+         "-incoming %s",
++        machine_options ? : "",
+         dst_tpm_addr->u.q_unix.path,
+         ifmodel, miguri);
+=20
+diff --git a/tests/qtest/tpm-util.h b/tests/qtest/tpm-util.h
+index 5755698ad2..15e3924942 100644
+--- a/tests/qtest/tpm-util.h
++++ b/tests/qtest/tpm-util.h
+@@ -44,7 +44,8 @@ void tpm_util_migration_start_qemu(QTestState **src_qemu,
+                                    SocketAddress *src_tpm_addr,
+                                    SocketAddress *dst_tpm_addr,
+                                    const char *miguri,
+-                                   const char *ifmodel);
++                                   const char *ifmodel,
++                                   const char *machine_options);
+=20
+ void tpm_util_wait_for_migration_complete(QTestState *who);
+=20
 --=20
 2.20.1
 
