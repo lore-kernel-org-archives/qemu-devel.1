@@ -2,76 +2,88 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C98C4BA24
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 20:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C1AC4BA21
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 20:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2ECD21556
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 20:12:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9C9521556
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 20:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FBeRouH8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2ECD21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZqWSQ679"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9C9521556
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j732b-00071H-48
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 15:12:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48454)
+	id 1j732n-0007LR-U3
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 15:12:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7318-0005WY-Iv
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:10:51 -0500
+ (envelope-from <jimw@sifive.com>) id 1j72zl-0004VO-Ae
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7317-0007cO-Bf
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:10:50 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39501
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7317-0007bi-7R
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:10:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582747848;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=1Uswvo93AQ5s785e9k0vQrys2oFD6LB/Mb/LaJZK4Mc=;
- b=FBeRouH8Niz05UGnVz+iTaP4PMQzFb0P5F7JwbykWRnVAwVD0qXcHKbeyhUgBKb34CFURE
- eiW+iGo6ZuL34cu1IU7t3YuGs8BCUSFTylCGwUbHC9d9zQrzPH7NseiO/1Z0nYVB+I6UdY
- FBFPIhjvybhZaLn9ktDF2lt6xEEngpc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-Ch3FMmtaP-2mzLnYL8m_iw-1; Wed, 26 Feb 2020 15:10:47 -0500
-X-MC-Unique: Ch3FMmtaP-2mzLnYL8m_iw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E853DB20;
- Wed, 26 Feb 2020 20:10:46 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-195.brq.redhat.com [10.40.205.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 97EFF5C28D;
- Wed, 26 Feb 2020 20:10:32 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] hw/i386/intel_iommu: Simplify vtd_find_as_from_bus_num()
- logic
-Date: Wed, 26 Feb 2020 21:10:30 +0100
-Message-Id: <20200226201030.22583-1-philmd@redhat.com>
+ (envelope-from <jimw@sifive.com>) id 1j72zk-0003Rl-AA
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:09:25 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36409)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jimw@sifive.com>) id 1j72zk-0003Lx-2a
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 15:09:24 -0500
+Received: by mail-pf1-x441.google.com with SMTP id i13so172518pfe.3
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 12:09:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=yyJNMLyrTyG3x116AuLrSuDe5q6fImd01Q5NIv53YPk=;
+ b=ZqWSQ679yOiFiKrnknXVFrf33Pg/TulmzRwAvD6lmC1AT2rXyCo/1dOF9bZ+KSKmHe
+ BAiS89w6dVuQjI9jwM4ajmzMOXIgSzX9OEHu+4feZDJDYLSUdktqsoIzLg7Yg+Mvnj8V
+ Hun4LWLJZn0ab2Eh4CuPfAiDsiGVCHhgDnoX8X5CFQ5s9GOWRq5EqRSBR1LbCvx5LLF3
+ aa6rBuRq+ZJR4ocRkSCGQxIKF+qI94BK1M9kXrPYJE4+HP27TZLZJACI1ie2Bbp9pgo7
+ JI1+SQ8kXrOvFPTh/uooc7G04QZoNxPVd9ZrujF8q3LRthdBkccA52fb2NKiEEpawMce
+ f2ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=yyJNMLyrTyG3x116AuLrSuDe5q6fImd01Q5NIv53YPk=;
+ b=jOkB44tyg7qdjXK1o5GouTK2pKouNH2ic0ms4IDYoKFsJ9Rr889tuUAkkuAPKhdD34
+ HcZhviMRQjY4xDpnp8Bzna2CFOCmjUbtIwm4tZMzjc3C7InrTf5jI8tHZlAWj5mOLg9c
+ Xv56c7ZjAH5OcqQu+7jjS+jZM9ZJpYEhGY0XTJWcono2v1kjADUJZSiN2GJJk0mrg+lg
+ sb4/qPSg5fyvMh6kAmzfRaoV3cceEQdIUxlJCcrTSW8TCBb5mJdTs1Eos7CEM2bcuRiu
+ 6DaBI5EHqGGAD7UNATfruesQyOPrQcFYniKzgk+ZlRykctshTmXtcjgKtmcvXVbXWu22
+ 7a4Q==
+X-Gm-Message-State: APjAAAVf2YkLY4vYtNI82KsQsorcasi0UGxH2h089GpMJu1YltaXL3tf
+ hmGgHruo8cZjU4P6fgRThsKuAw==
+X-Google-Smtp-Source: APXvYqwr4VOX3K3N87ePFT3LjDqtMkDqMtqA4FcnFkePcG6ossUeRtmCjH8TfSDQWq8NSHKFrUyC0Q==
+X-Received: by 2002:a63:2b93:: with SMTP id r141mr511283pgr.306.1582747762481; 
+ Wed, 26 Feb 2020 12:09:22 -0800 (PST)
+Received: from [10.17.0.226] ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id dw10sm3594375pjb.11.2020.02.26.12.09.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Feb 2020 12:09:22 -0800 (PST)
+Subject: Re: [PATCH v5 0/4] target-riscv: support vector extension part 1
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, richard.henderson@linaro.org,
+ alistair23@gmail.com, chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200221094531.61894-1-zhiwei_liu@c-sky.com>
+From: Jim Wilson <jimw@sifive.com>
+Message-ID: <ac290e38-bb39-6551-0758-95d087fa568c@sifive.com>
+Date: Wed, 26 Feb 2020 12:09:20 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20200221094531.61894-1-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,118 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liu Yi L <yi.l.liu@intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-trivial@nongnu.org, Peter Xu <peterx@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ wxy194768@alibaba-inc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The vtd_find_as_from_bus_num() function was introduced (in commit
-dbaabb25f) in a code format that could return an incorrect pointer,
-which was later fixed by commit a2e1cd41ccf.
-We could have avoid this by writing the if() statement differently.
-Do it now, in case this function is re-used. The code is easier to
-review (harder to miss bugs).
+On 2/21/20 1:45 AM, LIU Zhiwei wrote:
+> This is the first part of v5 patchset. The changelog of v5 is only coverd
+> the part1.
+> 
+> Features:
+>    * support specification riscv-v-spec-0.7.1.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Since v2: Re-worded commit description, patch sent without -w.
+I'm still concerned about versioning issues.  This implements an 
+unofficial draft of the proposed RISC-V vector extension.  This draft is 
+not compatible with the current draft, and will be even less compatible 
+with the final official version of the vector spec.
 
-This patch is easier to review with 'git-diff -w' (--ignore-all-space):
+The patch adds a version which is good, but there is only one check when 
+qemu starts.  Probably something like 25% of these patches will be wrong 
+for the official vector extension.  How are we going to handle this when 
+someone submits patches for the official support?  It would be better if 
+everything in these patches were conditional on the version number.  It 
+might also be better if we stopped calling this the 'v' extension and 
+maybe used another name like Xrvv071 to make it clear that it is an 
+unofficial draft of the proposed vector spec.  Or maybe be we can use 
+v0p7 but that isn't an officially supported extension name.
 
-@@ -987,14 +987,17 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, ui=
-nt32_t level)
- static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_nu=
-m)
- {
-     VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
--    if (!vtd_bus) {
-+    GHashTableIter iter;
-+
-+    if (vtd_bus) {
-+        return vtd_bus;
-+    }
-+
-     /*
-      * Iterate over the registered buses to find the one which
-      * currently hold this bus number, and update the bus_num
-      * lookup table:
-      */
--        GHashTableIter iter;
--
-     g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
-     while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
-         if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
-@@ -1002,9 +1005,8 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUSta=
-te *s, uint8_t bus_num)
-             return vtd_bus;
-         }
-     }
--        vtd_bus =3D NULL;
--    }
--    return vtd_bus;
-+
-+    return NULL;
- }
----
- hw/i386/intel_iommu.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
+If this rvv 0.7.1 implementation is considered a temporary solution, 
+maybe we can just remove all of this work when the official rvv spec if 
+available?  But presumably it is better if we can have both this 
+implementation and the official one, which means everything needs to be 
+conditional or tied to an Xsomething extension name instead of the V 
+extension name.
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 6258c58ac9..e720a8939c 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -987,24 +987,26 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, ui=
-nt32_t level)
- static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_nu=
-m)
- {
-     VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
--    if (!vtd_bus) {
--        /*
--         * Iterate over the registered buses to find the one which
--         * currently hold this bus number, and update the bus_num
--         * lookup table:
--         */
--        GHashTableIter iter;
-+    GHashTableIter iter;
-=20
--        g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
--        while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
--            if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
--                s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
--                return vtd_bus;
--            }
--        }
--        vtd_bus =3D NULL;
-+    if (vtd_bus) {
-+        return vtd_bus;
-     }
--    return vtd_bus;
-+
-+    /*
-+     * Iterate over the registered buses to find the one which
-+     * currently hold this bus number, and update the bus_num
-+     * lookup table:
-+     */
-+    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
-+    while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
-+        if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
-+            s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
-+            return vtd_bus;
-+        }
-+    }
-+
-+    return NULL;
- }
-=20
- /* Given the @iova, get relevant @slptep. @slpte_level will be the last le=
-vel
---=20
-2.21.1
-
+Jim
 
