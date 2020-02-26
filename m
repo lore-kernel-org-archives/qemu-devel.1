@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE899C4BA24
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DE2C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A779324650
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:03:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FBFD222C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:06:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m7I0bnUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A779324650
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sP8VlGvG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBFD222C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51375 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j75hm-0006V6-SW
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 18:03:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42527)
+	id 1j75lL-00080d-Bf
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 18:06:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j75h8-0005xK-K4
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:02:24 -0500
+ (envelope-from <alistair23@gmail.com>) id 1j75kX-0007F0-8H
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j75h6-0002sn-Op
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:02:22 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37026)
+ (envelope-from <alistair23@gmail.com>) id 1j75kV-0005RH-IW
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:05:52 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:33136)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j75h6-0002pd-Dj; Wed, 26 Feb 2020 18:02:20 -0500
-Received: by mail-lj1-x241.google.com with SMTP id q23so1059188ljm.4;
- Wed, 26 Feb 2020 15:02:20 -0800 (PST)
+ id 1j75kV-0005PN-8j; Wed, 26 Feb 2020 18:05:51 -0500
+Received: by mail-lj1-x241.google.com with SMTP id y6so1090406lji.0;
+ Wed, 26 Feb 2020 15:05:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lfiKTlyeXxLsn+X1WSKAxytELJiz7Eeecnonufgqrq8=;
- b=m7I0bnUB48Bw+SXm7+TyHw8VYsyj7bFOCkazgQJytqJNTjvRbYdK3aJm7JDCWMUCP3
- Hlqg7C/tnNab4h1mF0RS6m5Y5p/Wo9q+fk52Leq3j+QXUF1P49sTlB28erpsigTSd2AJ
- yaKu9gK+yKwT4C0KkbxZsZpAxmoH+E/RnBpBeeamq8kXNbCWbGK/Zdu/QSPlOf5HIkIy
- w6qEtYq7q5ViW9ebslfmgNeFHFVCMUiN6J70/rmkd5kAex4xrMRKooUCNztRjgLEYZIr
- Ys08XHRX6N4HJMzHacr+IpaqDEXr9bROyVqxULK0yBIUQdQmOs7ktmhwdc0wao1LE5KP
- 0enA==
+ :cc; bh=X1fyWx7cUYHPiMoRyKUX3oonI6sX83xhsfDJLl+1Lg8=;
+ b=sP8VlGvGDVv+e8mMJxA9+wF67Jp/csbzjyumwOPIjYvnEamEAEWkbGqLwlMOGQpNI4
+ syguRa9/t1xoxwx/wnXd6xAJGY8FT9ztkVzOHGPexUjI/J3h/WDSD5tPWY/GaYGZJu+r
+ xT/P32NbSWHCQ1sNkhFK/etu2kD9C+hlHvY04pNdM+ryqempIvUIkfm1/yHbP0zk+iED
+ Pt4tHg8w8iDkIzqDCco04MdNSRe9kGJRT+PcnvfUg0lCQHhmiHyt/BgLrk0lZ4NVoqDf
+ sxdLfCH0PzlKxb85AdYoEHtFvx+pB9uFa37nST5iuonpYygkeQSJ0Ul4C93fYin212cu
+ cOyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=lfiKTlyeXxLsn+X1WSKAxytELJiz7Eeecnonufgqrq8=;
- b=s0HdNy6ge4rXTDgDOlhCdjJV5D7EYdWjRRQBN1IHHIAnUEI8+qketw4QtAOX9YO7iM
- 4zAYcbcdrnRaXBB0Hkn74XiymEPOODoPtqQ6Wn8K5RjmOIYmHv7WJgpZRx0zHH2QpGn9
- 4UIgHuZUCa7O4+UqCCtAfyM1HHAfJt5ej7chdAgh6keYkcuiAbkErcxqiwDTlUgXc5Et
- ecs4y5bVcLoSGZ+M5uuURwIWHfk35USpNbb0JAkUs9K/Pssif2aiZbWJlcQoAbUPDDzk
- AzjtP5+KhlIwZlUtaBhyLXXSjcAJF41+/fuVZCnjrq2GJ+IozUkjRBFNfRFy62yIICD8
- NykA==
-X-Gm-Message-State: ANhLgQ0HITkeFW+/LQxdnR51gG0KllHbG5PdsmtTSUKqTVMe9Rr+bb5P
- x2eCvltNn32cl1XVQndlPDH9pi5qjfNS/E0uXTo=
-X-Google-Smtp-Source: ADFU+vvixwU6Jf1+iQfrnVjOoY9T7LesNco5owXnZ6eOsmrt3ryfbE9WUXXL05WlMgqMiCB6rRji72n5hzbuu12k9xE=
-X-Received: by 2002:a2e:544:: with SMTP id 65mr838621ljf.76.1582758138829;
- Wed, 26 Feb 2020 15:02:18 -0800 (PST)
+ bh=X1fyWx7cUYHPiMoRyKUX3oonI6sX83xhsfDJLl+1Lg8=;
+ b=n+Gw9NxDBlK72CftOGhpQvP9OhPXFPDXEfzuJ+bWI4ZAbxYTgwykRN+vSB2xTRbb01
+ YvWI8QDUIwrhhCnHRXwD1daC7EAvb1e4o0cHn7pU6y4I8baTJ8swAL7xcfdCJ0mkfIkR
+ taTdrrmIvEFiVPxjPr//tQ+Ihb+z0ycp4E50zNMuQVtj6bN7OfjG4L7p2waWGraHr0Pj
+ xjGXYd7y7ds1bkfrRa2iVr9IRiomFyxsgCianMBPeR85MkAnNxEWEMfKXu04U+It3eCl
+ BuWtqJ+2gdicIhT5F/Ki0h9N9IDPZhksOUHtVnpcCPZarvy4hNUU/KCH8ysRFTok0NX0
+ FcNw==
+X-Gm-Message-State: ANhLgQ0ioXb+V5s/EhKH+dOk0CAehoSyGNu4otkhYM5ZuPSUbiOw5Qlp
+ uQNjNlW/ELY9hsJYgXjPSPZhllZc7KpICfs7khs=
+X-Google-Smtp-Source: ADFU+vuDoFsYDE/5qs3walxyjNlVRFiOgCHgYmUXQPco40NOUFiei7NIN6NkbADfdjPi8klUtFXJFjeQS8dy7EbAHhU=
+X-Received: by 2002:a2e:a36a:: with SMTP id i10mr781220ljn.107.1582758350047; 
+ Wed, 26 Feb 2020 15:05:50 -0800 (PST)
 MIME-Version: 1.0
 References: <20200225131422.53368-1-damien.hedde@greensocs.com>
- <20200225131422.53368-8-damien.hedde@greensocs.com>
-In-Reply-To: <20200225131422.53368-8-damien.hedde@greensocs.com>
+ <20200225131422.53368-9-damien.hedde@greensocs.com>
+In-Reply-To: <20200225131422.53368-9-damien.hedde@greensocs.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 26 Feb 2020 14:54:41 -0800
-Message-ID: <CAKmqyKMczNPHVqZdQXW1B7+Rrs-+eeWMjqpEjY_mUF+Bfa3BjA@mail.gmail.com>
-Subject: Re: [PATCH v8 7/9] hw/char/cadence_uart: add clock support
+Date: Wed, 26 Feb 2020 14:58:13 -0800
+Message-ID: <CAKmqyKPmkjjAe-4M_-NXP=dEjLb7WUkhV-bGSmYnCnPUZT0n6w@mail.gmail.com>
+Subject: Re: [PATCH v8 8/9] hw/arm/xilinx_zynq: connect uart clocks to slcr
 To: Damien Hedde <damien.hedde@greensocs.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
@@ -101,18 +101,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Feb 25, 2020 at 5:31 AM Damien Hedde <damien.hedde@greensocs.com> wrote:
+On Tue, Feb 25, 2020 at 5:40 AM Damien Hedde <damien.hedde@greensocs.com> wrote:
 >
-> Switch the cadence uart to multi-phase reset and add the
-> reference clock input.
+> Add the connection between the slcr's output clocks and the uarts inputs.
 >
-> The input clock frequency is added to the migration structure.
->
-> The reference clock controls the baudrate generation. If it disabled,
-> any input characters and events are ignored.
->
-> If this clock remains unconnected, the uart behaves as before
-> (it default to a 50MHz ref clock).
+> Also add the main board clock 'ps_clk', which is hard-coded to 33.33MHz
+> (the default frequency). This clock is used to feed the slcr's input
+> clock.
 >
 > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 
@@ -122,219 +117,126 @@ Alistair
 
 >
 > ---
->
-> v7:
+> v7
 >  + update ClockIn/ClockOut types
->  + update due to resettable changes
->  + use a versioned field instead subsection in vmstate
+>  + simplify the ps_clk frequency init
 > ---
->  include/hw/char/cadence_uart.h |  1 +
->  hw/char/cadence_uart.c         | 73 +++++++++++++++++++++++++++++-----
->  hw/char/trace-events           |  3 ++
->  3 files changed, 67 insertions(+), 10 deletions(-)
+>  hw/arm/xilinx_zynq.c | 57 +++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 49 insertions(+), 8 deletions(-)
 >
-> diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uart.h
-> index 47cec956c4..2a179a572f 100644
-> --- a/include/hw/char/cadence_uart.h
-> +++ b/include/hw/char/cadence_uart.h
-> @@ -49,6 +49,7 @@ typedef struct {
->      CharBackend chr;
->      qemu_irq irq;
->      QEMUTimer *fifo_trigger_handle;
-> +    Clock *refclk;
->  } CadenceUARTState;
->
->  static inline DeviceState *cadence_uart_create(hwaddr addr,
-> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-> index 22e47972f1..e196906c92 100644
-> --- a/hw/char/cadence_uart.c
-> +++ b/hw/char/cadence_uart.c
-> @@ -31,6 +31,8 @@
->  #include "qemu/module.h"
+> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+> index 3a0fa5b23f..261a1690a8 100644
+> --- a/hw/arm/xilinx_zynq.c
+> +++ b/hw/arm/xilinx_zynq.c
+> @@ -34,6 +34,15 @@
 >  #include "hw/char/cadence_uart.h"
->  #include "hw/irq.h"
+>  #include "hw/net/cadence_gem.h"
+>  #include "hw/cpu/a9mpcore.h"
 > +#include "hw/qdev-clock.h"
-> +#include "trace.h"
+> +#include "sysemu/reset.h"
+> +
+> +#define TYPE_ZYNQ_MACHINE MACHINE_TYPE_NAME("xilinx-zynq-a9")
+> +#define ZYNQ_MACHINE(obj) \
+> +    OBJECT_CHECK(ZynqMachineState, (obj), TYPE_ZYNQ_MACHINE)
+> +
+> +/* board base frequency: 33.333333 MHz */
+> +#define PS_CLK_FREQUENCY (100 * 1000 * 1000 / 3)
 >
->  #ifdef CADENCE_UART_ERR_DEBUG
->  #define DB_PRINT(...) do { \
-> @@ -97,7 +99,7 @@
->  #define LOCAL_LOOPBACK         (0x2 << UART_MR_CHMODE_SH)
->  #define REMOTE_LOOPBACK        (0x3 << UART_MR_CHMODE_SH)
+>  #define NUM_SPI_FLASHES 4
+>  #define NUM_QSPI_FLASHES 2
+> @@ -74,6 +83,11 @@ static const int dma_irqs[8] = {
+>      0xe3401000 + ARMV7_IMM16(extract32((val), 16, 16)), /* movt r1 ... */ \
+>      0xe5801000 + (addr)
 >
-> -#define UART_INPUT_CLK         50000000
-> +#define UART_DEFAULT_REF_CLK (50 * 1000 * 1000)
->
->  #define R_CR       (0x00/4)
->  #define R_MR       (0x04/4)
-> @@ -171,12 +173,15 @@ static void uart_send_breaks(CadenceUARTState *s)
->  static void uart_parameters_setup(CadenceUARTState *s)
+> +typedef struct ZynqMachineState {
+> +    MachineState parent;
+> +    Clock *ps_clk;
+> +} ZynqMachineState;
+> +
+>  static void zynq_write_board_setup(ARMCPU *cpu,
+>                                     const struct arm_boot_info *info)
 >  {
->      QEMUSerialSetParams ssp;
-> -    unsigned int baud_rate, packet_size;
-> +    unsigned int baud_rate, packet_size, input_clk;
-> +    input_clk = clock_get_hz(s->refclk);
+> @@ -158,12 +172,13 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
 >
-> -    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ?
-> -            UART_INPUT_CLK / 8 : UART_INPUT_CLK;
-> +    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ? input_clk / 8 : input_clk;
-> +    baud_rate /= (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
-> +    trace_cadence_uart_baudrate(baud_rate);
-> +
-> +    ssp.speed = baud_rate;
->
-> -    ssp.speed = baud_rate / (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
->      packet_size = 1;
->
->      switch (s->r[R_MR] & UART_MR_PAR) {
-> @@ -215,6 +220,13 @@ static void uart_parameters_setup(CadenceUARTState *s)
->      }
->
->      packet_size += ssp.data_bits + ssp.stop_bits;
-> +    if (ssp.speed == 0) {
-> +        /*
-> +         * Avoid division-by-zero below.
-> +         * TODO: find something better
-> +         */
-> +        ssp.speed = 1;
-> +    }
->      s->char_tx_time = (NANOSECONDS_PER_SECOND / ssp.speed) * packet_size;
->      qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
->  }
-> @@ -340,6 +352,11 @@ static void uart_receive(void *opaque, const uint8_t *buf, int size)
->      CadenceUARTState *s = opaque;
->      uint32_t ch_mode = s->r[R_MR] & UART_MR_CHMODE;
->
-> +    /* ignore characters when unclocked or in reset */
-> +    if (!clock_is_enabled(s->refclk) || device_is_in_reset(DEVICE(s))) {
-> +        return;
-> +    }
-> +
->      if (ch_mode == NORMAL_MODE || ch_mode == ECHO_MODE) {
->          uart_write_rx_fifo(opaque, buf, size);
->      }
-> @@ -353,6 +370,11 @@ static void uart_event(void *opaque, QEMUChrEvent event)
->      CadenceUARTState *s = opaque;
->      uint8_t buf = '\0';
->
-> +    /* ignore characters when unclocked or in reset */
-> +    if (!clock_is_enabled(s->refclk) || device_is_in_reset(DEVICE(s))) {
-> +        return;
-> +    }
-> +
->      if (event == CHR_EVENT_BREAK) {
->          uart_write_rx_fifo(opaque, &buf, 1);
->      }
-> @@ -462,9 +484,9 @@ static const MemoryRegionOps uart_ops = {
->      .endianness = DEVICE_NATIVE_ENDIAN,
->  };
->
-> -static void cadence_uart_reset(DeviceState *dev)
-> +static void cadence_uart_reset_init(Object *obj, ResetType type)
+>  static void zynq_init(MachineState *machine)
 >  {
-> -    CadenceUARTState *s = CADENCE_UART(dev);
-> +    CadenceUARTState *s = CADENCE_UART(obj);
+> +    ZynqMachineState *zynq_machine = ZYNQ_MACHINE(machine);
+>      ram_addr_t ram_size = machine->ram_size;
+>      ARMCPU *cpu;
+>      MemoryRegion *address_space_mem = get_system_memory();
+>      MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
+>      MemoryRegion *ocm_ram = g_new(MemoryRegion, 1);
+> -    DeviceState *dev;
+> +    DeviceState *dev, *slcr;
+>      SysBusDevice *busdev;
+>      qemu_irq pic[64];
+>      int n;
+> @@ -208,9 +223,18 @@ static void zynq_init(MachineState *machine)
+>                            1, 0x0066, 0x0022, 0x0000, 0x0000, 0x0555, 0x2aa,
+>                            0);
 >
->      s->r[R_CR] = 0x00000128;
->      s->r[R_IMR] = 0;
-> @@ -473,6 +495,11 @@ static void cadence_uart_reset(DeviceState *dev)
->      s->r[R_BRGR] = 0x0000028B;
->      s->r[R_BDIV] = 0x0000000F;
->      s->r[R_TTRIG] = 0x00000020;
-> +}
+> -    dev = qdev_create(NULL, "xilinx,zynq_slcr");
+> -    qdev_init_nofail(dev);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0xF8000000);
+> +    /* Create slcr, keep a pointer to connect clocks */
+> +    slcr = qdev_create(NULL, "xilinx,zynq_slcr");
+> +    qdev_init_nofail(slcr);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(slcr), 0, 0xF8000000);
 > +
-> +static void cadence_uart_reset_hold(Object *obj)
-> +{
-> +    CadenceUARTState *s = CADENCE_UART(obj);
+> +    /* Create the main clock source, and feed slcr with it */
+> +    zynq_machine->ps_clk = CLOCK(object_new(TYPE_CLOCK));
+> +    object_property_add_child(OBJECT(zynq_machine), "ps_clk",
+> +                              OBJECT(zynq_machine->ps_clk), &error_abort);
+> +    object_unref(OBJECT(zynq_machine->ps_clk));
+> +    clock_set_hz(zynq_machine->ps_clk, PS_CLK_FREQUENCY);
+> +    qdev_connect_clock_in(slcr, "ps_clk", zynq_machine->ps_clk);
 >
->      uart_rx_reset(s);
->      uart_tx_reset(s);
-> @@ -491,6 +518,14 @@ static void cadence_uart_realize(DeviceState *dev, Error **errp)
->                               uart_event, NULL, s, NULL, true);
+>      dev = qdev_create(NULL, TYPE_A9MPCORE_PRIV);
+>      qdev_prop_set_uint32(dev, "num-cpu", 1);
+> @@ -231,8 +255,12 @@ static void zynq_init(MachineState *machine)
+>      sysbus_create_simple("xlnx,ps7-usb", 0xE0002000, pic[53-IRQ_OFFSET]);
+>      sysbus_create_simple("xlnx,ps7-usb", 0xE0003000, pic[76-IRQ_OFFSET]);
+>
+> -    cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
+> -    cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
+> +    dev = cadence_uart_create(0xE0000000, pic[59 - IRQ_OFFSET], serial_hd(0));
+> +    qdev_connect_clock_in(dev, "refclk",
+> +                          qdev_get_clock_out(slcr, "uart0_ref_clk"));
+> +    dev = cadence_uart_create(0xE0001000, pic[82 - IRQ_OFFSET], serial_hd(1));
+> +    qdev_connect_clock_in(dev, "refclk",
+> +                          qdev_get_clock_out(slcr, "uart1_ref_clk"));
+>
+>      sysbus_create_varargs("cadence_ttc", 0xF8001000,
+>              pic[42-IRQ_OFFSET], pic[43-IRQ_OFFSET], pic[44-IRQ_OFFSET], NULL);
+> @@ -310,8 +338,9 @@ static void zynq_init(MachineState *machine)
+>      arm_load_kernel(ARM_CPU(first_cpu), machine, &zynq_binfo);
 >  }
 >
-> +static void cadence_uart_refclk_update(void *opaque)
-> +{
-> +    CadenceUARTState *s = opaque;
-> +
-> +    /* recompute uart's speed on clock change */
-> +    uart_parameters_setup(s);
-> +}
-> +
->  static void cadence_uart_init(Object *obj)
+> -static void zynq_machine_init(MachineClass *mc)
+> +static void zynq_machine_class_init(ObjectClass *oc, void *data)
 >  {
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> @@ -500,9 +535,23 @@ static void cadence_uart_init(Object *obj)
->      sysbus_init_mmio(sbd, &s->iomem);
->      sysbus_init_irq(sbd, &s->irq);
->
-> +    s->refclk = qdev_init_clock_in(DEVICE(obj), "refclk",
-> +            cadence_uart_refclk_update, s);
-> +    /* initialize the frequency in case the clock remains unconnected */
-> +    clock_set_hz(s->refclk, UART_DEFAULT_REF_CLK);
-> +
->      s->char_tx_time = (NANOSECONDS_PER_SECOND / 9600) * 10;
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+>      mc->desc = "Xilinx Zynq Platform Baseboard for Cortex-A9";
+>      mc->init = zynq_init;
+>      mc->max_cpus = 1;
+> @@ -320,4 +349,16 @@ static void zynq_machine_init(MachineClass *mc)
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
 >  }
 >
-> +static int cadence_uart_pre_load(void *opaque)
-> +{
-> +    CadenceUARTState *s = opaque;
+> -DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+> +static const TypeInfo zynq_machine_type = {
+> +    .name = TYPE_ZYNQ_MACHINE,
+> +    .parent = TYPE_MACHINE,
+> +    .class_init = zynq_machine_class_init,
+> +    .instance_size = sizeof(ZynqMachineState),
+> +};
 > +
-> +    /* the frequency will be overriden if the refclk field is present */
-> +    clock_set_hz(s->refclk, UART_DEFAULT_REF_CLK);
-> +    return 0;
+> +static void zynq_machine_register_types(void)
+> +{
+> +    type_register_static(&zynq_machine_type);
 > +}
 > +
->  static int cadence_uart_post_load(void *opaque, int version_id)
->  {
->      CadenceUARTState *s = opaque;
-> @@ -521,8 +570,9 @@ static int cadence_uart_post_load(void *opaque, int version_id)
->
->  static const VMStateDescription vmstate_cadence_uart = {
->      .name = "cadence_uart",
-> -    .version_id = 2,
-> +    .version_id = 3,
->      .minimum_version_id = 2,
-> +    .pre_load = cadence_uart_pre_load,
->      .post_load = cadence_uart_post_load,
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32_ARRAY(r, CadenceUARTState, CADENCE_UART_R_MAX),
-> @@ -534,8 +584,9 @@ static const VMStateDescription vmstate_cadence_uart = {
->          VMSTATE_UINT32(tx_count, CadenceUARTState),
->          VMSTATE_UINT32(rx_wpos, CadenceUARTState),
->          VMSTATE_TIMER_PTR(fifo_trigger_handle, CadenceUARTState),
-> +        VMSTATE_CLOCK_V(refclk, CadenceUARTState, 3),
->          VMSTATE_END_OF_LIST()
-> -    }
-> +    },
->  };
->
->  static Property cadence_uart_properties[] = {
-> @@ -546,10 +597,12 @@ static Property cadence_uart_properties[] = {
->  static void cadence_uart_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> +    ResettableClass *rc = RESETTABLE_CLASS(klass);
->
->      dc->realize = cadence_uart_realize;
->      dc->vmsd = &vmstate_cadence_uart;
-> -    dc->reset = cadence_uart_reset;
-> +    rc->phases.enter = cadence_uart_reset_init;
-> +    rc->phases.hold  = cadence_uart_reset_hold;
->      device_class_set_props(dc, cadence_uart_properties);
->    }
->
-> diff --git a/hw/char/trace-events b/hw/char/trace-events
-> index 6f938301d9..d20eafd56f 100644
-> --- a/hw/char/trace-events
-> +++ b/hw/char/trace-events
-> @@ -97,3 +97,6 @@ exynos_uart_wo_read(uint32_t channel, const char *name, uint32_t reg) "UART%d: T
->  exynos_uart_rxsize(uint32_t channel, uint32_t size) "UART%d: Rx FIFO size: %d"
->  exynos_uart_channel_error(uint32_t channel) "Wrong UART channel number: %d"
->  exynos_uart_rx_timeout(uint32_t channel, uint32_t stat, uint32_t intsp) "UART%d: Rx timeout stat=0x%x intsp=0x%x"
-> +
-> +# hw/char/cadence_uart.c
-> +cadence_uart_baudrate(unsigned baudrate) "baudrate %u"
+> +type_init(zynq_machine_register_types)
 > --
 > 2.25.1
 >
