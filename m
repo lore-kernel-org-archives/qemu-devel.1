@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA28C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4638C4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDAFC24685
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFBF424685
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 11:39:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKJSj2Ep"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDAFC24685
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E68GRuC+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFBF424685
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6v1b-0003A0-3U
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:38:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52783)
+	id 1j6v1y-0003Xa-RI
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 06:39:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6utu-0000rn-S5
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6utu-0000rv-T7
  for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j6uts-0006Yk-OM
+ (envelope-from <paolo.bonzini@gmail.com>) id 1j6utp-0006GP-CI
  for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:50 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38937)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46248)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j6uts-0006Ub-Et
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:48 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y17so2543190wrn.6
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:30:48 -0800 (PST)
+ id 1j6utp-0006Bd-4s
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 06:30:45 -0500
+Received: by mail-wr1-x444.google.com with SMTP id j7so2492959wrp.13
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 03:30:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=C1Czdr2m5DCpm3/C+F4+eTk0CwrmAVdgxwfK1fMPVT8=;
- b=aKJSj2EpylLCpchD4TTM9rViZt3fAqg2z/7FuomWWS7Math7a21ss9FzVGL0mMj/SY
- UXjTw+0IxR33gnXMqZjmkCZGvUqsqN6tTpnhRBNw7zK/2zO1oJ5DT2oFEqYPsejst2CT
- plZmDX1WNrLHXz7NMhRCzCa34JT9Gn2tT3O6TWoovbtHzflTsnw/JxpAuXCA/1s8OO8F
- cgsTYKZ0du81dhogF5kxaL+5XuCWWw2WSwnXeW9WSpvAM09mkxwSmaE2eOaASigpWs6u
- XcXmZcHTtvxnls0liUnB0ErbG4DbJh8tmMiXCcta8gLls+W7aLsPGJPOCSDhaeIKFR1T
- 6k4A==
+ bh=xRK8bFWoSZBwkrBOa3bJQtvJAa0FRzsjPWhzdUOTyc8=;
+ b=E68GRuC+SmiF+NHZz0SaJowVi2RNlZjKeMC+bI1roLoonDLvNz5171eG1NNZAr/iGy
+ 5+LeUpy18gBRTWGK1BtGepvkx62Qu8qf92jWR6m/k2WKpVWxYAudUD/ZDq/QH62mCS3P
+ iwuSlPj3KQKD2zpf7LGT3TATSV0psUC59V/sDihN27WGS3XQvgxjkj4OX5HEZIlrPcp0
+ IO8omzmptPv8k3aWq3lwSpCxkEnRzT/b2WU6/PsyglaLanErLODycF18khxM/59FDlOM
+ zTCHVYHybNPaFgslcga8b10Xs2HthNuD+515wN1ZEiCAlyLWJ+avPUaP1xjj+/nHJyMV
+ C7aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=C1Czdr2m5DCpm3/C+F4+eTk0CwrmAVdgxwfK1fMPVT8=;
- b=M9fL7aL82LIrQolQPClKYJ6YxMvijFhkegYppZFRYuBowvcJN90FDzKjH0ojmDB3VU
- Mxv9voCND16z4O1OJTv4eq/tUJd3ZP+p+q1HpEoTF/QUISJjEhgMBQ1cD2fefjYhvbsQ
- /I7DKX74ICK+b86VA2R6enkwXD/iaY+zPLK4bD687hkoB5Kk1JM805z+xYJpIbj11A/2
- VSszkF/4C5mUHPUZPYXqh8J5AepG+f9TlU1bj+h+YXEDWecLcLV3M5m/zJ2aRGVenOPb
- 7wqz0G7ruOCm4yNx2PaAx82ZsJJSzNbNcXDW/xwrqFOb7eSUrlQJDVvmVZzfyzWw6iS8
- /ECg==
-X-Gm-Message-State: APjAAAWoeWGluiafVsQc0MTqFosaLT/OQp7iuHKuf1w8JVVtmiF80Hhs
- /uI5pntDoHb7T9TDcmkPVeJifASi
-X-Google-Smtp-Source: APXvYqyqOCWyZz2MJT5h4DGJndpePP8zFx+Bne2/zTPqdyZzJwMZHuwS9FKZiJ72ZsKufAt1XirD8g==
-X-Received: by 2002:adf:d4ca:: with SMTP id w10mr4961881wrk.407.1582716646942; 
- Wed, 26 Feb 2020 03:30:46 -0800 (PST)
+ bh=xRK8bFWoSZBwkrBOa3bJQtvJAa0FRzsjPWhzdUOTyc8=;
+ b=tkLVdfp+YqPX1f2PkcKMHW4stWgt8EPOzIOGC6p9JTmN5a4AzjWLeqfnq1JBq9/+Ir
+ pTbKDqcgLPdBukdRvXzT/ZxUuZ+iXkBiLvjkDhe/L4epC4LQiAwGFblc6Up9ObFJ5mYM
+ kNh1htPEY+29bbLcZgLUwTkGwAqYFqjSmu3v2eTmCWBh35R0wnaUGOQtkYk62fPwOjpv
+ ancrol6MmF/8nGNP6mTmG3m4DyCRoG89FPG0BzS1ZUFbxDuXMyfIdhEDrOrDj75bOYqo
+ 9Q9vWjVHr1jwByaR/svz4awwXu4zsDxTei6QmmSZv7YN2xW6MCn6AmA8B827j+FBKmjx
+ 86Mw==
+X-Gm-Message-State: APjAAAXXa145v4U7h/m0YMvPD90IcfVG0a5mgxHKZjZumy0ABsQ/n87v
+ xfkAB06TLBZ/tfrL68L3TnmafwuU
+X-Google-Smtp-Source: APXvYqz1+vrS4/O9QHbmIUFhB8YWLVddxb5Hf6x31xRSVll6nrGNECtt2DrCkx/bkYQCW8SoFirrJA==
+X-Received: by 2002:a5d:4b03:: with SMTP id v3mr5341314wrq.178.1582716643671; 
+ Wed, 26 Feb 2020 03:30:43 -0800 (PST)
 Received: from donizetti.lan ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
- by smtp.gmail.com with ESMTPSA id h128sm2628154wmh.33.2020.02.26.03.30.45
+ by smtp.gmail.com with ESMTPSA id h128sm2628154wmh.33.2020.02.26.03.30.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 03:30:45 -0800 (PST)
+ Wed, 26 Feb 2020 03:30:43 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/18] qemu-doc: remove indices other than findex
-Date: Wed, 26 Feb 2020 12:30:28 +0100
-Message-Id: <20200226113034.6741-13-pbonzini@redhat.com>
+Subject: [PATCH 09/18] qemu-doc: Remove the "CPU emulation" part of the
+ "Implementation notes"
+Date: Wed, 26 Feb 2020 12:30:25 +0100
+Message-Id: <20200226113034.6741-10-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200226113034.6741-1-pbonzini@redhat.com>
 References: <20200226113034.6741-1-pbonzini@redhat.com>
@@ -97,304 +98,200 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These indices are not well-maintained, and pandoc also chokes on the
-directives.  Just nuke them.
+From: Peter Maydell <peter.maydell@linaro.org>
 
+The "CPU emulation" part of the "Implementation notes" in
+qemu-tech.texi looks like it is documenting what features of various
+CPUs we do or don't emulate.  However:
+ * it covers only six of our 21 guest architectures
+ * the last time anybody updated it for actual content was in
+   2011/2012 for Xtensa; the content for the other five
+   architectures is even older, being from 2008 or before!
+
+What we have is out of date, misleading and incomplete.
+Just delete this part of the document rather than trying to
+convert it to rST.
+
+(It would be nice eventually to have documentation of the
+scope and limitations of our emulation; but we will want to
+separate out the generic "system emulation" information from
+the parts that are specific to linux-user anyway, as they will
+be in different manuals.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200225154121.21116-3-peter.maydell@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/system/keys.texi           | 10 --------
- docs/system/monitor.texi        |  1 -
- docs/system/mux-chardev.texi    |  7 ------
- docs/system/quickstart.texi     |  1 -
- docs/system/target-arm.texi     |  1 -
- docs/system/target-i386.texi    |  1 -
- docs/system/target-m68k.texi    |  2 --
- docs/system/target-mips.texi    |  2 --
- docs/system/target-ppc.texi     |  1 -
- docs/system/target-sparc.texi   |  1 -
- docs/system/target-sparc64.texi |  1 -
- docs/system/target-xtensa.texi  |  1 -
- qemu-doc.texi                   | 44 ---------------------------------
- 13 files changed, 73 deletions(-)
+ qemu-tech.texi | 153 -------------------------------------------------
+ 1 file changed, 153 deletions(-)
 
-diff --git a/docs/system/keys.texi b/docs/system/keys.texi
-index 4c74b3bf4d..c04daf54f2 100644
---- a/docs/system/keys.texi
-+++ b/docs/system/keys.texi
-@@ -10,23 +10,18 @@ then the modifier is Ctrl-Alt-Shift (instead of Ctrl-Alt) and if you use
- 
- @table @key
- @item Ctrl-Alt-f
--@kindex Ctrl-Alt-f
- Toggle full screen
- 
- @item Ctrl-Alt-+
--@kindex Ctrl-Alt-+
- Enlarge the screen
- 
- @item Ctrl-Alt--
--@kindex Ctrl-Alt--
- Shrink the screen
- 
- @item Ctrl-Alt-u
--@kindex Ctrl-Alt-u
- Restore the screen's un-scaled dimensions
- 
- @item Ctrl-Alt-n
--@kindex Ctrl-Alt-n
- Switch to virtual console 'n'. Standard console mappings are:
- @table @emph
- @item 1
-@@ -38,14 +33,9 @@ Serial port
- @end table
- 
- @item Ctrl-Alt
--@kindex Ctrl-Alt
- Toggle mouse and keyboard grab.
- @end table
- 
--@kindex Ctrl-Up
--@kindex Ctrl-Down
--@kindex Ctrl-PageUp
--@kindex Ctrl-PageDown
- In the virtual consoles, you can use @key{Ctrl-Up}, @key{Ctrl-Down},
- @key{Ctrl-PageUp} and @key{Ctrl-PageDown} to move in the back log.
- 
-diff --git a/docs/system/monitor.texi b/docs/system/monitor.texi
-index c5b6a9b38e..b41b144885 100644
---- a/docs/system/monitor.texi
-+++ b/docs/system/monitor.texi
-@@ -1,6 +1,5 @@
- @node pcsys_monitor
- @section QEMU Monitor
--@cindex QEMU monitor
- 
- The QEMU monitor is used to give complex commands to the QEMU
- emulator. You can use it to:
-diff --git a/docs/system/mux-chardev.texi b/docs/system/mux-chardev.texi
-index c9a2d14cb8..b21c2c5654 100644
---- a/docs/system/mux-chardev.texi
-+++ b/docs/system/mux-chardev.texi
-@@ -12,26 +12,19 @@ you're using the default.
- 
- @table @key
- @item Ctrl-a h
--@kindex Ctrl-a h
- Print this help
- @item Ctrl-a x
--@kindex Ctrl-a x
- Exit emulator
- @item Ctrl-a s
--@kindex Ctrl-a s
- Save disk data back to file (if -snapshot)
- @item Ctrl-a t
--@kindex Ctrl-a t
- Toggle console timestamps
- @item Ctrl-a b
--@kindex Ctrl-a b
- Send break (magic sysrq in Linux)
- @item Ctrl-a c
--@kindex Ctrl-a c
- Rotate between the frontends connected to the multiplexer (usually
- this switches between the monitor and the console)
- @item Ctrl-a Ctrl-a
--@kindex Ctrl-a Ctrl-a
- Send the escape character to the frontend
- @end table
- @c man end
-diff --git a/docs/system/quickstart.texi b/docs/system/quickstart.texi
-index ed7295de7a..baceaa96eb 100644
---- a/docs/system/quickstart.texi
-+++ b/docs/system/quickstart.texi
-@@ -1,6 +1,5 @@
- @node pcsys_quickstart
- @section Quick Start
--@cindex quick start
- 
- Download and uncompress a PC hard disk image with Linux installed (e.g.
- @file{linux.img}) and type:
-diff --git a/docs/system/target-arm.texi b/docs/system/target-arm.texi
-index 040d77b5e0..c56b5f6ebf 100644
---- a/docs/system/target-arm.texi
-+++ b/docs/system/target-arm.texi
-@@ -1,6 +1,5 @@
- @node ARM System emulator
- @section ARM System emulator
--@cindex system emulation (ARM)
- 
- Use the executable @file{qemu-system-arm} to simulate a ARM
- machine. The ARM Integrator/CP board is emulated with the following
-diff --git a/docs/system/target-i386.texi b/docs/system/target-i386.texi
-index 49ab6dbafc..bed076d807 100644
---- a/docs/system/target-i386.texi
-+++ b/docs/system/target-i386.texi
-@@ -1,6 +1,5 @@
- @node x86 (PC) System emulator
- @section x86 (PC) System emulator
--@cindex system emulation (PC)
+diff --git a/qemu-tech.texi b/qemu-tech.texi
+index 0380de77b6..35da6a40af 100644
+--- a/qemu-tech.texi
++++ b/qemu-tech.texi
+@@ -2,162 +2,9 @@
+ @appendix Implementation notes
  
  @menu
- * pcsys_devices::      Peripherals
-diff --git a/docs/system/target-m68k.texi b/docs/system/target-m68k.texi
-index b5bc9df40a..a77b19ea0f 100644
---- a/docs/system/target-m68k.texi
-+++ b/docs/system/target-m68k.texi
-@@ -1,7 +1,5 @@
- @node ColdFire System emulator
- @section ColdFire System emulator
--@cindex system emulation (ColdFire)
--@cindex system emulation (M68K)
+-* CPU emulation::
+ * Managed start up options::
+ @end menu
  
- Use the executable @file{qemu-system-m68k} to simulate a ColdFire machine.
- The emulator is able to boot a uClinux kernel.
-diff --git a/docs/system/target-mips.texi b/docs/system/target-mips.texi
-index f722c00912..fe12ee94c7 100644
---- a/docs/system/target-mips.texi
-+++ b/docs/system/target-mips.texi
-@@ -1,6 +1,5 @@
- @node MIPS System emulator
- @section MIPS System emulator
--@cindex system emulation (MIPS)
- 
- @menu
- * recommendations_cpu_models_MIPS:: Supported CPU model configurations on MIPS hosts
-@@ -126,7 +125,6 @@ MIPSnet network emulation
- 
- @node nanoMIPS System emulator
- @subsection nanoMIPS System emulator
--@cindex system emulation (nanoMIPS)
- 
- Executable @file{qemu-system-mipsel} also covers simulation of
- 32-bit nanoMIPS system in little endian mode:
-diff --git a/docs/system/target-ppc.texi b/docs/system/target-ppc.texi
-index c2c254d3d2..55f98f65b1 100644
---- a/docs/system/target-ppc.texi
-+++ b/docs/system/target-ppc.texi
-@@ -1,6 +1,5 @@
- @node PowerPC System emulator
- @section PowerPC System emulator
--@cindex system emulation (PowerPC)
- 
- Use the executable @file{qemu-system-ppc} to simulate a complete 40P (PREP)
- or PowerMac PowerPC system.
-diff --git a/docs/system/target-sparc.texi b/docs/system/target-sparc.texi
-index 7fe0aec9c3..7748001f73 100644
---- a/docs/system/target-sparc.texi
-+++ b/docs/system/target-sparc.texi
-@@ -1,6 +1,5 @@
- @node Sparc32 System emulator
- @section Sparc32 System emulator
--@cindex system emulation (Sparc32)
- 
- Use the executable @file{qemu-system-sparc} to simulate the following
- Sun4m architecture machines:
-diff --git a/docs/system/target-sparc64.texi b/docs/system/target-sparc64.texi
-index 9e7a27de0c..4db4ca3842 100644
---- a/docs/system/target-sparc64.texi
-+++ b/docs/system/target-sparc64.texi
-@@ -1,6 +1,5 @@
- @node Sparc64 System emulator
- @section Sparc64 System emulator
--@cindex system emulation (Sparc64)
- 
- Use the executable @file{qemu-system-sparc64} to simulate a Sun4u
- (UltraSPARC PC-like machine), Sun4v (T1 PC-like machine), or generic
-diff --git a/docs/system/target-xtensa.texi b/docs/system/target-xtensa.texi
-index 08b0b36299..40327de6fa 100644
---- a/docs/system/target-xtensa.texi
-+++ b/docs/system/target-xtensa.texi
-@@ -1,6 +1,5 @@
- @node Xtensa System emulator
- @section Xtensa System emulator
--@cindex system emulation (Xtensa)
- 
- Two executables cover simulation of both Xtensa endian options,
- @file{qemu-system-xtensa} and @file{qemu-system-xtensaeb}.
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index d3e743719a..c2b9c87c64 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -62,17 +62,14 @@
- QEMU is a FAST! processor emulator using dynamic translation to
- achieve good emulation speed.
- 
--@cindex operating modes
- QEMU has two operating modes:
- 
- @itemize
--@cindex system emulation
- @item Full system emulation. In this mode, QEMU emulates a full system (for
- example a PC), including one or several processors and various
- peripherals. It can be used to launch different Operating Systems
- without rebooting the PC or to debug system code.
- 
--@cindex user mode emulation
- @item User mode emulation. In this mode, QEMU can launch
- processes compiled for one CPU on another CPU. It can be used to
- launch the Wine Windows API emulator (@url{https://www.winehq.org}) or
-@@ -127,7 +124,6 @@ accelerator is required to use more than one host CPU for emulation.
- 
- @node QEMU System emulator
- @chapter QEMU System emulator
--@cindex system emulation
- 
- @menu
- * pcsys_quickstart::   Quick start
-@@ -163,7 +159,6 @@ accelerator is required to use more than one host CPU for emulation.
- 
- @node QEMU System emulator targets
- @chapter QEMU System emulator targets
--@cindex system emulation (PC)
- 
- QEMU is a generic emulator and it emulates many machines. Most of the
- options are similar for all machines. Specific information about the
-@@ -200,46 +195,7 @@ various targets are mentioned in the following sections.
- 
- @node Index
- @appendix Index
+-@node CPU emulation
+-@section CPU emulation
+-
 -@menu
--* Concept Index::
--* Function Index::
--* Keystroke Index::
--* Program Index::
--* Data Type Index::
--* Variable Index::
+-* x86::     x86 and x86-64 emulation
+-* ARM::     ARM emulation
+-* MIPS::    MIPS emulation
+-* PPC::     PowerPC emulation
+-* SPARC::   Sparc32 and Sparc64 emulation
+-* Xtensa::  Xtensa emulation
 -@end menu
 -
--@node Concept Index
--@section Concept Index
--This is the main index. Should we combine all keywords in one index? TODO
--@printindex cp
+-@node x86
+-@subsection x86 and x86-64 emulation
+-
+-QEMU x86 target features:
+-
+-@itemize
+-
+-@item The virtual x86 CPU supports 16 bit and 32 bit addressing with segmentation.
+-LDT/GDT and IDT are emulated. VM86 mode is also supported to run
+-DOSEMU. There is some support for MMX/3DNow!, SSE, SSE2, SSE3, SSSE3,
+-and SSE4 as well as x86-64 SVM.
+-
+-@item Support of host page sizes bigger than 4KB in user mode emulation.
+-
+-@item QEMU can emulate itself on x86.
+-
+-@item An extensive Linux x86 CPU test program is included @file{tests/test-i386}.
+-It can be used to test other x86 virtual CPUs.
+-
+-@end itemize
+-
+-Current QEMU limitations:
+-
+-@itemize
+-
+-@item Limited x86-64 support.
+-
+-@item IPC syscalls are missing.
+-
+-@item The x86 segment limits and access rights are not tested at every
+-memory access (yet). Hopefully, very few OSes seem to rely on that for
+-normal use.
+-
+-@end itemize
+-
+-@node ARM
+-@subsection ARM emulation
+-
+-@itemize
+-
+-@item Full ARM 7 user emulation.
+-
+-@item NWFPE FPU support included in user Linux emulation.
+-
+-@item Can run most ARM Linux binaries.
+-
+-@end itemize
+-
+-@node MIPS
+-@subsection MIPS emulation
+-
+-@itemize
+-
+-@item The system emulation allows full MIPS32/MIPS64 Release 2 emulation,
+-including privileged instructions, FPU and MMU, in both little and big
+-endian modes.
+-
+-@item The Linux userland emulation can run many 32 bit MIPS Linux binaries.
+-
+-@end itemize
+-
+-Current QEMU limitations:
+-
+-@itemize
+-
+-@item Self-modifying code is not always handled correctly.
+-
+-@item 64 bit userland emulation is not implemented.
+-
+-@item The system emulation is not complete enough to run real firmware.
+-
+-@item The watchpoint debug facility is not implemented.
+-
+-@end itemize
+-
+-@node PPC
+-@subsection PowerPC emulation
+-
+-@itemize
+-
+-@item Full PowerPC 32 bit emulation, including privileged instructions,
+-FPU and MMU.
+-
+-@item Can run most PowerPC Linux binaries.
+-
+-@end itemize
+-
+-@node SPARC
+-@subsection Sparc32 and Sparc64 emulation
+-
+-@itemize
+-
+-@item Full SPARC V8 emulation, including privileged
+-instructions, FPU and MMU. SPARC V9 emulation includes most privileged
+-and VIS instructions, FPU and I/D MMU. Alignment is fully enforced.
+-
+-@item Can run most 32-bit SPARC Linux binaries, SPARC32PLUS Linux binaries and
+-some 64-bit SPARC Linux binaries.
+-
+-@end itemize
+-
+-Current QEMU limitations:
+-
+-@itemize
+-
+-@item IPC syscalls are missing.
+-
+-@item Floating point exception support is buggy.
+-
+-@item Atomic instructions are not correctly implemented.
+-
+-@item There are still some problems with Sparc64 emulators.
+-
+-@end itemize
+-
+-@node Xtensa
+-@subsection Xtensa emulation
+-
+-@itemize
+-
+-@item Core Xtensa ISA emulation, including most options: code density,
+-loop, extended L32R, 16- and 32-bit multiplication, 32-bit division,
+-MAC16, miscellaneous operations, boolean, FP coprocessor, coprocessor
+-context, debug, multiprocessor synchronization,
+-conditional store, exceptions, relocatable vectors, unaligned exception,
+-interrupts (including high priority and timer), hardware alignment,
+-region protection, region translation, MMU, windowed registers, thread
+-pointer, processor ID.
+-
+-@item Not implemented options: data/instruction cache (including cache
+-prefetch and locking), XLMI, processor interface. Also options not
+-covered by the core ISA (e.g. FLIX, wide branches) are not implemented.
+-
+-@item Can run most Xtensa Linux binaries.
+-
+-@item New core configuration that requires no additional instructions
+-may be created from overlay with minimal amount of hand-written code.
+-
+-@end itemize
+-
+ @node Managed start up options
+ @section Managed start up options
  
--@node Function Index
--@section Function Index
--This index could be used for command line options and monitor functions.
- @printindex fn
- 
--@node Keystroke Index
--@section Keystroke Index
--
--This is a list of all keystrokes which have a special function
--in system emulation.
--
--@printindex ky
--
--@node Program Index
--@section Program Index
--@printindex pg
--
--@node Data Type Index
--@section Data Type Index
--
--This index could be used for qdev device names and options.
--
--@printindex tp
--
--@node Variable Index
--@section Variable Index
--@printindex vr
--
- @bye
 -- 
 2.21.1
 
