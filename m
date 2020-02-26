@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01260C4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6761AC4BA13
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FEC20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30ABB20838
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 15:17:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eXQOGWxl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FEC20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MmTi0RvZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30ABB20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6yQU-0008Rz-0R
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:16:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43642)
+	id 1j6yRK-000116-D6
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 10:17:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j6yPn-0007ti-5k
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:16:00 -0500
+ (envelope-from <david@redhat.com>) id 1j6yQh-0000Or-0j
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:16:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j6yPl-0006Ux-Ij
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:15:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50769
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j6yQe-0007fE-W5
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:16:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43291
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6yPk-0006QD-To
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:15:57 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6yQe-0007dt-Rn
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 10:16:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582730155;
+ s=mimecast20190719; t=1582730212;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LhCPSKD7BKfiaQUkimB+1hza6DX1hiKwTtEeixITSG4=;
- b=eXQOGWxl5Vn+c/T2NnzfjvXuHy+IZuUjwi1CbxJREfv0l4wPIRCu5yVIJ5/qWnDaNru997
- hK1qylw67rm91AWxLpvI4Ih76ayp6hZlUv92RKjOdBE0VOldRL6ifoyg9BwpEuJlu3crH3
- gAeAClHo+/cUr0HLAbnQte5yaNh09KM=
+ bh=wNZghjPjcbrO5U04F0Q0hwfjNEYNNkcJ6SwPQX07H5M=;
+ b=MmTi0RvZr8s3EjIfpIry/2dhOg9XmHXuC0UFzhN5UbwsC+KT+B6ChXHJ/I5T/o4xEmhBip
+ m5ETfxXaXSXctdbZsPbkm0fjo+42i+qPAzi8E2qUUVYL+sA+Kz+TW3NdI9dGJcTltPI/6+
+ uvosTkwP+a+HB2YOCmOSAqal8xuBQTU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-PxP0qel-Osu_FRsw24VeJw-1; Wed, 26 Feb 2020 10:15:52 -0500
-X-MC-Unique: PxP0qel-Osu_FRsw24VeJw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-418-hHvYJqzrMBOKW_x28_G1Ag-1; Wed, 26 Feb 2020 10:16:47 -0500
+X-MC-Unique: hHvYJqzrMBOKW_x28_G1Ag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DED13801E53;
- Wed, 26 Feb 2020 15:15:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A2F413F9;
+ Wed, 26 Feb 2020 15:16:46 +0000 (UTC)
 Received: from [10.36.117.196] (ovpn-117-196.ams2.redhat.com [10.36.117.196])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25A715DA81;
- Wed, 26 Feb 2020 15:15:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 488AB5C297;
+ Wed, 26 Feb 2020 15:16:44 +0000 (UTC)
 Subject: Re: [PATCH v5 07/18] s390x: protvirt: Inhibit balloon when switching
  to protected mode
 To: Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -65,8 +65,7 @@ To: Christian Borntraeger <borntraeger@de.ibm.com>,
 References: <20200226122038.61481-1-frankja@linux.ibm.com>
  <20200226122038.61481-8-frankja@linux.ibm.com>
  <ed51d194-1b63-1c54-953a-d2031336a90e@redhat.com>
- <58a51f40-21c7-5737-4f4c-568fdd2477fa@linux.ibm.com>
- <83bb5d7e-8852-476c-db9d-e673a889773e@de.ibm.com>
+ <9e8c83c2-5d17-2887-4073-698c12c40e79@de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -112,21 +111,20 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <8634143d-146c-bf15-b084-8470db2e72a6@redhat.com>
-Date: Wed, 26 Feb 2020 16:15:48 +0100
+Message-ID: <53287b24-6cab-2110-226c-f10cef3c8eb0@redhat.com>
+Date: Wed, 26 Feb 2020 16:16:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <83bb5d7e-8852-476c-db9d-e673a889773e@de.ibm.com>
+In-Reply-To: <9e8c83c2-5d17-2887-4073-698c12c40e79@de.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,35 +141,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26.02.20 16:13, Christian Borntraeger wrote:
+On 26.02.20 16:06, Christian Borntraeger wrote:
 > 
 > 
-> On 26.02.20 16:11, Janosch Frank wrote:
->> On 2/26/20 3:59 PM, David Hildenbrand wrote:
->>> On 26.02.20 13:20, Janosch Frank wrote:
->>>> Ballooning in protected VMs can only be done when the guest shares the
->>>> pages it gives to the host. Hence, until we have a solution for this
->>>> in the guest kernel, we inhibit ballooning when switching into
->>>> protected mode and reverse that once we move out of it.
->>>
->>> I don't understand what you mean here, sorry. zapping a page will mean
->>> that a fresh one will be faulted in when accessed. And AFAIK, that means
->>> it will be encrypted again when needed.
+> On 26.02.20 15:59, David Hildenbrand wrote:
+>> On 26.02.20 13:20, Janosch Frank wrote:
+>>> Ballooning in protected VMs can only be done when the guest shares the
+>>> pages it gives to the host. Hence, until we have a solution for this
+>>> in the guest kernel, we inhibit ballooning when switching into
+>>> protected mode and reverse that once we move out of it.
 >>
->> Yes, as soon as the host alters non-shared memory we'll run into
->> integrity issues.
+>> I don't understand what you mean here, sorry. zapping a page will mean
+>> that a fresh one will be faulted in when accessed. And AFAIK, that means
+>> it will be encrypted again when needed.
 >>
->>
->> I've been talking to Halil after I sent this out and it looks like we'll
->> rather try to automatically enable the IOMMU for all devices when
->> switching into protected mode. He said that if the IOMMU is set the
->> balloon code will do an early exit on feature negotiation.
+>> Is that more like the UV will detect this as an integrity issue and
+>> crash the VM?
 > 
-> I think we should fence the balloon here nevertheless, so the patch in 
-> itself is probably fine.
+> yes, the UV will detect a fresh page as an integrity issue.
+> Only if the page was defined to be shared by the guest, we would avoid the
+> integrity check.
+> 
 
-+1, this is a global "don't use ram_block_discard" trigger.
+Please make that clearer in the patch description. With that
 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
 Thanks,
