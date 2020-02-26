@@ -2,84 +2,82 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63F8C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 918E0C4BA11
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:19:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3C8721556
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 604E92084E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:19:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyLY1H2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C8721556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JF6CCqdB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 604E92084E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6spk-0001Bl-Pb
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:18:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32906)
+	id 1j6srE-0004BS-Eh
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:19:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j6shn-0003IZ-Ht
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:10:16 -0500
+ (envelope-from <drjones@redhat.com>) id 1j6spM-0000qx-8v
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:18:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j6shm-0005mT-C8
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:10:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29807
+ (envelope-from <drjones@redhat.com>) id 1j6spL-0006UI-8o
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:18:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43982
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j6shm-0005lN-69
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:10:10 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j6spL-0006TV-5I
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:17:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582708209;
+ s=mimecast20190719; t=1582708678;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ArWvs5AjeOwO3WdWkI/UEiLVxN1Wdw2Khcv2oBM7ZxI=;
- b=LyLY1H2VMx4rVHfXV9gyQ77Q5WQFLAp/sRFqYp6G6hPRlWsnVoj0Kr4my0OPJvhqwuYM2Q
- Hc10sWr3LPWhm3Km9AHnJv4KoLxzHsbpe15o6kjxrNvPXj7kYMHBFW1sjWjnXIvwtyj1Gl
- tPG9iruGozC+4XgPlSn8Woh3rrfCCdE=
+ bh=v1x0zFotiGHLbWCwRHfYUDlZaAOKUXGwZLb+0Q8vy84=;
+ b=JF6CCqdBa2sK4taCAL4+2JzAz2IbpCJ/KMTcrcfByvgZtEWEZrdqqxzPHzyQK66SsvfIX0
+ U0acS5/TIaXAbdh/6EzuNEtScuHXHRxyvVyUd6VXjOd9mPnlPuQnFGAkJrt4NjOKMu5AL5
+ mJ/LNIvFHgkHNyVZyz4KboZdt9ydEXo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-Qpj8ktF9N_-r0okQfIM4wA-1; Wed, 26 Feb 2020 04:10:07 -0500
-X-MC-Unique: Qpj8ktF9N_-r0okQfIM4wA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-309-7X6ruzUtOTu3M7vwbEU89w-1; Wed, 26 Feb 2020 04:17:54 -0500
+X-MC-Unique: 7X6ruzUtOTu3M7vwbEU89w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E7F8800D48;
- Wed, 26 Feb 2020 09:10:07 +0000 (UTC)
-Received: from [10.72.13.217] (ovpn-13-217.pek2.redhat.com [10.72.13.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1F4C3100164D;
- Wed, 26 Feb 2020 09:09:58 +0000 (UTC)
-Subject: Re: [PATCH] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200226070647.8103-1-jasowang@redhat.com>
- <20200226020836-mutt-send-email-mst@kernel.org>
- <344493874.10686339.1582701636434.JavaMail.zimbra@redhat.com>
- <20200226030945-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2a4415ff-c4b8-3982-5ab2-f1729b9f951c@redhat.com>
-Date: Wed, 26 Feb 2020 17:09:54 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 864B8800D5A;
+ Wed, 26 Feb 2020 09:17:53 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83CE292971;
+ Wed, 26 Feb 2020 09:17:52 +0000 (UTC)
+Date: Wed, 26 Feb 2020 10:17:50 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] hw/intc/arm_gic_kvm: Don't assume kernel can provide a
+ GICv2
+Message-ID: <20200226091750.mqkbqffod247bori@kamzik.brq.redhat.com>
+References: <20200225182435.1131-1-peter.maydell@linaro.org>
+ <20200226085209.ni7oph6odt24warq@kamzik.brq.redhat.com>
+ <CAFEAcA-Bhuy+2dU3joZoip5=tOkiTSoC+LzdNzyd+urUnoRNXw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200226030945-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CAFEAcA-Bhuy+2dU3joZoip5=tOkiTSoC+LzdNzyd+urUnoRNXw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,90 +89,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, qemu-devel@nongnu.org
+Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/2/26 =E4=B8=8B=E5=8D=884:12, Michael S. Tsirkin wrote:
-> On Wed, Feb 26, 2020 at 02:20:36AM -0500, Jason Wang wrote:
->>
->> ----- Original Message -----
->>> On Wed, Feb 26, 2020 at 03:06:47PM +0800, Jason Wang wrote:
->>>> We turn on device IOTLB via VIRTIO_F_IOMMU_PLATFORM unconditionally on
->>>> platform without IOMMU support. This can lead unnecessary IOTLB
->>>> transactions which will damage the performance.
->>>>
->>>> Fixing this by check whether the device is backed by IOMMU and disable
->>>> device IOTLB.
->>>>
->>>> Reported-by: Halil Pasic <pasic@linux.ibm.com>
->>>> Fixes: c471ad0e9bd46 ("vhost_net: device IOTLB support")
->>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>>> ---
->>>>   hw/virtio/vhost.c | 12 +++++++++++-
->>>>   1 file changed, 11 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->>>> index 9edfadc81d..6e12c3d2de 100644
->>>> --- a/hw/virtio/vhost.c
->>>> +++ b/hw/virtio/vhost.c
->>>> @@ -290,7 +290,14 @@ static int vhost_dev_has_iommu(struct vhost_dev *=
-dev)
->>>>   {
->>>>       VirtIODevice *vdev =3D dev->vdev;
->>>>  =20
->>>> -    return virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
->>>> +    /*
->>>> +     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
->>>> +     * incremental memory mapping API via IOTLB API. For platform tha=
-t
->>>> +     * does not have IOMMU, there's no need to enable this feature
->>>> +     * which may cause unnecessary IOTLB miss/update trnasactions.
->>>> +     */
->>>> +    return vdev->dma_as !=3D &address_space_memory &&
->>>> +           virtio_has_feature(dev->acked_features,
->>>> VIRTIO_F_IOMMU_PLATFORM);
->>>>   }
->>>>  =20
->>>>   static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
->>> Why check acked_features and not host features here?
->>> I'd worry that if we do it like this, userspace driver
->>> within guest can clear the feature and make device access
->>> memory directly.
->> Right, host_features should be more than enough.
->>
->>>> @@ -765,6 +772,9 @@ static int vhost_dev_set_features(struct vhost_dev
->>>> *dev,
->>>>       if (enable_log) {
->>>>           features |=3D 0x1ULL << VHOST_F_LOG_ALL;
->>>>       }
->>>> +    if (dev->vdev->dma_as =3D=3D &address_space_memory) {
->>>> +        features &=3D ~(0x1ULL << VIRTIO_F_IOMMU_PLATFORM);
->>>> +    }
->>>
->>> That's a guest visible change. Which seems at best unnecessary.
->>>
->> I don't get how this can be visible from guest? It works as F_LOG_ALL.
->>
->> Thanks
-> Oh you are right.
-> So just call vhost_dev_has_iommu here too?
-
-
-That should work.
-
-Thanks
-
-
+On Wed, Feb 26, 2020 at 08:56:03AM +0000, Peter Maydell wrote:
+> On Wed, 26 Feb 2020 at 08:52, Andrew Jones <drjones@redhat.com> wrote:
+> > Although, many QEMU command line users still won't know what to do
+> > without an explicit "Try -machine gic-version=3Dhost" hint, so that
+> > might be nice to add too.
+>=20
+> In the GIC code we don't know if the machine even has a
+> gic-version property, so we're not in the right place to try to
+> produce that message.
 >
->>>>       r =3D dev->vhost_ops->vhost_set_features(dev, features);
->>>>       if (r < 0) {
->>>>           VHOST_OPS_DEBUG("vhost_set_features failed");
->>>> --
->>>> 2.19.1
->>>
->
+
+Ah yes, we use qdev_init_nofail() in virt::create_gic(), so there's
+no chance to append another hint at the machine level.
+
+And what about when machine.gic-version is not provided and KVM is
+in use? Shouldn't we try version '2', as we do now, but then also
+'3', if '2' fails, before erroring out?
+
+Thanks,
+drew
 
 
