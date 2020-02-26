@@ -2,91 +2,105 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF6B6C4BA13
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:29:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 419B7C4BA18
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:36:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD866222C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E4E2222C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:36:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OP8jekfQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD866222C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tiqOTesf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4E2222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j70UV-0001Ad-Uw
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:28:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48623)
+	id 1j70bQ-0004Qt-3K
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:36:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j70T4-00005P-1f
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:27:31 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1j70aZ-0003ii-KF
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:35:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j70T2-0007Lh-AK
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:27:29 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33881)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j70T2-0007Hk-3R; Wed, 26 Feb 2020 12:27:28 -0500
-Received: by mail-ot1-x342.google.com with SMTP id j16so200241otl.1;
- Wed, 26 Feb 2020 09:27:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=gh/bA6yZttar7PgigfbgFIZcmxdx9gMOad8dFJvHZIA=;
- b=OP8jekfQgAehngTv/aUbdRMuZ/m6ZmscXUjmu97ogkFdSr4/PXXeXJtK8atYNMPKkG
- 4MmDNsgGNk4/ITNmMd2ACdvGJPYQKKN+oqCpJaJ5EqaiB4qnx1/OMcfBdH80pp3EVxrl
- nOfrYO6oBbybKEwj9MGFSDfZSzpAB0CwPRi1xoPMZlcFNCHlVRVq/KB2kcd4wM2QSHaG
- qcjiGd9rCTJfIicNdpuG/so6uDNfxxYiwMQY/CliYYV1KGOJlVbejc13Rf17/0+jYRoP
- 72ATQ1hoLbqsAYqfBlviF7GjgOpYtVj71L5h5Vpfz+r5Ai7VHUrurORjJKHbi5ohk3r6
- f8Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=gh/bA6yZttar7PgigfbgFIZcmxdx9gMOad8dFJvHZIA=;
- b=rp3cGNajImuCQpJTsQdduNC8OcuoqO4j53ySmIzhBX4EM9fQgopOBtmEde8b92vIk1
- 7Nt7fndoYIJ3BbnCTdu7DvBmMJPL7r2LGYjWRQ0l919OnZCjnMXeS0sVEG+xxCcLXA5c
- xt4nA3Alo6EF8s9NVNVmaCfZo6G3GQbCz/Bv3TUQPWQQhn1wyHQr89+n3gPibAx4M7WF
- +SU1OJPPeeshDhFWUwh8Vzp/P0a9pB0tC2ejhz4uCVbzw942/Yzc4Fybv2MOKZctvsg9
- j7IoFvyW8Kp6aw2bhmX42fCBnAMEY7vs8Va3VLsIXEhtr57WUoSgebm7QIB0w0xcJjCE
- IPlw==
-X-Gm-Message-State: APjAAAX5OWThrtiRHBYqaSllf+Xzym0mFeVBAmH6AdlXiT0KS2T1k6vP
- jlnPh/wJReM0dfUNkT2tYfrYT9P/FJbHtntRykE=
-X-Google-Smtp-Source: APXvYqzNDrJhVfaBvsHZqhCeEO2ptJeDjBUUr91B8PCkLxjFSac4Hpc5F8U2kubWejLQ7G5xOdu/VjqzP7CBZu/lpZE=
-X-Received: by 2002:a05:6830:1e76:: with SMTP id
- m22mr4165239otr.295.1582738047038; 
- Wed, 26 Feb 2020 09:27:27 -0800 (PST)
+ (envelope-from <liam.merwick@oracle.com>) id 1j70aY-0003JA-1g
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:35:15 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:39616)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1j70aX-0003CU-OA
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:35:13 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01QHWZWW021726;
+ Wed, 26 Feb 2020 17:35:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=mime-version :
+ message-id : date : from : to : cc : subject : references : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=AF/orsysS17ScJjbrih4kRwJjVlS+7wHJ2giBLo5lw8=;
+ b=tiqOTesfF4UdBJnDooYOTM1C74+TzFh88oez3Mb56NCUAVWh0f+v8FFZIxmPOTKenLXB
+ EHd/Xhn4SJV5TpDYOEUDA49GIwsEq5woCLIOKdeNN0L52KsGwLRoewbHDUQlcVw1UC7k
+ OtZ2LIQpVom4ek0O6bAq77+famSNZp3PtBnGhERRPi/Mb1pCbS4FmIqm/o25B6Kq3bpi
+ wXDMa0mHLjr55Qss3Ap/7EdLfDrTDbi/R9QRYExECqWuV8/gOBy8gO4YCax/JQaRaeET
+ lWYrkym2zAwXD2x7uApmU1UOzXWecJWwUyZh/0i1XcmhIWtGvkbIZaXxqEk/uu5a+aqA UA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 2ydct3583d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Feb 2020 17:35:09 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01QHWgw5065880;
+ Wed, 26 Feb 2020 17:35:09 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 2ydcsa9umu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Feb 2020 17:35:09 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01QHZ77M014049;
+ Wed, 26 Feb 2020 17:35:08 GMT
+Received: from [10.175.167.101] (/10.175.167.101) by default (Oracle Beehive
+ Gateway v4.0) with ESMTP ; Wed, 26 Feb 2020 09:34:58 -0800
+USER-AGENT: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+Content-Language: en-US
 MIME-Version: 1.0
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87eeuhxw0y.fsf@linaro.org>
- <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
- <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
-In-Reply-To: <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 26 Feb 2020 18:27:16 +0100
-Message-ID: <CAL1e-=hhhw4x4H24DWg6pTp9DmjyfwM6GFMOmWasKC66x5tR4Q@mail.gmail.com>
-Subject: Re: R: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: G 3 <programmingkidx@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <92dac8fb-87ae-d1a9-8bcf-5c39c8479816@oracle.com>
+Date: Wed, 26 Feb 2020 09:34:55 -0800 (PST)
+From: Liam Merwick <liam.merwick@oracle.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, Denis
+ Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 09/29] tests/acceptance: Use 'machine' tag to check if
+ available in QEMU binary
+References: <20200129212345.20547-1-philmd@redhat.com>
+ <20200129212345.20547-10-philmd@redhat.com>
+ <e1100e02-33aa-02a4-c59b-ad04f214972a@oracle.com>
+In-Reply-To: <e1100e02-33aa-02a4-c59b-ad04f214972a@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ phishscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=4 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002260115
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 suspectscore=4 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002260115
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2120.oracle.com id
+ 01QHWZWW021726
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,131 +112,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
- Dino Papararo <skizzato73@msn.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 26, 2020 at 6:04 PM G 3 <programmingkidx@gmail.com> wrote:
->
-> Accuracy is an important part of the IEEE 754 floating point standard. Th=
-e whole purpose of this standard is to ensure floating point calculations a=
-re consistent across multiple CPUs. I believe referring to this patch as in=
-accurate is itself inaccurate. That gives the impression that this patch pr=
-oduces calculations that are not inline with established standards. This is=
- not true. The only part of this patch that will produce incorrect values a=
-re the flags. There *may* be a program or two out there that depend on thes=
-e flags, but for the majority of programs that only care about basic floati=
-ng point arithmetic this patch will produce correct values. Currently the e=
-mulated PowerPC's FPU already produces wrong values for the flags. This pat=
-ch does set the Inexact flag (which I don't like), but since I have never e=
-ncountered any source code that cares for this flag, I can let it go. I thi=
-nk giving the user the ability to decide which option to use is the best th=
-ing to do.
->
+On 06/02/2020 18:17, Liam Merwick wrote:
+> On 29/01/2020 21:23, Philippe Mathieu-Daud=C3=A9 wrote:
+>> We already use the 'machine' tag in Avocado tests.
+>> If the requested machine is not available in the QEMU binary,
+>> the tests will be cancelled (skipped):
+>>
+>> =C2=A0=C2=A0 $ python -m avocado --show=3Dapp run=20
+>> tests/acceptance/x86_cpu_model_versions.py
+>> =C2=A0=C2=A0=C2=A0 ...
+>> =C2=A0=C2=A0=C2=A0 (04/11) CascadelakeArchCapabilities.test_4_1: CANCE=
+L: Test expects=20
+>> machine 'pc-i440fx-4.1' which is missing from QEMU binary (0.10 s)
+>> =C2=A0=C2=A0=C2=A0 (05/11) CascadelakeArchCapabilities.test_4_0: CANCE=
+L: Test expects=20
+>> machine 'pc-i440fx-4.0' which is missing from QEMU binary (0.11 s)
+>> =C2=A0=C2=A0=C2=A0 ...
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 13 ++++++++++---
+>> =C2=A0 1 file changed, 10 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/tests/acceptance/avocado_qemu/__init__.py=20
+>> b/tests/acceptance/avocado_qemu/__init__.py
+>> index e7d5affe24..53ec8512d1 100644
+>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D=20
+>> os.path.join(os.path.dirname(__file__), '..', '..', '..')
+>> =C2=A0 sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+>> =C2=A0 from qemu.binutils import binary_get_arch
+>> +from qemu.binutils import binary_get_machines
+>> =C2=A0 from qemu.binutils import binary_get_version
+>> =C2=A0 from qemu.machine import QEMUMachine
+>> @@ -118,9 +119,6 @@ class Test(avocado.Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.arch =3D s=
+elf.params.get('arch',
+>>                                      =20
+>> default=3Dself._get_unique_tag_val('arch'))
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.machine =3D self.para=
+ms.get('machine',
+>> -                                      =20
+>> default=3Dself._get_unique_tag_val('machine'))
+>> -
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Verify qemu_b=
+in
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default_qemu_bi=
+n =3D pick_default_qemu_bin(arch=3Dself.arch)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.qemu_bin =3D=
+ self.params.get('qemu_bin',
+>> @@ -151,6 +149,15 @@ class Test(avocado.Test):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 if bin_arch !=3D self.arch:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.cancel(fmt.format(self.arch, bin_arch=
+))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Verify machine
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.machine =3D self.para=
+ms.get('machine',
+>> +                                      =20
+>> default=3Dself._get_unique_tag_val('machine'))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 logger.debug('machine: {}'=
+.format(self.machine))
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.machine:
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fm=
+t =3D "Test expects machine '{}' which is missing from=20
+>> QEMU binary"
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
+ self.machine not in binary_get_machines(self.qemu_bin):
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 self.cancel(fmt.format(self.machine))
+>> +
+>=20
+> Starting with this patch:
+>=20
+> $ avocado run --filter-by-tags arch:x86_64 tests/acceptance
+> ...
+> /boot_linux_console.py:BootLinuxConsole.test_x86_64_pc: CANCEL: Test=20
+> expects machine 'pc' which is missing from QEMU binary (0.05 s)
+> ...
+>=20
+> $ x86_64-softmmu/qemu-system-x86_64 -machine help
+> Supported machines are:
+> microvm=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 microvm (i386)
+> pc=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Standard PC (i440FX + PIIX, 1996)=
+ (alias of=20
+> pc-i440fx-5.0)
+> ...
+>=20
+> but checking via QMP, 'pc' (and 'q35') is listed as 'alias'
+> ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ho=
+tpluggable-cpus": true,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "na=
+me": "pc-i440fx-5.0",
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "nu=
+ma-mem-supported": true,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "de=
+fault-cpu-type": "qemu64-x86_64-cpu",
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "is=
+-default": true,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "cp=
+u-max": 255,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "de=
+precated": false,
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "al=
+ias": "pc"
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
+> ...
+>=20
+> Does 'alias' need to be checked by binary_get_machines() in Patch8 as=20
+> well as 'name'?
+>=20
 
-From the experiments described above, the patch in question changes the beh=
-avior
-of applications (for example, sound is different with and without the
-patch), which is
-in contradiction with your claim that you "never encountered any
-source code that
-cares for this flag" and that "the only part of this patch that will
-produce incorrect
-values are the flags".
+When I made this change (I'm sure there is a more Pythonesque way)
 
-In other words, and playing further with them:
-
-The claim that "referring to this patch as inaccurate is itself
-inaccurate" is itself inaccurate.
-
-Best regards,
-Aleksandar
+--- a/python/qemu/binutils.py
++++ b/python/qemu/binutils.py
+@@ -65,7 +65,12 @@ def binary_get_machines(qemu_bin):
+          res =3D vm.command('query-machines')
+          LOG.info(res)
+          vm.shutdown()
+-        return [m['name'] for m in res]
++        d =3D []
++        for m in res:
++            d +=3D [m['name']]
++            if 'alias' in m:
++                d +=3D [m['alias']]
++        return d
 
 
-> On Wed, Feb 26, 2020 at 10:51 AM Aleksandar Markovic <aleksandar.m.mail@g=
-mail.com> wrote:
->>
->>
->>
->> On Wed, Feb 26, 2020 at 3:29 PM Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->> >
->> >
->> > Dino Papararo <skizzato73@msn.com> writes:
->> >
->> > > Please let's go with hardfloat pps support, it's really a good featu=
-re to implement.
->> > > Even if in a first step it could lead to inaccuracy results, later i=
-t
->> > > could solved with other patches.
->> >
->> > That's the wrong way around. We have regression tests for a reason.
->>
->> I tend to agree with Alex here, and additionally want to expand more on
->> this topic.
->>
->> In my view: (that I think is at least very close to the community consen=
-sus)
->>
->> This is *not* a ppc-specific issue. There exist a principle across all t=
-argets
->> that QEMU FPU calculation must be accurate - exactly as specified in any
->> applicable particular ISA document. Any discrepancy is an outright bug.
->>
->> We even recently had several patches for FPU in ppc target that handled
->> some fairly obscure cases of inaccuracies, I believe they were authored
->> by Paul Clarke, so there are people in ppc community that care about
->> FPU accuracy (as I guess is the case for any target).
->>
->> There shouldn't be a target that decides by itself and within itself
->> "ok, we don't need accuracy, let's trade it for speed". This violates
->> the architecture of QEMU. Please allow that for any given software
->> project, there is an architecture that should be respected.
->>
->> This doesn't mean that anybody's experimentation is discouraged. No-one
->> can stop anybody from forking from QEMU upstream tree and do whatever
->> is wanted.
->>
->> But, this doesn't mean such experimentation will be upstreamed. QEMU
->> upstream should be collecting place for the best ideas and implementatio=
-ns,
->> not for arbitrary experimentations.
->>
->> Best regards,
->> Aleksandar
->>
->>
->> > I'll happily accept patches to turn on hardfloat for PPC if:
->> >
->> >  a) they don't cause regressions in our fairly extensive floating poin=
-t
->> >  tests
->> >  b) the PPC maintainers are happy with the new performance profile
->> >
->> > The way forward would be to:
->> >
->> >  1. patch to drop #if defined(TARGET_PPC) || defined(__FAST_MATH__)
->> >  2. audit target/ppc/fpu_helper.c w.r.t chip manual and fix any unneed=
-ed
->> >  splatting of flags (if any)
->> >  3. measure the before/after performance effect and decide if on balan=
-ce
->> >  it's worth keeping
->> >
->> > > I think it's important for qemu to as global as possible and don't
->> > > target only recent hardware.
->> >
->> > Are you referring to guests or hosts? For guests we will always favour
->> > accuracy of speed of emulation. For hosts we need to have IEEE complia=
-nt
->> > FPU HW to even stand a chance of using hardfloat.
->> >
->> > --
->> > Alex Benn=C3=A9e
->> >
+
+I can then use binary_get_machines() in my PVH acceptance test patches.
+
+@@ -72,11 +74,16 @@ class BootLinuxConsole(Test):
+          os.chdir(cwd)
+          return os.path.normpath(os.path.join(self.workdir, path))
+
+-    def test_x86_64_pc(self):
++    def do_test_x86_64_machine(self):
+          """
+-        :avocado: tags=3Darch:x86_64
+-        :avocado: tags=3Dmachine:pc
++        Common routine to boot an x86_64 guest.
++        Caller must specify tags=3Darch and tags=3Dmachine
+          """
++
++        if self.machine not in binary_get_machines(self.qemu_bin):
++            raise TestCancel('QEMU binary %s does not support machine=20
+class %s'
++                             % (self.qemu_bin, self.machine))
++
+
+otherwise I was getting
+
+  (1/7)=20
+tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:=20
+CANCEL: Test expects machine 'pc' which is missing from QEMU binary (0.03=
+ s)
+
+Regards,
+Liam
 
