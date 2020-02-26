@@ -2,144 +2,91 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6B1C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 794A2C4BA10
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:14:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 341FF2467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:09:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341FF2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4530C2467B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:14:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TiU4WHtD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4530C2467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xMz-0007WQ-CR
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:09:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35411)
+	id 1j6xRz-0001dr-Gi
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:14:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38087)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j6xMQ-00074g-An
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:27 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j6xR9-00012F-7r
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j6xMP-0006WW-5P
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4452
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j6xMO-0006Vi-VV
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:08:25 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QE4RcL025630
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:08:24 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydqfup2ak-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:08:24 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 26 Feb 2020 14:08:22 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 26 Feb 2020 14:08:19 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 01QE8IbM31719700
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 14:08:18 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 126F2AE056;
- Wed, 26 Feb 2020 14:08:18 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D815CAE059;
- Wed, 26 Feb 2020 14:08:17 +0000 (GMT)
-Received: from dyn-9-152-224-212.boeblingen.de.ibm.com (unknown
- [9.152.224.212])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 14:08:17 +0000 (GMT)
-Subject: Re: [PATCH v5 05/18] s390x: protvirt: Add migration blocker
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200226122038.61481-6-frankja@linux.ibm.com>
- <a2aeac24-ae5e-7949-5174-a98fbe8e9b17@de.ibm.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Wed, 26 Feb 2020 15:08:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <alex.bennee@linaro.org>) id 1j6xR5-0000nv-Kn
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:18 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50261)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j6xR5-0000kO-Bj
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:13:15 -0500
+Received: by mail-wm1-x344.google.com with SMTP id a5so3243990wmb.0
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 06:13:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=q/vX08qXyPKR9hdS5IWeoNkVAVG21O2AzKW+3FKHvgQ=;
+ b=TiU4WHtDsl1xt0Aoh2AIG3tFoC+2QPPcrxOsxdzf2euK6AOM2PX7tKKzkFqq8cHMsw
+ 8wZa0YTOfHx/Agu62/qcFYi22kj4mNDUFknxVVKa9i7KQBoKA1B2dHw14ke3P4i4hTqR
+ lJlDZoQcj/sZdGju91ESbJ8TIGHeStMI8ojd7iwg3WmJvwbopNHpUtL+BQrhUSc7G5Xm
+ IsuxbAXviAgGjFLs+eDNsOIzoSxJClFsBcbYY3aoXPglyzneyAHQYlyFDwAP3rEhtdT6
+ j59xl5av41NJThsMbtMlQ5hNkwgDNt+/lOhHtLZdBu/nAZa4iIwzJ1kp0iuzNWi1Wb7b
+ 8Bvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=q/vX08qXyPKR9hdS5IWeoNkVAVG21O2AzKW+3FKHvgQ=;
+ b=rq+6t915AhOLql9N6x8KbBRErQQ60n2nTSi5vBMxqzWgigSXNrBnX2xkgYlODtx2wh
+ jbNrnPFvKXTm/Zp9cJQUHgKfFp5oxSo3bXeWUdaaSeQS18Ik9lMRIDBHOhRba1tMciRG
+ x9/pno/RIUoFgwViN6KZKy98TEqgup9973BoM8NL5oSOKIEk2B75s2d1CeKq18jKQrtD
+ vUmOG4bFL+NFKD7a+BZUvynUdoDY0IGboDoj+ceNJAvVioVLKgepp2Gt2blUjIPU1TIj
+ QbamzcOquqDVjcde15STyC/WfRw92EKCIWh39ss9s0OztoBTU79SdVcQo1c+0jvRQ1xa
+ Y4PA==
+X-Gm-Message-State: APjAAAUmk3Gu3kxdT1f4rcQe8x6Os3bwoSkNTiGFigbgdZ/IW/8unarR
+ JvSKIJ8bDtAgcHJrLJoSYKiLww==
+X-Google-Smtp-Source: APXvYqz3MlqwpEBnPvIDlYL1K1FGtjNMBfkS3ZZQLVgXwq23GbNGVaKvPW/OgNmiAubEfffrSKwaZA==
+X-Received: by 2002:a05:600c:290e:: with SMTP id
+ i14mr5691745wmd.24.1582726393543; 
+ Wed, 26 Feb 2020 06:13:13 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id e8sm3421973wrr.69.2020.02.26.06.13.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 06:13:12 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 751801FF87;
+ Wed, 26 Feb 2020 14:13:11 +0000 (GMT)
+References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
+ <20200226101948.786be4b0@redhat.com>
+ <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
+User-agent: mu4e 1.3.8; emacs 27.0.60
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Sudden slowdown of ARM emulation in master
+In-reply-to: <CAFEAcA80K+h-nkiHrh15mmgomBaqDpdhRwb34zwKqF31dp3KDw@mail.gmail.com>
+Date: Wed, 26 Feb 2020 14:13:11 +0000
+Message-ID: <87k149xwqw.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <a2aeac24-ae5e-7949-5174-a98fbe8e9b17@de.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl"
-X-TM-AS-GCONF: 00
-x-cbid: 20022614-0028-0000-0000-000003DE3081
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022614-0029-0000-0000-000024A34C88
-Message-Id: <16b8205e-6e90-fb36-5687-3e41d4011739@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-26_04:2020-02-26,
- 2020-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 clxscore=1015
- malwarescore=0 suspectscore=3 priorityscore=1501 phishscore=0 adultscore=0
- bulkscore=0 impostorscore=0 lowpriorityscore=0 mlxlogscore=973 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002260105
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,94 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
+Cc: Howard Spoelstra <hsp.cat7@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl
-Content-Type: multipart/mixed; boundary="pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM"
 
---pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 2/26/20 3:05 PM, Christian Borntraeger wrote:
->=20
->=20
-> On 26.02.20 13:20, Janosch Frank wrote:
->> Migration is not yet supported.
+> On Wed, 26 Feb 2020 at 09:19, Igor Mammedov <imammedo@redhat.com> wrote:
 >>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 28 ++++++++++++++++++++++------
->>  1 file changed, 22 insertions(+), 6 deletions(-)
+>> On Wed, 26 Feb 2020 00:07:55 +0100
+>> Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
 >>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index e506dd65ed..79f472c309 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -42,6 +42,9 @@
->>  #include "hw/s390x/tod.h"
->>  #include "sysemu/sysemu.h"
->>  #include "hw/s390x/pv.h"
->> +#include "migration/blocker.h"
->> +
->> +static Error *pv_mig_blocker;
->> =20
->>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>  {
->> @@ -325,18 +328,30 @@ static void s390_machine_unprotect(S390CcwMachin=
-eState *ms)
->>  {
->>      CPUState *t;
->> =20
->> -    s390_pv_vm_disable();
->> -    CPU_FOREACH(t) {
->> -        S390_CPU(t)->env.pv =3D false;
->> +    if (ms->pv) {
->> +        s390_pv_vm_disable();
->> +        CPU_FOREACH(t) {
->> +            S390_CPU(t)->env.pv =3D false;
->> +        }
->> +        ms->pv =3D false;
+>> > Hello Igor and Paolo,
+>>
+>> does following hack solves issue?
+>>
+>> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+>> index a08ab11f65..ab2448c5aa 100644
+>> --- a/accel/tcg/translate-all.c
+>> +++ b/accel/tcg/translate-all.c
+>> @@ -944,7 +944,7 @@ static inline size_t size_code_gen_buffer(size_t tb_=
+size)
+>>          /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
+>>             static buffer, we could size this on RESERVED_VA, on the text
+>>             segment size of the executable, or continue to use the defau=
+lt.  */
+>> -        tb_size =3D (unsigned long)(ram_size / 4);
+>> +        tb_size =3D MAX_CODE_GEN_BUFFER_SIZE;
+>>  #endif
 >>      }
->> -    ms->pv =3D false;
->>  }
->=20
-> Shouldnt that hunk go into the previous patch?
->=20
->=20
+>>      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
+>
+> Cc'ing Richard to ask: does it still make sense for TCG
+> to pick a codegen buffer size based on the guest RAM size?
 
-Yes, something went wrong
+Arguably you would never get more than ram_size * tcg gen overhead of
+active TBs at any one point although you can come up with pathological
+patterns where only a subset of pages are flushed in and out at a time.
+
+However the backing for the code is mmap'ed anyway so surely the kernel
+can work out the kinks here. We will never allocate more than the code
+generator can generate jumps for anyway.
+
+Looking at the SoftMMU version of alloc_code_gen_buffer it looks like
+everything now falls under the:
+
+  # if defined(__PIE__) || defined(__PIC__)
+
+leg so there is a bunch of code to be deleted there. The remaining
+question is what to do for linux-user because there is a bit more logic
+to deal with some corner cases on the static code generation buffer.
+
+I'd be tempted to rename DEFAULT_CODE_GEN_BUFFER_SIZE to
+SMALL_CODE_GEN_BUFFER_SIZE and only bother with a static allocation for
+32 bit linux-user hosts. Otherwise why not default to
+MAX_CODE_GEN_BUFFER_SIZE on 64 bit systems and let the kernel deal with
+it?
+
+> (We should fix the regression anyway, but it surprised me
+> slightly to find a config detail of the guest machine being
+> used here.)
+>
+> thanks
+> -- PMM
 
 
---pCxGBI3TjoqrsMB2z0QaD8Zp9yhBCGZyM--
-
---kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl5We9EACgkQ41TmuOI4
-ufiOgg/+JKWPkprs/85R8lFrhFR/szvFQx1kDfAPN9qVTH+bFOd3jOlRZdzH88Vj
-QxevUIVtIqiiqS0zWzSPM7yHhOOqNP6QRmI8u+/gSL3jhHilzS14VxNDQW7AWeR1
-pB19ShmfDWEU0GSOnNRlCqxxVw8zAgNdU3L/qb7u7IwQ0SCCffEmOdS5DtGlw89f
-5vIKFu06PFSM0o5TF+NIjXTG+7Ws/9POV0KfU1lsvhp0OuUeugIl0q8p29f3M80h
-h3OUoaL2CcmhFClwg0X7KOVZZxmR6z0DzbUZit8SrBxipWTSMi2zlhsO7zPSNYNF
-gr2zaFtbmvn74ay161QNwWZ6g5w0KOuQHXbf9uEG5pWgEGpZJ59baw9Je+VZFAh3
-7Z9C4IkRjedFahrkSAC9I9FwC9aYBN5rchfrLGTpeu3PmxLCfZsm6yU8dXFrcqja
-Z9CNKQQW3xnI4BG7qX0aYNaOTk+6J/4tS9qUE6yfmpmEXbZtKjifIpsEyVwh6qS1
-Q2E1jWTePd5TqsSdT0DKiHQkuCB3Of+aJiXJp3SVvSD2CNRWhPs8WGLnXp0o+1ES
-3KElFW+zskJ61UMO2sP7zEYF3/RbWR7EDIWmVH1mRCS4p/K8YoHaRNiELr8w/GuZ
-nPm97Hvl/aF7V35ip7nFEbxcO/lkoJiWFuPmg3RmZjYJ7Dx3CVA=
-=QPnQ
------END PGP SIGNATURE-----
-
---kSK9IiHPK2lbi4399WkWkIfIdxYa8FIcl--
-
+--=20
+Alex Benn=C3=A9e
 
