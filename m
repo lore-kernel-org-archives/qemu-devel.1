@@ -2,83 +2,79 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9920C4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C924C4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:55:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A501620714
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BA9820714
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 08:55:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A4Mo+m1i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A501620714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QjO4vTvV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BA9820714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6sTP-0005b7-R2
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:55:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45450)
+	id 1j6sTl-00061t-HZ
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 03:55:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j6sN0-0001jF-3g
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:48:47 -0500
+ (envelope-from <drjones@redhat.com>) id 1j6sQY-0000U8-Sr
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j6sMx-0001JL-SM
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:48:40 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35804)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j6sMx-00018H-Jq
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:48:39 -0500
-Received: by mail-oi1-x241.google.com with SMTP id b18so2288436oie.2
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 00:48:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=eHyZ+8Q0+T5PivPPaUzlhP1rP9BE4DHA1R8J+gyOeec=;
- b=A4Mo+m1inQCWtXXTb13EdfkhYo64odxSCmsFdnA1h3ymI0RFKiFWBI17mp5Zd4FgO5
- iZM4N3tO5Ssg/1uCBRxEbvQSJkmYDtBFZbgAi7fYsbZxD+JzLwiGIVh67mN3qHr1W1fa
- 2aA81dgDhOqSiS8/0v/0+t719AhLpXTofM7MGwpkDbLFa/ciCe2ZE2kp/HuwIDMvkhhO
- VvnyoeFa1WsdJYzN4ggq0vRvqI98exQxlFgj56Sk6HUCNg7QKJ1U7RNyu6i2V+OU23YN
- TDeHIH0EyWcCx0rbm2+IZzsriHtvz5Co9DHVdphglVLz9RXno3QEb2nITtkQJG6T8XXX
- sNQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=eHyZ+8Q0+T5PivPPaUzlhP1rP9BE4DHA1R8J+gyOeec=;
- b=Ev5xXwKPMNvLb6sH0gvLT8Yrmew2JCt1VSfQDLsAlSw2kG1rDDkaNxXvXwSDeiJIP0
- 8s8QWT2zCbOHNcG6bH7rDzevdvIUTF4JZnWo0lyWs76mxBM9WYOt9SV/lZloJ4Hg8yC+
- Cx0O76ICZMvj6e66qwpHyeQgl31EwUc6Tgmomrp2pXN/juFYxXeYmCSCAa1QRvayPBoS
- qmnrIwnLDdEG9YHsRAbKKKg6nyjcBtiOjmbxz+3PPIY+VnSrnEFu1qhcTOzb3o/002NB
- ltW9W/J5GzvVvhnIWqZoaYUBJdtVQMJNtTZSBmmzxjnoOMCaC1vf6uhlQwCqQMfTjDD9
- hFNA==
-X-Gm-Message-State: APjAAAWdArx7L9pkHBRc/eLy1Xt9p4vGE38P2fYoPHstFr4LusXqeppR
- W4XSZc6cNnkFjtrKwgEYHcFGRUDl5TOsAoT2Qd7h+A==
-X-Google-Smtp-Source: APXvYqygc8M579zHaRXI6AHr9qpTz7uXwSazma0BBFUyX5jNfDr3FBQNIgwzVXI+dEERoRTPqDIaBwAu8demOAfZ2ZU=
-X-Received: by 2002:a05:6808:3b2:: with SMTP id
- n18mr2124442oie.146.1582706917559; 
- Wed, 26 Feb 2020 00:48:37 -0800 (PST)
+ (envelope-from <drjones@redhat.com>) id 1j6sQW-0002bb-Qh
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:22 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27475
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1j6sQV-0002YU-7y
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 03:52:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582707138;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hE4ZjRT/EAvraI4ba6NiJZ5S8Rj+vZgtarqZfFcS7MI=;
+ b=QjO4vTvVtublM3d5BvdbgaJp9PzS2qbLW/90b6YIdlCVQGuxhqhiVnNyY5pp61dQXRVVmV
+ HcZgq/7IybY86WZycfXLNLMh5jh00WTqfifUJzPpHc001nAykXFyH9PX9/7YafhjyfMm+y
+ TPnPYqHpjF9r61z0LieIQqrfoFcBOFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-01hASuuXPzS3OT3k3-Huig-1; Wed, 26 Feb 2020 03:52:14 -0500
+X-MC-Unique: 01hASuuXPzS3OT3k3-Huig-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 445108018A2;
+ Wed, 26 Feb 2020 08:52:13 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4141419C58;
+ Wed, 26 Feb 2020 08:52:12 +0000 (UTC)
+Date: Wed, 26 Feb 2020 09:52:09 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] hw/intc/arm_gic_kvm: Don't assume kernel can provide a
+ GICv2
+Message-ID: <20200226085209.ni7oph6odt24warq@kamzik.brq.redhat.com>
+References: <20200225182435.1131-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-References: <CAPan3Wq-MVwcJQELP8n+g33CR7tsiGXQ698gA177nd2my9hWCw@mail.gmail.com>
- <CAFEAcA_azGqyzbxegpK8ch_bums6Wtd=U7cNxvM=bAJ-Ld2DDA@mail.gmail.com>
- <ffa87cab-e85c-c381-289a-fdf1ef07b45a@redhat.com>
-In-Reply-To: <ffa87cab-e85c-c381-289a-fdf1ef07b45a@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Feb 2020 08:48:26 +0000
-Message-ID: <CAFEAcA-32ddJW0ULWzGDDwLcvPGnXOatRHy73Agh0NRajfnRCQ@mail.gmail.com>
-Subject: Re: Sudden slowdown of ARM emulation in master
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200225182435.1131-1-peter.maydell@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,49 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Feb 2020 at 08:44, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Tue, Feb 25, 2020 at 06:24:35PM +0000, Peter Maydell wrote:
+> In our KVM GICv2 realize function, we try to cope with old kernels
+> that don't provide the device control API (KVM_CAP_DEVICE_CTRL): we
+> try to use the device control, and if that fails we fall back to
+> assuming that the kernel has the old style KVM_CREATE_IRQCHIP and
+> that it will provide a GICv2.
+>=20
+> This doesn't cater for the possibility of a kernel and hardware which
+> only provide a GICv3, which is very common now.  On that setup we
+> will abort() later on in kvm_arm_pmu_set_irq() when we try to wire up
+> an interrupt to the GIC we failed to create:
+>=20
+> qemu-system-aarch64: PMU: KVM_SET_DEVICE_ATTR: Invalid argument
+> qemu-system-aarch64: failed to set irq for PMU
+> Aborted
+>=20
+> If the kernel advertises KVM_CAP_DEVICE_CTRL we should trust it if it
+> says it can't create a GICv2, rather than assuming it has one.  We
+> can then produce a more helpful error message including a hint about
+> the most probable reason for the failure.
+>=20
+> If the kernel doesn't advertise KVM_CAP_DEVICE_CTRL then it is truly
+> ancient by this point but we might as well still fall back to a
+> KVM_CREATE_IRQCHIP GICv2.
+>=20
+> With this patch then the user misconfiguration which previously
+> caused an abort now prints:
+> qemu-system-aarch64: Initialization of device kvm-arm-gic failed: error c=
+reating in-kernel VGIC: No such device
+> Perhaps the host CPU does not support GICv2?
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I spent a while wondering if the PMU code was broken before Marc
+> put me on the right track about what was going wrong (ie that
+> I hadn't put "-machine gic-version=3Dhost" on the commandline).
+>=20
+>  hw/intc/arm_gic_kvm.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+> index 9deb15e7e69..d7df423a7a3 100644
+> --- a/hw/intc/arm_gic_kvm.c
+> +++ b/hw/intc/arm_gic_kvm.c
+> @@ -551,7 +551,16 @@ static void kvm_arm_gic_realize(DeviceState *dev, Er=
+ror **errp)
+>                                KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true,
+>                                &error_abort);
+>          }
+> +    } else if (kvm_check_extension(kvm_state, KVM_CAP_DEVICE_CTRL)) {
+> +        error_setg_errno(errp, -ret, "error creating in-kernel VGIC");
+> +        error_append_hint(errp,
+> +                          "Perhaps the host CPU does not support GICv2?\=
+n");
+>      } else if (ret !=3D -ENODEV && ret !=3D -ENOTSUP) {
+> +        /*
+> +         * Very ancient kernel without KVM_CAP_DEVICE_CTRL: assume that
+> +         * ENODEV or ENOTSUP mean "can't create GICv2 with KVM_CREATE_DE=
+VICE",
+> +         * and that we will get a GICv2 via KVM_CREATE_IRQCHIP.
+> +         */
+>          error_setg_errno(errp, -ret, "error creating in-kernel VGIC");
+>          return;
+>      }
+> --=20
+> 2.20.1
+>=20
 >
-> On 2/26/20 9:41 AM, Peter Maydell wrote:
-> > On Tue, 25 Feb 2020 at 23:08, Niek Linnenbank <nieklinnenbank@gmail.com=
-> wrote:
-> >
-> >> Just now I was working on some small fixes for the cubieboard machine =
-and rebasing my Allwinner H3 branches.
-> >> While doing some testing, I noticed that suddenly the machines were mu=
-ch slower than before.
-> >> I only see this happening when I rebase to this commit:
-> >>     ca6155c0f2bd39b4b4162533be401c98bd960820 ("Merge tag 'patchew/2020=
-0219160953.13771-1-imammedo@redhat.com' of https://github.com/patchew-proje=
-ct/qemu into HEAD")
-> >
-> > Yeah, I noticed a slowdown yesterday as well, but haven't tracked it do=
-wn
-> > as yet. The first thing would be to do a git bisect to try to narrow
-> > down what commit caused it.
->
-> My guess: biggest chunk of memory is the DRAM, registered as "fast RAM"
-> by QEMU, but the SoCs provide SRAM which is supposed to be faster. Not
-> anymore with QEMU. And Linux try to use the SRAM when possible.
 
-Doesn't sound very likely to me: generally Linux doesn't use random small
-lumps of SRAM, it just goes for whatever the dtb says is the main RAM,
-usually DRAM. And I thought that all RAM blocks within QEMU performed
-the same?
+This is nice, as some QEMU command line users may now be able to more
+easily correct their command lines. So,
 
-From the commit that Howard tracked down as the cause it looks like
-an ordering-of-actions issue in vl.c where something that was assuming
-memory-size-related stuff was set up is now running before those
-variables/fields are set correctly rather than after ?
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Tested-by: Andrew Jones <drjones@redhat.com>
 
-thanks
--- PMM
+Although, many QEMU command line users still won't know what to do
+without an explicit "Try -machine gic-version=3Dhost" hint, so that
+might be nice to add too.
+
+Also, unless our command line compatibility policy is so strict that
+we can't change failing command lines (which this patch does to some
+degree as it fails with a new message now), then we might as well
+just probe for a working GIC version when using KVM, as old command
+lines that implicitly or explicitly selected '2' never worked with
+KVM on gicv3-only hosts anyway. We just have to try '2' first in
+order to continue providing a gicv2 to a guests on hosts that support
+both, but if that fails, then we can try '3', and if that works, then
+users don't have to try and correct their command lines at all.
+
+Thanks,
+drew
+
 
