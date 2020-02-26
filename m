@@ -2,83 +2,67 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3FCC4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 850CFC4BA0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8996E20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:19:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NtK2Fplu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8996E20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5AF9B24673
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:22:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AF9B24673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6tmW-0001Al-PY
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:19:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47485)
+	id 1j6tpe-0002ge-Jz
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:22:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j6tlT-0000Zw-Kt
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:18:04 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6toh-0001tx-2M
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:21:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j6tlS-0000Tp-GD
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:18:03 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52916
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j6toc-0001wz-UG
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:21:22 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2505 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j6tlS-0000TD-Bs
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:18:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582712281;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cz7pXOIkDFC5sGtysBOBc/kSfB3RR1nCZ6xj0o75WtY=;
- b=NtK2Fplu/7lSqfel41pR6M7Puvga8+uijM5a0dPo22K3CeVnyz9oy/MptdwkWwIv5XxKBA
- vofdCbLm+FCxUwSf6l3G1HxpeSYasFJuP3+pZ8NvQOFKaSgAdQhRcEQxMCQqpAJ13wL18K
- GrILdCUxf0gDlb2DpSAimMt3r7oBAk4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-pXsgcyoENAmVHMxhcpFAsQ-1; Wed, 26 Feb 2020 05:17:58 -0500
-X-MC-Unique: pXsgcyoENAmVHMxhcpFAsQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C7A91005514;
- Wed, 26 Feb 2020 10:17:57 +0000 (UTC)
-Received: from [10.72.13.217] (ovpn-13-217.pek2.redhat.com [10.72.13.217])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BDE5D60BE1;
- Wed, 26 Feb 2020 10:17:38 +0000 (UTC)
-Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200226094357.25061-1-jasowang@redhat.com>
- <20200226045128-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <bd592433-71b9-773f-97ef-f5da87734b05@redhat.com>
-Date: Wed, 26 Feb 2020 18:17:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j6toc-0001Td-JP; Wed, 26 Feb 2020 05:21:18 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 6D380985A0725E50E009;
+ Wed, 26 Feb 2020 18:21:13 +0800 (CST)
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
+ DGGEMM405-HUB.china.huawei.com ([10.3.20.213]) with mapi id 14.03.0439.000;
+ Wed, 26 Feb 2020 18:21:04 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+Subject: RE: [PATCH v2 01/13] block/stream: Remove redundant statement in
+ stream_run()
+Thread-Topic: [PATCH v2 01/13] block/stream: Remove redundant statement in
+ stream_run()
+Thread-Index: AQHV7IFlUj7vrN4bEEyjDb3dOy8EkKgstWMAgACNqjA=
+Date: Wed, 26 Feb 2020 10:21:03 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B662BBF@dggemm531-mbx.china.huawei.com>
+References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
+ <20200226084647.20636-2-kuhn.chenqun@huawei.com>
+ <20200226095102.GA6096@linux.fritz.box>
+In-Reply-To: <20200226095102.GA6096@linux.fritz.box>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20200226045128-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 45.249.212.188
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,98 +74,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.ibm.com, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/2/26 =E4=B8=8B=E5=8D=885:53, Michael S. Tsirkin wrote:
-> On Wed, Feb 26, 2020 at 05:43:57PM +0800, Jason Wang wrote:
->> We turn on device IOTLB via VIRTIO_F_IOMMU_PLATFORM unconditionally on
->> platform without IOMMU support. This can lead unnecessary IOTLB
->> transactions which will damage the performance.
->>
->> Fixing this by check whether the device is backed by IOMMU and disable
->> device IOTLB.
->>
->> Reported-by: Halil Pasic <pasic@linux.ibm.com>
->> Fixes: c471ad0e9bd46 ("vhost_net: device IOTLB support")
-> Well it's just an optimization, isn't it?
-
-
-Kind of, or a fix for the performance.
-
-
-> I don't think it's justified to push this to everyone using
-> vhost with IOTLB, is it?
-
-
-My understanding is that the function should be equivalent to IOTLB in=20
-this case.
-
-Since no IOMMU is used and device may only see GPA.
-
-Another possible direction is to qemu to update memory table via device=20
-IOTLB API, this seems less straightforward.
-
-
-> If you disagree, could you comment a bit on which configurations where te=
-sted?
-
-
-I just do dirty shortcut to emulate the platform without get_dma_as wth=20
-IOMMU_PLATFORM set.
-
-Thanks
-
-
->
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> Halil could you test this pls? Does this help your performance issue?
->
->> ---
->> Changes from V1:
->> - do not check acked_features
->> - reuse vhost_dev_has_iommu()
->> ---
->>   hw/virtio/vhost.c | 12 +++++++++++-
->>   1 file changed, 11 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->> index 9edfadc81d..9182a00495 100644
->> --- a/hw/virtio/vhost.c
->> +++ b/hw/virtio/vhost.c
->> @@ -290,7 +290,14 @@ static int vhost_dev_has_iommu(struct vhost_dev *de=
-v)
->>   {
->>       VirtIODevice *vdev =3D dev->vdev;
->>  =20
->> -    return virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
->> +    /*
->> +     * For vhost, VIRTIO_F_IOMMU_PLATFORM means the backend support
->> +     * incremental memory mapping API via IOTLB API. For platform that
->> +     * does not have IOMMU, there's no need to enable this feature
->> +     * which may cause unnecessary IOTLB miss/update trnasactions.
->> +     */
->> +    return vdev->dma_as !=3D &address_space_memory &&
->> +           virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLATFORM);
->>   }
->>  =20
->>   static void *vhost_memory_map(struct vhost_dev *dev, hwaddr addr,
->> @@ -765,6 +772,9 @@ static int vhost_dev_set_features(struct vhost_dev *=
-dev,
->>       if (enable_log) {
->>           features |=3D 0x1ULL << VHOST_F_LOG_ALL;
->>       }
->> +    if (!vhost_dev_has_iommu(dev)) {
->> +        features &=3D ~(0x1ULL << VIRTIO_F_IOMMU_PLATFORM);
->> +    }
->>       r =3D dev->vhost_ops->vhost_set_features(dev, features);
->>       if (r < 0) {
->>           VHOST_OPS_DEBUG("vhost_set_features failed");
->> --=20
->> 2.19.1
-
+DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IEtldmluIFdvbGYgW21haWx0
+bzprd29sZkByZWRoYXQuY29tXQ0KPlNlbnQ6IFdlZG5lc2RheSwgRmVicnVhcnkgMjYsIDIwMjAg
+NTo1MSBQTQ0KPlRvOiBDaGVucXVuIChrdWhuKSA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+
+Q2M6IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgcWVtdS10cml2aWFsQG5vbmdudS5vcmc7DQo+cGV0
+ZXIubWF5ZGVsbEBsaW5hcm8ub3JnOyBaaGFuZ2hhaWxpYW5nIDx6aGFuZy56aGFuZ2hhaWxpYW5n
+QGh1YXdlaS5jb20+Ow0KPkV1bGVyIFJvYm90IDxldWxlci5yb2JvdEBodWF3ZWkuY29tPjsgSm9o
+biBTbm93IDxqc25vd0ByZWRoYXQuY29tPjsNCj5NYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29t
+Pg0KPlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDEvMTNdIGJsb2NrL3N0cmVhbTogUmVtb3ZlIHJl
+ZHVuZGFudCBzdGF0ZW1lbnQgaW4NCj5zdHJlYW1fcnVuKCkNCj4NCj5BbSAyNi4wMi4yMDIwIHVt
+IDA5OjQ2IGhhdCBrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbSBnZXNjaHJpZWJlbjoNCj4+IEZyb206
+IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+DQo+PiBDbGFuZyBzdGF0aWMg
+Y29kZSBhbmFseXplciBzaG93IHdhcm5pbmc6DQo+PiAgIGJsb2NrL3N0cmVhbS5jOjE4Njo5OiB3
+YXJuaW5nOiBWYWx1ZSBzdG9yZWQgdG8gJ3JldCcgaXMgbmV2ZXIgcmVhZA0KPj4gICAgICAgICBy
+ZXQgPSAwOw0KPj4gICAgICAgICBeICAgICB+DQo+PiBSZXBvcnRlZC1ieTogRXVsZXIgUm9ib3Qg
+PGV1bGVyLnJvYm90QGh1YXdlaS5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBDaGVuIFF1biA8a3Vo
+bi5jaGVucXVuQGh1YXdlaS5jb20+DQo+PiBSZXZpZXdlZC1ieTogSm9obiBTbm93IDxqc25vd0By
+ZWRoYXQuY29tPg0KPg0KPkxldCdzIG1lbnRpb24gdGhhdCB0aGlzIGlzIHVubmVjZXNzYXJ5IHNp
+bmNlIGNvbW1pdCAxZDgwOTA5OGFhOS4NCj4NCj5TaW5jZSB0aGUgc2FtZSBjb21taXQsIHRoZSBp
+bml0aWFsaXNhdGlvbiAnaW50IHJldCA9IDA7JyBpcyB1bm5lY2Vzc2FyeSBiZWNhdXNlDQo+d2Ug
+bmV2ZXIgcmVhZCByZXQgYmVmb3JlIG92ZXJ3cml0aW5nIHRoZSBpbml0aWFsIHZhbHVlLiBXZSBj
+b3VsZCBjbGVhbiB0aGlzIHVwDQo+aW4gdGhlIHNhbWUgcGF0Y2guDQoNClllcywgd2UgY2FuIGNs
+ZWFuIGl0IGFuZCBtb3ZlICdyZXQnICBkZWNsYXJhdGlvbiB0byB0aGUgZm9yKCkgc3RhdGVtZW50
+Lg0KDQpNb2RpZnkganVzdCBMaWtlIHRoaXPvvJoNCkBAIC0xMTQsNyArMTE0LDYgQEAgc3RhdGlj
+IGludCBjb3JvdXRpbmVfZm4gc3RyZWFtX3J1bihKb2IgKmpvYiwgRXJyb3IgKiplcnJwKQ0KICAg
+ICBpbnQ2NF90IG9mZnNldCA9IDA7DQogICAgIHVpbnQ2NF90IGRlbGF5X25zID0gMDsNCiAgICAg
+aW50IGVycm9yID0gMDsNCi0gICAgaW50IHJldCA9IDA7DQogICAgIGludDY0X3QgbiA9IDA7IC8q
+IGJ5dGVzICovDQoNCiAgICAgaWYgKGJzID09IHMtPmJvdHRvbSkgew0KQEAgLTEzOSw2ICsxMzgs
+NyBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBzdHJlYW1fcnVuKEpvYiAqam9iLCBFcnJvciAq
+KmVycnApDQoNCiAgICAgZm9yICggOyBvZmZzZXQgPCBsZW47IG9mZnNldCArPSBuKSB7DQogICAg
+ICAgICBib29sIGNvcHk7DQorICAgICAgICBpbnQgcmV0Ow0KDQogICAgICAgICAvKiBOb3RlIHRo
+YXQgZXZlbiB3aGVuIG5vIHJhdGUgbGltaXQgaXMgYXBwbGllZCB3ZSBuZWVkIHRvIHlpZWxkDQog
+ICAgICAgICAgKiB3aXRoIG5vIHBlbmRpbmcgSS9PIGhlcmUgc28gdGhhdCBiZHJ2X2RyYWluX2Fs
+bCgpIHJldHVybnMuDQpAQCAtMTgzLDcgKzE4Myw2IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2Zu
+IHN0cmVhbV9ydW4oSm9iICpqb2IsIEVycm9yICoqZXJycCkNCiAgICAgICAgICAgICAgICAgYnJl
+YWs7DQogICAgICAgICAgICAgfQ0KICAgICAgICAgfQ0KLSAgICAgICAgcmV0ID0gMDsNCg0KICAg
+ICAgICAgLyogUHVibGlzaCBwcm9ncmVzcyAqLw0KICAgICAgICAgam9iX3Byb2dyZXNzX3VwZGF0
+ZSgmcy0+Y29tbW9uLmpvYiwgbik7DQoNCj4NCj5XaXRoIG9yIHdpdGhvdXQgdGhlIGNoYW5nZXM6
+DQo+DQo+UmV2aWV3ZWQtYnk6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+DQoNCg==
 
