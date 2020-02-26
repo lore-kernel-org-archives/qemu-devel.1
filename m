@@ -2,96 +2,92 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2BBC4BA2D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD0AC4BA2D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:57:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6711C20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3616520838
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 22:57:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FA5NGAs6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6711C20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uO4qgUxR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3616520838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j75b0-0008GH-Ix
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:56:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39614)
+	id 1j75bz-00012x-EV
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 17:57:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j75a5-0007AX-5d
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:08 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j75af-0008Ed-Mu
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j75a3-0002Er-Sn
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48518
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j75a3-0002EU-Ou
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582757702;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sQ+3B2PsBNwy91uRvIR6aBTCd/S80BOOKAQ9EBJ4pwU=;
- b=FA5NGAs6moiXN431OuU7VI4zjRCNTeJ9WG2M8o6yh6mJVrCmQazp1u8BBtfh68E5943J7x
- 5oabUnp/Qn29mpFA2Te3jT3g8rHUTcmxaYeJ+DpfGd5nIeVEhjnK/ZiFLafQOn4inbB9Bi
- Zt5VRSxdevqGM5F32fk8fR04l6jeKa0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-Cvn24Kk7N1K38MSJrsABbQ-1; Wed, 26 Feb 2020 17:55:01 -0500
-X-MC-Unique: Cvn24Kk7N1K38MSJrsABbQ-1
-Received: by mail-qk1-f200.google.com with SMTP id e11so1288176qkl.8
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 14:55:00 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1j75ae-0002tU-K6
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:41 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35524)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j75ae-0002ru-Ds
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 17:55:40 -0500
+Received: by mail-pg1-x544.google.com with SMTP id 7so393065pgr.2
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 14:55:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6pTrTW2yxzhcyTv22bbpHT3wemj2wTbUxloA7/tytpc=;
+ b=uO4qgUxR8Hy5bm48qSeSmUy77qXL4Smm9vAKfpbzxZwPSrlRrzSqvNofuFqsY44nUj
+ 7s5fM9ZnIcqLkQ+gz8p7oT+WBCpCNYIVc9/aagKn7gba3unzjOhZ0EnGQfdSaNqdEbPq
+ /WwD22fcFFMjuDjzIo5ejI5Zo0Uo/AIf11+JFORlubazX6h8cVgAY6YTwmLPHq81cFBj
+ Qy9iBWsfdSmipJj++S0CmYkBJ0wP4goH+rSAM9PiKt0eXzRrjxyDR4iLhYXsrhDmbtWJ
+ n1ppp0jA+7CeqhPTJYbLDSuN1hx4wMidna+4Ukd9V7yXjpZTXTkCSzSz3Z7VarMKnxK8
+ xonQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6iF/hzx5xbCPUIf+puVE70hJQRDvIvHhsPT7aYBtNUQ=;
- b=SG8A1SnHBryJ3Y/loUBnqKeZESC+FOvZeKUWEMnbMW4bbmWKR7oi7XaQy+4B01r826
- Eyz2BVbkAHxnLkFQ/Q4ZrNZ9m9I9t4IehCwZmODrPvJxb70vd0Mp74mBapWhTL3O8WHq
- C9UT+/DFtfkpTyaMFRcZHNyoAhAHaZiYLGRmfZUWwcpfAVaB3eKiQnZICSSOBgfU/7XC
- MLZZcHQyry4zd5Tz5tKbXhZfUPhUO7F8rX0/qgNokRbSVwKne63kvP3SYxm4j3FPFIBh
- muWIVrHE/7LLvcAE/FqdA5ncg/yZ2HJqUGbxiTl9GnHpsQBi7GFWhGS6pHYyt+M4wyBj
- Hjvg==
-X-Gm-Message-State: APjAAAW0mfevNk1WvxtMqJZCFepEI2cuJQ0fJdPDSXuJKTOI8FxVZBYM
- c05SEIx5T4fCyHfKOm1bUI0V6EwGG1FMsoJplbItB4ZUmcMBebQREgMwHitLOWW4+Ww/UNWErDb
- BX3Onmb9VsHhmxZ0=
-X-Received: by 2002:a37:6841:: with SMTP id d62mr1705297qkc.365.1582757700027; 
- Wed, 26 Feb 2020 14:55:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz4xcaICWehbAkrsogjl5WAcyo1Iz+HUNOtbzBC/XHoZnKF76Ffq1b9zP/GBq6YIRY1j5YXqQ==
-X-Received: by 2002:a37:6841:: with SMTP id d62mr1705270qkc.365.1582757699779; 
- Wed, 26 Feb 2020 14:54:59 -0800 (PST)
-Received: from xz-x1.redhat.com
- (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca. [72.137.123.47])
- by smtp.gmail.com with ESMTPSA id n188sm1881855qkc.106.2020.02.26.14.54.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 14:54:59 -0800 (PST)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/5] KVM: Pass EventNotifier into kvm_irqchip_assign_irqfd
-Date: Wed, 26 Feb 2020 17:54:57 -0500
-Message-Id: <20200226225457.217014-1-peterx@redhat.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200226225048.216508-1-peterx@redhat.com>
-References: 
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6pTrTW2yxzhcyTv22bbpHT3wemj2wTbUxloA7/tytpc=;
+ b=aT6vCpLJx5aiPCk0V8yvNQ5kHwjKRgvrDsrO9WNBnBu+tuT5OEc+QDM6/r72HCja/B
+ hw9AL+k2iFLNPhLk/kubTEOmpLXfISiS+nHL/pWYpTQEYIKTcgPTyRKwVCdKCOLZUhIL
+ w3XRt/TZM1XY+BUN1vhuAXLfTxMplObsjnm0nI5L5XB6532xnRtamXYH25J9wWvQRZJ3
+ bLylWQu3TvaWJLSY2WdA2KEY77WCi5S1wTzOcDAo7e+gRxXn7N6YKXHBJZZGvjp27lpJ
+ L+l53B9rqPIgDnGiBnCj51M6DKLfRJ1zWfZlM2bpnOam1X+SWy1FTcFd8qt3g7Bf7C04
+ 9ywg==
+X-Gm-Message-State: APjAAAVn2gU1o7lLcmijaWdkUA7W5Ks8G1eo4HEBwveXqlNprtZ2kWmm
+ PmC4Bqn6L9cZg9ulW+ohypxnLw==
+X-Google-Smtp-Source: APXvYqzPkWGjGgy7qNRkSzRNBzqkFyQzH4ecjg2aWHrqQomX3f/Iy3PomIHJWGPCgBs6Ei/RWOR1Og==
+X-Received: by 2002:a62:33c6:: with SMTP id z189mr1002969pfz.246.1582757739161; 
+ Wed, 26 Feb 2020 14:55:39 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ 64sm4093441pfd.48.2020.02.26.14.55.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Feb 2020 14:55:38 -0800 (PST)
+Subject: Re: [PATCH v1 4/4] accel/tcg: increase default code gen buffer size
+ for 64 bit
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200226181020.19592-1-alex.bennee@linaro.org>
+ <20200226181020.19592-5-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2ca7b55b-5674-370d-5c4d-dc8b7782ca64@linaro.org>
+Date: Wed, 26 Feb 2020 14:55:36 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <20200226181020.19592-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,77 +99,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So that kvm_irqchip_assign_irqfd() can have access to the
-EventNotifiers, especially the resample event.  It is needed in follow
-up patch to cache and kick resamplefds from QEMU.
+On 2/26/20 10:10 AM, Alex Bennée wrote:
+> While 32mb is certainly usable a full system boot ends up flushing the
+> codegen buffer nearly 100 times. Increase the default on 64 bit hosts
+> to take advantage of all that spare memory. After this change I can
+> boot my tests system without any TB flushes.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- accel/kvm/kvm-all.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+> +#if TCG_TARGET_REG_BITS == 32
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)
+> +#else
+> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (2 * GiB)
+> +#endif
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 439a4efe52..d49b74512a 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1628,9 +1628,13 @@ int kvm_irqchip_update_msi_route(KVMState *s, int vi=
-rq, MSIMessage msg,
-     return kvm_update_routing_entry(s, &kroute);
- }
-=20
--static int kvm_irqchip_assign_irqfd(KVMState *s, int fd, int rfd, int virq=
-,
-+static int kvm_irqchip_assign_irqfd(KVMState *s, EventNotifier *event,
-+                                    EventNotifier *resample, int virq,
-                                     bool assign)
- {
-+    int fd =3D event_notifier_get_fd(event);
-+    int rfd =3D resample ? event_notifier_get_fd(resample) : -1;
-+
-     struct kvm_irqfd irqfd =3D {
-         .fd =3D fd,
-         .gsi =3D virq,
-@@ -1735,7 +1739,9 @@ int kvm_irqchip_add_hv_sint_route(KVMState *s, uint32=
-_t vcpu, uint32_t sint)
-     return -ENOSYS;
- }
-=20
--static int kvm_irqchip_assign_irqfd(KVMState *s, int fd, int virq, bool as=
-sign)
-+static int kvm_irqchip_assign_irqfd(KVMState *s, EventNotifier *event,
-+                                    EventNotifier *resample, int virq,
-+                                    bool assign)
- {
-     abort();
- }
-@@ -1749,15 +1755,13 @@ int kvm_irqchip_update_msi_route(KVMState *s, int v=
-irq, MSIMessage msg)
- int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                        EventNotifier *rn, int virq)
- {
--    return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n),
--           rn ? event_notifier_get_fd(rn) : -1, virq, true);
-+    return kvm_irqchip_assign_irqfd(s, n, rn, virq, true);
- }
-=20
- int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                           int virq)
- {
--    return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n), -1, virq,
--           false);
-+    return kvm_irqchip_assign_irqfd(s, n, NULL, virq, false);
- }
-=20
- int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
---=20
-2.24.1
+This particular number, I'm not so sure about.
 
+It makes sense for a lone vm, running in system mode, on a large-ish host.
+It's more questionable for a large-ish host running many system mode vm's,
+although one can tune that from the command-line, so perhaps it's still ok.
+
+It does not make sense for a linux-user chroot, running make -jN, on just about
+any host.  For linux-user, I could be happy with a modest increase, but not all
+the way out to 2GiB.
+
+Discuss.
+
+
+r~
 
