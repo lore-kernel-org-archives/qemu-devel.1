@@ -2,83 +2,74 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 238FFC4BA1E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 275A3C4BA1E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90BA1206E6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:52:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K7vGsZhC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90BA1206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBC2621D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:52:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBC2621D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j70rI-0001pU-Fo
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:52:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59115)
+	id 1j70rT-0001u8-3f
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:52:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58911)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j70qN-0000uW-Md
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:36 -0500
+ (envelope-from <bounces@canonical.com>) id 1j70q2-0000JQ-5j
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j70qM-0008T4-HY
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40546
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j70qM-0008SK-DB
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582739493;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eYSpSrR/wiJtWczK1CPrmViiuR64xMMBXnpSG2MGvw4=;
- b=K7vGsZhC+w8Xykc6BFnP3vQxB/FcQCKHetcs8sR3OFbizdXcEwxgyJa5SugyzKNVMweCYO
- AdOYtQlgruY5zLIfO9l+kZJF+ONpUz0h/h5+CO3yBss5XnjQ3wNDL5qe2bGvpfh0G6/XzP
- TQ3q91b3SYupgG1UHfTt7A7qY3+3ORo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-mbXsKEovPuac8VJQFdS7UQ-1; Wed, 26 Feb 2020 12:51:29 -0500
-X-MC-Unique: mbXsKEovPuac8VJQFdS7UQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2FBB801E53;
- Wed, 26 Feb 2020 17:51:27 +0000 (UTC)
-Received: from gondolin (ovpn-117-69.ams2.redhat.com [10.36.117.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 78DD460BE2;
- Wed, 26 Feb 2020 17:51:20 +0000 (UTC)
-Date: Wed, 26 Feb 2020 18:51:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v5 01/18] s390x: Use constant for ESA PSW address
-Message-ID: <20200226185118.316055d5.cohuck@redhat.com>
-In-Reply-To: <3d6f7f88-0a77-90f0-4e26-ee826593d55f@redhat.com>
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200226122038.61481-2-frankja@linux.ibm.com>
- <3d6f7f88-0a77-90f0-4e26-ee826593d55f@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <bounces@canonical.com>) id 1j70q0-0007uZ-Sv
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39096)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j70q0-0007rH-MV
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:51:12 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j70pz-0003NW-0C
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 17:51:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 006B52E80C8
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 17:51:11 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 26 Feb 2020 17:42:37 -0000
+From: Marco <jermy.07@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jermy-07 rth
+X-Launchpad-Bug-Reporter: Marco (jermy-07)
+X-Launchpad-Bug-Modifier: Marco (jermy-07)
+References: <158152698766.24807.871332888169155245.malonedeb@gac.canonical.com>
+Message-Id: <158273895756.14244.15131011130057185974.malone@wampee.canonical.com>
+Subject: [Bug 1862986] Re: qemu-s390x crashes when run on aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 78e4b45cad983e5f5dd554c45e1510a8e6a1b729
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,101 +78,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1862986 <1862986@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Feb 2020 15:27:52 +0100
-David Hildenbrand <david@redhat.com> wrote:
+Thanks for taking a look. With the binary I posted, the steps to
+reproduce are:
 
-> On 26.02.20 13:20, Janosch Frank wrote:
-> > Lets make it a bit more clear that we're extracting the 31 bit address
+dpkg --add-architecture s390x && apt update && apt install qemu-user
+wget libc6:s390x libstdc++6:s390x libfontconfig1:s390x libxcb1:s390x -y
+&& wget
+https://bugs.launchpad.net/qemu/+bug/1862986/+attachment/5331331/+files/tes=
+t_bitcoin_orig
+&& sha256sum  ./test_bitcoin_orig && chmod +x test_bitcoin_orig
 
-s/Lets/Let's/ :)
+The hash of the file is
+193758e2041d49fe90722927ba6b5371506831caf733ee2fe61ef7d61cc894f7 and
+qemu-user crashes for me:
 
-> > from the short psw.
-> > 
-> > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> > ---
-> >  hw/s390x/ipl.c     | 2 +-
-> >  target/s390x/cpu.c | 4 ++--
-> >  target/s390x/cpu.h | 1 +
-> >  3 files changed, 4 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index 7773499d7f..42e21e7a6a 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -179,7 +179,7 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-> >                  /* if not Linux load the address of the (short) IPL PSW */
-> >                  ipl_psw = rom_ptr(4, 4);
-> >                  if (ipl_psw) {
-> > -                    pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
-> > +                    pentry = be32_to_cpu(*ipl_psw) & PSW_MASK_ESA_ADDR;
-> >                  } else {
-> >                      error_setg(&err, "Could not get IPL PSW");
-> >                      goto error;
-> > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> > index 8da1905485..43360912a0 100644
-> > --- a/target/s390x/cpu.c
-> > +++ b/target/s390x/cpu.c
-> > @@ -78,13 +78,13 @@ static void s390_cpu_load_normal(CPUState *s)
-> >      S390CPU *cpu = S390_CPU(s);
-> >      uint64_t spsw = ldq_phys(s->as, 0);
-> >  
-> > -    cpu->env.psw.mask = spsw & 0xffffffff80000000ULL;
-> > +    cpu->env.psw.mask = spsw & PSW_MASK_ESA_MASK;
-> >      /*
-> >       * Invert short psw indication, so SIE will report a specification
-> >       * exception if it was not set.
-> >       */
-> >      cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
-> > -    cpu->env.psw.addr = spsw & 0x7fffffffULL;
-> > +    cpu->env.psw.addr = spsw & PSW_MASK_ESA_ADDR;
-> >  
-> >      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
-> >  }
-> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> > index 8a557fd8d1..74e66fe0c2 100644
-> > --- a/target/s390x/cpu.h
-> > +++ b/target/s390x/cpu.h
-> > @@ -277,6 +277,7 @@ extern const VMStateDescription vmstate_s390_cpu;
-> >  #define PSW_MASK_64             0x0000000100000000ULL
-> >  #define PSW_MASK_32             0x0000000080000000ULL
-> >  #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
-> > +#define PSW_MASK_ESA_MASK       0xffffffff80000000ULL  
-> 
-> ..._MASK_..._MASK
-> 
-> Isn't there a better name for all the bits in the PSW that are not an
-> address?
-> 
-> PSW_MASK_ESA_BITS
-> PSW_MASK_ESA_FLAGS
-> ...
+$ qemu-s390x ./test_bitcoin_orig
+Segmentation fault (core dumped)
 
-Hm, the PoP says that the PSW "includes the instruction address,
-condition code, and other control fields"; it also talks about the
-'short' PSW as being distinct from the 'ESA' PSW (bit 31 may be 0 or 1
-in the short PSW). Maybe
+-- =
 
-PSW_MASK_SHORT_ADDR
-PSW_MASK_SHORT_CTRL
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1862986
 
-(Or keep _ESA_ if renaming creates too much churn.)
+Title:
+  qemu-s390x crashes when run on aarch64
 
-> 
-> >  
-> >  #undef PSW_ASC_PRIMARY
-> >  #undef PSW_ASC_ACCREG
-> >   
-> 
-> 
+Status in QEMU:
+  Incomplete
 
-This patch is also independent of the protected virtualization
-support... I plan to send a pull request tomorrow, so I can include
-this patch, if we agree on a name for the constant :)
+Bug description:
+  All tested versions (2.11 and 4.2) qemu-s390x crashes with a segfault
+  when run on an aarch64 odroid Ubuntu.
 
+
+  Steps to reproduce:
+
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x "/root/wo=
+rkspace/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_or=
+ig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x --version
+  qemu-s390x version 4.2.0
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x "/root/workspac=
+e/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x --version
+  qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.22)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  qemu-arm does work on the same machine:
+
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-arm bitcoin-0.19.0.1-=
+armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-arm bitcoin-0.1=
+9.0.1-armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+
+
+  =
+
+  What kind of debug information would be helpful for this issue report?
+  GDB for the self-compiled latest release is not particularly helpful:
+
+  (gdb) run
+  Starting program: /usr/local/bin/qemu-s390x /root/workspace/bitcoin-core/=
+build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a2a140 (LWP 28264)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x000000555596b218 in __bss_start__ ()
+  (gdb) bt
+  #0  0x000000555596b218 in __bss_start__ ()
+  #1  0x00000055556120a8 in ?? ()
+  #2  0x00000055579904b0 in ?? ()
+  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+
+  =
+
+  A bit more information is available in the version shipped by Ubuntu:
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-s390x /root/workspace/bitcoin-core/build/=
+bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a01180 (LWP 28271)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x0000005555738f98 in code_gen_buffer ()
+  (gdb) bt
+  #0  0x0000005555738f98 in code_gen_buffer ()
+  #1  0x00000055555e96c8 in cpu_exec ()
+  #2  0x00000055555ee430 in cpu_loop ()
+  #3  0x00000055555c3328 in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1862986/+subscriptions
 
