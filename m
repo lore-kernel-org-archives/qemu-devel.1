@@ -2,91 +2,101 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A02C4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 784D6C4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:22:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 410692467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 410CA24680
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:22:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HqTl5J/u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410692467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOA777dc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410CA24680
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xU0-0002nW-GJ
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:16:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39253)
+	id 1j6xZY-0004b9-Gl
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:22:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frasse.iglesias@gmail.com>) id 1j6xT2-0002GI-LI
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:15:17 -0500
+ (envelope-from <philmd@redhat.com>) id 1j6xYu-00043Y-Ok
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frasse.iglesias@gmail.com>) id 1j6xT1-0006Pq-LQ
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:15:16 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39256)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
- id 1j6xT1-0006M7-Ck; Wed, 26 Feb 2020 09:15:15 -0500
-Received: by mail-lj1-x242.google.com with SMTP id o15so3269726ljg.6;
- Wed, 26 Feb 2020 06:15:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=NoslDEA1NYRcm1J+wN+Jn1HI8r/5R/eVtS142rhhQFs=;
- b=HqTl5J/uPPcs0qaM5njuye4hzxOdSC1vWGrvpjs0BhvN5EWTxf3R10eK8PcouY19Yv
- gdTYtsNHZBoB+EQy++X8VbK05yJkPd2jgptcG1Lz/N+OzvIwF8RMwQFvB8hpy7Sy2oK7
- QS7y4eg7KxaKWPfTgKxdFA5ra+t2tTTBUOyfc8YYhG7BPOHsbioGpCESwPBF75Zj/Sfv
- RoTP0AqCbK5K11y214nwpwMsGnQzkwaO0w2kPTkuefYAugs9T/X9OQXKM4ttYcyWK5Tz
- mgThrUsGTMDkuVqCbJ5g7WOqnvVG5jQ6GElfquwPY+52nZQb2jlkHOUIahHFJaa1oHWn
- o9/w==
+ (envelope-from <philmd@redhat.com>) id 1j6xYq-0005cH-M5
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21135
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6xYq-0005ZG-Hp
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582726875;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MSHbGqgS3B/wr2StKJrKN9dNOj5Ox0ESJKQAivfGhes=;
+ b=gOA777dc9tQfr5qMiqPA7N7tgnAfbvwQrsjwspTGkPgWwhAR87NxPXoJmp9IP0Y+kf6YDq
+ yRl0Xppez+RrMjQuyquEgS0ZLTPOYuSbuYKj8EguXvtn6MTnnWDOx88lfLTpaMT3s/X52z
+ 3knynBn5Oq299kVLcFw+fAwG4NtOhiU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-KfbwHwNsOYyfeHfn4zsPdg-1; Wed, 26 Feb 2020 09:21:13 -0500
+X-MC-Unique: KfbwHwNsOYyfeHfn4zsPdg-1
+Received: by mail-wm1-f69.google.com with SMTP id f9so640130wmb.2
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 06:21:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to:user-agent;
- bh=NoslDEA1NYRcm1J+wN+Jn1HI8r/5R/eVtS142rhhQFs=;
- b=lbInv0OOtpGuPs8l8QssE1d9BAjmTqmmdqBiTVV5ho6dh4iBHY3aAhk7rPidNVzVKa
- K1FmgfT7vN/wYsKpAFix3Yt4a8T72UvmryV6w8gBH2rpzcGRE/KyFSj5hO8K93jB52xq
- U6JG4pvU5F0pdzYy7aF0izENevGrbuWzaeiXSfaOO52jzrPkx3bNKbut4AdjheoaxmFR
- pdSXlgQDukujOl/xbOLTeVCUsTZK1ClJl8qGu3G3IljwLF2ZhqUpJS35Tf4+Inb/C/Sr
- yHkWo7ncn4nNbm2pTlsS9Cwe5n7SSx4vS2iTd1V7U3PVCKqE2K75iheT7Ca/sKrdsa02
- j+Xg==
-X-Gm-Message-State: ANhLgQ3Ih163Ovk73ZEK/flwl5dioveMHCAwoRRR5R8pTzY8P9tZ/LM6
- 33210sdDL+MHcj8Nrvaq2UM=
-X-Google-Smtp-Source: ADFU+vtljQR17EBpwj1G4m2tKaU9Ndw06+2ySLjKbkAE/iEcWtDTkn468EwTzGv445HNY9AkcZBGEw==
-X-Received: by 2002:a2e:9e55:: with SMTP id g21mr3218379ljk.245.1582726513738; 
- Wed, 26 Feb 2020 06:15:13 -0800 (PST)
-Received: from fralle-msi (31-208-27-151.cust.bredband2.com. [31.208.27.151])
- by smtp.gmail.com with ESMTPSA id
- l7sm1068670lfc.80.2020.02.26.06.15.11
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 26 Feb 2020 06:15:12 -0800 (PST)
-Date: Wed, 26 Feb 2020 15:15:10 +0100
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
-To: kuhn.chenqun@huawei.com
-Subject: Re: [PATCH v2 09/13] dma/xlnx-zdma: Remove redundant statement in
- zdma_write_dst()
-Message-ID: <20200226141509.6kg3eyrexv73mgop@fralle-msi>
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-10-kuhn.chenqun@huawei.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CBenu/1p0A399odB+r0l5DGS3G3AmJFUTUr0sxpL1B4=;
+ b=V++Gfp8pGa5O5EHbJIF9AjLjouth/CNj2pfkcSeJiQKvUaW5zCavkz6YUqOVMwTE/I
+ K2L9cF8t8/47dymaSq3m2adSHqmFMOso0B7ZSOb/Ph1Es8smhBuKIVlzWG2KXVEE62+u
+ Xeu8MmCnRXqsdJT0MkXPfuZ6iT0Gm8/4koa2d1WuaaGkzGy4SRh/EyjyclwFClT0sh5D
+ OBkVKeYxJzFWFooefsyufiUuVF9MHzTXVRV865QtldZ2n/DSu/9B767S6Rv9a7fZ5Qud
+ WvMFR79n5dE1iaJZEnI3PxQ7JRkqgbNa6bER10s/6c6+w+pEVtIM4PwDs4bsFPDPgEQS
+ TlqQ==
+X-Gm-Message-State: APjAAAU5wJboulru3z5JIKAjFtHCVjFE5vtHc3aY4RW0W5S74VMs6k05
+ j9O5WG/AR5f2Wi6TfX9sITgOXBEjbRnrJIbUAhp1nnnGimT3AcVpSv3V081sq/OpJU+MfSLC7+Y
+ fRfri2UCr1ofBz5s=
+X-Received: by 2002:adf:e742:: with SMTP id c2mr5775614wrn.262.1582726872641; 
+ Wed, 26 Feb 2020 06:21:12 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwJdFOZmI2Gsp4dGKfHGdPHM8nBJmmpzuLLZoPVs6a5/CSQbcL/CGbRn3eZDXpiL3vPxTW4ZQ==
+X-Received: by 2002:adf:e742:: with SMTP id c2mr5775577wrn.262.1582726872222; 
+ Wed, 26 Feb 2020 06:21:12 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id h10sm3163365wml.18.2020.02.26.06.21.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Feb 2020 06:21:11 -0800 (PST)
+Subject: Re: [PATCH 1/2] aspeed/smc: Add some tracing
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200206112645.21275-1-clg@kaod.org>
+ <20200206112645.21275-2-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ee72256b-8635-41e3-daa5-17ea1b5db9cd@redhat.com>
+Date: Wed, 26 Feb 2020 15:21:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200226084647.20636-10-kuhn.chenqun@huawei.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+In-Reply-To: <20200206112645.21275-2-clg@kaod.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,77 +108,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>,
- qemu-devel@nongnu.org, Euler Robot <euler.robot@huawei.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Andrew Geissler <geissonator@gmail.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On [2020 Feb 26] Wed 16:46:43, kuhn.chenqun@huawei.com wrote:
-> From: Chen Qun <kuhn.chenqun@huawei.com>
-> 
-> Clang static code analyzer show warning:
-> hw/dma/xlnx-zdma.c:399:13: warning: Value stored to 'dst_type' is never read
->             dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
->             ^          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-
-Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-
+On 2/6/20 12:26 PM, C=C3=A9dric Le Goater wrote:
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 > ---
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
-> v1->v2: move the 'dst_type' declaration.(Base on Philippe's suggestion).
-> ---
->  hw/dma/xlnx-zdma.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 8fb83f5b07..eeacad59ce 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
->  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
->  {
->      uint32_t dst_size, dlen;
-> -    bool dst_intr, dst_type;
-> +    bool dst_intr;
->      unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
->      unsigned int rw_mode = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MODE);
->      unsigned int burst_type = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_ATTR,
-> @@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
->      while (len) {
->          dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                SIZE);
-> -        dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
-> -                              TYPE);
->          if (dst_size == 0 && ptype == PT_MEM) {
->              uint64_t next;
-> +            bool dst_type = FIELD_EX32(s->dsc_dst.words[3],
-> +                                       ZDMA_CH_DST_DSCR_WORD3,
-> +                                       TYPE);
+>   Makefile.objs       |  1 +
+>   hw/ssi/aspeed_smc.c | 17 +++++++++++++++++
+>   hw/ssi/trace-events |  9 +++++++++
+>   3 files changed, 27 insertions(+)
+>   create mode 100644 hw/ssi/trace-events
+>=20
+> diff --git a/Makefile.objs b/Makefile.objs
+> index 26b9cff95436..9e4ba95794e9 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -168,6 +168,7 @@ trace-events-subdirs +=3D hw/scsi
+>   trace-events-subdirs +=3D hw/sd
+>   trace-events-subdirs +=3D hw/sparc
+>   trace-events-subdirs +=3D hw/sparc64
+> +trace-events-subdirs +=3D hw/ssi
+>   trace-events-subdirs +=3D hw/timer
+>   trace-events-subdirs +=3D hw/tpm
+>   trace-events-subdirs +=3D hw/usb
+> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+> index 23c8d2f06245..e5621bf728ca 100644
+> --- a/hw/ssi/aspeed_smc.c
+> +++ b/hw/ssi/aspeed_smc.c
+> @@ -31,6 +31,7 @@
+>   #include "qapi/error.h"
+>   #include "exec/address-spaces.h"
+>   #include "qemu/units.h"
+> +#include "trace.h"
+>  =20
+>   #include "hw/irq.h"
+>   #include "hw/qdev-properties.h"
+> @@ -513,6 +514,8 @@ static void aspeed_smc_flash_set_segment(AspeedSMCSta=
+te *s, int cs,
+>  =20
+>       s->ctrl->reg_to_segment(s, new, &seg);
+>  =20
+> +    trace_aspeed_smc_flash_set_segment(cs, new, seg.addr, seg.addr + seg=
+.size);
 > +
->              next = zdma_update_descr_addr(s, dst_type,
->                                            R_ZDMA_CH_DST_CUR_DSCR_LSB);
->              zdma_load_descriptor(s, next, &s->dsc_dst);
->              dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
->                                    SIZE);
-> -            dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
-> -                                  TYPE);
->          }
->  
->          /* Match what hardware does by ignoring the dst_size and only using
-> -- 
-> 2.23.0
-> 
-> 
-> 
+>       /* The start address of CS0 is read-only */
+>       if (cs =3D=3D 0 && seg.addr !=3D s->ctrl->flash_window_base) {
+>           qemu_log_mask(LOG_GUEST_ERROR,
+> @@ -753,6 +756,8 @@ static uint64_t aspeed_smc_flash_read(void *opaque, h=
+waddr addr, unsigned size)
+>                         __func__, aspeed_smc_flash_mode(fl));
+>       }
+>  =20
+> +    trace_aspeed_smc_flash_read(fl->id, addr, size, ret,
+> +                                aspeed_smc_flash_mode(fl));
+>       return ret;
+>   }
+>  =20
+> @@ -808,6 +813,9 @@ static bool aspeed_smc_do_snoop(AspeedSMCFlash *fl,  =
+uint64_t data,
+>       AspeedSMCState *s =3D fl->controller;
+>       uint8_t addr_width =3D aspeed_smc_flash_is_4byte(fl) ? 4 : 3;
+>  =20
+> +    trace_aspeed_smc_do_snoop(fl->id, s->snoop_index, s->snoop_dummies,
+> +                              (uint8_t) data & 0xff);
+> +
+>       if (s->snoop_index =3D=3D SNOOP_OFF) {
+>           return false; /* Do nothing */
+>  =20
+> @@ -858,6 +866,9 @@ static void aspeed_smc_flash_write(void *opaque, hwad=
+dr addr, uint64_t data,
+>       AspeedSMCState *s =3D fl->controller;
+>       int i;
+>  =20
+> +    trace_aspeed_smc_flash_write(fl->id, addr, size, data,
+> +                                 aspeed_smc_flash_mode(fl));
+> +
+>       if (!aspeed_smc_is_writable(fl)) {
+>           qemu_log_mask(LOG_GUEST_ERROR, "%s: flash is not writable at 0x=
+%"
+>                         HWADDR_PRIx "\n", __func__, addr);
+> @@ -972,6 +983,9 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
+addr, unsigned int size)
+>           (s->ctrl->has_dma && addr =3D=3D R_DMA_CHECKSUM) ||
+>           (addr >=3D R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_sla=
+ves) ||
+>           (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slave=
+s)) {
+> +
+> +        trace_aspeed_smc_read(addr, size, s->regs[addr]);
+> +
+>           return s->regs[addr];
+>       } else {
+>           qemu_log_mask(LOG_UNIMP, "%s: not implemented: 0x%" HWADDR_PRIx=
+ "\n",
+> @@ -1091,6 +1105,7 @@ static void aspeed_smc_dma_checksum(AspeedSMCState =
+*s)
+>                             __func__, s->regs[R_DMA_FLASH_ADDR]);
+>               return;
+>           }
+> +        trace_aspeed_smc_dma_checksum(s->regs[R_DMA_FLASH_ADDR], data);
+>  =20
+>           /*
+>            * When the DMA is on-going, the DMA registers are updated
+> @@ -1225,6 +1240,8 @@ static void aspeed_smc_write(void *opaque, hwaddr a=
+ddr, uint64_t data,
+>  =20
+>       addr >>=3D 2;
+>  =20
+> +    trace_aspeed_smc_write(addr, size, data);
+> +
+>       if (addr =3D=3D s->r_conf ||
+>           (addr >=3D s->r_timings &&
+>            addr < s->r_timings + s->ctrl->nregs_timings) ||
+> diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
+> new file mode 100644
+> index 000000000000..ffe531a500aa
+> --- /dev/null
+> +++ b/hw/ssi/trace-events
+> @@ -0,0 +1,9 @@
+> +# aspeed_smc.c
+> +
+> +aspeed_smc_flash_set_segment(int cs, uint64_t reg, uint64_t start, uint6=
+4_t end) "CS%d segreg=3D0x%"PRIx64" [ 0x%"PRIx64" - 0x%"PRIx64" ]"
+> +aspeed_smc_flash_read(int cs, uint64_t addr,  uint32_t size, uint64_t da=
+ta, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
+> +aspeed_smc_do_snoop(int cs, int index, int dummies, int data) "CS%d inde=
+x:0x%x dummies:%d data:0x%x"
+> +aspeed_smc_flash_write(int cs, uint64_t addr,  uint32_t size, uint64_t d=
+ata, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
+> +aspeed_smc_read(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRI=
+x64 " size %u: 0x%" PRIx64
+> +aspeed_smc_dma_checksum(uint32_t addr, uint32_t data) "0x%08x: 0x%08x"
+> +aspeed_smc_write(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PR=
+Ix64 " size %u: 0x%" PRIx64
+>=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
 
