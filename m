@@ -2,98 +2,143 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92250C4BA10
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D947EC4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E01E2467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:46:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9o87D9b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E01E2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF80124683
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 13:47:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF80124683
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6x1S-00075Y-Iz
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:46:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47845)
+	id 1j6x2T-000824-Ug
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 08:47:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6x0d-0006S7-QE
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:45:56 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6x0v-0006kA-9N
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6x0c-0001ZS-ND
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:45:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32242
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6x0c-0001Vw-JL
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:45:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582724753;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/EAzYK3OJ5ZGcwqRAY2qQCWviE6qm1Fx2MVE70YbouM=;
- b=Q9o87D9bygHI7GFyxNWAGx4KFawqzKeRiHiBye+zFevecOsdsJSsJRhkSnbxDZyRw1G43t
- YoF53R96oDUMQ5AKkMzFzh9V7S2VXOsJP50c1QW7z76WW+Mxviz2N7lalUJpFFre5H3x/T
- 32I6ZGuipEIx9dqETejD0861/JPs6l8=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-Phkd0fEwPJ-bN87PzrhPFw-1; Wed, 26 Feb 2020 08:45:50 -0500
-X-MC-Unique: Phkd0fEwPJ-bN87PzrhPFw-1
-Received: by mail-qk1-f200.google.com with SMTP id 205so4299996qkg.0
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 05:45:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fsvvToDs/CeyYwZP74lzMX9H8gae+87/RnoF18I3+7A=;
- b=KBz++DH9AsAL2SwFliH3CoRM2PSlLqgVF15JhzxRnP1EKpJydmaa8Yw4SOdzE0CK3f
- XsVWiXDC696EJhsyC7MitZ1QZJY3hGoeFa68wfqcMen+rkMkdJ9f+CVbaPq0W6G4JaHk
- 9V+HFt3nE0FJM5sM1q6kpN0+iC6mFc6mcv8zuz4nmn1iKTca/3SHMc9KARfXP2fAnuRz
- MJwKAEaY7+//V33JTIdJamD3wLDV8oPlZEL2Mwz+terllxHj6Kklyg0nUUR7T0ghKMKS
- 8sWs0OKCrFzJavUvVOQJOAGmtkkc+fhXM6tpApei67ZcAaJ2Ll3+FSWUr4z2i7RR5ooe
- 9P7w==
-X-Gm-Message-State: APjAAAXksti+O0ku2oykUjFK9xV070/a2zHaEgaCQPy7+nMow1r3LWAd
- 4eN07HJ8KRbmIkIsW6rZoHKPUSQSbvIu5jk0UylihSqgEBDONCxN/dK5D1NfFXUkKXk1QyqPPu0
- VYjPYM4q+Zi706b0=
-X-Received: by 2002:aed:2519:: with SMTP id v25mr1670880qtc.176.1582724749510; 
- Wed, 26 Feb 2020 05:45:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw5ZZQs/mSptEfC+8o7e3gl+Nvm26w/q/ZMKKYkJwj+kXZtTXCIeiuWnjiHJl/Ug56FPg28NQ==
-X-Received: by 2002:aed:2519:: with SMTP id v25mr1670858qtc.176.1582724749295; 
- Wed, 26 Feb 2020 05:45:49 -0800 (PST)
-Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
- by smtp.gmail.com with ESMTPSA id
- 89sm1123633qth.3.2020.02.26.05.45.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 05:45:48 -0800 (PST)
-Date: Wed, 26 Feb 2020 08:45:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-Message-ID: <20200226084423-mutt-send-email-mst@kernel.org>
-References: <20200226094357.25061-1-jasowang@redhat.com>
- <20200226045128-mutt-send-email-mst@kernel.org>
- <20200226135539.384489f7.pasic@linux.ibm.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1j6x0t-0002lb-Vc
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:46:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48464
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1j6x0t-0002ig-PJ
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 08:46:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 01QDiV7v040778
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 08:46:11 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2ydcngexuk-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 08:46:11 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 26 Feb 2020 13:46:09 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 26 Feb 2020 13:46:06 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 01QDk6c146137636
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 26 Feb 2020 13:46:06 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F24034C058;
+ Wed, 26 Feb 2020 13:46:05 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C06524C04E;
+ Wed, 26 Feb 2020 13:46:05 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.219])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 26 Feb 2020 13:46:05 +0000 (GMT)
+Subject: Re: [PATCH v5 01/18] s390x: Use constant for ESA PSW address
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200226122038.61481-1-frankja@linux.ibm.com>
+ <20200226122038.61481-2-frankja@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Wed, 26 Feb 2020 14:46:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226135539.384489f7.pasic@linux.ibm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <20200226122038.61481-2-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 20022613-0016-0000-0000-000002EA775B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20022613-0017-0000-0000-0000334DA709
+Message-Id: <0ac821dd-09a8-3b77-d4db-c167f5a4ac77@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-02-26_04:2020-02-26,
+ 2020-02-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ phishscore=0 spamscore=0 suspectscore=0 impostorscore=0 clxscore=1015
+ mlxscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002260102
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,57 +150,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org
+Cc: qemu-s390x@nongnu.org, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 26, 2020 at 01:55:39PM +0100, Halil Pasic wrote:
-> On Wed, 26 Feb 2020 04:53:33 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->=20
-> > On Wed, Feb 26, 2020 at 05:43:57PM +0800, Jason Wang wrote:
-> > > We turn on device IOTLB via VIRTIO_F_IOMMU_PLATFORM unconditionally o=
-n
-> > > platform without IOMMU support. This can lead unnecessary IOTLB
-> > > transactions which will damage the performance.
-> > >=20
-> > > Fixing this by check whether the device is backed by IOMMU and disabl=
-e
-> > > device IOTLB.
-> > >=20
-> > > Reported-by: Halil Pasic <pasic@linux.ibm.com>
-> > > Fixes: c471ad0e9bd46 ("vhost_net: device IOTLB support")
-> >=20
-> > Well it's just an optimization, isn't it?
-> > I don't think it's justified to push this to everyone using
-> > vhost with IOTLB, is it?
->=20
-> IMHO we need this for everyone using vhost! For instance vhost-vsock
-> currently does not work with iommu_platform=3Don, because unlike vhost-ne=
-t
-> vhost does not offer F_ACCESS_PLATFORM, so set features IOCTL fails.=20
 
-You mean vsock does not offer it? OK but that's still not a bugfix.
-Making new configs work is great, but that's a feature almost
-by definition.
 
-> > If you disagree, could you comment a bit on which configurations where =
-tested?
-> >=20
-> > > Cc: qemu-stable@nongnu.org
-> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> >=20
-> > Halil could you test this pls? Does this help your performance issue?
-> >=20
->=20
-> I'm pretty sure it does, but I will re-test. The previous version where
-> it was done virtio-net certainly did.
->=20
-> Regards,
-> Halil
->=20
->=20
+On 26.02.20 13:20, Janosch Frank wrote:
+> Lets make it a bit more clear that we're extracting the 31 bit address
+> from the short psw.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+
+
+
+PSW_MASK_ESA_MASK and PSW_MASK_ESA_ADDR look pretty similar, but I cant find
+a good name. We could use ~PSW_MASK_ESA_ADDR as an alternative.
+
+Either way, this makes sense.
+
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+> ---
+>  hw/s390x/ipl.c     | 2 +-
+>  target/s390x/cpu.c | 4 ++--
+>  target/s390x/cpu.h | 1 +
+>  3 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 7773499d7f..42e21e7a6a 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -179,7 +179,7 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>                  /* if not Linux load the address of the (short) IPL PSW */
+>                  ipl_psw = rom_ptr(4, 4);
+>                  if (ipl_psw) {
+> -                    pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
+> +                    pentry = be32_to_cpu(*ipl_psw) & PSW_MASK_ESA_ADDR;
+>                  } else {
+>                      error_setg(&err, "Could not get IPL PSW");
+>                      goto error;
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 8da1905485..43360912a0 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -78,13 +78,13 @@ static void s390_cpu_load_normal(CPUState *s)
+>      S390CPU *cpu = S390_CPU(s);
+>      uint64_t spsw = ldq_phys(s->as, 0);
+>  
+> -    cpu->env.psw.mask = spsw & 0xffffffff80000000ULL;
+> +    cpu->env.psw.mask = spsw & PSW_MASK_ESA_MASK;
+
+
+>      /*
+>       * Invert short psw indication, so SIE will report a specification
+>       * exception if it was not set.
+>       */
+>      cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
+> -    cpu->env.psw.addr = spsw & 0x7fffffffULL;
+> +    cpu->env.psw.addr = spsw & PSW_MASK_ESA_ADDR;
+>  
+>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>  }
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 8a557fd8d1..74e66fe0c2 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -277,6 +277,7 @@ extern const VMStateDescription vmstate_s390_cpu;
+>  #define PSW_MASK_64             0x0000000100000000ULL
+>  #define PSW_MASK_32             0x0000000080000000ULL
+>  #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
+> +#define PSW_MASK_ESA_MASK       0xffffffff80000000ULL
+>  
+>  #undef PSW_ASC_PRIMARY
+>  #undef PSW_ASC_ACCREG
+> 
 
 
