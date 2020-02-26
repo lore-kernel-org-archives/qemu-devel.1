@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A4CC4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F0AC4BA10
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 840C62084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F13921556
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 09:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bc5K1/6K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840C62084E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xlxr4nZN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F13921556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6sly-0002fY-Nm
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:14:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59063)
+	id 1j6smZ-0003b9-CX
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 04:15:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j6seo-0004xq-SH
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:08 -0500
+ (envelope-from <mst@redhat.com>) id 1j6sfd-0006kx-Ff
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:08:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j6sen-0008R9-AG
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33177
+ (envelope-from <mst@redhat.com>) id 1j6sfa-00018N-Bl
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:56 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22649
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6sen-0008Qc-5q
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:05 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j6sfZ-000183-TT
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 04:07:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582708024;
+ s=mimecast20190719; t=1582708073;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zCHf9L72V/C0Pq98N5gIZEjtBfCuRngk9tHaSFXAuXI=;
- b=Bc5K1/6K3RbFGzaFQv40GGFU+wF42Zd4S9s+JwYQ18n2iJFi+N8Hk6glo7S51+yhoVPpwy
- no+aEcBBAr9XMgZwpliDTqPLpcta6437hJXVV5FNUHcLIc2ooBc9qHKXxqYzyBjd7lK5hY
- zDqG+eT9xgJcfOAP5Zpd23nuKJtcTWw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-447-u-k_nLEZO-OwvVtkrN3SEQ-1; Wed, 26 Feb 2020 04:07:02 -0500
-X-MC-Unique: u-k_nLEZO-OwvVtkrN3SEQ-1
-Received: by mail-wr1-f71.google.com with SMTP id z1so1186802wrs.9
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 01:07:02 -0800 (PST)
+ bh=l++BsqWy6N6vNodZEk7v6Kw66F2SSiMTtlt2r/wo72g=;
+ b=Xlxr4nZNAjG7cYGq9mpzvnokhsMnLHwEYoqbNxXBO4xpmKmKlrgG4o0BZ5cdQfYLHW8HZ+
+ COvlVEgTTyTcV1a9Thjfqf8ONJM99mE38UlFWbOC1kBIft5+vRZkCGpWnvhKvRh+ps6M07
+ TB2HbZo5ct3Gymlz4zJNf6tCHvc9YFg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-d70bUCQsNx-ddwvKGP1MTw-1; Wed, 26 Feb 2020 04:07:51 -0500
+X-MC-Unique: d70bUCQsNx-ddwvKGP1MTw-1
+Received: by mail-wr1-f69.google.com with SMTP id d15so1196278wru.1
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 01:07:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=fMIucinzsx9/9CFPWzNLF6NCV2892T+sCnYLhAijSBk=;
- b=fms9zmihMHsPSbOORf87vvN3MkW9kv1ZXRTXDjL3Cz4k3JShs5op3/9VypSazxeFjv
- Htx3MZiK0M+goEUXMJ82l4W7A3T7lyAis2Hnh3dIjDXMUzQrTG5Si9ryVqDxw2YNFJ43
- EV9WEY/5jff4X3mG8Wy9DwNpddcPnRXgB7/xYKuox7uEZmu9KCX84YqC19c/VgLCLhJm
- 1A8HTwXv+jopkpC0/ZrhxNXG5txbIIWeg8LhB2v+8h6cRcakvTer9cN5TnfDzQELwORc
- 4aDaxXwcO35U0YbqWB4lAhW42VR7LkP2XmDdOgeBthkYWb/t57cdMo7N44w29V4Jl0Z3
- o9sw==
-X-Gm-Message-State: APjAAAV23CQLbFW/lXYNUNDXFqf2k/JYFxjyidBKejBqGCdE5DrjYnJA
- Hkjq/vnE+t/iF+RbEzVIsy6KpiieC0gEQVxXDOkwBm1Du1a5CqLw5QDShMqnGvz5X3ndBIYRhU3
- adJG44tfxW3PzPY4=
-X-Received: by 2002:a1c:4c0c:: with SMTP id z12mr4237888wmf.63.1582708021339; 
- Wed, 26 Feb 2020 01:07:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxEe9qGtTSjnph2l+n4efoPvZ0fCNimm1TcNOPQJDpuzMJUAjGGueNeLYWJy1fNh3q+uXjNeQ==
-X-Received: by 2002:a1c:4c0c:: with SMTP id z12mr4237858wmf.63.1582708021049; 
- Wed, 26 Feb 2020 01:07:01 -0800 (PST)
+ bh=ueZNy91f6vpalfK/xoKwpCSS7mTT4hlV5Y3nJIZ9/Zk=;
+ b=cJy4W4Hh0VI614kd4nYavFiFNSE4g2g4fIEXAxOSfXbtp/JU7vIjMjolSH0RZS/kPF
+ wqFWQ2df7uiv5Ou1vba3xTGueU7lVV6oGDJZzRvYuylJjUd9ctCmKyVQxh+RARvZO2LC
+ 2rcIP7f7C3VJgJzCpCdr1340Job/dHcw6ExyOI+7bNwtwEFZctucPlFuQuFchhB+IQmM
+ K4Yh33epMJZJYUAlorw3l0ImP7wjkm/fl8+klKZcwNjR+4AWrFxD6WaNGZ7O8L8TIyzb
+ uhSLftw4QHEvOCCUc/SQCJEEHe4ewfMMHQLXH/SwEF2GP2YniKTa1x194P23gleieli8
+ mmuw==
+X-Gm-Message-State: APjAAAVfnCi/aRl7mAmY7AsNaADIBT/L3g+2/+kq17aKGiezJP3PRwe5
+ IXxgJN8rq8Pjv7TLd6CfOsukOcE/PWJAVyF1jBNpWV/rhGmQ22/dX1lIrnSK6lRfnpKcd22NaNb
+ gnpaTzmJYmJjRYxE=
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr4104298wrl.190.1582708070064; 
+ Wed, 26 Feb 2020 01:07:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwoKCDuyRwV+5yWIC00O1VTnlMXdixnu3c78yhQii1u4RDRFIBx6cOaRgZiOdvwdeQL/ob8Bg==
+X-Received: by 2002:adf:df8e:: with SMTP id z14mr4104269wrl.190.1582708069703; 
+ Wed, 26 Feb 2020 01:07:49 -0800 (PST)
 Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
  by smtp.gmail.com with ESMTPSA id
- 133sm2158279wme.32.2020.02.26.01.06.59
+ x21sm1913251wmi.30.2020.02.26.01.07.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Feb 2020 01:07:00 -0800 (PST)
-Date: Wed, 26 Feb 2020 04:07:00 -0500
+ Wed, 26 Feb 2020 01:07:49 -0800 (PST)
+Date: Wed, 26 Feb 2020 04:07:48 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 17/30] virtio-iommu: Implement fault reporting
-Message-ID: <20200226090010.708934-18-mst@redhat.com>
+Subject: [PULL v2 27/30] libvhost-user: implement in-band notifications
+Message-ID: <20200226090010.708934-28-mst@redhat.com>
 References: <20200226090010.708934-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200226090010.708934-1-mst@redhat.com>
@@ -105,167 +105,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>,
- Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Xie Yongji <xieyongji@baidu.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-The event queue allows to report asynchronous errors.
-The translate function now injects faults when relevant.
+Add support for VHOST_USER_PROTOCOL_F_IN_BAND_NOTIFICATIONS, but
+as it's not desired by default, don't enable it unless the device
+implementation opts in by returning it from its protocol features
+callback.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Note that I updated vu_set_vring_err_exec(), but didn't add any
+sending of the VHOST_USER_SLAVE_VRING_ERR message as there's no
+write to the err_fd today either.
 
-Message-Id: <20200214132745.23392-7-eric.auger@redhat.com>
+This also adds vu_queue_notify_sync() which can be used to force
+a synchronous notification if inband notifications are supported.
+Previously, I had left out the slave->master direction handling
+of F_REPLY_ACK, this now adds some code to support it as well.
+
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Message-Id: <20200123081708.7817-7-johannes@sipsolutions.net>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-iommu.c | 70 +++++++++++++++++++++++++++++++++++++---
- hw/virtio/trace-events   |  1 +
- 2 files changed, 66 insertions(+), 5 deletions(-)
+ contrib/libvhost-user/libvhost-user.h |  14 ++++
+ contrib/libvhost-user/libvhost-user.c | 103 +++++++++++++++++++++++++-
+ 2 files changed, 114 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index 59e9cd3d9a..8509f64004 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -468,6 +468,48 @@ out:
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/=
+libvhost-user.h
+index 5cb7708559..6fc8000e99 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -54,6 +54,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD =3D 10,
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER =3D 11,
+     VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD =3D 12,
++    VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS =3D 14,
+=20
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+@@ -95,6 +96,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
+     VHOST_USER_GPU_SET_SOCKET =3D 33,
++    VHOST_USER_VRING_KICK =3D 35,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -103,6 +105,8 @@ typedef enum VhostUserSlaveRequest {
+     VHOST_USER_SLAVE_IOTLB_MSG =3D 1,
+     VHOST_USER_SLAVE_CONFIG_CHANGE_MSG =3D 2,
+     VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG =3D 3,
++    VHOST_USER_SLAVE_VRING_CALL =3D 4,
++    VHOST_USER_SLAVE_VRING_ERR =3D 5,
+     VHOST_USER_SLAVE_MAX
+ }  VhostUserSlaveRequest;
+=20
+@@ -528,6 +532,16 @@ bool vu_queue_empty(VuDev *dev, VuVirtq *vq);
+  */
+ void vu_queue_notify(VuDev *dev, VuVirtq *vq);
+=20
++/**
++ * vu_queue_notify_sync:
++ * @dev: a VuDev context
++ * @vq: a VuVirtq queue
++ *
++ * Request to notify the queue via callfd (skipped if unnecessary)
++ * or sync message if possible.
++ */
++void vu_queue_notify_sync(VuDev *dev, VuVirtq *vq);
++
+ /**
+  * vu_queue_pop:
+  * @dev: a VuDev context
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
+libvhost-user.c
+index 3abc9689e5..3bca996c62 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -136,6 +136,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_GET_INFLIGHT_FD),
+         REQ(VHOST_USER_SET_INFLIGHT_FD),
+         REQ(VHOST_USER_GPU_SET_SOCKET),
++        REQ(VHOST_USER_VRING_KICK),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+@@ -163,7 +164,10 @@ vu_panic(VuDev *dev, const char *msg, ...)
+     dev->panic(dev, buf);
+     free(buf);
+=20
+-    /* FIXME: find a way to call virtio_error? */
++    /*
++     * FIXME:
++     * find a way to call virtio_error, or perhaps close the connection?
++     */
+ }
+=20
+ /* Translate guest physical address to our virtual address.  */
+@@ -1203,6 +1207,14 @@ vu_set_vring_err_exec(VuDev *dev, VhostUserMsg *vmsg=
+)
+ static bool
+ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
++    /*
++     * Note that we support, but intentionally do not set,
++     * VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS. This means that
++     * a device implementation can return it in its callback
++     * (get_protocol_features) if it wants to use this for
++     * simulation, but it is otherwise not desirable (if even
++     * implemented by the master.)
++     */
+     uint64_t features =3D 1ULL << VHOST_USER_PROTOCOL_F_MQ |
+                         1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+                         1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
+@@ -1235,6 +1247,25 @@ vu_set_protocol_features_exec(VuDev *dev, VhostUserM=
+sg *vmsg)
+=20
+     dev->protocol_features =3D vmsg->payload.u64;
+=20
++    if (vu_has_protocol_feature(dev,
++                                VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS=
+) &&
++        (!vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_SLAVE_REQ) ||
++         !vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_REPLY_ACK))) =
+{
++        /*
++         * The use case for using messages for kick/call is simulation, to=
+ make
++         * the kick and call synchronous. To actually get that behaviour, =
+both
++         * of the other features are required.
++         * Theoretically, one could use only kick messages, or do them wit=
+hout
++         * having F_REPLY_ACK, but too many (possibly pending) messages on=
+ the
++         * socket will eventually cause the master to hang, to avoid this =
+in
++         * scenarios where not desired enforce that the settings are in a =
+way
++         * that actually enables the simulation case.
++         */
++        vu_panic(dev,
++                 "F_IN_BAND_NOTIFICATIONS requires F_SLAVE_REQ && F_REPLY_=
+ACK");
++        return false;
++    }
++
+     if (dev->iface->set_protocol_features) {
+         dev->iface->set_protocol_features(dev, features);
+     }
+@@ -1495,6 +1526,34 @@ vu_set_inflight_fd(VuDev *dev, VhostUserMsg *vmsg)
+     return false;
+ }
+=20
++static bool
++vu_handle_vring_kick(VuDev *dev, VhostUserMsg *vmsg)
++{
++    unsigned int index =3D vmsg->payload.state.index;
++
++    if (index >=3D dev->max_queues) {
++        vu_panic(dev, "Invalid queue index: %u", index);
++        return false;
++    }
++
++    DPRINT("Got kick message: handler:%p idx:%d\n",
++           dev->vq[index].handler, index);
++
++    if (!dev->vq[index].started) {
++        dev->vq[index].started =3D true;
++
++        if (dev->iface->queue_set_started) {
++            dev->iface->queue_set_started(dev, index, true);
++        }
++    }
++
++    if (dev->vq[index].handler) {
++        dev->vq[index].handler(dev, index);
++    }
++
++    return false;
++}
++
+ static bool
+ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+ {
+@@ -1577,6 +1636,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+         return vu_get_inflight_fd(dev, vmsg);
+     case VHOST_USER_SET_INFLIGHT_FD:
+         return vu_set_inflight_fd(dev, vmsg);
++    case VHOST_USER_VRING_KICK:
++        return vu_handle_vring_kick(dev, vmsg);
+     default:
+         vmsg_close_fds(vmsg);
+         vu_panic(dev, "Unhandled request: %d", vmsg->request);
+@@ -2038,8 +2099,7 @@ vring_notify(VuDev *dev, VuVirtq *vq)
+     return !v || vring_need_event(vring_get_used_event(vq), new, old);
+ }
+=20
+-void
+-vu_queue_notify(VuDev *dev, VuVirtq *vq)
++static void _vu_queue_notify(VuDev *dev, VuVirtq *vq, bool sync)
+ {
+     if (unlikely(dev->broken) ||
+         unlikely(!vq->vring.avail)) {
+@@ -2051,11 +2111,48 @@ vu_queue_notify(VuDev *dev, VuVirtq *vq)
+         return;
+     }
+=20
++    if (vq->call_fd < 0 &&
++        vu_has_protocol_feature(dev,
++                                VHOST_USER_PROTOCOL_F_INBAND_NOTIFICATIONS=
+) &&
++        vu_has_protocol_feature(dev, VHOST_USER_PROTOCOL_F_SLAVE_REQ)) {
++        VhostUserMsg vmsg =3D {
++            .request =3D VHOST_USER_SLAVE_VRING_CALL,
++            .flags =3D VHOST_USER_VERSION,
++            .size =3D sizeof(vmsg.payload.state),
++            .payload.state =3D {
++                .index =3D vq - dev->vq,
++            },
++        };
++        bool ack =3D sync &&
++                   vu_has_protocol_feature(dev,
++                                           VHOST_USER_PROTOCOL_F_REPLY_ACK=
+);
++
++        if (ack) {
++            vmsg.flags |=3D VHOST_USER_NEED_REPLY_MASK;
++        }
++
++        vu_message_write(dev, dev->slave_fd, &vmsg);
++        if (ack) {
++            vu_message_read(dev, dev->slave_fd, &vmsg);
++        }
++        return;
++    }
++
+     if (eventfd_write(vq->call_fd, 1) < 0) {
+         vu_panic(dev, "Error writing eventfd: %s", strerror(errno));
      }
  }
 =20
-+static void virtio_iommu_report_fault(VirtIOIOMMU *viommu, uint8_t reason,
-+                                      int flags, uint32_t endpoint,
-+                                      uint64_t address)
++void vu_queue_notify(VuDev *dev, VuVirtq *vq)
 +{
-+    VirtIODevice *vdev =3D &viommu->parent_obj;
-+    VirtQueue *vq =3D viommu->event_vq;
-+    struct virtio_iommu_fault fault;
-+    VirtQueueElement *elem;
-+    size_t sz;
-+
-+    memset(&fault, 0, sizeof(fault));
-+    fault.reason =3D reason;
-+    fault.flags =3D cpu_to_le32(flags);
-+    fault.endpoint =3D cpu_to_le32(endpoint);
-+    fault.address =3D cpu_to_le64(address);
-+
-+    elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
-+
-+    if (!elem) {
-+        error_report_once(
-+            "no buffer available in event queue to report event");
-+        return;
-+    }
-+
-+    if (iov_size(elem->in_sg, elem->in_num) < sizeof(fault)) {
-+        virtio_error(vdev, "error buffer of wrong size");
-+        virtqueue_detach_element(vq, elem, 0);
-+        g_free(elem);
-+        return;
-+    }
-+
-+    sz =3D iov_from_buf(elem->in_sg, elem->in_num, 0,
-+                      &fault, sizeof(fault));
-+    assert(sz =3D=3D sizeof(fault));
-+
-+    trace_virtio_iommu_report_fault(reason, flags, endpoint, address);
-+    virtqueue_push(vq, elem, sz);
-+    virtio_notify(vdev, vq);
-+    g_free(elem);
-+
++    _vu_queue_notify(dev, vq, false);
 +}
 +
- static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr =
-addr,
-                                             IOMMUAccessFlags flag,
-                                             int iommu_idx)
-@@ -476,9 +518,10 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemor=
-yRegion *mr, hwaddr addr,
-     VirtIOIOMMUInterval interval, *mapping_key;
-     VirtIOIOMMUMapping *mapping_value;
-     VirtIOIOMMU *s =3D sdev->viommu;
-+    bool read_fault, write_fault;
-     VirtIOIOMMUEndpoint *ep;
-+    uint32_t sid, flags;
-     bool bypass_allowed;
--    uint32_t sid;
-     bool found;
-=20
-     interval.low =3D addr;
-@@ -504,6 +547,9 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemory=
-Region *mr, hwaddr addr,
-     if (!ep) {
-         if (!bypass_allowed) {
-             error_report_once("%s sid=3D%d is not known!!", __func__, sid)=
-;
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_UNKNOWN,
-+                                      VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                      sid, addr);
-         } else {
-             entry.perm =3D flag;
-         }
-@@ -515,6 +561,9 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemory=
-Region *mr, hwaddr addr,
-             error_report_once("%s %02x:%02x.%01x not attached to any domai=
-n",
-                               __func__, PCI_BUS_NUM(sid),
-                               PCI_SLOT(sid), PCI_FUNC(sid));
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_DOMAIN,
-+                                      VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                      sid, addr);
-         } else {
-             entry.perm =3D flag;
-         }
-@@ -527,15 +576,26 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemo=
-ryRegion *mr, hwaddr addr,
-     if (!found) {
-         error_report_once("%s no mapping for 0x%"PRIx64" for sid=3D%d",
-                           __func__, addr, sid);
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                  sid, addr);
-         goto unlock;
-     }
-=20
--    if (((flag & IOMMU_RO) &&
--            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
--        ((flag & IOMMU_WO) &&
--            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
-+    read_fault =3D (flag & IOMMU_RO) &&
-+                    !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_READ);
-+    write_fault =3D (flag & IOMMU_WO) &&
-+                    !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_WRITE);
++void vu_queue_notify_sync(VuDev *dev, VuVirtq *vq)
++{
++    _vu_queue_notify(dev, vq, true);
++}
 +
-+    flags =3D read_fault ? VIRTIO_IOMMU_FAULT_F_READ : 0;
-+    flags |=3D write_fault ? VIRTIO_IOMMU_FAULT_F_WRITE : 0;
-+    if (flags) {
-         error_report_once("%s permission error on 0x%"PRIx64"(%d): allowed=
-=3D%d",
-                           __func__, addr, flag, mapping_value->flags);
-+        flags |=3D VIRTIO_IOMMU_FAULT_F_ADDRESS;
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  flags | VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                  sid, addr);
-         goto unlock;
-     }
-     entry.translated_addr =3D addr - mapping_key->low + mapping_value->phy=
-s_addr;
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 095aa8b509..e83500bee9 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -72,3 +72,4 @@ virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=
-=3D%d"
- virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=3D%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=3D%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_=
-t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=3D%d"
-+virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoin=
-t, uint64_t addr) "FAULT reason=3D%d flags=3D%d endpoint=3D%d address =3D0x=
-%"PRIx64
+ static inline void
+ vring_used_flags_set_bit(VuVirtq *vq, int mask)
+ {
 --=20
 MST
 
