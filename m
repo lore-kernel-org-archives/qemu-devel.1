@@ -2,89 +2,87 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB2DC4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC1CC4BA0A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 391E421D7E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 259D521D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vi+IjzEM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391E421D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDr4SaYZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 259D521D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6rSB-0000Ff-FK
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:49:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46359)
+	id 1j6rTP-0001o9-9b
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:51:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j6rIQ-00019M-NG
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:56 -0500
+ (envelope-from <armbru@redhat.com>) id 1j6rSg-0000r6-AT
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j6rIP-00031E-Fq
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:54 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:40695)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j6rIP-0002zQ-8a
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:39:53 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id t3so1657236wru.7
- for <qemu-devel@nongnu.org>; Tue, 25 Feb 2020 23:39:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=yA0pga7V3rNc2E3Kn75tRyKVD9rdhZJ6PsuYJbKRcmo=;
- b=Vi+IjzEMj0mRrqQgsLvPFHxXM421sRNy+ESIcb1eIYmsIqOyUbk6MkDo2BP5ObByvu
- 6zm7OmVGPg/Q3BGJKCrho470SvpTS2lKaDASvrR+35zGs0+CoTcncFmGN7oEeIcgiUHH
- FKRQm0kd8jMmQgMDscpvW8ZuUxVl8xSp5Q2fq81hc7jzREkZFiUwMtczobEJnnINmbVv
- Td9Xzgqg1eX2EIeohM+bbvUoSS4TIOcta/OI+KRsgaQFyX58iUDpkWtCep1M44IpadOK
- /cXds15qNpOJgGeKi0oNM/AppSibpUXf++ujbnDvyf9zAD/aEZeBOtFFZcPP69h5zI8E
- gJhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=yA0pga7V3rNc2E3Kn75tRyKVD9rdhZJ6PsuYJbKRcmo=;
- b=rGhsUbtD6M1UMsJ66n5rY+DI7QTrv08GUr1Zwpajf5GKjX36uYNFNYy03CwKoPePXK
- bN857Hyx0uG6Mi+NRfxXT52S+5Lcr3Q48lhFN3pB8in9IyzfYjHMKI1biknkVGA+STE0
- k8glZWAm3xzxxIHK1eSLakjFb52H3EXc5mlp8ch1/dw3rfyuLhHOc184/ck/NkgPDirC
- LNOFxLCn/QDNTlSYL7WhVlo/EV92ywMqlOb8C4kPQEdZFYDkcRRUdiWKdFRiMKpqV0Am
- DJTTXoKJ3XxnDEsVnjC+zyjvaLIUaoUdxpcwg0jIPrafJ2rcDI+CnGbl2Bxc54hMHLBB
- oz+w==
-X-Gm-Message-State: APjAAAWQFwOXhJJAbQerPExs8U2Gj3nxKWZXk4sjHRBMecQKQpibGpNy
- 2u+UbP7mQTseiO/qaoyf95DSiw==
-X-Google-Smtp-Source: APXvYqxV0AvHMN85MFGtO8f65KnoaSPzjGsG2NP3GZu+XwWL07vTFygWuCFNom5rTCzL9wgN6jW9wQ==
-X-Received: by 2002:adf:8084:: with SMTP id 4mr4040547wrl.201.1582702792233;
- Tue, 25 Feb 2020 23:39:52 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g7sm2064272wrq.21.2020.02.25.23.39.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Feb 2020 23:39:48 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BA1D01FFA6;
- Wed, 26 Feb 2020 07:39:30 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 17/19] tcg: save vaddr temp for plugin usage
-Date: Wed, 26 Feb 2020 07:39:27 +0000
-Message-Id: <20200226073929.28237-18-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200226073929.28237-1-alex.bennee@linaro.org>
-References: <20200226073929.28237-1-alex.bennee@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1j6rSf-0004CQ-9j
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43930
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j6rSf-0004Bg-5l
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:50:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582703428;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+tY0oUojW+2EZr6GZQKwp8RRahDHKrA6+NzUrOrkaF4=;
+ b=SDr4SaYZf7V9Z2JRlDGKDMwhW1GaugJMI8HbLLq6xyY9axyb3tSo4KxClbrr4I8aO2EfxQ
+ ht1NbiymsItljya+COGYXj6fp+nnPKLQg3d+f9H+zRI8A/bb7c5PXpvqf9AY9Us1sMkp3G
+ p2T+bKGI3/V4GYh5NPW30sNAanpKQEo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-vEMZ8NhEPxCgypuTeI6JMg-1; Wed, 26 Feb 2020 02:50:26 -0500
+X-MC-Unique: vEMZ8NhEPxCgypuTeI6JMg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54E64189F763;
+ Wed, 26 Feb 2020 07:50:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AA378C06A;
+ Wed, 26 Feb 2020 07:50:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 01C9F11386A6; Wed, 26 Feb 2020 08:50:20 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/4] docs: Miscellaneous rST conversions
+References: <20200225154121.21116-1-peter.maydell@linaro.org>
+ <5a6757cb-fda2-ba3f-6c24-f09829faf4ab@redhat.com>
+ <CAFEAcA-C0o_u8VABdRky7GUCvyiWhkn74cT1UYAtEAAFjGBLAA@mail.gmail.com>
+ <6ed08bea-4fcb-08dc-417c-a0f534173a31@redhat.com>
+ <CAFEAcA9KmsHS4fnYWvpMMa5SLLUBjiPcOsfmGOHcWopd11M3+g@mail.gmail.com>
+Date: Wed, 26 Feb 2020 08:50:20 +0100
+In-Reply-To: <CAFEAcA9KmsHS4fnYWvpMMa5SLLUBjiPcOsfmGOHcWopd11M3+g@mail.gmail.com>
+ (Peter Maydell's message of "Tue, 25 Feb 2020 17:59:33 +0000")
+Message-ID: <874kvdaitf.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,94 +94,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org, "Emilio G . Cota" <cota@braap.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While do_gen_mem_cb does copy (via extu_tl_i64) vaddr into a new temp
-this won't help if the vaddr temp gets clobbered by the actual
-load/store op. To avoid this clobbering we explicitly copy vaddr
-before the op to ensure it is live my the time we do the
-instrumentation.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Cc: qemu-stable@nongnu.org
-Message-Id: <20200225124710.14152-18-alex.bennee@linaro.org>
+> On Tue, 25 Feb 2020 at 17:48, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 25/02/20 18:11, Peter Maydell wrote:
+>> >> I assume these are not meant to be applied now, except patch 2?
+>> > No, I intended them to be reviewable and applied now. Why
+>> > do you think we should wait?
+>>
+>> Because they remove information from qemu-doc.texi.  I think it's
+>> feasible to do a mass conversion quite soon, within a single pull
+>> request, the only important part that is missing is the hxtool conversio=
+n.
+>
+> My assumption was that we would attack this by:
+>  * converting chunks of the documentation which are in qemu-doc.texi
+>    but which aren't in the qemu.1 manpage (basically in the way this
+>    series is doing)
+>  * get the qapidoc generation conversion reviewed and into
+>    master (since at the moment it outputs into files included
+>    from qemu-doc)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 7d782002e3f..e2e25ebf7db 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -2794,13 +2794,26 @@ static void tcg_gen_req_mo(TCGBar type)
-     }
- }
- 
-+static inline TCGv plugin_prep_mem_callbacks(TCGv vaddr)
-+{
-+#ifdef CONFIG_PLUGIN
-+    if (tcg_ctx->plugin_insn != NULL) {
-+        /* Save a copy of the vaddr for use after a load.  */
-+        TCGv temp = tcg_temp_new();
-+        tcg_gen_mov_tl(temp, vaddr);
-+        return temp;
-+    }
-+#endif
-+    return vaddr;
-+}
-+
- static inline void plugin_gen_mem_callbacks(TCGv vaddr, uint16_t info)
- {
- #ifdef CONFIG_PLUGIN
--    if (tcg_ctx->plugin_insn == NULL) {
--        return;
-+    if (tcg_ctx->plugin_insn != NULL) {
-+        plugin_gen_empty_mem_callback(vaddr, info);
-+        tcg_temp_free(vaddr);
-     }
--    plugin_gen_empty_mem_callback(vaddr, info);
- #endif
- }
- 
-@@ -2822,6 +2835,7 @@ void tcg_gen_qemu_ld_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
-         }
-     }
- 
-+    addr = plugin_prep_mem_callbacks(addr);
-     gen_ldst_i32(INDEX_op_qemu_ld_i32, val, addr, memop, idx);
-     plugin_gen_mem_callbacks(addr, info);
- 
-@@ -2868,6 +2882,7 @@ void tcg_gen_qemu_st_i32(TCGv_i32 val, TCGv addr, TCGArg idx, MemOp memop)
-         memop &= ~MO_BSWAP;
-     }
- 
-+    addr = plugin_prep_mem_callbacks(addr);
-     gen_ldst_i32(INDEX_op_qemu_st_i32, val, addr, memop, idx);
-     plugin_gen_mem_callbacks(addr, info);
- 
-@@ -2905,6 +2920,7 @@ void tcg_gen_qemu_ld_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
-         }
-     }
- 
-+    addr = plugin_prep_mem_callbacks(addr);
-     gen_ldst_i64(INDEX_op_qemu_ld_i64, val, addr, memop, idx);
-     plugin_gen_mem_callbacks(addr, info);
- 
-@@ -2967,6 +2983,7 @@ void tcg_gen_qemu_st_i64(TCGv_i64 val, TCGv addr, TCGArg idx, MemOp memop)
-         memop &= ~MO_BSWAP;
-     }
- 
-+    addr = plugin_prep_mem_callbacks(addr);
-     gen_ldst_i64(INDEX_op_qemu_st_i64, val, addr, memop, idx);
-     plugin_gen_mem_callbacks(addr, info);
- 
--- 
-2.20.1
+Not true.  QAPI doc comments go into *separate* manuals, the "QEMU QMP
+reference" (docs/interop/qemu-qmp-ref.*), and the "QEMU Guest Agent
+protocol reference" (docs/interop/qemu-ga-ref.*).
+
+In more detail: scripts/qapi-gen.py generates
+docs/interop/qemu-qmp-qapi.texi from qapi/qapi-schema.json, and
+docs/interop/qemu-ga-qapi.texi from qga/qapi-schema.json.  These are
+included into docs/interop/qemu-qmp-ref.texi and
+docs/interop/qemu-ga-ref.texi, respectively.
+
+>  * convert the manpage parts; we have the machinery for dealing
+>    with the hxtool files, it just needs a little more work
+[...]
 
 
