@@ -2,76 +2,90 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HK_RANDOM_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 803A8C4BA0E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B66C4BA0B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52EBC24673
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:43:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52EBC24673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5025A24673
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 10:47:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqbRLr6b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5025A24673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6u9o-0005PG-Iv
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:43:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60568)
+	id 1j6uE3-0007Uc-Gv
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 05:47:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <miaoyubo@huawei.com>) id 1j6u9E-0004rf-Q1
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:38 -0500
+ (envelope-from <programmingkidx@gmail.com>) id 1j6uDQ-00070S-RK
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <miaoyubo@huawei.com>) id 1j6u9D-00076v-8J
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:36 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2071 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <miaoyubo@huawei.com>) id 1j6u9C-0006xg-ME
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:42:35 -0500
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id 67A814133FB5CD0D5424;
- Wed, 26 Feb 2020 18:42:27 +0800 (CST)
-Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
- DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 26 Feb 2020 18:42:27 +0800
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme758-chm.china.huawei.com (10.3.19.104) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Wed, 26 Feb 2020 18:42:26 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1713.004;
- Wed, 26 Feb 2020 18:42:26 +0800
-From: miaoyubo <miaoyubo@huawei.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Thread-Topic: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for arm
-Thread-Index: AQHV634DptZMLVW0EUqun9Ee8tGbGqgrJCyAgACsLcD//4BQgIAAiRsw//+DXwCAAeyBoA==
-Date: Wed, 26 Feb 2020 10:42:26 +0000
-Message-ID: <f8e49df0209149808e55b6cef7f2ff05@huawei.com>
-References: <20200225015026.940-1-miaoyubo@huawei.com>
- <20200225015026.940-3-miaoyubo@huawei.com>
- <3086f4a2-fb0a-d276-7c76-f06474befa35@redhat.com>
- <c4aa08df40a74dbd876b9acfbbb09809@huawei.com>
- <20200225072522-mutt-send-email-mst@kernel.org>
- <766375327e6f422bbf751174269f7570@huawei.com>
- <20200225080529-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200225080529-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.173.221.29]
-Content-Type: text/plain; charset="iso-8859-1"
+ (envelope-from <programmingkidx@gmail.com>) id 1j6uDP-0007YY-Id
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 05:46:56 -0500
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:38176)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+ id 1j6uDM-0007N5-3e; Wed, 26 Feb 2020 05:46:53 -0500
+Received: by mail-yw1-xc41.google.com with SMTP id 10so2645464ywv.5;
+ Wed, 26 Feb 2020 02:46:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=UTx3NFxBdZPxuYKPf1+G0Vsmt35MgswZqfjQW72k32Q=;
+ b=jqbRLr6bUGle8yDlIvcSdNGcY2JdDbHj8UANXQHFeR8A2VUe38ty68TIDgx2a7Ljxh
+ 6U3ZQNAWdLbCYKindckFAfd/S4bojf1bh4kZNrXHDUVF2tNYELB6o4dtQyXihTsvxIRi
+ lI4jTUDGpRgTcc3fW16wi+EEYvDXXELwqCScG1oeHYT1UqDxPCr6suW3jl9Q4y9Uq+HO
+ P1kI6hQFsDw1FKDOV8RNvd09RRaVBR5nHDWFztl0G1GiBqT+wT5/y04A1uzmAesca3RY
+ q9BB9HmXrqGxhLbf3FPGg1oldrygwhPkmkkIiC1Z23TkqYtYtnpcW1+w0T2QjGrd7G9p
+ XY6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=UTx3NFxBdZPxuYKPf1+G0Vsmt35MgswZqfjQW72k32Q=;
+ b=blAebvXW6f428j9zf9/H4ihqK1jX5UoZRWnDTgYwZau1cf/26YWsSqhiZlAvfTha+S
+ K+RdnHNYMVKKApyP+/Uq0cEO1I0B8TiBWBrdQVZ5vHoLw4Dah8HI4x1TkEAhYEafd+DM
+ VLDiIM5nq84Xmkpn7A+KwMXRPwXvQkTP/FSiaLLXTpZJumMxN6HF+GM/9mLJ6VJ2ffEc
+ eilvtXInRkrNM2gubm49OmKpmuPiqRoMsYDX/GkzHhu8GPPtIEN5mi7TqWs+A6Fe0LCT
+ MG4/fAMgAIAs8/XTsDz5/plXm/VkKohYaI5d1IRhz+D494ma2+kUx7rWkJSh7sg1wzaO
+ +jEA==
+X-Gm-Message-State: APjAAAXlcm/Ogm1X9qwZQzvMfKbOfQgeyP6oWwfXGXMGetsl5TWYUsRH
+ oD3EvZxADhBaL8C3y6CLe9g=
+X-Google-Smtp-Source: APXvYqyL6Y8m8Q3I5j4wW1aj5gPhLTEFYViUlM7XhCS6TR12ZQ7mrtonZzDCOPg6Vel6Y2BwS+E7Iw==
+X-Received: by 2002:a81:8785:: with SMTP id x127mr2724412ywf.455.1582714010724; 
+ Wed, 26 Feb 2020 02:46:50 -0800 (PST)
+Received: from [192.168.0.5] (d149-67-30-58.try.wideopenwest.com.
+ [67.149.58.30])
+ by smtp.gmail.com with ESMTPSA id q16sm722502ywa.110.2020.02.26.02.46.49
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 26 Feb 2020 02:46:50 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+Date: Wed, 26 Feb 2020 05:46:47 -0500
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.189
+Message-Id: <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+ <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+ <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,189 +97,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Paul Clarke <pc@us.ibm.com>, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-ppc@nongnu.org, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-> -----Original Message-----
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Tuesday, February 25, 2020 9:12 PM
-> To: miaoyubo <miaoyubo@huawei.com>
-> Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>;
-> peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> berrange@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
-> <xiexiangyou@huawei.com>; imammedo@redhat.com
-> Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support for ar=
-m
+> On Feb 25, 2020, at 7:09 AM, BALATON Zoltan <balaton@eik.bme.hu> =
+wrote:
 >=20
-> On Tue, Feb 25, 2020 at 12:44:15PM +0000, miaoyubo wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > Sent: Tuesday, February 25, 2020 8:27 PM
-> > > To: miaoyubo <miaoyubo@huawei.com>
-> > > Cc: Philippe Mathieu-Daud=E9 <philmd@redhat.com>;
-> > > peter.maydell@linaro.org; shannon.zhaosl@gmail.com;
-> > > berrange@redhat.com; qemu-devel@nongnu.org; Xiexiangyou
-> > > <xiexiangyou@huawei.com>; imammedo@redhat.com
-> > > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb support
-> > > for arm
-> > >
-> > > On Tue, Feb 25, 2020 at 12:12:12PM +0000, miaoyubo wrote:
-> > > >
-> > > > > -----Original Message-----
-> > > > > From: Philippe Mathieu-Daud=E9 [mailto:philmd@redhat.com]
-> > > > > Sent: Tuesday, February 25, 2020 5:48 PM
-> > > > > To: miaoyubo <miaoyubo@huawei.com>; peter.maydell@linaro.org;
-> > > > > shannon.zhaosl@gmail.com
-> > > > > Cc: berrange@redhat.com; mst@redhat.com; qemu-
-> devel@nongnu.org;
-> > > > > Xiexiangyou <xiexiangyou@huawei.com>; imammedo@redhat.com
-> > > > > Subject: Re: [PATCH v4 2/3] acpi:pci-expender-bus: Add pxb
-> > > > > support for arm
-> > > > >
-> > > > > On 2/25/20 2:50 AM, Yubo Miao wrote:
-> > > > > > From: miaoyubo <miaoyubo@huawei.com>
-> > > > > >
-> > > > > > Currently virt machine is not supported by pxb-pcie, and only
-> > > > > > one main host bridge described in ACPI tables.
-> > > > > > In this patch,PXB-PCIE is supproted by arm and certain
-> > > > >
-> > > > > Typos: "expander" in subject and "supported" here.
-> > > > >
-> > > >
-> > > > Thanks for your reply and sorry for the mistakes.
-> > > > I will check all the subjects and comments.
-> > > >
-> > > > > > resource is allocated for each pxb-pcie in acpi table.
-> > > > > > The resource for the main host bridge is also reallocated.
-> > > > > >
-> > > > > > Signed-off-by: miaoyubo <miaoyubo@huawei.com>
-> > > > > > ---
-> > > > > >   hw/arm/virt-acpi-build.c | 115
-> > > > > ++++++++++++++++++++++++++++++++++++---
-> > > > > >   hw/arm/virt.c            |   3 +
-> > > > > >   include/hw/arm/virt.h    |   7 +++
-> > > > > >   3 files changed, 118 insertions(+), 7 deletions(-)
-> > > > > >
-> > > > > > diff --git a/hw/arm/virt-acpi-build.c
-> > > > > > b/hw/arm/virt-acpi-build.c index 37c34748a6..be1986c60d 100644
-> > > > > > --- a/hw/arm/virt-acpi-build.c
-> > > > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > > > @@ -49,6 +49,8 @@
-> > > > > >   #include "kvm_arm.h"
-> > > > > >   #include "migration/vmstate.h"
-> > > > > >
-> > > > > > +#include "hw/arm/virt.h"
-> > > > > > +#include "hw/pci/pci_bus.h"
-> > > > > >   #define ARM_SPI_BASE 32
-> > > > > >
-> > > > > >       if (use_highmem) {
-> > > > > >           hwaddr base_mmio_high =3D
-> > > > > > memmap[VIRT_HIGH_PCIE_MMIO].base;
-> > > > > @@
-> > > > > > -746,7 +847,7 @@ build_dsdt(GArray *table_data, BIOSLinker
-> > > > > > *linker,
-> > > > > VirtMachineState *vms)
-> > > > > >       acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-> > > > > >                       (irqmap[VIRT_MMIO] + ARM_SPI_BASE),
-> > > > > NUM_VIRTIO_TRANSPORTS);
-> > > > > >       acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] +
-> > > > > ARM_SPI_BASE),
-> > > > > > -                      vms->highmem, vms->highmem_ecam);
-> > > > > > +                      vms->highmem, vms->highmem_ecam, vms);
-> > > > > >       if (vms->acpi_dev) {
-> > > > > >           build_ged_aml(scope, "\\_SB."GED_DEVICE,
-> > > > > >                         HOTPLUG_HANDLER(vms->acpi_dev), diff
-> > > > > > --git a/hw/arm/virt.c b/hw/arm/virt.c index
-> > > > > > f788fe27d6..6314928671
-> > > > > > 100644
-> > > > > > --- a/hw/arm/virt.c
-> > > > > > +++ b/hw/arm/virt.c
-> > > > > > @@ -1246,6 +1246,9 @@ static void create_pcie(VirtMachineState
-> > > *vms)
-> > > > > >       }
-> > > > > >
-> > > > > >       pci =3D PCI_HOST_BRIDGE(dev);
-> > > > > > +
-> > > > > > +    VIRT_MACHINE(qdev_get_machine())->bus =3D pci->bus;
-> > > > > > +
-> > > > > >       if (pci->bus) {
-> > > > > >           for (i =3D 0; i < nb_nics; i++) {
-> > > > > >               NICInfo *nd =3D &nd_table[i]; diff --git
-> > > > > > a/include/hw/arm/virt.h b/include/hw/arm/virt.h index
-> > > > > > 71508bf40c..90f10a1e46 100644
-> > > > > > --- a/include/hw/arm/virt.h
-> > > > > > +++ b/include/hw/arm/virt.h
-> > > > > > @@ -140,6 +140,13 @@ typedef struct {
-> > > > > >       DeviceState *gic;
-> > > > > >       DeviceState *acpi_dev;
-> > > > > >       Notifier powerdown_notifier;
-> > > > > > +    /*
-> > > > > > +     * pointer to devices and objects
-> > > > > > +     * Via going through the bus, all
-> > > > > > +     * pci devices and related objectes
-> > > > >
-> > > > > Typo "objects", but I don't understand the comment well.
-> > > > >
-> > > >
-> > > > Sorry for any confusion caused ,I will rewrite the comment
-> > > > /* point to the root bus, which is pcie.0 */ Does this comment
-> > > > make sense?
-> > >
-> > > Not really. E.g. it doesn't say what happens if there's more than one=
- root.
-> > >
-> >
-> > If there's more than one root, like pcie.0 and pcie.1, it still point t=
-o pcie.0.
-> > In docs/pci_expander_bridge.txt, it points out pxb could be placed
-> > only on bus 0 (pci.0). Therfore, the structure still could help us to f=
-ind all
-> pxb devices.
-> > /* point to the bus 0, which is pcie.0
-> >   * pxb devices could only be placed on bus 0.
-> >   */
-> > Is this ok?
+> On Mon, 24 Feb 2020, Programmingkid wrote:
+>> Intel Core i5-2500S CPU @ 2.70GHz.
+> [...]
+>> Ok, I did test on the G4, here are my results:
+>>=20
+>> Git commit: c1e667d2598b9b3ce62b8e89ed22dd38dfe9f57f
+>> Mac OS 10.4.3 VM
+>> -cpu G4
+>> -USB audio device
+>>=20
+>> Hardfloat=3Dfalse
+>> Audio sounds bad when playing midi file.
+>> Extraction rate: 1.5x
+>> Converting rate: 0.7x
+>> Total time: 7:24
+>>=20
+>> Hardfloat=3Dtrue
+>> Midi audio sounded perfect for about 30 seconds, then it went silent!
+>> Extraction rate: 1.4x (slower with hard float)
+>> Converting rate: 0.7x (same as without hardfloat)
+>> Total time: 7:16 (faster time with hardfloat)
 >=20
-> All this needs more comments in the code constructing the tables.
+> How is that extraction rate is slower but total time is less than =
+without hardfloat? There must be other factors here than just FP ops. =
+Maybe a better test is to not play the audio just save it to a file so =
+other issues with USB is not influencing the test.
+
+I does seem odd to me also.=20
+
+>> When I played sound this second time I hard the same broken audio I =
+usually hear with the USB audio device with hardfloat set to false. When =
+playing the same midi file with hardfloat set to true, the audio played =
+perfectly! It only played for 30 seconds before it went silent.
 >=20
+> So probably there are at least two problems: FPU emulation is not fast =
+enough to decode audio to fill buffer then there's also something with =
+usb-audio that jams it after a while? I don't think all of this is FPU =
+related.
 
-Thanks for replying, I will add more comments in the table construction.
+I think a timeout takes place and that is why audio stops playing. It is =
+probably an USB OHCI issue. The other USB controller seems to work =
+better.=20
 
-> Also, instead of trying to store bus and spreading logic around like this=
-, how
-> about just using object_resolve_path_type?
 >=20
+>> I can give you the full testing suite if you like. I run it on Mac OS =
+10.4 but it should compile with gcc on Linux. I will send it to you in a =
+separate email because it is big.
 >=20
+> Thanks, I'll have a look and see if I can make sense of it but not =
+sure when will I find time.
 
-Thanks for the suggestion, using object_resolve_path_type  seems to be bett=
-er.=20
+Please let me know if you have any questions with it.
 
-> > > > > > +     * could be gained.
-> > > > > > +     */
-> > > > > > +    PCIBus *bus;
-> > > > > >   } VirtMachineState;
-> > > > > >
-> > > > > >   #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :
-> > > > > > VIRT_PCIE_ECAM)
-> > > > > >
-> > > >
-> > > > Regards,
-> > > > Miao
-> >
-> > Regards,
-> > Miao
+>=20
+>> I have another idea on how to improve QEMU's performance. What if you =
+enabled more CPUs for the PowerPC target? Mac OS 9, Mac OS X, and Linux =
+support multiple CPUs. It might actually be easier to do this than to
+>=20
+> Have you tried if it works? I think MTTCG is enabled for PPC64 but not =
+sure about 32 bit PPC. The mac99 machine seems to init multiple CPUs but =
+not sure if they'll use MTTCG. But you could test it to see if it makes =
+any difference.
 
-Regards,
-Miao
+I had completely forgot about MTTCG. I think Howard once did some =
+performance testing with it and came back with favorable results. Maybe =
+this is another avenue we should look at.
+
+>=20
+>> improve the FPU. I imagine the performance increase with multiple =
+emulated CPUs would be much more noticeable.
+>=20
+> The Amiga like OSes I'm interested in don't use multiple cores so I'm =
+mainly interested in improving single core performance. Also I'm not =
+sure if (part of) your problem is slow FPU preventing fast enough audio =
+decoding then having multiple CPUs with slow FPU would help as this may =
+use a single thread anyway.
+
+Good point. MTTCG might be the option that really helps with speed =
+improvements.=
 
