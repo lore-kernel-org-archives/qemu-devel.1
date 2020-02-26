@@ -7,96 +7,122 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 784D6C4BA12
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28974C4BA12
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:28:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 410CA24680
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:22:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E994E2467B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 14:28:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOA777dc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410CA24680
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTgxvp6m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E994E2467B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6xZY-0004b9-Gl
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:22:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42359)
+	id 1j6xgF-0006TJ-5U
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 09:28:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44875)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j6xYu-00043Y-Ok
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:24 -0500
+ (envelope-from <david@redhat.com>) id 1j6xfN-0005o1-Mk
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j6xYq-0005cH-M5
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21135
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j6xfM-00036I-EL
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:01 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29345
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j6xYq-0005ZG-Hp
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:21:16 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j6xfM-00035S-A0
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 09:28:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582726875;
+ s=mimecast20190719; t=1582727278;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MSHbGqgS3B/wr2StKJrKN9dNOj5Ox0ESJKQAivfGhes=;
- b=gOA777dc9tQfr5qMiqPA7N7tgnAfbvwQrsjwspTGkPgWwhAR87NxPXoJmp9IP0Y+kf6YDq
- yRl0Xppez+RrMjQuyquEgS0ZLTPOYuSbuYKj8EguXvtn6MTnnWDOx88lfLTpaMT3s/X52z
- 3knynBn5Oq299kVLcFw+fAwG4NtOhiU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-KfbwHwNsOYyfeHfn4zsPdg-1; Wed, 26 Feb 2020 09:21:13 -0500
-X-MC-Unique: KfbwHwNsOYyfeHfn4zsPdg-1
-Received: by mail-wm1-f69.google.com with SMTP id f9so640130wmb.2
- for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 06:21:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CBenu/1p0A399odB+r0l5DGS3G3AmJFUTUr0sxpL1B4=;
- b=V++Gfp8pGa5O5EHbJIF9AjLjouth/CNj2pfkcSeJiQKvUaW5zCavkz6YUqOVMwTE/I
- K2L9cF8t8/47dymaSq3m2adSHqmFMOso0B7ZSOb/Ph1Es8smhBuKIVlzWG2KXVEE62+u
- Xeu8MmCnRXqsdJT0MkXPfuZ6iT0Gm8/4koa2d1WuaaGkzGy4SRh/EyjyclwFClT0sh5D
- OBkVKeYxJzFWFooefsyufiUuVF9MHzTXVRV865QtldZ2n/DSu/9B767S6Rv9a7fZ5Qud
- WvMFR79n5dE1iaJZEnI3PxQ7JRkqgbNa6bER10s/6c6+w+pEVtIM4PwDs4bsFPDPgEQS
- TlqQ==
-X-Gm-Message-State: APjAAAU5wJboulru3z5JIKAjFtHCVjFE5vtHc3aY4RW0W5S74VMs6k05
- j9O5WG/AR5f2Wi6TfX9sITgOXBEjbRnrJIbUAhp1nnnGimT3AcVpSv3V081sq/OpJU+MfSLC7+Y
- fRfri2UCr1ofBz5s=
-X-Received: by 2002:adf:e742:: with SMTP id c2mr5775614wrn.262.1582726872641; 
- Wed, 26 Feb 2020 06:21:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwJdFOZmI2Gsp4dGKfHGdPHM8nBJmmpzuLLZoPVs6a5/CSQbcL/CGbRn3eZDXpiL3vPxTW4ZQ==
-X-Received: by 2002:adf:e742:: with SMTP id c2mr5775577wrn.262.1582726872222; 
- Wed, 26 Feb 2020 06:21:12 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id h10sm3163365wml.18.2020.02.26.06.21.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Feb 2020 06:21:11 -0800 (PST)
-Subject: Re: [PATCH 1/2] aspeed/smc: Add some tracing
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200206112645.21275-1-clg@kaod.org>
- <20200206112645.21275-2-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ee72256b-8635-41e3-daa5-17ea1b5db9cd@redhat.com>
-Date: Wed, 26 Feb 2020 15:21:10 +0100
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4oKjCCCKBsTMp/Gr9ZpczGsW6NxL1BebRzwclsXXWAQ=;
+ b=jTgxvp6mSewj1l1ZvBRLHw2I/z4A6ZpEgAAXVipLD4ItOZGMnlGrb8Td8Wa/Ul5PerXNlM
+ JBObaoamhttHSsfaUrCs6OxlxFCwjIs/0BvCANdQhQGltYzrgHyXt4Q8nICKuFZ6GdTKea
+ +VIPrp28fJweJTHEJEQb5hgdcY0oDtI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-a8kDG41KMaappZQbyoyNqQ-1; Wed, 26 Feb 2020 09:27:56 -0500
+X-MC-Unique: a8kDG41KMaappZQbyoyNqQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA21A1416;
+ Wed, 26 Feb 2020 14:27:54 +0000 (UTC)
+Received: from [10.36.117.196] (ovpn-117-196.ams2.redhat.com [10.36.117.196])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B2BC41001902;
+ Wed, 26 Feb 2020 14:27:53 +0000 (UTC)
+Subject: Re: [PATCH v5 01/18] s390x: Use constant for ESA PSW address
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200226122038.61481-1-frankja@linux.ibm.com>
+ <20200226122038.61481-2-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat GmbH
+Message-ID: <3d6f7f88-0a77-90f0-4e26-ee826593d55f@redhat.com>
+Date: Wed, 26 Feb 2020 15:27:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200206112645.21275-2-clg@kaod.org>
+In-Reply-To: <20200226122038.61481-2-frankja@linux.ibm.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,145 +134,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Andrew Geissler <geissonator@gmail.com>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/6/20 12:26 PM, C=C3=A9dric Le Goater wrote:
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On 26.02.20 13:20, Janosch Frank wrote:
+> Lets make it a bit more clear that we're extracting the 31 bit address
+> from the short psw.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   Makefile.objs       |  1 +
->   hw/ssi/aspeed_smc.c | 17 +++++++++++++++++
->   hw/ssi/trace-events |  9 +++++++++
->   3 files changed, 27 insertions(+)
->   create mode 100644 hw/ssi/trace-events
->=20
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 26b9cff95436..9e4ba95794e9 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -168,6 +168,7 @@ trace-events-subdirs +=3D hw/scsi
->   trace-events-subdirs +=3D hw/sd
->   trace-events-subdirs +=3D hw/sparc
->   trace-events-subdirs +=3D hw/sparc64
-> +trace-events-subdirs +=3D hw/ssi
->   trace-events-subdirs +=3D hw/timer
->   trace-events-subdirs +=3D hw/tpm
->   trace-events-subdirs +=3D hw/usb
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 23c8d2f06245..e5621bf728ca 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -31,6 +31,7 @@
->   #include "qapi/error.h"
->   #include "exec/address-spaces.h"
->   #include "qemu/units.h"
-> +#include "trace.h"
->  =20
->   #include "hw/irq.h"
->   #include "hw/qdev-properties.h"
-> @@ -513,6 +514,8 @@ static void aspeed_smc_flash_set_segment(AspeedSMCSta=
-te *s, int cs,
->  =20
->       s->ctrl->reg_to_segment(s, new, &seg);
->  =20
-> +    trace_aspeed_smc_flash_set_segment(cs, new, seg.addr, seg.addr + seg=
-.size);
-> +
->       /* The start address of CS0 is read-only */
->       if (cs =3D=3D 0 && seg.addr !=3D s->ctrl->flash_window_base) {
->           qemu_log_mask(LOG_GUEST_ERROR,
-> @@ -753,6 +756,8 @@ static uint64_t aspeed_smc_flash_read(void *opaque, h=
-waddr addr, unsigned size)
->                         __func__, aspeed_smc_flash_mode(fl));
->       }
->  =20
-> +    trace_aspeed_smc_flash_read(fl->id, addr, size, ret,
-> +                                aspeed_smc_flash_mode(fl));
->       return ret;
->   }
->  =20
-> @@ -808,6 +813,9 @@ static bool aspeed_smc_do_snoop(AspeedSMCFlash *fl,  =
-uint64_t data,
->       AspeedSMCState *s =3D fl->controller;
->       uint8_t addr_width =3D aspeed_smc_flash_is_4byte(fl) ? 4 : 3;
->  =20
-> +    trace_aspeed_smc_do_snoop(fl->id, s->snoop_index, s->snoop_dummies,
-> +                              (uint8_t) data & 0xff);
-> +
->       if (s->snoop_index =3D=3D SNOOP_OFF) {
->           return false; /* Do nothing */
->  =20
-> @@ -858,6 +866,9 @@ static void aspeed_smc_flash_write(void *opaque, hwad=
-dr addr, uint64_t data,
->       AspeedSMCState *s =3D fl->controller;
->       int i;
->  =20
-> +    trace_aspeed_smc_flash_write(fl->id, addr, size, data,
-> +                                 aspeed_smc_flash_mode(fl));
-> +
->       if (!aspeed_smc_is_writable(fl)) {
->           qemu_log_mask(LOG_GUEST_ERROR, "%s: flash is not writable at 0x=
-%"
->                         HWADDR_PRIx "\n", __func__, addr);
-> @@ -972,6 +983,9 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
-addr, unsigned int size)
->           (s->ctrl->has_dma && addr =3D=3D R_DMA_CHECKSUM) ||
->           (addr >=3D R_SEG_ADDR0 && addr < R_SEG_ADDR0 + s->ctrl->max_sla=
-ves) ||
->           (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->ctrl->max_slave=
-s)) {
-> +
-> +        trace_aspeed_smc_read(addr, size, s->regs[addr]);
-> +
->           return s->regs[addr];
->       } else {
->           qemu_log_mask(LOG_UNIMP, "%s: not implemented: 0x%" HWADDR_PRIx=
- "\n",
-> @@ -1091,6 +1105,7 @@ static void aspeed_smc_dma_checksum(AspeedSMCState =
-*s)
->                             __func__, s->regs[R_DMA_FLASH_ADDR]);
->               return;
->           }
-> +        trace_aspeed_smc_dma_checksum(s->regs[R_DMA_FLASH_ADDR], data);
->  =20
->           /*
->            * When the DMA is on-going, the DMA registers are updated
-> @@ -1225,6 +1240,8 @@ static void aspeed_smc_write(void *opaque, hwaddr a=
-ddr, uint64_t data,
->  =20
->       addr >>=3D 2;
->  =20
-> +    trace_aspeed_smc_write(addr, size, data);
-> +
->       if (addr =3D=3D s->r_conf ||
->           (addr >=3D s->r_timings &&
->            addr < s->r_timings + s->ctrl->nregs_timings) ||
-> diff --git a/hw/ssi/trace-events b/hw/ssi/trace-events
-> new file mode 100644
-> index 000000000000..ffe531a500aa
-> --- /dev/null
-> +++ b/hw/ssi/trace-events
-> @@ -0,0 +1,9 @@
-> +# aspeed_smc.c
-> +
-> +aspeed_smc_flash_set_segment(int cs, uint64_t reg, uint64_t start, uint6=
-4_t end) "CS%d segreg=3D0x%"PRIx64" [ 0x%"PRIx64" - 0x%"PRIx64" ]"
-> +aspeed_smc_flash_read(int cs, uint64_t addr,  uint32_t size, uint64_t da=
-ta, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
-> +aspeed_smc_do_snoop(int cs, int index, int dummies, int data) "CS%d inde=
-x:0x%x dummies:%d data:0x%x"
-> +aspeed_smc_flash_write(int cs, uint64_t addr,  uint32_t size, uint64_t d=
-ata, int mode) "CS%d @0x%" PRIx64 " size %u: 0x%" PRIx64" mode:%d"
-> +aspeed_smc_read(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PRI=
-x64 " size %u: 0x%" PRIx64
-> +aspeed_smc_dma_checksum(uint32_t addr, uint32_t data) "0x%08x: 0x%08x"
-> +aspeed_smc_write(uint64_t addr,  uint32_t size, uint64_t data) "@0x%" PR=
-Ix64 " size %u: 0x%" PRIx64
->=20
+>  hw/s390x/ipl.c     | 2 +-
+>  target/s390x/cpu.c | 4 ++--
+>  target/s390x/cpu.h | 1 +
+>  3 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 7773499d7f..42e21e7a6a 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -179,7 +179,7 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>                  /* if not Linux load the address of the (short) IPL PSW */
+>                  ipl_psw = rom_ptr(4, 4);
+>                  if (ipl_psw) {
+> -                    pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
+> +                    pentry = be32_to_cpu(*ipl_psw) & PSW_MASK_ESA_ADDR;
+>                  } else {
+>                      error_setg(&err, "Could not get IPL PSW");
+>                      goto error;
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 8da1905485..43360912a0 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -78,13 +78,13 @@ static void s390_cpu_load_normal(CPUState *s)
+>      S390CPU *cpu = S390_CPU(s);
+>      uint64_t spsw = ldq_phys(s->as, 0);
+>  
+> -    cpu->env.psw.mask = spsw & 0xffffffff80000000ULL;
+> +    cpu->env.psw.mask = spsw & PSW_MASK_ESA_MASK;
+>      /*
+>       * Invert short psw indication, so SIE will report a specification
+>       * exception if it was not set.
+>       */
+>      cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
+> -    cpu->env.psw.addr = spsw & 0x7fffffffULL;
+> +    cpu->env.psw.addr = spsw & PSW_MASK_ESA_ADDR;
+>  
+>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>  }
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 8a557fd8d1..74e66fe0c2 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -277,6 +277,7 @@ extern const VMStateDescription vmstate_s390_cpu;
+>  #define PSW_MASK_64             0x0000000100000000ULL
+>  #define PSW_MASK_32             0x0000000080000000ULL
+>  #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
+> +#define PSW_MASK_ESA_MASK       0xffffffff80000000ULL
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+..._MASK_..._MASK
+
+Isn't there a better name for all the bits in the PSW that are not an
+address?
+
+PSW_MASK_ESA_BITS
+PSW_MASK_ESA_FLAGS
+...
+
+>  
+>  #undef PSW_ASC_PRIMARY
+>  #undef PSW_ASC_ACCREG
+> 
+
+
+-- 
+Thanks,
+
+David / dhildenb
 
 
