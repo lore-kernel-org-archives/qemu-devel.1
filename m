@@ -2,104 +2,94 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7284FC4BA18
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4056DC4BA1E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48BFF206E6
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:54:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48BFF206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1053024656
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 17:58:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DednwtJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1053024656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j70sx-00048D-Gj
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:54:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59902)
+	id 1j70x6-00063L-AG
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 12:58:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1j70rt-00031R-J5
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:53:10 -0500
+ (envelope-from <peterx@redhat.com>) id 1j70wL-0005XF-NM
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1j70rs-0003DQ-Id
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:53:09 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4104
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1j70rq-0003A7-DK; Wed, 26 Feb 2020 12:53:06 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01QHqa0u099038; Wed, 26 Feb 2020 12:53:03 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ydcngq9ns-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 12:53:03 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01QHr2oq101490;
- Wed, 26 Feb 2020 12:53:03 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2ydcngq9nj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 12:53:02 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01QHoqt0012418;
- Wed, 26 Feb 2020 17:53:02 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma03wdc.us.ibm.com with ESMTP id 2ydcmkq1n0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Feb 2020 17:53:02 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01QHr1LY37224934
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Feb 2020 17:53:01 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BDA15AC05B;
- Wed, 26 Feb 2020 17:53:01 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1295DAC05E;
- Wed, 26 Feb 2020 17:53:00 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 26 Feb 2020 17:53:00 +0000 (GMT)
-Subject: Re: [PATCH v3 00/10] vTPM for aarch64
-To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200226102549.12158-1-eric.auger@redhat.com>
- <31e81f4b-ef00-692e-540f-ef3d9be5bb9a@linux.ibm.com>
- <22380cd3-b13e-aede-a7f5-158d86ca6136@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <a8913524-4de3-dc0a-0b2c-2deb88c33859@linux.ibm.com>
-Date: Wed, 26 Feb 2020 12:53:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <peterx@redhat.com>) id 1j70wK-0004nF-PA
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32531
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j70wK-0004lt-Kb
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 12:57:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582739862;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sebDUYLrDxN15HjxAKvkmNDKIlwQORdu5M9DKS14gEc=;
+ b=DednwtJf1sS1nB3tqgY/hhlW65IJmkZTvBoJEKJPJrWeyPEhiIhhMLIABQQUu4hqNA0bGl
+ YlEVtYslVZjmaxJSK/FSJN612aJjxtT7JskfWnapvTAPSubq4+0h3xyIcuEBQWhiON5i43
+ 7eXuw5K9w3UWXY+UIHHzEfngiIS20C0=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-HBLgXMBgOAuzxQcc99dsow-1; Wed, 26 Feb 2020 12:57:40 -0500
+X-MC-Unique: HBLgXMBgOAuzxQcc99dsow-1
+Received: by mail-qk1-f197.google.com with SMTP id s189so183886qke.5
+ for <qemu-devel@nongnu.org>; Wed, 26 Feb 2020 09:57:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=zIyV6cYTxtRMRBEZz9p+gZhtydpVS4YQXL45UhS0xXI=;
+ b=C66t7zrpfbi+WI5tzL5d22ESShoW7E5QWaTYkthPpr2EDAC64JRdX3UVOb25y0Bzt2
+ xNryBzIP6hXOV4nMTCx7tCIcGztRzENQq8UiK5GQw1fnh8z9TXsg3ayOB4DHboP/BMXa
+ 1xFQdMVon5zzc9D/azRo+ayjzKQwYYaMXlS+q9SnHeTznSrfsF9monpSpZd2Fi6vGtR2
+ ookXn5ddSXkLGcFpGnWwmwJKuQ5W1vcwEpG82nUy+EjD3yU0TCS7czJHqFCG9qiCJ/wi
+ qklwwoFOrxeiwkHdMZh6Z1YCWKaEUx+fJuRWSB4aBQbfnfx5jXbtI1/+Gj6QF0r/SP2e
+ yjfA==
+X-Gm-Message-State: APjAAAVWdMhVYPHMt3VvkM+xWcCwR2OCcCDoOJezoMmQBFOBVjQ+ZSYP
+ sD5n9Q0u7S7rxWxFG7ohUEg1tsN7CNqq7J8Q5pDYz6HbGGnjygp5VImxvvFU5hjBMLxysqIlVXH
+ Hbrvn1WWpXTLeQu8=
+X-Received: by 2002:a0c:e408:: with SMTP id o8mr284432qvl.236.1582739860029;
+ Wed, 26 Feb 2020 09:57:40 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwMmG/mZ0Fg9vDt+tAGd/Khs641RvsSkOEZG/qyP3trSwBOPv44DOBy30bJA1EwtYbYpEMy4Q==
+X-Received: by 2002:a0c:e408:: with SMTP id o8mr284407qvl.236.1582739859731;
+ Wed, 26 Feb 2020 09:57:39 -0800 (PST)
+Received: from xz-x1 (CPEf81d0fb19163-CMf81d0fb19160.cpe.net.fido.ca.
+ [72.137.123.47])
+ by smtp.gmail.com with ESMTPSA id r37sm1463731qtj.44.2020.02.26.09.57.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Feb 2020 09:57:38 -0800 (PST)
+Date: Wed, 26 Feb 2020 12:57:37 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH] hw/arm/smmu-common: a fix to smmu_find_smmu_pcibus
+Message-ID: <20200226175737.GE140200@xz-x1>
+References: <20200226172628.17449-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <22380cd3-b13e-aede-a7f5-158d86ca6136@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-26_06:2020-02-26,
- 2020-02-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- phishscore=0 spamscore=0 suspectscore=0 impostorscore=0 clxscore=1015
- mlxscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002260115
+In-Reply-To: <20200226172628.17449-1-eric.auger@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id 01QHqa0u099038
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,42 +101,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
- philmd@redhat.com
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/26/20 12:47 PM, Auger Eric wrote:
-> Hi Stefan,
->
-> On 2/26/20 2:32 PM, Stefan Berger wrote:
->> On 2/26/20 5:25 AM, Eric Auger wrote:
->>> This series adds the capability to instantiate an MMIO TPM TIS
->>> in ARM virt. It is candidate to qemu 5.0.
->> Looks good. Can you run the checkpatch script over the patches and
->> address the warnings?
->>
->>
-> Thank you for you review!
->
-> About warnings
->
-> - There are warnings due to new files added but I think they all have a=
-n
-> entry in MAINTAINERS as wildcards are used.
->
-> - In tpm: Add the SysBus TPM TIS device.
->    There is line over 80 chars but I think it is fine
->
-> #define TPM_TIS_SYSBUS(obj) OBJECT_CHECK(TPMStateSysBus, (obj),
-> TYPE_TPM_TIS_SYSBUS)
+On Wed, Feb 26, 2020 at 06:26:28PM +0100, Eric Auger wrote:
+> Make sure a null SMMUPciBus is returned in case we were
+> not able to identify a pci bus matching the @bus_num.
+>=20
+> This matches the fix done on intel iommu in commit:
+> a2e1cd41ccfe796529abfd1b6aeb1dd4393762a2
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-Ok, leave it as it is.
-
-
- =C2=A0=C2=A0 Stefan
-
+--=20
+Peter Xu
 
 
