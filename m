@@ -2,87 +2,79 @@ Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 693DFC4BA0B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D017BC4BA0A
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:37:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 346C22084E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BCA821D7E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 07:37:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FB+LMcxc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 346C22084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BgbUuQkB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BCA821D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j6r8e-00061a-Cs
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:29:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39973)
+	id 1j6rFq-00084M-S8
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 02:37:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j6r7o-0005AQ-8n
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:28:57 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1j6rFH-0007X7-7a
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j6r7m-0001al-9J
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:28:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44459
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j6r7m-0001Vk-4t
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:28:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582702133;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/wDBky7u+KHIb1lSpcmCSQh210AW1YUk6VEoscXbeXQ=;
- b=FB+LMcxcaW6m6q0oh2eSbUqtkUlFCJ1VE1LpYF3+5NLTkbHi4SnGqGqIZidSEsNWNZlhBp
- sP7CbOtClNjeWIequ22dAzfnW1pGD9mBUuQj9aLjWsBNeiwR1FYl3dEy0MXpUFENBoLR2e
- KWBMNEopifPPjHK2mpImXAx0jRJ9Sgs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-GOUJiUvpPtmRO-zUiUdwGA-1; Wed, 26 Feb 2020 02:28:51 -0500
-X-MC-Unique: GOUJiUvpPtmRO-zUiUdwGA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E0211005512;
- Wed, 26 Feb 2020 07:28:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 14A5C1001DDE;
- Wed, 26 Feb 2020 07:28:49 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7456F11386A6; Wed, 26 Feb 2020 08:28:48 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: QAPI schema for desired state of LUKS keyslots
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
- <20200114193350.10830-3-mlevitsk@redhat.com>
- <87lfp36gzh.fsf_-_@dusky.pond.sub.org>
- <ad92d470-7388-c419-f3fb-0bfd541b670b@redhat.com>
- <871rqid35p.fsf@dusky.pond.sub.org>
- <f6008cc8-e7d2-87a1-384e-eb651cf40ab7@redhat.com>
-Date: Wed, 26 Feb 2020 08:28:48 +0100
-In-Reply-To: <f6008cc8-e7d2-87a1-384e-eb651cf40ab7@redhat.com> (Max Reitz's
- message of "Tue, 25 Feb 2020 18:00:27 +0100")
-Message-ID: <87imjtajtb.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <hsp.cat7@gmail.com>) id 1j6rFG-0004Ea-1J
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 02:36:39 -0500
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:36166)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
+ id 1j6rFD-00047Y-Gw; Wed, 26 Feb 2020 02:36:35 -0500
+Received: by mail-ot1-x329.google.com with SMTP id j20so2095549otq.3;
+ Tue, 25 Feb 2020 23:36:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=e4h1QzzxTrFpAbBAQmInM/nVY0lJzyrmy+1s53NHOH8=;
+ b=BgbUuQkBAL0MFj37y9vGY134U9wdscnjNc9s2LvwmsWiBXmqL7w7ssxsgPWeWetUtO
+ D76Xee8H2CGibKiSsURnWn9jO5MAO9CBkKaOpuYI5N9BLbczxwopQQEawEn8tUcVY1PQ
+ CJsEE+vTA8GjaP/r89JTsFHmSNhfFUrxzsawEfDOzXzpVvqwGd+ggfyQSS7BHUikf+G0
+ 5BNXq6YLvZiXOm/ZuaFlMD5LDQTNzU7zYkC1fytgaly1s3yco6GAZoz0CbJlNx5kpH6S
+ b3eV8fNb53uml0T0Kejqr0CpShXR8ZlmIGqSysmdG91/2mSPQp85qp4VWSTYMCcg6p8l
+ o0oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=e4h1QzzxTrFpAbBAQmInM/nVY0lJzyrmy+1s53NHOH8=;
+ b=NwFxbgI/Mszj4SzxmH3ig+Cj32IjDSUmNBgJuHWZmua1b42r5YjTi2LuOFAU7Qi2OZ
+ oTBEk9l3Owm9+1HIiuT4DdEXNQ054X19d5XQl+84TdLIGrF4c/bt2YfxqGEmLEBYXc57
+ OEhDJlYk1zqdtDYu2HlrHzp4cVRiPKMAkCMkQnoqWTuhHzjCOoja8lFH0JsbDO+SCsaw
+ BL4REPVKOEY2xxRmP7J1VvzCWr7JEZQ7fBs4ngAc21TM91tBmLZLrWo8KuoImOv1m67g
+ mZWYYZz+Hv/AFiVjUr+griTgGvBMVS+Y9t2Avszr7kBN/d176jNArW1meGdgkjMlGoW+
+ 6mig==
+X-Gm-Message-State: APjAAAU+ABgN2h5SOQPGQ5gDpQQGOOo3VPWFWVHdh9+riyN1SvbBKDK8
+ pQjT48FL3lyLO8VTHT5Pa8t/xeWQbJCCn6Ql43AoVqN3
+X-Google-Smtp-Source: APXvYqwoXtItYm6wP0EMn73RbTsW2CD7sfnSiMZu19T0eOs1jymCahOTInarc9mjXL4F4mclztB48q7wqPNT9RU0aD4=
+X-Received: by 2002:a05:6830:1e76:: with SMTP id
+ m22mr2008329otr.295.1582702594181; 
+ Tue, 25 Feb 2020 23:36:34 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Wed, 26 Feb 2020 08:36:23 +0100
+Message-ID: <CABLmASF7CoOufGDz-1d-Py3t1PN3CrWdN64XAzgAx4=rbSxGEA@mail.gmail.com>
+Subject: Issue with vl.c: move -m parsing after memory backends has been
+ processed. Commit a1b18df9a4848fc8a906e40c275063bfe9ca2047
+To: qemu-ppc <qemu-ppc@nongnu.org>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>, 
+ Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Content-Type: multipart/alternative; boundary="000000000000e9545a059f75a9cb"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,147 +86,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
+--000000000000e9545a059f75a9cb
+Content-Type: text/plain; charset="UTF-8"
 
-> On 25.02.20 17:48, Markus Armbruster wrote:
->> Max Reitz <mreitz@redhat.com> writes:
->>=20
->>> On 15.02.20 15:51, Markus Armbruster wrote:
->>>> Review of this patch led to a lengthy QAPI schema design discussion.
->>>> Let me try to condense it into a concrete proposal.
->>>>
->>>> This is about the QAPI schema, and therefore about QMP.  The
->>>> human-friendly interface is out of scope.  Not because it's not
->>>> important (it clearly is!), only because we need to *focus* to have a
->>>> chance at success.
->>>>
->>>> I'm going to include a few design options.  I'll mark them "Option:".
->>>>
->>>> The proposed "amend" interface takes a specification of desired state,
->>>> and figures out how to get from here to there by itself.  LUKS keyslot=
-s
->>>> are one part of desired state.
->>>>
->>>> We commonly have eight LUKS keyslots.  Each keyslot is either active o=
-r
->>>> inactive.  An active keyslot holds a secret.
->>>>
->>>> Goal: a QAPI type for specifying desired state of LUKS keyslots.
->>>>
->>>> Proposal:
->>>>
->>>>     { 'enum': 'LUKSKeyslotState',
->>>>       'data': [ 'active', 'inactive' ] }
->>>>
->>>>     { 'struct': 'LUKSKeyslotActive',
->>>>       'data': { 'secret': 'str',
->>>>                 '*iter-time': 'int } }
->>>>
->>>>     { 'struct': 'LUKSKeyslotInactive',
->>>>       'data': { '*old-secret': 'str' } }
->>>>
->>>>     { 'union': 'LUKSKeyslotAmend',
->>>>       'base': { '*keyslot': 'int',
->>>>                 'state': 'LUKSKeyslotState' }
->>>>       'discriminator': 'state',
->>>>       'data': { 'active': 'LUKSKeyslotActive',
->>>>                 'inactive': 'LUKSKeyslotInactive' } }
->>>
->>> Looks OK to me.  The only thing is that @old-secret kind of works as an
->>> address, just like @keyslot,
->>=20
->> It does.
->>=20
->>>                              so it might also make sense to me to put
->>> @keyslot/@old-secret into a union in the base structure.
->>=20
->> I'm fine with state-specific extra adressing modes (I better be, I
->> proposed them).
->>=20
->> I'd also be fine with a single state-independent addressing mode, as
->> long as we can come up with sane semantics.  Less flexible when adding
->> states, but we almost certainly won't.
->>=20
->> Let's see how we could merge my two addressing modes into one.
->>=20
->> The two are
->>=20
->> * active
->>=20
->>   keyslot     old-secret      slot(s) selected
->>   absent      N/A             one inactive slot if exist, else error
->>   present     N/A             the slot given by @keyslot
->
-> Oh, I thought that maybe we could use old-secret here, too, for
-> modifying the iter-time.
+Hi all,
 
-Update in place is unsafe.
+Commit a1b18df9a4848fc8a906e40c275063bfe9ca2047 on the ppc-for-50 branch
+makes qemu-system-ppc running Mac OS 9 extremely slow. I bisected to the
+result below.
 
->                           But if old-secret makes no sense for
-> to-be-active slots, then there=E2=80=99s little point in putting old-secr=
-et in
-> the base.
->
-> (OTOH, specifying old-secret for to-be-active slots does have a sensible
-> meaning; it=E2=80=99s just that we won=E2=80=99t support changing anythin=
-g about
-> already-active slots, except making them inactive.  So that might be an
-> argument for not making it a syntactic error, but just a semantic error.)
+Command line used:
+./qemu-system-ppc -L pc-bios -M mac99,via=pmu -m 512 -boot c \
+-hda 9.2.img \
+-serial stdio -sdl
 
-Matter of taste.  I like to keep simple things syntactic, and thus
-visible in introspection.
+Best,
+Howard
 
-> [...]
->
->> Note we we don't really care what "inactive, both absent" does.  My
->> proposed semantics are just the most regular I could find.  We can
->> therefore resolve the conflict by picking "active, both absent":
->>=20
->>   keyslot     old-secret      slot(s) selected
->>   absent      absent          one inactive slot if exist, else error
->>   present     absent          the slot given by @keyslot
->>   absent      present         all active slots holding @old-secret
->>   present     present         the slot given by @keyslot, error unless
->>                               it's active holding @old-secret
->>=20
->> Changes:
->>=20
->> * inactive, both absent: changed; we select "one inactive slot" instead =
-of
->>   "all slots".
->>=20
->>   "All slots" is a no-op when the current state has no active keyslots,
->>   else error.
->>=20
->>   "One inactive slot" is a no-op when the current state has one, else
->>   error.  Thus, we no-op rather than error in some states.
->>=20
->> * active, keyslot absent or present, old-secret present: new; selects
->>   active slot(s) holding @old-secret, no-op when old-secret =3D=3D secre=
-t,
->>   else error (no in place update)
->>=20
->> Can do.  It's differently irregular, and has a few more combinations
->> that are basically useless, which I find unappealing.  Matter of taste,
->> I guess.
->>=20
->> Anyone got strong feelings here?
->
-> The only strong feeling I have is that I absolutely don=E2=80=99t have a =
-strong
-> feeling about this. :)
->
-> As such, I think we should just treat my rambling as such and stick to
-> your proposal, since we=E2=80=99ve already gathered support for it.
+a1b18df9a4848fc8a906e40c275063bfe9ca2047 is the first bad commit
+commit a1b18df9a4848fc8a906e40c275063bfe9ca2047
+Author: Igor Mammedov <imammedo@redhat.com>
+Date:   Wed Feb 19 11:08:40 2020 -0500
 
-Thanks!
+    vl.c: move -m parsing after memory backends has been processed
 
+    It will be possible for main RAM to come from memory-backend
+    and we should check that size specified in -m matches the size
+    of the backend and [MachineState::]ram_size also matches
+    backend's size.
+
+    However -m parsing (set_memory_options()) happens before backends
+    are intialized (object_create_delayed()) which complicates it.
+    Consolidate set_memory_options() and assigning parsed results to
+    current_machine after backends are initialized, so it would be
+    possible access the initialized backend instance to compare
+    sizes.
+
+    This patch only consolidates scattered places touching ram_size
+    within vl.c. And follow up patch will integrate backend handling
+    to set_memory_options().
+
+    Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+    Message-Id: <20200219160953.13771-7-imammedo@redhat.com>
+
+ vl.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
+--000000000000e9545a059f75a9cb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi all,<br></div><div><br></div><div>Commit a1b18df9a=
+4848fc8a906e40c275063bfe9ca2047 on the ppc-for-50 branch makes qemu-system-=
+ppc running Mac OS 9 extremely slow. I bisected to the result below.</div><=
+div><br></div><div>Command line used:</div><div>./qemu-system-ppc -L pc-bio=
+s -M mac99,via=3Dpmu -m 512 -boot c \<br>-hda 9.2.img \<br>-serial stdio -s=
+dl</div><div><br></div><div>Best,</div><div>Howard<br></div><div><br></div>=
+<div>a1b18df9a4848fc8a906e40c275063bfe9ca2047 is the first bad commit<br>co=
+mmit a1b18df9a4848fc8a906e40c275063bfe9ca2047<br>Author: Igor Mammedov &lt;=
+<a href=3D"mailto:imammedo@redhat.com">imammedo@redhat.com</a>&gt;<br>Date:=
+ =C2=A0 Wed Feb 19 11:08:40 2020 -0500<br><br>=C2=A0 =C2=A0 vl.c: move -m p=
+arsing after memory backends has been processed<br>=C2=A0 =C2=A0 <br>=C2=A0=
+ =C2=A0 It will be possible for main RAM to come from memory-backend<br>=C2=
+=A0 =C2=A0 and we should check that size specified in -m matches the size<b=
+r>=C2=A0 =C2=A0 of the backend and [MachineState::]ram_size also matches<br=
+>=C2=A0 =C2=A0 backend&#39;s size.<br>=C2=A0 =C2=A0 <br>=C2=A0 =C2=A0 Howev=
+er -m parsing (set_memory_options()) happens before backends<br>=C2=A0 =C2=
+=A0 are intialized (object_create_delayed()) which complicates it.<br>=C2=
+=A0 =C2=A0 Consolidate set_memory_options() and assigning parsed results to=
+<br>=C2=A0 =C2=A0 current_machine after backends are initialized, so it wou=
+ld be<br>=C2=A0 =C2=A0 possible access the initialized backend instance to =
+compare<br>=C2=A0 =C2=A0 sizes.<br>=C2=A0 =C2=A0 <br>=C2=A0 =C2=A0 This pat=
+ch only consolidates scattered places touching ram_size<br>=C2=A0 =C2=A0 wi=
+thin vl.c. And follow up patch will integrate backend handling<br>=C2=A0 =
+=C2=A0 to set_memory_options().<br>=C2=A0 =C2=A0 <br>=C2=A0 =C2=A0 Signed-o=
+ff-by: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com">imammedo@re=
+dhat.com</a>&gt;<br>=C2=A0 =C2=A0 Message-Id: &lt;<a href=3D"mailto:2020021=
+9160953.13771-7-imammedo@redhat.com">20200219160953.13771-7-imammedo@redhat=
+.com</a>&gt;<br><br>=C2=A0vl.c | 27 ++++++++++++++-------------<br>=C2=A01 =
+file changed, 14 insertions(+), 13 deletions(-)<br></div></div>
+
+--000000000000e9545a059f75a9cb--
 
