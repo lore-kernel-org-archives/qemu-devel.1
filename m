@@ -2,45 +2,46 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9EDC4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 07:32:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA03C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 07:33:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E92C220714
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 07:32:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92C220714
+	by mail.kernel.org (Postfix) with ESMTPS id 749A720714
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 07:33:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 749A720714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Dew-0002TS-0o
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 02:32:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42266)
+	id 1j7DfL-000363-HK
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 02:33:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j7DcY-0000G1-Kd
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 02:30:17 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j7Dca-0000GC-PK
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 02:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j7DcW-0000Ah-IE
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 02:30:10 -0500
-Received: from relay.sw.ru ([185.231.240.75]:33982)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j7DcV-00009L-1t
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 02:30:12 -0500
+Received: from relay.sw.ru ([185.231.240.75]:33956)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j7DcU-00005f-Le; Thu, 27 Feb 2020 02:30:07 -0500
+ id 1j7DcU-00005d-Lz; Thu, 27 Feb 2020 02:30:06 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j7DcO-0003Tx-AU; Thu, 27 Feb 2020 10:30:00 +0300
+ id 1j7DcO-0003Tx-JC; Thu, 27 Feb 2020 10:30:00 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/8] qcow2: introduce compression type feature
-Date: Thu, 27 Feb 2020 10:29:46 +0300
-Message-Id: <20200227072953.25445-2-dplotnikov@virtuozzo.com>
+Subject: [PATCH v1 3/8] qcow2: add zstd cluster compression
+Date: Thu, 27 Feb 2020 10:29:48 +0300
+Message-Id: <20200227072953.25445-4-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
 In-Reply-To: <20200227072953.25445-1-dplotnikov@virtuozzo.com>
 References: <20200227072953.25445-1-dplotnikov@virtuozzo.com>
@@ -63,340 +64,360 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch adds some preparation parts for incompatible compression type
-feature to Qcow2 that indicates which allow to use different compression
-methods for image clusters (de)compressing.
+zstd significantly reduces cluster compression time.
+It provides better compression performance maintaining
+the same level of the compression ratio in comparison with
+zlib, which, at the moment, is the only compression
+method available.
 
-It is implied that the compression type is set on the image creation and
-can be changed only later by image conversion, thus compression type
-defines the only compression algorithm used for the image, and thus,
-for all image clusters.
+The performance test results:
+Test compresses and decompresses qemu qcow2 image with just
+installed rhel-7.6 guest.
+Image cluster size: 64K. Image on disk size: 2.2G
 
-The goal of the feature is to add support of other compression methods
-to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
+The test was conducted with brd disk to reduce the influence
+of disk subsystem to the test results.
+The results is given in seconds.
 
-The default compression is ZLIB. Images created with ZLIB compression type
-are backward compatible with older qemu versions.
+compress cmd:
+  time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
+                  src.img [zlib|zstd]_compressed.img
+decompress cmd
+  time ./qemu-img convert -O qcow2
+                  [zlib|zstd]_compressed.img uncompressed.img
+
+           compression               decompression
+         zlib       zstd           zlib         zstd
+------------------------------------------------------------
+real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
+user     65.0       15.8            5.3          2.5
+sys       3.3        0.2            2.0          2.0
+
+Both ZLIB and ZSTD gave the same compression ratio: 1.57
+compressed image size in both cases: 1.4G
 
 Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
- block/qcow2.c             | 105 ++++++++++++++++++++++++++++++++++++++
- block/qcow2.h             |  31 ++++++++---
- include/block/block_int.h |   1 +
- qapi/block-core.json      |  22 +++++++-
- 4 files changed, 150 insertions(+), 9 deletions(-)
+ block/qcow2-threads.c  | 122 +++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   7 +++
+ configure              |  29 ++++++++++
+ docs/interop/qcow2.txt |  18 ++++++
+ qapi/block-core.json   |   3 +-
+ 5 files changed, 178 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3c754f616b..2ccb2cabd1 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1242,6 +1242,50 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index 1c128e9840..e942c4d7e5 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -28,6 +28,11 @@
+ #define ZLIB_CONST
+ #include <zlib.h>
+ 
++#ifdef CONFIG_ZSTD
++#include <zstd.h>
++#include <zstd_errors.h>
++#endif
++
+ #include "qcow2.h"
+ #include "block/thread-pool.h"
+ #include "crypto.h"
+@@ -164,6 +169,113 @@ static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
      return ret;
  }
  
-+static int validate_compression_type(BDRVQcow2State *s, Error **errp)
++#ifdef CONFIG_ZSTD
++
++#define ZSTD_LEN_BUF 4
++
++/*
++ * qcow2_zstd_compress()
++ *
++ * Compress @src_size bytes of data using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          -ENOMEM destination buffer is not enough to store compressed data
++ *          -EIO    on any other error
++ */
++
++static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
++{
++    size_t ret;
++
++    /*
++     * steal ZSTD_LEN_BUF bytes in the very beginng of the buffer
++     * to store compressed chunk size
++     */
++    char *d_buf = ((char *) dest) + ZSTD_LEN_BUF;
++
++    /*
++     * sanity check that we can store the compressed data length,
++     * and there is some space left for the compressor buffer
++     */
++    if (dest_size <= ZSTD_LEN_BUF) {
++        return -ENOMEM;
++    }
++
++    dest_size -= ZSTD_LEN_BUF;
++
++    ret = ZSTD_compress(d_buf, dest_size, src, src_size, 5);
++
++    if (ZSTD_isError(ret)) {
++        if (ZSTD_getErrorCode(ret) == ZSTD_error_dstSize_tooSmall) {
++            return -ENOMEM;
++        } else {
++            return -EIO;
++        }
++    }
++
++    /* paraniod sanity check that we can store the commpressed size */
++    if (ret > UINT_MAX) {
++        return -ENOMEM;
++    }
++
++    /* store the compressed chunk size in the very beginning of the buffer */
++    stl_be_p(dest, ret);
++
++    return ret + ZSTD_LEN_BUF;
++}
++
++/*
++ * qcow2_zstd_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          -EIO on any error
++ */
++
++static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
 +{
 +    /*
-+     * Sanity check
-+     * according to qcow2 spec, the compression type is 1-byte field
-+     * but in BDRVQcow2State the compression_type is enum sizeof(int)
-+     * so, the max compression_type value is 255.
++     * zstd decompress wants to know the exact length of the data.
++     * For that purpose, on compression, the length is stored in
++     * the very beginning of the compressed buffer
 +     */
-+    if (s->compression_type > 0xff) {
-+        error_setg(errp, "qcow2: compression type value is too big");
-+        return -EINVAL;
-+    }
-+
-+    switch (s->compression_type) {
-+    case QCOW2_COMPRESSION_TYPE_ZLIB:
-+        break;
-+
-+    default:
-+        error_setg(errp, "qcow2: unknown compression type: %u",
-+                   s->compression_type);
-+        return -ENOTSUP;
-+    }
++    size_t s_size;
++    const char *s_buf = ((const char *) src) + ZSTD_LEN_BUF;
 +
 +    /*
-+     * if the compression type differs from QCOW2_COMPRESSION_TYPE_ZLIB
-+     * the incompatible feature flag must be set
++     * sanity check that we can read 4 byte the content length and
++     * and there is some content to decompress
 +     */
-+    if (s->compression_type == QCOW2_COMPRESSION_TYPE_ZLIB) {
-+        if (s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE) {
-+            error_setg(errp, "qcow2: Compression type incompatible feature "
-+                             "bit must not be set");
-+            return -EINVAL;
-+        }
-+    } else {
-+        if (!(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE)) {
-+            error_setg(errp, "qcow2: Compression type incompatible feature "
-+                             "bit must be set");
-+            return -EINVAL;
-+        }
++    if (src_size <= ZSTD_LEN_BUF) {
++        return -EIO;
++    }
++
++    s_size = ldl_be_p(src);
++
++    /* sanity check that the buffer is big enough to read the content from */
++    if (src_size - ZSTD_LEN_BUF < s_size) {
++        return -EIO;
++    }
++
++    if (ZSTD_isError(
++            ZSTD_decompress(dest, dest_size, s_buf, s_size))) {
++        return -EIO;
 +    }
 +
 +    return 0;
 +}
++#endif
 +
- /* Called with s->lock held.  */
- static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                                       int flags, Error **errp)
-@@ -1357,6 +1401,26 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     s->compatible_features      = header.compatible_features;
-     s->autoclear_features       = header.autoclear_features;
+ static int qcow2_compress_pool_func(void *opaque)
+ {
+     Qcow2CompressData *data = opaque;
+@@ -215,6 +327,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_compress;
+         break;
  
-+    /*
-+     * Handle compression type
-+     * Older qcow2 images don't contain the compression type header.
-+     * Distinguish them by the header length and use
-+     * the only valid (default) compression type in that case
-+     */
-+    if (header.header_length > offsetof(QCowHeader, compression_type)) {
-+        /*
-+         * don't deal with endians since compression_type is 1 byte long
-+         */
-+        s->compression_type = header.compression_type;
-+    } else {
-+        s->compression_type = QCOW2_COMPRESSION_TYPE_ZLIB;
-+    }
-+
-+    ret = validate_compression_type(s, errp);
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
-         void *feature_table = NULL;
-         qcow2_read_extensions(bs, header.header_length, ext_end,
-@@ -2720,6 +2784,12 @@ int qcow2_update_header(BlockDriverState *bs)
-     total_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-     refcount_table_clusters = s->refcount_table_size >> (s->cluster_bits - 3);
- 
-+    ret = validate_compression_type(s, NULL);
-+
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     *header = (QCowHeader) {
-         /* Version 2 fields */
-         .magic                  = cpu_to_be32(QCOW_MAGIC),
-@@ -2742,6 +2812,7 @@ int qcow2_update_header(BlockDriverState *bs)
-         .autoclear_features     = cpu_to_be64(s->autoclear_features),
-         .refcount_order         = cpu_to_be32(s->refcount_order),
-         .header_length          = cpu_to_be32(header_length),
-+        .compression_type       = (uint8_t) s->compression_type,
-     };
- 
-     /* For older versions, write a shorter header */
-@@ -2839,6 +2910,11 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-                 .name = "lazy refcounts",
-             },
-+            {
-+                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
-+                .bit  = QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
-+                .name = "compression type",
-+            },
-         };
- 
-         ret = header_ext_add(buf, QCOW2_EXT_MAGIC_FEATURE_TABLE,
-@@ -3401,6 +3477,7 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         .refcount_table_offset      = cpu_to_be64(cluster_size),
-         .refcount_table_clusters    = cpu_to_be32(1),
-         .refcount_order             = cpu_to_be32(refcount_order),
-+        .compression_type           = (uint8_t) QCOW2_COMPRESSION_TYPE_ZLIB,
-         .header_length              = cpu_to_be32(sizeof(*header)),
-     };
- 
-@@ -3420,6 +3497,26 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-             cpu_to_be64(QCOW2_AUTOCLEAR_DATA_FILE_RAW);
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_compress;
++        break;
++#endif
+     default:
+         return -ENOTSUP;
      }
+@@ -247,6 +364,11 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_decompress;
+         break;
  
-+    if (qcow2_opts->has_compression_type &&
-+        qcow2_opts->compression_type != QCOW2_COMPRESSION_TYPE_ZLIB) {
-+
-+        if (qcow2_opts->compression_type > 0xff) {
-+            error_setg_errno(errp, -EINVAL, "Too big compression type value");
-+            goto out;
-+        }
-+
-+        switch (qcow2_opts->compression_type) {
-+        default:
-+            error_setg_errno(errp, -EINVAL, "Unknown compression type");
-+            goto out;
-+        }
-+
-+        header->compression_type = (uint8_t) qcow2_opts->compression_type;
-+
-+        header->incompatible_features |=
-+            cpu_to_be64(QCOW2_INCOMPAT_COMPRESSION_TYPE);
-+    }
-+
-     ret = blk_pwrite(blk, 0, header, cluster_size, 0);
-     g_free(header);
-     if (ret < 0) {
-@@ -3602,6 +3699,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-         { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
-         { BLOCK_OPT_COMPAT_LEVEL,       "version" },
-         { BLOCK_OPT_DATA_FILE_RAW,      "data-file-raw" },
-+        { BLOCK_OPT_COMPRESSION_TYPE,   "compression-type" },
-         { NULL, NULL },
-     };
- 
-@@ -4859,6 +4957,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-             .data_file          = g_strdup(s->image_data_file),
-             .has_data_file_raw  = has_data_file(bs),
-             .data_file_raw      = data_file_is_raw(bs),
-+            .compression_type   = s->compression_type,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-@@ -5516,6 +5615,12 @@ static QemuOptsList qcow2_create_opts = {
-             .help = "Width of a reference count entry in bits",
-             .def_value_str = "16"
-         },
-+        {
-+            .name = BLOCK_OPT_COMPRESSION_TYPE,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Compression method used for image clusters compression",
-+            .def_value_str = "zlib"
-+        },
-         { /* end of list */ }
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_decompress;
++        break;
++#endif
+     default:
+         return -ENOTSUP;
      }
- };
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 0942126232..f92412ed5e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -146,6 +146,12 @@ typedef struct QCowHeader {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 2ccb2cabd1..9c8ad9d580 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1257,6 +1257,9 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
  
-     uint32_t refcount_order;
-     uint32_t header_length;
+     switch (s->compression_type) {
+     case QCOW2_COMPRESSION_TYPE_ZLIB:
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++#endif
+         break;
+ 
+     default:
+@@ -3506,6 +3509,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+         }
+ 
+         switch (qcow2_opts->compression_type) {
++#ifdef CONFIG_ZSTD
++        case QCOW2_COMPRESSION_TYPE_ZSTD:
++            break;
++#endif
+         default:
+             error_setg_errno(errp, -EINVAL, "Unknown compression type");
+             goto out;
+diff --git a/configure b/configure
+index 48d6f89d57..4690a7ea9f 100755
+--- a/configure
++++ b/configure
+@@ -444,6 +444,7 @@ opengl_dmabuf="no"
+ cpuid_h="no"
+ avx2_opt=""
+ zlib="yes"
++zstd=""
+ capstone=""
+ lzo=""
+ snappy=""
+@@ -1371,6 +1372,10 @@ for opt do
+   ;;
+   --disable-lzfse) lzfse="no"
+   ;;
++  --enable-zstd) zstd="yes"
++  ;;
++  --disable-zstd) zstd="no"
++  ;;
+   --enable-guest-agent) guest_agent="yes"
+   ;;
+   --disable-guest-agent) guest_agent="no"
+@@ -1829,6 +1834,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+                   (for reading bzip2-compressed dmg images)
+   lzfse           support of lzfse compression library
+                   (for reading lzfse-compressed dmg images)
++  zstd            support of zstd compression library
+   seccomp         seccomp support
+   coroutine-pool  coroutine freelist (better performance)
+   glusterfs       GlusterFS backend
+@@ -2453,6 +2459,25 @@ EOF
+     fi
+ fi
+ 
++#########################################
++# zstd check
 +
-+    /* Additional fields */
-+    uint8_t  compression_type;
++if test "$zstd" != "no" ; then
++    cat > $TMPC << EOF
++#include <zstd.h>
++int main(void) { ZSTD_versionNumber(); return 0; }
++EOF
++    if compile_prog "" "-lzstd" ; then
++        LIBS="$LIBS -lzstd"
++        zstd="yes"
++    else
++        if test "$zstd" = "yes"; then
++            feature_not_found "zstd" "Install libzstd-devel"
++        fi
++        zstd="no"
++    fi
++fi
 +
-+    /* header must be a multiple of 8 */
-+    uint8_t  padding[7];
- } QEMU_PACKED QCowHeader;
+ ##########################################
+ # libseccomp check
  
- typedef struct QEMU_PACKED QCowSnapshotHeader {
-@@ -213,16 +219,20 @@ enum {
+@@ -6668,6 +6693,7 @@ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
+ echo "lzfse support     $lzfse"
++echo "zstd support      $zstd"
+ echo "NUMA host support $numa"
+ echo "libxml2           $libxml2"
+ echo "tcmalloc support  $tcmalloc"
+@@ -7559,6 +7585,9 @@ if test "$plugins" = "yes" ; then
+ 	    "\$ld_exported_symbols_list should have been set to 'yes'."
+     fi
+ fi
++if test "$zstd" = "yes" ; then
++  echo "CONFIG_ZSTD=y" >> $config_host_mak
++fi
  
- /* Incompatible feature bits */
- enum {
--    QCOW2_INCOMPAT_DIRTY_BITNR      = 0,
--    QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
--    QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
--    QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
--    QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
--    QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_DIRTY_BITNR            = 0,
-+    QCOW2_INCOMPAT_CORRUPT_BITNR          = 1,
-+    QCOW2_INCOMPAT_DATA_FILE_BITNR        = 2,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR = 3,
-+    QCOW2_INCOMPAT_DIRTY                  = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-+    QCOW2_INCOMPAT_CORRUPT                = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-+    QCOW2_INCOMPAT_DATA_FILE              = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_COMPRESSION_TYPE       =
-+        1 << QCOW2_INCOMPAT_COMPRESSION_TYPE_BITNR,
+ if test "$tcg_interpreter" = "yes"; then
+   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 5597e24474..aeca2ddebd 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -208,6 +208,7 @@ version 2.
  
-     QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
-                                     | QCOW2_INCOMPAT_CORRUPT
--                                    | QCOW2_INCOMPAT_DATA_FILE,
-+                                    | QCOW2_INCOMPAT_DATA_FILE
-+                                    | QCOW2_INCOMPAT_COMPRESSION_TYPE,
- };
+                     Available compression type values:
+                         0: zlib <https://www.zlib.net/>
++                        1: zstd <http://github.com/facebook/zstd>
  
- /* Compatible feature bits */
-@@ -369,6 +379,13 @@ typedef struct BDRVQcow2State {
  
-     bool metadata_preallocation_checked;
-     bool metadata_preallocation;
-+    /*
-+     * Compression type used for the image. Default: 0 - ZLIB
-+     * The image compression type is set on image creation.
-+     * The only way to change the compression type is to convert the image
-+     * with the desired compression type set
-+     */
-+    Qcow2CompressionType compression_type;
- } BDRVQcow2State;
+ === Header padding ===
+@@ -575,11 +576,28 @@ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+                     Another compressed cluster may map to the tail of the final
+                     sector used by this compressed cluster.
  
- typedef struct Qcow2COWRegion {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 6f9fd5e20e..2c6bb9dc99 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -57,6 +57,7 @@
- #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
- #define BLOCK_OPT_DATA_FILE         "data_file"
- #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
-+#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
++                    The layout of the compressed data depends on the compression
++                    type used for the image (see compressed cluster layout).
++
+ If a cluster is unallocated, read requests shall read the data from the backing
+ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
+ no backing file or the backing file is smaller than the image, they shall read
+ zeros for all parts that are not covered by the backing file.
  
- #define BLOCK_PROBE_BUF_SIZE        512
++=== Compressed Cluster Layout ===
++
++The compressed cluster data has a layout depending on the compression
++type used for the image, as follows:
++
++Compressed data layout for the available compression types:
++(x = data_space_length - 1)
++
++    0:  (default)  zlib <http://zlib.net/>:
++            Byte  0 -  x:     the compressed data content
++                              all the space provided used for compressed data
++    1:  zstd <http://github.com/facebook/zstd>:
++            Byte  0 -  3:     the length of compressed data in bytes
++                  4 -  x:     the compressed data content
+ 
+ == Snapshots ==
  
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 85e27bb61f..873fbef3b5 100644
+index 873fbef3b5..4b6e576c44 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -78,6 +78,8 @@
+@@ -4401,11 +4401,12 @@
+ # Compression type used in qcow2 image file
  #
- # @bitmaps: A list of qcow2 bitmap details (since 4.0)
+ # @zlib:  zlib compression, see <http://zlib.net/>
++# @zstd:  zstd compression, see <http://github.com/facebook/zstd>
  #
-+# @compression-type: the image cluster compression method (since 5.0)
-+#
- # Since: 1.7
+ # Since: 5.0
  ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -89,7 +91,8 @@
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
-       '*encrypt': 'ImageInfoSpecificQCow2Encryption',
--      '*bitmaps': ['Qcow2BitmapInfo']
-+      '*bitmaps': ['Qcow2BitmapInfo'],
-+      'compression-type': 'Qcow2CompressionType'
-   } }
+ { 'enum': 'Qcow2CompressionType',
+-  'data': [ 'zlib' ] }
++  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
  
- ##
-@@ -4392,6 +4395,18 @@
-   'data': [ 'v2', 'v3' ] }
- 
- 
-+##
-+# @Qcow2CompressionType:
-+#
-+# Compression type used in qcow2 image file
-+#
-+# @zlib:  zlib compression, see <http://zlib.net/>
-+#
-+# Since: 5.0
-+##
-+{ 'enum': 'Qcow2CompressionType',
-+  'data': [ 'zlib' ] }
-+
  ##
  # @BlockdevCreateOptionsQcow2:
- #
-@@ -4415,6 +4430,8 @@
- #                 allowed values: off, falloc, full, metadata)
- # @lazy-refcounts: True if refcounts may be updated lazily (default: off)
- # @refcount-bits: Width of reference counts in bits (default: 16)
-+# @compression-type: The image cluster compression method
-+#                    (default: zlib, since 5.0)
- #
- # Since: 2.12
- ##
-@@ -4430,7 +4447,8 @@
-             '*cluster-size':    'size',
-             '*preallocation':   'PreallocMode',
-             '*lazy-refcounts':  'bool',
--            '*refcount-bits':   'int' } }
-+            '*refcount-bits':   'int',
-+            '*compression-type': 'Qcow2CompressionType' } }
- 
- ##
- # @BlockdevCreateOptionsQed:
 -- 
 2.17.0
 
