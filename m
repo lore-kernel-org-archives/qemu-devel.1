@@ -2,85 +2,93 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B44BC4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64330C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F4C2469D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:22:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FF3F21556
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:23:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XyCoURoD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F4C2469D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OSfrmpyO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF3F21556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7J7Y-0005pl-DS
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:22:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58756)
+	id 1j7J8q-0006my-CX
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:23:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1j7J6x-0005M6-53
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:21:56 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7J88-0006KM-9D
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:23:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1j7J6w-0005PQ-60
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:21:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48935
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j7J6w-0005P9-2i
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:21:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582809713;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d37p1uqBBnkUUGRvuZE8lZCw5fBoHp3l8/kWIztcokY=;
- b=XyCoURoDmKgOUOEvklls7opMX6J9pkJk63dYQjpOISTxXMj3qiZWKoeJFP4qyAU0LXqdax
- sfpvcordsRr4npazFAsENYS2t3soqdiKmMkDGsOXVTeFWINLnXIvbu8EV2JW1TH9HU4V9y
- yxWRdzS+lQHQoWsB5VyBR9ZrC/JhOw0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-s3aKHT7sMX69liXgx3ciEQ-1; Thu, 27 Feb 2020 08:21:50 -0500
-X-MC-Unique: s3aKHT7sMX69liXgx3ciEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05EB88017DF;
- Thu, 27 Feb 2020 13:21:49 +0000 (UTC)
-Received: from [10.3.116.57] (ovpn-116-57.phx2.redhat.com [10.3.116.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A5111BC6D;
- Thu, 27 Feb 2020 13:21:48 +0000 (UTC)
-Subject: Re: [PATCH v4 08/10] nbd/server: introduce NBDExtentArray
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200205112041.6003-1-vsementsov@virtuozzo.com>
- <20200205112041.6003-9-vsementsov@virtuozzo.com>
- <6396ff32-16a3-62fe-1001-fde8b5a4f431@redhat.com>
- <f23161d4-0bff-30aa-6700-70c532ff8db5@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <18b6e7e8-c4a0-0c9e-e4f1-aa5d460f3592@redhat.com>
-Date: Thu, 27 Feb 2020 07:21:47 -0600
+ (envelope-from <richard.henderson@linaro.org>) id 1j7J87-00079M-7B
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:23:07 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38371)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j7J86-00077j-W3
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:23:07 -0500
+Received: by mail-pl1-x643.google.com with SMTP id p7so1149075pli.5
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:23:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=QB7LKDKMLixce1CKgGUJpUu6MTCR78GRVzNWyM/Vu7s=;
+ b=OSfrmpyO+jAxd5ccJGuz8/pAoUEDQL3esyyF6K6m3Slm6LvivKogvzR3hTlq6J0/ne
+ awY19IVi2da2B7iPtKajHbBC72HVRR8Dh7XMtZoULt1O1Xxl4e+T02ipHa9nNJF2/B36
+ PJt2jex1GUNBhr46z1xG+aaw+lI3wdM6Eup0XcmCwDapxQ/ShAOGRFqvQ4BzGlyONxQk
+ HDUwrY9yXSsFgEwv0R87rs19jQWJx6Q/kicVXxjwCRv8/LYFxYz3km2bEnnSHrIcDNfO
+ KzkeSxnPCIhDkktC740xqUhAudcbFdXE2Hir6euZLP1fW6mkJVzMjn47VNXuw+yCaiFz
+ tJXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QB7LKDKMLixce1CKgGUJpUu6MTCR78GRVzNWyM/Vu7s=;
+ b=YMZjTOpEo4ipbdUDeHpuS0a9bX9smxixPzdA1QJwn9g/LF+G0cbWZb8cvPUT57eFUy
+ e3/V45AMdB/QCwso1uY1uYOw4jZ+HoCO908nsD31J0Nq1UN7zwjK9atx3a/F4QN+BquL
+ vEGq6BS/F+O1ngQQCfQevkJHzzWboK99TIi4qfN19lLIDfwb0WNnfWzyI/J4ot1x73L7
+ MtPM7pOidF4YF3Aph9FvB3jxJsKpl4FwpO682ITu6YAU/RjJ3L7pr/Qqv29OeZ57YKL8
+ G7zpO7voRcqdlInd5OMgEsxTd1hPQW++cd7j25kCdJxNtD5G2RqyKG8RpZUCbzfewWzb
+ aljg==
+X-Gm-Message-State: APjAAAUFoaJu7iPxQ5t7yvbYsddFW52pgLcctc+Kh1qypx+Knq8BP6Hr
+ YbIKNb8bRV+gf2oiwYh4ddWIxQ==
+X-Google-Smtp-Source: APXvYqy6CcGOZQK3Fts+NwV3cY5lSl6KDIMEVrPdEn8xW2lddIfkZv5IE0SMenfDQVc+m4+dR/BDEQ==
+X-Received: by 2002:a17:90b:14e:: with SMTP id
+ em14mr4648511pjb.112.1582809785649; 
+ Thu, 27 Feb 2020 05:23:05 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ y18sm6837943pfe.19.2020.02.27.05.23.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 05:23:05 -0800 (PST)
+Subject: Re: [PATCH v2 2/2] util: add util function buffer_zero_avx512()
+To: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org,
+ pbonzini@redhat.com, laurent@vivier.eu, philmd@redhat.com,
+ berrange@redhat.com
+References: <1582688142-113997-1-git-send-email-robert.hu@linux.intel.com>
+ <1582688142-113997-3-git-send-email-robert.hu@linux.intel.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a027778f-08a9-a7f9-68b6-a6dab19e7e3d@linaro.org>
+Date: Thu, 27 Feb 2020 05:23:02 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <f23161d4-0bff-30aa-6700-70c532ff8db5@virtuozzo.com>
+In-Reply-To: <1582688142-113997-3-git-send-email-robert.hu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,60 +100,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: robert.hu@intel.com, chao.p.peng@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/27/20 6:46 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 26.02.2020 18:06, Eric Blake wrote:
->> On 2/5/20 5:20 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Introduce NBDExtentArray class, to handle extents list creation in more
->>> controlled way and with fewer OUT parameters in functions.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>> =A0 nbd/server.c | 210 +++++++++++++++++++++++++++++-------------------=
----
->>> =A0 1 file changed, 118 insertions(+), 92 deletions(-)
->>>
->>
->>> +
->>> +/* Further modifications of the array after conversion are abandoned *=
-/
->>> +static void nbd_extent_array_convert_to_be(NBDExtentArray *ea)
->>> +{
->>> +=A0=A0=A0 int i;
->>> +
->>> +=A0=A0=A0 assert(!ea->converted_to_be);
->>
->> Comment is stale - further modifications after conversion are a bug=20
->> that aborts the program, not abandoned.
->=20
-> I always thought that "abandoned" is something that must not be done, so=
-=20
-> the word works here. But I don't know English well).
+On 2/25/20 7:35 PM, Robert Hoo wrote:
+> @@ -226,10 +263,16 @@ static void init_accel(unsigned cache)
+>          fn = buffer_zero_avx2;
+>      }
+>  #endif
+> +#ifdef CONFIG_AVX512F_OPT
+> +    if (cache & CACHE_AVX512F) {
+> +        fn = buffer_zero_avx512;
+> +        length_to_accel = 256;
+> +    }
+> +#endif
+>      buffer_accel = fn;
+>  }
 
-Rephrasing my comment, further modifications are "a bug that aborts the=20
-program", rather than "an ignored action that gets abandoned".
+The other cases within init_accel should also set the length.  Otherwise, when
+unit testing, sse2 will also see 256.
 
-> May be:
->=20
-> "No further modifications of the array allowed after converting to BE."?=
-=20
+Recall that unit testing is done in order of
 
-Yes, that wording is better.
+> +#define CACHE_AVX512F 1
+> +#define CACHE_AVX2    2
+> +#define CACHE_SSE4    4
+> +#define CACHE_SSE2    8
 
-> Is it better?
->=20
-> Or just drop the comment.
+Otherwise this looks ok.
 
-That's also viable; the code reads fairly well even without the comment.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+r~
 
