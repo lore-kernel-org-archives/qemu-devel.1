@@ -2,78 +2,100 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE4EC11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 16:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF69DC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 16:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE04F246A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 16:36:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A3BB2469C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 16:37:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhgehElv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE04F246A1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B4fgyqD4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A3BB2469C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7M9h-0001py-N0
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 11:36:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40910)
+	id 1j7MAg-0003WO-Ph
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 11:37:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7M50-0004NX-RI
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:32:07 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7M8P-0000dH-IP
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7M4z-00033M-T8
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:32:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21885
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j7M8N-0005EP-M7
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:35:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42116
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7M4z-00032s-5d
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:32:05 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7M8N-0005E6-6i
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 11:35:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582821123;
+ s=mimecast20190719; t=1582821334;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P74SiNUxpKL8ZPS0To1187cVvGqPWjuWELUewBJjUJo=;
- b=BhgehElveBWPfI8QmiVjfH5eqq376b5cA+aRNHHGnGcBAfPmrGP8GYAzd1x5rc2/2yhtxO
- 6WCnin1S0p+JNaD2zkzBDmcbUeu0Nrc8EXW30dnOvlsrBpk0YAwEpq4Gh004CyYWpT4ROO
- DNmKHUXXqIdcTWcxAHAZW6lxgwAzXTo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-wTJ4Is98OBWftlPy7j-zKQ-1; Thu, 27 Feb 2020 11:31:58 -0500
-X-MC-Unique: wTJ4Is98OBWftlPy7j-zKQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBB0C802560;
- Thu, 27 Feb 2020 16:31:57 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-195.brq.redhat.com [10.40.205.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4F1C6E3EE;
- Thu, 27 Feb 2020 16:31:52 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/6] util/osdep: Improve error report by calling
- error_setg_win32()
-Date: Thu, 27 Feb 2020 17:30:59 +0100
-Message-Id: <20200227163101.414-5-philmd@redhat.com>
-In-Reply-To: <20200227163101.414-1-philmd@redhat.com>
-References: <20200227163101.414-1-philmd@redhat.com>
+ bh=qrrgzLI9dFk0vFO5y4lknIwdwegO/AibxlJNnXR7Qm0=;
+ b=B4fgyqD4pPtJ0d6IRVQNGXK6l5IlUCeNjjmV2ZU0rBJWazyGDy9Z4WIGYCPdUdBTei1n58
+ 3sT/3iq/WcEWqFGaGstg+4TqBpr9sJ8jR12jqFU8IWICBM5IruXHUbtLuYKEdgRDjrfCNL
+ 0a118plxe2nb8ozn7rzAVVix+cAIi0s=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-qPMCZxk4OlmU-v4JLEhUAw-1; Thu, 27 Feb 2020 11:35:32 -0500
+X-MC-Unique: qPMCZxk4OlmU-v4JLEhUAw-1
+Received: by mail-wr1-f72.google.com with SMTP id p11so70422wrn.10
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 08:35:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XhzIT/gV6b2z75HaYsyeGAu19awhsRqLt/n4X+OhWH8=;
+ b=XIHV7fB0nDbzdG8XhmAvURyjGL0BWSsTLc5BKXD3IcEejOzbsZ8wmf3w/8VveoeA1p
+ p5c2/gCPkQn5rdVon1mgKdencl44OZa3tzq2mm9Xc8QlooIznBYDY7T0Zsp8Di7j7qeJ
+ ge0dytNu4m37p48pzRNLRq2iN3zWbbNAv63cSbJ9wCw/z1qTElJEtps/z0RheUCxlakE
+ c7JmBQXzd7Ai3REfWKG+YsGECNkZi8bJzSPCpIwygrmO/PqhDALq0ZzRiZIKMv1OHYxf
+ Hc6K1catjIhvoR1OtusQNVlHCPUXN2av5UxFbzmixP/yi0Has4y+2XatUl/1JSsqp2fR
+ m6QA==
+X-Gm-Message-State: APjAAAXBOXOD6pLoQ4fd60U3B7/JyHZBdfRTgTLEJIHw9Hqro4A59emz
+ 4mtT0momEWgOEDanXozq2Yk2oNdeXKS7iyLixrfAQfX5jKGLTuvYvVIHtIALSfF8l17kjX+RBlw
+ gN1xofICM9YyRZAA=
+X-Received: by 2002:a05:600c:294a:: with SMTP id
+ n10mr342789wmd.11.1582821331367; 
+ Thu, 27 Feb 2020 08:35:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx6QnaCbcV2IlfP9um9Kf5XIs2tyqW2jOHCypVW5JH7ov9aYHNzCDzwThcz8wkOn/p4+c68+Q==
+X-Received: by 2002:a05:600c:294a:: with SMTP id
+ n10mr342760wmd.11.1582821331081; 
+ Thu, 27 Feb 2020 08:35:31 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id f127sm8214767wma.4.2020.02.27.08.35.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 08:35:30 -0800 (PST)
+Subject: Re: [PATCH v2] softmmu/vl.c: fix too slow TCG regression
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200227161454.32368-1-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4ad9e0a0-2e1e-d931-6210-08fd2154f330@redhat.com>
+Date: Thu, 27 Feb 2020 17:35:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200227161454.32368-1-imammedo@redhat.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,59 +107,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Markus Armbruster <armbru@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, f4bug@amsat.org, nieklinnenbank@gmail.com,
+ hsp.cat7@gmail.com, pbonzini@redhat.com, alex.bennee@linaro.org,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use error_setg_win32() which adds a hint similar to strerror(errno)).
+Can we improve the patch subject? "vl: Fix slower TCG on softmmu" or better=
+?
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- util/osdep.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On 2/27/20 5:14 PM, Igor Mammedov wrote:
+> Commit a1b18df9a4 moved -m option parsing after configure_accelerators()
+> that broke TCG accelerator initialization which accesses global ram_size
+> from size_code_gen_buffer() which is equal to 0 at that moment.
+>=20
+> Partially revert a1b18df9a4, by returning set_memory_options() to its
+> original location and only keep 32-bit host VA check and 'memory-backend'
+> size check introduced by fe64d06afc at current place.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-diff --git a/util/osdep.c b/util/osdep.c
-index ef40ae512a..144e217cb9 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -82,8 +82,8 @@ static int qemu_mprotect__osdep(void *addr, size_t size, =
-int prot)
-     DWORD old_protect;
-=20
-     if (!VirtualProtect(addr, size, prot, &old_protect)) {
--        error_report("%s: VirtualProtect failed with error code %ld",
--                     __func__, GetLastError());
-+        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError());
-+        error_report("%s: VirtualProtect failed: %s", __func__, emsg);
-         return -1;
-     }
-     return 0;
-@@ -506,12 +506,12 @@ int socket_init(void)
- {
- #ifdef _WIN32
-     WSADATA Data;
--    int ret, err;
-+    int ret;
-=20
-     ret =3D WSAStartup(MAKEWORD(2, 2), &Data);
-     if (ret !=3D 0) {
--        err =3D WSAGetLastError();
--        error_report("WSAStartup: %d", err);
-+        g_autofree gchar *emsg =3D g_win32_error_message(WSAGetLastError()=
-);
-+        error_report("WSAStartup: %s", emsg);
-         return -1;
-     }
-     atexit(socket_cleanup);
---=20
-2.21.1
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+> ---
+> v2:
+>    * check if user used -m SZ before comparing ram_size with backend's si=
+ze.
+>      Fixes case where qemu exits with error when backend's size doesn't m=
+atch
+>      dafault ram_size (i.e. user haven't used -m option  at all)
+>      (Peter Maydell <peter.maydell@linaro.org>)
+>    * keep order addr space size check for 32-bit host after
+>      backend size check. So it would be affected by backend's size as wel=
+l.
+> ---
+>   softmmu/vl.c | 54 ++++++++++++++++++++++++++++------------------------
+>   1 file changed, 29 insertions(+), 25 deletions(-)
+>=20
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index a9cce78f45..16ff5a16a3 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -2558,7 +2558,7 @@ static bool object_create_delayed(const char *type,=
+ QemuOpts *opts)
+>   }
+>  =20
+>  =20
+> -static void set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_s=
+ize,
+> +static bool set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_s=
+ize,
+>                                  MachineClass *mc)
+>   {
+>       uint64_t sz;
+> @@ -2634,30 +2634,8 @@ static void set_memory_options(uint64_t *ram_slots=
+, ram_addr_t *maxram_size,
+>           exit(EXIT_FAILURE);
+>       }
+>  =20
+> -    if (current_machine->ram_memdev_id) {
+> -        Object *backend;
+> -        ram_addr_t backend_size;
+> -
+> -        backend =3D object_resolve_path_type(current_machine->ram_memdev=
+_id,
+> -                                           TYPE_MEMORY_BACKEND, NULL);
+> -        backend_size =3D object_property_get_uint(backend, "size",  &err=
+or_abort);
+> -        if (mem_str && backend_size !=3D ram_size) {
+> -                error_report("Size specified by -m option must match siz=
+e of "
+> -                             "explicitly specified 'memory-backend' prop=
+erty");
+> -                exit(EXIT_FAILURE);
+> -        }
+> -        ram_size =3D backend_size;
+> -    }
+> -
+> -    if (!xen_enabled()) {
+> -        /* On 32-bit hosts, QEMU is limited by virtual address space */
+> -        if (ram_size > (2047 << 20) && HOST_LONG_BITS =3D=3D 32) {
+> -            error_report("at most 2047 MB RAM can be simulated");
+> -            exit(1);
+> -        }
+> -    }
+> -
+>       loc_pop(&loc);
+> +    return !!mem_str;
+>   }
+>  =20
+>   static int global_init_func(void *opaque, QemuOpts *opts, Error **errp)
+> @@ -2861,6 +2839,7 @@ void qemu_init(int argc, char **argv, char **envp)
+>       bool list_data_dirs =3D false;
+>       char *dir, **dirs;
+>       const char *mem_path =3D NULL;
+> +    bool have_custom_ram_size;
+>       BlockdevOptionsQueue bdo_queue =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_qu=
+eue);
+>       QemuPluginList plugin_list =3D QTAILQ_HEAD_INITIALIZER(plugin_list)=
+;
+>       int mem_prealloc =3D 0; /* force preallocation of physical target m=
+emory */
+> @@ -3821,6 +3800,9 @@ void qemu_init(int argc, char **argv, char **envp)
+>       machine_class =3D select_machine();
+>       object_set_machine_compat_props(machine_class->compat_props);
+>  =20
+> +    have_custom_ram_size =3D set_memory_options(&ram_slots, &maxram_size=
+,
+> +                                              machine_class);
+> +
+>       os_daemonize();
+>  =20
+>       /*
+> @@ -4296,7 +4278,29 @@ void qemu_init(int argc, char **argv, char **envp)
+>           current_machine->cpu_type =3D parse_cpu_option(cpu_option);
+>       }
+>  =20
+> -    set_memory_options(&ram_slots, &maxram_size, machine_class);
+> +    if (current_machine->ram_memdev_id) {
+> +        Object *backend;
+> +        ram_addr_t backend_size;
+> +
+> +        backend =3D object_resolve_path_type(current_machine->ram_memdev=
+_id,
+> +                                           TYPE_MEMORY_BACKEND, NULL);
+> +        backend_size =3D object_property_get_uint(backend, "size",  &err=
+or_abort);
+> +        if (have_custom_ram_size && backend_size !=3D ram_size) {
+> +                error_report("Size specified by -m option must match siz=
+e of "
+> +                             "explicitly specified 'memory-backend' prop=
+erty");
+> +                exit(EXIT_FAILURE);
+> +        }
+> +        ram_size =3D backend_size;
+> +    }
+> +
+> +    if (!xen_enabled()) {
+> +        /* On 32-bit hosts, QEMU is limited by virtual address space */
+> +        if (ram_size > (2047 << 20) && HOST_LONG_BITS =3D=3D 32) {
+> +            error_report("at most 2047 MB RAM can be simulated");
+> +            exit(1);
+> +        }
+> +    }
+> +
+>       current_machine->ram_size =3D ram_size;
+>       current_machine->maxram_size =3D maxram_size;
+>       current_machine->ram_slots =3D ram_slots;
+>=20
 
 
