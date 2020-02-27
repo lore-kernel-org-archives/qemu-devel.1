@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3006C4BA3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4D4C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:18:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A292B24699
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF30B24699
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:18:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="Tf3ZPhNq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A292B24699
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="V8iMZCKE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF30B24699
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=citrix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7I7G-0008IQ-RV
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 07:18:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60383)
+	id 1j7I7O-0008PC-2j
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 07:18:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anthony.perard@citrix.com>) id 1j7I6F-00072f-HC
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:08 -0500
+ (envelope-from <anthony.perard@citrix.com>) id 1j7I6D-00072Q-F6
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anthony.perard@citrix.com>) id 1j7I6D-0001C2-C4
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:07 -0500
-Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:64923)
+ (envelope-from <anthony.perard@citrix.com>) id 1j7I6B-00019x-LT
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:04 -0500
+Received: from esa1.hc3370-68.iphmx.com ([216.71.145.142]:64917)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <anthony.perard@citrix.com>)
- id 1j7I6C-0001AF-PM
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:05 -0500
+ id 1j7I6B-00014m-0Y
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:17:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1582805825;
+ d=citrix.com; s=securemail; t=1582805823;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=Z+JBE/qWSO5nUyB0osbzoDZoZzb91YmZWMVffW9rbmA=;
- b=Tf3ZPhNqYRrHYz+8N3545JwqFkFun8UaaMP38TWlz2kgj2diSaBaaVox
- nvV0b0SEfubtz0cY8Yr0Q8jL2SOh7MPnMeMEeq6MpydfoUgsIpHYhFs/n
- yFRRF4wgte0CnXBmjOT2hHreCoejlq2VfgX+0M5vuU3eTkSv765kT2Ikw 8=;
+ bh=8IRbE7fi2zeIru+YNuSvtho8VZpqQ7qeuz/NZSjvevc=;
+ b=V8iMZCKEziZn8Y4BIkJgJOEx8iaDiZJLUehIRLPq0qNaHuo0s9HlOGxq
+ QnavSOQhmSVRV6qW8Uo9BzRkDXQl3i8bdQFguWu1n5N5cFh+S6ijbAzN5
+ 8NU3Et38UbnIX6U1YJMR9+aMpbGygNp+wCy8SWRlgi2imM8Q7zuNQaCc7 4=;
 Authentication-Results: esa1.hc3370-68.iphmx.com;
  dkim=none (message not signed) header.i=none;
  spf=None smtp.pra=anthony.perard@citrix.com;
@@ -75,30 +75,29 @@ Received-SPF: None (esa1.hc3370-68.iphmx.com: no sender
  envelope-from="anthony.perard@citrix.com";
  x-sender="postmaster@mail.citrix.com";
  x-conformance=sidf_compatible
-IronPort-SDR: 6HDLwN2y+PFLSalCjceQp0430N+RKVAXGxKaBmeZ9eoxZik/rbVEZ3jbYVAkz+fxyYFxuH7mJZ
- 5axX9fqv83Pp1JoqMFHGPO3ll6pQ4OVxa8nPO58rylEZPX0BQyn0/EJLr2ZR2EkmbY6QwarEz/
- KLYnACqCe5Cimcim4u9y3n/4IHCvbXjv3KXlV/6PmPZT8mrItsMFa5ppWG6Sr/uULI//N0NX9O
- QfWP6GQwGz2pl0Bcl39YEIjql8T4IS8SDj8r1605Dx9gydT5AKZprEBoI443HnXDQu2MwLIjq1
- zpg=
+IronPort-SDR: X6WABXO5my6vAqtmL3fiBTbQmtsXko+bec88TVAPgHel1loM5pe9b6lDJYGMLFykzkQJD3LscV
+ pvpiVbdBGJSKyKaZGxq3MQJs6/Eb+AGJd4l9F5UMRiD7zaBjc3trGFsdIxOC9FvchDq004U5Sd
+ qpUVchZJbN70SsEnDjFqRYRi107x+aNi6eoz4n8SOpRUc7kEMEDFe+zE0GudVz5M3wHmdyoxAI
+ vvq3K+dVY6/byyAbyAPJhAfzx+5rsOR4a/rpu56dzTanZlMtYxfMj1SiAbYXCd+w5pPbfmUark
+ vJ0=
 X-SBRS: 2.7
-X-MesageID: 13277764
+X-MesageID: 13277762
 X-Ironport-Server: esa1.hc3370-68.iphmx.com
 X-Remote-IP: 162.221.158.21
 X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.70,492,1574139600"; d="scan'208";a="13277764"
+X-IronPort-AV: E=Sophos;i="5.70,492,1574139600"; d="scan'208";a="13277762"
 From: Anthony PERARD <anthony.perard@citrix.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PULL 3/3] Memory: Only call ramblock_ptr when needed in
- qemu_ram_writeback
-Date: Thu, 27 Feb 2020 12:16:45 +0000
-Message-ID: <20200227121645.2601280-4-anthony.perard@citrix.com>
+Subject: [PULL 1/3] hw/xen/xen_pt_load_rom: Remove unused includes
+Date: Thu, 27 Feb 2020 12:16:43 +0000
+Message-ID: <20200227121645.2601280-2-anthony.perard@citrix.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200227121645.2601280-1-anthony.perard@citrix.com>
 References: <20200227121645.2601280-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
 X-Received-From: 216.71.145.142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,50 +115,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is possible that a ramblock doesn't have memory that QEMU can
-access, this is the case with the Xen hypervisor.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-In order to avoid to trigger an assert, only call ramblock_ptr() when
-needed in qemu_ram_writeback(). This should fix migration of Xen
-guests that was broken with bd108a44bc29 ("migration: ram: Switch to
-ram block writeback").
+xen_pt_load_rom.c does not use any of these includes, remove them.
 
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+Message-Id: <20191014142246.4538-9-philmd@redhat.com>
 Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20191219154323.325255-1-anthony.perard@citrix.com>
 ---
- exec.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/xen/xen_pt_load_rom.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 231d6e564109..0cc500d53a23 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2116,14 +2116,13 @@ int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp)
+diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
+index 307a5c93e235..a50a80837ea2 100644
+--- a/hw/xen/xen_pt_load_rom.c
++++ b/hw/xen/xen_pt_load_rom.c
+@@ -3,12 +3,8 @@
   */
- void qemu_ram_writeback(RAMBlock *block, ram_addr_t start, ram_addr_t length)
- {
--    void *addr = ramblock_ptr(block, start);
--
-     /* The requested range should fit in within the block range */
-     g_assert((start + length) <= block->used_length);
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "hw/i386/pc.h"
+ #include "qemu/error-report.h"
+-#include "ui/console.h"
+ #include "hw/loader.h"
+-#include "monitor/monitor.h"
+-#include "qemu/range.h"
+ #include "hw/pci/pci.h"
+ #include "xen_pt.h"
  
- #ifdef CONFIG_LIBPMEM
-     /* The lack of support for pmem should not block the sync */
-     if (ramblock_is_pmem(block)) {
-+        void *addr = ramblock_ptr(block, start);
-         pmem_persist(addr, length);
-         return;
-     }
-@@ -2134,6 +2133,7 @@ void qemu_ram_writeback(RAMBlock *block, ram_addr_t start, ram_addr_t length)
-          * specified as persistent (or is not one) - use the msync.
-          * Less optimal but still achieves the same goal
-          */
-+        void *addr = ramblock_ptr(block, start);
-         if (qemu_msync(addr, length, block->fd)) {
-             warn_report("%s: failed to sync memory range: start: "
-                     RAM_ADDR_FMT " length: " RAM_ADDR_FMT,
 -- 
 Anthony PERARD
 
