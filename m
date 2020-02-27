@@ -2,63 +2,108 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D946EC4BA3B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE490C4BA3B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:18:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAEEB222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:16:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAEEB222C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F7A8222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:18:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHMMYNiq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7A8222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7FHB-0003Nn-RQ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:16:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42781)
+	id 1j7FIz-00057P-Lc
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:18:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43956)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j7FGQ-0002Jy-Qb
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:27 -0500
+ (envelope-from <mreitz@redhat.com>) id 1j7FIG-0004Rf-0n
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:17:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j7FGP-0000wI-Mf
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:26 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3252 helo=huawei.com)
+ (envelope-from <mreitz@redhat.com>) id 1j7FIE-0003VZ-ND
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:17:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42043
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j7FGM-0000rd-Vj; Thu, 27 Feb 2020 04:15:23 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id C66B5D06BC57D3EB34DD;
- Thu, 27 Feb 2020 17:15:18 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.208) with Microsoft SMTP Server (TLS) id 14.3.439.0; Thu, 27 Feb
- 2020 17:15:12 +0800
-Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
-To: David Hildenbrand <david@redhat.com>, <peter.maydell@linaro.org>
-References: <20200227025055.14341-1-pannengyuan@huawei.com>
- <20200227025055.14341-2-pannengyuan@huawei.com>
- <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
- <46d1fc23-6ef5-947f-becd-c3004a6b76bc@huawei.com>
- <f0576f75-d8b5-0e65-7390-32cd3021e1f2@redhat.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <11fc3595-4bc4-a523-cf41-62ca7cfbd70d@huawei.com>
-Date: Thu, 27 Feb 2020 17:15:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j7FIE-0003Sf-A1
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:17:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582795037;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ZgMG+w5NDTs49Uptfu6yAfX8Ue3xpcdxjbc8toZyVko=;
+ b=VHMMYNiqVVy95qa7w0Za+EVt60ldnuGIgZjL3fyypAYpy04FZkj5SftCLGKNkCeiLD7a0r
+ M9L2TjAMMi3a+fQFu14hqPYAON5qww4AKCLKSurvFssSjTPfmJUsLtAHJFV6FOt+btiFxN
+ m2dO1aBmlmpoUxTWlXroiZCgWrOpo4Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-S_FEsY8RP0G2qZXOcufd3A-1; Thu, 27 Feb 2020 04:17:13 -0500
+X-MC-Unique: S_FEsY8RP0G2qZXOcufd3A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72CC4477;
+ Thu, 27 Feb 2020 09:17:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A20169079D;
+ Thu, 27 Feb 2020 09:17:04 +0000 (UTC)
+Subject: Re: [RFC PATCH v3 19/27] qcow2: Add subcluster support to
+ expand_zero_clusters_in_l1()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1577014346.git.berto@igalia.com>
+ <d7c9c2d54c7be83eda854db37e54dd7aabb1a1e1.1577014346.git.berto@igalia.com>
+ <194970c2-07a5-41f5-bd3c-7153d6f5e1b7@redhat.com>
+ <w51k149p8p0.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8ee61115-b5e1-7861-1550-afa5928ee97b@redhat.com>
+Date: Thu, 27 Feb 2020 10:17:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <f0576f75-d8b5-0e65-7390-32cd3021e1f2@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <w51k149p8p0.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ch0qlEUV77r80kqkiZ0HbN87A9yIQJtP5"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,102 +115,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ch0qlEUV77r80kqkiZ0HbN87A9yIQJtP5
+Content-Type: multipart/mixed; boundary="z7s23lZxEBfpfEL6EJacbdC1luc829paw"
 
+--z7s23lZxEBfpfEL6EJacbdC1luc829paw
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 2/27/2020 5:04 PM, David Hildenbrand wrote:
-> On 27.02.20 09:58, Pan Nengyuan wrote:
->>
->>
->> On 2/27/2020 4:41 PM, David Hildenbrand wrote:
->>> On 27.02.20 03:50, Pan Nengyuan wrote:
->>>> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s3=
-90x. The leak stack is as follow:
->>>>
->>>> Direct leak of 48 byte(s) in 1 object(s) allocated from:
->>>>     #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0=
-xef970)
->>>>     #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
->>>>     #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/inclu=
-de/qemu/timer.h:530
->>>>     #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qe=
-mu/timer.h:551
->>>>     #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include=
-/qemu/timer.h:569
->>>>     #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/targ=
-et/s390x/cpu.c:285
->>>>     #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qem=
-u/qom/object.c:372
->>>>     #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-n=
-ew/qemu/qom/object.c:516
->>>>     #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu=
-/qom/object.c:684
->>>>     #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s39=
-0x/s390-virtio-ccw.c:64
->>>>     #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core=
-/machine-hmp-cmds.c:57
->>>>     #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/=
-monitor/hmp.c:1082
->>>>     #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-ne=
-w/qemu/monitor/misc.c:142
->>>>
->>>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>>> ---
->>>> Cc: Richard Henderson <rth@twiddle.net>
->>>> Cc: David Hildenbrand <david@redhat.com>
->>>> Cc: Cornelia Huck <cohuck@redhat.com>
->>>> Cc: qemu-s390x@nongnu.org
->>>> ---
->>>> v2->v1:
->>>> - Similarly to other cleanups, move timer_new into realize(Suggested=
- by Philippe Mathieu-Daud=C3=A9)
->>>> v3->v2:
->>>> - Also do the timer_free in unrealize, it seems more balance.
->>>> ---
->>>
->>>
->>> As I already said, I think this is init and not realize stuff. Do we
->>> have a convention now and documented that?
->>>
->>> Anyhow, I don't really care
->>> [...]
->>>
->>>
->>>> @@ -453,6 +466,7 @@ static void s390_cpu_class_init(ObjectClass *oc,=
- void *data)
->>>> =20
->>>>      device_class_set_parent_realize(dc, s390_cpu_realizefn,
->>>>                                      &scc->parent_realize);
->>>> +    dc->unrealize =3D s390_cpu_unrealizefn;
->>>
->>> Shouldn't we use device_class_set_parent_unrealize?
->>
->> We just only declare parent_realize field in S390CPUClass(), it seems =
-nothing to do in parent_unrealize.
->>
->> typedef struct S390CPUClass {
->> ...
->> DeviceRealize parent_realize;    // no parent_unrealize;
->> ...
->> }
->>
->> So I think we can't use it.
+On 26.02.20 18:19, Alberto Garcia wrote:
+> On Fri 21 Feb 2020 03:57:27 PM CET, Max Reitz wrote:
+>> As noted in v2, this function is only called when downgrading qcow2
+>> images to v2.  It kind of made sense to just call set_l2_bitmap() in
+>> v2, but now with the if () conditional...  I suppose it may make more
+>> sense to assert that the image does not have subclusters at the
+>> beginning of the function and be done with it.
 >=20
-> So you should add it and properly call the parent_unrealize from your
-> new unrealize function?
+> Hmmm, you're right.
 >=20
-> AFAIKS you are overwriting cpu_common_unrealizefn set in hw/core/cpu.c
-> for TYPE_CPU with this change.
-
-Oh, I think you are right, I will change it.
-
-Thanks.
+>> OTOH, well, this does make ensuring that we have subcluster =E2=80=9Csup=
+port=E2=80=9D
+>> everywhere a bit easier because this way all set_l2_entry() calls are
+>> accompanied by an =E2=80=9Cif (subclusters) { set_l2_bitmap() }=E2=80=9D=
+ part.
 >=20
+> Another alternative is to assert that the image does not have subcluster
+> but still leave a comment after both set_l2_entry() calls explaining why
+> there's no need to touch the bitmap.
+
+Sounds good.
+
+Max
+
+
+--z7s23lZxEBfpfEL6EJacbdC1luc829paw--
+
+--ch0qlEUV77r80kqkiZ0HbN87A9yIQJtP5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5XiQ4ACgkQ9AfbAGHV
+z0A33wgAkm/kJq5HyKtn182JpnrqNImwhKNef81DIDfmjjyPVjGbRPwPga1t3ISm
+Ep5Vs/26pLafphxLnHcRX1KunxVNwCFvxBreDMmGjwTV8PhkdlDy19c/NBAGlMhH
+UZYMCYJIxrK9KNJGKKJDcBEPGQ3pc6Yk2XcjX1dvkuczF23eTwLnEwPrzHensBhn
++zcQ2e/YedspxYSsz7d9GB9K7fA4zo6z7YgMeExtYkMjJgGH16RlqsMYLHnrETKg
+eqPasZys1v5LQ6IJ5QZxVXcnVP2aWRv97eJvpZwbuRN4hV5ZdtsKY8m8HWQYHKfN
+mhTUE+H5tx2A30ovIima0ay/w7T9Bg==
+=3AH4
+-----END PGP SIGNATURE-----
+
+--ch0qlEUV77r80kqkiZ0HbN87A9yIQJtP5--
+
 
