@@ -2,100 +2,85 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B79C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BD1C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:06:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE51B2469A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:03:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE51B2469A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 996C224650
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:06:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LAMZ2AlT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 996C224650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Ip6-0001aF-5r
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:03:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50712)
+	id 1j7IsK-0002vi-Py
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:06:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51646)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1j7IoK-00016S-5b
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:02:41 -0500
+ (envelope-from <eblake@redhat.com>) id 1j7IrS-0002S2-CJ
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1j7IoJ-0006MG-0T
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:02:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32546)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1j7IoI-0006M9-SF
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:02:38 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 01RD2UFO055886
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 08:02:38 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2ydhhpahnr-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 08:02:36 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Thu, 27 Feb 2020 13:02:21 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 27 Feb 2020 13:02:18 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 01RD2Hfd55574556
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 27 Feb 2020 13:02:17 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9C18C4C052;
- Thu, 27 Feb 2020 13:02:17 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 690804C04A;
- Thu, 27 Feb 2020 13:02:17 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.150])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 27 Feb 2020 13:02:17 +0000 (GMT)
-Date: Thu, 27 Feb 2020 14:02:15 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH V2] vhost: correctly turn on VIRTIO_F_IOMMU_PLATFORM
-In-Reply-To: <20200226115009-mutt-send-email-mst@kernel.org>
-References: <20200226094357.25061-1-jasowang@redhat.com>
- <20200226142839.4263de9b.pasic@linux.ibm.com>
- <20200226083654-mutt-send-email-mst@kernel.org>
- <20200226163618.31aa86ed.pasic@linux.ibm.com>
- <20200226115009-mutt-send-email-mst@kernel.org>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <eblake@redhat.com>) id 1j7IrR-0007t1-3S
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:05:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21749
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j7IrQ-0007rv-Uj
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:05:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582808750;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K6HQB4gaP+eZ99NIo7zUw+QpWBtueKbifVRClt7IJWY=;
+ b=LAMZ2AlT55bldodJ+YgJ26EqZPlSM/1JV7eMc2GJdvdaNMmHMAU1tQ21NjKNidO3uiVpdL
+ SOp+HWc1Ouxw51CDy6eAoqau8RuHx9mSvo0tMHJ85WfNyWqgnfV4J3cB/HAZuZKAj5CdD3
+ ANU0qzbCCLiK1/7jJ3Zd/lb6+6pJp6w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-ueiHzDeNPjWPjKPSnG8TnA-1; Thu, 27 Feb 2020 08:05:48 -0500
+X-MC-Unique: ueiHzDeNPjWPjKPSnG8TnA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D065618FF66B;
+ Thu, 27 Feb 2020 13:05:47 +0000 (UTC)
+Received: from [10.3.116.57] (ovpn-116-57.phx2.redhat.com [10.3.116.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B3051101D48E;
+ Thu, 27 Feb 2020 13:05:44 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] iotests: Specify explicit backing format where
+ sensible
+To: Peter Krempa <pkrempa@redhat.com>
+References: <20200227023928.1021959-1-eblake@redhat.com>
+ <20200227023928.1021959-2-eblake@redhat.com>
+ <20200227072046.GC20737@andariel.pipo.sk>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <3ae47ca2-b7b0-e07e-d725-9ea6cb431d0f@redhat.com>
+Date: Thu, 27 Feb 2020 07:05:44 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20022713-0012-0000-0000-0000038ACCC1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20022713-0013-0000-0000-000021C775F2
-Message-Id: <20200227140215.2d12149c.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-02-27_03:2020-02-26,
- 2020-02-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 phishscore=0
- bulkscore=0 suspectscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2002270103
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20200227072046.GC20737@andariel.pipo.sk>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,75 +92,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: libvir-list@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Feb 2020 11:52:26 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-
-> On Wed, Feb 26, 2020 at 04:36:18PM +0100, Halil Pasic wrote:
-> > On Wed, 26 Feb 2020 08:37:13 -0500
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > 
-> > > On Wed, Feb 26, 2020 at 02:28:39PM +0100, Halil Pasic wrote:
-> > > > On Wed, 26 Feb 2020 17:43:57 +0800
-> > > > Jason Wang <jasowang@redhat.com> wrote:
-> > > > 
-> > > > > We turn on device IOTLB via VIRTIO_F_IOMMU_PLATFORM unconditionally on
-> > > > > platform without IOMMU support. This can lead unnecessary IOTLB
-> > > > > transactions which will damage the performance.
-> > > > > 
-> > > > > Fixing this by check whether the device is backed by IOMMU and disable
-> > > > > device IOTLB.
-> > > > > 
-> > > > > Reported-by: Halil Pasic <pasic@linux.ibm.com>
-> > > > > Fixes: c471ad0e9bd46 ("vhost_net: device IOTLB support")
-> > > > > Cc: qemu-stable@nongnu.org
-> > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > 
-> > > > Tested-by: Halil Pasic <pasic@linux.ibm.com>
-> > > > Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> > > > 
-> > > > Thank you very much for fixing this! BTW as I mentioned before it
-> > > > fixes vhost-vsock with iommu_platform=on as well.
-> > > 
-> > > Fixes as in improves performance?
-> > 
-> > No, fixes like one does not get something like:
-> > qemu-system-s390x: vhost_set_features failed: Operation not supported (95)
-> > qemu-system-s390x: Error starting vhost: 95
-> > any more.
-> > 
-> > Regards,
-> > Halil
-> > 
-> > [..]
+On 2/27/20 1:20 AM, Peter Krempa wrote:
+> On Wed, Feb 26, 2020 at 20:39:26 -0600, Eric Blake wrote:
+>> There are many existing qcow2 images that specify a backing file but
+>> no format.  This has been the source of CVEs in the past, but has
+>> become more prominent of a problem now that libvirt has switched to
+>> -blockdev.  With older -drive, at least the probing was always done by
+>> qemu (so the only risk of a changed format between successive boots of
+>> a guest was if qemu was upgraded and probed differently).  But with
+>> newer -blockdev, libvirt must specify a format; if libvirt guesses raw
+>> where the image was formatted, this results in data corruption visible
+>> to the guest; conversely, if libvirt guesses qcow2 where qemu was
+>> using raw, this can result in potential security holes, so modern
+>> libvirt instead refuses to use images without explicit backing format.
+>>
+>> The change in libvirt to reject images without explicit backing format
+>> has pointed out that a number of tools have been far too reliant on
+>> probing in the past.  It's time to set a better example in our own
+>> iotests of properly setting this parameter.
+>>
+>> iotest calls to create, rebase, convert, and amend are all impacted to
+>> some degree.  It's a bit annoying that we are inconsistent on command
+>> line - while all of those accept -o backing_file=...,backing_fmt=...,
+>> the shortcuts are different: create and rebase have -b and -F, convert
+>> has -B but no -F, and amend has no shortcuts.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
 > 
-> But can commit c471ad0e9bd46 actually boot a secure guest
-> where iommu_platform=on is required?
+> [...]
 > 
+>>   113 files changed, 414 insertions(+), 338 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
+>> index 0a4b854e6520..585512bb296b 100755
+>> --- a/tests/qemu-iotests/017
+>> +++ b/tests/qemu-iotests/017
+>> @@ -66,7 +66,7 @@ echo "Creating test image with backing file"
+>>   echo
+>>
+>>   TEST_IMG=$TEST_IMG_SAVE
+>> -_make_test_img -b "$TEST_IMG.base" 6G
+>> +_make_test_img -b "$TEST_IMG.base" -F $IMGFMT 6G
+>>
+> 
+> My understanding of the intricacies of the qemu-iotest suite is not good
+> enoug to be able to review this patch. Specifically $IMGFMT in this
+> instance is also used in the '-f' switch of qemu-img in _make_test_img
+> and I don't know if it's expected for the backing file to share the
+> format.
 
-No, of course it can not. But I'm not sure about AMD SEV. AFAIU without
-Jason's patch it does not work for AMD SEV. Tom already stated that with
-SEV they don't need the IOVA translation aspect of ACCESS_PLATFORM, but
-I have no idea if the condition vdev->dma_as == &address_space_memory
-catches them as well or not. They probably have !=.
+That's fine; I'm hoping a qemu expert reviews as well.
 
-CCing Tom. @Tom does vhost-vsock work for you with SEV and current qemu?
+$IMGFMT allows an iotest to be run on multiple formats (qcow2, qed, 
+vmdk); most tests in this patch series either hard-coded the base image 
+to be 'raw' (in which case I added -F raw) or to be the same type as the 
+wrapper image under test (in which case it is -F $IMGFMT).  We have very 
+few tests that would try to mix-and-match other formats, such as a qcow2 
+on top of qed.
 
-Also, one can specify iommu_platform=on on a device that ain't a part of
-a secure-capable VM, just for the fun of it. And that breaks
-vhost-vsock. Or is setting iommu_platform=on only valid if
-qemu-system-s390x is protected virtualization capable?
-
-BTW, I don't have a strong opinion on the fixes tag. We currently do not
-recommend setting iommu_platform, and thus I don't think we care too
-much about past qemus having problems with it.
-
-Regards,
-Halil
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
