@@ -2,81 +2,91 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 036E0C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 434F7C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:04:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C405F24699
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EDEC2469F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:04:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jA7bcHoQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C405F24699
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8ZXOsYv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EDEC2469F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7PHQ-00089X-1D
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 14:57:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51004)
+	id 1j7POd-0002Qu-5G
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 15:04:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7PGq-0007hv-GQ
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:56:33 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7PO2-0001zU-8M
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7PGp-0004GJ-8u
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:56:32 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42624)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7PO1-0006nx-36
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:57 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39885)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7PGp-0004G5-3U
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:56:31 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 66so345134otd.9
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 11:56:31 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j7PO0-0006nF-Rv
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:57 -0500
+Received: by mail-pl1-x643.google.com with SMTP id g6so234060plp.6
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 12:03:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tOGfRx1VQZ8hzZFqM5uiScInP12M9f5YygMjv1KTZA8=;
- b=jA7bcHoQqbraZXZRYO9qFIHfnAg0lGjItoglpppOBRK6FaRfJiatENgY8Yzq/gVLqF
- o1Qdg7j1Zds1ExgxYAEJ89DyZzg58JXDPzGffQ4yF9AcObVZBa5nckORHIcvFngZV13o
- kO/kja0DEXV3fkTL474qvTZOdLSAks8X0WBPNC8Kr3nzVpC84KRf/Aqn5FI/P6Bm632r
- IxCr5DOQwCcpUkfx5Ifp5CJ78CeLYfCTS3uimNiXDQsjc87f7Lqf8iMTFFk33Y6sYLUi
- QI7pBMlMIx8bIk50dmzOx9y3GqSXvZhLlP0Vg3aqvmNGcxQGA7WDCyjDe4IcKjwOVy0c
- Z8ew==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2WBG2RTr0qjTefzGTgfeJN1oG1HTTmoJ+yNPM/A6T10=;
+ b=l8ZXOsYvG5faDbzB6+SADiSTbHsop8RnEdbFCEQh5/bOP8yBUa+XbvWAtvPk5qH8uH
+ 9zcRSqcn15d8RNblNSs17FJMKJwN7V0Hxgdq9f/V6I8FFR9RWuALTzMN22bgk2JdnHDJ
+ w6ILVZIM9S1pWBihQzKBWn3u8d8i2OcOTUOfRyi6PpYOviTjcw+M367ejppTCbXPZeee
+ EARhTKVXvvQhJfD4ohw+LMAnjTv25O2n586VceIl/xexvefHQTwq1Rk4u+sE7m47Zkb3
+ 2aF7zvhksEysO1AOUG+jRpxXh8PdOKHgsnqmztbGE/H0WPXUttbgctvQCK+t3S6t+k5q
+ PVBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tOGfRx1VQZ8hzZFqM5uiScInP12M9f5YygMjv1KTZA8=;
- b=najgthNbPfl/ZZO/kbZuFkVjX6nDz7jXRth/5E9i/iazwns/YD45c8zAuXJLLj79XA
- mKH/fHYVvLmlLArWIW7qGogFgZK8Il7opQqzqEgq4c/fCQpBg1yDqEAGr3u3xv8c2dwB
- 9dA6FMVL9MbW0QFMRnOqWdabPcnqAFLKZNaAMddCQu7dZOmK1BN67xwduIutx1QxBxuh
- xDEZbp1TztJysMrneT5c5DqCNry7+PYuFmW2rM6BiPcUtaYRA7Co+s2MtlQfohuwAyis
- oJ/J4+TLFMEi9S2logyKT3PlDUjguDDqXWbbDCun/hGe6dUqqMgxp41sizp5puOjxFQm
- uH2Q==
-X-Gm-Message-State: APjAAAX1kw0HlyMI4IJUach7lXY/U50nM1JI1wlMX/uxNvCR0UkqP7bB
- FglB1sgGI4hjYjQ+vBnSYDwSfZhtUIxwJfnG9M+r5A==
-X-Google-Smtp-Source: APXvYqzRLDwVpIFfkrWtWe8anmWzpj+cNXim5+SN12tbaWAtTZKwpijI72X7ohQvXAVgMDL+Hai5XLaQCS+UClrKYvo=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr403121otq.221.1582833390236; 
- Thu, 27 Feb 2020 11:56:30 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2WBG2RTr0qjTefzGTgfeJN1oG1HTTmoJ+yNPM/A6T10=;
+ b=CcYIjD0riBu2ANlt3V7jwVALZo/JfXlVbY5dHTcdmhdTzVKojZAZ42nLRAO5hqY6U8
+ rMMTqevQ/mDcaotoLMoad6zMz1jao4tlJFNCjO97+se7m//Bu19walwxIiLsmaNrNzgu
+ YD1GNuPsFwbLD9Yt0SEHFmDI1EhMmyG3On2Clpb2RY/sTtwE/1SsFFfnYrP6x0zaMxkg
+ HlRXaBPEMWpmex2o5N2IhfDnHP2eNKlj2DjmwGSqynnkFFYPhgKr8kSBzxlXBYwYKw3H
+ 8p5Oqngfw7Dyu47sgtPNNOjF5GzzfbjNSvi8VIoUyCmCsyk+WtCOzq8S5586aXblrOu+
+ G0Gw==
+X-Gm-Message-State: APjAAAUPtuHYTjv6B4vteWCwkSKm/yBBDCs7pKvw58ghN3/i+/hR+P2S
+ TJKNEFuoUPYlCN7ha1D1k+/huA==
+X-Google-Smtp-Source: APXvYqyyoR6u4iTvjBo3zec75zYzVUCXcFwHVh61O+y1jSA18KzXIJdckFBffqPn4HAigPtdkybDqg==
+X-Received: by 2002:a17:902:504:: with SMTP id 4mr403983plf.276.1582833835735; 
+ Thu, 27 Feb 2020 12:03:55 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ x4sm8341657pff.143.2020.02.27.12.03.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 12:03:55 -0800 (PST)
+Subject: Re: [PATCH v4 4/5] target/riscv: add fault-only-first unit stride load
+To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
+ <20200225103508.7651-5-zhiwei_liu@c-sky.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <2b7d7af1-61ee-edf6-5e57-1108428f920c@linaro.org>
+Date: Thu, 27 Feb 2020 12:03:53 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200226090010.708934-1-mst@redhat.com>
- <20200227035423-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200227035423-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Feb 2020 19:56:19 +0000
-Message-ID: <CAFEAcA9j7aYyJ0yLRd5+=urdBgvE6U+w-6fzRfsWfscagU1HoA@mail.gmail.com>
-Subject: Re: [PULL v2 00/30] virtio, pc: fixes, features
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200225103508.7651-5-zhiwei_liu@c-sky.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,35 +98,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, linux-csky@vger.kernel.org,
+ wxy194768@alibaba-inc.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 27 Feb 2020 at 08:55, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Feb 26, 2020 at 04:01:02AM -0500, Michael S. Tsirkin wrote:
-> > changes from v1:
-> >     dropped vhost changes, hope this fixes build on Mac OS.
-> >
-> > The following changes since commit 9a8abceb5f01d1066d3a1ac5a33aabcbaeec1860:
-> >
-> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20200225' into staging (2020-02-25 11:03:47 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to deec824070e408b936e02883a1e2cb5af92448d0:
->
-> I updated one of the commit logs to include CC stable, so the new
-> hash is: b844a4c77b618acfba6b3f4ce12d2ad709f99279
+On 2/25/20 2:35 AM, LIU Zhiwei wrote:
+> +GEN_VEXT_LD_ELEM(vlbff_v_b, int8_t,  int8_t,  H1, ldsb)
+> +GEN_VEXT_LD_ELEM(vlbff_v_h, int8_t,  int16_t, H2, ldsb)
+> +GEN_VEXT_LD_ELEM(vlbff_v_w, int8_t,  int32_t, H4, ldsb)
+> +GEN_VEXT_LD_ELEM(vlbff_v_d, int8_t,  int64_t, H8, ldsb)
+> +GEN_VEXT_LD_ELEM(vlhff_v_h, int16_t, int16_t, H2, ldsw)
+> +GEN_VEXT_LD_ELEM(vlhff_v_w, int16_t, int32_t, H4, ldsw)
+> +GEN_VEXT_LD_ELEM(vlhff_v_d, int16_t, int64_t, H8, ldsw)
+> +GEN_VEXT_LD_ELEM(vlwff_v_w, int32_t, int32_t, H4, ldl)
+> +GEN_VEXT_LD_ELEM(vlwff_v_d, int32_t, int64_t, H8, ldl)
+> +GEN_VEXT_LD_ELEM(vleff_v_b, int8_t,  int8_t,  H1, ldsb)
+> +GEN_VEXT_LD_ELEM(vleff_v_h, int16_t, int16_t, H2, ldsw)
+> +GEN_VEXT_LD_ELEM(vleff_v_w, int32_t, int32_t, H4, ldl)
+> +GEN_VEXT_LD_ELEM(vleff_v_d, int64_t, int64_t, H8, ldq)
+> +GEN_VEXT_LD_ELEM(vlbuff_v_b, uint8_t,  uint8_t,  H1, ldub)
+> +GEN_VEXT_LD_ELEM(vlbuff_v_h, uint8_t,  uint16_t, H2, ldub)
+> +GEN_VEXT_LD_ELEM(vlbuff_v_w, uint8_t,  uint32_t, H4, ldub)
+> +GEN_VEXT_LD_ELEM(vlbuff_v_d, uint8_t,  uint64_t, H8, ldub)
+> +GEN_VEXT_LD_ELEM(vlhuff_v_h, uint16_t, uint16_t, H2, lduw)
+> +GEN_VEXT_LD_ELEM(vlhuff_v_w, uint16_t, uint32_t, H4, lduw)
+> +GEN_VEXT_LD_ELEM(vlhuff_v_d, uint16_t, uint64_t, H8, lduw)
+> +GEN_VEXT_LD_ELEM(vlwuff_v_w, uint32_t, uint32_t, H4, ldl)
+> +GEN_VEXT_LD_ELEM(vlwuff_v_d, uint32_t, uint64_t, H8, ldl)
+
+We definitely should not have a 3rd copy of these.
 
 
-Applied, thanks.
+> +        if (i == 0) {
+> +            probe_read_access(env, addr, nf * msz, ra);
+> +        } else {
+> +            /* if it triggles an exception, no need to check watchpoint */
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+triggers.
 
--- PMM
+> +            offset = -(addr | TARGET_PAGE_MASK);
+> +            remain = nf * msz;
+> +            while (remain > 0) {
+> +                host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmuidx);
+> +                if (host) {
+> +#ifdef CONFIG_USER_ONLY
+> +                    if (page_check_range(addr, nf * msz, PAGE_READ) < 0) {
+> +                        vl = i;
+> +                        goto ProbeSuccess;
+> +                    }
+> +#else
+> +                    probe_read_access(env, addr, nf * msz, ra);
+> +#endif
+
+Good job finding all of the corner cases.  I should invent a new cputlb
+function that handles this better.  For now, this is the best we can do.
+
+
+r~
 
