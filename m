@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE94C3F2C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 22:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0903EC3F2C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 22:02:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C82A2469F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 22:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C92552469F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 22:02:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCG+xv0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C82A2469F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRxNIcER"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C92552469F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7RF8-00026J-JV
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 17:02:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44905)
+	id 1j7RFA-0002AN-VK
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 17:02:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j7REG-00018j-CM
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 17:02:02 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7REI-00018x-Qn
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 17:02:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j7REF-0003kQ-11
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 17:02:00 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38887)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7REG-0003ko-BZ
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 17:02:02 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33450)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j7REE-0003jz-IY; Thu, 27 Feb 2020 17:01:58 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a9so1106670wmj.3;
- Thu, 27 Feb 2020 14:01:57 -0800 (PST)
+ id 1j7REF-0003k6-6T; Thu, 27 Feb 2020 17:01:59 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m10so7951003wmc.0;
+ Thu, 27 Feb 2020 14:01:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=zZS79vliNn3E7I89zlAY0tg2EKwBR1ZC6u6n1nsEkUU=;
- b=LCG+xv0LPzhtZK/Yv0BWy/bhOzHLYl7LC+6NEIni3/gV1ZbTowfSj8riwYKHqVDLnf
- RO7hRGDt+PeM/fGE5l/R/tnvMrWAs2fwTFY4S+DZO/GznZKAZGL/AIxnDRBI2LY4Myra
- /my2IHlvj05hAyF/0fF8P/0+5Fw8QJS9W9U3TWfnqR7d/9F2Qj5myYCtR+cTtJBE9UAa
- St+tPNtinqHGFPn8Mdx66NFQyphtW2dHaeHrjJwGVTZH68ccpWk4QOy/d30q85X91bhQ
- ZV46fZSGU+IUpkw+S7hFr1y0o0clHOr1hMX7pOot152EH24sGVWPiouHiyYfkN9Cr6gK
- PbOA==
+ bh=w9GsmGdCeDlovWnkHL5RzV48eH16cTZY3b9rQUOLBwU=;
+ b=SRxNIcERCgH0LrWsW75smZfdKOtL2lX4ZYJvUBFMq3CNSr7xgFGS6nqUbtW2O4hYm/
+ GncxLJVBpL1pkTQqU8Ms6BDHydE8t70w8rrXNv1KtRFDQCohKpTMKSjzCUYAu0SfI+aH
+ xk/S51ufxF4CRMEUoJbPBdP69eXGP3oTEbPcrZsONtJHn6ClbTp5OUoR9/2h4kMwOts2
+ xEQAKmUfdydcOc1qEAPI0WPwSOnZEJaPu60E/gn3f5/YSBYKM4fmB0qnonn9nn3b+Im4
+ eN8enXMq/aPB8uhPknZPvPsVZ6ASYRbNL+L/mCztm/FKJmFrbvPw08D+uIwc4w+NNFwc
+ nIcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=zZS79vliNn3E7I89zlAY0tg2EKwBR1ZC6u6n1nsEkUU=;
- b=N7sU6RNk/xzxi8IzL4hy4dxInJqiUmD/5iN7Xa3gE2x2vpklV2lfXU+Oe7565WMx3p
- lOdrrVY+dHQ/apHF/Ueaaf9EsD8k9LPB9v936XHkohD3Lv70OlD2g7olESGE5TT5VkNV
- ZBTlr+1Qxy5aOTGXtSuu7xVursurufitZjRwohNsp+kLWWuxwRMdcuMkx9bvuTPZLMtq
- K2HY8lf0sVwNxvHV+CllACJlPr+pQnCTK+N1tm6/Gmtn1wVE2Kqvh5D2yfETuE0WUc9K
- hYD9DbOT9Xrw73si7Hzs7U9DGfD2PGu9xRkkyDc8pRCL3NFeGZ5pzl2Kfm3FDYMeyIVj
- sPRQ==
-X-Gm-Message-State: APjAAAW3WP+nuSJ3xNJtCAwbqLy2RWE0JiZNzpOoCXuUnB8m3hDyYAkM
- XlpPbZL0Fxg1fLAyYInt+k2nILOK
-X-Google-Smtp-Source: APXvYqxo7pymiWQ1eGs8PgI1nWqREn23qAtbKU/XFTdg/lLIJJwnp/1S/tnQghZUY+Ot5pYlezbgcQ==
-X-Received: by 2002:a7b:c392:: with SMTP id s18mr806466wmj.169.1582840916604; 
- Thu, 27 Feb 2020 14:01:56 -0800 (PST)
+ bh=w9GsmGdCeDlovWnkHL5RzV48eH16cTZY3b9rQUOLBwU=;
+ b=mFTOPQCLexVe7IuRwzCC/Q00XlfyCH2NV1vSQVDL7gDJXaNEGdNJqD5US6RYvi/nYS
+ Ls0Lk3TNuAFqRB4gbDoFkYf4NrMb0gnYdU04JPskb7aMHoF4Au8BAyB57TpV+Tt9bKNb
+ M3RoecPaRtaIGYn1zu0uLoOELlzaR6pXjwCXsV7es0Aj1DjJafgbdVY9PeVJl4snOth9
+ tRtyjgUlvj9hZD36JErmiONi4zDH5zuKYU6X9KXBu63kVkcmPFaVGlcL5mOsHoz7Ev/w
+ lRUitjPfQzlpPKUWnKg3GWqIgUJUyhqqfipbSvl1aZJ0Fl9FDFpLjBvZ9GqSM/S7b97/
+ Sj5g==
+X-Gm-Message-State: APjAAAXGUBGzpkm26xIJ8YQu9xHctiKxOILqfvrn3LPzkAYObj9X8sB0
+ GtY9/xz8seTTh5ustZroPrLvcrFA
+X-Google-Smtp-Source: APXvYqzkvXHwyxUWqTLeAnLIDGswJN6riHMajmUwLdI9F+97U8m/u2kjKFWg7oxvywN8fFgFurq0UA==
+X-Received: by 2002:a05:600c:2107:: with SMTP id
+ u7mr884038wml.54.1582840917494; 
+ Thu, 27 Feb 2020 14:01:57 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id z14sm6447040wrg.76.2020.02.27.14.01.55
+ by smtp.gmail.com with ESMTPSA id z14sm6447040wrg.76.2020.02.27.14.01.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Feb 2020 14:01:55 -0800 (PST)
+ Thu, 27 Feb 2020 14:01:56 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/4] hw/arm/cubieboard: use ARM Cortex-A8 as the default
- CPU in machine definition
-Date: Thu, 27 Feb 2020 23:01:46 +0100
-Message-Id: <20200227220149.6845-2-nieklinnenbank@gmail.com>
+Subject: [PATCH v1 2/4] hw/arm/cubieboard: restrict allowed CPU type to ARM
+ Cortex-A8
+Date: Thu, 27 Feb 2020 23:01:47 +0100
+Message-Id: <20200227220149.6845-3-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200227220149.6845-1-nieklinnenbank@gmail.com>
 References: <20200227220149.6845-1-nieklinnenbank@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,36 +98,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Cubieboard is a singleboard computer with an Allwinner A10 System-on-Chip [1].
-As documented in the Allwinner A10 User Manual V1.5 [2], the SoC has an ARM
-Cortex-A8 processor. Currently the Cubieboard machine definition specifies the
-ARM Cortex-A9 in its description and as the default CPU.
-
-This patch corrects the Cubieboard machine definition to use the ARM Cortex-A8.
-
- [1] http://docs.cubieboard.org/products/start#cubieboard1
- [2] https://linux-sunxi.org/File:Allwinner_A10_User_manual_V1.5.pdf
+The Cubieboard has an ARM Cortex-A8. Prevent changing the CPU
+to a different type which could break user programs.
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- hw/arm/cubieboard.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/arm/cubieboard.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index 089f9a30c1..0195925c73 100644
+index 0195925c73..010375f0a8 100644
 --- a/hw/arm/cubieboard.c
 +++ b/hw/arm/cubieboard.c
-@@ -68,8 +68,8 @@ static void cubieboard_init(MachineState *machine)
+@@ -30,9 +30,17 @@ static struct arm_boot_info cubieboard_binfo = {
  
- static void cubieboard_machine_init(MachineClass *mc)
+ static void cubieboard_init(MachineState *machine)
  {
--    mc->desc = "cubietech cubieboard (Cortex-A9)";
--    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
-+    mc->desc = "cubietech cubieboard (Cortex-A8)";
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a8");
-     mc->init = cubieboard_init;
-     mc->block_default_type = IF_IDE;
-     mc->units_per_default_bus = 1;
+-    AwA10State *a10 = AW_A10(object_new(TYPE_AW_A10));
++    AwA10State *a10;
+     Error *err = NULL;
+ 
++    /* Only allow Cortex-A8 for this board */
++    if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a8")) != 0) {
++        error_report("This board can only be used with cortex-a8 CPU");
++        exit(1);
++    }
++
++    a10 = AW_A10(object_new(TYPE_AW_A10));
++
+     object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err);
+     if (err != NULL) {
+         error_reportf_err(err, "Couldn't set phy address: ");
 -- 
 2.17.1
 
