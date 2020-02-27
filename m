@@ -7,51 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C2EC35DF9
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01CBC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AC18246B4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF366246B4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:36:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="DDpcReMo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AC18246B4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="atP3rKav"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF366246B4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7O0u-0004bd-BZ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 13:36:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36243)
+	id 1j7O0t-0004do-SR
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 13:35:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1j7Nzo-0003DI-8a
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:34:54 -0500
+ (envelope-from <berto@igalia.com>) id 1j7Nzo-0003DJ-9J
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1j7Nzm-0000gi-6Q
+ (envelope-from <berto@igalia.com>) id 1j7Nzm-0000gc-5q
  for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:34:52 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:33970)
+Received: from fanzine.igalia.com ([178.60.130.6]:33969)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1j7Nzl-0000MN-Da; Thu, 27 Feb 2020 13:34:50 -0500
+ id 1j7Nzl-0000MO-Ee; Thu, 27 Feb 2020 13:34:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=HyikUCesDCH37bcDyzRmQu7fuOx8P2zF8fh19cRdJC0=; 
- b=DDpcReMooOXfGNSvKELJAPTnLiECwn3WQmApmSGyoOmuzAqO1Hz2EZn6VEho5kwaV2aKziATkMqEqM9ykpaOLM0iwtxNRLNh/SgSKQUeflT9WMf8nNghzqV8JfT1+6UuvvMVfoCMzjxQXz4duA99pO1mEkBugGZHaomUs9Ipcj4OXEKwuBN0602k7NSIALZJ4E/hPS1a+yQYaX0pdwvKxSwKJHYvs1BwCthnAtjtvsNah5zr6/fz48K1lLEWdR/PQkWuO94uaLFuR+2PKK2iPD4kOd6IV9n4cBNZ+BX/m+Ewdrm57y5t7goQnfCl/qaCLoza2n4VJ2aC57GjIMOW+Q==;
+ bh=GDYD+J9dAX/ssnGu5VQoxB8YjEtrjE0Chi3bhJ1NP2M=; 
+ b=atP3rKavXNwiP4i6M5rafX/Zh0HIwTqCC71CHgJjtA8TKmGPTyqJJkRxYNqt/Irdga1XN1QfByUTO/JFswUtCfN0hWNrasjjWdPfeJVl7Y+kz9/MC/Q/PrsNfzgk22AaFu1FNQm2ylw3LoVwrMJcOm9qW86mRP5WOCoT1OyYA2HTxQofYnVRLM+Zt1upqa4VYOfompjtC+nfazvlTK6C0SdBQSmfR70VDvrh5LBygLAg2r6WLUB68RftTbxhFiDOKr9uwLf4iN5DzFJH0a6IPsnLKpgj/Q2WfEeDmekujeKcxOIhzPgXbzlRqPL6t8cXX+4KC8MrQXorOPYQA+VhYA==;
 Received: from [192.168.12.213] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1j7NzT-0000H1-AZ; Thu, 27 Feb 2020 19:34:31 +0100
+ id 1j7NzT-0000H3-Bu; Thu, 27 Feb 2020 19:34:31 +0100
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1j7NzS-0000VV-OT; Thu, 27 Feb 2020 19:34:30 +0100
+ id 1j7NzS-0000VY-PS; Thu, 27 Feb 2020 19:34:30 +0100
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] qcow2: Make Qcow2AioTask store the full host offset
-Date: Thu, 27 Feb 2020 19:34:25 +0100
-Message-Id: <ad4d3aaaa26faf5b11707de9589f58799b498b11.1582828123.git.berto@igalia.com>
+Subject: [PATCH 2/2] qcow2: Convert qcow2_get_cluster_offset() into
+ qcow2_get_host_offset()
+Date: Thu, 27 Feb 2020 19:34:26 +0100
+Message-Id: <3dd7bc21f0ecde7db83ac580a8d3ccd8b9bfceb4.1582828123.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1582828123.git.berto@igalia.com>
 References: <cover.1582828123.git.berto@igalia.com>
@@ -77,252 +78,248 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The file_cluster_offset field of Qcow2AioTask stores a cluster-aligned
-host offset. In practice this is not very useful because all users(*)
-of this structure need the final host offset into the cluster, which
-they calculate using
+qcow2_get_cluster_offset() takes an (unaligned) guest offset and
+returns the (aligned) offset of the corresponding cluster in the qcow2
+image.
 
-   host_offset = file_cluster_offset + offset_into_cluster(s, offset)
+In practice none of the callers need to know where the cluster starts
+so this patch makes the function calculate and return the final host
+offset directly. The function is also renamed accordingly.
 
-There is no reason why Qcow2AioTask cannot store host_offset directly
-and that is what this patch does.
-
-(*) compressed clusters are the exception: in this case what
-    file_cluster_offset was storing was the full compressed cluster
-    descriptor (offset + size). This does not change with this patch
-    but it is documented now.
+There is a pre-existing exception with compressed clusters: in this
+case the function returns the complete cluster descriptor (containing
+the offset and size of the compressed data). This does not change with
+this patch but it is now documented.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2.c | 68 +++++++++++++++++++++++++--------------------------
- 1 file changed, 33 insertions(+), 35 deletions(-)
+ block/qcow2.h         |  4 ++--
+ block/qcow2-cluster.c | 38 ++++++++++++++++++++++----------------
+ block/qcow2.c         | 24 +++++++-----------------
+ 3 files changed, 31 insertions(+), 35 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3c754f616b..b2c7c8255e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -74,7 +74,7 @@ typedef struct {
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 0942126232..f47ef6ca4e 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -679,8 +679,8 @@ int qcow2_write_l1_entry(BlockDriverState *bs, int l1_index);
+ int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
+                           uint8_t *buf, int nb_sectors, bool enc, Error **errp);
  
- static int coroutine_fn
- qcow2_co_preadv_compressed(BlockDriverState *bs,
--                           uint64_t file_cluster_offset,
-+                           uint64_t cluster_descriptor,
-                            uint64_t offset,
-                            uint64_t bytes,
-                            QEMUIOVector *qiov,
-@@ -2037,7 +2037,7 @@ out:
+-int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+-                             unsigned int *bytes, uint64_t *cluster_offset);
++int qcow2_get_host_offset(BlockDriverState *bs, uint64_t offset,
++                          unsigned int *bytes, uint64_t *host_offset);
+ int qcow2_alloc_cluster_offset(BlockDriverState *bs, uint64_t offset,
+                                unsigned int *bytes, uint64_t *host_offset,
+                                QCowL2Meta **m);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 78c95dfa16..498330bb09 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -496,10 +496,15 @@ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
  
- static coroutine_fn int
- qcow2_co_preadv_encrypted(BlockDriverState *bs,
--                           uint64_t file_cluster_offset,
-+                           uint64_t host_offset,
-                            uint64_t offset,
-                            uint64_t bytes,
-                            QEMUIOVector *qiov,
-@@ -2064,16 +2064,12 @@ qcow2_co_preadv_encrypted(BlockDriverState *bs,
-     }
  
-     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
--    ret = bdrv_co_pread(s->data_file,
--                        file_cluster_offset + offset_into_cluster(s, offset),
--                        bytes, buf, 0);
-+    ret = bdrv_co_pread(s->data_file, host_offset, bytes, buf, 0);
-     if (ret < 0) {
-         goto fail;
-     }
- 
--    if (qcow2_co_decrypt(bs,
--                         file_cluster_offset + offset_into_cluster(s, offset),
--                         offset, buf, bytes) < 0)
-+    if (qcow2_co_decrypt(bs, host_offset, offset, buf, bytes) < 0)
-     {
-         ret = -EIO;
-         goto fail;
-@@ -2091,7 +2087,7 @@ typedef struct Qcow2AioTask {
- 
-     BlockDriverState *bs;
-     QCow2ClusterType cluster_type; /* only for read */
--    uint64_t file_cluster_offset;
-+    uint64_t host_offset; /* or full descriptor in compressed clusters */
-     uint64_t offset;
-     uint64_t bytes;
-     QEMUIOVector *qiov;
-@@ -2104,7 +2100,7 @@ static coroutine_fn int qcow2_add_task(BlockDriverState *bs,
-                                        AioTaskPool *pool,
-                                        AioTaskFunc func,
-                                        QCow2ClusterType cluster_type,
--                                       uint64_t file_cluster_offset,
-+                                       uint64_t host_offset,
-                                        uint64_t offset,
-                                        uint64_t bytes,
-                                        QEMUIOVector *qiov,
-@@ -2119,7 +2115,7 @@ static coroutine_fn int qcow2_add_task(BlockDriverState *bs,
-         .bs = bs,
-         .cluster_type = cluster_type,
-         .qiov = qiov,
--        .file_cluster_offset = file_cluster_offset,
-+        .host_offset = host_offset,
-         .offset = offset,
-         .bytes = bytes,
-         .qiov_offset = qiov_offset,
-@@ -2128,7 +2124,7 @@ static coroutine_fn int qcow2_add_task(BlockDriverState *bs,
- 
-     trace_qcow2_add_task(qemu_coroutine_self(), bs, pool,
-                          func == qcow2_co_preadv_task_entry ? "read" : "write",
--                         cluster_type, file_cluster_offset, offset, bytes,
-+                         cluster_type, host_offset, offset, bytes,
-                          qiov, qiov_offset);
- 
-     if (!pool) {
-@@ -2142,13 +2138,12 @@ static coroutine_fn int qcow2_add_task(BlockDriverState *bs,
- 
- static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
-                                              QCow2ClusterType cluster_type,
--                                             uint64_t file_cluster_offset,
-+                                             uint64_t host_offset,
-                                              uint64_t offset, uint64_t bytes,
-                                              QEMUIOVector *qiov,
-                                              size_t qiov_offset)
+ /*
+- * get_cluster_offset
++ * get_host_offset
+  *
+- * For a given offset of the virtual disk, find the cluster type and offset in
+- * the qcow2 file. The offset is stored in *cluster_offset.
++ * For a given offset of the virtual disk find the equivalent host
++ * offset in the qcow2 file and store it in *host_offset. Neither
++ * offset needs to be aligned to a cluster boundary.
++ *
++ * If the cluster is unallocated then *host_offset will be 0.
++ * If the cluster is compressed then *host_offset will contain the
++ * complete compressed cluster descriptor.
+  *
+  * On entry, *bytes is the maximum number of contiguous bytes starting at
+  * offset that we are interested in.
+@@ -511,12 +516,12 @@ static int coroutine_fn do_perform_cow_write(BlockDriverState *bs,
+  * Returns the cluster type (QCOW2_CLUSTER_*) on success, -errno in error
+  * cases.
+  */
+-int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+-                             unsigned int *bytes, uint64_t *cluster_offset)
++int qcow2_get_host_offset(BlockDriverState *bs, uint64_t offset,
++                          unsigned int *bytes, uint64_t *host_offset)
  {
      BDRVQcow2State *s = bs->opaque;
--    int offset_in_cluster = offset_into_cluster(s, offset);
+     unsigned int l2_index;
+-    uint64_t l1_index, l2_offset, *l2_slice;
++    uint64_t l1_index, l2_offset, *l2_slice, l2_entry;
+     int c;
+     unsigned int offset_in_cluster;
+     uint64_t bytes_available, bytes_needed, nb_clusters;
+@@ -537,7 +542,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+         bytes_needed = bytes_available;
+     }
  
-     switch (cluster_type) {
+-    *cluster_offset = 0;
++    *host_offset = 0;
+ 
+     /* seek to the l2 offset in the l1 table */
+ 
+@@ -570,7 +575,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+     /* find the cluster offset for the given disk offset */
+ 
+     l2_index = offset_to_l2_slice_index(s, offset);
+-    *cluster_offset = be64_to_cpu(l2_slice[l2_index]);
++    l2_entry = be64_to_cpu(l2_slice[l2_index]);
+ 
+     nb_clusters = size_to_clusters(s, bytes_needed);
+     /* bytes_needed <= *bytes + offset_in_cluster, both of which are unsigned
+@@ -578,7 +583,7 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+      * true */
+     assert(nb_clusters <= INT_MAX);
+ 
+-    type = qcow2_get_cluster_type(bs, *cluster_offset);
++    type = qcow2_get_cluster_type(bs, l2_entry);
+     if (s->qcow_version < 3 && (type == QCOW2_CLUSTER_ZERO_PLAIN ||
+                                 type == QCOW2_CLUSTER_ZERO_ALLOC)) {
+         qcow2_signal_corruption(bs, true, -1, -1, "Zero cluster entry found"
+@@ -599,41 +604,42 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, uint64_t offset,
+         }
+         /* Compressed clusters can only be processed one by one */
+         c = 1;
+-        *cluster_offset &= L2E_COMPRESSED_OFFSET_SIZE_MASK;
++        *host_offset = l2_entry & L2E_COMPRESSED_OFFSET_SIZE_MASK;
+         break;
      case QCOW2_CLUSTER_ZERO_PLAIN:
-@@ -2164,19 +2159,17 @@ static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
-                                    qiov, qiov_offset, 0);
- 
-     case QCOW2_CLUSTER_COMPRESSED:
--        return qcow2_co_preadv_compressed(bs, file_cluster_offset,
-+        return qcow2_co_preadv_compressed(bs, host_offset,
-                                           offset, bytes, qiov, qiov_offset);
- 
+     case QCOW2_CLUSTER_UNALLOCATED:
+         /* how many empty clusters ? */
+         c = count_contiguous_clusters_unallocated(bs, nb_clusters,
+                                                   &l2_slice[l2_index], type);
+-        *cluster_offset = 0;
++        *host_offset = 0;
+         break;
+     case QCOW2_CLUSTER_ZERO_ALLOC:
      case QCOW2_CLUSTER_NORMAL:
--        assert(offset_into_cluster(s, file_cluster_offset) == 0);
-         if (bs->encrypted) {
--            return qcow2_co_preadv_encrypted(bs, file_cluster_offset,
-+            return qcow2_co_preadv_encrypted(bs, host_offset,
-                                              offset, bytes, qiov, qiov_offset);
+         /* how many allocated clusters ? */
+         c = count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
+                                       &l2_slice[l2_index], QCOW_OFLAG_ZERO);
+-        *cluster_offset &= L2E_OFFSET_MASK;
+-        if (offset_into_cluster(s, *cluster_offset)) {
++        *host_offset = l2_entry & L2E_OFFSET_MASK;
++        if (offset_into_cluster(s, *host_offset)) {
+             qcow2_signal_corruption(bs, true, -1, -1,
+                                     "Cluster allocation offset %#"
+                                     PRIx64 " unaligned (L2 offset: %#" PRIx64
+-                                    ", L2 index: %#x)", *cluster_offset,
++                                    ", L2 index: %#x)", *host_offset,
+                                     l2_offset, l2_index);
+             ret = -EIO;
+             goto fail;
+         }
+-        if (has_data_file(bs) && *cluster_offset != offset - offset_in_cluster)
++        if (has_data_file(bs) && *host_offset != offset - offset_in_cluster)
+         {
+             qcow2_signal_corruption(bs, true, -1, -1,
+                                     "External data file host cluster offset %#"
+                                     PRIx64 " does not match guest cluster "
+                                     "offset: %#" PRIx64
+-                                    ", L2 index: %#x)", *cluster_offset,
++                                    ", L2 index: %#x)", *host_offset,
+                                     offset - offset_in_cluster, l2_index);
+             ret = -EIO;
+             goto fail;
+         }
++        *host_offset += offset_in_cluster;
+         break;
+     default:
+         abort();
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b2c7c8255e..ac34c1d172 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1960,7 +1960,7 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+                                               BlockDriverState **file)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    uint64_t cluster_offset;
++    uint64_t host_offset;
+     unsigned int bytes;
+     int ret, status = 0;
+ 
+@@ -1973,7 +1973,7 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+     }
+ 
+     bytes = MIN(INT_MAX, count);
+-    ret = qcow2_get_cluster_offset(bs, offset, &bytes, &cluster_offset);
++    ret = qcow2_get_host_offset(bs, offset, &bytes, &host_offset);
+     qemu_co_mutex_unlock(&s->lock);
+     if (ret < 0) {
+         return ret;
+@@ -1983,7 +1983,7 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+ 
+     if ((ret == QCOW2_CLUSTER_NORMAL || ret == QCOW2_CLUSTER_ZERO_ALLOC) &&
+         !s->crypto) {
+-        *map = cluster_offset | offset_into_cluster(s, offset);
++        *map = host_offset;
+         *file = s->data_file->bs;
+         status |= BDRV_BLOCK_OFFSET_VALID;
+     }
+@@ -2197,7 +2197,7 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+     BDRVQcow2State *s = bs->opaque;
+     int ret = 0;
+     unsigned int cur_bytes; /* number of bytes in current iteration */
+-    uint64_t cluster_offset = 0;
++    uint64_t host_offset = 0;
+     AioTaskPool *aio = NULL;
+ 
+     while (bytes != 0 && aio_task_pool_status(aio) == 0) {
+@@ -2209,7 +2209,7 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
          }
  
-         BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
--        return bdrv_co_preadv_part(s->data_file,
--                                   file_cluster_offset + offset_in_cluster,
-+        return bdrv_co_preadv_part(s->data_file, host_offset,
-                                    bytes, qiov, qiov_offset, 0);
- 
-     default:
-@@ -2192,7 +2185,7 @@ static coroutine_fn int qcow2_co_preadv_task_entry(AioTask *task)
- 
-     assert(!t->l2meta);
- 
--    return qcow2_co_preadv_task(t->bs, t->cluster_type, t->file_cluster_offset,
-+    return qcow2_co_preadv_task(t->bs, t->cluster_type, t->host_offset,
-                                 t->offset, t->bytes, t->qiov, t->qiov_offset);
- }
- 
-@@ -2228,11 +2221,20 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+         qemu_co_mutex_lock(&s->lock);
+-        ret = qcow2_get_cluster_offset(bs, offset, &cur_bytes, &cluster_offset);
++        ret = qcow2_get_host_offset(bs, offset, &cur_bytes, &host_offset);
+         qemu_co_mutex_unlock(&s->lock);
+         if (ret < 0) {
+             goto out;
+@@ -2221,15 +2221,6 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
          {
              qemu_iovec_memset(qiov, qiov_offset, 0, cur_bytes);
          } else {
-+            /*
-+             * For compressed clusters the variable cluster_offset
-+             * does not actually store the offset but the full
-+             * descriptor. We need to leave it unchanged because
-+             * that's what qcow2_co_preadv_compressed() expects.
-+             */
-+            uint64_t host_offset = (ret == QCOW2_CLUSTER_COMPRESSED) ?
-+                cluster_offset :
-+                cluster_offset + offset_into_cluster(s, offset);
+-            /*
+-             * For compressed clusters the variable cluster_offset
+-             * does not actually store the offset but the full
+-             * descriptor. We need to leave it unchanged because
+-             * that's what qcow2_co_preadv_compressed() expects.
+-             */
+-            uint64_t host_offset = (ret == QCOW2_CLUSTER_COMPRESSED) ?
+-                cluster_offset :
+-                cluster_offset + offset_into_cluster(s, offset);
              if (!aio && cur_bytes != bytes) {
                  aio = aio_task_pool_new(QCOW2_MAX_WORKERS);
              }
-             ret = qcow2_add_task(bs, aio, qcow2_co_preadv_task_entry, ret,
--                                 cluster_offset, offset, cur_bytes,
-+                                 host_offset, offset, cur_bytes,
-                                  qiov, qiov_offset, NULL);
-             if (ret < 0) {
-                 goto out;
-@@ -2383,7 +2385,7 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-  *           not use it somehow after qcow2_co_pwritev_task() call
-  */
- static coroutine_fn int qcow2_co_pwritev_task(BlockDriverState *bs,
--                                              uint64_t file_cluster_offset,
-+                                              uint64_t host_offset,
-                                               uint64_t offset, uint64_t bytes,
-                                               QEMUIOVector *qiov,
-                                               uint64_t qiov_offset,
-@@ -2392,7 +2394,6 @@ static coroutine_fn int qcow2_co_pwritev_task(BlockDriverState *bs,
-     int ret;
-     BDRVQcow2State *s = bs->opaque;
-     void *crypt_buf = NULL;
--    int offset_in_cluster = offset_into_cluster(s, offset);
-     QEMUIOVector encrypted_qiov;
+@@ -3730,7 +3721,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+         offset = QEMU_ALIGN_DOWN(offset, s->cluster_size);
+         bytes = s->cluster_size;
+         nr = s->cluster_size;
+-        ret = qcow2_get_cluster_offset(bs, offset, &nr, &off);
++        ret = qcow2_get_host_offset(bs, offset, &nr, &off);
+         if (ret != QCOW2_CLUSTER_UNALLOCATED &&
+             ret != QCOW2_CLUSTER_ZERO_PLAIN &&
+             ret != QCOW2_CLUSTER_ZERO_ALLOC) {
+@@ -3795,7 +3786,7 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
+         cur_bytes = MIN(bytes, INT_MAX);
+         cur_write_flags = write_flags;
  
-     if (bs->encrypted) {
-@@ -2405,8 +2406,7 @@ static coroutine_fn int qcow2_co_pwritev_task(BlockDriverState *bs,
-         }
-         qemu_iovec_to_buf(qiov, qiov_offset, crypt_buf, bytes);
- 
--        if (qcow2_co_encrypt(bs, file_cluster_offset + offset_in_cluster,
--                             offset, crypt_buf, bytes) < 0)
-+        if (qcow2_co_encrypt(bs, host_offset, offset, crypt_buf, bytes) < 0)
-         {
-             ret = -EIO;
-             goto out_unlocked;
-@@ -2431,10 +2431,8 @@ static coroutine_fn int qcow2_co_pwritev_task(BlockDriverState *bs,
-      */
-     if (!merge_cow(offset, bytes, qiov, qiov_offset, l2meta)) {
-         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
--        trace_qcow2_writev_data(qemu_coroutine_self(),
--                                file_cluster_offset + offset_in_cluster);
--        ret = bdrv_co_pwritev_part(s->data_file,
--                                   file_cluster_offset + offset_in_cluster,
-+        trace_qcow2_writev_data(qemu_coroutine_self(), host_offset);
-+        ret = bdrv_co_pwritev_part(s->data_file, host_offset,
-                                    bytes, qiov, qiov_offset, 0);
+-        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &copy_offset);
++        ret = qcow2_get_host_offset(bs, src_offset, &cur_bytes, &copy_offset);
          if (ret < 0) {
-             goto out_unlocked;
-@@ -2464,7 +2462,7 @@ static coroutine_fn int qcow2_co_pwritev_task_entry(AioTask *task)
- 
-     assert(!t->cluster_type);
- 
--    return qcow2_co_pwritev_task(t->bs, t->file_cluster_offset,
-+    return qcow2_co_pwritev_task(t->bs, t->host_offset,
-                                  t->offset, t->bytes, t->qiov, t->qiov_offset,
-                                  t->l2meta);
- }
-@@ -2519,8 +2517,8 @@ static coroutine_fn int qcow2_co_pwritev_part(
-             aio = aio_task_pool_new(QCOW2_MAX_WORKERS);
+             goto out;
          }
-         ret = qcow2_add_task(bs, aio, qcow2_co_pwritev_task_entry, 0,
--                             cluster_offset, offset, cur_bytes,
--                             qiov, qiov_offset, l2meta);
-+                             cluster_offset + offset_in_cluster, offset,
-+                             cur_bytes, qiov, qiov_offset, l2meta);
-         l2meta = NULL; /* l2meta is consumed by qcow2_co_pwritev_task() */
-         if (ret < 0) {
-             goto fail_nometa;
-@@ -4353,7 +4351,7 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
+@@ -3827,7 +3818,6 @@ qcow2_co_copy_range_from(BlockDriverState *bs,
  
- static int coroutine_fn
- qcow2_co_preadv_compressed(BlockDriverState *bs,
--                           uint64_t file_cluster_offset,
-+                           uint64_t cluster_descriptor,
-                            uint64_t offset,
-                            uint64_t bytes,
-                            QEMUIOVector *qiov,
-@@ -4365,8 +4363,8 @@ qcow2_co_preadv_compressed(BlockDriverState *bs,
-     uint8_t *buf, *out_buf;
-     int offset_in_cluster = offset_into_cluster(s, offset);
+         case QCOW2_CLUSTER_NORMAL:
+             child = s->data_file;
+-            copy_offset += offset_into_cluster(s, src_offset);
+             break;
  
--    coffset = file_cluster_offset & s->cluster_offset_mask;
--    nb_csectors = ((file_cluster_offset >> s->csize_shift) & s->csize_mask) + 1;
-+    coffset = cluster_descriptor & s->cluster_offset_mask;
-+    nb_csectors = ((cluster_descriptor >> s->csize_shift) & s->csize_mask) + 1;
-     csize = nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE -
-         (coffset & ~QCOW2_COMPRESSED_SECTOR_MASK);
- 
+         default:
 -- 
 2.20.1
 
