@@ -2,119 +2,104 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 293E0C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86718C4BA06
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7CFC24688
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5280524680
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="O84UbF5R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7CFC24688
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7z5tfbl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5280524680
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7ExH-0000ua-1H
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 03:55:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59784)
+	id 1j7EyM-0002Kd-G3
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 03:56:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j7Ewa-0000Q2-UC
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:54:58 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7ExR-0001KM-OV
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j7EwZ-0005bw-MH
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:54:56 -0500
-Received: from mail-vi1eur04on070d.outbound.protection.outlook.com
- ([2a01:111:f400:fe0e::70d]:23525
- helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j7EwU-0005TK-I7; Thu, 27 Feb 2020 03:54:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D2j2Qd6RnEXKR6bhcdo7oE69e6DI/E1HIYuJd76bPyYHVKplqLT49CIQx/iQ169mmlapMkV9xfDDsIb08I/0NwyzPmIUh3mpf+7ubgGxENeytxclsR4Qx5Q7U8RxrHlPRJm/X84ob2T4L07njmjTPXutff/0ajiRsgqhSZPy7gBGg2L9ytPF4+7/SZJMHK+y9OS3TxSyKlPTF0+ke1ga2jA/UAGrsorBSAn002Jcjf5RR2dVWZ6TEMzoPvPL/iw5lXCyKLTaW2klFQPbrQouoGYm+Mfw/1IpNrZY+DF8cHXPvraJLNNLFRB7L6EXNrHBnG9+qdLT09LO2Ipsilljjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OqxS4CYW0q6g7sXzYvNgX+c4Ip+wz9R1qeMOr0/faM8=;
- b=XEYUqIzca+u/T4OS2qewSwRL2CpSWC8bEGMH2hOZMXuUx2QLd106P9fAW4zwgbhcQsj5qxWuMQiDf9o8MqH962KuyFRT3lqxEuwp05+4vSl0sWJ9w6qFQEgGGk9zQm32MZZv25dwr4mU3/w66XL8Dt/L4E959JhuVczR+dzxKmgPYl3F3DgkVGfXURWrrponZepV9wi/D8A6Y2yLLpGI+ssPKj32ygEpd4WliOod5Hr/8TU0Yy3RW4NZbFyrFuZwhUuF6f4u+G8V0Q74w6ak9E8dbsLTWInRq+YJKUHCbL0B1rTJJ7LRskLvkWryeXg9nuANZVzIIOa7IJ1RtHYfzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OqxS4CYW0q6g7sXzYvNgX+c4Ip+wz9R1qeMOr0/faM8=;
- b=O84UbF5RWSpLZXjR2cMY/6+Ebr1c1kKdGrRHeJ8Hhl0p0/bMDiZM13EbxomWUMA7jPOfIsPnxEoYAX3t5Ll9YeFhUwtBph37zH2sdPSE5F6ATgaeYWnWlnXuRpYV9MpQgmWmUyZeqhbLp7Y2kADcBkGKTqQq7xjG/mh1j8nWMMw=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
- VI1PR08MB5309.eurprd08.prod.outlook.com (52.133.245.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Thu, 27 Feb 2020 08:54:48 +0000
-Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
- ([fe80::91aa:2540:62c:aeda]) by VI1PR08MB4432.eurprd08.prod.outlook.com
- ([fe80::91aa:2540:62c:aeda%5]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
- 08:54:48 +0000
-Subject: Re: [PATCH v1 2/8] qcow2: rework the cluster compression routine
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200227072953.25445-1-dplotnikov@virtuozzo.com>
- <20200227072953.25445-3-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200227115444461
-Message-ID: <3283410c-fc70-f73e-c924-47a34c6b980d@virtuozzo.com>
-Date: Thu, 27 Feb 2020 11:54:44 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200227072953.25445-3-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1P18901CA0022.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::32) To VI1PR08MB4432.eurprd08.prod.outlook.com
- (2603:10a6:803:102::10)
+ (envelope-from <philmd@redhat.com>) id 1j7ExQ-000745-Cy
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:49 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49634
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7ExQ-00071k-9h
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582793747;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UFIoBLV8LN6KXnMOGR55IF/rKYy0/YvpI5E5W93PyrM=;
+ b=e7z5tfblZ1svTqYE69Go3HpK4XkJBhOSAoPCN969rI56cXzpJzdEZeGf7Hm8h3IfyMT7Zm
+ 9R039+94sURKzMrzDjGQQA9atq2cFaLK3vzBYPUT3DGfvCaPTmWoposx3VXgIUF2NfcfcY
+ P4FnDib4ir9CkeSWTjiIkGVzk4BuJ8g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-PVDWqYLSPYmB3lrqfgdGSg-1; Thu, 27 Feb 2020 03:55:41 -0500
+X-MC-Unique: PVDWqYLSPYmB3lrqfgdGSg-1
+Received: by mail-wr1-f70.google.com with SMTP id p8so1016944wrw.5
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 00:55:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kD8h6BKhPgPJsZKOsFIr7rx01I3aF95aVsYiWOV+iUw=;
+ b=si/Lz3Rnhw6qLYVe4xxxlr/QyZsdAP6wnB6B+Ew8zooEgxTa2A/cnvpvAj3xk9b8BO
+ xgTI/8TQW9kmeZr0SG+2TgyjcD62xbd2LFQLf4qs1CMgXwH9HyazK6x+llVyjoGbnjaG
+ eNhiNANYX9ccUvbk0OdT9/SJMtY3fhorZJs14Z0y2/Ie1H0v4kXrWpPTTjQ1ZaFwwgTT
+ CfqnIa7nHxTcO0LYGvEvjSFvSllsmoUjeEJ1HCWE/Sw7LSjHtthsgB1Bz/vK0Do5wfTR
+ CCiMosqe1+FnLxYp4HpXyJagz1qvGpH6eWvMbEDq1RZcvBlrphJgc2TCLYK40rwnb+F0
+ 9+Jw==
+X-Gm-Message-State: APjAAAVkyXPolYPADcj3k00BIyRxikcv2lf+q285PIWQdi7XEQXdPZKn
+ B0rZFWX9TqkEvyDjKVPEPdAL4swlek7LkVdZWm8/mYvTged9ncuhHZ8SGHZV8RzTAtFhUSOc5G9
+ IqzmLMsBx/EvV2C0=
+X-Received: by 2002:a05:600c:54e:: with SMTP id
+ k14mr3764662wmc.115.1582793740632; 
+ Thu, 27 Feb 2020 00:55:40 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxK5k1tzIxCseOTXdx6BDCj+k/v0kectTb/ktLg24ybPU61jkaN49CjxXBx41ukVr9lTKKdgQ==
+X-Received: by 2002:a05:600c:54e:: with SMTP id
+ k14mr3764641wmc.115.1582793740359; 
+ Thu, 27 Feb 2020 00:55:40 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id r28sm7442074wra.16.2020.02.27.00.55.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 00:55:39 -0800 (PST)
+Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
+To: David Hildenbrand <david@redhat.com>,
+ Pan Nengyuan <pannengyuan@huawei.com>, peter.maydell@linaro.org
+References: <20200227025055.14341-1-pannengyuan@huawei.com>
+ <20200227025055.14341-2-pannengyuan@huawei.com>
+ <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <399dfb54-62b7-945b-9f68-4818d419f079@redhat.com>
+Date: Thu, 27 Feb 2020 09:55:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1P18901CA0022.EURP189.PROD.OUTLOOK.COM (2603:10a6:3:8b::32) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.14 via Frontend Transport; Thu, 27 Feb 2020 08:54:46 +0000
-X-Tagtoolbar-Keys: D20200227115444461
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f790733f-6fd0-489a-16ff-08d7bb62b2a8
-X-MS-TrafficTypeDiagnostic: VI1PR08MB5309:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR08MB53097CDC63F0E4A63FA0AB03C1EB0@VI1PR08MB5309.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2887;
-X-Forefront-PRVS: 03264AEA72
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(39840400004)(376002)(366004)(396003)(346002)(189003)(199004)(31686004)(86362001)(16526019)(26005)(316002)(186003)(6486002)(52116002)(31696002)(16576012)(478600001)(36756003)(8936002)(2616005)(81166006)(81156014)(8676002)(956004)(4326008)(66946007)(66556008)(66476007)(5660300002)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB5309;
- H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ICEsyFq/SIg7fnWxZFG1tD6EAtXdwbvjot74kv7HO0eK/CY1O9/SOJjr5680g3yCIn4to/B+wUFjTketPh2TJSDFXziJJU0+LfAs0jj7O5WzaQgm93u1YoGNPF9i0SHqdEmKkD0d1hLZ0CCrCqhpnVN00kyVP/Rs6UmX8208N3SXHcu6Sx7UTR3sk/+a7C0Rck18DEDqgIvC1pF5DlVfa89H1jZtKWvb7fc/aZdq71mtV5wKr13dbTbVOIdPYo+r+yAWm6ScLnRuQpv3wcGKrgrO0j38YR3gHGexYDeHRhv3PtoXuUfWpC2UfRQUkg1i2Uaq3xau3Ex6UZ7gBzhXwrYy2DMqHvEivTDbFi5cdwyIrGq6ndEwo/uu5srpsbM4ZXQPpM/krKtmqVubh8cPfKp4F+GIx21uB6UeYnc9AHl4434kAtcGh+s0HbmdunCp
-X-MS-Exchange-AntiSpam-MessageData: V+XHYeEB8kU61zLmUWBrILMkjAhsWWGcCIbDbLEOBFmwaGDptLVswOafS3qXM39sr4WNOeORMszFVDDKlNIpbhQCQTBau6T3P3vD7oACl5OkS9iD+ucfs0s5TjE4U5wizXT5NYEsf9okiprd7OT6gA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f790733f-6fd0-489a-16ff-08d7bb62b2a8
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2020 08:54:47.6563 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2jD3vSJPkA4d/hbyJD2Bpa4rd7SbGbUxCwJKFy/i6bEwASY0Kzt40PyI+7Bqj0m/nE1EP69JaAkRHbXwDLADXsQ3eVN/4qRL0TO2hK4iSmQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB5309
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0e::70d
+In-Reply-To: <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,176 +111,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, den@vrtuozzo.com,
- armbru@redhat.com, mreitz@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-27.02.2020 10:29, Denis Plotnikov wrote:
-> The patch enables processing the image compression type defined
-> for the image and chooses an appropriate method for image clusters
-> (de)compression.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->   block/qcow2-threads.c | 77 +++++++++++++++++++++++++++++++++++--------
->   1 file changed, 63 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-> index 77bb578cdf..1c128e9840 100644
-> --- a/block/qcow2-threads.c
-> +++ b/block/qcow2-threads.c
-> @@ -74,7 +74,9 @@ typedef struct Qcow2CompressData {
->   } Qcow2CompressData;
->   
->   /*
-> - * qcow2_compress()
-> + * qcow2_zlib_compress()
-> + *
-> + * Compress @src_size bytes of data using zlib compression method
->    *
->    * @dest - destination buffer, @dest_size bytes
->    * @src - source buffer, @src_size bytes
-> @@ -83,8 +85,8 @@ typedef struct Qcow2CompressData {
->    *          -ENOMEM destination buffer is not enough to store compressed data
->    *          -EIO    on any other error
->    */
-> -static ssize_t qcow2_compress(void *dest, size_t dest_size,
-> -                              const void *src, size_t src_size)
-> +static ssize_t qcow2_zlib_compress(void *dest, size_t dest_size,
-> +                                   const void *src, size_t src_size)
->   {
->       ssize_t ret;
->       z_stream strm;
-> @@ -119,19 +121,19 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
->   }
->   
->   /*
-> - * qcow2_decompress()
-> + * qcow2_zlib_decompress()
->    *
->    * Decompress some data (not more than @src_size bytes) to produce exactly
-> - * @dest_size bytes.
-> + * @dest_size bytes using zlib compression method
->    *
->    * @dest - destination buffer, @dest_size bytes
->    * @src - source buffer, @src_size bytes
->    *
->    * Returns: 0 on success
-> - *          -1 on fail
-> + *          -EIO on failure
->    */
-> -static ssize_t qcow2_decompress(void *dest, size_t dest_size,
-> -                                const void *src, size_t src_size)
-> +static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
-> +                                     const void *src, size_t src_size)
->   {
->       int ret = 0;
->       z_stream strm;
-> @@ -144,7 +146,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
->   
->       ret = inflateInit2(&strm, -12);
->       if (ret != Z_OK) {
-> -        return -1;
-> +        return -EIO;
->       }
->   
->       ret = inflate(&strm, Z_FINISH);
-> @@ -154,7 +156,7 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
->            * @src buffer may be processed partly (because in qcow2 we know size of
->            * compressed data with precision of one sector)
->            */
-> -        ret = -1;
-> +        ret = -EIO;
->       }
->   
->       inflateEnd(&strm);
-> @@ -189,20 +191,67 @@ qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
->       return arg.ret;
->   }
->   
-> +/*
-> + * qcow2_co_compress()
-> + *
-> + * Compress @src_size bytes of data using the compression
-> + * method defined by the image compression type
-> + *
-> + * @dest - destination buffer, @dest_size bytes
-> + * @src - source buffer, @src_size bytes
-> + *
-> + * Returns: 0 on success
-> + *          a negative error code on failure
+On 2/27/20 9:41 AM, David Hildenbrand wrote:
+> On 27.02.20 03:50, Pan Nengyuan wrote:
+>> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s390x.=
+ The leak stack is as follow:
+>>
+>> Direct leak of 48 byte(s) in 1 object(s) allocated from:
+>>      #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0xef=
+970)
+>>      #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
+>>      #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/include/=
+qemu/timer.h:530
+>>      #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qemu/=
+timer.h:551
+>>      #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include/qe=
+mu/timer.h:569
+>>      #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/target/=
+s390x/cpu.c:285
+>>      #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qemu/q=
+om/object.c:372
+>>      #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-new/=
+qemu/qom/object.c:516
+>>      #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu/qo=
+m/object.c:684
+>>      #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s390x/=
+s390-virtio-ccw.c:64
+>>      #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core/ma=
+chine-hmp-cmds.c:57
+>>      #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/mon=
+itor/hmp.c:1082
+>>      #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-new/q=
+emu/monitor/misc.c:142
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>> Cc: Richard Henderson <rth@twiddle.net>
+>> Cc: David Hildenbrand <david@redhat.com>
+>> Cc: Cornelia Huck <cohuck@redhat.com>
+>> Cc: qemu-s390x@nongnu.org
+>> ---
+>> v2->v1:
+>> - Similarly to other cleanups, move timer_new into realize(Suggested by =
+Philippe Mathieu-Daud=C3=A9)
+>> v3->v2:
+>> - Also do the timer_free in unrealize, it seems more balance.
+>> ---
+>=20
+>=20
+> As I already said, I think this is init and not realize stuff. Do we
+> have a convention now and documented that?
 
-Hmm, it's default semantics and it used without any comment for most of C
-functions, so I don't think we need the comment. As well as dest/src
-argument names are obvious enough. Still, I'm not against too.
+The clearer doc I read so far is this post:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg680187.html
+(but see the thread for more helpful comments)
 
+Another thread that you might find interesting is "how to handle QOM=20
+'container' objects whose contents depend on QOM properties?"
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg511703.html
 
-> + */
->   ssize_t coroutine_fn
->   qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
->                     const void *src, size_t src_size)
->   {
-> -    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
-> -                                qcow2_compress);
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2CompressFunc fn;
-> +
-> +    switch (s->compression_type) {
-> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
-> +        fn = qcow2_zlib_compress;
-> +        break;
-> +
-> +    default:
-> +        return -ENOTSUP;
+>=20
+> Anyhow, I don't really care
+> [...]
 
-it can't be anything other. Maybe, better abort() ?
+Well, looking at the time spent on these series and their review, having=20
+it better documented might save time the whole community.
 
-> +    }
-> +
-> +    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
->   }
->   
-> +/*
-> + * qcow2_co_decompress()
-> + *
-> + * Decompress some data (not more than @src_size bytes) to produce exactly
-> + * @dest_size bytes using the compression method defined by the image
-> + * compression type
-> + *
-> + * @dest - destination buffer, @dest_size bytes
-> + * @src - source buffer, @src_size bytes
-> + *
-> + * Returns: 0 on success
-> + *          a negative error code on failure
-> + */
->   ssize_t coroutine_fn
->   qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
->                       const void *src, size_t src_size)
->   {
-> -    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size,
-> -                                qcow2_decompress);
-> +    BDRVQcow2State *s = bs->opaque;
-> +    Qcow2CompressFunc fn;
-> +
-> +    switch (s->compression_type) {
-> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
-> +        fn = qcow2_zlib_decompress;
-> +        break;
-> +
-> +    default:
-> +        return -ENOTSUP;
-> +    }
-> +
-> +    return qcow2_co_do_compress(bs, dest, dest_size, src, src_size, fn);
->   }
->   
->   
-> 
+>=20
+>> @@ -453,6 +466,7 @@ static void s390_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+>>  =20
+>>       device_class_set_parent_realize(dc, s390_cpu_realizefn,
+>>                                       &scc->parent_realize);
+>> +    dc->unrealize =3D s390_cpu_unrealizefn;
+>=20
+> Shouldn't we use device_class_set_parent_unrealize?
+>=20
+>=20
 
-
--- 
-Best regards,
-Vladimir
 
