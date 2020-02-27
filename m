@@ -1,84 +1,81 @@
 Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26944C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 740C6C4BA3B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E531C24680
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4407424683
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:04:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QM4HMZD0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E531C24680
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBgWCgHq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4407424683
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7G1Y-0002TC-T2
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 05:04:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34889)
+	id 1j7G1l-0002mN-DI
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 05:04:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j7Fzy-0000zg-Qw
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:02:35 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1j7G06-00012b-Mg
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j7Fzs-0008Ql-62
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:02:25 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22897
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j7Fzq-0008JO-6o
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:02:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582797738;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yEP0uL/7y5bev94ZxGklPmRsSoskzSTmRapYsEMv4ZA=;
- b=QM4HMZD0AyLQgBn6UjF0RF6Sw4erSeATXee6ou+tLBABxdYM5d1POzJRTYlVdV864BYg4x
- n7S1rsGBjvKibOTfPtdZWU91n53fMhU7vP4AVFCCyvcDa4Q0Oj2YqkxYwVVbq8t8TOWtiP
- C1Vp5SIcDAsZCQ8mmpCB0uIW2MfrVlY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-bRKkmXuiN2GPlvUvfEsdNA-1; Thu, 27 Feb 2020 05:02:17 -0500
-X-MC-Unique: bRKkmXuiN2GPlvUvfEsdNA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AA3B13E5;
- Thu, 27 Feb 2020 10:02:16 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3054C8B779;
- Thu, 27 Feb 2020 10:02:08 +0000 (UTC)
-Date: Thu, 27 Feb 2020 11:02:06 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Coiby Xu <coiby.xu@gmail.com>
-Subject: Re: [PATCH v4 0/5] vhost-user block device backend implementation
-Message-ID: <20200227100206.GA7493@linux.fritz.box>
-References: <20200218050711.8133-1-coiby.xu@gmail.com>
- <20200219163815.GD1085125@stefanha-x1.localdomain>
- <CAJAkqrXaqmT2pR4K1x06AeQZHvUWp-fcqnbKZq_45czO96v5PA@mail.gmail.com>
- <20200227074114.GB83512@stefanha-x1.localdomain>
- <CAJAkqrWUJWLdT+6b_XmHFwnzhhbYei2SakCKVW0Rf92HJgoZDw@mail.gmail.com>
+ (envelope-from <hsp.cat7@gmail.com>) id 1j7G01-0000JA-N9
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:02:38 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:44411)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>)
+ id 1j7Fzs-0008NP-54; Thu, 27 Feb 2020 05:02:24 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id h9so2325771otj.11;
+ Thu, 27 Feb 2020 02:02:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1SaTRXLGZ6xhqVh+M+49VL4j/2zUmRwLOKg9dwkpoFY=;
+ b=fBgWCgHqkfvOLuCzq7CajVSG65XEN54T+f0rXquMvYK2qu7Ank8kZZjkkq26xhJ+XS
+ QGzdk3ke5CcCBXnqIqUvxp74HS1oq819QbqDNEcr2goAYUHJW9NjDSYIA2qrZvZOf3m3
+ GeuduxMEoGuw69Fmyl0pkT/i70xgp+9PrHACQqA84dTEIeHw1YnP2M8QKbkDHkHMLjbx
+ 2cw9gx96y8OIMuGVbSAozC2oj2UJzc34emCfb6VfxxW+La+rKlFlxVZVii3jUZWhRUIH
+ NI9+wfenWP1gCHPozZ3vUgmqWQ2wAVxUI3yZVFrD1Zphlqw603lISzGaHNpcVqGFf3E7
+ KR0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1SaTRXLGZ6xhqVh+M+49VL4j/2zUmRwLOKg9dwkpoFY=;
+ b=SotREDOszazlF0GMFTfVB8zTOeeYYNm/3xCqFeUnXi+Tqye93HQ9Yb0pASybnwnxvu
+ Ou6W3i5W1l9dtVbLGNrd7BAaoZIzi0xcaahS6/C1ZsA8LKQRoyoxmhjv9edCPzkNL5bP
+ F5s5+hrNZJVdBxlEXWrtUMDwxxYY43aLniKa0xmpsvI+OoFxM8w6NGM2wbk6BNGmUJOu
+ 5UlpfBwXPzmzkvO0c/iwprda8M8LqEkQXbeRVq69Alm7PzDcU/zabKL7DWKQycE+LB7H
+ WaBtYOs25Kl4xfDThwN9IyKrQbwwMLRW7eXgrIQF3vNqoYwKX6v9H2oXkzdVBuSg108S
+ L8aw==
+X-Gm-Message-State: APjAAAXe7GMAvpO6ZklGlmdhvu/e3LTWH9AvFyxdeRTSJHDglDVeytmv
+ Z9RCiCsjxqYbXG7eQthnHVWxDH2D7XngtAAywMk=
+X-Google-Smtp-Source: APXvYqwv3CHLkk5hNjhQ6RncXfxJva42pztDsahfRWG8Qdq/AfXZA/F8fIYBZ/8FJ65pqKdIybt7LsreMvsBogV8E/k=
+X-Received: by 2002:a9d:1706:: with SMTP id i6mr2708265ota.151.1582797740711; 
+ Thu, 27 Feb 2020 02:02:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAJAkqrWUJWLdT+6b_XmHFwnzhhbYei2SakCKVW0Rf92HJgoZDw@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <CABLmASF7CoOufGDz-1d-Py3t1PN3CrWdN64XAzgAx4=rbSxGEA@mail.gmail.com>
+ <alpine.BSF.2.22.395.2002261237310.39786@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.22.395.2002261237310.39786@zero.eik.bme.hu>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Thu, 27 Feb 2020 11:02:09 +0100
+Message-ID: <CABLmASEsnW8jYtyDHdUdgJ0jALE6f6W0xYSbx9_RSVp4j4RsVg@mail.gmail.com>
+Subject: Re: Issue with vl.c: move -m parsing after memory backends has been
+ processed. Commit a1b18df9a4848fc8a906e40c275063bfe9ca2047
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Content-Type: multipart/alternative; boundary="000000000000162378059f8bd1c9"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,65 +87,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bharatlkmlkvm@gmail.com,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 27.02.2020 um 10:53 hat Coiby Xu geschrieben:
-> Thank you for reminding me of this socket short read issue! It seems
-> we still need customized vu_message_read because libvhost-user assumes
-> we will always get a full-size VhostUserMsg and hasn't taken care of
-> this short read case. I will improve libvhost-user's vu_message_read
-> by making it keep reading from socket util getting enough bytes. I
-> assume short read is a rare case thus introduced performance penalty
-> would be negligible.
+--000000000000162378059f8bd1c9
+Content-Type: text/plain; charset="UTF-8"
 
-In any case, please make sure that we use the QIOChannel functions
-called from a coroutine in QEMU so that it will never block, but the
-coroutine can just yield while it's waiting for more bytes.
+On Wed, Feb 26, 2020 at 12:38 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
 
-Kevin
+> Hello,
+>
+> On Wed, 26 Feb 2020, Howard Spoelstra wrote:
+> > Hi all,
+> >
+> > Commit a1b18df9a4848fc8a906e40c275063bfe9ca2047 on the ppc-for-50 branch
+> > makes qemu-system-ppc running Mac OS 9 extremely slow. I bisected to the
+> > result below.
+> >
+> > Command line used:
+> > ./qemu-system-ppc -L pc-bios -M mac99,via=pmu -m 512 -boot c \
+> > -hda 9.2.img \
+> > -serial stdio -sdl
+> >
+> > Best,
+> > Howard
+> >
+> > a1b18df9a4848fc8a906e40c275063bfe9ca2047 is the first bad commit
+> > commit a1b18df9a4848fc8a906e40c275063bfe9ca2047
+> > Author: Igor Mammedov <imammedo@redhat.com>
+>
+> Isn't this the same as what's discussed in
+>
+> https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg07229.html
+>
+> Regards,
+> BALATON Zoltan
+>
+> Yes, this refers to the same issue. I responded there too with reference
+to the bisection result I got.
+As it is being dealt with, there is no further need to follow up on this
+particular report..
 
-> On Thu, Feb 27, 2020 at 3:41 PM Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> >
-> > On Wed, Feb 26, 2020 at 11:18:41PM +0800, Coiby Xu wrote:
-> > > Hi Stefan,
-> > >
-> > > Thank you for reviewing my code!
-> > >
-> > > I tried to reach you on IRC. But somehow either you missed my message
-> > > or I missed your reply. So I will reply by email instead.
-> > >
-> > > If we use qio_channel_set_aio_fd_handler to monitor G_IO_IN event,
-> > > i.e. use vu_dispatch as the read handler, then we can re-use
-> > > vu_message_read. And "removing the blocking recv from libvhost-user"
-> > > isn't necessary because "the operation of poll() and ppoll() is not
-> > > affected by the O_NONBLOCK flag" despite that we use
-> > > qio_channel_set_blocking before calling qio_channel_set_aio_fd_handle=
-r
-> > > to make recv non-blocking.
-> >
-> > I'm not sure I understand.  poll() just says whether the file descripto=
-r
-> > is readable.  It does not say whether enough bytes are readable :).  So
-> > our callback will be invoked if there is 1 byte ready, but when we try
-> > to read 20 bytes either it will block (without O_NONBLOCK) or return
-> > only 1 byte (with O_NONBLOCK).  Neither case is okay, so I expect that
-> > code changes will be necessary.
-> >
-> > But please go ahead and send the next revision and I'll take a look.
-> >
-> > Stefan
->=20
->=20
->=20
-> --
-> Best regards,
-> Coiby
->=20
+Best,
+Howard
 
+--000000000000162378059f8bd1c9
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Feb 26, 2020 at 12:38 PM BALA=
+TON Zoltan &lt;<a href=3D"mailto:balaton@eik.bme.hu">balaton@eik.bme.hu</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hell=
+o,<br>
+<br>
+On Wed, 26 Feb 2020, Howard Spoelstra wrote:<br>
+&gt; Hi all,<br>
+&gt;<br>
+&gt; Commit a1b18df9a4848fc8a906e40c275063bfe9ca2047 on the ppc-for-50 bran=
+ch<br>
+&gt; makes qemu-system-ppc running Mac OS 9 extremely slow. I bisected to t=
+he<br>
+&gt; result below.<br>
+&gt;<br>
+&gt; Command line used:<br>
+&gt; ./qemu-system-ppc -L pc-bios -M mac99,via=3Dpmu -m 512 -boot c \<br>
+&gt; -hda 9.2.img \<br>
+&gt; -serial stdio -sdl<br>
+&gt;<br>
+&gt; Best,<br>
+&gt; Howard<br>
+&gt;<br>
+&gt; a1b18df9a4848fc8a906e40c275063bfe9ca2047 is the first bad commit<br>
+&gt; commit a1b18df9a4848fc8a906e40c275063bfe9ca2047<br>
+&gt; Author: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" targe=
+t=3D"_blank">imammedo@redhat.com</a>&gt;<br>
+<br>
+Isn&#39;t this the same as what&#39;s discussed in<br>
+<br>
+<a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg0722=
+9.html" rel=3D"noreferrer" target=3D"_blank">https://lists.nongnu.org/archi=
+ve/html/qemu-devel/2020-02/msg07229.html</a><br>
+<br>
+Regards,<br>
+BALATON Zoltan<br>
+<br></blockquote><div>Yes, this refers to the same issue. I responded there=
+ too with reference to the bisection result I got. <br></div><div>As it is =
+being dealt with, there is no further need to follow up on this particular =
+report..</div><div><br></div><div>Best,</div><div>Howard<br></div></div></d=
+iv>
+
+--000000000000162378059f8bd1c9--
 
