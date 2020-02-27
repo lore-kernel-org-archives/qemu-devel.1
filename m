@@ -6,77 +6,81 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A927FC11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E946C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:41:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78AAB2469F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:38:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 618D424695
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 18:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eojtzK+y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78AAB2469F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJTk6OWj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 618D424695
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7O3m-0007mB-M1
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 13:38:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36799)
+	id 1j7O6f-0000iS-L3
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 13:41:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j7O2y-0007FP-2a
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:38:08 -0500
+ (envelope-from <quintela@redhat.com>) id 1j7O62-0000GI-5R
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j7O2x-0003WV-7T
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:38:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42852
+ (envelope-from <quintela@redhat.com>) id 1j7O61-0007DY-62
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:41:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23782
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7O2x-0003Ve-3g
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:38:07 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7O61-0007As-1d
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 13:41:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582828685;
+ s=mimecast20190719; t=1582828876;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g9MnFxfXGiREnWBDLjgCDwPfHXBU7We4D+aVAxA2Wc0=;
- b=eojtzK+ygs2TE7DScWZf35rYQ/zK353EGdBRk1m+NJkAa+eYfZg7XvA9gMqY3NKolGPlYR
- 0R/oxb1geogC28+Qbcd0SXbhLsksTaWHCBLLdD3ezr7ytXRoehni45Rz3Xxc0p944K+efe
- Xmpvar9W4GMbqpSBqdzJk+U/qGZeOsk=
+ bh=aan4GHA4jGdZmasRoEwkI4JV8GXWa7MU/CP7Nifoz9k=;
+ b=WJTk6OWj8c1U72uI7R2R4O6pPE+78hMjw8BtuwVKobmFykzopNdoAYY605L9jCXBMmQZQY
+ SXZsmkHZyUyNZgRaDxuc3ebSopf6JAD6VVP2mn4ga4T7i0SWxw4SdZ0zTQ6Cn4wkvmolZz
+ pJgixt8o6ePR86tlLz1hGBm3dTl9Qdw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-btIa6ENBOduYhmlkhUcN_Q-1; Thu, 27 Feb 2020 13:38:03 -0500
-X-MC-Unique: btIa6ENBOduYhmlkhUcN_Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-479-_i2ijAlBOT-wfdoS4l80Qg-1; Thu, 27 Feb 2020 13:41:14 -0500
+X-MC-Unique: _i2ijAlBOT-wfdoS4l80Qg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D6513E5;
- Thu, 27 Feb 2020 18:38:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78A00800D50;
+ Thu, 27 Feb 2020 18:41:13 +0000 (UTC)
 Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0742C90F5B;
- Thu, 27 Feb 2020 18:38:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1310B101D48E;
+ Thu, 27 Feb 2020 18:41:13 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Subject: Re: [PATCH V2 3/8] savevm: Don't call colo_init_ram_cache twice
-In-Reply-To: <20200224065414.36524-4-zhang.zhanghailiang@huawei.com>
- (zhanghailiang's message of "Mon, 24 Feb 2020 14:54:09 +0800")
-References: <20200224065414.36524-1-zhang.zhanghailiang@huawei.com>
- <20200224065414.36524-4-zhang.zhanghailiang@huawei.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH v2 3/3] savevm: check RAM is pagesize aligned
+In-Reply-To: <CAJ+F1CLgg6Yz=2V8_eCVtsJ1zPm=1-piz-Nw05KGXkSqWytLgA@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 17 Feb 2020
+ 12:33:58 +0100")
+References: <20200103074000.1006389-1-marcandre.lureau@redhat.com>
+ <20200103074000.1006389-4-marcandre.lureau@redhat.com>
+ <8736cqi07g.fsf@secure.laptop>
+ <CAJ+F1CLgg6Yz=2V8_eCVtsJ1zPm=1-piz-Nw05KGXkSqWytLgA@mail.gmail.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 27 Feb 2020 19:37:59 +0100
-Message-ID: <87v9nrc1vc.fsf@secure.laptop>
+Date: Thu, 27 Feb 2020 19:41:10 +0100
+Message-ID: <87r1yfc1q1.fsf@secure.laptop>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,18 +93,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: quintela@redhat.com
-Cc: danielcho@qnap.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-zhanghailiang <zhang.zhanghailiang@huawei.com> wrote:
-> This helper has been called twice which is wrong.
-> Left the one where called while get COLO enable message
-> from source side.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+> Hi Juan
 >
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> On Wed, Jan 8, 2020 at 2:08 PM Juan Quintela <quintela@redhat.com> wrote:
+>>
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>> n> Check the host pointer is correctly aligned, otherwise we may fail
+>> > during migration in ram_block_discard_range().
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>>
+>> queued
+>>
+>
+> Did it get lost? thanks
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I dropped it in the past, because it made "make check" for mips fail.
+(I put it on my ToDo list to investigate and forgot about it)
+
+But now it pass, go figure.
+
+Included again.  Sorry.
+
+Later, Juan.
 
 
