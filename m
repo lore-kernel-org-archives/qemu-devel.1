@@ -2,129 +2,83 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0216C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8502FC4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:07:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF592467F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F841222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cH/aP3xI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF592467F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Np6K4+wx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F841222C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7F8m-0002wJ-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:07:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38359)
+	id 1j7F8u-0003DM-Fh
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:07:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j7F84-00028a-9Z
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:49 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j7F8A-0002HE-Mh
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j7F7z-00059M-5x
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23723
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1j7F89-0005OG-ER
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:54 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49689
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j7F7z-00057O-1T
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:43 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j7F89-0005NL-AM
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:06:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582794402;
+ s=mimecast20190719; t=1582794412;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=2U5vMT3JdBAOxnGxXsjcLScn+I4d1aJDFb5ALjfamB8=;
- b=cH/aP3xIR7WsPahGKWCw4EaOmWUrQ0u3MvZcKHl5EXrJbNapIQi2q5imeAYefn0qHejlay
- cSEdEhhmUIDkDWIPFtBsPE9oQMI0V8sFB9KRePiFPvGcpojvmMriaNCdtffj+uJcRbUqNX
- hcM5o+YiXPuK0tfxXgLOYKN9WnXXHcM=
+ in-reply-to:in-reply-to:references:references;
+ bh=Xil23CEiYqcuHbjZLErJNYGNGhWhgL0pU2jLZrD0SF8=;
+ b=Np6K4+wxLHcZyX3cC0KmfKe6kJKLppEJDpznvy8NXbqpt5EYL9bBNVd0PE5DmiVVOtyyTb
+ vmEOMYzZ5xWdvG1ka7jy46QH3ttNHVDVLgHskzxtRar5picrB4Bws3IS5Ojt8PZ2yp8rDK
+ Oy8jrUAPoi3HfR3guhX/mRny2VbGgg0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-S14ry7VcOtOWE5te-nZbJg-1; Thu, 27 Feb 2020 04:06:41 -0500
-X-MC-Unique: S14ry7VcOtOWE5te-nZbJg-1
+ us-mta-91-TPeFQKw0MBSQQkIsbaxY-w-1; Thu, 27 Feb 2020 04:06:48 -0500
+X-MC-Unique: TPeFQKw0MBSQQkIsbaxY-w-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86AAE8017CC;
- Thu, 27 Feb 2020 09:06:39 +0000 (UTC)
-Received: from [10.36.116.36] (ovpn-116-36.ams2.redhat.com [10.36.116.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7D5F5D9CD;
- Thu, 27 Feb 2020 09:06:33 +0000 (UTC)
-Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Pan Nengyuan <pannengyuan@huawei.com>, peter.maydell@linaro.org
-References: <20200227025055.14341-1-pannengyuan@huawei.com>
- <20200227025055.14341-2-pannengyuan@huawei.com>
- <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
- <399dfb54-62b7-945b-9f68-4818d419f079@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DC7B19251A1;
+ Thu, 27 Feb 2020 09:06:47 +0000 (UTC)
+Received: from gondolin (ovpn-117-2.ams2.redhat.com [10.36.117.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C36325D9CD;
+ Thu, 27 Feb 2020 09:06:43 +0000 (UTC)
+Date: Thu, 27 Feb 2020 10:06:32 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v5 01/18] s390x: Use constant for ESA PSW address
+Message-ID: <20200227100632.5292d773.cohuck@redhat.com>
+In-Reply-To: <12970780-c4bd-dee3-280d-efcc15d6f162@linux.ibm.com>
+References: <20200226122038.61481-1-frankja@linux.ibm.com>
+ <20200226122038.61481-2-frankja@linux.ibm.com>
+ <3d6f7f88-0a77-90f0-4e26-ee826593d55f@redhat.com>
+ <20200226185118.316055d5.cohuck@redhat.com>
+ <7d9a3dcb-29c5-724c-70d8-9c7559ae6d64@linux.ibm.com>
+ <12970780-c4bd-dee3-280d-efcc15d6f162@linux.ibm.com>
 Organization: Red Hat GmbH
-Message-ID: <7a20ff91-5117-bf74-0d25-3d5fd196d6c4@redhat.com>
-Date: Thu, 27 Feb 2020 10:06:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <399dfb54-62b7-945b-9f68-4818d419f079@redhat.com>
-Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/Mpw321Pe22u2205Y=WbZhMG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,89 +90,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.02.20 09:55, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 2/27/20 9:41 AM, David Hildenbrand wrote:
->> On 27.02.20 03:50, Pan Nengyuan wrote:
->>> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s390x=
-. The leak stack is as follow:
->>>
->>> Direct leak of 48 byte(s) in 1 object(s) allocated from:
->>>      #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0xe=
-f970)
->>>      #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
->>>      #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/include=
-/qemu/timer.h:530
->>>      #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qemu=
-/timer.h:551
->>>      #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include/q=
-emu/timer.h:569
->>>      #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/target=
-/s390x/cpu.c:285
->>>      #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qemu/=
-qom/object.c:372
->>>      #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-new=
-/qemu/qom/object.c:516
->>>      #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu/q=
-om/object.c:684
->>>      #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s390x=
-/s390-virtio-ccw.c:64
->>>      #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core/m=
-achine-hmp-cmds.c:57
->>>      #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/mo=
-nitor/hmp.c:1082
->>>      #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-new/=
-qemu/monitor/misc.c:142
->>>
->>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->>> ---
->>> Cc: Richard Henderson <rth@twiddle.net>
->>> Cc: David Hildenbrand <david@redhat.com>
->>> Cc: Cornelia Huck <cohuck@redhat.com>
->>> Cc: qemu-s390x@nongnu.org
->>> ---
->>> v2->v1:
->>> - Similarly to other cleanups, move timer_new into realize(Suggested by=
- Philippe Mathieu-Daud=C3=A9)
->>> v3->v2:
->>> - Also do the timer_free in unrealize, it seems more balance.
->>> ---
->>
->>
->> As I already said, I think this is init and not realize stuff. Do we
->> have a convention now and documented that?
->=20
-> The clearer doc I read so far is this post:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg680187.html
-> (but see the thread for more helpful comments)
->=20
-> Another thread that you might find interesting is "how to handle QOM=20
-> 'container' objects whose contents depend on QOM properties?"
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg511703.html
->=20
->>
->> Anyhow, I don't really care
->> [...]
->=20
-> Well, looking at the time spent on these series and their review, having=
-=20
-> it better documented might save time the whole community.
+--Sig_/Mpw321Pe22u2205Y=WbZhMG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the pointers. Yes, we should document that. Especially if it
-might save me some time ;)
+On Thu, 27 Feb 2020 09:09:47 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Moving stuff around without a clear convention is not-so-nice IMHO.
+> On 2/27/20 8:53 AM, Janosch Frank wrote:
+> > On 2/26/20 6:51 PM, Cornelia Huck wrote: =20
+> >> On Wed, 26 Feb 2020 15:27:52 +0100
+> >> David Hildenbrand <david@redhat.com> wrote:
+> >> =20
+> >>> On 26.02.20 13:20, Janosch Frank wrote: =20
+> >>>> Lets make it a bit more clear that we're extracting the 31 bit addre=
+ss =20
+> >>
+> >> s/Lets/Let's/ :) =20
+> >=20
+> > Ack
+> >  =20
+> >> =20
+> >>>> from the short psw.
+> >>>>
+> >>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >>>> ---
+> >>>>  hw/s390x/ipl.c     | 2 +-
+> >>>>  target/s390x/cpu.c | 4 ++--
+> >>>>  target/s390x/cpu.h | 1 +
+> >>>>  3 files changed, 4 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> >>>> index 7773499d7f..42e21e7a6a 100644
+> >>>> --- a/hw/s390x/ipl.c
+> >>>> +++ b/hw/s390x/ipl.c
+> >>>> @@ -179,7 +179,7 @@ static void s390_ipl_realize(DeviceState *dev, E=
+rror **errp)
+> >>>>                  /* if not Linux load the address of the (short) IPL=
+ PSW */
+> >>>>                  ipl_psw =3D rom_ptr(4, 4);
+> >>>>                  if (ipl_psw) {
+> >>>> -                    pentry =3D be32_to_cpu(*ipl_psw) & 0x7fffffffUL=
+;
+> >>>> +                    pentry =3D be32_to_cpu(*ipl_psw) & PSW_MASK_ESA=
+_ADDR;
+> >>>>                  } else {
+> >>>>                      error_setg(&err, "Could not get IPL PSW");
+> >>>>                      goto error;
+> >>>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> >>>> index 8da1905485..43360912a0 100644
+> >>>> --- a/target/s390x/cpu.c
+> >>>> +++ b/target/s390x/cpu.c
+> >>>> @@ -78,13 +78,13 @@ static void s390_cpu_load_normal(CPUState *s)
+> >>>>      S390CPU *cpu =3D S390_CPU(s);
+> >>>>      uint64_t spsw =3D ldq_phys(s->as, 0);
+> >>>> =20
+> >>>> -    cpu->env.psw.mask =3D spsw & 0xffffffff80000000ULL;
+> >>>> +    cpu->env.psw.mask =3D spsw & PSW_MASK_ESA_MASK;
+> >>>>      /*
+> >>>>       * Invert short psw indication, so SIE will report a specificat=
+ion
+> >>>>       * exception if it was not set.
+> >>>>       */
+> >>>>      cpu->env.psw.mask ^=3D PSW_MASK_SHORTPSW;
+> >>>> -    cpu->env.psw.addr =3D spsw & 0x7fffffffULL;
+> >>>> +    cpu->env.psw.addr =3D spsw & PSW_MASK_ESA_ADDR;
+> >>>> =20
+> >>>>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+> >>>>  }
+> >>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> >>>> index 8a557fd8d1..74e66fe0c2 100644
+> >>>> --- a/target/s390x/cpu.h
+> >>>> +++ b/target/s390x/cpu.h
+> >>>> @@ -277,6 +277,7 @@ extern const VMStateDescription vmstate_s390_cpu=
+;
+> >>>>  #define PSW_MASK_64             0x0000000100000000ULL
+> >>>>  #define PSW_MASK_32             0x0000000080000000ULL
+> >>>>  #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
+> >>>> +#define PSW_MASK_ESA_MASK       0xffffffff80000000ULL   =20
+> >>>
+> >>> ..._MASK_..._MASK
+> >>>
+> >>> Isn't there a better name for all the bits in the PSW that are not an
+> >>> address?
+> >>>
+> >>> PSW_MASK_ESA_BITS
+> >>> PSW_MASK_ESA_FLAGS
+> >>> ... =20
+> >>
+> >> Hm, the PoP says that the PSW "includes the instruction address,
+> >> condition code, and other control fields"; it also talks about the
+> >> 'short' PSW as being distinct from the 'ESA' PSW (bit 31 may be 0 or 1
+> >> in the short PSW). Maybe
+> >>
+> >> PSW_MASK_SHORT_ADDR
+> >> PSW_MASK_SHORT_CTRL =20
+> >=20
+> > Sure, why not
+> >  =20
+> >>
+> >> (Or keep _ESA_ if renaming creates too much churn.)
+> >> =20
+> >>> =20
+> >>>> =20
+> >>>>  #undef PSW_ASC_PRIMARY
+> >>>>  #undef PSW_ASC_ACCREG
+> >>>>    =20
+> >>>
+> >>> =20
+> >>
+> >> This patch is also independent of the protected virtualization
+> >> support... I plan to send a pull request tomorrow, so I can include
+> >> this patch, if we agree on a name for the constant :) =20
+> >=20
+> > Well, you would also need to rename all users of PSW_MASK_ESA_ADDR
+> > Let me split that up into two patches, the rename for the ADDR and this
+> > one. I'll send it out once I'm more or less awake. =20
+>=20
+> Seems like the ADDR constant has never been used anyway...
+> Ok, I renounce everything I said before, if you want to fix this up
+> yourself that would be wonderful, if not I'd be happy to provide you
+> with a patch.
 
---=20
-Thanks,
+A quick respin of this patch would be easiest for me.
 
-David / dhildenb
+--Sig_/Mpw321Pe22u2205Y=WbZhMG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl5XhpgACgkQ3s9rk8bw
+L6/5rBAArCxdHOtyyUnP6cvugyUuRDGOhPm7/PPoRZf1RnAEbMjIOfZ5qBCwJUk9
+YWyASvnp08ZkrxcpyK4klTRgMajJEz3SuInmkSFlDAJ8taZdaoiliGjMb2h6ra2W
+vDiccF92ho5kQISYyY/eD1iJpAmqsGorOWSY6aExgdA5thY78ePx4pQBboQN/Qdt
+CzXBeEWmOQUUdOlhJCP1olPzm8qIH/33TMojdRD3XSvzyJ3/NZFTdPQKKpEAtqqT
+USyC75zNTnJXeY0bQQ6zl9qjB1XF89P7BRyAwKPF4nXygZ2dknw8hcgLR8WN9Lt5
+Luw2ftWqiF60yzaBjJD1P8M/tKKkAOUKRAVjhVTNUBNM5Z0QRJAb7yrrem4Np4LA
+RiolFxkvAjAq0ltDdxbwuZPdYuLJj0Mg+WXXRqeJNtWTKPwfi7RAvdxQZOL3P201
+TxCzy9wENb16pVIz6NiCxzWkatvy4YuBEz7MlXCQuYPFcB1R9JgwpVgM8HX09Vz6
+wIGuSLMuUc3zZouEPmaaT1kJyY0AvDcnh4kwr72g1ucLtNQPsjQfENaAtstmNwvk
+Cp77R1g5xI6G7whTv64+OXwbLV0/MbXMpuvo25KeLYqGsTh0vKpXFDxRaqHgBYkV
+eoPKMhY7kLl4EDMvbGwFXEEUSx9exQW2POoY99DymmvbjEocIwY=
+=o0TT
+-----END PGP SIGNATURE-----
+
+--Sig_/Mpw321Pe22u2205Y=WbZhMG--
 
 
