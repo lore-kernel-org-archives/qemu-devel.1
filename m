@@ -2,105 +2,92 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F01E3C3F363
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A79AC3F362
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:53:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEC8C2469D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA222084E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:53:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqdRL5gA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC8C2469D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="huGRMdHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA222084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7JZo-00030M-VU
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:51:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38483)
+	id 1j7Jbq-0004Ga-BD
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:53:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j7JZD-0002We-AP
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:51:08 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7JbD-0003f6-9o
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:53:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j7JZC-00019f-D2
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:51:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47892
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j7JZC-00019I-8V
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:51:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582811465;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fJsIjN0iGeI7xWvCBH5bcyuOWpVwUYm33unS8Zw9hEw=;
- b=DqdRL5gA7VRk3vK1tqC+WwE1b49F1bwaZ8k9kfULJXiPTnZJ1SKxNYQ+ne90qygPymHwCs
- Os2EHUzSqYuwG9hyPLRHnqwk6q9NB+QTJLbxkU35eWTQXEE5mqsluqY5nVq60FmxrS5G8E
- oC/chixgzmC8ZZ/zUg8DizNdLxEfoIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-rYiW1oKKNRqfQYqhn8dqBw-1; Thu, 27 Feb 2020 08:51:02 -0500
-X-MC-Unique: rYiW1oKKNRqfQYqhn8dqBw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA9BC18FE86F;
- Thu, 27 Feb 2020 13:51:01 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 117D360BE2;
- Thu, 27 Feb 2020 13:51:00 +0000 (UTC)
-Subject: Re: [PATCH v6 3/9] iotests: replace mutable list default args
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200227000639.9644-1-jsnow@redhat.com>
- <20200227000639.9644-4-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <68740c5b-a5e8-370c-e593-f0c298cae45d@redhat.com>
-Date: Thu, 27 Feb 2020 14:50:59 +0100
+ (envelope-from <richard.henderson@linaro.org>) id 1j7JbC-00034F-7X
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:53:11 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:51612)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j7JbB-000332-VT
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:53:10 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id fa20so1176948pjb.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:53:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=M5P1rDTGO+oizNpB6uI7bw6ZjsPwNQ/42mt+6B1sD2M=;
+ b=huGRMdHGxc6ELp8XmmbQoDmIxuA9/DHVovn7hNTMJEZs5uecpPco2r9s6+ezVmTB+v
+ STIesyAxmmn8oThBCxKcjcoK3B87/uLsPWHBLd3PdP3hdML5X8Syu+p9S+hCh6YHvDYy
+ iWLqFfKdkdtTNgSmcw6VYbP5e6hU3yUZG8OoO2aTCtGiXKDzfH2FWLxUlAiLJSpcQy12
+ AygEomopu2j99vBohHzF9ty5OEiqYiw7S1ga4BOFW6PuW9Xeg5eFyjHuI5gxDNrDUq53
+ U9hZ24CfKmRt9dESqj9tM/i3ioZ3vrI7Di8dmYfL4UXnpM8B9VOUmUTWjIeIdR7wqif1
+ +7yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=M5P1rDTGO+oizNpB6uI7bw6ZjsPwNQ/42mt+6B1sD2M=;
+ b=aFCOaUMc/SMeoarKhaNMJKxxhty2KFj4QkhLfuNAxbonaUql0qbqNO6LCAHWycc6r8
+ mBxtKCBzPD+9eV+BAtyIue+lyd3810ocRFJ2zJHkP6fETWKkXyn5l7dSvvTNzHi8xVBW
+ eWoyXzZ6Kpl6M0u7aOiUIxjhxUz5AJyplWadXgAy0qM34qiDd3obrWbeYNRGAVQN0EDk
+ BHlK5uoEj7aR5eQSNUw3jc/m0ixftvz5UxTcIhM0BMPuAHf1tjyRP2Q1cpw9iSDVFvOT
+ 98jOtpo9C5h2r+dHqAkIbPzDFZ05fulqiMQhf3rNW/h2dqtkink7yy+gBRpgbuaiBI8q
+ Phew==
+X-Gm-Message-State: APjAAAUyqtKy7MqtN+aF+mgST4Vit2v2i67oSk0w1UXR2oOK1iGoUq81
+ yUMA/s3FjWUXpfjpGIp4rns7gw==
+X-Google-Smtp-Source: APXvYqy1EpfmUrZsmYTx+TR8szTDkiH9n2aR8kDnp5yCaEh9h+KKK+qFUH04R1aJy2eqT+3spO/dnA==
+X-Received: by 2002:a17:902:8a89:: with SMTP id
+ p9mr4585773plo.286.1582811588880; 
+ Thu, 27 Feb 2020 05:53:08 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ k63sm6740974pjb.10.2020.02.27.05.53.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 05:53:08 -0800 (PST)
+Subject: Re: [PATCH v3 01/12] qapi/qapi-schema.json: Put headers in their own
+ doc-comment blocks
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+References: <20200225140437.20609-1-peter.maydell@linaro.org>
+ <20200225140437.20609-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <16d20e11-190c-24fc-a966-24345b780720@linaro.org>
+Date: Thu, 27 Feb 2020 05:53:06 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200227000639.9644-4-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="uJEwxtS9BcvxefQwcPHGetXWFC7p8zfUG"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200225140437.20609-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,51 +99,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: John Snow <jsnow@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---uJEwxtS9BcvxefQwcPHGetXWFC7p8zfUG
-Content-Type: multipart/mixed; boundary="MGiiG6z3y47XNvBHo7rZVag1vXluOYGma"
-
---MGiiG6z3y47XNvBHo7rZVag1vXluOYGma
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 27.02.20 01:06, John Snow wrote:
-> It's bad hygiene: if we modify this list, it will be modified across all
-> invocations.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On 2/25/20 6:04 AM, Peter Maydell wrote:
+> Our current QAPI doc-comment markup allows section headers
+> (introduced with a leading '=' or '==') anywhere in any documentation
+> comment.  This works for texinfo because the texi generator simply
+> prints a texinfo heading directive at that point in the output
+> stream.  For rST generation, since we're assembling a tree of
+> docutils nodes, this is awkward because a new section implies
+> starting a new section node at the top level of the tree and
+> generating text into there.
+> 
+> New section headings in the middle of the documentation of a command
+> or event would be pretty nonsensical, and in fact we only ever output
+> new headings using 'freeform' doc comment blocks whose only content
+> is the single line of the heading, with two exceptions, which are in
+> the introductory freeform-doc-block at the top of
+> qapi/qapi-schema.json.
+> 
+> Split that doc-comment up so that the heading lines are in their own
+> doc-comment.  This will allow us to tighten the specification to
+> insist that heading lines are always standalone, rather than
+> requiring the rST document generator to look at every line in a doc
+> comment block and handle headings in odd places.
+> 
+> This change makes no difference to the generated texi.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  tests/qemu-iotests/iotests.py | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  qapi/qapi-schema.json | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
---MGiiG6z3y47XNvBHo7rZVag1vXluOYGma--
-
---uJEwxtS9BcvxefQwcPHGetXWFC7p8zfUG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5XyUMACgkQ9AfbAGHV
-z0C9NAgAh229WvJ/GzvSvyua/Nu4+WtlZFgaU+AqEw23Cp11hsDra8gGw0tF99/B
-fOUdILULEj7f1GnNOpBjyBR/Y6hI0b9Ir6EkosGJWzF3fB1V47E0+fUbgizS9E3M
-IvBwOjTHm0Y0ncVKOrnRlYx1zqYup+rlljviIQTOIrrh6K+FzQZQVvehaDWIBMp2
-EiJT4fXyECanDvXc+/E7xqUh/e4cNFPWNOlSYy4zCiy8eOUOCoJdz81U+dI5mDNL
-Z7Mjnp6TpNqV95kRrYAnKllAo8v8NaeU7gVATSGYhVrr0cAp7O7XJhTbBI6+FQKn
-VidAU6tVtMnbvCR3lZCQVxm0OMzZIQ==
-=83g+
------END PGP SIGNATURE-----
-
---uJEwxtS9BcvxefQwcPHGetXWFC7p8zfUG--
-
+r~
 
