@@ -6,91 +6,72 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0981C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E054AC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:12:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8961824688
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8A122469B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:12:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMh3kD+3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8961824688
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJgxlTQK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8A122469B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7MgZ-0000Uh-Ql
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:10:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48496)
+	id 1j7MiK-0001aO-TJ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:12:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j7Mfn-0008Nb-Vm
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:09 -0500
+ (envelope-from <stefanha@redhat.com>) id 1j7MhX-00014h-Dk
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:11:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j7Mfm-0002NB-Iq
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55381
+ (envelope-from <stefanha@redhat.com>) id 1j7MhW-0002pE-DG
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:11:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60981
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7Mfm-0002N2-El
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:06 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j7MhW-0002p3-7O
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:11:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582823405;
+ s=mimecast20190719; t=1582823513;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GEYk2/dbUdT3xIinsoxoEKMLfiNgu+B1rBwjY1EWgZc=;
- b=DMh3kD+3NFgs4/K16yx35Zngt+bAA0+4aNPk58Q1JviqZt5PupJMZid3um4FVJrR3ImDCK
- wWQlRjMV22UvVT6u9Z6bNxkQW1x6QCBqvkFP7sYTRORg4zJNuW+ZpFtd/eAx/JWA3yienN
- UjphwuqqypS+MZ5pv2rLfQ4kHaSZKAA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-LFWjHvcOOYuvWu79djcytg-1; Thu, 27 Feb 2020 12:10:03 -0500
-X-MC-Unique: LFWjHvcOOYuvWu79djcytg-1
-Received: by mail-qt1-f198.google.com with SMTP id p12so7186qtu.6
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:10:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=2vbdWQapmZamSeF+bJL8aB7iMEyP5e3Iv1xyHMVrcOM=;
- b=kvurKSDPnYJbmXejgY2ALnrvy1469WxIXdAnEKAYNMdPJegAt/V4vPf17dgZC+zQGw
- Yt9Rpo5s99rWTg2JbctDj2m+Lrs7BhF6hn099cqakz7NyxW2D6L3JHcIlfLqNM3i2+l1
- amklCC4lpAY9edbBbT0qnCFLJeBJU+2tOihYhTNAvVYfmzz5bKJ5SFfOEVtywqtuEaN2
- buFrcDRdmASKoaHETqeRCxzIXllmYQA8258ef4HQbDOugkDSqtnkTIRB6VBMe5O+JIaQ
- KyKECZBh4cqS9QBE7ZfNRGfQ5JQc4KeH31R9wRPWYIwQkol5iQRz7QQkuN5A14WkhYoC
- IA+g==
-X-Gm-Message-State: APjAAAWQFnQinhGE6rzCu46lzp5Q6FDz/6OBmFJ3k/jN7MBkZFztRlC/
- qTJlF+yex8YE/QZYxn6tiXZV1UEysxfrCGwngxK1geaSB6MYkuc9MDeIhQRTbu+LEz8gvr+iWmv
- rFU2m1h/DreXx4js=
-X-Received: by 2002:a05:620a:2103:: with SMTP id
- l3mr267578qkl.90.1582823403027; 
- Thu, 27 Feb 2020 09:10:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx/v6ssdiNhxeOfyTr1qqMPtkqxdnPTkVXMHAabIgGT+YBOTsCr//LsNdDejSggKqWyXUU81A==
-X-Received: by 2002:a05:620a:2103:: with SMTP id
- l3mr267553qkl.90.1582823402768; 
- Thu, 27 Feb 2020 09:10:02 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id j30sm3368229qki.96.2020.02.27.09.10.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Feb 2020 09:10:02 -0800 (PST)
-Date: Thu, 27 Feb 2020 12:10:01 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 1/5] vfio/pci: Disable INTx fast path if using split
- irqchip
-Message-ID: <20200227171001.GH180973@xz-x1>
-References: <20200226225048.216508-1-peterx@redhat.com>
- <20200226225048.216508-2-peterx@redhat.com>
- <59815cf7-7fb8-faf6-4bb8-5376c87aa684@redhat.com>
+ bh=C/bwEV6N/6SLHHEHo4L7ef+gE9c47gthlpme7V+Sq1k=;
+ b=OJgxlTQKGzGU0+nIZBp9apOf+9iK+Yfm58QmHOl8GD9K8MakkAQqvsrUwEOhuzzXpX96EV
+ ds+zIFuwNl1k5OH/A1bslAP9mDGwpbPTA4TFBTVPgOiz9i5PT3bPJuNrHrukvml3Hpq8Zz
+ QEyiezRsSTN5rw6Skg/uRV5c0bFqJMg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-s_yYK3PVPWmmsudRe5Wieg-1; Thu, 27 Feb 2020 12:11:49 -0500
+X-MC-Unique: s_yYK3PVPWmmsudRe5Wieg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 975A4802562;
+ Thu, 27 Feb 2020 17:11:47 +0000 (UTC)
+Received: from localhost (ovpn-117-38.ams2.redhat.com [10.36.117.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 10B6E9296C;
+ Thu, 27 Feb 2020 17:11:41 +0000 (UTC)
+Date: Thu, 27 Feb 2020 17:11:40 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [PATCH v5 49/50] multi-process: add the concept description to
+ docs/devel/qemu-multiprocess
+Message-ID: <20200227171140.GF315098@stefanha-x1.localdomain>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <b6a030f0a81a1129b853c30a4c10def606a53089.1582576372.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <59815cf7-7fb8-faf6-4bb8-5376c87aa684@redhat.com>
+In-Reply-To: <b6a030f0a81a1129b853c30a4c10def606a53089.1582576372.git.jag.raman@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="VuQYccsttdhdIfIP"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -105,77 +86,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 27, 2020 at 05:53:32PM +0100, Auger Eric wrote:
-> Hi Peter,
->=20
-> On 2/26/20 11:50 PM, Peter Xu wrote:
-> > It's currently broken.  Let's use the slow path to at least make it
-> > functional.
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
->=20
-> > ---
-> >  hw/vfio/pci.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> >=20
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index 5e75a95129..98e0e0c994 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -128,6 +128,18 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vd=
-ev, Error **errp)
-> >          return;
-> >      }
-> > =20
-> > +    if (kvm_irqchip_is_split()) {
-> > +        /*
-> > +         * VFIO INTx is currently not working with split kernel
-> > +         * irqchip for level triggered interrupts.  Go the slow path
-> > +         * as long as split is enabled so we can be at least
-> > +         * functional (even with poor performance).
-> > +         *
-> > +         * TODO: Remove this after all things fixed up.
-> If this patch were to be applied sooner than the other patches as
-> suggested in the cover letter, We may emit a warning message saying that
-> slow path is selected due to split irqchip and this will induce perf
-> downgrade
+--VuQYccsttdhdIfIP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes we can.  Here I followed the rest of the cases where we'll
-silently fallback to slow path if e.g. we used an even older kernel
-that does not support resamplefd at all.  IMHO it's the same as that
-(feature not supported yet, silent fallback, just in case it scares
-the user a bit, which makes some sense).
+On Mon, Feb 24, 2020 at 03:55:40PM -0500, Jagannathan Raman wrote:
+> From: John G Johnson <john.g.johnson@oracle.com>
+>=20
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> ---
+>  docs/devel/index.rst             |    1 +
+>  docs/devel/qemu-multiprocess.rst | 1102 ++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 1103 insertions(+)
+>  create mode 100644 docs/devel/qemu-multiprocess.rst
+>=20
+> diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+> index 4dc2ca8..1a95871 100644
+> --- a/docs/devel/index.rst
+> +++ b/docs/devel/index.rst
+> @@ -25,3 +25,4 @@ Contents:
+>     tcg-plugins
+>     bitops
+>     reset
+> +   multi-process
+> diff --git a/docs/devel/qemu-multiprocess.rst b/docs/devel/qemu-multiproc=
+ess.rst
+> new file mode 100644
+> index 0000000..477e246
+> --- /dev/null
+> +++ b/docs/devel/qemu-multiprocess.rst
+> @@ -0,0 +1,1102 @@
+> +Disaggregating QEMU
 
-> > +         */
-> > +        return;
-> > +    }
-> > +
-> >      /* Get to a known interrupt state */
-> >      qemu_set_fd_handler(irqfd.fd, NULL, NULL, vdev);
-> >      vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX=
-);
-> >=20
->=20
->=20
-> Tested with a 5.2-rc1 kernel with reverted "654f1f13ea56  kvm: Check
-> irqchip mode before assign irqfd" and guest booting with nomsi.
->=20
-> Without this patch the assigned NIC does not work. This patch fixes the
-> issue.
->=20
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
+Please revise this document and the patch series to use consistent
+terminology.  At least "qemu-multiprocess.rst", "--enable-mpqemu", and
+"disaggregated QEMU" are used to describe this feature (there are
+probably more, I have only looked at 2 patches so far).
 
-Thanks Eric!
+It's confusing for someone who stumbles across one of these terms and
+then has to figure out that we're talking about the same thing when
+encountering other terms later on.
 
---=20
-Peter Xu
+Please use a single name and use it consistently.
+
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +QEMU is often used as the hypervisor for virtual machines running in the
+> +Oracle cloud. Since one of the advantages of cloud computing is the
+> +ability to run many VMs from different tenants in the same cloud
+> +infrastructure, a guest that compromised its hypervisor could
+> +potentially use the hypervisor's access privileges to access data it is
+> +not authorized for.
+> +
+> +QEMU can be susceptible to security attack because it is a large,
+
+s/attack/attacks/
+
+> +monolithic program that provides many features to the VMs it services.
+> +Many of these feature can be configured out of QEMU, but even a reduced
+
+s/feature/features/
+
+--VuQYccsttdhdIfIP
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5X+EwACgkQnKSrs4Gr
+c8gfwwf9EO2qrxovaGOiXwn2B9bb2wkU5P7aKjMasHSfAEs1YHkBAjGBAptwleiR
+cRwx/BjNw5Zcu/+lS0Z/ac+f0DO3IRs1tqdMULKGYg3CanXbjKvk21cQrj6UsxWh
+KUFbwf5JGHiXSCMQxIfuysey7n7B19za6kjHJbIeJUwfxKireWW9D8JcwlWtPh66
+rCfHZemcXPJEwnxwxGUZ0MfHwpTgmcdzKRbCv/tRYw7s23Oyc2/kY1KWOHIsTKiF
+eO9smVOn4y0n3cNeYN+InjR4Rdb9OZOpfGfG2gsB8uIKc8sGSyhshxGyJBauj+jQ
+TwX6E4zi28eCD2HssDcI0D/zza01Tg==
+=Pv7s
+-----END PGP SIGNATURE-----
+
+--VuQYccsttdhdIfIP--
 
 
