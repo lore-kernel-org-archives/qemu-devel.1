@@ -2,78 +2,63 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD836C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D946EC4BA3B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:16:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C3E62467F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:15:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rhg9mDfa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3E62467F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AAEEB222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:16:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAEEB222C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7FGw-000307-R5
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:15:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42645)
+	id 1j7FHB-0003Nn-RQ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:16:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42781)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7FGE-00028s-78
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:15 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1j7FGQ-0002Jy-Qb
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7FGC-0000m7-T9
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:13 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43372)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7FGC-0000kh-NF
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:12 -0500
-Received: by mail-oi1-x244.google.com with SMTP id p125so2562998oif.10
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 01:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PBPO653nrRDilb+V5bdvLTuegWyUOH6huXVkJlyy0oE=;
- b=rhg9mDfaZlaDbmOKiL/nDRqQcc2o0b6kLHL+Iq90cKndLIv31GSw8lB28eAMhnnWrO
- UX+WeUa8phMHuPdTN4JkrdhF9na8qKLbOVrHd5gBdLrTYvAjUjm7PM5A4SjNvqHe2jnT
- 8I2dGVYfuoeTFSs5bOQtFAbeaM26/yT0Q1gFruxxsiaXpFPN0a9fMkPt6kwGPKR9DX6H
- +fmyWrSHSA4LAOQ34fvuZ7dcX92QP+zzNbIKZKS/HEoCKiqa7BZBLx7gWrt4PP85LKck
- zCHG3YRTPy3+i3orp3Xkgk8O4A/SQ0I6ds1xeqdnPLUrm5o8RY4o5eFJfS8w1k/0zkGG
- r81w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PBPO653nrRDilb+V5bdvLTuegWyUOH6huXVkJlyy0oE=;
- b=KmhBgLmWwNFx/OPmw0vXV97HkIIyF4wFvBFeJhdMQ4t4G8UPeIraDfxe1Xql6yZ/Tj
- YBotC8tWNsX3WKS53dhX5WT9WzSOVZkgYRouQPQmKlX6uR/KqLBIHx5OhimFkviHqhQj
- PEZ6ilFcjF5P+mfeQjxsN0WY0imPvhv46WVmb8MT4QosfCa80FJlDvCetLdzILsj0fFM
- Xg+qxMkqotTU2Osm4380MHqbonYmbthhdE0/DwapwGl67oR+KyvE2CBu09Fp9II2U+XN
- l0r/0DevcmoDTFj3v4rOyQdRyJ0fyEmIW2ITWzpx+rGh5Daae2BqLLNaXexS8gbl+nng
- AoRg==
-X-Gm-Message-State: APjAAAWWEoF2DQ/m9BkZMp+/jeWI5Jftwwea+Zswm1WyK0AGUIyXLkq9
- 0xkjbnZa6nHv0v3NtLoiLtgjp/mbVv13L6O3Evs+Jg==
-X-Google-Smtp-Source: APXvYqyWz33fA8Z/ut99RdiAiASabli+ezQATS8z5LVvoKfaXEJU8f8eirowE3llGgbv1W8FwTBRiJuKTiOSV2PtrWg=
-X-Received: by 2002:a54:4f16:: with SMTP id e22mr2614609oiy.170.1582794911701; 
- Thu, 27 Feb 2020 01:15:11 -0800 (PST)
+ (envelope-from <pannengyuan@huawei.com>) id 1j7FGP-0000wI-Mf
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:26 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3252 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1j7FGM-0000rd-Vj; Thu, 27 Feb 2020 04:15:23 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id C66B5D06BC57D3EB34DD;
+ Thu, 27 Feb 2020 17:15:18 +0800 (CST)
+Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server (TLS) id 14.3.439.0; Thu, 27 Feb
+ 2020 17:15:12 +0800
+Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
+To: David Hildenbrand <david@redhat.com>, <peter.maydell@linaro.org>
+References: <20200227025055.14341-1-pannengyuan@huawei.com>
+ <20200227025055.14341-2-pannengyuan@huawei.com>
+ <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
+ <46d1fc23-6ef5-947f-becd-c3004a6b76bc@huawei.com>
+ <f0576f75-d8b5-0e65-7390-32cd3021e1f2@redhat.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <11fc3595-4bc4-a523-cf41-62ca7cfbd70d@huawei.com>
+Date: Thu, 27 Feb 2020 17:15:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20200226163539.31960-1-imammedo@redhat.com>
-In-Reply-To: <20200226163539.31960-1-imammedo@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Feb 2020 09:15:00 +0000
-Message-ID: <CAFEAcA9BTrC_OOTRboydOFn6GFsyKzqUNEExw5VRXmRsYvoXYA@mail.gmail.com>
-Subject: Re: [PATCH] softmmu/vl.c: fix too slow TCG regression
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <f0576f75-d8b5-0e65-7390-32cd3021e1f2@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,59 +70,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Niek Linnenbank <nieklinnenbank@gmail.com>,
- Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Feb 2020 at 16:35, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> Commit a1b18df9a4 moved -m option parsing after configure_accelerators()
-> that broke TCG accelerator initialization which accesses global ram_size
-> from size_code_gen_buffer() which is equal to 0 at that moment.
->
-> Partially revert a1b18df9a4, by returning set_memory_options() to its
-> original location and only keep 32-bit host VA check and 'memory-backend'
-> size check introduced by fe64d06afc at current place.
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->
-> PS:
-> This should take care of regression and give more time to think about
-> how to remove size_code_gen_buffer() dependency on ram_size
 
-> +    if (current_machine->ram_memdev_id) {
-> +        Object *backend;
-> +        ram_addr_t backend_size;
-> +
-> +        backend = object_resolve_path_type(current_machine->ram_memdev_id,
-> +                                           TYPE_MEMORY_BACKEND, NULL);
-> +        backend_size = object_property_get_uint(backend, "size",  &error_abort);
-> +        if (backend_size != ram_size) {
-> +                error_report("Size specified by -m option must match size of "
-> +                             "explicitly specified 'memory-backend' property");
-> +                exit(EXIT_FAILURE);
-> +        }
-> +        ram_size = backend_size;
 
-Why do we do this assignment? We've just checked that
-backend_size == ram_size so the assignment won't do
-anything, will it?
+On 2/27/2020 5:04 PM, David Hildenbrand wrote:
+> On 27.02.20 09:58, Pan Nengyuan wrote:
+>>
+>>
+>> On 2/27/2020 4:41 PM, David Hildenbrand wrote:
+>>> On 27.02.20 03:50, Pan Nengyuan wrote:
+>>>> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s3=
+90x. The leak stack is as follow:
+>>>>
+>>>> Direct leak of 48 byte(s) in 1 object(s) allocated from:
+>>>>     #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0=
+xef970)
+>>>>     #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
+>>>>     #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/inclu=
+de/qemu/timer.h:530
+>>>>     #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qe=
+mu/timer.h:551
+>>>>     #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include=
+/qemu/timer.h:569
+>>>>     #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/targ=
+et/s390x/cpu.c:285
+>>>>     #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qem=
+u/qom/object.c:372
+>>>>     #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-n=
+ew/qemu/qom/object.c:516
+>>>>     #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu=
+/qom/object.c:684
+>>>>     #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s39=
+0x/s390-virtio-ccw.c:64
+>>>>     #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core=
+/machine-hmp-cmds.c:57
+>>>>     #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/=
+monitor/hmp.c:1082
+>>>>     #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-ne=
+w/qemu/monitor/misc.c:142
+>>>>
+>>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>>>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>>>> ---
+>>>> Cc: Richard Henderson <rth@twiddle.net>
+>>>> Cc: David Hildenbrand <david@redhat.com>
+>>>> Cc: Cornelia Huck <cohuck@redhat.com>
+>>>> Cc: qemu-s390x@nongnu.org
+>>>> ---
+>>>> v2->v1:
+>>>> - Similarly to other cleanups, move timer_new into realize(Suggested=
+ by Philippe Mathieu-Daud=C3=A9)
+>>>> v3->v2:
+>>>> - Also do the timer_free in unrealize, it seems more balance.
+>>>> ---
+>>>
+>>>
+>>> As I already said, I think this is init and not realize stuff. Do we
+>>> have a convention now and documented that?
+>>>
+>>> Anyhow, I don't really care
+>>> [...]
+>>>
+>>>
+>>>> @@ -453,6 +466,7 @@ static void s390_cpu_class_init(ObjectClass *oc,=
+ void *data)
+>>>> =20
+>>>>      device_class_set_parent_realize(dc, s390_cpu_realizefn,
+>>>>                                      &scc->parent_realize);
+>>>> +    dc->unrealize =3D s390_cpu_unrealizefn;
+>>>
+>>> Shouldn't we use device_class_set_parent_unrealize?
+>>
+>> We just only declare parent_realize field in S390CPUClass(), it seems =
+nothing to do in parent_unrealize.
+>>
+>> typedef struct S390CPUClass {
+>> ...
+>> DeviceRealize parent_realize;    // no parent_unrealize;
+>> ...
+>> }
+>>
+>> So I think we can't use it.
+>=20
+> So you should add it and properly call the parent_unrealize from your
+> new unrealize function?
+>=20
+> AFAIKS you are overwriting cpu_common_unrealizefn set in hw/core/cpu.c
+> for TYPE_CPU with this change.
 
-In the version of this check in set_memory_options()
-the assignment was useful because the error check
-only happened if mem_str is not NULL, ie there was
-an explicitly specified 'size' option somewhere. It
-looks like now we require the backend size to match
-even if the size is not explicitly specified by the
-user but comes from some default somewhere?
+Oh, I think you are right, I will change it.
 
-thanks
--- PMM
+Thanks.
+>=20
 
