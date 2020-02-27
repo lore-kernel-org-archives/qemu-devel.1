@@ -2,83 +2,102 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02EB5C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A56DC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C36A32469F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:33:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 352CB2469F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:36:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZfZXGkxE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C36A32469F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMvaTmJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352CB2469F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7LAU-00009T-SC
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:33:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57492)
+	id 1j7LCo-0001Pw-CX
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:36:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58081)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j7L9a-000817-72
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:32:47 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7LCC-0000mT-AE
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:35:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j7L9Y-0005qC-8U
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:32:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51541
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j7LCB-0007ls-DX
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:35:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23785
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j7L9Y-0005pF-2V
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:32:44 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7LCB-0007km-AI
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:35:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582817563;
+ s=mimecast20190719; t=1582817726;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=flkaoN32fHfnV+Wb3CdGYQ+uAtG2ZUjFEdjzExVmXQw=;
- b=ZfZXGkxELwJFsvZAEa2wtGq0kYzt7nGNhL51jZ6b2RZUR7dMSp2XzSHC5oEPK8L9MfRn9z
- c+x9bKkAsnm4IMNGWUhTlPkoKhxfpsviuEAx1cxyq4oY9pL1sssv6l0lmN2nWjMoUkma6C
- RsT0RmSaNXTMOpAAHLuUuzk9C9YHnxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-lxI3cm93PMum2-EIgQ-WTA-1; Thu, 27 Feb 2020 10:32:35 -0500
-X-MC-Unique: lxI3cm93PMum2-EIgQ-WTA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82092107BAB6
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 15:32:34 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BAE525DA7B;
- Thu, 27 Feb 2020 15:32:26 +0000 (UTC)
-Subject: Re: [PATCH 0/5] vfio/pci: Fix up breakage against split irqchip and
- INTx
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200226225048.216508-1-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <bd685da9-bc50-f901-bfec-a1cd18832307@redhat.com>
-Date: Thu, 27 Feb 2020 16:32:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=NF4E9rOgtCZE9IThrbg7pTderyZQUYYORdAU/Nf/mUc=;
+ b=hMvaTmJ3z3a+h6whsRhWtRFQVJ14h9KkJTpm44YgQdt9WE3TquZ4v0xuRuy3pQMVZgCFf7
+ 6D+yReqXZn5k+S+1G8k21xAI0ASn+lX6p2f+gw5h4/rPkvx8/vZbMLkDtyOc6uuyWM0wMj
+ CLBWlaxVOZpkZ/fLePdR53he47aFq2A=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281--js1bjmxOXCpdi7_DOpXVw-1; Thu, 27 Feb 2020 10:35:25 -0500
+X-MC-Unique: -js1bjmxOXCpdi7_DOpXVw-1
+Received: by mail-wr1-f70.google.com with SMTP id r1so1449699wrc.15
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 07:35:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qhsvCr8jZD0F4RJ22ERrwxPlGA82K7TJGhS6HMn0sFc=;
+ b=WltbA3G/zWqA5fe8GTz1/p5B9x6pDSIOi1gRx5Kkwh3Kwd5Ce5OJwEAHKrWcJtOmUx
+ Ul1db1nBzriv2KD2ZG/J2k2hl07aTj5Xz0KtejlwraFMhg02MSxliLZMn66KuaRkilCr
+ w4C0wsRBVlrxddQv41mi76NTeggwbGwauCO/EDU4C86hxTl/kPQxze2Uj5fnhCApb6rI
+ 0B8tDlI41pBJh1KI4vni72EvMsmD1ovQ4dUumlakZzyCu6f1JS5onhUsKjIqCnASQMql
+ fA7RkOyOGyfjSK1jNfJ8Zvw2F/enAICyXyoTJ2M1NP8r4+zqRGUQwZ22K8dxp2pcMwge
+ sxlg==
+X-Gm-Message-State: APjAAAUtAQHSikyLCG22h1KTQ6PfKhCeYtewfu3JkGVPk3vun7YNo0Ms
+ KlhXKEBKkiBLWvVFj3g6QsXDJP4ttI04x9Mv7JLIEUUcZrpuNslOS4WQ+mk0f8gb4sF2jOImsNI
+ Upwaf4PM9+qD7XT4=
+X-Received: by 2002:adf:a114:: with SMTP id o20mr5393477wro.7.1582817723903;
+ Thu, 27 Feb 2020 07:35:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxCE8WP7/70/qfZ23012B2ERp/howwJmG7d+gDFzsPJzAQGbErLa0IDH9rHyacG7b4+m1pVKw==
+X-Received: by 2002:adf:a114:: with SMTP id o20mr5393456wro.7.1582817723695;
+ Thu, 27 Feb 2020 07:35:23 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id a7sm7564161wmj.12.2020.02.27.07.35.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 07:35:23 -0800 (PST)
+Subject: Re: [PATCH 2/2] util/oslib-win32: Improve error report by calling
+ error_setg_win32()
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200227100250.20514-1-philmd@redhat.com>
+ <20200227100250.20514-3-philmd@redhat.com>
+ <87zhd4ozv7.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2d967cdd-3625-5b00-a154-65781f4f7d4b@redhat.com>
+Date: Thu, 27 Feb 2020 16:35:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226225048.216508-1-peterx@redhat.com>
+In-Reply-To: <87zhd4ozv7.fsf@dusky.pond.sub.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,88 +109,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On 2/27/20 3:42 PM, Markus Armbruster wrote:
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+>=20
+>> Use error_setg_win32() which adds a hint similar to strerror(errno)).
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>   util/oslib-win32.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+>> index e9b14ab178..d2fca1808d 100644
+>> --- a/util/oslib-win32.c
+>> +++ b/util/oslib-win32.c
+>> @@ -46,7 +46,8 @@
+>>   void *qemu_oom_check(void *ptr)
+>>   {
+>>       if (ptr =3D=3D NULL) {
+>> -        fprintf(stderr, "Failed to allocate memory: %lu\n", GetLastErro=
+r());
+>> +        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError()=
+);
+>=20
+> Since we're on a path to abort(), I wouldn't bother with g_autofree.\
 
-On 2/26/20 11:50 PM, Peter Xu wrote:
-> VFIO INTx is not working with split irqchip.  On new kernels KVM_IRQFD
-> will directly fail with resamplefd attached so QEMU will automatically
-> fallback to the INTx slow path.  However on old kernels it's still
-> broken.
-I think you should quote the commit that changes the behavior:
-654f1f13ea56  kvm: Check irqchip mode before assign irqfd?
-so that one can understand what it fixed.
+This is in case other developers copy that elsewhere.
 
-So on kernels that do not feature that commit, the ioctl succeeds and we
-pretend the resamplefd was properly attached whereas in practice it was
-never triggered.
+>=20
+>> +        fprintf(stderr, "Failed to allocate memory: %s\n", emsg);
+>=20
+> Any particular reason not to use error_report()?
 
-Thanks
+Pre-existing call, but I can change.
 
-Eric
-
-> 
-> Only until recently I noticed that this could also break PXE boot for
-> assigned NICs [1].  My wild guess is that the PXE ROM will be mostly
-> using INTx as well, which means we can't bypass that even if we
-> enables MSI for the guest kernel.
-> 
-> This series tries to first fix this issue function-wise, then speed up
-> for the INTx again with resamplefd (mostly following the ideas
-> proposed by Paolo one year ago [2]).  My TCP_RR test shows that:
-
-> 
->   - Before this series: this is broken, no number to show
-> 
->   - After patch 1 (enable slow path): get 63% perf comparing to full
->     kernel irqchip
-> 
->   - After whole series (enable fast path partly, irq injection will be
->     the same as fast path, however userspace needs to intercept for
->     EOI broadcast to resamplefd, though should still be faster than
->     the MMIO trick for intx eoi): get 93% perf comparing to full
->     kernel irqchip, which is a 46% performance boost
-> 
-> I think we can consider to apply patch 1 even sooner than the rest of
-> the series to unbreak intx+split first.
-> 
-> The whole test matrix for reference:
-> 
->   |----------+---------+-------------------+--------------+--------------------|
->   | IRQ type | irqchip | TCP_STREAM (Gbps) | TCP_RR (pps) | note               |
->   |----------+---------+-------------------+--------------+--------------------|
->   | msi      | on      |              9.39 |        17567 |                    |
->   | nomsi    | on      |              9.29 |        14056 |                    |
->   | msi      | split   |              9.36 |        17330 |                    |
->   | nomsi    | split   |                 / |            / | currently broken   |
->   | nomsi    | split   |              8.98 |         8977 | after patch 1      |
->   | nomsi    | split   |              9.21 |        13142 | after whole series |
->   |----------+---------+-------------------+--------------+--------------------|
-> 
-> Any review comment is welcomed.  Thanks,
-> 
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1786404
-> [2] https://patchwork.kernel.org/patch/10738541/#22609933
-> 
-> Peter Xu (5):
->   vfio/pci: Disable INTx fast path if using split irqchip
->   vfio/pci: Use kvm_irqchip_add_irqfd_notifier_gsi() for irqfds
->   KVM: Pass EventNotifier into kvm_irqchip_assign_irqfd
->   KVM: Kick resamplefd for split kernel irqchip
->   Revert "vfio/pci: Disable INTx fast path if using split irqchip"
-> 
->  accel/kvm/kvm-all.c    | 83 +++++++++++++++++++++++++++++++++++++++---
->  accel/kvm/trace-events |  1 +
->  hw/intc/ioapic.c       | 11 +++++-
->  hw/vfio/pci.c          | 37 ++++++++-----------
->  include/sysemu/kvm.h   |  4 ++
->  5 files changed, 106 insertions(+), 30 deletions(-)
-> 
+>=20
+>>           abort();
+>>       }
+>>       return ptr;
+>=20
 
 
