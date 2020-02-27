@@ -2,86 +2,118 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E259EC3F2C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 21:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5B8C3F2C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 21:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FBD4246A1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 21:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39532246A0
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 21:30:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkbteeL9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FBD4246A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="SZHnr/Vu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39532246A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7QVc-0007OP-QX
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 16:15:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37844)
+	id 1j7QjI-0003Tg-DH
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 16:30:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j7QUu-0006aV-Iw
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:15:10 -0500
+ (envelope-from <sunilmut@microsoft.com>) id 1j7Qie-0002za-1D
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j7QUs-0006tQ-Ae
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:15:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43056
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j7QUs-0006tB-5P
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:15:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582838105;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QE2Os8OJqt+GS/1/pDPcoIZ/WvrTfRfl4DDF1/elMiI=;
- b=fkbteeL9b5Kx7yWLmsDw/+TNJBWGzBw3Vz9fAmW65y7nhdEQyjIQi/XCVxph2kollorT2y
- TxqhSE7iNRhtjk86hcyr3MkknyPfcxs0IEnKl1VpKo2WhyIPu61oHiXFQxF0wuLqWr1ykw
- uSVwS9QX0hZ/1naGXeJh4V033cey0QY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-gBlIeHukNYaj6gkvvGZB4A-1; Thu, 27 Feb 2020 16:14:57 -0500
-X-MC-Unique: gBlIeHukNYaj6gkvvGZB4A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD60ADB62
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 21:14:56 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A0AE5C1B5;
- Thu, 27 Feb 2020 21:14:49 +0000 (UTC)
-Subject: Re: [PATCH v1.1 4/5] KVM: Kick resamplefd for split kernel irqchip
-To: Peter Xu <peterx@redhat.com>
-References: <20200227170048.236599-1-peterx@redhat.com>
- <5e69c385-b27c-61d4-5856-21bcf5e9c8f5@redhat.com>
- <20200227180003.GJ180973@xz-x1>
- <2852480c-89fe-4c4e-75be-7322592976b6@redhat.com>
- <20200227191900.GK180973@xz-x1>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8ab9ccaa-7060-9e90-d4a9-a9de32610381@redhat.com>
-Date: Thu, 27 Feb 2020 22:14:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200227191900.GK180973@xz-x1>
+ (envelope-from <sunilmut@microsoft.com>) id 1j7Qib-0005qU-Qc
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:29:19 -0500
+Received: from mail-co1nam11on2121.outbound.protection.outlook.com
+ ([40.107.220.121]:34144 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
+ id 1j7Qib-0005oQ-CQ
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 16:29:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nQ4xWRKZrK/QyZmf8CThdQHNuKDB8m9NXqxMJqi59uyhPMF45q6DCvJl5a9l3lnXmkiA5sWK8lJGNM5VDTtxz3kZpnXbrg1ECV2wmqZ9jhARRJA+8q5Lc1hu+rOtCOAZMf7Jn/kG1Cmw/oMMfYGHurl0hNlJP+PLEmksxSmy1Q/jH4ZvvV8EadqRGkcErJxr/7nmeL79+Ab+ywrv31PYkne/d4BjD81+otvHzXAD6bdL3RmeV+EPn8HQihT9A3+8MKvM8r0YBY8+uAHh1A6r4uHFqtQKsnSbXpfld/QjMLawP/MJPyXVYvvz7lkhfda+gCXeTpk5TGDyrb7ajwb4ww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eYP6obvtA+Rk1wwCRlFeTkvmlCWok0i0tynIxUSC4i8=;
+ b=ZT5AvAD1IHkQlebiqgGbbyJkeuq128fehLb9F2kvjyVp9jAVECWNhStC3zbRi6zN04DVpSZtMWOqvZ8htFpbS9A7RLe0kjzVRvhwJvebpD1VXrrUUydn+K53AjbDKXP9+inlEXuke39JS2E5tVpmMf5n3nefKPgUWE+NMfIqzlz7Jp1Tp5VyYdrHMRCFG3Xavzk3Lm3b2pqojvj0CdVpTW6fngGqCNnuiAuM0dCUNrqJUdZCEr8c06hRjckWmQtukoMW0ZSWf2npgpAk63/yeJfxD4JLSV1HtCMhFmDuvRjGF6Sc1su/jdEg8Mrt4+JfC56cR2Rk8V6i1Wh/kir5qQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eYP6obvtA+Rk1wwCRlFeTkvmlCWok0i0tynIxUSC4i8=;
+ b=SZHnr/VuS+pS/nZEe1B0jqMjI9PR8obzNIPuCtbIVgKI5jbD+86qn1e0jQiUbfwZ6FZII/ZOmmHnsJTKZRZT0LlhlpA0Gj18NmHGlK9vsgqDIdPyOQPgLzFZ1PMiFnuTDU6a+KPezP8mopq8uaWbU330cmYXXPQsWt1yBgYmGyU=
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ (2603:10b6:803:51::33) by SN4PR2101MB0815.namprd21.prod.outlook.com
+ (2603:10b6:803:51::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.5; Thu, 27 Feb
+ 2020 21:29:14 +0000
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::15c9:bf73:c204:7cb7]) by SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::15c9:bf73:c204:7cb7%8]) with mapi id 15.20.2793.003; Thu, 27 Feb 2020
+ 21:29:14 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Weil <sw@weilnetz.de>
+Subject: RE: [EXTERNAL] Re: [PATCH] WHPX: Use QEMU values for trapped CPUID
+Thread-Topic: [EXTERNAL] Re: [PATCH] WHPX: Use QEMU values for trapped CPUID
+Thread-Index: AdXtsNoeJNEkd+WMTCOFtkYfkkG5GwAAWEOAAACNp/A=
+Date: Thu, 27 Feb 2020 21:29:14 +0000
+Message-ID: <SN4PR2101MB0880BBB072EC47CA988B79E9C0EB0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+References: <SN4PR2101MB0880A8323EAD0CD0E8E2F423C0EB0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <20200227210943.GJ4440@habkost.net>
+In-Reply-To: <20200227210943.GJ4440@habkost.net>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sunilmut@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:b:3028:825f:ab03:1fb9]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 50629f5d-4e58-490b-2e4e-08d7bbcc17ec
+x-ms-traffictypediagnostic: SN4PR2101MB0815:
+x-microsoft-antispam-prvs: <SN4PR2101MB08150C508F43EE23C36E07CEC0EB0@SN4PR2101MB0815.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 03264AEA72
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(189003)(199004)(71200400001)(66476007)(10290500003)(64756008)(316002)(478600001)(66946007)(81166006)(54906003)(81156014)(5660300002)(8936002)(66446008)(66556008)(76116006)(86362001)(8676002)(186003)(8990500004)(6916009)(6506007)(53546011)(52536014)(33656002)(2906002)(4326008)(55016002)(9686003)(7696005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:SN4PR2101MB0815;
+ H:SN4PR2101MB0880.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Mny1yCs5BA0rYlxPmRIlrzXLcFVMb+sxHpHS7OzCJQdJEMP7pXB9cJQ1T0LNNny5JfkBHPkadzKtUyi08vYJIxRPNB9ubAznSVPCrxpKRmlzzFVR45dIn0D26HyelXVeZIhBbzm03724GKkEJ2Vigtp+cyhnIwBzRTFF5qlpLyFt690abHChbX81+74PcYZHrJ9+5IchJMwb2jfsJLIkyVsuKY8aSd74+cWMT/xdrc3KsemavY6I1zWylrGmncDOOWaYCwMy7TCBqTyIwsNwuKC1qldK8y4BSJ0ciGAoQkDKnhPL1egh6Zk+P5a4w07+95wytb6aFTv2Wjcntr7A0tVNY22B2aLxuSoB7TSvAWYq7jkDn6TGPnJmVgWtNtcapjrc3NLqsPiLEIf/1G5SKwJEufSfkEC5DDppm/MH4ijpoppU/Okb/XDjQyz6r/SN
+x-ms-exchange-antispam-messagedata: DblRxHl2jDa+d2uEMW1rw7MiKuAtstBwPq8cz0+Uy4j1aFdXRQ6DwdKHR/EwGdP8VRfzRDQkdbaN/vqM4cAWXpktGVcjor33Eg+Uyv50djFaNfPqcgvfBrshNHlk6+GH2fB7cYthfe3+O3KqT0fBsojsIbdZxSS8V5gwXxz+HglRI1RPqaw/MVSX93QqG71msGFku3rsK1WSx2u/XshjlA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50629f5d-4e58-490b-2e4e-08d7bbcc17ec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2020 21:29:14.3702 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bANlJgOPPBEQJMscHogQjhYYSu53j//ghG257a5cZwEiil4phHzgyOVgu8g15A2ohIaWD0xF4xLxK8AY/wl9EMh9JlMmKAuV4Il6TE3sSQE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0815
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.220.121
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,312 +125,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+> -----Original Message-----
+> From: Eduardo Habkost <ehabkost@redhat.com>
+> Sent: Thursday, February 27, 2020 1:10 PM
+> To: Sunil Muthuswamy <sunilmut@microsoft.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.n=
+et>; qemu-devel@nongnu.org; Stefan Weil
+> <sw@weilnetz.de>
+> Subject: [EXTERNAL] Re: [PATCH] WHPX: Use QEMU values for trapped CPUID
+>=20
+> On Thu, Feb 27, 2020 at 09:01:04PM +0000, Sunil Muthuswamy wrote:
+> > Currently, WHPX is using some default values for the trapped CPUID
+> > functions. These were not in sync with the QEMU values because the
+> > CPUID values were never set with WHPX during VCPU initialization.
+> > Additionally, at the moment, WHPX doesn't support setting CPUID
+> > values in the hypervisor at runtime (i.e. after the partition has
+> > been setup). That is needed to be able to set the CPUID values in
+> > the hypervisor during VCPU init.
+> > Until that support comes, use the QEMU values for the trapped CPUIDs.
+> >
+> > Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+>=20
+> I like the change, but I wonder if any if your users would still
+> prefer to use the default result chosen by WHPX instead of the
+> ones chosen by QEMU.
+>=20
 
-On 2/27/20 8:19 PM, Peter Xu wrote:
-> On Thu, Feb 27, 2020 at 07:22:08PM +0100, Auger Eric wrote:
->> Hi Peter,
->>
->> On 2/27/20 7:00 PM, Peter Xu wrote:
->>> On Thu, Feb 27, 2020 at 06:42:09PM +0100, Auger Eric wrote:
->>>> Hi Peter,
->>>>
->>>> On 2/27/20 6:00 PM, Peter Xu wrote:
->>>>> This is majorly only for X86 because that's the only one that supports
->>>>> split irqchip for now.
->>>>>
->>>>> When the irqchip is split, we face a dilemma that KVM irqfd will be
->>>>> enabled, however the slow irqchip is still running in the userspace.
->>>>> It means that the resamplefd in the kernel irqfds won't take any
->>>>> effect and it can miss to ack INTx interrupts on EOIs.
->>>> Won't it always fail to ack INTx? With the above sentence I understand
->>>> it can work sometimes?
->>>
->>> I wanted to mean that it will fail.  How about s/can/will/?  Or even
->>> better wordings that you'd suggest?
->> yes: s/can/will
->>>
->>>>>
->>>>> One example is split irqchip with VFIO INTx, which will break if we
->>>>> use the VFIO INTx fast path.
->>>>>
->>>>> This patch can potentially supports the VFIO fast path again for INTx,
->>>>> that the IRQ delivery will still use the fast path, while we don't
->>>>> need to trap MMIOs in QEMU for the device to emulate the EIOs (see the
->>>>> callers of vfio_eoi() hook).  However the EOI of the INTx will still
->>>>> need to be done from the userspace by caching all the resamplefds in
->>>>> QEMU and kick properly for IOAPIC EOI broadcast.
->>>> If I understand correctly this is a one way fast path? Fast path is on
->>>> the trigger side only: VFIO -> KVM but not on the deactivation side,
->>>> trapped by the userspace IOAPIC where you directly notify the UNMASK
->>>> eventfd from userspace. Is that correct?
->>>
->>> Right, the injection is still using the whole fast path.  However
->>> AFAIU even for the EOI path it should still be faster than the pure
->>> slow path of vfio INTx EIO.  From what I got from reading the code,
->>> the slow path will conditionally unmap MMIO regions (with a timer to
->>> delay the recovery) so all MMIOs will be slowed down.  For what this
->>> patch is doing, it will need to exit to userspace for sure for each
->>> EOI (after all IOAPIC is in userspace), however for the whole
->>> lifecycle of the device, the MMIO regions should always be mapped so
->>> no unwanted MMIO traps.
->> Yes the EOI is trapped on IOAPIC side and not at the BAR level. So it
->> should be more efficient and more precise.
-> 
-> Yes.
-> 
->>>
->>>>>
->>>>> When the userspace is responsible for the resamplefd kickup, don't
->>>>> register it on the kvm_irqfd anymore, because on newer kernels (after
->>>>> commit 654f1f13ea56, 5.2+) the KVM_IRQFD will fail if with both split
->>>>> irqchip and resamplefd.  This will make sure that the fast path will
->>>>> work for all supported kernels.
->>>>>
->>>>> https://patchwork.kernel.org/patch/10738541/#22609933
->>>>>
->>>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
->>>>> ---
->>>>> v1.1 changelog:
->>>>> - when resamplefd is going to be kicked from userspace, don't register
->>>>>   it again in KVM_IRQFD.  Tested against upstream kernel.
->>>>>
->>>>>  accel/kvm/kvm-all.c    | 74 ++++++++++++++++++++++++++++++++++++++++--
->>>>>  accel/kvm/trace-events |  1 +
->>>>>  hw/intc/ioapic.c       | 11 +++++--
->>>>>  include/sysemu/kvm.h   |  4 +++
->>>>>  4 files changed, 86 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>>> index d49b74512a..b766b6e93c 100644
->>>>> --- a/accel/kvm/kvm-all.c
->>>>> +++ b/accel/kvm/kvm-all.c
->>>>> @@ -159,9 +159,62 @@ static const KVMCapabilityInfo kvm_required_capabilites[] = {
->>>>>  static NotifierList kvm_irqchip_change_notifiers =
->>>>>      NOTIFIER_LIST_INITIALIZER(kvm_irqchip_change_notifiers);
->>>>>  
->>>>> +struct KVMResampleFd {
->>>>> +    int gsi;
->>>>> +    EventNotifier *resample_event;
->>>>> +    QLIST_ENTRY(KVMResampleFd) node;
->>>>> +};
->>>>> +typedef struct KVMResampleFd KVMResampleFd;
->>>>> +
->>>>> +/*
->>>>> + * Only used with split irqchip where we need to do the resample fd
->>>>> + * kick for the kernel from userspace.
->>>>> + */
->>>>> +static QLIST_HEAD(, KVMResampleFd) kvm_resample_fd_list =
->>>>> +    QLIST_HEAD_INITIALIZER(kvm_resample_fd_list);
->>>>> +
->>>>>  #define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
->>>>>  #define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
->>>>>  
->>>>> +static inline void kvm_resample_fd_remove(int gsi)
->>>>> +{
->>>>> +    KVMResampleFd *rfd;
->>>>> +
->>>>> +    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
->>>>> +        if (rfd->gsi == gsi) {
->>>>> +            QLIST_REMOVE(rfd, node);
->>>>> +            break;
->>>>> +        }
->>>>> +    }
->>>>> +}
->>>>> +
->>>>> +static inline void kvm_resample_fd_insert(int gsi, EventNotifier *event)
->>>>> +{
->>>>> +    KVMResampleFd *rfd = g_new0(KVMResampleFd, 1);
->>>>> +
->>>>> +    rfd->gsi = gsi;
->>>>> +    rfd->resample_event = event;
->>>>> +
->>>>> +    QLIST_INSERT_HEAD(&kvm_resample_fd_list, rfd, node);
->>>>> +}
->>>>> +
->>>>> +void kvm_resample_fd_notify(int gsi)
->>>>> +{
->>>>> +    KVMResampleFd *rfd;
->>>>> +
->>>>> +    if (!kvm_irqchip_is_split()) {
->>>>> +        return;
->>>>> +    }
->>>>> +
->>>>> +    QLIST_FOREACH(rfd, &kvm_resample_fd_list, node) {
->>>>> +        if (rfd->gsi == gsi) {
->>>>> +            event_notifier_set(rfd->resample_event);
->>>>> +            trace_kvm_resample_fd_notify(gsi);
->>>>> +            break;
->>>>> +        }
->>>>> +    }
->>>>> +}
->>>>> +
->>>>>  int kvm_get_max_memslots(void)
->>>>>  {
->>>>>      KVMState *s = KVM_STATE(current_accel());
->>>>> @@ -1642,8 +1695,25 @@ static int kvm_irqchip_assign_irqfd(KVMState *s, EventNotifier *event,
->>>>>      };
->>>>>  
->>>>>      if (rfd != -1) {
->>>>> -        irqfd.flags |= KVM_IRQFD_FLAG_RESAMPLE;
->>>>> -        irqfd.resamplefd = rfd;
->>>>> +        assert(assign);
->>>>> +        if (kvm_irqchip_is_split()) {
->>>>> +            /*
->>>>> +             * When the slow irqchip (e.g. IOAPIC) is in the
->>>>> +             * userspace, resamplefd will not work because the EOI of
->>>>> +             * the interrupt will be delivered to userspace instead,
->>>> s/delivered to userspace/handled in userspace
->>>
->>> It will be delivered to userspace by KVM_EXIT_IOAPIC_EOI, so
->>> maybe... "delivered and handled"?
->> ah ok. TBH I don't really know how the split irqchip works and that may
->> explain below misunderstandings.
->>>
->>>>> +             * the KVM resample fd kick is skipped.  The userspace
->>>>> +             * needs to remember the resamplefd and kick it when we
->>>>> +             * receive EOI of this IRQ.
->>>> Practically we now talk about a VFIO ACTION_UNMASK classical eventfd
->>>> As such isn't it a bit weird to handle those normal UNMASK eventfds in
->>>> the KVM code?
->>>
->>> I'm not sure I completely get the question, but this should be
->>> something general to KVM resamplefd support.  In other words, this
->>> should also fix other devices (besides VFIO) when they're using the
->>> KVM resamplefd, because IMHO it's the resamplefd and split irqchip
->>> which is really broken here.
->> Here is my understanding (& memories): the KVM resamplefd is an eventfd
->> you register to KVM so that KVM triggers the resamplefd when KVM traps
->> the EOI. Here I understand this is the userspace IOAPIC that traps the
->> EOI and not the in-kernel virtual interrupt controller. So I would have
->> expected you just need to signal the VFIO UNMASK eventfd to re-enable
->> the physical IRQ (which was automasked). This is no more a KVM
->> resamplefd strictly speaking as KVM is not involved anymore in the
->> deactivation process.
-> 
-> Yes KVM kernel side should not be involed when we're using split
-> irqchip in this case.  However it should still belongs to the work of
-> the userspace KVM module (kvm-all.c) so that it can still "mimic" the
-> resamplefd feature that KVM_IRQFD provides.
-OK. So that what my actual question. Should this be handled by kvm-all.c?
-> 
->>>
->>> With that in mind, I think KVM should not need to even know what's
->>> behind the resamplefd (in VFIO's case, it's the UNMASK eventfd).  It
->>> just needs to kick it when IOAPIC EOI comes for the specific IRQ
->> But above the userspace directly calls
->> event_notifier_set(rfd->resample_event);
->>
->> This is not KVM anymore that "kicks it". Or maybe I miss something. So
->> my comment was, why is it handled in the QEMU KVM layer?
-> 
-> It's my fault to be unclear on using "KVM" above.  I should really say
-> it as kvm-all.c, say, the QEMU layer for the kernel KVM module.
-> 
-> Indeed this problem is complicated... let me try to summarize.
-> 
-> Firstly KVM split irqchip and resamplefd is not really going to work
-> in the kernel (I think we just overlooked that when introducing the
-> 2nd feature, no matter which one comes first), because the resample
-> operation should be part of IOAPIC EOI, nevertheless when using split
-> irqchip IOAPIC is in userspace.
-> 
-> After we noticed this, Alex somewhere proposed to disable that in KVM,
-> which is actually the 1st kernel patch (654f1f13ea56).
-> 
-> We should (at the same time) propose patch 1 too in this series but I
-> guess everybody just forgot this afterwards (Paolo actually proposed
-> mostly the whole solution but I guess it got forgotten too)...
-> 
-> About the fast path speedup: the main logic should be to mimic the
-> same resamplefd feature as provided by KVM_IRQFD but this time only in
-> the userspace.  However now we're implementing the same logic only
-> within userspace kvm-all.c, and the kernel KVM should be totally not
-> aware of this.  Doing that benefits us in that the KVM interface in
-> QEMU does not need to be changed (majorly kvm_irqchip_assign_irqfd()).
-> What we need to do is just to wire up the userspace IOAPIC with these
-> resamplefds.  And the idea is actually the same too - someone (VFIO)
-> wants to have one fd (which is the resamplefd) kicked when EOI comes
-> when requesting for a KVM irqfd, no matter who's going to kick it
-> (kernel KVM or userspace).  That's all.
+Note that the current patch only applies to the trapped CPUIDs, which for
+WHPX are currently only {1, 0x80000001}. WHPX will still provide most
+of the values.
 
-Yep I think it makes sense to accelerate the trigger path. And for the
-EOI path if you have means to trap this on the userspace irqchip it
-looks better than doing the map/unmap dance. So it looks a good iead to
-me. Now shall it be in kvm-all.c or elsewhere, to me it is not the most
-important, as long as we reach a consensus and the scheme gets
-documented somewhere.
+> On the KVM side I have always wondered if we should have a mode
+> where all CPUID leaves are the ones chosen by KVM, making no
+> KVM_SET_CPUID calls.  It would be useful for experimentation and
+> debugging of KVM/QEMU defaults.
+>=20
+Agreed. I think such an option could be useful debugging tool.
 
-Thanks
-
-Eric
-> 
->> .
->>>
->>>>
->>>>
->>>>> +             */
->>>>> +            kvm_resample_fd_insert(virq, resample);
->>>>> +        } else {
->>>>> +            irqfd.flags |= KVM_IRQFD_FLAG_RESAMPLE;
->>>>> +            irqfd.resamplefd = rfd;
->>>>> +        }
->>>>> +    } else if (!assign) {
->>>>> +        if (kvm_irqchip_is_split()) {
->>>>> +            kvm_resample_fd_remove(virq);
->>>>> +        }
->>>>>      }
->>>>>  
->>>>>      if (!kvm_irqfds_enabled()) {
->>>>> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
->>>>> index 4fb6e59d19..a68eb66534 100644
->>>>> --- a/accel/kvm/trace-events
->>>>> +++ b/accel/kvm/trace-events
->>>>> @@ -16,4 +16,5 @@ kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_
->>>>>  kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
->>>>>  kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
->>>>>  kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
->>>>> +kvm_resample_fd_notify(int gsi) "gsi %d"
->>>>>  
->>>>> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
->>>>> index 15747fe2c2..8c75465c62 100644
->>>>> --- a/hw/intc/ioapic.c
->>>>> +++ b/hw/intc/ioapic.c
->>>>> @@ -236,8 +236,15 @@ void ioapic_eoi_broadcast(int vector)
->>>>>          for (n = 0; n < IOAPIC_NUM_PINS; n++) {
->>>>>              entry = s->ioredtbl[n];
->>>>>  
->>>>> -            if ((entry & IOAPIC_VECTOR_MASK) != vector ||
->>>>> -                ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) != IOAPIC_TRIGGER_LEVEL) {
->>>>> +            if ((entry & IOAPIC_VECTOR_MASK) != vector) {
->>>>> +                continue;
->>>>> +            }
->>>>> +
->>>>> +            /* Kick resamplefd if KVM is bypassed */
->>>>> +            kvm_resample_fd_notify(n);
->>>> KVM is bypassed on the deactivation path but still we call
->>>> kvm_resample_fd_notify().
->>>
->>> Yes I wanted to say that the kernel won't be able to kick the
->>> resamplefd.  How about:
->>>
->>>   When IOAPIC is in the userspace (while APIC is still in the kernel),
->>>   we need to kick the resamplefd to deactivate the IRQ for KVM.
->> This fd "just" aims at unmasking the IRQ at physical level (UNMASK VFIO
->> event)? Does it perform anything related to the virtual interrupt
->> controller?
-> 
-> It should not.
-> 
-> Thanks,
-> 
+>=20
+> > ---
+> >  target/i386/whpx-all.c | 42 ++++++++++++++++++------------------------
+> >  1 file changed, 18 insertions(+), 24 deletions(-)
+> >
+> > diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> > index 35601b8176..4fe5a78b29 100644
+> > --- a/target/i386/whpx-all.c
+> > +++ b/target/i386/whpx-all.c
+> > @@ -980,38 +980,32 @@ static int whpx_vcpu_run(CPUState *cpu)
+> >              WHV_REGISTER_VALUE reg_values[5];
+> >              WHV_REGISTER_NAME reg_names[5];
+> >              UINT32 reg_count =3D 5;
+> > -            UINT64 rip, rax, rcx, rdx, rbx;
+> > +            UINT64 cpuid_fn, rip =3D 0, rax =3D 0, rcx =3D 0, rdx =3D =
+0, rbx =3D 0;
+> > +            X86CPU *x86_cpu =3D X86_CPU(cpu);
+> > +            CPUX86State *env =3D &x86_cpu->env;
+> >
+> >              memset(reg_values, 0, sizeof(reg_values));
+> >
+> >              rip =3D vcpu->exit_ctx.VpContext.Rip +
+> >                    vcpu->exit_ctx.VpContext.InstructionLength;
+> > -            switch (vcpu->exit_ctx.CpuidAccess.Rax) {
+> > -            case 1:
+> > -                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+> > -                /* Advertise that we are running on a hypervisor */
+> > -                rcx =3D
+> > -                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx |
+> > -                    CPUID_EXT_HYPERVISOR;
+> > -
+> > -                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> > -                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+> > -                break;
+> > +            cpuid_fn =3D vcpu->exit_ctx.CpuidAccess.Rax;
+> > +
+> > +            /*
+> > +             * Ideally, these should be supplied to the hypervisor dur=
+ing VCPU
+> > +             * initialization and it should be able to satisfy this re=
+quest.
+> > +             * But, currently, WHPX doesn't support setting CPUID valu=
+es in the
+> > +             * hypervisor once the partition has been setup, which is =
+too late
+> > +             * since VCPUs are realized later. For now, use the values=
+ from
+> > +             * QEMU to satisfy these requests, until WHPX adds support=
+ for
+> > +             * being able to set these values in the hypervisor at run=
+time.
+> > +             */
+> > +            cpu_x86_cpuid(env, cpuid_fn, 0, (UINT32 *)&rax, (UINT32 *)=
+&rbx,
+> > +                (UINT32 *)&rcx, (UINT32 *)&rdx);
+> > +            switch (cpuid_fn) {
+> >              case 0x80000001:
+> > -                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+> >                  /* Remove any support of OSVW */
+> > -                rcx =3D
+> > -                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx &
+> > -                    ~CPUID_EXT3_OSVW;
+> > -
+> > -                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> > -                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+> > +                rcx &=3D ~CPUID_EXT3_OSVW;
+> >                  break;
+> > -            default:
+> > -                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+> > -                rcx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRcx;
+> > -                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> > -                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+> >              }
+> >
+> >              reg_names[0] =3D WHvX64RegisterRip;
+> > --
+> > 2.17.1
+> >
+>=20
+> --
+> Eduardo
 
 
