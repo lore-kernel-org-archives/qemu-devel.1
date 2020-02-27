@@ -2,62 +2,78 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AFFC4BA06
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD836C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:15:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33B1A222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:13:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B1A222C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C3E62467F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:15:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rhg9mDfa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3E62467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7FEn-00011d-BL
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:13:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41505)
+	id 1j7FGw-000307-R5
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:15:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1j7FDk-0000K7-D2
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:12:41 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7FGE-00028s-78
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1j7FDi-0003hA-UK
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:12:40 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3177 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1j7FDi-00036G-IZ
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:12:38 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id EF9FA6AB7851BC2FF506;
- Thu, 27 Feb 2020 17:12:29 +0800 (CST)
-Received: from [127.0.0.1] (10.173.221.228) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0;
- Thu, 27 Feb 2020 17:12:22 +0800
-Subject: Re: [PATCH] hw/smbios: add options for type 4 max_speed and
- current_speed
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- <qemu-devel@nongnu.org>
-References: <20200225075046.30151-1-guoheyi@huawei.com>
- <4bd58f6e-e522-d920-bc9a-8198147e8856@redhat.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <6e6c6c8b-c67c-6433-2bb8-d246c5f49b62@huawei.com>
-Date: Thu, 27 Feb 2020 17:12:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <peter.maydell@linaro.org>) id 1j7FGC-0000m7-T9
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:13 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43372)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7FGC-0000kh-NF
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:15:12 -0500
+Received: by mail-oi1-x244.google.com with SMTP id p125so2562998oif.10
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 01:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PBPO653nrRDilb+V5bdvLTuegWyUOH6huXVkJlyy0oE=;
+ b=rhg9mDfaZlaDbmOKiL/nDRqQcc2o0b6kLHL+Iq90cKndLIv31GSw8lB28eAMhnnWrO
+ UX+WeUa8phMHuPdTN4JkrdhF9na8qKLbOVrHd5gBdLrTYvAjUjm7PM5A4SjNvqHe2jnT
+ 8I2dGVYfuoeTFSs5bOQtFAbeaM26/yT0Q1gFruxxsiaXpFPN0a9fMkPt6kwGPKR9DX6H
+ +fmyWrSHSA4LAOQ34fvuZ7dcX92QP+zzNbIKZKS/HEoCKiqa7BZBLx7gWrt4PP85LKck
+ zCHG3YRTPy3+i3orp3Xkgk8O4A/SQ0I6ds1xeqdnPLUrm5o8RY4o5eFJfS8w1k/0zkGG
+ r81w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PBPO653nrRDilb+V5bdvLTuegWyUOH6huXVkJlyy0oE=;
+ b=KmhBgLmWwNFx/OPmw0vXV97HkIIyF4wFvBFeJhdMQ4t4G8UPeIraDfxe1Xql6yZ/Tj
+ YBotC8tWNsX3WKS53dhX5WT9WzSOVZkgYRouQPQmKlX6uR/KqLBIHx5OhimFkviHqhQj
+ PEZ6ilFcjF5P+mfeQjxsN0WY0imPvhv46WVmb8MT4QosfCa80FJlDvCetLdzILsj0fFM
+ Xg+qxMkqotTU2Osm4380MHqbonYmbthhdE0/DwapwGl67oR+KyvE2CBu09Fp9II2U+XN
+ l0r/0DevcmoDTFj3v4rOyQdRyJ0fyEmIW2ITWzpx+rGh5Daae2BqLLNaXexS8gbl+nng
+ AoRg==
+X-Gm-Message-State: APjAAAWWEoF2DQ/m9BkZMp+/jeWI5Jftwwea+Zswm1WyK0AGUIyXLkq9
+ 0xkjbnZa6nHv0v3NtLoiLtgjp/mbVv13L6O3Evs+Jg==
+X-Google-Smtp-Source: APXvYqyWz33fA8Z/ut99RdiAiASabli+ezQATS8z5LVvoKfaXEJU8f8eirowE3llGgbv1W8FwTBRiJuKTiOSV2PtrWg=
+X-Received: by 2002:a54:4f16:: with SMTP id e22mr2614609oiy.170.1582794911701; 
+ Thu, 27 Feb 2020 01:15:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <4bd58f6e-e522-d920-bc9a-8198147e8856@redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-X-Originating-IP: [10.173.221.228]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+References: <20200226163539.31960-1-imammedo@redhat.com>
+In-Reply-To: <20200226163539.31960-1-imammedo@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Feb 2020 09:15:00 +0000
+Message-ID: <CAFEAcA9BTrC_OOTRboydOFn6GFsyKzqUNEExw5VRXmRsYvoXYA@mail.gmail.com>
+Subject: Re: [PATCH] softmmu/vl.c: fix too slow TCG regression
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,160 +85,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, "Michael S. Tsirkin" <mst@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/2/25 17:24, Philippe Mathieu-Daud=E9 wrote:
-> On 2/25/20 8:50 AM, Heyi Guo wrote:
->> Common VM users sometimes care about CPU speed, so we add two new
->> options to allow VM vendors to present CPU speed to their users.
->> Normally these information can be fetched from host smbios.
->>
->> Strictly speaking, the "max speed" and "current speed" in type 4
->> are not really for the max speed and current speed of processor, for
->> "max speed" identifies a capability of the system, and "current speed"
->> identifies the processor's speed at boot (see smbios spec), but some
->> applications do not tell the differences.
->>
->> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->>
->> ---
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> ---
->> =A0 hw/smbios/smbios.c | 22 +++++++++++++++++++---
->> =A0 qemu-options.hx=A0=A0=A0 |=A0 3 ++-
->> =A0 2 files changed, 21 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
->> index ffd98727ee..1d5439643d 100644
->> --- a/hw/smbios/smbios.c
->> +++ b/hw/smbios/smbios.c
->> @@ -94,6 +94,8 @@ static struct {
->> =A0 =A0 static struct {
->> =A0=A0=A0=A0=A0 const char *sock_pfx, *manufacturer, *version, *serial=
-, *asset,=20
->> *part;
->> +=A0=A0=A0 uint32_t max_speed;
->> +=A0=A0=A0 uint32_t current_speed;
->> =A0 } type4;
->> =A0 =A0 static struct {
->> @@ -272,6 +274,14 @@ static const QemuOptDesc=20
->> qemu_smbios_type4_opts[] =3D {
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .name =3D "version",
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .type =3D QEMU_OPT_STRING,
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .help =3D "version number",
->> +=A0=A0=A0 },{
->> +=A0=A0=A0=A0=A0=A0=A0 .name =3D "max_speed",
->> +=A0=A0=A0=A0=A0=A0=A0 .type =3D QEMU_OPT_NUMBER,
->> +=A0=A0=A0=A0=A0=A0=A0 .help =3D "max speed in MHz",
->> +=A0=A0=A0 },{
->> +=A0=A0=A0=A0=A0=A0=A0 .name =3D "current_speed",
->> +=A0=A0=A0=A0=A0=A0=A0 .type =3D QEMU_OPT_NUMBER,
->> +=A0=A0=A0=A0=A0=A0=A0 .help =3D "speed at system boot in MHz",
->> =A0=A0=A0=A0=A0 },{
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .name =3D "serial",
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 .type =3D QEMU_OPT_STRING,
->> @@ -586,9 +596,8 @@ static void=20
->> smbios_build_type_4_table(MachineState *ms, unsigned instance)
->> =A0=A0=A0=A0=A0 SMBIOS_TABLE_SET_STR(4, processor_version_str, type4.v=
-ersion);
->> =A0=A0=A0=A0=A0 t->voltage =3D 0;
->> =A0=A0=A0=A0=A0 t->external_clock =3D cpu_to_le16(0); /* Unknown */
->> -=A0=A0=A0 /* SVVP requires max_speed and current_speed to not be unkn=
-own. */
->> -=A0=A0=A0 t->max_speed =3D cpu_to_le16(2000); /* 2000 MHz */
->> -=A0=A0=A0 t->current_speed =3D cpu_to_le16(2000); /* 2000 MHz */
->> +=A0=A0=A0 t->max_speed =3D cpu_to_le16(type4.max_speed);
->> +=A0=A0=A0 t->current_speed =3D cpu_to_le16(type4.current_speed);
->> =A0=A0=A0=A0=A0 t->status =3D 0x41; /* Socket populated, CPU enabled *=
-/
->> =A0=A0=A0=A0=A0 t->processor_upgrade =3D 0x01; /* Other */
->> =A0=A0=A0=A0=A0 t->l1_cache_handle =3D cpu_to_le16(0xFFFF); /* N/A */
->> @@ -1129,6 +1138,13 @@ void smbios_entry_add(QemuOpts *opts, Error=20
->> **errp)
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 save_opt(&type4.serial, opts, =
-"serial");
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 save_opt(&type4.asset, opts, "=
-asset");
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 save_opt(&type4.part, opts, "p=
-art");
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /*
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 * SVVP requires max_speed and cu=
-rrent_speed to not be=20
->> unknown, and
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 * we set the default value to 20=
-00MHz as we did before.
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 */
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 type4.max_speed =3D qemu_opt_get_nu=
-mber(opts, "max_speed",=20
->> 2000);
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 type4.current_speed =3D qemu_opt_ge=
-t_number(opts,=20
->> "current_speed",
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0 2000);
+On Wed, 26 Feb 2020 at 16:35, Igor Mammedov <imammedo@redhat.com> wrote:
 >
-> Maybe check speeds are <=3D UINT16_MAX else set errp?
-
-OK; I can do that in the v2. But I would wait for the maintainers to=20
-provide more comments :)
-
-Thanks,
-
-Heyi
-
+> Commit a1b18df9a4 moved -m option parsing after configure_accelerators()
+> that broke TCG accelerator initialization which accesses global ram_size
+> from size_code_gen_buffer() which is equal to 0 at that moment.
 >
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0 case 11:
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 qemu_opts_validate(opts, qemu_=
-smbios_type11_opts, &err);
->> diff --git a/qemu-options.hx b/qemu-options.hx
->> index ac315c1ac4..bc9ef0fda8 100644
->> --- a/qemu-options.hx
->> +++ b/qemu-options.hx
->> @@ -2233,6 +2233,7 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
->> =A0=A0=A0=A0=A0 "=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 specify=
- SMBIOS type 3 fields\n"
->> =A0=A0=A0=A0=A0 "-smbios=20
->> type=3D4[,sock_pfx=3Dstr][,manufacturer=3Dstr][,version=3Dstr][,serial=
-=3Dstr]\n"
->> =A0=A0=A0=A0=A0 "=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [,asset=3Dstr=
-][,part=3Dstr]\n"
->> +=A0=A0=A0 "=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [,max_speed=3D%d][=
-,current_speed=3D%d]\n"
->> =A0=A0=A0=A0=A0 "=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 specify=
- SMBIOS type 4 fields\n"
->> =A0=A0=A0=A0=A0 "-smbios=20
->> type=3D17[,loc_pfx=3Dstr][,bank=3Dstr][,manufacturer=3Dstr][,serial=3D=
-str]\n"
->> =A0=A0=A0=A0=A0 "=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 [,asset=3D=
-str][,part=3Dstr][,speed=3D%d]\n"
->> @@ -2255,7 +2256,7 @@ Specify SMBIOS type 2 fields
->> =A0 @item -smbios=20
->> type=3D3[,manufacturer=3D@var{str}][,version=3D@var{str}][,serial=3D@v=
-ar{str}][,asset=3D@var{str}][,sku=3D@var{str}]
->> =A0 Specify SMBIOS type 3 fields
->> =A0 -@item -smbios=20
->> type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}][,version=3D=
-@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}]
->> +@item -smbios=20
->> type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}][,version=3D=
-@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}][,m=
-ax_speed=3D@var{%d}][,current_speed=3D@var{%d}]
->> =A0 Specify SMBIOS type 4 fields
->> =A0 =A0 @item -smbios=20
->> type=3D17[,loc_pfx=3D@var{str}][,bank=3D@var{str}][,manufacturer=3D@va=
-r{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}][,spee=
-d=3D@var{%d}]
->>
+> Partially revert a1b18df9a4, by returning set_memory_options() to its
+> original location and only keep 32-bit host VA check and 'memory-backend'
+> size check introduced by fe64d06afc at current place.
 >
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
 >
-> .
+> PS:
+> This should take care of regression and give more time to think about
+> how to remove size_code_gen_buffer() dependency on ram_size
 
+> +    if (current_machine->ram_memdev_id) {
+> +        Object *backend;
+> +        ram_addr_t backend_size;
+> +
+> +        backend = object_resolve_path_type(current_machine->ram_memdev_id,
+> +                                           TYPE_MEMORY_BACKEND, NULL);
+> +        backend_size = object_property_get_uint(backend, "size",  &error_abort);
+> +        if (backend_size != ram_size) {
+> +                error_report("Size specified by -m option must match size of "
+> +                             "explicitly specified 'memory-backend' property");
+> +                exit(EXIT_FAILURE);
+> +        }
+> +        ram_size = backend_size;
+
+Why do we do this assignment? We've just checked that
+backend_size == ram_size so the assignment won't do
+anything, will it?
+
+In the version of this check in set_memory_options()
+the assignment was useful because the error check
+only happened if mem_str is not NULL, ie there was
+an explicitly specified 'size' option somewhere. It
+looks like now we require the backend size to match
+even if the size is not explicitly specified by the
+user but comes from some default somewhere?
+
+thanks
+-- PMM
 
