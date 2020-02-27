@@ -1,83 +1,118 @@
-Return-Path: <SRS0=zj/5=4O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C09C4BA24
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E445C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 00:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04508206BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Feb 2020 23:55:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YeBztnJy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04508206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 03B7E24670
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 00:03:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03B7E24670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j76W8-0001hg-4x
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 18:55:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36449)
+	id 1j76e7-0003sC-6e
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 19:03:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j76VX-0001E2-5H
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:54:29 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j76dW-0003RG-Dj
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 19:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j76VW-0004Lf-25
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 18:54:27 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:46755)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j76VS-00045t-O3; Wed, 26 Feb 2020 18:54:22 -0500
-Received: by mail-lf1-x143.google.com with SMTP id v6so618423lfo.13;
- Wed, 26 Feb 2020 15:54:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tygxNCoM38EfVRKUBOfwHkEzNwitoEsggLJYj0Hqk50=;
- b=YeBztnJy3fUPSazLC9cbVaf2PCtpwVqXWf5iGlBB53Eo3q8UTuxm5uQgpYj2nwurmL
- QliPIthSYqKa/XUUGcTFureKlZ0jiqOWzeOZs7qTtcnPrjWuh/2yoQThibMSBTg5RjVW
- 4gtycAQ9STco/F1EKiJ3YUkhAgeMxvPDyoq67CMtlcHRFkCD2DuTSh6Zqn7bMwc8z19q
- KPxXFEaxbJxtLNRdZ21p/+nlGRv9/S3hIbCLM2kHOwf1NglHUo4YYQvMOpy8u9AZGk9t
- GLV8HVlg4dCm6h0Dn1qDjGPsTxZ60Lw7elVpppBZ8GSw1KfXBcmhwmN49nQ81Ge3/5pC
- zaxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tygxNCoM38EfVRKUBOfwHkEzNwitoEsggLJYj0Hqk50=;
- b=fbJJryh3D5P3oxLJtuXIwMaq0OANqdiFC7n92koPaCNn8HLy42936JUtuKLo+uZsO0
- 8MgooKc8SN7axJ7HWbReHYMEfRX1fNyigf/RpTqREBO4gyckuomkylbDrBo1nhYmZ1aI
- 9wI+a+vcmCzQQB95qJ9vBOo+TOWwCPRNTmMhwKlT1iyUb3X3HrZlDeZ7bf9tjKkFVx5o
- 0ANTVFjmbShbtCyfOlXHSeL1MwWJ0oVuz/GKcWJ+YFjk9TIl5/Gjk3GNfHtO5owllgsK
- rWLgpFmWrAcUrKjBYBxNaAV0ol4XPJh5yb86tGgll/ty6lncEM6ozJnCHUXG1c7sOQae
- wdNw==
-X-Gm-Message-State: ANhLgQ0LPaKoQJRPP7/2laozicDohExb8i9uV9068EQX1UyHn4aHDd+N
- r40LAD/bPtOjQro2QZ1XFRzT0hAuvwZ3LZaEVdA=
-X-Google-Smtp-Source: ADFU+vsJkrFNFQefz1XDNyaI8hJk4sTTdyzqVWFi1ug/CIzkwp3QgVEZyfVb2S4adg0kQDA0/FnBGaLyoQpu5xyVV0c=
-X-Received: by 2002:a05:6512:31d3:: with SMTP id
- j19mr557323lfe.178.1582761260352; 
- Wed, 26 Feb 2020 15:54:20 -0800 (PST)
+ (envelope-from <laurent@vivier.eu>) id 1j76dV-00080F-C8
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 19:02:42 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:57653)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j76dT-0007pY-14; Wed, 26 Feb 2020 19:02:39 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MNtny-1inOzF3g7M-00OEje; Thu, 27 Feb 2020 01:02:30 +0100
+Subject: Re: [PATCH v2 2/2] linux-user/riscv: Update the syscall_nr's to the
+ 5.5 kernel
+To: Alistair Francis <alistair23@gmail.com>
+References: <cover.1582586444.git.alistair.francis@wdc.com>
+ <85f33856ee6f32125e5c81a9561346b28b340a3e.1582586444.git.alistair.francis@wdc.com>
+ <24431d59-b535-97d4-95d7-fe4401e10787@vivier.eu>
+ <CAKmqyKObXNXj2jsMYTvAL-eHS43Wb5upwq6mHeHo7q-4Pr4W7g@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <fd0e0b49-b2c4-9adf-8cbe-9e160b89f9f2@vivier.eu>
+Date: Thu, 27 Feb 2020 01:02:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200221094531.61894-1-zhiwei_liu@c-sky.com>
- <ac290e38-bb39-6551-0758-95d087fa568c@sifive.com>
- <CAKmqyKOedrW3HZFfep4ErJ8H86V=KXeBL8LN2Cy_+669a6c9gQ@mail.gmail.com>
- <CAFyWVabLp78M2RGe0TDF5TyW4sJpa6Rm0sJLnc3-CPv8pW+TzA@mail.gmail.com>
-In-Reply-To: <CAFyWVabLp78M2RGe0TDF5TyW4sJpa6Rm0sJLnc3-CPv8pW+TzA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 26 Feb 2020 15:46:43 -0800
-Message-ID: <CAKmqyKMx6pPDaeJmGXCa+cKUHphD+dzwPLDtZ4R_yXiN8t2KBQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/4] target-riscv: support vector extension part 1
-To: Jim Wilson <jimw@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
+In-Reply-To: <CAKmqyKObXNXj2jsMYTvAL-eHS43Wb5upwq6mHeHo7q-4Pr4W7g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:viEirk3XuTzzrZK2NS7lcTxaNpXHnDZIj5UJNR+nJnjMdjds2y3
+ hsBCZyrifyxHTOyVHzEFxkVi9bYcEnTuf1tXFhsYwiedJXMyeDivlcbKt2v/TpAd2c9y3ub
+ 4huEiKon/qRxpVvUTVhq5oOTW8m1/WJnnnbuGgL9k9hr72rTT12VYyfCqQ099QE/hHMNXs9
+ 3M1TsTWGZA7fSbTpRmGDg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IiIES79BAtM=:YdQo401CHi0fXA+JXhx4JU
+ a6edAQ8Un45r3D8nal8494WApAM7O8QZgGkuQg3vNRvklFrHe6cqmw2qgxzWHYTy5bxyICxo0
+ oei5NrYUiWBl4sYb6jbXuNVvbhsTyKVoLKdmHJtgbW0rwemAdXq8D5nEYm8eEKmpUxqeqHSfE
+ j3R7iitIFiN9iuhL4ReQhuURjkgF0jgKhPMVfi6Y7EpRoaPzHx8TCvtGvTApoU85QppfaQZAA
+ RPw0lZnWHm2nhC8A179umyLFE/0q8ko+3O7BPNpyYLM4KT83vJxth8XIqDu41YIrDWN4sDcbq
+ drSiTW3TRoLJf1p44VUlrtNdKz3SkOtxJMPc7od+O5XvRy3D7E4SzlK0Z9pM4n9nykoR8pRud
+ YrazJ4bhrzlVh1C2ZAYveVmdkAwc1eqDFwbSpDhDqR3ZsPRFOIggXMHHFbRZST4fcSqst8Ddp
+ ZWXMvgGadJw+tSLmkjqPpVeZDYEO8rb/Ep/O9emi3GMkVN3nDMdsc3NsReCb3w8o5FmYRFoPY
+ H/luE7c/4ZiFmJyGe+6GIonnHy8XcjQXeythMz4sJj0Dcu+wnQlYj1rRET5fbinFZEOAqko4T
+ 737DIxr/08cYccMN1XnoUuzzjKGbMkifQOiLXY0I26AWTpyYUdLKn44Skl3jn1JEi/F5/B0+R
+ AdSKJxyumuLkFss9PWlP5BvrMXMOfHP7Y94kehAJ0l3Uu34CnwLOKeRHhc6nm00YCwsJQpOIV
+ NcBDwjkx9YDrqKTtGwScKOut1sP1hv89zmXksPT+eBqVy7BpdvFYgiEBho9S6My14okbKzfEU
+ kHYBsYMyweEgfJoG8mJRs8UkudhuJ9n6A6xk/BUD8DjUHLfcimyGRTLJvOOlv2R3GJ2oFid
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,52 +124,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- wxy194768@alibaba-inc.com, Chih-Min Chao <chihmin.chao@sifive.com>,
- wenmeng_zhang@c-sky.com, Palmer Dabbelt <palmer@dabbelt.com>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Feb 26, 2020 at 3:40 PM Jim Wilson <jimw@sifive.com> wrote:
->
-> On Wed, Feb 26, 2020 at 2:36 PM Alistair Francis <alistair23@gmail.com> wrote:
-> > On Wed, Feb 26, 2020 at 12:09 PM Jim Wilson <jimw@sifive.com> wrote:
-> > > If this rvv 0.7.1 implementation is considered a temporary solution,
-> > > maybe we can just remove all of this work when the official rvv spec if
-> > > available?  But presumably it is better if we can have both this
-> >
-> > That is generally the plan. When the final spec comes out this will be
-> > updated and we will only support that.
->
-> This solves my problem, but maybe creates one for Alibaba.  They have
-> apparently fabbed a chip using the 0.7.1 draft of the vector spec
-> proposal.  So for qemu to properly support their asic, the 0.7.1 draft
-> support will have to be retained.  But I think SiFive and everyone
-> else is waiting for the official spec before building asics with
-> vector support.  If Alibaba will update their processor as the spec
-> evolves, then maybe this isn't a problem for them.
+Le 26/02/2020 à 20:32, Alistair Francis a écrit :
+> On Tue, Feb 25, 2020 at 3:50 AM Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> Le 25/02/2020 à 00:21, Alistair Francis a écrit :
+>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+...
+>> I think you can remove following defintion as they should be translated
+>> by the target glibc.
+> 
+> glibc won't be exposing these externally, the current plan is just to
+> use this internally to glibc.
 
-That does seem unfortunate. I don't see a way for us to be able to
-support previous draft spec versions though. That seems like a huge
-amount of maintenance.
+But if they are defined internally to glibc, glibc will always translate
+the older ones to the 64bit ones and thus glibc will never use the older
+ones with the kernel, only the 64bit ones, thus the older syscalls
+should never come to QEMU.
 
-It shouldn't actually be that bad. Here is kind of what I'm imagining.
+So why do we need to define the translation older-to-64bit in QEMU too?
 
- - Vector extensions v0.7.1 are merged to QEMU
- - QEMU 5.x ships with v0.7.1 vector extensions (it seems unlikely
-someone will upstream v0.8.0 before the 5.x release)
+> 
+>>
+>>> +/*
+>>> + * Alias some of the older pre 64-bit time_t syscalls to the 64-bit
+>>> + * ones for RV32. This is based on the list used by glibc.
+>>> + */
+>>> +#define TARGET_NR_futex TARGET_NR_futex_time64
+>>> +#define TARGET_NR_rt_sigtimedwait TARGET_NR_rt_sigtimedwait_time64
+>>> +#define TARGET_NR_ppoll TARGET_NR_ppoll_time64
+>>> +#define TARGET_NR_utimensat TARGET_NR_utimensat_time64
+>>> +#define TARGET_NR_pselect6 TARGET_NR_pselect6_time64
+>>> +#define TARGET_NR_recvmmsg TARGET_NR_recvmmsg_time64
+>>> +#define TARGET_NR_semtimedop TARGET_NR_semtimedop_time64
+>>> +#define TARGET_NR_mq_timedreceive TARGET_NR_mq_timedreceive_time64
+>>> +#define TARGET_NR_mq_timedsend TARGET_NR_mq_timedsend_time64
+>>> +#define TARGET_NR_clock_getres TARGET_NR_clock_getres_time64
+>>> +#define TARGET_NR_timerfd_settime TARGET_NR_timerfd_settime64
+>>> +#define TARGET_NR_timerfd_gettime TARGET_NR_timerfd_gettime64
+>>> +#define TARGET_NR_sched_rr_get_interval TARGET_NR_sched_rr_get_interval_time64
+>>> +#define TARGET_NR_clock_adjtime TARGET_NR_clock_adjtime64
+>>> +
+>>> +#endif
+>>> diff --git a/linux-user/riscv/syscall64_nr.h b/linux-user/riscv/syscall64_nr.h
+>>> new file mode 100644
+>>> index 0000000000..b58364b570
+>>> --- /dev/null
+>>> +++ b/linux-user/riscv/syscall64_nr.h
+>>
+>> syscall64_nr.h is correct.
+>>
+>> Thanks,
+>> Laurent
+>>
+> 
 
-At some point in the future someone will update the experimental
-support in QEMU from v0.7.1 to a fully released v1.0. In which case
-there is still a release with the older experimental support which can
-be used for the v0.7.1 if required.
-
-Alistair
-
->
-> Jim
 
