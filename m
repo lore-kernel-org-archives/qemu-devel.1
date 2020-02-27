@@ -2,85 +2,104 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70309C4BA2D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61496C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:30:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4018B21556
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:29:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D1CD2469D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:30:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IyveNwjT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4018B21556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyNjlY7E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1CD2469D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7JE0-0001H0-Ah
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:29:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60996)
+	id 1j7JEz-0002yq-6s
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:30:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j7JDD-0000kM-Dl
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:24 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j7JDi-00019q-8w
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j7JDC-0004ml-6L
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56701
+ (envelope-from <pbonzini@redhat.com>) id 1j7JDg-0005Qt-Ui
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47500
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j7JDC-0004mF-1Y
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:22 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7JDg-0005Oe-Ri
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:28:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582810101;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1582810131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4sV8QBNGz00Me5HBeTKSqaEjjbQTx+PMZWeofGO6oIE=;
- b=IyveNwjTnH+UipxbJ5x2H2eCw/PgtRIy7IIsVOCM/qZREoVu5k3reZd9kWu0T37wG68OYC
- 0PfdNtN8Z30clX5eMxbpJWEfvRKmLZi3AByHXP/1ttaYzn7uH9Fh2d3H7uPKHTS8ddA0G0
- QnbrM9CfXMmJ+/5dacLl3k7v/qBUbe8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-JtzwNU9oPTKhS0OmSXy1pA-1; Thu, 27 Feb 2020 08:28:13 -0500
-X-MC-Unique: JtzwNU9oPTKhS0OmSXy1pA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94D0918A8C80;
- Thu, 27 Feb 2020 13:28:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-43.ams2.redhat.com [10.36.112.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8634277945;
- Thu, 27 Feb 2020 13:28:11 +0000 (UTC)
-Date: Thu, 27 Feb 2020 13:28:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 13/18] docs/system: put qemu-block-drivers body in an
- included file
-Message-ID: <20200227132808.GJ1645630@redhat.com>
-References: <20200226113034.6741-1-pbonzini@redhat.com>
- <20200226113034.6741-14-pbonzini@redhat.com>
- <CAFEAcA_qWUY19ubmSaNoqbwjf8N8d1Dw=vMMD7j5yH8TSwK35A@mail.gmail.com>
+ bh=7cil+S2TI0XenfpWIIHgW3zIl7wCogwPVlPkS1oJPDY=;
+ b=iyNjlY7EoBq/ma+A+6Qodz2rf7LPyd73dnecPArgJGyrtrN01uVa8OF/FCr1acHchdAdG3
+ 1Vue+XxbrjcuooTlfA1aS8YVFR5J5Djz5u2/VY5oTLVfjGgufkYz989uvvQIV1b6Pvx+5q
+ oTq65sDWmisNd59lhT0+nejvzgvm5H0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-zNUZT7qdM0-riHPe5Z7GWA-1; Thu, 27 Feb 2020 08:28:44 -0500
+X-MC-Unique: zNUZT7qdM0-riHPe5Z7GWA-1
+Received: by mail-wm1-f69.google.com with SMTP id m4so1004229wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:28:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fD0MNpuWhab4G9SMLJRbIrZoxFLbb/kORsNGxaBYd4A=;
+ b=gwjf6nVeoHSOuyp4nDclLOBkvgHRexvwqdqxgkMpKAWxpnhZYVwNuke9hHmd9sePa2
+ AK8a4iZvCeh91k3aYXcmjw+SP/iOZOfqNb/Wi3HtnhN6GNni9GoqXymGu+SatcHH9L3j
+ D9FcDt0UW5deyJ0bmdWCrdLcMF6HdxChz8IA5NFyOqRVrH1D0gdWaP6c4J0jvAvJCSpP
+ tncVwyFQWmakh2lIfWTUS9TlgXsVuEAbD1K2uQ0kxD/gBcDfGkgAWXSigd43hLV+hu+b
+ aDoM8F0kFMgHNSHzRgvLkUvLDO9uAwJUiIznRKSxQgTsgS2bEYYRJM50whCFqdMFGPlG
+ p0LQ==
+X-Gm-Message-State: APjAAAVNbfC79Jhby1krFXrPuTYkDfYC24otyAN92Sld5O5wNxsUjFDo
+ FVZe5mNh3irptN/PWQDhF3YrhvkMbXuYDz32rxFlzcY4zeNXZK66+Vtbh7q3tB+ueFunKR1/bF5
+ pbvGFBn17qe48gpM=
+X-Received: by 2002:a05:600c:2c06:: with SMTP id
+ q6mr5577722wmg.154.1582810123068; 
+ Thu, 27 Feb 2020 05:28:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxX9vFksVNpjyfpvF+15trhX7hg8u9UM2U82hQyws3i3YOmakD1qZEDxeGYMrxyXo5pOq/jow==
+X-Received: by 2002:a05:600c:2c06:: with SMTP id
+ q6mr5577674wmg.154.1582810122767; 
+ Thu, 27 Feb 2020 05:28:42 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:30cb:d037:e500:2b47?
+ ([2001:b07:6468:f312:30cb:d037:e500:2b47])
+ by smtp.gmail.com with ESMTPSA id z1sm7450624wmf.42.2020.02.27.05.28.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 05:28:42 -0800 (PST)
+Subject: Re: [PATCH 00/20] hw: Clean up hw/i386 headers (and few alpha/hppa)
+To: Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ QEMU Trivial <qemu-trivial@nongnu.org>
+References: <20191014142246.4538-1-philmd@redhat.com>
+ <dacba192-0a1e-9801-3e6f-02583bd8b994@redhat.com>
+ <fe8ef9e8-d8d2-e92c-cde3-13a11fa1a5bf@vivier.eu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <18164a90-1ad2-28d1-f6e2-cc7741532f72@redhat.com>
+Date: Thu, 27 Feb 2020 14:28:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_qWUY19ubmSaNoqbwjf8N8d1Dw=vMMD7j5yH8TSwK35A@mail.gmail.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <fe8ef9e8-d8d2-e92c-cde3-13a11fa1a5bf@vivier.eu>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,96 +111,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, Helge Deller <deller@gmx.de>,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 27, 2020 at 11:58:27AM +0000, Peter Maydell wrote:
-> On Wed, 26 Feb 2020 at 11:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > This removes the "only" directives, and lets us use the conventional
-> > "DESCRIPTION" section in the manpage.
-> >
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  docs/system/index.rst                  |   2 -
-> >  docs/system/qemu-block-drivers.rst     | 987 +------------------------
-> >  docs/system/qemu-block-drivers.rst.inc | 954 ++++++++++++++++++++++++
-> >  3 files changed, 966 insertions(+), 977 deletions(-)
-> >  create mode 100644 docs/system/qemu-block-drivers.rst.inc
-> >
-> > diff --git a/docs/system/index.rst b/docs/system/index.rst
-> > index f66e6ea585..21b5a18b67 100644
-> > --- a/docs/system/index.rst
-> > +++ b/docs/system/index.rst
-> > @@ -13,5 +13,3 @@ Contents:
-> >
-> >  .. toctree::
-> >     :maxdepth: 2
-> > -
-> > -   qemu-block-drivers
+On 26/10/19 15:32, Laurent Vivier wrote:
+> Le 26/10/2019 =C3=A0 14:20, Philippe Mathieu-Daud=C3=A9 a =C3=A9crit=C2=
+=A0:
+>> Hi,
+>>
+>> On 10/14/19 4:22 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> This is a follow-up of Markus's cleanup series:
+>>> Tame a few "touch this, recompile the world"
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg635748.html
+>>>
+>>> This part is mostly restricted to X86, but since some file from the
+>>> Alpha/PA-RISC machines include "hw/i386/pc.h" I had to fix them
+>>> too.
+>>>
+>>> Eventually I'll succeed at removing hw/i386/ dependency on non-X86
+>>> platforms (Quest I started 2 years ago...).
+>>>
+>>> Regards,
+>>>
+>>> Phil.
+>>>
+>>> Philippe Mathieu-Daud=C3=A9 (20):
+>>> =C2=A0=C2=A0 vl: Add missing "hw/boards.h" include
+>>> =C2=A0=C2=A0 hw/southbridge/ich9: Removed unused headers
+>>> =C2=A0=C2=A0 hw/input/pckbd: Remove unused "hw/i386/pc.h" header
+>>> =C2=A0=C2=A0 hw/i386/ioapic_internal: Remove unused "hw/i386/ioapic.h" =
+header
+>>> =C2=A0=C2=A0 hw/timer: Remove unused "ui/console.h" header
+>>> =C2=A0=C2=A0 hw/usb/dev-storage: Remove unused "ui/console.h" header
+>>> =C2=A0=C2=A0 hw/i386/intel_iommu: Remove unused includes
+>>> =C2=A0=C2=A0 hw/xen/xen_pt_load_rom: Remove unused includes
+>>> =C2=A0=C2=A0 hw/alpha/alpha_sys: Remove unused "hw/ide.h" header
+>>> =C2=A0=C2=A0 hw/alpha/dp264: Include "net/net.h"
+>>> =C2=A0=C2=A0 hw/hppa/machine: Include "net/net.h"
+>>> =C2=A0=C2=A0 hw/acpi/cpu_hotplug: Include "hw/pci/pci.h"
+>>> =C2=A0=C2=A0 hw/timer/hpet: Include "exec/address-spaces.h"
+>>> =C2=A0=C2=A0 hw/pci-host/q35: Include "qemu/range.h"
+>>> =C2=A0=C2=A0 hw/i2c/smbus_ich9: Include "qemu/range.h"
+>>> =C2=A0=C2=A0 hw/pci-host/piix: Include "qemu/range.h"
+>>> =C2=A0=C2=A0 hw/acpi: Include "hw/mem/nvdimm.h"
+>>> =C2=A0=C2=A0 hw/i386: Include "hw/mem/nvdimm.h"
+>>> =C2=A0=C2=A0 hw/pci-host/q35: Remove unused includes
+>>> =C2=A0=C2=A0 hw/i386/pc: Clean up includes
+>> Laurent, since this series is fully reviewed, can it go via
+>> your qemu-trivial tree?
 >=20
-> Why do you drop the documentation from the HTML manual ?
->=20
-> Is the changing in the underline styles for section
-> headings necessary? It's non-obvious in the diff format
-> the patch in the email has, but with my local git diff
-> settings (algorithm=3Dhistogram) it shows up better:
->=20
-> > Secure Shell (ssh) disk images
-> >-------------------------------
-> >+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Given that rST figures out subsection depth automatically
-> rather than based on which particular character is used
-> maybe we could avoid the noise in the diff?
->=20
-> (OTOH, we should probably pick a rST style guide for which
-> characters to use for which section headings and follow
-> it here to avoid unnecessarily confusing ourselves...)
+> I'll try but I'm not sure to have the time to do that before the softfree=
+ze.
 
-Yes, I'd encourage explicitly documenting the required section
-heading chars in particular, as otherwise we get a free for all
-which becomes confusing, especially if we need to move
-text from one doc into another doc.
+Ping :)
 
-For libvirt we chose:
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D
-  Heading 1
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Heading 2
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  Heading 3
-  ---------
-
-  Heading 4
-  ~~~~~~~~~
-
-  Heading 5
-  .........
-
-  Heading 6
-  ^^^^^^^^^
-
-
-Heading 6 looks a bit odd, but on the flipside it should almost never
-need to be used.  https://libvirt.org/styleguide.html
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Paolo
 
 
