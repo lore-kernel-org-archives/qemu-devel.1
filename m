@@ -2,82 +2,96 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B6D8C35DF1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB70C35DF1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:03:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA6992469F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AFA4246A0
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:03:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T48HS+gX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6992469F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S0SkUAiV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFA4246A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7MYl-0000w8-SV
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:02:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46716)
+	id 1j7MZV-0002Wy-7K
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:03:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47028)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j7MXe-0007wT-4H
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:01:47 -0500
+ (envelope-from <peterx@redhat.com>) id 1j7MYO-0000tv-FJ
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:02:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j7MXZ-0008I6-37
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:01:42 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24176)
+ (envelope-from <peterx@redhat.com>) id 1j7MYN-0000GG-Gc
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:02:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55075
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j7MXY-0008Hy-Ts
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:01:37 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7MYN-0000G3-By
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:02:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582822896;
+ s=mimecast20190719; t=1582822946;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DTcBXs77dItMi0gGpDFVZ3JqoJwYy1OdCcQ8c+utpZc=;
- b=T48HS+gXq1cOqGtwqUjOHzxfrLvoZY7JxfM7jTlFXkDpniBG1o+XCFQEQRZLhXLRa5TT8x
- J1OzyEK0+saUXWFJ2uaPHtIstb1jXnxw4v4JH1DH+P1LuTyHyeZ4MBD9a/ZhGrJGueAb/L
- xmw1QRoce/DK9XD6GgoWbvVBeWqCme4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-Zzd7rfcANGivsfquT4EGYg-1; Thu, 27 Feb 2020 12:01:33 -0500
-X-MC-Unique: Zzd7rfcANGivsfquT4EGYg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD49E801E53
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 17:01:32 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F79F60BE2;
- Thu, 27 Feb 2020 17:01:25 +0000 (UTC)
-Subject: Re: [PATCH 3/5] KVM: Pass EventNotifier into kvm_irqchip_assign_irqfd
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200226225457.217014-1-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8fd8a9ca-7be0-72f6-04b7-6a92be73f179@redhat.com>
-Date: Thu, 27 Feb 2020 18:01:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=S+bM0tldptzZCAB8q6ycEpSHZcyTtU2opbDXYATbJq4=;
+ b=S0SkUAiVgGXQaRPq2hGVrX3KwPgS+eyI217KIL/lHtExL47hiQQOnaJ14qUIVWwLlxJ4DJ
+ Kaa9tbd9SufvbHTDqkfIjhqs1X18QHR2y4A7v4zvaQaRB0GeeN66/cEsAyrAzAMpWn2FlV
+ L6kXKCUoSiaXpySjI6c5RiCsY3aelzE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-9DTxHWAGPOOpJqiQhCJJIQ-1; Thu, 27 Feb 2020 12:02:18 -0500
+X-MC-Unique: 9DTxHWAGPOOpJqiQhCJJIQ-1
+Received: by mail-qv1-f70.google.com with SMTP id dr18so4401643qvb.14
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:02:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CLhfuU2cVVTqnGslpq+h1cUZQ3Yw/DgyD96SDPklakA=;
+ b=ZDMtn6jc5wdyP8Sion2FkLgAqMnpLPpIhXp9FYsm94iqVMU0bCFQm7oO0NEZpN8OKk
+ GVeASjGQVK/n5KvSP4vIaYzna4+bRiSHHUnvC8jv5ak1TGa1/xSZDN+O1eH/teJ/U43q
+ 6ZsOje38oAVCn/tEaTFx+fna5/5hLL/NG62q1lJax46bVrO4lVWlaeSNUQQx9a/QvqbM
+ KWVBjisn6vvAtKPd4HL88t3xozWYb9bU974N/HEDAj0XP2jZvaUQnp3FS3lAXKiowpU4
+ GS0DGwsC7X1F+E+U9ODnla3KaTLffhwub0Co6IQ3NCf6aR/W6KfGZT/tDgqfBUGPkYga
+ lnNg==
+X-Gm-Message-State: APjAAAXSg8hUbw/vvafzgJYruZGSBYNlu7CMIVfy0EEL+eAI5FK4eQ4q
+ VKKblJ3EPyMDACXlKDEXPWrGU2iIdjWQupLOW8K3OryggE4dD7J6C4RXeXeX8RD8HZnQsgsFn3p
+ 8szk+e5lsBZ+3aSU=
+X-Received: by 2002:a37:7cc5:: with SMTP id x188mr206491qkc.390.1582822938366; 
+ Thu, 27 Feb 2020 09:02:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqziAsEB+WSP+dJdSW75kxcDzN8+T4Q8i/00zkMTXZAr7e256EqFirVxh1nxnbDiiL7nECalQw==
+X-Received: by 2002:a37:7cc5:: with SMTP id x188mr206470qkc.390.1582822938158; 
+ Thu, 27 Feb 2020 09:02:18 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id d5sm3504787qke.105.2020.02.27.09.02.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Feb 2020 09:02:16 -0800 (PST)
+Date: Thu, 27 Feb 2020 12:02:14 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 0/5] vfio/pci: Fix up breakage against split irqchip and
+ INTx
+Message-ID: <20200227170214.GG180973@xz-x1>
+References: <20200226225048.216508-1-peterx@redhat.com>
+ <bd685da9-bc50-f901-bfec-a1cd18832307@redhat.com>
+ <20200227155146.GD180973@xz-x1>
 MIME-Version: 1.0
-In-Reply-To: <20200226225457.217014-1-peterx@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200227155146.GD180973@xz-x1>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,76 +105,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On Thu, Feb 27, 2020 at 10:51:46AM -0500, Peter Xu wrote:
+> Right.  Another thing I just noticed is that we must _not_ attach the
+> resamplefd to the KVM_IRQFD ioctl when we registered this in the
+> userspace.  One thing is it's for sure not needed at all.  More
+> importantly, on new kernels (after commit 654f1f13ea56) the KVM_IRQFD
+> could fail (because it sees both split irqchip and resamplefd) and
+> QEMU will fallback again to the slow path even if the fast path can
+> work.
 
-On 2/26/20 11:54 PM, Peter Xu wrote:
-> So that kvm_irqchip_assign_irqfd() can have access to the
-> EventNotifiers, especially the resample event.  It is needed in follow
-> up patch to cache and kick resamplefds from QEMU.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+I've just posted a v1.1 version of patch 4 only, which should fix this
+problem on new kernels, so fast path will always be preferred.  The
+only changed function is kvm_irqchip_assign_irqfd().
 
-Thanks
-
-Eric
-> ---
->  accel/kvm/kvm-all.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 439a4efe52..d49b74512a 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1628,9 +1628,13 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
->      return kvm_update_routing_entry(s, &kroute);
->  }
->  
-> -static int kvm_irqchip_assign_irqfd(KVMState *s, int fd, int rfd, int virq,
-> +static int kvm_irqchip_assign_irqfd(KVMState *s, EventNotifier *event,
-> +                                    EventNotifier *resample, int virq,
->                                      bool assign)
->  {
-> +    int fd = event_notifier_get_fd(event);
-> +    int rfd = resample ? event_notifier_get_fd(resample) : -1;
-> +
->      struct kvm_irqfd irqfd = {
->          .fd = fd,
->          .gsi = virq,
-> @@ -1735,7 +1739,9 @@ int kvm_irqchip_add_hv_sint_route(KVMState *s, uint32_t vcpu, uint32_t sint)
->      return -ENOSYS;
->  }
->  
-> -static int kvm_irqchip_assign_irqfd(KVMState *s, int fd, int virq, bool assign)
-> +static int kvm_irqchip_assign_irqfd(KVMState *s, EventNotifier *event,
-> +                                    EventNotifier *resample, int virq,
-> +                                    bool assign)
->  {
->      abort();
->  }
-> @@ -1749,15 +1755,13 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg)
->  int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
->                                         EventNotifier *rn, int virq)
->  {
-> -    return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n),
-> -           rn ? event_notifier_get_fd(rn) : -1, virq, true);
-> +    return kvm_irqchip_assign_irqfd(s, n, rn, virq, true);
->  }
->  
->  int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
->                                            int virq)
->  {
-> -    return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n), -1, virq,
-> -           false);
-> +    return kvm_irqchip_assign_irqfd(s, n, NULL, virq, false);
->  }
->  
->  int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
-> 
+--=20
+Peter Xu
 
 
