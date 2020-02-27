@@ -2,91 +2,82 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434F7C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91789C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:10:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EDEC2469F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BED92468E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 20:10:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l8ZXOsYv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EDEC2469F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StVy6jVX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BED92468E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7POd-0002Qu-5G
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 15:04:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52877)
+	id 1j7PU4-0004R5-Fq
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 15:10:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7PO2-0001zU-8M
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:59 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1j7PTM-0003vB-0w
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:09:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7PO1-0006nx-36
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:57 -0500
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39885)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7PO0-0006nF-Rv
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:03:57 -0500
-Received: by mail-pl1-x643.google.com with SMTP id g6so234060plp.6
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 12:03:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2WBG2RTr0qjTefzGTgfeJN1oG1HTTmoJ+yNPM/A6T10=;
- b=l8ZXOsYvG5faDbzB6+SADiSTbHsop8RnEdbFCEQh5/bOP8yBUa+XbvWAtvPk5qH8uH
- 9zcRSqcn15d8RNblNSs17FJMKJwN7V0Hxgdq9f/V6I8FFR9RWuALTzMN22bgk2JdnHDJ
- w6ILVZIM9S1pWBihQzKBWn3u8d8i2OcOTUOfRyi6PpYOviTjcw+M367ejppTCbXPZeee
- EARhTKVXvvQhJfD4ohw+LMAnjTv25O2n586VceIl/xexvefHQTwq1Rk4u+sE7m47Zkb3
- 2aF7zvhksEysO1AOUG+jRpxXh8PdOKHgsnqmztbGE/H0WPXUttbgctvQCK+t3S6t+k5q
- PVBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2WBG2RTr0qjTefzGTgfeJN1oG1HTTmoJ+yNPM/A6T10=;
- b=CcYIjD0riBu2ANlt3V7jwVALZo/JfXlVbY5dHTcdmhdTzVKojZAZ42nLRAO5hqY6U8
- rMMTqevQ/mDcaotoLMoad6zMz1jao4tlJFNCjO97+se7m//Bu19walwxIiLsmaNrNzgu
- YD1GNuPsFwbLD9Yt0SEHFmDI1EhMmyG3On2Clpb2RY/sTtwE/1SsFFfnYrP6x0zaMxkg
- HlRXaBPEMWpmex2o5N2IhfDnHP2eNKlj2DjmwGSqynnkFFYPhgKr8kSBzxlXBYwYKw3H
- 8p5Oqngfw7Dyu47sgtPNNOjF5GzzfbjNSvi8VIoUyCmCsyk+WtCOzq8S5586aXblrOu+
- G0Gw==
-X-Gm-Message-State: APjAAAUPtuHYTjv6B4vteWCwkSKm/yBBDCs7pKvw58ghN3/i+/hR+P2S
- TJKNEFuoUPYlCN7ha1D1k+/huA==
-X-Google-Smtp-Source: APXvYqyyoR6u4iTvjBo3zec75zYzVUCXcFwHVh61O+y1jSA18KzXIJdckFBffqPn4HAigPtdkybDqg==
-X-Received: by 2002:a17:902:504:: with SMTP id 4mr403983plf.276.1582833835735; 
- Thu, 27 Feb 2020 12:03:55 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- x4sm8341657pff.143.2020.02.27.12.03.54
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Feb 2020 12:03:55 -0800 (PST)
-Subject: Re: [PATCH v4 4/5] target/riscv: add fault-only-first unit stride load
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
- <20200225103508.7651-5-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2b7d7af1-61ee-edf6-5e57-1108428f920c@linaro.org>
-Date: Thu, 27 Feb 2020 12:03:53 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <ehabkost@redhat.com>) id 1j7PTK-0000eV-Hi
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:09:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41679
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1j7PTK-0000dn-EO
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 15:09:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582834165;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Pvd4aSgOe6ddTrJuLZDObahl+QYE4sUHQVvmF0SsGqE=;
+ b=StVy6jVXLGibdlE+o+kMhdJ7N6FtNY4p3jELxWnhgnSN6nNY4bOvmAIh+nlvBGwypFScGF
+ m9mcu6f47pZN3UewzJ1rggi/45RydgnrSDwnfM3kRYU+nCvDAoYcZxo/ViajowNpQkGuMd
+ PPuGxdIm2G8FgY30HwyfM0NAZlShNjU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-TQXqgbjUPwOvSqoYSxV_Ew-1; Thu, 27 Feb 2020 15:09:15 -0500
+X-MC-Unique: TQXqgbjUPwOvSqoYSxV_Ew-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14621005512;
+ Thu, 27 Feb 2020 20:09:13 +0000 (UTC)
+Received: from localhost (unused-10-15-17-6.yyz.redhat.com [10.15.17.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 34D5660BE0;
+ Thu, 27 Feb 2020 20:09:13 +0000 (UTC)
+Date: Thu, 27 Feb 2020 15:09:12 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: ping Re: [PATCH for-5.0 v2 0/3] benchmark util
+Message-ID: <20200227200912.GE4440@habkost.net>
+References: <20191126154848.193407-1-vsementsov@virtuozzo.com>
+ <e1efd3d2-b623-292b-67a9-e3cdd479f104@virtuozzo.com>
+ <fca8ced2-b3c6-74db-0d70-11ac3304b273@virtuozzo.com>
+ <1ae79aad-5405-cf95-1401-e93191e94033@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20200225103508.7651-5-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+In-Reply-To: <1ae79aad-5405-cf95-1401-e93191e94033@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,63 +89,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, linux-csky@vger.kernel.org,
- wxy194768@alibaba-inc.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, stefanha@gmail.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, crosa@redhat.com, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/25/20 2:35 AM, LIU Zhiwei wrote:
-> +GEN_VEXT_LD_ELEM(vlbff_v_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(vlbff_v_h, int8_t,  int16_t, H2, ldsb)
-> +GEN_VEXT_LD_ELEM(vlbff_v_w, int8_t,  int32_t, H4, ldsb)
-> +GEN_VEXT_LD_ELEM(vlbff_v_d, int8_t,  int64_t, H8, ldsb)
-> +GEN_VEXT_LD_ELEM(vlhff_v_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(vlhff_v_w, int16_t, int32_t, H4, ldsw)
-> +GEN_VEXT_LD_ELEM(vlhff_v_d, int16_t, int64_t, H8, ldsw)
-> +GEN_VEXT_LD_ELEM(vlwff_v_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vlwff_v_d, int32_t, int64_t, H8, ldl)
-> +GEN_VEXT_LD_ELEM(vleff_v_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(vleff_v_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(vleff_v_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vleff_v_d, int64_t, int64_t, H8, ldq)
-> +GEN_VEXT_LD_ELEM(vlbuff_v_b, uint8_t,  uint8_t,  H1, ldub)
-> +GEN_VEXT_LD_ELEM(vlbuff_v_h, uint8_t,  uint16_t, H2, ldub)
-> +GEN_VEXT_LD_ELEM(vlbuff_v_w, uint8_t,  uint32_t, H4, ldub)
-> +GEN_VEXT_LD_ELEM(vlbuff_v_d, uint8_t,  uint64_t, H8, ldub)
-> +GEN_VEXT_LD_ELEM(vlhuff_v_h, uint16_t, uint16_t, H2, lduw)
-> +GEN_VEXT_LD_ELEM(vlhuff_v_w, uint16_t, uint32_t, H4, lduw)
-> +GEN_VEXT_LD_ELEM(vlhuff_v_d, uint16_t, uint64_t, H8, lduw)
-> +GEN_VEXT_LD_ELEM(vlwuff_v_w, uint32_t, uint32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vlwuff_v_d, uint32_t, uint64_t, H8, ldl)
+Sorry, this is due to lack of bandwidth of maintainers who can
+review those patches.
 
-We definitely should not have a 3rd copy of these.
+I have one suggestion: if you make your script self-contained
+inside a scripts/ subdirectory, it would be simpler to merge it
+without detailed reviews from others.
+
+The python/ subdirectory is supposed to appear on sys.path, so
+maybe simplebench.py and qemu/bench_block_job.py can stay there,
+but bench-example.py is not a loadable Python module and
+shouldn't be there.
+
+I see two possible options:
+
+a) Moving everything to a scripts/simplebench subdirectory.
+b) Moving only bench-example.py to scripts/, and do the sys.path
+   hacking the other scripts do.
+
+On either case, please add your name to MAINTAINERS as the
+maintainer of those new files.
 
 
-> +        if (i == 0) {
-> +            probe_read_access(env, addr, nf * msz, ra);
-> +        } else {
-> +            /* if it triggles an exception, no need to check watchpoint */
+On Thu, Feb 27, 2020 at 04:18:00PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi!
+>=20
+> Is problem in "S: Odd fixes" in Python section of MAINTAINERS?
+>=20
+> Will it be correct, if I send a patch to MAINTAINERS, proposing
+> myself as maintainer of Python scripts and s/Odd fixes/Maintained/ ?
+>=20
+> And then just send pull request with this series, as "nobody minds"?
+>=20
+> 08.02.2020 13:36, Vladimir Sementsov-Ogievskiy wrote:
+> > pingg..
+> >=20
+> > Hi! Could it be merged at all?
+> >=20
+> > 20.01.2020 12:10, Vladimir Sementsov-Ogievskiy wrote:
+> > > ping
+> > >=20
+> > > 26.11.2019 18:48, Vladimir Sementsov-Ogievskiy wrote:
+> > > > Hi all!
+> > > >=20
+> > > > Here is simple benchmarking utility, to generate performance
+> > > > comparison tables, like the following:
+> > > >=20
+> > > > ----------=A0 -------------=A0 -------------=A0 -------------
+> > > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 backup-1=A0=A0=A0=A0=A0=A0 bac=
+kup-2=A0=A0=A0=A0=A0=A0 mirror
+> > > > ssd -> ssd=A0 0.43 +- 0.00=A0=A0 4.48 +- 0.06=A0=A0 4.38 +- 0.02
+> > > > ssd -> hdd=A0 10.60 +- 0.08=A0 10.69 +- 0.18=A0 10.57 +- 0.05
+> > > > ssd -> nbd=A0 33.81 +- 0.37=A0 10.67 +- 0.17=A0 10.07 +- 0.07
+> > > > ----------=A0 -------------=A0 -------------=A0 -------------
+> > > >=20
+> > > > This is a v2, as v1 was inside
+> > > > =A0 "[RFC 00/24] backup performance: block_status + async"
+> > > >=20
+> > > > I'll use this benchmark in other series, hope someone
+> > > > will like it.
+> > > >=20
+> > > > Vladimir Sementsov-Ogievskiy (3):
+> > > > =A0=A0 python: add simplebench.py
+> > > > =A0=A0 python: add qemu/bench_block_job.py
+> > > > =A0=A0 python: add example usage of simplebench
+> > > >=20
+> > > > =A0 python/bench-example.py=A0=A0=A0=A0=A0=A0=A0 |=A0 80 ++++++++++=
++++++++++++
+> > > > =A0 python/qemu/bench_block_job.py | 115 ++++++++++++++++++++++++++=
++++
+> > > > =A0 python/simplebench.py=A0=A0=A0=A0=A0=A0=A0=A0=A0 | 128 ++++++++=
++++++++++++++++++++++++++
+> > > > =A0 3 files changed, 323 insertions(+)
+> > > > =A0 create mode 100644 python/bench-example.py
+> > > > =A0 create mode 100755 python/qemu/bench_block_job.py
+> > > > =A0 create mode 100644 python/simplebench.py
+> > > >=20
+> > >=20
+> > >=20
+> >=20
+> >=20
+>=20
+>=20
+> --=20
+> Best regards,
+> Vladimir
+>=20
 
-triggers.
+--=20
+Eduardo
 
-> +            offset = -(addr | TARGET_PAGE_MASK);
-> +            remain = nf * msz;
-> +            while (remain > 0) {
-> +                host = tlb_vaddr_to_host(env, addr, MMU_DATA_LOAD, mmuidx);
-> +                if (host) {
-> +#ifdef CONFIG_USER_ONLY
-> +                    if (page_check_range(addr, nf * msz, PAGE_READ) < 0) {
-> +                        vl = i;
-> +                        goto ProbeSuccess;
-> +                    }
-> +#else
-> +                    probe_read_access(env, addr, nf * msz, ra);
-> +#endif
-
-Good job finding all of the corner cases.  I should invent a new cputlb
-function that handles this better.  For now, this is the best we can do.
-
-
-r~
 
