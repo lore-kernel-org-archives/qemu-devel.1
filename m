@@ -6,71 +6,92 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A05C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0981C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:10:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D323424697
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:06:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8961824688
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:10:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0SdUHLT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D323424697
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMh3kD+3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8961824688
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7McT-0007Mk-2S
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:06:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47282)
+	id 1j7MgZ-0000Uh-Ql
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:10:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j7MZ4-00023l-DZ
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:03:11 -0500
+ (envelope-from <peterx@redhat.com>) id 1j7Mfn-0008Nb-Vm
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j7MZ3-0000Vl-6A
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:03:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49444
+ (envelope-from <peterx@redhat.com>) id 1j7Mfm-0002NB-Iq
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55381
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j7MZ3-0000VC-2h
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:03:09 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7Mfm-0002N2-El
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:10:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582822987;
+ s=mimecast20190719; t=1582823405;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9bDbO6KfewA7HuAfE2F3liY299JJeFspK5VWfGudlE4=;
- b=a0SdUHLTZ7QVYGXCf99DB5VnTcEgltjTu+JM20BdMNzfl+ZCxmpNFxJKuyAEJ2Ksd2+Rt8
- cmg/tDSmpeSO9Mn46eHGnzKxqpvnRNMYDrWhVOtKyn6c9LTMr1S605xfpplcC85Tk3Tcwc
- PWunafPpJu3vyJ+zRzuQ2m4OWWF55Xs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-DzRqpXGMMw6IYQIJfftrbQ-1; Thu, 27 Feb 2020 12:03:00 -0500
-X-MC-Unique: DzRqpXGMMw6IYQIJfftrbQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E22B9800D5A;
- Thu, 27 Feb 2020 17:02:59 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CAFA5C57D;
- Thu, 27 Feb 2020 17:02:59 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 3/3] iotests/138: Test leaks/corruptions fixed report
-Date: Thu, 27 Feb 2020 18:02:51 +0100
-Message-Id: <20200227170251.86113-4-mreitz@redhat.com>
-In-Reply-To: <20200227170251.86113-1-mreitz@redhat.com>
-References: <20200227170251.86113-1-mreitz@redhat.com>
+ bh=GEYk2/dbUdT3xIinsoxoEKMLfiNgu+B1rBwjY1EWgZc=;
+ b=DMh3kD+3NFgs4/K16yx35Zngt+bAA0+4aNPk58Q1JviqZt5PupJMZid3um4FVJrR3ImDCK
+ wWQlRjMV22UvVT6u9Z6bNxkQW1x6QCBqvkFP7sYTRORg4zJNuW+ZpFtd/eAx/JWA3yienN
+ UjphwuqqypS+MZ5pv2rLfQ4kHaSZKAA=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-LFWjHvcOOYuvWu79djcytg-1; Thu, 27 Feb 2020 12:10:03 -0500
+X-MC-Unique: LFWjHvcOOYuvWu79djcytg-1
+Received: by mail-qt1-f198.google.com with SMTP id p12so7186qtu.6
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:10:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=2vbdWQapmZamSeF+bJL8aB7iMEyP5e3Iv1xyHMVrcOM=;
+ b=kvurKSDPnYJbmXejgY2ALnrvy1469WxIXdAnEKAYNMdPJegAt/V4vPf17dgZC+zQGw
+ Yt9Rpo5s99rWTg2JbctDj2m+Lrs7BhF6hn099cqakz7NyxW2D6L3JHcIlfLqNM3i2+l1
+ amklCC4lpAY9edbBbT0qnCFLJeBJU+2tOihYhTNAvVYfmzz5bKJ5SFfOEVtywqtuEaN2
+ buFrcDRdmASKoaHETqeRCxzIXllmYQA8258ef4HQbDOugkDSqtnkTIRB6VBMe5O+JIaQ
+ KyKECZBh4cqS9QBE7ZfNRGfQ5JQc4KeH31R9wRPWYIwQkol5iQRz7QQkuN5A14WkhYoC
+ IA+g==
+X-Gm-Message-State: APjAAAWQFnQinhGE6rzCu46lzp5Q6FDz/6OBmFJ3k/jN7MBkZFztRlC/
+ qTJlF+yex8YE/QZYxn6tiXZV1UEysxfrCGwngxK1geaSB6MYkuc9MDeIhQRTbu+LEz8gvr+iWmv
+ rFU2m1h/DreXx4js=
+X-Received: by 2002:a05:620a:2103:: with SMTP id
+ l3mr267578qkl.90.1582823403027; 
+ Thu, 27 Feb 2020 09:10:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx/v6ssdiNhxeOfyTr1qqMPtkqxdnPTkVXMHAabIgGT+YBOTsCr//LsNdDejSggKqWyXUU81A==
+X-Received: by 2002:a05:620a:2103:: with SMTP id
+ l3mr267553qkl.90.1582823402768; 
+ Thu, 27 Feb 2020 09:10:02 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id j30sm3368229qki.96.2020.02.27.09.10.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Feb 2020 09:10:02 -0800 (PST)
+Date: Thu, 27 Feb 2020 12:10:01 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 1/5] vfio/pci: Disable INTx fast path if using split
+ irqchip
+Message-ID: <20200227171001.GH180973@xz-x1>
+References: <20200226225048.216508-1-peterx@redhat.com>
+ <20200226225048.216508-2-peterx@redhat.com>
+ <59815cf7-7fb8-faf6-4bb8-5376c87aa684@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <59815cf7-7fb8-faf6-4bb8-5376c87aa684@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,108 +105,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test that qemu-img check reports the number of leaks and corruptions
-fixed in its JSON report (after a successful run).
+On Thu, Feb 27, 2020 at 05:53:32PM +0100, Auger Eric wrote:
+> Hi Peter,
+>=20
+> On 2/26/20 11:50 PM, Peter Xu wrote:
+> > It's currently broken.  Let's use the slow path to at least make it
+> > functional.
+> >=20
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>=20
+> > ---
+> >  hw/vfio/pci.c | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >=20
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 5e75a95129..98e0e0c994 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -128,6 +128,18 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vd=
+ev, Error **errp)
+> >          return;
+> >      }
+> > =20
+> > +    if (kvm_irqchip_is_split()) {
+> > +        /*
+> > +         * VFIO INTx is currently not working with split kernel
+> > +         * irqchip for level triggered interrupts.  Go the slow path
+> > +         * as long as split is enabled so we can be at least
+> > +         * functional (even with poor performance).
+> > +         *
+> > +         * TODO: Remove this after all things fixed up.
+> If this patch were to be applied sooner than the other patches as
+> suggested in the cover letter, We may emit a warning message saying that
+> slow path is selected due to split irqchip and this will induce perf
+> downgrade
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/138     | 41 ++++++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/138.out | 14 +++++++++++++
- 2 files changed, 53 insertions(+), 2 deletions(-)
+Yes we can.  Here I followed the rest of the cases where we'll
+silently fallback to slow path if e.g. we used an even older kernel
+that does not support resamplefd at all.  IMHO it's the same as that
+(feature not supported yet, silent fallback, just in case it scares
+the user a bit, which makes some sense).
 
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index 54b01046ad..25bfbd4cca 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -41,8 +41,10 @@ _supported_fmt qcow2
- _supported_proto file
- _supported_os Linux
- # With an external data file, data clusters are not refcounted
--# (and so qemu-img check does not check their refcount)
--_unsupported_imgopts data_file
-+# (and so qemu-img check does not check their refcount);
-+# we want to modify the refcounts, so we need them to have a specific
-+# format (namely u16)
-+_unsupported_imgopts data_file 'refcount_bits=3D\([^1]\|.\([^6]\|$\)\)'
-=20
- echo
- echo '=3D=3D=3D Check on an image with a multiple of 2^32 clusters =3D=3D=
-=3D'
-@@ -65,6 +67,41 @@ poke_file "$TEST_IMG" $((2048 + 8)) "\x00\x80\x00\x00\x0=
-0\x00\x00\x00"
- # allocate memory", we have an error showing that l2 entry is invalid.
- _check_test_img
-=20
-+echo
-+echo '=3D=3D=3D Check leaks-fixed/corruptions-fixed report'
-+echo
-+
-+# After leaks and corruptions were fixed, those numbers should be
-+# reported by qemu-img check
-+_make_test_img 64k
-+
-+# Allocate data cluster
-+$QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
-+
-+reftable_ofs=3D$(peek_file_be "$TEST_IMG" 48 8)
-+refblock_ofs=3D$(peek_file_be "$TEST_IMG" $reftable_ofs 8)
-+
-+# Introduce a leak: Make the image header's refcount 2
-+poke_file "$TEST_IMG" "$refblock_ofs" "\x00\x02"
-+
-+l1_ofs=3D$(peek_file_be "$TEST_IMG" 40 8)
-+
-+# Introduce a corruption: Drop the COPIED flag from the (first) L1 entry
-+l1_entry=3D$(peek_file_be "$TEST_IMG" $l1_ofs 8)
-+l1_entry=3D$((l1_entry & ~(1 << 63)))
-+poke_file_be "$TEST_IMG" $l1_ofs 8 $l1_entry
-+
-+echo
-+# Should print the number of corruptions and leaks fixed
-+# (Filter out all JSON fields (recognizable by their four-space
-+# indentation), but keep the "-fixed" fields (by removing two spaces
-+# from their indentation))
-+# (Also filter out the L1 entry, because why not)
-+_check_test_img -r all --output=3Djson \
-+    | sed -e 's/^  \(.*\)-fixed"/\1-fixed"/' \
-+    | grep -v '^    ' \
-+    | sed -e "s/\\<$(printf %x $l1_entry)\\>/L1_ENTRY_VALUE/"
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/138.out b/tests/qemu-iotests/138.out
-index aca7d47a80..79681e7cc9 100644
---- a/tests/qemu-iotests/138.out
-+++ b/tests/qemu-iotests/138.out
-@@ -9,4 +9,18 @@ ERROR: counting reference for region exceeding the end of =
-the file by one cluste
-=20
- 1 errors were found on the image.
- Data may be corrupted, or further writes to the image may corrupt it.
-+
-+=3D=3D=3D Check leaks-fixed/corruptions-fixed report
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D65536
-+wrote 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Leaked cluster 0 refcount=3D2 reference=3D1
-+Repairing cluster 0 refcount=3D2 reference=3D1
-+Repairing OFLAG_COPIED L2 cluster: l1_index=3D0 l1_entry=3DL1_ENTRY_VALUE =
-refcount=3D1
-+{
-+  "corruptions-fixed": 1,
-+  "leaks-fixed": 1,
-+}
- *** done
+> > +         */
+> > +        return;
+> > +    }
+> > +
+> >      /* Get to a known interrupt state */
+> >      qemu_set_fd_handler(irqfd.fd, NULL, NULL, vdev);
+> >      vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX=
+);
+> >=20
+>=20
+>=20
+> Tested with a 5.2-rc1 kernel with reverted "654f1f13ea56  kvm: Check
+> irqchip mode before assign irqfd" and guest booting with nomsi.
+>=20
+> Without this patch the assigned NIC does not work. This patch fixes the
+> issue.
+>=20
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Tested-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks Eric!
+
 --=20
-2.24.1
+Peter Xu
 
 
