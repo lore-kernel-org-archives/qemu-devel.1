@@ -2,101 +2,95 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86718C4BA06
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4EFC4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5280524680
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B60FC2467F
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7z5tfbl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5280524680
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtGwCNRE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B60FC2467F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7EyM-0002Kd-G3
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 03:56:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60255)
+	id 1j7EyT-0002XF-UG
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 03:56:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7ExR-0001KM-OV
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:51 -0500
+ (envelope-from <mst@redhat.com>) id 1j7Ewq-0000gF-QH
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7ExQ-000745-Cy
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:49 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49634
+ (envelope-from <mst@redhat.com>) id 1j7Ewp-0005ia-9D
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:12 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27082
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7ExQ-00071k-9h
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:48 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j7Ewp-0005hZ-47
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:55:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582793747;
+ s=mimecast20190719; t=1582793710;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UFIoBLV8LN6KXnMOGR55IF/rKYy0/YvpI5E5W93PyrM=;
- b=e7z5tfblZ1svTqYE69Go3HpK4XkJBhOSAoPCN969rI56cXzpJzdEZeGf7Hm8h3IfyMT7Zm
- 9R039+94sURKzMrzDjGQQA9atq2cFaLK3vzBYPUT3DGfvCaPTmWoposx3VXgIUF2NfcfcY
- P4FnDib4ir9CkeSWTjiIkGVzk4BuJ8g=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-PVDWqYLSPYmB3lrqfgdGSg-1; Thu, 27 Feb 2020 03:55:41 -0500
-X-MC-Unique: PVDWqYLSPYmB3lrqfgdGSg-1
-Received: by mail-wr1-f70.google.com with SMTP id p8so1016944wrw.5
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 00:55:41 -0800 (PST)
+ bh=jEZK8yNXE+wTsqCbhXeyQ8VOR2n8Z7HF0gh+Ky3xHo0=;
+ b=WtGwCNREpYiI5avvc9KAkkMNRYoQkccYFSTVtydWrnFwAKpP1avjvIEREeKcjTAy5uQaWY
+ IPvJWIRpN89szI1EM3s1Cbreb+1/pA7JNPlYe2uAuNlXGKVYHHGM3mLM+7+US8xdJFkcOh
+ WTF6X3dBDnf5QL+/eq44PVFzudN8jII=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-YbGUe6oXMF2WSiPNRbGM7g-1; Thu, 27 Feb 2020 03:55:05 -0500
+X-MC-Unique: YbGUe6oXMF2WSiPNRbGM7g-1
+Received: by mail-qt1-f197.google.com with SMTP id f25so2658141qtp.12
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 00:55:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kD8h6BKhPgPJsZKOsFIr7rx01I3aF95aVsYiWOV+iUw=;
- b=si/Lz3Rnhw6qLYVe4xxxlr/QyZsdAP6wnB6B+Ew8zooEgxTa2A/cnvpvAj3xk9b8BO
- xgTI/8TQW9kmeZr0SG+2TgyjcD62xbd2LFQLf4qs1CMgXwH9HyazK6x+llVyjoGbnjaG
- eNhiNANYX9ccUvbk0OdT9/SJMtY3fhorZJs14Z0y2/Ie1H0v4kXrWpPTTjQ1ZaFwwgTT
- CfqnIa7nHxTcO0LYGvEvjSFvSllsmoUjeEJ1HCWE/Sw7LSjHtthsgB1Bz/vK0Do5wfTR
- CCiMosqe1+FnLxYp4HpXyJagz1qvGpH6eWvMbEDq1RZcvBlrphJgc2TCLYK40rwnb+F0
- 9+Jw==
-X-Gm-Message-State: APjAAAVkyXPolYPADcj3k00BIyRxikcv2lf+q285PIWQdi7XEQXdPZKn
- B0rZFWX9TqkEvyDjKVPEPdAL4swlek7LkVdZWm8/mYvTged9ncuhHZ8SGHZV8RzTAtFhUSOc5G9
- IqzmLMsBx/EvV2C0=
-X-Received: by 2002:a05:600c:54e:: with SMTP id
- k14mr3764662wmc.115.1582793740632; 
- Thu, 27 Feb 2020 00:55:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxK5k1tzIxCseOTXdx6BDCj+k/v0kectTb/ktLg24ybPU61jkaN49CjxXBx41ukVr9lTKKdgQ==
-X-Received: by 2002:a05:600c:54e:: with SMTP id
- k14mr3764641wmc.115.1582793740359; 
- Thu, 27 Feb 2020 00:55:40 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id r28sm7442074wra.16.2020.02.27.00.55.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Feb 2020 00:55:39 -0800 (PST)
-Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
-To: David Hildenbrand <david@redhat.com>,
- Pan Nengyuan <pannengyuan@huawei.com>, peter.maydell@linaro.org
-References: <20200227025055.14341-1-pannengyuan@huawei.com>
- <20200227025055.14341-2-pannengyuan@huawei.com>
- <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <399dfb54-62b7-945b-9f68-4818d419f079@redhat.com>
-Date: Thu, 27 Feb 2020 09:55:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=lguPzS+Ymx9VaZQ4TQOOrzS0xNq8Vcz+XX/8B96kn7w=;
+ b=Rn9UEjBkUEYyahNxRaqEBIZc6O7H+nlQHETAYY5CwnvPcKuzH73ZUewjferKiDN9tr
+ aozk+CAbdrIDj4rPKQX6hYeW+gI35lGExptaCE8gFd4RMq+K3cPr5JcfH7guZwjjBzTF
+ d7rLwldRmvfFE5O6U8J19upcVSeBXd9CgqKqfcXYjLOZxLrkRNnVz6NZ+QXCrumxxoDA
+ 0Yo1AVvFYeQ6OhaDuJXoj8BlZ9rdJ0O3GyWogGZAdlcmwmUQb74JV69TE7llLmZ1kK6n
+ 0eHe42wz6SFY9yGcYw8HRAuIbVw5ggei9RSQ7zIuaxLj4LI9JLvuB/fV3kDLCyi4fglh
+ 0fSg==
+X-Gm-Message-State: APjAAAVQucPOxNXYrHDkLN1grNzISit+Kd8JO6qHzMCGN4tcU/n0Dt2V
+ VJPFkRfd/f4kbuCU18cz9dS3tv9D7jLEbBH+XYVU287rv/XejCLQt7oHgTZaW7HEwi1hXUFOYmx
+ jS6P6UrwVsSlU5ik=
+X-Received: by 2002:a05:620a:2114:: with SMTP id
+ l20mr4167660qkl.214.1582793704297; 
+ Thu, 27 Feb 2020 00:55:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxlh4spGJnzMsbIb5pZHoUAsJlXgtJJLp2DpL1zE0p0oergLPL2jTCXcuhe8vYjRPCeLqv5yA==
+X-Received: by 2002:a05:620a:2114:: with SMTP id
+ l20mr4167634qkl.214.1582793703970; 
+ Thu, 27 Feb 2020 00:55:03 -0800 (PST)
+Received: from redhat.com (bzq-79-178-2-214.red.bezeqint.net. [79.178.2.214])
+ by smtp.gmail.com with ESMTPSA id
+ n8sm2721518qke.37.2020.02.27.00.55.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Feb 2020 00:55:03 -0800 (PST)
+Date: Thu, 27 Feb 2020 03:54:59 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PULL v2 00/30] virtio, pc: fixes, features
+Message-ID: <20200227035423-mutt-send-email-mst@kernel.org>
+References: <20200226090010.708934-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
-Content-Language: en-US
+In-Reply-To: <20200226090010.708934-1-mst@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -111,89 +105,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/27/20 9:41 AM, David Hildenbrand wrote:
-> On 27.02.20 03:50, Pan Nengyuan wrote:
->> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s390x.=
- The leak stack is as follow:
->>
->> Direct leak of 48 byte(s) in 1 object(s) allocated from:
->>      #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0xef=
-970)
->>      #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
->>      #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/include/=
-qemu/timer.h:530
->>      #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qemu/=
-timer.h:551
->>      #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include/qe=
-mu/timer.h:569
->>      #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/target/=
-s390x/cpu.c:285
->>      #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qemu/q=
-om/object.c:372
->>      #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-new/=
-qemu/qom/object.c:516
->>      #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu/qo=
-m/object.c:684
->>      #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s390x/=
-s390-virtio-ccw.c:64
->>      #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core/ma=
-chine-hmp-cmds.c:57
->>      #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/mon=
-itor/hmp.c:1082
->>      #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-new/q=
-emu/monitor/misc.c:142
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: David Hildenbrand <david@redhat.com>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: qemu-s390x@nongnu.org
->> ---
->> v2->v1:
->> - Similarly to other cleanups, move timer_new into realize(Suggested by =
-Philippe Mathieu-Daud=C3=A9)
->> v3->v2:
->> - Also do the timer_free in unrealize, it seems more balance.
->> ---
+On Wed, Feb 26, 2020 at 04:01:02AM -0500, Michael S. Tsirkin wrote:
+> changes from v1:
+>     dropped vhost changes, hope this fixes build on Mac OS.
 >=20
+> The following changes since commit 9a8abceb5f01d1066d3a1ac5a33aabcbaeec18=
+60:
 >=20
-> As I already said, I think this is init and not realize stuff. Do we
-> have a convention now and documented that?
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-docs-20200225'=
+ into staging (2020-02-25 11:03:47 +0000)
+>=20
+> are available in the Git repository at:
+>=20
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>=20
+> for you to fetch changes up to deec824070e408b936e02883a1e2cb5af92448d0:
 
-The clearer doc I read so far is this post:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg680187.html
-(but see the thread for more helpful comments)
+I updated one of the commit logs to include CC stable, so the new
+hash is: b844a4c77b618acfba6b3f4ce12d2ad709f99279
 
-Another thread that you might find interesting is "how to handle QOM=20
-'container' objects whose contents depend on QOM properties?"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg511703.html
-
+>   Fixed assert in vhost_user_set_mem_table_postcopy (2020-02-25 16:55:32 =
+-0500)
 >=20
-> Anyhow, I don't really care
-> [...]
-
-Well, looking at the time spent on these series and their review, having=20
-it better documented might save time the whole community.
-
+> ----------------------------------------------------------------
+> virtio, pc: fixes, features
 >=20
->> @@ -453,6 +466,7 @@ static void s390_cpu_class_init(ObjectClass *oc, voi=
-d *data)
->>  =20
->>       device_class_set_parent_realize(dc, s390_cpu_realizefn,
->>                                       &scc->parent_realize);
->> +    dc->unrealize =3D s390_cpu_unrealizefn;
+> New virtio iommu.
+> Unrealize memory leaks.
+> In-band kick/call support.
+> Bugfixes, documentation all over the place.
 >=20
-> Shouldn't we use device_class_set_parent_unrealize?
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >=20
+> ----------------------------------------------------------------
+> Adrian Moreno (1):
+>       vhost-user: only set slave channel for first vq
+>=20
+> Eric Auger (10):
+>       virtio-iommu: Add skeleton
+>       virtio-iommu: Decode the command payload
+>       virtio-iommu: Implement attach/detach command
+>       virtio-iommu: Implement map/unmap
+>       virtio-iommu: Implement translate
+>       virtio-iommu: Implement fault reporting
+>       virtio-iommu: Support migration
+>       virtio-iommu-pci: Add virtio iommu pci support
+>       hw/arm/virt: Add the virtio-iommu device tree mappings
+>       MAINTAINERS: add virtio-iommu related files
+>=20
+> Igor Mammedov (1):
+>       acpi: cpuhp: document CPHP_GET_CPU_ID_CMD command
+>=20
+> Johannes Berg (6):
+>       libvhost-user: implement VHOST_USER_PROTOCOL_F_REPLY_ACK
+>       libvhost-user-glib: fix VugDev main fd cleanup
+>       libvhost-user-glib: use g_main_context_get_thread_default()
+>       libvhost-user: handle NOFD flag in call/kick/err better
+>       docs: vhost-user: add in-band kick/call messages
+>       libvhost-user: implement in-band notifications
+>=20
+> Michael S. Tsirkin (4):
+>       bios-tables-test: tell people how to update
+>       bios-tables-test: fix up DIFF generation
+>       bios-tables-test: default diff command
+>       rebuild-expected-aml.sh: remind about the process
+>=20
+> Pan Nengyuan (6):
+>       vhost-user-fs: do delete virtio_queues in unrealize
+>       vhost-user-fs: convert to the new virtio_delete_queue function
+>       virtio-pmem: do delete rq_vq in virtio_pmem_unrealize
+>       virtio-crypto: do delete ctrl_vq in virtio_crypto_device_unrealize
+>       vhost-user-blk: delete virtioqueues in unrealize to fix memleaks
+>       vhost-user-blk: convert to new virtio_delete_queue
+>=20
+> Raphael Norwitz (1):
+>       Fixed assert in vhost_user_set_mem_table_postcopy
+>=20
+> Stefan Hajnoczi (1):
+>       virtio: gracefully handle invalid region caches
+>=20
+>  docs/specs/acpi_cpu_hotplug.txt            |   2 +
+>  contrib/libvhost-user/libvhost-user-glib.h |   1 +
+>  contrib/libvhost-user/libvhost-user.h      |  14 +
+>  include/hw/arm/virt.h                      |   2 +
+>  include/hw/pci/pci.h                       |   1 +
+>  include/hw/virtio/vhost-user-blk.h         |   3 +-
+>  include/hw/virtio/vhost-user-fs.h          |   2 +
+>  include/hw/virtio/virtio-iommu.h           |  61 ++
+>  contrib/libvhost-user/libvhost-user-glib.c |  17 +-
+>  contrib/libvhost-user/libvhost-user.c      | 139 ++++-
+>  contrib/vhost-user-input/main.c            |   6 +-
+>  hw/arm/virt.c                              |  57 +-
+>  hw/block/vhost-user-blk.c                  |  23 +-
+>  hw/virtio/vhost-user-fs.c                  |  16 +-
+>  hw/virtio/vhost-user.c                     |  10 +-
+>  hw/virtio/virtio-crypto.c                  |   3 +-
+>  hw/virtio/virtio-iommu-pci.c               | 104 ++++
+>  hw/virtio/virtio-iommu.c                   | 890 +++++++++++++++++++++++=
+++++++
+>  hw/virtio/virtio-pmem.c                    |   1 +
+>  hw/virtio/virtio.c                         |  99 +++-
+>  qdev-monitor.c                             |   1 +
+>  tests/qtest/bios-tables-test.c             |  31 +-
+>  MAINTAINERS                                |   6 +
+>  docs/interop/vhost-user.rst                | 122 +++-
+>  hw/virtio/Kconfig                          |   5 +
+>  hw/virtio/Makefile.objs                    |   2 +
+>  hw/virtio/trace-events                     |  20 +
+>  tests/data/acpi/rebuild-expected-aml.sh    |   7 +
+>  28 files changed, 1562 insertions(+), 83 deletions(-)
+>  create mode 100644 include/hw/virtio/virtio-iommu.h
+>  create mode 100644 hw/virtio/virtio-iommu-pci.c
+>  create mode 100644 hw/virtio/virtio-iommu.c
 >=20
 
 
