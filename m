@@ -2,67 +2,78 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C07C4BA35
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 01:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC53C4BA35
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 01:56:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A73E208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 01:50:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A73E208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9ECE20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 01:56:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUdGxyyP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9ECE20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j78K7-0003gM-DS
-	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 20:50:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34128)
+	id 1j78Pd-0006Nq-0u
+	for qemu-devel@archiver.kernel.org; Wed, 26 Feb 2020 20:56:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j78JU-0003CM-Ph
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 20:50:09 -0500
+ (envelope-from <eblake@redhat.com>) id 1j78OA-0004c4-NJ
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 20:55:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j78JT-0000Yx-GD
- for qemu-devel@nongnu.org; Wed, 26 Feb 2020 20:50:08 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2506 helo=huawei.com)
+ (envelope-from <eblake@redhat.com>) id 1j78O9-0002ZP-7S
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 20:54:58 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58060
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1j78JT-0000Ti-5t; Wed, 26 Feb 2020 20:50:07 -0500
-Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id 2A28962E71BFD1CE1EF5;
- Thu, 27 Feb 2020 09:50:01 +0800 (CST)
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
- DGGEMM403-HUB.china.huawei.com ([10.3.20.211]) with mapi id 14.03.0439.000;
- Thu, 27 Feb 2020 09:49:51 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: RE: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
- iscsi_open()
-Thread-Topic: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
- iscsi_open()
-Thread-Index: AQHV7IFlkw7HklI9YUytmY61YTlYXagstmsAgAGL6HA=
-Date: Thu, 27 Feb 2020 01:49:50 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B6638BE@dggemm531-mbx.china.huawei.com>
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-3-kuhn.chenqun@huawei.com>
- <20200226095444.GB6096@linux.fritz.box>
-In-Reply-To: <20200226095444.GB6096@linux.fritz.box>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.205.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1j78O9-0002X8-40
+ for qemu-devel@nongnu.org; Wed, 26 Feb 2020 20:54:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582768496;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CoJGR4ZI+9m4O0mPGBL05+mvr80zAshpXsWSv07d0Ow=;
+ b=cUdGxyyPZkpI3dK1fwLqI4DoQ3IJsIJ5M7oa2nQ2S4Ubotwsvg2mDsoecvsZu4TII3/ZvD
+ 39ZHgAryMFZTgq5hhAp12bna2qwJQn8+skWA5SKk8CQJX7QMdwRt0+PnLwIGZwBTuAymWj
+ 5Qk+eg+K23v2pFHu8KQVOKa2oQE0f38=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-XIXfOmM1PjKlFp3HwhhTqA-1; Wed, 26 Feb 2020 20:54:52 -0500
+X-MC-Unique: XIXfOmM1PjKlFp3HwhhTqA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F09C5800D53;
+ Thu, 27 Feb 2020 01:54:51 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-57.phx2.redhat.com [10.3.116.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7CB6C5C28E;
+ Thu, 27 Feb 2020 01:54:51 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/4] nbd-client: Support leading / in NBD URI
+Date: Wed, 26 Feb 2020 19:54:46 -0600
+Message-Id: <20200227015448.960538-3-eblake@redhat.com>
+In-Reply-To: <20200227015448.960538-1-eblake@redhat.com>
+References: <20200227015448.960538-1-eblake@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.188
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,52 +85,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Peter Lieven <pl@kamp.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?J=C3=A1n=20Tomko?= <jtomko@redhat.com>,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogS2V2aW4gV29sZiBbbWFpbHRvOmt3
-b2xmQHJlZGhhdC5jb21dDQo+U2VudDogV2VkbmVzZGF5LCBGZWJydWFyeSAyNiwgMjAyMCA1OjU1
-IFBNDQo+VG86IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj5DYzog
-cWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LXRyaXZpYWxAbm9uZ251Lm9yZzsNCj5wZXRlci5t
-YXlkZWxsQGxpbmFyby5vcmc7IFpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVh
-d2VpLmNvbT47DQo+RXVsZXIgUm9ib3QgPGV1bGVyLnJvYm90QGh1YXdlaS5jb20+OyBSb25uaWUg
-U2FobGJlcmcNCj48cm9ubmllc2FobGJlcmdAZ21haWwuY29tPjsgUGFvbG8gQm9uemluaSA8cGJv
-bnppbmlAcmVkaGF0LmNvbT47IFBldGVyDQo+TGlldmVuIDxwbEBrYW1wLmRlPjsgTWF4IFJlaXR6
-IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj5TdWJqZWN0OiBSZTogW1BBVENIIHYyIDAyLzEzXSBibG9j
-ay9pc2NzaTpSZW1vdmUgcmVkdW5kYW50IHN0YXRlbWVudCBpbg0KPmlzY3NpX29wZW4oKQ0KPg0K
-PkFtIDI2LjAyLjIwMjAgdW0gMDk6NDYgaGF0IGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tIGdlc2No
-cmllYmVuOg0KPj4gRnJvbTogQ2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPj4N
-Cj4+IENsYW5nIHN0YXRpYyBjb2RlIGFuYWx5emVyIHNob3cgd2FybmluZzoNCj4+ICAgYmxvY2sv
-aXNjc2kuYzoxOTIwOjk6IHdhcm5pbmc6IFZhbHVlIHN0b3JlZCB0byAnZmxhZ3MnIGlzIG5ldmVy
-IHJlYWQNCj4+ICAgICAgICAgZmxhZ3MgJj0gfkJEUlZfT19SRFdSOw0KPj4gICAgICAgICBeICAg
-ICAgICB+fn5+fn5+fn5+fn4NCj4+DQo+PiBSZXBvcnRlZC1ieTogRXVsZXIgUm9ib3QgPGV1bGVy
-LnJvYm90QGh1YXdlaS5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBDaGVuIFF1biA8a3Vobi5jaGVu
-cXVuQGh1YXdlaS5jb20+DQo+DQo+SG1tLCBJJ20gbm90IHNvIHN1cmUgYWJvdXQgdGhpcyBvbmUg
-YmVjYXVzZSBpZiB3ZSByZW1vdmUgdGhlIGxpbmUsIGZsYWdzIHdpbGwNCj5iZSBpbmNvbnNpc3Rl
-bnQgd2l0aCBicy0+b3Blbl9mbGFncy4gSXQgZmVlbHMgbGlrZSBzZXR0aW5nIGEgdHJhcCBmb3Ig
-YW55b25lDQo+d2hvIHdhbnRzIHRvIGFkZCBjb2RlIHVzaW5nIGZsYWdzIGluIHRoZSBmdXR1cmUu
-DQpIaSBLZXZpbiwgIA0KSSBmaW5kIGl0IGV4aXN0cyBzaW5jZSA4ZjNiZjUwZDM0MDM3MjY2LiAg
-IDogICkgIA0KSXQncyBub3QgYSBiaWcgZGVhbCwgIGp1c3QgdXBzZXQgY2xhbmcgc3RhdGljIGNv
-ZGUgYW5hbHl6ZXIuIA0KQXMgeW91IHNhaWQsIGl0IGNvdWxkIGJlIGEgdHJhcCBmb3IgdGhlIGZ1
-dHVyZS4gDQoNCkl0IOKAmXMgb2theSwgd2hldGhlciBpdCBleGlzdHMgb3Igbm90Lg0KDQpUaGFu
-a3MuDQo+DQo+S2V2aW4NCj4NCj4+IENjOiBSb25uaWUgU2FobGJlcmcgPHJvbm5pZXNhaGxiZXJn
-QGdtYWlsLmNvbT4NCj4+IENjOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0K
-Pj4gQ2M6IFBldGVyIExpZXZlbiA8cGxAa2FtcC5kZT4NCj4+IENjOiBLZXZpbiBXb2xmIDxrd29s
-ZkByZWRoYXQuY29tPg0KPj4gQ2M6IE1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+DQo+PiAt
-LS0NCj4+ICBibG9jay9pc2NzaS5jIHwgMSAtDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDEgZGVsZXRp
-b24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svaXNjc2kuYyBiL2Jsb2NrL2lzY3NpLmMg
-aW5kZXgNCj4+IDY4MmFiZDhlMDkuLmVkODg0NzllZGUgMTAwNjQ0DQo+PiAtLS0gYS9ibG9jay9p
-c2NzaS5jDQo+PiArKysgYi9ibG9jay9pc2NzaS5jDQo+PiBAQCAtMTkxNyw3ICsxOTE3LDYgQEAg
-c3RhdGljIGludCBpc2NzaV9vcGVuKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBRRGljdA0KPipvcHRp
-b25zLCBpbnQgZmxhZ3MsDQo+PiAgICAgICAgICBpZiAocmV0IDwgMCkgew0KPj4gICAgICAgICAg
-ICAgIGdvdG8gb3V0Ow0KPj4gICAgICAgICAgfQ0KPj4gLSAgICAgICAgZmxhZ3MgJj0gfkJEUlZf
-T19SRFdSOw0KPj4gICAgICB9DQo+Pg0KPj4gICAgICBpc2NzaV9yZWFkY2FwYWNpdHlfc3luYyhp
-c2NzaWx1biwgJmxvY2FsX2Vycik7DQo+PiAtLQ0KPj4gMi4yMy4wDQo+Pg0KPj4NCg0K
+The NBD URI specification [1] states that only one leading slash at
+the beginning of the URI path component is stripped, not all such
+slashes.  This becomes important to a patch I just proposed to nbdkit
+[2], which would allow the exportname to select a file embedded within
+an ext2 image: ext2fs demands an absolute pathname beginning with '/',
+and because qemu was inadvertantly stripping it, my nbdkit patch had
+to work around the behavior.
+
+[1] https://github.com/NetworkBlockDevice/nbd/blob/master/doc/uri.md
+[2] https://www.redhat.com/archives/libguestfs/2020-February/msg00109.html
+
+Note that the qemu bug only affects handling of URIs such as
+nbd://host:port//abs/path (where '/abs/path' should be the export
+name); it is still possible to use --image-opts and pass the desired
+export name with a leading slash directly through JSON even without
+this patch.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20200212023101.1162686-1-eblake@redhat.com>
+Reviewed-by: J=C3=A1n Tomko <jtomko@redhat.com>
+---
+ block/nbd.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/block/nbd.c b/block/nbd.c
+index 6d3b22f844ea..f69e61e68ad6 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1528,8 +1528,10 @@ static int nbd_parse_uri(const char *filename, QDict=
+ *options)
+         goto out;
+     }
+
+-    p =3D uri->path ? uri->path : "/";
+-    p +=3D strspn(p, "/");
++    p =3D uri->path ? uri->path : "";
++    if (p[0] =3D=3D '/') {
++        p++;
++    }
+     if (p[0]) {
+         qdict_put_str(options, "export", p);
+     }
+--=20
+2.24.1
+
 
