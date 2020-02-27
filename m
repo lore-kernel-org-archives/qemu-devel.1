@@ -2,105 +2,122 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5971FC54FD2
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B67C35DEE
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:31:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26B7921D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:27:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3DB024656
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:31:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eZFwbfdq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B7921D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="BxUQlgp+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3DB024656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7K7z-0007g1-D1
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 09:27:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46325)
+	id 1j7KCe-00023y-Ml
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 09:31:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1j7K7L-000751-6e
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 09:26:24 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7KBh-0001Xt-5v
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 09:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1j7K7K-0007B9-BX
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 09:26:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44963
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1j7K7K-00079S-7R
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 09:26:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582813581;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=77aHn2uf5XBWVxEGhUdz3jcGOLErWRiLcbTwA9O067s=;
- b=eZFwbfdqnwc+jyl33fT3VKhS3loVSw8wQGZxmf+LyS8r13B+MTH5KygNPufWe7HcUX0z0f
- BQrJH+027maCAAd2i+lASvq1twVG7ZV7wagiHNN8vBrl8pDbKaDWuebzNacwPFF2Tdu/Yx
- ZBW3Q2p+5PYRnQlu2eIZsY4nq5oWgSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-YT5JEN6RPFGny6AuDSed5A-1; Thu, 27 Feb 2020 09:26:17 -0500
-X-MC-Unique: YT5JEN6RPFGny6AuDSed5A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BD6F800D5F;
- Thu, 27 Feb 2020 14:26:16 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.111])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 65EB98C08D;
- Thu, 27 Feb 2020 14:26:15 +0000 (UTC)
-Subject: Re: [PATCH v6 8/9] iotests: don't use 'format' for drive_add
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20200227000639.9644-1-jsnow@redhat.com>
- <20200227000639.9644-9-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ffb6c46e-2fca-998e-f1b2-9bccc9173593@redhat.com>
-Date: Thu, 27 Feb 2020 15:26:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7KBf-0002vA-Uk
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 09:30:53 -0500
+Received: from mail-eopbgr00100.outbound.protection.outlook.com
+ ([40.107.0.100]:9089 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j7KBb-0002ty-Vw; Thu, 27 Feb 2020 09:30:48 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VfhSXUEJaMveNV05EirN9OTRCgklIx2hCGw5cl/BPpPIba/6dQTvfz2EnGr7bXFgipBCAoW9aP+/lTaqy7+olf/fj6aCESHi9Wi0cd8UzSBAUFjCIL9hs+9Ig0KwGeS6DkqQyEagAZnSlmsxnyLkkvJa1H0r8UbJlDfUJOsIp+0EF84c/Alpt+nyW+7ABmNlEIf90/cp5EYR/QsBZAw8YIAOuvFAbRUZZRrTTs31/FuJti2gg8GCB9lYf6blW4tRw93utAAISSgLPdhV6dcpRoYBg/OUssu116I4ED/n8u5SjxVQmo5wQLOzI3tl7x7CUtKXmNkrAIx0arEa/Wjvnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EDL8qxV/B+Zr3Teo1xuBlyatfgYxtuXKwe00FlRw4Bo=;
+ b=fIXqdkDqr8YJMzbf4XU2t9KEjIMB2z570asYpOI9mynvpskeWufxz8CK9k3KGQ746rCEpy8X2LnroecObRv1NKFpLBONCgI3/iBIzP1qrMrrh4BOcpGeGUcFFaGYvKv+UEVjB7LpD1u167ZAPdUF5koySVn/jYCejsI+MflgDD37GHi9h+ighLpeWPwrNyx8pai3/9n8Xpdd49nNqZdydls7Eqlln8GcqO0t2j0xLCVXxq1FHYd7IncLe5trUxckpM6fZ59RXAlIyrbQY6uWgdwYAi9bGKGL6DHQQv/YCskb0xgO2Vswzo6BNl5lXNfDaczXQYNvSr8Hpc+b8Grlfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EDL8qxV/B+Zr3Teo1xuBlyatfgYxtuXKwe00FlRw4Bo=;
+ b=BxUQlgp+2yo/EYkfVfxNc2VyZkLyg02pcJo2OIb5XgxLAUTFoOyaWZJV/x8BiqEsXwOhQV6ig+oE+DheIcUnFECKYjyM0zpg6zvlZ87NnpmknY9STFTTEg/DWxDp9CJPIbUP6iKgck7LrmIUXoISw+mi/0f2vz8XMpDo2yQoT0w=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
+ VI1PR08MB3984.eurprd08.prod.outlook.com (20.178.204.91) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21; Thu, 27 Feb 2020 14:30:45 +0000
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::91aa:2540:62c:aeda]) by VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::91aa:2540:62c:aeda%5]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
+ 14:30:45 +0000
+Subject: Re: [PATCH v1 1/8] qcow2: introduce compression type feature
+To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
+ <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
+References: <20200227072953.25445-1-dplotnikov@virtuozzo.com>
+ <20200227072953.25445-2-dplotnikov@virtuozzo.com>
+ <501fde69-f116-a3b9-0356-05708f0b78b7@redhat.com>
+ <78aa28c9-49a4-ac0a-51c5-e3587f46603d@virtuozzo.com>
+ <e93ca287-07c0-c6f9-c490-31954bcde274@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200227173041972
+Message-ID: <e166d252-37ae-7b56-8ff4-d8524e055eed@virtuozzo.com>
+Date: Thu, 27 Feb 2020 17:30:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <e93ca287-07c0-c6f9-c490-31954bcde274@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1P190CA0057.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::46)
+ To VI1PR08MB4432.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::10)
 MIME-Version: 1.0
-In-Reply-To: <20200227000639.9644-9-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="CSpJjOlXNSW4R7q7cl13fWNMmzOzOF82u"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P190CA0057.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::46) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.14 via Frontend Transport; Thu, 27 Feb 2020 14:30:44 +0000
+X-Tagtoolbar-Keys: D20200227173041972
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8d235ff5-2990-4117-3023-08d7bb91a177
+X-MS-TrafficTypeDiagnostic: VI1PR08MB3984:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR08MB39849B2EAA3C4C379BC43B3FC1EB0@VI1PR08MB3984.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-Forefront-PRVS: 03264AEA72
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(346002)(39850400004)(396003)(366004)(189003)(199004)(2906002)(36756003)(66556008)(6486002)(52116002)(956004)(2616005)(66476007)(66946007)(478600001)(8676002)(5660300002)(81156014)(16576012)(110136005)(8936002)(53546011)(81166006)(186003)(6666004)(26005)(316002)(31686004)(31696002)(4326008)(86362001)(16526019);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3984;
+ H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JE6DFvQzURE9SoMxx8hKgonyUIy/sUo40Xn8bHZS0J92tBp11M9Fe6Ds2a5aqGQzXfZbfQpWmJ87sXb+RjgmeoKkxSZEWV9lGCNBRV17+D0oHvjU5CldcWVn9XZS1aaS84igpYifWNoL6tgR0oZMUUP4QcZ5rdJfcV0uM2PxRUqLZVqfgTq+/L9vP5cHykQu3B4760ryD693PeZkwuv3LxPoNpc01ud6t4uCfboIoCF2nLD1RWAJVSD4odjZj4Cr5lAQemGyOmYq8qicbnyLMlzbprRR48osyFbJTBG9cQChV6/+Q3s3GQ32YaLsXlgGcwazmkHRImAQuujM3h2UDTUTK1j1XRKfzyAh8e7epfsyCuasQmamUfoGaQOdZbCjV+tFpIrMO+lS4GYyJ5WefQk0A1ubYDxUOygYxcrO6NjyBx/Ph7ulVBIfShhabvac
+X-MS-Exchange-AntiSpam-MessageData: n/4znOswovwCz7yVYnBgkW9G7DNdkXEoin+LioY2Tt7Znd/oTOKAN4XO90NiRlT+J0UaqASBKujpGJ/YPrI9UQtL7qo9KXKbTZP31mE7Hn6mk1ZZbOgNVnslv01E7po6uYC9NJ1tZeAyR0t3cbZg2Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d235ff5-2990-4117-3023-08d7bb91a177
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2020 14:30:45.1298 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OvYK9nLW8c3pPTQlMLcCkUmk50PBQdxrgPFIah2lQ2rOg9JV6N//nCtmEdoyM3uqYp1ifxGFSJ2PaSCipSUjSnPJS9BpZDWUw8flkvLYo3w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3984
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,52 +129,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CSpJjOlXNSW4R7q7cl13fWNMmzOzOF82u
-Content-Type: multipart/mixed; boundary="na1q2Ood7gHyZIRKay2hAHar3wDxCQ2Sz"
-
---na1q2Ood7gHyZIRKay2hAHar3wDxCQ2Sz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 27.02.20 01:06, John Snow wrote:
-> It shadows (with a different type) the built-in format.
-> Use something else.
+27.02.2020 17:13, Eric Blake wrote:
+> On 2/27/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  tests/qemu-iotests/055        | 3 ++-
->  tests/qemu-iotests/iotests.py | 6 +++---
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>>> Hmm - I think it may be worth a tweak to qcow2.txt to call out:
+>>>
+>>> 104: compression_type
+>>> 105 - 111: padding, must be 0
+>>>
+>>> or else call out:
+>>>
+>>> 104-111: compression type
+>>>
+>>> and just blindly use all 8 bytes for the value even though really only =
+1 or two values will ever be defined.=A0 Of course, that moves the byte in =
+question from 104 to 111, thanks to our big endian encoding, but as this se=
+ries is the first one installing a non-zero value in those 8 bytes, and as =
+we just finished documenting that the header length must be a multiple of 8=
+, there is no real impact - we can make such tweaks up until the 5.0 releas=
+e.
+>>
+>> But what is the benefit? We have already documented padding in the spec,=
+ and discussed it so much time... What is the problem with padding? And why=
+ to add 8 bytes for every new feature which needs only one byte?
+>=20
+> Okay, so requiring an 8-byte field is not necessary.=A0 But still, at lea=
+st mentioning padding bytes (that may be assigned meanings later) is consis=
+tent with the rest of the document (for example, we have padding bits docum=
+ented for the compatible/incompatible/autoclear feature bits), and reminds =
+implementers to keep size rounded to a multiple of 8.
+>=20
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Yes, we can add something about it.. But I'm not sure we need, and I can't =
+imaging correct short wording.
 
 
---na1q2Ood7gHyZIRKay2hAHar3wDxCQ2Sz--
+We have section about padding:
 
---CSpJjOlXNSW4R7q7cl13fWNMmzOzOF82u
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+"
+=3D=3D=3D Header padding =3D=3D=3D
 
------BEGIN PGP SIGNATURE-----
+@header_length must be a multiple of 8, which means that if the end of the =
+last
+additional field is not aligned, some padding is needed. This padding must =
+be
+zeroed, so that if some existing (or future) additional field will fall int=
+o
+the padding, it will be interpreted accordingly to point [3.] of the previo=
+us
+paragraph, i.e.  in the same manner as when this field is not present.
+"
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl5X0YUACgkQ9AfbAGHV
-z0AcJwf/QU6pnSByfrwly9zXwDyWhN9pVYl7DpE82aBXYmsugBHW5YNyjxNiem1O
-9jkvcIeYMjUuLCBdB6QWUPF6mGBN7NPQ89W+F9b/ztpSKi7OothlAVW/IXn3aGdh
-43DttKukBYLTUdcd8tnGpYZuHUlP1HcLTOuh1vmwBbnaI+oZYhFL/6ZRnB4TihGW
-oPknmSCG8SNCVAJ4ow6CSvtsue/M7emJN0dF7hclA4FSRR260H5ioz5aMV5pJi3D
-Cj+f9jqKxWlsp/fT7nklWugUJM+eGI5biyugIXwStROZHRhT3M1XdgIM3YpvBUk2
-RLLE+QH1Xgulu1ZTJcY5DctRbHXASQ==
-=vJfB
------END PGP SIGNATURE-----
 
---CSpJjOlXNSW4R7q7cl13fWNMmzOzOF82u--
+So, if we want to add something about 104-111, it should be added to this s=
+ection, not to previous "=3D=3D=3D Additional fields (version 3 and higher)=
+ =3D=3D=3D".
 
+And, if we want, to add something, we should consider both cases when compr=
+ession type field exists and when not... What to write?
+
+"105 - 111: These bytes are padding, if header length > 104. May be turned =
+into new additional fields in future."
+
+Sounds a bit strange... Keeping in mind that different versions of qemu may=
+ consider the same bytes as additional field or as padding, and it is corre=
+ct.
+
+
+--=20
+Best regards,
+Vladimir
 
