@@ -2,119 +2,75 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MISSING_HEADERS,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3185FC4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA5CC4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEA782468F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0907C206E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=stephanosio.onmicrosoft.com header.i=@stephanosio.onmicrosoft.com header.b="Qs+d50mH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEA782468F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stephanos.io
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ml/oqAKV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0907C206E2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7HjV-0006xU-M9
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:53:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49388)
+	id 1j7HlZ-0000jJ-6A
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:55:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <root@stephanos.io>) id 1j7HhX-0004dd-A5
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:51:36 -0500
+ (envelope-from <cohuck@redhat.com>) id 1j7HkY-0007n9-0U
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:54:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <root@stephanos.io>) id 1j7HhW-0002vR-9M
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:51:35 -0500
-Received: from mail-eopbgr1280119.outbound.protection.outlook.com
- ([40.107.128.119]:30380 helo=KOR01-PS2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <root@stephanos.io>)
- id 1j7HhT-0002Xq-KC; Thu, 27 Feb 2020 06:51:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=frc/yp1U8s53NOGQS3ZPV163R/3C6QddBtytZliOiyrBFoHjiFlVvW2QkDTCXF8DJ5Xp26g5oUDgYu+cOefyaSpBJplYr+2SjN0C5yom+jXHlX7YqgI2uhQ/B/1askBLJfQPdV1pHLiF5cSFl2OFalqHnSfNdpM5SJlQ4LPt7htxTpevujf9RqkrZ1Dw/68avAel7CV5nxgE4cG7/QGdq34n4XZ4PmGhBH9lF99JbCJShH0/25UAFzCxyjcnmKGKPA46PZ4nHtB2Az2TYunXOnCKqMbaPtTz+SjqewOBStzWzc8jnZeYtB25P82DL9GIt8SBnw1DJ9mIMOEVBuiVpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ow0FlfI6mqJho6v+kQ479IpbDkXfBlVrdY42XHlMWBI=;
- b=gM12JiSee1cc7C9Q/ZwkliHu/xsueNkjEuDlaqJW80lOIVdIZ5V+iVp+X0ceuF5MuQqUr9xaxDLnJKdLC2z7tjlbBrkrc1zCun62LnfCRAbOwwLT9mllW6ihiW0qC4LApUZ/nwHiJcxy18r0J03K7eOg+9nBCpe70sHGiZ+SI1Xce8Ew2jBargaG3VSwCcu9BwSHiunA8SjxkDIl1z0PiovIcQesAuZYW3xmemSSjxZ+iA9b/A/lXy1RSf5KY47oAhTwBJWxKlR7X1wR664oDcfARMlB8OUVbP3dM8GPaW6xDtTIo/BtiVLjBi9/dX4nM1FuV85YRS0AdBYSt5dZgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=stephanos.io; dmarc=pass action=none header.from=stephanos.io;
- dkim=pass header.d=stephanos.io; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=stephanosio.onmicrosoft.com; s=selector1-stephanosio-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ow0FlfI6mqJho6v+kQ479IpbDkXfBlVrdY42XHlMWBI=;
- b=Qs+d50mHsHFIyufuoZ/0i+jktWM/QtjgzaonzFxijXYyuLCznJR5tlOLFKixGjJhJWhmZ0tnJKYbKHB6gMDf1c2TvCjVauIs3T6qsUQ5ZkTUdcB3AxTOxsYpoKGYneQ7IayTe34FUP9AgCO2KTr62HPeW8LzgfsR+X8gAy+60Jw=
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM (10.174.35.136) by
- SLXP216MB0351.KORP216.PROD.OUTLOOK.COM (10.174.41.8) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.15; Thu, 27 Feb 2020 11:51:28 +0000
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b]) by SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b%8]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
- 11:51:28 +0000
-Received: from DOMINUS.corp.kimin.kr (1.214.196.86) by
- HK2PR02CA0191.apcprd02.prod.outlook.com (2603:1096:201:21::27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.18 via Frontend Transport; Thu, 27 Feb 2020 11:51:27 +0000
-From: Stephanos Ioannidis <root@stephanos.io>
-Subject: [PATCH v2 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
-Thread-Topic: [PATCH v2 2/2] hw/arm/armv7m: Downgrade CPU reset handler
- priority
-Thread-Index: AQHV7WQ/RCF2oAiXBUCnUB+VwCKjkQ==
-Date: Thu, 27 Feb 2020 11:51:28 +0000
-Message-ID: <20200227115005.66349-3-root@stephanos.io>
-References: <20200227115005.66349-1-root@stephanos.io>
-In-Reply-To: <20200227115005.66349-1-root@stephanos.io>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HK2PR02CA0191.apcprd02.prod.outlook.com
- (2603:1096:201:21::27) To SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- (2603:1096:100:9::8)
-x-mailer: git-send-email 2.17.1
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=root@stephanos.io; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [1.214.196.86]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 864a5210-f431-4280-e84d-08d7bb7b6170
-x-ms-traffictypediagnostic: SLXP216MB0351:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SLXP216MB035158FC5893AB2DB31E2F6ABDEB0@SLXP216MB0351.KORP216.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:873;
-x-forefront-prvs: 03264AEA72
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39830400003)(136003)(396003)(346002)(376002)(366004)(189003)(199004)(26005)(316002)(54906003)(956004)(4326008)(2616005)(36756003)(109986005)(2906002)(478600001)(16526019)(186003)(6486002)(81166006)(8676002)(81156014)(71200400001)(8936002)(1076003)(5660300002)(86362001)(52116002)(6506007)(66946007)(6512007)(66476007)(66556008)(64756008)(66446008)(36456003)(42976004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:SLXP216MB0351;
- H:SLXP216MB0285.KORP216.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: stephanos.io does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: l/xM858PiLrxabv6ZAFWlAdMA+vtNs/G70G7Mb/OSHPhRWkZd24qcgBB71+CKc2LbxBH3ewPAjVGZltVmOu9BL6l1F/WFSaGOnupG5TtytF+vfN4O103a48TPwH+annrM2DDI/vG/Z7VVEgXB+oN7bPHmTUWZFGYpcsD78+QcPO0ab1rWQ95yYFB8+HGnytW574uMKT+l9TP6KeWOnv+0RIFrbF41YmgH3pU2hkJtzwKKovUmUQYmEK6rpxO+YeyxGJGNBcmpt3jN5eLG5yw+ZBNVj7P+QYpiXopF/HoHsZWXaIPONpVEJLHZcSmFZo9lPOAr0DmxvEgoAL0JD/uwDf3TWgx0eiEbDW9lrpT9pZP+IdOmlwZSzPEIycdTmLEGD0oYgehfkooxiHhbPrDiNFwiL7NlkCnRB22skPIUXYh+5PvtcGN2xciKdinqSfQCS+BilJ/mzM81PDjCslQFK9OcRfVoXt7VKz9tjnTjCS6MRDOr//NhVELRs5UoGRIEm/nY+p2UHtALv2nwKuLpQ==
-x-ms-exchange-antispam-messagedata: btNrkfSqEB7iYePsevFIC2uVmKrULyHXhWdRHjjP7FPkfoP8U8b0i2KiuBzkfsyvssYLmm4PThqHWuTPrwDjTSlVJtVTnnT05xnFwX7tYDpT7huZCSsjsi4osDNPMD9Ic/xKtxjniTszH3kUVfqu6A==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <cohuck@redhat.com>) id 1j7HkW-0000rm-OQ
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:54:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20614
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j7HkW-0000rU-Ki
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:54:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582804480;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/aJMPG71UspefCp5A01IdKlr8J9qHAczpNpidnvgAfI=;
+ b=Ml/oqAKVMuzPwdd2fNQYGWALcxeLh3U+zSQOMYWdRyga3KTR5xTn+ez9sD5+ek1hATYoi8
+ fJ1s0g8AvTtHPmhUfyDmjBaTk41kdIWcrZvfAI+BkCT6hZ1Wm8NdY4W4zQH843E9rc8Q0P
+ 80ZUZFfWfuaJDYrNNv8+LscLP6wRlRw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-IADh7zASPUS7etPQoSaaTw-1; Thu, 27 Feb 2020 06:54:36 -0500
+X-MC-Unique: IADh7zASPUS7etPQoSaaTw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B0981005512;
+ Thu, 27 Feb 2020 11:54:35 +0000 (UTC)
+Received: from localhost (ovpn-117-2.ams2.redhat.com [10.36.117.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 17A2419C58;
+ Thu, 27 Feb 2020 11:54:34 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 0/7] s390x updates
+Date: Thu, 27 Feb 2020 12:54:24 +0100
+Message-Id: <20200227115431.32364-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: stephanos.io
-X-MS-Exchange-CrossTenant-Network-Message-Id: 864a5210-f431-4280-e84d-08d7bb7b6170
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2020 11:51:28.8344 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: c98113d8-f05d-4479-8605-bfc8e93dc16d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lzMtDlS1r6ZXdFrEn70aQdMZl4PAN8OF8mM+53BHzzSCRpEDjH1YdI+cE2MwCtLxPKLZ1cNGXhlGgUHp0NDOVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SLXP216MB0351
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.128.119
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,51 +82,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Stephanos Ioannidis <root@stephanos.io>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ARMv7-M CPU reset handler, which loads the initial SP and PC
-register values from the vector table, is currently executed before
-the ROM reset handler (rom_reset), and this causes the devices that
-alias low memory region (e.g. STM32F405 that aliases the flash memory
-located at 0x8000000 to 0x0) to load an invalid reset vector of 0 when
-the kernel image is linked to be loaded at the high memory address.
+The following changes since commit db736e0437aa6fd7c1b7e4599c17f9619ab6b837=
+:
 
-For instance, it is norm for the STM32F405 firmware ELF image to have
-the text and rodata sections linked at 0x8000000, as this facilitates
-proper image loading by the firmware burning utility, and the processor
-can execute in place from the high flash memory address region as well.
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into sta=
+ging (2020-02-25 13:31:16 +0000)
 
-In order to resolve this issue, this commit downgrades the ARMCPU reset
-handler invocation priority level to -1 such that it is always executed
-after the ROM reset handler, which has a priority level of 0.
+are available in the Git repository at:
 
-Signed-off-by: Stephanos Ioannidis <root@stephanos.io>
----
- hw/arm/armv7m.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  https://github.com/cohuck/qemu tags/s390x-20200227
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 7531b97ccd..8b7c4b12a6 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -352,7 +352,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel=
-_filename, int mem_size)
-      * way A-profile does it. Note that this means that every M profile
-      * board must call this function!
-      */
--    qemu_register_reset(armv7m_reset, cpu);
-+    qemu_register_reset_with_priority(
-+        QEMU_RESET_PRIORITY_LEVEL(-1), armv7m_reset, cpu);
- }
-=20
- static Property bitband_properties[] =3D {
+for you to fetch changes up to b6c2dbd7214b0b2396e1dcf9668c8b48ab571115:
+
+  s390x: Rename and use constants for short PSW address and mask (2020-02-2=
+7 11:10:29 +0100)
+
+----------------------------------------------------------------
+Includes a headers update against 5.6-current.
+- add missing vcpu reset functionality
+- rstfy some s390 documentation
+- fixes and enhancements
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  s390/sclp: improve special wait psw logic
+
+Cornelia Huck (3):
+  linux-headers: update
+  docs: rstfy s390 dasd ipl documentation
+  docs: rstfy vfio-ap documentation
+
+Janosch Frank (2):
+  s390x: Add missing vcpu reset functions
+  s390x: Rename and use constants for short PSW address and mask
+
+Thomas Huth (1):
+  target/s390x/translate: Fix RNSBG instruction
+
+ MAINTAINERS                                   |   4 +-
+ docs/devel/index.rst                          |   1 +
+ .../{s390-dasd-ipl.txt =3D> s390-dasd-ipl.rst}  | 119 +--
+ docs/system/index.rst                         |   1 +
+ docs/{vfio-ap.txt =3D> system/vfio-ap.rst}      | 796 +++++++++---------
+ hw/s390x/ipl.c                                |   2 +-
+ include/standard-headers/drm/drm_fourcc.h     |  24 +
+ include/standard-headers/linux/ethtool.h      |  11 +
+ include/standard-headers/linux/input.h        |   1 +
+ include/standard-headers/linux/pci_regs.h     |   1 +
+ linux-headers/asm-arm/unistd-common.h         |   2 +
+ linux-headers/asm-arm64/kvm.h                 |  12 +-
+ linux-headers/asm-arm64/unistd.h              |   1 +
+ linux-headers/asm-generic/mman-common.h       |   2 +
+ linux-headers/asm-generic/unistd.h            |   7 +-
+ linux-headers/asm-mips/unistd_n32.h           |   2 +
+ linux-headers/asm-mips/unistd_n64.h           |   2 +
+ linux-headers/asm-mips/unistd_o32.h           |   2 +
+ linux-headers/asm-powerpc/unistd_32.h         |   2 +
+ linux-headers/asm-powerpc/unistd_64.h         |   2 +
+ linux-headers/asm-s390/unistd_32.h            |   2 +
+ linux-headers/asm-s390/unistd_64.h            |   2 +
+ linux-headers/asm-x86/unistd_32.h             |   2 +
+ linux-headers/asm-x86/unistd_64.h             |   2 +
+ linux-headers/asm-x86/unistd_x32.h            |   2 +
+ linux-headers/linux/kvm.h                     |   5 +
+ target/s390x/cpu.c                            |  18 +-
+ target/s390x/cpu.h                            |   3 +-
+ target/s390x/helper.c                         |   2 +-
+ target/s390x/kvm-stub.c                       |  10 +-
+ target/s390x/kvm.c                            |  42 +-
+ target/s390x/kvm_s390x.h                      |   4 +-
+ target/s390x/translate.c                      |   2 +-
+ 33 files changed, 632 insertions(+), 458 deletions(-)
+ rename docs/devel/{s390-dasd-ipl.txt =3D> s390-dasd-ipl.rst} (51%)
+ rename docs/{vfio-ap.txt =3D> system/vfio-ap.rst} (55%)
+
+
+base-commit: db736e0437aa6fd7c1b7e4599c17f9619ab6b837
 --=20
-2.17.1
+2.21.1
 
 
