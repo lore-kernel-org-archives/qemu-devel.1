@@ -2,118 +2,72 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MISSING_HEADERS,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D89C4BA3B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A687C4BA3B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:30:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6A3C24691
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:29:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=stephanosio.onmicrosoft.com header.i=@stephanosio.onmicrosoft.com header.b="YJbGXb1I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A3C24691
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stephanos.io
+	by mail.kernel.org (Postfix) with ESMTPS id 2059424691
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:30:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2059424691
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57701 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7HMN-0006jd-6R
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:29:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39573)
+	id 1j7HNV-0007wr-8j
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:30:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <root@stephanos.io>) id 1j7HK3-0004F0-Pq
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:27:20 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j7HKy-0005Zt-Td
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <root@stephanos.io>) id 1j7HK2-0002JL-OI
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:27:19 -0500
-Received: from mail-eopbgr1280101.outbound.protection.outlook.com
- ([40.107.128.101]:30592 helo=KOR01-PS2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <root@stephanos.io>)
- id 1j7HK0-0001zN-0E; Thu, 27 Feb 2020 06:27:16 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FKq1RNrpvKw1Fq2N+2n4GjF9ktCGbln7fSQBbQKQTtdkjqjcFSitAqvmbg4uCnif02tXUiEPt34MocD1kDIJytHWElxMoO9I5eaXTAYxq3obUnBK6rDMdLg8QFsITx7B/cet4f546AhYEpc1nBmioRC/szBP5p9HBg3pshAEZRMKqn/MIRGw/st5nEs4sjkVYunJQkak02mH8chqukEzjSV3gsNE2m5JIWCA2Rx7EIXCTy0SN9u//ZhXuCvb8aXnwxsoVDI6zRRDFXxmUqXXgCkHzxTWuaQrzoUP8ZL8vP6DARhruB6HHSPfTiII0By3GwAFPCA5ZXN362psMY5cSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ow0FlfI6mqJho6v+kQ479IpbDkXfBlVrdY42XHlMWBI=;
- b=JTzQbnQf7Jhn0Hlh01lHLeLIOi/dSpzBwkhrktekR4BZVld6mDaw5IUQImEYWO8tLvlYmfRNuv67rZWDCLEiR2yKY9PyLrNz5ht/8LuBZUWKtOo51xuxiKrAQlp9s/DYtfhHk5M5Qx+1UB9ameNI62LhWnhqvettEpVqKVMQDJUxHpddbqzIwPt+oShEbM7Qvympg6lL716hUXSp7oxYVos1/HpXsjdFwAJwGVb7Rw1P1ayyDodO0s+WCNo2B5qtxPde6pc34SRfJoeNKuvHRqH8sWoc4LpP+uFFs00EL/MdMRgGKsqytQN4wVh/g0IiGQWJkxC8XXzmyqam4vkfhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=stephanos.io; dmarc=pass action=none header.from=stephanos.io;
- dkim=pass header.d=stephanos.io; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=stephanosio.onmicrosoft.com; s=selector1-stephanosio-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ow0FlfI6mqJho6v+kQ479IpbDkXfBlVrdY42XHlMWBI=;
- b=YJbGXb1INYY/SXQrojwnehDRkR60Lvxutt5LP1baxUY9recdCWHLxh7oohF5NzzjefE5IZGZdwYZDpa7s2sPYq6te73zW79K2GJjA2cBPVMexytlR3Qe8x7Ou2OgkqFIK9MTNmSEdlLyVJ9eRBg7/miS2JR05EmAUd+a2m7q2qQ=
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM (10.174.35.136) by
- SLXP216MB0031.KORP216.PROD.OUTLOOK.COM (10.174.39.141) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Thu, 27 Feb 2020 11:27:11 +0000
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b]) by SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b%8]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
- 11:27:11 +0000
-Received: from DOMINUS.corp.kimin.kr (1.214.196.86) by
- HK2PR03CA0063.apcprd03.prod.outlook.com (2603:1096:202:17::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.11 via Frontend Transport; Thu, 27 Feb 2020 11:27:09 +0000
-From: Stephanos Ioannidis <root@stephanos.io>
-Subject: [PATCH 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
-Thread-Topic: [PATCH 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
-Thread-Index: AQHV7WDamNGXYjwsUEm9K1g4p+T2pA==
-Date: Thu, 27 Feb 2020 11:27:10 +0000
-Message-ID: <20200227112617.66044-2-root@stephanos.io>
-References: <20200227112617.66044-1-root@stephanos.io>
-In-Reply-To: <20200227112617.66044-1-root@stephanos.io>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1j7HKx-0003m8-Qj
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:28:16 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2452 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1j7HKx-0003kN-Fv; Thu, 27 Feb 2020 06:28:15 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 474BDF77525DAC0001BB;
+ Thu, 27 Feb 2020 19:28:12 +0800 (CST)
+Received: from DGGEMM422-HUB.china.huawei.com (10.1.198.39) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 27 Feb 2020 19:28:11 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.163]) by
+ dggemm422-hub.china.huawei.com ([10.1.198.39]) with mapi id 14.03.0439.000;
+ Thu, 27 Feb 2020 19:28:05 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: RE: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
+ iscsi_open()
+Thread-Topic: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
+ iscsi_open()
+Thread-Index: AQHV7IFlkw7HklI9YUytmY61YTlYXagstmsAgAGL6HCAABCIAIAAkGkQ
+Date: Thu, 27 Feb 2020 11:28:04 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B663B55@dggemm531-mbx.china.huawei.com>
+References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
+ <20200226084647.20636-3-kuhn.chenqun@huawei.com>
+ <20200226095444.GB6096@linux.fritz.box>
+ <7412CDE03601674DA8197E2EBD8937E83B6638BE@dggemm531-mbx.china.huawei.com>
+ <20200227103054.GB7493@linux.fritz.box>
+In-Reply-To: <20200227103054.GB7493@linux.fritz.box>
+Accept-Language: en-US
+Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: HK2PR03CA0063.apcprd03.prod.outlook.com
- (2603:1096:202:17::33) To SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- (2603:1096:100:9::8)
-x-mailer: git-send-email 2.17.1
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=root@stephanos.io; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [1.214.196.86]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f5a23963-5b5e-4f05-5988-08d7bb77fc7a
-x-ms-traffictypediagnostic: SLXP216MB0031:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SLXP216MB00312180BE62B09C889B2237BDEB0@SLXP216MB0031.KORP216.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:873;
-x-forefront-prvs: 03264AEA72
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(136003)(346002)(39830400003)(376002)(396003)(189003)(199004)(478600001)(16526019)(6666004)(4326008)(64756008)(66556008)(6506007)(109986005)(86362001)(54906003)(2906002)(66446008)(26005)(1076003)(186003)(66476007)(66946007)(316002)(2616005)(81166006)(71200400001)(956004)(5660300002)(52116002)(8676002)(36756003)(81156014)(6486002)(6512007)(8936002)(36456003)(42976004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:SLXP216MB0031;
- H:SLXP216MB0285.KORP216.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: stephanos.io does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hWYO4gQIr2y19K0zXGZItOpmAAROlo9lJtFQgiIGO9mXwTnfTkWqK0xSAAPCEiqZOhenD5yXpsHa0dbeze/3ppFNEBW0oJXKVrhagEsmMORGYH09z2lp5KeKQnQmohS+L4z+EBKDMssuhAiI0NJ9bJqqrfmdu+bQ/pW0lJ61LGYRnJiKWZV3cx1Qrenj/M3m7CtgKKXX8P49VFRmBbtqsXeVBJgeie5cQ85j6BL1AcD32+PWUf3tn15zS+XOWg/vbeEpTP/8mXPbBcoFZd6e1xKjv3Pq0vNMffe/NKzkAAKbJjKtBbqOLvE5ub6vhpGFoi8wEi6cdkebK7wUWZEchZBhwragWCrYqNb3OnQzPkkgqfzZyCEXqn1CInqUQs6IgraLQ/Ii8lw5BsfqJyWGxQpjVt3HPxqwtvnoHRgGHafpppCQqfDmb5/BwSRcXaALNxSVz8o0npwx6so813JZz8Fo+n8o8QwNzDHE4+SpyXIkqtH6IDMOc70H+sqW9gvYHws3vciiUnfUoV9FSi8FFA==
-x-ms-exchange-antispam-messagedata: CvBObwq0Lwcc9II0LN/fW0N7GSduRbeqTfJibRLclRsceSabHnZ/ic49YTGXjEDkDSuHC45t5W165rr8qplRXmN1ckD0EJCIGwbigzYt0msh985N8GR2cge9N6o5qiMIen5hHYl8EOwVsa2rJGBhWw==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+x-originating-ip: [10.133.205.93]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: stephanos.io
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5a23963-5b5e-4f05-5988-08d7bb77fc7a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2020 11:27:11.0472 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: c98113d8-f05d-4479-8605-bfc8e93dc16d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iw4AYUkIIiW5Nk9jPQmEsYPVorXz8pqFR+10p6FNZGAdC8jjBdfmqNIbH0bVBowmqddzzBJKgp26IqmV4XkeVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SLXP216MB0031
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.128.101
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,51 +79,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Stephanos Ioannidis <root@stephanos.io>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Peter Lieven <pl@kamp.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ARMv7-M CPU reset handler, which loads the initial SP and PC
-register values from the vector table, is currently executed before
-the ROM reset handler (rom_reset), and this causes the devices that
-alias low memory region (e.g. STM32F405 that aliases the flash memory
-located at 0x8000000 to 0x0) to load an invalid reset vector of 0 when
-the kernel image is linked to be loaded at the high memory address.
-
-For instance, it is norm for the STM32F405 firmware ELF image to have
-the text and rodata sections linked at 0x8000000, as this facilitates
-proper image loading by the firmware burning utility, and the processor
-can execute in place from the high flash memory address region as well.
-
-In order to resolve this issue, this commit downgrades the ARMCPU reset
-handler invocation priority level to -1 such that it is always executed
-after the ROM reset handler, which has a priority level of 0.
-
-Signed-off-by: Stephanos Ioannidis <root@stephanos.io>
----
- hw/arm/armv7m.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 7531b97ccd..8b7c4b12a6 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -352,7 +352,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel=
-_filename, int mem_size)
-      * way A-profile does it. Note that this means that every M profile
-      * board must call this function!
-      */
--    qemu_register_reset(armv7m_reset, cpu);
-+    qemu_register_reset_with_priority(
-+        QEMU_RESET_PRIORITY_LEVEL(-1), armv7m_reset, cpu);
- }
-=20
- static Property bitband_properties[] =3D {
---=20
-2.17.1
-
+Pi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+RnJvbTogS2V2aW4gV29sZiBbbWFpbHRvOmt3
+b2xmQHJlZGhhdC5jb21dDQo+U2VudDogVGh1cnNkYXksIEZlYnJ1YXJ5IDI3LCAyMDIwIDY6MzEg
+UE0NCj5UbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPkNjOiBx
+ZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlhbEBub25nbnUub3JnOw0KPnBldGVyLm1h
+eWRlbGxAbGluYXJvLm9yZzsgWmhhbmdoYWlsaWFuZyA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3
+ZWkuY29tPjsNCj5FdWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT47IFJvbm5pZSBT
+YWhsYmVyZw0KPjxyb25uaWVzYWhsYmVyZ0BnbWFpbC5jb20+OyBQYW9sbyBCb256aW5pIDxwYm9u
+emluaUByZWRoYXQuY29tPjsgUGV0ZXINCj5MaWV2ZW4gPHBsQGthbXAuZGU+OyBNYXggUmVpdHog
+PG1yZWl0ekByZWRoYXQuY29tPg0KPlN1YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMDIvMTNdIGJsb2Nr
+L2lzY3NpOlJlbW92ZSByZWR1bmRhbnQgc3RhdGVtZW50IGluDQo+aXNjc2lfb3BlbigpDQo+DQo+
+QW0gMjcuMDIuMjAyMCB1bSAwMjo0OSBoYXQgQ2hlbnF1biAoa3VobikgZ2VzY2hyaWViZW46DQo+
+PiA+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4+ID5Gcm9tOiBLZXZpbiBXb2xmIFttYWls
+dG86a3dvbGZAcmVkaGF0LmNvbV0NCj4+ID5TZW50OiBXZWRuZXNkYXksIEZlYnJ1YXJ5IDI2LCAy
+MDIwIDU6NTUgUE0NCj4+ID5UbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBodWF3ZWku
+Y29tPg0KPj4gPkNjOiBxZW11LWRldmVsQG5vbmdudS5vcmc7IHFlbXUtdHJpdmlhbEBub25nbnUu
+b3JnOw0KPj4gPnBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgWmhhbmdoYWlsaWFuZw0KPj4gPjx6
+aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBFdWxlciBSb2JvdA0KPj4gPjxldWxlci5y
+b2JvdEBodWF3ZWkuY29tPjsgUm9ubmllIFNhaGxiZXJnDQo+PHJvbm5pZXNhaGxiZXJnQGdtYWls
+LmNvbT47DQo+PiA+UGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT47IFBldGVyIExp
+ZXZlbiA8cGxAa2FtcC5kZT47IE1heA0KPj4gPlJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj4+
+ID5TdWJqZWN0OiBSZTogW1BBVENIIHYyIDAyLzEzXSBibG9jay9pc2NzaTpSZW1vdmUgcmVkdW5k
+YW50IHN0YXRlbWVudA0KPj4gPmluDQo+PiA+aXNjc2lfb3BlbigpDQo+PiA+DQo+PiA+QW0gMjYu
+MDIuMjAyMCB1bSAwOTo0NiBoYXQga3Vobi5jaGVucXVuQGh1YXdlaS5jb20gZ2VzY2hyaWViZW46
+DQo+PiA+PiBGcm9tOiBDaGVuIFF1biA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+PiA+Pg0K
+Pj4gPj4gQ2xhbmcgc3RhdGljIGNvZGUgYW5hbHl6ZXIgc2hvdyB3YXJuaW5nOg0KPj4gPj4gICBi
+bG9jay9pc2NzaS5jOjE5MjA6OTogd2FybmluZzogVmFsdWUgc3RvcmVkIHRvICdmbGFncycgaXMg
+bmV2ZXIgcmVhZA0KPj4gPj4gICAgICAgICBmbGFncyAmPSB+QkRSVl9PX1JEV1I7DQo+PiA+PiAg
+ICAgICAgIF4gICAgICAgIH5+fn5+fn5+fn5+fg0KPj4gPj4NCj4+ID4+IFJlcG9ydGVkLWJ5OiBF
+dWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4+ID4+IFNpZ25lZC1vZmYtYnk6
+IENoZW4gUXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4+ID4NCj4+ID5IbW0sIEknbSBu
+b3Qgc28gc3VyZSBhYm91dCB0aGlzIG9uZSBiZWNhdXNlIGlmIHdlIHJlbW92ZSB0aGUgbGluZSwN
+Cj4+ID5mbGFncyB3aWxsIGJlIGluY29uc2lzdGVudCB3aXRoIGJzLT5vcGVuX2ZsYWdzLiBJdCBm
+ZWVscyBsaWtlIHNldHRpbmcNCj4+ID5hIHRyYXAgZm9yIGFueW9uZSB3aG8gd2FudHMgdG8gYWRk
+IGNvZGUgdXNpbmcgZmxhZ3MgaW4gdGhlIGZ1dHVyZS4NCj4+IEhpIEtldmluLA0KPj4gSSBmaW5k
+IGl0IGV4aXN0cyBzaW5jZSA4ZjNiZjUwZDM0MDM3MjY2LiAgIDogICkNCj4NCj5ZZXMsIGl0IGhh
+cyBleGlzdGVkIGZyb20gdGhlIHN0YXJ0IHdpdGggYXV0by1yZWFkLW9ubHkuDQo+DQo+PiBJdCdz
+IG5vdCBhIGJpZyBkZWFsLCAganVzdCB1cHNldCBjbGFuZyBzdGF0aWMgY29kZSBhbmFseXplci4N
+Cj4+IEFzIHlvdSBzYWlkLCBpdCBjb3VsZCBiZSBhIHRyYXAgZm9yIHRoZSBmdXR1cmUuDQo+DQo+
+V2hhdCdzIGludGVyZXN0aW5nIGlzIHRoYXQgd2UgZG8gaGF2ZSBvbmUgdXNlciBvZiB0aGUgZmxh
+Z3MgbGF0ZXIgaW4gdGhlIGZ1bmN0aW9uLA0KPmJ1dCBpdCB1c2VzIGJzLT5vcGVuX2ZsYWdzIGlu
+c3RlYWQ6DQo+DQo+ICAgIHJldCA9IGlzY3NpX2FsbG9jbWFwX2luaXQoaXNjc2lsdW4sIGJzLT5v
+cGVuX2ZsYWdzKTsNCj4NCkdvb2QgcG9pbnQsICBJIHRoaW5rIHRoaXMgaXMgZXhhY3RseSB3aGVy
+ZSB0aGUgJ2ZsYWdzJyBhcmUgbmVlZGVkIG5vdy4gIA0KSXQgc2hvdWxkIGJlIHJpZ2h0IHRvIGtl
+ZXAgaXQgZm9yIHRoZSBmdXR1cmUsIHRvby4NCg0KTGF0ZXIgdmVyc2lvbiwgSSB3aWxsIG1vZGlm
+eSBpdC4NCg0KVGhhbmtzLg0KPg0KPk1heWJlIHRoaXMgc2hvdWxkIGJlIHVzaW5nIGZsYWdzPyAo
+VGhlIHZhbHVlIG9mIHRoZSBiaXRzIHdlJ3JlIGludGVyZXN0ZWQgaW4gaXMNCj50aGUgc2FtZSwg
+YnV0IHdoZW4gZmxhZ3MgaXMgcGFzc2VkIGFzIGEgcGFyYW1ldGVyLCBJIHdvdWxkIGV4cGVjdCBp
+dCB0byBiZQ0KPnVzZWQuKQ0K
 
