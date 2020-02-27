@@ -1,101 +1,84 @@
 Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB28C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F31DC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47E3D24692
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:06:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E492424692
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:08:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mqt2PMZ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E3D24692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnCBUaR+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E492424692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7OUf-0003W2-H8
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 14:06:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41557)
+	id 1j7OWI-0004gR-6R
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 14:08:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41857)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7OTh-0002zj-Fi
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:05:47 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7OVa-00048S-Ut
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:07:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7OTf-0000RR-TX
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:05:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37678
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7OTf-0000JM-Q1
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:05:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582830339;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AGVK2F/TbfEDqN5cBRyE0/Hj1kZbg9bBmRRH8RAbREc=;
- b=Mqt2PMZ3e0vJBJ22V71cHzDbUGVlpCQymLhPyxaF/Ufn4/FZf2iKaT4XGLng4YSJWwl19h
- lKd6dPJZD2SoingFL/R12hHLsDSABl7qBymzCvgMct25CeNX09AIfzaR7xfFh/9hmzGi8T
- 72kdo7O3Hd07olg3oKIBbFiOycxEUWc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-3oAUzvs0NRaUit4DnEkkug-1; Thu, 27 Feb 2020 14:05:37 -0500
-X-MC-Unique: 3oAUzvs0NRaUit4DnEkkug-1
-Received: by mail-wr1-f72.google.com with SMTP id p5so221287wrj.17
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 11:05:37 -0800 (PST)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7OVY-0001TR-Vh
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:07:42 -0500
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42964)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j7OVU-0001M5-Nw; Thu, 27 Feb 2020 14:07:36 -0500
+Received: by mail-io1-xd42.google.com with SMTP id z1so635337iom.9;
+ Thu, 27 Feb 2020 11:07:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xIaAzOO7CiQeAH4qsbtZ0X6RjIuzPqsDnaVRY+vJMyg=;
+ b=NnCBUaR+zBYH8eIiTe9Si9RoGFPIRzyCL6SYG0xdClQwmeJgfCgWApXTpjHYs3Xrk/
+ p8FnOSG76FfmQVWoOO2yrxuyS/tiDmCwkhumbTIcpnqN+jcgtEmzK9bzfBmb5qcT/AwX
+ KIDDuwKVHhV7DFqTsAA01LmE3gWKFM0qbsVy+WDMrn5MLx2zCa3tTCefUqWbR5kMKABN
+ W+qsGgyemJNBa3pE+jFnbyjO28Vhd/hW58A5L+kIR5whD74jODaD9ucWoNSJSzp/8rTE
+ 21PzfBUXv1EblBl6ISlywPLhaJj0zZP2BGm3fd7yYY9pAQPRHOWffVM433IjFdb5oatS
+ HOcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+KT/FCOzM7vqW8m0x1I3CaHhfRz4Fup2MyNkoVNC+xg=;
- b=I7gyfC7BkzaMcgO+TwGVxPEMMR12geI3Qcr+CWckyrjM5Ms1KLgHqi5xE4n2pcWG7q
- tj1p5Wp9X+i8/6BEKJoFojYnJP5imdoWlhPBhs0ys9BwQOiodbDKc2B3scmPj7m746fl
- I88DNwP1JFouLDBHjeH3RLqRYNRKO5sKgk3vpfQ+zmvQOp3U3StiW5GbCt9YdkBlugCT
- Nko+FcH0+RX+DW1tVQD3sl4e/ds/Avc3Szq2p2CeL33SR9C9iR9wLmggsCb1tBzrJsg6
- DFOIXKGIuZEyQCAjkiGhOMhtZnmq5QnEZ6XKEjbUBSN1VDYkS0DOBzrZBfI2KXxyMf/V
- 3a4Q==
-X-Gm-Message-State: APjAAAXbZO77XUJm28lKKs6aBVH15iQKxIhfTbZSRRu5VjpgqAKINMP8
- XWiVQufMBFzbzjmDdxzAAmr2vMvh+zaVLR7qS7OLmUzyZ2lowxCB4VSERfH7ft4QRMYP7Xw7HVd
- M14c+BOTMfjOBtBU=
-X-Received: by 2002:adf:eac1:: with SMTP id o1mr308405wrn.234.1582830336582;
- Thu, 27 Feb 2020 11:05:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwjQrBYg2rDlZrzW7VHPNhpDfL1Sai1e0nKm9bwTm8WYD10D5XD5uam/q/K2u2qP9r7pf/e9A==
-X-Received: by 2002:adf:eac1:: with SMTP id o1mr308383wrn.234.1582830336364;
- Thu, 27 Feb 2020 11:05:36 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id m22sm7899123wmc.41.2020.02.27.11.05.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Feb 2020 11:05:35 -0800 (PST)
-Subject: Re: [PATCH] migration/savevm: release gslist after dump_vmstate_json
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, pannengyuan@huawei.com
-References: <20200219094705.8960-1-pannengyuan@huawei.com>
- <20200219095908.GB3089@work-vm>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6dbc9a44-0e99-266b-11b6-d4f5b5fdb285@redhat.com>
-Date: Thu, 27 Feb 2020 20:05:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xIaAzOO7CiQeAH4qsbtZ0X6RjIuzPqsDnaVRY+vJMyg=;
+ b=USpYrFdL9JVWq3enUncIbJx3emBSbkpsD9ZGRI1ASkPaD0ewR0K60FmNOjXJylXKji
+ o/zxjSqjr6ySE4cqmBjByuK8YFppIvDi5bsfqoUy9+xdcLSvEH9PTYNuJxNhEjHQ23SB
+ vzY+zH+cnxz9CO3x6J8ZeSnUP6bI5NQojjBxd8l+kRNp895Xn6fjtP5ZTzTReOaZhjQo
+ TPtgZuQbZkmdkA2ZsqeA5c5xpZ0mWnopueqtPZbZr/PXLa4H9Uz8DGcdV2to0Lpmnekx
+ LmWsJIlOW1uiX2Hv+IyvlJNoS5CZoX8rUy82ZOCQsS5MS7l8iKQ27cpV2qRzvehvLYmC
+ 5/4Q==
+X-Gm-Message-State: APjAAAXT3DZpYmIpYkwZPE5szYBHEOoZunTkhh3hkrsBVKi3z/SL8ChM
+ zauafB0sKyG/vBACTuhGsnY7G9ZHjALodBNHDEI=
+X-Google-Smtp-Source: APXvYqwMmSKe6zMqgVBTvSvaC0BkVyDodskrCdOT/NZO07wSJA6kB0s0wipVEGOz9FzW8fxqBxFjepP4OIMwBcMxAG4=
+X-Received: by 2002:a05:6602:158e:: with SMTP id
+ e14mr584466iow.217.1582830455947; 
+ Thu, 27 Feb 2020 11:07:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200219095908.GB3089@work-vm>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200226181020.19592-1-alex.bennee@linaro.org>
+ <20200226181020.19592-5-alex.bennee@linaro.org>
+ <2ca7b55b-5674-370d-5c4d-dc8b7782ca64@linaro.org>
+ <87pne0w6rt.fsf@linaro.org> <56f5e355-9357-e212-e92b-9db1d8424dea@linaro.org>
+In-Reply-To: <56f5e355-9357-e212-e92b-9db1d8424dea@linaro.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Thu, 27 Feb 2020 20:07:24 +0100
+Message-ID: <CAPan3WrSRm986EfwJdXV2MduNLE5BS+QmCv0Bo5-BD+QfT-=dg@mail.gmail.com>
+Subject: Re: [PATCH v1 4/4] accel/tcg: increase default code gen buffer size
+ for 64 bit
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="00000000000011092f059f936f1b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,105 +90,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- euler.robot@huawei.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/19/20 10:59 AM, Dr. David Alan Gilbert wrote:
-> * pannengyuan@huawei.com (pannengyuan@huawei.com) wrote:
->> From: Pan Nengyuan <pannengyuan@huawei.com>
->>
->> 'list' forgot to free at the end of dump_vmstate_json_to_file(), althoug=
-h it's called only once, but seems like a clean code.
->>
->> Fix the leak as follow:
->> Direct leak of 16 byte(s) in 1 object(s) allocated from:
->>      #0 0x7fb946abd768 in __interceptor_malloc (/lib64/libasan.so.5+0xef=
-768)
->>      #1 0x7fb945eca445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->>      #2 0x7fb945ee2066 in g_slice_alloc (/lib64/libglib-2.0.so.0+0x6a066=
-)
->>      #3 0x7fb945ee3139 in g_slist_prepend (/lib64/libglib-2.0.so.0+0x6b1=
-39)
->>      #4 0x5585db591581 in object_class_get_list_tramp /mnt/sdb/qemu-new/=
-qemu/qom/object.c:1084
->>      #5 0x5585db590f66 in object_class_foreach_tramp /mnt/sdb/qemu-new/q=
-emu/qom/object.c:1028
->>      #6 0x7fb945eb35f7 in g_hash_table_foreach (/lib64/libglib-2.0.so.0+=
-0x3b5f7)
->>      #7 0x5585db59110c in object_class_foreach /mnt/sdb/qemu-new/qemu/qo=
-m/object.c:1038
->>      #8 0x5585db5916b6 in object_class_get_list /mnt/sdb/qemu-new/qemu/q=
-om/object.c:1092
->>      #9 0x5585db335ca0 in dump_vmstate_json_to_file /mnt/sdb/qemu-new/qe=
-mu/migration/savevm.c:638
->>      #10 0x5585daa5bcbf in main /mnt/sdb/qemu-new/qemu/vl.c:4420
->>      #11 0x7fb941204812 in __libc_start_main ../csu/libc-start.c:308
->>      #12 0x5585da29420d in _start (/mnt/sdb/qemu-new/qemu/build/x86_64-s=
-oftmmu/qemu-system-x86_64+0x27f020d)
->>
->> Indirect leak of 7472 byte(s) in 467 object(s) allocated from:
->>      #0 0x7fb946abd768 in __interceptor_malloc (/lib64/libasan.so.5+0xef=
-768)
->>      #1 0x7fb945eca445 in g_malloc (/lib64/libglib-2.0.so.0+0x52445)
->>      #2 0x7fb945ee2066 in g_slice_alloc (/lib64/libglib-2.0.so.0+0x6a066=
-)
->>      #3 0x7fb945ee3139 in g_slist_prepend (/lib64/libglib-2.0.so.0+0x6b1=
-39)
->>      #4 0x5585db591581 in object_class_get_list_tramp /mnt/sdb/qemu-new/=
-qemu/qom/object.c:1084
->>      #5 0x5585db590f66 in object_class_foreach_tramp /mnt/sdb/qemu-new/q=
-emu/qom/object.c:1028
->>      #6 0x7fb945eb35f7 in g_hash_table_foreach (/lib64/libglib-2.0.so.0+=
-0x3b5f7)
->>      #7 0x5585db59110c in object_class_foreach /mnt/sdb/qemu-new/qemu/qo=
-m/object.c:1038
->>      #8 0x5585db5916b6 in object_class_get_list /mnt/sdb/qemu-new/qemu/q=
-om/object.c:1092
->>      #9 0x5585db335ca0 in dump_vmstate_json_to_file /mnt/sdb/qemu-new/qe=
-mu/migration/savevm.c:638
->>      #10 0x5585daa5bcbf in main /mnt/sdb/qemu-new/qemu/vl.c:4420
->>      #11 0x7fb941204812 in __libc_start_main ../csu/libc-start.c:308
->>      #12 0x5585da29420d in _start (/mnt/sdb/qemu-new/qemu/build/x86_64-s=
-oftmmu/qemu-system-x86_64+0x27f020d)
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->=20
-> Good robot!
+--00000000000011092f059f936f1b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Unfortunately it doesn't generate the documentation along...
+Hi Richard,
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Thu, Feb 27, 2020 at 1:57 PM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
->=20
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->>   migration/savevm.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index f19cb9ec7a..60e6ea8a8d 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -665,6 +665,7 @@ void dump_vmstate_json_to_file(FILE *out_file)
->>       }
->>       fprintf(out_file, "\n}\n");
->>       fclose(out_file);
->> +    g_slist_free(list);
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
->>   }
->>  =20
->>   static uint32_t calculate_new_instance_id(const char *idstr)
->> --=20
->> 2.18.2
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
+> On 2/27/20 4:31 AM, Alex Benn=C3=A9e wrote:
+> >> It does not make sense for a linux-user chroot, running make -jN, on
+> just about
+> >> any host.  For linux-user, I could be happy with a modest increase, bu=
+t
+> not all
+> >> the way out to 2GiB.
+> >>
+> >> Discuss.
+> >
+> > Does it matter that much? Surely for small programs the kernel just
+> > never pages in the used portions of the mmap?
+>
+> That's why I used the example of a build under the chroot, because the
+> compiler
+> is not a small program.
+>
+> Consider when the memory *is* used, and N * 2GB implies lots of paging,
+> where
+> the previous N * 32MB did not.
+>
+> I agree that a lower default value probably is safer until we have more
+proof that a larger value does not give any issues.
 
+
+> I'm saying that we should consider a setting more like 128MB or so, since
+> the
+> value cannot be changed from the command-line, or through the environment=
+.
+>
+
+Proposal: can we then introduce a new command line parameter for this?
+Maybe in a new patch?
+Since the size of the code generation buffer appears to have an impact on
+performance,
+in my opinion it would make sense to make it configurable by the user.
+
+Regards,
+Niek
+
+
+>
+>
+> r~
+>
+>
+
+--=20
+Niek Linnenbank
+
+--00000000000011092f059f936f1b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi Richard,<br></div><br><div class=3D"gmail_quote"><=
+div dir=3D"ltr" class=3D"gmail_attr">On Thu, Feb 27, 2020 at 1:57 PM Richar=
+d Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hen=
+derson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
+adding-left:1ex">On 2/27/20 4:31 AM, Alex Benn=C3=A9e wrote:<br>
+&gt;&gt; It does not make sense for a linux-user chroot, running make -jN, =
+on just about<br>
+&gt;&gt; any host.=C2=A0 For linux-user, I could be happy with a modest inc=
+rease, but not all<br>
+&gt;&gt; the way out to 2GiB.<br>
+&gt;&gt;<br>
+&gt;&gt; Discuss.<br>
+&gt; <br>
+&gt; Does it matter that much? Surely for small programs the kernel just<br=
+>
+&gt; never pages in the used portions of the mmap?<br>
+<br>
+That&#39;s why I used the example of a build under the chroot, because the =
+compiler<br>
+is not a small program.<br>
+<br>
+Consider when the memory *is* used, and N * 2GB implies lots of paging, whe=
+re<br>
+the previous N * 32MB did not.<br>
+<br></blockquote><div><div>I agree that a lower default value probably is s=
+afer until we have more proof that a larger value does not give any issues.=
+</div></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
+ex">
+I&#39;m saying that we should consider a setting more like 128MB or so, sin=
+ce the<br>
+value cannot be changed from the command-line, or through the environment.<=
+br></blockquote><div><br></div><div>Proposal: can we then introduce a new c=
+ommand line parameter for this? Maybe in a new patch?</div><div>Since the s=
+ize of the code generation buffer appears to have an impact on performance,=
+</div><div>in my opinion it would make sense to make it configurable by the=
+ user.<br></div><div><br></div><div>Regards,</div><div>Niek<br></div><div>=
+=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
+.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+<br>
+r~<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--00000000000011092f059f936f1b--
 
