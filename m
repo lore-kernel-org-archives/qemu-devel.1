@@ -2,89 +2,80 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B41FC4BA3B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71451C4BA3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:40:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9AFC24690
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 418C324690
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:40:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aQQvi8W2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9AFC24690
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qO0IIXHo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 418C324690
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7HWS-0004n6-Vo
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:40:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43765)
+	id 1j7HWc-000520-EU
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:40:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j7HV0-0003UO-AV
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:41 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7HVG-0003gQ-7N
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j7HUw-0008AU-QX
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:36 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57970
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j7HUw-00086B-Jz
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582803513;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=M8TyWRDiZfwO4iR/rU1PuO7ZYtPvtyt775EDLXpXcW4=;
- b=aQQvi8W2HTPVPZ+uuQqQlKmQFKKpWQfwYLGlUfqkNmnjomsVz1eXbyMa2Lio0uLnkFg0Vb
- PXltPhx9sYecObHZ+joFSe8QrR+WMOFuU2LSg6KkFZ/bTGGiVMznQKqI2/vgJ0d9eVrnEV
- C7KqPkDtbfdohXRE8Dgs0e+dBsqW43k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-g064SZGmPCuzuerejsL_tA-1; Thu, 27 Feb 2020 06:38:25 -0500
-X-MC-Unique: g064SZGmPCuzuerejsL_tA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51F7C800D54;
- Thu, 27 Feb 2020 11:38:24 +0000 (UTC)
-Received: from redhat.com (ovpn-112-43.ams2.redhat.com [10.36.112.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7230B1BC6D;
- Thu, 27 Feb 2020 11:38:17 +0000 (UTC)
-Date: Thu, 27 Feb 2020 11:38:14 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v4 0/5] vhost-user block device backend implementation
-Message-ID: <20200227113814.GI1645630@redhat.com>
-References: <20200218050711.8133-1-coiby.xu@gmail.com>
- <20200219163815.GD1085125@stefanha-x1.localdomain>
- <CAJAkqrXaqmT2pR4K1x06AeQZHvUWp-fcqnbKZq_45czO96v5PA@mail.gmail.com>
- <20200227074114.GB83512@stefanha-x1.localdomain>
- <CAJAkqrWUJWLdT+6b_XmHFwnzhhbYei2SakCKVW0Rf92HJgoZDw@mail.gmail.com>
- <20200227100206.GA7493@linux.fritz.box>
- <CAJAkqrW_Euur3HjWaK6E-TAjT1dmjA1fz1oPwKSt7_pOC3=S+w@mail.gmail.com>
- <20200227105528.GC7493@linux.fritz.box>
- <CAMxuvay1vLosHTpXP7b3pXQvfRPOMp0z3ML66khLSrK-iLf7aQ@mail.gmail.com>
- <20200227111958.GD7493@linux.fritz.box>
+ (envelope-from <peter.maydell@linaro.org>) id 1j7HVF-0000I9-4h
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:53 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:33999)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7HVE-0000GP-Va
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:38:53 -0500
+Received: by mail-oi1-x243.google.com with SMTP id l136so2990416oig.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 03:38:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PqOtJqkV58ZIscjJS1hPys5Cmx0isyL4PEcXThnmNgA=;
+ b=qO0IIXHoIJvwvgYz83BKFw83byH1lwPBbP2YlcFQJGU3gFtZcV0Ld3PvlA+teGK19l
+ DoKCNcVISWK+Ty/lItLNkj26k2VXACZbFD2vlstv91D3c2i6loc3mJvHr9vpDEAhqaUK
+ XPAh0UZTF48UTYh/2vYT6P8AL2NEPrIAOBzUNJmWYEV2F1vF/BxLbltCpQs7ocnxajo7
+ 1ibUU9/3Oe3xDf0ZbohXoVfSd7aR68pc1+6SBsPhBP4LPNT0lfjV1WaKxjm/AG47M7uQ
+ bGWATZknRsI3Y8RSXNPtCRZBYDYkg6U8IVbohOZGA46/Sr3hpJlJkqeN+d/RuNlxLiXG
+ wv9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PqOtJqkV58ZIscjJS1hPys5Cmx0isyL4PEcXThnmNgA=;
+ b=U99Cs4qjeNMypQWkrLCvq1Mh1s+fLIR0c2Ge5F+aqVypTFHFvPyLgYVf+yVhsNCR3r
+ n4N9ifvpOuq4j/SGwuOWt7CyioEYgQak/C9/TroYb3zRj9V2USVwoFRY2gnNp+C1IKBz
+ wc/69i6XFNGjFWHpbxYRTTaNktUMa2VFqOAVkRE/dCj6Tqh/SmIUTUUquPsUBPhGkLTH
+ 1t0CrVScvNomjUFmyhALV3ET3eT8Q6aFS1sg4Vi2CjBgmIdFSU64TDQOiF9LAPKEjWnY
+ zp6VoeR1zXVTOohe47IuvfYFnBYSZu+xsXTbShT42ODaA/i79CJX+ZbRbgoj6qlRWCI5
+ NdcQ==
+X-Gm-Message-State: APjAAAWfzud54kaxTVS/4hNBSDDC0NI/uIbssrB7A6CmlY63ccEgWxB+
+ 3EAGIGR1AzeVZRnYUPrpWWrEApuqI3L3aSNoakVfZk8y
+X-Google-Smtp-Source: APXvYqz5dunF/DDZNzwTe8BZ3d2QSAZPvMKxLkQ7i9BS9wwHZkNI2YlhHSyRWgzlqv+y1CpZsES+W22YdsxRYT/4uo0=
+X-Received: by 2002:a05:6808:289:: with SMTP id
+ z9mr2859834oic.48.1582803532256; 
+ Thu, 27 Feb 2020 03:38:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200227111958.GD7493@linux.fritz.box>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200226113034.6741-1-pbonzini@redhat.com>
+ <20200226113034.6741-6-pbonzini@redhat.com>
+In-Reply-To: <20200226113034.6741-6-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Feb 2020 11:38:41 +0000
+Message-ID: <CAFEAcA9T=1iMJJSOK6YEBoN84Bq0uMqAbHdCFS976uJgtxZf=g@mail.gmail.com>
+Subject: Re: [PATCH 05/18] qemu-doc: split qemu-doc.texi in multiple files
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,123 +87,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: bharatlkmlkvm@gmail.com,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Coiby Xu <coiby.xu@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 27, 2020 at 12:19:58PM +0100, Kevin Wolf wrote:
-> Am 27.02.2020 um 12:07 hat Marc-Andr=C3=A9 Lureau geschrieben:
-> > On Thu, Feb 27, 2020 at 11:55 AM Kevin Wolf <kwolf@redhat.com> wrote:
-> > > Am 27.02.2020 um 11:28 hat Coiby Xu geschrieben:
-> > > > > > we still need customized vu_message_read because libvhost-user =
-assumes
-> > > > > > we will always get a full-size VhostUserMsg and hasn't taken ca=
-re of
-> > > > > > this short read case. I will improve libvhost-user's vu_message=
-_read
-> > > > > > by making it keep reading from socket util getting enough bytes=
-. I
-> > > > > > assume short read is a rare case thus introduced performance pe=
-nalty
-> > > > > > would be negligible.
-> > > >
-> > > > > In any case, please make sure that we use the QIOChannel function=
-s
-> > > > > called from a coroutine in QEMU so that it will never block, but =
-the
-> > > > > coroutine can just yield while it's waiting for more bytes.
-> > > >
-> > > > But if I am not wrong, libvhost-user is supposed to be indepdent fr=
-om
-> > > > the main QEMU code. So it can't use the QIOChannel functions if we
-> > > > simply modify exiting vu_message_read to address the short read iss=
-ue.
-> > > > In v3 & v4, I extended libvhost-user to allow vu_message_read to be
-> > > > replaced by one which will depend on the main QEMU code. I'm not su=
-re
-> > > > which way is better.
-> > >
-> > > The way your latest patches have it, with a separate read function,
-> > > works for me.
-> >=20
-> > Done right, I am not against it, fwiw
-> >=20
-> > > You could probably change libvhost-user to reimplement the same
-> > > functionality, and it might be an improvement for other users of the
-> > > library, but it's also code duplication and doesn't provide more valu=
-e
-> > > in the context of the vhost-user export in QEMU.
-> > >
-> > > The point that's really important to me is just that we never block w=
-hen
-> > > we run inside QEMU because that would actually stall the guest. This
-> > > means busy waiting in a tight loop until read() returns enough bytes =
-is
-> > > not acceptable in QEMU.
-> >=20
-> > In the context of vhost-user, local unix sockets with short messages
-> > (do we have >1k messages?), I am not sure if this is really a problem.
->=20
-> I'm not sure how much of a problem it is in practice, and whether we
-> can consider the vhost-user client trusted. But using QIOChannel from
-> within a coroutine just avoids the problem completely, so it feels like
-> a natural choice to just do that.
+On Wed, 26 Feb 2020 at 11:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> In order to facilitate the reorganization of qemu-doc.texi content,
+> as well as the conversion to rST/Sphinx, split it in multiple .texi
+> files that are included from docs/system.
+>
+> The "other devices" section is renamed to ivshmem and placed last.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-It isn't clear to me that we have a consitent plan for how we intend
-libvhost-user to develop & what it is permitted to use.  What information
-I see in the source code and in this thread are contradictory.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-For example, in the text quoted above:
+(used git's colorMoved feature to check nothing accidentally
+changed during the reshuffle and eyeballed the table of
+contents in the generated HTML to confirm it's all still
+there and in the same order.)
 
-  "libvhost-user is supposed to be indepdent from the main QEMU code."
-
-which did match my overall understanding too. At the top of libvhost-user.c
-there is a comment
-
-   /* this code avoids GLib dependency */
-
-but a few lines later it does
-
-  #include "qemu/atomic.h"
-  #include "qemu/osdep.h"
-  #include "qemu/memfd.h"
-
-and in the Makefile we link it to much of QEMU util code:
-
-  libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
-
-this in turn pulls in GLib code, and looking at symbols we can see
-over 100 GLib functions used:
-
-  $ nm ./libvhost-user.a | grep 'U g_' | sort | uniq | wc -l
-  128
-
-And over 200 QEMU source object files included:
-
-  $ nm ./libvhost-user.a | grep '.o:' | sort | wc -l
-  224
-
-So unless I'm missing something, we have lost any independance from
-both QEMU and GLib code that we might have had in the past.
-
-Note this also has licensing implications, as I expect this means that
-via the QEMU source objects it pulls in, libvhost-user.a has become
-a GPLv2-only combined work, not a GPLv2-or-later combined work.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+thanks
+-- PMM
 
