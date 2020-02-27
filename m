@@ -2,90 +2,61 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98023C52D5D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A1FC3F34E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:00:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 664DD24656
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:59:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b4V2R98F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 664DD24656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 51F1220801
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 14:00:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F1220801
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Jh1-0007p8-KQ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:59:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40522)
+	id 1j7Ji1-0000Ee-FC
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 09:00:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7Jg2-0007MO-Oq
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:11 -0500
+ (envelope-from <groug@kaod.org>) id 1j7Jgh-0007jn-E9
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7Jg1-0006uP-RV
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:10 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44271)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7Jg1-0006tn-LU
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:09 -0500
-Received: by mail-pf1-x443.google.com with SMTP id y5so1679793pfb.11
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:58:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6bTgmZs4+0yKu7QhFYSn6OguxtaGnMvy0J2gOiPho4U=;
- b=b4V2R98FHSfZ75vpAlyYlJkPxQc02Zj+Zr+V/cYNAyVfB4O/OTGZtoewTgtIRE27qU
- 0R6e1myGUy4FBsakGqO5G+pwZh2gBVi55zuZvMtaqml9eKDqG07oGmtZJ/yWsLJdmfv7
- 1YGfkFCLCRszxn0KbVvqXna151NaqTS43ibaFFRn1gSzJpqFMKJ8CUD+nFVETuY4ag9N
- Mk4zzTX9xR5AxI94Lf9pv8ioMeHhZHMsFx39AJOmHDTdqcxO+cDeobwX8PTp22tgpNjY
- jYVAlPAHj0EsJDu+1Tk4dAEp1akF5YGdjA7wZsS5b2bKZwj7NJmislkZF6RtDrroDd91
- JqpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6bTgmZs4+0yKu7QhFYSn6OguxtaGnMvy0J2gOiPho4U=;
- b=LJczcLQ2vbem62pniv7HDCQ4YrlNt3P76+VgSmGE6UrdkbzdQdZgHa53Yv2qT6FeFO
- MmRkc2VaIgjnUphZD7ibSrmVb+d/uq2W8845AIF2byY5g4KmLTVVj0uDp78E/AEvfu9S
- IVeIZPDrHwym5+GQUsADi7ba5UHzKdT3Av/i9vOgTxlOENtFvoL5K12/AvA133GCLdK5
- OratUlcX7LRehk7tkmLUWxXbQePrmltxZZq5n0bUy7WZChIUV6OAahCNx7ooybqOZPgV
- L7bRT5FUaeR3oWORiSVOF55GduwkisA3SnLbrvCK/QWa6z8UClK4DnDMASJLkPAo1VNa
- y/qA==
-X-Gm-Message-State: APjAAAXzrBJas3iblPu2Hm97DOtstKP20snWZgn9prcaTqdbufODPUQE
- z7qawQ6ci0iVbS/RNOmbu3nOTQ==
-X-Google-Smtp-Source: APXvYqw8Rd6WoSWSFkWThr5h+tTSFPfVFWeBonJVNCILKjV4gc+fZ1GVfwYI7fW6gnz8VVMQk0E4tA==
-X-Received: by 2002:a62:e414:: with SMTP id r20mr4180654pfh.154.1582811888536; 
- Thu, 27 Feb 2020 05:58:08 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- p94sm2687327pjp.15.2020.02.27.05.58.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Feb 2020 05:58:07 -0800 (PST)
-Subject: Re: [PATCH v3 03/12] tests/qapi/doc-good.json: Clean up markup
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20200225140437.20609-1-peter.maydell@linaro.org>
- <20200225140437.20609-4-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <28ce6039-71c1-5098-9037-c1637f47d275@linaro.org>
-Date: Thu, 27 Feb 2020 05:58:06 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <groug@kaod.org>) id 1j7Jgg-00078d-Bh
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:51 -0500
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:55681)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j7Jgg-00074v-5M
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:58:50 -0500
+Received: from player779.ha.ovh.net (unknown [10.108.35.95])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1876415D998
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 14:58:38 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player779.ha.ovh.net (Postfix) with ESMTPSA id 1A4A1FCECA56;
+ Thu, 27 Feb 2020 13:58:31 +0000 (UTC)
+Date: Thu, 27 Feb 2020 14:58:29 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Subject: Re: [PATCH v2] spapr: Fix Coverity warning while validating nvdimm
+ options
+Message-ID: <20200227145829.56c28da0@bahia.home>
+In-Reply-To: <158281096564.89540.4507375445765515529.stgit@lep8c.aus.stglabs.ibm.com>
+References: <158281096564.89540.4507375445765515529.stgit@lep8c.aus.stglabs.ibm.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200225140437.20609-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Ovh-Tracer-Id: 14631632243308271957
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedrleeigdeitdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.105.58.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,38 +68,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-ppc@nongnu.org,
+ f4bug@amsat.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/25/20 6:04 AM, Peter Maydell wrote:
-> doc-good.json tests some oddities of markup that we don't want to
-> accept.  Make them match the more restrictive rST syntax:
+On Thu, 27 Feb 2020 07:42:49 -0600
+Shivaprasad G Bhat <sbhat@linux.ibm.com> wrote:
+
+> Fixes Coverity issue,
+>       CID 1419883:  Error handling issues  (CHECKED_RETURN)
+>            Calling "qemu_uuid_parse" without checking return value
 > 
->  * in a single list the bullet types must all match
->  * lists must have leading and following blank lines
->  * indentation is important
->  * the '|' example syntax is going to go away entirely, so stop
->    testing it
+> nvdimm_set_uuid() already verifies if the user provided uuid is valid or
+> not. So, need to check for the validity during pre-plug validation again.
 > 
-> This will avoid the tests spuriously breaking when we tighten up the
-> parser code in the following commits.
+> As this a false positive in this case, assert if not valid to be safe.
+> Also, error_abort if QOM accessor encounters error while fetching the uuid
+> property.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reported-by: Coverity (CID 1419883)
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 > ---
-> New patch in v2
-> ---
->  tests/qapi-schema/doc-good.json | 25 +++++++++++++------------
->  tests/qapi-schema/doc-good.out  | 12 ++++++------
->  tests/qapi-schema/doc-good.texi | 12 +++---------
->  3 files changed, 22 insertions(+), 27 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+You should theoretically add the list of changes since the previous
+version but fortunately the patch is simple enough to figure this
+out :)
 
+LGTM
 
-r~
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_nvdimm.c |    7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+> index 74eeb8bb74..25be8082d7 100644
+> --- a/hw/ppc/spapr_nvdimm.c
+> +++ b/hw/ppc/spapr_nvdimm.c
+> @@ -35,6 +35,7 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+>  {
+>      char *uuidstr = NULL;
+>      QemuUUID uuid;
+> +    int ret;
+>  
+>      if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
+>          error_setg(errp, "NVDIMM memory size excluding the label area"
+> @@ -43,8 +44,10 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+>          return;
+>      }
+>  
+> -    uuidstr = object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP, NULL);
+> -    qemu_uuid_parse(uuidstr, &uuid);
+> +    uuidstr = object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP,
+> +                                      &error_abort);
+> +    ret = qemu_uuid_parse(uuidstr, &uuid);
+> +    g_assert(!ret);
+>      g_free(uuidstr);
+>  
+>      if (qemu_uuid_is_null(&uuid)) {
+> 
+
 
