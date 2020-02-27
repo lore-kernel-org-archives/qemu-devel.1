@@ -2,64 +2,73 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F70C4BA06
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 304C6C4BA06
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C55F92467F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 08:59:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C55F92467F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04FB424687
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 09:01:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04FB424687
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=riseup.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7F0j-0004OQ-Uf
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 03:59:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33925)
+	id 1j7F36-0005gh-4i
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 04:01:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35066)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1j7F08-0003pG-DU
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:58:37 -0500
+ (envelope-from <bounces@canonical.com>) id 1j7F2M-0005Et-11
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:00:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1j7F07-0005uj-3Z
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 03:58:36 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:3176 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1j7F04-0005RP-50; Thu, 27 Feb 2020 03:58:32 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 222E6A77A0A3E8399D1C;
- Thu, 27 Feb 2020 16:58:26 +0800 (CST)
-Received: from [10.184.39.213] (10.184.39.213) by smtp.huawei.com
- (10.3.19.213) with Microsoft SMTP Server (TLS) id 14.3.439.0; Thu, 27 Feb
- 2020 16:58:16 +0800
-Subject: Re: [PATCH v3 1/6] s390x: fix memleaks in cpu_finalize
-To: David Hildenbrand <david@redhat.com>, <peter.maydell@linaro.org>
-References: <20200227025055.14341-1-pannengyuan@huawei.com>
- <20200227025055.14341-2-pannengyuan@huawei.com>
- <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
-From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <46d1fc23-6ef5-947f-becd-c3004a6b76bc@huawei.com>
-Date: Thu, 27 Feb 2020 16:58:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bounces@canonical.com>) id 1j7F2K-0005Al-3j
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:00:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60654)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j7F2I-0005AY-VD
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 04:00:52 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j7F2H-0006S0-G8
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:00:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 43AB82E806B
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:00:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <59af1e29-8075-a25c-dd80-e93cc21bb328@redhat.com>
 Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 27 Feb 2020 08:52:37 -0000
+From: Patrick Schleizer <adrelanos@riseup.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: adrelanos philmd
+X-Launchpad-Bug-Reporter: Patrick Schleizer (adrelanos)
+X-Launchpad-Bug-Modifier: Patrick Schleizer (adrelanos)
+References: <158278309128.18853.6534515173893863136.malonedeb@chaenomeles.canonical.com>
+Message-Id: <158279355744.19252.5850362454839178636.malone@chaenomeles.canonical.com>
+Subject: [Bug 1864955] Re: bundle QEMU installer with HAXM accelerator for
+ Windows
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: dc8f0ddf872735b085726eab88c4a33594b162e5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,92 +77,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- euler.robot@huawei.com, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1864955 <1864955@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I think licensing is a non-issue.
 
+That is probably a quote from the github license summary at
+https://github.com/intel/haxm/blob/master/LICENSE
 
-On 2/27/2020 4:41 PM, David Hildenbrand wrote:
-> On 27.02.20 03:50, Pan Nengyuan wrote:
->> This patch fix memleaks when we call tests/qtest/cpu-plug-test on s390=
-x. The leak stack is as follow:
->>
->> Direct leak of 48 byte(s) in 1 object(s) allocated from:
->>     #0 0x7fb43c7cd970 in __interceptor_calloc (/lib64/libasan.so.5+0xe=
-f970)
->>     #1 0x7fb43be2149d in g_malloc0 (/lib64/libglib-2.0.so.0+0x5249d)
->>     #2 0x558ba96da716 in timer_new_full /mnt/sdb/qemu-new/qemu/include=
-/qemu/timer.h:530
->>     #3 0x558ba96da716 in timer_new /mnt/sdb/qemu-new/qemu/include/qemu=
-/timer.h:551
->>     #4 0x558ba96da716 in timer_new_ns /mnt/sdb/qemu-new/qemu/include/q=
-emu/timer.h:569
->>     #5 0x558ba96da716 in s390_cpu_initfn /mnt/sdb/qemu-new/qemu/target=
-/s390x/cpu.c:285
->>     #6 0x558ba9c969ab in object_init_with_type /mnt/sdb/qemu-new/qemu/=
-qom/object.c:372
->>     #7 0x558ba9c9eb5f in object_initialize_with_type /mnt/sdb/qemu-new=
-/qemu/qom/object.c:516
->>     #8 0x558ba9c9f053 in object_new_with_type /mnt/sdb/qemu-new/qemu/q=
-om/object.c:684
->>     #9 0x558ba967ede6 in s390x_new_cpu /mnt/sdb/qemu-new/qemu/hw/s390x=
-/s390-virtio-ccw.c:64
->>     #10 0x558ba99764b3 in hmp_cpu_add /mnt/sdb/qemu-new/qemu/hw/core/m=
-achine-hmp-cmds.c:57
->>     #11 0x558ba9b1c27f in handle_hmp_command /mnt/sdb/qemu-new/qemu/mo=
-nitor/hmp.c:1082
->>     #12 0x558ba96c1b02 in qmp_human_monitor_command /mnt/sdb/qemu-new/=
-qemu/monitor/misc.c:142
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: David Hildenbrand <david@redhat.com>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: qemu-s390x@nongnu.org
->> ---
->> v2->v1:
->> - Similarly to other cleanups, move timer_new into realize(Suggested b=
-y Philippe Mathieu-Daud=C3=A9)
->> v3->v2:
->> - Also do the timer_free in unrealize, it seems more balance.
->> ---
->=20
->=20
-> As I already said, I think this is init and not realize stuff. Do we
-> have a convention now and documented that?
->=20
-> Anyhow, I don't really care
-> [...]
->=20
->=20
->> @@ -453,6 +466,7 @@ static void s390_cpu_class_init(ObjectClass *oc, v=
-oid *data)
->> =20
->>      device_class_set_parent_realize(dc, s390_cpu_realizefn,
->>                                      &scc->parent_realize);
->> +    dc->unrealize =3D s390_cpu_unrealizefn;
->=20
-> Shouldn't we use device_class_set_parent_unrealize?
+> A permissive license similar to the BSD 2-Clause License, but with a
+3rd clause that prohibits others from using the name of the project or
+its contributors to promote derived products without written consent.
 
-We just only declare parent_realize field in S390CPUClass(), it seems not=
-hing to do in parent_unrealize.
+I would ignore whatever github says "This is not legal advice. Learn
+more about repository licenses." Their summary might have good
+intentions but cause confusion. Only github mentions "project". The
+actual license text does not.
 
-typedef struct S390CPUClass {
-...
-DeviceRealize parent_realize;    // no parent_unrealize;
-...
-}
+The actual text of the third clause in the license being:
 
-So I think we can't use it.
+> Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
 
-Thanks.
+This should be easy to comply with.
 
->=20
->=20
+One could would wrap that clause into quotes (") to put it into a google
+search engine.
+
+This clause is OSI approved since included in BSD-3-Clause license:
+
+https://opensource.org/licenses/BSD-3-Clause
+
+Debian takes being Free / Libre / Open Source very serious too. Search
+term:
+
+> site:debian.org "Neither the name of the copyright holder nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission."
+
+https://ftp-master.debian.org/licenses/good/bsd/
+
+FSF also does not have an issue with it.
+
+> site:fsf.org "Neither the name of the copyright holder nor the names
+of its contributors may be used to endorse or promote products derived
+from this software without specific prior written permission."
+
+3 authorities don't have an issue with modified BSD license (without
+advertising clause).
+
+Rather, the QEMU installer doesn't need to have HAXM in its file name.
+
+It may or may not be good idea to make HAXM an opt-in or opt-out in the
+installer. I'd argue opt-out if anything. But ideally for usability
+there is no need to mention HAXM. Things would just work out of the box.
+
+As a role model for usability I'd recommend VirtualBox. Their installer
+also doesn't ask/show "enable acceleration" or "VirtualBox includes
+QEMU" or other components in prominent places.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1864955
+
+Title:
+  bundle QEMU installer with HAXM accelerator for Windows
+
+Status in QEMU:
+  New
+
+Bug description:
+  As you probably know HAXM is an accelerator for Windows.
+
+  https://www.qemu.org/2017/11/22/haxm-usage-windows/
+
+  Currently it is required to first install QEMU and then install HAXM.
+
+  For a better out of the box user experience on the Windows platform it
+  would be nice if QEMU and HAXM would be installed by the same
+  installer.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1864955/+subscriptions
 
