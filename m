@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D532C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A826C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:50:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE4E824690
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:37:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C10CC24699
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 19:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pxIXBzLo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE4E824690
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eU6LFt04"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C10CC24699
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Oyi-0002o6-V6
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 14:37:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47496)
+	id 1j7PAV-0006Ww-Tq
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 14:49:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7Oxj-0002Gl-Gd
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:36:48 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7P9e-0005vW-Sg
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7Oxi-0008Pg-3d
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:36:47 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:46457)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7P9d-00005X-MO
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:49:06 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41720)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7Oxh-0008P0-SG
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:36:46 -0500
-Received: by mail-pl1-x641.google.com with SMTP id y8so190599pll.13
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 11:36:45 -0800 (PST)
+ id 1j7P9d-00005K-Eg
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 14:49:05 -0500
+Received: by mail-pf1-x441.google.com with SMTP id j9so360856pfa.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 11:49:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RR7Rmmcf+FIgzkY0kiQKmj0flCfQOy2YCZTrv/2dkWE=;
- b=pxIXBzLoXb0v69ORAB1R6HPunPvUDVaRFjPJUZp/gcNEdOKoYd9NJdO1NbcRf3Xh6r
- mZn2+2XO15tQ/YhGa1YOTAYNmjb1tRcEiTezyI69EV+uw2ABdwnnOrIey/f9SXyq5DZq
- dJD5JGjaPVkPHJ43y68tCXWsj32CzgXBYw/YqjiWen6CrOIVhtsLiQ++XdyxTEZwRu+i
- 1PvLoF2tIgG0feADCv8rjjcpskFm+5mRGZZCHVNe2rhpdxvJAMiU5/tN+CaXKMnf98Zl
- Wgb8fHvPM3Xi9LjvtCNB/GbjTKsJjjffDawiM9TQxAMgzN0kpWhe8rrA9FbJLGCrk1A9
- hRWw==
+ bh=5yN6sH6PQyT2zWxZQXjM0a62AyWsU4lD3wudwbpMNcQ=;
+ b=eU6LFt042wGzY4/cSfnJuWAHQ/73aMWgnM3j6qj9gbXp8h5qwvtb+GzG5cHrPMmX+n
+ U3YKJiLN8eV0d7MRizBN5JJx/xhOv+KwtqR6nxljZBvCh2kS4/OMMSwJgPS+E7j37ahw
+ F8JkgjTj+nZjeuqefmqxvy7lQmPRUL5CIEnRJoMHjoirIdUFOi54iZUJKJ6Oe6yPb8Kk
+ hpg4qY9myI9DGpl+sYk0RXlJL5gsywsves8g0oEuG54S2l7OyOgYaozW8gFNRkd4Oa9E
+ /EPw0T4fQtHNeTYr39kf0eHYb4EXem94o0vSyuJ9MaSvmfUo93ibHNYPlzf15nljgk0Y
+ 8NhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=RR7Rmmcf+FIgzkY0kiQKmj0flCfQOy2YCZTrv/2dkWE=;
- b=s91egHJw9U43K5VWPD9nw/X92Pknpw+jFb82Pwvfy+LXmibEq4QLRxMmmnouLCqniv
- usKWHZ9jaZgqlU5s7jzNiqqmJ9W1+G5YqXzyPBt4XfEBv9C0IsZgz++TXkLtWwfRW9k0
- FnoMB4pe85WJgWp9wwnqEnSyXWWVtVlf20KS7jLkGo1+Rvtp67BRYocTeFYEoh/pgCzU
- vOkLhrBItP4XQHH4kREuQyLDp3TAlMP63WxQScGt6caEtfJP5/CgYNFMtysm67i4Gu7o
- UpTabOBwZQbjBf2ku6ODvDiWPTqz+y6qEzkhApXWkoR/cl4wpmdSRlDRdVjqRLDZDK0A
- fG9Q==
-X-Gm-Message-State: APjAAAX4j0J6me50e9WdXP1adeoSBbLwAwg+L2hj2G5N5tgqc973FMb1
- Nrr43YdQL1eHp8VnwCwmNqCHCiNZ0Nk=
-X-Google-Smtp-Source: APXvYqx7Pzed3kqw3CzPRyLvp/Z6N7kxHXzr7DRK3TC8BNiTn4RW45cVAWOL+W/UokvdAlSflaH9hA==
-X-Received: by 2002:a17:902:463:: with SMTP id 90mr335342ple.213.1582832204463; 
- Thu, 27 Feb 2020 11:36:44 -0800 (PST)
+ bh=5yN6sH6PQyT2zWxZQXjM0a62AyWsU4lD3wudwbpMNcQ=;
+ b=Xtz3QZXckbNQCdJsvHyAnn8jLL/Plox8/qjGyziN5kA4yWlZLjMGc6QQ3/lvm4JSJ8
+ MFMa40SjZYMKWkObkHH9ADkV2Bn1UcBQ+TkHf01wJlTmJefo+AxHS5nC/HTtf64aeuBW
+ KwY+/FEV128pn/jdSTwKnFk8sSrLk6l8OFzU30gc9xHo8na8Aep/9qPKypr7C3VP6IOT
+ Z6QnzGU9XJ80bFUpbyIR2Cx6tMLFR41sang9kyVHwUdbvdRYLPwj8UtlXqFPbeBTzZfq
+ iM2Lzt+OMy6mYTAZpRwuAPwOrSN4TVaORPjTJnhuzOttIOUQeXM7iVmV/MlGK5yZPk7F
+ Ye2g==
+X-Gm-Message-State: APjAAAWdDHW5wZ8HH95CmPJgzCOpe+ax4qQ61PAQjyAyWm839E0vaLIa
+ 1zTseodKgLTwTIcQB2t5/l+BGg==
+X-Google-Smtp-Source: APXvYqyomvcL6FS7utxlqRTE2UGXlv3vGzIut3Nt363K04DlCt7BPoo0beMALHABzUs3iTPCXExQDQ==
+X-Received: by 2002:a63:e509:: with SMTP id r9mr990070pgh.274.1582832944247;
+ Thu, 27 Feb 2020 11:49:04 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- w189sm7896561pfw.157.2020.02.27.11.36.43
+ k9sm7332755pjo.19.2020.02.27.11.49.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Feb 2020 11:36:43 -0800 (PST)
-Subject: Re: [PATCH v4 2/5] target/riscv: add vector stride load and store
+ Thu, 27 Feb 2020 11:49:03 -0800 (PST)
+Subject: Re: [PATCH v4 3/5] target/riscv: add vector index load and store
  instructions
 To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
  chihmin.chao@sifive.com, palmer@dabbelt.com
 References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
- <20200225103508.7651-3-zhiwei_liu@c-sky.com>
+ <20200225103508.7651-4-zhiwei_liu@c-sky.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0e806ca9-7991-baf7-58d1-50cddf9ce4ef@linaro.org>
-Date: Thu, 27 Feb 2020 11:36:41 -0800
+Message-ID: <30ac8dcd-a6d4-b4d6-212c-6819f914bd21@linaro.org>
+Date: Thu, 27 Feb 2020 11:49:01 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200225103508.7651-3-zhiwei_liu@c-sky.com>
+In-Reply-To: <20200225103508.7651-4-zhiwei_liu@c-sky.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,84 +106,50 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 2/25/20 2:35 AM, LIU Zhiwei wrote:
-> +GEN_VEXT_LD_ELEM(vlsb_v_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(vlsb_v_h, int8_t,  int16_t, H2, ldsb)
-> +GEN_VEXT_LD_ELEM(vlsb_v_w, int8_t,  int32_t, H4, ldsb)
-> +GEN_VEXT_LD_ELEM(vlsb_v_d, int8_t,  int64_t, H8, ldsb)
-> +GEN_VEXT_LD_ELEM(vlsh_v_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(vlsh_v_w, int16_t, int32_t, H4, ldsw)
-> +GEN_VEXT_LD_ELEM(vlsh_v_d, int16_t, int64_t, H8, ldsw)
-> +GEN_VEXT_LD_ELEM(vlsw_v_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vlsw_v_d, int32_t, int64_t, H8, ldl)
-> +GEN_VEXT_LD_ELEM(vlse_v_b, int8_t,  int8_t,  H1, ldsb)
-> +GEN_VEXT_LD_ELEM(vlse_v_h, int16_t, int16_t, H2, ldsw)
-> +GEN_VEXT_LD_ELEM(vlse_v_w, int32_t, int32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vlse_v_d, int64_t, int64_t, H8, ldq)
-> +GEN_VEXT_LD_ELEM(vlsbu_v_b, uint8_t,  uint8_t,  H1, ldub)
-> +GEN_VEXT_LD_ELEM(vlsbu_v_h, uint8_t,  uint16_t, H2, ldub)
-> +GEN_VEXT_LD_ELEM(vlsbu_v_w, uint8_t,  uint32_t, H4, ldub)
-> +GEN_VEXT_LD_ELEM(vlsbu_v_d, uint8_t,  uint64_t, H8, ldub)
-> +GEN_VEXT_LD_ELEM(vlshu_v_h, uint16_t, uint16_t, H2, lduw)
-> +GEN_VEXT_LD_ELEM(vlshu_v_w, uint16_t, uint32_t, H4, lduw)
-> +GEN_VEXT_LD_ELEM(vlshu_v_d, uint16_t, uint64_t, H8, lduw)
-> +GEN_VEXT_LD_ELEM(vlswu_v_w, uint32_t, uint32_t, H4, ldl)
-> +GEN_VEXT_LD_ELEM(vlswu_v_d, uint32_t, uint64_t, H8, ldl)
+> +vsxb_v     ... 011 . ..... ..... 000 ..... 0100111 @r_nfvm
+> +vsxh_v     ... 011 . ..... ..... 101 ..... 0100111 @r_nfvm
+> +vsxw_v     ... 011 . ..... ..... 110 ..... 0100111 @r_nfvm
+> +vsxe_v     ... 011 . ..... ..... 111 ..... 0100111 @r_nfvm
+> +vsuxb_v    ... 111 . ..... ..... 000 ..... 0100111 @r_nfvm
+> +vsuxh_v    ... 111 . ..... ..... 101 ..... 0100111 @r_nfvm
+> +vsuxw_v    ... 111 . ..... ..... 110 ..... 0100111 @r_nfvm
+> +vsuxe_v    ... 111 . ..... ..... 111 ..... 0100111 @r_nfvm
 
-Why do you need to define new functions identical to the old ones?  Are you
-doing this just to make the names match up?
+These can be merged, with a comment, like
 
+# Vector ordered-indexed and unordered-indexed store insns.
+vsxb_v     ... -11 . ..... ..... 000 ..... 0100111 @r_nfvm
 
-> +GEN_VEXT_ST_ELEM(vssb_v_b, int8_t,  H1, stb)
-> +GEN_VEXT_ST_ELEM(vssb_v_h, int16_t, H2, stb)
-> +GEN_VEXT_ST_ELEM(vssb_v_w, int32_t, H4, stb)
-> +GEN_VEXT_ST_ELEM(vssb_v_d, int64_t, H8, stb)
-> +GEN_VEXT_ST_ELEM(vssh_v_h, int16_t, H2, stw)
-> +GEN_VEXT_ST_ELEM(vssh_v_w, int32_t, H4, stw)
-> +GEN_VEXT_ST_ELEM(vssh_v_d, int64_t, H8, stw)
-> +GEN_VEXT_ST_ELEM(vssw_v_w, int32_t, H4, stl)
-> +GEN_VEXT_ST_ELEM(vssw_v_d, int64_t, H8, stl)
-> +GEN_VEXT_ST_ELEM(vsse_v_b, int8_t,  H1, stb)
-> +GEN_VEXT_ST_ELEM(vsse_v_h, int16_t, H2, stw)
-> +GEN_VEXT_ST_ELEM(vsse_v_w, int32_t, H4, stl)
-> +GEN_VEXT_ST_ELEM(vsse_v_d, int64_t, H8, stq)
+which means you don't need these:
 
-Likewise.
-
-> +static void vext_st_stride(void *vd, void *v0, target_ulong base,
-> +        target_ulong stride, CPURISCVState *env, uint32_t desc,
-> +        vext_st_elem_fn st_elem, uint32_t esz, uint32_t msz, uintptr_t ra)
+> +static bool trans_vsuxb_v(DisasContext *s, arg_rnfvm* a)
 > +{
-> +    uint32_t i, k;
-> +    uint32_t nf = vext_nf(desc);
-> +    uint32_t vm = vext_vm(desc);
-> +    uint32_t mlen = vext_mlen(desc);
-> +    uint32_t vlmax = vext_maxsz(desc) / esz;
+> +    return trans_vsxb_v(s, a);
+> +}
 > +
-> +    /* probe every access*/
-> +    for (i = 0; i < env->vl; i++) {
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        probe_write_access(env, base + stride * i, nf * msz, ra);
-> +    }
-> +    /* store bytes to guest memory */
-> +    for (i = 0; i < env->vl; i++) {
-> +        k = 0;
-> +        if (!vm && !vext_elem_mask(v0, mlen, i)) {
-> +            continue;
-> +        }
-> +        while (k < nf) {
-> +            target_ulong addr = base + stride * i + k * msz;
-> +            st_elem(env, addr, i + k * vlmax, vd, ra);
-> +            k++;
-> +        }
-> +    }
+> +static bool trans_vsuxh_v(DisasContext *s, arg_rnfvm* a)
+> +{
+> +    return trans_vsxh_v(s, a);
+> +}
+> +
+> +static bool trans_vsuxw_v(DisasContext *s, arg_rnfvm* a)
+> +{
+> +    return trans_vsxw_v(s, a);
+> +}
+> +
+> +static bool trans_vsuxe_v(DisasContext *s, arg_rnfvm* a)
+> +{
+> +    return trans_vsxe_v(s, a);
 > +}
 
-Similar comments wrt unifying the load and store helpers.
+> +static inline void vext_ld_index(void *vd, void *v0, target_ulong base,
+> +        void *vs2, CPURISCVState *env, uint32_t desc,
+> +        vext_get_index_addr get_index_addr,
+> +        vext_ld_elem_fn ld_elem,
+> +        vext_ld_clear_elem clear_elem,
+> +        uint32_t esz, uint32_t msz, uintptr_t ra)
 
-I'll also note that vext_st_stride and vext_st_us_mask could be unified by
-passing sizeof(ETYPE) as stride, and vm = true as a parameter.
+Similar comment about merging vext_ld_index and vext_st_index.
 
 
 r~
