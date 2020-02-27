@@ -2,90 +2,101 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62447C4BA2D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59511C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BAAD24699
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EE9324699
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 13:09:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EPF2ZPdV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BAAD24699
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BglioF/n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EE9324699
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Itz-0003s2-BJ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:08:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52367)
+	id 1j7Iv3-00053v-Bp
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 08:09:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j7ItM-0003So-7e
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:07:53 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j7IuF-0004Gj-7h
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:08:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j7ItK-0000X9-OR
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:07:52 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46504)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1j7ItK-0000Wr-I5
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:07:50 -0500
-Received: by mail-wr1-x444.google.com with SMTP id j7so3205221wrp.13
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:07:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=IEHCLjENEyCVQC+RrGMaazdbswLCiSmYrZRSvmrRl2k=;
- b=EPF2ZPdVgQlI/gC5Nj5e7To2VXn4ttFI4Om/W8wwPd8zVdRVLKJAeVkbnqJtl1JR6u
- OtkF34YlfrJrOl30o/KZZOaQOQmoye4LXH9ZgCarWbvPXAQ+VtoTSAybAZAKT9johRMj
- XBA9FdKPga3kBq+Wa0StSR0wXe77pbXiaY06wiVX1zGA3EZX5FyockjTxum+48SgrpEr
- 89EOzhGbPGrwG4GKtdxVovo+08aPkHZ+kK5yzTA8lVqkb3Dw5WwfqV59i81d4kyiCWlB
- lQO7QJTYyHSwjfT6XYm4DOaqwvDSn+Pf6wLhsEP75x2lZ/68TjxBeKEcu/PEJCDMuokJ
- LvaA==
+ (envelope-from <pbonzini@redhat.com>) id 1j7IuA-0001Md-0w
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:08:47 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30619
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7Iu9-0001ME-Sn
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 08:08:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582808921;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wQPbJcOqw+XN7HfItx73DM4KbIp2VUGPQcud0GTG3qc=;
+ b=BglioF/n/+BtwGezIwg9eeEzDB7F82Z2jyks7jb2VuE3RmsLfs5htba5ZGqWN7DI7sWjVj
+ vY7jVVT5JPlJfxIjWN/GdhL5eadCApRnkiLYWXYSijWLfZZhCzmhxchQHXj/NcHXqdT2Fz
+ G3cutP6nb+7ezsFgrcXIr6H0dceMv3s=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-ua2yyaPQM6WEwy1y9FbloQ-1; Thu, 27 Feb 2020 08:08:36 -0500
+X-MC-Unique: ua2yyaPQM6WEwy1y9FbloQ-1
+Received: by mail-wr1-f72.google.com with SMTP id o9so1285606wrw.14
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 05:08:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IEHCLjENEyCVQC+RrGMaazdbswLCiSmYrZRSvmrRl2k=;
- b=r4GAfs3r5C9r0dnLHi8AGpughslBC50z9jk4+Td0vrVtF8o3CUnaEAsF93aJLpI0RF
- XOAQNuzVPP+VkRNBFmflyJfBL2xhdj+VO3Mj6sCwECYCB8ItqYHpAHPbi65zyyzuNWlt
- TRbng1spwUnLE8G7gu+MWFQJuSvDxvs14iTzl68FsMm2QM3uIq2zRBaAesPAzEBlZ0SH
- BTkOj9QexurvSgtvv6PQUlof1AlikPhuu2KIME76UcHHuH6XuaJ/4WCITRYvwO2b6x3v
- I/WhOojbvMGxlvzrJOtuIDcoR+r2M+w8eS8CrYdOsSa9/6Rcj5S5/TxI22Kx/B6Pi7is
- 9H6g==
-X-Gm-Message-State: APjAAAUfj/DEYyhMwGQTUSbYkCcw9PTqhl7C/6hz9chXxKttY79WEmy8
- 2XrAw+3qiVZmXpm4q9N4KBMNOjwcew6uDlXLjYk=
-X-Google-Smtp-Source: APXvYqw+GWzFT9ftuMqx+H0RXo9vzACuHG9HJpHXMI7p8lQOo7TGTb+PHdJF2cnzFFOV0o0yrFGdLNHqNzP6BWYg+0k=
-X-Received: by 2002:adf:cc85:: with SMTP id p5mr4788325wrj.196.1582808869175; 
- Thu, 27 Feb 2020 05:07:49 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wQPbJcOqw+XN7HfItx73DM4KbIp2VUGPQcud0GTG3qc=;
+ b=q//mzSqMmkPje4xgJzY6xW++X8bd2KIjcUFwBuk/F9xjCpjj8rmDSM2WOzTvgFX8g8
+ NCCPQzxcL1QJ11qyaauRJiBrf32/1r7qDKFnV+IR6GUJmz+/V6rN6gYPGz8NJbFTkMzi
+ vVQl6bK8hUOPpWSXReEoBVDgPQUENM8oAhM1mvyHXcQr2ccAyAposYigO4i7nElDvLb/
+ K9dQYFenGq7Hzl9t99CGZB8MyD0N3zHPVf/3U2IfiLz06MxEuMgLSIddg5zmht8IdAsU
+ F+EFyWYV7FhHWa48HicKKRZU3ncuNgfP5hCvGvi/hFdVfVFSf/vYuvDGkEbbaS2RULVb
+ RRCQ==
+X-Gm-Message-State: APjAAAXKVwK9pqGUVcYHachL/IpQ2SeESxeY2K50dGmVlHhC8OMXzS/o
+ NkwN1UWd6xvO+lgfjApfTYKHXDRrgScDQBEsL0+9BIzy+qKLL1JIZ8/Zxa6bEZ9NvXCYD9Aa050
+ jgGZAu60vijYzGFY=
+X-Received: by 2002:a1c:960c:: with SMTP id y12mr5241249wmd.9.1582808912626;
+ Thu, 27 Feb 2020 05:08:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx8nb+0YLDh5IhZzJT880WnFsAFMW0qE975lKIs60G6OnI1YOZrt+PCOGy/oLL6beNvC7Tv5g==
+X-Received: by 2002:a1c:960c:: with SMTP id y12mr5241216wmd.9.1582808912213;
+ Thu, 27 Feb 2020 05:08:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:30cb:d037:e500:2b47?
+ ([2001:b07:6468:f312:30cb:d037:e500:2b47])
+ by smtp.gmail.com with ESMTPSA id z16sm7795579wrp.33.2020.02.27.05.08.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Feb 2020 05:08:31 -0800 (PST)
+Subject: Re: [PATCH 01/18] qemu-doc: convert user-mode emulation to a separate
+ Sphinx manual
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200226113034.6741-1-pbonzini@redhat.com>
+ <20200226113034.6741-2-pbonzini@redhat.com>
+ <CAFEAcA-Qf_rC-EFNvmiFZtF1hhipL4qcPt8iOeK9pjAwOsPC2w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4b651b07-f7c5-b8e9-d5df-a868af82d9ef@redhat.com>
+Date: Thu, 27 Feb 2020 14:08:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200218050711.8133-1-coiby.xu@gmail.com>
- <20200219163815.GD1085125@stefanha-x1.localdomain>
- <CAJAkqrXaqmT2pR4K1x06AeQZHvUWp-fcqnbKZq_45czO96v5PA@mail.gmail.com>
- <20200227074114.GB83512@stefanha-x1.localdomain>
- <CAJAkqrWUJWLdT+6b_XmHFwnzhhbYei2SakCKVW0Rf92HJgoZDw@mail.gmail.com>
- <20200227100206.GA7493@linux.fritz.box>
- <CAJAkqrW_Euur3HjWaK6E-TAjT1dmjA1fz1oPwKSt7_pOC3=S+w@mail.gmail.com>
- <20200227105528.GC7493@linux.fritz.box>
- <CAMxuvay1vLosHTpXP7b3pXQvfRPOMp0z3ML66khLSrK-iLf7aQ@mail.gmail.com>
- <20200227111958.GD7493@linux.fritz.box> <20200227113814.GI1645630@redhat.com>
-In-Reply-To: <20200227113814.GI1645630@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 27 Feb 2020 14:07:37 +0100
-Message-ID: <CAJ+F1CLNu9Q8e8sEU+6_LMHySraAJA+QkcPStfjjGacu4YK3=Q@mail.gmail.com>
-Subject: Re: [PATCH v4 0/5] vhost-user block device backend implementation
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <CAFEAcA-Qf_rC-EFNvmiFZtF1hhipL4qcPt8iOeK9pjAwOsPC2w@mail.gmail.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,147 +108,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, bharatlkmlkvm@gmail.com,
- Stefan Hajnoczi <stefanha@redhat.com>, Coiby Xu <coiby.xu@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On 27/02/20 12:07, Peter Maydell wrote:
+> On Wed, 26 Feb 2020 at 11:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The final addition to the set of QEMU manuals is the user-mode emulation
+>> manual, which right now is included in qemu-doc.texi.  Extract it and
+>> convert it to rST, so that qemu-doc.texi covers only full system emulation.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> I'm going to wade in and start making review comments, but
+> I'm happy to just take on this series and clean it up myself
+> for a v2 (I'd like to quickly get to a base where I can start
+> on dealing with the last bits of qemu-doc conversion that
+> deal with hxtool.)
+> 
+> Did you do the conversion to rST automatically? If so then
+> it would be useful to give the runes used in the commit message.
 
-On Thu, Feb 27, 2020 at 12:39 PM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
->
-> On Thu, Feb 27, 2020 at 12:19:58PM +0100, Kevin Wolf wrote:
-> > Am 27.02.2020 um 12:07 hat Marc-Andr=C3=A9 Lureau geschrieben:
-> > > On Thu, Feb 27, 2020 at 11:55 AM Kevin Wolf <kwolf@redhat.com> wrote:
-> > > > Am 27.02.2020 um 11:28 hat Coiby Xu geschrieben:
-> > > > > > > we still need customized vu_message_read because libvhost-use=
-r assumes
-> > > > > > > we will always get a full-size VhostUserMsg and hasn't taken =
-care of
-> > > > > > > this short read case. I will improve libvhost-user's vu_messa=
-ge_read
-> > > > > > > by making it keep reading from socket util getting enough byt=
-es. I
-> > > > > > > assume short read is a rare case thus introduced performance =
-penalty
-> > > > > > > would be negligible.
-> > > > >
-> > > > > > In any case, please make sure that we use the QIOChannel functi=
-ons
-> > > > > > called from a coroutine in QEMU so that it will never block, bu=
-t the
-> > > > > > coroutine can just yield while it's waiting for more bytes.
-> > > > >
-> > > > > But if I am not wrong, libvhost-user is supposed to be indepdent =
-from
-> > > > > the main QEMU code. So it can't use the QIOChannel functions if w=
-e
-> > > > > simply modify exiting vu_message_read to address the short read i=
-ssue.
-> > > > > In v3 & v4, I extended libvhost-user to allow vu_message_read to =
-be
-> > > > > replaced by one which will depend on the main QEMU code. I'm not =
-sure
-> > > > > which way is better.
-> > > >
-> > > > The way your latest patches have it, with a separate read function,
-> > > > works for me.
-> > >
-> > > Done right, I am not against it, fwiw
-> > >
-> > > > You could probably change libvhost-user to reimplement the same
-> > > > functionality, and it might be an improvement for other users of th=
-e
-> > > > library, but it's also code duplication and doesn't provide more va=
-lue
-> > > > in the context of the vhost-user export in QEMU.
-> > > >
-> > > > The point that's really important to me is just that we never block=
- when
-> > > > we run inside QEMU because that would actually stall the guest. Thi=
-s
-> > > > means busy waiting in a tight loop until read() returns enough byte=
-s is
-> > > > not acceptable in QEMU.
-> > >
-> > > In the context of vhost-user, local unix sockets with short messages
-> > > (do we have >1k messages?), I am not sure if this is really a problem=
-.
-> >
-> > I'm not sure how much of a problem it is in practice, and whether we
-> > can consider the vhost-user client trusted. But using QIOChannel from
-> > within a coroutine just avoids the problem completely, so it feels like
-> > a natural choice to just do that.
->
-> It isn't clear to me that we have a consitent plan for how we intend
-> libvhost-user to develop & what it is permitted to use.  What information
-> I see in the source code and in this thread are contradictory.
->
-> For example, in the text quoted above:
->
->   "libvhost-user is supposed to be indepdent from the main QEMU code."
->
-> which did match my overall understanding too. At the top of libvhost-user=
-.c
-> there is a comment
->
->    /* this code avoids GLib dependency */
->
-> but a few lines later it does
->
->   #include "qemu/atomic.h"
->   #include "qemu/osdep.h"
->   #include "qemu/memfd.h"
->
-> and in the Makefile we link it to much of QEMU util code:
->
->   libvhost-user.a: $(libvhost-user-obj-y) $(util-obj-y) $(stub-obj-y)
->
-> this in turn pulls in GLib code, and looking at symbols we can see
-> over 100 GLib functions used:
->
->   $ nm ./libvhost-user.a | grep 'U g_' | sort | uniq | wc -l
->   128
->
-> And over 200 QEMU source object files included:
->
->   $ nm ./libvhost-user.a | grep '.o:' | sort | wc -l
->   224
->
-> So unless I'm missing something, we have lost any independance from
-> both QEMU and GLib code that we might have had in the past.
+I started from the pandoc conversion but, unlike the others, this one
+was reviewed, so I didn't include the command line.
 
-Yep, I think this is mostly due to commit 5f9ff1eff38 ("libvhost-user:
-Support tracking inflight I/O in shared memory")
+Paolo
 
-It may not be that hard to bring back glib independence. Is it worth it tho=
-ugh?
+>> ---
+>>  Makefile            |   8 +-
+>>  docs/user/conf.py   |  18 +++
+>>  docs/user/index.rst |  16 +++
+>>  docs/user/main.rst  | 295 ++++++++++++++++++++++++++++++++++++++
+>>  qemu-doc.texi       | 337 --------------------------------------------
+>>  5 files changed, 336 insertions(+), 338 deletions(-)
+>>  create mode 100644 docs/user/conf.py
+>>  create mode 100644 docs/user/index.rst
+>>  create mode 100644 docs/user/main.rst
+> 
+> A new manual also needs to be added to docs/index.html.in
+> and to docs/index.rst.
+> 
+> (Compare 0928523a1230a69 which added the system manual.)
+> 
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 15f8e53d05..73d8ed2b6a 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -786,6 +786,7 @@ distclean: clean
+>>         $(call clean-manual,interop)
+>>         $(call clean-manual,specs)
+>>         $(call clean-manual,system)
+>> +       $(call clean-manual,user)
+> 
+> This doesn't apply to current master because of the addition
+> of the 'tools' manual, but the fixes to the conflicts are easy.
+> 
+>>         for d in $(TARGET_DIRS); do \
+>>         rm -rf $$d || exit 1 ; \
+>>          done
+>> @@ -843,6 +844,7 @@ install-sphinxdocs: sphinxdocs
+>>         $(call install-manual,interop)
+>>         $(call install-manual,specs)
+>>         $(call install-manual,system)
+>> +       $(call install-manual,user)
+>>
+>>  install-doc: $(DOCS) install-sphinxdocs
+>>         $(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+>> @@ -1036,7 +1038,8 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+>>  sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
+>>              $(MANUAL_BUILDDIR)/interop/index.html \
+>>              $(MANUAL_BUILDDIR)/specs/index.html \
+>> -            $(MANUAL_BUILDDIR)/system/index.html
+>> +            $(MANUAL_BUILDDIR)/system/index.html \
+>> +            $(MANUAL_BUILDDIR)/user/index.html
+>>
+>>  # Canned command to build a single manual
+>>  # Arguments: $1 = manual name, $2 = Sphinx builder ('html' or 'man')
+>> @@ -1069,6 +1072,9 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+>>  $(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
+>>         $(call build-manual,system,html)
+>>
+>> +$(MANUAL_BUILDDIR)/user/index.html: $(call manual-deps,user)
+>> +       $(call build-manual,user,html)
+>> +
+>>  $(call define-manpage-rule,interop,\
+>>         qemu-ga.8 qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
+>>         virtiofsd.1 virtfs-proxy-helper.1,\
+>> diff --git a/docs/user/conf.py b/docs/user/conf.py
+>> new file mode 100644
+>> index 0000000000..b3e1b2318a
+>> --- /dev/null
+>> +++ b/docs/user/conf.py
+>> @@ -0,0 +1,18 @@
+>> +# -*- coding: utf-8 -*-
+>> +#
+>> +# QEMU documentation build configuration file for the 'system' manual.
+> 
+> Should say 'user'.
+> 
+>> +#
+>> +# This includes the top level conf file and then makes any necessary tweaks.
+>> +import sys
+>> +import os
+>> +
+>> +qemu_docdir = os.path.abspath("..")
+>> +parent_config = os.path.join(qemu_docdir, "conf.py")
+>> +exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
+>> +
+>> +# This slightly misuses the 'description', but is the best way to get
+>> +# the manual title to appear in the sidebar.
+>> +html_theme_options['description'] = u'User Mode Emulation User''s Guide'
+>> +# One entry per manual page. List of tuples
+>> +# (source start file, name, description, authors, manual section).
+>> +man_pages = []
+> 
+> You can just not specify man_pages at all if the manual
+> doesn't create any manpages (devel and specs are like this):
+> docs/conf.py sets it to [] by default.
+> 
+>> diff --git a/docs/user/index.rst b/docs/user/index.rst
+>> new file mode 100644
+>> index 0000000000..c81d2898cd
+>> --- /dev/null
+>> +++ b/docs/user/index.rst
+>> @@ -0,0 +1,16 @@
+>> +.. This is the top level page for the 'system' manual.
+> 
+> Should say 'user'.
+> 
+>> +
+>> +
+>> +QEMU User Mode Emulation User's Guide
+>> +=====================================
+>> +
+>> +This manual is the overall guide for users using QEMU
+>> +for user-mode emulation.  In this mode, QEMU can launch
+>> +processes compiled for one CPU on another CPU.
+>> +
+>> +Contents:
+>> +
+>> +.. toctree::
+>> +   :maxdepth: 2
+>> +
+>> +   main
+> 
+> The top level document looks a bit odd with this toctree
+> which has a single level 1 entry whose title is basically
+> the same as the whole manual's title, but it gives us a
+> structure we can expand later I guess.
+> 
+> thanks
+> -- PMM
+> 
 
->
-> Note this also has licensing implications, as I expect this means that
-> via the QEMU source objects it pulls in, libvhost-user.a has become
-> a GPLv2-only combined work, not a GPLv2-or-later combined work.
->
-
-libvhost-user.c is GPLv2-or-later because tests/vhost-user-bridge.c
-was and is still as well. Do we need to change that?
-
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
