@@ -6,86 +6,86 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6525C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC92BC3567B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 906AF21D7E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:23:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A5A9246A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 17:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2AygNJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 906AF21D7E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQhwG8Tq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5A9246A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7MsH-0007ZY-PK
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:23:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50306)
+	id 1j7Mt3-0008W9-NT
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 12:23:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50589)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1j7Mqt-0006TW-8s
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:21:36 -0500
+ (envelope-from <mlureau@redhat.com>) id 1j7MsC-0007eH-73
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1j7Mqs-0003QM-7w
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:21:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51208
+ (envelope-from <mlureau@redhat.com>) id 1j7MsB-0006Dj-92
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:22:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30586
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1j7Mqs-0003Om-3c
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:21:34 -0500
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1j7MsB-0006Br-4u
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 12:22:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582824090;
+ s=mimecast20190719; t=1582824174;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=g1Dq87ha8NSh+JjOHr86pvMgso8CBLwoJ4nFqfRMXuk=;
- b=O2AygNJ74v8pDl5G2u5cpl19YucuUAp+wxPojYaQnfKkanMmuV5RNAs8/OhYqxjOx8ibt0
- fEMUTG3sI08q8I9FM/s7gFU5O9azpkmhfcnQ8AgLMbQUjWCJbgU5EWTJJ+nnP34Y+8uVMD
- dFbmR8A+e8zrJUaaHQGeeBx22IJl8/Q=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-MEhZ_kXgOmizMAfjUq4A_g-1; Thu, 27 Feb 2020 12:21:26 -0500
-X-MC-Unique: MEhZ_kXgOmizMAfjUq4A_g-1
-Received: by mail-oi1-f198.google.com with SMTP id c22so1988428oic.20
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:21:26 -0800 (PST)
+ bh=yW0BKahmLAfPH4sFf7uE3N+3qPvGxIYuT1kgrkDqoOw=;
+ b=gQhwG8TqMl7xtP2/Xk+oo0r2kU59lgOW0+uBXSwG/j8Rd5CcMUZYH1PtGnwSv5/NWqw0XG
+ eT58rL25Q1v807fUjreJTne7a/K0xdMW5ELCtn6FX2u7Wofga1PX6X/skEQGfKwfP45AqU
+ naSNFS2slyjy1V6JDMZiyO4fdPJQmQc=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-nFLXaDRvNAi2yCsTXnrxvQ-1; Thu, 27 Feb 2020 12:22:43 -0500
+X-MC-Unique: nFLXaDRvNAi2yCsTXnrxvQ-1
+Received: by mail-ot1-f69.google.com with SMTP id e11so108533otq.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 09:22:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=g1Dq87ha8NSh+JjOHr86pvMgso8CBLwoJ4nFqfRMXuk=;
- b=NJKtjU6ZuodQ7hVQQUTX6SvUyKxYLwLaf294h1anyIF33/dY6gZlNC3VYovfMBqzxS
- N38iUWQb600EouqOOCw3gdc3Y5SXAXX2oAipsVDQSYrNofHPvaRC3CiUPY9CkupDj9bw
- dgDVLc7VeQvJime+BJ1l02PNmA8am0cxT3CVdyyEoO8AUbkAoP2L1mKLeNLZTnG9c/5L
- wqNJBLjEc2TyGYI5HFcJ0V1DKzkh+QVEXniqYDXoB+seXtS4B5PU0IGLXC7oCuzetLcK
- Wb3uECtdZ9oyIx6p7qKlFiBySsZu5aA3gH4DyiDS86NjxXLfIqAFcR14zJLxp2jfqQCh
- 9ufg==
-X-Gm-Message-State: APjAAAW75HtfYGgPfzylvnoFYaUbXYD3HnWRwtb9riOrKDzb5miMDcTu
- s/qSFUbNovId1IphkLzLs4nfv7Q8hjkWPSugT7TwbdE7RN4E93G5jT/HQKYwg3B9tqS6SOufmlp
- Vy9L6KR2ZxJBm5vn5crsWPA77DdHyXAg=
-X-Received: by 2002:a9d:730e:: with SMTP id e14mr3559otk.62.1582824085793;
- Thu, 27 Feb 2020 09:21:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxDRSngCcr694+/MxJwjqtQkdfSfmg3zO9g8X4teJ5KtXewsYb8aCZcFg8D8y5WRkWpkKzh2jU0GzIHgEX8Q3c=
-X-Received: by 2002:a9d:730e:: with SMTP id e14mr3535otk.62.1582824085573;
- Thu, 27 Feb 2020 09:21:25 -0800 (PST)
+ bh=yW0BKahmLAfPH4sFf7uE3N+3qPvGxIYuT1kgrkDqoOw=;
+ b=nTdqb8n+AXI4Oa0WuCCFI83mrac44wM87xzvGx+GBpEeQ8XDmvvy6E0TNz98briDGT
+ PE1KZkwZ+3j4BFDDW6WisAUrRHTiME+VgCPC+1az0zx6/BA+Ug3ko+7pUwf/IZJ52OMn
+ AoeFmhsGrLovRLpRhPqCDpKWIpUCxKtiuFlpctqgxdmAsL4ShP8IWx/LuyCoYPc4+uG8
+ 6RjqFkLc75yq3BYmaviDAk+pFz9FLTaPqpebb8EGayRMrzQUDbuokciSZbpFgvN6wq61
+ FPulmy8ScgWrezskEFWmG0o/gpQzozr/zp4hagw/CJ3Jzb1ZWfZ5LNCYsv7cQqJ7g5gd
+ LeEQ==
+X-Gm-Message-State: APjAAAUNzSjstBEU7KM6tks2LZKtdwTS7iZN0i5lzhv+wBVFGGEKaWbE
+ EJQA8h1p3T+yf4TLq0hs6JDEDjV94pBhZddh52K3EzVrvPFvy/d5nj+/O4TxrpXhNN4JMubq41n
+ VBkXYfaUCAve2CroQsx8f1WVi4gjQOr0=
+X-Received: by 2002:a05:6808:487:: with SMTP id z7mr105131oid.46.1582824162047; 
+ Thu, 27 Feb 2020 09:22:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5beJzSdeaAXwlWDs+/bBPAS5INZI7ZBYUCriFi+xpZ7BDgZUEL9Dke12qZDtciyuewKS8rBZSfwrtU/DuMiY=
+X-Received: by 2002:a05:6808:487:: with SMTP id z7mr105110oid.46.1582824161787; 
+ Thu, 27 Feb 2020 09:22:41 -0800 (PST)
 MIME-Version: 1.0
 References: <20200227163101.414-1-philmd@redhat.com>
- <20200227163101.414-6-philmd@redhat.com>
-In-Reply-To: <20200227163101.414-6-philmd@redhat.com>
+ <20200227163101.414-5-philmd@redhat.com>
+In-Reply-To: <20200227163101.414-5-philmd@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 27 Feb 2020 18:21:14 +0100
-Message-ID: <CAMxuvay_a6oihjoPU0B_t04Yn=dqwCK_WC2CdtWu65xgG9ubKA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/6] qga: Fix a memory leak
+Date: Thu, 27 Feb 2020 18:22:30 +0100
+Message-ID: <CAMxuvayLYP--wLfFr2G9fjNUw8xxRSycYPGNgOfJa6a3VvJbcg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] util/osdep: Improve error report by calling
+ error_setg_win32()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,8 +109,7 @@ Sender: "Qemu-devel"
 On Thu, Feb 27, 2020 at 5:32 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> The string returned by g_win32_error_message() has to be
-> deallocated with g_free().
+> Use error_setg_win32() which adds a hint similar to strerror(errno)).
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -118,27 +117,43 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  qga/channel-win32.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  util/osdep.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> diff --git a/qga/channel-win32.c b/qga/channel-win32.c
-> index c86f4388db..774205e017 100644
-> --- a/qga/channel-win32.c
-> +++ b/qga/channel-win32.c
-> @@ -302,8 +302,8 @@ static gboolean ga_channel_open(GAChannel *c, GAChann=
-elMethod method,
->                             OPEN_EXISTING,
->                             FILE_FLAG_NO_BUFFERING | FILE_FLAG_OVERLAPPED=
-, NULL);
->      if (c->handle =3D=3D INVALID_HANDLE_VALUE) {
-> -        g_critical("error opening path %s: %s", newpath,
-> -                   g_win32_error_message(GetLastError()));
+> diff --git a/util/osdep.c b/util/osdep.c
+> index ef40ae512a..144e217cb9 100644
+> --- a/util/osdep.c
+> +++ b/util/osdep.c
+> @@ -82,8 +82,8 @@ static int qemu_mprotect__osdep(void *addr, size_t size=
+, int prot)
+>      DWORD old_protect;
+>
+>      if (!VirtualProtect(addr, size, prot, &old_protect)) {
+> -        error_report("%s: VirtualProtect failed with error code %ld",
+> -                     __func__, GetLastError());
 > +        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError())=
 ;
-> +        g_critical("error opening path %s: %s", newpath, emsg);
->          return false;
+> +        error_report("%s: VirtualProtect failed: %s", __func__, emsg);
+>          return -1;
 >      }
+>      return 0;
+> @@ -506,12 +506,12 @@ int socket_init(void)
+>  {
+>  #ifdef _WIN32
+>      WSADATA Data;
+> -    int ret, err;
+> +    int ret;
 >
+>      ret =3D WSAStartup(MAKEWORD(2, 2), &Data);
+>      if (ret !=3D 0) {
+> -        err =3D WSAGetLastError();
+> -        error_report("WSAStartup: %d", err);
+> +        g_autofree gchar *emsg =3D g_win32_error_message(WSAGetLastError=
+());
+> +        error_report("WSAStartup: %s", emsg);
+>          return -1;
+>      }
+>      atexit(socket_cleanup);
 > --
 > 2.21.1
 >
