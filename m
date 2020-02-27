@@ -2,84 +2,119 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F0C2C4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE5D1C4BA2D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A0A424695
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:38:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3B6B24695
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnwIZfFT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0A424695
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="O61vZ3fS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B6B24695
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7IQo-0002cu-HJ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 07:38:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40830)
+	id 1j7IZJ-0004qj-TR
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 07:47:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1j7IQ5-00029L-FV
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:37:38 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7IYV-0004Jo-TU
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:46:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1j7IQ3-0003DW-Dz
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:37:36 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45554
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j7IQ3-0003Ad-7T
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:37:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582807054;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QBnv079Sl3q4YllPlsEhNMJkumdaxYhLR7f9IPp2GGk=;
- b=KnwIZfFT+nrs2TDZpki12zmZKP1KttbFX3L+kiyMNqq81G0wVyP9SLINJXp93w6KBAhs7t
- DPuVHJoxHZ0zlAW9YQVkozDsMeyi3Nta+6tHP+z87v/Qc8z7YURY0eWjbqgWbHMGSAxCG4
- J30HJVRKIkU92+HtthpriBytlFNcMaI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-d8WTTVgCPdaog82P8f507A-1; Thu, 27 Feb 2020 07:37:25 -0500
-X-MC-Unique: d8WTTVgCPdaog82P8f507A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8235C13E6;
- Thu, 27 Feb 2020 12:37:24 +0000 (UTC)
-Received: from paraplu.localdomain (unknown [10.36.118.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 21FD860BE2;
- Thu, 27 Feb 2020 12:37:24 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id 6549B3E04B9; Thu, 27 Feb 2020 13:37:22 +0100 (CET)
-Date: Thu, 27 Feb 2020 13:37:22 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 14/18] docs/system: Convert qemu-cpu-models.texi to rST
-Message-ID: <20200227123722.GN24572@paraplu>
-References: <20200226113034.6741-1-pbonzini@redhat.com>
- <20200226113034.6741-15-pbonzini@redhat.com>
- <CAFEAcA-ps7dmo_7Lgf2kTsy0nvFgU6qopS8HvZMu3DY81VvE_g@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-ps7dmo_7Lgf2kTsy0nvFgU6qopS8HvZMu3DY81VvE_g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7IYU-0001cE-61
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 07:46:19 -0500
+Received: from mail-eopbgr140133.outbound.protection.outlook.com
+ ([40.107.14.133]:34967 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j7IYT-0001Z7-FJ; Thu, 27 Feb 2020 07:46:18 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lrbr0OsDADLJoYrlwDUz3fDaFcyuA1hoXHDD1CBOUfxl1qARubX1NNbzzlXJIFyHEWJJRFBXcb9DR5St05TzRoqr9vZslLspjpa3eHNMt7F/Fn6BzMG8icxLQlESwFKXAloJ0mMkY2hF5RuQltcpv+ZHfhnA0XLCQoOBinyKdsLteiYcYWWXMyrv6pGxYt/iel+E10MQYf55oosoNeLX5eeg64lHjlchf2t7AwiRpUex/TNqrQs0R31y85bzT7HlVaw1HiIZMNmLvTYltqU/0D977m0JZris6OiMyNgJqXXJEMqkKfEBLfFAb1FjGC1+ebuv6Sv29ku2qnXVB/VfaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hhk0mhzdRrB7BMqRQjOD0+Z+AL0RGjB0onHf3CdM8bI=;
+ b=k1ymZQgo32EnWZCn1qbNQ5YPUUxKBJQPZ7hG7ZkdeCacZlbigOc3dh6lBh/lp9Zt+8VOlGmV8BLjVtnIzDzEXEHfnYi7SXboJbqUTcOyk/JHy+mF5fmRnpJ5dzd+JNRnx+x264y49q/On1azj/hl824Lln3k5SWCdWKVvd8Scn9xfqhbT4sGSjds0f7mBmWrWcajXdAPWQyIDj8/t8xlqkf93eIycaOkMvq4oQo0P4iouXw6T/Enz3vAoPGidZfgIGcpx5Z8uOVSbmC1qY+iMRvevKtiNpEDx3jB5YIavz41IMCQo6sVHLekHwM1n8dwhi0J9Cw4/7Knl33xcladcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hhk0mhzdRrB7BMqRQjOD0+Z+AL0RGjB0onHf3CdM8bI=;
+ b=O61vZ3fSpuMm+3qV6AN/vE6oGnnIEM5gSVKaHMCPVV5qCBqd7Bla+AIyyxZFCK9le+q9DsEqshFLMBtUHw99M752ficKGaGRt9wNYALieooLs2mUfGF4m34geWOt4tHMs34NjD8zQatuhjHRtOf+mroho2TzZXNbwHeGK5cKG5w=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com (20.179.28.138) by
+ VI1PR08MB3902.eurprd08.prod.outlook.com (20.178.80.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.15; Thu, 27 Feb 2020 12:46:14 +0000
+Received: from VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::91aa:2540:62c:aeda]) by VI1PR08MB4432.eurprd08.prod.outlook.com
+ ([fe80::91aa:2540:62c:aeda%5]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
+ 12:46:14 +0000
+Subject: Re: [PATCH v4 08/10] nbd/server: introduce NBDExtentArray
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200205112041.6003-1-vsementsov@virtuozzo.com>
+ <20200205112041.6003-9-vsementsov@virtuozzo.com>
+ <6396ff32-16a3-62fe-1001-fde8b5a4f431@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200227154612365
+Message-ID: <f23161d4-0bff-30aa-6700-70c532ff8db5@virtuozzo.com>
+Date: Thu, 27 Feb 2020 15:46:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <6396ff32-16a3-62fe-1001-fde8b5a4f431@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-ClientProxiedBy: HE1PR05CA0281.eurprd05.prod.outlook.com
+ (2603:10a6:3:fc::33) To VI1PR08MB4432.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::10)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0281.eurprd05.prod.outlook.com (2603:10a6:3:fc::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.18 via Frontend Transport; Thu, 27 Feb 2020 12:46:14 +0000
+X-Tagtoolbar-Keys: D20200227154612365
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2f3574e4-c84a-4f8c-fb9a-08d7bb83080a
+X-MS-TrafficTypeDiagnostic: VI1PR08MB3902:
+X-Microsoft-Antispam-PRVS: <VI1PR08MB3902E4B2A4E42194D73F10E4C1EB0@VI1PR08MB3902.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 03264AEA72
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(396003)(136003)(346002)(376002)(39850400004)(366004)(199004)(189003)(956004)(2616005)(4326008)(81166006)(81156014)(2906002)(6486002)(186003)(26005)(31696002)(8936002)(8676002)(31686004)(36756003)(66946007)(66556008)(16526019)(66476007)(53546011)(316002)(86362001)(52116002)(478600001)(16576012)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3902;
+ H:VI1PR08MB4432.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QPk/5weRAKESFA2QYwbr4xKRCNYM5dzVtSZ6ppw+Sa4EhxrcGXt60/6/CtOJliFl3dgguyb0bZ8AoqmMFuCkch5Y/BATKUqZ/5ts9dVjBNj+IWQmbztn2M1go741hLOxL/0n8CC7BVOimE6Dex77UFquV0orW4/p24sDYcCQfPFI1oBM5/8TaYOgu4QDeXeqXekr4PiB0+XdNM4DZlTRSp17/KMjFVIZnZpdfrgaMFfWINTkS2NXGbko5k5aeu6zFtw4w49W6KAxpy2PKOpv7OZVogOojATlWBZ7O+T5lpwaS91cJTAIhI0dR+lCE5L1ZPZKuIOnZwAQj0r9V4X/tXt9IiXw5JjQX9UDaZEbzFQRQeTKUU+ZJTeo/sasA6PY3lUowCu6AQyXqm2uQ+CmIRy0SU2Zn9+o4e3KQZbmkTTvJ+qucjMOwBKnrCkdXPa7
+X-MS-Exchange-AntiSpam-MessageData: O+UoAWoEJ8ygXuRf27vH/roF2qg7Duf1JXotrufPt1WVBs+G3qKdGPDqrvw/OaefyG2y/RQdD4FM6X22fupreiBHt7HBUQGWAc2ZAH6Jrbt2n3+7PUmlQkAjdHCX/MEEwQox05iri31m4rWXQX/WiQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f3574e4-c84a-4f8c-fb9a-08d7bb83080a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2020 12:46:14.7331 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mmbcN6QXu5SdpnMkvDBgZZRhDqsx/P9ft01yjNBOqLXJoso6cYQWkVDizFRNr7Ypz1N360rbz+mcTmycb2H/LfcccFqilDSIZS33rtHo328=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3902
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 40.107.14.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,154 +126,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 27, 2020 at 12:10:02PM +0000, Peter Maydell wrote:
-> On Wed, 26 Feb 2020 at 11:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-[...]
-
-> >  delete mode 100644 docs/system/qemu-cpu-models.texi
+26.02.2020 18:06, Eric Blake wrote:
+> On 2/5/20 5:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Introduce NBDExtentArray class, to handle extents list creation in more
+>> controlled way and with fewer OUT parameters in functions.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>> =A0 nbd/server.c | 210 +++++++++++++++++++++++++++++--------------------=
+--
+>> =A0 1 file changed, 118 insertions(+), 92 deletions(-)
+>>
 >=20
-> Why don't we also delete cpu-models-x86.texi and
-> cpu-models-mips.texi ?
-
-We can; will do.
-
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 0d3ee8bdc6..01d1ee4b50 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -320,7 +320,7 @@ F: tests/tcg/i386/
-> >  F: tests/tcg/x86_64/
-> >  F: hw/i386/
-> >  F: disas/i386.c
-> > -F: docs/system/cpu-models-x86.texi
-> > +F: docs/system/cpu-models-x86.rst
+>> +
+>> +/* Further modifications of the array after conversion are abandoned */
+>> +static void nbd_extent_array_convert_to_be(NBDExtentArray *ea)
+>> +{
+>> +=A0=A0=A0 int i;
+>> +
+>> +=A0=A0=A0 assert(!ea->converted_to_be);
 >=20
-> This isn't the filename the patch actually uses.
+> Comment is stale - further modifications after conversion are a bug that =
+aborts the program, not abandoned.
 
-Originally, I used:=20
+I always thought that "abandoned" is something that must not be done, so th=
+e word works here. But I don't know English well).
+May be:
 
-    -F: docs/qemu-cpu-models.texi
-    +F: docs/system/qemu-cpu-models.rst
+"No further modifications of the array allowed after converting to BE."? Is=
+ it better?
 
-as part of my v4, here:
-https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg07165.html
+Or just drop the comment.
 
-But got "obsoleted" with Paolo's split of x86 & MIPS change.
 
-> There should be a corresponding new F: line for the mips version too.
-
-Correct; will add.
-
-> >  qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor=
--info.texi
-> >  qemu.1: docs/system/qemu-option-trace.texi
-> > -docs/system/qemu-cpu-models.7: docs/system/qemu-cpu-models.texi docs/s=
-ystem/cpu-models-x86.texi docs/system/cpu-models-mips.texi
-> >
-> >  html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-g=
-a-ref.html sphinxdocs
-> >  info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-g=
-a-ref.info
 >=20
-> The install line for qemu-cpu-models.7 also needs updating to
-> include $(MANUAL_BUILDDIR).
 >=20
-> The distclean line that removes qemu-cpu-models.7 can be removed.
-
-Noted, will do.
-
-[...]
-
-> >  # General information about the project.
-> >  project =3D u'QEMU'
-> > -copyright =3D u'2019, The QEMU Project Developers'
-> > +copyright =3D u'2020, The QEMU Project Developers'
-> >  author =3D u'The QEMU Project Developers'
-> >
-> >  # The version info for the project you're documenting, acts as replace=
-ment for
+>> =A0 /*
+>> - * Populate @extents from block status. Update @bytes to be the actual
+>> - * length encoded (which may be smaller than the original), and update
+>> - * @nb_extents to the number of extents used.
+>> - *
+>> - * Returns zero on success and -errno on bdrv_block_status_above failur=
+e.
+>> + * Add extent to NBDExtentArray. If extent can't be added (no available=
+ space),
+>> + * return -1.
+>> + * For safety, when returning -1 for the first time, .can_add is set to=
+ false,
+>> + * further call to nbd_extent_array_add() will crash.
 >=20
-> We should indeed fix the copyright date, but not in the middle
-> of this texi->rst series, and we should update the QEMU_COPYRIGHT
-> macro in qemu-common.h at the same time.
-
-Indeed.  A voice at the back of my head _did_ nag, "you're mashing this
-unrelated change into the middle of .texi --> .rst series..."
-
-Will make it a separate patch.
-
-> > +
-> > +rst_prolog =3D '''
-> > +.. include:: defs.rst.inc
-> > +'''
-> > +
+> s/further call/so further calls/
 >=20
-> Maybe we should do this in docs/conf.py where we update
-> rst_epilog with the CONFDIR replacement ?
-
-I'm ambivalent about it; can do it in docs/conf.py if you that is more
-appropriate.
-
-> Doing the "put these replacements into a generic defs.rst.inc"
-> would also be clearer in its own patch, I think.
-
-Fair enough. =20
-
-> >  # One entry per manual page. List of tuples
-> >  # (source start file, name, description, authors, manual section).
-> >  man_pages =3D [
-> >      ('qemu-block-drivers', 'qemu-block-drivers',
-> >       u'QEMU block drivers reference',
-> > -     ['Fabrice Bellard and the QEMU Project developers'], 7)
-> > +     ['Fabrice Bellard and the QEMU Project Developers'], 7),
+>> + * (to avoid the situation, when after failing to add an extent (return=
+ed -1),
+>> + * user miss this failure and add another extent, which is successfully=
+ added
+>> + * (array is full, but new extent may be squashed into the last one), t=
+hen we
+>> + * have invalid array with skipped extent)
 >=20
-> If we want to capitalize the 'D' in Developers, we should
-> make that fix in its own commit, and we should update
-> the QEMU_COPYRIGHT macro too, for consistency.
-
-I did wonder about that too; fair enough.  Will not mix it here.
-
-> > +    ('qemu-cpu-models', 'qemu-cpu-models',
-> > +     u'QEMU CPU Models',
-> > +     ['The QEMU Project Developers'], 7)
-> >  ]
+> Long comment with nested ().=A0 I'm not sure it adds much value, I think =
+it can safely be dropped.=A0 But if it is kept, I suggest:
 >=20
-> I would mention explicitly in the commit message that Dan agreed
-> to the updating of the manpage's Author information to
-> the more generic string.
+> (this ensures that after a failure, no further extents can accidentally c=
+hange the bounds of the last extent in the array)
 
-Can do; I actually mentioned it in my v4 revision history, below the
-"---" line
-(https://lists.nongnu.org/archive/html/qemu-devel/2020-02/msg07165.html):
+works for me
 
-   - Fix author attribution as per the thread:
-     Message-ID:
-     <CAFEAcA8dTR6xkQnsf32HAo6aDXf5Z0UmkhL3+257KWLj1ES6Sw@mail.gmail.com>
-     [danpb, pm215]
- =20
-Can spell it out as part of the commit message.
+>=20
+>> =A0=A0 */
+>> -static int blockstatus_to_extents(BlockDriverState *bs, uint64_t offset=
+,
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint64_t *bytes, NBDExtent *extents,
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 unsigned int *nb_extents)
+>> +static int nbd_extent_array_add(NBDExtentArray *ea,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0 uint32_t length, uint32_t flags)
+>> =A0 {
+>> -=A0=A0=A0 uint64_t remaining_bytes =3D *bytes;
+>> -=A0=A0=A0 NBDExtent *extent =3D extents, *extents_end =3D extents + *nb=
+_extents;
+>> -=A0=A0=A0 bool first_extent =3D true;
+>> +=A0=A0=A0 assert(ea->can_add);
+>> +
+>> +=A0=A0=A0 if (!length) {
+>> +=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 /* Extend previous extent if flags are the same */
+>> +=A0=A0=A0 if (ea->count > 0 && flags =3D=3D ea->extents[ea->count - 1].=
+flags) {
+>> +=A0=A0=A0=A0=A0=A0=A0 uint64_t sum =3D (uint64_t)length + ea->extents[e=
+a->count - 1].length;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (sum <=3D UINT32_MAX) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ea->extents[ea->count - 1].length =3D=
+ sum;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ea->total_length +=3D length;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 if (ea->count >=3D ea->nb_alloc) {
+>> +=A0=A0=A0=A0=A0=A0=A0 ea->can_add =3D false;
+>> +=A0=A0=A0=A0=A0=A0=A0 return -1;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 ea->total_length +=3D length;
+>> +=A0=A0=A0 ea->extents[ea->count] =3D (NBDExtent) {.length =3D length, .=
+flags =3D flags};
+>> +=A0=A0=A0 ea->count++;
+>> -=A0=A0=A0 assert(*nb_extents);
+>> -=A0=A0=A0 while (remaining_bytes) {
+>> +=A0=A0=A0 return 0;
+>> +}
+>=20
+> Looks like you properly addressed my concerns from v3.
+>=20
+> Comment changes are trivial, so you can add:
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-
-In summary, to-do for v5:
-
-  - Fix the things you pointed out in this patch here.
-
-  - Don't mix unrelated changes with .texi --> rst conversion (undo the
-    copyright year and the capitalization changes; make them separate
-    patches).
-
-  - Do the split of x86 | MIPS in a separate patch, including the change
-    of moving the macros to 'defs.rst.inc'.
-
+Thanks!
 
 --=20
-/kashyap
-
+Best regards,
+Vladimir
 
