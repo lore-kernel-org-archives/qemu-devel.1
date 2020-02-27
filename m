@@ -6,64 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DF5C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27102C11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:41:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C33524697
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:41:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C33524697
+	by mail.kernel.org (Postfix) with ESMTPS id 0076024697
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:41:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0076024697
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7LIG-0003xP-CU
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:41:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60501)
+	id 1j7LIK-00047R-69
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:41:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j7LHM-00035d-O9
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:50 -0500
+ (envelope-from <bounces@canonical.com>) id 1j7LHP-00035m-TE
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j7LHL-00037C-6X
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38258)
+ (envelope-from <bounces@canonical.com>) id 1j7LHO-00037t-KY
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38412)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j7LHL-00036u-0u
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:47 -0500
+ id 1j7LHO-00037k-F1
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:40:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j7LHJ-0003yx-Oh
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 15:40:45 +0000
+ id 1j7LHN-000441-Jt
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 15:40:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 92C592E80D1
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 15:40:45 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7596C2E80C8
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 15:40:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Feb 2020 15:33:56 -0000
-From: Olaf Seibert <1865048@bugs.launchpad.net>
+Date: Thu, 27 Feb 2020 15:28:28 -0000
+From: Xiaoxing Fang <1864704@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: oseibert-sys11
-X-Launchpad-Bug-Reporter: Olaf Seibert (oseibert-sys11)
-X-Launchpad-Bug-Modifier: Olaf Seibert (oseibert-sys11)
-Message-Id: <158281763694.13572.4793000469968260846.malonedeb@gac.canonical.com>
-Subject: [Bug 1865048] [NEW] qemu-img --force-share does not disable file
- locking
+X-Launchpad-Bug-Commenters: laurent-vivier xiaoxing-fang
+X-Launchpad-Bug-Reporter: Xiaoxing Fang (xiaoxing-fang)
+X-Launchpad-Bug-Modifier: Xiaoxing Fang (xiaoxing-fang)
+References: <158266147970.14929.12590183127375701795.malonedeb@wampee.canonical.com>
+Message-Id: <158281730822.13572.16894022157420326647.malone@gac.canonical.com>
+Subject: [Bug 1864704] Re: No compatible -machine option in qemu-system-ppc64
+ for e6500 core
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 06a78918ce62722dea9fc1b63d29d874428c5695
+X-Launchpad-Hash: 4f119050ea83c7c2c263543ff2ae51da9f4f0e9f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,143 +78,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1865048 <1865048@bugs.launchpad.net>
+Reply-To: Bug 1864704 <1864704@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-The new option "--force-share" for qemu-img does not disable file
-locking.
-
-I tried it with version qemu-img version 2.11.1(Debian 1:2.11+dfsg-
-1ubuntu7.21~cloud0) and I traced the source code of the current git
-trunk.
-
-Sample to demonstrate:
-
-# strace qemu-img info --force-share testfile.qcow2   2>&1 | grep F_RDLCK
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D10=
-0, l_len=3D1}) =3D 0
-
-I traced the passing of the --force-share option through the source code
-(I used commit 6c599282f8 as of Mon Feb 17 13:32:25 2020 +0000)
-
-qemu-img.c:img_info()
-        force_share =3D true;
-qemu-img.c:collect_image_info_list(force_share)
-qemu-img.c:img_open(force_share)
-qemu-img.c:img_open_file(force_share)
-        qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
-block/block-backend.c:blk_new_open(options)
-block.c:bdrv_open(options)
-block.c:bdrv_open_inheritoptions()
-block.c:bdrv_open_common(options)
-        bs->force_share =3D qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE, f=
-alse);
-block.c:bdrv_open_driver(bs)
-include/block/block_int.h:int (*bdrv_file_open)(BlockDriverState *bs, QDict=
- *options, int flags,
-block/file-posix.c:.bdrv_file_open =3D raw_open,
-block/file-posix.c:raw_open_common(bs)
-        locking =3D qapi_enum_parse(&OnOffAuto_lookup,
-                              qemu_opt_get(opts, "locking"),
-                              ON_OFF_AUTO_AUTO, &local_err);
-        ignoring bs->force_share
-
-At the end, bs->force_share is ignored in determining the locking value.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Thank you very much for your reply, Laurent. Does it mean that we can
+just use "-M ppce500 -cpu e6500" and for other options, there is no need
+to change? Is there any approach to verify this setup (for example, with
+a bare metal elf running in T2080)? Thanks again!
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1865048
+https://bugs.launchpad.net/bugs/1864704
 
 Title:
-  qemu-img --force-share does not disable file locking
+  No compatible -machine option in qemu-system-ppc64 for e6500 core
 
 Status in QEMU:
   New
 
 Bug description:
-  The new option "--force-share" for qemu-img does not disable file
-  locking.
+  Hi,
 
-  I tried it with version qemu-img version 2.11.1(Debian 1:2.11+dfsg-
-  1ubuntu7.21~cloud0) and I traced the source code of the current git
-  trunk.
+  I'm trying to use qemu-system-ppc64 for emulating a QorIQ T2080 (with e65=
+00 cores). =
 
-  Sample to demonstrate:
+  However, I couldn't find any -machine option that matches -cpu e6500 opti=
+on, which are listed below:
 
-  # strace qemu-img info --force-share testfile.qcow2   2>&1 | grep F_RDLCK
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
-  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
-100, l_len=3D1}) =3D 0
+  C:\Program Files\qemu>qemu-system-ppc64 -machine help
+  Supported machines are:
+  40p                  IBM RS/6000 7020 (40p)
+  bamboo               bamboo
+  g3beige              Heathrow based PowerMAC
+  mac99                Mac99 based PowerMAC
+  mpc8544ds            mpc8544ds
+  none                 empty machine
+  powernv8             IBM PowerNV (Non-Virtualized) POWER8
+  powernv              IBM PowerNV (Non-Virtualized) POWER9 (alias of power=
+nv9)
+  powernv9             IBM PowerNV (Non-Virtualized) POWER9
+  ppce500              generic paravirt e500 platform
+  prep                 PowerPC PREP platform (deprecated)
+  pseries-2.1          pSeries Logical Partition (PAPR compliant)
+  pseries-2.10         pSeries Logical Partition (PAPR compliant)
+  pseries-2.11         pSeries Logical Partition (PAPR compliant)
+  pseries-2.12         pSeries Logical Partition (PAPR compliant)
+  pseries-2.12-sxxm    pSeries Logical Partition (PAPR compliant)
+  pseries-2.2          pSeries Logical Partition (PAPR compliant)
+  pseries-2.3          pSeries Logical Partition (PAPR compliant)
+  pseries-2.4          pSeries Logical Partition (PAPR compliant)
+  pseries-2.5          pSeries Logical Partition (PAPR compliant)
+  pseries-2.6          pSeries Logical Partition (PAPR compliant)
+  pseries-2.7          pSeries Logical Partition (PAPR compliant)
+  pseries-2.8          pSeries Logical Partition (PAPR compliant)
+  pseries-2.9          pSeries Logical Partition (PAPR compliant)
+  pseries-3.0          pSeries Logical Partition (PAPR compliant)
+  pseries-3.1          pSeries Logical Partition (PAPR compliant)
+  pseries-4.0          pSeries Logical Partition (PAPR compliant)
+  pseries-4.1          pSeries Logical Partition (PAPR compliant)
+  pseries              pSeries Logical Partition (PAPR compliant) (alias of=
+ pseries-4.2)
+  pseries-4.2          pSeries Logical Partition (PAPR compliant) (default)
+  ref405ep             ref405ep
+  sam460ex             aCube Sam460ex
+  taihu                taihu
+  virtex-ml507         Xilinx Virtex ML507 reference design
 
-  I traced the passing of the --force-share option through the source
-  code (I used commit 6c599282f8 as of Mon Feb 17 13:32:25 2020 +0000)
-
-  qemu-img.c:img_info()
-          force_share =3D true;
-  qemu-img.c:collect_image_info_list(force_share)
-  qemu-img.c:img_open(force_share)
-  qemu-img.c:img_open_file(force_share)
-          qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
-  block/block-backend.c:blk_new_open(options)
-  block.c:bdrv_open(options)
-  block.c:bdrv_open_inheritoptions()
-  block.c:bdrv_open_common(options)
-          bs->force_share =3D qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE,=
- false);
-  block.c:bdrv_open_driver(bs)
-  include/block/block_int.h:int (*bdrv_file_open)(BlockDriverState *bs, QDi=
-ct *options, int flags,
-  block/file-posix.c:.bdrv_file_open =3D raw_open,
-  block/file-posix.c:raw_open_common(bs)
-          locking =3D qapi_enum_parse(&OnOffAuto_lookup,
-                                qemu_opt_get(opts, "locking"),
-                                ON_OFF_AUTO_AUTO, &local_err);
-          ignoring bs->force_share
-
-  At the end, bs->force_share is ignored in determining the locking
-  value.
+  I am wondering if anyone knows that is if any of them can be selected
+  for such emulation? Thank you!
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1865048/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1864704/+subscriptions
 
