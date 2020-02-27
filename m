@@ -2,79 +2,103 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6086AC4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A04C4BA3B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:00:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C64624692
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 11:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1071424692
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 12:00:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVu/Zs/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C64624692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TofFI1ww"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1071424692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7HpL-0007TH-86
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 06:59:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51156)
+	id 1j7HqJ-0008TG-7C
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 07:00:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1j7Hks-0008Ct-2l
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:55:04 -0500
+ (envelope-from <liam.merwick@oracle.com>) id 1j7How-0007Ah-2R
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:59:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1j7Hko-0001L7-UE
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:55:01 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48421
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1j7Hko-0001JJ-QM
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:54:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582804498;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UzkgrkdsbLQ+e9noKNpfI2WzRGgM1Y29u5xdSavK9wg=;
- b=OVu/Zs/CHe02yM68arkHoQ4nFbuS9yJ8zxaowqpqcVoIZwgTDVDrBOZ5paKWGsMhD0nXmZ
- dFBSKvg+5pdhtfi7ZSmJLAMZLDRSv99NpfNSQ5kez+Zc64dVtOo1Gm4m6VepMv8mxswLPI
- U3RVcFIq/VwK24I2W9mYQiVNusreBSQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-aM7pJTxeO4aHqaGGbPgU3Q-1; Thu, 27 Feb 2020 06:54:55 -0500
-X-MC-Unique: aM7pJTxeO4aHqaGGbPgU3Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43864800D53;
- Thu, 27 Feb 2020 11:54:54 +0000 (UTC)
-Received: from localhost (ovpn-117-2.ams2.redhat.com [10.36.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA39D1001B2C;
- Thu, 27 Feb 2020 11:54:53 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 5/7] docs: rstfy s390 dasd ipl documentation
-Date: Thu, 27 Feb 2020 12:54:29 +0100
-Message-Id: <20200227115431.32364-6-cohuck@redhat.com>
-In-Reply-To: <20200227115431.32364-1-cohuck@redhat.com>
-References: <20200227115431.32364-1-cohuck@redhat.com>
+ (envelope-from <liam.merwick@oracle.com>) id 1j7Hot-00086S-PE
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:59:13 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:37854)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1j7Hot-00084O-F9
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 06:59:11 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RBvp9R190973;
+ Thu, 27 Feb 2020 11:59:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ZfBfU4l2lCyKAtHRyJBJpgaF0BG3XH7DfhBvX/2uPCk=;
+ b=TofFI1wwKMtaDEMm95UzAV0K9uwSUIWJ5ygk51zWxa9KSwiVlf2cYYI3YLs3ke0+YbVm
+ JeLJbLCtD2THk6U7ClAW5BSB0ApM8/0E6KNcY7jWjIwuGrKWEfDe3D/eJzQgGfg8SP/j
+ xHpb9y2Loa/ovTWTt7u4HLxToKL/svVwMaC0gceMeKAThwt6eBL5cwITjNqjpKdxqTqb
+ eRpJd9vMefASvfbTJupMdFHV7DSAvVsL30Ir0aUGDIv9d5I45+9A5uAOhnf10UkfsKqr
+ lVMuEkU3nhoZOpDgb20JvRuyafi/XBXIHvx7GW5zp7vVxltD51CcdbeQFBrXk9jR/25G wA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2ydybcmf80-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 27 Feb 2020 11:59:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01RBw7Pb002080;
+ Thu, 27 Feb 2020 11:59:06 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2ydj4mbsfd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 27 Feb 2020 11:59:06 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01RBx5cC022416;
+ Thu, 27 Feb 2020 11:59:05 GMT
+Received: from [10.175.167.101] (/10.175.167.101)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 27 Feb 2020 03:59:05 -0800
+Subject: Re: [PATCH] qapi/machine: Place the 'Notes' tag after the 'Since' tag
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200227104153.29425-1-philmd@redhat.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <24ca5661-7707-1413-c910-e531e89488b0@oracle.com>
+Date: Thu, 27 Feb 2020 11:59:02 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20200227104153.29425-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ phishscore=0 suspectscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002270097
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9543
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ adultscore=0
+ priorityscore=1501 suspectscore=0 mlxlogscore=999 lowpriorityscore=0
+ phishscore=0 spamscore=0 clxscore=1015 malwarescore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002270097
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
+ 01RBvp9R190973
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,297 +110,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While at it, also fix the numbering in 'What QEMU does'.
+On 27/02/2020 10:41, Philippe Mathieu-Daud=C3=A9 wrote:
+> This fixes when adding a 'Since' tag:
+>=20
+>    In file included from qapi/qapi-schema.json:105:
+>    qapi/machine.json:25:1: '@arch:' can't follow 'Notes' section
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>   qapi/machine.json | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index 6c11e3cf3a..2b4f5f0962 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -16,11 +16,11 @@
+>   # individual target constants are not documented here, for the time
+>   # being.
+>   #
+> +# Since: 3.0
+> +#
+>   # Notes: The resulting QMP strings can be appended to the "qemu-syste=
+m-"
+>   #        prefix to produce the corresponding QEMU executable name. Th=
+is
+>   #        is true even for "qemu-system-x86_64".
+> -#
+> -# Since: 3.0
+>   ##
+>   { 'enum' : 'SysEmuTarget',
+>     'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32=
+',
+>=20
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200213162942.14177-2-cohuck@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- MAINTAINERS                                   |   2 +-
- docs/devel/index.rst                          |   1 +
- .../{s390-dasd-ipl.txt =3D> s390-dasd-ipl.rst}  | 119 +++++++++---------
- 3 files changed, 64 insertions(+), 58 deletions(-)
- rename docs/devel/{s390-dasd-ipl.txt =3D> s390-dasd-ipl.rst} (51%)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36d94c17a654..c591ea6a60e3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1259,7 +1259,7 @@ S: Supported
- F: hw/s390x/ipl.*
- F: pc-bios/s390-ccw/
- F: pc-bios/s390-ccw.img
--F: docs/devel/s390-dasd-ipl.txt
-+F: docs/devel/s390-dasd-ipl.rst
- T: git https://github.com/borntraeger/qemu.git s390-next
- L: qemu-s390x@nongnu.org
-=20
-diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-index 4dc2ca8d715e..b734ba465577 100644
---- a/docs/devel/index.rst
-+++ b/docs/devel/index.rst
-@@ -25,3 +25,4 @@ Contents:
-    tcg-plugins
-    bitops
-    reset
-+   s390-dasd-ipl
-diff --git a/docs/devel/s390-dasd-ipl.txt b/docs/devel/s390-dasd-ipl.rst
-similarity index 51%
-rename from docs/devel/s390-dasd-ipl.txt
-rename to docs/devel/s390-dasd-ipl.rst
-index 9107e048e4e6..2529eb5f54b3 100644
---- a/docs/devel/s390-dasd-ipl.txt
-+++ b/docs/devel/s390-dasd-ipl.rst
-@@ -1,49 +1,55 @@
--*****************************
--***** s390 hardware IPL *****
--*****************************
-+Booting from real channel-attached devices on s390x
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-+
-+s390 hardware IPL
-+-----------------
-=20
- The s390 hardware IPL process consists of the following steps.
-=20
--1. A READ IPL ccw is constructed in memory location 0x0.
--    This ccw, by definition, reads the IPL1 record which is located on the=
- disk
--    at cylinder 0 track 0 record 1. Note that the chain flag is on in this=
- ccw
--    so when it is complete another ccw will be fetched and executed from m=
-emory
--    location 0x08.
--
--2. Execute the Read IPL ccw at 0x00, thereby reading IPL1 data into 0x00.
--    IPL1 data is 24 bytes in length and consists of the following pieces o=
-f
--    information: [psw][read ccw][tic ccw]. When the machine executes the R=
-ead
--    IPL ccw it read the 24-bytes of IPL1 to be read into memory starting a=
-t
--    location 0x0. Then the ccw program at 0x08 which consists of a read
--    ccw and a tic ccw is automatically executed because of the chain flag =
-from
--    the original READ IPL ccw. The read ccw will read the IPL2 data into m=
-emory
--    and the TIC (Transfer In Channel) will transfer control to the channel
--    program contained in the IPL2 data. The TIC channel command is the
--    equivalent of a branch/jump/goto instruction for channel programs.
--    NOTE: The ccws in IPL1 are defined by the architecture to be format 0.
-+1. A READ IPL ccw is constructed in memory location ``0x0``.
-+   This ccw, by definition, reads the IPL1 record which is located on the =
-disk
-+   at cylinder 0 track 0 record 1. Note that the chain flag is on in this =
-ccw
-+   so when it is complete another ccw will be fetched and executed from me=
-mory
-+   location ``0x08``.
-+
-+2. Execute the Read IPL ccw at ``0x00``, thereby reading IPL1 data into ``=
-0x00``.
-+   IPL1 data is 24 bytes in length and consists of the following pieces of
-+   information: ``[psw][read ccw][tic ccw]``. When the machine executes th=
-e Read
-+   IPL ccw it read the 24-bytes of IPL1 to be read into memory starting at
-+   location ``0x0``. Then the ccw program at ``0x08`` which consists of a =
-read
-+   ccw and a tic ccw is automatically executed because of the chain flag f=
-rom
-+   the original READ IPL ccw. The read ccw will read the IPL2 data into me=
-mory
-+   and the TIC (Transfer In Channel) will transfer control to the channel
-+   program contained in the IPL2 data. The TIC channel command is the
-+   equivalent of a branch/jump/goto instruction for channel programs.
-+
-+   NOTE: The ccws in IPL1 are defined by the architecture to be format 0.
-=20
- 3. Execute IPL2.
--    The TIC ccw instruction at the end of the IPL1 channel program will be=
-gin
--    the execution of the IPL2 channel program. IPL2 is stage-2 of the boot
--    process and will contain a larger channel program than IPL1. The point=
- of
--    IPL2 is to find and load either the operating system or a small progra=
-m that
--    loads the operating system from disk. At the end of this step all or s=
-ome of
--    the real operating system is loaded into memory and we are ready to ha=
-nd
--    control over to the guest operating system. At this point the guest
--    operating system is entirely responsible for loading any more data it =
-might
--    need to function. NOTE: The IPL2 channel program might read data into =
-memory
--    location 0 thereby overwriting the IPL1 psw and channel program. This =
-is ok
--    as long as the data placed in location 0 contains a psw whose instruct=
-ion
--    address points to the guest operating system code to execute at the en=
-d of
--    the IPL/boot process.
--    NOTE: The ccws in IPL2 are defined by the architecture to be format 0.
-+   The TIC ccw instruction at the end of the IPL1 channel program will beg=
-in
-+   the execution of the IPL2 channel program. IPL2 is stage-2 of the boot
-+   process and will contain a larger channel program than IPL1. The point =
-of
-+   IPL2 is to find and load either the operating system or a small program=
- that
-+   loads the operating system from disk. At the end of this step all or so=
-me of
-+   the real operating system is loaded into memory and we are ready to han=
-d
-+   control over to the guest operating system. At this point the guest
-+   operating system is entirely responsible for loading any more data it m=
-ight
-+   need to function.
-+
-+   NOTE: The IPL2 channel program might read data into memory
-+   location ``0x0`` thereby overwriting the IPL1 psw and channel program. =
-This is ok
-+   as long as the data placed in location ``0x0`` contains a psw whose ins=
-truction
-+   address points to the guest operating system code to execute at the end=
- of
-+   the IPL/boot process.
-+
-+   NOTE: The ccws in IPL2 are defined by the architecture to be format 0.
-=20
- 4. Start executing the guest operating system.
--    The psw that was loaded into memory location 0 as part of the ipl proc=
-ess
--    should contain the needed flags for the operating system we have loade=
-d. The
--    psw's instruction address will point to the location in memory where w=
-e want
--    to start executing the operating system. This psw is loaded (via LPSW
--    instruction) causing control to be passed to the operating system code=
-.
-+   The psw that was loaded into memory location ``0x0`` as part of the ipl=
- process
-+   should contain the needed flags for the operating system we have loaded=
-. The
-+   psw's instruction address will point to the location in memory where we=
- want
-+   to start executing the operating system. This psw is loaded (via LPSW
-+   instruction) causing control to be passed to the operating system code.
-=20
- In a non-virtualized environment this process, handled entirely by the har=
-dware,
- is kicked off by the user initiating a "Load" procedure from the hardware
-@@ -54,18 +60,17 @@ written immediately after the special "Read IPL" ccw, t=
-he IPL1 channel program
- will be executed immediately (the special read ccw has the chaining bit tu=
-rned
- on). The TIC at the end of the IPL1 channel program will cause the IPL2 ch=
-annel
- program to be executed automatically. After this sequence completes the "L=
-oad"
--procedure then loads the psw from 0x0.
-+procedure then loads the psw from ``0x0``.
-=20
--**********************************************************
--***** How this all pertains to QEMU (and the kernel) *****
--**********************************************************
-+How this all pertains to QEMU (and the kernel)
-+----------------------------------------------
-=20
- In theory we should merely have to do the following to IPL/boot a guest
- operating system from a DASD device:
-=20
--1. Place a "Read IPL" ccw into memory location 0x0 with chaining bit on.
--2. Execute channel program at 0x0.
--3. LPSW 0x0.
-+1. Place a "Read IPL" ccw into memory location ``0x0`` with chaining bit o=
-n.
-+2. Execute channel program at ``0x0``.
-+3. LPSW ``0x0``.
-=20
- However, our emulation of the machine's channel program logic within the k=
-ernel
- is missing one key feature that is required for this process to work:
-@@ -89,32 +94,31 @@ Lastly, in some cases (the zipl bootloader for example)=
- the IPL2 program also
- transfers control to another channel program segment immediately after rea=
-ding
- it from the disk. So we need to be able to handle this case.
-=20
--**************************
--***** What QEMU does *****
--**************************
-+What QEMU does
-+--------------
-=20
- Since we are forced to live with prefetch we cannot use the very simple IP=
-L
- procedure we defined in the preceding section. So we compensate by doing t=
-he
- following.
-=20
--1. Place "Read IPL" ccw into memory location 0x0, but turn off chaining bi=
-t.
--2. Execute "Read IPL" at 0x0.
-+1. Place "Read IPL" ccw into memory location ``0x0``, but turn off chainin=
-g bit.
-+2. Execute "Read IPL" at ``0x0``.
-=20
--   So now IPL1's psw is at 0x0 and IPL1's channel program is at 0x08.
-+   So now IPL1's psw is at ``0x0`` and IPL1's channel program is at ``0x08=
-``.
-=20
--4. Write a custom channel program that will seek to the IPL2 record and th=
-en
-+3. Write a custom channel program that will seek to the IPL2 record and th=
-en
-    execute the READ and TIC ccws from IPL1.  Normally the seek is not requ=
-ired
-    because after reading the IPL1 record the disk is automatically positio=
-ned
-    to read the very next record which will be IPL2. But since we are not r=
-eading
-    both IPL1 and IPL2 as part of the same channel program we must manually=
- set
-    the position.
-=20
--5. Grab the target address of the TIC instruction from the IPL1 channel pr=
-ogram.
-+4. Grab the target address of the TIC instruction from the IPL1 channel pr=
-ogram.
-    This address is where the IPL2 channel program starts.
-=20
-    Now IPL2 is loaded into memory somewhere, and we know the address.
-=20
--6. Execute the IPL2 channel program at the address obtained in step #5.
-+5. Execute the IPL2 channel program at the address obtained in step #4.
-=20
-    Because this channel program can be dynamic, we must use a special algo=
-rithm
-    that detects a READ immediately followed by a TIC and breaks the ccw ch=
-ain
-@@ -126,8 +130,9 @@ following.
-    channel program from executing properly.
-=20
-    Now the operating system code is loaded somewhere in guest memory and t=
-he psw
--   in memory location 0x0 will point to entry code for the guest operating
-+   in memory location ``0x0`` will point to entry code for the guest opera=
-ting
-    system.
-=20
--7. LPSW 0x0.
-+6. LPSW ``0x0``
-+
-    LPSW transfers control to the guest operating system and we're done.
---=20
-2.21.1
+Does the same issue occur for @CpuInstanceProperties: at line 829?
+The 'Since:' follows a 'Note:' section (but maybe the singular usage is=20
+intended).
 
+otherwise
+
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
