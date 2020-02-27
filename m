@@ -2,113 +2,85 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27162C11D3D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FFEC11D3D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:15:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E04D824688
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 945F324688
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 15:15:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=stephanosio.onmicrosoft.com header.i=@stephanosio.onmicrosoft.com header.b="f4CAzA/0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E04D824688
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stephanos.io
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBemmj6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945F324688
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7KmY-0007p3-4E
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:08:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53876)
+	id 1j7Ksb-00019b-P2
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 10:15:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <root@stephanos.io>) id 1j7Klu-0007HS-0f
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:08:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7Krq-0000bU-Ek
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:14:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <root@stephanos.io>) id 1j7Kls-0006Mb-VT
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:08:17 -0500
-Received: from mail-eopbgr1280100.outbound.protection.outlook.com
- ([40.107.128.100]:51527 helo=KOR01-PS2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <root@stephanos.io>)
- id 1j7Klq-0006D8-3G; Thu, 27 Feb 2020 10:08:14 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EZ/0tzUuOWKdP+INqTfEi/dJava8LsvaB0q21ARam84YCG3LJiiHP0rcoE4bKfEo8ivP3FzVLwA9urtWpJTp4fxI47YOOJsQ5LyiJvriWfHT0F8mDWAgzgP2rOsb2/Iur3BpRQXeauuOWzJk77hfYtGUdA3+0Ia+k3MCF4TZO7tz0khD1Qy2hrYnau49DhrppsReQAvqbaE0NRiJCJdO8OY7EFslnKorsYy4jz6Fsv8kBQauJQSIjS23+CMitGM1Sb71uIOR13c+hC/DS9NenNSYirfK1xHfJpA1P3bSBSkcDjU9z7V3DOcTChheAg1U+MJnI/dGD8AD0eQBLpyMMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rFcC8PYHes/XJgSfNQjDipS1POXIWjrLr+6Kroh2ZZg=;
- b=QqYi2La+Yj9Zt5epzPHkvG4duHO3Ij4dQJdUzIJ8zGVsyyrD/uzPr5jME5r6CfwPJhqEKnGTC/Xcalluu8JScB4nXVd1XlRg3JnRLgPr8Je/UbYUIYABVg5sTP1j9eZ8Bj16CwH+s3ukKbMy8U5sB3a6vNJjI+QNjyHGxpepQmUkIe6PtnGyzGmsLWCgs9uY3Ba9yH5kz5H3qW4W9lzkN0Of9GeaPBPkLKOhxG5XgTFWj/iQjDKp1BFXTAK3nJ0b5cZDYux+YXxnwpy/oPMzH8WKs8d2LdHwSuZZ8Ps9l0nOeqhIh8rZWW+EmlriILLAtfAnpR7DD5eNyYdJQa4aBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=stephanos.io; dmarc=pass action=none header.from=stephanos.io;
- dkim=pass header.d=stephanos.io; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=stephanosio.onmicrosoft.com; s=selector1-stephanosio-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rFcC8PYHes/XJgSfNQjDipS1POXIWjrLr+6Kroh2ZZg=;
- b=f4CAzA/01lBJ/9fd8Ro0zn9MejGICj5UBl+5jcK1lOy6reHfl1SjdKgBp5Cx2iXiDbXgZxstjvh6Ukirde39RkcOWsm0vMAtPoEExxtZQgyZFcvx0li7O+e2vOyif8+iFsSezNSK2Xd1fEJ19vvIW6GipDUFmk/icrbVV9vF52o=
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM (10.174.35.136) by
- SLXP216MB0112.KORP216.PROD.OUTLOOK.COM (10.174.39.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.15; Thu, 27 Feb 2020 15:08:09 +0000
-Received: from SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b]) by SLXP216MB0285.KORP216.PROD.OUTLOOK.COM
- ([fe80::d10f:962f:91d7:b1b%8]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
- 15:08:09 +0000
-From: Stephanos Ioannidis <root@stephanos.io>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, Peter
- Maydell <peter.maydell@linaro.org>
-Subject: RE: [PATCH 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
-Thread-Topic: [PATCH 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
-Thread-Index: AQHV7WDamNGXYjwsUEm9K1g4p+T2pKgu8+SAgAAW84CAAAZ6QA==
-Date: Thu, 27 Feb 2020 15:08:09 +0000
-Message-ID: <SLXP216MB0285F1E97DBA3FDED2ED72D2BDEB0@SLXP216MB0285.KORP216.PROD.OUTLOOK.COM>
+ (envelope-from <peter.maydell@linaro.org>) id 1j7Krp-0003D6-Ac
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:14:26 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36980)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7Kro-0003CN-Qh
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 10:14:24 -0500
+Received: by mail-ot1-x344.google.com with SMTP id b3so3230295otp.4
+ for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 07:14:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=tBunEO6n1Cf3cqibwNADI9A/VhZGvU7kq5vzac51UFs=;
+ b=JBemmj6fDzrzZHcTQqIF5ooil6h9GdvALZS29ShHp/Ao5mTXmNOQJvqdtrSyUwseqy
+ euy2Zv46C3pOxM3Q7kO3YFmKHKM3PoVunxZdKgXcsKOSZP+DtFGAf3H6wEcAK0zyTQe5
+ 5j3tgVHfgpB6Z1FP0ZJzpu1+rGW5UNMO1Dqjbj9y9Wq2vnS1FVKsnUq1oEVaqhyvYO0g
+ kRgu7jtNdj1lReKucp03nRmlBmw7yRO6W9hAdOgsEcM24+/QuD2umDViwhekAjnrlGlE
+ RC780l6NX8vrDDHPnIih9cFnQfL04Kb+vmzspPefOJ8Z/JM3myQDBJ5aoImeKxNxhcmv
+ lCAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tBunEO6n1Cf3cqibwNADI9A/VhZGvU7kq5vzac51UFs=;
+ b=a2TudKWLNxFIC0Y66jrSeHt8qdpvIsf8N3ka+70rxJpXJ3jTKj9QsYwU51VcF0Qiey
+ uT7Yfa7VwDo56mi4BNLStj2SOctDn3aiyiI/C00mbwcbrYlivyo5uzranYo/TDADSUVI
+ aNIUgBl89eTVpCVWVY1cA6UQ1BEVXPdy4nLfjVq6P6+/mvRq1VdpCxU//PB4lACTxIit
+ /y3fTNYg0M8RppbUykhImrWAMKLfULGdeOXMpZcXCxxUeKoKJuKe5xw8guO6kV2M0pXV
+ sTSy9QgbREO2hZbT+janji1IufxoQmxX6zCzMY1iD/900UcJYb8y/shZ39yTnU1ilgXA
+ qmoA==
+X-Gm-Message-State: APjAAAVzrH8rKYEavZ32j9HcxeIMkqFMqsuMTKTInSJUA11+S9+Fa3n2
+ 49wM3S53bRfu1+hcJebOnLwdXUsCoWSXfRB3xkjryEZP
+X-Google-Smtp-Source: APXvYqzgWEjrtxJ3v6x+kSWAAQe2n9vZKrk3wMp16F5UEDfwydykqowubwzsgnz/GAkueJgKhXbOu3jyRl6E6mAdlVc=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr89504otq.97.1582816463293; 
+ Thu, 27 Feb 2020 07:14:23 -0800 (PST)
+MIME-Version: 1.0
 References: <20200227112617.66044-1-root@stephanos.io>
  <20200227112617.66044-2-root@stephanos.io>
  <CAFEAcA9qbndHqoW1oaUAKMZY5hNYjP+mMt-K_WqoT9Z=Q=ct7g@mail.gmail.com>
  <e1813f57-57ac-e6ad-d119-dd6c2cdc90e1@redhat.com>
-In-Reply-To: <e1813f57-57ac-e6ad-d119-dd6c2cdc90e1@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=root@stephanos.io; 
-x-originating-ip: [59.151.229.56]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 50e1f440-ef12-4d6a-52f0-08d7bb96db6a
-x-ms-traffictypediagnostic: SLXP216MB0112:
-x-microsoft-antispam-prvs: <SLXP216MB01125DCC248FFBEC0F49D9A2BDEB0@SLXP216MB0112.KORP216.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 03264AEA72
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39830400003)(376002)(366004)(396003)(136003)(346002)(199004)(189003)(54906003)(52536014)(2906002)(76116006)(66556008)(66446008)(64756008)(66476007)(81156014)(110136005)(66946007)(53546011)(26005)(8676002)(8936002)(81166006)(33656002)(4326008)(71200400001)(316002)(5660300002)(186003)(9686003)(966005)(7696005)(6506007)(86362001)(508600001)(55016002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:SLXP216MB0112;
- H:SLXP216MB0285.KORP216.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: stephanos.io does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lc3XlKA2IwGALA25qKvB7SQ6WmWqEnwLE4nEVh5BNOMBDrpZBx3qR4xUJxRaZ+wiAor+QBXcgr1lyLSR3g08/bTyORGB5Oo36Qcj/QSFjuRLR8WxIV7wBAxqNqN8YbYk8hFdfp6/rxcyZ9VZH/h81MXwkrr9wELE1QiFZNSd1sc/+X6yMzUY45xy7TBOiWmo2O4kANIiidrkN/HkAox/8NM9q9q07dxZHtDqsokLiCX8d00zKN12ptaM1TS9FHzbRkkHnx3Av4k7ACak7eI+mVH4u2dUv+d8RHGiWkeCd8N9flwKDmddWoGvRw+xyllsjnMDM4xpiqSklfspun28Q4UxSUvRoWyDW7ZpXDk8v0yoFbChQPEfisCHYqfoq8vSW2qAmppf5kywfBZtthGzn0OL2FRWjrjZWAeyo/kuTpSRRvMVzitXxhOA3FG4CSjruO4pdTzhXEaCqfpTEnaDGx9oeNdKm8hI2aHM4o3DHY24OqwFXsmBrj/F8PSBYHKW/XAKYft4lb8f3Zjsxdgcfw==
-x-ms-exchange-antispam-messagedata: Y5vf9zb67g5ZZyTOfl/v1ttKbspOGIW/JT+ZqwC6Rb933499IxakDB4lP2Jp7Gq7RymKmHyZq622HrLJH78gtzwbJyhLLGeRaBTyFgaUrZxgbfWMfArAfV8V+LBsdywfr8Y/3YyUi67DBTk/HeNPbA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: stephanos.io
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50e1f440-ef12-4d6a-52f0-08d7bb96db6a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2020 15:08:09.5891 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: c98113d8-f05d-4479-8605-bfc8e93dc16d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NHYIPMzCBgwpeSU/3HERpD6E1wJgnromOFUKIXGGeyEtEoTI5HE7uJJu0GNg62XRvdig+ShbCeK/2ucSY4C5sg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SLXP216MB0112
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.128.100
+ <SLXP216MB0285F1E97DBA3FDED2ED72D2BDEB0@SLXP216MB0285.KORP216.PROD.OUTLOOK.COM>
+In-Reply-To: <SLXP216MB0285F1E97DBA3FDED2ED72D2BDEB0@SLXP216MB0285.KORP216.PROD.OUTLOOK.COM>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Feb 2020 15:14:12 +0000
+Message-ID: <CAFEAcA_s_UgtRJKjHnwFrPj0PSzbEuPEpdePnTpJ0bbuBrCJug@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/arm/armv7m: Downgrade CPU reset handler priority
+To: Stephanos Ioannidis <root@stephanos.io>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,29 +93,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  "open list:All patches CC here" <qemu-devel@nongnu.org>,
  "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgUGV0ZXIgYW5kIFBoaWxpcCwNCg0KVGhhbmtzIGZvciB5b3VyIGluc2lnaHQgb24gdGhpcyBt
-YXR0ZXIuDQoNCkkgYW0gb2theSBhcyBsb25nIGFzIHRoaXMgaXNzdWUgaXMgZ29pbmcgdG8gYmUg
-ZXZlbnR1YWxseSBmaXhlZCBpbiBvbmUgd2F5IG9yIGFub3RoZXI7IHRoZSB0aHJlZS1waGFzZSBy
-ZXNldCBzY2hlbWUgeW91IG1lbnRpb25lZCBkb2VzIHNvdW5kIGxpa2UgYSBtb3JlIG1hbmFnZWFi
-bGUgYXBwcm9hY2ggZm9yIHRoaXMgcHVycG9zZTsgdGhvdWdoLCBJIHN0aWxsIGJlbGlldmUgaGF2
-aW5nIHRoZSBvcHRpb24gdG8gc3BlY2lmeSB0aGUgaW52b2NhdGlvbiBwcmlvcml0eSBmb3IgcmVz
-ZXQgaGFuZGxlcnMgd291bGQgY29tZSBpbiBoYW5keSBpbiB0aGUgZnV0dXJlIGZvciB2YXJpb3Vz
-IHB1cnBvc2VzLg0KDQpPbiAyLzI3LzIwIDEwOjMxIFBNLCBQaGlsaXBwZSBNYXRoaWV1LURhdWTD
-qSB3cm90ZToNCj4gSSB0aGluayBBbGlzdGFpciBhbmQgbXlzZWxmIHVzZSB0aGUgJ2xvYWRlcicg
-ZGV2aWNlIHdpdGggQ29ydGV4LU0gYm9hcmRzIGFuZCBuZXZlciBoaXQgdGhpcyBwcm9ibGVtLg0K
-DQpJIHRyaWVkIGJvdGggYC1rZXJuZWwgW0VMRiBJTUFHRV1gIGFuZCBgLWRldmljZSBsb2FkZXIs
-ZmlsZT1bRUxGIElNQUdFXWAgd2l0aG91dCBhbnkgc3VjY2VzczsgaW4gYm90aCBjYXNlcywgd2l0
-aG91dCB0aGlzIHBhdGNoLCBRRU1VIGhhcmQtZmF1bHRzIGR1cmluZyBzdGFydC11cCBkdWUgdG8g
-dGhlIHVuYXZhaWxhYmlsaXR5IG9mIHRoZSB2ZWN0b3IgdGFibGUgY29udGVudCBhdCB0aGUgdGlt
-ZSBvZiBDUFUgcmVzZXQuDQoNCk1heWJlIHlvdXIgZmlybXdhcmUgaW1hZ2UgaGFzIGEgbG9hZCBh
-ZGRyZXNzIG9mIDB4MCBpbnN0ZWFkIG9mIDB4ODAwMDAwMD8NCg0KVGhlIGZvbGxvd2luZyBpcyB0
-aGUgTUFQIGZpbGUgZm9yIHRoZSBmaXJtd2FyZSBpbWFnZSBJIGFtIHRlc3Rpbmcgd2l0aDoNCmh0
-dHBzOi8vZ2lzdC5naXRodWIuY29tL3N0ZXBoYW5vc2lvLzk3ZDFmNDdmOTYyODQ0NDc5YTc2ZTBl
-OTA5YTNiOGNmDQoNClJlZ2FyZHMsDQoNClN0ZXBoYW5vcyANCg==
+On Thu, 27 Feb 2020 at 15:08, Stephanos Ioannidis <root@stephanos.io> wrote=
+:
+> On 2/27/20 10:31 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > I think Alistair and myself use the 'loader' device with Cortex-M board=
+s and never hit this problem.
+>
+> I tried both `-kernel [ELF IMAGE]` and `-device loader,file=3D[ELF IMAGE]=
+` without any success; in both cases, without this patch, QEMU hard-faults =
+during start-up due to the unavailability of the vector table content at th=
+e time of CPU reset.
+
+You only run into this bug if:
+ * you're using a Cortex-M CPU
+ * and the board model has aliased memory regions so that the
+   flash or memory you're loading the ELF file into appears at
+   multiple addresses in the memory map
+ * and the ELF file loads the data into the aliased address
+   rather than the CPU's VTOR register reset value (which is
+   0 for CPUs without the Security Extension)
+ * but it doesn't matter whether you use -kernel or -device loader
+
+So you can work around it by linking your images to be loaded
+at 0 rather than the higher address. It is definitely a bug
+that we don't correctly handle these ELF images.
+
+thanks
+-- PMM
 
