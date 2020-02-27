@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1496DC4BA24
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B50C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63C624672
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07FF92073D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 10:25:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXlM70B8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63C624672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZbdLKDsg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FF92073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7GLR-0005qm-1e
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 05:24:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40517)
+	id 1j7GMa-0007ka-7m
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 05:25:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j7GC4-0004OL-UP
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:15:01 -0500
+ (envelope-from <david@redhat.com>) id 1j7GBi-00041X-IE
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:14:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j7GC2-0001Yj-SD
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:15:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46519
+ (envelope-from <david@redhat.com>) id 1j7GBh-000103-20
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:14:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48061
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j7GC1-0001UP-OQ
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:14:58 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j7GBg-0000z7-Tj
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 05:14:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582798495;
+ s=mimecast20190719; t=1582798476;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7BJc03B0S3OKlAGbitvN5dpmwN+YdFl+CckVsdEMIJE=;
- b=hXlM70B8tOAzpRMxZ+K6shhKr5Sxo92s1+0soFC3m0f2Xprd1Ewm00+fs5fjUpewe8qXl/
- WgUO26UflAK1xv9RmUIrhfXTgWoWEBLNz2pjl1MhivYow/GX/TtZnsrSiLLUPj1XtwipLg
- rG23B9NSoTHgHp2VM4qufCuG36MU4cA=
+ bh=KMDvJ5mlpWKgYA3FKjQpwt+bcTDd3WLHazG7j+Anq/4=;
+ b=ZbdLKDsgYoH+PVAA77/TGkGaolCIRCZGn44eJKrNyLs3/VTLHPDrkRcMD7LoSLh2Zk6rnq
+ 2bKgBVIA4f8hR1/jpxlF6Ib83KbOhKfVMNoYjmOI1P2f12vmkIjWEucyqEQ/nIJoXDBrIA
+ U+X4Q6SIrO4xT2fycfJMGRd4ieHTbkY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-9Yix3FYUNNGWA9dC4mphqg-1; Thu, 27 Feb 2020 05:14:53 -0500
-X-MC-Unique: 9Yix3FYUNNGWA9dC4mphqg-1
+ us-mta-133-pSBdSpkOMNKmI22A55bnZw-1; Thu, 27 Feb 2020 05:14:35 -0500
+X-MC-Unique: pSBdSpkOMNKmI22A55bnZw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40B538017CC;
- Thu, 27 Feb 2020 10:14:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AAC7DBA3;
+ Thu, 27 Feb 2020 10:14:33 +0000 (UTC)
 Received: from t480s.redhat.com (ovpn-116-36.ams2.redhat.com [10.36.116.36])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7EA06E3EE;
- Thu, 27 Feb 2020 10:14:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC8D987B08;
+ Thu, 27 Feb 2020 10:14:24 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/15] numa: Introduce ram_block_notifiers_support_resize()
-Date: Thu, 27 Feb 2020 11:12:04 +0100
-Message-Id: <20200227101205.5616-15-david@redhat.com>
+Subject: [PATCH v3 12/15] util: vfio-helpers: Implement ram_block_resized()
+Date: Thu, 27 Feb 2020 11:12:02 +0100
+Message-Id: <20200227101205.5616-13-david@redhat.com>
 In-Reply-To: <20200227101205.5616-1-david@redhat.com>
 References: <20200227101205.5616-1-david@redhat.com>
 MIME-Version: 1.0
@@ -90,69 +90,215 @@ Cc: Eduardo Habkost <ehabkost@redhat.com>,
  Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
  David Hildenbrand <david@redhat.com>,
  "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
  Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
  Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to actually use resizeable allocations in resizeable ram blocks
-(IOW, make everything between used_length and max_length inaccessible) -
-however, not all ram block notifiers can support that.
+Let's implement ram_block_resized(), allowing resizeable mappings.
 
-Introduce a way to detect if any registered notifier does not
-support resizes - ram_block_notifiers_support_resize() - which we can later
-use to fallback to legacy handling if a registered notifier (esp., SEV and
-HAX) does not support actual resizes.
+For resizeable mappings, we reserve $max_size IOVA address space, but only
+map $size of it. When resizing, unmap the old part and remap the new
+part. We'll need a new ioctl to do this atomically (e.g., to resize
+while the guest is running - not allowed for now).
 
 Cc: Richard Henderson <rth@twiddle.net>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/core/numa.c         | 12 ++++++++++++
- include/exec/ramlist.h |  1 +
- 2 files changed, 13 insertions(+)
+ util/trace-events   |  5 ++--
+ util/vfio-helpers.c | 70 ++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 66 insertions(+), 9 deletions(-)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 37ce175e13..1d5288c22c 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -914,3 +914,15 @@ void ram_block_notify_resize(void *host, size_t old_si=
-ze, size_t new_size)
-         }
+diff --git a/util/trace-events b/util/trace-events
+index 83b6639018..88b7dbf4a5 100644
+--- a/util/trace-events
++++ b/util/trace-events
+@@ -74,8 +74,9 @@ qemu_mutex_unlock(void *mutex, const char *file, const in=
+t line) "released mutex
+=20
+ # vfio-helpers.c
+ qemu_vfio_dma_reset_temporary(void *s) "s %p"
+-qemu_vfio_ram_block_added(void *s, void *p, size_t size) "s %p host %p siz=
+e 0x%zx"
+-qemu_vfio_ram_block_removed(void *s, void *p, size_t size) "s %p host %p s=
+ize 0x%zx"
++qemu_vfio_ram_block_added(void *s, void *p, size_t size, size_t max_size) =
+"s %p host %p size 0x%zx max_size 0x%zx"
++qemu_vfio_ram_block_removed(void *s, void *p, size_t size, size_t max_size=
+) "s %p host %p size 0x%zx max_size 0x%zx"
++qemu_vfio_ram_block_resized(void *s, void *p, size_t old_size, size_t new_=
+sizze) "s %p host %p old_size 0x%zx new_size 0x%zx"
+ qemu_vfio_find_mapping(void *s, void *p) "s %p host %p"
+ qemu_vfio_new_mapping(void *s, void *host, size_t size, int index, uint64_=
+t iova) "s %p host %p size %zu index %d iova 0x%"PRIx64
+ qemu_vfio_do_mapping(void *s, void *host, size_t size, uint64_t iova) "s %=
+p host %p size %zu iova 0x%"PRIx64
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index f0c77f0d69..566eb4e1eb 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -372,14 +372,20 @@ fail_container:
+     return ret;
+ }
+=20
++static int qemu_vfio_dma_map_resizeable(QEMUVFIOState *s, void *host,
++                                        size_t size, size_t max_size,
++                                        bool temporary, uint64_t *iova);
++static void qemu_vfio_dma_map_resize(QEMUVFIOState *s, void *host,
++                                     size_t old_size, size_t new_size);
++
+ static void qemu_vfio_ram_block_added(RAMBlockNotifier *n, void *host,
+                                       size_t size, size_t max_size)
+ {
+     QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
+     int ret;
+=20
+-    trace_qemu_vfio_ram_block_added(s, host, max_size);
+-    ret =3D qemu_vfio_dma_map(s, host, max_size, false, NULL);
++    trace_qemu_vfio_ram_block_added(s, host, size, max_size);
++    ret =3D qemu_vfio_dma_map_resizeable(s, host, size, max_size, false, N=
+ULL);
+     if (ret) {
+         error_report("qemu_vfio_dma_map(%p, %zu) failed: %s", host, max_si=
+ze,
+                      strerror(-ret));
+@@ -391,16 +397,28 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotif=
+ier *n, void *host,
+ {
+     QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
+     if (host) {
+-        trace_qemu_vfio_ram_block_removed(s, host, max_size);
++        trace_qemu_vfio_ram_block_removed(s, host, size, max_size);
+         qemu_vfio_dma_unmap(s, host);
      }
  }
-+
-+bool ram_block_notifiers_support_resize(void)
+=20
++static void qemu_vfio_ram_block_resized(RAMBlockNotifier *n, void *host,
++                                        size_t old_size, size_t new_size)
 +{
-+    RAMBlockNotifier *notifier;
++    QEMUVFIOState *s =3D container_of(n, QEMUVFIOState, ram_notifier);
 +
-+    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-+        if (!notifier->ram_block_resized) {
-+            return false;
-+        }
++    if (host) {
++        trace_qemu_vfio_ram_block_resized(s, host, old_size, new_size);
++        qemu_vfio_dma_map_resize(s, host, old_size, new_size);
 +    }
-+    return true;
 +}
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-index 293c0ddabe..ac5811be96 100644
---- a/include/exec/ramlist.h
-+++ b/include/exec/ramlist.h
-@@ -79,6 +79,7 @@ void ram_block_notifier_remove(RAMBlockNotifier *n);
- void ram_block_notify_add(void *host, size_t size, size_t max_size);
- void ram_block_notify_remove(void *host, size_t size, size_t max_size);
- void ram_block_notify_resize(void *host, size_t old_size, size_t new_size)=
-;
-+bool ram_block_notifiers_support_resize(void);
++
+ static void qemu_vfio_open_common(QEMUVFIOState *s)
+ {
+     qemu_mutex_init(&s->lock);
+     s->ram_notifier.ram_block_added =3D qemu_vfio_ram_block_added;
+     s->ram_notifier.ram_block_removed =3D qemu_vfio_ram_block_removed;
++    s->ram_notifier.ram_block_resized =3D qemu_vfio_ram_block_resized;
+     s->low_water_mark =3D QEMU_VFIO_IOVA_MIN;
+     s->high_water_mark =3D QEMU_VFIO_IOVA_MAX;
+     ram_block_notifier_add(&s->ram_notifier);
+@@ -597,9 +615,14 @@ static bool qemu_vfio_verify_mappings(QEMUVFIOState *s=
+)
+  * the result in @iova if not NULL. The caller need to make sure the area =
+is
+  * aligned to page size, and mustn't overlap with existing mapping areas (=
+split
+  * mapping status within this area is not allowed).
++ *
++ * If size < max_size, a region of max_size in IOVA address is reserved, s=
+uch
++ * that the mapping can later be resized. Resizeable mappings are only all=
+owed
++ * for !temporary mappings.
+  */
+-int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
+-                      bool temporary, uint64_t *iova)
++static int qemu_vfio_dma_map_resizeable(QEMUVFIOState *s, void *host,
++                                        size_t size, size_t max_size,
++                                        bool temporary, uint64_t *iova)
+ {
+     int ret =3D 0;
+     int index;
+@@ -608,13 +631,17 @@ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, s=
+ize_t size,
 =20
- void ram_block_dump(Monitor *mon);
+     assert(QEMU_PTR_IS_ALIGNED(host, qemu_real_host_page_size));
+     assert(QEMU_IS_ALIGNED(size, qemu_real_host_page_size));
++    assert(QEMU_IS_ALIGNED(max_size, qemu_real_host_page_size));
++    assert(size =3D=3D max_size || !temporary);
++    assert(size <=3D max_size);
++
+     trace_qemu_vfio_dma_map(s, host, size, temporary, iova);
+     qemu_mutex_lock(&s->lock);
+     mapping =3D qemu_vfio_find_mapping(s, host, &index);
+     if (mapping) {
+         iova0 =3D mapping->iova + ((uint8_t *)host - (uint8_t *)mapping->h=
+ost);
+     } else {
+-        if (s->high_water_mark - s->low_water_mark + 1 < size) {
++        if (s->high_water_mark - s->low_water_mark + 1 < max_size) {
+             ret =3D -ENOMEM;
+             goto out;
+         }
+@@ -631,7 +658,7 @@ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, siz=
+e_t size,
+                 qemu_vfio_remove_mapping(s, mapping);
+                 goto out;
+             }
+-            s->low_water_mark +=3D size;
++            s->low_water_mark +=3D max_size;
+             qemu_vfio_dump_mappings(s);
+         } else {
+             iova0 =3D s->high_water_mark - size;
+@@ -650,6 +677,12 @@ out:
+     return ret;
+ }
 =20
++int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
++                      bool temporary, uint64_t *iova)
++{
++    return qemu_vfio_dma_map_resizeable(s, host, size, size, temporary, io=
+va);
++}
++
+ /* Reset the high watermark and free all "temporary" mappings. */
+ int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s)
+ {
+@@ -694,6 +727,29 @@ out:
+     qemu_mutex_unlock(&s->lock);
+ }
+=20
++static void qemu_vfio_dma_map_resize(QEMUVFIOState *s, void *host,
++                                     size_t old_size, size_t new_size)
++{
++    IOVAMapping *m;
++    int index =3D 0;
++
++    qemu_mutex_lock(&s->lock);
++    m =3D qemu_vfio_find_mapping(s, host, &index);
++    if (!m) {
++        return;
++    }
++    assert(m->size =3D=3D old_size);
++
++    /* Note: Not atomic - we need a new ioctl for that. */
++    qemu_vfio_undo_mapping(s, m->iova, m->size);
++    qemu_vfio_do_mapping(s, host, m->iova, new_size);
++
++    m->size =3D new_size;
++    assert(qemu_vfio_verify_mappings(s));
++
++    qemu_mutex_unlock(&s->lock);
++}
++
+ static void qemu_vfio_reset(QEMUVFIOState *s)
+ {
+     ioctl(s->device, VFIO_DEVICE_RESET);
 --=20
 2.24.1
 
