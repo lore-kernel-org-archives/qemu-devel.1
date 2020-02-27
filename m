@@ -2,67 +2,134 @@ Return-Path: <SRS0=0TZc=4P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C9BC4BA06
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 05:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F42C4BA24
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 05:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF51724672
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 05:51:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF51724672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jp.fujitsu.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2968224672
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Feb 2020 05:57:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=bt.com header.i=@bt.com header.b="n1Dtrnji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2968224672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7C5T-0000Gt-Uw
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 00:51:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40528)
+	id 1j7CBI-0002g5-Ay
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 00:57:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1j7C4K-0007Sd-SP
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:50:46 -0500
+ (envelope-from <jasper.lowell@bt.com>) id 1j7CAS-00027j-Py
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:57:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <misono.tomohiro@fujitsu.com>) id 1j7C4J-0000ts-1g
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:50:44 -0500
-Received: from mgwkm04.jp.fujitsu.com ([202.219.69.171]:34544)
+ (envelope-from <jasper.lowell@bt.com>) id 1j7CAQ-0007uc-G4
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:57:04 -0500
+Received: from smtpe1.intersmtp.com ([213.121.35.72]:2058)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <misono.tomohiro@fujitsu.com>)
- id 1j7C4I-0000pU-BH
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:50:42 -0500
-Received: from kw-mxauth.gw.nic.fujitsu.com (unknown [192.168.231.132]) by
- mgwkm04.jp.fujitsu.com with smtp
- id 0687_5148_ad2c6a87_73a2_42f2_828c_5ed06e1c8d12;
- Thu, 27 Feb 2020 14:50:33 +0900
-Received: from g01jpfmpwyt02.exch.g01.fujitsu.local
- (g01jpfmpwyt02.exch.g01.fujitsu.local [10.128.193.56])
- by kw-mxauth.gw.nic.fujitsu.com (Postfix) with ESMTP id 20091AC004F
- for <qemu-devel@nongnu.org>; Thu, 27 Feb 2020 14:50:32 +0900 (JST)
-Received: from g01jpexchyt35.g01.fujitsu.local (unknown [10.128.193.4])
- by g01jpfmpwyt02.exch.g01.fujitsu.local (Postfix) with ESMTP id 234DF5842E0;
- Thu, 27 Feb 2020 14:50:31 +0900 (JST)
-Received: from luna3.soft.fujitsu.com (10.124.196.199) by
- g01jpexchyt35.g01.fujitsu.local (10.128.193.50) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 27 Feb 2020 14:50:31 +0900
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-To: <virtio-fs@redhat.com>
-Subject: [PATCH v4 2/2] virtiofsd: Fix xattr operations
-Date: Thu, 27 Feb 2020 14:59:27 +0900
-Message-ID: <20200227055927.24566-3-misono.tomohiro@jp.fujitsu.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
-References: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
+ (Exim 4.71) (envelope-from <jasper.lowell@bt.com>)
+ id 1j7CAP-0007sO-RY
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 00:57:02 -0500
+Received: from tpw09926dag05h.domain1.systemhost.net (10.9.202.32) by
+ BWP09926077.bt.com (10.36.82.108) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 27
+ Feb 2020 05:56:54 +0000
+Received: from tpw09926dag05f.domain1.systemhost.net (10.9.202.24) by
+ tpw09926dag05h.domain1.systemhost.net (10.9.202.32) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Thu, 27 Feb 2020 05:56:58 +0000
+Received: from RDW083A009ED65.bt.com (10.187.98.35) by
+ tpw09926dag05f.domain1.systemhost.net (10.9.202.24) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4 via Frontend Transport; Thu, 27 Feb 2020 05:56:58
+ +0000
+Received: from GBR01-LO2-obe.outbound.protection.outlook.com (104.47.21.51) by
+ smtpe1.intersmtp.com (62.239.224.236) with Microsoft SMTP Server
+ (TLS) id 14.3.439.0; Thu, 27 Feb 2020 05:50:38 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zlmotx7YXz+4M9PEDC/XLHzwro9N0aYCIIYLhRGo7/rNrKsOKyZuY+icnfZlaI0ghzBD5tH8hRjkALCNeKX/4pAljYNGvCRxAVXO0wTWRZCaxQgfOTwOc8r+RFrJsSucWjK2POK/sAl9SyyQRHpaoiqMJMT3pHSJlGRRxvWhc2Ln8WcPaM9nUy5ZQhfOMPFzoV4NRMinyocj1ZLrUgJsNGfBwK08T+YKur6WF+0jNH/BFvSzu7frXrzi5cLzOkLn9QA4MtWgr5ZH5yJ6b4jk8dA/1N9jS7MV1A6oI7nZVSD6kqxz1h/VHSxWabZooMlHxGE9md6+GOjK0olfmxXuEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3g83gLfuam6Whq9+jei96v8hqX5I1YWRxsUmwGP2fns=;
+ b=elVcQJazJ/fKpr+Vr1MslQNOIFAa93CKXkFiNG/RpSzs9LZ5aCK5Hvu3G92A3YFSdDrw4Iw4qZJjKHVWSw2bc6PDqOk2mshLBoNy/Jf/tTqH2EB6J50by/kZrQXoiPlqaUKU08ZRbOhCbE8vlpoLV1bBVn9/8iiNREUuAICEdKCU8fqLGRvUu/Q6zkWahSLv21NINEvBBGeGreE/o+GjfPqcVlmYEOcVLO0lpNcJOvVXGnab/bFTDeyGpTY5HoEfdCjf9ILHVwCA0Fj1X1riF0LyHUsQeRlv0d2GEU1fsxeKO1HoDvlfb4oy1WbPxvDR/xb73P3gpLVWqHQPf1DbvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bt.com; dmarc=pass action=none header.from=bt.com; dkim=pass
+ header.d=bt.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bt.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3g83gLfuam6Whq9+jei96v8hqX5I1YWRxsUmwGP2fns=;
+ b=n1DtrnjioF+/XHLrPc+/Q5NP7q8UE8d+BxG88gTUjaYr5dOSMad+wXzOhACtnGk7wwf9IMiiszPdpfWTSVlAPaC8CjUAtRHq4NwIOMqSGpcWdGDTmv+aswqxG6slaA3M33JiCR+YBZZGA3p/EfI+//NnPrT6IlestHfyCyk+1Hg=
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM (20.176.154.209) by
+ LO2P123MB2335.GBRP123.PROD.OUTLOOK.COM (20.176.155.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21; Thu, 27 Feb 2020 05:56:56 +0000
+Received: from LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5]) by LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::312f:184d:74b1:28c5%4]) with mapi id 15.20.2750.024; Thu, 27 Feb 2020
+ 05:56:56 +0000
+From: <jasper.lowell@bt.com>
+To: <balaton@eik.bme.hu>
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+Thread-Topic: [PATCH] hw/ide: Remove status register read side effect
+Thread-Index: AQHV6IMztk0nS91QXUSAhbuFxp1TiagnnJkAgAADjoCAAAXGgIAAvUiAgACESgCAAmZZAIAAvBaAgADuooCAAGA3gIABLrQAgAAM7IA=
+Date: Thu, 27 Feb 2020 05:56:56 +0000
+Message-ID: <ec3861e40717ef1ccfba29671e4dd42356e63cf1.camel@bt.com>
+References: <20200221065015.337915-1-jasper.lowell@bt.com>
+ <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+ <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
+ <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
+ <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
+ <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
+ <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
+ <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
+ <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
+ <alpine.BSF.2.22.395.2002261109290.39786@zero.eik.bme.hu>
+ <e7758063db7312ab052e595a508f0baa70d454dc.camel@bt.com>
+In-Reply-To: <e7758063db7312ab052e595a508f0baa70d454dc.camel@bt.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=jasper.lowell@bt.com; 
+x-originating-ip: [217.138.204.86]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fc6e12be-b95f-46bb-f33d-08d7bb49da2d
+x-ms-traffictypediagnostic: LO2P123MB2335:
+x-microsoft-antispam-prvs: <LO2P123MB233559A95E30877569EF46E983EB0@LO2P123MB2335.GBRP123.PROD.OUTLOOK.COM>
+x-antispam-2: 1
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 03264AEA72
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(366004)(346002)(39850400004)(136003)(396003)(376002)(199004)(189003)(64756008)(2906002)(66476007)(66946007)(91956017)(16799955002)(66556008)(6506007)(30864003)(76116006)(26005)(71200400001)(186003)(66446008)(316002)(6916009)(8936002)(36756003)(81156014)(81166006)(8676002)(86362001)(6512007)(478600001)(2616005)(966005)(5660300002)(4326008)(6486002)(54906003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:LO2P123MB2335;
+ H:LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: bt.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IUwGy0v0OdJIz4T4d3squoel8UALe+q0P+HnQ5k10aITRte80aPv3K++KXdnnGAkLmmwzW6ZB5gBpOuONpIxanDfS7Pbuz/oPmIddpNZ2cEk68HNuvnfpbOBzofPWUxcxt82FHLnuQen5ApeP1+WxLcj1e1bciOELrtvGEFcMeRnvVEHxYh1PUqM4sblzU/M6OJrfbUpPAikm7IBTStRq6ENi43JCDOkegIXLeICEvmRdglzAEjyA5f9ZA/+wPV6W8v3BzZO8DQAyyohTRp9m1OfnUG/t2mXUDr4yo4kT3agsPn1CmNCMx9l9l42UpfdGOyytY7duRkQDX46YK8BbqdtzhjIADckTlnk1wKkwegrIlL5NZ+xxmzp7lXmv1ZPohZwBoP4VHtjkmZ0nFO41suMYaorM1YiAu3aTAaBcCIcELPYAYfIV3h/zMEWRAd6DgL6p8RsQsCHxCV5K58wyRNSdTIyKYSs6N2k8R9FMfOWvnXywzqogS8a+6cvLOY3z8+fZPqDlfqqfucPkqOJNw==
+x-ms-exchange-antispam-messagedata: /IUIKyDcZ5BEjDPjHQvvn0Hwy8xUddEuovKK3pgXg+pXEl4FwnWZTbLlCZ8Z9qZZBZD3mbo76EGWuSkROUkFkoF/UHyGeUDf+xlbb+czeDuvUVEu3KlJpsPUWMXqFz/xpRWYw1Aj9v2z4aQ/hUvDcQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0EB5C0AB2AF335459F359BA985EF100B@GBRP123.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-SecurityPolicyCheck-GC: OK by FENCE-Mail
-X-TM-AS-GCONF: 00
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 202.219.69.171
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc6e12be-b95f-46bb-f33d-08d7bb49da2d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Feb 2020 05:56:56.1007 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7f35688-9c00-4d5e-ba41-29f146377ab0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7Uiy4Yr0fHFWNHmA7ORpgePiMu5S9qwkZmczlfnru6ooQ5zC7IomZ/A7QZ2hfukffJcDIbpYYX20ukecnz6z8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P123MB2335
+X-OriginatorOrg: bt.com
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.72
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,311 +141,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, vgoyal@redhat.com
+Cc: mark.cave-ayland@ilande.co.uk, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Current virtiofsd has problems about xattr operations and
-they does not work properly for directory/symlink/special file.
-
-The fundamental cause is that virtiofsd uses openat() + f...xattr()
-systemcalls for xattr operation but we should not open symlink/special
-file in the daemon. Therefore the function is restricted.
-
-Fix this problem by:
- 1. during setup of each thread, call unshare(CLONE_FS)
- 2. in xattr operations (i.e. lo_getxattr), if inode is not a regular
-    file or directory, use fchdir(proc_loot_fd) + ...xattr() +
-    fchdir(root.fd) instead of openat() + f...xattr()
-
-    (Note: for a regular file/directory openat() + f...xattr()
-     is still used for performance reason)
-
-With this patch, xfstests generic/062 passes on virtiofs.
-
-This fix is suggested by Miklos Szeredi and Stefan Hajnoczi.
-The original discussion can be found here:
-  https://www.redhat.com/archives/virtio-fs/2019-October/msg00046.html
-
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
----
- tools/virtiofsd/fuse_virtio.c    |  13 ++++
- tools/virtiofsd/passthrough_ll.c | 105 +++++++++++++++++--------------
- tools/virtiofsd/seccomp.c        |   6 ++
- 3 files changed, 77 insertions(+), 47 deletions(-)
-
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 655b9a1413..21c5d76d58 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -463,6 +463,8 @@ err:
-     return ret;
- }
- 
-+static __thread bool clone_fs_called;
-+
- /* Process one FVRequest in a thread pool */
- static void fv_queue_worker(gpointer data, gpointer user_data)
- {
-@@ -478,6 +480,17 @@ static void fv_queue_worker(gpointer data, gpointer user_data)
- 
-     assert(se->bufsize > sizeof(struct fuse_in_header));
- 
-+    if (!clone_fs_called) {
-+        int ret;
-+
-+        /* unshare FS for xattr operation */
-+        ret = unshare(CLONE_FS);
-+        /* should not fail */
-+        assert(ret == 0);
-+
-+        clone_fs_called = true;
-+    }
-+
-     /*
-      * An element contains one request and the space to send our response
-      * They're spread over multiple descriptors in a scatter/gather set
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 7b94300ae0..9d325be8a5 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -130,7 +130,7 @@ struct lo_inode {
-     pthread_mutex_t plock_mutex;
-     GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
- 
--    bool is_symlink;
-+    mode_t filetype;
- };
- 
- struct lo_cred {
-@@ -734,7 +734,7 @@ static int utimensat_empty(struct lo_data *lo, struct lo_inode *inode,
-     struct lo_inode *parent;
-     char path[PATH_MAX];
- 
--    if (inode->is_symlink) {
-+    if (S_ISLNK(inode->filetype)) {
-         res = utimensat(inode->fd, "", tv, AT_EMPTY_PATH);
-         if (res == -1 && errno == EINVAL) {
-             /* Sorry, no race free way to set times on symlink. */
-@@ -1037,7 +1037,8 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
-             goto out_err;
-         }
- 
--        inode->is_symlink = S_ISLNK(e->attr.st_mode);
-+        /* cache only filetype */
-+        inode->filetype = (e->attr.st_mode & S_IFMT);
- 
-         /*
-          * One for the caller and one for nlookup (released in
-@@ -1264,7 +1265,7 @@ static int linkat_empty_nofollow(struct lo_data *lo, struct lo_inode *inode,
-     struct lo_inode *parent;
-     char path[PATH_MAX];
- 
--    if (inode->is_symlink) {
-+    if (S_ISLNK(inode->filetype)) {
-         res = linkat(inode->fd, "", dfd, name, AT_EMPTY_PATH);
-         if (res == -1 && (errno == ENOENT || errno == EINVAL)) {
-             /* Sorry, no race free way to hard-link a symlink. */
-@@ -2378,12 +2379,6 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
-     fuse_log(FUSE_LOG_DEBUG, "lo_getxattr(ino=%" PRIu64 ", name=%s size=%zd)\n",
-              ino, name, size);
- 
--    if (inode->is_symlink) {
--        /* Sorry, no race free way to getxattr on symlink. */
--        saverr = EPERM;
--        goto out;
--    }
--
-     if (size) {
-         value = malloc(size);
-         if (!value) {
-@@ -2392,12 +2387,25 @@ static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
-     }
- 
-     sprintf(procname, "%i", inode->fd);
--    fd = openat(lo->proc_self_fd, procname, O_RDONLY);
--    if (fd < 0) {
--        goto out_err;
-+    /*
-+     * It is not safe to open() non-regular/non-dir files in file server
-+     * unless O_PATH is used, so use that method for regular files/dir
-+     * only (as it seems giving less performance overhead).
-+     * Otherwise, call fchdir() to avoid open().
-+     */
-+    if (S_ISREG(inode->filetype) || S_ISDIR(inode->filetype)) {
-+        fd = openat(lo->proc_self_fd, procname, O_RDONLY);
-+        if (fd < 0) {
-+            goto out_err;
-+        }
-+        ret = fgetxattr(fd, name, value, size);
-+    } else {
-+        /* fchdir should not fail here */
-+        assert(fchdir(lo->proc_self_fd) == 0);
-+        ret = getxattr(procname, name, value, size);
-+        assert(fchdir(lo->root.fd) == 0);
-     }
- 
--    ret = fgetxattr(fd, name, value, size);
-     if (ret == -1) {
-         goto out_err;
-     }
-@@ -2451,12 +2459,6 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size)
-     fuse_log(FUSE_LOG_DEBUG, "lo_listxattr(ino=%" PRIu64 ", size=%zd)\n", ino,
-              size);
- 
--    if (inode->is_symlink) {
--        /* Sorry, no race free way to listxattr on symlink. */
--        saverr = EPERM;
--        goto out;
--    }
--
-     if (size) {
-         value = malloc(size);
-         if (!value) {
-@@ -2465,12 +2467,19 @@ static void lo_listxattr(fuse_req_t req, fuse_ino_t ino, size_t size)
-     }
- 
-     sprintf(procname, "%i", inode->fd);
--    fd = openat(lo->proc_self_fd, procname, O_RDONLY);
--    if (fd < 0) {
--        goto out_err;
-+    if (S_ISREG(inode->filetype) || S_ISDIR(inode->filetype)) {
-+        fd = openat(lo->proc_self_fd, procname, O_RDONLY);
-+        if (fd < 0) {
-+            goto out_err;
-+        }
-+        ret = flistxattr(fd, value, size);
-+    } else {
-+        /* fchdir should not fail here */
-+        assert(fchdir(lo->proc_self_fd) == 0);
-+        ret = listxattr(procname, value, size);
-+        assert(fchdir(lo->root.fd) == 0);
-     }
- 
--    ret = flistxattr(fd, value, size);
-     if (ret == -1) {
-         goto out_err;
-     }
-@@ -2524,20 +2533,21 @@ static void lo_setxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
-     fuse_log(FUSE_LOG_DEBUG, "lo_setxattr(ino=%" PRIu64
-              ", name=%s value=%s size=%zd)\n", ino, name, value, size);
- 
--    if (inode->is_symlink) {
--        /* Sorry, no race free way to setxattr on symlink. */
--        saverr = EPERM;
--        goto out;
--    }
--
-     sprintf(procname, "%i", inode->fd);
--    fd = openat(lo->proc_self_fd, procname, O_RDWR);
--    if (fd < 0) {
--        saverr = errno;
--        goto out;
-+    if (S_ISREG(inode->filetype) || S_ISDIR(inode->filetype)) {
-+        fd = openat(lo->proc_self_fd, procname, O_RDONLY);
-+        if (fd < 0) {
-+            saverr = errno;
-+            goto out;
-+        }
-+        ret = fsetxattr(fd, name, value, size, flags);
-+    } else {
-+        /* fchdir should not fail here */
-+        assert(fchdir(lo->proc_self_fd) == 0);
-+        ret = setxattr(procname, name, value, size, flags);
-+        assert(fchdir(lo->root.fd) == 0);
-     }
- 
--    ret = fsetxattr(fd, name, value, size, flags);
-     saverr = ret == -1 ? errno : 0;
- 
-     if (!saverr) {
-@@ -2575,20 +2585,21 @@ static void lo_removexattr(fuse_req_t req, fuse_ino_t ino, const char *name)
-     fuse_log(FUSE_LOG_DEBUG, "lo_removexattr(ino=%" PRIu64 ", name=%s)\n", ino,
-              name);
- 
--    if (inode->is_symlink) {
--        /* Sorry, no race free way to setxattr on symlink. */
--        saverr = EPERM;
--        goto out;
--    }
--
-     sprintf(procname, "%i", inode->fd);
--    fd = openat(lo->proc_self_fd, procname, O_RDWR);
--    if (fd < 0) {
--        saverr = errno;
--        goto out;
-+    if (S_ISREG(inode->filetype) || S_ISDIR(inode->filetype)) {
-+        fd = openat(lo->proc_self_fd, procname, O_RDONLY);
-+        if (fd < 0) {
-+            saverr = errno;
-+            goto out;
-+        }
-+        ret = fremovexattr(fd, name);
-+    } else {
-+        /* fchdir should not fail here */
-+        assert(fchdir(lo->proc_self_fd) == 0);
-+        ret = removexattr(procname, name);
-+        assert(fchdir(lo->root.fd) == 0);
-     }
- 
--    ret = fremovexattr(fd, name);
-     saverr = ret == -1 ? errno : 0;
- 
-     if (!saverr) {
-@@ -3185,7 +3196,7 @@ static void setup_root(struct lo_data *lo, struct lo_inode *root)
-         exit(1);
-     }
- 
--    root->is_symlink = false;
-+    root->filetype = S_IFDIR;
-     root->fd = fd;
-     root->key.ino = stat.st_ino;
-     root->key.dev = stat.st_dev;
-diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/seccomp.c
-index 2d9d4a7ec0..bd9e7b083c 100644
---- a/tools/virtiofsd/seccomp.c
-+++ b/tools/virtiofsd/seccomp.c
-@@ -41,6 +41,7 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(exit),
-     SCMP_SYS(exit_group),
-     SCMP_SYS(fallocate),
-+    SCMP_SYS(fchdir),
-     SCMP_SYS(fchmodat),
-     SCMP_SYS(fchownat),
-     SCMP_SYS(fcntl),
-@@ -62,7 +63,9 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(getpid),
-     SCMP_SYS(gettid),
-     SCMP_SYS(gettimeofday),
-+    SCMP_SYS(getxattr),
-     SCMP_SYS(linkat),
-+    SCMP_SYS(listxattr),
-     SCMP_SYS(lseek),
-     SCMP_SYS(madvise),
-     SCMP_SYS(mkdirat),
-@@ -85,6 +88,7 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(recvmsg),
-     SCMP_SYS(renameat),
-     SCMP_SYS(renameat2),
-+    SCMP_SYS(removexattr),
-     SCMP_SYS(rt_sigaction),
-     SCMP_SYS(rt_sigprocmask),
-     SCMP_SYS(rt_sigreturn),
-@@ -98,10 +102,12 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(setresuid32),
- #endif
-     SCMP_SYS(set_robust_list),
-+    SCMP_SYS(setxattr),
-     SCMP_SYS(symlinkat),
-     SCMP_SYS(time), /* Rarely needed, except on static builds */
-     SCMP_SYS(tgkill),
-     SCMP_SYS(unlinkat),
-+    SCMP_SYS(unshare),
-     SCMP_SYS(utimensat),
-     SCMP_SYS(write),
-     SCMP_SYS(writev),
--- 
-2.21.1
-
+PiBJJ2xsIHN1Ym1pdCBhIFJGQyBWMiBwYXRjaCB3aXRoIGEgcHJvcG9zZWQgZml4Lg0KDQpUaGlz
+IHdpbGwgaGF2ZSB0byB3YWl0Lg0KDQpSZWNlbnQgY29tbWl0cyBoYXZlIGNhdXNlZCBTb2xhcmlz
+IDEwIHRvIGVycm9yIG91dCBvZiBib290aW5nIG11Y2gNCmVhcmxpZXIgdGhhbiBwcmV2aW91c2x5
+Lg0KDQpKYXNwZXIgTG93ZWxsLg0KDQpPbiBUaHUsIDIwMjAtMDItMjcgYXQgMDU6MTAgKzAwMDAs
+IGphc3Blci5sb3dlbGxAYnQuY29tIHdyb3RlOg0KPiBJJ3ZlIHNpbmNlIGxvb2tlZCBhdCBhIFVs
+dHJhIDUgYm9hcmQgYW5kIGNhbiBjb25maXJtIHRoYXQgaXQgc2hpcHBlZA0KPiB3aXRoIGEgQ01E
+NjQ2VSBjaGlwIGxpa2UgdGhlIFVsdHJhIDEwLg0KPiANCj4gPiBTaW5jZSBib3RoIHRoZSBnZW5l
+cmljIFBDSSBJREUgYW5kIENNRDY0NiBMaW51eCBkcml2ZXJzIG1lbnRpb24gaXJxDQo+ID4gaXMg
+DQo+ID4gY2xlYXJlZCBvbiByZWFkaW5nIHN0YXR1cyBJIHRoaW5rIHVzaW5nIGlkZV9pb3BvcnRf
+cmVhZCBpbg0KPiA+IGh3L2lkZS9wY2kuYyANCj4gPiBtYXkgYmUgY29ycmVjdCBmb3IgdGhlIGdl
+bmVyaWMgY2FzZS4NCj4gDQo+IEZvciBjbGFyaXR5LCB0aGUgTGludXggZHJpdmVycyBtZW50aW9u
+IHRoYXQgZm9yIHNvbWUgY2hpcHMgcmVhZGluZw0KPiBDRlINCj4gb3IgQVJUVElNMjMgd2lsbCBj
+bGVhciBpbnRlcnJ1cHRzLiBIZXJlIGluDQo+IC9saW51eC9kcml2ZXJzL2F0YS9wYXRhX2NtZDY0
+eC5jLCBmb3IgaW5zdGFuY2U6DQo+IA0KPiBzdGF0aWMgYm9vbCBjbWQ2NHhfc2ZmX2lycV9jaGVj
+ayhzdHJ1Y3QgYXRhX3BvcnQgKmFwKQ0KPiB7DQo+IAlzdHJ1Y3QgcGNpX2RldiAqcGRldiA9IHRv
+X3BjaV9kZXYoYXAtPmhvc3QtPmRldik7DQo+IAlpbnQgaXJxX21hc2sgPSBhcC0+cG9ydF9ubyA/
+IEFSVFRJTTIzX0lOVFJfQ0gxIDogQ0ZSX0lOVFJfQ0gwOw0KPiAJaW50IGlycV9yZWcgID0gYXAt
+PnBvcnRfbm8gPyBBUlRUSU0yMyA6IENGUjsNCj4gCXU4IGlycV9zdGF0Ow0KPiANCj4gCS8qIE5P
+VEU6IHJlYWRpbmcgdGhlIHJlZ2lzdGVyIHNob3VsZCBjbGVhciB0aGUgaW50ZXJydXB0ICovDQo+
+IAlwY2lfcmVhZF9jb25maWdfYnl0ZShwZGV2LCBpcnFfcmVnLCAmaXJxX3N0YXQpOw0KPiANCj4g
+CXJldHVybiBpcnFfc3RhdCAmIGlycV9tYXNrOw0KPiB9DQo+IA0KPiBJIG1pZ2h0IGJlIG1pc3Vu
+ZGVyc3RhbmRpbmcgYnV0IGlzbid0IHRoaXMgYSBkaWZmZXJlbnQgc2lkZSBlZmZlY3QNCj4gdGhh
+bg0KPiBjbGVhcmluZyBpbnRlcnJ1cHRzIGZyb20gdGhlIElERSBkZXZpY2Ugd2hlbiB0aGUgSURF
+IGRldmljZSBzdGF0dXMNCj4gcmVnaXN0ZXIgaXMgcmVhZD8gVGhpcyBpcyBzYXlpbmcgdGhhdCBy
+ZWFkaW5nIEFSVFRJTTIzIG9yIENGUiB3aWxsDQo+IGNsZWFyIElOVEEjLg0KPiANCj4gVGhpcyBj
+b2RlIGlzIGFsc28gb25seSB1c2VkIGZvciB0aGUgQ01ENjQzLCBDTUQ2NDYsIGFuZCBDTUQ2NDYg
+cmV2IDENCj4gLQ0KPiBub25lIG9mIHdoaWNoIEkgYmVsaWV2ZSBRRU1VIGlzIGF0dGVtcHRpbmcg
+dG8gZW11bGF0ZS4gVGhpcyBkb2Vzbid0DQo+IGxvb2sgcmVsZXZhbnQgdG8gdXMuDQo+IA0KPiA+
+IEknbSBub3Qgc3VyZSBlaXRoZXIgYnV0IGZyb20gd2hhdCBJJ3ZlIHNlZW4gc28gZmFyIEkgdGhp
+bmsgQ01ENjQ2DQo+ID4gZWl0aGVyIA0KPiA+IHJlZmVycyB0byB0aGUgd2hvbGUgZmFtaWx5IChp
+LmUuIGFsbCB2ZXJzaW9ucykgb3IgZWFybHkgdmVyc2lvbnMNCj4gPiBkZXBlbmRpbmcgDQo+ID4g
+b24gY29udGV4dCB3aGlsZSB0aGVyZSBhcmUgYXQgbGVhc3QgdHdvIG1vcmUgbmV3ZXIgdmVyc2lv
+bnMNCj4gPiByZWZlcnJlZA0KPiA+IHRvIGFzIA0KPiA+IENNRDY0NlUgYW5kIENNRDY0NlUyIGJ1
+dCBwcm9iYWJseSB0aGVyZSBhcmUgbW9yZSByZXZpc2lvbnMgd2l0aGluDQo+ID4gdGhlc2UgYXMg
+DQo+ID4gVTIgc2VlbXMgdG8gYmUgcmV2NS4gUUVNVSBzZXRzIHRoZSByZXZpc2lvbiBmaWVsZCB0
+byA3IGJ1dCBJJ20gbm90DQo+ID4gc3VyZSANCj4gPiB0aGF0J3MgdGhlIHNhbWUgTGludXggY2hl
+Y2tzIGZvci4gVGhlcmUncyBzb21lIG1vcmUgaW5mbyBvbiB0aGlzDQo+ID4gaGVyZToNCj4gPiAN
+Cj4gPiBodHRwczovL2F0YS53aWtpLmtlcm5lbC5vcmcvaW5kZXgucGhwL1BhdGFfY21kNjR4DQo+
+IA0KPiBJJ3ZlIHNlZW4gQ01ENjQ2IHVzZWQgdG8gcmVmZXIgdG8gdGhlIGZhbWlseSBhcyB3ZWxs
+Lg0KPiANCj4gPiBRRU1VIHNldHMgdGhlIHJldmlzaW9uIGZpZWxkIHRvIDcNCj4gDQo+IEluIC9s
+aW51eC9kcml2ZXJzL2lkZS9jbWQ2NHguYyBJIGZvdW5kIHRoZSBmb2xsb3dpbmcgY29tbWVudDoN
+Cj4gDQo+ICogVWx0cmFETUEgb25seSBzdXBwb3J0ZWQgb24gUENJNjQ2VSBhbmQgUENJNjQ2VTIs
+IHdoaWNoDQo+ICogY29ycmVzcG9uZCB0byByZXZpc2lvbnMgMHgwMywgMHgwNSBhbmQgMHgwNyBy
+ZXNwZWN0aXZlbHkuDQo+IA0KPiBJIGd1ZXNzIHRoZSBQQ0k2NDZVMiBpcyBib3RoIHJldmlzaW9u
+cyAweDA1IGFuZCAweDA3Lg0KPiANCj4gQWNjb3JkaW5nIHRvIC9saW51eC9kcml2ZXJzL2F0YS9w
+YXRhX2NtZDY0eC5jLCBpbnRlcnJ1cHQgYmVoYXZpb3VyDQo+IGRvZXNuJ3QgY2hhbmdlIGFjcm9z
+cyB0aGUgQ01ENjQ2VSwgQ01ENjQ2VTIsIENNRDY0OCwgYW5kIHRoZSBDTUQ2NDkuDQo+IFRoZXNl
+IGNoaXBzIHNldCB0aGUgaW50ZXJydXB0IGJpdCBleHBsaWNpdGx5IGFuZCBkbyBub3QgaGF2ZSB0
+aGUNCj4gY29tbWVudCB5b3UgaGlnaGxpZ2h0ZWQgZWFybGllciBhYm91dCBjbGVhcmluZyBpbnRl
+cnJ1cHRzIHdoZW4NCj4gcmVhZGluZw0KPiBBUlRUSU0yMyBvciBDRlIuDQo+IA0KPiA+IFRoaXMg
+bWF5IGV4cGxhaW4gd2h5DQo+ID4gTGludXggDQo+ID4gY2hlY2tzIGFsdCBzdGF0dXMgYW5kIGNs
+ZWFycyBpbnRlcnJ1cHQgaW5zdGVhZCBvZiByZWFkaW5nIHN0YXR1cw0KPiA+IHJlZ2lzdGVyLg0K
+PiANCj4gSSB0aGluayBMaW51eCBkb2VzIHRoaXMgd2hlbiB0aGVyZSBpcyBubyBQQ0kgSURFIGNv
+bnRyb2xsZXIuIFRoZSBjb2RlDQo+IGluIC9saW51eC9kcml2ZXJzL2lkZS9pZGUtaW8uYyBhY3Rz
+IGRpcmVjdGx5IG9uIElERSBkZXZpY2VzLg0KPiANCj4gPiBJIGRvbid0IGtub3cgYnV0IHNvdW5k
+cyBwbGF1c2libGUgdGhhdCByZWFkaW5nIHRoZSBzdGF0dXMgcmVnDQo+ID4gY2xlYXJzDQo+ID4g
+aXJxIA0KPiA+IGJ1dCByZWFkaW5nIHRoZSBwY2kgY29uZmlnIHdvcmRzIHRoYXQgbWlycm9ycyBp
+dCB3b24ndCBjbGVhciBpdC4NCj4gPiBCdXQNCj4gPiB0aGUgDQo+ID4gdHJhY2VzIHlvdSBoYWQg
+c2hvdyB0aGF0IGlkZV9pb3BvcnRfcmVhZCB3YXMgY2FsbGVkIHNvIGRyaXZlciB3YXMNCj4gPiBs
+aWtlbHkgDQo+ID4gcmVhZGluZyBzdGF0dXMgYW5kIG5vdCB0aGUgY29uZmlnIHJlZ3M/DQo+IA0K
+PiBXaGVuIGluIFBDSSBuYXRpdmUgbW9kZSwgaWRlX2lvcG9ydF9yZWFkIGlzIGNhbGxlZCBiZWNh
+dXNlIG9mIHRoZQ0KPiBmb2xsb3dpbmcgY29kZSBpbiAvcWVtdS9ody9pZGUvcGNpLmMuDQo+IA0K
+PiBzdGF0aWMgdWludDY0X3QgcGNpX2lkZV9kYXRhX3JlYWQodm9pZCAqb3BhcXVlLCBod2FkZHIg
+YWRkciwgdW5zaWduZWQNCj4gc2l6ZSkNCj4gew0KPiAgICAgSURFQnVzICpidXMgPSBvcGFxdWU7
+DQo+IA0KPiAgICAgaWYgKHNpemUgPT0gMSkgew0KPiAgICAgICAgIHJldHVybiBpZGVfaW9wb3J0
+X3JlYWQoYnVzLCBhZGRyKTsNCj4gICAgIH0gZWxzZSBpZiAoYWRkciA9PSAwKSB7DQo+ICAgICAg
+ICAgaWYgKHNpemUgPT0gMikgew0KPiAgICAgICAgICAgICByZXR1cm4gaWRlX2RhdGFfcmVhZHco
+YnVzLCBhZGRyKTsNCj4gICAgICAgICB9IGVsc2Ugew0KPiAgICAgICAgICAgICByZXR1cm4gaWRl
+X2RhdGFfcmVhZGwoYnVzLCBhZGRyKTsNCj4gICAgICAgICB9DQo+ICAgICB9DQo+ICAgICByZXR1
+cm4gKCh1aW50NjRfdCkxIDw8IChzaXplICogOCkpIC0gMTsNCj4gfQ0KPiANCj4gaWRlX2lvcG9y
+dF9yZWFkIGNhbGxzIHFlbXVfaXJxX2xvd2VyIHdoZW4gdGhlIElERSBkZXZpY2Ugc3RhdHVzDQo+
+IHJlZ2lzdGVyIGlzIHJlYWQuIFRoaXMgd2lsbCBwcm9wYWdhdGUgYWxsIHRoZSB3YXkgdG8gdGhl
+IHJvb3QgYnVzLiBJDQo+IHRoaW5rIHRoYXQgd2hlbiB0aGVyZSBpcyBhIFBDSSBJREUgY29udHJv
+bGxlciBpbmJldHdlZW4gYW5kIGluIFBDSQ0KPiBuYXRpdmUgbW9kZSwgdGhpcyBpcyBub3QgYWx3
+YXlzIHByb3BhZ2F0ZWQgcGFzdCB0aGUgUENJIElERQ0KPiBjb250cm9sbGVyLg0KPiBJbiB0aGUg
+Y2FzZSBvZiB0aGUgQ01ENjQ2VTIsIEkgdGhpbmsgdGhlIGxvd2VyaW5nIG9mIGludGVycnVwdHMg
+aXMNCj4gb25seQ0KPiBwcm9wYWdhdGVkIHdoZW4gdGhlIGNvbnRyb2xsZXIgaXMgaW4gbGVnYWN5
+L2NvbXBhdGliaWxpdHkgbW9kZS4NCj4gDQo+IEZyb20gd2hhdCBJIGNhbiB0ZWxsIGNtZDY0Nl9z
+ZXRfaXJxIGlzIG9ubHkgZXZlciBjYWxsZWQgZnJvbSBJREUNCj4gZGV2aWNlDQo+IGNvZGUsIGll
+LiBpZGVfaW9wb3J0X3JlYWQuIElmIHRoZSBjb250cm9sbGVyIGlzIG5vdCBzdXBwb3NlZCB0bw0K
+PiBwcm9wYWdhdGUgdGhlIGxvd2VyaW5nIG9mIGludGVycnVwdHMsIEkgdGhpbmsgYSBwb3NzaWJs
+ZSBmaXggd291bGQgYmUNCj4gY2hhbmdpbmcgY21kNjQ2X3NldF9pcnEgdG8gZG8gbm90aGluZyB3
+aGVuIHRoZSBwcm92aWRlZCBsZXZlbCBpcyAwLg0KPiBJbnRlcnJ1cHRzIGNhbiBzdGlsbCBiZSBj
+bGVhcmVkIGJ5IHdyaXRpbmcgdG8gQ0ZSLCBBUlRUSU0yMywgYW5kDQo+IE1SRE1PREUgd2hpY2gg
+bGV2ZXJhZ2UgY21kNjQ2X3VwZGF0ZV9pcnEgaW5zdGVhZC4gVGhpcyBmaXggaXMgbm90DQo+IHN1
+aXRhYmxlIGlmIHRoZSBlbXVsYXRlZCBDTUQ2NDYgY2FuIGJlIHVzZWQgaW4gY29tcGF0aWJpbGl0
+eSBtb2RlIGJ1dA0KPiBJDQo+IGRvbid0IHRoaW5rIHdlIGhhdmUgc3VwcG9ydCBmb3IgdGhhdCBh
+bnl3YXlzLiANCj4gDQo+IEknbGwgc3VibWl0IGEgUkZDIFYyIHBhdGNoIHdpdGggYSBwcm9wb3Nl
+ZCBmaXguDQo+IA0KPiBUaGFua3MsDQo+IEphc3BlciBMb3dlbGwuDQo+IA0KPiBPbiBXZWQsIDIw
+MjAtMDItMjYgYXQgMTI6MDcgKzAxMDAsIEJBTEFUT04gWm9sdGFuIHdyb3RlOg0KPiA+IE9uIFdl
+ZCwgMjYgRmViIDIwMjAsIGphc3Blci5sb3dlbGxAYnQuY29tIHdyb3RlOg0KPiA+ID4gPiBQcm9i
+bGVtIHdpdGggdGhhdCBwYXRjaCBpcyB0aGF0IGl0IHJlbW92ZXMgdGhpcyBjbGVhcmluZyBmcm9t
+DQo+ID4gPiA+IHRoZQ0KPiA+ID4gPiBmdW5jIA0KPiA+ID4gPiB0aGF0J3MgYWxzbyB1c2VkIHRv
+IGVtdWxhdGUgSVNBIElERSBpb3BvcnRzIHdoaWNoIGFjY29yZGluZyB0bw0KPiA+ID4gPiB0aGVp
+ciANCj4gPiA+ID4gc3BlYyBzaG91bGQgY2xlYXIgaXJxIG9uIHJlYWQgc28gdGhhdCBmdW5jdGlv
+biBzaG91bGQgYmUgT0sgYnV0DQo+ID4gPiA+IG1heWJlIA0KPiA+ID4gPiBzaG91bGQgbm90IGJl
+IGNhbGxlZCBieSBQQ0kgSURFIGNvZGU/DQo+ID4gPiANCj4gPiA+IFRoaXMgbWlnaHQgYmUgaXQu
+DQo+ID4gPiANCj4gPiA+IFRoZSBwYXRjaCBJIHByb3ZpZGVkIGlzIGRlZmluaXRlbHkgaW5jb3Jy
+ZWN0IGFuZCBkZXZpYXRlcyBmcm9tDQo+ID4gPiB0aGUNCj4gPiA+IHNwZWNpZmljYXRpb24gYXMg
+TWFyayBtZW50aW9uZWQgZWFybGllci4gSSBtaXN1bmRlcnN0b29kIHdoYXQNCj4gPiA+IGlkZV9p
+b3BvcnRfcmVhZC93cml0ZSB3ZXJlIGZvciBhbmQgaGF2ZW4ndCBiZWVuIHRoaW5raW5nIGFib3V0
+DQo+ID4gPiBsZWdhY3kNCj4gPiA+IG1vZGUuIA0KPiA+ID4gDQo+ID4gPiBUaGUgYnVnIHRoYXQg
+SSBiZWxpZXZlIGV4aXN0cyBpcyBwcmVzZW50IHdoZW4gdGhlIENNRDY0NiBpcw0KPiA+ID4gb3Bl
+cmF0aW5nDQo+ID4gPiBpbiBQQ0kgbmF0aXZlIG1vZGUuIFllYWgsIEkgdGhpbmsgYSBwb3NzaWJs
+ZSBzb2x1dGlvbiBtaWdodCBiZSB0bw0KPiA+ID4gYXZvaWQNCj4gPiA+IHVzaW5nIHRoZSBpb3Bv
+cnRfcmVhZC93cml0ZSBmdW5jdGlvbnMgZnJvbSB0aGUgUENJIGNvZGUgaWYgdGhleQ0KPiA+ID4g
+aGF2ZQ0KPiA+ID4gc2lkZSBlZmZlY3RzIHRoYXQgYXNzdW1lIHRoZSBkZXZpY2UgaXMgaW4gbGVn
+YWN5IG1vZGUuIEknbGwgaGF2ZQ0KPiA+ID4gdG8NCj4gPiA+IHNwZW5kIG1vcmUgdGltZSByZWFk
+aW5nIHRocm91Z2ggdGhlIGNvZGUgYW5kIGRvY3VtZW50YXRpb24uDQo+ID4gDQo+ID4gU2luY2Ug
+Ym90aCB0aGUgZ2VuZXJpYyBQQ0kgSURFIGFuZCBDTUQ2NDYgTGludXggZHJpdmVycyBtZW50aW9u
+IGlycQ0KPiA+IGlzIA0KPiA+IGNsZWFyZWQgb24gcmVhZGluZyBzdGF0dXMgSSB0aGluayB1c2lu
+ZyBpZGVfaW9wb3J0X3JlYWQgaW4NCj4gPiBody9pZGUvcGNpLmMgDQo+ID4gbWF5IGJlIGNvcnJl
+Y3QgZm9yIHRoZSBnZW5lcmljIGNhc2UuIE5vdCBzdXJlIGlmIHRoZSBDTUQ2NDYgaGFzDQo+ID4g
+c29tZSANCj4gPiBwZWN1bGFyaXR5IGJ1dCBtYXliZSB0aGUgZGlmZmVyZW5jZSBpbiBkcml2ZXJz
+IGlzIHRvIGF2b2lkIGJ1Z3MNCj4gPiBub3QgDQo+ID4gYmVjYXVzZSBvZiBDTUQ2NDYgbm90IGNs
+ZWFyaW5nIGlycS4gVGhlIHdpa2lwZWRpYSBwYWdlIG9mIENNRDY0MDoNCj4gPiANCj4gPiBodHRw
+czovL2VuLndpa2lwZWRpYS5vcmcvd2lraS9DTUQ2NDANCj4gPiANCj4gPiBtZW50aW9ucyBzb21l
+IHZlcnNpb25zIG9mIGl0IGhhcyBhIGJ1ZyBzaW1pbGFyIHRvIFJaLTEwMDAgZm9yDQo+ID4gd2hp
+Y2ggDQo+ID4gdGhlcmUncyBhIGRvYyByZWZlcmVuY2VkIHRoYXQgc2F5cyB0aGUgcHJvYmxlbSBp
+cyB0aGF0IGl0IGZvcmdldHMNCj4gPiBsYXN0IA0KPiA+IGRhdGEgd29yZCBhZnRlciByYWlzaW5n
+IChvciBjbGVhcmluZz8pIElSUSBhbmQgYSB3b3JrYXJvdW5kIGlzIHRvDQo+ID4gYXZvaWQgDQo+
+ID4gY2hlY2tpbmcgc3RhdHVzIHVudGlsIGFsbCBkYXRhIHRyYW5zZmVycmVkLiBUaGlzIG1heSBl
+eHBsYWluIHdoeQ0KPiA+IExpbnV4IA0KPiA+IGNoZWNrcyBhbHQgc3RhdHVzIGFuZCBjbGVhcnMg
+aW50ZXJydXB0IGluc3RlYWQgb2YgcmVhZGluZyBzdGF0dXMNCj4gPiByZWdpc3Rlci4NCj4gPiAN
+Cj4gPiA+IEFjY29yZGluZyB0byB0aGUgQ01ENjQ2VTIgc3BlY2lmaWNhdGlvbjoNCj4gPiA+ICJX
+aGVuIGFuIElERSBwb3J0IGlzIGluIFBDSSBJREUgTGVnYWN5IE1vZGUsIHRoZSBQQ0k2NDZVMiBp
+cw0KPiA+ID4gY29tcGF0aWJsZQ0KPiA+ID4gd2l0aCBzdGFuZGFyZCBJU0EgSURFLiBUaGUgSURF
+IHRhc2sgZmlsZSByZWdpc3RlcnMgYXJlIG1hcHBlZCB0bw0KPiA+ID4gdGhlDQo+ID4gPiBzdGFu
+ZGFyZCBJU0EgcG9ydCBhZGRyZXNzZXMsIGFuZCBJREUgZHJpdmUgaW50ZXJydXB0cyBvY2N1ciBh
+dA0KPiA+ID4gSVJRMTQNCj4gPiA+IChwcmltYXJ5KSBvciBJUlExNSAoc2Vjb25kYXJ5KS4iDQo+
+ID4gPiANCj4gPiA+IEluIGxlZ2FjeSBtb2RlLCBJUlExNCBhbmQgSVJRMTUgbWlycm9yIHRoZSBz
+dGF0ZSBvZiBJTlRSUSBvbiBlYWNoDQo+ID4gPiBvZg0KPiA+ID4gdGhlIHNlbGVjdGVkIElERSBk
+ZXZpY2VzLiBRRU1VIGFwcGVhcnMgdG8gZW11bGF0ZSB0aGlzIGNvcnJlY3RseS4NCj4gPiA+IA0K
+PiA+ID4gSW4gUENJIG5hdGl2ZSBtb2RlLCBJTlRSUSBpcyBub3QgbWlycm9yZWQgb3IgZ2l2ZW4g
+YSBzaW5nbGUgSVJRLg0KPiA+ID4gSW50ZXJydXB0cyBhcmUgcHJvdmlkZWQgYnkgdGhlIFBDSSBJ
+REUgY29udHJvbGxlciBkZXBlbmRpbmcgb24NCj4gPiA+IHRoZQ0KPiA+ID4gY29udHJvbGxlcidz
+IGxvZ2ljLiBGb3IgaW5zdGFuY2UsIGFuIElERSBkZXZpY2UgY2FuIHJhaXNlIGFuDQo+ID4gPiBp
+bnRlcnJ1cHQNCj4gPiA+IGJ1dCB0aGUgQ01ENjQ2IG1heSBub3QgcHJvcGFnYXRlIHRoYXQgaW50
+ZXJydXB0IGlmIE1SRE1PREUgaGFzDQo+ID4gPiBjZXJ0YWluDQo+ID4gPiBiaXRzIHNldC4gSSdt
+IHRoaW5raW5nIHRoYXQgbWF5YmUgdGhlIGNvbnRyb2xsZXIgZG9lcyBub3QgaGF2ZQ0KPiA+ID4g
+bG9naWMgdG8NCj4gPiA+IHVuc2V0IHRoZSBpbnRlcnJ1cHQgYml0cyBpbiBDRlIgYW5kIEFSVFRJ
+TTIzIHdoZW4gdGhlIElERSBkZXZpY2UNCj4gPiA+IGxvd2Vycw0KPiA+ID4gSU5UUlEuIFRoaXMg
+bWlnaHQgbWVhbiB0aGF0IHRoZSBjb250cm9sbGVyIHdpbGwgY29udGludWUgdG8NCj4gPiA+IGFz
+c2VydA0KPiA+ID4gYW4NCj4gPiA+IGludGVycnVwdCB3aGlsZSBiaXRzIGluIENGUiBhbmQgQVJU
+VElNMjMgcmVtYWluIHNldCwgZXZlbiBpZiB0aGUNCj4gPiA+IElERQ0KPiA+ID4gZGV2aWNlIGxv
+d2VycyBJTlRSUS4gVGhpcyB3b3VsZCBleHBsYWluIHdoeSB0aGUgQ01ENjQ2DQo+ID4gPiBkb2N1
+bWVudGF0aW9uDQo+ID4gPiBpbnN0cnVjdHMgZGV2ZWxvcGVycyB0byBsb3dlciB0aGVtIGV4cGxp
+Y2l0bHkuDQo+ID4gDQo+ID4gSSBkb24ndCBrbm93IGJ1dCBzb3VuZHMgcGxhdXNpYmxlIHRoYXQg
+cmVhZGluZyB0aGUgc3RhdHVzIHJlZw0KPiA+IGNsZWFycw0KPiA+IGlycSANCj4gPiBidXQgcmVh
+ZGluZyB0aGUgcGNpIGNvbmZpZyB3b3JkcyB0aGF0IG1pcnJvcnMgaXQgd29uJ3QgY2xlYXIgaXQu
+DQo+ID4gQnV0DQo+ID4gdGhlIA0KPiA+IHRyYWNlcyB5b3UgaGFkIHNob3cgdGhhdCBpZGVfaW9w
+b3J0X3JlYWQgd2FzIGNhbGxlZCBzbyBkcml2ZXIgd2FzDQo+ID4gbGlrZWx5IA0KPiA+IHJlYWRp
+bmcgc3RhdHVzIGFuZCBub3QgdGhlIGNvbmZpZyByZWdzPw0KPiA+IA0KPiA+IEkndmUgZm91bmQg
+c29tZSBmdXJ0aGVyIGxvZ3M6DQo+ID4gDQo+ID4gaHR0cHM6Ly9mb3J1bXMuZ2VudG9vLm9yZy92
+aWV3dG9waWMtdC0yNzAzNTcuaHRtbA0KPiA+IGh0dHBzOi8vd3d3LnJlZGhhdC5jb20vYXJjaGl2
+ZXMvYXhwLWxpc3QvMjAwMC1PY3RvYmVyL21zZzAwMDcwLmh0bWwNCj4gPiBodHRwczovL3d3dy5s
+aW51eHRvcGlhLm9yZy9vbmxpbmVfYm9va3MvbGludXhfYmVnaW5uZXJfYm9va3MvZGViaWFuX2xp
+bnV4X2Rlc2t0b3Bfc3Vydml2YWxfZ3VpZGUvRG9ja2luZ19TdGF0aW9uLnNodG1sDQo+ID4gDQo+
+ID4gVGhlc2Ugc2hvdyBMaW51eCBtZXNzYWdlcyBmb3IgZWFybHkgQ01ENjQ2IHJldmlzaW9ucyB0
+aGF0IGhhZCBidWdzDQo+ID4gYnV0IA0KPiA+IHdoYXQgSSd2ZSBub3RpY2VkIGlzIHRoYXQgdGhl
+eSBzYXkgc29tZXRoaW5nIGFib3V0IG5vdCAxMDAlIG5hdGl2ZQ0KPiA+IG1vZGUgDQo+ID4gd2hp
+Y2ggc2VlbXMgdG8gYmUgc2ltaWxhciB0byB3aGF0IEkgaGFkIHdpdGggdmlhLWlkZSB3aGVuIGl0
+IHVzZXMNCj4gPiBJUlExNC0xNSANCj4gPiBldmVuIGluIG5hdGl2ZSBtb2RlLiBDb3VsZCB5b3Vy
+IHByb2JsZW0gYmUgc2ltaWxhcj8gTWF5YmUgeW91IGNvdWxkDQo+ID4gc2VhcmNoIA0KPiA+IGZv
+ciBtb3JlIHN1Y2ggbG9ncyBmb3IgTGludXggYm9vdGluZyBvbiBTdW4gVWx0cmEgbWFjaGluZXMg
+YW5kIHNlZQ0KPiA+IHdoYXQgDQo+ID4gdGhvc2Ugc2F5IGFuZCBjaGVjayBob3cgaXQgZGV0ZXJt
+aW5lcyB3aGljaCBJUlEgbnVtYmVyIGl0IHNob3VsZA0KPiA+IHVzZS4NCj4gPiBUaGlzIA0KPiA+
+IG1heSBkZXBlbmQgb24gc29tZSBzZXR0aW5nIHRoYXQncyBub3QgZW11bGF0ZWQgY29ycmVjdGx5
+Lg0KPiA+IA0KPiA+ID4gVGhlIExpbnV4IGRyaXZlciBjb2RlIGFwcGVhcnMgdG8gYmUgY29uc2lz
+dGVudCB3aXRoIHRoZSBiZWhhdmlvdXINCj4gPiA+IHRoYXQNCj4gPiA+IEknbSBzZWVpbmcgZnJv
+bSBTb2xhcmlzIDEwLg0KPiA+ID4gDQo+ID4gPiBUaGUgZm9sbG93aW5nIGFwcGVhcnMgdG8gYmUg
+dXNlZCB0byBpbml0aWFsaXNlIHRoZSBDTUQ2NDZVLg0KPiA+ID4gDQo+ID4gPiB7CS8qIENNRCA2
+NDZVIHdpdGggYnJva2VuIFVETUEgKi8NCj4gPiA+IAkuZmxhZ3MgPSBBVEFfRkxBR19TTEFWRV9Q
+T1NTLA0KPiA+ID4gCS5waW9fbWFzayA9IEFUQV9QSU80LA0KPiA+ID4gCS5td2RtYV9tYXNrID0g
+QVRBX01XRE1BMiwNCj4gPiA+IAkucG9ydF9vcHMgPSAmY21kNjQ2cjNfcG9ydF9vcHMNCj4gPiA+
+IH0sDQo+ID4gPiANCj4gPiA+IFRoZSBwb3J0IG9wZXJhdGlvbnMgaXQgdXNlcyBhcmUgZGVmaW5l
+ZCBhcyBzbzoNCj4gPiA+IA0KPiA+ID4gc3RhdGljIHN0cnVjdCBhdGFfcG9ydF9vcGVyYXRpb25z
+IGNtZDY0NnIzX3BvcnRfb3BzID0gew0KPiA+ID4gCS5pbmhlcml0cwk9ICZjbWQ2NHhfYmFzZV9v
+cHMsDQo+ID4gPiAJLnNmZl9pcnFfY2hlY2sJPSBjbWQ2NDhfc2ZmX2lycV9jaGVjaywNCj4gPiA+
+IAkuc2ZmX2lycV9jbGVhcgk9IGNtZDY0OF9zZmZfaXJxX2NsZWFyLA0KPiA+ID4gCS5jYWJsZV9k
+ZXRlY3QJPSBhdGFfY2FibGVfNDB3aXJlLA0KPiA+ID4gfQ0KPiA+ID4gDQo+ID4gPiBBcyB5b3Ug
+bWVudGlvbiwgY21kNjQ4X3NmZl9pcnFfY2xlYXIgY2xlYXJzIGludGVycnVwdHMgZXhwbGljaXRs
+eQ0KPiA+ID4gYnkNCj4gPiA+IHNldHRpbmcgYml0cyBpbiBNUkRNT0RFIC0gY29uc2lzdGVudCB3
+aXRoIHRoZSBDTUQ2NDZVMg0KPiA+ID4gZG9jdW1lbnRhdGlvbi4NCj4gPiA+IFRoaXMgYmVoYXZp
+b3VyIGlzIHZlcnkgc2ltaWxhciB0byBTb2xhcmlzIDEwLg0KPiA+IA0KPiA+IEkgdGhpbmsgdGhp
+cyBtYXkgYmUgdG8gYXZvaWQgYnVnIHdpdGggQ01ENjQ2VS4NCj4gPiANCj4gPiA+ID4gQWx0aG91
+Z2ggaWYgSSBnb3QgDQo+ID4gPiA+IHRoYXQgY29ycmVjdGx5IExpbnV4IHRoaW5rcyByZXZpc2lv
+bnMgb3ZlciA1IGFyZSBPSyBhbmQgUUVNVQ0KPiA+ID4gPiBoYXMNCj4gPiA+ID4gNy4NCj4gPiA+
+IA0KPiA+ID4gSSdtIG5vdCBzdXJlIGhvdyByZXZpc2lvbiBudW1iZXJzIHdvcmsgd2l0aCB0aGVz
+ZSBjaGlwcy4gRG8NCj4gPiA+IENNRDY0Ng0KPiA+ID4gYW5kDQo+ID4gPiBDTUQ2NDZVMiByZWZl
+ciB0byBkaWZmZXJlbnQgcmV2aXNpb25zIG9mIHRoZSBDTUQ2NDYgY2hpcD8NCj4gPiANCj4gPiBJ
+J20gbm90IHN1cmUgZWl0aGVyIGJ1dCBmcm9tIHdoYXQgSSd2ZSBzZWVuIHNvIGZhciBJIHRoaW5r
+IENNRDY0Ng0KPiA+IGVpdGhlciANCj4gPiByZWZlcnMgdG8gdGhlIHdob2xlIGZhbWlseSAoaS5l
+LiBhbGwgdmVyc2lvbnMpIG9yIGVhcmx5IHZlcnNpb25zDQo+ID4gZGVwZW5kaW5nIA0KPiA+IG9u
+IGNvbnRleHQgd2hpbGUgdGhlcmUgYXJlIGF0IGxlYXN0IHR3byBtb3JlIG5ld2VyIHZlcnNpb25z
+DQo+ID4gcmVmZXJyZWQNCj4gPiB0byBhcyANCj4gPiBDTUQ2NDZVIGFuZCBDTUQ2NDZVMiBidXQg
+cHJvYmFibHkgdGhlcmUgYXJlIG1vcmUgcmV2aXNpb25zIHdpdGhpbg0KPiA+IHRoZXNlIGFzIA0K
+PiA+IFUyIHNlZW1zIHRvIGJlIHJldjUuIFFFTVUgc2V0cyB0aGUgcmV2aXNpb24gZmllbGQgdG8g
+NyBidXQgSSdtIG5vdA0KPiA+IHN1cmUgDQo+ID4gdGhhdCdzIHRoZSBzYW1lIExpbnV4IGNoZWNr
+cyBmb3IuIFRoZXJlJ3Mgc29tZSBtb3JlIGluZm8gb24gdGhpcw0KPiA+IGhlcmU6DQo+ID4gDQo+
+ID4gaHR0cHM6Ly9hdGEud2lraS5rZXJuZWwub3JnL2luZGV4LnBocC9QYXRhX2NtZDY0eA0KPiA+
+IA0KPiA+IFJlZ2FyZHMsDQo+ID4gQkFMQVRPTiBab2x0YW4NCj4gPiANCg==
 
