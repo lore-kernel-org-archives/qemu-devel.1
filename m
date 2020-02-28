@@ -2,71 +2,89 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0949AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFFEC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6F7C24691
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AAD324691
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:09:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="uvP69USt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F7C24691
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aeG0pYb/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AAD324691
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7j7u-0007dm-Vu
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 12:08:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58144)
+	id 1j7j8T-0000HW-Iy
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 12:09:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ilL-0004JJ-QT
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:45:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifV-0008DU-Lw
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ilJ-0006Qx-Rd
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:45:19 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:13235)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
- id 1j7ilJ-0005U6-C2
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:45:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1582908317; x=1614444317;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=J/CNIescHakrSYwZeabTtA5yBzDGVHYDq4Bf/AC12VI=;
- b=uvP69USt9fkFYa2WFedthpy3O0KNdBpFvzsdHNSACBwdGwmBu5zJ2IWr
- 9ZsrfoTt4uCj91y0jcRXHg413wr/UTBrXCGiJSl+GayRc6jWyb+A5FmpF
- hGS5V4Xvh/PjboIxFq02ki/bJzVyN8y+651mSUBlrVeCiQvnHfma42EU1 8=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 28 Feb 2020 08:44:31 -0800
-Received: from vu-tsimpson-aus.qualcomm.com (HELO
- vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
- by ironmsg01-sd.qualcomm.com with ESMTP; 28 Feb 2020 08:44:30 -0800
-Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id 37565119A; Fri, 28 Feb 2020 10:44:30 -0600 (CST)
-From: Taylor Simpson <tsimpson@quicinc.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifU-00025Y-8u
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:17 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:55450)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7ifU-000256-2D
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:16 -0500
+Received: by mail-wm1-x334.google.com with SMTP id q9so3813450wmj.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:39:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=hTbY0nJfRg44cC4x/jkt29PNMvHIJImu3BmtAxBXRUA=;
+ b=aeG0pYb/ggqslbXgJm/hF6BjCA4tRiDrvAm8kOn4xhxTdW1suW+X2lH1a0PaqaHj+d
+ 1edvoZTMikv1vWDxLLgIchq6KuDR8FRp7SmJw/1B8yV+eCjTiskTX6ZinMqAtw6GNZD3
+ /oyGAqTKDhGBLgjFm4Qel2zIHkxdHkQ8BChUAYCZNJClB0tPdtP4PD55zlKsIr3RukoA
+ Ir8St7AVjk5DH5AqAQnSKJnhsvXPdz5nl6zhyrETGRfSapUyDsy/wx1+sPagwX9PURzs
+ B50ts03pxKt5ZACVJUcT2IDMYQM7KCD7p+REHsQ6zIpHFrW0mnBTdON60VHALvcexw+R
+ e2nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=hTbY0nJfRg44cC4x/jkt29PNMvHIJImu3BmtAxBXRUA=;
+ b=fA0KA2X27xejjFaIagtxcZpdAY7Ra08T1TollTKDqFYDFH6WsVp4PYDwGiP8zkZ4lq
+ gOkDeWh99eQKmMQwS51pPKWXrLTKMxPYqwYAjjll7KgoNOzimy3jgRTVawgvRSe0QbE7
+ CJZxfjEJDpJnPXh7OgnDtU8UmeXlhz1/SRB1LlhpS9jgurLLSLF79BFwvQV4mh265EwD
+ RKI+HB+iwSXQJE17dWQX7oQUyf2hXzenX7WUO9hfww/GY7n32Owp2diP5m6ddDfVpyfm
+ vJLDVEPL/Q7eirnBBm2Xif1gsYkXsrFzFai3uxmTlKhE54wP38gEbJ3ovyel1O5SNKlt
+ epNw==
+X-Gm-Message-State: APjAAAUrtkNec2kL4hR67LN6qKXz6P7v+dG97faPcajrmPmDNNDqyeJ+
+ 9ewa6+AsIYgMJNHnbA9cuQsMFy1CVfnQtQ==
+X-Google-Smtp-Source: APXvYqwzkbW/MZ5n/ULQ9POm2Xt/rCkrJAFh4nPR4gciBW6mTqdU92Bn4tCNNLSYLXViozlcIQvJXQ==
+X-Received: by 2002:a05:600c:290:: with SMTP id
+ 16mr3131736wmk.64.1582907954723; 
+ Fri, 28 Feb 2020 08:39:14 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.39.13
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 08:39:14 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 28/67] Hexagon generator phase 3 - C preprocessor for
- decode tree
-Date: Fri, 28 Feb 2020 10:43:24 -0600
-Message-Id: <1582908244-304-29-git-send-email-tsimpson@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
-References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
+Subject: [PULL 28/33] tests/acceptance/integratorcp: Verify Tux is displayed
+ on framebuffer
+Date: Fri, 28 Feb 2020 16:38:35 +0000
+Message-Id: <20200228163840.23585-29-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
+References: <20200228163840.23585-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,131 +96,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
- Taylor Simpson <tsimpson@quicinc.com>, philmd@redhat.com,
- aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UnVuIHRoZSBDIHByZXByb2Nlc3NvciBhY3Jvc3MgdGhlIGluc3RydWN0aW9uIGRlZmluaXRpb24g
-YW5kIGVuY29kaW5nCmZpbGVzIHRvIGV4cGFuZCBtYWNyb3MgYW5kIHByZXBhcmUgdGhlIGlzZXQu
-cHkgZmlsZS4gIFRoZSByZXN1bHRpbmcKZmlsbCBjb250YWlucyBweXRob24gZGF0YSBzdHJ1Y3R1
-cmVzIHVzZWQgdG8gYnVpbGQgdGhlIGRlY29kZSB0cmVlLgoKVGVzdGVkLWJ5OiBQaGlsaXBwZSBN
-YXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhhdC5jb20KU2lnbmVkLW9mZi1ieTogVGF5bG9yIFNp
-bXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPgotLS0KIHRhcmdldC9oZXhhZ29uL2dlbl9kZWN0
-cmVlX2ltcG9ydC5jIHwgMjA1ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwog
-MSBmaWxlIGNoYW5nZWQsIDIwNSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAxMDA2NDQgdGFy
-Z2V0L2hleGFnb24vZ2VuX2RlY3RyZWVfaW1wb3J0LmMKCmRpZmYgLS1naXQgYS90YXJnZXQvaGV4
-YWdvbi9nZW5fZGVjdHJlZV9pbXBvcnQuYyBiL3RhcmdldC9oZXhhZ29uL2dlbl9kZWN0cmVlX2lt
-cG9ydC5jCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjRkZmQ0ZDQKLS0tIC9k
-ZXYvbnVsbAorKysgYi90YXJnZXQvaGV4YWdvbi9nZW5fZGVjdHJlZV9pbXBvcnQuYwpAQCAtMCww
-ICsxLDIwNSBAQAorLyoKKyAqICBDb3B5cmlnaHQoYykgMjAxOS0yMDIwIFF1YWxjb21tIElubm92
-YXRpb24gQ2VudGVyLCBJbmMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCisgKgorICogIFRoaXMgcHJv
-Z3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9k
-aWZ5CisgKiAgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGlj
-ZW5zZSBhcyBwdWJsaXNoZWQgYnkKKyAqICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBl
-aXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgorICogIChhdCB5b3VyIG9wdGlvbikg
-YW55IGxhdGVyIHZlcnNpb24uCisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBp
-biB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLAorICogIGJ1dCBXSVRIT1VUIEFOWSBX
-QVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mCisgKiAgTUVSQ0hB
-TlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZQor
-ICogIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCisgKgorICog
-IFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1Ymxp
-YyBMaWNlbnNlCisgKiAgYWxvbmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgc2VlIDxodHRw
-Oi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4KKyAqLworCisvKgorICogVGhpcyBwcm9ncmFtIGdl
-bmVyYXRlcyB0aGUgZW5jb2RpbmdzIGZpbGUgdGhhdCBpcyBwcm9jZXNzZWQgYnkKKyAqIHRoZSBk
-ZWN0cmVlLnB5IHNjcmlwdCB0byBwcm9kdWNlIHRoZSBkZWNvZGluZyB0cmVlLiAgV2UgdXNlIHRo
-ZSBDCisgKiBwcmVwcm9jZXNzb3IgdG8gbWFuaXB1bGF0ZSB0aGUgZmlsZXMgaW1wb3J0ZWQgZnJv
-bSB0aGUgSGV4YWdvbgorICogYXJjaGl0ZWN0dXJlIGxpYnJhcnkuCisgKi8KKyNpbmNsdWRlIDxz
-dGRpby5oPgorI2luY2x1ZGUgPHN0cmluZy5oPgorI2luY2x1ZGUgIm9wY29kZXMuaCIKKworI2Rl
-ZmluZSBTVFJJTkdJWkUoWCkgICAgI1gKKworY29uc3QgY2hhciAqb3Bjb2RlX25hbWVzW10gPSB7
-CisjZGVmaW5lIE9QQ09ERShJSUQpIFNUUklOR0laRShJSUQpCisjaW5jbHVkZSAib3Bjb2Rlc19k
-ZWZfZ2VuZXJhdGVkLmgiCisgICAgTlVMTAorI3VuZGVmIE9QQ09ERQorfTsKKworY2hhciAqb3Bj
-b2RlX3N5bnRheFtYWF9MQVNUX09QQ09ERV07CisKKy8qCisgKiBQcm9jZXNzIHRoZSBpbnN0cnVj
-dGlvbiBkZWZpbml0aW9ucworICogICAgIFNjYWxhciBjb3JlIGluc3RydWN0aW9ucyBoYXZlIHRo
-ZSBmb2xsb3dpbmcgZm9ybQorICogICAgICAgICBRNklOU04oQTJfYWRkLCJSZDMyPWFkZChSczMy
-LFJ0MzIpIixBVFRSSUJTKCksCisgKiAgICAgICAgICJBZGQgMzItYml0IHJlZ2lzdGVycyIsCisg
-KiAgICAgICAgIHsgUmRWPVJzVitSdFY7fSkKKyAqICAgICBIVlggaW5zdHJ1Y3Rpb25zIGhhdmUg
-dGhlIGZvbGxvd2luZyBmb3JtCisgKiAgICAgICAgIEVYVElOU04oVjZfdmluc2VydHdyLCAiVngz
-Mi53PXZpbnNlcnQoUnQzMikiLAorICogICAgICAgICBBVFRSSUJTKEFfRVhURU5TSU9OLEFfQ1ZJ
-LEFfQ1ZJX1ZYLEFfQ1ZJX0xBVEUsQV9OT1RFX01QWV9SRVNPVVJDRSksCisgKiAgICAgICAgICJJ
-bnNlcnQgV29yZCBTY2FsYXIgaW50byBWZWN0b3IiLAorICogICAgICAgICBWeFYudXdbMF0gPSBS
-dFY7KQorICovCit2b2lkIG9wY29kZV9pbml0KCkKK3sKKyNkZWZpbmUgUTZJTlNOKFRBRywgQkVI
-LCBBVFRSSUJTLCBERVNDUiwgU0VNKSBcCisgICBvcGNvZGVfc3ludGF4W1RBR10gPSBCRUg7Cisj
-ZGVmaW5lIEVYVElOU04oVEFHLCBCRUgsIEFUVFJJQlMsIERFU0NSLCBTRU0pIFwKKyAgIG9wY29k
-ZV9zeW50YXhbVEFHXSA9IEJFSDsKKyNpbmNsdWRlICJpbXBvcnRlZC9hbGxpZGVmcy5kZWYiCisj
-dW5kZWYgUTZJTlNOCisjdW5kZWYgRVhUSU5TTgorfQorCitjb25zdCBjaGFyICpvcGNvZGVfcnJl
-Z3NbXSA9IHsKKyNkZWZpbmUgUkVHSU5GTyhUQUcsIFJFR0lORk8sIFJSRUdTLCBXUkVHUykgUlJF
-R1MsCisjZGVmaW5lIElNTUlORk8oVEFHLCBTSUdOLCBTSVpFLCBTSEFNVCwgU0lHTjIsIFNJWkUy
-LCBTSEFNVDIpICAvKiBub3RoaW5nICovCisjaW5jbHVkZSAib3BfcmVnc19nZW5lcmF0ZWQuaCIK
-KyAgICBOVUxMCisjdW5kZWYgUkVHSU5GTworI3VuZGVmIElNTUlORk8KK307CisKK2NvbnN0IGNo
-YXIgKm9wY29kZV93cmVnc1tdID0geworI2RlZmluZSBSRUdJTkZPKFRBRywgUkVHSU5GTywgUlJF
-R1MsIFdSRUdTKSBXUkVHUywKKyNkZWZpbmUgSU1NSU5GTyhUQUcsIFNJR04sIFNJWkUsIFNIQU1U
-LCBTSUdOMiwgU0laRTIsIFNIQU1UMikgIC8qIG5vdGhpbmcgKi8KKyNpbmNsdWRlICJvcF9yZWdz
-X2dlbmVyYXRlZC5oIgorICAgIE5VTEwKKyN1bmRlZiBSRUdJTkZPCisjdW5kZWYgSU1NSU5GTwor
-fTsKKworb3Bjb2RlX2VuY29kaW5nX3Qgb3Bjb2RlX2VuY29kaW5nc1tdID0geworI2RlZmluZSBE
-RUZfRU5DMzIoVEFHLCBFTkNTVFIpIFwKKyAgICBbVEFHXSA9IHsgLmVuY29kaW5nID0gRU5DU1RS
-IH0sCisjZGVmaW5lIERFRl9FTkNfU1VCSU5TTihUQUcsIENMQVNTLCBFTkNTVFIpIFwKKyAgICBb
-VEFHXSA9IHsgLmVuY29kaW5nID0gRU5DU1RSLCAuZW5jX2NsYXNzID0gQ0xBU1MgfSwKKyNkZWZp
-bmUgREVGX0VYVF9FTkMoVEFHLCBDTEFTUywgRU5DU1RSKSBcCisgICAgW1RBR10gPSB7IC5lbmNv
-ZGluZyA9IEVOQ1NUUiwgLmVuY19jbGFzcyA9IENMQVNTIH0sCisjaW5jbHVkZSAiaW1wb3J0ZWQv
-ZW5jb2RlLmRlZiIKKyN1bmRlZiBERUZfRU5DMzIKKyN1bmRlZiBERUZfRU5DX1NVQklOU04KKyN1
-bmRlZiBERUZfRVhUX0VOQworfTsKKworc3RhdGljIGNvbnN0IGNoYXIgKiBjb25zdCBvcGNvZGVf
-ZW5jX2NsYXNzX25hbWVzW1hYX0xBU1RfRU5DX0NMQVNTXSA9IHsKKyAgICAiTk9STUFMIiwKKyAg
-ICAiMTZCSVQiLAorICAgICJTVUJJTlNOX0EiLAorICAgICJTVUJJTlNOX0wxIiwKKyAgICAiU1VC
-SU5TTl9MMiIsCisgICAgIlNVQklOU05fUzEiLAorICAgICJTVUJJTlNOX1MyIiwKKyAgICAiRVhU
-X25vZXh0IiwKKyAgICAiRVhUX21tdmVjIiwKK307CisKK3N0YXRpYyBjb25zdCBjaGFyICpnZXRf
-b3Bjb2RlX2VuYyhpbnQgb3Bjb2RlKQoreworICAgIGNvbnN0IGNoYXIgKnRtcCA9IG9wY29kZV9l
-bmNvZGluZ3Nbb3Bjb2RlXS5lbmNvZGluZzsKKyAgICBpZiAodG1wID09IE5VTEwpIHsKKyAgICAg
-ICAgdG1wID0gIk1JU1NJTkcgRU5DT0RJTkciOworICAgIH0KKyAgICByZXR1cm4gdG1wOworfQor
-CitzdGF0aWMgY29uc3QgY2hhciAqZ2V0X29wY29kZV9lbmNfY2xhc3MoaW50IG9wY29kZSkKK3sK
-KyAgICBjb25zdCBjaGFyICp0bXAgPSBvcGNvZGVfZW5jb2RpbmdzW29wY29kZV0uZW5jb2Rpbmc7
-CisgICAgaWYgKHRtcCA9PSBOVUxMKSB7CisgICAgICAgIGNoYXIgKnRlc3QgPSAiVjZfIjsgICAg
-ICAgIC8qIEhWWCAqLworICAgICAgICBjaGFyICpuYW1lID0gKGNoYXIgKilvcGNvZGVfbmFtZXNb
-b3Bjb2RlXTsKKyAgICAgICAgaWYgKHN0cm5jbXAobmFtZSwgdGVzdCwgc3RybGVuKHRlc3QpKSA9
-PSAwKSB7CisgICAgICAgICAgICByZXR1cm4gIkVYVF9tbXZlYyI7CisgICAgICAgIH0KKyAgICB9
-CisgICAgcmV0dXJuIG9wY29kZV9lbmNfY2xhc3NfbmFtZXNbb3Bjb2RlX2VuY29kaW5nc1tvcGNv
-ZGVdLmVuY19jbGFzc107Cit9CisKK3N0YXRpYyB2b2lkIGdlbl9pc2V0X3RhYmxlKEZJTEUgKm91
-dCkKK3sKKyAgICBpbnQgaTsKKworICAgIGZwcmludGYob3V0LCAiaXNldCA9IHtcbiIpOworICAg
-IGZvciAoaSA9IDA7IGkgPCBYWF9MQVNUX09QQ09ERTsgaSsrKSB7CisgICAgICAgIGZwcmludGYo
-b3V0LCAiXHRcJyVzXCcgOiB7XG4iLCBvcGNvZGVfbmFtZXNbaV0pOworICAgICAgICBmcHJpbnRm
-KG91dCwgIlx0XHRcJ3RhZ1wnIDogXCclc1wnLFxuIiwgb3Bjb2RlX25hbWVzW2ldKTsKKyAgICAg
-ICAgZnByaW50ZihvdXQsICJcdFx0XCdzeW50YXhcJyA6IFwnJXNcJyxcbiIsIG9wY29kZV9zeW50
-YXhbaV0pOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ3JyZWdzXCcgOiBcJyVzXCcsXG4i
-LCBvcGNvZGVfcnJlZ3NbaV0pOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ3dyZWdzXCcg
-OiBcJyVzXCcsXG4iLCBvcGNvZGVfd3JlZ3NbaV0pOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0
-XHRcJ2VuY1wnIDogXCclc1wnLFxuIiwgZ2V0X29wY29kZV9lbmMoaSkpOworICAgICAgICBmcHJp
-bnRmKG91dCwgIlx0XHRcJ2VuY19jbGFzc1wnIDogXCclc1wnLFxuIiwgZ2V0X29wY29kZV9lbmNf
-Y2xhc3MoaSkpOworICAgICAgICBmcHJpbnRmKG91dCwgIlx0fSxcbiIpOworICAgIH0KKyAgICBm
-cHJpbnRmKG91dCwgIn07XG5cbiIpOworfQorCitzdGF0aWMgdm9pZCBnZW5fdGFnc19saXN0KEZJ
-TEUgKm91dCkKK3sKKyAgICBpbnQgaTsKKworICAgIGZwcmludGYob3V0LCAidGFncyA9IFtcbiIp
-OworICAgIGZvciAoaSA9IDA7IGkgPCBYWF9MQVNUX09QQ09ERTsgaSsrKSB7CisgICAgICAgIGZw
-cmludGYob3V0LCAiXHRcJyVzXCcsXG4iLCBvcGNvZGVfbmFtZXNbaV0pOworICAgIH0KKyAgICBm
-cHJpbnRmKG91dCwgIl07XG5cbiIpOworfQorCitzdGF0aWMgdm9pZCBnZW5fZW5jX2V4dF9zcGFj
-ZXNfdGFibGUoRklMRSAqb3V0KQoreworICAgIGZwcmludGYob3V0LCAiZW5jX2V4dF9zcGFjZXMg
-PSB7XG4iKTsKKyNkZWZpbmUgREVGX0VYVF9TUEFDRShTUEFDRUlELCBFTkNTVFIpIFwKKyAgICBm
-cHJpbnRmKG91dCwgIlx0XCclc1wnIDogXCclc1wnLFxuIiwgI1NQQUNFSUQsIEVOQ1NUUik7Cisj
-aW5jbHVkZSAiaW1wb3J0ZWQvZW5jb2RlLmRlZiIKKyN1bmRlZiBERUZfRVhUX1NQQUNFCisgICAg
-ZnByaW50ZihvdXQsICJ9O1xuXG4iKTsKK30KKworc3RhdGljIHZvaWQgZ2VuX3N1Ymluc25fZ3Jv
-dXBpbmdzX3RhYmxlKEZJTEUgKm91dCkKK3sKKyAgICBmcHJpbnRmKG91dCwgInN1Ymluc25fZ3Jv
-dXBpbmdzID0ge1xuIik7CisjZGVmaW5lIERFRl9QQUNLRUQzMihUQUcsIFRZUEVBLCBUWVBFQiwg
-RU5DU1RSKSBcCisgICAgZG8geyBcCisgICAgICAgIGZwcmludGYob3V0LCAiXHRcJyVzXCcgOiB7
-XG4iLCAjVEFHKTsgXAorICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ25hbWVcJyA6IFwnJXNc
-JyxcbiIsICNUQUcpOyBcCisgICAgICAgIGZwcmludGYob3V0LCAiXHRcdFwnY2xhc3NfYVwnIDog
-XCclc1wnLFxuIiwgI1RZUEVBKTsgXAorICAgICAgICBmcHJpbnRmKG91dCwgIlx0XHRcJ2NsYXNz
-X2JcJyA6IFwnJXNcJyxcbiIsICNUWVBFQik7IFwKKyAgICAgICAgZnByaW50ZihvdXQsICJcdFx0
-XCdlbmNcJyA6IFwnJXNcJyxcbiIsIEVOQ1NUUik7IFwKKyAgICAgICAgZnByaW50ZihvdXQsICJc
-dH0sXG4iKTsgXAorICAgIH0gd2hpbGUgKDApOworI2luY2x1ZGUgImltcG9ydGVkL2VuY29kZS5k
-ZWYiCisjdW5kZWYgREVGX1BBQ0tFRDMyCisgICAgZnByaW50ZihvdXQsICJ9O1xuXG4iKTsKK30K
-KworaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKK3sKKyAgICBGSUxFICpvdXRmaWxl
-OworCisgICAgaWYgKGFyZ2MgIT0gMikgeworICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIlVzYWdl
-OiBnZW5fZGVjdHJlZV9pbXBvcnQgb3VwdHB1dGZpbGVcbiIpOworICAgICAgICByZXR1cm4gLTE7
-CisgICAgfQorICAgIG91dGZpbGUgPSBmb3Blbihhcmd2WzFdLCAidyIpOworICAgIGlmIChvdXRm
-aWxlID09IE5VTEwpIHsKKyAgICAgICAgZnByaW50ZihzdGRlcnIsICJDYW5ub3Qgb3BlbiAlcyBm
-b3Igd3JpdGluZ1xuIiwgYXJndlsxXSk7CisgICAgICAgIHJldHVybiAtMTsKKyAgICB9CisKKyAg
-ICBvcGNvZGVfaW5pdCgpOworICAgIGdlbl9pc2V0X3RhYmxlKG91dGZpbGUpOworICAgIGdlbl90
-YWdzX2xpc3Qob3V0ZmlsZSk7CisgICAgZ2VuX2VuY19leHRfc3BhY2VzX3RhYmxlKG91dGZpbGUp
-OworICAgIGdlbl9zdWJpbnNuX2dyb3VwaW5nc190YWJsZShvdXRmaWxlKTsKKworICAgIGZjbG9z
-ZShvdXRmaWxlKTsKKyAgICByZXR1cm4gMDsKK30KLS0gCjIuNy40Cgo=
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Add a test that verifies the Tux logo is displayed on the framebuffer.
+
+We simply follow the OpenCV "Template Matching with Multiple Objects"
+tutorial, replacing Lionel Messi by Tux:
+https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html
+
+When OpenCV and NumPy are installed, this test can be run using:
+
+  $ AVOCADO_ALLOW_UNTRUSTED_CODE=hmmm \
+    avocado --show=app,framebuffer run -t device:framebuffer \
+      tests/acceptance/machine_arm_integratorcp.py
+  JOB ID     : 8c46b0f8269242e87d738247883ea2a470df949e
+  JOB LOG    : avocado/job-results/job-2020-01-31T21.38-8c46b0f/job.log
+   (1/1) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine.test_framebuffer_tux_logo:
+  framebuffer: found Tux at position [x, y] = (0, 0)
+  PASS (3.96 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 4.23 s
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-id: 20200225172501.29609-5-philmd@redhat.com
+Message-Id: <20200131211102.29612-3-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ tests/acceptance/machine_arm_integratorcp.py | 52 ++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
+
+diff --git a/tests/acceptance/machine_arm_integratorcp.py b/tests/acceptance/machine_arm_integratorcp.py
+index 22afd3b82a8..49c8ebff78b 100644
+--- a/tests/acceptance/machine_arm_integratorcp.py
++++ b/tests/acceptance/machine_arm_integratorcp.py
+@@ -9,11 +9,26 @@
+ # later.  See the COPYING file in the top-level directory.
+ 
+ import os
++import logging
+ 
+ from avocado import skipUnless
+ from avocado_qemu import Test
+ from avocado_qemu import wait_for_console_pattern
+ 
++
++NUMPY_AVAILABLE = True
++try:
++    import numpy as np
++except ImportError:
++    NUMPY_AVAILABLE = False
++
++CV2_AVAILABLE = True
++try:
++    import cv2
++except ImportError:
++    CV2_AVAILABLE = False
++
++
+ class IntegratorMachine(Test):
+ 
+     timeout = 90
+@@ -45,3 +60,40 @@ class IntegratorMachine(Test):
+         """
+         self.boot_integratorcp()
+         wait_for_console_pattern(self, 'Log in as root')
++
++    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
++    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
++    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
++    def test_framebuffer_tux_logo(self):
++        """
++        Boot Linux and verify the Tux logo is displayed on the framebuffer.
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:integratorcp
++        :avocado: tags=device:pl110
++        :avocado: tags=device:framebuffer
++        """
++        screendump_path = os.path.join(self.workdir, "screendump.pbm")
++        tuxlogo_url = ('https://github.com/torvalds/linux/raw/v2.6.12/'
++                       'drivers/video/logo/logo_linux_vga16.ppm')
++        tuxlogo_hash = '3991c2ddbd1ddaecda7601f8aafbcf5b02dc86af'
++        tuxlogo_path = self.fetch_asset(tuxlogo_url, asset_hash=tuxlogo_hash)
++
++        self.boot_integratorcp()
++        framebuffer_ready = 'Console: switching to colour frame buffer device'
++        wait_for_console_pattern(self, framebuffer_ready)
++        self.vm.command('human-monitor-command', command_line='stop')
++        self.vm.command('human-monitor-command',
++                        command_line='screendump %s' % screendump_path)
++        logger = logging.getLogger('framebuffer')
++
++        cpu_count = 1
++        match_threshold = 0.92
++        screendump_bgr = cv2.imread(screendump_path)
++        screendump_gray = cv2.cvtColor(screendump_bgr, cv2.COLOR_BGR2GRAY)
++        result = cv2.matchTemplate(screendump_gray, cv2.imread(tuxlogo_path, 0),
++                                   cv2.TM_CCOEFF_NORMED)
++        loc = np.where(result >= match_threshold)
++        tux_count = 0
++        for tux_count, pt in enumerate(zip(*loc[::-1]), start=1):
++            logger.debug('found Tux at position [x, y] = %s', pt)
++        self.assertGreaterEqual(tux_count, cpu_count)
+-- 
+2.20.1
+
 
