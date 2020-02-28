@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7EDFC3F2CF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B07F3C3F2D0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:28:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 973E324695
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:28:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C12724695
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:28:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAAm0dwv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973E324695
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLU2fa+E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C12724695
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7bwT-0003tN-Gs
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:28:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50542)
+	id 1j7bwb-0004Ch-Kx
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:28:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j7btY-0007ot-4A
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:21 -0500
+ (envelope-from <quintela@redhat.com>) id 1j7btE-00077G-Oe
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j7btW-000436-Jl
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33150
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1j7btD-0003tW-6e
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47363
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7btV-00042o-Fx
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:18 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7btD-0003tB-3L
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:24:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582881916;
+ s=mimecast20190719; t=1582881898;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Xsd4VVycDhAV3MVKF8+s4aTYKkltuXMZi5Z3cvzxxBQ=;
- b=iAAm0dwvtNdJbrzBcSQWlSHwlgu75rhaRs6eynadAkDGkMCYkTUE48YZJrKRY3MZgEFdud
- KU/SWwfJ0UBNYDdwYgNrQtOXdkxjrIPloXdG3qcJHBGsfGKHsPgzNxlOgSCIeBYItgVVtK
- acOAx6JS/BYN50gJtepdFpNVuQT1eOY=
+ bh=QTUvsLVV9AD1ni2B1FTeD9gDr33hOT+CZ+tKeAj/3I0=;
+ b=MLU2fa+ES3glah2zb1zw6CnpDLKYsF/5/HBSMzSVVK45D4Sen1HpdE5MIz371TXi05BYVz
+ x42RK/2u+cIKUP3CfDfzCxjXXoVTflNOP+z8PGJCJYw/8I9xGx+hpkg7dfp3vDSflCeQC9
+ tiwrbrlpl7vKWV+G2TV//WEOrYnUdxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-tPz--BktPUmGcU466iyjRg-1; Fri, 28 Feb 2020 04:25:12 -0500
-X-MC-Unique: tPz--BktPUmGcU466iyjRg-1
+ us-mta-456-vkuze-8cPhuaXv2ZKJ4BlQ-1; Fri, 28 Feb 2020 04:24:57 -0500
+X-MC-Unique: vkuze-8cPhuaXv2ZKJ4BlQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34D83801F75;
- Fri, 28 Feb 2020 09:25:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E80C7800D6C;
+ Fri, 28 Feb 2020 09:24:55 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-211.ams2.redhat.com [10.36.116.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B05E60BE0;
- Fri, 28 Feb 2020 09:24:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8372E60C18;
+ Fri, 28 Feb 2020 09:24:52 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/15] multifd: Add multifd-zstd-level parameter
-Date: Fri, 28 Feb 2020 10:24:12 +0100
-Message-Id: <20200228092420.103757-8-quintela@redhat.com>
+Subject: [PULL 06/15] configure: Enable test and libs for zstd
+Date: Fri, 28 Feb 2020 10:24:11 +0100
+Message-Id: <20200228092420.103757-7-quintela@redhat.com>
 In-Reply-To: <20200228092420.103757-1-quintela@redhat.com>
 References: <20200228092420.103757-1-quintela@redhat.com>
 MIME-Version: 1.0
@@ -72,7 +72,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,7 +89,7 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
  Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -99,195 +99,256 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This parameter specifies the zstd compression level. The next patch
-will put it to use.
+Add it to several build systems to make testing good.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Acked-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c | 24 ++++++++++++++++++++++++
- migration/migration.h |  1 +
- monitor/hmp-cmds.c    |  4 ++++
- qapi/migration.json   | 29 ++++++++++++++++++++++++++---
- 4 files changed, 55 insertions(+), 3 deletions(-)
+ .gitlab-ci.yml                                |  1 +
+ .travis.yml                                   |  1 +
+ configure                                     | 30 +++++++++++++++++++
+ tests/docker/dockerfiles/centos7.docker       |  3 +-
+ .../dockerfiles/fedora-i386-cross.docker      |  3 +-
+ tests/docker/dockerfiles/fedora.docker        |  3 +-
+ tests/docker/dockerfiles/ubuntu.docker        |  1 +
+ tests/docker/dockerfiles/ubuntu1804.docker    |  1 +
+ tests/vm/fedora                               |  5 +++-
+ tests/vm/freebsd                              |  3 ++
+ tests/vm/netbsd                               |  3 ++
+ tests/vm/openbsd                              |  3 ++
+ 12 files changed, 53 insertions(+), 4 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index a09726f679..c1814a6861 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -91,6 +91,8 @@
- #define DEFAULT_MIGRATE_MULTIFD_COMPRESSION MULTIFD_COMPRESSION_NONE
- /* 0: means nocompress, 1: best speed, ... 9: best compress ratio */
- #define DEFAULT_MIGRATE_MULTIFD_ZLIB_LEVEL 1
-+/* 0: means nocompress, 1: best speed, ... 20: best compress ratio */
-+#define DEFAULT_MIGRATE_MULTIFD_ZSTD_LEVEL 1
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index c15e394f09..72f8b8aa51 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -21,6 +21,7 @@ build-system2:
+  script:
+  - apt-get install -y -qq libsdl2-dev libgcrypt-dev libbrlapi-dev libaio-d=
+ev
+       libfdt-dev liblzo2-dev librdmacm-dev libibverbs-dev libibumad-dev
++      libzstd-dev
+  - mkdir build
+  - cd build
+  - ../configure --enable-werror --target-list=3D"tricore-softmmu unicore32=
+-softmmu
+diff --git a/.travis.yml b/.travis.yml
+index f4020dcc6c..9867272177 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -49,6 +49,7 @@ addons:
+       - libusb-1.0-0-dev
+       - libvdeplug-dev
+       - libvte-2.91-dev
++      - libzstd-dev
+       - sparse
+       - uuid-dev
+       - gcovr
+diff --git a/configure b/configure
+index 48d6f89d57..7b373bc0bb 100755
+--- a/configure
++++ b/configure
+@@ -449,6 +449,7 @@ lzo=3D""
+ snappy=3D""
+ bzip2=3D""
+ lzfse=3D""
++zstd=3D""
+ guest_agent=3D""
+ guest_agent_with_vss=3D"no"
+ guest_agent_ntddscsi=3D"no"
+@@ -1371,6 +1372,10 @@ for opt do
+   ;;
+   --disable-lzfse) lzfse=3D"no"
+   ;;
++  --disable-zstd) zstd=3D"no"
++  ;;
++  --enable-zstd) zstd=3D"yes"
++  ;;
+   --enable-guest-agent) guest_agent=3D"yes"
+   ;;
+   --disable-guest-agent) guest_agent=3D"no"
+@@ -1829,6 +1834,8 @@ disabled with --disable-FEATURE, default is enabled i=
+f available:
+                   (for reading bzip2-compressed dmg images)
+   lzfse           support of lzfse compression library
+                   (for reading lzfse-compressed dmg images)
++  zstd            support for zstd compression library
++                  (for migration compression)
+   seccomp         seccomp support
+   coroutine-pool  coroutine freelist (better performance)
+   glusterfs       GlusterFS backend
+@@ -2453,6 +2460,24 @@ EOF
+     fi
+ fi
 =20
- /* Background transfer rate for postcopy, 0 means unlimited, note
-  * that page requests can still exceed this limit.
-@@ -805,6 +807,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error=
- **errp)
-     params->multifd_compression =3D s->parameters.multifd_compression;
-     params->has_multifd_zlib_level =3D true;
-     params->multifd_zlib_level =3D s->parameters.multifd_zlib_level;
-+    params->has_multifd_zstd_level =3D true;
-+    params->multifd_zstd_level =3D s->parameters.multifd_zstd_level;
-     params->has_xbzrle_cache_size =3D true;
-     params->xbzrle_cache_size =3D s->parameters.xbzrle_cache_size;
-     params->has_max_postcopy_bandwidth =3D true;
-@@ -1219,6 +1223,13 @@ static bool migrate_params_check(MigrationParameters=
- *params, Error **errp)
-         return false;
-     }
-=20
-+    if (params->has_multifd_zstd_level &&
-+        (params->multifd_zstd_level > 20)) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "multifd_zstd_level=
-",
-+                   "is invalid, it should be in the range of 0 to 20");
-+        return false;
-+    }
++##########################################
++# zstd check
 +
-     if (params->has_xbzrle_cache_size &&
-         (params->xbzrle_cache_size < qemu_target_page_size() ||
-          !is_power_of_2(params->xbzrle_cache_size))) {
-@@ -2274,6 +2285,15 @@ int migrate_multifd_zlib_level(void)
-     return s->parameters.multifd_zlib_level;
- }
-=20
-+int migrate_multifd_zstd_level(void)
-+{
-+    MigrationState *s;
++if test "$zstd" !=3D "no" ; then
++    if $pkg_config --exist libzstd ; then
++        zstd_cflags=3D"$($pkg_config --cflags libzstd)"
++        zstd_libs=3D"$($pkg_config --libs libzstd)"
++        LIBS=3D"$zstd_libs $LIBS"
++        QEMU_CFLAGS=3D"$QEMU_CFLAGS $zstd_cflags"
++        zstd=3D"yes"
++    else
++        if test "$zstd" =3D "yes" ; then
++            feature_not_found "libzstd" "Install libzstd devel"
++        fi
++        zstd=3D"no"
++    fi
++fi
 +
-+    s =3D migrate_get_current();
+ ##########################################
+ # libseccomp check
+=20
+@@ -6668,6 +6693,7 @@ echo "lzo support       $lzo"
+ echo "snappy support    $snappy"
+ echo "bzip2 support     $bzip2"
+ echo "lzfse support     $lzfse"
++echo "zstd support      $zstd"
+ echo "NUMA host support $numa"
+ echo "libxml2           $libxml2"
+ echo "tcmalloc support  $tcmalloc"
+@@ -7242,6 +7268,10 @@ if test "$lzfse" =3D "yes" ; then
+   echo "LZFSE_LIBS=3D-llzfse" >> $config_host_mak
+ fi
+=20
++if test "$zstd" =3D "yes" ; then
++  echo "CONFIG_ZSTD=3Dy" >> $config_host_mak
++fi
 +
-+    return s->parameters.multifd_zstd_level;
-+}
+ if test "$libiscsi" =3D "yes" ; then
+   echo "CONFIG_LIBISCSI=3Dm" >> $config_host_mak
+   echo "LIBISCSI_CFLAGS=3D$libiscsi_cflags" >> $config_host_mak
+diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerf=
+iles/centos7.docker
+index 562d65be9e..cdd72de7eb 100644
+--- a/tests/docker/dockerfiles/centos7.docker
++++ b/tests/docker/dockerfiles/centos7.docker
+@@ -33,6 +33,7 @@ ENV PACKAGES \
+     tar \
+     vte-devel \
+     xen-devel \
+-    zlib-devel
++    zlib-devel \
++    libzstd-devel
+ RUN yum install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/dockerfiles/fedora-i386-cross.docker b/tests/dock=
+er/dockerfiles/fedora-i386-cross.docker
+index 9106cf9ebe..cd16cd1bfa 100644
+--- a/tests/docker/dockerfiles/fedora-i386-cross.docker
++++ b/tests/docker/dockerfiles/fedora-i386-cross.docker
+@@ -7,7 +7,8 @@ ENV PACKAGES \
+     gnutls-devel.i686 \
+     nettle-devel.i686 \
+     pixman-devel.i686 \
+-    zlib-devel.i686
++    zlib-devel.i686 \
++    libzstd-devel.i686
+=20
+ RUN dnf install -y $PACKAGES
+ RUN rpm -q $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfi=
+les/fedora.docker
+index 987a3c170a..a6522228c0 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -92,7 +92,8 @@ ENV PACKAGES \
+     vte291-devel \
+     which \
+     xen-devel \
+-    zlib-devel
++    zlib-devel \
++    libzstd-devel
+ ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
+=20
+ RUN dnf install -y $PACKAGES
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfi=
+les/ubuntu.docker
+index 4177f33691..b6c7b41ddd 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -58,6 +58,7 @@ ENV PACKAGES flex bison \
+     libvdeplug-dev \
+     libvte-2.91-dev \
+     libxen-dev \
++    libzstd-dev \
+     make \
+     python3-yaml \
+     python3-sphinx \
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dock=
+erfiles/ubuntu1804.docker
+index 0766f94cf4..1efedeef99 100644
+--- a/tests/docker/dockerfiles/ubuntu1804.docker
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -44,6 +44,7 @@ ENV PACKAGES flex bison \
+     libvdeplug-dev \
+     libvte-2.91-dev \
+     libxen-dev \
++    libzstd-dev \
+     make \
+     python3-yaml \
+     python3-sphinx \
+diff --git a/tests/vm/fedora b/tests/vm/fedora
+index 4d7d6049f4..4843b4175e 100755
+--- a/tests/vm/fedora
++++ b/tests/vm/fedora
+@@ -53,7 +53,10 @@ class FedoraVM(basevm.BaseVM):
+         # libs: audio
+         '"pkgconfig(libpulse)"',
+         '"pkgconfig(alsa)"',
+-    ]
 +
- int migrate_use_xbzrle(void)
- {
-     MigrationState *s;
-@@ -3567,6 +3587,9 @@ static Property migration_properties[] =3D {
-     DEFINE_PROP_UINT8("multifd-zlib-level", MigrationState,
-                       parameters.multifd_zlib_level,
-                       DEFAULT_MIGRATE_MULTIFD_ZLIB_LEVEL),
-+    DEFINE_PROP_UINT8("multifd-zstd-level", MigrationState,
-+                      parameters.multifd_zstd_level,
-+                      DEFAULT_MIGRATE_MULTIFD_ZSTD_LEVEL),
-     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
-                       parameters.xbzrle_cache_size,
-                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
-@@ -3659,6 +3682,7 @@ static void migration_instance_init(Object *obj)
-     params->has_multifd_channels =3D true;
-     params->has_multifd_compression =3D true;
-     params->has_multifd_zlib_level =3D true;
-+    params->has_multifd_zstd_level =3D true;
-     params->has_xbzrle_cache_size =3D true;
-     params->has_max_postcopy_bandwidth =3D true;
-     params->has_max_cpu_throttle =3D true;
-diff --git a/migration/migration.h b/migration/migration.h
-index c363ef9334..507284e563 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -302,6 +302,7 @@ bool migrate_pause_before_switchover(void);
- int migrate_multifd_channels(void);
- MultiFDCompression migrate_multifd_compression(void);
- int migrate_multifd_zlib_level(void);
-+int migrate_multifd_zstd_level(void);
++        # libs: migration
++        '"pkgconfig(libzstd)"',
++]
 =20
- int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 409ebb2b03..30313858c2 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1841,6 +1841,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const Q=
-Dict *qdict)
-         p->has_multifd_zlib_level =3D true;
-         visit_type_int(v, param, &p->multifd_zlib_level, &err);
-         break;
-+    case MIGRATION_PARAMETER_MULTIFD_ZSTD_LEVEL:
-+        p->has_multifd_zstd_level =3D true;
-+        visit_type_int(v, param, &p->multifd_zstd_level, &err);
-+        break;
-     case MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE:
-         p->has_xbzrle_cache_size =3D true;
-         visit_type_size(v, param, &cache_size, &err);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 3fb9e59bce..f2da5cfa0f 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -610,6 +610,13 @@
- #          will consume more CPU.
- #          Defaults to 1. (Since 5.0)
- #
-+# @multifd-zstd-level: Set the compression level to be used in live
-+#          migration, the compression level is an integer between 0
-+#          and 20, where 0 means no compression, 1 means the best
-+#          compression speed, and 20 means best compression ratio which
-+#          will consume more CPU.
-+#          Defaults to 1. (Since 5.0)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-@@ -623,7 +630,7 @@
-            'multifd-channels',
-            'xbzrle-cache-size', 'max-postcopy-bandwidth',
-            'max-cpu-throttle', 'multifd-compression',
--           'multifd-zlib-level' ] }
-+           'multifd-zlib-level' ,'multifd-zstd-level' ] }
+     BUILD_SCRIPT =3D """
+         set -e;
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index fb54334696..86770878b6 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -55,6 +55,9 @@ class FreeBSDVM(basevm.BaseVM):
+         # libs: opengl
+         "libepoxy",
+         "mesa-libs",
++
++        # libs: migration
++        "zstd",
+     ]
 =20
- ##
- # @MigrateSetParameters:
-@@ -723,6 +730,13 @@
- #          will consume more CPU.
- #          Defaults to 1. (Since 5.0)
- #
-+# @multifd-zstd-level: Set the compression level to be used in live
-+#          migration, the compression level is an integer between 0
-+#          and 20, where 0 means no compression, 1 means the best
-+#          compression speed, and 20 means best compression ratio which
-+#          will consume more CPU.
-+#          Defaults to 1. (Since 5.0)
-+#
- # Since: 2.4
- ##
- # TODO either fuse back into MigrationParameters, or make
-@@ -750,7 +764,8 @@
-             '*max-postcopy-bandwidth': 'size',
-             '*max-cpu-throttle': 'int',
-             '*multifd-compression': 'MultiFDCompression',
--            '*multifd-zlib-level': 'int' } }
-+            '*multifd-zlib-level': 'int',
-+            '*multifd-zstd-level': 'int' } }
+     BUILD_SCRIPT =3D """
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index c5069a45f4..55590f4601 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -49,6 +49,9 @@ class NetBSDVM(basevm.BaseVM):
+         "SDL2",
+         "gtk3+",
+         "libxkbcommon",
++
++        # libs: migration
++        "zstd",
+     ]
 =20
- ##
- # @migrate-set-parameters:
-@@ -870,6 +885,13 @@
- #          will consume more CPU.
- #          Defaults to 1. (Since 5.0)
- #
-+# @multifd-zstd-level: Set the compression level to be used in live
-+#          migration, the compression level is an integer between 0
-+#          and 20, where 0 means no compression, 1 means the best
-+#          compression speed, and 20 means best compression ratio which
-+#          will consume more CPU.
-+#          Defaults to 1. (Since 5.0)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -895,7 +917,8 @@
-             '*max-postcopy-bandwidth': 'size',
-             '*max-cpu-throttle': 'uint8',
-             '*multifd-compression': 'MultiFDCompression',
--            '*multifd-zlib-level': 'uint8' } }
-+            '*multifd-zlib-level': 'uint8',
-+            '*multifd-zstd-level': 'uint8' } }
+     BUILD_SCRIPT =3D """
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index 22cd9513dd..ab6abbedab 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -51,6 +51,9 @@ class OpenBSDVM(basevm.BaseVM):
+         "sdl2",
+         "gtk+3",
+         "libxkbcommon",
++
++        # libs: migration
++        "zstd",
+     ]
 =20
- ##
- # @query-migrate-parameters:
+     BUILD_SCRIPT =3D """
 --=20
 2.24.1
 
