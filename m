@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FA4C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 010CAC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:57:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D319F246A0
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1664246A0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:57:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0p+w1pA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D319F246A0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TcW+qkUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1664246A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7fBq-0000XR-2V
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:56:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50150)
+	id 1j7fCe-0001kK-0E
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:57:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7fA1-0005kl-Lb
+ (envelope-from <philmd@redhat.com>) id 1j7fA1-0005kr-Mc
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7fA0-0002uz-Jo
+ (envelope-from <philmd@redhat.com>) id 1j7fA0-0002vB-NY
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37362
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22812
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7fA0-0002uG-GE
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7fA0-0002uP-JF
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582894467;
+ s=mimecast20190719; t=1582894470;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fGbS/zlE8uJcFaugSfNNCFiui8oNM2qeJ1yh+1ke7gM=;
- b=P0p+w1pAFzwHKjiPJp/UyCPEFZhmx/W5CxVhR0nBcNDRUozd6u2MUjVuDuv1LVLBbsa8aW
- UCDJ5C6iwsLtde3RQqaeTjVg3A/x73uIt4pokMOKbZ38le5xSNPaKi7LXZDWPZGMH4eTcM
- TR9iMRa8sKRzF/4niNXSMHWZSkTdwM0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-DDbzvcI2OEmDvDnd87G1Yw-1; Fri, 28 Feb 2020 07:54:26 -0500
-X-MC-Unique: DDbzvcI2OEmDvDnd87G1Yw-1
-Received: by mail-wr1-f69.google.com with SMTP id n23so1278689wra.20
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:54:26 -0800 (PST)
+ bh=RFVTFY7GEBgh7q7HWz8/cePShORRz7+aAiJuxr5/kZA=;
+ b=TcW+qkUoUEku5KnqvIL1YpKS4CWkaO7VYLUWLLz723hs1CX1XJOGfVGAsVkeuozNXpxRYF
+ ycovKlI5EmQ+oABcMcKn5YzMC+tpEdYXWrjoiKvQV3d5USwZ8/unpmdLpL4+5AdmaxNvY6
+ 9FBnB6FMnydfMBHP0DQXFKmB4ApkQL0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-3gN0aA4ZOJCIBD82HLGzfw-1; Fri, 28 Feb 2020 07:54:28 -0500
+X-MC-Unique: 3gN0aA4ZOJCIBD82HLGzfw-1
+Received: by mail-wm1-f71.google.com with SMTP id q20so85241wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:54:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4y3/KK4nBcHl83eeBXH6BEe9dO9OSqQV02N1QOTozm8=;
- b=l6mGTDamWLs3LiUxv+3Qe+iPorau7sPBIAPsnOaPyMn4byxgWBVVqXkdHvfZ+XmNeN
- vD+SzkIhboqubO4SeDWhNX4stANgIldyEhQzzJ7/L3uTHJRV4MVkPcS1E8JRut6PZtp4
- gkp4yRwkTFyTic4xg1KuVQFNyO6lajqd5iWte9lx0DtYvCxt1XQWVDFrX9cCz9BMfYUA
- GDXj69KSv98b+iHFrIkr+W3lYM02Eu6yZbvhvpFIGEZ+n07ytMZzxn0OdsXI1rkfB2Wv
- Ir2TSyF7RPaBN9cgspnpEV7++mhq/bppoln1nxCyyTw0zqhtMiu5AAMvikyVjwkgQ9MC
- g2CQ==
-X-Gm-Message-State: APjAAAXmRUQ8MzV4Dsk6Adhrwso6WFyki0meywuiEc5Vn7FUhQ3MPKVP
- /0HlSHVlK1L/AMbN26osorxHT6LGHC0TERPpLeRBxZMI3qinQXqcYPfLbJjNVtTzOqLM7VN0/XM
- R3Buv2MQoy/37+Zg=
-X-Received: by 2002:a1c:f401:: with SMTP id z1mr4725374wma.103.1582894464760; 
- Fri, 28 Feb 2020 04:54:24 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyTDFFrbbWQ1gqyE0HnPAEiinU20JFQYfC+X6S6SGvjuV/pj15/Xx2f7qLM3AzvvyK/uw8RcA==
-X-Received: by 2002:a1c:f401:: with SMTP id z1mr4725353wma.103.1582894464487; 
- Fri, 28 Feb 2020 04:54:24 -0800 (PST)
+ bh=K6aC7TQ6a+95A3Kf8tkZ4l6ui47wA33c90/e4cK4bZs=;
+ b=kmUW1ZA9kUWacPqDL3ieeJOHrmTndf0/d0qC4g1a9QgAtvSQCxqnufpKjVZZvsN6b0
+ Iq1SAYGz49fV9Zh2ecMSsjuBji3OMUcudmnEKJWDxlxiPZJS6WnFeVYmBzqn4bSinxWz
+ 8G3e5yzsdUQOr9jnMnMAl2kGc+5mg1vAjHcC0fk4WXcqjVqWTds89oNSw1A1SydIeHY2
+ m5Wryr8ESgIzp4TSg/zoeW4J9i81GtINJcO0619Lavp+iJ/Yb0tZsZ3WHDuOxc7Kf4tW
+ 5DR9Zm9uDRM6pMUSn1oxdL289XfHfh2uZL+TQaBVrnPREiSbvyc8Cdzzb+BHQFrq5qZb
+ hBXw==
+X-Gm-Message-State: APjAAAUvpjEhWSUE2MMyWVooy5beUUvMAvyI/H/NLNFCpE4iutnHonJw
+ g7ul27XOekXH+VzAPwsSsHCe1yS74X/rQ0dTxU41UxR1+DVdlBY+RC5kF8AbSGjIqcgmCP5+A38
+ +JPoS8HqTRpPeFfs=
+X-Received: by 2002:a5d:6acf:: with SMTP id u15mr4981948wrw.182.1582894466975; 
+ Fri, 28 Feb 2020 04:54:26 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw7z8D4EeKLFPXzjEbjIsJrYk6RlFT4N3p3BB47Ow70QZgCfP2Gtp3/SeLJ/mnkUQyXiuMgQA==
+X-Received: by 2002:a5d:6acf:: with SMTP id u15mr4981927wrw.182.1582894466774; 
+ Fri, 28 Feb 2020 04:54:26 -0800 (PST)
 Received: from x1w.moovbox.local ([185.102.219.36])
- by smtp.gmail.com with ESMTPSA id y7sm340988wrl.26.2020.02.28.04.54.22
+ by smtp.gmail.com with ESMTPSA id y7sm340988wrl.26.2020.02.28.04.54.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 04:54:23 -0800 (PST)
+ Fri, 28 Feb 2020 04:54:26 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/5] hw/arm/z2: Simplify since the machines are little-endian
- only
-Date: Fri, 28 Feb 2020 13:53:50 +0100
-Message-Id: <20200228125351.29482-5-philmd@redhat.com>
+Subject: [PATCH 5/5] hw/arm/musicpal: Simplify since the machines are
+ little-endian only
+Date: Fri, 28 Feb 2020 13:53:51 +0100
+Message-Id: <20200228125351.29482-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200228125351.29482-1-philmd@redhat.com>
 References: <20200228125351.29482-1-philmd@redhat.com>
@@ -91,7 +91,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,39 +115,37 @@ for big endian is pointless, remove the unused code.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/z2.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ hw/arm/musicpal.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 4bb237f22d..a0f4095990 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -300,7 +300,6 @@ static void z2_init(MachineState *machine)
-     uint32_t sector_len =3D 0x10000;
-     PXA2xxState *mpu;
-     DriveInfo *dinfo;
--    int be;
-     void *z2_lcd;
-     I2CBus *bus;
-     DeviceState *wm;
-@@ -308,15 +307,10 @@ static void z2_init(MachineState *machine)
-     /* Setup CPU & memory */
-     mpu =3D pxa270_init(address_space_mem, z2_binfo.ram_size, machine->cpu=
-_type);
-=20
+diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
+index db8b03cb83..b2d0cfdac8 100644
+--- a/hw/arm/musicpal.c
++++ b/hw/arm/musicpal.c
+@@ -1645,22 +1645,12 @@ static void musicpal_init(MachineState *machine)
+          * 0xFF800000 (if there is 8 MB flash). So remap flash access if t=
+he
+          * image is smaller than 32 MB.
+          */
 -#ifdef TARGET_WORDS_BIGENDIAN
--    be =3D 1;
+-        pflash_cfi02_register(0x100000000ULL - MP_FLASH_SIZE_MAX,
+-                              "musicpal.flash", flash_size,
+-                              blk, 0x10000,
+-                              MP_FLASH_SIZE_MAX / flash_size,
+-                              2, 0x00BF, 0x236D, 0x0000, 0x0000,
+-                              0x5555, 0x2AAA, 1);
 -#else
--    be =3D 0;
+         pflash_cfi02_register(0x100000000ULL - MP_FLASH_SIZE_MAX,
+                               "musicpal.flash", flash_size,
+                               blk, 0x10000,
+                               MP_FLASH_SIZE_MAX / flash_size,
+                               2, 0x00BF, 0x236D, 0x0000, 0x0000,
+                               0x5555, 0x2AAA, 0);
 -#endif
-     dinfo =3D drive_get(IF_PFLASH, 0, 0);
-     if (!pflash_cfi01_register(Z2_FLASH_BASE, "z2.flash0", Z2_FLASH_SIZE,
-                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
--                               sector_len, 4, 0, 0, 0, 0, be)) {
-+                               sector_len, 4, 0, 0, 0, 0, 0)) {
-         error_report("Error registering flash memory");
-         exit(1);
+-
      }
+     sysbus_create_simple(TYPE_MV88W8618_FLASHCFG, MP_FLASHCFG_BASE, NULL);
+=20
 --=20
 2.21.1
 
