@@ -2,89 +2,92 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33755C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A795EC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:16:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F10932072A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:11:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 733172467B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:16:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xCpm4ZLq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F10932072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CiqP7gF3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 733172467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7iEA-0006g1-7F
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:11:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52387)
+	id 1j7iJ5-0000EW-KI
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:16:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j7iDY-00063C-2S
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:10:25 -0500
+ (envelope-from <peterx@redhat.com>) id 1j7iIF-0007SB-S9
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j7iDW-00045h-MY
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:10:23 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52892)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j7iDW-00045C-E3
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:10:22 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p9so3763072wmc.2
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:10:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=t6dtFNT3X5pNLHQ7lV/W9T1GPncYoLn1Y5hsIj6kdPg=;
- b=xCpm4ZLqnwJQ+jS4/W5l4Fgy+y2uMoeHaTHn8RiAaz7ud7A2yT1MzKCZLE3PJ+zUd4
- 6M+TD9v5G6hhVbXcznEL+RaJBeyf41IRAd2cSKTr4arsDqfXivlxROg1mTlkXrVV6pI5
- onqxDB5VuUHFnaIXeFICB+5gx59PjWTiNBXRCvAN1jqPBPBPtxdsBsljTiZskndIItDz
- T2AFWfNECX03/zw/rLPY4n1EqpGeZQpzbvmEEFGlUd2p8IECTmRLTwZisEaEKjelMikQ
- btvvbxYa6UrPRtxJ0nJL6oOpSY774E0xXp2wZyRMJ0mmy2tUJp34mxRifeciOFKAz5DL
- jX4A==
+ (envelope-from <peterx@redhat.com>) id 1j7iIE-0006KJ-3a
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31502
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7iIE-0006Jm-0C
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582906513;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=C9640rUAjpviNshx6LDTNOAy3oPg+kOruFP1DZrwdO8=;
+ b=CiqP7gF3akI6bkG8anclhwJJ/HuuGqskfTQwZseeEl0I4t9utA2XaKvTjratFdmWsqwu+j
+ eZbAPCNRnWe5/op1XkNDiY8LUt/T6cHdYhA03UtZdhe1A6LY2tIMgvg0Fh5icU2ozQUKlR
+ f0Dy7Y9pO9ZyMai2QsMoz8aHq9e/CYM=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-431-4VuFM64PMkOgusez3yPg7g-1; Fri, 28 Feb 2020 11:15:07 -0500
+X-MC-Unique: 4VuFM64PMkOgusez3yPg7g-1
+Received: by mail-qk1-f198.google.com with SMTP id 205so3318203qkg.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:15:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=t6dtFNT3X5pNLHQ7lV/W9T1GPncYoLn1Y5hsIj6kdPg=;
- b=DkCK5REamcelNvA5O5HZb29l73HPB6vhGUIQQPmRZrJ6uJM7P68zX8HaHJonG4dvjh
- hGsgEKyHMABkTKCc5nTmPtYY/dit9TEK2+W+yWN/JjtNpGGi6IzVlW6O50uzHettlXy5
- jJ2Xk4/UrgUvGqJZUWXuWwMCrJumTL6+5fhweeN2XOBInSrivheHeza7Y/4BvP8sueIw
- aC6lE5fpylY90XajGXOuPkv7vUhTqtKqkJgBa8ynYey4S5/KgnSYfmNz1v+2X5yHQwzu
- 4CxWeeGJE3ZTAKr0/PFDDqgZajCe3YobZkcIHEMH3jlXl0j7mX1H4on1ACgS2zeq3L9d
- o84Q==
-X-Gm-Message-State: APjAAAWviGA7RRfqUX/MtnPAlQKHHxbRsf/J6LSCxj50jmCKO/eSV6Y3
- ZGqKgZci5NhHYU6KmAix9K96uw==
-X-Google-Smtp-Source: APXvYqwZqziGoTllTMMF2RFib1l8eJ8ru+7IAs8vKgufkDyMpBpQ1VDx3MsyZ3YFYapPrZtWEj0C5w==
-X-Received: by 2002:a7b:cd8e:: with SMTP id y14mr5531837wmj.150.1582906220925; 
- Fri, 28 Feb 2020 08:10:20 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t3sm12934152wrx.38.2020.02.28.08.10.19
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=s94Ca9pAMmAvav2blTufA3RgnkjJ4014cp9prKvCvyA=;
+ b=qPuYtBKncLd1filobjYCvjEOFwu6AZUNfPgaMxwD8t8h+/9QYMwEWJbYYDtKT/qfTr
+ s/LDdX9AjqEfgkwnsn58HXk7YI4ALJ2CkOMOo4iPQMlzbeHXclQ2OeKlDfoG3tAAxYdf
+ Uvq+jAGp9Rl2EBBdyM1cqN2DnmLbGblEzItdy/UM37AunNZAi7dXzHL90iO++j72RXP+
+ YrN1ykZdSqpvVlPTCNr8VrNcJy58eHxHMOAUmD2Iyi17y69QxR5Qy2CZ6mEkB+a02hlh
+ BIRvgHUwef8Pjqduml7sj6v5skuufol8+hB/s7wx+fxD9PEEoP/VbBfSLmkAwc0MMTRj
+ Xy0w==
+X-Gm-Message-State: APjAAAXKfWxtis8GahaeCNo0u8C7O+v5OgmzO9xoqpxwASVUssCSliFI
+ 1VDCrzwfKGGksm0WLkcDxfwhi468hSqzOYRg7dbGw8tl0F1qdbZTjHDZPSDTqZvhaz0d9w5bq38
+ w/wC0WapBg6Q3LQw=
+X-Received: by 2002:ac8:664f:: with SMTP id j15mr4899916qtp.267.1582906506191; 
+ Fri, 28 Feb 2020 08:15:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx3sulcWd1UDn+oQxtpaQQvatquWcR+iq8zu/vj1R9IMPK5/36MqeeB3XxmCRejDI1ArwcmuA==
+X-Received: by 2002:ac8:664f:: with SMTP id j15mr4899870qtp.267.1582906505737; 
+ Fri, 28 Feb 2020 08:15:05 -0800 (PST)
+Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id x44sm3769833qtc.88.2020.02.28.08.15.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:10:19 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 175DC1FF87;
- Fri, 28 Feb 2020 16:10:19 +0000 (GMT)
-References: <20200211134504.9156-1-philmd@redhat.com>
-User-agent: mu4e 1.3.8; emacs 27.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] tests/acceptance/ppc_prep_40p: Use cdn.netbsd.org hostname
-In-reply-to: <20200211134504.9156-1-philmd@redhat.com>
-Date: Fri, 28 Feb 2020 16:10:19 +0000
-Message-ID: <87eeuewv4k.fsf@linaro.org>
+ Fri, 28 Feb 2020 08:15:04 -0800 (PST)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/5] vfio/pci: Fix up breakage against split irqchip and
+ INTx
+Date: Fri, 28 Feb 2020 11:14:58 -0500
+Message-Id: <20200228161503.382656-1-peterx@redhat.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,67 +99,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>,
- =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
- Cleber Rosa <crosa@redhat.com>, qemu-ppc@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, peterx@redhat.com,
+ Eric Auger <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+v2:
+- pick tags
+- don't register resamplefd with KVM kernel when the userspace
+  resamplefd path is enabled (should enable fast path on new kernels)
+- fix resamplefd mem leak
+- fix commit message of patch 4 [Eric]
+- let kvm_resample_fd_notify() return a boolean, skip ioapic check if
+  returned true
+- more comments here and there in the code to state the fact that
+  userspace ioapic irr & remote-irr are bypassed [Paolo]
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+VFIO INTx is not working with split irqchip.  On new kernels KVM_IRQFD
+will directly fail with resamplefd attached so QEMU will automatically
+fallback to the INTx slow path.  However on old kernels it's still
+broken.
 
-> Use NetBSD content delivery network to get faster downloads.
+Only until recently I noticed that this could also break PXE boot for
+assigned NICs [1].  My wild guess is that the PXE ROM will be mostly
+using INTx as well, which means we can't bypass that even if we
+enables MSI for the guest kernel.
 
-Even with this patch I get failures on my big dev box:
+This series tries to first fix this issue function-wise, then speed up
+for the INTx again with resamplefd (mostly following the ideas
+proposed by Paolo one year ago [2]).  My TCP_RR test shows that:
 
- (48/67) tests/acceptance/ppc_prep_40p.py:IbmPrep40pMachine.test_openbios_a=
-nd_netbsd: INTERRUPTED: Failed to fetch NetBSD-7.1.2-prep.iso.\nRunner erro=
-r occurred: Timeout reached\nOriginal status: ERROR\n{'name': '48-tests/acc=
-eptance/ppc_prep_40p.py:IbmPrep40pMachine.test_openbios_and_netbsd', 'logdi=
-r': '/home/alex/lsrc/qemu.git/builds/all/tests/results/jo... (60.31 s)
+  - Before this series: this is broken, no number to show
 
-I think ultimately a whole ISO download is just too much for an
-acceptance test.
+  - After patch 1 (enable slow path): get 63% perf comparing to full
+    kernel irqchip
 
->
-> Suggested-by: Kamil Rytarowski <kamil@netbsd.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/acceptance/ppc_prep_40p.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep=
-_40p.py
-> index efe06037ba..6729d96f5e 100644
-> --- a/tests/acceptance/ppc_prep_40p.py
-> +++ b/tests/acceptance/ppc_prep_40p.py
-> @@ -34,7 +34,7 @@ def test_factory_firmware_and_netbsd(self):
->                      '7020-40p/P12H0456.IMG')
->          bios_hash =3D '1775face4e6dc27f3a6ed955ef6eb331bf817f03'
->          bios_path =3D self.fetch_asset(bios_url, asset_hash=3Dbios_hash)
-> -        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/NetBSD-archive=
-/'
-> +        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/NetBSD-archive=
-/'
->                       'NetBSD-4.0/prep/installation/floppy/generic_com0.f=
-s')
->          drive_hash =3D 'dbcfc09912e71bd5f0d82c7c1ee43082fb596ceb'
->          drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_ha=
-sh)
-> @@ -67,7 +67,7 @@ def test_openbios_and_netbsd(self):
->          :avocado: tags=3Darch:ppc
->          :avocado: tags=3Dmachine:40p
->          """
-> -        drive_url =3D ('https://ftp.netbsd.org/pub/NetBSD/iso/7.1.2/'
-> +        drive_url =3D ('https://cdn.netbsd.org/pub/NetBSD/iso/7.1.2/'
->                       'NetBSD-7.1.2-prep.iso')
->          drive_hash =3D 'ac6fa2707d888b36d6fa64de6e7fe48e'
->          drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_ha=
-sh,
+  - After whole series (enable fast path partly, irq injection will be
+    the same as fast path, however userspace needs to intercept for
+    EOI broadcast to resamplefd, though should still be faster than
+    the MMIO trick for intx eoi): get 93% perf comparing to full
+    kernel irqchip, which is a 46% performance boost
 
+I think we can consider to apply patch 1 even sooner than the rest of
+the series to unbreak intx+split first.
+
+The whole test matrix for reference:
+
+  |----------+---------+-------------------+--------------+----------------=
+----|
+  | IRQ type | irqchip | TCP_STREAM (Gbps) | TCP_RR (pps) | note           =
+    |
+  |----------+---------+-------------------+--------------+----------------=
+----|
+  | msi      | on      |              9.39 |        17567 |                =
+    |
+  | nomsi    | on      |              9.29 |        14056 |                =
+    |
+  | msi      | split   |              9.36 |        17330 |                =
+    |
+  | nomsi    | split   |                 / |            / | currently broke=
+n   |
+  | nomsi    | split   |              8.98 |         8977 | after patch 1  =
+    |
+  | nomsi    | split   |              9.21 |        13142 | after whole ser=
+ies |
+  |----------+---------+-------------------+--------------+----------------=
+----|
+
+Any review comment is welcomed.  Thanks,
+
+[1] https://bugzilla.redhat.com/show_bug.cgi?id=3D1786404
+[2] https://patchwork.kernel.org/patch/10738541/#22609933
+
+Peter Xu (5):
+  vfio/pci: Disable INTx fast path if using split irqchip
+  vfio/pci: Use kvm_irqchip_add_irqfd_notifier_gsi() for irqfds
+  KVM: Pass EventNotifier into kvm_irqchip_assign_irqfd
+  KVM: Kick resamplefd for split kernel irqchip
+  Revert "vfio/pci: Disable INTx fast path if using split irqchip"
+
+ accel/kvm/kvm-all.c    | 101 +++++++++++++++++++++++++++++++++++++----
+ accel/kvm/trace-events |   1 +
+ hw/intc/ioapic.c       |  23 +++++++++-
+ hw/vfio/pci.c          |  37 ++++++---------
+ include/sysemu/kvm.h   |   7 +++
+ 5 files changed, 137 insertions(+), 32 deletions(-)
 
 --=20
-Alex Benn=C3=A9e
+2.24.1
+
 
