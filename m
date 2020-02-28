@@ -2,87 +2,106 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65757C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEB2C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26802222C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:31:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFAA9246A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDEAUYWq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26802222C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ih4aWZmh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFAA9246A8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7cvg-0005rW-Dm
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:31:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60355)
+	id 1j7czR-0007Ym-3Y
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:35:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j7cus-0005Rq-09
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:30:47 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j7cyO-0006qP-WB
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:34:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1j7cuq-0006da-Jg
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:30:45 -0500
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:41128)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1j7cuq-0006bD-EF
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:30:44 -0500
-Received: by mail-ot1-x32d.google.com with SMTP id v19so2099153ote.8
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:30:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=ljcQ88lxoyLCBUmiDl1ogokuzC5lHincmdIaLlvt0I0=;
- b=FDEAUYWqaZiVOf+d3r6UpE0df6h7rYxN4HLyBPSlPxNdfjBYksVTt/8x6+5QSAx8uX
- sALur/C+UFOiKQbD8NJD8aA+S9H4NcFkIDanzlz8SqYtqKOK4lrgyMikizQG7/aLt2y1
- vm4c9dGeP8Lj2G4R+27vqTiIWbQXuoztIUJIo1tLln8ltCxkY5BVgszEWF3FfCFqqqAB
- wJAgXnPHDY4uO9Y7ldfrhMQHPyos0YC9UDbNG/DwnA0ExDHuUMsq636044nII77sDep6
- S2/VTQJf1AAbkSFRpq2iqDIxKlqxavI2wf4eQjM3h2PKKm5oSpnfemX9sncq0gyVSP2q
- Qv7w==
+ (envelope-from <pbonzini@redhat.com>) id 1j7cyN-00081k-KK
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:34:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46487
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7cyN-00080n-Ds
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:34:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582886059;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j0pg2IenwN7t5QCBH1oveC89x9IaVHX2BKicMCPpaFk=;
+ b=Ih4aWZmh4As3yNNOdBSnnjCzeX4OzoaV+pmJY/r2GBB0jQeFe2KCQ5SmR6Id/OmnF82t+o
+ TIgYB8JMg9HJ7WOCYtz4NwhJiy5SdF/P9Ce7P2SSZEBMKj24NherSx4AAEOMdbLn3+rZcc
+ 11bdxc3QOv3a+sHVgR1H1jsHdfbH52A=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-Bvlwok_fMSSq0lT6DxgXdQ-1; Fri, 28 Feb 2020 05:34:17 -0500
+X-MC-Unique: Bvlwok_fMSSq0lT6DxgXdQ-1
+Received: by mail-wr1-f71.google.com with SMTP id o6so1149750wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:34:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=ljcQ88lxoyLCBUmiDl1ogokuzC5lHincmdIaLlvt0I0=;
- b=jgNTDbF8BGl8jjfWq0Z48SeD3lvtz/I1G9rbDJMLyL6gw2C3UUXXDEdx1slAfFjsBI
- fN7fOMauiZpK0/ShubNzRMg537beV4eAj6HdyYuzhOlXhvO74zGvNTV0z5Lp5dgDX8j0
- SXkf+GKPNBtU9pvhitTjr2VgmaCMSnwp8jSOZho/1v/U5XBIwmH8Hrler0dYI9NX1kjR
- P2xW7NVCocPPNprcyqLAuiHIokzSuljin4rtjT8mpTbNnQfysHXucazpgZAxYFkmLW9n
- nU3NWD79i4CEmsspFrw6DQC3/d8nmS5HZSrkqDVzi39E7l+vsb7GI/d2pBFteV60686Y
- 6smQ==
-X-Gm-Message-State: APjAAAUi1j+4B0qaBjatFNmNEbR/0073Yhdz08Z8p+PHRaqCiJmOjCNF
- AX2cbn1qg5lhsAvIL5x9H03U08DzGvcRS6kVvOePqg==
-X-Google-Smtp-Source: APXvYqwEfqblaoUfwWUCxvf0SUdTiKoSGGxNbAYJJIR9Ar3DmC9qHoukzHuk2At1U06RXQjFpKnf1Yhc9DPNXW+FAiY=
-X-Received: by 2002:a9d:2184:: with SMTP id s4mr2541725otb.121.1582885843547; 
- Fri, 28 Feb 2020 02:30:43 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=j0pg2IenwN7t5QCBH1oveC89x9IaVHX2BKicMCPpaFk=;
+ b=A+Zln/A8w0Vb5tf+krg1m8VbMesCdupSn3YMM94pXKXop8JLhr6ma3EgEkZMV2IUD3
+ +eTGyrEv7L/BlS9YIphBelDlmj0whpA5yRtOVquA3VLSy8ztzEd5BfecjsjkIG0WPIEj
+ Wk9Ls8DzLyyNrde9FjzzQ+ITLoISTdEM4nymeUNoyiV60GqJC6Dga5+4oq6o6EoTWZNV
+ 5OyDT3IUEdf9LwylDwbW9+Wr0d4G03SlX3YjXy1y1GeR331imF1v0ODL8P2Ee4JH0QeR
+ Egz1J11KETgjCsbfgVbAPXzMKXCf8Bp/UPJwxthuVJ+n1VU2IXpgb/Li7Lndk6w3YBeo
+ VD+g==
+X-Gm-Message-State: APjAAAUM7C18HnBkWEzneT4kfGAttRSTGNH1VS/Nw9pb8PchPtrzmATG
+ zFOK540FBvuS9Zlt5j+7zRvxkM7S2Pj93lnZa4FvL/9spYLBUhmnl37o4nEKQE/esK8uSb9LIzX
+ Ej7ivp2lzYbzma0c=
+X-Received: by 2002:a05:600c:104d:: with SMTP id
+ 13mr4208311wmx.50.1582886056453; 
+ Fri, 28 Feb 2020 02:34:16 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzYXl4XkeRChz1DZsjaE3OCxCbAxlQznEblqKEN9ZLLQSWY5874V2XhzS2Bs1tJkJh9aCdJLw==
+X-Received: by 2002:a05:600c:104d:: with SMTP id
+ 13mr4208290wmx.50.1582886056170; 
+ Fri, 28 Feb 2020 02:34:16 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f?
+ ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
+ by smtp.gmail.com with ESMTPSA id v17sm11129142wrt.91.2020.02.28.02.34.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 28 Feb 2020 02:34:15 -0800 (PST)
+Subject: Re: [PATCH v1.1 4/5] KVM: Kick resamplefd for split kernel irqchip
+To: Auger Eric <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>
+References: <20200227170048.236599-1-peterx@redhat.com>
+ <5e69c385-b27c-61d4-5856-21bcf5e9c8f5@redhat.com>
+ <20200227180003.GJ180973@xz-x1>
+ <2852480c-89fe-4c4e-75be-7322592976b6@redhat.com>
+ <20200227191900.GK180973@xz-x1>
+ <8ab9ccaa-7060-9e90-d4a9-a9de32610381@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8c3e3f25-b20e-08bd-fa1e-f307fe7f02a4@redhat.com>
+Date: Fri, 28 Feb 2020 11:34:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Fri, 28 Feb 2020 02:30:43 -0800 (PST)
-In-Reply-To: <87mu9384e4.fsf@secure.laptop>
-References: <20200103074000.1006389-1-marcandre.lureau@redhat.com>
- <20200103074000.1006389-4-marcandre.lureau@redhat.com>
- <8736cqi07g.fsf@secure.laptop>
- <CAJ+F1CLgg6Yz=2V8_eCVtsJ1zPm=1-piz-Nw05KGXkSqWytLgA@mail.gmail.com>
- <87r1yfc1q1.fsf@secure.laptop>
- <CAL1e-=h+SkEPy1VVvdNeo9T1mAT5-dA7orsj0TFtfDsTofwzFg@mail.gmail.com>
- <87mu9384e4.fsf@secure.laptop>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 28 Feb 2020 11:30:43 +0100
-Message-ID: <CAL1e-=jacne+SxLqf0fJKTpHzELOMLkhsFaaakxTuOvE_3AW2Q@mail.gmail.com>
-Subject: [PATCH v2 3/3] savevm: check RAM is pagesize aligned
-To: "quintela@redhat.com" <quintela@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000006cbea2059fa0548f"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32d
+In-Reply-To: <8ab9ccaa-7060-9e90-d4a9-a9de32610381@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,217 +113,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006cbea2059fa0548f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 27/02/20 22:14, Auger Eric wrote:
+>> Yes KVM kernel side should not be involed when we're using split
+>> irqchip in this case.  However it should still belongs to the work of
+>> the userspace KVM module (kvm-all.c) so that it can still "mimic" the
+>> resamplefd feature that KVM_IRQFD provides.
+> OK. So that what my actual question. Should this be handled by kvm-all.c?
 
-just cc-ing Herve and Philippe, related to Magnum machine support (this is
-one of so-called Jazz mips machines)
+I think it should; kvm-all.c in this case is providing the API to enable
+irqfds (including resamplefds).
 
-On Friday, February 28, 2020, Juan Quintela <quintela@redhat.com> wrote:
+You could have a generic file descriptor<->interrupt routing subsystem,
+but for now that only exists for KVM so that's where Peter's code need
+to go.
 
-> Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
-> > On Thursday, February 27, 2020, Juan Quintela <quintela@redhat.com>
-> wrote:
-> >
-> >  Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
-> >  > Hi Juan
-> >  >
-> >  > On Wed, Jan 8, 2020 at 2:08 PM Juan Quintela <quintela@redhat.com>
-> wrote:
-> >  >>
-> >  >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> >  >> n> Check the host pointer is correctly aligned, otherwise we may fa=
-il
-> >  >> > during migration in ram_block_discard_range().
-> >  >> >
-> >  >> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-> >  >>
-> >  >> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> >  >>
-> >  >> queued
-> >  >>
-> >  >
-> >  > Did it get lost? thanks
-> >
-> >  I dropped it in the past, because it made "make check" for mips fail.
-> >  (I put it on my ToDo list to investigate and forgot about it)
-> >
-> > Thank you for caring for mips.
-> >
-> > Do you perhaps remember what was tgevtest and environment for the
-> failing test?
->
->
-> And here we are again.
-> I only compile on an x86 32bit host when I am going to do a pull
-> request.
->
-> qemu-system-mips64el: /mnt/code/qemu/full/migration/savevm.c:2923:
-> vmstate_register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qemu_ram
-> _get_host_addr(rb), qemu_ram_pagesize(rb))' failed.
-> Broken pipe
-> /mnt/code/qemu/full/tests/qtest/libqtest.c:175: kill_qemu() detected QEMU
-> death from signal 6 (Aborted) (core dumped)
->   TEST    check-qtest-aarch64: tests/qtest/qom-test
-> ERROR - too few tests run (expected 4, got 0)
-> make: *** [/mnt/code/qemu/full/tests/Makefile.include:632:
-> check-qtest-mips64el] Error 1
-> make: *** Waiting for unfinished jobs....
->
->
-> As you can see, this is mips tcg running in a 32bit host.
->
-> $ export QTEST_QEMU_BINARY=3D./mips64el-softmmu/qemu-system-mips64el
-> $ ./tests/qtest/qom-test
-> /mips64el/qom/pica61: OK
-> /mips64el/qom/mipssim: OK
-> /mips64el/qom/mips: OK
-> /mips64el/qom/fulong2e: OK
-> /mips64el/qom/malta: OK
-> /mips64el/qom/boston: OK
-> /mips64el/qom/none: OK
-> /mips64el/qom/magnum: qemu-system-mips64el: /mnt/code/qemu/full/migration=
-/savevm.c:2923:
-> vmstate_register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qemu_ram_get_host_ad=
-dr(rb),
-> qemu_ram_pagesize(rb))' failed.
-> Broken pipe
-> /mnt/code/qemu/full/tests/qtest/libqtest.c:175: kill_qemu() detected QEMU
-> death from signal 6 (Aborted) (core dumped)
-> Aborted (core dumped)
-> $
->
-> Can you take a look at this?
->
-> mips64-softmmu also fails on the same place, mips[el]-softmmu passes,
-> but they don't use magnum.
->
-> Code is supposed to be right, I will expect that the problem is in the
-> magnum board, but this is qemu + mips + migration.  Anything can happen.
->
-> Marc, I have to drop it again.
->
-> Later, Juan.
->
->
+Paolo
 
---0000000000006cbea2059fa0548f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-just cc-ing Herve and Philippe, related to Magnum machine support (this is =
-one of so-called Jazz mips machines)<br><br>On Friday, February 28, 2020, J=
-uan Quintela &lt;<a href=3D"mailto:quintela@redhat.com" target=3D"_blank">q=
-uintela@redhat.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" styl=
-e=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Aleksan=
-dar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_=
-blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br>
-&gt; On Thursday, February 27, 2020, Juan Quintela &lt;<a href=3D"mailto:qu=
-intela@redhat.com" target=3D"_blank">quintela@redhat.com</a>&gt; wrote:<br>
-&gt;<br>
-&gt;=C2=A0 Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@gm=
-ail.com" target=3D"_blank">marcandre.lureau@gmail.com</a>&gt; wrote:<br>
-&gt;=C2=A0 &gt; Hi Juan<br>
-&gt;=C2=A0 &gt;<br>
-&gt;=C2=A0 &gt; On Wed, Jan 8, 2020 at 2:08 PM Juan Quintela &lt;<a href=3D=
-"mailto:quintela@redhat.com" target=3D"_blank">quintela@redhat.com</a>&gt; =
-wrote:<br>
-&gt;=C2=A0 &gt;&gt;<br>
-&gt;=C2=A0 &gt;&gt; Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.=
-lureau@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt; wr=
-ote:<br>
-&gt;=C2=A0 &gt;&gt; n&gt; Check the host pointer is correctly aligned, othe=
-rwise we may fail<br>
-&gt;=C2=A0 &gt;&gt; &gt; during migration in ram_block_discard_range().<br>
-&gt;=C2=A0 &gt;&gt; &gt;<br>
-&gt;=C2=A0 &gt;&gt; &gt; Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=
-=3D"mailto:marcandre.lureau@redhat.com" target=3D"_blank">marcandre.lureau@=
-redhat.com</a>&gt;<br>
-&gt;=C2=A0 &gt;&gt;<br>
-&gt;=C2=A0 &gt;&gt; Reviewed-by: Juan Quintela &lt;<a href=3D"mailto:quinte=
-la@redhat.com" target=3D"_blank">quintela@redhat.com</a>&gt;<br>
-&gt;=C2=A0 &gt;&gt;<br>
-&gt;=C2=A0 &gt;&gt; queued<br>
-&gt;=C2=A0 &gt;&gt;<br>
-&gt;=C2=A0 &gt;<br>
-&gt;=C2=A0 &gt; Did it get lost? thanks<br>
-&gt;<br>
-&gt;=C2=A0 I dropped it in the past, because it made &quot;make check&quot;=
- for mips fail.<br>
-&gt;=C2=A0 (I put it on my ToDo list to investigate and forgot about it)<br=
->
-&gt;<br>
-&gt; Thank you for caring for mips.<br>
-&gt;<br>
-&gt; Do you perhaps remember what was tgevtest and environment for the fail=
-ing test?<br>
-<br>
-<br>
-And here we are again.<br>
-I only compile on an x86 32bit host when I am going to do a pull<br>
-request.<br>
-<br>
-qemu-system-mips64el: /mnt/code/qemu/full/migration/<wbr>savevm.c:2923: vms=
-tate_register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qemu_ram<br>
-_get_host_addr(rb), qemu_ram_pagesize(rb))&#39; failed.<br>
-Broken pipe<br>
-/mnt/code/qemu/full/tests/qtes<wbr>t/libqtest.c:175: kill_qemu() detected Q=
-EMU death from signal 6 (Aborted) (core dumped)<br>
-=C2=A0 TEST=C2=A0 =C2=A0 check-qtest-aarch64: tests/qtest/qom-test<br>
-ERROR - too few tests run (expected 4, got 0)<br>
-make: *** [/mnt/code/qemu/full/tests/Mak<wbr>efile.include:632: check-qtest=
--mips64el] Error 1<br>
-make: *** Waiting for unfinished jobs....<br>
-<br>
-<br>
-As you can see, this is mips tcg running in a 32bit host.<br>
-<br>
-$ export QTEST_QEMU_BINARY=3D./mips64el-s<wbr>oftmmu/qemu-system-mips64el <=
-br>
-$ ./tests/qtest/qom-test<br>
-/mips64el/qom/pica61: OK<br>
-/mips64el/qom/mipssim: OK<br>
-/mips64el/qom/mips: OK<br>
-/mips64el/qom/fulong2e: OK<br>
-/mips64el/qom/malta: OK<br>
-/mips64el/qom/boston: OK<br>
-/mips64el/qom/none: OK<br>
-/mips64el/qom/magnum: qemu-system-mips64el: /mnt/code/qemu/full/migration/<=
-wbr>savevm.c:2923: vmstate_register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qem=
-u_ram_<wbr>get_host_addr(rb), qemu_ram_pagesize(rb))&#39; failed.<br>
-Broken pipe<br>
-/mnt/code/qemu/full/tests/qtes<wbr>t/libqtest.c:175: kill_qemu() detected Q=
-EMU death from signal 6 (Aborted) (core dumped)<br>
-Aborted (core dumped)<br>
-$ <br>
-<br>
-Can you take a look at this?<br>
-<br>
-mips64-softmmu also fails on the same place, mips[el]-softmmu passes,<br>
-but they don&#39;t use magnum.<br>
-<br>
-Code is supposed to be right, I will expect that the problem is in the<br>
-magnum board, but this is qemu + mips + migration.=C2=A0 Anything can happe=
-n.<br>
-<br>
-Marc, I have to drop it again.<br>
-<br>
-Later, Juan.<br>
-<br>
-</blockquote>
-
---0000000000006cbea2059fa0548f--
 
