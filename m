@@ -6,90 +6,89 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5348FC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E04C3F2D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:55:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FD6D24699
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 291AB2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:55:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZojLvOyt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD6D24699
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jXTMPorO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 291AB2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7kfU-0003WO-Av
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 13:47:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34479)
+	id 1j7knm-0005Ny-8L
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 13:55:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35695)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7keo-00032f-SX
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:46:44 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7kn9-0004m9-04
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:55:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7ken-0005Mz-CJ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:46:42 -0500
-Received: from mail-pj1-x102b.google.com ([2607:f8b0:4864:20::102b]:39494)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7kn8-0004BL-2B
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:55:18 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38295)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7ken-0005Hz-52
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:46:41 -0500
-Received: by mail-pj1-x102b.google.com with SMTP id e9so1649642pjr.4
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 10:46:41 -0800 (PST)
+ id 1j7kn7-0004As-S1
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:55:18 -0500
+Received: by mail-pg1-x542.google.com with SMTP id d6so1970246pgn.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 10:55:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=lkO3eDsnSCHgk2ZSfYpnMjFYTTSFiLrheSd6RGfKT64=;
- b=ZojLvOytMuu+Z0xhZl5fF6z2jDwHrM42ahTeTJy86O8MR9rt0ziQu8a+nRgOtv0lZv
- K/OkvFCfpX1fC5zS98xovRp3N6lr/8+ELsV2RAwBcNwfI0hW1Ce8uoCGfcLM8TgWJQav
- dYgGqoupvAUQG3TNU3NeKbaKCsZzrcMaA10QkFv9pL/f758uKdgtKtKuLmEtBSe+m9ft
- pEo6rJoSdZZy2kDBU6ydV1ExlcNOEtFiv61r1lY3Pdmc12GPH5CpqgOHj9uyob76f/6K
- X96ygAIR1RxZwbl4zV6kY/oAl/AwGiEI/Ebc+rR1rOsbbWt5s+R+qlAsmWBznRQ2xODc
- Gt7A==
+ bh=CaNPjxUdILAEisvzy2n3Tjs7R7KHUIriO4+JEcz7vKg=;
+ b=jXTMPorOB5hKigES85YgOZpw8J+NV9/oFFNkrXp54XyhQ/F8OJKSQyD1iU9Knsr1aY
+ 1CQBE8kYC6s25TNsO3C4Q9ozFd1/EDgqVmQEn7pnpSgP9weuvIyaXLUIGR9+QhRwFdhS
+ v7xX83g3LHrlQQpHT/WP2bSOOcIvcsqerP70uk50OSXpljTblM1d5JqN4ydqSmzrpRhG
+ eBc+Yk06rYuB7F2eIvSrnb8Cs8bTCSYGrKj6yokpCabKpoAySn529gkI8xIJ+qXhIbWB
+ wA4LlvRfOEs3OhckC8Rc+Oju5Aqd1YCt2FuGQ8TNYz9PB6Bp37WC6LXdrasDqlvgQfE7
+ IxMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=lkO3eDsnSCHgk2ZSfYpnMjFYTTSFiLrheSd6RGfKT64=;
- b=TFa6Nnawib1WJObAZYzM8XrIGhqv3/pFeUdtKDKsKX8aIy6XlusBNvIKrfz0hgFHQP
- GRlZN0tEU1uYJ3z+EkgMsphJcTaNXKwF9ICpVKWB/QOV4SCYvbD+7FhHq7vZo4jIuYov
- WFfc24ro0LCVuVQDppTjnvRNkA9wIBtaadNoaqLBvpnuwXTwZSMvboRETkPWktV/C/g1
- yJs+Z67/aMLsgiwl7DGn7wkvqRaL4HHExXcvGrPZDetlTRxPr642fvLEm4kJXAFgbyMH
- /kUbLzFswcdGvXxczhdSwh89hQhy2nLi4YHPwSTpCA2FMEjrPZOZqc+ZbwgzB4YacHCx
- NHDQ==
-X-Gm-Message-State: APjAAAVCrCeGfzzUW+qpu5hx/r0DVHnu72y8hlcEAJYCMRq5jIVytiEN
- sieAKHk7xrVRVdgS5WoHd7V59A==
-X-Google-Smtp-Source: APXvYqzo+n98ff2PEV8rUSbp5XXgxtcE/PD3nZEOhyQO6asEmCU0fqjYbSe2xnZrX3UFu2n9x6VvSA==
-X-Received: by 2002:a17:902:aa04:: with SMTP id
- be4mr5553328plb.41.1582915599846; 
- Fri, 28 Feb 2020 10:46:39 -0800 (PST)
+ bh=CaNPjxUdILAEisvzy2n3Tjs7R7KHUIriO4+JEcz7vKg=;
+ b=uL9lNPJuF8QybsME8kRGaCfQ+V11+fihN+KgEMtx1oDoN8G+XszY02ACoLZTECsFr7
+ GjizLTxrTfbWNLuXgSogVbqkG+WeyIp3UMaW5mMvriTE4Go/IpUVqS6kAEpqBPpktD7x
+ sFbOA+fqXVQ/K1xvnzeoe3arXw5WRWpQclQbfyB/hG+RiJkJQ++4z+05ICJKeM+hYeyR
+ QI/bMS40/TFlmaaUgGJxSKpKQHRi/un4FrTvvgmjE2G0RML0rF45xCqE1+mtCXYtfoHY
+ Am3eIjp05Gaor4e6OwHrjTgAFTQMXf5wp1Jmd08L7jEOHlAyPxJxahu2WDxk7PcKWh8K
+ L9Eg==
+X-Gm-Message-State: APjAAAVvk1RmDtPmM9eY8XbyC2BZhEI/Y8ff04QsWCuLLKcigDnKnWki
+ OfIEIAi/jaudrj3OmXH/F6V2vQ==
+X-Google-Smtp-Source: APXvYqyEWGlZXoG8kXmEe1cIRtMQFGzxvglz80WsvkmFEcloTrUkWE/UWdLCgQSGSOoV4C769nV5vw==
+X-Received: by 2002:a65:404d:: with SMTP id h13mr5740036pgp.156.1582916116608; 
+ Fri, 28 Feb 2020 10:55:16 -0800 (PST)
 Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
  by smtp.gmail.com with ESMTPSA id
- e12sm1727641pgb.67.2020.02.28.10.46.38
+ q6sm11724367pfh.127.2020.02.28.10.55.15
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Feb 2020 10:46:39 -0800 (PST)
-Subject: Re: [PATCH v4 5/5] target/riscv: add vector amo operations
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
- <20200225103508.7651-6-zhiwei_liu@c-sky.com>
- <03bf483e-d6bb-9de4-9934-12bfa7093ad3@linaro.org>
- <6d008841-4356-b0f1-ece2-df8323ad8254@c-sky.com>
+ Fri, 28 Feb 2020 10:55:15 -0800 (PST)
+Subject: Re: [PATCH v4 1/7] target/arm: Improve masking of HCR RES0 bits
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200225180831.26078-1-richard.henderson@linaro.org>
+ <20200225180831.26078-2-richard.henderson@linaro.org>
+ <CAFEAcA8ipK0nZioEgbNq5B1L-tqA+rzn-C2yyfet4_4yNVnYqA@mail.gmail.com>
+ <e4a70637-f4b7-eaa7-237a-57053c5a63cc@linaro.org>
+ <CAFEAcA-8a4eQXf+LRS3KLURyyEPpPm9uh6q6r6D-1-sh3t8Pdw@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a3a614d1-aa54-046b-2c14-b6e517f1fbf0@linaro.org>
-Date: Fri, 28 Feb 2020 10:46:37 -0800
+Message-ID: <5c484ae5-b4da-8eae-c10a-547c670c89e5@linaro.org>
+Date: Fri, 28 Feb 2020 10:55:14 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <6d008841-4356-b0f1-ece2-df8323ad8254@c-sky.com>
+In-Reply-To: <CAFEAcA-8a4eQXf+LRS3KLURyyEPpPm9uh6q6r6D-1-sh3t8Pdw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102b
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,109 +100,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, linux-csky@vger.kernel.org,
- wxy194768@alibaba-inc.com, qemu-devel@nongnu.org
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/28/20 1:19 AM, LIU Zhiwei wrote:
->>> +#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ETYPE, MTYPE, H, DO_OP, SUF)      \
->>> +static void vext_##NAME##_noatomic_op(void *vs3, target_ulong addr,      \
->>> +        uint32_t wd, uint32_t idx, CPURISCVState *env, uintptr_t retaddr)\
->>> +{                                                                        \
->>> +    ETYPE ret;                                                           \
->>> +    target_ulong tmp;                                                    \
->>> +    int mmu_idx = cpu_mmu_index(env, false);                             \
->>> +    tmp = cpu_ld##SUF##_mmuidx_ra(env, addr, mmu_idx, retaddr);          \
->>> +    ret = DO_OP((ETYPE)(MTYPE)tmp, *((ETYPE *)vs3 + H(idx)));            \
->>> +    cpu_st##SUF##_mmuidx_ra(env, addr, ret, mmu_idx, retaddr);           \
->>> +    if (wd) {                                                            \
->>> +        *((ETYPE *)vs3 + H(idx)) = (target_long)(MTYPE)tmp;              \
->> The target_long cast is wrong; should be ETYPE.
-> "If the AMO memory element width is less than SEW, the value returned from memory
->  is sign-extended to fill SEW"
+On 2/28/20 9:34 AM, Peter Maydell wrote:
+> One of us is miscounting, and I don't *think* it's me...
 > 
-> So just use (target_long) to sign-extended. As you see, instructions like
+> bits 63..0:  ff80ff8c90000000
+> bits 63..32: ff80ff8c
+> bits 64..48: ff80
 > 
-> vamominud
+> bit 48 looks like it's 0 to me.
+
+Oops, yes, it's me.
+
+> You could refine the valid mask as the & of the bits which we
+> do want to exist in aarch32, rather than &~ of the reserved bits:
 > 
-> have the uint64_t as ETYPE.  And it can't sign-extend the value from memory by
-> (ETYPE)(MTYPE)tmp.
-
-Casting to target_long doesn't help -- it becomes signed at a variable size,
-possibly larger than MTYPE.
-
-In addition, I think you're performing the operation at the wrong length.  The
-text of the ISA document could be clearer, but
-
-  # If SEW > 32 bits, the value returned from memory
-  # is sign-extended to fill SEW.
-
-You are performing the operation in ETYPE, but it should be done in MTYPE and
-only afterward extended to ETYPE.
-
-For minu/maxu, you're right that you need an unsigned for the operation.  But
-then you need a signed type of the same width for the extension.
-
-One possibility is to *always* make MTYPE a signed type, but for the two cases
-that require an unsigned type, provide it.  E.g.
-
-#define GEN_VEXT_AMO_NOATOMIC_OP(NAME, ESZ, MSZ, H, DO_OP, SUF)
-static void vext_##NAME##_noatomic_op(void *vs3,
-    target_ulong addr, uint32_t wd, uint32_t idx,
-    CPURISCVState *env, uintptr_t retaddr)
-{
-    typedef int##ESZ##_t ETYPE;
-    typedef int##MSZ##_t MTYPE;
-    typedef uint##MSZ##_t UMTYPE;
-    ETYPE *pe3 = (ETYPE *)vs3 + H(idx);
-    MTYPE a = *pe3, b = cpu_ld##SUF##_data(env, addr);
-    a = DO_OP(a, b);
-    cpu_st##SUF##_data(env, addr, a);
-    if (wd) {
-        *pe3 = a;
-    }
-}
-
-/* Signed min/max */
-#define DO_MAX(N, M)  ((N) >= (M) ? (N) : (M))
-#define DO_MIN(N, M)  ((N) >= (M) ? (M) : (N))
-
-/* Unsigned min/max */
-#define DO_MAXU(N, M) DO_MAX((UMTYPE)N, (UMTYPE)M)
-#define DO_MINU(N, M) DO_MIN((UMTYPE)N, (UMTYPE)M)
-
-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxuw_v_d, 64, 32, H8, DO_MAXU, l)
-GEN_VEXT_AMO_NOATOMIC_OP(vamomaxud_v_d, 64, 64, H8, DO_MAXU, q)
-
-
->> The missing aligned address check is the only remaining exception that the
->> helper_atomic_* functions would raise, since you have properly checked for
->> read+write.  So it might be possible to get away with using the helpers, but I
->> don't like it.
-> Do you mean write my own helpers to implement atomic operations?
+>  valid_mask &= TTLBIS | TOCU | TICAB | ...
 > 
-> What's the meaning of " but I don't like it. "?
+> ?
 
-I don't like re-using helpers in an incorrect way.
-
->> But I do think it would be better to write your own helpers for the atomic
->> paths.  They need not check quite so much, since we have already done the
->> validation above.  You pretty much only need to use tlb_vaddr_to_host.
->>
->> If that gets too ugly, we can talk about rearranging
->> accel/tcg/atomic_template.h so that it could be reused.
-> Good idea.  Perhaps use tlb_vaddr_to_host instead of atomic_mmu_lookup
-> to define another macro like GEN_ATOMIC_HELPER?
->> Alternately, we could simply *always* use the non-atomic helpers, and raise
->> exit_atomic if PARALLEL.
-> Yes, it's the simplest way.
-> However I prefer try to define something like GEN_ATOMIC_HELPER in
-> vector_helper.c.
-
-I'll think about this some more.
-In the short-term, I think non-atomic is the best we can do.
+Yes, that's a good idea.
 
 
 r~
