@@ -2,87 +2,70 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D661AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3C6C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:03:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9122D2467B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A78E02467B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:03:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DbU6El3R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9122D2467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="yZ345A+q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A78E02467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7j2Q-0006Y0-Ka
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 12:02:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56634)
+	id 1j7j2T-0006bw-Pa
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 12:03:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7ifO-0007w2-6f
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:12 -0500
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7iko-00037W-Qo
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7ifM-0001zU-Av
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:10 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:36855)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7ifM-0001z3-44
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:08 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id g83so1709463wme.1
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:39:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=rSk9BgFu3T3dOv7f971GWlTWgS0ZJflIP01745EcQLM=;
- b=DbU6El3RfmnBD5ebh6tX5a9FYmmYqlfIwZ3FDcWT+sAe9hyIQTMGwi2tt7k0VGY38z
- ysDUzJZRX/D+vOehNcc7LXetXOeYRGuuq7tC5pvWZEPyT+aaAa0MdvN5Cla+LgdZTTuF
- iyOpbO6tIc8ngH728DS2938tJquNOxlg07U17Njczm03+dCxOPHGHeZqG9sfY6XHUubX
- MO1WqrFUQ+Sz4edCJKk9rlRMsCxOTPdTVfuzwMjqNKiuo6IC99xNWf2TCoC88SsqAgcg
- e1rAYCkavheQR8xBw/hPthVC/oJwcYanYVt8P5C1dYp1OtV90CobO2Z1k0R52kaCBADs
- 5sqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=rSk9BgFu3T3dOv7f971GWlTWgS0ZJflIP01745EcQLM=;
- b=MhgqqRyCQ+nK4z3/sK1XHtMpmnp27UKvWe51Z/WEqRQGQpUotCz9sLzfSzb+aL9UES
- 3XvjzmaupwR7Q4bJw2BQxtUvx81h2vgdke0VgBzb6QVkrsIrP82Js83Nnv0+AHWYCKOX
- VUIKnwdtl4E5KhMrnoIDDbhmVQWz2cVQMeFqa8ab3jk21eCdraw0BBUzw4W9oimzgyQa
- +eRHa5CKNWBV6QcJRKJoQ01jjwACYCDat/8F/oJvYseob1eUqnSOoZexCuskytxCv1pR
- MyyLTne0fq6JckTF9/BLrkW8RijwsryKrxEA/+heiMeBr6jk3Y9IIWerwRwZPXyGFeq3
- zovw==
-X-Gm-Message-State: APjAAAVe1E395wuRHFNMUrSKwt89w+/4zS5SSEIeNpux6DhZ+4Xh/rXV
- nscOwlx6lr3ii601Gdbt7Y7OVDo6GaChuA==
-X-Google-Smtp-Source: APXvYqy5JoqQJH+iwmx+mffxRXSHEryBrnR/Fwcwm+U/joCHmjzPAFnHjMcxetxolDHKQUjOBSbOXg==
-X-Received: by 2002:a7b:c5d9:: with SMTP id n25mr5948290wmk.65.1582907946398; 
- Fri, 28 Feb 2020 08:39:06 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.39.05
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:39:05 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7ikl-0005fW-SW
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:46 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:27026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
+ id 1j7ikl-0005U4-LM
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1582908283; x=1614444283;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=sd/X9qB+amUWsCBfLOpii2/fzjKFqs6vrbVq8DtdJ8Y=;
+ b=yZ345A+qDCBlxAoRnWbHsBg+2L8jdiocCvU+v9f0mF8EtSd9XaYqyuJX
+ +1YmAiurtOMP7JWAiO4cFDB8AsPUw4bl/8xp/g325XhbvKNLgsoZ20HCb
+ ZF/PjD1e/lDnybu5bYmzm0MmZO0A0Dp5lG0lL3YnOVb7l/Wc2mupVtgIO o=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 28 Feb 2020 08:44:31 -0800
+Received: from vu-tsimpson-aus.qualcomm.com (HELO
+ vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
+ by ironmsg-SD-alpha.qualcomm.com with ESMTP; 28 Feb 2020 08:44:30 -0800
+Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
+ id 4CF9C1110; Fri, 28 Feb 2020 10:44:30 -0600 (CST)
+From: Taylor Simpson <tsimpson@quicinc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/33] target/arm: Add formats for some vfp 2 and 3-register
- insns
-Date: Fri, 28 Feb 2020 16:38:27 +0000
-Message-Id: <20200228163840.23585-21-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
-References: <20200228163840.23585-1-peter.maydell@linaro.org>
+Subject: [RFC PATCH v2 29/67] Hexagon generater phase 4 - Decode tree
+Date: Fri, 28 Feb 2020 10:43:25 -0600
+Message-Id: <1582908244-304-30-git-send-email-tsimpson@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
+References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32f
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,227 +77,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
+ Taylor Simpson <tsimpson@quicinc.com>, philmd@redhat.com,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-Those vfp instructions without extra opcode fields can
-share a common @format for brevity.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200224222232.13807-16-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/vfp.decode | 134 ++++++++++++++++--------------------------
- 1 file changed, 52 insertions(+), 82 deletions(-)
-
-diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 592fe9e1e42..4f294f88be5 100644
---- a/target/arm/vfp.decode
-+++ b/target/arm/vfp.decode
-@@ -46,6 +46,14 @@
- 
- %vmov_imm 16:4 0:4
- 
-+@vfp_dnm_s   ................................ vm=%vm_sp vn=%vn_sp vd=%vd_sp
-+@vfp_dnm_d   ................................ vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+
-+@vfp_dm_ss   ................................ vm=%vm_sp vd=%vd_sp
-+@vfp_dm_dd   ................................ vm=%vm_dp vd=%vd_dp
-+@vfp_dm_ds   ................................ vm=%vm_sp vd=%vd_dp
-+@vfp_dm_sd   ................................ vm=%vm_dp vd=%vd_sp
-+
- # VMOV scalar to general-purpose register; note that this does
- # include some Neon cases.
- VMOV_to_gp   ---- 1110 u:1 1.        1 .... rt:4 1011 ... 1 0000 \
-@@ -66,20 +74,15 @@ VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
-              vn=%vn_dp
- 
- VMSR_VMRS    ---- 1110 111 l:1 reg:4 rt:4 1010 0001 0000
--VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000 \
--             vn=%vn_sp
-+VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000    vn=%vn_sp
- 
--VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 .... \
--             vm=%vm_sp
--VMOV_64_dp   ---- 1100 010 op:1 rt2:4 rt:4 1011 00.1 .... \
--             vm=%vm_dp
-+VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 ....   vm=%vm_sp
-+VMOV_64_dp   ---- 1100 010 op:1 rt2:4 rt:4 1011 00.1 ....   vm=%vm_dp
- 
- # Note that the half-precision variants of VLDR and VSTR are
- # not part of this decodetree at all because they have bits [9:8] == 0b01
--VLDR_VSTR_sp ---- 1101 u:1 .0 l:1 rn:4 .... 1010 imm:8 \
--             vd=%vd_sp
--VLDR_VSTR_dp ---- 1101 u:1 .0 l:1 rn:4 .... 1011 imm:8 \
--             vd=%vd_dp
-+VLDR_VSTR_sp ---- 1101 u:1 .0 l:1 rn:4 .... 1010 imm:8      vd=%vd_sp
-+VLDR_VSTR_dp ---- 1101 u:1 .0 l:1 rn:4 .... 1011 imm:8      vd=%vd_dp
- 
- # We split the load/store multiple up into two patterns to avoid
- # overlap with other insns in the "Advanced SIMD load/store and 64-bit move"
-@@ -100,50 +103,32 @@ VLDM_VSTM_dp ---- 1101 0.1 l:1 rn:4 .... 1011 imm:8 \
-              vd=%vd_dp p=1 u=0 w=1
- 
- # 3-register VFP data-processing; bits [23,21:20,6] identify the operation.
--VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VMLS_sp      ---- 1110 0.00 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMLS_dp      ---- 1110 0.00 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMLS_sp      ---- 1110 0.00 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VMLS_dp      ---- 1110 0.00 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VNMLS_sp     ---- 1110 0.01 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMLS_dp     ---- 1110 0.01 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMLS_sp     ---- 1110 0.01 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VNMLS_dp     ---- 1110 0.01 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VNMLA_sp     ---- 1110 0.01 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMLA_dp     ---- 1110 0.01 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMLA_sp     ---- 1110 0.01 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VNMLA_dp     ---- 1110 0.01 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VMUL_sp      ---- 1110 0.10 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VMUL_dp      ---- 1110 0.10 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VMUL_sp      ---- 1110 0.10 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VMUL_dp      ---- 1110 0.10 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VNMUL_sp     ---- 1110 0.10 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VNMUL_dp     ---- 1110 0.10 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VNMUL_sp     ---- 1110 0.10 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VNMUL_dp     ---- 1110 0.10 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VADD_sp      ---- 1110 0.11 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VADD_dp      ---- 1110 0.11 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VADD_sp      ---- 1110 0.11 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VADD_dp      ---- 1110 0.11 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
--VSUB_sp      ---- 1110 0.11 .... .... 1010 .1.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VSUB_sp      ---- 1110 0.11 .... .... 1010 .1.0 ....        @vfp_dnm_s
-+VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 ....        @vfp_dnm_d
- 
--VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 .... \
--             vm=%vm_sp vn=%vn_sp vd=%vd_sp
--VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 .... \
--             vm=%vm_dp vn=%vn_dp vd=%vd_dp
-+VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
-+VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
- 
- VFM_sp       ---- 1110 1.01 .... .... 1010 . o2:1 . 0 .... \
-              vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=1
-@@ -159,25 +144,17 @@ VMOV_imm_sp  ---- 1110 1.11 .... .... 1010 0000 .... \
- VMOV_imm_dp  ---- 1110 1.11 .... .... 1011 0000 .... \
-              vd=%vd_dp imm=%vmov_imm
- 
--VMOV_reg_sp  ---- 1110 1.11 0000 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VMOV_reg_dp  ---- 1110 1.11 0000 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VMOV_reg_sp  ---- 1110 1.11 0000 .... 1010 01.0 ....        @vfp_dm_ss
-+VMOV_reg_dp  ---- 1110 1.11 0000 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VABS_sp      ---- 1110 1.11 0000 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VABS_dp      ---- 1110 1.11 0000 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VABS_sp      ---- 1110 1.11 0000 .... 1010 11.0 ....        @vfp_dm_ss
-+VABS_dp      ---- 1110 1.11 0000 .... 1011 11.0 ....        @vfp_dm_dd
- 
--VNEG_sp      ---- 1110 1.11 0001 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VNEG_dp      ---- 1110 1.11 0001 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VNEG_sp      ---- 1110 1.11 0001 .... 1010 01.0 ....        @vfp_dm_ss
-+VNEG_dp      ---- 1110 1.11 0001 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 ....        @vfp_dm_ss
-+VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 ....        @vfp_dm_dd
- 
- VCMP_sp      ---- 1110 1.11 010 z:1 .... 1010 e:1 1.0 .... \
-              vd=%vd_sp vm=%vm_sp
-@@ -190,32 +167,26 @@ VCVT_f32_f16 ---- 1110 1.11 0010 .... 1010 t:1 1.0 .... \
- VCVT_f64_f16 ---- 1110 1.11 0010 .... 1011 t:1 1.0 .... \
-              vd=%vd_dp vm=%vm_sp
- 
--# VCVTB and VCVTT to f16: Vd format is always vd_sp; Vm format depends on size bit
-+# VCVTB and VCVTT to f16: Vd format is always vd_sp;
-+# Vm format depends on size bit
- VCVT_f16_f32 ---- 1110 1.11 0011 .... 1010 t:1 1.0 .... \
-              vd=%vd_sp vm=%vm_sp
- VCVT_f16_f64 ---- 1110 1.11 0011 .... 1011 t:1 1.0 .... \
-              vd=%vd_sp vm=%vm_dp
- 
--VRINTR_sp    ---- 1110 1.11 0110 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTR_dp    ---- 1110 1.11 0110 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTR_sp    ---- 1110 1.11 0110 .... 1010 01.0 ....        @vfp_dm_ss
-+VRINTR_dp    ---- 1110 1.11 0110 .... 1011 01.0 ....        @vfp_dm_dd
- 
--VRINTZ_sp    ---- 1110 1.11 0110 .... 1010 11.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTZ_dp    ---- 1110 1.11 0110 .... 1011 11.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTZ_sp    ---- 1110 1.11 0110 .... 1010 11.0 ....        @vfp_dm_ss
-+VRINTZ_dp    ---- 1110 1.11 0110 .... 1011 11.0 ....        @vfp_dm_dd
- 
--VRINTX_sp    ---- 1110 1.11 0111 .... 1010 01.0 .... \
--             vd=%vd_sp vm=%vm_sp
--VRINTX_dp    ---- 1110 1.11 0111 .... 1011 01.0 .... \
--             vd=%vd_dp vm=%vm_dp
-+VRINTX_sp    ---- 1110 1.11 0111 .... 1010 01.0 ....        @vfp_dm_ss
-+VRINTX_dp    ---- 1110 1.11 0111 .... 1011 01.0 ....        @vfp_dm_dd
- 
--# VCVT between single and double: Vm precision depends on size; Vd is its reverse
--VCVT_sp      ---- 1110 1.11 0111 .... 1010 11.0 .... \
--             vd=%vd_dp vm=%vm_sp
--VCVT_dp      ---- 1110 1.11 0111 .... 1011 11.0 .... \
--             vd=%vd_sp vm=%vm_dp
-+# VCVT between single and double:
-+# Vm precision depends on size; Vd is its reverse
-+VCVT_sp      ---- 1110 1.11 0111 .... 1010 11.0 ....        @vfp_dm_ds
-+VCVT_dp      ---- 1110 1.11 0111 .... 1011 11.0 ....        @vfp_dm_sd
- 
- # VCVT from integer to floating point: Vm always single; Vd depends on size
- VCVT_int_sp  ---- 1110 1.11 1000 .... 1010 s:1 1.0 .... \
-@@ -224,8 +195,7 @@ VCVT_int_dp  ---- 1110 1.11 1000 .... 1011 s:1 1.0 .... \
-              vd=%vd_dp vm=%vm_sp
- 
- # VJCVT is always dp to sp
--VJCVT        ---- 1110 1.11 1001 .... 1011 11.0 .... \
--             vd=%vd_sp vm=%vm_dp
-+VJCVT        ---- 1110 1.11 1001 .... 1011 11.0 ....        @vfp_dm_sd
- 
- # VCVT between floating-point and fixed-point. The immediate value
- # is in the same format as a Vm single-precision register number.
--- 
-2.20.1
-
+UHl0aG9uIHNjcmlwdCB0aGF0IGVtaXRzIHRoZSBkZWNvZGUgdHJlZSBpbiBkZWN0cmVlX2dlbmVy
+YXRlZC5oLgoKVGVzdGVkLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8cGhpbG1kQHJlZGhh
+dC5jb20KU2lnbmVkLW9mZi1ieTogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29t
+PgotLS0KIHRhcmdldC9oZXhhZ29uL2RlY3RyZWUucHkgfCAzNTMgKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQsIDM1MyBpbnNlcnRp
+b25zKCspCiBjcmVhdGUgbW9kZSAxMDA3NTUgdGFyZ2V0L2hleGFnb24vZGVjdHJlZS5weQoKZGlm
+ZiAtLWdpdCBhL3RhcmdldC9oZXhhZ29uL2RlY3RyZWUucHkgYi90YXJnZXQvaGV4YWdvbi9kZWN0
+cmVlLnB5Cm5ldyBmaWxlIG1vZGUgMTAwNzU1CmluZGV4IDAwMDAwMDAuLjJiOWM4MmIKLS0tIC9k
+ZXYvbnVsbAorKysgYi90YXJnZXQvaGV4YWdvbi9kZWN0cmVlLnB5CkBAIC0wLDAgKzEsMzUzIEBA
+CisjIS91c3IvYmluL2VudiBweXRob24zCisKKyMjCisjIyAgQ29weXJpZ2h0KGMpIDIwMTktMjAy
+MCBRdWFsY29tbSBJbm5vdmF0aW9uIENlbnRlciwgSW5jLiBBbGwgUmlnaHRzIFJlc2VydmVkLgor
+IyMKKyMjICBUaGlzIHByb2dyYW0gaXMgZnJlZSBzb2Z0d2FyZTsgeW91IGNhbiByZWRpc3RyaWJ1
+dGUgaXQgYW5kL29yIG1vZGlmeQorIyMgIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdl
+bmVyYWwgUHVibGljIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5CisjIyAgdGhlIEZyZWUgU29mdHdh
+cmUgRm91bmRhdGlvbjsgZWl0aGVyIHZlcnNpb24gMiBvZiB0aGUgTGljZW5zZSwgb3IKKyMjICAo
+YXQgeW91ciBvcHRpb24pIGFueSBsYXRlciB2ZXJzaW9uLgorIyMKKyMjICBUaGlzIHByb2dyYW0g
+aXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBpdCB3aWxsIGJlIHVzZWZ1bCwKKyMjICBi
+dXQgV0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50
+eSBvZgorIyMgIE1FUkNIQU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVS
+UE9TRS4gIFNlZSB0aGUKKyMjICBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9yZSBk
+ZXRhaWxzLgorIyMKKyMjICBZb3Ugc2hvdWxkIGhhdmUgcmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBH
+TlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQorIyMgIGFsb25nIHdpdGggdGhpcyBwcm9ncmFtOyBp
+ZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uCisjIworCitpbXBvcnQg
+aW8KK2ltcG9ydCByZQorCitpbXBvcnQgc3lzCitzeXMucGF0aC5pbnNlcnQoMCwgc3lzLmFyZ3Zb
+MV0pCitpbXBvcnQgaXNldAorCitlbmNzID0ge3RhZyA6ICcnLmpvaW4ocmV2ZXJzZWQoaXNldC5p
+c2V0W3RhZ11bJ2VuYyddLnJlcGxhY2UoJyAnLCAnJykpKQorICAgIGZvciB0YWcgaW4gaXNldC50
+YWdzIGlmIGlzZXQuaXNldFt0YWddWydlbmMnXSAhPSAnTUlTU0lORyBFTkNPRElORyd9CisKK2Vu
+Y19jbGFzc2VzID0gc2V0KFtpc2V0LmlzZXRbdGFnXVsnZW5jX2NsYXNzJ10gZm9yIHRhZyBpbiBl
+bmNzLmtleXMoKV0pCitzdWJpbnNuX2VuY19jbGFzc2VzID0gXAorICAgIHNldChbZW5jX2NsYXNz
+IGZvciBlbmNfY2xhc3MgaW4gZW5jX2NsYXNzZXMgXAorICAgICAgICBpZiBlbmNfY2xhc3Muc3Rh
+cnRzd2l0aCgnU1VCSU5TTl8nKV0pCitleHRfZW5jX2NsYXNzZXMgPSBcCisgICAgc2V0KFtlbmNf
+Y2xhc3MgZm9yIGVuY19jbGFzcyBpbiBlbmNfY2xhc3NlcyBcCisgICAgICAgIGlmIGVuY19jbGFz
+cyBub3QgaW4gKCdOT1JNQUwnLCAnMTZCSVQnKSBhbmQgXAorICAgICAgICAgICBub3QgZW5jX2Ns
+YXNzLnN0YXJ0c3dpdGgoJ1NVQklOU05fJyldKQorCit0cnk6CisgICAgc3ViaW5zbl9ncm91cGlu
+Z3MgPSBpc2V0LnN1Ymluc25fZ3JvdXBpbmdzCitleGNlcHQgQXR0cmlidXRlRXJyb3I6CisgICAg
+c3ViaW5zbl9ncm91cGluZ3MgPSB7fQorCitmb3IgKHRhZywgc3ViaW5zbl9ncm91cGluZykgaW4g
+c3ViaW5zbl9ncm91cGluZ3MuaXRlbXMoKToKKyAgICBlbmNzW3RhZ10gPSAnJy5qb2luKHJldmVy
+c2VkKHN1Ymluc25fZ3JvdXBpbmdbJ2VuYyddLnJlcGxhY2UoJyAnLCAnJykpKQorCitkZWN0cmVl
+X25vcm1hbCA9IHsnbGVhdmVzJyA6IHNldCgpfQorZGVjdHJlZV8xNmJpdCA9IHsnbGVhdmVzJyA6
+IHNldCgpfQorZGVjdHJlZV9zdWJpbnNuX2dyb3VwaW5ncyA9IHsnbGVhdmVzJyA6IHNldCgpfQor
+ZGVjdHJlZV9zdWJpbnNucyA9IHtuYW1lIDogeydsZWF2ZXMnIDogc2V0KCl9IGZvciBuYW1lIGlu
+IHN1Ymluc25fZW5jX2NsYXNzZXN9CitkZWN0cmVlX2V4dGVuc2lvbnMgPSB7bmFtZSA6IHsnbGVh
+dmVzJyA6IHNldCgpfSBmb3IgbmFtZSBpbiBleHRfZW5jX2NsYXNzZXN9CisKK2ZvciB0YWcgaW4g
+ZW5jcy5rZXlzKCk6CisgICAgaWYgdGFnIGluIHN1Ymluc25fZ3JvdXBpbmdzOgorICAgICAgICBk
+ZWN0cmVlX3N1Ymluc25fZ3JvdXBpbmdzWydsZWF2ZXMnXS5hZGQodGFnKQorICAgICAgICBjb250
+aW51ZQorICAgIGVuY19jbGFzcyA9IGlzZXQuaXNldFt0YWddWydlbmNfY2xhc3MnXQorICAgIGlm
+IGVuY19jbGFzcy5zdGFydHN3aXRoKCdTVUJJTlNOXycpOgorICAgICAgICBpZiBsZW4oZW5jc1t0
+YWddKSAhPSAzMjoKKyAgICAgICAgICAgIGVuY3NbdGFnXSA9IGVuY3NbdGFnXSArICcwJyAqICgz
+MiAtIGxlbihlbmNzW3RhZ10pKQorICAgICAgICBkZWN0cmVlX3N1Ymluc25zW2VuY19jbGFzc11b
+J2xlYXZlcyddLmFkZCh0YWcpCisgICAgZWxpZiAgZW5jX2NsYXNzID09ICcxNkJJVCc6CisgICAg
+ICAgIGlmIGxlbihlbmNzW3RhZ10pICE9IDE2OgorICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9u
+KCdUYWcgInt9IiBoYXMgZW5jX2NsYXNzICJ7fSIgYW5kIG5vdCBhbiBlbmNvZGluZyAnICsKKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAnd2lkdGggb2YgMTYgYml0cyEnLmZvcm1hdCh0YWcs
+IGVuY19jbGFzcykpCisgICAgICAgIGRlY3RyZWVfMTZiaXRbJ2xlYXZlcyddLmFkZCh0YWcpCisg
+ICAgZWxzZToKKyAgICAgICAgaWYgbGVuKGVuY3NbdGFnXSkgIT0gMzI6CisgICAgICAgICAgICBy
+YWlzZSBFeGNlcHRpb24oJ1RhZyAie30iIGhhcyBlbmNfY2xhc3MgInt9IiBhbmQgbm90IGFuIGVu
+Y29kaW5nICcgKworICAgICAgICAgICAgICAgICAgICAgICAgICAgICd3aWR0aCBvZiAzMiBiaXRz
+IScuZm9ybWF0KHRhZywgZW5jX2NsYXNzKSkKKyAgICAgICAgaWYgZW5jX2NsYXNzID09ICdOT1JN
+QUwnOgorICAgICAgICAgICAgZGVjdHJlZV9ub3JtYWxbJ2xlYXZlcyddLmFkZCh0YWcpCisgICAg
+ICAgIGVsc2U6CisgICAgICAgICAgICBkZWN0cmVlX2V4dGVuc2lvbnNbZW5jX2NsYXNzXVsnbGVh
+dmVzJ10uYWRkKHRhZykKKworZmFrZXRhZ3MgPSBzZXQoKQorZm9yICh0YWcsIGVuYykgaW4gaXNl
+dC5lbmNfZXh0X3NwYWNlcy5pdGVtcygpOgorICAgIGZha2V0YWdzLmFkZCh0YWcpCisgICAgZW5j
+c1t0YWddID0gJycuam9pbihyZXZlcnNlZChlbmMucmVwbGFjZSgnICcsICcnKSkpCisgICAgZGVj
+dHJlZV9ub3JtYWxbJ2xlYXZlcyddLmFkZCh0YWcpCisKK2Zha2V0YWdzIHw9IHNldChzdWJpbnNu
+X2dyb3VwaW5ncy5rZXlzKCkpCisKK2RlZiBldmVyeV9iaXRfY291bnRzKGJpdHNldCk6CisgICAg
+Zm9yIGkgaW4gcmFuZ2UoMSwgbGVuKG5leHQoaXRlcihiaXRzZXQpKSkpOgorICAgICAgICBpZiBs
+ZW4oc2V0KFtiaXRzWzppXSArIGJpdHNbaSsxOl0gZm9yIGJpdHMgaW4gYml0c2V0XSkpID09IGxl
+bihiaXRzZXQpOgorICAgICAgICAgICAgcmV0dXJuIEZhbHNlCisgICAgcmV0dXJuIFRydWUKKwor
+ZGVmIGF1dG9fc2VwYXJhdGUobm9kZSk6CisgICAgdGFncyA9IG5vZGVbJ2xlYXZlcyddCisgICAg
+aWYgbGVuKHRhZ3MpIDw9IDE6CisgICAgICAgIHJldHVybgorICAgIGVuY193aWR0aCA9IGxlbihl
+bmNzW25leHQoaXRlcih0YWdzKSldKQorICAgIG9wY29kZV9iaXRfZm9yX2FsbCA9IFwKKyAgICAg
+ICAgW2FsbChbZW5jc1t0YWddW2ldIGluICcwMScgXAorICAgICAgICAgICAgZm9yIHRhZyBpbiB0
+YWdzXSkgZm9yIGkgaW4gcmFuZ2UoZW5jX3dpZHRoKV0KKyAgICBvcGNvZGVfYml0X2lzXzBfZm9y
+X2FsbCA9IFwKKyAgICAgICAgW29wY29kZV9iaXRfZm9yX2FsbFtpXSBhbmQgYWxsKFtlbmNzW3Rh
+Z11baV0gPT0gJzAnIFwKKyAgICAgICAgICAgIGZvciB0YWcgaW4gdGFnc10pIGZvciBpIGluIHJh
+bmdlKGVuY193aWR0aCldCisgICAgb3Bjb2RlX2JpdF9pc18xX2Zvcl9hbGwgPSBcCisgICAgICAg
+IFtvcGNvZGVfYml0X2Zvcl9hbGxbaV0gYW5kIGFsbChbZW5jc1t0YWddW2ldID09ICcxJyBcCisg
+ICAgICAgICAgICBmb3IgdGFnIGluIHRhZ3NdKSBmb3IgaSBpbiByYW5nZShlbmNfd2lkdGgpXQor
+ICAgIGRpZmZlcmVudGlhdG9yX29wY29kZV9iaXQgPSBcCisgICAgICAgIFtvcGNvZGVfYml0X2Zv
+cl9hbGxbaV0gYW5kIFwKKyAgICAgICAgIG5vdCAob3Bjb2RlX2JpdF9pc18wX2Zvcl9hbGxbaV0g
+b3IgXAorICAgICAgICAgb3Bjb2RlX2JpdF9pc18xX2Zvcl9hbGxbaV0pIFwKKyAgICAgICAgICAg
+IGZvciBpIGluIHJhbmdlKGVuY193aWR0aCldCisgICAgYmVzdF93aWR0aCA9IDAKKyAgICBmb3Ig
+d2lkdGggaW4gcmFuZ2UoNCwgMCwgLTEpOgorICAgICAgICBmb3IgbHNiIGluIHJhbmdlKGVuY193
+aWR0aCAtIHdpZHRoLCAtMSwgLTEpOgorICAgICAgICAgICAgYml0c2V0ID0gc2V0KFtlbmNzW3Rh
+Z11bbHNiOmxzYit3aWR0aF0gZm9yIHRhZyBpbiB0YWdzXSkKKyAgICAgICAgICAgIGlmIGFsbChk
+aWZmZXJlbnRpYXRvcl9vcGNvZGVfYml0W2xzYjpsc2Ird2lkdGhdKSBhbmQgXAorICAgICAgICAg
+ICAgICAgIChsZW4oYml0c2V0KSA9PSBsZW4odGFncykgb3IgZXZlcnlfYml0X2NvdW50cyhiaXRz
+ZXQpKToKKyAgICAgICAgICAgICAgICBiZXN0X3dpZHRoID0gd2lkdGgKKyAgICAgICAgICAgICAg
+ICBiZXN0X2xzYiA9IGxzYgorICAgICAgICAgICAgICAgIGNhdWdodF9hbGxfdGFncyA9IGxlbihi
+aXRzZXQpID09IGxlbih0YWdzKQorICAgICAgICAgICAgICAgIGJyZWFrCisgICAgICAgIGlmIGJl
+c3Rfd2lkdGggIT0gMDoKKyAgICAgICAgICAgIGJyZWFrCisgICAgaWYgYmVzdF93aWR0aCA9PSAw
+OgorICAgICAgICByYWlzZSBFeGNlcHRpb24oJ0NvdWxkIG5vdCBmaW5kIGEgd2F5IHRvIGRpZmZl
+cmVudGlhdGUgdGhlIGVuY29kaW5ncyAnICsKKyAgICAgICAgICAgICAgICAgICAgICAgICAnb2Yg
+dGhlIGZvbGxvd2luZyB0YWdzOlxue30nLmZvcm1hdCgnXG4nLmpvaW4odGFncykpKQorICAgIGlm
+IGNhdWdodF9hbGxfdGFnczoKKyAgICAgICAgZm9yIHdpZHRoIGluIHJhbmdlKDEsIGJlc3Rfd2lk
+dGgpOgorICAgICAgICAgICAgZm9yIGxzYiBpbiByYW5nZShlbmNfd2lkdGggLSB3aWR0aCwgLTEs
+IC0xKToKKyAgICAgICAgICAgICAgICBiaXRzZXQgPSBzZXQoW2VuY3NbdGFnXVtsc2I6bHNiK3dp
+ZHRoXSBmb3IgdGFnIGluIHRhZ3NdKQorICAgICAgICAgICAgICAgIGlmIGFsbChkaWZmZXJlbnRp
+YXRvcl9vcGNvZGVfYml0W2xzYjpsc2Ird2lkdGhdKSBhbmQgXAorICAgICAgICAgICAgICAgICAg
+ICBsZW4oYml0c2V0KSA9PSBsZW4odGFncyk6CisgICAgICAgICAgICAgICAgICAgIGJlc3Rfd2lk
+dGggPSB3aWR0aAorICAgICAgICAgICAgICAgICAgICBiZXN0X2xzYiA9IGxzYgorICAgICAgICAg
+ICAgICAgICAgICBicmVhaworICAgICAgICAgICAgZWxzZToKKyAgICAgICAgICAgICAgICBjb250
+aW51ZQorICAgICAgICAgICAgYnJlYWsKKyAgICBub2RlWydzZXBhcmF0b3JfbHNiJ10gPSBiZXN0
+X2xzYgorICAgIG5vZGVbJ3NlcGFyYXRvcl93aWR0aCddID0gYmVzdF93aWR0aAorICAgIG5vZGVb
+J2NoaWxkcmVuJ10gPSBbXQorICAgIGZvciB2YWx1ZSBpbiByYW5nZSgyICoqIGJlc3Rfd2lkdGgp
+OgorICAgICAgICBjaGlsZCA9IHt9CisgICAgICAgIGJpdHMgPSAnJy5qb2luKHJldmVyc2VkKCd7
+OjB7fWJ9Jy5mb3JtYXQodmFsdWUsIGJlc3Rfd2lkdGgpKSkKKyAgICAgICAgY2hpbGRbJ2xlYXZl
+cyddID0gXAorICAgICAgICAgICAgc2V0KFt0YWcgZm9yIHRhZyBpbiB0YWdzIFwKKyAgICAgICAg
+ICAgICAgICBpZiBlbmNzW3RhZ11bYmVzdF9sc2I6YmVzdF9sc2IrYmVzdF93aWR0aF0gPT0gYml0
+c10pCisgICAgICAgIG5vZGVbJ2NoaWxkcmVuJ10uYXBwZW5kKGNoaWxkKQorICAgIGZvciBjaGls
+ZCBpbiBub2RlWydjaGlsZHJlbiddOgorICAgICAgICBhdXRvX3NlcGFyYXRlKGNoaWxkKQorCith
+dXRvX3NlcGFyYXRlKGRlY3RyZWVfbm9ybWFsKQorYXV0b19zZXBhcmF0ZShkZWN0cmVlXzE2Yml0
+KQoraWYgc3ViaW5zbl9ncm91cGluZ3M6CisgICAgYXV0b19zZXBhcmF0ZShkZWN0cmVlX3N1Ymlu
+c25fZ3JvdXBpbmdzKQorZm9yIGRlY3RyZWVfc3ViaW5zbiBpbiBkZWN0cmVlX3N1Ymluc25zLnZh
+bHVlcygpOgorICAgIGF1dG9fc2VwYXJhdGUoZGVjdHJlZV9zdWJpbnNuKQorZm9yIGRlY3RyZWVf
+ZXh0IGluIGRlY3RyZWVfZXh0ZW5zaW9ucy52YWx1ZXMoKToKKyAgICBhdXRvX3NlcGFyYXRlKGRl
+Y3RyZWVfZXh0KQorCitmb3IgdGFnIGluIGZha2V0YWdzOgorICAgIGRlbCBlbmNzW3RhZ10KKwor
+ZGVmIHRhYmxlX25hbWUocGFyZW50cywgbm9kZSk6CisgICAgcGF0aCA9IHBhcmVudHMgKyBbbm9k
+ZV0KKyAgICByb290ID0gcGF0aFswXQorICAgIHRhZyA9IG5leHQoaXRlcihub2RlWydsZWF2ZXMn
+XSkpCisgICAgaWYgdGFnIGluIHN1Ymluc25fZ3JvdXBpbmdzOgorICAgICAgICBlbmNfd2lkdGgg
+PSBsZW4oc3ViaW5zbl9ncm91cGluZ3NbdGFnXVsnZW5jJ10ucmVwbGFjZSgnICcsICcnKSkKKyAg
+ICBlbHNlOgorICAgICAgICB0YWcgPSBuZXh0KGl0ZXIobm9kZVsnbGVhdmVzJ10gLSBmYWtldGFn
+cykpCisgICAgICAgIGVuY193aWR0aCA9IGxlbihlbmNzW3RhZ10pCisgICAgZGV0ZXJtaW5pbmdf
+Yml0cyA9IFsnXyddICogZW5jX3dpZHRoCisgICAgZm9yIChwYXJlbnQsIGNoaWxkKSBpbiB6aXAo
+cGF0aFs6LTFdLCBwYXRoWzE6XSk6CisgICAgICAgIGxzYiA9IHBhcmVudFsnc2VwYXJhdG9yX2xz
+YiddCisgICAgICAgIHdpZHRoID0gcGFyZW50WydzZXBhcmF0b3Jfd2lkdGgnXQorICAgICAgICB2
+YWx1ZSA9IHBhcmVudFsnY2hpbGRyZW4nXS5pbmRleChjaGlsZCkKKyAgICAgICAgZGV0ZXJtaW5p
+bmdfYml0c1tsc2I6bHNiK3dpZHRoXSA9IFwKKyAgICAgICAgICAgIGxpc3QocmV2ZXJzZWQoJ3s6
+MHt9Yn0nLmZvcm1hdCh2YWx1ZSwgd2lkdGgpKSkKKyAgICBpZiB0YWcgaW4gc3ViaW5zbl9ncm91
+cGluZ3M6CisgICAgICAgIG5hbWUgPSAnREVDT0RFX1JPT1RfRUUnCisgICAgZWxzZToKKyAgICAg
+ICAgZW5jX2NsYXNzID0gaXNldC5pc2V0W3RhZ11bJ2VuY19jbGFzcyddCisgICAgICAgIGlmIGVu
+Y19jbGFzcyBpbiBleHRfZW5jX2NsYXNzZXM6CisgICAgICAgICAgICBuYW1lID0gJ0RFQ09ERV9F
+WFRfe30nLmZvcm1hdChlbmNfY2xhc3MpCisgICAgICAgIGVsaWYgZW5jX2NsYXNzIGluIHN1Ymlu
+c25fZW5jX2NsYXNzZXM6CisgICAgICAgICAgICBuYW1lID0gJ0RFQ09ERV9TVUJJTlNOX3t9Jy5m
+b3JtYXQoZW5jX2NsYXNzKQorICAgICAgICBlbHNlOgorICAgICAgICAgICAgbmFtZSA9ICdERUNP
+REVfUk9PVF97fScuZm9ybWF0KGVuY193aWR0aCkKKyAgICBpZiBub2RlICE9IHJvb3Q6CisgICAg
+ICAgIG5hbWUgKz0gJ18nICsgJycuam9pbihyZXZlcnNlZChkZXRlcm1pbmluZ19iaXRzKSkKKyAg
+ICByZXR1cm4gbmFtZQorCitkZWYgcHJpbnRfbm9kZShmLCBub2RlLCBwYXJlbnRzKToKKyAgICBp
+ZiBsZW4obm9kZVsnbGVhdmVzJ10pIDw9IDE6CisgICAgICAgIHJldHVybgorICAgIG5hbWUgPSB0
+YWJsZV9uYW1lKHBhcmVudHMsIG5vZGUpCisgICAgbHNiID0gbm9kZVsnc2VwYXJhdG9yX2xzYidd
+CisgICAgd2lkdGggPSBub2RlWydzZXBhcmF0b3Jfd2lkdGgnXQorICAgIHByaW50KCdERUNPREVf
+TkVXX1RBQkxFKHt9LHt9LERFQ09ERV9TRVBBUkFUT1JfQklUUyh7fSx7fSkpJy5cCisgICAgICAg
+IGZvcm1hdChuYW1lLCAyICoqIHdpZHRoLCBsc2IsIHdpZHRoKSwgZmlsZT1mKQorICAgIGZvciBj
+aGlsZCBpbiBub2RlWydjaGlsZHJlbiddOgorICAgICAgICBpZiBsZW4oY2hpbGRbJ2xlYXZlcydd
+KSA9PSAwOgorICAgICAgICAgICAgcHJpbnQoJ0lOVkFMSUQoKScsIGZpbGU9ZikKKyAgICAgICAg
+ZWxpZiBsZW4oY2hpbGRbJ2xlYXZlcyddKSA9PSAxOgorICAgICAgICAgICAgKHRhZywpID0gY2hp
+bGRbJ2xlYXZlcyddCisgICAgICAgICAgICBpZiB0YWcgaW4gc3ViaW5zbl9ncm91cGluZ3M6Cisg
+ICAgICAgICAgICAgICAgY2xhc3NfYSA9IHN1Ymluc25fZ3JvdXBpbmdzW3RhZ11bJ2NsYXNzX2En
+XQorICAgICAgICAgICAgICAgIGNsYXNzX2IgPSBzdWJpbnNuX2dyb3VwaW5nc1t0YWddWydjbGFz
+c19iJ10KKyAgICAgICAgICAgICAgICBlbmMgPSBzdWJpbnNuX2dyb3VwaW5nc1t0YWddWydlbmMn
+XS5yZXBsYWNlKCcgJywgJycpCisgICAgICAgICAgICAgICAgaWYgJ1JFU0VSVkVEJyBpbiB0YWc6
+CisgICAgICAgICAgICAgICAgICAgIHByaW50KCdJTlZBTElEKCknLCBmaWxlPWYpCisgICAgICAg
+ICAgICAgICAgZWxzZToKKyAgICAgICAgICAgICAgICAgICAgcHJpbnQoJ1NVQklOU05TKHt9LHt9
+LHt9LCJ7fSIpJy5cCisgICAgICAgICAgICAgICAgICAgICAgICBmb3JtYXQodGFnLCBjbGFzc19h
+LCBjbGFzc19iLCBlbmMpLCBmaWxlPWYpCisgICAgICAgICAgICBlbGlmIHRhZyBpbiBpc2V0LmVu
+Y19leHRfc3BhY2VzOgorICAgICAgICAgICAgICAgIGVuYyA9IGlzZXQuZW5jX2V4dF9zcGFjZXNb
+dGFnXS5yZXBsYWNlKCcgJywgJycpCisgICAgICAgICAgICAgICAgcHJpbnQoJ0VYVFNQQUNFKHt9
+LCJ7fSIpJy5mb3JtYXQodGFnLCBlbmMpLCBmaWxlPWYpCisgICAgICAgICAgICBlbHNlOgorICAg
+ICAgICAgICAgICAgIGVuYyA9ICcnLmpvaW4ocmV2ZXJzZWQoZW5jc1t0YWddKSkKKyAgICAgICAg
+ICAgICAgICBwcmludCgnVEVSTUlOQUwoe30sInt9IiknLmZvcm1hdCh0YWcsIGVuYyksIGZpbGU9
+ZikKKyAgICAgICAgZWxzZToKKyAgICAgICAgICAgIHByaW50KCdUQUJMRV9MSU5LKHt9KScuZm9y
+bWF0KHRhYmxlX25hbWUocGFyZW50cyArIFtub2RlXSwgY2hpbGQpKSwKKyAgICAgICAgICAgICAg
+ICAgIGZpbGU9ZikKKyAgICBwcmludCgnREVDT0RFX0VORF9UQUJMRSh7fSx7fSxERUNPREVfU0VQ
+QVJBVE9SX0JJVFMoe30se30pKScuXAorICAgICAgICBmb3JtYXQobmFtZSwgMiAqKiB3aWR0aCwg
+bHNiLCB3aWR0aCksIGZpbGU9ZikKKyAgICBwcmludChmaWxlPWYpCisgICAgcGFyZW50cy5hcHBl
+bmQobm9kZSkKKyAgICBmb3IgY2hpbGQgaW4gbm9kZVsnY2hpbGRyZW4nXToKKyAgICAgICAgcHJp
+bnRfbm9kZShmLCBjaGlsZCwgcGFyZW50cykKKyAgICBwYXJlbnRzLnBvcCgpCisKK2RlZiBwcmlu
+dF90cmVlKGYsIHRyZWUpOgorICAgIHByaW50X25vZGUoZiwgdHJlZSwgW10pCisKK2RlZiBwcmlu
+dF9tYXRjaF9pbmZvKGYpOgorICAgIGZvciB0YWcgaW4gc29ydGVkKGVuY3Mua2V5cygpLCBrZXk9
+aXNldC50YWdzLmluZGV4KToKKyAgICAgICAgZW5jID0gJycuam9pbihyZXZlcnNlZChlbmNzW3Rh
+Z10pKQorICAgICAgICBtYXNrID0gaW50KHJlLnN1YihyJ1teMV0nLCByJzAnLCBlbmMucmVwbGFj
+ZSgnMCcsICcxJykpLCAyKQorICAgICAgICBtYXRjaCA9IGludChyZS5zdWIocidbXjAxXScsIHIn
+MCcsIGVuYyksIDIpCisgICAgICAgIHN1ZmZpeCA9ICcnCisgICAgICAgIHByaW50KCdERUNPREV7
+fV9NQVRDSF9JTkZPKHt9LDB4ezp4fVUsMHh7Onh9VSknLlwKKyAgICAgICAgICAgIGZvcm1hdChz
+dWZmaXgsIHRhZywgbWFzaywgbWF0Y2gpLCBmaWxlPWYpCisKK3JlZ3JlID0gcmUuY29tcGlsZSgK
+KyAgICByJygoPzwhRFVQKVtNTk9SQ1BRWFNHVlpBXSkoW3N0dXZ3eHl6ZGVmZ10rKShbLl0/W0xs
+SGhdPykoXGQrUz8pJykKK2ltbXJlID0gcmUuY29tcGlsZShyJ1sjXShbclJzU3VVbV0pKFxkKyko
+PzpbOl0oXGQrKSk/JykKKworZGVmIG9yZGVyZWRfdW5pcXVlKGwpOgorICAgIHJldHVybiBzb3J0
+ZWQoc2V0KGwpLCBrZXk9bC5pbmRleCkKKworaW1wbGljaXRfcmVnaXN0ZXJzID0geworICAgICdT
+UCcgOiAyOSwKKyAgICAnRlAnIDogMzAsCisgICAgJ0xSJyA6IDMxCit9CisKK251bV9yZWdpc3Rl
+cnMgPSB7CisgICAgJ1InIDogMzIsCisgICAgJ1YnIDogMzIKK30KKworZGVmIHByaW50X29wX2lu
+Zm8oZik6CisgICAgZm9yIHRhZyBpbiBzb3J0ZWQoZW5jcy5rZXlzKCksIGtleT1pc2V0LnRhZ3Mu
+aW5kZXgpOgorICAgICAgICBlbmMgPSBlbmNzW3RhZ10KKyAgICAgICAgcHJpbnQoZmlsZT1mKQor
+ICAgICAgICBwcmludCgnREVDT0RFX09QSU5GTyh7fSwnLmZvcm1hdCh0YWcpLCBmaWxlPWYpCisg
+ICAgICAgIHJlZ3MgPSBvcmRlcmVkX3VuaXF1ZShyZWdyZS5maW5kYWxsKGlzZXQuaXNldFt0YWdd
+WydzeW50YXgnXSkpCisgICAgICAgIGltbXMgPSBvcmRlcmVkX3VuaXF1ZShpbW1yZS5maW5kYWxs
+KGlzZXQuaXNldFt0YWddWydzeW50YXgnXSkpCisgICAgICAgIHJlZ25vID0gMAorICAgICAgICBm
+b3IgcmVnIGluIHJlZ3M6CisgICAgICAgICAgICByZWdfdHlwZSA9IHJlZ1swXQorICAgICAgICAg
+ICAgcmVnX2xldHRlciA9IHJlZ1sxXVswXQorICAgICAgICAgICAgcmVnX251bV9jaG9pY2VzID0g
+aW50KHJlZ1szXS5yc3RyaXAoJ1MnKSkKKyAgICAgICAgICAgIHJlZ19tYXBwaW5nID0gcmVnWzBd
+ICsgJycuam9pbihbJ18nIGZvciBsZXR0ZXIgaW4gcmVnWzFdXSkgKyByZWdbM10KKyAgICAgICAg
+ICAgIHJlZ19lbmNfZmllbGRzID0gcmUuZmluZGFsbChyZWdfbGV0dGVyICsgJysnLCBlbmMpCisg
+ICAgICAgICAgICBpZiBsZW4ocmVnX2VuY19maWVsZHMpID09IDA6CisgICAgICAgICAgICAgICAg
+cmFpc2UgRXhjZXB0aW9uKCdUYWcgInt9IiBtaXNzaW5nIHJlZ2lzdGVyIGZpZWxkIScuZm9ybWF0
+KHRhZykpCisgICAgICAgICAgICBpZiBsZW4ocmVnX2VuY19maWVsZHMpID4gMToKKyAgICAgICAg
+ICAgICAgICByYWlzZSBFeGNlcHRpb24oJ1RhZyAie30iIGhhcyBzcGxpdCByZWdpc3RlciBmaWVs
+ZCEnLlwKKyAgICAgICAgICAgICAgICAgICAgZm9ybWF0KHRhZykpCisgICAgICAgICAgICByZWdf
+ZW5jX2ZpZWxkID0gcmVnX2VuY19maWVsZHNbMF0KKyAgICAgICAgICAgIGlmIDIgKiogbGVuKHJl
+Z19lbmNfZmllbGQpICE9IHJlZ19udW1fY2hvaWNlczoKKyAgICAgICAgICAgICAgICByYWlzZSBF
+eGNlcHRpb24oJ1RhZyAie30iIGhhcyBpbmNvcnJlY3QgcmVnaXN0ZXIgZmllbGQgd2lkdGghJy5c
+CisgICAgICAgICAgICAgICAgICAgIGZvcm1hdCh0YWcpKQorICAgICAgICAgICAgcHJpbnQoJyAg
+ICAgICAgREVDT0RFX1JFRyh7fSx7fSx7fSknLlwKKyAgICAgICAgICAgICAgICBmb3JtYXQocmVn
+bm8sIGxlbihyZWdfZW5jX2ZpZWxkKSwgZW5jLmluZGV4KHJlZ19lbmNfZmllbGQpKSwKKyAgICAg
+ICAgICAgICAgICAgICAgICAgZmlsZT1mKQorICAgICAgICAgICAgaWYgcmVnX3R5cGUgaW4gbnVt
+X3JlZ2lzdGVycyBhbmQgXAorICAgICAgICAgICAgICAgIHJlZ19udW1fY2hvaWNlcyAhPSBudW1f
+cmVnaXN0ZXJzW3JlZ190eXBlXToKKyAgICAgICAgICAgICAgICBwcmludCgnICAgICAgICBERUNP
+REVfTUFQUEVEX1JFRyh7fSx7fSknLlwKKyAgICAgICAgICAgICAgICAgICAgZm9ybWF0KHJlZ25v
+LCByZWdfbWFwcGluZyksIGZpbGU9ZikKKyAgICAgICAgICAgIHJlZ25vICs9IDEKKyAgICAgICAg
+ZGVmIGltcGxpY2l0X3JlZ2lzdGVyX2tleShyZWcpOgorICAgICAgICAgICAgcmV0dXJuIGltcGxp
+Y2l0X3JlZ2lzdGVyc1tyZWddCisgICAgICAgIGZvciByZWcgaW4gc29ydGVkKAorICAgICAgICAg
+ICAgc2V0KFtyIGZvciByIGluIChpc2V0LmlzZXRbdGFnXVsncnJlZ3MnXS5zcGxpdCgnLCcpICsg
+XAorICAgICAgICAgICAgICAgIGlzZXQuaXNldFt0YWddWyd3cmVncyddLnNwbGl0KCcsJykpIFwK
+KyAgICAgICAgICAgICAgICAgICAgaWYgciBpbiBpbXBsaWNpdF9yZWdpc3RlcnNdKSwga2V5PWlt
+cGxpY2l0X3JlZ2lzdGVyX2tleSk6CisgICAgICAgICAgICBwcmludCgnICAgICAgICBERUNPREVf
+SU1QTF9SRUcoe30se30pJy5cCisgICAgICAgICAgICAgICAgZm9ybWF0KHJlZ25vLCBpbXBsaWNp
+dF9yZWdpc3RlcnNbcmVnXSksIGZpbGU9ZikKKyAgICAgICAgICAgIHJlZ25vICs9IDEKKyAgICAg
+ICAgaWYgaW1tcyBhbmQgaW1tc1swXVswXS5pc3VwcGVyKCk6CisgICAgICAgICAgICBpbW1zID0g
+cmV2ZXJzZWQoaW1tcykKKyAgICAgICAgZm9yIGltbSBpbiBpbW1zOgorICAgICAgICAgICAgaWYg
+aW1tWzBdLmlzdXBwZXIoKToKKyAgICAgICAgICAgICAgICBpbW1ubyA9IDEKKyAgICAgICAgICAg
+IGVsc2U6CisgICAgICAgICAgICAgICAgaW1tbm8gPSAwCisgICAgICAgICAgICBpbW1fdHlwZSA9
+IGltbVswXQorICAgICAgICAgICAgaW1tX3dpZHRoID0gaW50KGltbVsxXSkKKyAgICAgICAgICAg
+IGltbV9zaGlmdCA9IGltbVsyXQorICAgICAgICAgICAgaWYgaW1tX3NoaWZ0OgorICAgICAgICAg
+ICAgICAgIGltbV9zaGlmdCA9IGludChpbW1fc2hpZnQpCisgICAgICAgICAgICBlbHNlOgorICAg
+ICAgICAgICAgICAgIGltbV9zaGlmdCA9IDAKKyAgICAgICAgICAgIGlmIGltbV90eXBlLmlzbG93
+ZXIoKToKKyAgICAgICAgICAgICAgICBpbW1fbGV0dGVyID0gJ2knCisgICAgICAgICAgICBlbHNl
+OgorICAgICAgICAgICAgICAgIGltbV9sZXR0ZXIgPSAnSScKKyAgICAgICAgICAgIHJlbWFpbmRl
+ciA9IGltbV93aWR0aAorICAgICAgICAgICAgZm9yIG0gaW4gcmV2ZXJzZWQobGlzdChyZS5maW5k
+aXRlcihpbW1fbGV0dGVyICsgJysnLCBlbmMpKSk6CisgICAgICAgICAgICAgICAgcmVtYWluZGVy
+IC09IG0uZW5kKCkgLSBtLnN0YXJ0KCkKKyAgICAgICAgICAgICAgICBwcmludCgnICAgICAgICBE
+RUNPREVfSU1NKHt9LHt9LHt9LHt9KScuXAorICAgICAgICAgICAgICAgICAgICBmb3JtYXQoaW1t
+bm8sIG0uZW5kKCkgLSBtLnN0YXJ0KCksIG0uc3RhcnQoKSwgcmVtYWluZGVyKSwKKyAgICAgICAg
+ICAgICAgICAgICAgICAgIGZpbGU9ZikKKyAgICAgICAgICAgIGlmIHJlbWFpbmRlciAhPSAwOgor
+ICAgICAgICAgICAgICAgIGlmIGltbVsyXToKKyAgICAgICAgICAgICAgICAgICAgaW1tWzJdID0g
+JzonICsgaW1tWzJdCisgICAgICAgICAgICAgICAgcmFpc2UgRXhjZXB0aW9uKCdUYWcgInt9IiBo
+YXMgYW4gaW5jb3JyZWN0IG51bWJlciBvZiAnICsgXAorICAgICAgICAgICAgICAgICAgICAnZW5j
+b2RpbmcgYml0cyBmb3IgaW1tZWRpYXRlICJ7fSInLlwKKyAgICAgICAgICAgICAgICAgICAgZm9y
+bWF0KHRhZywgJycuam9pbihpbW0pKSkKKyAgICAgICAgICAgIGlmIGltbV90eXBlLmxvd2VyKCkg
+aW4gJ3NyJzoKKyAgICAgICAgICAgICAgICBwcmludCgnICAgICAgICBERUNPREVfSU1NX1NYVCh7
+fSx7fSknLlwKKyAgICAgICAgICAgICAgICAgICAgZm9ybWF0KGltbW5vLCBpbW1fd2lkdGgpLCBm
+aWxlPWYpCisgICAgICAgICAgICBpZiBpbW1fdHlwZS5sb3dlcigpID09ICduJzoKKyAgICAgICAg
+ICAgICAgICBwcmludCgnICAgICAgICBERUNPREVfSU1NX05FRyh7fSx7fSknLlwKKyAgICAgICAg
+ICAgICAgICAgICAgZm9ybWF0KGltbW5vLCBpbW1fd2lkdGgpLCBmaWxlPWYpCisgICAgICAgICAg
+ICBpZiBpbW1fc2hpZnQ6CisgICAgICAgICAgICAgICAgcHJpbnQoJyAgICAgICAgREVDT0RFX0lN
+TV9TSElGVCh7fSx7fSknLlwKKyAgICAgICAgICAgICAgICAgICAgZm9ybWF0KGltbW5vLCBpbW1f
+c2hpZnQpLCBmaWxlPWYpCisgICAgICAgIHByaW50KCcpJywgZmlsZT1mKQorCitpZiBfX25hbWVf
+XyA9PSAnX19tYWluX18nOgorICAgIGYgPSBpby5TdHJpbmdJTygpCisgICAgcHJpbnRfdHJlZShm
+LCBkZWN0cmVlX25vcm1hbCkKKyAgICBwcmludF90cmVlKGYsIGRlY3RyZWVfMTZiaXQpCisgICAg
+aWYgc3ViaW5zbl9ncm91cGluZ3M6CisgICAgICAgIHByaW50X3RyZWUoZiwgZGVjdHJlZV9zdWJp
+bnNuX2dyb3VwaW5ncykKKyAgICBmb3IgKG5hbWUsIGRlY3RyZWVfc3ViaW5zbikgaW4gc29ydGVk
+KGRlY3RyZWVfc3ViaW5zbnMuaXRlbXMoKSk6CisgICAgICAgIHByaW50X3RyZWUoZiwgZGVjdHJl
+ZV9zdWJpbnNuKQorICAgIGZvciAobmFtZSwgZGVjdHJlZV9leHQpIGluIHNvcnRlZChkZWN0cmVl
+X2V4dGVuc2lvbnMuaXRlbXMoKSk6CisgICAgICAgIHByaW50X3RyZWUoZiwgZGVjdHJlZV9leHQp
+CisgICAgcHJpbnRfbWF0Y2hfaW5mbyhmKQorICAgIHByaW50X29wX2luZm8oZikKKyAgICBvcGVu
+KCdkZWN0cmVlX2dlbmVyYXRlZC5oJywgJ3cnKS53cml0ZShmLmdldHZhbHVlKCkpCi0tIAoyLjcu
+NAoK
 
