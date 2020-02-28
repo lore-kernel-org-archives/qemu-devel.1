@@ -1,81 +1,101 @@
 Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41816C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA3FC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:45:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1254A24677
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CCF724677
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 18:45:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vsdr5Pn+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1254A24677
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Rk+jBbgY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CCF724677
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7kdl-00020v-7X
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 13:45:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33886)
+	id 1j7kdo-00025s-Hh
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 13:45:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1j7kcm-0000e4-9Q
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:44:37 -0500
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1j7kck-0000bu-MT
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:44:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1j7kcl-0007gA-76
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:44:36 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:38512)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1j7kci-0007Ow-DU; Fri, 28 Feb 2020 13:44:32 -0500
-Received: by mail-lj1-x242.google.com with SMTP id w1so4439576ljh.5;
- Fri, 28 Feb 2020 10:44:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h6x6+3qwN6xjzA0xy2KKcx6OQOpuOQ2dni+X5uUQ/Uc=;
- b=Vsdr5Pn+87FkcCL8Dzoc6+GnMyHHJ0iJzxQ1aK9q0c7H/k+qBLcDGJrChUDcWd2uag
- 69vMn8WO3ymSHbx76924fHly/fRO8fF1Y/PBMyfBUwhPWs7pQD9wHAJzPfKdkktixk7d
- pV5mBDRpiJ+7RUxkHg//o9OaorIXtd/UDB5YPBBGKVMs0d/zMpDKJUQY+IupmI8eaFci
- vXEuZzwx7mXxsoGayrNDRPjIaDp1ufpPDMg6xxnZdplNmdpU6xFQV2Z1DziuoxkCjAgf
- MJ8vu23nzJk+GARacbBUQnWQ4ZLNQH1Lgy2/x0GkRnZthntWkHTqGoAEk07XAu6SjUy3
- 4Qdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=h6x6+3qwN6xjzA0xy2KKcx6OQOpuOQ2dni+X5uUQ/Uc=;
- b=gXm1YwUiPzaGTDRwH6rnUU+PUb47a70g0E0pTO5JNU3LA3DdruR8z/Q5PEKvifHLAh
- pwEftIv56Td/Icled2DuE2p5ltQ4scuYb0i6Zc5+rvYv3/57qqrD9GOYGSlo/cAx764T
- YuXsY/EJDhcGRZdRBb1/T7D6l9uMsnMBYGRpaibrhTXNS+T1eCJgjF5CyeJBW5+brctl
- cPAGtpLD6R1LfEtOLoTY1pvlRgmliLiYz7D1Gy8frfj0bbMqQlJvxxuwRe7VdQK7eyTz
- h1MeO8DnE4nlMLQ9cUmaZwuyRlQApLmyF3Zj7pUT0Y2kGC5PSPs61m62loG/4axvH6SX
- 60Tw==
-X-Gm-Message-State: ANhLgQ2l2anqGUGgMdxCp+jEAGTMM7NoWKaewXxDPepTSNxjbBrGA6cO
- 7XV6qVXwwMKkyQnqVfzZ++fNn01oEcMOubW16zc=
-X-Google-Smtp-Source: ADFU+vu+pd79PzGSNqdt6oFNtNxdr26k3DfuNDwl+vYGwVnfh144KYcoU/l/yJ+1CwMvqf8jnmjTmih9+5FUoYV9cYg=
-X-Received: by 2002:a2e:6c13:: with SMTP id h19mr3758062ljc.221.1582915470424; 
- Fri, 28 Feb 2020 10:44:30 -0800 (PST)
+ (envelope-from <elena.ufimtseva@oracle.com>) id 1j7kcj-0007XH-Jk
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:44:34 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:59194)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
+ id 1j7kcj-0007Td-Aa
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 13:44:33 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01SIgmFq134056;
+ Fri, 28 Feb 2020 18:44:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=1CooSqxG8VqB2eEcRvUmmyjg9XI7Djeca1W76Buy2+4=;
+ b=Rk+jBbgY8IMsHiUCRCrSDUW/qKEmgYl74l5e0gu8ljuhczEtc9Mqgh+T4zoa2FrmQMMh
+ 16ttP0tVRZxFzO4wHuaa8qKk0LLsmhAVfa8WtodjC/LsbQ1z2SzrKPVHx5HZIn0z82us
+ Mf/expntZEtFT6EN7y0Ez2k1Cv0Vg2D+ebzxxyq4psUvCwZUqwHPp40dpdYfcUgm+S4j
+ Szj8RSi1qUM800iNYdw5RjySHANqPH7UooYV4mgn9AdfmYTopfGtbzLHqvw3OUfJOkSp
+ bH2o71FyvEwGNmBIY61elEs5smcQmCy0E050IFKGEOBGKm+okRXojwlQgauAhVGoJDxo Tw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 2ydct3mn9k-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 28 Feb 2020 18:44:23 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 01SIiMJ2177721;
+ Fri, 28 Feb 2020 18:44:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2ydj4rfu36-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 28 Feb 2020 18:44:23 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 01SIiKgv029483;
+ Fri, 28 Feb 2020 18:44:20 GMT
+Received: from flaka (/108.236.14.91) by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 28 Feb 2020 10:44:18 -0800
+Date: Fri, 28 Feb 2020 10:44:11 -0800
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v5 49/50] multi-process: add the concept description to
+ docs/devel/qemu-multiprocess
+Message-ID: <20200228184411.GC25838@flaka>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <b6a030f0a81a1129b853c30a4c10def606a53089.1582576372.git.jag.raman@oracle.com>
+ <20200227171140.GF315098@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <20200215122354.13706-1-linux@roeck-us.net>
- <CAFEAcA-u=j3MYu-Ck0UbMzXXEoB41dx6UbGw15QBEnqBBX988g@mail.gmail.com>
- <CAFEAcA-_V-7VDZvVg4WE99A4b1UimQ0RrLG910qmsxCgRVvq5A@mail.gmail.com>
-In-Reply-To: <CAFEAcA-_V-7VDZvVg4WE99A4b1UimQ0RrLG910qmsxCgRVvq5A@mail.gmail.com>
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Fri, 28 Feb 2020 12:44:19 -0600
-Message-ID: <CAJy5ezoP7qNCymOpVXgMcwOuYvXBPVnf718gN_qfsfW_D9MVFQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] hw/arm/xilinx_zynq: Fix USB port instantiation
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000052fe86059fa73a62"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200227171140.GF315098@stefanha-x1.localdomain>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9545
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
+ phishscore=0 suspectscore=0
+ spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002280137
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9545
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 bulkscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002280137
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,106 +107,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>, qemu-arm <qemu-arm@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Guenter Roeck <linux@roeck-us.net>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
+ thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ dgilbert@redhat.com, liran.alon@oracle.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000052fe86059fa73a62
-Content-Type: text/plain; charset="UTF-8"
-
-Sorry Peter, I missed the email.
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Best regards,
-Edgar
-
-
-On Fri, 28 Feb. 2020, 10:00 Peter Maydell, <peter.maydell@linaro.org> wrote:
-
-> On Thu, 20 Feb 2020 at 15:05, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> >
-> > On Sat, 15 Feb 2020 at 12:23, Guenter Roeck <linux@roeck-us.net> wrote:
-> > >
-> > > USB ports on Xilinx Zync must be instantiated as TYPE_CHIPIDEA to work.
-> > > Linux expects and checks various chipidea registers, which do not exist
-> > > with the basic ehci emulation. This patch series fixes the problem.
-> > >
-> > > The first patch in the series fixes the actual problem.
-> > >
-> > > The second patch removes the now obsolete explicit Xilinx
-> > > support from the EHCI code.
-> > >
-> > > v2: Introduced summary
-> > >
-> > > ----------------------------------------------------------------
-> > > Guenter Roeck (2):
-> > >       hw/arm/xilinx_zynq: Fix USB port instantiation
-> > >       hw/usb/hcd-ehci-sysbus: Remove obsolete xlnx,ps7-usb class
-> >
-> > Xilinx folks -- could you provide a reviewed-by or acked-by
-> > for this series, please?
+On Thu, Feb 27, 2020 at 05:11:40PM +0000, Stefan Hajnoczi wrote:
+> On Mon, Feb 24, 2020 at 03:55:40PM -0500, Jagannathan Raman wrote:
+> > From: John G Johnson <john.g.johnson@oracle.com>
+> > 
+> > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> > ---
+> >  docs/devel/index.rst             |    1 +
+> >  docs/devel/qemu-multiprocess.rst | 1102 ++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 1103 insertions(+)
+> >  create mode 100644 docs/devel/qemu-multiprocess.rst
+> > 
+> > diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+> > index 4dc2ca8..1a95871 100644
+> > --- a/docs/devel/index.rst
+> > +++ b/docs/devel/index.rst
+> > @@ -25,3 +25,4 @@ Contents:
+> >     tcg-plugins
+> >     bitops
+> >     reset
+> > +   multi-process
+> > diff --git a/docs/devel/qemu-multiprocess.rst b/docs/devel/qemu-multiprocess.rst
+> > new file mode 100644
+> > index 0000000..477e246
+> > --- /dev/null
+> > +++ b/docs/devel/qemu-multiprocess.rst
+> > @@ -0,0 +1,1102 @@
+> > +Disaggregating QEMU
+> 
+> Please revise this document and the patch series to use consistent
+> terminology.  At least "qemu-multiprocess.rst", "--enable-mpqemu", and
+> "disaggregated QEMU" are used to describe this feature (there are
+> probably more, I have only looked at 2 patches so far).
+> 
+> It's confusing for someone who stumbles across one of these terms and
+> then has to figure out that we're talking about the same thing when
+> encountering other terms later on.
+> 
+> Please use a single name and use it consistently.
 >
-> No? Oh, well, applied to target-arm.next anyway.
->
-> thanks
-> -- PMM
->
 
---00000000000052fe86059fa73a62
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div>Sorry Peter, I missed the email.<div dir=3D"auto"><b=
-r></div><div dir=3D"auto">Reviewed-by: Edgar E. Iglesias &lt;<a href=3D"mai=
-lto:edgar.iglesias@xilinx.com">edgar.iglesias@xilinx.com</a>&gt;</div><div =
-dir=3D"auto"><br></div><div dir=3D"auto">Best regards,=C2=A0</div><div dir=
-=3D"auto">Edgar</div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" cl=
-ass=3D"gmail_attr">On Fri, 28 Feb. 2020, 10:00 Peter Maydell, &lt;<a href=
-=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; wrote=
-:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">On Thu, 20 Feb 2020 at 15:05, Pet=
-er Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank=
-" rel=3D"noreferrer">peter.maydell@linaro.org</a>&gt; wrote:<br>
-&gt;<br>
-&gt; On Sat, 15 Feb 2020 at 12:23, Guenter Roeck &lt;<a href=3D"mailto:linu=
-x@roeck-us.net" target=3D"_blank" rel=3D"noreferrer">linux@roeck-us.net</a>=
-&gt; wrote:<br>
-&gt; &gt;<br>
-&gt; &gt; USB ports on Xilinx Zync must be instantiated as TYPE_CHIPIDEA to=
- work.<br>
-&gt; &gt; Linux expects and checks various chipidea registers, which do not=
- exist<br>
-&gt; &gt; with the basic ehci emulation. This patch series fixes the proble=
-m.<br>
-&gt; &gt;<br>
-&gt; &gt; The first patch in the series fixes the actual problem.<br>
-&gt; &gt;<br>
-&gt; &gt; The second patch removes the now obsolete explicit Xilinx<br>
-&gt; &gt; support from the EHCI code.<br>
-&gt; &gt;<br>
-&gt; &gt; v2: Introduced summary<br>
-&gt; &gt;<br>
-&gt; &gt; ----------------------------------------------------------------<=
-br>
-&gt; &gt; Guenter Roeck (2):<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/arm/xilinx_zynq: Fix USB port instan=
-tiation<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/usb/hcd-ehci-sysbus: Remove obsolete=
- xlnx,ps7-usb class<br>
-&gt;<br>
-&gt; Xilinx folks -- could you provide a reviewed-by or acked-by<br>
-&gt; for this series, please?<br>
-<br>
-No? Oh, well, applied to target-arm.next anyway.<br>
-<br>
-thanks<br>
--- PMM<br>
-</blockquote></div></div></div>
+Thanks Stefan, will work on this. 
+> > +===================
+> > +
+> > +QEMU is often used as the hypervisor for virtual machines running in the
+> > +Oracle cloud. Since one of the advantages of cloud computing is the
+> > +ability to run many VMs from different tenants in the same cloud
+> > +infrastructure, a guest that compromised its hypervisor could
+> > +potentially use the hypervisor's access privileges to access data it is
+> > +not authorized for.
+> > +
+> > +QEMU can be susceptible to security attack because it is a large,
+> 
+> s/attack/attacks/
+> 
+> > +monolithic program that provides many features to the VMs it services.
+> > +Many of these feature can be configured out of QEMU, but even a reduced
+> 
+> s/feature/features/
 
---00000000000052fe86059fa73a62--
+
 
