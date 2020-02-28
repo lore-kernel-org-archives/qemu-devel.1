@@ -2,95 +2,87 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 250F3C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBBDC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 23:17:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E279820637
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68E39246B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 23:17:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ODMhL+jh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E279820637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jFzBc6Kp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68E39246B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7o46-0000UB-4t
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 17:25:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44280)
+	id 1j7osu-0002F4-4l
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 18:17:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50900)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7o3U-0008O0-MZ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:25 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j7osB-0001iP-Qo
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 18:16:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7o3T-0005I6-L0
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:24 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33644)
+ (envelope-from <groeck7@gmail.com>) id 1j7os9-000787-Vb
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 18:16:47 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:33857)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7o3T-0005Dk-El
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:23 -0500
-Received: by mail-pf1-x441.google.com with SMTP id n7so2427559pfn.0
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 14:24:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LDKcCQrJ4exTysNpbESaXVg67i7nnbIKyjv3uxqKM8c=;
- b=ODMhL+jh1Jyj14pdOKkkwznHPVvdTu25FHkvzUTbDTiUxVtokR0+6AFDl5l661J44q
- E5/WrigMrRRaUKwpC5Uu1+jyWff3yD9qi5Q3IGWwpny0WTWVpMj9CLYTLwd79E48eHY/
- LK+vAfxZoy3z8uJ3WYKf3p8phqPKy2ukQe79CKQBvR5AnfKMM0fw1tbYcCZFkk8v6JrO
- qnxeMazHghCvnnJKOmyv8fI+BY+jNFu1xqBjT1lbq0t4BvpySpNtOtTQeLmEChQb+i1h
- 2D+RfMwBBHqBcR+wUbAqv1iFWnjy8VMkOYhZQ7EN/uFceru+1nVBDWXZgQ4Wh3ca3qlB
- VQpA==
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1j7os4-000742-4M; Fri, 28 Feb 2020 18:16:40 -0500
+Received: by mail-pf1-x442.google.com with SMTP id i6so2479458pfc.1;
+ Fri, 28 Feb 2020 15:16:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=yPhsdxmC3P85Uu1od0m2OjFA80DoP33yC53pLjt19dE=;
+ b=jFzBc6Kp3JmT6ItRsoBTr3TfN0cqoAeg2VmGP8JAfAlhCsiqZYswieYPgs8//hh2BE
+ mUAostq2UGWcb+C4aUe5A6VpwxTBZ5fbgfGcBEdVnpeYhZF32P0aHc2D31CwhhAOuA7Q
+ evZ1tzycAyjDAmbpozrt8zAk018JG5HEpxlO4Fx6AGdpnxTqdiLsPqbQOwfhf/oNtqMX
+ saXbl/ON3Pg8eAylaTyStPdqMk+HREHn7ZbvULRJQ18L/Ov0NXjag8CjxzCjWk1ydi55
+ 7jwprKYLBIgrqRYHXJbybOZ1qOygBmHhLyXpuU4K3ejxvRxLBSgOP2yrwV3ZMHnL0BS/
+ yHvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LDKcCQrJ4exTysNpbESaXVg67i7nnbIKyjv3uxqKM8c=;
- b=S8X6NCNncl1QTMGkQ1g+SucixvuIwWNS1e4jL1wscalJ+35cO7WAq8sJehmBPtNSWV
- wLedvRX6QkSSUmF6yCoUAHhCUwRP1NWiai88D8d3CM2581vFIsDfyCzdY6pu4Tbm5wDH
- m71IG7/s0k7aP1X9ZN4RaF5hOFV17mtx6HQCY7meSJwtyIEBjR0AU9bT8BzxvHpn1G7j
- h42FBQOtN8ygAiedtI10KmRxm6VkbrPjtee35+bvvxPdWa5iDnBlRxMrbTEv8BViyGhG
- pNNLSr4w0XN4SrEYr88m/fFDn17afhbl91PMKk90VJfvyn2zNVbBRDQ0ehksgA9TTV3D
- sFvg==
-X-Gm-Message-State: APjAAAXVciq7wf4hZMFyq6PCIau6ZbipKKMcd/SVC/jy/ep7Cj2ZDUig
- j4fycq+s7bGS9zk5SVcxTEpiSw==
-X-Google-Smtp-Source: APXvYqxU6/k1GzhETwD0jJID3PdCWVEo7WzwNaZe3rVRtmVxpHDJ0FEVaNO2PocsPSCodjkFCDMfXQ==
-X-Received: by 2002:aa7:8299:: with SMTP id s25mr6256714pfm.261.1582928661951; 
- Fri, 28 Feb 2020 14:24:21 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- f9sm11994710pfd.141.2020.02.28.14.24.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Feb 2020 14:24:21 -0800 (PST)
-Subject: Re: [PATCH v4 1/7] target/arm: Improve masking of HCR RES0 bits
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200225180831.26078-1-richard.henderson@linaro.org>
- <20200225180831.26078-2-richard.henderson@linaro.org>
- <CAFEAcA8ipK0nZioEgbNq5B1L-tqA+rzn-C2yyfet4_4yNVnYqA@mail.gmail.com>
- <e4a70637-f4b7-eaa7-237a-57053c5a63cc@linaro.org>
- <CAFEAcA-8a4eQXf+LRS3KLURyyEPpPm9uh6q6r6D-1-sh3t8Pdw@mail.gmail.com>
- <5c484ae5-b4da-8eae-c10a-547c670c89e5@linaro.org>
- <CAFEAcA96AZB765TizrPLJYfXhx=KUcb_feL3JK1WNmf5dRSR0w@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <08a6a113-4082-246c-2aeb-4424b921caa4@linaro.org>
-Date: Fri, 28 Feb 2020 14:24:19 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=yPhsdxmC3P85Uu1od0m2OjFA80DoP33yC53pLjt19dE=;
+ b=nKA8NPO0y6jWMkjAGS1cGzdEx8X8w2hMX3fI7xk/FYTesbTKIJV6ZFI6knVujPFAYM
+ +bOo/+l1GB8ENC54ZaKbRCZdZjB6rmdtOh8wXp7gV45vpIq1zd471PNMo/JrRfWfXMlB
+ TcHTrCz3qjL7chbkXUOlZToje+eyMawO0WqeH3zkrsxotP9AbYLTJm6tA1E8ESmU63i7
+ bDJbw8B0lO46zpKkJVS6NVssS7ooszqKEh/WAHptlys7MVyKup38fPa2BRfpDfoBPeZI
+ O+POPCGk67tmifdl9AWJH6Ty1kuG4NtIs/lEmWaI2xdcwRmUfNGxEwKjyOTPGJmQGDnP
+ dYiw==
+X-Gm-Message-State: APjAAAXxiTyrBpN3D99VApmD9Ot1UGN8R6T7Ul6uwsqpLUhx/Ec4YftL
+ +tir/uxTQuUT8zxHfSKmGcA=
+X-Google-Smtp-Source: APXvYqwGlSC6CWYrS2loT1X9jucypmqglMY4S5NRxMtvWKfRFl5XczwkFK8fgIRIAncMyiF62qKCEw==
+X-Received: by 2002:a63:b22:: with SMTP id 34mr6698586pgl.78.1582931798845;
+ Fri, 28 Feb 2020 15:16:38 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id t20sm133819pfl.114.2020.02.28.15.16.37
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 28 Feb 2020 15:16:37 -0800 (PST)
+Date: Fri, 28 Feb 2020 15:16:36 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: Re: [PATCH v2 0/2] hw/arm/xilinx_zynq: Fix USB port instantiation
+Message-ID: <20200228231636.GA11737@roeck-us.net>
+References: <20200215122354.13706-1-linux@roeck-us.net>
+ <CAFEAcA-u=j3MYu-Ck0UbMzXXEoB41dx6UbGw15QBEnqBBX988g@mail.gmail.com>
+ <CAFEAcA-_V-7VDZvVg4WE99A4b1UimQ0RrLG910qmsxCgRVvq5A@mail.gmail.com>
+ <CAJy5ezoP7qNCymOpVXgMcwOuYvXBPVnf718gN_qfsfW_D9MVFQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA96AZB765TizrPLJYfXhx=KUcb_feL3JK1WNmf5dRSR0w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJy5ezoP7qNCymOpVXgMcwOuYvXBPVnf718gN_qfsfW_D9MVFQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,40 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/28/20 11:03 AM, Peter Maydell wrote:
-> It occurs to me that we should check what the required
-> semantics are for the opposite half of the register
-> if the guest writes to one half of it via hcr_writehigh()
-> or hcr_writelow() -- is the un-accessed half supposed
-> to stay exactly as it is, or is it ok for the
-> RES0-for-aarch32 bits to get squashed in the process?
-> That would seem at least a bit odd even if it's valid,
-> so maybe better to do aarch32 RES0 masking in
-> hcr_writehigh() and hcr_writelow()?
+On Fri, Feb 28, 2020 at 12:44:19PM -0600, Edgar E. Iglesias wrote:
+> Sorry Peter, I missed the email.
+> 
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> 
 
-Hmm.  You're thinking of a situation in which
+Thanks a lot everyone!
 
- 1) EL3 invokes EL2 with aa64 which sets HCR_EL2,
- 2) EL3 invokes EL2 in aa32 which sets HCR which
-    as a side-effect clears some of the bits in HCR2
- 3) EL3 invokes EL2 with aa64 again and HCR_EL2
-    incorrectly has some high bits clear.
+Guenter
 
-I can't find any language that explicitly says, but "architecturally mapped"
-means that the bits backing the storage must be the same.  So while it isn't
-legal for aa32 to set HCR2 bit 8 (HCR_EL2.APK), I imagine that it would still
-read as written.
-
-So I think you're correct that we shouldn't alter the half B when writing to
-half A.
-
-Perhaps I should do some masking for aa32 in arm_hcr_el2_eff.
-
-
-r~
+> Best regards,
+> Edgar
+> 
+> 
+> On Fri, 28 Feb. 2020, 10:00 Peter Maydell, <peter.maydell@linaro.org> wrote:
+> 
+> > On Thu, 20 Feb 2020 at 15:05, Peter Maydell <peter.maydell@linaro.org>
+> > wrote:
+> > >
+> > > On Sat, 15 Feb 2020 at 12:23, Guenter Roeck <linux@roeck-us.net> wrote:
+> > > >
+> > > > USB ports on Xilinx Zync must be instantiated as TYPE_CHIPIDEA to work.
+> > > > Linux expects and checks various chipidea registers, which do not exist
+> > > > with the basic ehci emulation. This patch series fixes the problem.
+> > > >
+> > > > The first patch in the series fixes the actual problem.
+> > > >
+> > > > The second patch removes the now obsolete explicit Xilinx
+> > > > support from the EHCI code.
+> > > >
+> > > > v2: Introduced summary
+> > > >
+> > > > ----------------------------------------------------------------
+> > > > Guenter Roeck (2):
+> > > >       hw/arm/xilinx_zynq: Fix USB port instantiation
+> > > >       hw/usb/hcd-ehci-sysbus: Remove obsolete xlnx,ps7-usb class
+> > >
+> > > Xilinx folks -- could you provide a reviewed-by or acked-by
+> > > for this series, please?
+> >
+> > No? Oh, well, applied to target-arm.next anyway.
+> >
+> > thanks
+> > -- PMM
+> >
 
