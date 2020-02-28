@@ -2,47 +2,92 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBAEC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 207FFC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94262246A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:09:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94262246A8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sysgo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF297246AF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:33:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WamxfPHH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF297246AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7eS6-0006MM-Ra
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:09:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44689)
+	id 1j7epy-0002sj-SR
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:33:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rka@sysgo.com>) id 1j7eRa-0005vN-AT
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:08:39 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7epM-00029S-3g
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:33:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rka@sysgo.com>) id 1j7eRX-0000fx-GX
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:08:36 -0500
-Received: from mail.sysgo.com ([176.9.12.79]:50022)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <rka@sysgo.com>) id 1j7eRX-0000fq-7L
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:08:35 -0500
-From: Roman Kapl <rka@sysgo.com>
-To: 
-Subject: [PATCH] vfio: avoid SET_ACTION_TRIGGER ioctls
-Date: Fri, 28 Feb 2020 13:08:00 +0100
-Message-Id: <20200228120800.5979-1-rka@sysgo.com>
-X-Mailer: git-send-email 2.22.0
+ (envelope-from <philmd@redhat.com>) id 1j7epK-00042n-Tf
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:33:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48855
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7epK-00042G-Qc
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:33:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582893190;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=vm+aNNOWd75exghh6UEIZXw8DMFqqm4EGT73R+r5OW0=;
+ b=WamxfPHHvCuiE4yuNAualwQAzzyqm3kV79r9fAD9IazfiZKIavv2IbihBRmfUU9ZIawecT
+ gqUBNv4PB3mQKPOFuv6DWCEy6jA6wvkw+q9Jc5MP7k/dtzNpu7R5IeTXruhZnkH+YKmzyS
+ 3vPdh4lG3QxY6fhAt2luJ5D7dJu4kP0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-254-XBZPDc4bMGKRMmCmqsQ-qA-1; Fri, 28 Feb 2020 07:33:08 -0500
+X-MC-Unique: XBZPDc4bMGKRMmCmqsQ-qA-1
+Received: by mail-wr1-f72.google.com with SMTP id o9so1268570wrw.14
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:33:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Rhr6+r2tfY9AQJ5VKaVuxzDS32T1jjUavdB/SnDaCLY=;
+ b=jpkRmzUNfeGdFrqdV0mLL2PO/Yo5MNktrUAFIOgCUkPDZGuun5R5ymWZzaV5W2MOVa
+ Nu12bczHq5VD/0b742LRCOPiCuUskB2Xz8DsRd2VmsFX9hEozz9oecWquVZISWiK3lpi
+ SI25U5urt8bG8B1XgZt1bUCAgB6ENY4FBQVvuhMsktBzfyJa4H9Tgcx7spoqTZr55ASf
+ 9F4oFwA5v8jBVw0UnmiRr6ON7RojeedXd00KrLblWukqBnEFI4MPQ47dwpjpkgZL5QCT
+ 8xjuhJFL+5ep6RaGuzSoEOIBuVPpoxCpYNxvhS54uiBrgl/AcSAYrOR2ak+zhfvBF5Tj
+ pcBQ==
+X-Gm-Message-State: APjAAAX7TDkdtFTZRWGVN6qK7aNfULseFUaFRcEHRA0hlZuhKedR7xme
+ s+YE38bW1JUdi/Pp/bOgSiv0WI2USffAK08KqgZg9H8x9aSGOWgcXhHsa89y5tagZr4H80hlaa1
+ czF9yE2iMtJ7k9J4=
+X-Received: by 2002:a1c:9a13:: with SMTP id c19mr4584487wme.134.1582893186758; 
+ Fri, 28 Feb 2020 04:33:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw2Ef8TpQQT+Wdpy+qlrAYFnikp8Q+5VIeOArFBRmanDvK4L9Z6oFZXNDdcmwtW4ChwSCpy+w==
+X-Received: by 2002:a1c:9a13:: with SMTP id c19mr4584460wme.134.1582893186460; 
+ Fri, 28 Feb 2020 04:33:06 -0800 (PST)
+Received: from x1w.moovbox.local ([185.102.219.36])
+ by smtp.gmail.com with ESMTPSA id z16sm12054016wrp.33.2020.02.28.04.33.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 04:33:05 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/ppc/pnv: Fix typo in comment
+Date: Fri, 28 Feb 2020 13:33:03 +0100
+Message-Id: <20200228123303.14540-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 176.9.12.79
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -54,156 +99,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
- Roman Kapl <rka@sysgo.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For MSI-X interrupts, remember what the last used eventfd was (KVM
-bypass vs QEMU) and only call vfio_set_irq_signaling if it has changed.
-
-This not only helps with performance, but it seems that interrupts can
-be lost during VFIO_IRQ_SET_ACTION_TRIGGER. With the 'x-no-kvm-msix'
-switch and this patch, SET_ACTION_TRIGGER is not called during
-mask/unmask. This really only affects guests that actively use MSI-X mask=
-ing.
-
-Signed-off-by: Roman Kapl <rka@sysgo.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
+ hw/ppc/pnv_lpc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch scratches my particular itch. I am able to get our guest (whic=
-h masks
-MSI on each interrupt) running, without getting randomly stuck on waiting=
- for
-interrupt. However, the solution is far from perfect (x-no-kvm-msix is re=
-quired)
-and pretty slow. I would be interested in hearing any ideas how to improv=
-e this.
-Some ideas:
-
-1) Fix the kernel so that SET_ACTION_TRIGGER does not loose interrupts (I=
- think
-the problem is there, but not 100% sure). I've tested on 5.3.0-40-generic
-#32~18.04.1-Ubuntu SMP.
-
-2) Add support for MASK/UNMASK for MSI-X in kernel and use that. But I do=
-n't
-know how to do PBA in that case. Another IOCTL? We could look at the real=
- PBA
-array, if mapping is supported, but that seems hacky.
-
-3) Twiddle the bits behing kernel's back, if it can be mapped?
-
-Still, I think this patch does not hurt anything and could be applied if =
-no-one
-can think of a better way.
-
----
-
- hw/vfio/pci.c | 32 ++++++++++++++++++++++----------
- hw/vfio/pci.h |  2 ++
- 2 files changed, 24 insertions(+), 10 deletions(-)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index e6569a7968..5f7ce91519 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -390,12 +390,16 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev,=
- bool msix)
-          * MSI-X mask and pending bits are emulated, so we want to use t=
-he
-          * KVM signaling path only when configured and unmasked.
-          */
--        if (vdev->msi_vectors[i].use) {
--            if (vdev->msi_vectors[i].virq < 0 ||
--                (msix && msix_is_masked(&vdev->pdev, i))) {
--                fd =3D event_notifier_get_fd(&vdev->msi_vectors[i].inter=
-rupt);
-+        VFIOMSIVector *vector =3D &vdev->msi_vectors[i];
-+        if (vector->use) {
-+            if (vector->virq < 0 ||
-+                (msix && msix_is_masked(&vdev->pdev, i)))
-+            {
-+                vector->kvm_path_active =3D false;
-+                fd =3D event_notifier_get_fd(&vector->interrupt);
-             } else {
--                fd =3D event_notifier_get_fd(&vdev->msi_vectors[i].kvm_i=
-nterrupt);
-+                vector->kvm_path_active =3D true;
-+                fd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-             }
-         }
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index f150deca34..b5ffa48dac 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -829,7 +829,7 @@ ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool =
+use_cpld, Error **errp)
+     bool hostboot_mode =3D !!pnv->fw_load_addr;
 =20
-@@ -509,17 +513,23 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev,=
- unsigned int nr,
-     } else {
-         Error *err =3D NULL;
-         int32_t fd;
-+        bool kvm_path;
-=20
-         if (vector->virq >=3D 0) {
-             fd =3D event_notifier_get_fd(&vector->kvm_interrupt);
-+            kvm_path =3D true;
-         } else {
-             fd =3D event_notifier_get_fd(&vector->interrupt);
-+            kvm_path =3D false;
-         }
-=20
--        if (vfio_set_irq_signaling(&vdev->vbasedev,
--                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
--                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &e=
-rr)) {
--            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
-;
-+        if (vector->kvm_path_active !=3D kvm_path) {
-+            if (vfio_set_irq_signaling(&vdev->vbasedev,
-+                                       VFIO_PCI_MSIX_IRQ_INDEX, nr,
-+                                       VFIO_IRQ_SET_ACTION_TRIGGER, fd, =
-&err)) {
-+                error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.n=
-ame);
-+            }
-+            vector->kvm_path_active =3D kvm_path;
-         }
-     }
-=20
-@@ -555,13 +565,15 @@ static void vfio_msix_vector_release(PCIDevice *pde=
-v, unsigned int nr)
-      * core will mask the interrupt and set pending bits, allowing it to
-      * be re-asserted on unmask.  Nothing to do if already using QEMU mo=
-de.
+     /* let isa_bus_new() create its own bridge on SysBus otherwise
+-     * devices speficied on the command line won't find the bus and
++     * devices specified on the command line won't find the bus and
+      * will fail to create.
       */
--    if (vector->virq >=3D 0) {
-+    if (vector->virq >=3D 0 && vector->kvm_path_active) {
-         int32_t fd =3D event_notifier_get_fd(&vector->interrupt);
-         Error *err =3D NULL;
-=20
-         if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_IN=
-DEX, nr,
-                                    VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err=
-)) {
-             error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name)=
+     isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, &local_err)=
 ;
-+        } else {
-+            vector->kvm_path_active =3D false;
-         }
-     }
- }
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index b329d50338..b01d2676cf 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -91,6 +91,8 @@ typedef struct VFIOMSIVector {
-      */
-     EventNotifier interrupt;
-     EventNotifier kvm_interrupt;
-+    /* Set when the trigger action is set to the KVM bypass FD */
-+    bool kvm_path_active;
-     struct VFIOPCIDevice *vdev; /* back pointer to device */
-     int virq;
-     bool use;
 --=20
-2.22.0
+2.21.1
 
 
