@@ -2,63 +2,66 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B846EC3F2CF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 06:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A274FC3F2CF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 06:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 810AC246A0
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 06:01:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="P6UPgeYS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 810AC246A0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 782B2205C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 06:17:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782B2205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Yi4-00027S-MH
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 01:01:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53089)
+	id 1j7Yy8-0004n6-Ho
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 01:17:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54541)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j7YhE-0001UH-GR
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 01:00:27 -0500
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j7YxV-00043d-QX
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 01:17:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j7YhD-0002zj-9d
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 01:00:24 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:47799 helo=ozlabs.org)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j7YxU-0004P2-Jl
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 01:17:13 -0500
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:50518)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j7YhC-0002vt-D4; Fri, 28 Feb 2020 01:00:23 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48TJmF1Nm3z9sRt; Fri, 28 Feb 2020 17:00:12 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1582869613;
- bh=Qt022AiCv9RultKsKPb2lerzd07doWoe/poeWUUCtNA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=P6UPgeYSdtrD57kM8g+0gJ6dph9mTk8OuQLm5Y8JhEqcQaJ7w2ag2PFcRKGUe84p2
- ElgS/RHrAdEE6ezGGRHDD1GYdBYNg9Dp61wkGQuASt9cLFEmPt1eTj3zQd8L6B4QPy
- pWmSep+aE/M8h+Jsns8QPAug6DMU7VRJ0R6ZOKws=
-Date: Fri, 28 Feb 2020 12:05:38 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Subject: Re: [PATCH v2] spapr: Fix Coverity warning while validating nvdimm
- options
-Message-ID: <20200228010538.GB1842@umbus.fritz.box>
-References: <158281096564.89540.4507375445765515529.stgit@lep8c.aus.stglabs.ibm.com>
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1j7YxU-0004N8-5i; Fri, 28 Feb 2020 01:17:12 -0500
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.1105056|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.668689-0.00268013-0.328631;
+ DS=CONTINUE|ham_system_inform|0.01643-0.000390589-0.983179;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e02c03309; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.GtZaCA3_1582870620; 
+Received: from 192.168.43.249(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GtZaCA3_1582870620)
+ by smtp.aliyun-inc.com(10.147.44.145);
+ Fri, 28 Feb 2020 14:17:01 +0800
+Subject: Re: [PATCH v4 1/5] target/riscv: add vector unit stride load and
+ store instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
+ <20200225103508.7651-2-zhiwei_liu@c-sky.com>
+ <4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org>
+ <287bde05-421c-f49c-2404-fdee183c9e12@c-sky.com>
+ <10e50ea8-7614-f094-a827-38ed09462f29@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <30622566-09d2-17b6-edc1-8726dce8cbd8@c-sky.com>
+Date: Fri, 28 Feb 2020 14:16:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="98e8jtXdkpgskNou"
-Content-Disposition: inline
-In-Reply-To: <158281096564.89540.4507375445765515529.stgit@lep8c.aus.stglabs.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <10e50ea8-7614-f094-a827-38ed09462f29@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,94 +73,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, groug@kaod.org, qemu-ppc@nongnu.org,
- f4bug@amsat.org, qemu-devel@nongnu.org
+Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, linux-csky@vger.kernel.org,
+ wxy194768@alibaba-inc.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---98e8jtXdkpgskNou
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 27, 2020 at 07:42:49AM -0600, Shivaprasad G Bhat wrote:
-> Fixes Coverity issue,
->       CID 1419883:  Error handling issues  (CHECKED_RETURN)
->            Calling "qemu_uuid_parse" without checking return value
->=20
-> nvdimm_set_uuid() already verifies if the user provided uuid is valid or
-> not. So, need to check for the validity during pre-plug validation again.
->=20
-> As this a false positive in this case, assert if not valid to be safe.
-> Also, error_abort if QOM accessor encounters error while fetching the uuid
-> property.
->=20
-> Reported-by: Coverity (CID 1419883)
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+On 2020/2/28 11:33, Richard Henderson wrote:
+> On 2/27/20 5:50 PM, LIU Zhiwei wrote:
+>>> This is not what I had in mind, and looks wrong as well.
+>>>
+>>>      int idx = (index * mlen) / 64;
+>>>      int pos = (index * mlen) % 64;
+>>>      return (((uint64_t *)v0)[idx] >> pos) & 1;
+>>>
+>>> You also might consider passing log2(mlen), so the multiplication could be
+>>> strength-reduced to a shift.
+>> I don't think so. For example, when mlen is 8 bits and index is 0, it will
+>> reduce to
+>>
+>> return (((uint64_t *)v0)[0]) & 1
+>>
+>> And it's not right.
+>>
+>> The right bit is first bit in vector register 0. And in host big endianess,
+>> it will be  the first bit of the seventh byte.
+> You've forgotten that we've just done an 8-byte big-endian load, which means
+> that we *are* looking at the first bit of the byte at offset 7.
+>
+> It is right.
+Yes, that's it.
+>   
+>>> You don't need to pass mlen, since it's
+>> Yes.
+> I finally remembered all of the bits that go into mlen and thought I had
+> deleted that sentence -- apparently I only removed half.  ;-)
+>
+>
+> r~
 
-Applied to ppc-for-5.0, thanks.
-
-> ---
->  hw/ppc/spapr_nvdimm.c |    7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-> index 74eeb8bb74..25be8082d7 100644
-> --- a/hw/ppc/spapr_nvdimm.c
-> +++ b/hw/ppc/spapr_nvdimm.c
-> @@ -35,6 +35,7 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, u=
-int64_t size,
->  {
->      char *uuidstr =3D NULL;
->      QemuUUID uuid;
-> +    int ret;
-> =20
->      if (size % SPAPR_MINIMUM_SCM_BLOCK_SIZE) {
->          error_setg(errp, "NVDIMM memory size excluding the label area"
-> @@ -43,8 +44,10 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, =
-uint64_t size,
->          return;
->      }
-> =20
-> -    uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP=
-, NULL);
-> -    qemu_uuid_parse(uuidstr, &uuid);
-> +    uuidstr =3D object_property_get_str(OBJECT(nvdimm), NVDIMM_UUID_PROP,
-> +                                      &error_abort);
-> +    ret =3D qemu_uuid_parse(uuidstr, &uuid);
-> +    g_assert(!ret);
->      g_free(uuidstr);
-> =20
->      if (qemu_uuid_is_null(&uuid)) {
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---98e8jtXdkpgskNou
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5YZ18ACgkQbDjKyiDZ
-s5KtPRAAwMnb1Nr5Fk9Qtp0UFqBFoMkOBzlOtpkmC3c/E8UUaXErRG5RMrlxPmuL
-ksp6U8UNwBd2q7dikEro5Aas4HZtkgPyKbbRPN7WIcTaDiVeiZbwRKCypP8fOhmX
-zZYESJ9Da7AkYDqg0cnqXpGn043uUhIbvUDNKXwOR9OVrbUd6Tw5cAtyeBJhg1m4
-r61xd4xWKOUndwcpHH06KjCjzxUmSNWB2R9KQYZGLORxBJXKOE/3SMCyPtOF6FQS
-W1TcJGmfNryueDAol7XprFa1vv/JdFJ/D+8Ytgdf+DL5todgZoOH0jzlx6AGKAt4
-3DnUU4ieElNvzVFGyquusZlMYATyvD1fNN8F6hItaompxPdeSeRdtxKB5nCzN/gh
-F8kQ6E0GYL3FNHCmrPyxbBHg8cVFw4nUqJRAuspIb+96CgDYaf1YxZnposFUwppa
-m6/W/bST5sC0Hyo7Qb0xHTLahjtMq7+9r8NhZI0kQeSfluJ28KNIswlGLSrTAh3P
-EHEYgNkqAMYSeQDDTdcxXk0J9T1YBY7ZAl5gezwLfJolFV6mzseyUbibLUueQnfU
-ISSefQ9Xrm/psZ4kXwUkghS8sD0Byr8JFKhch6a3gtEEmksfeQ4cS1+sjV0onCeI
-/dbNqdueaIX3QB55ZARuswiDZeqyUmwySf7O45RgFMSGCNaMqR0=
-=JQyo
------END PGP SIGNATURE-----
-
---98e8jtXdkpgskNou--
 
