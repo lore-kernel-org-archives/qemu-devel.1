@@ -2,95 +2,81 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0F4C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FFAC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB7B72469C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:18:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AD592468E
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNV1R+Lc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB7B72469C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PCHBan/f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD592468E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7iLa-0003zk-0h
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:18:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53091)
+	id 1j7iQM-000629-Jy
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:23:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1j7iIc-00085Y-Pe
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:39 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7iPf-0005Ay-NV
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1j7iIb-0006SN-Du
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20666
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7iIb-0006S7-AN
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:15:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582906536;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=67BJoWVgjqRaE3ez8MIcs6ZgskV92ME7JrNNMKV0joI=;
- b=jNV1R+Lc7RW68IQ+Jp3dOoORpO4OAqAx6Zc6nYKIb0Sa+56Bzc2YEaayEwhqsnwADqTHUp
- HSRFwnLtIBV5cMbx6Bt7OT/Kwx9O6e+Nka5zRirXPhtBoOl1azTaGWYo9VcVko35qoUt8n
- t83uDhtntIBzFves9x7e+X/vOkS2cUo=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-lM5xUSESM42CwGD_AC5NJQ-1; Fri, 28 Feb 2020 11:15:34 -0500
-X-MC-Unique: lM5xUSESM42CwGD_AC5NJQ-1
-Received: by mail-qk1-f199.google.com with SMTP id h6so3258259qkj.14
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:15:34 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7iPe-0005at-Fg
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:22:55 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34550)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7iPe-0005a8-6y
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:22:54 -0500
+Received: by mail-ot1-x343.google.com with SMTP id j16so3129201otl.1
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:22:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vUyVrR5UnNRx0q4may4bQIwQNcS0KvoRhyJK6bJDMD4=;
+ b=PCHBan/fR4XVM7nCiotyl+2Rjn3+hW6QXudEar8T2pwcrGtaHs7oXV+l0DDddL5Eoh
+ q2c2vwg5oA95AYXfJ176eQy681K0Mx1q0gzYAGA3IxzAZaTUctsJziJcQT756DpkbS8w
+ BPfln6Pkq0JQlQeKpUOzM/hGDBjDo39H9EXgQdO7dAlwWTwigRTjcYB2F1qb6ZvrzjKK
+ gL7DP0Qm8D9TRdK3oAc9mFac3IcfXM90HJ8iUinXQ5VBWdz1JIFDkxVKuNGRWzD6/XDJ
+ Ej1lt5goNPujZ6XRmx4Rs94PAlGyBVueDwNh3H1utjb/mxPZpmd+RaC9vvqNvHfnH8Tr
+ 9OPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wQ1AClskklPLaQx5THQ8KFrAAijnqVsY12r4IQjRE6M=;
- b=EZ7OTWmzO5YfxE5BGV76i7aXbFyskZqWLA55yluMqrzm71hyPyOVZWoRzIhLpHyuw1
- fJPOYDzAlsl3LLAfwK7prIQQBG/bPY6keNUXsYWQJtxjYYCLIUcWU9PES2Ali0FZplfy
- ExTWUfT9JlGVqyX4aPX3ObSkLOOe3zzDYUOCJUa9gTXJMB0s3VmOT/XLhFBWCG5X6IR1
- 1fFAeGk9jgd/IcK7aK0xTZUEk9sETY4m9VIzfKUW0KF8CP+AZS+HcCuCX0wsvYMXjThz
- kToXRA7ypfsVTR8i+IM0de+XwQd5TfpFd2H0lbnqTWqzvuKm3RJj7ccQ/6wqMaNIXu44
- rFIA==
-X-Gm-Message-State: APjAAAWh4daoempmtr/2p45j21NKUGO1bF99Z7WJMtuZqASwiH4hZUqZ
- oVULdHqoa7sOG7CaHJNA8c2KjI6znYo9HPj76Au6PQLiLhqlRXXYPYfBYal8ebHheqnrbQ34UtC
- Ot6Ir9SPWwakOw90=
-X-Received: by 2002:ae9:e115:: with SMTP id g21mr5146093qkm.83.1582906533022; 
- Fri, 28 Feb 2020 08:15:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzhnNx7ZU7ZRIwo9V0nLkFwIxTLpKRePAlVl/GsyK84AfaA/bps4j76vCiMQqZA5qbIMPaKsA==
-X-Received: by 2002:ae9:e115:: with SMTP id g21mr5146074qkm.83.1582906532826; 
- Fri, 28 Feb 2020 08:15:32 -0800 (PST)
-Received: from xz-x1.redhat.com ([2607:9880:19c0:32::2])
- by smtp.gmail.com with ESMTPSA id g62sm5257277qkd.25.2020.02.28.08.15.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:15:32 -0800 (PST)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/5] Revert "vfio/pci: Disable INTx fast path if using
- split irqchip"
-Date: Fri, 28 Feb 2020 11:15:03 -0500
-Message-Id: <20200228161503.382656-6-peterx@redhat.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200228161503.382656-1-peterx@redhat.com>
-References: <20200228161503.382656-1-peterx@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vUyVrR5UnNRx0q4may4bQIwQNcS0KvoRhyJK6bJDMD4=;
+ b=tswBQFvP8RdeWj69M01ZKtyG3oP+lP7+f4ldTcLjvnnL33NoCa+mXobjNWy3RAUgoN
+ tEaldTFdf0iXwRTcv3+jHFtml7zRpUD9RptWUkm64PGnY6kxp7S4UDSnipUtjKnR5HFR
+ hCBB6FhHXPu3S/TSQ0jqTMkZ9ERefaltwYI73rC2k73VYdOcBL+MErnD9j/bRzsuZUXM
+ m1Az+Cy1v3T9dWr+KMVwp5qFHU949WzkyhontWR8RTSlutaeli8nk9xGOu0y306J5CaP
+ YQk8QdFkNZQag/RLi/Ps7KusoaMWsTGazcDekc/FwPwrhhUobFE/I6CjFAy+wcav7xvP
+ KVDw==
+X-Gm-Message-State: APjAAAWrrvkCSz8Y/ERgkE7ReHtQsYs9NJKbR9OEF5gN3d3ivneP1t6z
+ x+1NkGaB44WdaWFqYv7uKIkqqEeofMjVPxcHzHxTUrLU
+X-Google-Smtp-Source: APXvYqzh9MrjuGvldUGNCEthHAqb1WsVjpXb+OFLvLPXlQQbbO61yIiRhCx5fpUsGwy1iWK1jGcTrM+9Hqk7isl0bEs=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr3762536otq.97.1582906973325; 
+ Fri, 28 Feb 2020 08:22:53 -0800 (PST)
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+References: <20200225180831.26078-1-richard.henderson@linaro.org>
+ <20200225180831.26078-2-richard.henderson@linaro.org>
+In-Reply-To: <20200225180831.26078-2-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Feb 2020 16:22:42 +0000
+Message-ID: <CAFEAcA8ipK0nZioEgbNq5B1L-tqA+rzn-C2yyfet4_4yNVnYqA@mail.gmail.com>
+Subject: Re: [PATCH v4 1/7] target/arm: Improve masking of HCR RES0 bits
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,48 +88,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, peterx@redhat.com,
- Eric Auger <eric.auger@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the resamplefd list introduced, we can savely enable VFIO INTx
-fast path again with split irqchip so it can still be faster than the
-complete slow path.
+On Tue, 25 Feb 2020 at 18:08, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Don't merely start with v8.0, handle v7VE as well.
+> Notice writes from aarch32 mode, and the bits that
+> ought not be settable from there.
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 79db169e04..d65160fdb3 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -5089,8 +5089,13 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[] = {
+>  static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>  {
+>      ARMCPU *cpu = env_archcpu(env);
+> -    /* Begin with bits defined in base ARMv8.0.  */
+> -    uint64_t valid_mask = MAKE_64BIT_MASK(0, 34);
+> +    uint64_t valid_mask;
+> +
+> +    if (arm_feature(env, ARM_FEATURE_V8)) {
+> +        valid_mask = MAKE_64BIT_MASK(0, 34);  /* ARMv8.0 */
+> +    } else {
+> +        valid_mask = MAKE_64BIT_MASK(0, 28);  /* ARMv7VE */
+> +    }
+>
+>      if (arm_feature(env, ARM_FEATURE_EL3)) {
+>          valid_mask &= ~HCR_HCD;
+> @@ -5114,6 +5119,14 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>          valid_mask |= HCR_API | HCR_APK;
+>      }
+>
+> +    if (ri->state == ARM_CP_STATE_AA32) {
+> +        /*
+> +         * Writes from aarch32 mode have more RES0 bits.
+> +         * This includes TDZ, RW, E2H, and more.
+> +         */
+> +        valid_mask &= ~0xff80ff8c90000000ull;
+> +    }
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/vfio/pci.c | 12 ------------
- 1 file changed, 12 deletions(-)
+Isn't bit HCR2 bit 16 (aka bit 32+16==48 here) also RES0 from AArch32 ?
+I suppose it's RES0 from AArch64 too, but as far as what we've
+implemented goes so are a bunch of other bits.
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 09703362df..1c0aa27386 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -124,18 +124,6 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, =
-Error **errp)
-         return;
-     }
-=20
--    if (kvm_irqchip_is_split()) {
--        /*
--         * VFIO INTx is currently not working with split kernel
--         * irqchip for level triggered interrupts.  Go the slow path
--         * as long as split is enabled so we can be at least
--         * functional (even with poor performance).
--         *
--         * TODO: Remove this after all things fixed up.
--         */
--        return;
--    }
--
-     /* Get to a known interrupt state */
-     qemu_set_fd_handler(irq_fd, NULL, NULL, vdev);
-     vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
---=20
-2.24.1
+I'm not really a fan of the hex-number here either, given we
+have HCR_* constants.
 
+thanks
+-- PMM
 
