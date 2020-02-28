@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE52C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D83C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87EBD246A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6ED8246A0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:56:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ee4eIO0j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EBD246A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmqD9rVS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6ED8246A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7fAW-0006bJ-N3
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:55:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50073)
+	id 1j7fBj-0000MK-19
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:56:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50102)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j7f9X-0004zj-W1
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:04 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7f9Z-00053H-Vb
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j7f9X-0002oA-0m
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:03 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45050
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j7f9Z-0002p2-19
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49158
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7f9W-0002o1-Ti
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:02 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7f9Y-0002on-U9
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582894442;
+ s=mimecast20190719; t=1582894444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XwDs7eB7yM8J9r+WDDmjIGrx6VK50GLopC5M52Cl3uU=;
- b=ee4eIO0jrLywUxQexV2zM5LSOcs+43XFQjbyZgerV1PUGlDpYRTzEoiQ+cbQYc0m9X2X2w
- 5rMbM3niqICCTq2/EwuTLq6iF8RuOjrqZ5Whtv30dS0SGds/0hbQGi4Q2VN41JcrXwrtYG
- JeRWwAAhbixPe325u8IlZQIn7el226A=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-2gz3hXYlO4ChF49ddIzr0g-1; Fri, 28 Feb 2020 07:54:00 -0500
-X-MC-Unique: 2gz3hXYlO4ChF49ddIzr0g-1
-Received: by mail-wm1-f72.google.com with SMTP id t17so658903wmi.7
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:54:00 -0800 (PST)
+ bh=NGU4cckMOQBBSno3d5GnmeEO95k4ubXtwQS7BoucsBw=;
+ b=OmqD9rVS1HM96Yh1mLzDv0AoAbfAjlXh7QBQWQ/mTBXuWQvojMgBdkCj5HqNxdJ54d7gOE
+ xHr/JRUxfkWOiRh4R+tJpjSpoBXq53Gj82lV+gTshT6xJXduWZrwzLmsIznaCXUqW4tpkS
+ bc/xp5w8TbtaDXjsBruDrnIPNgXHb6o=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-qUzZ9cFTMduF2i3JS8Xo1A-1; Fri, 28 Feb 2020 07:54:02 -0500
+X-MC-Unique: qUzZ9cFTMduF2i3JS8Xo1A-1
+Received: by mail-wr1-f71.google.com with SMTP id z1so1289020wrs.9
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:54:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0FgPL1xTyWyfSBALtTC0/9engcqp/M7CptMznNnbZK0=;
- b=JEzreu9yRWVvZqjcX3sf9UzR+PQLn+o9UHau65F2cTbvC1wuEQHrqWk4GcaPdlWdRA
- nrLd0FrxjjBYZ+KSyOK+Suw6NpDm93W1yzsTHu8yUfDAsNWrFcXuIfzIrJ8rBAdYcXgH
- Ongg7zakSvRRWMVfsAe4u5AMCGHKLgbd3PgqOO1Odgqj2SQGKqHqrA4g3kxNkcWvUVtU
- DE+x0jw9OwhuMXwBB3qKMpvLH74+DnZ1iqd/TE0HEOPTZDRDaHR8R2QKK4kjuIWwxMw/
- eF5fvbuVVSMSMY7zbkLh7m85XivEAUrBx94Usb6vCY0ZGZtRMWC+4XTawLyA7zUz++N6
- nTdA==
-X-Gm-Message-State: APjAAAWVeG+81/tYjV3gPVQeOmY4M6flhiE2Eg1CKitVfNwdXyLSRSe9
- fY8Hwkdi9jpkfWDtkXwe8qGM7KhjtoL417t06hBoighBL/7DuXFF3YQ+kOFLYE7b0LKqCnS6mmO
- huEX3+UBUPFI808c=
-X-Received: by 2002:a7b:cf08:: with SMTP id l8mr4600425wmg.169.1582894439246; 
- Fri, 28 Feb 2020 04:53:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx7v06HKBq9Kj6vX/A4DZnr1ikzdcav5IYjqnCsm3Y5qrj16y5xbXFeAyBP8EzWUBXymLUZTw==
-X-Received: by 2002:a7b:cf08:: with SMTP id l8mr4600406wmg.169.1582894439000; 
- Fri, 28 Feb 2020 04:53:59 -0800 (PST)
+ bh=/dnD18K5Rg50i85S9IuEqrMYly3TKELwfFapxO4Kdxw=;
+ b=m5L9Jn0fyDb1CbKeRSUaRkGA663HpWr7jIW6pHJZrpt8K/04SN3vKhX/ANtbhOxWB+
+ mll6vmOS4YgxRXIyD2hPtG66h8VKQLTu3IAfngGf6Y2LsXQmDn/W7c01Bg2sBbSYsg30
+ +wUGdUXvY3ScQXovK15VUNIwBFZtQc7hOM6MoQEA7wHprxkjh2UEOvO6PVyrD1oGTv5C
+ FBEKTxYXy+yMbQON2uKTgg5RLe/oaEyf2yQXkx+2XkeN8yMTqfPS/Qv0g8HndVBkDeBC
+ o3dPQlh4Vviga7RBFXrIhLe8ZZ/y1u+gRIGBYOaY4rhOSXAEziYO5r7cqL65ez59b0cp
+ KLmg==
+X-Gm-Message-State: APjAAAUmbGX7OOrPGE2SfEJvS6m4utMzUys16fFApplPjdZCmoKbG4l1
+ 3zD/zbDNC88KyTyW6kYymOcaGyQUzS7nlVm0SpMZbRViePTzR7E+KsphmtTHZeXFoaOKwBmn5jk
+ /fegMlrgOvqDJGs8=
+X-Received: by 2002:a7b:c119:: with SMTP id w25mr4905043wmi.112.1582894441010; 
+ Fri, 28 Feb 2020 04:54:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxOP4q9x5AyxNWEnf4sfeDn+4jd1+qHdoJpX9ZlWtegtCL1nCs2OEOMz+gvVSiFqM5gmmEcFg==
+X-Received: by 2002:a7b:c119:: with SMTP id w25mr4905028wmi.112.1582894440828; 
+ Fri, 28 Feb 2020 04:54:00 -0800 (PST)
 Received: from x1w.moovbox.local ([185.102.219.36])
- by smtp.gmail.com with ESMTPSA id d9sm12398979wrx.94.2020.02.28.04.53.57
+ by smtp.gmail.com with ESMTPSA id d9sm12398979wrx.94.2020.02.28.04.53.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 04:53:58 -0800 (PST)
+ Fri, 28 Feb 2020 04:54:00 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/5] hw/arm/mainstone: Simplify since the machines are
+Subject: [PATCH 3/5] hw/arm/omap_sx1: Simplify since the machines are
  little-endian only
-Date: Fri, 28 Feb 2020 13:53:48 +0100
-Message-Id: <20200228125351.29482-3-philmd@redhat.com>
+Date: Fri, 28 Feb 2020 13:53:49 +0100
+Message-Id: <20200228125351.29482-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.21.1
 In-Reply-To: <20200228125351.29482-1-philmd@redhat.com>
 References: <20200228125351.29482-1-philmd@redhat.com>
@@ -91,7 +91,7 @@ Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,46 +115,51 @@ for big endian is pointless, remove the unused code.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/arm/mainstone.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ hw/arm/omap_sx1.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index 6e64dfab50..1042017086 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -119,7 +119,6 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-     DeviceState *mst_irq;
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index 2bebab4171..de5ff447dc 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -114,7 +114,6 @@ static void sx1_init(MachineState *machine, const int v=
+ersion)
      DriveInfo *dinfo;
-     int i;
+     int fl_idx;
+     uint32_t flash_size =3D flash0_size;
 -    int be;
-     MemoryRegion *rom =3D g_new(MemoryRegion, 1);
 =20
-     /* Setup CPU & memory */
-@@ -130,11 +129,6 @@ static void mainstone_common_init(MemoryRegion *addres=
-s_space_mem,
-     memory_region_set_readonly(rom, true);
-     memory_region_add_subregion(address_space_mem, 0, rom);
+     if (machine->ram_size !=3D mc->default_ram_size) {
+         char *sz =3D size_to_str(mc->default_ram_size);
+@@ -154,17 +153,11 @@ static void sx1_init(MachineState *machine, const int=
+ version)
+                                 OMAP_CS2_BASE, &cs[3]);
 =20
+     fl_idx =3D 0;
 -#ifdef TARGET_WORDS_BIGENDIAN
 -    be =3D 1;
 -#else
 -    be =3D 0;
 -#endif
-     /* There are two 32MiB flash devices on the board */
-     for (i =3D 0; i < 2; i ++) {
-         dinfo =3D drive_get(IF_PFLASH, 0, i);
-@@ -142,7 +136,7 @@ static void mainstone_common_init(MemoryRegion *address=
-_space_mem,
-                                    i ? "mainstone.flash1" : "mainstone.fla=
-sh0",
-                                    MAINSTONE_FLASH,
-                                    dinfo ? blk_by_legacy_dinfo(dinfo) : NU=
-LL,
--                                   sector_len, 4, 0, 0, 0, 0, be)) {
-+                                   sector_len, 4, 0, 0, 0, 0, 0)) {
-             error_report("Error registering flash memory");
-             exit(1);
+-
+     if ((dinfo =3D drive_get(IF_PFLASH, 0, fl_idx)) !=3D NULL) {
+         if (!pflash_cfi01_register(OMAP_CS0_BASE,
+                                    "omap_sx1.flash0-1", flash_size,
+                                    blk_by_legacy_dinfo(dinfo),
+-                                   sector_size, 4, 0, 0, 0, 0, be)) {
++                                   sector_size, 4, 0, 0, 0, 0, 0)) {
+             fprintf(stderr, "qemu: Error registering flash memory %d.\n",
+                            fl_idx);
+         }
+@@ -187,7 +180,7 @@ static void sx1_init(MachineState *machine, const int v=
+ersion)
+         if (!pflash_cfi01_register(OMAP_CS1_BASE,
+                                    "omap_sx1.flash1-1", flash1_size,
+                                    blk_by_legacy_dinfo(dinfo),
+-                                   sector_size, 4, 0, 0, 0, 0, be)) {
++                                   sector_size, 4, 0, 0, 0, 0, 0)) {
+             fprintf(stderr, "qemu: Error registering flash memory %d.\n",
+                            fl_idx);
          }
 --=20
 2.21.1
