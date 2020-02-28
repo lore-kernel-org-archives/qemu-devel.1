@@ -2,69 +2,86 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BECC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F20C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 17:00:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79FE024672
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C527224672
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:59:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pFZhahSL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79FE024672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d8Hb5eA9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C527224672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7iyh-0000l0-Gp
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:59:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57742)
+	id 1j7izW-0002ru-U4
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:59:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56636)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ike-0002p6-BI
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:38 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifO-0007wH-7s
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ikb-0005YK-LZ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:36 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:27035)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
- id 1j7ikb-0005Ug-BP
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1582908273; x=1614444273;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=lDXRczXbSjQqnrjxsxyR7JmtcZU6E4pY6Xovl1kDpLQ=;
- b=pFZhahSL/vVXFRTvv1uFOY+sGbGvN1LwbJ5S8ZFhNS2m17tOPZOMR5u+
- VvUVbPwtPe96q/oHXNyrJkPIoheDw0Bk0exuQ9zDfi6CXWWZKtE3Mrf0V
- H4Gql+sitBU5sxIKaOv4LxheXikeN50mAnF3FkFX5DI6CJwJDSZXYo/Fu Y=;
-Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 28 Feb 2020 08:44:30 -0800
-Received: from vu-tsimpson-aus.qualcomm.com (HELO
- vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
- by ironmsg04-sd.qualcomm.com with ESMTP; 28 Feb 2020 08:44:30 -0800
-Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id 231BA1102; Fri, 28 Feb 2020 10:44:30 -0600 (CST)
-From: Taylor Simpson <tsimpson@quicinc.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifM-0001zk-SA
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:10 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41893)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7ifM-0001zI-Le
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:08 -0500
+Received: by mail-wr1-x441.google.com with SMTP id v4so3642525wrs.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:39:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=H9vgJ1xHyPTbz5vgbyrb9N1PuwfNuQ0QSjFXbJuKM48=;
+ b=d8Hb5eA9ftrUsULuODN5juju2IgEVy3sSpUaHbbx40qsXUSO0tstmosyZGiCCxCgSn
+ BwaFsgunCSR/zn8S7qeheUXcXy/3WoCYzvW1whaS/PAF56jkXw7bpIYM1a9O4FjoWOUw
+ 3ZVazTWpVuO4e3U/6DotxWHHIF13uI4UQ4LNCFgVYRCNYgiZ2N08ns7re5l6k1UBnGqp
+ /FHLI7ybJJC2DyA5xro6z5EI7ctJ0CrANiY7+3eaob9I6wN9vOsaae3XdFcvNASKTnXc
+ ur6WopbvutIUp352T1q2SklM/qlBfa7Bab93PPVWGpcuUu4TBpQYyUFK+iRnHQ41F3u4
+ i4Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=H9vgJ1xHyPTbz5vgbyrb9N1PuwfNuQ0QSjFXbJuKM48=;
+ b=HfBnz32/SYn+BfgwoljVCw5Ls7QxQM89tKUImh6ozmYnjupQ3P361aTc8rRsrxNzly
+ ++dl2OuSOy3ekpGOODo1Z5W7irLpsLvdrDFZq3+OK1Dp7XYJMz2954A56UAK2OSS8XEH
+ PFe+w50ctJ1LB7eSG2pdADUfCswsFnTGyE3KoNF+gPj4UiqsXgfYc9atn/O47lyo1iV2
+ 7zR4dKI1J0t8IxXqbMQUK7KyvSHupMJH/W8EkLv9VR6n2ILzxQdfAB0laOv5WXjXfa1/
+ m1ZNFeJSPcGDetrdJlnz1tUVWuqsfFpwrDGwtwZ43QbPFecoSRTH0+22FkmDr5MPIz24
+ dasA==
+X-Gm-Message-State: APjAAAVgH2D1iEast/tFW0NMPSqrs54RS4WIGiNrkblbG4qkwlEtbhPB
+ r0yqZ+8vcFKVPI5AwEyMdyMj8iQ9x+dOiw==
+X-Google-Smtp-Source: APXvYqxxwZQ7PBWv2Y8MJOjF7eRG/uFopVTTz+P1pdFAQlaoz3nM0HpVUnWZNUtodiJgmUxQIGgWIA==
+X-Received: by 2002:a5d:5007:: with SMTP id e7mr5661156wrt.228.1582907947340; 
+ Fri, 28 Feb 2020 08:39:07 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.39.06
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 08:39:06 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 27/67] Hexagon generator phase 2 - printinsn-generated.h
-Date: Fri, 28 Feb 2020 10:43:23 -0600
-Message-Id: <1582908244-304-28-git-send-email-tsimpson@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
-References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
+Subject: [PULL 21/33] target/arm: Split VFM decode
+Date: Fri, 28 Feb 2020 16:38:28 +0000
+Message-Id: <20200228163840.23585-22-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
+References: <20200228163840.23585-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.39
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,108 +93,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
- Taylor Simpson <tsimpson@quicinc.com>, philmd@redhat.com,
- aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RGF0YSBmb3IgcHJpbnRpbmcgKGRpc2Fzc2VtYmxpbmcpIGVhY2ggaW5zdHJ1Y3Rpb24gKGZvcm1h
-dCBzdHJpbmcgKyBvcGVyYW5kcykKClNpZ25lZC1vZmYtYnk6IFRheWxvciBTaW1wc29uIDx0c2lt
-cHNvbkBxdWljaW5jLmNvbT4KLS0tCiB0YXJnZXQvaGV4YWdvbi9kb19xZW11LnB5IHwgMTUxICsr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIDEgZmlsZSBjaGFu
-Z2VkLCAxNTEgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL3RhcmdldC9oZXhhZ29uL2RvX3Fl
-bXUucHkgYi90YXJnZXQvaGV4YWdvbi9kb19xZW11LnB5CmluZGV4IDBjNzY0M2EuLjMyNTQzYzgg
-MTAwNzU1Ci0tLSBhL3RhcmdldC9oZXhhZ29uL2RvX3FlbXUucHkKKysrIGIvdGFyZ2V0L2hleGFn
-b24vZG9fcWVtdS5weQpAQCAtODkyLDMgKzg5MiwxNTQgQEAgcmVhbGYud3JpdGUoZi5nZXR2YWx1
-ZSgpKQogcmVhbGYuY2xvc2UoKQogZi5jbG9zZSgpCiAKKyMjCisjIyBHZW5lcmF0ZSB0aGUgcHJp
-bnRpbnNuX2dlbmVyYXRlZC5oIGZpbGUKKyMjICAgICBEYXRhIGZvciBwcmludGluZyBlYWNoIGlu
-c3RydWN0aW9uIChmb3JtYXQgc3RyaW5nICsgb3BlcmFuZHMpCisjIworZGVmIHJlZ3ByaW50ZXIo
-bSk6CisgICAgc3RyID0gbS5ncm91cCgxKQorICAgIHN0ciArPSAiOiIuam9pbihbIiVkIl0qbGVu
-KG0uZ3JvdXAoMikpKQorICAgIHN0ciArPSBtLmdyb3VwKDMpCisgICAgaWYgKCdTJyBpbiBtLmdy
-b3VwKDEpKSBhbmQgKGxlbihtLmdyb3VwKDIpKSA9PSAxKToKKyAgICAgICAgc3RyICs9ICIvJXMi
-CisgICAgZWxpZiAoJ0MnIGluIG0uZ3JvdXAoMSkpIGFuZCAobGVuKG0uZ3JvdXAoMikpID09IDEp
-OgorICAgICAgICBzdHIgKz0gIi8lcyIKKyAgICByZXR1cm4gc3RyCisKKyMgUmVndWxhciBleHBy
-ZXNzaW9uIHRoYXQgbWF0Y2hlcyBhbnkgb3BlcmF0b3IgdGhhdCBjb250YWlucyAnPScgY2hhcmFj
-dGVyOgorb3Bzd2l0aGVxdWFsX3JlID0gJ1stK14mfCE8Pj1dPz0nCisjIFJlZ3VsYXIgZXhwcmVz
-c2lvbiB0aGF0IG1hdGNoZXMgYW55IGFzc2lnbm1lbnQgb3BlcmF0b3IuCithc3NpZ25tZW50X3Jl
-ID0gJ1stK14mfF0/PScKKworIyBPdXQgb2YgdGhlIG9wZXJhdG9ycyB0aGF0IGNvbnRhaW4gdGhl
-ID0gc2lnbiwgaWYgdGhlIG9wZXJhdG9yIGlzIGFsc28gYW4KKyMgYXNzaWdubWVudCwgc3BhY2Vz
-IHdpbGwgYmUgYWRkZWQgYXJvdW5kIGl0LCB1bmxlc3MgaXQncyBlbmNsb3NlZCB3aXRoaW4KKyMg
-cGFyZW50aGVzZXMsIG9yIHNwYWNlcyBhcmUgYWxyZWFkeSBwcmVzZW50LgorCitlcXVhbHMgPSBy
-ZS5jb21waWxlKG9wc3dpdGhlcXVhbF9yZSkKK2Fzc2lnbiA9IHJlLmNvbXBpbGUoYXNzaWdubWVu
-dF9yZSkKKworZGVmIHNwYWNpZnkocyk6CisgICAgc2xlbiA9IGxlbihzKQorICAgIHBhcmVuX2Nv
-dW50ID0ge30KKyAgICBpID0gMAorICAgIHBjID0gMAorICAgIHdoaWxlIGkgPCBzbGVuOgorICAg
-ICAgICBjID0gc1tpXQorICAgICAgICBpZiBjID09ICcoJzoKKyAgICAgICAgICAgIHBjICs9IDEK
-KyAgICAgICAgZWxpZiBjID09ICcpJzoKKyAgICAgICAgICAgIHBjIC09IDEKKyAgICAgICAgcGFy
-ZW5fY291bnRbaV0gPSBwYworICAgICAgICBpICs9IDEKKworICAgICMgSXRlcmF0ZSBvdmVyIGFs
-bCBvcGVyYXRvcnMgdGhhdCBjb250YWluIHRoZSBlcXVhbCBzaWduLiBJZiBhbnkKKyAgICAjIG1h
-dGNoIGlzIGFsc28gYW4gYXNzaWdubWVudCBvcGVyYXRvciwgYWRkIHNwYWNlcyBhcm91bmQgaXQg
-aWYKKyAgICAjIHRoZSBwYXJlbnRoZXNpcyBjb3VudCBpcyAwLgorICAgIHBvcyA9IDAKKyAgICBv
-dXQgPSBbXQorICAgIGZvciBtIGluIGVxdWFscy5maW5kaXRlcihzKToKKyAgICAgICAgbXMgPSBt
-LnN0YXJ0KCkKKyAgICAgICAgbWUgPSBtLmVuZCgpCisgICAgICAgICMgdCBpcyB0aGUgc3RyaW5n
-IHRoYXQgbWF0Y2hlZCBvcHN3aXRoZXF1YWxfcmUuCisgICAgICAgIHQgPSBtLnN0cmluZ1ttczpt
-ZV0KKyAgICAgICAgb3V0ICs9IHNbcG9zOm1zXQorICAgICAgICBwb3MgPSBtZQorICAgICAgICBp
-ZiBwYXJlbl9jb3VudFttc10gPT0gMDoKKyAgICAgICAgICAgICMgQ2hlY2sgaWYgdGhlIGVudGly
-ZSBzdHJpbmcgdCBpcyBhbiBhc3NpZ25tZW50LgorICAgICAgICAgICAgYW0gPSBhc3NpZ24ubWF0
-Y2godCkKKyAgICAgICAgICAgIGlmIGFtIGFuZCBsZW4oYW0uZ3JvdXAoMCkpID09IG1lLW1zOgor
-ICAgICAgICAgICAgICAgICMgRG9uJ3QgYWRkIHNwYWNlcyBpZiB0aGV5IGFyZSBhbHJlYWR5IHRo
-ZXJlLgorICAgICAgICAgICAgICAgIGlmIG1zID4gMCBhbmQgc1ttcy0xXSAhPSAnICc6CisgICAg
-ICAgICAgICAgICAgICAgIG91dC5hcHBlbmQoJyAnKQorICAgICAgICAgICAgICAgIG91dCArPSB0
-CisgICAgICAgICAgICAgICAgaWYgbWUgPCBzbGVuIGFuZCBzW21lXSAhPSAnICc6CisgICAgICAg
-ICAgICAgICAgICAgIG91dC5hcHBlbmQoJyAnKQorICAgICAgICAgICAgICAgIGNvbnRpbnVlCisg
-ICAgICAgICMgSWYgdGhpcyBpcyBub3QgYW4gYXNzaWdubWVudCwganVzdCBhcHBlbmQgaXQgdG8g
-dGhlIG91dHB1dAorICAgICAgICAjIHN0cmluZy4KKyAgICAgICAgb3V0ICs9IHQKKworICAgICMg
-QXBwZW5kIHRoZSByZW1haW5pbmcgcGFydCBvZiB0aGUgc3RyaW5nLgorICAgIG91dCArPSBzW3Bv
-czpsZW4ocyldCisgICAgcmV0dXJuICcnLmpvaW4ob3V0KQorCitpbW1leHRfY2FzZXJlID0gcmUu
-Y29tcGlsZShyJ0lNTUVYVFwoKFtBLVphLXpdKScpCisKK2YgPSBTdHJpbmdJTygpCisKK2ZvciB0
-YWcgaW4gdGFnczoKKyAgICBpZiBub3QgYmVoZGljdFt0YWddOiBjb250aW51ZQorICAgIGV4dGVu
-ZGFibGVfdXBwZXJfaW1tID0gRmFsc2UKKyAgICBleHRlbmRhYmxlX2xvd2VyX2ltbSA9IEZhbHNl
-CisgICAgbSA9IGltbWV4dF9jYXNlcmUuc2VhcmNoKHNlbWRpY3RbdGFnXSkKKyAgICBpZiBtOgor
-ICAgICAgICBpZiBtLmdyb3VwKDEpLmlzdXBwZXIoKToKKyAgICAgICAgICAgIGV4dGVuZGFibGVf
-dXBwZXJfaW1tID0gVHJ1ZQorICAgICAgICBlbHNlOgorICAgICAgICAgICAgZXh0ZW5kYWJsZV9s
-b3dlcl9pbW0gPSBUcnVlCisgICAgYmVoID0gYmVoZGljdFt0YWddCisgICAgYmVoID0gcmVncmUu
-c3ViKHJlZ3ByaW50ZXIsYmVoKQorICAgIGJlaCA9IGFic2ltbXJlLnN1YihyIiMlczB4JXgiLGJl
-aCkKKyAgICBiZWggPSByZWxpbW1yZS5zdWIociJQQyslcyVkIixiZWgpCisgICAgYmVoID0gc3Bh
-Y2lmeShiZWgpCisgICAgIyBQcmludCBvdXQgYSBsaXRlcmFsICIlcyIgYXQgdGhlIGVuZCwgdXNl
-ZCB0byBtYXRjaCBlbXB0eSBzdHJpbmcKKyAgICAjIHNvIEMgd29uJ3QgY29tcGxhaW4gYXQgdXMK
-KyAgICBpZiAoIkFfVkVDWCIgaW4gYXR0cmliZGljdFt0YWddKTogbWFjbmFtZSA9ICJERUZfVkVD
-WF9QUklOVElORk8iCisgICAgZWxzZTogbWFjbmFtZSA9ICJERUZfUFJJTlRJTkZPIgorICAgIGYu
-d3JpdGUoJyVzKCVzLCIlcyUlcyInICUgKG1hY25hbWUsdGFnLGJlaCkpCisgICAgcmVnc19vcl9p
-bW1zID0gcmVnX29yX2ltbXJlLmZpbmRhbGwoYmVoZGljdFt0YWddKQorICAgIHJpID0gMAorICAg
-IHNlZW5yZWdzID0ge30KKyAgICBmb3IgYWxscmVncyxhLGIsYyxkLGFsbGltbSxpbW1sZXR0LGJp
-dHMsaW1tc2hpZnQgaW4gcmVnc19vcl9pbW1zOgorICAgICAgICBpZiBhOgorICAgICAgICAgICAg
-I3JlZ2lzdGVyCisgICAgICAgICAgICBpZiBiIGluIHNlZW5yZWdzOgorICAgICAgICAgICAgICAg
-IHJlZ25vID0gc2VlbnJlZ3NbYl0KKyAgICAgICAgICAgIGVsc2U6CisgICAgICAgICAgICAgICAg
-cmVnbm8gPSByaQorICAgICAgICAgICAgaWYgbGVuKGIpID09IDE6CisgICAgICAgICAgICAgICAg
-Zi53cml0ZSgnLFJFR05PKCVkKScgJSByZWdubykKKyAgICAgICAgICAgICAgICBpZiAnUycgaW4g
-YToKKyAgICAgICAgICAgICAgICAgICAgZi53cml0ZSgnLHNyZWcyc3RyKFJFR05PKCVkKSknICUg
-cmVnbm8pCisgICAgICAgICAgICAgICAgZWxpZiAnQycgaW4gYToKKyAgICAgICAgICAgICAgICAg
-ICAgZi53cml0ZSgnLGNyZWcyc3RyKFJFR05PKCVkKSknICUgcmVnbm8pCisgICAgICAgICAgICBl
-bGlmIGxlbihiKSA9PSAyOgorICAgICAgICAgICAgICAgIGYud3JpdGUoJyxSRUdOTyglZCkrMSxS
-RUdOTyglZCknICUgKHJlZ25vLHJlZ25vKSkKKyAgICAgICAgICAgIGVsaWYgbGVuKGIpID09IDQ6
-CisgICAgICAgICAgICAgICAgZi53cml0ZSgnLFJFR05PKCVkKV4zLFJFR05PKCVkKV4yLFJFR05P
-KCVkKV4xLFJFR05PKCVkKScgJSBcCisgICAgICAgICAgICAgICAgICAgICAgICAocmVnbm8scmVn
-bm8scmVnbm8scmVnbm8pKQorICAgICAgICAgICAgZWxzZToKKyAgICAgICAgICAgICAgICBwcmlu
-dCgiUHV0IHNvbWUgc3R1ZmYgdG8gaGFuZGxlIHF1YWRzIGhlcmUiKQorICAgICAgICAgICAgaWYg
-YiBub3QgaW4gc2VlbnJlZ3M6CisgICAgICAgICAgICAgICAgc2VlbnJlZ3NbYl0gPSByaQorICAg
-ICAgICAgICAgICAgIHJpICs9IDEKKyAgICAgICAgZWxzZToKKyAgICAgICAgICAgICNpbW1lZGlh
-dGUKKyAgICAgICAgICAgIGlmIChpbW1sZXR0LmlzdXBwZXIoKSk6CisgICAgICAgICAgICAgICAg
-aWYgZXh0ZW5kYWJsZV91cHBlcl9pbW06CisgICAgICAgICAgICAgICAgICAgIGlmIGltbWxldHQg
-aW4gJ3JSJzoKKyAgICAgICAgICAgICAgICAgICAgICAgIGYud3JpdGUoJyxpbnNuLT5leHRlbnNp
-b25fdmFsaWQ/IiMjIjoiIicpCisgICAgICAgICAgICAgICAgICAgIGVsc2U6CisgICAgICAgICAg
-ICAgICAgICAgICAgICBmLndyaXRlKCcsaW5zbi0+ZXh0ZW5zaW9uX3ZhbGlkPyIjIjoiIicpCisg
-ICAgICAgICAgICAgICAgZWxzZToKKyAgICAgICAgICAgICAgICAgICAgZi53cml0ZSgnLCIiJykK
-KyAgICAgICAgICAgICAgICBpaSA9IDEKKyAgICAgICAgICAgIGVsc2U6CisgICAgICAgICAgICAg
-ICAgaWYgZXh0ZW5kYWJsZV9sb3dlcl9pbW06CisgICAgICAgICAgICAgICAgICAgIGlmIGltbWxl
-dHQgaW4gJ3JSJzoKKyAgICAgICAgICAgICAgICAgICAgICAgIGYud3JpdGUoJyxpbnNuLT5leHRl
-bnNpb25fdmFsaWQ/IiMjIjoiIicpCisgICAgICAgICAgICAgICAgICAgIGVsc2U6CisgICAgICAg
-ICAgICAgICAgICAgICAgICBmLndyaXRlKCcsaW5zbi0+ZXh0ZW5zaW9uX3ZhbGlkPyIjIjoiIicp
-CisgICAgICAgICAgICAgICAgZWxzZToKKyAgICAgICAgICAgICAgICAgICAgZi53cml0ZSgnLCIi
-JykKKyAgICAgICAgICAgICAgICBpaSA9IDAKKyAgICAgICAgICAgIGYud3JpdGUoJyxJTU1OTygl
-ZCknICUgaWkpCisgICAgIyBhcHBlbmQgZW1wdHkgc3RyaW5nIHNvIHRoZXJlIGlzIGF0IGxlYXN0
-IG9uZSBtb3JlIGFyZworICAgIGYud3JpdGUoJywiIilcbicpCisKK3JlYWxmID0gb3BlbigncHJp
-bnRpbnNuX2dlbmVyYXRlZC5oJywndycpCityZWFsZi53cml0ZShmLmdldHZhbHVlKCkpCityZWFs
-Zi5jbG9zZSgpCitmLmNsb3NlKCkKKworCi0tIAoyLjcuNAoK
+From: Richard Henderson <richard.henderson@linaro.org>
+
+Passing the raw o1 and o2 fields from the manual is less
+instructive than it might be.  Do the full decode and let
+the trans_* functions pass in booleans to a helper.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200224222232.13807-17-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-vfp.inc.c | 52 ++++++++++++++++++++++++++++++----
+ target/arm/vfp.decode          | 17 +++++------
+ 2 files changed, 55 insertions(+), 14 deletions(-)
+
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index 1964af3ea5e..41aa67c133a 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1784,7 +1784,7 @@ static bool trans_VDIV_dp(DisasContext *s, arg_VDIV_dp *a)
+     return do_vfp_3op_dp(s, gen_helper_vfp_divd, a->vd, a->vn, a->vm, false);
+ }
+ 
+-static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
++static bool do_vfm_sp(DisasContext *s, arg_VFMA_sp *a, bool neg_n, bool neg_d)
+ {
+     /*
+      * VFNMA : fd = muladd(-fd,  fn, fm)
+@@ -1828,12 +1828,12 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+ 
+     neon_load_reg32(vn, a->vn);
+     neon_load_reg32(vm, a->vm);
+-    if (a->o2) {
++    if (neg_n) {
+         /* VFNMS, VFMS */
+         gen_helper_vfp_negs(vn, vn);
+     }
+     neon_load_reg32(vd, a->vd);
+-    if (a->o1 & 1) {
++    if (neg_d) {
+         /* VFNMA, VFNMS */
+         gen_helper_vfp_negs(vd, vd);
+     }
+@@ -1849,7 +1849,27 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+     return true;
+ }
+ 
+-static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
++static bool trans_VFMA_sp(DisasContext *s, arg_VFMA_sp *a)
++{
++    return do_vfm_sp(s, a, false, false);
++}
++
++static bool trans_VFMS_sp(DisasContext *s, arg_VFMS_sp *a)
++{
++    return do_vfm_sp(s, a, true, false);
++}
++
++static bool trans_VFNMA_sp(DisasContext *s, arg_VFNMA_sp *a)
++{
++    return do_vfm_sp(s, a, false, true);
++}
++
++static bool trans_VFNMS_sp(DisasContext *s, arg_VFNMS_sp *a)
++{
++    return do_vfm_sp(s, a, true, true);
++}
++
++static bool do_vfm_dp(DisasContext *s, arg_VFMA_dp *a, bool neg_n, bool neg_d)
+ {
+     /*
+      * VFNMA : fd = muladd(-fd,  fn, fm)
+@@ -1905,12 +1925,12 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+ 
+     neon_load_reg64(vn, a->vn);
+     neon_load_reg64(vm, a->vm);
+-    if (a->o2) {
++    if (neg_n) {
+         /* VFNMS, VFMS */
+         gen_helper_vfp_negd(vn, vn);
+     }
+     neon_load_reg64(vd, a->vd);
+-    if (a->o1 & 1) {
++    if (neg_d) {
+         /* VFNMA, VFNMS */
+         gen_helper_vfp_negd(vd, vd);
+     }
+@@ -1926,6 +1946,26 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+     return true;
+ }
+ 
++static bool trans_VFMA_dp(DisasContext *s, arg_VFMA_dp *a)
++{
++    return do_vfm_dp(s, a, false, false);
++}
++
++static bool trans_VFMS_dp(DisasContext *s, arg_VFMS_dp *a)
++{
++    return do_vfm_dp(s, a, true, false);
++}
++
++static bool trans_VFNMA_dp(DisasContext *s, arg_VFNMA_dp *a)
++{
++    return do_vfm_dp(s, a, false, true);
++}
++
++static bool trans_VFNMS_dp(DisasContext *s, arg_VFNMS_dp *a)
++{
++    return do_vfm_dp(s, a, true, true);
++}
++
+ static bool trans_VMOV_imm_sp(DisasContext *s, arg_VMOV_imm_sp *a)
+ {
+     uint32_t delta_d = 0;
+diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
+index 4f294f88be5..5fd70f975ae 100644
+--- a/target/arm/vfp.decode
++++ b/target/arm/vfp.decode
+@@ -130,14 +130,15 @@ VSUB_dp      ---- 1110 0.11 .... .... 1011 .1.0 ....        @vfp_dnm_d
+ VDIV_sp      ---- 1110 1.00 .... .... 1010 .0.0 ....        @vfp_dnm_s
+ VDIV_dp      ---- 1110 1.00 .... .... 1011 .0.0 ....        @vfp_dnm_d
+ 
+-VFM_sp       ---- 1110 1.01 .... .... 1010 . o2:1 . 0 .... \
+-             vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=1
+-VFM_dp       ---- 1110 1.01 .... .... 1011 . o2:1 . 0 .... \
+-             vm=%vm_dp vn=%vn_dp vd=%vd_dp o1=1
+-VFM_sp       ---- 1110 1.10 .... .... 1010 . o2:1 . 0 .... \
+-             vm=%vm_sp vn=%vn_sp vd=%vd_sp o1=2
+-VFM_dp       ---- 1110 1.10 .... .... 1011 . o2:1 . 0 .... \
+-             vm=%vm_dp vn=%vn_dp vd=%vd_dp o1=2
++VFMA_sp      ---- 1110 1.10 .... .... 1010 .0. 0 ....       @vfp_dnm_s
++VFMS_sp      ---- 1110 1.10 .... .... 1010 .1. 0 ....       @vfp_dnm_s
++VFNMA_sp     ---- 1110 1.01 .... .... 1010 .0. 0 ....       @vfp_dnm_s
++VFNMS_sp     ---- 1110 1.01 .... .... 1010 .1. 0 ....       @vfp_dnm_s
++
++VFMA_dp      ---- 1110 1.10 .... .... 1011 .0.0 ....        @vfp_dnm_d
++VFMS_dp      ---- 1110 1.10 .... .... 1011 .1.0 ....        @vfp_dnm_d
++VFNMA_dp     ---- 1110 1.01 .... .... 1011 .0.0 ....        @vfp_dnm_d
++VFNMS_dp     ---- 1110 1.01 .... .... 1011 .1.0 ....        @vfp_dnm_d
+ 
+ VMOV_imm_sp  ---- 1110 1.11 .... .... 1010 0000 .... \
+              vd=%vd_sp imm=%vmov_imm
+-- 
+2.20.1
+
 
