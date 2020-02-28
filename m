@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5073AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E43A7C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CB2E2467B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B33EA2467B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="rNILWEs/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB2E2467B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LlBBjBS+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B33EA2467B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7is4-0006XM-5U
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:52:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57635)
+	id 1j7is5-0006bS-Qj
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:52:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ikb-0002m5-8P
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7ikc-0002oa-Md
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@qualcomm.com>) id 1j7ikZ-0005WH-Qt
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:33 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:13235)
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7ika-0005XD-OM
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:34 -0500
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:13250)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
- id 1j7ikZ-0005U6-HN
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:31 -0500
+ id 1j7ika-0005Uz-CN
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1582908271; x=1614444271;
+ t=1582908272; x=1614444272;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=KjSfe/LNgxASg/kGzX2P+rVYr/qkO7AS5cqs9VoEV50=;
- b=rNILWEs/NhYlGeNT2VR0IjxAcDOELwhpIVL7e5lVM0v/4WHAWDLswBiL
- ebEEdRDGezq/X8lqBddY0zko+OWfzEKAkHxdqMuKLsEA2Gjvm9p1TIhp4
- jz3VWlKCHdHUs9pb+DlOYYvtKebkEoBqVZhOAfAbvDZt4Xt71+Ln8KThs M=;
+ bh=tUWIh60VIBZ0LRuhNAwMPb0vZxGR3JoiB9ulRsp8naY=;
+ b=LlBBjBS+SQmPywNMZxbIfI7zB+uAqirrQudbLJ2a5genMN1RFubdiCdJ
+ ldzTBj+63KMPslw/VbSnaIXKIZecFxhayimiRMhAGwy2QMHfAZlbFLa9R
+ bhAy1LNr1xj09V+CoJN7ZoWCglBHIY+h64VtXv7tbA4y+Zf2JgxZcGcK/ o=;
 Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
  by alexa-out-sd-01.qualcomm.com with ESMTP; 28 Feb 2020 08:44:28 -0800
 Received: from vu-tsimpson-aus.qualcomm.com (HELO
  vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
  by ironmsg-SD-alpha.qualcomm.com with ESMTP; 28 Feb 2020 08:44:28 -0800
 Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id B060EFCD; Fri, 28 Feb 2020 10:44:27 -0600 (CST)
+ id 329C8119A; Fri, 28 Feb 2020 10:44:28 -0600 (CST)
 From: Taylor Simpson <tsimpson@quicinc.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 09/67] Hexagon architecture types
-Date: Fri, 28 Feb 2020 10:43:05 -0600
-Message-Id: <1582908244-304-10-git-send-email-tsimpson@quicinc.com>
+Subject: [RFC PATCH v2 13/67] Hexagon register map
+Date: Fri, 28 Feb 2020 10:43:09 -0600
+Message-Id: <1582908244-304-14-git-send-email-tsimpson@quicinc.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
 References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
@@ -83,37 +83,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RGVmaW5lIHR5cGVzIHVzZWQgaW4gZmlsZXMgaW1wb3J0ZWQgZnJvbSB0aGUgSGV4YWdvbiBhcmNo
-aXRlY3R1cmUgbGlicmFyeQoKU2lnbmVkLW9mZi1ieTogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29u
-QHF1aWNpbmMuY29tPgotLS0KIHRhcmdldC9oZXhhZ29uL2hleF9hcmNoX3R5cGVzLmggfCA0MiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQs
-IDQyIGluc2VydGlvbnMoKykKIGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvaGV4YWdvbi9oZXhf
-YXJjaF90eXBlcy5oCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0L2hleGFnb24vaGV4X2FyY2hfdHlwZXMu
-aCBiL3RhcmdldC9oZXhhZ29uL2hleF9hcmNoX3R5cGVzLmgKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-aW5kZXggMDAwMDAwMC4uYmI1OGY0OQotLS0gL2Rldi9udWxsCisrKyBiL3RhcmdldC9oZXhhZ29u
-L2hleF9hcmNoX3R5cGVzLmgKQEAgLTAsMCArMSw0MiBAQAorLyoKKyAqICBDb3B5cmlnaHQoYykg
-MjAxOS0yMDIwIFF1YWxjb21tIElubm92YXRpb24gQ2VudGVyLCBJbmMuIEFsbCBSaWdodHMgUmVz
-ZXJ2ZWQuCisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJl
-ZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5CisgKiAgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRo
-ZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkKKyAqICB0aGUgRnJl
-ZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBv
-cgorICogIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZlcnNpb24uCisgKgorICogIFRoaXMg
-cHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVs
-LAorICogIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVk
-IHdhcnJhbnR5IG9mCisgKiAgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElD
-VUxBUiBQVVJQT1NFLiAgU2VlIHRoZQorICogIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZv
-ciBtb3JlIGRldGFpbHMuCisgKgorICogIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkg
-b2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlCisgKiAgYWxvbmcgd2l0aCB0aGlzIHBy
-b2dyYW07IGlmIG5vdCwgc2VlIDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4KKyAqLwor
-CisjaWZuZGVmIEhFWEFHT05fQVJDSF9UWVBFU19ICisjZGVmaW5lIEhFWEFHT05fQVJDSF9UWVBF
-U19ICisKKy8qCisgKiBUaGVzZSB0eXBlcyBhcmUgdXNlZCBieSB0aGUgY29kZSBnZW5lcmF0ZWQg
-ZnJvbSB0aGUgSGV4YWdvbgorICogYXJjaGl0ZWN0dXJlIGxpYnJhcnkuCisgKi8KK3R5cGVkZWYg
-dW5zaWduZWQgY2hhciBzaXplMXVfdDsKK3R5cGVkZWYgY2hhciBzaXplMXNfdDsKK3R5cGVkZWYg
-dW5zaWduZWQgc2hvcnQgaW50IHNpemUydV90OwordHlwZWRlZiBzaG9ydCBzaXplMnNfdDsKK3R5
-cGVkZWYgdW5zaWduZWQgaW50IHNpemU0dV90OwordHlwZWRlZiBpbnQgc2l6ZTRzX3Q7Cit0eXBl
-ZGVmIHVuc2lnbmVkIGxvbmcgbG9uZyBpbnQgc2l6ZTh1X3Q7Cit0eXBlZGVmIGxvbmcgbG9uZyBp
-bnQgc2l6ZThzX3Q7Cit0eXBlZGVmIHNpemU4dV90IHBhZGRyX3Q7Cit0eXBlZGVmIHNpemU0dV90
-IHZhZGRyX3Q7Cit0eXBlZGVmIHNpemU4dV90IHBjeWNsZXNfdDsKKwordHlwZWRlZiBzdHJ1Y3Qg
-c2l6ZTE2cyB7CisgICAgc2l6ZThzX3QgaGk7CisgICAgc2l6ZTh1X3QgbG87Cit9IHNpemUxNnNf
-dDsKKworI2VuZGlmCi0tIAoyLjcuNAoK
+Q2VydGFpbiBvcGVyYW5kIHR5cGVzIHJlcHJlc2VudCBhIG5vbi1jb250aWd1b3VzIHNldCBvZiB2
+YWx1ZXMuCkZvciBleGFtcGxlLCB0aGUgY29tcG91bmQgY29tcGFyZS1hbmQtanVtcCBpbnN0cnVj
+dGlvbiBjYW4gb25seSBhY2Nlc3MKcmVnaXN0ZXJzIFIwLVI3IGFuZCBSMTYtMjMuClRoaXMgdGFi
+bGUgcmVwcmVzZW50cyB0aGUgbWFwcGluZyBmcm9tIHRoZSBlbmNvZGluZyB0byB0aGUgYWN0dWFs
+IHZhbHVlcy4KClNpZ25lZC1vZmYtYnk6IFRheWxvciBTaW1wc29uIDx0c2ltcHNvbkBxdWljaW5j
+LmNvbT4KLS0tCiB0YXJnZXQvaGV4YWdvbi9yZWdtYXAuaCB8IDM4ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgMzggaW5zZXJ0aW9ucygrKQog
+Y3JlYXRlIG1vZGUgMTAwNjQ0IHRhcmdldC9oZXhhZ29uL3JlZ21hcC5oCgpkaWZmIC0tZ2l0IGEv
+dGFyZ2V0L2hleGFnb24vcmVnbWFwLmggYi90YXJnZXQvaGV4YWdvbi9yZWdtYXAuaApuZXcgZmls
+ZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi4yYmNjMGRlCi0tLSAvZGV2L251bGwKKysrIGIv
+dGFyZ2V0L2hleGFnb24vcmVnbWFwLmgKQEAgLTAsMCArMSwzOCBAQAorLyoKKyAqICBDb3B5cmln
+aHQoYykgMjAxOS0yMDIwIFF1YWxjb21tIElubm92YXRpb24gQ2VudGVyLCBJbmMuIEFsbCBSaWdo
+dHMgUmVzZXJ2ZWQuCisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3Ug
+Y2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5CisgKiAgaXQgdW5kZXIgdGhlIHRlcm1z
+IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkKKyAqICB0
+aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNl
+bnNlLCBvcgorICogIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZlcnNpb24uCisgKgorICog
+IFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUg
+dXNlZnVsLAorICogIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBp
+bXBsaWVkIHdhcnJhbnR5IG9mCisgKiAgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEg
+UEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZQorICogIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNl
+bnNlIGZvciBtb3JlIGRldGFpbHMuCisgKgorICogIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBh
+IGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlCisgKiAgYWxvbmcgd2l0aCB0
+aGlzIHByb2dyYW07IGlmIG5vdCwgc2VlIDxodHRwOi8vd3d3LmdudS5vcmcvbGljZW5zZXMvPi4K
+KyAqLworCisvKgorICogIENlcnRhaW4gb3BlcmFuZCB0eXBlcyByZXByZXNlbnQgYSBub24tY29u
+dGlndW91cyBzZXQgb2YgdmFsdWVzLgorICogIEZvciBleGFtcGxlLCB0aGUgY29tcG91bmQgY29t
+cGFyZS1hbmQtanVtcCBpbnN0cnVjdGlvbiBjYW4gb25seSBhY2Nlc3MKKyAqICByZWdpc3RlcnMg
+UjAtUjcgYW5kIFIxNi0yMy4KKyAqICBUaGlzIHRhYmxlIHJlcHJlc2VudHMgdGhlIG1hcHBpbmcg
+ZnJvbSB0aGUgZW5jb2RpbmcgdG8gdGhlIGFjdHVhbCB2YWx1ZXMuCisgKi8KKworI2lmbmRlZiBI
+RVhBR09OX1JFR01BUF9ICisjZGVmaW5lIEhFWEFHT05fUkVHTUFQX0gKKworICAgICAgICAvKiBO
+YW1lICAgTnVtIFRhYmxlICovCitERUZfUkVHTUFQKFJfMTYsICAxNiwgMCwgMSwgMiwgMywgNCwg
+NSwgNiwgNywgMTYsIDE3LCAxOCwgMTksIDIwLCAyMSwgMjIsIDIzKQorREVGX1JFR01BUChSX184
+LCAgOCwgIDAsIDIsIDQsIDYsIDE2LCAxOCwgMjAsIDIyKQorREVGX1JFR01BUChSX180LCAgNCwg
+IDAsIDIsIDQsIDYpCitERUZfUkVHTUFQKFJfNCwgICA0LCAgMCwgMSwgMiwgMykKK0RFRl9SRUdN
+QVAoUl84UywgIDgsICAwLCAxLCAyLCAzLCAxNiwgMTcsIDE4LCAxOSkKK0RFRl9SRUdNQVAoUl84
+LCAgIDgsICAwLCAxLCAyLCAzLCA0LCA1LCA2LCA3KQorREVGX1JFR01BUChWX184LCAgOCwgIDAs
+IDQsIDgsIDEyLCAxNiwgMjAsIDI0LCAyOCkKK0RFRl9SRUdNQVAoVl9fMTYsIDE2LCAwLCAyLCA0
+LCA2LCA4LCAxMCwgMTIsIDE0LCAxNiwgMTgsIDIwLCAyMiwgMjQsIDI2LCAyOCwgMzApCisKKyNl
+bmRpZgotLSAKMi43LjQKCg==
 
