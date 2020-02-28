@@ -2,84 +2,91 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E898C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E84DEC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:08:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AAE3246AC
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7C56246A0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:08:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hH5PxTLe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AAE3246AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvOiKQi/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7C56246A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7cYW-0007rQ-7Q
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:07:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56773)
+	id 1j7cZd-0001G8-Sq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:08:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56901)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j7cXo-0007MO-Uv
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:06:58 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7cYa-00086K-Ed
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:07:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1j7cXn-0002K0-TH
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:06:56 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1j7cXl-0002H6-Gp; Fri, 28 Feb 2020 05:06:53 -0500
-Received: by mail-wr1-x441.google.com with SMTP id l5so2277424wrx.4;
- Fri, 28 Feb 2020 02:06:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=QcsX2Iifni8h7N5Wd79o/fV54m+uzfu3rFUKUk2JlQA=;
- b=hH5PxTLemaCYtpVRGZYWxWtnOvFUL7rbH5Qi/13c1YwNRbl4FBpDUuTnMTl/m/1jMV
- s+k6/n11zmrTruwYlGe63PMZwPMRNh2mVLrTY2YPfBSzCAU/55N5ZihU8Y8ks50TAAuc
- 3c6iLyRjjxsdr5iw1JgxZcOhmJV63Nl+HRtlHvEI+hMHfEE0h/B0ZUQBc2zPywYLZSQt
- fjH4ukGiQgq7eiTNnslFYFqp6oFz3+wqtfmK8ZK/mcadRx3Yvh04LTsrBoEMMx1bC7zH
- ArPA+wdi/5TPOgdavaGpYFhFBE2Gd7q4+To5JW+UXXiyycQDpPZq/FKvLHgLgCEigCKy
- nDwA==
+ (envelope-from <philmd@redhat.com>) id 1j7cYY-0002oO-6b
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:07:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42877
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7cYW-0002nN-IB
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:07:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582884459;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=QusGXbB16+fD+JpyOdOgOzufoJqlutG1Rs5p7p93/+8=;
+ b=WvOiKQi/sVwz4ptYNBRRV+TW3YOXWQjU6w1/4AO6IxnDIeWQTfN5+PemXDYhS66lqoXL9u
+ f92ncHYmorg4xqWxE3sYgrkhc/M5WYvx3Ld6ENt7ZZXMT6FbGVaM0aqcv5lDRWmOspG2jf
+ SnvTUE/3AoxwHvEvW1HUQp1XnPVAdMc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-DpmRCU8ONgOiMhYT8drXkQ-1; Fri, 28 Feb 2020 05:07:33 -0500
+X-MC-Unique: DpmRCU8ONgOiMhYT8drXkQ-1
+Received: by mail-wm1-f71.google.com with SMTP id w3so509795wmg.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:07:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=QcsX2Iifni8h7N5Wd79o/fV54m+uzfu3rFUKUk2JlQA=;
- b=lDb+QvIRzq//HdsNYv9RNjvMpM0IF0i7ate7fKJ4PCcBFfinikXj3fM4RCZ4WpYRNU
- EvtCa5xXWsmDy+FvQOpnww5SMu9DOObXnDhucAgykSd8KcDVLp58BBYQ5bOIlLOe543D
- /M0d7hBI0fQ8pMzOhAbe2Qj5zq8DJ8Levka+LXUrYPujN19bp9Ni6wXlmZxJDXKCM7Ef
- QQ0u66YJduRvklvKbXdCMRV/gKVXlVjzT9Vj72cIF3qfvwNNBRZw8GNRAqvnuEM7WC2Q
- KTgacl9y6X/sOJXGZq4koTafjZFl9bjFGqHOlRZNRTq8fHrtMqI8bg9XnCyBptffdc9q
- sZVQ==
-X-Gm-Message-State: APjAAAVnmQLWjNLQJhjCh/LU4/RTsdjPsV98JJ8VMWDjbPG5RZqw2QsA
- ykQjasBuPzIQK7AI3MtwLGA3hEMDLyd0EP/q3uw=
-X-Google-Smtp-Source: APXvYqwWJbOX6qehrMq0Aju+p/SCkGPRTmp4tJ3aEupW4W479dG/pdnHnJhCdyfH9YooPOE4Oq5aCwBXkGywGosHbuU=
-X-Received: by 2002:a05:6000:4a:: with SMTP id
- k10mr3932452wrx.381.1582884411686; 
- Fri, 28 Feb 2020 02:06:51 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=wnDvjmsR0Fx1jpSLjo2oU9Nma1VeFY3J2/yuqXRPvG4=;
+ b=RV229mGeu9PHLiYW1JCD7L0lySJE5mr9N0aBOyvUD5r4H7rgl+kct1dW6tCC08lX03
+ 0ySoZrjxhY2Bx6Y5w3517HnnLqqfdPrOEFTJvhNY23tCRwDV/dQ4A2+gBQFIN1KFrk33
+ qFjNqJqPY5yYvVIyvOb+Go92udVqIP4AHY4nnhGUqftSOSXXQjU89i47y1hlXh9M0eHE
+ hsdkg5kxDJkkEwRRksobKaxpGtSHFfVaoUn3wad0nbc1gQryTJ9A7lDWM+6Khe929706
+ ilc52uqSacrO3RXDYWQ3WabGtkDrOolwkGajexOeroEdZWiCftD41s5pbwE8UZrJpyNJ
+ 7FDg==
+X-Gm-Message-State: APjAAAVviaNmQBd9QZeAYNODpIZnzNayQ2DEotsPFwU4GmB7cPRGl1I/
+ RXZM3SGqp76PMt8o3L+CMgsmlE340RyBFbOp13VGRxf+8L5rs0B1yr4n7yC1fv0Rf58XzOvR7W4
+ I4jxA4ckRT0/nMzs=
+X-Received: by 2002:adf:cf0b:: with SMTP id o11mr4031016wrj.315.1582884452410; 
+ Fri, 28 Feb 2020 02:07:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwWweUuD+OM3VSMgCotBxyyOLyX0SHgMuXsc7GCxGPkxT/qiWZ7FPTaA/PPK4SpsJsLePLsOA==
+X-Received: by 2002:adf:cf0b:: with SMTP id o11mr4030995wrj.315.1582884452156; 
+ Fri, 28 Feb 2020 02:07:32 -0800 (PST)
+Received: from x1w.moovbox.local ([185.102.219.36])
+ by smtp.gmail.com with ESMTPSA id q12sm12534994wrg.71.2020.02.28.02.07.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 02:07:31 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/4] misc: Improve error reporting on Windows
+Date: Fri, 28 Feb 2020 11:07:22 +0100
+Message-Id: <20200228100726.8414-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-References: <20200227190942.8834-1-philmd@redhat.com>
- <20200228094652.GB1657361@redhat.com>
-In-Reply-To: <20200228094652.GB1657361@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 28 Feb 2020 11:06:38 +0100
-Message-ID: <CAJ+F1CL-fbX=dXpopMMT1o-WH1JhrqrzpM55J9cGoGDNpDq=AQ@mail.gmail.com>
-Subject: Re: [PATCH] qom/object: Comment to use g_slist_free on
- object_class_get_list result
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,85 +98,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- qemu trival <qemu-trivial@nongnu.org>, Pan Nengyuan <pannengyuan@huawei.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Few patches to improve bug reports on Windows.
+(i.e. https://bugs.launchpad.net/qemu/+bug/1657841)
 
-On Fri, Feb 28, 2020 at 10:47 AM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
->
-> On Thu, Feb 27, 2020 at 08:09:42PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > Document the list returned by object_class_get_list() must be
-> > released with g_slist_free() to avoid memory leaks.
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > ---
-> >  include/qom/object.h | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/include/qom/object.h b/include/qom/object.h
-> > index 29546496c1..5517b56508 100644
-> > --- a/include/qom/object.h
-> > +++ b/include/qom/object.h
-> > @@ -984,6 +984,9 @@ void object_class_foreach(void (*fn)(ObjectClass *k=
-lass, void *opaque),
-> >   * @include_abstract: Whether to include abstract classes.
-> >   *
-> >   * Returns: A singly-linked list of the classes in reverse hashtable o=
-rder.
-> > + *
-> > + * The returned list must be released with g_slist_free()
-> > + * when no longer required.
->
-> I'd suggest
->
->   "The returned list, but not its elements, must be released with
->    g_slist_free() or g_autoptr when no longer required"
+Since v2:
+- Remove changes in functions using fprintf()
+  (util/oslib-win32.c is no more modified)
+- Do not remove slog() call in qmp_guest_shutdown()
 
-As gobject-introspection annotations: "Returns: (transfer container)
-(element-type ObjectClass): A list of #ObjectClass"
+Since v1:
+- Rebase an old patch from Alistair to use error_report()
+  as suggested by Markus
+- Fix other uses in util/osdep.c and QEMU guest-agent
 
->
-> >   */
-> >  GSList *object_class_get_list(const char *implements_type,
-> >                                bool include_abstract);
-> > @@ -995,6 +998,9 @@ GSList *object_class_get_list(const char *implement=
-s_type,
-> >   *
-> >   * Returns: A singly-linked list of the classes in alphabetical
-> >   * case-insensitive order.
-> > + *
-> > + * The returned list must be released with g_slist_free()
-> > + * when no longer required.
-> >   */
-> >  GSList *object_class_get_list_sorted(const char *implements_type,
-> >                                bool include_abstract);
-> > --
-> > 2.21.1
-> >
-> >
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
->
->
+Philippe Mathieu-Daud=C3=A9 (4):
+  chardev: Improve error report by calling error_setg_win32()
+  util/osdep: Improve error report by calling error_setg_win32()
+  qga: Improve error report by calling error_setg_win32()
+  qga: Fix a memory leak
 
+ chardev/char-pipe.c  | 2 +-
+ chardev/char-win.c   | 2 +-
+ qga/channel-win32.c  | 7 ++++---
+ qga/commands-win32.c | 8 +++++---
+ util/osdep.c         | 4 ++--
+ 5 files changed, 13 insertions(+), 10 deletions(-)
 
 --=20
-Marc-Andr=C3=A9 Lureau
+2.21.1
+
 
