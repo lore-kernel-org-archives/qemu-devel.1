@@ -2,83 +2,97 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F0CC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADECC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8723720665
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:52:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB09B246A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 12:54:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtyR2Y1X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8723720665
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbpE7AC8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB09B246A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7f8J-0004Lp-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:52:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49937)
+	id 1j7fAQ-0006Pa-V2
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 07:54:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vgoyal@redhat.com>) id 1j7f7c-0003xN-5X
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:52:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7f9V-0004xD-MD
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vgoyal@redhat.com>) id 1j7f7a-0002K7-C6
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:52:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46180
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j7f9U-0002nR-O0
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:01 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31880
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1j7f7a-0002Jz-8T
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:52:02 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7f9U-0002nF-LG
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 07:54:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582894321;
+ s=mimecast20190719; t=1582894440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gwl0bs98tScylQa1ApKYz3amT2WVTLJDy+ssmPy9fOA=;
- b=XtyR2Y1XfELDfMQxYtCvSejTxi48ewPQujvE4rDQLIq94SyNqtTknRp3upZbJXoZaNjYHo
- op8ePDbiJeMETD8RNBBjw/nRfr7x2a/Bzg1KpUQdSRWFgZLOouQWwXmH9FAoDsLTtBwHrx
- 5I2Wsni/bWAijOVsqiSeBX1K0HGnJYE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-tsqG4lf4NFCvZNGW27A8nw-1; Fri, 28 Feb 2020 07:50:47 -0500
-X-MC-Unique: tsqG4lf4NFCvZNGW27A8nw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C39718AB2C0;
- Fri, 28 Feb 2020 12:50:46 +0000 (UTC)
-Received: from horse.redhat.com (ovpn-122-84.rdu2.redhat.com [10.10.122.84])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA8CD10027BA;
- Fri, 28 Feb 2020 12:50:43 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id 97B732257D2; Fri, 28 Feb 2020 07:50:44 -0500 (EST)
-Date: Fri, 28 Feb 2020 07:50:44 -0500
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Subject: Re: [PATCH v4 0/2] virtiofsd: Fix xattr operations
-Message-ID: <20200228125044.GA21565@redhat.com>
-References: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
+ bh=hCU51xFXYmUd1xKOruip+g6P/RBBcNpYeEW6REUohy8=;
+ b=WbpE7AC8HEHpMaktFAnWGHPIcy3C+xdp4CLUl3WifWcmSRSXYt89cyfYnt8CBeXEgOWmEJ
+ kbaDOxgdwV2f2lcbXStm5fZoq5mKH0ed7zepBrGYj9LqLTaQyXI+sS96pp1X4dFQ+KxgFH
+ /Rgp0TpcxG4ih5riPq7g7ArRmC1+6u4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-MmkjTIsIMF2wfRPl10hgxA-1; Fri, 28 Feb 2020 07:53:58 -0500
+X-MC-Unique: MmkjTIsIMF2wfRPl10hgxA-1
+Received: by mail-wm1-f72.google.com with SMTP id v21so456913wml.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 04:53:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=om0orcuUNcgbjYJFBk5NZd23kX2WFadmaS0vRzXLejY=;
+ b=U1x1oBXhUVikAg/PYXJvDof3tzQ5jhXkyNtV3p8fgGpV5XyGt0CLl58B9LSHxhC5Qy
+ 9OpXm/HO5Jv2hw1cxtjwiWbjSM+q6mvwJqSSE1WaMY5wM5BqL1yCwLpDN+/PWwQoHXsX
+ IbowDBmoVBpKEFUr7JBeEYmMIXbtNO4jMvGWZxq2aBaePdDkYWN6hjRO4qkpwZCV8wnK
+ 2GKmyXk6Uj67rARwQlIV1N+QPg4snvdScmST+fa4dj4oaD326ZPUuImTI4IaCtMPtTSp
+ buefM96HvVUbzCYhbgLYJrQaUl5rGdSXhHD+AO84TUemAdWICYg+lq2v+IU7qbFV2Xac
+ cUdQ==
+X-Gm-Message-State: APjAAAWdNPEp9B8vMaYv2DSUQK5+IY+5qwVLtgO8XdmG9edmeJYLG2MN
+ WqcKVGPttr+wO3ZQNukjOFxarjdvtt1yGDEjn8VeeHGDAH86aWUaY6VT82veArcRe/qAt15Voov
+ hmO1ZguK/l64VA4M=
+X-Received: by 2002:a5d:4c52:: with SMTP id n18mr4981722wrt.403.1582894437407; 
+ Fri, 28 Feb 2020 04:53:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzM/sxlv8YE5kDTiVHAvqAw/act89mDCgky2Xq6c5uz/7/BLXjqxyOoAdXff593ZcPROP5Hkw==
+X-Received: by 2002:a5d:4c52:: with SMTP id n18mr4981711wrt.403.1582894437156; 
+ Fri, 28 Feb 2020 04:53:57 -0800 (PST)
+Received: from x1w.moovbox.local ([185.102.219.36])
+ by smtp.gmail.com with ESMTPSA id d9sm12398979wrx.94.2020.02.28.04.53.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 04:53:56 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/5] hw/arm/gumstix: Simplify since the machines are
+ little-endian only
+Date: Fri, 28 Feb 2020 13:53:47 +0100
+Message-Id: <20200228125351.29482-2-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200228125351.29482-1-philmd@redhat.com>
+References: <20200228125351.29482-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +104,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 27, 2020 at 02:59:25PM +0900, Misono Tomohiro wrote:
-> Currently xattr operations on virtiofs does not work properly in some cas=
-e:
->  - directory ... cannot set
->  - special files (pipe) ... cause hang
->=20
-> This fixes these problems and now xfstests generic/062 passes on virtiofs
-> with -o xattr option (I tested with xfs).
->=20
-> v3 -> v4:
->  - No logic change
->  - Some code style fix/update comments and commit log as suggested by Viv=
-ek
->  - CC qemu-devel ML too
->=20
-> Previous versions can be found in virtiofs ML:
->  v3: https://www.redhat.com/archives/virtio-fs/2020-February/msg00032.htm=
-l
->=20
-> Thanks,
-> Misono Tomohiro (2):
->   virtiofsd: passthrough_ll: cleanup getxattr/listxattr
->   virtiofsd: Fix xattr operations
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Thanks Misono for this work. I am fine with this patch series.
+As the Connex and Verdex machines only boot in little-endian,
+we can simplify the code.
 
-Acked-by: Vivek Goyal <vgoyal@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+v2: Do not use target_words_bigendian(), arm-softmmu is only
+    little endian (Peter Maydell)
+---
+ hw/arm/gumstix.c | 16 ++--------------
+ 1 file changed, 2 insertions(+), 14 deletions(-)
 
-Thanks
-Vivek
-
->=20
->  tools/virtiofsd/fuse_virtio.c    |  13 +++
->  tools/virtiofsd/passthrough_ll.c | 139 ++++++++++++++++---------------
->  tools/virtiofsd/seccomp.c        |   6 ++
->  3 files changed, 89 insertions(+), 69 deletions(-)
->=20
-> --=20
-> 2.21.1
->=20
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index f26a0e8010..3a4bc332c4 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -51,7 +51,6 @@ static void connex_init(MachineState *machine)
+ {
+     PXA2xxState *cpu;
+     DriveInfo *dinfo;
+-    int be;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+=20
+     uint32_t connex_rom =3D 0x01000000;
+@@ -66,14 +65,9 @@ static void connex_init(MachineState *machine)
+         exit(1);
+     }
+=20
+-#ifdef TARGET_WORDS_BIGENDIAN
+-    be =3D 1;
+-#else
+-    be =3D 0;
+-#endif
+     if (!pflash_cfi01_register(0x00000000, "connext.rom", connex_rom,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                               sector_len, 2, 0, 0, 0, 0, be)) {
++                               sector_len, 2, 0, 0, 0, 0, 0)) {
+         error_report("Error registering flash memory");
+         exit(1);
+     }
+@@ -87,7 +81,6 @@ static void verdex_init(MachineState *machine)
+ {
+     PXA2xxState *cpu;
+     DriveInfo *dinfo;
+-    int be;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+=20
+     uint32_t verdex_rom =3D 0x02000000;
+@@ -102,14 +95,9 @@ static void verdex_init(MachineState *machine)
+         exit(1);
+     }
+=20
+-#ifdef TARGET_WORDS_BIGENDIAN
+-    be =3D 1;
+-#else
+-    be =3D 0;
+-#endif
+     if (!pflash_cfi01_register(0x00000000, "verdex.rom", verdex_rom,
+                                dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                               sector_len, 2, 0, 0, 0, 0, be)) {
++                               sector_len, 2, 0, 0, 0, 0, 0)) {
+         error_report("Error registering flash memory");
+         exit(1);
+     }
+--=20
+2.21.1
 
 
