@@ -2,80 +2,95 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FORGED_YAHOO_RCVD,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18713C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 21:00:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26DDC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 21:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D75C1246AE
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 21:00:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D685246AE
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 21:02:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="F0s8CfRd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D75C1246AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJPgl55s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D685246AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7mkV-0006ek-3k
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 16:00:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58668)
+	id 1j7mmQ-0007p1-Rj
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 16:02:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nevilad@yahoo.com>) id 1j7mjn-00069I-Va
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 16:00:01 -0500
+ (envelope-from <peterx@redhat.com>) id 1j7mlj-0007OK-Ht
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 16:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nevilad@yahoo.com>) id 1j7mjl-0000M0-UQ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:59:59 -0500
-Received: from sonic310-11.consmr.mail.ir2.yahoo.com ([77.238.177.32]:45445)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nevilad@yahoo.com>) id 1j7mjl-0000J7-Nc
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:59:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
- t=1582923595; bh=7uxKgR/4Bt0taBXYRLRkq2kSBEO6uFIUfYS5cxzvEXQ=;
- h=Date:From:To:Cc:Subject:References:From:Subject;
- b=F0s8CfRdmH8mZBKGp418OWk4ppP285rbRslKJRIDhxlinS/8RqbvDWv5YH9esIs/7TZv81cxl9OwtWOacjNxkGRzAXVoCSUL9bnwNlPxd19JF6tbSEx+fVGfaqdwDhT1GpEZ99ThQW6vJ0is3hUtamzGCc6dJ87GrNDjLVKiCUgiBSSb9+PQpTzTGmSBiCn+0zrGGya30VWstFkOoTpK4gy2vV1Jfr+4wyj4PTomt0lbtDcHNGcw9YH4bAVNACAQCos6Azoe3lGgXpAql9RGujCW/FdjNsc14Wi33od4yPJaxkeSP9VCAZKJ+HjEnPNT/s2ZywaSvSsQsDvI3DI2mA==
-X-YMail-OSG: XD1hVh8VM1kWwWsIbER1CFnHVgraKbEdFKD3pU8CRAzOXi4FjmbwDw51n6OYgjU
- NavWU6Ch9x3ThKZqYkydbWMUEJpEeWFCk21RLDWsbRyCDngmwvNGRCVIJN.WF_wet5eo93N5kBdO
- dNB1gK4m2lcS2_Qv0dudAQveo7iSjocPIreDYVGBI7gYMbDKW6AVtfe6EdDy1gN1cxc.psBaEoU2
- 4G63fe9vB8vwzSNEKNxlrFZasJl4VCoeSfilCWqvvKZ4qLwrRvwnwVO_FQCJ.Gqefnd11l2fjfa5
- GnCkfkJ8doKHClYnsU4yvM1U.EKSOENETFvEo1F.OQaAqKbPC.HX6h5DsJ5G0yU8f84Jn.UTI1aM
- myVp6_K1qst7ZHWwuqv.M1XtW4m9KL9.6ouesgkNSU3rorVZsVI.YS9ssSySjtk7jUzb03ynrzFm
- aBaXMQZcaP7P.Cvk9R39Sd1Te3geq2ZlN2soefd4imVMmj832wKs9u26F_7bnG5sj4Ya13J3QSv9
- 6pZTcZZ_SJNK.ZzEkpuQ7JvM377KZWoXZfifowesRKdknRHH0X9zD2hJPPDKa82ur7Ba1sO__QPf
- hCTWDUsaN_4awMKMOaO9Xp.aDbUmbe9XxufFRTb6R8M4YlRIYr2dd_ayyYozIZqlYH_5QBgDQRuT
- 5O9pcnUqaoF9sDvcVGIywGvlZ_aqy_R_vzYheVgiqhf7oBOkDl1fjswH8sFxdrqA9NUQwF3YEsL4
- z4yJ795Rrc2DUQRd.DsL5oG9G3iK7759zQh0jL06vg0z3IUXWawXYOVZ.5tQDeIPGZ8MngK45A44
- rOcQaxem236GnQ6SEaJp.Qe30cl69kkWnbXO0Bfo2ZnmfgeJUIIKZaUpfpxYcZbzCfswypfeV0hq
- xjndihe9vP4IyYeJJLPbJkP2F3Qf7SwK34VbGMecmw3C6862TrqE8V_MtouR5TSTPP4GDtZ_yBFQ
- mZnM3vmvEBeLi5OrlO2Imd47TeQFb2vDgy_kZtW5iKPJqP2xQuQ.7LtiKOjnSHvLTZp41Q9Vl43g
- n7g2qbEept1JEPNlRaH2wVc8RNxTQz8NoKJteTJUnJuPjAFzDXF_5q5qEKIQOXXdpiGSyuyfll6a
- 2Zz12Qnbsflx5bFnKYgQFjUBElafJmlHDjMBdu47bEGlRXphFsbVq6Lfq7gE68RjHi8vLafFIKrG
- VRo74suxlgfMSzTyf8ajp4cRsIaBtVzUCSItx43LpzySDXAgyr2Ni7gjujockgeTjCR9iH5bhMRt
- ZpQD2rcdnvrXXMAT_2WePg6MfKDBhqw3vw1PtiFEH8wVGLNgVQP2ECJ2H89kMvnYsVe586Z.zlm_
- BclZull77FNnq0nV3Yqvw_nY-
-Received: from sonic.gate.mail.ne1.yahoo.com by
- sonic310.consmr.mail.ir2.yahoo.com with HTTP; Fri, 28 Feb 2020 20:59:55 +0000
-Date: Fri, 28 Feb 2020 20:59:52 +0000 (UTC)
-From: Alexey Romko <nevilad@yahoo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "wenchao.wang@intel.com" <wenchao.wang@intel.com>, 
- "colin.xu@intel.com" <colin.xu@intel.com>
-Message-ID: <1786823015.3514736.1582923592218@mail.yahoo.com>
-Subject: [PATCH] Add PAT, cr8 and EFER for 32-bit qemu to hax ioctl interface
+ (envelope-from <peterx@redhat.com>) id 1j7mli-0002sU-J2
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 16:01:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26236
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j7mli-0002qr-F2
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 16:01:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582923717;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2icag08FOgOd5w1C9vmEmRmrQMw5rjM8ohwNYGZeGjk=;
+ b=QJPgl55svnT3zEegh9TBP7otZcemHwpGQ9xN9BN9WcqMQwhGKObXlGdKWmTpKCrOAqMQuu
+ IMlpHtS70xdrMcQyvzaa+roFnTtBoyDUoAAlvu0SIcEgwnHXWyhDck8K2pvaGFmPhFJVPs
+ 3KVsNY7bmSxR2lHRa2+6Rdq3fyyO5tA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-w9YcRUiiOqaoJIKkg231yA-1; Fri, 28 Feb 2020 16:01:55 -0500
+X-MC-Unique: w9YcRUiiOqaoJIKkg231yA-1
+Received: by mail-qv1-f71.google.com with SMTP id m6so2600205qvo.11
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 13:01:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=zg5COqSniCUgzsW5zPB4OaKMk3i2DDD4HUmLxnEuiNo=;
+ b=MbjS6cm+eG9b72T2UZurQ7/FkA2d1n60DI5JkSSvn46vjnwktuKPrmyz+1MhceylHJ
+ nQKisSQFFOBXCeZ6WUQ5mL3WbXjIssGKysnjoiXpXbfVl1hNVHVcFb/NYnJpJqyC9Ujh
+ e01oiJTMdsrk6oSoXjTi+QSs5e3gDhIhkBkDlxndfRVvCmu6cCouGSwVUwDlRfEdBAjz
+ SegBzjv5j4RUmWvKQUpICDtarDWxTp7f1LpKSA0Fs5+LfgloqDnCp+/VhHWVsl5oNaPo
+ MaHSwNcxDvlCCl0k1S4Qqi6Cg3jw9I99vx6MJHREZA9+MRIZmyYzoj9pYRYn/0taA7yo
+ xWWA==
+X-Gm-Message-State: APjAAAVZrQIWRTPadzyE/RWeat61+rzsh+Ru+IkFiO3Td2OuVroQDOWU
+ uLsZRIFKMpyWYaxlcgPsKXtnFQAPVfue6YfK/fxZUso9pNkF9RStNdogmA2snntJUxe53StX72v
+ 896Qny9gJEQzsvbM=
+X-Received: by 2002:ac8:145:: with SMTP id f5mr5857639qtg.194.1582923715431;
+ Fri, 28 Feb 2020 13:01:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw7HtA9FzU9ZxhtZk1NRgk4XtVXQRKPxg8QSwvPetARE/KaC5n1vYEPY9yC237HRMxHFqfmYA==
+X-Received: by 2002:ac8:145:: with SMTP id f5mr5857623qtg.194.1582923715210;
+ Fri, 28 Feb 2020 13:01:55 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id p53sm5994130qtb.85.2020.02.28.13.01.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 13:01:54 -0800 (PST)
+Date: Fri, 28 Feb 2020 16:01:52 -0500
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v3 12/15] util: vfio-helpers: Implement ram_block_resized()
+Message-ID: <20200228210152.GD180973@xz-x1>
+References: <20200228194257.GV180973@xz-x1>
+ <509A885B-055F-4EEF-96FA-2EDA759F4F2C@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <509A885B-055F-4EEF-96FA-2EDA759F4F2C@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-References: <1786823015.3514736.1582923592218.ref@mail.yahoo.com>
-X-Mailer: WebService/1.1.15302 YMailNorrin Mozilla/5.0 (Windows NT 6.1)
- AppleWebKit/537.36 (KHTML,
- like Gecko) Chrome/78.0.3904.108 Safari/537.36 OPR/65.0.3467.72
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 77.238.177.32
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,168 +102,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add PAT, cr8 and EFER for 32-bit qemu to hax ioctl interface, part of HAX P=
-R 204
+On Fri, Feb 28, 2020 at 09:16:28PM +0100, David Hildenbrand wrote:
+>=20
 
-Signed-off-by: Alexey Romko <nevilad@yahoo.com>
----
-=C2=A0target/i386/hax-all.c=C2=A0 =C2=A0 =C2=A0 =C2=A0| 32 ++++++++++++++++=
-++++++++++++----
-=C2=A0target/i386/hax-i386.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-
-=C2=A0target/i386/hax-interface.h |=C2=A0 2 ++
-=C2=A03 files changed, 31 insertions(+), 5 deletions(-)
+[...]
 
+> >> @@ -631,7 +658,7 @@ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host=
+, size_t size,
+> >>                 qemu_vfio_remove_mapping(s, mapping);
+> >>                 goto out;
+> >>             }
+> >> -            s->low_water_mark +=3D size;
+> >> +            s->low_water_mark +=3D max_size;
+> >=20
+> > I think it's fine to only increase the low water mark here, however
+> > imo it would be better to also cache the max size in IOVAMapping too,
+> > then in resize() we double check new_size <=3D max_size?  It also makes
+> > IOVAMapping more self contained.
+> >=20
+>=20
+> I=E2=80=98ll have a look how much additional code that will imply - if it=
+=E2=80=98s simple, I=E2=80=98ll do it.
 
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index a8b6e5aeb8..0bdd309665 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -45,7 +45,7 @@
-=C2=A0 =C2=A0 =C2=A0} while (0)
-=C2=A0
-=C2=A0/* Current version */
--const uint32_t hax_cur_version =3D 0x4; /* API v4: unmapping and MMIO move=
-s */
-+const uint32_t hax_cur_version =3D 0x5; /* API v5: supports CR8/EFER/PAT *=
-/
-=C2=A0/* Minimum HAX kernel version */
-=C2=A0const uint32_t hax_min_version =3D 0x4; /* API v4: supports unmapping=
- */
-=C2=A0
-@@ -137,6 +137,7 @@ static int hax_version_support(struct hax_state *hax)
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
-=C2=A0 =C2=A0 =C2=A0}
-=C2=A0
-+=C2=A0 =C2=A0 hax_global.cur_api_version =3D version.cur_version;
-=C2=A0 =C2=A0 =C2=A0return 1;
-=C2=A0}
-=C2=A0
-@@ -845,12 +846,24 @@ static int hax_sync_vcpu_register(CPUArchState *env, =
-int set)
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0regs._cr2 =3D env->cr[2];
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0regs._cr3 =3D env->cr[3];
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0regs._cr4 =3D env->cr[4];
-+
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if( hax_global.cur_api_version >=3D 0x5 ) {
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CPUState *cs =3D env_cpu(env);
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 X86CPU *x86_cpu =3D X86_CPU(cs);
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 regs._cr8 =3D cpu_get_apic_tpr(x86_cpu-=
->apic_state);
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-+
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hax_set_segments(env, &regs);
-=C2=A0 =C2=A0 =C2=A0} else {
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->cr[0] =3D regs._cr0;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->cr[2] =3D regs._cr2;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->cr[3] =3D regs._cr3;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->cr[4] =3D regs._cr4;
-+
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 //if( hax_global.cur_api_version >=3D 0x5 ) {
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 //no need to update TPR from regs._cr8,=
- since all changes are notified.
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 //}
-+
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hax_get_segments(env, &regs);
-=C2=A0 =C2=A0 =C2=A0}
-=C2=A0
-@@ -881,14 +894,18 @@ static int hax_get_msrs(CPUArchState *env)
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_IA32_SYSENTER_ESP;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_IA32_SYSENTER_EIP;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_IA32_TSC;
--#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_EFER;
-+#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_STAR;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_LSTAR;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_CSTAR;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_FMASK;
-=C2=A0 =C2=A0 =C2=A0msrs[n++].entry =3D MSR_KERNELGSBASE;
-=C2=A0#endif
-+=C2=A0 =C2=A0 if( hax_global.cur_api_version >=3D 0x5 ) {
-+=C2=A0 =C2=A0 =C2=A0 msrs[n++].entry =3D MSR_PAT;
-+=C2=A0 =C2=A0 }
-+
-=C2=A0 =C2=A0 =C2=A0md.nr_msr =3D n;
-=C2=A0 =C2=A0 =C2=A0ret =3D hax_sync_msr(env, &md, 0);
-=C2=A0 =C2=A0 =C2=A0if (ret < 0) {
-@@ -909,10 +926,10 @@ static int hax_get_msrs(CPUArchState *env)
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case MSR_IA32_TSC:
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->tsc =3D msrs[i].value;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
--#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case MSR_EFER:
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->efer =3D msrs[i].value=
-;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
-+#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case MSR_STAR:
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->star =3D msrs[i].value=
-;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
-@@ -929,6 +946,9 @@ static int hax_get_msrs(CPUArchState *env)
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env->kernelgsbase =3D msrs[=
-i].value;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;
-=C2=A0#endif
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MSR_PAT:
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env->pat =3D msrs[i].value;
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-=C2=A0 =C2=A0 =C2=A0}
-=C2=A0
-@@ -947,14 +967,18 @@ static int hax_set_msrs(CPUArchState *env)
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_IA32_SYSENTER_ESP, en=
-v->sysenter_esp);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_IA32_SYSENTER_EIP, en=
-v->sysenter_eip);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_IA32_TSC, env->tsc);
--#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_EFER, env->efer);
-+#ifdef TARGET_X86_64
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_STAR, env->star);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_LSTAR, env->lstar);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_CSTAR, env->cstar);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_FMASK, env->fmask);
-=C2=A0 =C2=A0 =C2=A0hax_msr_entry_set(&msrs[n++], MSR_KERNELGSBASE, env->ke=
-rnelgsbase);
-=C2=A0#endif
-+=C2=A0 =C2=A0 if( hax_global.cur_api_version >=3D 0x5 ) {
-+=C2=A0 =C2=A0 =C2=A0 hax_msr_entry_set(&msrs[n++], MSR_PAT, env->pat);
-+=C2=A0 =C2=A0 }
-+
-=C2=A0 =C2=A0 =C2=A0md.nr_msr =3D n;
-=C2=A0 =C2=A0 =C2=A0md.done =3D 0;
-=C2=A0
-diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
-index 54e9d8b057..9515803184 100644
---- a/target/i386/hax-i386.h
-+++ b/target/i386/hax-i386.h
-@@ -34,7 +34,7 @@ struct hax_vcpu_state {
-=C2=A0
-=C2=A0struct hax_state {
-=C2=A0 =C2=A0 =C2=A0hax_fd fd; /* the global hax device interface */
--=C2=A0 =C2=A0 uint32_t version;
-+=C2=A0 =C2=A0 uint32_t cur_api_version;
-=C2=A0 =C2=A0 =C2=A0struct hax_vm *vm;
-=C2=A0 =C2=A0 =C2=A0uint64_t mem_quota;
-=C2=A0 =C2=A0 =C2=A0bool supports_64bit_ramblock;
-diff --git a/target/i386/hax-interface.h b/target/i386/hax-interface.h
-index 537ae084e9..c87aedbc2e 100644
---- a/target/i386/hax-interface.h
-+++ b/target/i386/hax-interface.h
-@@ -218,6 +218,8 @@ struct vcpu_state_t {
-=C2=A0 =C2=A0 =C2=A0uint32_t _activity_state;
-=C2=A0 =C2=A0 =C2=A0uint32_t pad;
-=C2=A0 =C2=A0 =C2=A0interruptibility_state_t _interruptibility_state;
-+
-+=C2=A0 =C2=A0 uint64_t _cr8;
-=C2=A0};
-=C2=A0
-=C2=A0/* HAX exit status */
---=C2=A0
-2.15.0.windows.1
+AFAICT it'll be as simple as introducing IOVAMapping.max_size, then
+pass max_size into qemu_vfio_add_mapping().  Thanks,
+
+--=20
+Peter Xu
+
 
