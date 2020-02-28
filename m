@@ -2,87 +2,73 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3EBC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8EFC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:16:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC19620732
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:11:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVfIob68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC19620732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C288C20732
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C288C20732
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7dYU-0005Pe-RK
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:11:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36564)
+	id 1j7dcq-0007Dl-U0
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:16:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j7dXl-0004v8-Gw
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:10:58 -0500
+ (envelope-from <bounces@canonical.com>) id 1j7dcG-0006jQ-W1
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:15:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j7dXj-00070t-Jd
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:10:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27866
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j7dXj-0006zB-Ev
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:10:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582888254;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NWQKtSW8qeCOC8ta5ZF4rzwmzx7MFgGROqOWw3Caoik=;
- b=EVfIob682H7c1LDmSweY+x4WZEFpXjulejMGqkswTyiSp/cH1F2pI/3KZp174BLnClwr+S
- t8tX6Q0Bg3UgS+jbdxgAAwKyiAkBhbgbLsT2+5CvpFcUYUwHofYmGbzjQf9AJH2vWy4zCR
- 7n+gagGmvwFnemQaiD5d8pmi2Zkq39I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-8QHyUWR-NDOLUp-7jPtm6g-1; Fri, 28 Feb 2020 06:10:51 -0500
-X-MC-Unique: 8QHyUWR-NDOLUp-7jPtm6g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F9AA8017DF;
- Fri, 28 Feb 2020 11:10:49 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5954826FD9;
- Fri, 28 Feb 2020 11:10:48 +0000 (UTC)
-Date: Fri, 28 Feb 2020 12:10:46 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Ring <stefanrin@gmail.com>
-Subject: Re: Strange data corruption issue with gluster (libgfapi) and ZFS
-Message-ID: <20200228111046.GC5274@linux.fritz.box>
-References: <CAAxjCEzHQz4cG_8m7S6=CwCBoN5daQs+KVyuU5GL5Tq3Bky1NA@mail.gmail.com>
- <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
- <CAAxjCEwv61e87ZUz-jueL9AkzaNbY3pRoFmf2dah-p9W8nosWA@mail.gmail.com>
- <CAAxjCEx__TsY75b0iecG1a_wUO2MF2UMVP50nFHQi2Ouyu0znw@mail.gmail.com>
- <CAAxjCExb8GKP0Y8hwEbv=DETfu1dG3++umYV0n8vX6kxuJW3pQ@mail.gmail.com>
+ (envelope-from <bounces@canonical.com>) id 1j7dcF-00020j-N0
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:15:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34094)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j7dcF-00020F-Gu
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:15:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j7dcE-00026v-5I
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 11:15:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2278B2E8031
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 11:15:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAAxjCExb8GKP0Y8hwEbv=DETfu1dG3++umYV0n8vX6kxuJW3pQ@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Fri, 28 Feb 2020 11:10:29 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jermy-07 laurent-vivier rth
+X-Launchpad-Bug-Reporter: Marco (jermy-07)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <158152698766.24807.871332888169155245.malonedeb@gac.canonical.com>
+Message-Id: <158288822918.13276.17102043173678244196.malone@gac.canonical.com>
+Subject: [Bug 1862986] Re: qemu-s390x crashes when run on aarch64
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 10e0ff2ff15aa1004393292660848f52cbbae2b8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,73 +77,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: integration@gluster.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Reply-To: Bug 1862986 <1862986@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 27.02.2020 um 23:25 hat Stefan Ring geschrieben:
-> On Thu, Feb 27, 2020 at 10:12 PM Stefan Ring <stefanrin@gmail.com> wrote:
-> > Victory! I have a reproducer in the form of a plain C libgfapi client.
-> >
-> > However, I have not been able to trigger corruption by just executing
-> > the simple pattern in an artificial way. Currently, I need to feed my
-> > reproducer 2 GB of data that I streamed out of the qemu block driver.
-> > I get two possible end states out of my reproducer: The correct one or
-> > a corrupted one, where 48 KB are zeroed out. It takes no more than 10
-> > runs to get each of them at least once. The corrupted end state is
-> > exactly the same that I got from the real qemu process from where I
-> > obtained the streamed trace. This gives me a lot of confidence in the
-> > soundness of my reproducer.
-> >
-> > More details will follow.
->=20
-> Ok, so the exact sequence of activity around the corruption is this:
->=20
-> 8700 and so on are the sequential request numbers. All of these
-> requests are writes. Blocks are 512 bytes.
->=20
-> 8700
->   grows the file to a certain size (2134144 blocks)
->=20
-> <8700 retires, nothing in flight>
->=20
-> 8701
->   writes 55 blocks inside currently allocated file range, close to the
-> end (7 blocks short)
->=20
-> 8702
->   writes 54 blocks from the end of 8701, growing the file by 47 blocks
->=20
-> <8702 retires, 8701 remains in flight>
->=20
-> 8703
->   writes from the end of 8702, growing the file by 81 blocks
->=20
-> <8703 retires, 8701 remains in flight>
->=20
-> 8704
->   writes 1623 blocks also from the end of 8702, growing the file by 1542 =
-blocks
->=20
-> <8701 retires>
-> <8704 retires>
->=20
-> The exact range covered by 8703 ends up zeroed out.
->=20
-> If 8701 retires earlier (before 8702 is issued), everything is fine.
+Could it be related to https://bugs.launchpad.net/qemu/+bug/1860920 ?
 
-This sounds almost like two other bugs we got fixed recently (in the
-QEMU file-posix driver and in the XFS kernel driver) where two write
-extending the file size were in flight in parallel, but if the shorter
-one completed last, instead extending the file, it would end up
-truncating it.
+Could you try latest QEMU source (including "target/s390x/translate: Fix
+RNSBG instruction")?
 
-I'm not sure, though, why 8701 would try to change the file size because
-it's entirely inside the already allocated file range. But maybe adding
-the current file size at the start and completion of each request to
-your debug output could give us more data points?
+-- =
 
-Kevin
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1862986
 
+Title:
+  qemu-s390x crashes when run on aarch64
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  All tested versions (2.11 and 4.2) qemu-s390x crashes with a segfault
+  when run on an aarch64 odroid Ubuntu.
+
+
+  Steps to reproduce:
+
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x "/root/wo=
+rkspace/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_or=
+ig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-s390x --version
+  qemu-s390x version 4.2.0
+  Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x "/root/workspac=
+e/bitcoin-core/build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig"
+  Segmentation fault (core dumped)
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-s390x --version
+  qemu-s390x version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.22)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+  qemu-arm does work on the same machine:
+
+  root@odroid:~/workspace/bitcoin-core# /usr/bin/qemu-arm bitcoin-0.19.0.1-=
+armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+  root@odroid:~/workspace/bitcoin-core# /usr/local/bin/qemu-arm bitcoin-0.1=
+9.0.1-armhf/bin/test_bitcoin -t amount_tests
+  Running 4 test cases...
+
+  *** No errors detected
+
+
+  =
+
+  What kind of debug information would be helpful for this issue report?
+  GDB for the self-compiled latest release is not particularly helpful:
+
+  (gdb) run
+  Starting program: /usr/local/bin/qemu-s390x /root/workspace/bitcoin-core/=
+build/bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a2a140 (LWP 28264)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x000000555596b218 in __bss_start__ ()
+  (gdb) bt
+  #0  0x000000555596b218 in __bss_start__ ()
+  #1  0x00000055556120a8 in ?? ()
+  #2  0x00000055579904b0 in ?? ()
+  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+
+
+  =
+
+  A bit more information is available in the version shipped by Ubuntu:
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-s390x /root/workspace/bitcoin-core/build/=
+bitcoin-s390x-linux-gnu/src/test/test_bitcoin_orig
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/aarch64-linux-gnu/libthread_db.so.1=
+".
+  [New Thread 0x7fb7a01180 (LWP 28271)]
+
+  Thread 1 "qemu-s390x" received signal SIGSEGV, Segmentation fault.
+  0x0000005555738f98 in code_gen_buffer ()
+  (gdb) bt
+  #0  0x0000005555738f98 in code_gen_buffer ()
+  #1  0x00000055555e96c8 in cpu_exec ()
+  #2  0x00000055555ee430 in cpu_loop ()
+  #3  0x00000055555c3328 in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1862986/+subscriptions
 
