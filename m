@@ -2,46 +2,48 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB43C3F2D0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0474C3F2CF
 	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 07:20:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C474A246AA
+	by mail.kernel.org (Postfix) with ESMTPS id A5FAD246A0
 	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 07:20:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C474A246AA
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5FAD246A0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42649 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Zwh-0004Xc-RJ
+	id 1j7Zwh-0004Vp-PD
 	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 02:20:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33389)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j7Zvm-0002Zd-0F
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 02:19:30 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7Zvm-0002Zh-Ij
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 02:19:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j7Zvl-00061I-08
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 02:19:29 -0500
-Received: from relay.sw.ru ([185.231.240.75]:51942)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j7Zvl-00061H-02
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 02:19:30 -0500
+Received: from relay.sw.ru ([185.231.240.75]:51950)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j7Zvk-00060c-OT; Fri, 28 Feb 2020 02:19:28 -0500
+ id 1j7Zvk-00060d-OQ; Fri, 28 Feb 2020 02:19:28 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1j7Zve-0002hc-5A; Fri, 28 Feb 2020 10:19:22 +0300
+ id 1j7Zve-0002hc-9x; Fri, 28 Feb 2020 10:19:22 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/4] benchmark util
-Date: Fri, 28 Feb 2020 10:19:10 +0300
-Message-Id: <20200228071914.11746-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 1/4] scripts/simplebench: add simplebench.py
+Date: Fri, 28 Feb 2020 10:19:11 +0300
+Message-Id: <20200228071914.11746-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200228071914.11746-1-vsementsov@virtuozzo.com>
+References: <20200228071914.11746-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
@@ -64,40 +66,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+Add simple benchmark table creator.
 
-v3:
-  move all to scripts/simplebench
-  add myself as a maintainer of this thing
-
-Here is simple benchmarking utility, to generate performance
-comparison tables, like the following:
-
-----------  -------------  -------------  -------------
-            backup-1       backup-2       mirror
-ssd -> ssd  0.43 +- 0.00   4.48 +- 0.06   4.38 +- 0.02
-ssd -> hdd  10.60 +- 0.08  10.69 +- 0.18  10.57 +- 0.05
-ssd -> nbd  33.81 +- 0.37  10.67 +- 0.17  10.07 +- 0.07
-----------  -------------  -------------  -------------
-
-I'll use this benchmark in other series, hope someone
-will like it.
-
-Vladimir Sementsov-Ogievskiy (4):
-  scripts/simplebench: add simplebench.py
-  scripts/simplebench: add qemu/bench_block_job.py
-  scripts/simplebench: add example usage of simplebench
-  MAINTAINERS: add simplebench
-
- MAINTAINERS                            |   5 +
- scripts/simplebench/bench-example.py   |  80 ++++++++++++++++
- scripts/simplebench/bench_block_job.py | 119 +++++++++++++++++++++++
- scripts/simplebench/simplebench.py     | 128 +++++++++++++++++++++++++
- 4 files changed, 332 insertions(+)
- create mode 100644 scripts/simplebench/bench-example.py
- create mode 100755 scripts/simplebench/bench_block_job.py
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ scripts/simplebench/simplebench.py | 128 +++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
  create mode 100644 scripts/simplebench/simplebench.py
 
+diff --git a/scripts/simplebench/simplebench.py b/scripts/simplebench/simplebench.py
+new file mode 100644
+index 0000000000..59e7314ff6
+--- /dev/null
++++ b/scripts/simplebench/simplebench.py
+@@ -0,0 +1,128 @@
++#!/usr/bin/env python
++#
++# Simple benchmarking framework
++#
++# Copyright (c) 2019 Virtuozzo International GmbH.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++
++def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
++    """Benchmark one test-case
++
++    test_func   -- benchmarking function with prototype
++                   test_func(env, case), which takes test_env and test_case
++                   arguments and returns {'seconds': int} (which is benchmark
++                   result) on success and {'error': str} on error. Returned
++                   dict may contain any other additional fields.
++    test_env    -- test environment - opaque first argument for test_func
++    test_case   -- test case - opaque second argument for test_func
++    count       -- how many times to call test_func, to calculate average
++    initial_run -- do initial run of test_func, which don't get into result
++
++    Returns dict with the following fields:
++        'runs':     list of test_func results
++        'average':  average seconds per run (exists only if at least one run
++                    succeeded)
++        'delta':    maximum delta between test_func result and the average
++                    (exists only if at least one run succeeded)
++        'n-failed': number of failed runs (exists only if at least one run
++                    failed)
++    """
++    if initial_run:
++        print('  #initial run:')
++        print('   ', test_func(test_env, test_case))
++
++    runs = []
++    for i in range(count):
++        print('  #run {}'.format(i+1))
++        res = test_func(test_env, test_case)
++        print('   ', res)
++        runs.append(res)
++
++    result = {'runs': runs}
++
++    successed = [r for r in runs if ('seconds' in r)]
++    if successed:
++        avg = sum(r['seconds'] for r in successed) / len(successed)
++        result['average'] = avg
++        result['delta'] = max(abs(r['seconds'] - avg) for r in successed)
++
++    if len(successed) < count:
++        result['n-failed'] = count - len(successed)
++
++    return result
++
++
++def ascii_one(result):
++    """Return ASCII representation of bench_one() returned dict."""
++    if 'average' in result:
++        s = '{:.2f} +- {:.2f}'.format(result['average'], result['delta'])
++        if 'n-failed' in result:
++            s += '\n({} failed)'.format(result['n-failed'])
++        return s
++    else:
++        return 'FAILED'
++
++
++def bench(test_func, test_envs, test_cases, *args, **vargs):
++    """Fill benchmark table
++
++    test_func -- benchmarking function, see bench_one for description
++    test_envs -- list of test environments, see bench_one
++    test_cases -- list of test cases, see bench_one
++    args, vargs -- additional arguments for bench_one
++
++    Returns dict with the following fields:
++        'envs':  test_envs
++        'cases': test_cases
++        'tab':   filled 2D array, where cell [i][j] is bench_one result for
++                 test_cases[i] for test_envs[j] (i.e., rows are test cases and
++                 columns are test environments)
++    """
++    tab = {}
++    results = {
++        'envs': test_envs,
++        'cases': test_cases,
++        'tab': tab
++    }
++    n = 1
++    n_tests = len(test_envs) * len(test_cases)
++    for env in test_envs:
++        for case in test_cases:
++            print('Testing {}/{}: {} :: {}'.format(n, n_tests,
++                                                   env['id'], case['id']))
++            if case['id'] not in tab:
++                tab[case['id']] = {}
++            tab[case['id']][env['id']] = bench_one(test_func, env, case,
++                                                   *args, **vargs)
++            n += 1
++
++    print('Done')
++    return results
++
++
++def ascii(results):
++    """Return ASCII representation of bench() returned dict."""
++    from tabulate import tabulate
++
++    tab = [[""] + [c['id'] for c in results['envs']]]
++    for case in results['cases']:
++        row = [case['id']]
++        for env in results['envs']:
++            row.append(ascii_one(results['tab'][case['id']][env['id']]))
++        tab.append(row)
++
++    return tabulate(tab)
 -- 
 2.21.0
 
