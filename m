@@ -8,75 +8,76 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6429DC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 20:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC2CCC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 20:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ECC524677
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 20:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 987E624677
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 20:19:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ti0LHKvC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ECC524677
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H26V2MZh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 987E624677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7m5S-0000Vz-ED
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 15:18:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50173)
+	id 1j7m6U-0001Xa-RD
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 15:19:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j7m4Q-0007ki-Q6
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:17:15 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7m5q-0000ye-Eg
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:18:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j7m4P-0008RD-Gx
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:17:14 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:36069)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j7m5o-0000ay-Vc
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 15:18:42 -0500
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43250)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j7m4P-0008PL-Be; Fri, 28 Feb 2020 15:17:13 -0500
-Received: by mail-il1-x143.google.com with SMTP id b15so3868717iln.3;
- Fri, 28 Feb 2020 12:17:12 -0800 (PST)
+ id 1j7m5o-0000aj-PO; Fri, 28 Feb 2020 15:18:40 -0500
+Received: by mail-io1-xd44.google.com with SMTP id n21so4832146ioo.10;
+ Fri, 28 Feb 2020 12:18:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=y7oKwH0w5cdz9ggYBkA4FnWloJ8QjaZibTiDdQfWYLs=;
- b=Ti0LHKvCdGaLzsCNqiY6LlPjxDNz5KX6HeKMTVtU6uaNacb4nScof4l7JoTB1naZHh
- OgRq5adi+6YzAKB9It03gTH6Z+1J+X3IkrDvPGQQKSqdG2QVaW0Dfj8dU1sS4nHu6p8n
- 69K+4la+IZbcNFLex6apXnxY4UOeuMLWi6yXst71qY5t8MWUZdyvY0mmGVHiW1oyDEoy
- Gt3jEXfH9hQQhwGXh7wgzofN2CFFbVEWATXyBEvdNw76SrUF7Q0+sE/SWpkKerkkVypZ
- r3xxVwAw3jPS72zarV4uekWV4eFZvbZvbRJN6Vjjah5MdbnkUnNLnS2x1Xf/FUwNzSTB
- 3meQ==
+ :cc; bh=zJo13C/fpyM1Civx33BwXNXgau4DiEh2S1nc11FbHK8=;
+ b=H26V2MZhNhTkShWqgwlzdMu6TAX4ctIryZv5akLeJlv6WiSOYR/mefpCiaRKSVMnc3
+ OuPkJLI+UFOV0Avhw5URa1Mat68kCGzY+lj56GF7Td/d37v4dbABPceXpOku0CIuuI3J
+ 6yUCtiOUdUdjbJ+zosYVxLmYf7TX6eM87lw45tJyPHHkZdGhgyRpBSges82xcO7dudf3
+ wsdk5WNGFu4/yIEJwNxNbuKUTEtoPEBADFgvsHzcztc8vCbzGhXob6U//2pRZpcyzVhF
+ OLISDRg5Ov6ebBwxeuuA5A/6RymwDH6wvmk+LWT3TakpXtKztghU+jtWqf27zQOnFb2j
+ cgwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=y7oKwH0w5cdz9ggYBkA4FnWloJ8QjaZibTiDdQfWYLs=;
- b=VcNULZHAK2EFJv48tABxaar+Bgwi/dno3oe8pzRUHVoRIvOGn9C8crdaBdZajs9jKU
- m5bC55GxPAVNpue6hnRIbU0D2nOzcR5c/AEgfPvx+gydWnxxED1TR8OJa7IpLll9pLrQ
- CE6bb9F2jYs+dnE1OVNYdcyAr6wSCVPod0KDqxX8cMuWZoKhVKpfT4XGg5ALWP7cGhPO
- LZQP+NEnlv+Ar2ba6o3g+fkBVySyk9KMAKNl/Wi2sKKzw+ZZp2l9Zatx58JdoblP0UEQ
- ykady1QdePBMNyon6pQz3X9qHYHdvPrv2YuzExYvYpkycsb+kaJh2NCQSvQWeB+IsjR4
- TePw==
-X-Gm-Message-State: APjAAAUeTERvJIlAVAwRtlFK2Iw49HKCcwKmw5mRPo2fC2sFNsHaBiVh
- ucM1ICBPKrxpzpfR7zWRWFHDgcQA/nc9zrZnw/w=
-X-Google-Smtp-Source: APXvYqxleJ8dP7SA/AsFRqSxdCP/TWf0oYz15g6Q3kVymMHxFmvlDW25DdlFqNbKVFn+0aAwbEpnlVjsVwXDXsxi/EY=
-X-Received: by 2002:a92:81d9:: with SMTP id q86mr5663179ilk.67.1582921031645; 
- Fri, 28 Feb 2020 12:17:11 -0800 (PST)
+ bh=zJo13C/fpyM1Civx33BwXNXgau4DiEh2S1nc11FbHK8=;
+ b=Wby/rP59i3HfcfZ8CIJGLwVFJbi9/tmExWZb0yt3SS7bXKREb4x1NjtC8CX7VNPhvf
+ PISX5CGqtPFSx2iwA73z7YZtK4o2iqLHoasAMzUhrPkEBV2egwZI+NDj1m90e8vuNEkh
+ N2oNU0+b/drUJRTMe0B2F3ZhD4DSy/Cw5pxdUwkOZ4oZKwzb5r7r3A5jilaO65Sknft2
+ 8nvkrjLiMM3/s3IL4KT6dQsBVdESFa3/0ip7oTDd+b7FGTpc1MMi87/dtdT9A4PTOeDK
+ 1P4R3aApG+VU1inOdBrua6CMvSkYf2WaDno5KW0Q7e/ZIZSIZf2gRNXWGM9caEYYK2u+
+ 1dBg==
+X-Gm-Message-State: APjAAAWC/aLRSM99G/cchXLtCMaI89ESFfoQbYAuH4NG6eQSV2yRqT+2
+ HiA5b79TMwnfgdWlMhS4sJxNmOvKstp7dbLniI8=
+X-Google-Smtp-Source: APXvYqzMARJfBKN3xHOPf2nq53amXzS9VpJ6OdOWaC8dUUwprp4vObBYKXcazwQWe1v367DjeoGzuKbA4duwQnnSm2c=
+X-Received: by 2002:a05:6602:158e:: with SMTP id
+ e14mr4773586iow.217.1582921120024; 
+ Fri, 28 Feb 2020 12:18:40 -0800 (PST)
 MIME-Version: 1.0
 References: <20200228192415.19867-1-alex.bennee@linaro.org>
- <20200228192415.19867-3-alex.bennee@linaro.org>
-In-Reply-To: <20200228192415.19867-3-alex.bennee@linaro.org>
+ <20200228192415.19867-5-alex.bennee@linaro.org>
+In-Reply-To: <20200228192415.19867-5-alex.bennee@linaro.org>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Fri, 28 Feb 2020 21:17:00 +0100
-Message-ID: <CAPan3WrZZ6FtkY+ZNkMwVuTTaXSk9_99dW4=0LwkDqkn0rWUZA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] accel/tcg: remove link between guest ram and TCG
- cache size
+Date: Fri, 28 Feb 2020 21:18:29 +0100
+Message-ID: <CAPan3WpV=Uh1JYnQojG50jCYNfe8HfMQaZ6ia_0XGxjYhtOJ0w@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] accel/tcg: increase default code gen buffer size
+ for 64 bit
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000cc8008059fa88578"
+Content-Type: multipart/alternative; boundary="000000000000110c1b059fa88be5"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::143
+X-Received-From: 2607:f8b0:4864:20::d44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,64 +89,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cc8008059fa88578
+--000000000000110c1b059fa88be5
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Feb 28, 2020 at 8:24 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
 rote:
 
-> Basing the TB cache size on the ram_size was always a little heuristic
-> and was broken by a1b18df9a4 which caused ram_size not to be fully
-> realised at the time we initialise the TCG translation cache.
+> While 32mb is certainly usable a full system boot ends up flushing the
+> codegen buffer nearly 100 times. Increase the default on 64 bit hosts
+> to take advantage of all that spare memory. After this change I can
+> boot my tests system without any TB flushes.
 >
-> The current DEFAULT_CODE_GEN_BUFFER_SIZE may still be a little small
-> but follow-up patches will address that.
+> As we usually run more CONFIG_USER binaries at a time in typical usage
+> we aren't quite as profligate for user-mode code generation usage. We
+> also bring the static code gen defies to the same place to keep all
+> the reasoning in the comments together.
 >
-> Fixes: a1b18df9a4
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 >
 Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 
-Cc: Niek Linnenbank <nieklinnenbank@gmail.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
+
+>
 > ---
->  accel/tcg/translate-all.c | 8 --------
->  1 file changed, 8 deletions(-)
+> v2
+>   - 2gb->1gb for system emulation
+>   - split user and system emulation buffer sizes
+> ---
+>  accel/tcg/translate-all.c | 35 ++++++++++++++++++++++++++---------
+>  1 file changed, 26 insertions(+), 9 deletions(-)
 >
 > diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index 238b0e575bf..5b66af783b5 100644
+> index 4ce5d1b3931..78914154bfc 100644
 > --- a/accel/tcg/translate-all.c
 > +++ b/accel/tcg/translate-all.c
-> @@ -938,15 +938,7 @@ static inline size_t size_code_gen_buffer(size_t
-> tb_size)
->  {
->      /* Size the buffer.  */
->      if (tb_size =3D=3D 0) {
-> -#ifdef USE_STATIC_CODE_GEN_BUFFER
->          tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;
-> -#else
-> -        /* ??? Needs adjustments.  */
-> -        /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
-> -           static buffer, we could size this on RESERVED_VA, on the text
-> -           segment size of the executable, or continue to use the
-> default.  */
-> -        tb_size =3D (unsigned long)(ram_size / 4);
-> -#endif
+> @@ -892,15 +892,6 @@ static void page_lock_pair(PageDesc **ret_p1,
+> tb_page_addr_t phys1,
 >      }
->      if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
->          tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;
+>  }
+>
+> -#if defined(CONFIG_USER_ONLY) && TCG_TARGET_REG_BITS =3D=3D 32
+> -/*
+> - * For user mode on smaller 32 bit systems we may run into trouble
+> - * allocating big chunks of data in the right place. On these systems
+> - * we utilise a static code generation buffer directly in the binary.
+> - */
+> -#define USE_STATIC_CODE_GEN_BUFFER
+> -#endif
+> -
+>  /* Minimum size of the code gen buffer.  This number is randomly chosen,
+>     but not so small that we can't have a fair number of TB's live.  */
+>  #define MIN_CODE_GEN_BUFFER_SIZE     (1 * MiB)
+> @@ -929,7 +920,33 @@ static void page_lock_pair(PageDesc **ret_p1,
+> tb_page_addr_t phys1,
+>  # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+>  #endif
+>
+> +#if TCG_TARGET_REG_BITS =3D=3D 32
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)
+> +#ifdef CONFIG_USER_ONLY
+> +/*
+> + * For user mode on smaller 32 bit systems we may run into trouble
+> + * allocating big chunks of data in the right place. On these systems
+> + * we utilise a static code generation buffer directly in the binary.
+> + */
+> +#define USE_STATIC_CODE_GEN_BUFFER
+> +#endif
+> +#else /* TCG_TARGET_REG_BITS =3D=3D 64 */
+> +#ifdef CONFIG_USER_ONLY
+> +/*
+> + * As user-mode emulation typically means running multiple instances
+> + * of the translator don't go too nuts with our default code gen
+> + * buffer lest we make things too hard for the OS.
+> + */
+> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (128 * MiB)
+> +#else
+> +/*
+> + * We expect most system emulation to run one or two guests per host.
+> + * Users running large scale system emulation may want to tweak their
+> + * runtime setup via the tb-size control on the command line.
+> + */
+> +#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)
+> +#endif
+> +#endif
+>
+>  #define DEFAULT_CODE_GEN_BUFFER_SIZE \
+>    (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
 > --
 > 2.20.1
 >
@@ -154,7 +191,7 @@ Cc: Niek Linnenbank <nieklinnenbank@gmail.com>
 --=20
 Niek Linnenbank
 
---000000000000cc8008059fa88578
+--000000000000110c1b059fa88be5
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -163,58 +200,95 @@ Content-Transfer-Encoding: quoted-printable
 Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linar=
 o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
 rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">Basing the TB cache size on the ram_size was always a little heuristic=
+1ex">While 32mb is certainly usable a full system boot ends up flushing the=
 <br>
-and was broken by a1b18df9a4 which caused ram_size not to be fully<br>
-realised at the time we initialise the TCG translation cache.<br>
+codegen buffer nearly 100 times. Increase the default on 64 bit hosts<br>
+to take advantage of all that spare memory. After this change I can<br>
+boot my tests system without any TB flushes.<br>
 <br>
-The current DEFAULT_CODE_GEN_BUFFER_SIZE may still be a little small<br>
-but follow-up patches will address that.<br>
+As we usually run more CONFIG_USER binaries at a time in typical usage<br>
+we aren&#39;t quite as profligate for user-mode code generation usage. We<b=
+r>
+also bring the static code gen defies to the same place to keep all<br>
+the reasoning in the comments together.<br>
 <br>
-Fixes: a1b18df9a4<br>
 Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
 g" target=3D"_blank">alex.bennee@linaro.org</a>&gt;<br>
-Reviewed-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@lina=
-ro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br></blockquote><div>Revie=
-wed-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nie=
-klinnenbank@gmail.com</a>&gt;</div><div> <br></div><blockquote class=3D"gma=
-il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
-04,204);padding-left:1ex">
-Cc: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" target=
-=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
-Cc: Igor Mammedov &lt;<a href=3D"mailto:imammedo@redhat.com" target=3D"_bla=
-nk">imammedo@redhat.com</a>&gt;<br>
+Tested-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" =
+target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br></blockquote><div>Rev=
+iewed-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">n=
+ieklinnenbank@gmail.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">
+<br>
 ---<br>
-=C2=A0accel/tcg/translate-all.c | 8 --------<br>
-=C2=A01 file changed, 8 deletions(-)<br>
+v2<br>
+=C2=A0 - 2gb-&gt;1gb for system emulation<br>
+=C2=A0 - split user and system emulation buffer sizes<br>
+---<br>
+=C2=A0accel/tcg/translate-all.c | 35 ++++++++++++++++++++++++++---------<br=
+>
+=C2=A01 file changed, 26 insertions(+), 9 deletions(-)<br>
 <br>
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c<br>
-index 238b0e575bf..5b66af783b5 100644<br>
+index 4ce5d1b3931..78914154bfc 100644<br>
 --- a/accel/tcg/translate-all.c<br>
 +++ b/accel/tcg/translate-all.c<br>
-@@ -938,15 +938,7 @@ static inline size_t size_code_gen_buffer(size_t tb_si=
-ze)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0/* Size the buffer.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size =3D=3D 0) {<br>
--#ifdef USE_STATIC_CODE_GEN_BUFFER<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D DEFAULT_CODE_GEN_BUFFER_SIZE;=
-<br>
--#else<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* ??? Needs adjustments.=C2=A0 */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* ??? If we relax the requirement that CONFIG=
-_USER_ONLY use the<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0static buffer, we could size this=
- on RESERVED_VA, on the text<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0segment size of the executable, o=
-r continue to use the default.=C2=A0 */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 tb_size =3D (unsigned long)(ram_size / 4);<br>
--#endif<br>
+@@ -892,15 +892,6 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_=
+addr_t phys1,<br>
 =C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0if (tb_size &lt; MIN_CODE_GEN_BUFFER_SIZE) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tb_size =3D MIN_CODE_GEN_BUFFER_SIZE;<br>
+=C2=A0}<br>
+<br>
+-#if defined(CONFIG_USER_ONLY) &amp;&amp; TCG_TARGET_REG_BITS =3D=3D 32<br>
+-/*<br>
+- * For user mode on smaller 32 bit systems we may run into trouble<br>
+- * allocating big chunks of data in the right place. On these systems<br>
+- * we utilise a static code generation buffer directly in the binary.<br>
+- */<br>
+-#define USE_STATIC_CODE_GEN_BUFFER<br>
+-#endif<br>
+-<br>
+=C2=A0/* Minimum size of the code gen buffer.=C2=A0 This number is randomly=
+ chosen,<br>
+=C2=A0 =C2=A0 but not so small that we can&#39;t have a fair number of TB&#=
+39;s live.=C2=A0 */<br>
+=C2=A0#define MIN_CODE_GEN_BUFFER_SIZE=C2=A0 =C2=A0 =C2=A0(1 * MiB)<br>
+@@ -929,7 +920,33 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_=
+addr_t phys1,<br>
+=C2=A0# define MAX_CODE_GEN_BUFFER_SIZE=C2=A0 ((size_t)-1)<br>
+=C2=A0#endif<br>
+<br>
++#if TCG_TARGET_REG_BITS =3D=3D 32<br>
+=C2=A0#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)<br>
++#ifdef CONFIG_USER_ONLY<br>
++/*<br>
++ * For user mode on smaller 32 bit systems we may run into trouble<br>
++ * allocating big chunks of data in the right place. On these systems<br>
++ * we utilise a static code generation buffer directly in the binary.<br>
++ */<br>
++#define USE_STATIC_CODE_GEN_BUFFER<br>
++#endif<br>
++#else /* TCG_TARGET_REG_BITS =3D=3D 64 */<br>
++#ifdef CONFIG_USER_ONLY<br>
++/*<br>
++ * As user-mode emulation typically means running multiple instances<br>
++ * of the translator don&#39;t go too nuts with our default code gen<br>
++ * buffer lest we make things too hard for the OS.<br>
++ */<br>
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (128 * MiB)<br>
++#else<br>
++/*<br>
++ * We expect most system emulation to run one or two guests per host.<br>
++ * Users running large scale system emulation may want to tweak their<br>
++ * runtime setup via the tb-size control on the command line.<br>
++ */<br>
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)<br>
++#endif<br>
++#endif<br>
+<br>
+=C2=A0#define DEFAULT_CODE_GEN_BUFFER_SIZE \<br>
+=C2=A0 =C2=A0(DEFAULT_CODE_GEN_BUFFER_SIZE_1 &lt; MAX_CODE_GEN_BUFFER_SIZE =
+\<br>
 -- <br>
 2.20.1<br>
 <br>
@@ -222,5 +296,5 @@ r continue to use the default.=C2=A0 */<br>
 mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
 div></div>
 
---000000000000cc8008059fa88578--
+--000000000000110c1b059fa88be5--
 
