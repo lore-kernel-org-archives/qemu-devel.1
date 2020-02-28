@@ -2,79 +2,69 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 790BBC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CAEEC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:54:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 487382467B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B4BF2467B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:54:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IK0D+bxt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487382467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QRsXdR+9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4BF2467B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7itN-0000L3-BQ
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:53:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57556)
+	id 1j7iuO-0001dw-D5
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:54:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1j7ikR-0002Td-JY
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:24 -0500
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7ika-0002lS-U1
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1j7ikQ-0005QO-32
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57448
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1j7ikO-0005MM-OW
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582908259;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=JbKqI1nnK8EVo1x92Esuh5LZAjCk6KpIljqLivcx920=;
- b=IK0D+bxtFUPQZV7BjOH23T75m2UEwMGFwu4cQwN6dSImUA0ay/iPjM4mmL+TqfkTjpqjei
- SoMt9z5G1iLAxBpMERcRFehscoJpJDgNq5bKwXTiQGkThX3Z7f60Uh8JC83GgBtgE8EA/K
- z1KXWYHpBbjJI9ysToLRyB5ZYO+3ch0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-HOJ9gczDNcaMzF94O9KyeA-1; Fri, 28 Feb 2020 11:44:15 -0500
-X-MC-Unique: HOJ9gczDNcaMzF94O9KyeA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25C9918FF664;
- Fri, 28 Feb 2020 16:44:13 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.3])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B2D68C07F;
- Fri, 28 Feb 2020 16:44:04 +0000 (UTC)
-Date: Fri, 28 Feb 2020 16:44:03 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v5 47/50] multi-process: Enable support for multiple
- devices in remote
-Message-ID: <20200228164403.GA332098@stefanha-x1.localdomain>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <cf33de60b827e0cdd3d5fce48eb038cb056dc304.1582576372.git.jag.raman@oracle.com>
+ (envelope-from <tsimpson@qualcomm.com>) id 1j7ikZ-0005Vs-HB
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:32 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:27026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
+ id 1j7ikZ-0005U4-8i
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:44:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1582908271; x=1614444271;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=cT4X7MI/9BxdH1ZaW8Ir51TSoO+1uubcZyuSlgTJlEw=;
+ b=QRsXdR+9YVYQIkH455OML0KW8bnmrKU2ZaHyfDFbGYpVGaF3hADif3wc
+ P0GFbfG3uPlU8sO1pdCZX137CLBZJ27yMxbpRwFrdaNtkdjsRBABOenVD
+ Hu58ZjdJAOtPv4jYhSDnhprEm5xXD/gEZCqSwnEfo2pVPmlB0weo5D3Rx Q=;
+Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 28 Feb 2020 08:44:28 -0800
+Received: from vu-tsimpson-aus.qualcomm.com (HELO
+ vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
+ by ironmsg01-sd.qualcomm.com with ESMTP; 28 Feb 2020 08:44:27 -0800
+Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
+ id 508B9115A; Fri, 28 Feb 2020 10:44:27 -0600 (CST)
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v2 05/67] Hexagon register names
+Date: Fri, 28 Feb 2020 10:43:01 -0600
+Message-Id: <1582908244-304-6-git-send-email-tsimpson@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
+References: <1582908244-304-1-git-send-email-tsimpson@quicinc.com>
 MIME-Version: 1.0
-In-Reply-To: <cf33de60b827e0cdd3d5fce48eb038cb056dc304.1582576372.git.jag.raman@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,57 +76,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: riku.voipio@iki.fi, richard.henderson@linaro.org, laurent@vivier.eu,
+ Taylor Simpson <tsimpson@quicinc.com>, philmd@redhat.com,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---FCuugMFkClbJLl1L
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Feb 24, 2020 at 03:55:38PM -0500, Jagannathan Raman wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->=20
-> Add support to allow multiple devices to be configured in the
-> remote process
-
-This patch allows multiple devices to be addressed over a single UNIX
-domain socket.  This could be a scalability/performance bottleneck
-because an SMP guest can only talk to 1 device at a time.
-
-This approach doesn't address the qemu-storage-daemon use case where one
-device emulation process provides devices to multiple guests.  Multiple
-UNIX domain sockets are needed for that.
-
-Is multiplexing multiple devices over a single connection is a desirable
-feature?  The alternative of one UNIX domain socket per device instance
-seems more practical to me because it should perform better and solves
-the qemu-storage-daemon use case.
-
---FCuugMFkClbJLl1L
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl5ZQ1MACgkQnKSrs4Gr
-c8hfYwf/eSGyr7OXlpnFu5TR7dNACEilTRAIMr8sr03KuCcH6XTYwOyQ+1AeLFZh
-hNWev760tdDQ4yF69mRhF5H7VyP246yXDMp/4OA9DVeMQyuDZIf1CrH32JUhGLdO
-ky2UjhPBgzMQXEDLpWDBinKLFozS31UnoLl/NzOZb12BMLgDB0eEe/Ma1hS5fmpI
-j6Hkfg8Bwyv9QvIM40UmUW82QacDhRDdfqJd0OW/kTYgFnmAHxX7iRj2xUDnlhvc
-P012AAQnWS8r2MuU5VPrhLt6g0KMX9obEoXfEKZr1up0l021gzbzeaS8PGsdq9Hb
-tVcIgvkhWFmXW/7D9gSCGwP6obX30w==
-=ljcf
------END PGP SIGNATURE-----
-
---FCuugMFkClbJLl1L--
-
+U2lnbmVkLW9mZi1ieTogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPgotLS0K
+IHRhcmdldC9oZXhhZ29uL2hleF9yZWdzLmggfCA5OSArKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKwogMSBmaWxlIGNoYW5nZWQsIDk5IGluc2VydGlvbnMoKykK
+IGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvaGV4YWdvbi9oZXhfcmVncy5oCgpkaWZmIC0tZ2l0
+IGEvdGFyZ2V0L2hleGFnb24vaGV4X3JlZ3MuaCBiL3RhcmdldC9oZXhhZ29uL2hleF9yZWdzLmgK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uNjcwZGExYQotLS0gL2Rldi9udWxs
+CisrKyBiL3RhcmdldC9oZXhhZ29uL2hleF9yZWdzLmgKQEAgLTAsMCArMSw5OSBAQAorLyoKKyAq
+ICBDb3B5cmlnaHQoYykgMjAxOS0yMDIwIFF1YWxjb21tIElubm92YXRpb24gQ2VudGVyLCBJbmMu
+IEFsbCBSaWdodHMgUmVzZXJ2ZWQuCisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3
+YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5CisgKiAgaXQgdW5kZXIg
+dGhlIHRlcm1zIG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQg
+YnkKKyAqICB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9m
+IHRoZSBMaWNlbnNlLCBvcgorICogIChhdCB5b3VyIG9wdGlvbikgYW55IGxhdGVyIHZlcnNpb24u
+CisgKgorICogIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0
+IHdpbGwgYmUgdXNlZnVsLAorICogIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBl
+dmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mCisgKiAgTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5F
+U1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZQorICogIEdOVSBHZW5lcmFsIFB1
+YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCisgKgorICogIFlvdSBzaG91bGQgaGF2ZSBy
+ZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlCisgKiAgYWxv
+bmcgd2l0aCB0aGlzIHByb2dyYW07IGlmIG5vdCwgc2VlIDxodHRwOi8vd3d3LmdudS5vcmcvbGlj
+ZW5zZXMvPi4KKyAqLworCisjaWZuZGVmIEhFWEFHT05fUkVHU19ICisjZGVmaW5lIEhFWEFHT05f
+UkVHU19ICisKK2VudW0geworICAgIEhFWF9SRUdfUjAwICAgICAgICAgICAgICA9IDAsCisgICAg
+SEVYX1JFR19SMDEgICAgICAgICAgICAgID0gMSwKKyAgICBIRVhfUkVHX1IwMiAgICAgICAgICAg
+ICAgPSAyLAorICAgIEhFWF9SRUdfUjAzICAgICAgICAgICAgICA9IDMsCisgICAgSEVYX1JFR19S
+MDQgICAgICAgICAgICAgID0gNCwKKyAgICBIRVhfUkVHX1IwNSAgICAgICAgICAgICAgPSA1LAor
+ICAgIEhFWF9SRUdfUjA2ICAgICAgICAgICAgICA9IDYsCisgICAgSEVYX1JFR19SMDcgICAgICAg
+ICAgICAgID0gNywKKyAgICBIRVhfUkVHX1IwOCAgICAgICAgICAgICAgPSA4LAorICAgIEhFWF9S
+RUdfUjA5ICAgICAgICAgICAgICA9IDksCisgICAgSEVYX1JFR19SMTAgICAgICAgICAgICAgID0g
+MTAsCisgICAgSEVYX1JFR19SMTEgICAgICAgICAgICAgID0gMTEsCisgICAgSEVYX1JFR19SMTIg
+ICAgICAgICAgICAgID0gMTIsCisgICAgSEVYX1JFR19SMTMgICAgICAgICAgICAgID0gMTMsCisg
+ICAgSEVYX1JFR19SMTQgICAgICAgICAgICAgID0gMTQsCisgICAgSEVYX1JFR19SMTUgICAgICAg
+ICAgICAgID0gMTUsCisgICAgSEVYX1JFR19SMTYgICAgICAgICAgICAgID0gMTYsCisgICAgSEVY
+X1JFR19SMTcgICAgICAgICAgICAgID0gMTcsCisgICAgSEVYX1JFR19SMTggICAgICAgICAgICAg
+ID0gMTgsCisgICAgSEVYX1JFR19SMTkgICAgICAgICAgICAgID0gMTksCisgICAgSEVYX1JFR19S
+MjAgICAgICAgICAgICAgID0gMjAsCisgICAgSEVYX1JFR19SMjEgICAgICAgICAgICAgID0gMjEs
+CisgICAgSEVYX1JFR19SMjIgICAgICAgICAgICAgID0gMjIsCisgICAgSEVYX1JFR19SMjMgICAg
+ICAgICAgICAgID0gMjMsCisgICAgSEVYX1JFR19SMjQgICAgICAgICAgICAgID0gMjQsCisgICAg
+SEVYX1JFR19SMjUgICAgICAgICAgICAgID0gMjUsCisgICAgSEVYX1JFR19SMjYgICAgICAgICAg
+ICAgID0gMjYsCisgICAgSEVYX1JFR19SMjcgICAgICAgICAgICAgID0gMjcsCisgICAgSEVYX1JF
+R19SMjggICAgICAgICAgICAgID0gMjgsCisgICAgSEVYX1JFR19SMjkgICAgICAgICAgICAgID0g
+MjksCisgICAgSEVYX1JFR19TUCAgICAgICAgICAgICAgID0gMjksCisgICAgSEVYX1JFR19GUCAg
+ICAgICAgICAgICAgID0gMzAsCisgICAgSEVYX1JFR19SMzAgICAgICAgICAgICAgID0gMzAsCisg
+ICAgSEVYX1JFR19MUiAgICAgICAgICAgICAgID0gMzEsCisgICAgSEVYX1JFR19SMzEgICAgICAg
+ICAgICAgID0gMzEsCisgICAgSEVYX1JFR19TQTAgICAgICAgICAgICAgID0gMzIsCisgICAgSEVY
+X1JFR19MQzAgICAgICAgICAgICAgID0gMzMsCisgICAgSEVYX1JFR19TQTEgICAgICAgICAgICAg
+ID0gMzQsCisgICAgSEVYX1JFR19MQzEgICAgICAgICAgICAgID0gMzUsCisgICAgSEVYX1JFR19Q
+M18wICAgICAgICAgICAgID0gMzYsCisgICAgSEVYX1JFR19NMCAgICAgICAgICAgICAgID0gMzgs
+CisgICAgSEVYX1JFR19NMSAgICAgICAgICAgICAgID0gMzksCisgICAgSEVYX1JFR19VU1IgICAg
+ICAgICAgICAgID0gNDAsCisgICAgSEVYX1JFR19QQyAgICAgICAgICAgICAgID0gNDEsCisgICAg
+SEVYX1JFR19VR1AgICAgICAgICAgICAgID0gNDIsCisgICAgSEVYX1JFR19HUCAgICAgICAgICAg
+ICAgID0gNDMsCisgICAgSEVYX1JFR19DUzAgICAgICAgICAgICAgID0gNDQsCisgICAgSEVYX1JF
+R19DUzEgICAgICAgICAgICAgID0gNDUsCisgICAgSEVYX1JFR19VUENZQ0xFTE8gICAgICAgID0g
+NDYsCisgICAgSEVYX1JFR19VUENZQ0xFSEkgICAgICAgID0gNDcsCisgICAgSEVYX1JFR19GUkFN
+RUxJTUlUICAgICAgID0gNDgsCisgICAgSEVYX1JFR19GUkFNRUtFWSAgICAgICAgID0gNDksCisg
+ICAgSEVYX1JFR19QS1RDTlRMTyAgICAgICAgID0gNTAsCisgICAgSEVYX1JFR19QS1RDTlRISSAg
+ICAgICAgID0gNTEsCisgICAgLyogVXNlIHJlc2VydmVkIGNvbnRyb2wgcmVnaXN0ZXJzIGZvciBx
+ZW11IGV4ZWN1dGlvbiBjb3VudHMgKi8KKyAgICBIRVhfUkVHX1FFTVVfUEtUX0NOVCAgICAgID0g
+NTIsCisgICAgSEVYX1JFR19RRU1VX0lOU05fQ05UICAgICA9IDUzLAorICAgIEhFWF9SRUdfUUVN
+VV9IVlhfQ05UICAgICAgPSA1NCwKKyAgICBIRVhfUkVHX1VUSU1FUkxPICAgICAgICAgID0gNjIs
+CisgICAgSEVYX1JFR19VVElNRVJISSAgICAgICAgICA9IDYzLAorCisjaWZuZGVmIENPTkZJR19V
+U0VSX09OTFkKKyAgICBIRVhfUkVHX1NHUDAgICAgICAgICAgICAgID0gNjQsCisgICAgSEVYX1JF
+R19TR1AxICAgICAgICAgICAgICA9IDY1LAorICAgIEhFWF9SRUdfU1RJRCAgICAgICAgICAgICAg
+PSA2NiwKKyAgICBIRVhfUkVHX0VMUiAgICAgICAgICAgICAgID0gNjcsCisgICAgSEVYX1JFR19C
+QURWQTAgICAgICAgICAgICA9IDY4LAorICAgIEhFWF9SRUdfQkFEVkExICAgICAgICAgICAgPSA2
+OSwKKyAgICBIRVhfUkVHX1NTUiAgICAgICAgICAgICAgID0gNzAsCisgICAgSEVYX1JFR19DQ1Ig
+ICAgICAgICAgICAgICA9IDcxLAorICAgIEhFWF9SRUdfSFRJRCAgICAgICAgICAgICAgPSA3MiwK
+KyAgICBIRVhfUkVHX0JBRFZBICAgICAgICAgICAgID0gNzMsCisgICAgSEVYX1JFR19JTUFTSyAg
+ICAgICAgICAgICA9IDc0LAorICAgIEhFWF9SRUdfR0VWQiAgICAgICAgICAgICAgPSA3NSwKKyNl
+bmRpZgorfTsKKworI2VuZGlmCi0tIAoyLjcuNAoK
 
