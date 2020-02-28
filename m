@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E671EC3F2D0
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A08C3F2D0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:33:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A55A1246A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AEA124695
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IUVVNzqW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A55A1246A8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mv5nkube"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AEA124695
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7bzr-0002kc-MA
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:31:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50749)
+	id 1j7c0y-000491-Cq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:33:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j7bu1-0000lc-OO
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:51 -0500
+ (envelope-from <quintela@redhat.com>) id 1j7bu7-0000zv-65
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j7bu0-0004EP-03
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:49 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29654
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1j7bu6-0004Gh-3C
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42999
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7btz-0004E9-Sz
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:47 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7bu6-0004GP-0B
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:25:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582881947;
+ s=mimecast20190719; t=1582881953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mHQvkIrJwASSeuU++Wd5hvR4gc9mmlZ3ev3VOatSSHg=;
- b=IUVVNzqW2oRMLNx5A5rxmXD2c+PvSq4LAly2X7f3fvbIfJUgkfCRW7z9CJtxIYIjHQbyMZ
- h9twS+4YxyEKUTZ4j8F7yc7J6z0YO9XlZwVRkhE10r7QxjqeOPl3dSJZDpjy4WSw76BcXs
- KWePaEUeWxdNlhkvv7FJ1sRCq5eP8zU=
+ bh=4bo+MP6i40tZaaVcbsbTlXwrB0dZjErp3C+gHsABICw=;
+ b=Mv5nkubeGFPQL5O8PaOeV/RGZfHs1pPER/6lF9HnJeArG7kSqpXZNHpbsE1maJUik6A45G
+ BaU1ZidDPOKSY5PXcz9PK5ynvUewRILYwoB+7wRhmNBFtWe7f0fkMtNVBOEtJjSNcaC6g2
+ aqAKW2hZ5bIDQhPmni/pX7usRxuMwyM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-ExGlHOqwM_-KFX_fklaMBA-1; Fri, 28 Feb 2020 04:25:45 -0500
-X-MC-Unique: ExGlHOqwM_-KFX_fklaMBA-1
+ us-mta-368-4g0pRgORObuQBcTi80oXUA-1; Fri, 28 Feb 2020 04:25:51 -0500
+X-MC-Unique: 4g0pRgORObuQBcTi80oXUA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A73A1005513;
- Fri, 28 Feb 2020 09:25:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F486100550E;
+ Fri, 28 Feb 2020 09:25:50 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-211.ams2.redhat.com [10.36.116.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E561760BE0;
- Fri, 28 Feb 2020 09:25:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B087B60BE0;
+ Fri, 28 Feb 2020 09:25:44 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/15] migration/colo: wrap incoming checkpoint process into
- new helper
-Date: Fri, 28 Feb 2020 10:24:19 +0100
-Message-Id: <20200228092420.103757-15-quintela@redhat.com>
+Subject: [PULL 15/15] savevm: Don't call colo_init_ram_cache twice
+Date: Fri, 28 Feb 2020 10:24:20 +0100
+Message-Id: <20200228092420.103757-16-quintela@redhat.com>
 In-Reply-To: <20200228092420.103757-1-quintela@redhat.com>
 References: <20200228092420.103757-1-quintela@redhat.com>
 MIME-Version: 1.0
@@ -74,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,329 +102,34 @@ Sender: "Qemu-devel"
 
 From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Split checkpoint incoming process into a helper.
+This helper has been called twice which is wrong.
+Left the one where called while get COLO enable message
+from source side.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/colo.c | 260 ++++++++++++++++++++++++-----------------------
- 1 file changed, 133 insertions(+), 127 deletions(-)
+ migration/migration.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 2c88aa57a2..93c5a452fb 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -664,13 +664,138 @@ void migrate_start_colo_process(MigrationState *s)
-     qemu_mutex_lock_iothread();
- }
-=20
--static void colo_wait_handle_message(QEMUFile *f, int *checkpoint_request,
--                                     Error **errp)
-+static void colo_incoming_process_checkpoint(MigrationIncomingState *mis,
-+                      QEMUFile *fb, QIOChannelBuffer *bioc, Error **errp)
-+{
-+    uint64_t total_size;
-+    uint64_t value;
-+    Error *local_err =3D NULL;
-+    int ret;
-+
-+    qemu_mutex_lock_iothread();
-+    vm_stop_force_state(RUN_STATE_COLO);
-+    trace_colo_vm_state_change("run", "stop");
-+    qemu_mutex_unlock_iothread();
-+
-+    /* FIXME: This is unnecessary for periodic checkpoint mode */
-+    colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
-+                 &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    colo_receive_check_message(mis->from_src_file,
-+                       COLO_MESSAGE_VMSTATE_SEND, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    qemu_mutex_lock_iothread();
-+    cpu_synchronize_all_pre_loadvm();
-+    ret =3D qemu_loadvm_state_main(mis->from_src_file, mis);
-+    qemu_mutex_unlock_iothread();
-+
-+    if (ret < 0) {
-+        error_setg(errp, "Load VM's live state (ram) error");
-+        return;
-+    }
-+
-+    value =3D colo_receive_message_value(mis->from_src_file,
-+                             COLO_MESSAGE_VMSTATE_SIZE, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    /*
-+     * Read VM device state data into channel buffer,
-+     * It's better to re-use the memory allocated.
-+     * Here we need to handle the channel buffer directly.
-+     */
-+    if (value > bioc->capacity) {
-+        bioc->capacity =3D value;
-+        bioc->data =3D g_realloc(bioc->data, bioc->capacity);
-+    }
-+    total_size =3D qemu_get_buffer(mis->from_src_file, bioc->data, value);
-+    if (total_size !=3D value) {
-+        error_setg(errp, "Got %" PRIu64 " VMState data, less than expected=
-"
-+                    " %" PRIu64, total_size, value);
-+        return;
-+    }
-+    bioc->usage =3D total_size;
-+    qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
-+
-+    colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_RECEIVED,
-+                 &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    qemu_mutex_lock_iothread();
-+    vmstate_loading =3D true;
-+    ret =3D qemu_load_device_state(fb);
-+    if (ret < 0) {
-+        error_setg(errp, "COLO: load device state failed");
-+        qemu_mutex_unlock_iothread();
-+        return;
-+    }
-+
-+#ifdef CONFIG_REPLICATION
-+    replication_get_error_all(&local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        qemu_mutex_unlock_iothread();
-+        return;
-+    }
-+
-+    /* discard colo disk buffer */
-+    replication_do_checkpoint_all(&local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        qemu_mutex_unlock_iothread();
-+        return;
-+    }
-+#else
-+    abort();
-+#endif
-+    /* Notify all filters of all NIC to do checkpoint */
-+    colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
-+
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        qemu_mutex_unlock_iothread();
-+        return;
-+    }
-+
-+    vmstate_loading =3D false;
-+    vm_start();
-+    trace_colo_vm_state_change("stop", "run");
-+    qemu_mutex_unlock_iothread();
-+
-+    if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
-+        failover_set_state(FAILOVER_STATUS_RELAUNCH,
-+                        FAILOVER_STATUS_NONE);
-+        failover_request_active(NULL);
-+        return;
-+    }
-+
-+    colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_LOADED,
-+                 &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+    }
-+}
-+
-+static void colo_wait_handle_message(MigrationIncomingState *mis,
-+                QEMUFile *fb, QIOChannelBuffer *bioc, Error **errp)
- {
-     COLOMessage msg;
-     Error *local_err =3D NULL;
-=20
--    msg =3D colo_receive_message(f, &local_err);
-+    msg =3D colo_receive_message(mis->from_src_file, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -678,10 +803,9 @@ static void colo_wait_handle_message(QEMUFile *f, int =
-*checkpoint_request,
-=20
-     switch (msg) {
-     case COLO_MESSAGE_CHECKPOINT_REQUEST:
--        *checkpoint_request =3D 1;
-+        colo_incoming_process_checkpoint(mis, fb, bioc, errp);
-         break;
-     default:
--        *checkpoint_request =3D 0;
-         error_setg(errp, "Got unknown COLO message: %d", msg);
-         break;
-     }
-@@ -692,10 +816,7 @@ void *colo_process_incoming_thread(void *opaque)
-     MigrationIncomingState *mis =3D opaque;
-     QEMUFile *fb =3D NULL;
-     QIOChannelBuffer *bioc =3D NULL; /* Cache incoming device state */
--    uint64_t total_size;
--    uint64_t value;
-     Error *local_err =3D NULL;
--    int ret;
-=20
-     rcu_register_thread();
-     qemu_sem_init(&mis->colo_incoming_sem, 0);
-@@ -749,134 +870,19 @@ void *colo_process_incoming_thread(void *opaque)
-     }
-=20
-     while (mis->state =3D=3D MIGRATION_STATUS_COLO) {
--        int request =3D 0;
--
--        colo_wait_handle_message(mis->from_src_file, &request, &local_err)=
-;
-+        colo_wait_handle_message(mis, fb, bioc, &local_err);
-         if (local_err) {
--            goto out;
-+            error_report_err(local_err);
-+            break;
+diff --git a/migration/migration.c b/migration/migration.c
+index 92272250f4..0b2045ccbd 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -489,11 +489,6 @@ static void process_incoming_migration_co(void *opaque=
+)
+             goto fail;
          }
--        assert(request);
-         if (failover_get_state() !=3D FAILOVER_STATUS_NONE) {
-             error_report("failover request");
--            goto out;
--        }
--
--        qemu_mutex_lock_iothread();
--        vm_stop_force_state(RUN_STATE_COLO);
--        trace_colo_vm_state_change("run", "stop");
--        qemu_mutex_unlock_iothread();
--
--        /* FIXME: This is unnecessary for periodic checkpoint mode */
--        colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
--                     &local_err);
--        if (local_err) {
--            goto out;
--        }
--
--        colo_receive_check_message(mis->from_src_file,
--                           COLO_MESSAGE_VMSTATE_SEND, &local_err);
--        if (local_err) {
--            goto out;
--        }
--
--        qemu_mutex_lock_iothread();
--        cpu_synchronize_all_pre_loadvm();
--        ret =3D qemu_loadvm_state_main(mis->from_src_file, mis);
--        qemu_mutex_unlock_iothread();
--
--        if (ret < 0) {
--            error_report("Load VM's live state (ram) error");
--            goto out;
--        }
--
--        value =3D colo_receive_message_value(mis->from_src_file,
--                                 COLO_MESSAGE_VMSTATE_SIZE, &local_err);
--        if (local_err) {
--            goto out;
--        }
--
--        /*
--         * Read VM device state data into channel buffer,
--         * It's better to re-use the memory allocated.
--         * Here we need to handle the channel buffer directly.
--         */
--        if (value > bioc->capacity) {
--            bioc->capacity =3D value;
--            bioc->data =3D g_realloc(bioc->data, bioc->capacity);
--        }
--        total_size =3D qemu_get_buffer(mis->from_src_file, bioc->data, val=
-ue);
--        if (total_size !=3D value) {
--            error_report("Got %" PRIu64 " VMState data, less than expected=
-"
--                        " %" PRIu64, total_size, value);
--            goto out;
--        }
--        bioc->usage =3D total_size;
--        qio_channel_io_seek(QIO_CHANNEL(bioc), 0, 0, NULL);
--
--        colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_RECEIVED,
--                     &local_err);
--        if (local_err) {
--            goto out;
--        }
--
--        qemu_mutex_lock_iothread();
--        vmstate_loading =3D true;
--        ret =3D qemu_load_device_state(fb);
--        if (ret < 0) {
--            error_report("COLO: load device state failed");
--            qemu_mutex_unlock_iothread();
--            goto out;
--        }
--
--#ifdef CONFIG_REPLICATION
--        replication_get_error_all(&local_err);
--        if (local_err) {
--            qemu_mutex_unlock_iothread();
--            goto out;
--        }
--
--        /* discard colo disk buffer */
--        replication_do_checkpoint_all(&local_err);
--        if (local_err) {
--            qemu_mutex_unlock_iothread();
--            goto out;
--        }
--#else
--        abort();
--#endif
--        /* Notify all filters of all NIC to do checkpoint */
--        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
--
--        if (local_err) {
--            qemu_mutex_unlock_iothread();
--            goto out;
--        }
--
--        vmstate_loading =3D false;
--        vm_start();
--        trace_colo_vm_state_change("stop", "run");
--        qemu_mutex_unlock_iothread();
--
--        if (failover_get_state() =3D=3D FAILOVER_STATUS_RELAUNCH) {
--            failover_set_state(FAILOVER_STATUS_RELAUNCH,
--                            FAILOVER_STATUS_NONE);
--            failover_request_active(NULL);
--            goto out;
--        }
--
--        colo_send_message(mis->to_src_file, COLO_MESSAGE_VMSTATE_LOADED,
--                     &local_err);
--        if (local_err) {
--            goto out;
-+            break;
-         }
-     }
 =20
- out:
-     vmstate_loading =3D false;
--    /* Throw the unreported error message after exited from loop */
--    if (local_err) {
--        error_report_err(local_err);
--    }
-=20
-     /*
-      * There are only two reasons we can get here, some error happened
+-        if (colo_init_ram_cache() < 0) {
+-            error_report("Init ram cache failed");
+-            goto fail;
+-        }
+-
+         qemu_thread_create(&mis->colo_incoming_thread, "COLO incoming",
+              colo_process_incoming_thread, mis, QEMU_THREAD_JOINABLE);
+         mis->have_colo_incoming_thread =3D true;
 --=20
 2.24.1
 
