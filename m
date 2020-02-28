@@ -2,85 +2,96 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B12AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F3DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:48:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17E75246A0
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FE4F246AA
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:48:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rGfK5llN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E75246A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+N1dLOq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE4F246AA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45745 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7e1p-0006Qx-9c
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:42:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
+	id 1j7e7w-0000dZ-Cr
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:48:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanrin@gmail.com>) id 1j7e1D-0005f8-A0
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:41:24 -0500
+ (envelope-from <philmd@redhat.com>) id 1j7e6g-0007LA-Vg
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:47:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanrin@gmail.com>) id 1j7e1C-0006Ud-Eu
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:41:23 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:42546)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanrin@gmail.com>)
- id 1j7e1A-0006U0-F6; Fri, 28 Feb 2020 06:41:20 -0500
-Received: by mail-io1-xd41.google.com with SMTP id z1so3047891iom.9;
- Fri, 28 Feb 2020 03:41:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Gr5LmJZlxHOHuQ6gyEfwrE1cHMWKEe9J8ZRtrjl8sqg=;
- b=rGfK5llNKQhbjZLGP+PLv7LMWU5pPXfxELhkoX/fmwV1lt36AJpJtDy/HRkUxR3PIZ
- jd1biIbMcp4L3zgGFWw1wbr0iimv9FAJnzNmCGPwz9YaK2+iI4TS1BQ7EMSR4X/DlWoa
- d5OWr2UnXxZymD2cWAKd/KjXw54j1mnWowLglr5oFfdbVghlt5J1G7gIrqDO/NIDXePQ
- 3n5rkQcl9NoWx/gNY5KA1JsTiBAZsu1imqdLIMKVuKl2NulWTQdqB/IxwlzB2iuf2gZg
- mjdOzN4QJh+KnWnLVeWfuE/qxvbRHRzgUp344X4BC1V5Ce+M3w2Y3vV5+c2GiA+vVjcD
- dZIQ==
+ (envelope-from <philmd@redhat.com>) id 1j7e6f-00018y-V4
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:47:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49785
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j7e6f-00018e-Ru
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:47:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1582890421;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=c3546yi0MNEa4PeS8dV7Vwzlyh9MvQJ56uhzxTJLw0w=;
+ b=d+N1dLOq+LcvnjqJbSRSZhq/i9Ls4lTfMdSwLjo8Ee1IDA0TflQOggQunNyAsuo7QbtLK8
+ 0sxXAr8eWygTG2P/8s6jWvmyrrwMx9JFImHkz5lrUqhcYEBCs8G9qPIldKlledxz3f7Kmy
+ hFf7swhKFVC3DV44jVOMqKHlW/UU3cU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-451-qEoFox1-OWaSAZpJadt_Qw-1; Fri, 28 Feb 2020 06:46:59 -0500
+X-MC-Unique: qEoFox1-OWaSAZpJadt_Qw-1
+Received: by mail-wr1-f71.google.com with SMTP id o6so1220512wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 03:46:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Gr5LmJZlxHOHuQ6gyEfwrE1cHMWKEe9J8ZRtrjl8sqg=;
- b=O9afKIE1FeNIBg7z3ZVXaa7PNUnAhkD5kPZzSCJAuq3wAr2fLv61+1os0aIcg/MhI8
- RSUCOsHEaITSkKG1DheYtC+dLnSG3Gd4/I4Ngp9mW/KB6R3BsMcNlDpDsFRRzWXeE/Bn
- MiKlx6gf4AD1inFRJvcHqLDcyHU90hYJXFLJKe+ShA2dJ8UrrWr3KYQslWnRYLPDEpKJ
- fnzlvH4nt3NjEyKx7Y012M2gtbXdQ9aHLB8J5AR9wMvLgWo4p4KX/ot+CSI+MvyNzsKB
- umx7RIcpX1cllFn187VxSjZ8w3esWN1jlIfanDsjDp6/y+KcXeIA00pU+oCYSBY9ldbk
- Q87w==
-X-Gm-Message-State: APjAAAXc326sKKP3kJ3/secdKViG+PWhz1XGGjs3e3rpUP8tuQLr6qWM
- 77/fFfrfGxcO9NWznZSmGlKx4LA9VlWO97rKBjrgNA==
-X-Google-Smtp-Source: APXvYqwvmgt/bw+pHWWXou5tyccFRyXunW6p7SQR2RZbuTc8/lWcYhqTEzF+kVUypx9r00/QHnthFI29Omdf0qdOEa4=
-X-Received: by 2002:a5d:8d90:: with SMTP id b16mr3294983ioj.262.1582890079434; 
- Fri, 28 Feb 2020 03:41:19 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=f7g55rjk1KrrisnX/ncLGxvcfXQdY0DJfVs+Hz1podY=;
+ b=C6WoIqJ/Lv3UU/8NDZzdHHGnShQEcdmnoofsWhkxCTCBugA5trspf8TeExM8BCLOOv
+ tjMP3M4m+AL9T2C661SGr6KEX69uoDfVt3UNMKERx422B0oXbInsXQXZgCfGxtQFjzvm
+ 74qitZLTEUYE40UMb/pzNrFpuvRueUxdWIYoVUJ1ynT9ZAlganLLLYwdoaPkY59RR1mp
+ O3MkfGLbOH8jql+LinTSbgdI9Cjq8lI3g1scSEwRB6eMDoLFqvjK4hfbWBpANe3+yIql
+ XjPNphY753bmlyOT5/MBU1elJojtg2MUj/vzAM2zVYH7jqblv+MjhGGGNOTkCAusQbj7
+ qb1A==
+X-Gm-Message-State: APjAAAWL9x2F1PhhhcLfFkYJPSPRp2BR3BoI7dbiEW/5gFE2DJlYDkW5
+ kcDULWucipmnfwM+lpLiedsvdk3G3KLlR6ASyyf9S+Wt5PGyn7CMt1z06CrAIBle2XqKQCLMJF3
+ z7a737WiaePLbEYM=
+X-Received: by 2002:adf:f7c4:: with SMTP id a4mr4494905wrq.361.1582890418143; 
+ Fri, 28 Feb 2020 03:46:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxnzX87j3iygThg/Ua8j06sDbyEO3Vmhe1XCY219T9ODOfqM0dNbos+7UVje+Hl6zfQMiBUGg==
+X-Received: by 2002:adf:f7c4:: with SMTP id a4mr4494890wrq.361.1582890417971; 
+ Fri, 28 Feb 2020 03:46:57 -0800 (PST)
+Received: from x1w.moovbox.local ([185.102.219.36])
+ by smtp.gmail.com with ESMTPSA id q138sm1127219wme.41.2020.02.28.03.46.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 03:46:57 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 02/18] hw/southbridge/ich9: Removed unused headers
+Date: Fri, 28 Feb 2020 12:46:33 +0100
+Message-Id: <20200228114649.12818-3-philmd@redhat.com>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200228114649.12818-1-philmd@redhat.com>
+References: <20200228114649.12818-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <CAAxjCEzHQz4cG_8m7S6=CwCBoN5daQs+KVyuU5GL5Tq3Bky1NA@mail.gmail.com>
- <CAAxjCEx79Fkjw9tFbSMo+b1LGv2LNivLRXf1GS9JsYnXrNVVkQ@mail.gmail.com>
- <CAAxjCEwv61e87ZUz-jueL9AkzaNbY3pRoFmf2dah-p9W8nosWA@mail.gmail.com>
- <CAAxjCEx__TsY75b0iecG1a_wUO2MF2UMVP50nFHQi2Ouyu0znw@mail.gmail.com>
- <CAAxjCExb8GKP0Y8hwEbv=DETfu1dG3++umYV0n8vX6kxuJW3pQ@mail.gmail.com>
- <20200228111046.GC5274@linux.fritz.box>
-In-Reply-To: <20200228111046.GC5274@linux.fritz.box>
-From: Stefan Ring <stefanrin@gmail.com>
-Date: Fri, 28 Feb 2020 12:41:08 +0100
-Message-ID: <CAAxjCEx8EVyEs9akLV+WNghxE9A-ej5_u5o3f+=zrL7VNjXa2g@mail.gmail.com>
-Subject: Re: Strange data corruption issue with gluster (libgfapi) and ZFS
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,22 +103,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: integration@gluster.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 28, 2020 at 12:10 PM Kevin Wolf <kwolf@redhat.com> wrote:
->
-> This sounds almost like two other bugs we got fixed recently (in the
-> QEMU file-posix driver and in the XFS kernel driver) where two write
-> extending the file size were in flight in parallel, but if the shorter
-> one completed last, instead extending the file, it would end up
-> truncating it.
+The ICH9 chipset is not X86/PC specific.
 
-Hmm, XFS is used on the gluster server, with a CentOS 7 kernel. I can
-switch to ext4 and check if it changes anything.
+These files don't use anything declared by the "hw/i386/pc.h"
+or "hw/i386/ioapic.h" headers. Remove them.
 
-At this point I actually wanted to take this investigation away from
-qemu, because it=E2=80=99s not involved anymore in my reproducer.
+Reviewed-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ include/hw/i386/ich9.h | 1 -
+ hw/acpi/ich9.c         | 1 -
+ hw/isa/lpc_ich9.c      | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
+index 72e803f6e2..a98d10b252 100644
+--- a/include/hw/i386/ich9.h
++++ b/include/hw/i386/ich9.h
+@@ -5,7 +5,6 @@
+ #include "hw/sysbus.h"
+ #include "hw/i386/pc.h"
+ #include "hw/isa/apm.h"
+-#include "hw/i386/ioapic.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pcie_host.h"
+ #include "hw/pci/pci_bridge.h"
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 2034dd749e..fdd0a6c79e 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -27,7 +27,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+-#include "hw/i386/pc.h"
+ #include "hw/pci/pci.h"
+ #include "migration/vmstate.h"
+ #include "qemu/timer.h"
+diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+index f85b484eac..cb79616ced 100644
+--- a/hw/isa/lpc_ich9.c
++++ b/hw/isa/lpc_ich9.c
+@@ -37,7 +37,6 @@
+ #include "migration/vmstate.h"
+ #include "hw/irq.h"
+ #include "hw/isa/apm.h"
+-#include "hw/i386/ioapic.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_bridge.h"
+ #include "hw/i386/ich9.h"
+--=20
+2.21.1
+
 
