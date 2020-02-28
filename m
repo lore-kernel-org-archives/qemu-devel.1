@@ -7,81 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E20D6C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 991E1C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:47:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAC662468D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:45:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E44C24697
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:47:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n5u91R6e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC662468D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z07IPW5I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E44C24697
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7ilX-0003ys-H7
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:45:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56779)
+	id 1j7in0-0006Pf-Bq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:47:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7ifY-0008Kw-Mb
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:22 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7if8-0007Jp-Iz
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7ifX-00027f-9T
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:20 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:45277)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7if7-0001qI-8s
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:54 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42256)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7ifX-00027E-26
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:19 -0500
-Received: by mail-wr1-x430.google.com with SMTP id v2so3600858wrp.12
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:39:18 -0800 (PST)
+ id 1j7if7-0001pn-2D
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:53 -0500
+Received: by mail-wr1-x433.google.com with SMTP id p18so3636781wre.9
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:38:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=kVj8xiNy7P+impZo0PATu9zmL7PfKEv61GKapK4HB3M=;
- b=n5u91R6eRFocJHArmg6rLlH+evDOkI7c6BcilazFITxHqvtq/bJY3sQarvwKrgrwbX
- sPfHUTvM9y5wy/6lbJb28KIFW/AGSyTZtVriET4U6gxh3jwcgrSZqFpURbPITOeoeL5s
- 2ohZoqhaHlj9Yaa5v5p+CQMc4wxwfDRKKjWoEP12YqnpScanRXds+pYnBv8C2WSOUPb4
- wpVbulEpDdSXICerpOzLPBUHpRzTiNC8ESIAmusj9B33ExJNetE8C9fEE1RJZG9gc7uQ
- zBuBGF/C7H0N+9VW7V8pVhG7UqtqZI83mF+pASeNxJK+LkYzP7y06vA0xVoVyWnVOgzH
- e8hA==
+ bh=sePkBd54w+3287LZ8LJspmr9uwrTqj5oJOIrdf/A0uM=;
+ b=z07IPW5IErtmdNtGsafxx25bHg7fqigpofL7hXnZ+NCU0ASILniY2ujLxFrjOxhXC3
+ y+Oagn5NSACPency6dciLTgPXn+ph1HHr50HWHbdgCU/0nC3IBY6PpXnqiqs/VAM+4IX
+ SI5G5njSSmK5cE+L1pLFUK3+kN3OuLruktcuBGkKM82wswIO/jKcMo1FhdBhzGeBQZyb
+ 02KrqdC7jjZHXQUGXKbPBF26MvVR8c3HAf7A31sflqTdC09WR5sKFY7q6tzmTnVyMsE7
+ gFs/Re4raGpDD4AZ4nvjp/p+uH/Bpj+5HWUbc/SOSfcIGIFWnYs9SefHoLjLhOu0HEAZ
+ tN1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kVj8xiNy7P+impZo0PATu9zmL7PfKEv61GKapK4HB3M=;
- b=PFYgKiAyoat/rx2ja9pNZFCtmRDTosZ+GCjvzVcSixZfZb5Z32M7oKcPD8vmbyKvb/
- PpdTj6sS07xpoZz0lmPgSP9tX16sVJnOBabdbHSjwhHhai97dV/5nwQ2wdYwxzw4TfdQ
- kXh/sLsnehg3moc3orRH23UATwun2LGYVgsSzzpMjLzHAaQAtFdbOznxy3UZs+o5Vm41
- uufdcbZhMCImPITWs027NVi/g5hocjci1t+gtI0Jo6RCQ7se/Qvi6O2OxdE0pMNa9x4R
- EZB6v7LMMU7LTE+J3Oq2cIbn9CpCmPOrusNPwQijZvYbcMD1IQOa8PPyISfH9hRXe0La
- Kcrw==
-X-Gm-Message-State: APjAAAXe3rxkuH6HfQm7bM6gaIDb8t9E6PMHrBJ5wGZhLRfzuj+z86gI
- OsBjPt3htfR2e9dTC30TJGLkXiDrVSOnrw==
-X-Google-Smtp-Source: APXvYqyrTvJxaFQ4V9KyXYLkW+WuW/Fpa6jxejFBRmsdMHkhctjVLCTihkQuNafdYzCpWLZWhDMqtA==
-X-Received: by 2002:a5d:628e:: with SMTP id k14mr5318873wru.425.1582907957592; 
- Fri, 28 Feb 2020 08:39:17 -0800 (PST)
+ bh=sePkBd54w+3287LZ8LJspmr9uwrTqj5oJOIrdf/A0uM=;
+ b=YuxDJPcqGbVQBKFpeXzjTmGF0PAfu/wLjamvoufayXqzjNLbCx0YD2/gEViR9bY1yY
+ cK19LgLNQKpIn7eautG64MQa/407Q+tUf50eu4cJ9Zn3N+dLq1vsE2kdPG3tCFQoSHcB
+ aWuLo1K2mwGv7jkiZbKLyzEJojWMASdmCxjM43fJTlhBtzD/X214jzfBnnZ7jfcNd3BZ
+ zlIjIHYZAVXuP//G3BbrWFqeUIFi0NrVVWXc9YHXcQN9McZaDNA4n/P7OCKUrdi6JVE9
+ xlhxoYcGgX3pWeIUzYYukXjVj4zXMut4YmcGN4A2p8HqOSGzTFLC5Kc7/Ei6aP6/0fGw
+ 5YLQ==
+X-Gm-Message-State: APjAAAVAUuKG/zZI+jAzXccV+vJ0ui3iDqc1Y7eslt6G/2xtZCvUS+pG
+ yGGb0725qY774poBnV2hnf3KHfprLMHxng==
+X-Google-Smtp-Source: APXvYqylST1/yH46ggQ8hjDRLDzT29KDXHPvcfMppKsj5y9uzxNw90pWyVMFdI/8Iv8Epl9ZJ2gRPw==
+X-Received: by 2002:a5d:5007:: with SMTP id e7mr5660291wrt.228.1582907931694; 
+ Fri, 28 Feb 2020 08:38:51 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.39.16
+ by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.38.50
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:39:17 -0800 (PST)
+ Fri, 28 Feb 2020 08:38:51 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/33] target/arm: Implement v8.4-RCPC
-Date: Fri, 28 Feb 2020 16:38:38 +0000
-Message-Id: <20200228163840.23585-32-peter.maydell@linaro.org>
+Subject: [PULL 08/33] target/arm: Rename isar_feature_aa32_fpdp_v2
+Date: Fri, 28 Feb 2020 16:38:15 +0000
+Message-Id: <20200228163840.23585-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
 References: <20200228163840.23585-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,176 +98,221 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The v8.4-RCPC extension implements some new instructions:
- * LDAPUR, LDAPURB, LDAPURH, LDAPRSB, LDAPRSH, LDAPRSW
- * STLUR, STLURB, STLURH
+From: Richard Henderson <richard.henderson@linaro.org>
 
-These are all in a new subgroup of encodings that sits below the
-top-level "Loads and Stores" group in the Arm ARM.
+The old name, isar_feature_aa32_fpdp, does not reflect
+that the test includes VFPv2.  We will introduce another
+feature tests for VFPv3.
 
-The STLUR* instructions have standard store-release semantics; the
-LDAPUR* have Load-AcquirePC semantics, but (as with LDAPR*) we choose
-to implement them as the slightly stronger Load-Acquire.
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200224222232.13807-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200224172846.13053-4-peter.maydell@linaro.org
 ---
- target/arm/cpu.h           |  5 +++
- linux-user/elfload.c       |  1 +
- target/arm/cpu64.c         |  2 +-
- target/arm/translate-a64.c | 90 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 97 insertions(+), 1 deletion(-)
+ target/arm/cpu.h               |  4 ++--
+ target/arm/translate-vfp.inc.c | 40 +++++++++++++++++-----------------
+ 2 files changed, 22 insertions(+), 22 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ff30985ead4..ce1e2a090e5 100644
+index a128d48d405..1e6eac0cd2a 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -3779,6 +3779,11 @@ static inline bool isar_feature_aa64_rcpc_8_3(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, LRCPC) != 0;
+@@ -3470,9 +3470,9 @@ static inline bool isar_feature_aa32_fpshvec(const ARMISARegisters *id)
+     return FIELD_EX32(id->mvfr0, MVFR0, FPSHVEC) > 0;
  }
  
-+static inline bool isar_feature_aa64_rcpc_8_4(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, LRCPC) >= 2;
-+}
-+
- /*
-  * Feature tests for "does this exist in either 32-bit or 64-bit?"
-  */
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index d76b828a789..db748c58775 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -662,6 +662,7 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE_ID(aa64_condm_4, ARM_HWCAP_A64_FLAGM);
-     GET_FEATURE_ID(aa64_dcpop, ARM_HWCAP_A64_DCPOP);
-     GET_FEATURE_ID(aa64_rcpc_8_3, ARM_HWCAP_A64_LRCPC);
-+    GET_FEATURE_ID(aa64_rcpc_8_4, ARM_HWCAP_A64_ILRCPC);
- 
-     return hwcaps;
- }
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 18c7b40f98c..b842e2b664a 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -654,7 +654,7 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, SPECRES, 1);
-         t = FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 1);
--        t = FIELD_DP64(t, ID_AA64ISAR1, LRCPC, 1); /* ARMv8.3-RCPC */
-+        t = FIELD_DP64(t, ID_AA64ISAR1, LRCPC, 2); /* ARMv8.4-RCPC */
-         cpu->isar.id_aa64isar1 = t;
- 
-         t = cpu->isar.id_aa64pfr0;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 7a066fb7cb2..579180af0a9 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -3283,6 +3283,88 @@ static void disas_ldst_pac(DisasContext *s, uint32_t insn,
-     }
- }
- 
-+/*
-+ * LDAPR/STLR (unscaled immediate)
-+ *
-+ *  31  30            24    22  21       12    10    5     0
-+ * +------+-------------+-----+---+--------+-----+----+-----+
-+ * | size | 0 1 1 0 0 1 | opc | 0 |  imm9  | 0 0 | Rn |  Rt |
-+ * +------+-------------+-----+---+--------+-----+----+-----+
-+ *
-+ * Rt: source or destination register
-+ * Rn: base register
-+ * imm9: unscaled immediate offset
-+ * opc: 00: STLUR*, 01/10/11: various LDAPUR*
-+ * size: size of load/store
-+ */
-+static void disas_ldst_ldapr_stlr(DisasContext *s, uint32_t insn)
-+{
-+    int rt = extract32(insn, 0, 5);
-+    int rn = extract32(insn, 5, 5);
-+    int offset = sextract32(insn, 12, 9);
-+    int opc = extract32(insn, 22, 2);
-+    int size = extract32(insn, 30, 2);
-+    TCGv_i64 clean_addr, dirty_addr;
-+    bool is_store = false;
-+    bool is_signed = false;
-+    bool extend = false;
-+    bool iss_sf;
-+
-+    if (!dc_isar_feature(aa64_rcpc_8_4, s)) {
-+        unallocated_encoding(s);
-+        return;
-+    }
-+
-+    switch (opc) {
-+    case 0: /* STLURB */
-+        is_store = true;
-+        break;
-+    case 1: /* LDAPUR* */
-+        break;
-+    case 2: /* LDAPURS* 64-bit variant */
-+        if (size == 3) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        is_signed = true;
-+        break;
-+    case 3: /* LDAPURS* 32-bit variant */
-+        if (size > 1) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        is_signed = true;
-+        extend = true; /* zero-extend 32->64 after signed load */
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    iss_sf = disas_ldst_compute_iss_sf(size, is_signed, opc);
-+
-+    if (rn == 31) {
-+        gen_check_sp_alignment(s);
-+    }
-+
-+    dirty_addr = read_cpu_reg_sp(s, rn, 1);
-+    tcg_gen_addi_i64(dirty_addr, dirty_addr, offset);
-+    clean_addr = clean_data_tbi(s, dirty_addr);
-+
-+    if (is_store) {
-+        /* Store-Release semantics */
-+        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-+        do_gpr_st(s, cpu_reg(s, rt), clean_addr, size, true, rt, iss_sf, true);
-+    } else {
-+        /*
-+         * Load-AcquirePC semantics; we implement as the slightly more
-+         * restrictive Load-Acquire.
-+         */
-+        do_gpr_ld(s, cpu_reg(s, rt), clean_addr, size, is_signed, extend,
-+                  true, rt, iss_sf, true);
-+        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
-+    }
-+}
-+
- /* Load/store register (all forms) */
- static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+-static inline bool isar_feature_aa32_fpdp(const ARMISARegisters *id)
++static inline bool isar_feature_aa32_fpdp_v2(const ARMISARegisters *id)
  {
-@@ -3634,6 +3716,14 @@ static void disas_ldst(DisasContext *s, uint32_t insn)
-     case 0x0d: /* AdvSIMD load/store single structure */
-         disas_ldst_single_struct(s, insn);
-         break;
-+    case 0x19: /* LDAPR/STLR (unscaled immediate) */
-+        if (extract32(insn, 10, 2) != 0 ||
-+            extract32(insn, 21, 1) != 0) {
-+            unallocated_encoding(s);
-+            break;
-+        }
-+        disas_ldst_ldapr_stlr(s, insn);
-+        break;
-     default:
-         unallocated_encoding(s);
-         break;
+-    /* Return true if CPU supports double precision floating point */
++    /* Return true if CPU supports double precision floating point, VFPv2 */
+     return FIELD_EX32(id->mvfr0, MVFR0, FPDP) > 0;
+ }
+ 
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index ba46e2557a1..e94876c30ca 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -206,7 +206,7 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
+         return false;
+     }
+ 
+-    if (dp && !dc_isar_feature(aa32_fpdp, s)) {
++    if (dp && !dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -339,7 +339,7 @@ static bool trans_VMINMAXNM(DisasContext *s, arg_VMINMAXNM *a)
+         return false;
+     }
+ 
+-    if (dp && !dc_isar_feature(aa32_fpdp, s)) {
++    if (dp && !dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -425,7 +425,7 @@ static bool trans_VRINT(DisasContext *s, arg_VRINT *a)
+         return false;
+     }
+ 
+-    if (dp && !dc_isar_feature(aa32_fpdp, s)) {
++    if (dp && !dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -488,7 +488,7 @@ static bool trans_VCVT(DisasContext *s, arg_VCVT *a)
+         return false;
+     }
+ 
+-    if (dp && !dc_isar_feature(aa32_fpdp, s)) {
++    if (dp && !dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -1313,7 +1313,7 @@ static bool do_vfp_3op_dp(DisasContext *s, VFPGen3OpDPFn *fn,
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -1462,7 +1462,7 @@ static bool do_vfp_2op_dp(DisasContext *s, VFPGen2OpDPFn *fn, int vd, int vm)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -1827,7 +1827,7 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -1926,7 +1926,7 @@ static bool trans_VMOV_imm_dp(DisasContext *s, arg_VMOV_imm_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2070,7 +2070,7 @@ static bool trans_VCMP_dp(DisasContext *s, arg_VCMP_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2143,7 +2143,7 @@ static bool trans_VCVT_f64_f16(DisasContext *s, arg_VCVT_f64_f16 *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2209,7 +2209,7 @@ static bool trans_VCVT_f16_f64(DisasContext *s, arg_VCVT_f16_f64 *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2269,7 +2269,7 @@ static bool trans_VRINTR_dp(DisasContext *s, arg_VRINTR_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2330,7 +2330,7 @@ static bool trans_VRINTZ_dp(DisasContext *s, arg_VRINTZ_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2389,7 +2389,7 @@ static bool trans_VRINTX_dp(DisasContext *s, arg_VRINTX_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2417,7 +2417,7 @@ static bool trans_VCVT_sp(DisasContext *s, arg_VCVT_sp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2445,7 +2445,7 @@ static bool trans_VCVT_dp(DisasContext *s, arg_VCVT_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2499,7 +2499,7 @@ static bool trans_VCVT_int_dp(DisasContext *s, arg_VCVT_int_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2539,7 +2539,7 @@ static bool trans_VJCVT(DisasContext *s, arg_VJCVT *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2632,7 +2632,7 @@ static bool trans_VCVT_fix_dp(DisasContext *s, arg_VCVT_fix_dp *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
+@@ -2728,7 +2728,7 @@ static bool trans_VCVT_dp_int(DisasContext *s, arg_VCVT_dp_int *a)
+         return false;
+     }
+ 
+-    if (!dc_isar_feature(aa32_fpdp, s)) {
++    if (!dc_isar_feature(aa32_fpdp_v2, s)) {
+         return false;
+     }
+ 
 -- 
 2.20.1
 
