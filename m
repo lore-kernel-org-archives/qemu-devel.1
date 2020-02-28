@@ -2,91 +2,117 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA15EC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D630C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FC5A2469F
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:30:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECA0D246A0
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:41:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f1oR/ibD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC5A2469F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qtCjMQR5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECA0D246A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7dqI-0003N0-GP
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:30:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39219)
+	id 1j7e17-0005Ow-4N
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:41:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1j7dpg-0002vW-22
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:29:30 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j7e0F-0004nS-A2
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:40:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1j7dpd-0001GE-1e
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:29:27 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46329
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1j7dpc-0001Fb-KZ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:29:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582889363;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yYJkMQlwnkgyCVURpXs6P4Z7O5E9qq1vhLTwQPkAhig=;
- b=f1oR/ibDQ0zYshagJpbpCHfUFaqBQoqpCzk9/Rsu0gfuQFmWHSyt0htPBhbNvZKS59lRci
- qrCK+k9Xvk6PfVA+B5l8B3oJ06BBY9e0f8cpfUuGeyz/jQuFErFNd/ig+Tdf7iOqE6kK6V
- avvOkwe9iqaIjka2b+5fU8aNvBUCp3c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-bWwAuYFYPIG0cF7_kakAPg-1; Fri, 28 Feb 2020 06:29:16 -0500
-X-MC-Unique: bWwAuYFYPIG0cF7_kakAPg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1728107ACC7;
- Fri, 28 Feb 2020 11:29:13 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-243.ams2.redhat.com
- [10.36.116.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D80FF5C554;
- Fri, 28 Feb 2020 11:29:10 +0000 (UTC)
-Subject: Re: [edk2-devel] A problem with live migration of UEFI virtual
- machines
-To: "Zhoujian (jay)" <jianjay.zhou@huawei.com>, Andrew Fish
- <afish@apple.com>, "devel@edk2.groups.io" <devel@edk2.groups.io>
-References: <tencent_BC7FD00363690990994E90F8@qq.com>
- <87sgjhxbtc.fsf@zen.linaroharston> <20200224152810.GX635661@redhat.com>
- <8b0ec286-9322-ee00-3729-6ec7ee8260a6@redhat.com>
- <3E8BB07B-8730-4AB8-BCB6-EA183FB589C5@apple.com>
- <465a5a84-cac4-de39-8956-e38771807450@redhat.com>
- <8F42F6F1-A65D-490D-9F2F-E12746870B29@apple.com>
- <6666a886-720d-1ead-8f7e-13e65dcaaeb4@redhat.com>
- <B2D15215269B544CADD246097EACE7474BB28B35@dggemm508-mbx.china.huawei.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ea6f0558-a007-64a3-09d6-0a803f09b5ad@redhat.com>
-Date: Fri, 28 Feb 2020 12:29:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <B2D15215269B544CADD246097EACE7474BB28B35@dggemm508-mbx.china.huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j7e0D-0006HK-R7
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 06:40:23 -0500
+Received: from mail-eopbgr70124.outbound.protection.outlook.com
+ ([40.107.7.124]:49606 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j7e05-00067W-LK; Fri, 28 Feb 2020 06:40:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=URlSNS8taVWYZfbidAvBLo82TZfryEZvS4BhFId/kjRNVOrnHTZavzTOiBa6m+pn/bUKcJe96Vkgu0XQ0tuVSsY4UDyHHe5SgSAWdRYDNUV0bbIqIuhk+90pWFGKuB2VVDW4j0x9XanuWfAJfPPvG/wDfiTP/rfcyO0GrlCyKMZYxxOmnQDcd+5WCaqK/ZUOzZSuRl0BZzgguRw+gXTbOleculJgbyoe1pish55qgA1NPg0BnSoE+moANBRtvbvcOUIDe5Zo7BScGGy0V1uuyvv/z669tLgagA5zMOkkeJIOMtghQJBUujkXEDlbQWG5zPIjpgNv3v6LCNvMR0y+wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tgRe594Cfk7Uf8Tqsu1Ln3CkAcAfhX5NgHhaPsKPIBI=;
+ b=V1ecrExtwcm89naNPrXWao8TXc0VF+hPKDg+nfItvtQbhw8LzTueWJ8c7sRYYkTKtngjoxL3a+tHQ66PvHdZDUB/9qsD0Ll9mbvlfGRTZVp7SzClHphKGGD6bAXsyBiIz8soXH3SzkiVcJlbLcHmICmtw+iIeSLlkYOqb2u7OhMa8Y8NtQLslOnD1ZboQp5sqKuKgurfBOsdq+N//eQ75Ja/mSXxBx5d87XPwxi7h4iOPKtE6eOv8ogR4TE8BOPXvl3QjIKNtV5Zo6fR//ViPKGgNoxT8vTaexLMNFVAJG9rOUF1IGlC+ahBqDuxsoXOOIoS5dkAPV0sSc1J68fbUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tgRe594Cfk7Uf8Tqsu1Ln3CkAcAfhX5NgHhaPsKPIBI=;
+ b=qtCjMQR5wBBjiAegx9H3LvJyB6g0x2jxdqtmdEIxonc1d08bM5wZemj+F3sP8KwcvxenfTH3/MXshklMl4E8H8VERR5wk32mV192F1DhBYA6ThTrod8m8XcGsk+3r16EcF+HcDn/fql81XFhU3ZRcMMnpPB7JNESGhTSI+HpOqo=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB3202.eurprd08.prod.outlook.com (52.134.90.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.14; Fri, 28 Feb 2020 11:40:10 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::9875:c099:713b:8219]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::9875:c099:713b:8219%4]) with mapi id 15.20.2772.012; Fri, 28 Feb 2020
+ 11:40:10 +0000
+Subject: Re: [PATCH v1 3/8] qcow2: add zstd cluster compression
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200227072953.25445-1-dplotnikov@virtuozzo.com>
+ <20200227072953.25445-4-dplotnikov@virtuozzo.com>
+ <6b9b3f63-5760-c0a1-b330-b92ac894970a@redhat.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-ID: <8345724b-63c7-7d12-3fe7-38fac5e087b2@virtuozzo.com>
+Date: Fri, 28 Feb 2020 14:40:07 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <6b9b3f63-5760-c0a1-b330-b92ac894970a@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR0402CA0022.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::32) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.64] (178.34.162.229) by
+ HE1PR0402CA0022.eurprd04.prod.outlook.com (2603:10a6:3:d0::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.15 via Frontend Transport; Fri, 28 Feb 2020 11:40:09 +0000
+X-Originating-IP: [178.34.162.229]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: bded8b5e-7125-4af6-9e60-08d7bc42f76e
+X-MS-TrafficTypeDiagnostic: AM0PR08MB3202:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR08MB32020357B8A6B351227FBFE8CFE80@AM0PR08MB3202.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 0327618309
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(346002)(366004)(396003)(376002)(39850400004)(136003)(189003)(199004)(26005)(6486002)(31686004)(316002)(186003)(4326008)(5660300002)(16576012)(81166006)(81156014)(2906002)(107886003)(8676002)(478600001)(31696002)(66476007)(66946007)(53546011)(956004)(66556008)(16526019)(2616005)(19273905006)(52116002)(8936002)(86362001)(36756003)(563064011);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3202;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aqnnbPCNjHCMyoaFUUQA5Hi2S0r5w4mJbzSStPE4/AcltYcT3jTvz0B1u9D0K54dclS4ylho1zj0Q02EXlsi9aLHo7FgpF7UoFEi/a9K0p8M99MDziKs3CfIXJwJmrDVsUo1D1AKk9+H4G7aut1x8AJc44IYBd6vnenZaEi7wZlzNEZK3Vw9m4/I6QmuMA/tJQkEjOSa1bg2bvC+8bITM3yEQIXCRxqAMOdbquRvz3INpdncvcc4We0f5fCKsfUzYMxpMdQoYINsoxajbCCvhklwc4NmS6uVRScrdup5UQLWX/Tf8cYekjZAtgltCjDQj8wi2QaPM5X2Ei8GL/JO/GgQFEEKYr7nUbqN8Szw5IJCAj7YJQuqD2sEHByAgne36aOKtlwCfHentiEHqH7FTOjZcK/2Bw9CkwXFG1TH2XV/Q60ZanXGBNa0TsM4NGfTlx+DqqwxfF79d/QLvE+FP0MjlH8zGOMrAR/h97XGSbhDjse8Gb6x2oMmNAKLy4ZUt2mf/E1TAGTk35S6cg/U+L1Yv54X/QdYrR7opDQJjHVXCb0HrESVeDAhfs93oApk
+X-MS-Exchange-AntiSpam-MessageData: chP21Vah2ANHArAqxlqToXJDx8xofY9HcqgqjySoWOUjjTM6DBXPWYMHN7gjykNE7S8ZZqrCxwq+Cvt69OevSDJ+uG/JsGSpmHdYSUsL6wpmmu3RyBcsfFFY9V4oTKId34VPi9pw62WE+cxamYT4xA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bded8b5e-7125-4af6-9e60-08d7bc42f76e
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2020 11:40:10.3318 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ogu3okFlTttCIOsnyaz298VFWrJWZH4qnx6V+vdkAetCEh0XOnLMOipUJqQUem8bi83WGUPDe5vj4fC3b0VAG9S1VIX+Z+5Qg56T57TD7nY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3202
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.124
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,357 +124,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "berrange@redhat.com" <berrange@redhat.com>,
- "wangxin \(U\)" <wangxinxin.wang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- zhoujianjay <zhoujianjay@gmail.com>, discuss <discuss@edk2.groups.io>,
- "Huangweidong \(C\)" <weidong.huang@huawei.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- wuchenye1995 <wuchenye1995@gmail.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/28/20 04:20, Zhoujian (jay) wrote:
-> Hi Laszlo,
->=20
->> -----Original Message-----
->> From: Qemu-devel
->> [mailto:qemu-devel-bounces+jianjay.zhou=3Dhuawei.com@nongnu.org] On Beha=
-lf
->> Of Laszlo Ersek
->> Sent: Wednesday, February 26, 2020 5:42 PM
->> To: Andrew Fish <afish@apple.com>; devel@edk2.groups.io
->> Cc: berrange@redhat.com; qemu-devel@nongnu.org; Dr. David Alan Gilbert
->> <dgilbert@redhat.com>; zhoujianjay <zhoujianjay@gmail.com>; discuss
->> <discuss@edk2.groups.io>; Alex Benn=C3=A9e <alex.bennee@linaro.org>;
->> wuchenye1995 <wuchenye1995@gmail.com>
->> Subject: Re: [edk2-devel] A problem with live migration of UEFI virtual =
-machines
+
+
+On 27.02.2020 17:01, Eric Blake wrote:
+> On 2/27/20 1:29 AM, Denis Plotnikov wrote:
+>> zstd significantly reduces cluster compression time.
+>> It provides better compression performance maintaining
+>> the same level of the compression ratio in comparison with
+>> zlib, which, at the moment, is the only compression
+>> method available.
 >>
->> Hi Andrew,
->>
->> On 02/25/20 22:35, Andrew Fish wrote:
->>
->>> Laszlo,
->>>
->>> The FLASH offsets changing breaking things makes sense.
->>>
->>> I now realize this is like updating the EFI ROM without rebooting the
->>> system.  Thus changes in how the new EFI code works is not the issue.
->>>
->>> Is this migration event visible to the firmware? Traditionally the
->>> NVRAM is a region in the FD so if you update the FD you have to skip
->>> NVRAM region or save and restore it. Is that activity happening in
->>> this case? Even if the ROM layout does not change how do you not lose
->>> the contents of the NVRAM store when the live migration happens? Sorry
->>> if this is a remedial question but I'm trying to learn how this
->>> migration works.
->>
->> With live migration, the running guest doesn't notice anything. This is =
-a general
->> requirement for live migration (regardless of UEFI or flash).
->>
->> You are very correct to ask about "skipping" the NVRAM region. With the
->> approach that OvmfPkg originally supported, live migration would simply =
-be
->> unfeasible. The "build" utility would produce a single (unified) OVMF.fd=
- file, which
->> would contain both NVRAM and executable regions, and the guest's variabl=
-e
->> updates would modify the one file that would exist.
->> This is inappropriate even without considering live migration, because O=
-VMF
->> binary upgrades (package updates) on the virtualization host would force=
- guests
->> to lose their private variable stores (NVRAMs).
->>
->> Therefore, the "build" utility produces "split" files too, in addition t=
-o the unified
->> OVMF.fd file. Namely, OVMF_CODE.fd and OVMF_VARS.fd.
->> OVMF.fd is simply the concatenation of the latter two.
->>
->> $ cat OVMF_VARS.fd OVMF_CODE.fd | cmp - OVMF.fd [prints nothing]
->>
->> When you define a new domain (VM) on a virtualization host, the domain
->> definition saves a reference (pathname) to the OVMF_CODE.fd file.
->> However, the OVMF_VARS.fd file (the variable store *template*) is not di=
-rectly
->> referenced; instead, it is *copied* into a separate (private) file for t=
-he domain.
->>
->> Furthermore, once booted, guest has two flash chips, one that maps the
->> firmware executable OVMF_CODE.fd read-only, and another pflash chip that
->> maps its private varstore file read-write.
->>
->> This makes it possible to upgrade OVMF_CODE.fd and OVMF_VARS.fd (via
->> package upgrades on the virt host) without messing with varstores that w=
-ere
->> earlier instantiated from OVMF_VARS.fd. What's important here is that th=
-e
->> various constants in the new (upgraded) OVMF_CODE.fd file remain compati=
-ble
->> with the *old* OVMF_VARS.fd structure, across package upgrades.
->>
->> If that's not possible for introducing e.g. a new feature, then the pack=
-age
->> upgrade must not overwrite the OVMF_CODE.fd file in place, but must prov=
-ide an
->> additional firmware binary. This firmware binary can then only be used b=
-y freshly
->> defined domains (old domains cannot be switched over). Old domains can b=
-e
->> switched over manually -- and only if the sysadmin decides it is OK to l=
-ose the
->> current variable store contents. Then the old varstore file for the doma=
-in is
->> deleted (manually), the domain definition is updated, and then a new (lo=
-gically
->> empty, pristine) varstore can be created from the *new* OVMF_2_VARS.fd t=
-hat
->> matches the *new* OVMF_2_CODE.fd.
->>
->>
->> During live migration, the "RAM-like" contents of both pflash chips are =
-migrated
->> (the guest-side view of both chips remains the same, including the case =
-when the
->> writeable chip happens to be in "programming mode", i.e., during a UEFI =
-variable
->> write through the Fault Tolerant Write and Firmware Volume Block(2) prot=
-ocols).
->>
->> Once live migration completes, QEMU dumps the full contents of the write=
-able
->> chip to the backing file (on the destination host). Going forward, flash=
- writes from
->> within the guest are reflected to said host-side file on-line, just like=
- it happened
->> on the source host before live migration. If the file backing the r/w pf=
-lash chip is
->> on NFS (shared by both src and dst hosts), then this one-time dumping wh=
-en the
->> migration completes is superfluous, but it's also harmless.
->>
->> The interesting question is, what happens when you power down the VM on =
-the
->> destination host (=3D post migration), and launch it again there, from z=
-ero. In that
->> case, the firmware executable file comes from the *destination host* (it=
- was
->> never persistently migrated from the source host, i.e. never written out=
- on the
->> dst). It simply comes from the OVMF package that had been installed on t=
-he
->> destination host, by the sysadmin. However, the varstore pflash does ref=
-lect the
->> permanent result of the previous migration. So this is where things can =
-fall apart,
->> if both firmware binaries (on the src host and on the dst host) don't ag=
-ree about
->> the internal structure of the varstore pflash.
->>
->=20
-> Hi Laszlo,
->=20
-> I found an ealier thread that you said there're 4 options to use ovmf:
->=20
-> https://lists.gnu.org/archive/html/qemu-discuss/2018-04/msg00045.html
->=20
-> Excerpt:
-> "(1) If you map the unified image with -bios, all of that becomes ROM --
-> read-only memory.
-> (2) If you map the unified image with -pflash, all of that becomes
-> read-write MMIO.
-> (3) If you use the split images (OVMF_CODE.fd and a copy of
-> OVMF_VARS.fd), and map then as flash chips, then the top part
-> (OVMF_CODE.fd, consisting of SECFV and FVMAIN_COMPACT) becomes
-> read-only flash (MMIO), and the bottom part (copy of OVMF_VARS.fd,
-> consisting of FTW Spare, FTW Work, Event log, and NV store) becomes
-> read-write flash (MMIO).
-> (4) If you use -bios with OVMF_CODE.fd only, then the top part will be
-> ROM, and the bottom part will be "black hole" MMIO."
->=20
-> I think you're talking about the option (2)(acceptable) and option (3)
-> (best solution) in this thread, and I agree.
+>
+>> +static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 const void *src, size_t src_size)
+>> +{
+>> +=A0=A0=A0 size_t ret;
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * steal ZSTD_LEN_BUF bytes in the very beginng of the buff=
+er
+>
+> beginning
+>
+>> +=A0=A0=A0=A0 * to store compressed chunk size
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 char *d_buf =3D ((char *) dest) + ZSTD_LEN_BUF;
+>> +
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * sanity check that we can store the compressed data lengt=
+h,
+>> +=A0=A0=A0=A0 * and there is some space left for the compressor buffer
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 if (dest_size <=3D ZSTD_LEN_BUF) {
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 dest_size -=3D ZSTD_LEN_BUF;
+>> +
+>> +=A0=A0=A0 ret =3D ZSTD_compress(d_buf, dest_size, src, src_size, 5);
+>> +
+>> +=A0=A0=A0 if (ZSTD_isError(ret)) {
+>> +=A0=A0=A0=A0=A0=A0=A0 if (ZSTD_getErrorCode(ret) =3D=3D ZSTD_error_dstS=
+ize_tooSmall) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>> +=A0=A0=A0=A0=A0=A0=A0 } else {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return -EIO;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0 /* paraniod sanity check that we can store the commpressed si=
+ze */
+>
+> paranoid, compressed
+>
+>> +=A0=A0=A0 if (ret > UINT_MAX) {
+>> +=A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+>> +=A0=A0=A0 }
+>
+> This is pointless.=A0 Better is to ensure that we actually compressed=20
+> data (the pigeonhole principle states that there are some inputs that=20
+> MUST result in inflation, in order for most other inputs to result in=20
+> compression).=A0 But that check was satisfied by checking for=20
+> ZSTD_error_dstSize_tooSmall, which is what happens for one of those=20
+> uncompressible inputs.=A0 Namely, zstd will never return a result larger=
+=20
+> than dest_size, and since dest_size is smaller than UINT_MAX on entry,=20
+> this check is pointless.=A0 But if you want something, I'd be okay with:=
+=20
+> assert(ret <=3D dest_size).
+Taking into account that this is "just in case" and I'm trying to=20
+protect the first 4 bytes of the buffer from the overflow and
+I can't imagine the situation when we deal with cluster sizes greater=20
+than UINT32_MAX but the input size is size_t which can be > UINT32_MAX=20
+on 64bit archs.
+I'd rather stick with
+ =A0=A0=A0 if (ret > UINT32_MAX) {
+ =A0=A0=A0=A0=A0=A0=A0 return -ENOMEM;
+ =A0=A0=A0 }
+as Vladimir suggested.
 
-Yes, exactly.
+I'm not sure that the assert is good here, since it stops the system=20
+operating and this isn't potential error but a limitation
+Does it work for you?
 
->=20
-> I'm wondering will it be different about ancient option (1) with live
-> migration. You tried add -DMEM_VARSTORE_EMU_ENABLE=3DFALSE
-> build flag to disable -bios support, but Option (1) may be used for the
-> old VMs started several years ago running on the cloud...
-
-I'm unaware of any VMs running in clouds that use "-bios" with OVMF. It
-certainly seems a terrible idea, regardless of live migration.
-
->=20
-> With developing new features, the size of OVMF.fd is becoming larger
-> and larger, that seems to be the trend. It would be nice if it could be
-> hot-updated to the new version. As Daniel said, could it feasible to add
-> zero-padding to the firmware images?
-
-You're mixing up small details. OVMF_CODE.fd is already heavily padded,
-internally. We've grown the *internal* DXEFV firmware volume repeatedly
-over *years*, without *any* disruption to users. Please see:
-
-- da78c88f4535 ("OvmfPkg: raise DXEFV size to 8 MB", 2014-03-05)
-
-- 08df58ec3043 ("OvmfPkg: raise DXEFV size to 9 MB", 2015-10-07)
-
-- 2f7b34b20842 ("OvmfPkg: raise DXEFV size to 10 MB", 2016-05-31)
-
-- d272449d9e1e ("OvmfPkg: raise DXEFV size to 11 MB", 2018-05-29)
-
-To this day, i.e., with edk2 master @ edfe16a6d9f8, you can build OVMF
-in the default feature configuration [*] for -D FD_SIZE_2MB.
-
-[*]
-  DEFINE SECURE_BOOT_ENABLE      =3D FALSE
-  DEFINE SMM_REQUIRE             =3D FALSE
-  DEFINE SOURCE_DEBUG_ENABLE     =3D FALSE
-  DEFINE TPM2_ENABLE             =3D FALSE
-  DEFINE TPM2_CONFIG_ENABLE      =3D FALSE
-
-  DEFINE NETWORK_TLS_ENABLE             =3D FALSE
-  DEFINE NETWORK_IP6_ENABLE             =3D FALSE
-  DEFINE NETWORK_HTTP_BOOT_ENABLE       =3D FALSE
-
-For example:
-
-$ build \
-  -a IA32 -a X64 \
-  -b DEBUG \
-  -p OvmfPkg/OvmfPkgIa32X64.dsc \
-  -t GCC48 \
-  -D FD_SIZE_2MB
-
-Note that this build will contain DEBUG messages (at least DEBUG_INFO
-level ones) and ASSERT()s too.
-
-The final usage report at the end of the command is:
-
-SECFV [14%Full] 212992 total, 31648 used, 181344 free
-PEIFV [31%Full] 917504 total, 284584 used, 632920 free
-DXEFV [44%Full] 11534336 total, 5113688 used, 6420648 free
-FVMAIN_COMPACT [73%Full] 1753088 total, 1284216 used, 468872 free
-
-What does that mean? It means that largest firmware volume, DXEFV, uses
-just 44% of the 11MB allotted size.
-
-And FVMAIN_COMPACT, which embeds (among other things) DXEFV in
-LZMA-compressed format, only uses 73% of its allotted size, which is
-1712 KB.
-
-All this means that in the default feature config, there's still a bunch
-of room free in the 2MB build, even with DEBUGs and ASSERT()s enabled,
-and with an old compiler that does not do link-time optimization.
-
-I think you must have misunderstood the purpose of the 4MB build. The
-4MB build was solely introduced for enlarging the *varstore*. That was
-motivated by passing an SVVP check. This is described in detail in the
-relevant commit, which I may have linked earlier.
-
-https://github.com/tianocore/edk2/commit/b24fca05751f
-
-(Please consult the diagram in the commit message carefully. It shows
-you how the various firmware volumes / flash devices are nested; it will
-help you understand where the 1712 KB FVMAIN_COMPACT firmware volume is
-placed in the final image, and how FVMAIN_COMPACT embeds / compresses
-DXEFV.)
-
-And *given that* we had to introduce an incompatible change (for
-enlarging the varstore, for SVVP's sake), it made sense to *also*
-enlarge the other parts of the flash content. But the motivation was
-strictly the varstore change, and that was inevitably an incompatible
-change. In fact, you can see in the commit message that the *outer*
-container FVMAIN_COMPACT was enlarged from 1712 to 3360 kilobytes, the
-embedded PEIFV and DXEFV firmware volumes didn't put that extra space to
-use. The SECFV firmware volume runs directly from flash, so it's not
-compressed, but even that firmware volume got no "space injection". So
-basically all the size increase that *could* have been exploited for
-executable code size was spent on padding.
-
-As far as I can tell, we have never broken compatibility due to
-executable code size increases.
-
-Sorry if I over-explained this; I simply don't know how to express this
-any better.
-
-
-> Things are a little different here,
-> i.e. the size of src and dest are 2M and 4M respectively, copy the source
-> 2M to the dest side, and then add zero-padding to the end of the image
-> to round it upto 4 MB at the dest side (With some modification of
-> qemu_ram_resize in QEMU to avoid length mismatch error report)?
-
-No, this doesn't make any sense.
-
-On both the source host and the destination host, the same pathname (for
-example, "/usr/share/OVMF/OVMF_CODE.fd") must point to same-size
-(compatible) firmware binaries. Both must be built with the same -D
-FD_SIZE_2MB flag, or with the same -D FD_SIZE_4MB flag. Then you can
-migrate.
-
-You can offer a 4MB build too on the destination host, but it must be
-under a different pathname. So that after the domain has been migrated
-in from the source host, and then re-launched against the firmware
-binary that's on the destination host, there is an incompatibility
-between the domain's *original* varstore, and the domain's *new*
-firmware binary.
-
->=20
-> The physical address assigned to ovmf region will change from
-> 0xffe00000 - 0xffffffff to 0xffc00000 - 0xffffffff, after the OS has
-> started I see this range will be recycled and assigned to other PCI
-> devices(using the command "cat /proc/iomem") by guest OS. So,
-> this range change seems that will not affect the guest I think.
-> But if the code of OVMF is running when paused at the src side
-> then will it be continued to run at the dest side, I'm not sure...
->=20
-> So, may I ask that would it be feasible or compatible for option (1)
-> when live migration between different ovmf sizes? Thanks.
-
-Sorry, my brain just cannot cope with the idea of even *running* OVMF in
-production with "-bios" -- let alone migrate it.
-
-But anyway... if you are dead set on this, you can try the following:
-
-- On the destination host, rename the 4MB build to a different filename.
-
-- On the destination host, update all your domain definitions to refer
-to the renamed filename with "-bios"
-
-- on the destination host, rebuild your current (more modern) firmware
-package, using the -D FD_SIZE_2MB flag. If you have not enabled a bunch
-of features meanwhile, it will actually succeed.
-
-- on the destination host, put this fresh build (with unified size 2MB)
-in the original place (using the original pathname)
-
-- now you can migrate domains from your source host. The pathname they
-refer to with "-bios" will exist, and it will be a 2MB build. And the
-contents of that build will be more modern (presumably) than what you
-are migrating away from.
-
-Please understand this: when you *allowed* OVMF to build with 4MB size,
-and installed it under the exact same pathname (on the destination host)
-where you previously used to keep a 2MB binary, *that* is when you broke
-compatibility.
-
-What's quite unfathomable to me is that the 2MB->4MB change in upstream
-was *solely* motivated by varstore enlargement (for passing SVVP with
-*flash*-based variables), but you're still using the ancient and
-non-conformant \NvVars emulation that comes with "-bios".
-
-Please, flash based variables with OVMF and QEMU have been supported
-since QEMU v1.6.
-
-I've attempted to remove -bios support from OVMF multiple times, I've
-always been prevented from doing that, and the damage is obvious only now.
-
-Laszlo
+Denis
+>
+>> +++ b/docs/interop/qcow2.txt
+>> @@ -208,6 +208,7 @@ version 2.
+>> =A0 =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Avai=
+lable compression type values:
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0 0: zlib <https://www.zlib.net/>
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 1=
+: zstd <http://github.com/facebook/zstd>
+>> =A0 =A0 =A0 =3D=3D=3D Header padding =3D=3D=3D
+>> @@ -575,11 +576,28 @@ Compressed Clusters Descriptor (x =3D 62 -=20
+>> (cluster_bits - 8)):
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Another =
+compressed cluster may map to the tail=20
+>> of the final
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 sector u=
+sed by this compressed cluster.
+>> =A0 +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 The layou=
+t of the compressed data depends on=20
+>> the compression
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 type used for=
+ the image (see compressed cluster=20
+>> layout).
+>> +
+>> =A0 If a cluster is unallocated, read requests shall read the data from=
+=20
+>> the backing
+>> =A0 file (except if bit 0 in the Standard Cluster Descriptor is set).=20
+>> If there is
+>> =A0 no backing file or the backing file is smaller than the image, they=
+=20
+>> shall read
+>> =A0 zeros for all parts that are not covered by the backing file.
+>> =A0 +=3D=3D=3D Compressed Cluster Layout =3D=3D=3D
+>> +
+>> +The compressed cluster data has a layout depending on the compression
+>> +type used for the image, as follows:
+>> +
+>> +Compressed data layout for the available compression types:
+>> +(x =3D data_space_length - 1)
+>> +
+>> +=A0=A0=A0 0:=A0 (default)=A0 zlib <http://zlib.net/>:
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Byte=A0 0 -=A0 x:=A0=A0=A0=A0 the com=
+pressed data content
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0 all the space provided used for=20
+>> compressed data
+>> +=A0=A0=A0 1:=A0 zstd <http://github.com/facebook/zstd>:
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 Byte=A0 0 -=A0 3:=A0=A0=A0=A0 the len=
+gth of compressed data in bytes
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 4 -=A0 x:=A0=A0=A0=
+=A0 the compressed data content
+>> =A0 =A0 =3D=3D Snapshots =3D=3D
+>> =A0 diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 873fbef3b5..4b6e576c44 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -4401,11 +4401,12 @@
+>> =A0 # Compression type used in qcow2 image file
+>> =A0 #
+>> =A0 # @zlib:=A0 zlib compression, see <http://zlib.net/>
+>> +# @zstd:=A0 zstd compression, see <http://github.com/facebook/zstd>
+>> =A0 #
+>> =A0 # Since: 5.0
+>> =A0 ##
+>> =A0 { 'enum': 'Qcow2CompressionType',
+>> -=A0 'data': [ 'zlib' ] }
+>> +=A0 'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' }=
+=20
+>> ] }
+>
+> The spec and UI changes are okay.
+>
 
 
