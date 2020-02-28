@@ -2,61 +2,95 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66C5C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250F3C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:25:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB4AC2469F
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:06:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4AC2469F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id E279820637
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 22:25:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ODMhL+jh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E279820637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7nlh-0005Z8-Rt
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 17:06:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42029)
+	id 1j7o46-0000UB-4t
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 17:25:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j7nkx-0004y1-4u
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:05:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7o3U-0008O0-MZ
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j7nkv-0003U2-5o
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:05:14 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:27412)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j7nku-0003EZ-Qt
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:05:13 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 30C1A747DCF;
- Fri, 28 Feb 2020 23:05:01 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 02D277475F6; Fri, 28 Feb 2020 23:05:01 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 00A0674637E;
- Fri, 28 Feb 2020 23:05:00 +0100 (CET)
-Date: Fri, 28 Feb 2020 23:05:00 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: jasper.lowell@bt.com
-Subject: RE: Emulating Solaris 10 on SPARC64 sun4u
-In-Reply-To: <alpine.BSF.2.22.395.2002192059340.88848@zero.eik.bme.hu>
-Message-ID: <alpine.BSF.2.22.395.2002282148540.17122@zero.eik.bme.hu>
-References: <CWXP123MB2262B6F3159B7AA7AB010F4183020@CWXP123MB2262.GBRP123.PROD.OUTLOOK.COM>
- <f0f00ecd-1989-9bc1-02e0-8a9b4819f051@ilande.co.uk>
- <LO2P123MB2271B1493AD1B4DC8DDCB97783100@LO2P123MB2271.GBRP123.PROD.OUTLOOK.COM>
- <alpine.BSF.2.22.395.2002191904370.88848@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2002192059340.88848@zero.eik.bme.hu>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7o3T-0005I6-L0
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:24 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33644)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j7o3T-0005Dk-El
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 17:24:23 -0500
+Received: by mail-pf1-x441.google.com with SMTP id n7so2427559pfn.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 14:24:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=LDKcCQrJ4exTysNpbESaXVg67i7nnbIKyjv3uxqKM8c=;
+ b=ODMhL+jh1Jyj14pdOKkkwznHPVvdTu25FHkvzUTbDTiUxVtokR0+6AFDl5l661J44q
+ E5/WrigMrRRaUKwpC5Uu1+jyWff3yD9qi5Q3IGWwpny0WTWVpMj9CLYTLwd79E48eHY/
+ LK+vAfxZoy3z8uJ3WYKf3p8phqPKy2ukQe79CKQBvR5AnfKMM0fw1tbYcCZFkk8v6JrO
+ qnxeMazHghCvnnJKOmyv8fI+BY+jNFu1xqBjT1lbq0t4BvpySpNtOtTQeLmEChQb+i1h
+ 2D+RfMwBBHqBcR+wUbAqv1iFWnjy8VMkOYhZQ7EN/uFceru+1nVBDWXZgQ4Wh3ca3qlB
+ VQpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LDKcCQrJ4exTysNpbESaXVg67i7nnbIKyjv3uxqKM8c=;
+ b=S8X6NCNncl1QTMGkQ1g+SucixvuIwWNS1e4jL1wscalJ+35cO7WAq8sJehmBPtNSWV
+ wLedvRX6QkSSUmF6yCoUAHhCUwRP1NWiai88D8d3CM2581vFIsDfyCzdY6pu4Tbm5wDH
+ m71IG7/s0k7aP1X9ZN4RaF5hOFV17mtx6HQCY7meSJwtyIEBjR0AU9bT8BzxvHpn1G7j
+ h42FBQOtN8ygAiedtI10KmRxm6VkbrPjtee35+bvvxPdWa5iDnBlRxMrbTEv8BViyGhG
+ pNNLSr4w0XN4SrEYr88m/fFDn17afhbl91PMKk90VJfvyn2zNVbBRDQ0ehksgA9TTV3D
+ sFvg==
+X-Gm-Message-State: APjAAAXVciq7wf4hZMFyq6PCIau6ZbipKKMcd/SVC/jy/ep7Cj2ZDUig
+ j4fycq+s7bGS9zk5SVcxTEpiSw==
+X-Google-Smtp-Source: APXvYqxU6/k1GzhETwD0jJID3PdCWVEo7WzwNaZe3rVRtmVxpHDJ0FEVaNO2PocsPSCodjkFCDMfXQ==
+X-Received: by 2002:aa7:8299:: with SMTP id s25mr6256714pfm.261.1582928661951; 
+ Fri, 28 Feb 2020 14:24:21 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ f9sm11994710pfd.141.2020.02.28.14.24.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 28 Feb 2020 14:24:21 -0800 (PST)
+Subject: Re: [PATCH v4 1/7] target/arm: Improve masking of HCR RES0 bits
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200225180831.26078-1-richard.henderson@linaro.org>
+ <20200225180831.26078-2-richard.henderson@linaro.org>
+ <CAFEAcA8ipK0nZioEgbNq5B1L-tqA+rzn-C2yyfet4_4yNVnYqA@mail.gmail.com>
+ <e4a70637-f4b7-eaa7-237a-57053c5a63cc@linaro.org>
+ <CAFEAcA-8a4eQXf+LRS3KLURyyEPpPm9uh6q6r6D-1-sh3t8Pdw@mail.gmail.com>
+ <5c484ae5-b4da-8eae-c10a-547c670c89e5@linaro.org>
+ <CAFEAcA96AZB765TizrPLJYfXhx=KUcb_feL3JK1WNmf5dRSR0w@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <08a6a113-4082-246c-2aeb-4424b921caa4@linaro.org>
+Date: Fri, 28 Feb 2020 14:24:19 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+In-Reply-To: <CAFEAcA96AZB765TizrPLJYfXhx=KUcb_feL3JK1WNmf5dRSR0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,101 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.cave-ayland@ilande.co.uk, jsnow@redhat.com, qemu-devel@nongnu.org,
- atar4qemu@gmail.com, dgilbert@redhat.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Feb 2020, BALATON Zoltan wrote:
-> On Wed, 19 Feb 2020, BALATON Zoltan wrote:
->> faster or doing something differently? Does someone know what interrupts 
->> are generated on real hardware in DMA mode so we can compare that to what 
->> we see with QEMU?
->
-> The document Programming Interface for Bus Master IDE Controller, Revision 
-> 1.0 (5/16/94) has some info on this. AFAIU it says that after DMA operation 
-> is completed an IRQ should be raised. On page 5, section 3.1. Data 
-> Synchronization it says:
->
-> "Another way to view this requirement is that the first read to the 
-> controller Status register in response to the IDE device interrupt must 
-> return with the Interrupt bit set and with the guarantee that all buffered 
-> data has been written to memory."
->
-> Not sure if this is relevant but how is it handled in QEMU? Is the right 
-> interrupt bit set after DMA transfer is done? If so is it the one that's 
-> checked by the OS driver?
+On 2/28/20 11:03 AM, Peter Maydell wrote:
+> It occurs to me that we should check what the required
+> semantics are for the opposite half of the register
+> if the guest writes to one half of it via hcr_writehigh()
+> or hcr_writelow() -- is the un-accessed half supposed
+> to stay exactly as it is, or is it ok for the
+> RES0-for-aarch32 bits to get squashed in the process?
+> That would seem at least a bit odd even if it's valid,
+> so maybe better to do aarch32 RES0 masking in
+> hcr_writehigh() and hcr_writelow()?
 
-I think I now understand the problem with via-ide at least and the 
-following is true for that case. I'm not sure about the CMD646 but it may 
-be similar as these seem to be similar designs or maybe even related 
-somehow. The problem in my case stems from that the device has two modes 
-documented: legacy where it uses standard ISA ioports and INT14 and 15 for 
-the two channels and native mode in which it uses PCI BARs for io address 
-and an IRQ configurable via PCI_INTERRUPT_LINE (config reg 9). It seems 
-the IRQ in native mode is still not a PCI INT line but an ISA IRQ, however 
-it can be selected by config reg and it's a single interrupt instead of 
-two for separate channels (Linux prints these during boot so that's a good 
-way to check which mode it thinks it's using). That's so far is complex 
-enough to not be easy to emulate in QEMU as we can set up legacy ISA ports 
-with ide_init_ioport() but there's no way then to switch it off so via-ide 
-either implemented legacy or native mode but can't correctly switch 
-between those. This may not be a problem most of the time for Linux at 
-least which tries to check which mode the controller is in and use that so 
-it would work with whatever is there as long as the regs match what's 
-emulated so we can just emulate one mode and still work.
+Hmm.  You're thinking of a situation in which
 
-But all of the above is further complicated by that on some (most?) boards 
-there's also a "non 100% native mode" in which the io addresses are taken 
-from the PCI BARs but still using hardcoded INT14 and 15, ignoring the 
-setting in PCI_INTERRUPT_LINE. So guest drivers may assume this without 
-checking regs and not care about what's set in PCI_INTERRUPT_LINE just 
-expect interrupts on INT14 and 15. If the emulation raises PCI INT or some 
-other isa interrupt it won't work, even if config regs correctly describe 
-the difference following the docs but guest drivers don't care about the 
-chip spec only the implementation on the board they meant to run on. 
-Unfortunately different guests use different heuristics and workarounds 
-(even Linux does so on different archs) so it's not easy to make an 
-emulation that works with all. The pegasos2 firmware for example sets 
-via-ide in native mode and assigns interrupt 9 but on real hardware this 
-reg seems to be hardcoded to 14 and Linux uses this to detect if it needs 
-to use the half-native mode but sets the mode reg to legacy to note this 
-despite then using PCI BARs (so we can't hardcode mode reg to always 
-native without breaking this but have to force int reg and emulate half 
-native mode to work with other guests). Linux would also work with 100% 
-native mode with IRQ9 but Amiga like OSes don't seem to care and just use 
-hardcoded half-native mode regardless of config regs and expect interrupt 
-on IRQ14 and 15. I could make a patch to work with all these on pegasos2 
-but the via-ide is also used on a mips board where the corresponding Linux 
-version also applies its own (different) workarounds corresponding to the 
-quirks of that board and ends up either trying to use legacy mode (which 
-is not emulated as io is only on PCI BARs) or trying to use 100% native 
-mode which does not work with half-native interrupts. I think I'll need to 
-add a special property to the device to set it to half-native for pegasos2 
-and leave it 100% native for mips, otherwise there may not be a 
-combination which works with all these firmwares and guests on both 
-machines. (We still can avoid having to implement native mode as well but 
-I can imagine if some PC guests were involved we may need that too but on 
-these ppc and mips boards and also in your case I think native and 
-half-native modes should be enough as that's all guests use.)
+ 1) EL3 invokes EL2 with aa64 which sets HCR_EL2,
+ 2) EL3 invokes EL2 in aa32 which sets HCR which
+    as a side-effect clears some of the bits in HCR2
+ 3) EL3 invokes EL2 with aa64 again and HCR_EL2
+    incorrectly has some high bits clear.
 
-The CMD646 case might be similar and that's also used on a hppa board so 
-you may need to check with that too if you make changes. To check this 
-theory you might try forcing ide interrupts to be IRQ14 and 15 via 
-something like:
+I can't find any language that explicitly says, but "architecturally mapped"
+means that the bits backing the storage must be the same.  So while it isn't
+legal for aa32 to set HCR2 bit 8 (HCR_EL2.APK), I imagine that it would still
+read as written.
 
-qemu_set_irq(isa_get_irq(NULL, (channel ? 15 : 14)), level);
+So I think you're correct that we shouldn't alter the half B when writing to
+half A.
 
-instead of using PCI interrupt or configured ISA interrupt in native mode 
-and see if Solaris likes it better. If so then go on a quest to find a 
-combination that works with at least Linux on both the sparc and hppa 
-boards and Solaris (if that's not enough you can also try NeXTSTEP :-) ). 
-So I think after all the common ide and bmdma code is probably OK and we 
-have problems in individual controller emulations which is made difficult 
-because of different hardware quirks and assumptions of guest sofware.
+Perhaps I should do some masking for aa32 in arm_hcr_el2_eff.
 
-Regards,
-BALATON Zoltan
 
+r~
 
