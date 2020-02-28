@@ -2,86 +2,85 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C25C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56703C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BCB52469F
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFE812469F
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:50:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eT1N7AL4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BCB52469F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JabnKGbc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE812469F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7htB-0006d4-7J
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:49:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47010)
+	id 1j7huR-0000KL-W0
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:50:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hhO-0001dy-Hc
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hhM-0001b5-Fw
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hhE-00053v-7q
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:09 -0500
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:41453)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hhD-00053O-BN
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:08 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:43916)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7hhD-00053A-Kj
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:00 -0500
-Received: by mail-wr1-x429.google.com with SMTP id v4so3407347wrs.8
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:36:59 -0800 (PST)
+ id 1j7hhC-00052j-V4
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:59 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id e10so1987953wrr.10
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=URB4Y/WQMa6JZ/AOLKKdKC1rLwHfdPyAM2VCAvj2MiY=;
- b=eT1N7AL4ORy7Otz8oHsQF+3iryRXoEAClshupuSucu0LO8XBmKcD4bUdMOkWq2XKJz
- JvgCK/Jw/2j9JlMZRV1qwLqPf+JpHVp5p9ngPpneKNE4nWOHSSypl0NpK0hC3/gcn9zP
- acN5vsfEFdoWNymv/i9WusfQOBYoaPcrtYPfjer4cwas0r7+41eEFJhWXxv94QVhPkQ8
- cuQk6J3d3RV5VZ3MgwLNDmdU0QeZsGhSf8LeEhlzNWQnHb3GoDZUh07vyz8sU+4Zgy9J
- PLmL5cTWcjvw9m7sa2TdVxcdtYJ3mpamT53lk16F7TOw+MIMRqEHmGTvNAhNxDFXfeQV
- PbIA==
+ bh=Le/j7ngaNcdYIo8U+ouOScp1lkeS6xr/+FeJtXMPgWk=;
+ b=JabnKGbcC0Z+wz7NrzBI4vz2pzVQ9gfIuCzTo3gOlmxEGTY1mxSENGFsWHTU6XY+/b
+ PC7Rt4AW/mlxCCP3nWYjdj0KHOTCDk/EW6g0PnLl6rKsWr/U3RduJfGgQ3OHmBL+gkiR
+ /zNUAYgVjzCw2UviPkkgny7qiHOrNdLseyBtkHLNeD6VTn/Z+JdmB86pN90f/g2tfOGl
+ /1gluaZwEpTUkpM1Ce5l6Ty2/vEaf1E34l91M8cZkL8F1pvuWO/ZoGMHw5JpDMLwkEu1
+ AnHJU0b9iHmfrADIOwG2TqO9Z14sH8Lrm/4YIPWIaFU7DS3ZC2qP/2KdgNlLQB5VdG7W
+ u/BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=URB4Y/WQMa6JZ/AOLKKdKC1rLwHfdPyAM2VCAvj2MiY=;
- b=LcFVWzpXT29kOK7RhDz2eaXilbnrFtb+gx+OQVqPBdSTIU1t1iJZJuAuEUNqfr/iGp
- dyamwDcpLlKrVE05yqNqYwXGyugpVk7MYUga4VX2BsZsOAc9+MnlmXEqKFkduR1kb+kc
- KjaFCmGwhZj3ttMrKe9uwgaTt16IDj1XYg+xw64n41rscwtXpJsRCgZ4m/Icz+fAXspq
- wL61aSu+gMZ80T7bI1cCGGhnkTdKnTx7LfLNlPXihZa0fr8yOUgBjj7TFd0veWP0yP3b
- Whg704zO3k5sJdUJWn7lkM1d3jPjvpvfUdKgfD7d3GgUPyFHTVjX9FpM3eqfP9UyZPWx
- 6ZaA==
-X-Gm-Message-State: APjAAAVNVdIyoENDh5dHpXn8SHlItpc0ps0TJ/zQ0jIwwIzdOEc0MVPk
- 4nzxbyMqnja/8rFmyWpsiOnh3jyVSU7jdg==
-X-Google-Smtp-Source: APXvYqzxI1mvX/MEHC56TThFTWUFLXVQ82yW0n/cgK9s/MdRvO0TB9QpT9Y+aoqJ2Bba39mW3w/MSg==
-X-Received: by 2002:adf:f343:: with SMTP id e3mr5341460wrp.402.1582904213691; 
- Fri, 28 Feb 2020 07:36:53 -0800 (PST)
+ bh=Le/j7ngaNcdYIo8U+ouOScp1lkeS6xr/+FeJtXMPgWk=;
+ b=RIZjFoUBRfDOD4IbqsU2yqRFhHnbXyoubG+5M05AEZTqZ88Ky3lLawbAT94IMfkj6W
+ 28ffXNCbdigtqEoznkYWEqQj1r6JgZ6FueQtdTa/f0Z/ZBiktq6jj2EhXLKubo3Dv2nk
+ pO3zd3fevb5QIddnCzozbv8m3l4S7dX0rb4eVxKxdC25SpfiQ1PfjBKobUIQyySP4Z3N
+ t8Xq8idO8iUDfSJSM+sKZcnYGL3ldA9tRZJbX0BvFyBLUVtzb9DLuDNNfO+ht2hthE5u
+ wCN9u5ebZU5DRSGnXn1JFx9yNPXNMn38rUwFlhbKXzKntgSZh9WmcxRVusnWVmM/SHpf
+ DyNw==
+X-Gm-Message-State: APjAAAV6E0r18d9uG2cyNH1/796UNyJVcS7fjHqLwv3DwcSiyC8mmcWY
+ 058UzxE2AoSNYpSDAMBn4KgvUVKCJMi09w==
+X-Google-Smtp-Source: APXvYqwhkBSeL9qYyWDeyi1e8M94+GtpQ5CWx4hjRfsWUM+me0R/WO3Mewee8h2MmM4383pS5m2BSQ==
+X-Received: by 2002:adf:e80e:: with SMTP id o14mr5284188wrm.212.1582904215445; 
+ Fri, 28 Feb 2020 07:36:55 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.36.50
+ by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.36.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 07:36:52 -0800 (PST)
+ Fri, 28 Feb 2020 07:36:54 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 19/33] docs/system: convert Texinfo documentation to rST
-Date: Fri, 28 Feb 2020 15:36:05 +0000
-Message-Id: <20200228153619.9906-20-peter.maydell@linaro.org>
+Subject: [PATCH v3 20/33] hmp-commands.hx: Add rST documentation fragments
+Date: Fri, 28 Feb 2020 15:36:06 +0000
+Message-Id: <20200228153619.9906-21-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228153619.9906-1-peter.maydell@linaro.org>
 References: <20200228153619.9906-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::429
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,2479 +98,1533 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Add the rST versions of the documentation fragments.  Once we've
+converted fully from Texinfo to rST we can remove the ETEXI
+fragments; for the moment we need both.
 
-Apart from targets.rst, which was written by hand, this is an automated
-conversion obtained with the following command:
+Since the only consumer of the hmp-commands hxtool documentation
+is the HTML manual, all we need to do for the monitor command
+documentation to appear in the Sphinx system manual is add the
+one line that invokes the hxtool extension on the .hx file.
 
-  makeinfo --force -o - --docbook \
-    -D 'qemu_system_x86 QEMU_SYSTEM_X86_MACRO' \
-    -D 'qemu_system     QEMU_SYSTEM_MACRO' \
-    $texi | pandoc -f docbook -t rst+smart | perl -e '
-      $/=undef;
-      $_ = <>;
-      s/^-  − /-  /gm;
-      s/QEMU_SYSTEM_MACRO/|qemu_system|/g;
-      s/QEMU_SYSTEM_X86_MACRO/|qemu_system_x86|/g;
-      s/(?=::\n\n +\|qemu)/.. parsed-literal/g;
-      s/:\n\n::$/::/gm;
-      print' > $rst
-
-In addition, the following changes were made manually:
-
-- target-i386.rst and target-mips.rst: replace CPU model documentation with
-  an include directive
-
-- monitor.rst: replace the command section with a comment
-
-- images.rst: add toctree
-
-- target-arm.rst: Replace use of :math: (which Sphinx complains
-  about) with :sup:, and hide it behind |I2C| and |I2C| substitutions.
-
-Content that is not @included remains exclusive to qemu-doc.texi.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20200226113034.6741-19-pbonzini@redhat.com
-[PMM: Fixed target-arm.rst use of :math:; remove out of date
- note about images.rst from commit message; fixed expansion
- of |qemu_system_x86|; use parsed-literal in invocation.rst
- when we want to use |qemu_system_x86|; fix incorrect subsection
- level for "OS requirements" in target-i386.rst; fix incorrect
- syntax for making links to other sections of the manual]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/defs.rst.inc               |  12 +-
- docs/system/build-platforms.rst |  79 ++++++++
- docs/system/gdb.rst             |  81 ++++++++
- docs/system/images.rst          |  85 +++++++++
- docs/system/index.rst           |  19 +-
- docs/system/invocation.rst      | 242 +++++++++++++++++++++++
- docs/system/ivshmem.rst         |  64 +++++++
- docs/system/keys.rst            |  40 ++++
- docs/system/license.rst         |  11 ++
- docs/system/linuxboot.rst       |  30 +++
- docs/system/monitor.rst         |  25 +++
- docs/system/mux-chardev.rst     |  32 ++++
- docs/system/net.rst             | 100 ++++++++++
- docs/system/quickstart.rst      |  13 ++
- docs/system/target-arm.rst      | 227 ++++++++++++++++++++++
- docs/system/target-i386.rst     |  84 ++++++++
- docs/system/target-m68k.rst     |  32 ++++
- docs/system/target-mips.rst     | 120 ++++++++++++
- docs/system/target-ppc.rst      |  61 ++++++
- docs/system/target-sparc.rst    |  81 ++++++++
- docs/system/target-sparc64.rst  |  49 +++++
- docs/system/target-xtensa.rst   |  39 ++++
- docs/system/targets.rst         |  19 ++
- docs/system/tls.rst             | 328 ++++++++++++++++++++++++++++++++
- docs/system/usb.rst             | 137 +++++++++++++
- docs/system/vnc-security.rst    | 202 ++++++++++++++++++++
- 26 files changed, 2207 insertions(+), 5 deletions(-)
- create mode 100644 docs/system/build-platforms.rst
- create mode 100644 docs/system/gdb.rst
- create mode 100644 docs/system/images.rst
- create mode 100644 docs/system/invocation.rst
- create mode 100644 docs/system/ivshmem.rst
- create mode 100644 docs/system/keys.rst
- create mode 100644 docs/system/license.rst
- create mode 100644 docs/system/linuxboot.rst
- create mode 100644 docs/system/monitor.rst
- create mode 100644 docs/system/mux-chardev.rst
- create mode 100644 docs/system/net.rst
- create mode 100644 docs/system/quickstart.rst
- create mode 100644 docs/system/target-arm.rst
- create mode 100644 docs/system/target-i386.rst
- create mode 100644 docs/system/target-m68k.rst
- create mode 100644 docs/system/target-mips.rst
- create mode 100644 docs/system/target-ppc.rst
- create mode 100644 docs/system/target-sparc.rst
- create mode 100644 docs/system/target-sparc64.rst
- create mode 100644 docs/system/target-xtensa.rst
- create mode 100644 docs/system/targets.rst
- create mode 100644 docs/system/tls.rst
- create mode 100644 docs/system/usb.rst
- create mode 100644 docs/system/vnc-security.rst
+ Makefile                |   2 +-
+ docs/system/monitor.rst |  10 +-
+ hmp-commands.hx         | 688 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 698 insertions(+), 2 deletions(-)
 
-diff --git a/docs/defs.rst.inc b/docs/defs.rst.inc
-index ae80d2f35d8..48d05aaf33e 100644
---- a/docs/defs.rst.inc
-+++ b/docs/defs.rst.inc
-@@ -3,9 +3,13 @@
-    all rST files as part of the epilogue by docs/conf.py.  conf.py
-    also defines some dynamically generated substitutions like CONFDIR.
+diff --git a/Makefile b/Makefile
+index f8642cd28a1..22427376b48 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1071,7 +1071,7 @@ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+ 	$(call build-manual,specs,html)
  
--   Note that |qemu_system| is intended to be used inside a parsed-literal
--   block: the definition must not include extra literal formatting with
--   ``..``: this works in the HTML output but the manpages will end up
--   misrendered with following normal text incorrectly in boldface.
-+   Note that |qemu_system| and |qemu_system_x86| are intended to be
-+   used inside a parsed-literal block: the definition must not include
-+   extra literal formatting with ``..``: this works in the HTML output
-+   but the manpages will end up misrendered with following normal text
-+   incorrectly in boldface.
+-$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system)
++$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PATH)/hmp-commands.hx
+ 	$(call build-manual,system,html)
  
- .. |qemu_system| replace:: qemu-system-x86_64
-+.. |qemu_system_x86| replace:: qemu_system-x86_64
-+.. |I2C| replace:: I\ :sup:`2`\ C
-+.. |I2S| replace:: I\ :sup:`2`\ S
-diff --git a/docs/system/build-platforms.rst b/docs/system/build-platforms.rst
-new file mode 100644
-index 00000000000..c2b92a96987
---- /dev/null
-+++ b/docs/system/build-platforms.rst
-@@ -0,0 +1,79 @@
-+.. _Supported-build-platforms:
-+
-+Supported build platforms
-+=========================
-+
-+QEMU aims to support building and executing on multiple host OS
-+platforms. This appendix outlines which platforms are the major build
-+targets. These platforms are used as the basis for deciding upon the
-+minimum required versions of 3rd party software QEMU depends on. The
-+supported platforms are the targets for automated testing performed by
-+the project when patches are submitted for review, and tested before and
-+after merge.
-+
-+If a platform is not listed here, it does not imply that QEMU won't
-+work. If an unlisted platform has comparable software versions to a
-+listed platform, there is every expectation that it will work. Bug
-+reports are welcome for problems encountered on unlisted platforms
-+unless they are clearly older vintage than what is described here.
-+
-+Note that when considering software versions shipped in distros as
-+support targets, QEMU considers only the version number, and assumes the
-+features in that distro match the upstream release with the same
-+version. In other words, if a distro backports extra features to the
-+software in their distro, QEMU upstream code will not add explicit
-+support for those backports, unless the feature is auto-detectable in a
-+manner that works for the upstream releases too.
-+
-+The Repology site https://repology.org is a useful resource to identify
-+currently shipped versions of software in various operating systems,
-+though it does not cover all distros listed below.
-+
-+Linux OS
-+--------
-+
-+For distributions with frequent, short-lifetime releases, the project
-+will aim to support all versions that are not end of life by their
-+respective vendors. For the purposes of identifying supported software
-+versions, the project will look at Fedora, Ubuntu, and openSUSE distros.
-+Other short- lifetime distros will be assumed to ship similar software
-+versions.
-+
-+For distributions with long-lifetime releases, the project will aim to
-+support the most recent major version at all times. Support for the
-+previous major version will be dropped 2 years after the new major
-+version is released, or when it reaches "end of life". For the purposes
-+of identifying supported software versions, the project will look at
-+RHEL, Debian, Ubuntu LTS, and SLES distros. Other long-lifetime distros
-+will be assumed to ship similar software versions.
-+
-+Windows
-+-------
-+
-+The project supports building with current versions of the MinGW
-+toolchain, hosted on Linux.
-+
-+macOS
-+-----
-+
-+The project supports building with the two most recent versions of
-+macOS, with the current homebrew package set available.
-+
-+FreeBSD
-+-------
-+
-+The project aims to support the all the versions which are not end of
-+life.
-+
-+NetBSD
-+------
-+
-+The project aims to support the most recent major version at all times.
-+Support for the previous major version will be dropped 2 years after the
-+new major version is released.
-+
-+OpenBSD
-+-------
-+
-+The project aims to support the all the versions which are not end of
-+life.
-diff --git a/docs/system/gdb.rst b/docs/system/gdb.rst
-new file mode 100644
-index 00000000000..639f814b32d
---- /dev/null
-+++ b/docs/system/gdb.rst
-@@ -0,0 +1,81 @@
-+.. _gdb_005fusage:
-+
-+GDB usage
-+---------
-+
-+QEMU has a primitive support to work with gdb, so that you can do
-+'Ctrl-C' while the virtual machine is running and inspect its state.
-+
-+In order to use gdb, launch QEMU with the '-s' option. It will wait for
-+a gdb connection:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -s -kernel bzImage -hda rootdisk.img -append "root=/dev/hda"
-+   Connected to host network interface: tun0
-+   Waiting gdb connection on port 1234
-+
-+Then launch gdb on the 'vmlinux' executable::
-+
-+   > gdb vmlinux
-+
-+In gdb, connect to QEMU::
-+
-+   (gdb) target remote localhost:1234
-+
-+Then you can use gdb normally. For example, type 'c' to launch the
-+kernel::
-+
-+   (gdb) c
-+
-+Here are some useful tips in order to use gdb on system code:
-+
-+1. Use ``info reg`` to display all the CPU registers.
-+
-+2. Use ``x/10i $eip`` to display the code at the PC position.
-+
-+3. Use ``set architecture i8086`` to dump 16 bit code. Then use
-+   ``x/10i $cs*16+$eip`` to dump the code at the PC position.
-+
-+Advanced debugging options:
-+
-+The default single stepping behavior is step with the IRQs and timer
-+service routines off. It is set this way because when gdb executes a
-+single step it expects to advance beyond the current instruction. With
-+the IRQs and timer service routines on, a single step might jump into
-+the one of the interrupt or exception vectors instead of executing the
-+current instruction. This means you may hit the same breakpoint a number
-+of times before executing the instruction gdb wants to have executed.
-+Because there are rare circumstances where you want to single step into
-+an interrupt vector the behavior can be controlled from GDB. There are
-+three commands you can query and set the single step behavior:
-+
-+``maintenance packet qqemu.sstepbits``
-+   This will display the MASK bits used to control the single stepping
-+   IE:
-+
-+   ::
-+
-+      (gdb) maintenance packet qqemu.sstepbits
-+      sending: "qqemu.sstepbits"
-+      received: "ENABLE=1,NOIRQ=2,NOTIMER=4"
-+
-+``maintenance packet qqemu.sstep``
-+   This will display the current value of the mask used when single
-+   stepping IE:
-+
-+   ::
-+
-+      (gdb) maintenance packet qqemu.sstep
-+      sending: "qqemu.sstep"
-+      received: "0x7"
-+
-+``maintenance packet Qqemu.sstep=HEX_VALUE``
-+   This will change the single step mask, so if wanted to enable IRQs on
-+   the single step, but not timers, you would use:
-+
-+   ::
-+
-+      (gdb) maintenance packet Qqemu.sstep=0x5
-+      sending: "qemu.sstep=0x5"
-+      received: "OK"
-diff --git a/docs/system/images.rst b/docs/system/images.rst
-new file mode 100644
-index 00000000000..ff26bf95875
---- /dev/null
-+++ b/docs/system/images.rst
-@@ -0,0 +1,85 @@
-+.. _disk_005fimages:
-+
-+Disk Images
-+-----------
-+
-+QEMU supports many disk image formats, including growable disk images
-+(their size increase as non empty sectors are written), compressed and
-+encrypted disk images.
-+
-+.. _disk_005fimages_005fquickstart:
-+
-+Quick start for disk image creation
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+You can create a disk image with the command::
-+
-+   qemu-img create myimage.img mysize
-+
-+where myimage.img is the disk image filename and mysize is its size in
-+kilobytes. You can add an ``M`` suffix to give the size in megabytes and
-+a ``G`` suffix for gigabytes.
-+
-+See the qemu-img invocation documentation for more information.
-+
-+.. _disk_005fimages_005fsnapshot_005fmode:
-+
-+Snapshot mode
-+~~~~~~~~~~~~~
-+
-+If you use the option ``-snapshot``, all disk images are considered as
-+read only. When sectors in written, they are written in a temporary file
-+created in ``/tmp``. You can however force the write back to the raw
-+disk images by using the ``commit`` monitor command (or C-a s in the
-+serial console).
-+
-+.. _vm_005fsnapshots:
-+
-+VM snapshots
-+~~~~~~~~~~~~
-+
-+VM snapshots are snapshots of the complete virtual machine including CPU
-+state, RAM, device state and the content of all the writable disks. In
-+order to use VM snapshots, you must have at least one non removable and
-+writable block device using the ``qcow2`` disk image format. Normally
-+this device is the first virtual hard drive.
-+
-+Use the monitor command ``savevm`` to create a new VM snapshot or
-+replace an existing one. A human readable name can be assigned to each
-+snapshot in addition to its numerical ID.
-+
-+Use ``loadvm`` to restore a VM snapshot and ``delvm`` to remove a VM
-+snapshot. ``info snapshots`` lists the available snapshots with their
-+associated information::
-+
-+   (qemu) info snapshots
-+   Snapshot devices: hda
-+   Snapshot list (from hda):
-+   ID        TAG                 VM SIZE                DATE       VM CLOCK
-+   1         start                   41M 2006-08-06 12:38:02   00:00:14.954
-+   2                                 40M 2006-08-06 12:43:29   00:00:18.633
-+   3         msys                    40M 2006-08-06 12:44:04   00:00:23.514
-+
-+A VM snapshot is made of a VM state info (its size is shown in
-+``info snapshots``) and a snapshot of every writable disk image. The VM
-+state info is stored in the first ``qcow2`` non removable and writable
-+block device. The disk image snapshots are stored in every disk image.
-+The size of a snapshot in a disk image is difficult to evaluate and is
-+not shown by ``info snapshots`` because the associated disk sectors are
-+shared among all the snapshots to save disk space (otherwise each
-+snapshot would need a full copy of all the disk images).
-+
-+When using the (unrelated) ``-snapshot`` option
-+(:ref:`disk_005fimages_005fsnapshot_005fmode`),
-+you can always make VM snapshots, but they are deleted as soon as you
-+exit QEMU.
-+
-+VM snapshots currently have the following known limitations:
-+
-+-  They cannot cope with removable devices if they are removed or
-+   inserted after a snapshot is done.
-+
-+-  A few device drivers still have incomplete snapshot support so their
-+   state is not saved or restored properly (in particular USB).
-+
-+.. include:: qemu-block-drivers.rst.inc
-diff --git a/docs/system/index.rst b/docs/system/index.rst
-index f2f29fb6d2c..6e5f20fa133 100644
---- a/docs/system/index.rst
-+++ b/docs/system/index.rst
-@@ -12,8 +12,25 @@ or Hypervisor.Framework.
- Contents:
- 
- .. toctree::
--   :maxdepth: 2
-+   :maxdepth: 3
-+
-+   quickstart
-+   invocation
-+   keys
-+   mux-chardev
-+   monitor
-+   images
-+   net
-+   usb
-+   ivshmem
-+   linuxboot
-+   vnc-security
-+   tls
-+   gdb
-    managed-startup
-+   targets
-    security
-    vfio-ap
-    deprecated
-+   build-platforms
-+   license
-diff --git a/docs/system/invocation.rst b/docs/system/invocation.rst
-new file mode 100644
-index 00000000000..c112bcb45a4
---- /dev/null
-+++ b/docs/system/invocation.rst
-@@ -0,0 +1,242 @@
-+.. _sec_005finvocation:
-+
-+Invocation
-+----------
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [options] [disk_image]
-+
-+disk_image is a raw hard disk image for IDE hard disk 0. Some targets do
-+not need a disk image.
-+
-+Device URL Syntax
-+~~~~~~~~~~~~~~~~~
-+
-+In addition to using normal file images for the emulated storage
-+devices, QEMU can also use networked resources such as iSCSI devices.
-+These are specified using a special URL syntax.
-+
-+``iSCSI``
-+   iSCSI support allows QEMU to access iSCSI resources directly and use
-+   as images for the guest storage. Both disk and cdrom images are
-+   supported.
-+
-+   Syntax for specifying iSCSI LUNs is
-+   "iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>"
-+
-+   By default qemu will use the iSCSI initiator-name
-+   'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from
-+   the command line or a configuration file.
-+
-+   Since version Qemu 2.4 it is possible to specify a iSCSI request
-+   timeout to detect stalled requests and force a reestablishment of the
-+   session. The timeout is specified in seconds. The default is 0 which
-+   means no timeout. Libiscsi 1.15.0 or greater is required for this
-+   feature.
-+
-+   Example (without authentication):
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| -iscsi initiator-name=iqn.2001-04.com.example:my-initiator \
-+                       -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
-+                       -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
-+
-+   Example (CHAP username/password via URL):
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| -drive file=iscsi://user%password@192.0.2.1/iqn.2001-04.com.example/1
-+
-+   Example (CHAP username/password via environment variables):
-+
-+   .. parsed-literal::
-+
-+      LIBISCSI_CHAP_USERNAME="user" \
-+      LIBISCSI_CHAP_PASSWORD="password" \
-+      |qemu_system| -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
-+
-+``NBD``
-+   QEMU supports NBD (Network Block Devices) both using TCP protocol as
-+   well as Unix Domain Sockets. With TCP, the default port is 10809.
-+
-+   Syntax for specifying a NBD device using TCP, in preferred URI form:
-+   "nbd://<server-ip>[:<port>]/[<export>]"
-+
-+   Syntax for specifying a NBD device using Unix Domain Sockets;
-+   remember that '?' is a shell glob character and may need quoting:
-+   "nbd+unix:///[<export>]?socket=<domain-socket>"
-+
-+   Older syntax that is also recognized:
-+   "nbd:<server-ip>:<port>[:exportname=<export>]"
-+
-+   Syntax for specifying a NBD device using Unix Domain Sockets
-+   "nbd:unix:<domain-socket>[:exportname=<export>]"
-+
-+   Example for TCP
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| --drive file=nbd:192.0.2.1:30000
-+
-+   Example for Unix Domain Sockets
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| --drive file=nbd:unix:/tmp/nbd-socket
-+
-+``SSH``
-+   QEMU supports SSH (Secure Shell) access to remote disks.
-+
-+   Examples:
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| -drive file=ssh://user@host/path/to/disk.img
-+      |qemu_system| -drive file.driver=ssh,file.user=user,file.host=host,file.port=22,file.path=/path/to/disk.img
-+
-+   Currently authentication must be done using ssh-agent. Other
-+   authentication methods may be supported in future.
-+
-+``Sheepdog``
-+   Sheepdog is a distributed storage system for QEMU. QEMU supports
-+   using either local sheepdog devices or remote networked devices.
-+
-+   Syntax for specifying a sheepdog device
-+
-+   ::
-+
-+      sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=path][#snapid|#tag]
-+
-+   Example
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| --drive file=sheepdog://192.0.2.1:30000/MyVirtualMachine
-+
-+   See also https://sheepdog.github.io/sheepdog/.
-+
-+``GlusterFS``
-+   GlusterFS is a user space distributed file system. QEMU supports the
-+   use of GlusterFS volumes for hosting VM disk images using TCP, Unix
-+   Domain Sockets and RDMA transport protocols.
-+
-+   Syntax for specifying a VM disk image on GlusterFS volume is
-+
-+   .. parsed-literal::
-+
-+      URI:
-+      gluster[+type]://[host[:port]]/volume/path[?socket=...][,debug=N][,logfile=...]
-+
-+      JSON:
-+      'json:{"driver":"qcow2","file":{"driver":"gluster","volume":"testvol","path":"a.img","debug":N,"logfile":"...",
-+                                       "server":[{"type":"tcp","host":"...","port":"..."},
-+                                                 {"type":"unix","socket":"..."}]}}'
-+
-+   Example
-+
-+   .. parsed-literal::
-+
-+      URI:
-+      |qemu_system| --drive file=gluster://192.0.2.1/testvol/a.img,
-+                                     file.debug=9,file.logfile=/var/log/qemu-gluster.log
-+
-+      JSON:
-+      |qemu_system| 'json:{"driver":"qcow2",
-+                                "file":{"driver":"gluster",
-+                                         "volume":"testvol","path":"a.img",
-+                                         "debug":9,"logfile":"/var/log/qemu-gluster.log",
-+                                         "server":[{"type":"tcp","host":"1.2.3.4","port":24007},
-+                                                   {"type":"unix","socket":"/var/run/glusterd.socket"}]}}'
-+      |qemu_system| -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
-+                                            file.debug=9,file.logfile=/var/log/qemu-gluster.log,
-+                                            file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
-+                                            file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
-+
-+   See also http://www.gluster.org.
-+
-+``HTTP/HTTPS/FTP/FTPS``
-+   QEMU supports read-only access to files accessed over http(s) and
-+   ftp(s).
-+
-+   Syntax using a single filename:
-+
-+   ::
-+
-+      <protocol>://[<username>[:<password>]@]<host>/<path>
-+
-+   where:
-+
-+   ``protocol``
-+      'http', 'https', 'ftp', or 'ftps'.
-+
-+   ``username``
-+      Optional username for authentication to the remote server.
-+
-+   ``password``
-+      Optional password for authentication to the remote server.
-+
-+   ``host``
-+      Address of the remote server.
-+
-+   ``path``
-+      Path on the remote server, including any query string.
-+
-+   The following options are also supported:
-+
-+   ``url``
-+      The full URL when passing options to the driver explicitly.
-+
-+   ``readahead``
-+      The amount of data to read ahead with each range request to the
-+      remote server. This value may optionally have the suffix 'T', 'G',
-+      'M', 'K', 'k' or 'b'. If it does not have a suffix, it will be
-+      assumed to be in bytes. The value must be a multiple of 512 bytes.
-+      It defaults to 256k.
-+
-+   ``sslverify``
-+      Whether to verify the remote server's certificate when connecting
-+      over SSL. It can have the value 'on' or 'off'. It defaults to
-+      'on'.
-+
-+   ``cookie``
-+      Send this cookie (it can also be a list of cookies separated by
-+      ';') with each outgoing request. Only supported when using
-+      protocols such as HTTP which support cookies, otherwise ignored.
-+
-+   ``timeout``
-+      Set the timeout in seconds of the CURL connection. This timeout is
-+      the time that CURL waits for a response from the remote server to
-+      get the size of the image to be downloaded. If not set, the
-+      default timeout of 5 seconds is used.
-+
-+   Note that when passing options to qemu explicitly, ``driver`` is the
-+   value of <protocol>.
-+
-+   Example: boot from a remote Fedora 20 live ISO image
-+
-+   .. parsed-literal::
-+
-+      |qemu_system_x86| --drive media=cdrom,file=https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
-+
-+      |qemu_system_x86| --drive media=cdrom,file.driver=http,file.url=http://archives.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
-+
-+   Example: boot from a remote Fedora 20 cloud image using a local
-+   overlay for writes, copy-on-read, and a readahead of 64k
-+
-+   .. parsed-literal::
-+
-+      qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"http",, "file.url":"http://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"64k"}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
-+
-+      |qemu_system_x86| -drive file=/tmp/Fedora-x86_64-20-20131211.1-sda.qcow2,copy-on-read=on
-+
-+   Example: boot from an image stored on a VMware vSphere server with a
-+   self-signed certificate using a local overlay for writes, a readahead
-+   of 64k and a timeout of 10 seconds.
-+
-+   .. parsed-literal::
-+
-+      qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"https",, "file.url":"https://user:password@vsphere.example.com/folder/test/test-flat.vmdk?dcPath=Datacenter&dsName=datastore1",, "file.sslverify":"off",, "file.readahead":"64k",, "file.timeout":10}' /tmp/test.qcow2
-+
-+      |qemu_system_x86| -drive file=/tmp/test.qcow2
-diff --git a/docs/system/ivshmem.rst b/docs/system/ivshmem.rst
-new file mode 100644
-index 00000000000..b03a48afa3a
---- /dev/null
-+++ b/docs/system/ivshmem.rst
-@@ -0,0 +1,64 @@
-+.. _pcsys_005fivshmem:
-+
-+Inter-VM Shared Memory device
-+-----------------------------
-+
-+On Linux hosts, a shared memory device is available. The basic syntax
-+is:
-+
-+.. parsed-literal::
-+
-+   |qemu_system_x86| -device ivshmem-plain,memdev=hostmem
-+
-+where hostmem names a host memory backend. For a POSIX shared memory
-+backend, use something like
-+
-+::
-+
-+   -object memory-backend-file,size=1M,share,mem-path=/dev/shm/ivshmem,id=hostmem
-+
-+If desired, interrupts can be sent between guest VMs accessing the same
-+shared memory region. Interrupt support requires using a shared memory
-+server and using a chardev socket to connect to it. The code for the
-+shared memory server is qemu.git/contrib/ivshmem-server. An example
-+syntax when using the shared memory server is:
-+
-+.. parsed-literal::
-+
-+   # First start the ivshmem server once and for all
-+   ivshmem-server -p pidfile -S path -m shm-name -l shm-size -n vectors
-+
-+   # Then start your qemu instances with matching arguments
-+   |qemu_system_x86| -device ivshmem-doorbell,vectors=vectors,chardev=id
-+                    -chardev socket,path=path,id=id
-+
-+When using the server, the guest will be assigned a VM ID (>=0) that
-+allows guests using the same server to communicate via interrupts.
-+Guests can read their VM ID from a device register (see
-+ivshmem-spec.txt).
-+
-+Migration with ivshmem
-+~~~~~~~~~~~~~~~~~~~~~~
-+
-+With device property ``master=on``, the guest will copy the shared
-+memory on migration to the destination host. With ``master=off``, the
-+guest will not be able to migrate with the device attached. In the
-+latter case, the device should be detached and then reattached after
-+migration using the PCI hotplug support.
-+
-+At most one of the devices sharing the same memory can be master. The
-+master must complete migration before you plug back the other devices.
-+
-+ivshmem and hugepages
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+Instead of specifying the <shm size> using POSIX shm, you may specify a
-+memory backend that has hugepage support:
-+
-+.. parsed-literal::
-+
-+   |qemu_system_x86| -object memory-backend-file,size=1G,mem-path=/dev/hugepages/my-shmem-file,share,id=mb1
-+                    -device ivshmem-plain,memdev=mb1
-+
-+ivshmem-server also supports hugepages mount points with the ``-m``
-+memory path argument.
-diff --git a/docs/system/keys.rst b/docs/system/keys.rst
-new file mode 100644
-index 00000000000..bf99ee8d5be
---- /dev/null
-+++ b/docs/system/keys.rst
-@@ -0,0 +1,40 @@
-+.. _pcsys_005fkeys:
-+
-+Keys in the graphical frontends
-+-------------------------------
-+
-+During the graphical emulation, you can use special key combinations to
-+change modes. The default key mappings are shown below, but if you use
-+``-alt-grab`` then the modifier is Ctrl-Alt-Shift (instead of Ctrl-Alt)
-+and if you use ``-ctrl-grab`` then the modifier is the right Ctrl key
-+(instead of Ctrl-Alt):
-+
-+Ctrl-Alt-f
-+   Toggle full screen
-+
-+Ctrl-Alt-+
-+   Enlarge the screen
-+
-+Ctrl-Alt\--
-+   Shrink the screen
-+
-+Ctrl-Alt-u
-+   Restore the screen's un-scaled dimensions
-+
-+Ctrl-Alt-n
-+   Switch to virtual console 'n'. Standard console mappings are:
-+
-+   *1*
-+      Target system display
-+
-+   *2*
-+      Monitor
-+
-+   *3*
-+      Serial port
-+
-+Ctrl-Alt
-+   Toggle mouse and keyboard grab.
-+
-+In the virtual consoles, you can use Ctrl-Up, Ctrl-Down, Ctrl-PageUp and
-+Ctrl-PageDown to move in the back log.
-diff --git a/docs/system/license.rst b/docs/system/license.rst
-new file mode 100644
-index 00000000000..cde3d2d25d7
---- /dev/null
-+++ b/docs/system/license.rst
-@@ -0,0 +1,11 @@
-+.. _License:
-+
-+License
-+=======
-+
-+QEMU is a trademark of Fabrice Bellard.
-+
-+QEMU is released under the `GNU General Public
-+License <https://www.gnu.org/licenses/gpl-2.0.txt>`__, version 2. Parts
-+of QEMU have specific licenses, see file
-+`LICENSE <https://git.qemu.org/?p=qemu.git;a=blob_plain;f=LICENSE>`__.
-diff --git a/docs/system/linuxboot.rst b/docs/system/linuxboot.rst
-new file mode 100644
-index 00000000000..228650abc5e
---- /dev/null
-+++ b/docs/system/linuxboot.rst
-@@ -0,0 +1,30 @@
-+.. _direct_005flinux_005fboot:
-+
-+Direct Linux Boot
-+-----------------
-+
-+This section explains how to launch a Linux kernel inside QEMU without
-+having to make a full bootable image. It is very useful for fast Linux
-+kernel testing.
-+
-+The syntax is:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -kernel bzImage -hda rootdisk.img -append "root=/dev/hda"
-+
-+Use ``-kernel`` to provide the Linux kernel image and ``-append`` to
-+give the kernel command line arguments. The ``-initrd`` option can be
-+used to provide an INITRD image.
-+
-+If you do not need graphical output, you can disable it and redirect the
-+virtual serial port and the QEMU monitor to the console with the
-+``-nographic`` option. The typical command line is:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -kernel bzImage -hda rootdisk.img \
-+                    -append "root=/dev/hda console=ttyS0" -nographic
-+
-+Use Ctrl-a c to switch between the serial console and the monitor (see
-+:ref:`pcsys_005fkeys`).
+ $(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
 diff --git a/docs/system/monitor.rst b/docs/system/monitor.rst
-new file mode 100644
-index 00000000000..482f391f327
---- /dev/null
+index 482f391f327..52b0f18cfec 100644
+--- a/docs/system/monitor.rst
 +++ b/docs/system/monitor.rst
-@@ -0,0 +1,25 @@
-+.. _pcsys_005fmonitor:
-+
-+QEMU Monitor
-+------------
-+
-+The QEMU monitor is used to give complex commands to the QEMU emulator.
-+You can use it to:
-+
-+-  Remove or insert removable media images (such as CD-ROM or
-+   floppies).
-+
-+-  Freeze/unfreeze the Virtual Machine (VM) and save or restore its
-+   state from a disk file.
-+
-+-  Inspect the VM state without an external debugger.
-+
-+..
-+  The commands section goes here once it's converted from Texinfo to RST.
-+
-+Integer expressions
-+~~~~~~~~~~~~~~~~~~~
-+
-+The monitor understands integers expressions for every integer argument.
-+You can use register names to get the value of specifics CPU registers
-+by prefixing them with *$*.
-diff --git a/docs/system/mux-chardev.rst b/docs/system/mux-chardev.rst
-new file mode 100644
-index 00000000000..e50172c0815
---- /dev/null
-+++ b/docs/system/mux-chardev.rst
-@@ -0,0 +1,32 @@
-+.. _mux_005fkeys:
-+
-+Keys in the character backend multiplexer
-+-----------------------------------------
-+
-+During emulation, if you are using a character backend multiplexer
-+(which is the default if you are using ``-nographic``) then several
-+commands are available via an escape sequence. These key sequences all
-+start with an escape character, which is Ctrl-a by default, but can be
-+changed with ``-echr``. The list below assumes you're using the default.
-+
-+Ctrl-a h
-+   Print this help
-+
-+Ctrl-a x
-+   Exit emulator
-+
-+Ctrl-a s
-+   Save disk data back to file (if -snapshot)
-+
-+Ctrl-a t
-+   Toggle console timestamps
-+
-+Ctrl-a b
-+   Send break (magic sysrq in Linux)
-+
-+Ctrl-a c
-+   Rotate between the frontends connected to the multiplexer (usually
-+   this switches between the monitor and the console)
-+
-+Ctrl-a Ctrl-a
-+   Send the escape character to the frontend
-diff --git a/docs/system/net.rst b/docs/system/net.rst
-new file mode 100644
-index 00000000000..4b2640c448e
---- /dev/null
-+++ b/docs/system/net.rst
-@@ -0,0 +1,100 @@
-+.. _pcsys_005fnetwork:
-+
-+Network emulation
-+-----------------
-+
-+QEMU can simulate several network cards (e.g. PCI or ISA cards on the PC
-+target) and can connect them to a network backend on the host or an
-+emulated hub. The various host network backends can either be used to
-+connect the NIC of the guest to a real network (e.g. by using a TAP
-+devices or the non-privileged user mode network stack), or to other
-+guest instances running in another QEMU process (e.g. by using the
-+socket host network backend).
-+
-+Using TAP network interfaces
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+This is the standard way to connect QEMU to a real network. QEMU adds a
-+virtual network device on your host (called ``tapN``), and you can then
-+configure it as if it was a real ethernet card.
-+
-+Linux host
-+^^^^^^^^^^
-+
-+As an example, you can download the ``linux-test-xxx.tar.gz`` archive
-+and copy the script ``qemu-ifup`` in ``/etc`` and configure properly
-+``sudo`` so that the command ``ifconfig`` contained in ``qemu-ifup`` can
-+be executed as root. You must verify that your host kernel supports the
-+TAP network interfaces: the device ``/dev/net/tun`` must be present.
-+
-+See :ref:`sec_005finvocation` to have examples of command
-+lines using the TAP network interfaces.
-+
-+Windows host
-+^^^^^^^^^^^^
-+
-+There is a virtual ethernet driver for Windows 2000/XP systems, called
-+TAP-Win32. But it is not included in standard QEMU for Windows, so you
-+will need to get it separately. It is part of OpenVPN package, so
-+download OpenVPN from : https://openvpn.net/.
-+
-+Using the user mode network stack
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+By using the option ``-net user`` (default configuration if no ``-net``
-+option is specified), QEMU uses a completely user mode network stack
-+(you don't need root privilege to use the virtual network). The virtual
-+network configuration is the following::
-+
-+        guest (10.0.2.15)  <------>  Firewall/DHCP server <-----> Internet
-+                              |          (10.0.2.2)
-+                              |
-+                              ---->  DNS server (10.0.2.3)
-+                              |
-+                              ---->  SMB server (10.0.2.4)
-+
-+The QEMU VM behaves as if it was behind a firewall which blocks all
-+incoming connections. You can use a DHCP client to automatically
-+configure the network in the QEMU VM. The DHCP server assign addresses
-+to the hosts starting from 10.0.2.15.
-+
-+In order to check that the user mode network is working, you can ping
-+the address 10.0.2.2 and verify that you got an address in the range
-+10.0.2.x from the QEMU virtual DHCP server.
-+
-+Note that ICMP traffic in general does not work with user mode
-+networking. ``ping``, aka. ICMP echo, to the local router (10.0.2.2)
-+shall work, however. If you're using QEMU on Linux >= 3.0, it can use
-+unprivileged ICMP ping sockets to allow ``ping`` to the Internet. The
-+host admin has to set the ping_group_range in order to grant access to
-+those sockets. To allow ping for GID 100 (usually users group)::
-+
-+   echo 100 100 > /proc/sys/net/ipv4/ping_group_range
-+
-+When using the built-in TFTP server, the router is also the TFTP server.
-+
-+When using the ``'-netdev user,hostfwd=...'`` option, TCP or UDP
-+connections can be redirected from the host to the guest. It allows for
-+example to redirect X11, telnet or SSH connections.
-+
-+Hubs
-+~~~~
-+
-+QEMU can simulate several hubs. A hub can be thought of as a virtual
-+connection between several network devices. These devices can be for
-+example QEMU virtual ethernet cards or virtual Host ethernet devices
-+(TAP devices). You can connect guest NICs or host network backends to
-+such a hub using the ``-netdev
-+hubport`` or ``-nic hubport`` options. The legacy ``-net`` option also
-+connects the given device to the emulated hub with ID 0 (i.e. the
-+default hub) unless you specify a netdev with ``-net nic,netdev=xxx``
-+here.
-+
-+Connecting emulated networks between QEMU instances
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Using the ``-netdev socket`` (or ``-nic socket`` or ``-net socket``)
-+option, it is possible to create emulated networks that span several
-+QEMU instances. See the description of the ``-netdev socket`` option in
-+:ref:`sec_005finvocation` to have a basic
-+example.
-diff --git a/docs/system/quickstart.rst b/docs/system/quickstart.rst
-new file mode 100644
-index 00000000000..3a3acab5e74
---- /dev/null
-+++ b/docs/system/quickstart.rst
-@@ -0,0 +1,13 @@
-+.. _pcsys_005fquickstart:
-+
-+Quick Start
-+-----------
-+
-+Download and uncompress a PC hard disk image with Linux installed (e.g.
-+``linux.img``) and type:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| linux.img
-+
-+Linux should boot and give you a prompt.
-diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-new file mode 100644
-index 00000000000..0490be55871
---- /dev/null
-+++ b/docs/system/target-arm.rst
-@@ -0,0 +1,227 @@
-+.. _ARM-System-emulator:
-+
-+ARM System emulator
-+-------------------
-+
-+Use the executable ``qemu-system-arm`` to simulate a ARM machine. The
-+ARM Integrator/CP board is emulated with the following devices:
-+
-+-  ARM926E, ARM1026E, ARM946E, ARM1136 or Cortex-A8 CPU
-+
-+-  Two PL011 UARTs
-+
-+-  SMC 91c111 Ethernet adapter
-+
-+-  PL110 LCD controller
-+
-+-  PL050 KMI with PS/2 keyboard and mouse.
-+
-+-  PL181 MultiMedia Card Interface with SD card.
-+
-+The ARM Versatile baseboard is emulated with the following devices:
-+
-+-  ARM926E, ARM1136 or Cortex-A8 CPU
-+
-+-  PL190 Vectored Interrupt Controller
-+
-+-  Four PL011 UARTs
-+
-+-  SMC 91c111 Ethernet adapter
-+
-+-  PL110 LCD controller
-+
-+-  PL050 KMI with PS/2 keyboard and mouse.
-+
-+-  PCI host bridge. Note the emulated PCI bridge only provides access
-+   to PCI memory space. It does not provide access to PCI IO space. This
-+   means some devices (eg. ne2k_pci NIC) are not usable, and others (eg.
-+   rtl8139 NIC) are only usable when the guest drivers use the memory
-+   mapped control registers.
-+
-+-  PCI OHCI USB controller.
-+
-+-  LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM
-+   devices.
-+
-+-  PL181 MultiMedia Card Interface with SD card.
-+
-+Several variants of the ARM RealView baseboard are emulated, including
-+the EB, PB-A8 and PBX-A9. Due to interactions with the bootloader, only
-+certain Linux kernel configurations work out of the box on these boards.
-+
-+Kernels for the PB-A8 board should have CONFIG_REALVIEW_HIGH_PHYS_OFFSET
-+enabled in the kernel, and expect 512M RAM. Kernels for The PBX-A9 board
-+should have CONFIG_SPARSEMEM enabled, CONFIG_REALVIEW_HIGH_PHYS_OFFSET
-+disabled and expect 1024M RAM.
-+
-+The following devices are emulated:
-+
-+-  ARM926E, ARM1136, ARM11MPCore, Cortex-A8 or Cortex-A9 MPCore CPU
-+
-+-  ARM AMBA Generic/Distributed Interrupt Controller
-+
-+-  Four PL011 UARTs
-+
-+-  SMC 91c111 or SMSC LAN9118 Ethernet adapter
-+
-+-  PL110 LCD controller
-+
-+-  PL050 KMI with PS/2 keyboard and mouse
-+
-+-  PCI host bridge
-+
-+-  PCI OHCI USB controller
-+
-+-  LSI53C895A PCI SCSI Host Bus Adapter with hard disk and CD-ROM
-+   devices
-+
-+-  PL181 MultiMedia Card Interface with SD card.
-+
-+The XScale-based clamshell PDA models (\"Spitz\", \"Akita\", \"Borzoi\"
-+and \"Terrier\") emulation includes the following peripherals:
-+
-+-  Intel PXA270 System-on-chip (ARM V5TE core)
-+
-+-  NAND Flash memory
-+
-+-  IBM/Hitachi DSCM microdrive in a PXA PCMCIA slot - not in \"Akita\"
-+
-+-  On-chip OHCI USB controller
-+
-+-  On-chip LCD controller
-+
-+-  On-chip Real Time Clock
-+
-+-  TI ADS7846 touchscreen controller on SSP bus
-+
-+-  Maxim MAX1111 analog-digital converter on |I2C| bus
-+
-+-  GPIO-connected keyboard controller and LEDs
-+
-+-  Secure Digital card connected to PXA MMC/SD host
-+
-+-  Three on-chip UARTs
-+
-+-  WM8750 audio CODEC on |I2C| and |I2S| busses
-+
-+The Palm Tungsten|E PDA (codename \"Cheetah\") emulation includes the
-+following elements:
-+
-+-  Texas Instruments OMAP310 System-on-chip (ARM 925T core)
-+
-+-  ROM and RAM memories (ROM firmware image can be loaded with
-+   -option-rom)
-+
-+-  On-chip LCD controller
-+
-+-  On-chip Real Time Clock
-+
-+-  TI TSC2102i touchscreen controller / analog-digital converter /
-+   Audio CODEC, connected through MicroWire and |I2S| busses
-+
-+-  GPIO-connected matrix keypad
-+
-+-  Secure Digital card connected to OMAP MMC/SD host
-+
-+-  Three on-chip UARTs
-+
-+Nokia N800 and N810 internet tablets (known also as RX-34 and RX-44 /
-+48) emulation supports the following elements:
-+
-+-  Texas Instruments OMAP2420 System-on-chip (ARM 1136 core)
-+
-+-  RAM and non-volatile OneNAND Flash memories
-+
-+-  Display connected to EPSON remote framebuffer chip and OMAP on-chip
-+   display controller and a LS041y3 MIPI DBI-C controller
-+
-+-  TI TSC2301 (in N800) and TI TSC2005 (in N810) touchscreen
-+   controllers driven through SPI bus
-+
-+-  National Semiconductor LM8323-controlled qwerty keyboard driven
-+   through |I2C| bus
-+
-+-  Secure Digital card connected to OMAP MMC/SD host
-+
-+-  Three OMAP on-chip UARTs and on-chip STI debugging console
-+
-+-  Mentor Graphics \"Inventra\" dual-role USB controller embedded in a
-+   TI TUSB6010 chip - only USB host mode is supported
-+
-+-  TI TMP105 temperature sensor driven through |I2C| bus
-+
-+-  TI TWL92230C power management companion with an RTC on
-+   |I2C| bus
-+
-+-  Nokia RETU and TAHVO multi-purpose chips with an RTC, connected
-+   through CBUS
-+
-+The Luminary Micro Stellaris LM3S811EVB emulation includes the following
-+devices:
-+
-+-  Cortex-M3 CPU core.
-+
-+-  64k Flash and 8k SRAM.
-+
-+-  Timers, UARTs, ADC and |I2C| interface.
-+
-+-  OSRAM Pictiva 96x16 OLED with SSD0303 controller on
-+   |I2C| bus.
-+
-+The Luminary Micro Stellaris LM3S6965EVB emulation includes the
-+following devices:
-+
-+-  Cortex-M3 CPU core.
-+
-+-  256k Flash and 64k SRAM.
-+
-+-  Timers, UARTs, ADC, |I2C| and SSI interfaces.
-+
-+-  OSRAM Pictiva 128x64 OLED with SSD0323 controller connected via
-+   SSI.
-+
-+The Freecom MusicPal internet radio emulation includes the following
-+elements:
-+
-+-  Marvell MV88W8618 ARM core.
-+
-+-  32 MB RAM, 256 KB SRAM, 8 MB flash.
-+
-+-  Up to 2 16550 UARTs
-+
-+-  MV88W8xx8 Ethernet controller
-+
-+-  MV88W8618 audio controller, WM8750 CODEC and mixer
-+
-+-  128x64 display with brightness control
-+
-+-  2 buttons, 2 navigation wheels with button function
-+
-+The Siemens SX1 models v1 and v2 (default) basic emulation. The
-+emulation includes the following elements:
-+
-+-  Texas Instruments OMAP310 System-on-chip (ARM 925T core)
-+
-+-  ROM and RAM memories (ROM firmware image can be loaded with
-+   -pflash) V1 1 Flash of 16MB and 1 Flash of 8MB V2 1 Flash of 32MB
-+
-+-  On-chip LCD controller
-+
-+-  On-chip Real Time Clock
-+
-+-  Secure Digital card connected to OMAP MMC/SD host
-+
-+-  Three on-chip UARTs
-+
-+A Linux 2.6 test image is available on the QEMU web site. More
-+information is available in the QEMU mailing-list archive.
-+
-+The following options are specific to the ARM emulation:
-+
-+``-semihosting``
-+   Enable semihosting syscall emulation.
-+
-+   On ARM this implements the \"Angel\" interface.
-+
-+   Note that this allows guest direct access to the host filesystem, so
-+   should only be used with trusted guest OS.
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
-new file mode 100644
-index 00000000000..92e2038b11e
---- /dev/null
-+++ b/docs/system/target-i386.rst
-@@ -0,0 +1,84 @@
-+.. _QEMU-PC-System-emulator:
-+
-+x86 (PC) System emulator
-+------------------------
-+
-+.. _pcsys_005fdevices:
-+
-+Peripherals
-+~~~~~~~~~~~
-+
-+The QEMU PC System emulator simulates the following peripherals:
-+
-+-  i440FX host PCI bridge and PIIX3 PCI to ISA bridge
-+
-+-  Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
-+   extensions (hardware level, including all non standard modes).
-+
-+-  PS/2 mouse and keyboard
-+
-+-  2 PCI IDE interfaces with hard disk and CD-ROM support
-+
-+-  Floppy disk
-+
-+-  PCI and ISA network adapters
-+
-+-  Serial ports
-+
-+-  IPMI BMC, either and internal or external one
-+
-+-  Creative SoundBlaster 16 sound card
-+
-+-  ENSONIQ AudioPCI ES1370 sound card
-+
-+-  Intel 82801AA AC97 Audio compatible sound card
-+
-+-  Intel HD Audio Controller and HDA codec
-+
-+-  Adlib (OPL2) - Yamaha YM3812 compatible chip
-+
-+-  Gravis Ultrasound GF1 sound card
-+
-+-  CS4231A compatible sound card
-+
-+-  PCI UHCI, OHCI, EHCI or XHCI USB controller and a virtual USB-1.1
-+   hub.
-+
-+SMP is supported with up to 255 CPUs.
-+
-+QEMU uses the PC BIOS from the Seabios project and the Plex86/Bochs LGPL
-+VGA BIOS.
-+
-+QEMU uses YM3812 emulation by Tatsuyuki Satoh.
-+
-+QEMU uses GUS emulation (GUSEMU32 http://www.deinmeister.de/gusemu/) by
-+Tibor \"TS\" Schütz.
-+
-+Note that, by default, GUS shares IRQ(7) with parallel ports and so QEMU
-+must be told to not have parallel ports to have working GUS.
-+
-+.. parsed-literal::
-+
-+   |qemu_system_x86| dos.img -soundhw gus -parallel none
-+
-+Alternatively:
-+
-+.. parsed-literal::
-+
-+   |qemu_system_x86| dos.img -device gus,irq=5
-+
-+Or some other unclaimed IRQ.
-+
-+CS4231A is the chip used in Windows Sound System and GUSMAX products
-+
-+.. include:: cpu-models-x86.rst.inc
-+
-+.. _pcsys_005freq:
-+
-+OS requirements
-+~~~~~~~~~~~~~~~
-+
-+On x86_64 hosts, the default set of CPU features enabled by the KVM
-+accelerator require the host to be running Linux v4.5 or newer. Red Hat
-+Enterprise Linux 7 is also supported, since the required
-+functionality was backported.
-diff --git a/docs/system/target-m68k.rst b/docs/system/target-m68k.rst
-new file mode 100644
-index 00000000000..50b7dd9d639
---- /dev/null
-+++ b/docs/system/target-m68k.rst
-@@ -0,0 +1,32 @@
-+.. _ColdFire-System-emulator:
-+
-+ColdFire System emulator
-+------------------------
-+
-+Use the executable ``qemu-system-m68k`` to simulate a ColdFire machine.
-+The emulator is able to boot a uClinux kernel.
-+
-+The M5208EVB emulation includes the following devices:
-+
-+-  MCF5208 ColdFire V2 Microprocessor (ISA A+ with EMAC).
-+
-+-  Three Two on-chip UARTs.
-+
-+-  Fast Ethernet Controller (FEC)
-+
-+The AN5206 emulation includes the following devices:
-+
-+-  MCF5206 ColdFire V2 Microprocessor.
-+
-+-  Two on-chip UARTs.
-+
-+The following options are specific to the ColdFire emulation:
-+
-+``-semihosting``
-+   Enable semihosting syscall emulation.
-+
-+   On M68K this implements the \"ColdFire GDB\" interface used by
-+   libgloss.
-+
-+   Note that this allows guest direct access to the host filesystem, so
-+   should only be used with trusted guest OS.
-diff --git a/docs/system/target-mips.rst b/docs/system/target-mips.rst
-new file mode 100644
-index 00000000000..2736fd0509b
---- /dev/null
-+++ b/docs/system/target-mips.rst
-@@ -0,0 +1,120 @@
-+.. _MIPS-System-emulator:
-+
-+MIPS System emulator
-+--------------------
-+
-+Four executables cover simulation of 32 and 64-bit MIPS systems in both
-+endian options, ``qemu-system-mips``, ``qemu-system-mipsel``
-+``qemu-system-mips64`` and ``qemu-system-mips64el``. Five different
-+machine types are emulated:
-+
-+-  A generic ISA PC-like machine \"mips\"
-+
-+-  The MIPS Malta prototype board \"malta\"
-+
-+-  An ACER Pica \"pica61\". This machine needs the 64-bit emulator.
-+
-+-  MIPS emulator pseudo board \"mipssim\"
-+
-+-  A MIPS Magnum R4000 machine \"magnum\". This machine needs the
-+   64-bit emulator.
-+
-+The generic emulation is supported by Debian 'Etch' and is able to
-+install Debian into a virtual disk image. The following devices are
-+emulated:
-+
-+-  A range of MIPS CPUs, default is the 24Kf
-+
-+-  PC style serial port
-+
-+-  PC style IDE disk
-+
-+-  NE2000 network card
-+
-+The Malta emulation supports the following devices:
-+
-+-  Core board with MIPS 24Kf CPU and Galileo system controller
-+
-+-  PIIX4 PCI/USB/SMbus controller
-+
-+-  The Multi-I/O chip's serial device
-+
-+-  PCI network cards (PCnet32 and others)
-+
-+-  Malta FPGA serial device
-+
-+-  Cirrus (default) or any other PCI VGA graphics card
-+
-+The Boston board emulation supports the following devices:
-+
-+-  Xilinx FPGA, which includes a PCIe root port and an UART
-+
-+-  Intel EG20T PCH connects the I/O peripherals, but only the SATA bus
-+   is emulated
-+
-+The ACER Pica emulation supports:
-+
-+-  MIPS R4000 CPU
-+
-+-  PC-style IRQ and DMA controllers
-+
-+-  PC Keyboard
-+
-+-  IDE controller
-+
-+The MIPS Magnum R4000 emulation supports:
-+
-+-  MIPS R4000 CPU
-+
-+-  PC-style IRQ controller
-+
-+-  PC Keyboard
-+
-+-  SCSI controller
-+
-+-  G364 framebuffer
-+
-+The Fulong 2E emulation supports:
-+
-+-  Loongson 2E CPU
-+
-+-  Bonito64 system controller as North Bridge
-+
-+-  VT82C686 chipset as South Bridge
-+
-+-  RTL8139D as a network card chipset
-+
-+The mipssim pseudo board emulation provides an environment similar to
-+what the proprietary MIPS emulator uses for running Linux. It supports:
-+
-+-  A range of MIPS CPUs, default is the 24Kf
-+
-+-  PC style serial port
-+
-+-  MIPSnet network emulation
-+
-+.. include:: cpu-models-mips.rst.inc
-+
-+.. _nanoMIPS-System-emulator:
-+
-+nanoMIPS System emulator
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Executable ``qemu-system-mipsel`` also covers simulation of 32-bit
-+nanoMIPS system in little endian mode:
-+
-+-  nanoMIPS I7200 CPU
-+
-+Example of ``qemu-system-mipsel`` usage for nanoMIPS is shown below:
-+
-+Download ``<disk_image_file>`` from
-+https://mipsdistros.mips.com/LinuxDistro/nanomips/buildroot/index.html.
-+
-+Download ``<kernel_image_file>`` from
-+https://mipsdistros.mips.com/LinuxDistro/nanomips/kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/index.html.
-+
-+Start system emulation of Malta board with nanoMIPS I7200 CPU::
-+
-+   qemu-system-mipsel -cpu I7200 -kernel <kernel_image_file> \
-+       -M malta -serial stdio -m <memory_size> -hda <disk_image_file> \
-+       -append "mem=256m@0x0 rw console=ttyS0 vga=cirrus vesa=0x111 root=/dev/sda"
-diff --git a/docs/system/target-ppc.rst b/docs/system/target-ppc.rst
-new file mode 100644
-index 00000000000..43fadf3c00b
---- /dev/null
-+++ b/docs/system/target-ppc.rst
-@@ -0,0 +1,61 @@
-+.. _PowerPC-System-emulator:
-+
-+PowerPC System emulator
-+-----------------------
-+
-+Use the executable ``qemu-system-ppc`` to simulate a complete 40P (PREP)
-+or PowerMac PowerPC system.
-+
-+QEMU emulates the following PowerMac peripherals:
-+
-+-  UniNorth or Grackle PCI Bridge
-+
-+-  PCI VGA compatible card with VESA Bochs Extensions
-+
-+-  2 PMAC IDE interfaces with hard disk and CD-ROM support
-+
-+-  NE2000 PCI adapters
-+
-+-  Non Volatile RAM
-+
-+-  VIA-CUDA with ADB keyboard and mouse.
-+
-+QEMU emulates the following 40P (PREP) peripherals:
-+
-+-  PCI Bridge
-+
-+-  PCI VGA compatible card with VESA Bochs Extensions
-+
-+-  2 IDE interfaces with hard disk and CD-ROM support
-+
-+-  Floppy disk
-+
-+-  PCnet network adapters
-+
-+-  Serial port
-+
-+-  PREP Non Volatile RAM
-+
-+-  PC compatible keyboard and mouse.
-+
-+Since version 0.9.1, QEMU uses OpenBIOS https://www.openbios.org/ for
-+the g3beige and mac99 PowerMac and the 40p machines. OpenBIOS is a free
-+(GPL v2) portable firmware implementation. The goal is to implement a
-+100% IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
-+
-+The following options are specific to the PowerPC emulation:
-+
-+``-g WxH[xDEPTH]``
-+   Set the initial VGA graphic mode. The default is 800x600x32.
-+
-+``-prom-env string``
-+   Set OpenBIOS variables in NVRAM, for example:
-+
-+   ::
-+
-+      qemu-system-ppc -prom-env 'auto-boot?=false' \
-+       -prom-env 'boot-device=hd:2,\yaboot' \
-+       -prom-env 'boot-args=conf=hd:2,\yaboot.conf'
-+
-+More information is available at
-+http://perso.magic.fr/l_indien/qemu-ppc/.
-diff --git a/docs/system/target-sparc.rst b/docs/system/target-sparc.rst
-new file mode 100644
-index 00000000000..589c88d1756
---- /dev/null
-+++ b/docs/system/target-sparc.rst
-@@ -0,0 +1,81 @@
-+.. _Sparc32-System-emulator:
-+
-+Sparc32 System emulator
-+-----------------------
-+
-+Use the executable ``qemu-system-sparc`` to simulate the following Sun4m
-+architecture machines:
-+
-+-  SPARCstation 4
-+
-+-  SPARCstation 5
-+
-+-  SPARCstation 10
-+
-+-  SPARCstation 20
-+
-+-  SPARCserver 600MP
-+
-+-  SPARCstation LX
-+
-+-  SPARCstation Voyager
-+
-+-  SPARCclassic
-+
-+-  SPARCbook
-+
-+The emulation is somewhat complete. SMP up to 16 CPUs is supported, but
-+Linux limits the number of usable CPUs to 4.
-+
-+QEMU emulates the following sun4m peripherals:
-+
-+-  IOMMU
-+
-+-  TCX or cgthree Frame buffer
-+
-+-  Lance (Am7990) Ethernet
-+
-+-  Non Volatile RAM M48T02/M48T08
-+
-+-  Slave I/O: timers, interrupt controllers, Zilog serial ports,
-+   keyboard and power/reset logic
-+
-+-  ESP SCSI controller with hard disk and CD-ROM support
-+
-+-  Floppy drive (not on SS-600MP)
-+
-+-  CS4231 sound device (only on SS-5, not working yet)
-+
-+The number of peripherals is fixed in the architecture. Maximum memory
-+size depends on the machine type, for SS-5 it is 256MB and for others
-+2047MB.
-+
-+Since version 0.8.2, QEMU uses OpenBIOS https://www.openbios.org/.
-+OpenBIOS is a free (GPL v2) portable firmware implementation. The goal
-+is to implement a 100% IEEE 1275-1994 (referred to as Open Firmware)
-+compliant firmware.
-+
-+A sample Linux 2.6 series kernel and ram disk image are available on the
-+QEMU web site. There are still issues with NetBSD and OpenBSD, but most
-+kernel versions work. Please note that currently older Solaris kernels
-+don't work probably due to interface issues between OpenBIOS and
-+Solaris.
-+
-+The following options are specific to the Sparc32 emulation:
-+
-+``-g WxHx[xDEPTH]``
-+   Set the initial graphics mode. For TCX, the default is 1024x768x8
-+   with the option of 1024x768x24. For cgthree, the default is
-+   1024x768x8 with the option of 1152x900x8 for people who wish to use
-+   OBP.
-+
-+``-prom-env string``
-+   Set OpenBIOS variables in NVRAM, for example:
-+
-+   ::
-+
-+      qemu-system-sparc -prom-env 'auto-boot?=false' \
-+       -prom-env 'boot-device=sd(0,2,0):d' -prom-env 'boot-args=linux single'
-+
-+``-M [SS-4|SS-5|SS-10|SS-20|SS-600MP|LX|Voyager|SPARCClassic] [|SPARCbook]``
-+   Set the emulated machine type. Default is SS-5.
-diff --git a/docs/system/target-sparc64.rst b/docs/system/target-sparc64.rst
-new file mode 100644
-index 00000000000..ca76ba9c488
---- /dev/null
-+++ b/docs/system/target-sparc64.rst
-@@ -0,0 +1,49 @@
-+.. _Sparc64-System-emulator:
-+
-+Sparc64 System emulator
-+-----------------------
-+
-+Use the executable ``qemu-system-sparc64`` to simulate a Sun4u
-+(UltraSPARC PC-like machine), Sun4v (T1 PC-like machine), or generic
-+Niagara (T1) machine. The Sun4u emulator is mostly complete, being able
-+to run Linux, NetBSD and OpenBSD in headless (-nographic) mode. The
-+Sun4v emulator is still a work in progress.
-+
-+The Niagara T1 emulator makes use of firmware and OS binaries supplied
-+in the S10image/ directory of the OpenSPARC T1 project
-+http://download.oracle.com/technetwork/systems/opensparc/OpenSPARCT1_Arch.1.5.tar.bz2
-+and is able to boot the disk.s10hw2 Solaris image.
-+
-+::
-+
-+   qemu-system-sparc64 -M niagara -L /path-to/S10image/ \
-+                       -nographic -m 256 \
-+                       -drive if=pflash,readonly=on,file=/S10image/disk.s10hw2
-+
-+QEMU emulates the following peripherals:
-+
-+-  UltraSparc IIi APB PCI Bridge
-+
-+-  PCI VGA compatible card with VESA Bochs Extensions
-+
-+-  PS/2 mouse and keyboard
-+
-+-  Non Volatile RAM M48T59
-+
-+-  PC-compatible serial ports
-+
-+-  2 PCI IDE interfaces with hard disk and CD-ROM support
-+
-+-  Floppy disk
-+
-+The following options are specific to the Sparc64 emulation:
-+
-+``-prom-env string``
-+   Set OpenBIOS variables in NVRAM, for example:
-+
-+   ::
-+
-+      qemu-system-sparc64 -prom-env 'auto-boot?=false'
-+
-+``-M [sun4u|sun4v|niagara]``
-+   Set the emulated machine type. The default is sun4u.
-diff --git a/docs/system/target-xtensa.rst b/docs/system/target-xtensa.rst
-new file mode 100644
-index 00000000000..43cab8dc4da
---- /dev/null
-+++ b/docs/system/target-xtensa.rst
-@@ -0,0 +1,39 @@
-+.. _Xtensa-System-emulator:
-+
-+Xtensa System emulator
-+----------------------
-+
-+Two executables cover simulation of both Xtensa endian options,
-+``qemu-system-xtensa`` and ``qemu-system-xtensaeb``. Two different
-+machine types are emulated:
-+
-+-  Xtensa emulator pseudo board \"sim\"
-+
-+-  Avnet LX60/LX110/LX200 board
-+
-+The sim pseudo board emulation provides an environment similar to one
-+provided by the proprietary Tensilica ISS. It supports:
-+
-+-  A range of Xtensa CPUs, default is the DC232B
-+
-+-  Console and filesystem access via semihosting calls
-+
-+The Avnet LX60/LX110/LX200 emulation supports:
-+
-+-  A range of Xtensa CPUs, default is the DC232B
-+
-+-  16550 UART
-+
-+-  OpenCores 10/100 Mbps Ethernet MAC
-+
-+The following options are specific to the Xtensa emulation:
-+
-+``-semihosting``
-+   Enable semihosting syscall emulation.
-+
-+   Xtensa semihosting provides basic file IO calls, such as
-+   open/read/write/seek/select. Tensilica baremetal libc for ISS and
-+   linux platform \"sim\" use this interface.
-+
-+   Note that this allows guest direct access to the host filesystem, so
-+   should only be used with trusted guest OS.
-diff --git a/docs/system/targets.rst b/docs/system/targets.rst
-new file mode 100644
-index 00000000000..eba3111247f
---- /dev/null
-+++ b/docs/system/targets.rst
-@@ -0,0 +1,19 @@
-+QEMU System Emulator Targets
-+============================
-+
-+QEMU is a generic emulator and it emulates many machines. Most of the
-+options are similar for all machines. Specific information about the
-+various targets are mentioned in the following sections.
-+
-+Contents:
-+
-+.. toctree::
-+
-+   target-i386
-+   target-ppc
-+   target-sparc
-+   target-sparc64
-+   target-mips
-+   target-arm
-+   target-m68k
-+   target-xtensa
-diff --git a/docs/system/tls.rst b/docs/system/tls.rst
-new file mode 100644
-index 00000000000..dc2b94257f7
---- /dev/null
-+++ b/docs/system/tls.rst
-@@ -0,0 +1,328 @@
-+.. _network_005ftls:
-+
-+TLS setup for network services
-+------------------------------
-+
-+Almost all network services in QEMU have the ability to use TLS for
-+session data encryption, along with x509 certificates for simple client
-+authentication. What follows is a description of how to generate
-+certificates suitable for usage with QEMU, and applies to the VNC
-+server, character devices with the TCP backend, NBD server and client,
-+and migration server and client.
-+
-+At a high level, QEMU requires certificates and private keys to be
-+provided in PEM format. Aside from the core fields, the certificates
-+should include various extension data sets, including v3 basic
-+constraints data, key purpose, key usage and subject alt name.
-+
-+The GnuTLS package includes a command called ``certtool`` which can be
-+used to easily generate certificates and keys in the required format
-+with expected data present. Alternatively a certificate management
-+service may be used.
-+
-+At a minimum it is necessary to setup a certificate authority, and issue
-+certificates to each server. If using x509 certificates for
-+authentication, then each client will also need to be issued a
-+certificate.
-+
-+Assuming that the QEMU network services will only ever be exposed to
-+clients on a private intranet, there is no need to use a commercial
-+certificate authority to create certificates. A self-signed CA is
-+sufficient, and in fact likely to be more secure since it removes the
-+ability of malicious 3rd parties to trick the CA into mis-issuing certs
-+for impersonating your services. The only likely exception where a
-+commercial CA might be desirable is if enabling the VNC websockets
-+server and exposing it directly to remote browser clients. In such a
-+case it might be useful to use a commercial CA to avoid needing to
-+install custom CA certs in the web browsers.
-+
-+The recommendation is for the server to keep its certificates in either
-+``/etc/pki/qemu`` or for unprivileged users in ``$HOME/.pki/qemu``.
-+
-+.. _tls_005fgenerate_005fca:
-+
-+Setup the Certificate Authority
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+This step only needs to be performed once per organization /
-+organizational unit. First the CA needs a private key. This key must be
-+kept VERY secret and secure. If this key is compromised the entire trust
-+chain of the certificates issued with it is lost.
-+
-+::
-+
-+   # certtool --generate-privkey > ca-key.pem
-+
-+To generate a self-signed certificate requires one core piece of
-+information, the name of the organization. A template file ``ca.info``
-+should be populated with the desired data to avoid having to deal with
-+interactive prompts from certtool::
-+
-+   # cat > ca.info <<EOF
-+   cn = Name of your organization
-+   ca
-+   cert_signing_key
-+   EOF
-+   # certtool --generate-self-signed \
-+              --load-privkey ca-key.pem
-+              --template ca.info \
-+              --outfile ca-cert.pem
-+
-+The ``ca`` keyword in the template sets the v3 basic constraints
-+extension to indicate this certificate is for a CA, while
-+``cert_signing_key`` sets the key usage extension to indicate this will
-+be used for signing other keys. The generated ``ca-cert.pem`` file
-+should be copied to all servers and clients wishing to utilize TLS
-+support in the VNC server. The ``ca-key.pem`` must not be
-+disclosed/copied anywhere except the host responsible for issuing
-+certificates.
-+
-+.. _tls_005fgenerate_005fserver:
-+
-+Issuing server certificates
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Each server (or host) needs to be issued with a key and certificate.
-+When connecting the certificate is sent to the client which validates it
-+against the CA certificate. The core pieces of information for a server
-+certificate are the hostnames and/or IP addresses that will be used by
-+clients when connecting. The hostname / IP address that the client
-+specifies when connecting will be validated against the hostname(s) and
-+IP address(es) recorded in the server certificate, and if no match is
-+found the client will close the connection.
-+
-+Thus it is recommended that the server certificate include both the
-+fully qualified and unqualified hostnames. If the server will have
-+permanently assigned IP address(es), and clients are likely to use them
-+when connecting, they may also be included in the certificate. Both IPv4
-+and IPv6 addresses are supported. Historically certificates only
-+included 1 hostname in the ``CN`` field, however, usage of this field
-+for validation is now deprecated. Instead modern TLS clients will
-+validate against the Subject Alt Name extension data, which allows for
-+multiple entries. In the future usage of the ``CN`` field may be
-+discontinued entirely, so providing SAN extension data is strongly
-+recommended.
-+
-+On the host holding the CA, create template files containing the
-+information for each server, and use it to issue server certificates.
-+
-+::
-+
-+   # cat > server-hostNNN.info <<EOF
-+   organization = Name  of your organization
-+   cn = hostNNN.foo.example.com
-+   dns_name = hostNNN
-+   dns_name = hostNNN.foo.example.com
-+   ip_address = 10.0.1.87
-+   ip_address = 192.8.0.92
-+   ip_address = 2620:0:cafe::87
-+   ip_address = 2001:24::92
-+   tls_www_server
-+   encryption_key
-+   signing_key
-+   EOF
-+   # certtool --generate-privkey > server-hostNNN-key.pem
-+   # certtool --generate-certificate \
-+              --load-ca-certificate ca-cert.pem \
-+              --load-ca-privkey ca-key.pem \
-+              --load-privkey server-hostNNN-key.pem \
-+              --template server-hostNNN.info \
-+              --outfile server-hostNNN-cert.pem
-+
-+The ``dns_name`` and ``ip_address`` fields in the template are setting
-+the subject alt name extension data. The ``tls_www_server`` keyword is
-+the key purpose extension to indicate this certificate is intended for
-+usage in a web server. Although QEMU network services are not in fact
-+HTTP servers (except for VNC websockets), setting this key purpose is
-+still recommended. The ``encryption_key`` and ``signing_key`` keyword is
-+the key usage extension to indicate this certificate is intended for
-+usage in the data session.
-+
-+The ``server-hostNNN-key.pem`` and ``server-hostNNN-cert.pem`` files
-+should now be securely copied to the server for which they were
-+generated, and renamed to ``server-key.pem`` and ``server-cert.pem``
-+when added to the ``/etc/pki/qemu`` directory on the target host. The
-+``server-key.pem`` file is security sensitive and should be kept
-+protected with file mode 0600 to prevent disclosure.
-+
-+.. _tls_005fgenerate_005fclient:
-+
-+Issuing client certificates
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The QEMU x509 TLS credential setup defaults to enabling client
-+verification using certificates, providing a simple authentication
-+mechanism. If this default is used, each client also needs to be issued
-+a certificate. The client certificate contains enough metadata to
-+uniquely identify the client with the scope of the certificate
-+authority. The client certificate would typically include fields for
-+organization, state, city, building, etc.
-+
-+Once again on the host holding the CA, create template files containing
-+the information for each client, and use it to issue client
-+certificates.
-+
-+::
-+
-+   # cat > client-hostNNN.info <<EOF
-+   country = GB
-+   state = London
-+   locality = City Of London
-+   organization = Name of your organization
-+   cn = hostNNN.foo.example.com
-+   tls_www_client
-+   encryption_key
-+   signing_key
-+   EOF
-+   # certtool --generate-privkey > client-hostNNN-key.pem
-+   # certtool --generate-certificate \
-+              --load-ca-certificate ca-cert.pem \
-+              --load-ca-privkey ca-key.pem \
-+              --load-privkey client-hostNNN-key.pem \
-+              --template client-hostNNN.info \
-+              --outfile client-hostNNN-cert.pem
-+
-+The subject alt name extension data is not required for clients, so the
-+the ``dns_name`` and ``ip_address`` fields are not included. The
-+``tls_www_client`` keyword is the key purpose extension to indicate this
-+certificate is intended for usage in a web client. Although QEMU network
-+clients are not in fact HTTP clients, setting this key purpose is still
-+recommended. The ``encryption_key`` and ``signing_key`` keyword is the
-+key usage extension to indicate this certificate is intended for usage
-+in the data session.
-+
-+The ``client-hostNNN-key.pem`` and ``client-hostNNN-cert.pem`` files
-+should now be securely copied to the client for which they were
-+generated, and renamed to ``client-key.pem`` and ``client-cert.pem``
-+when added to the ``/etc/pki/qemu`` directory on the target host. The
-+``client-key.pem`` file is security sensitive and should be kept
-+protected with file mode 0600 to prevent disclosure.
-+
-+If a single host is going to be using TLS in both a client and server
-+role, it is possible to create a single certificate to cover both roles.
-+This would be quite common for the migration and NBD services, where a
-+QEMU process will be started by accepting a TLS protected incoming
-+migration, and later itself be migrated out to another host. To generate
-+a single certificate, simply include the template data from both the
-+client and server instructions in one.
-+
-+::
-+
-+   # cat > both-hostNNN.info <<EOF
-+   country = GB
-+   state = London
-+   locality = City Of London
-+   organization = Name of your organization
-+   cn = hostNNN.foo.example.com
-+   dns_name = hostNNN
-+   dns_name = hostNNN.foo.example.com
-+   ip_address = 10.0.1.87
-+   ip_address = 192.8.0.92
-+   ip_address = 2620:0:cafe::87
-+   ip_address = 2001:24::92
-+   tls_www_server
-+   tls_www_client
-+   encryption_key
-+   signing_key
-+   EOF
-+   # certtool --generate-privkey > both-hostNNN-key.pem
-+   # certtool --generate-certificate \
-+              --load-ca-certificate ca-cert.pem \
-+              --load-ca-privkey ca-key.pem \
-+              --load-privkey both-hostNNN-key.pem \
-+              --template both-hostNNN.info \
-+              --outfile both-hostNNN-cert.pem
-+
-+When copying the PEM files to the target host, save them twice, once as
-+``server-cert.pem`` and ``server-key.pem``, and again as
-+``client-cert.pem`` and ``client-key.pem``.
-+
-+.. _tls_005fcreds_005fsetup:
-+
-+TLS x509 credential configuration
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+QEMU has a standard mechanism for loading x509 credentials that will be
-+used for network services and clients. It requires specifying the
-+``tls-creds-x509`` class name to the ``--object`` command line argument
-+for the system emulators. Each set of credentials loaded should be given
-+a unique string identifier via the ``id`` parameter. A single set of TLS
-+credentials can be used for multiple network backends, so VNC,
-+migration, NBD, character devices can all share the same credentials.
-+Note, however, that credentials for use in a client endpoint must be
-+loaded separately from those used in a server endpoint.
-+
-+When specifying the object, the ``dir`` parameters specifies which
-+directory contains the credential files. This directory is expected to
-+contain files with the names mentioned previously, ``ca-cert.pem``,
-+``server-key.pem``, ``server-cert.pem``, ``client-key.pem`` and
-+``client-cert.pem`` as appropriate. It is also possible to include a set
-+of pre-generated Diffie-Hellman (DH) parameters in a file
-+``dh-params.pem``, which can be created using the
-+``certtool --generate-dh-params`` command. If omitted, QEMU will
-+dynamically generate DH parameters when loading the credentials.
-+
-+The ``endpoint`` parameter indicates whether the credentials will be
-+used for a network client or server, and determines which PEM files are
-+loaded.
-+
-+The ``verify`` parameter determines whether x509 certificate validation
-+should be performed. This defaults to enabled, meaning clients will
-+always validate the server hostname against the certificate subject alt
-+name fields and/or CN field. It also means that servers will request
-+that clients provide a certificate and validate them. Verification
-+should never be turned off for client endpoints, however, it may be
-+turned off for server endpoints if an alternative mechanism is used to
-+authenticate clients. For example, the VNC server can use SASL to
-+authenticate clients instead.
-+
-+To load server credentials with client certificate validation enabled
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server
-+
-+while to load client credentials use
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=client
-+
-+Network services which support TLS will all have a ``tls-creds``
-+parameter which expects the ID of the TLS credentials object. For
-+example with VNC:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| -vnc 0.0.0.0:0,tls-creds=tls0
-+
-+.. _tls_005fpsk:
-+
-+TLS Pre-Shared Keys (PSK)
-+~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Instead of using certificates, you may also use TLS Pre-Shared Keys
-+(TLS-PSK). This can be simpler to set up than certificates but is less
-+scalable.
-+
-+Use the GnuTLS ``psktool`` program to generate a ``keys.psk`` file
-+containing one or more usernames and random keys::
-+
-+   mkdir -m 0700 /tmp/keys
-+   psktool -u rich -p /tmp/keys/keys.psk
-+
-+TLS-enabled servers such as qemu-nbd can use this directory like so::
-+
-+   qemu-nbd \
-+     -t -x / \
-+     --object tls-creds-psk,id=tls0,endpoint=server,dir=/tmp/keys \
-+     --tls-creds tls0 \
-+     image.qcow2
-+
-+When connecting from a qemu-based client you must specify the directory
-+containing ``keys.psk`` and an optional username (defaults to "qemu")::
-+
-+   qemu-img info \
-+     --object tls-creds-psk,id=tls0,dir=/tmp/keys,username=rich,endpoint=client \
-+     --image-opts \
-+     file.driver=nbd,file.host=localhost,file.port=10809,file.tls-creds=tls0,file.export=/
-diff --git a/docs/system/usb.rst b/docs/system/usb.rst
-new file mode 100644
-index 00000000000..ddfa828d74a
---- /dev/null
-+++ b/docs/system/usb.rst
-@@ -0,0 +1,137 @@
-+.. _pcsys_005fusb:
-+
-+USB emulation
-+-------------
-+
-+QEMU can emulate a PCI UHCI, OHCI, EHCI or XHCI USB controller. You can
-+plug virtual USB devices or real host USB devices (only works with
-+certain host operating systems). QEMU will automatically create and
-+connect virtual USB hubs as necessary to connect multiple USB devices.
-+
-+.. _usb_005fdevices:
-+
-+Connecting USB devices
-+~~~~~~~~~~~~~~~~~~~~~~
-+
-+USB devices can be connected with the ``-device usb-...`` command line
-+option or the ``device_add`` monitor command. Available devices are:
-+
-+``usb-mouse``
-+   Virtual Mouse. This will override the PS/2 mouse emulation when
-+   activated.
-+
-+``usb-tablet``
-+   Pointer device that uses absolute coordinates (like a touchscreen).
-+   This means QEMU is able to report the mouse position without having
-+   to grab the mouse. Also overrides the PS/2 mouse emulation when
-+   activated.
-+
-+``usb-storage,drive=drive_id``
-+   Mass storage device backed by drive_id (see
-+   :ref:`disk_005fimages`)
-+
-+``usb-uas``
-+   USB attached SCSI device, see
-+   `usb-storage.txt <https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/usb-storage.txt>`__
-+   for details
-+
-+``usb-bot``
-+   Bulk-only transport storage device, see
-+   `usb-storage.txt <https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/usb-storage.txt>`__
-+   for details here, too
-+
-+``usb-mtp,rootdir=dir``
-+   Media transfer protocol device, using dir as root of the file tree
-+   that is presented to the guest.
-+
-+``usb-host,hostbus=bus,hostaddr=addr``
-+   Pass through the host device identified by bus and addr
-+
-+``usb-host,vendorid=vendor,productid=product``
-+   Pass through the host device identified by vendor and product ID
-+
-+``usb-wacom-tablet``
-+   Virtual Wacom PenPartner tablet. This device is similar to the
-+   ``tablet`` above but it can be used with the tslib library because in
-+   addition to touch coordinates it reports touch pressure.
-+
-+``usb-kbd``
-+   Standard USB keyboard. Will override the PS/2 keyboard (if present).
-+
-+``usb-serial,chardev=id``
-+   Serial converter. This emulates an FTDI FT232BM chip connected to
-+   host character device id.
-+
-+``usb-braille,chardev=id``
-+   Braille device. This will use BrlAPI to display the braille output on
-+   a real or fake device referenced by id.
-+
-+``usb-net[,netdev=id]``
-+   Network adapter that supports CDC ethernet and RNDIS protocols. id
-+   specifies a netdev defined with ``-netdev …,id=id``. For instance,
-+   user-mode networking can be used with
-+
-+   .. parsed-literal::
-+
-+      |qemu_system| [...] -netdev user,id=net0 -device usb-net,netdev=net0
-+
-+``usb-ccid``
-+   Smartcard reader device
-+
-+``usb-audio``
-+   USB audio device
-+
-+.. _host_005fusb_005fdevices:
-+
-+Using host USB devices on a Linux host
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+WARNING: this is an experimental feature. QEMU will slow down when using
-+it. USB devices requiring real time streaming (i.e. USB Video Cameras)
-+are not supported yet.
-+
-+1. If you use an early Linux 2.4 kernel, verify that no Linux driver is
-+   actually using the USB device. A simple way to do that is simply to
-+   disable the corresponding kernel module by renaming it from
-+   ``mydriver.o`` to ``mydriver.o.disabled``.
-+
-+2. Verify that ``/proc/bus/usb`` is working (most Linux distributions
-+   should enable it by default). You should see something like that:
-+
-+   ::
-+
-+      ls /proc/bus/usb
-+      001  devices  drivers
-+
-+3. Since only root can access to the USB devices directly, you can
-+   either launch QEMU as root or change the permissions of the USB
-+   devices you want to use. For testing, the following suffices:
-+
-+   ::
-+
-+      chown -R myuid /proc/bus/usb
-+
-+4. Launch QEMU and do in the monitor:
-+
-+   ::
-+
-+      info usbhost
-+        Device 1.2, speed 480 Mb/s
-+          Class 00: USB device 1234:5678, USB DISK
-+
-+   You should see the list of the devices you can use (Never try to use
-+   hubs, it won't work).
-+
-+5. Add the device in QEMU by using:
-+
-+   ::
-+
-+      device_add usb-host,vendorid=0x1234,productid=0x5678
-+
-+   Normally the guest OS should report that a new USB device is plugged.
-+   You can use the option ``-device usb-host,...`` to do the same.
-+
-+6. Now you can try to use the host USB device in QEMU.
-+
-+When relaunching QEMU, you may have to unplug and plug again the USB
-+device to make it work again (this is a bug).
-diff --git a/docs/system/vnc-security.rst b/docs/system/vnc-security.rst
-new file mode 100644
-index 00000000000..b237b07330d
---- /dev/null
-+++ b/docs/system/vnc-security.rst
-@@ -0,0 +1,202 @@
-+.. _vnc_005fsecurity:
-+
-+VNC security
-+------------
-+
-+The VNC server capability provides access to the graphical console of
-+the guest VM across the network. This has a number of security
-+considerations depending on the deployment scenarios.
-+
-+.. _vnc_005fsec_005fnone:
-+
-+Without passwords
-+~~~~~~~~~~~~~~~~~
-+
-+The simplest VNC server setup does not include any form of
-+authentication. For this setup it is recommended to restrict it to
-+listen on a UNIX domain socket only. For example
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] -vnc unix:/home/joebloggs/.qemu-myvm-vnc
-+
-+This ensures that only users on local box with read/write access to that
-+path can access the VNC server. To securely access the VNC server from a
-+remote machine, a combination of netcat+ssh can be used to provide a
-+secure tunnel.
-+
-+.. _vnc_005fsec_005fpassword:
-+
-+With passwords
-+~~~~~~~~~~~~~~
-+
-+The VNC protocol has limited support for password based authentication.
-+Since the protocol limits passwords to 8 characters it should not be
-+considered to provide high security. The password can be fairly easily
-+brute-forced by a client making repeat connections. For this reason, a
-+VNC server using password authentication should be restricted to only
-+listen on the loopback interface or UNIX domain sockets. Password
-+authentication is not supported when operating in FIPS 140-2 compliance
-+mode as it requires the use of the DES cipher. Password authentication
-+is requested with the ``password`` option, and then once QEMU is running
-+the password is set with the monitor. Until the monitor is used to set
-+the password all clients will be rejected.
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] -vnc :1,password -monitor stdio
-+   (qemu) change vnc password
-+   Password: ********
-+   (qemu)
-+
-+.. _vnc_005fsec_005fcertificate:
-+
-+With x509 certificates
-+~~~~~~~~~~~~~~~~~~~~~~
-+
-+The QEMU VNC server also implements the VeNCrypt extension allowing use
-+of TLS for encryption of the session, and x509 certificates for
-+authentication. The use of x509 certificates is strongly recommended,
-+because TLS on its own is susceptible to man-in-the-middle attacks.
-+Basic x509 certificate support provides a secure session, but no
-+authentication. This allows any client to connect, and provides an
-+encrypted session.
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] \
-+     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=no \
-+     -vnc :1,tls-creds=tls0 -monitor stdio
-+
-+In the above example ``/etc/pki/qemu`` should contain at least three
-+files, ``ca-cert.pem``, ``server-cert.pem`` and ``server-key.pem``.
-+Unprivileged users will want to use a private directory, for example
-+``$HOME/.pki/qemu``. NB the ``server-key.pem`` file should be protected
-+with file mode 0600 to only be readable by the user owning it.
-+
-+.. _vnc_005fsec_005fcertificate_005fverify:
-+
-+With x509 certificates and client verification
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Certificates can also provide a means to authenticate the client
-+connecting. The server will request that the client provide a
-+certificate, which it will then validate against the CA certificate.
-+This is a good choice if deploying in an environment with a private
-+internal certificate authority. It uses the same syntax as previously,
-+but with ``verify-peer`` set to ``yes`` instead.
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] \
-+     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
-+     -vnc :1,tls-creds=tls0 -monitor stdio
-+
-+.. _vnc_005fsec_005fcertificate_005fpw:
-+
-+With x509 certificates, client verification and passwords
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Finally, the previous method can be combined with VNC password
-+authentication to provide two layers of authentication for clients.
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] \
-+     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
-+     -vnc :1,tls-creds=tls0,password -monitor stdio
-+   (qemu) change vnc password
-+   Password: ********
-+   (qemu)
-+
-+.. _vnc_005fsec_005fsasl:
-+
-+With SASL authentication
-+~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The SASL authentication method is a VNC extension, that provides an
-+easily extendable, pluggable authentication method. This allows for
-+integration with a wide range of authentication mechanisms, such as PAM,
-+GSSAPI/Kerberos, LDAP, SQL databases, one-time keys and more. The
-+strength of the authentication depends on the exact mechanism
-+configured. If the chosen mechanism also provides a SSF layer, then it
-+will encrypt the datastream as well.
-+
-+Refer to the later docs on how to choose the exact SASL mechanism used
-+for authentication, but assuming use of one supporting SSF, then QEMU
-+can be launched with:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] -vnc :1,sasl -monitor stdio
-+
-+.. _vnc_005fsec_005fcertificate_005fsasl:
-+
-+With x509 certificates and SASL authentication
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+If the desired SASL authentication mechanism does not supported SSF
-+layers, then it is strongly advised to run it in combination with TLS
-+and x509 certificates. This provides securely encrypted data stream,
-+avoiding risk of compromising of the security credentials. This can be
-+enabled, by combining the 'sasl' option with the aforementioned TLS +
-+x509 options:
-+
-+.. parsed-literal::
-+
-+   |qemu_system| [...OPTIONS...] \
-+     -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu,endpoint=server,verify-peer=yes \
-+     -vnc :1,tls-creds=tls0,sasl -monitor stdio
-+
-+.. _vnc_005fsetup_005fsasl:
-+
-+Configuring SASL mechanisms
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The following documentation assumes use of the Cyrus SASL implementation
-+on a Linux host, but the principles should apply to any other SASL
-+implementation or host. When SASL is enabled, the mechanism
-+configuration will be loaded from system default SASL service config
-+/etc/sasl2/qemu.conf. If running QEMU as an unprivileged user, an
-+environment variable SASL_CONF_PATH can be used to make it search
-+alternate locations for the service config file.
-+
-+If the TLS option is enabled for VNC, then it will provide session
-+encryption, otherwise the SASL mechanism will have to provide
-+encryption. In the latter case the list of possible plugins that can be
-+used is drastically reduced. In fact only the GSSAPI SASL mechanism
-+provides an acceptable level of security by modern standards. Previous
-+versions of QEMU referred to the DIGEST-MD5 mechanism, however, it has
-+multiple serious flaws described in detail in RFC 6331 and thus should
-+never be used any more. The SCRAM-SHA-1 mechanism provides a simple
-+username/password auth facility similar to DIGEST-MD5, but does not
-+support session encryption, so can only be used in combination with TLS.
-+
-+When not using TLS the recommended configuration is
-+
-+::
-+
-+   mech_list: gssapi
-+   keytab: /etc/qemu/krb5.tab
-+
-+This says to use the 'GSSAPI' mechanism with the Kerberos v5 protocol,
-+with the server principal stored in /etc/qemu/krb5.tab. For this to work
-+the administrator of your KDC must generate a Kerberos principal for the
-+server, with a name of 'qemu/somehost.example.com@EXAMPLE.COM' replacing
-+'somehost.example.com' with the fully qualified host name of the machine
-+running QEMU, and 'EXAMPLE.COM' with the Kerberos Realm.
-+
-+When using TLS, if username+password authentication is desired, then a
-+reasonable configuration is
-+
-+::
-+
-+   mech_list: scram-sha-1
-+   sasldb_path: /etc/qemu/passwd.db
-+
-+The ``saslpasswd2`` program can be used to populate the ``passwd.db``
-+file with accounts.
-+
-+Other SASL configurations will be left as an exercise for the reader.
-+Note that all mechanisms, except GSSAPI, should be combined with use of
-+TLS to ensure a secure data channel.
+@@ -14,8 +14,16 @@ You can use it to:
+ 
+ -  Inspect the VM state without an external debugger.
+ 
++Commands
++~~~~~~~~
++
++The following commands are available:
++
++.. hxtool-doc:: hmp-commands.hx
++
+ ..
+-  The commands section goes here once it's converted from Texinfo to RST.
++  TODO: convert and reference hmp-commands-info.hx
++
+ 
+ Integer expressions
+ ~~~~~~~~~~~~~~~~~~~
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index dc23185de43..9aa59f52312 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -23,6 +23,10 @@ STEXI
+ @findex help
+ Show the help for all commands or just for command @var{cmd}.
+ ETEXI
++SRST
++``help`` or ``?`` [*cmd*]
++  Show the help for all commands or just for command *cmd*.
++ERST
+ 
+     {
+         .name       = "commit",
+@@ -42,6 +46,16 @@ the backing file, the backing file will not be truncated.  If you want the
+ backing file to match the size of the smaller snapshot, you can safely truncate
+ it yourself once the commit operation successfully completes.
+ ETEXI
++SRST
++``commit``
++  Commit changes to the disk images (if -snapshot is used) or backing files.
++  If the backing file is smaller than the snapshot, then the backing file
++  will be resized to be the same size as the snapshot.  If the snapshot is
++  smaller than the backing file, the backing file will not be truncated.
++  If you want the backing file to match the size of the smaller snapshot,
++  you can safely truncate it yourself once the commit operation successfully
++  completes.
++ERST
+ 
+     {
+         .name       = "q|quit",
+@@ -56,6 +70,10 @@ STEXI
+ @findex quit
+ Quit the emulator.
+ ETEXI
++SRST
++``q`` or ``quit``
++  Quit the emulator.
++ERST
+ 
+     {
+         .name       = "exit_preconfig",
+@@ -75,6 +93,14 @@ and via the QMP monitor during the preconfig state. The command is only
+ available during the preconfig state (i.e. when the --preconfig command
+ line option was in use).
+ ETEXI
++SRST
++``exit_preconfig``
++  This command makes QEMU exit the preconfig state and proceed with
++  VM initialization using configuration data provided on the command line
++  and via the QMP monitor during the preconfig state. The command is only
++  available during the preconfig state (i.e. when the --preconfig command
++  line option was in use).
++ERST
+ 
+     {
+         .name       = "block_resize",
+@@ -92,6 +118,13 @@ action to see the updated size.  Resize to a lower size is supported,
+ but should be used with extreme caution.  Note that this command only
+ resizes image files, it can not resize block devices like LVM volumes.
+ ETEXI
++SRST
++``block_resize``
++  Resize a block image while a guest is running.  Usually requires guest
++  action to see the updated size.  Resize to a lower size is supported,
++  but should be used with extreme caution.  Note that this command only
++  resizes image files, it can not resize block devices like LVM volumes.
++ERST
+ 
+     {
+         .name       = "block_stream",
+@@ -106,6 +139,10 @@ STEXI
+ @findex block_stream
+ Copy data from a backing file into a block device.
+ ETEXI
++SRST
++``block_stream``
++  Copy data from a backing file into a block device.
++ERST
+ 
+     {
+         .name       = "block_job_set_speed",
+@@ -120,6 +157,10 @@ STEXI
+ @findex block_job_set_speed
+ Set maximum speed for a background block operation.
+ ETEXI
++SRST
++``block_job_set_speed``
++  Set maximum speed for a background block operation.
++ERST
+ 
+     {
+         .name       = "block_job_cancel",
+@@ -136,6 +177,10 @@ STEXI
+ @findex block_job_cancel
+ Stop an active background block operation (streaming, mirroring).
+ ETEXI
++SRST
++``block_job_cancel``
++  Stop an active background block operation (streaming, mirroring).
++ERST
+ 
+     {
+         .name       = "block_job_complete",
+@@ -151,6 +196,11 @@ STEXI
+ Manually trigger completion of an active background block operation.
+ For mirroring, this will switch the device to the destination path.
+ ETEXI
++SRST
++``block_job_complete``
++  Manually trigger completion of an active background block operation.
++  For mirroring, this will switch the device to the destination path.
++ERST
+ 
+     {
+         .name       = "block_job_pause",
+@@ -165,6 +215,10 @@ STEXI
+ @findex block_job_pause
+ Pause an active block streaming operation.
+ ETEXI
++SRST
++``block_job_pause``
++  Pause an active block streaming operation.
++ERST
+ 
+     {
+         .name       = "block_job_resume",
+@@ -179,6 +233,10 @@ STEXI
+ @findex block_job_resume
+ Resume a paused block streaming operation.
+ ETEXI
++SRST
++``block_job_resume``
++  Resume a paused block streaming operation.
++ERST
+ 
+     {
+         .name       = "eject",
+@@ -193,6 +251,10 @@ STEXI
+ @findex eject
+ Eject a removable medium (use -f to force it).
+ ETEXI
++SRST
++``eject [-f]`` *device*
++  Eject a removable medium (use -f to force it).
++ERST
+ 
+     {
+         .name       = "drive_del",
+@@ -212,6 +274,15 @@ errors in the guest for applications that are reading/writing to the device.
+ These errors are always reported to the guest, regardless of the drive's error
+ actions (drive options rerror, werror).
+ ETEXI
++SRST
++``drive_del`` *device*
++  Remove host block device.  The result is that guest generated IO is no longer
++  submitted against the host device underlying the disk.  Once a drive has
++  been deleted, the QEMU Block layer returns -EIO which results in IO
++  errors in the guest for applications that are reading/writing to the device.
++  These errors are always reported to the guest, regardless of the drive's error
++  actions (drive options rerror, werror).
++ERST
+ 
+     {
+         .name       = "change",
+@@ -271,6 +342,45 @@ Password: ********
+ 
+ @end table
+ ETEXI
++SRST
++``change`` *device* *setting*
++  Change the configuration of a device.
++
++  ``change`` *diskdevice* *filename* [*format* [*read-only-mode*]]
++    Change the medium for a removable disk device to point to *filename*. eg::
++
++      (qemu) change ide1-cd0 /path/to/some.iso
++
++    *format* is optional.
++
++    *read-only-mode* may be used to change the read-only status of the device.
++    It accepts the following values:
++
++    retain
++      Retains the current status; this is the default.
++
++    read-only
++      Makes the device read-only.
++
++    read-write
++      Makes the device writable.
++
++  ``change vnc`` *display*,\ *options*
++    Change the configuration of the VNC server. The valid syntax for *display*
++    and *options* are described at :ref:`sec_005finvocation`. eg::
++
++      (qemu) change vnc localhost:1
++
++  ``change vnc password`` [*password*]
++
++    Change the password associated with the VNC server. If the new password
++    is not supplied, the monitor will prompt for it to be entered. VNC
++    passwords are only significant up to 8 letters. eg::
++
++      (qemu) change vnc password
++      Password: ********
++
++ERST
+ 
+     {
+         .name       = "screendump",
+@@ -286,6 +396,10 @@ STEXI
+ @findex screendump
+ Save screen into PPM image @var{filename}.
+ ETEXI
++SRST
++``screendump`` *filename*
++  Save screen into PPM image *filename*.
++ERST
+ 
+     {
+         .name       = "logfile",
+@@ -300,6 +414,10 @@ STEXI
+ @findex logfile
+ Output logs to @var{filename}.
+ ETEXI
++SRST
++``logfile`` *filename*
++  Output logs to *filename*.
++ERST
+ 
+     {
+         .name       = "trace-event",
+@@ -316,6 +434,10 @@ STEXI
+ @findex trace-event
+ changes status of a trace event
+ ETEXI
++SRST
++``trace-event``
++  changes status of a trace event
++ERST
+ 
+ #if defined(CONFIG_TRACE_SIMPLE)
+     {
+@@ -331,6 +453,11 @@ STEXI
+ @findex trace-file
+ Open, close, or flush the trace file.  If no argument is given, the status of the trace file is displayed.
+ ETEXI
++SRST
++``trace-file on|off|flush``
++  Open, close, or flush the trace file.  If no argument is given, the
++  status of the trace file is displayed.
++ERST
+ #endif
+ 
+     {
+@@ -346,6 +473,10 @@ STEXI
+ @findex log
+ Activate logging of the specified items.
+ ETEXI
++SRST
++``log`` *item1*\ [,...]
++  Activate logging of the specified items.
++ERST
+ 
+     {
+         .name       = "savevm",
+@@ -366,6 +497,16 @@ a snapshot with the same tag, it is replaced. More info at
+ Since 4.0, savevm stopped allowing the snapshot id to be set, accepting
+ only @var{tag} as parameter.
+ ETEXI
++SRST
++``savevm`` *tag*
++  Create a snapshot of the whole virtual machine. If *tag* is
++  provided, it is used as human readable identifier. If there is already
++  a snapshot with the same tag, it is replaced. More info at
++  :ref:`vm_005fsnapshots`.
++
++  Since 4.0, savevm stopped allowing the snapshot id to be set, accepting
++  only *tag* as parameter.
++ERST
+ 
+     {
+         .name       = "loadvm",
+@@ -384,6 +525,13 @@ Set the whole virtual machine to the snapshot identified by the tag
+ 
+ Since 4.0, loadvm stopped accepting snapshot id as parameter.
+ ETEXI
++SRST
++``loadvm`` *tag*
++  Set the whole virtual machine to the snapshot identified by the tag
++  *tag*.
++
++  Since 4.0, loadvm stopped accepting snapshot id as parameter.
++ERST
+ 
+     {
+         .name       = "delvm",
+@@ -402,6 +550,13 @@ Delete the snapshot identified by @var{tag}.
+ Since 4.0, delvm stopped deleting snapshots by snapshot id, accepting
+ only @var{tag} as parameter.
+ ETEXI
++SRST
++``delvm`` *tag*
++  Delete the snapshot identified by *tag*.
++
++  Since 4.0, delvm stopped deleting snapshots by snapshot id, accepting
++  only *tag* as parameter.
++ERST
+ 
+     {
+         .name       = "singlestep",
+@@ -417,6 +572,11 @@ STEXI
+ Run the emulation in single step mode.
+ If called with option off, the emulation returns to normal mode.
+ ETEXI
++SRST
++``singlestep [off]``
++  Run the emulation in single step mode.
++  If called with option off, the emulation returns to normal mode.
++ERST
+ 
+     {
+         .name       = "stop",
+@@ -431,6 +591,10 @@ STEXI
+ @findex stop
+ Stop emulation.
+ ETEXI
++SRST
++``stop``
++  Stop emulation.
++ERST
+ 
+     {
+         .name       = "c|cont",
+@@ -445,6 +609,10 @@ STEXI
+ @findex cont
+ Resume emulation.
+ ETEXI
++SRST
++``c`` or ``cont``
++  Resume emulation.
++ERST
+ 
+     {
+         .name       = "system_wakeup",
+@@ -459,6 +627,10 @@ STEXI
+ @findex system_wakeup
+ Wakeup guest from suspend.
+ ETEXI
++SRST
++``system_wakeup``
++  Wakeup guest from suspend.
++ERST
+ 
+     {
+         .name       = "gdbserver",
+@@ -473,6 +645,10 @@ STEXI
+ @findex gdbserver
+ Start gdbserver session (default @var{port}=1234)
+ ETEXI
++SRST
++``gdbserver`` [*port*]
++  Start gdbserver session (default *port*\=1234)
++ERST
+ 
+     {
+         .name       = "x",
+@@ -487,6 +663,10 @@ STEXI
+ @findex x
+ Virtual memory dump starting at @var{addr}.
+ ETEXI
++SRST
++``x/``\ *fmt* *addr*
++  Virtual memory dump starting at *addr*.
++ERST
+ 
+     {
+         .name       = "xp",
+@@ -554,6 +734,54 @@ Dump 80 16 bit values at the start of the video memory.
+ @end smallexample
+ @end itemize
+ ETEXI
++SRST
++``xp /``\ *fmt* *addr*
++  Physical memory dump starting at *addr*.
++
++  *fmt* is a format which tells the command how to format the
++  data. Its syntax is: ``/{count}{format}{size}``
++
++  *count*
++    is the number of items to be dumped.
++  *format*
++    can be x (hex), d (signed decimal), u (unsigned decimal), o (octal),
++    c (char) or i (asm instruction).
++  *size*
++    can be b (8 bits), h (16 bits), w (32 bits) or g (64 bits). On x86,
++    ``h`` or ``w`` can be specified with the ``i`` format to
++    respectively select 16 or 32 bit code instruction size.
++
++  Examples:
++
++  Dump 10 instructions at the current instruction pointer::
++
++    (qemu) x/10i $eip
++    0x90107063:  ret
++    0x90107064:  sti
++    0x90107065:  lea    0x0(%esi,1),%esi
++    0x90107069:  lea    0x0(%edi,1),%edi
++    0x90107070:  ret
++    0x90107071:  jmp    0x90107080
++    0x90107073:  nop
++    0x90107074:  nop
++    0x90107075:  nop
++    0x90107076:  nop
++
++  Dump 80 16 bit values at the start of the video memory::
++
++    (qemu) xp/80hx 0xb8000
++    0x000b8000: 0x0b50 0x0b6c 0x0b65 0x0b78 0x0b38 0x0b36 0x0b2f 0x0b42
++    0x000b8010: 0x0b6f 0x0b63 0x0b68 0x0b73 0x0b20 0x0b56 0x0b47 0x0b41
++    0x000b8020: 0x0b42 0x0b69 0x0b6f 0x0b73 0x0b20 0x0b63 0x0b75 0x0b72
++    0x000b8030: 0x0b72 0x0b65 0x0b6e 0x0b74 0x0b2d 0x0b63 0x0b76 0x0b73
++    0x000b8040: 0x0b20 0x0b30 0x0b35 0x0b20 0x0b4e 0x0b6f 0x0b76 0x0b20
++    0x000b8050: 0x0b32 0x0b30 0x0b30 0x0b33 0x0720 0x0720 0x0720 0x0720
++    0x000b8060: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
++    0x000b8070: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
++    0x000b8080: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
++    0x000b8090: 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720 0x0720
++
++ERST
+ 
+     {
+         .name       = "gpa2hva",
+@@ -569,6 +797,11 @@ STEXI
+ Print the host virtual address at which the guest's physical address @var{addr}
+ is mapped.
+ ETEXI
++SRST
++``gpa2hva`` *addr*
++  Print the host virtual address at which the guest's physical address *addr*
++  is mapped.
++ERST
+ 
+ #ifdef CONFIG_LINUX
+     {
+@@ -586,6 +819,11 @@ STEXI
+ Print the host physical address at which the guest's physical address @var{addr}
+ is mapped.
+ ETEXI
++SRST
++``gpa2hpa`` *addr*
++  Print the host physical address at which the guest's physical address *addr*
++  is mapped.
++ERST
+ 
+     {
+         .name       = "gva2gpa",
+@@ -601,6 +839,11 @@ STEXI
+ Print the guest physical address at which the guest's virtual address @var{addr}
+ is mapped based on the mapping for the current CPU.
+ ETEXI
++SRST
++``gva2gpa`` *addr*
++  Print the guest physical address at which the guest's virtual address *addr*
++  is mapped based on the mapping for the current CPU.
++ERST
+ 
+     {
+         .name       = "p|print",
+@@ -616,6 +859,11 @@ STEXI
+ Print expression value. Only the @var{format} part of @var{fmt} is
+ used.
+ ETEXI
++SRST
++``p`` or ``print/``\ *fmt* *expr*
++  Print expression value. Only the *format* part of *fmt* is
++  used.
++ERST
+ 
+     {
+         .name       = "i",
+@@ -630,6 +878,10 @@ STEXI
+ @findex i
+ Read I/O port.
+ ETEXI
++SRST
++``i/``\ *fmt* *addr* [.\ *index*\ ]
++  Read I/O port.
++ERST
+ 
+     {
+         .name       = "o",
+@@ -644,6 +896,10 @@ STEXI
+ @findex o
+ Write to I/O port.
+ ETEXI
++SRST
++``o/``\ *fmt* *addr* *val*
++  Write to I/O port.
++ERST
+ 
+     {
+         .name       = "sendkey",
+@@ -667,6 +923,17 @@ sendkey ctrl-alt-f1
+ This command is useful to send keys that your graphical user interface
+ intercepts at low level, such as @code{ctrl-alt-f1} in X Window.
+ ETEXI
++SRST
++``sendkey`` *keys*
++  Send *keys* to the guest. *keys* could be the name of the
++  key or the raw value in hexadecimal format. Use ``-`` to press
++  several keys simultaneously. Example::
++
++    sendkey ctrl-alt-f1
++
++  This command is useful to send keys that your graphical user interface
++  intercepts at low level, such as ``ctrl-alt-f1`` in X Window.
++ERST
+     {
+         .name       = "sync-profile",
+         .args_type  = "op:s?",
+@@ -682,6 +949,11 @@ STEXI
+ Enable, disable or reset synchronization profiling. With no arguments, prints
+ whether profiling is on or off.
+ ETEXI
++SRST
++``sync-profile [on|off|reset]``
++  Enable, disable or reset synchronization profiling. With no arguments, prints
++  whether profiling is on or off.
++ERST
+ 
+     {
+         .name       = "system_reset",
+@@ -696,6 +968,10 @@ STEXI
+ @findex system_reset
+ Reset the system.
+ ETEXI
++SRST
++``system_reset``
++  Reset the system.
++ERST
+ 
+     {
+         .name       = "system_powerdown",
+@@ -710,6 +986,10 @@ STEXI
+ @findex system_powerdown
+ Power down the system (if supported).
+ ETEXI
++SRST
++``system_powerdown``
++  Power down the system (if supported).
++ERST
+ 
+     {
+         .name       = "sum",
+@@ -724,6 +1004,10 @@ STEXI
+ @findex sum
+ Compute the checksum of a memory region.
+ ETEXI
++SRST
++``sum`` *addr* *size*
++  Compute the checksum of a memory region.
++ERST
+ 
+     {
+         .name       = "device_add",
+@@ -739,6 +1023,10 @@ STEXI
+ @findex device_add
+ Add device.
+ ETEXI
++SRST
++``device_add`` *config*
++  Add device.
++ERST
+ 
+     {
+         .name       = "device_del",
+@@ -755,6 +1043,11 @@ STEXI
+ Remove device @var{id}. @var{id} may be a short ID
+ or a QOM object path.
+ ETEXI
++SRST
++``device_del`` *id*
++  Remove device *id*. *id* may be a short ID
++  or a QOM object path.
++ERST
+ 
+     {
+         .name       = "cpu",
+@@ -769,6 +1062,10 @@ STEXI
+ @findex cpu
+ Set the default CPU.
+ ETEXI
++SRST
++``cpu`` *index*
++  Set the default CPU.
++ERST
+ 
+     {
+         .name       = "mouse_move",
+@@ -784,6 +1081,11 @@ STEXI
+ Move the active mouse to the specified coordinates @var{dx} @var{dy}
+ with optional scroll axis @var{dz}.
+ ETEXI
++SRST
++``mouse_move`` *dx* *dy* [*dz*]
++  Move the active mouse to the specified coordinates *dx* *dy*
++  with optional scroll axis *dz*.
++ERST
+ 
+     {
+         .name       = "mouse_button",
+@@ -798,6 +1100,10 @@ STEXI
+ @findex mouse_button
+ Change the active mouse button state @var{val} (1=L, 2=M, 4=R).
+ ETEXI
++SRST
++``mouse_button`` *val*
++  Change the active mouse button state *val* (1=L, 2=M, 4=R).
++ERST
+ 
+     {
+         .name       = "mouse_set",
+@@ -816,6 +1122,14 @@ can be obtained with
+ info mice
+ @end example
+ ETEXI
++SRST
++``mouse_set`` *index*
++  Set which mouse device receives events at given *index*, index
++  can be obtained with::
++
++    info mice
++
++ERST
+ 
+     {
+         .name       = "wavcapture",
+@@ -838,6 +1152,18 @@ Defaults:
+ @item Number of channels = 2 - Stereo
+ @end itemize
+ ETEXI
++SRST
++``wavcapture`` *filename* *audiodev* [*frequency* [*bits* [*channels*]]]
++  Capture audio into *filename* from *audiodev*, using sample rate
++  *frequency* bits per sample *bits* and number of channels
++  *channels*.
++
++  Defaults:
++
++  - Sample rate = 44100 Hz - CD quality
++  - Bits = 16
++  - Number of channels = 2 - Stereo
++ERST
+ 
+     {
+         .name       = "stopcapture",
+@@ -854,6 +1180,13 @@ Stop capture with a given @var{index}, index can be obtained with
+ info capture
+ @end example
+ ETEXI
++SRST
++``stopcapture`` *index*
++  Stop capture with a given *index*, index can be obtained with::
++
++    info capture
++
++ERST
+ 
+     {
+         .name       = "memsave",
+@@ -868,6 +1201,10 @@ STEXI
+ @findex memsave
+ save to disk virtual memory dump starting at @var{addr} of size @var{size}.
+ ETEXI
++SRST
++``memsave`` *addr* *size* *file*
++  save to disk virtual memory dump starting at *addr* of size *size*.
++ERST
+ 
+     {
+         .name       = "pmemsave",
+@@ -882,6 +1219,10 @@ STEXI
+ @findex pmemsave
+ save to disk physical memory dump starting at @var{addr} of size @var{size}.
+ ETEXI
++SRST
++``pmemsave`` *addr* *size* *file*
++  save to disk physical memory dump starting at *addr* of size *size*.
++ERST
+ 
+     {
+         .name       = "boot_set",
+@@ -900,6 +1241,14 @@ the values specified on the command line through the @code{-boot} option.
+ The values that can be specified here depend on the machine type, but are
+ the same that can be specified in the @code{-boot} command line option.
+ ETEXI
++SRST
++``boot_set`` *bootdevicelist*
++  Define new values for the boot device list. Those values will override
++  the values specified on the command line through the ``-boot`` option.
++
++  The values that can be specified here depend on the machine type, but are
++  the same that can be specified in the ``-boot`` command line option.
++ERST
+ 
+     {
+         .name       = "nmi",
+@@ -914,6 +1263,10 @@ STEXI
+ Inject an NMI on the default CPU (x86/s390) or all CPUs (ppc64).
+ 
+ ETEXI
++SRST
++``nmi`` *cpu*
++  Inject an NMI on the default CPU (x86/s390) or all CPUs (ppc64).
++ERST
+ 
+     {
+         .name       = "ringbuf_write",
+@@ -931,6 +1284,11 @@ Write @var{data} to ring buffer character device @var{device}.
+ @var{data} must be a UTF-8 string.
+ 
+ ETEXI
++SRST
++``ringbuf_write`` *device* *data*
++  Write *data* to ring buffer character device *device*.
++  *data* must be a UTF-8 string.
++ERST
+ 
+     {
+         .name       = "ringbuf_read",
+@@ -953,6 +1311,16 @@ NUL characters, after the ring buffer lost data, and when reading
+ stops because the size limit is reached.
+ 
+ ETEXI
++SRST
++``ringbuf_read`` *device*
++  Read and print up to *size* bytes from ring buffer character
++  device *device*.
++  Certain non-printable characters are printed ``\uXXXX``, where ``XXXX`` is the
++  character code in hexadecimal.  Character ``\`` is printed ``\\``.
++  Bug: can screw up when the buffer contains invalid UTF-8 sequences,
++  NUL characters, after the ring buffer lost data, and when reading
++  stops because the size limit is reached.
++ERST
+ 
+     {
+         .name       = "announce_self",
+@@ -972,6 +1340,15 @@ An optional comma separated @var{interfaces} list restricts the announce to the
+ named set of interfaces. An optional @var{id} can be used to start a separate announce
+ timer and to change the parameters of it later.
+ ETEXI
++SRST
++``announce_self``
++  Trigger a round of GARP/RARP broadcasts; this is useful for explicitly
++  updating the network infrastructure after a reconfiguration or some forms
++  of migration. The timings of the round are set by the migration announce
++  parameters. An optional comma separated *interfaces* list restricts the
++  announce to the named set of interfaces. An optional *id* can be used to
++  start a separate announce timer and to change the parameters of it later.
++ERST
+ 
+     {
+         .name       = "migrate",
+@@ -994,6 +1371,15 @@ Migrate to @var{uri} (using -d to not wait for completion).
+ 	-b for migration with full copy of disk
+ 	-i for migration with incremental copy of disk (base image is shared)
+ ETEXI
++SRST
++``migrate [-d] [-b] [-i]`` *uri*
++  Migrate to *uri* (using -d to not wait for completion).
++
++  ``-b``
++    for migration with full copy of disk
++  ``-i``
++    for migration with incremental copy of disk (base image is shared)
++ERST
+ 
+     {
+         .name       = "migrate_cancel",
+@@ -1008,6 +1394,10 @@ STEXI
+ @findex migrate_cancel
+ Cancel the current VM migration.
+ ETEXI
++SRST
++``migrate_cancel``
++  Cancel the current VM migration.
++ERST
+ 
+     {
+         .name       = "migrate_continue",
+@@ -1021,6 +1411,10 @@ STEXI
+ @findex migrate_continue
+ Continue migration from the paused state @var{state}
+ ETEXI
++SRST
++``migrate_continue`` *state*
++  Continue migration from the paused state *state*
++ERST
+ 
+     {
+         .name       = "migrate_incoming",
+@@ -1036,6 +1430,11 @@ STEXI
+ Continue an incoming migration using the @var{uri} (that has the same syntax
+ as the -incoming option).
+ ETEXI
++SRST
++``migrate_incoming`` *uri*
++  Continue an incoming migration using the *uri* (that has the same syntax
++  as the ``-incoming`` option).
++ERST
+ 
+     {
+         .name       = "migrate_recover",
+@@ -1050,6 +1449,10 @@ STEXI
+ @findex migrate_recover
+ Continue a paused incoming postcopy migration using the @var{uri}.
+ ETEXI
++SRST
++``migrate_recover`` *uri*
++  Continue a paused incoming postcopy migration using the *uri*.
++ERST
+ 
+     {
+         .name       = "migrate_pause",
+@@ -1064,6 +1467,10 @@ STEXI
+ @findex migrate_pause
+ Pause an ongoing migration.  Currently it only supports postcopy.
+ ETEXI
++SRST
++``migrate_pause``
++  Pause an ongoing migration.  Currently it only supports postcopy.
++ERST
+ 
+     {
+         .name       = "migrate_set_cache_size",
+@@ -1083,6 +1490,10 @@ STEXI
+ @findex migrate_set_cache_size
+ Set cache size to @var{value} (in bytes) for xbzrle migrations.
+ ETEXI
++SRST
++``migrate_set_cache_size`` *value*
++  Set cache size to *value* (in bytes) for xbzrle migrations.
++ERST
+ 
+     {
+         .name       = "migrate_set_speed",
+@@ -1098,6 +1509,10 @@ STEXI
+ @findex migrate_set_speed
+ Set maximum speed to @var{value} (in bytes) for migrations.
+ ETEXI
++SRST
++``migrate_set_speed`` *value*
++  Set maximum speed to *value* (in bytes) for migrations.
++ERST
+ 
+     {
+         .name       = "migrate_set_downtime",
+@@ -1112,6 +1527,10 @@ STEXI
+ @findex migrate_set_downtime
+ Set maximum tolerated downtime (in seconds) for migration.
+ ETEXI
++SRST
++``migrate_set_downtime`` *second*
++  Set maximum tolerated downtime (in seconds) for migration.
++ERST
+ 
+     {
+         .name       = "migrate_set_capability",
+@@ -1127,6 +1546,10 @@ STEXI
+ @findex migrate_set_capability
+ Enable/Disable the usage of a capability @var{capability} for migration.
+ ETEXI
++SRST
++``migrate_set_capability`` *capability* *state*
++  Enable/Disable the usage of a capability *capability* for migration.
++ERST
+ 
+     {
+         .name       = "migrate_set_parameter",
+@@ -1142,6 +1565,10 @@ STEXI
+ @findex migrate_set_parameter
+ Set the parameter @var{parameter} for migration.
+ ETEXI
++SRST
++``migrate_set_parameter`` *parameter* *value*
++  Set the parameter *parameter* for migration.
++ERST
+ 
+     {
+         .name       = "migrate_start_postcopy",
+@@ -1160,6 +1587,11 @@ STEXI
+ Switch in-progress migration to postcopy mode. Ignored after the end of
+ migration (or once already in postcopy).
+ ETEXI
++SRST
++``migrate_start_postcopy``
++  Switch in-progress migration to postcopy mode. Ignored after the end of
++  migration (or once already in postcopy).
++ERST
+ 
+     {
+         .name       = "x_colo_lost_heartbeat",
+@@ -1175,6 +1607,10 @@ STEXI
+ @findex x_colo_lost_heartbeat
+ Tell COLO that heartbeat is lost, a failover or takeover is needed.
+ ETEXI
++SRST
++``x_colo_lost_heartbeat``
++  Tell COLO that heartbeat is lost, a failover or takeover is needed.
++ERST
+ 
+     {
+         .name       = "client_migrate_info",
+@@ -1191,6 +1627,12 @@ Set migration information for remote display.  This makes the server
+ ask the client to automatically reconnect using the new parameters
+ once migration finished successfully.  Only implemented for SPICE.
+ ETEXI
++SRST
++``client_migrate_info`` *protocol* *hostname* *port* *tls-port* *cert-subject*
++  Set migration information for remote display.  This makes the server
++  ask the client to automatically reconnect using the new parameters
++  once migration finished successfully.  Only implemented for SPICE.
++ERST
+ 
+     {
+         .name       = "dump-guest-memory",
+@@ -1227,6 +1669,34 @@ gdb. Without -z|-l|-s|-w, the dump format is ELF.
+     length: the memory size, in bytes. It's optional, and should be specified
+             together with begin.
+ ETEXI
++SRST
++``dump-guest-memory [-p]`` *filename* *begin* *length*
++  \ 
++``dump-guest-memory [-z|-l|-s|-w]`` *filename*
++  Dump guest memory to *protocol*. The file can be processed with crash or
++  gdb. Without ``-z|-l|-s|-w``, the dump format is ELF.
++
++  ``-p``
++    do paging to get guest's memory mapping.
++  ``-z``
++    dump in kdump-compressed format, with zlib compression.
++  ``-l``
++    dump in kdump-compressed format, with lzo compression.
++  ``-s``
++    dump in kdump-compressed format, with snappy compression.
++  ``-w``
++    dump in Windows crashdump format (can be used instead of ELF-dump converting),
++    for Windows x64 guests with vmcoreinfo driver only
++  *filename*
++    dump file name.
++  *begin*
++    the starting physical address. It's optional, and should be
++    specified together with *length*.
++  *length*
++    the memory size, in bytes. It's optional, and should be specified
++    together with *begin*.
++
++ERST
+ 
+ #if defined(TARGET_S390X)
+     {
+@@ -1243,6 +1713,10 @@ STEXI
+ @findex dump-skeys
+ Save guest storage keys to a file.
+ ETEXI
++SRST
++``dump-skeys`` *filename*
++  Save guest storage keys to a file.
++ERST
+ 
+ #if defined(TARGET_S390X)
+     {
+@@ -1259,6 +1733,10 @@ STEXI
+ @findex migration_mode
+ Enables or disables migration mode.
+ ETEXI
++SRST
++``migration_mode`` *mode*
++  Enables or disables migration mode.
++ERST
+ 
+     {
+         .name       = "snapshot_blkdev",
+@@ -1280,6 +1758,10 @@ STEXI
+ @findex snapshot_blkdev
+ Snapshot device, using snapshot file as target if provided
+ ETEXI
++SRST
++``snapshot_blkdev``
++  Snapshot device, using snapshot file as target if provided
++ERST
+ 
+     {
+         .name       = "snapshot_blkdev_internal",
+@@ -1296,6 +1778,10 @@ STEXI
+ @findex snapshot_blkdev_internal
+ Take an internal snapshot on device if it support
+ ETEXI
++SRST
++``snapshot_blkdev_internal``
++  Take an internal snapshot on device if it support
++ERST
+ 
+     {
+         .name       = "snapshot_delete_blkdev_internal",
+@@ -1314,6 +1800,10 @@ STEXI
+ @findex snapshot_delete_blkdev_internal
+ Delete an internal snapshot on device if it support
+ ETEXI
++SRST
++``snapshot_delete_blkdev_internal``
++  Delete an internal snapshot on device if it support
++ERST
+ 
+     {
+         .name       = "drive_mirror",
+@@ -1335,6 +1825,11 @@ STEXI
+ Start mirroring a block device's writes to a new destination,
+ using the specified target.
+ ETEXI
++SRST
++``drive_mirror``
++  Start mirroring a block device's writes to a new destination,
++  using the specified target.
++ERST
+ 
+     {
+         .name       = "drive_backup",
+@@ -1357,6 +1852,10 @@ STEXI
+ @findex drive_backup
+ Start a point-in-time copy of a block device to a specificed target.
+ ETEXI
++SRST
++``drive_backup``
++  Start a point-in-time copy of a block device to a specificed target.
++ERST
+ 
+     {
+         .name       = "drive_add",
+@@ -1375,6 +1874,10 @@ STEXI
+ @findex drive_add
+ Add drive to PCI storage controller.
+ ETEXI
++SRST
++``drive_add``
++  Add drive to PCI storage controller.
++ERST
+ 
+     {
+         .name       = "pcie_aer_inject_error",
+@@ -1399,6 +1902,10 @@ STEXI
+ @findex pcie_aer_inject_error
+ Inject PCIe AER error
+ ETEXI
++SRST
++``pcie_aer_inject_error``
++  Inject PCIe AER error
++ERST
+ 
+     {
+         .name       = "netdev_add",
+@@ -1414,6 +1921,10 @@ STEXI
+ @findex netdev_add
+ Add host network device.
+ ETEXI
++SRST
++``netdev_add``
++  Add host network device.
++ERST
+ 
+     {
+         .name       = "netdev_del",
+@@ -1429,6 +1940,10 @@ STEXI
+ @findex netdev_del
+ Remove host network device.
+ ETEXI
++SRST
++``netdev_del``
++  Remove host network device.
++ERST
+ 
+     {
+         .name       = "object_add",
+@@ -1444,6 +1959,10 @@ STEXI
+ @findex object_add
+ Create QOM object.
+ ETEXI
++SRST
++``object_add``
++  Create QOM object.
++ERST
+ 
+     {
+         .name       = "object_del",
+@@ -1459,6 +1978,10 @@ STEXI
+ @findex object_del
+ Destroy QOM object.
+ ETEXI
++SRST
++``object_del``
++  Destroy QOM object.
++ERST
+ 
+ #ifdef CONFIG_SLIRP
+     {
+@@ -1474,6 +1997,10 @@ STEXI
+ @findex hostfwd_add
+ Redirect TCP or UDP connections from host to guest (requires -net user).
+ ETEXI
++SRST
++``hostfwd_add``
++  Redirect TCP or UDP connections from host to guest (requires -net user).
++ERST
+ 
+ #ifdef CONFIG_SLIRP
+     {
+@@ -1490,6 +2017,10 @@ STEXI
+ @findex hostfwd_remove
+ Remove host-to-guest TCP or UDP redirection.
+ ETEXI
++SRST
++``hostfwd_remove``
++  Remove host-to-guest TCP or UDP redirection.
++ERST
+ 
+     {
+         .name       = "balloon",
+@@ -1504,6 +2035,10 @@ STEXI
+ @findex balloon
+ Request VM to change its memory allocation to @var{value} (in MB).
+ ETEXI
++SRST
++``balloon`` *value*
++  Request VM to change its memory allocation to *value* (in MB).
++ERST
+ 
+     {
+         .name       = "set_link",
+@@ -1519,6 +2054,10 @@ STEXI
+ @findex set_link
+ Switch link @var{name} on (i.e. up) or off (i.e. down).
+ ETEXI
++SRST
++``set_link`` *name* ``[on|off]``
++  Switch link *name* on (i.e. up) or off (i.e. down).
++ERST
+ 
+     {
+         .name       = "watchdog_action",
+@@ -1534,6 +2073,10 @@ STEXI
+ @findex watchdog_action
+ Change watchdog action.
+ ETEXI
++SRST
++``watchdog_action``
++  Change watchdog action.
++ERST
+ 
+     {
+         .name       = "acl_show",
+@@ -1551,6 +2094,13 @@ policy. There are currently two named access control lists,
+ @var{vnc.x509dname} and @var{vnc.username} matching on the x509 client
+ certificate distinguished name, and SASL username respectively.
+ ETEXI
++SRST
++``acl_show`` *aclname*
++  List all the matching rules in the access control list, and the default
++  policy. There are currently two named access control lists,
++  *vnc.x509dname* and *vnc.username* matching on the x509 client
++  certificate distinguished name, and SASL username respectively.
++ERST
+ 
+     {
+         .name       = "acl_policy",
+@@ -1567,6 +2117,12 @@ Set the default access control list policy, used in the event that
+ none of the explicit rules match. The default policy at startup is
+ always @code{deny}.
+ ETEXI
++SRST
++``acl_policy`` *aclname* ``allow|deny``
++  Set the default access control list policy, used in the event that
++  none of the explicit rules match. The default policy at startup is
++  always ``deny``.
++ERST
+ 
+     {
+         .name       = "acl_add",
+@@ -1586,6 +2142,15 @@ allow all users in the @code{EXAMPLE.COM} kerberos realm. The match will
+ normally be appended to the end of the ACL, but can be inserted
+ earlier in the list if the optional @var{index} parameter is supplied.
+ ETEXI
++SRST
++``acl_add`` *aclname* *match* ``allow|deny`` [*index*]
++  Add a match rule to the access control list, allowing or denying access.
++  The match will normally be an exact username or x509 distinguished name,
++  but can optionally include wildcard globs. eg ``*@EXAMPLE.COM`` to
++  allow all users in the ``EXAMPLE.COM`` kerberos realm. The match will
++  normally be appended to the end of the ACL, but can be inserted
++  earlier in the list if the optional *index* parameter is supplied.
++ERST
+ 
+     {
+         .name       = "acl_remove",
+@@ -1600,6 +2165,10 @@ STEXI
+ @findex acl_remove
+ Remove the specified match rule from the access control list.
+ ETEXI
++SRST
++``acl_remove`` *aclname* *match*
++  Remove the specified match rule from the access control list.
++ERST
+ 
+     {
+         .name       = "acl_reset",
+@@ -1615,6 +2184,11 @@ STEXI
+ Remove all matches from the access control list, and set the default
+ policy back to @code{deny}.
+ ETEXI
++SRST
++``acl_reset`` *aclname*
++  Remove all matches from the access control list, and set the default
++  policy back to ``deny``.
++ERST
+ 
+     {
+         .name       = "nbd_server_start",
+@@ -1631,6 +2205,13 @@ option is included, all of the virtual machine's block devices that
+ have an inserted media on them are automatically exported; in this case,
+ the @option{-w} option makes the devices writable too.
+ ETEXI
++SRST
++``nbd_server_start`` *host*:*port*
++  Start an NBD server on the given host and/or port.  If the ``-a``
++  option is included, all of the virtual machine's block devices that
++  have an inserted media on them are automatically exported; in this case,
++  the ``-w`` option makes the devices writable too.
++ERST
+ 
+     {
+         .name       = "nbd_server_add",
+@@ -1647,6 +2228,13 @@ beforehand with @command{nbd_server_start}.  The @option{-w} option makes the
+ exported device writable too.  The export name is controlled by @var{name},
+ defaulting to @var{device}.
+ ETEXI
++SRST
++``nbd_server_add`` *device* [ *name* ]
++  Export a block device through QEMU's NBD server, which must be started
++  beforehand with ``nbd_server_start``.  The ``-w`` option makes the
++  exported device writable too.  The export name is controlled by *name*,
++  defaulting to *device*.
++ERST
+ 
+     {
+         .name       = "nbd_server_remove",
+@@ -1664,6 +2252,14 @@ option forces the server to drop the export immediately even if
+ clients are connected; otherwise the command fails unless there are no
+ clients.
+ ETEXI
++SRST
++``nbd_server_remove [-f]`` *name*
++  Stop exporting a block device through QEMU's NBD server, which was
++  previously started with ``nbd_server_add``.  The ``-f``
++  option forces the server to drop the export immediately even if
++  clients are connected; otherwise the command fails unless there are no
++  clients.
++ERST
+ 
+     {
+         .name       = "nbd_server_stop",
+@@ -1677,6 +2273,10 @@ STEXI
+ @findex nbd_server_stop
+ Stop the QEMU embedded NBD server.
+ ETEXI
++SRST
++``nbd_server_stop``
++  Stop the QEMU embedded NBD server.
++ERST
+ 
+ 
+ #if defined(TARGET_I386)
+@@ -1695,6 +2295,10 @@ STEXI
+ @findex mce (x86)
+ Inject an MCE on the given CPU (x86 only).
+ ETEXI
++SRST
++``mce`` *cpu* *bank* *status* *mcgstatus* *addr* *misc*
++  Inject an MCE on the given CPU (x86 only).
++ERST
+ 
+     {
+         .name       = "getfd",
+@@ -1711,6 +2315,12 @@ If a file descriptor is passed alongside this command using the SCM_RIGHTS
+ mechanism on unix sockets, it is stored using the name @var{fdname} for
+ later use by other monitor commands.
+ ETEXI
++SRST
++``getfd`` *fdname*
++  If a file descriptor is passed alongside this command using the SCM_RIGHTS
++  mechanism on unix sockets, it is stored using the name *fdname* for
++  later use by other monitor commands.
++ERST
+ 
+     {
+         .name       = "closefd",
+@@ -1727,6 +2337,12 @@ Close the file descriptor previously assigned to @var{fdname} using the
+ @code{getfd} command. This is only needed if the file descriptor was never
+ used by another monitor command.
+ ETEXI
++SRST
++``closefd`` *fdname*
++  Close the file descriptor previously assigned to *fdname* using the
++  ``getfd`` command. This is only needed if the file descriptor was never
++  used by another monitor command.
++ERST
+ 
+     {
+         .name       = "block_passwd",
+@@ -1743,6 +2359,12 @@ Set the encrypted device @var{device} password to @var{password}
+ 
+ This command is now obsolete and will always return an error since 2.10
+ ETEXI
++SRST
++``block_passwd`` *device* *password*
++  Set the encrypted device *device* password to *password*
++
++  This command is now obsolete and will always return an error since 2.10
++ERST
+ 
+     {
+         .name       = "block_set_io_throttle",
+@@ -1758,6 +2380,12 @@ STEXI
+ Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}.
+ @var{device} can be a block device name, a qdev ID or a QOM path.
+ ETEXI
++SRST
++``block_set_io_throttle`` *device* *bps* *bps_rd* *bps_wr* *iops* *iops_rd* *iops_wr*
++  Change I/O throttle limits for a block drive to
++  *bps* *bps_rd* *bps_wr* *iops* *iops_rd* *iops_wr*.
++  *device* can be a block device name, a qdev ID or a QOM path.
++ERST
+ 
+     {
+         .name       = "set_password",
+@@ -1777,6 +2405,15 @@ fail.  @var{disconnect} changes the password and disconnects the
+ client.  @var{keep} changes the password and keeps the connection up.
+ @var{keep} is the default.
+ ETEXI
++SRST
++``set_password [ vnc | spice ] password [ action-if-connected ]``
++  Change spice/vnc password.  Use zero to make the password stay valid
++  forever.  *action-if-connected* specifies what should happen in
++  case a connection is established: *fail* makes the password change
++  fail.  *disconnect* changes the password and disconnects the
++  client.  *keep* changes the password and keeps the connection up.
++  *keep* is the default.
++ERST
+ 
+     {
+         .name       = "expire_password",
+@@ -1808,6 +2445,22 @@ passed since 1970, i.e. unix epoch.
+ 
+ @end table
+ ETEXI
++SRST
++``expire_password [ vnc | spice ]`` *expire-time*
++  Specify when a password for spice/vnc becomes
++  invalid. *expire-time* accepts:
++
++  ``now``
++    Invalidate password instantly.
++  ``never``
++    Password stays valid forever.
++  ``+``\ *nsec*
++    Password stays valid for *nsec* seconds starting now.
++  *nsec*
++    Password is invalidated at the given time.  *nsec* are the seconds
++    passed since 1970, i.e. unix epoch.
++
++ERST
+ 
+     {
+         .name       = "chardev-add",
+@@ -1824,6 +2477,10 @@ STEXI
+ chardev-add accepts the same parameters as the -chardev command line switch.
+ 
+ ETEXI
++SRST
++``chardev-add`` *args*
++  chardev-add accepts the same parameters as the -chardev command line switch.
++ERST
+ 
+     {
+         .name       = "chardev-change",
+@@ -1840,6 +2497,11 @@ chardev-change accepts existing chardev @var{id} and then the same arguments
+ as the -chardev command line switch (except for "id").
+ 
+ ETEXI
++SRST
++``chardev-change`` *args*
++  chardev-change accepts existing chardev *id* and then the same arguments
++  as the -chardev command line switch (except for "id").
++ERST
+ 
+     {
+         .name       = "chardev-remove",
+@@ -1856,6 +2518,10 @@ STEXI
+ Removes the chardev @var{id}.
+ 
+ ETEXI
++SRST
++``chardev-remove`` *id*
++  Removes the chardev *id*.
++ERST
+ 
+     {
+         .name       = "chardev-send-break",
+@@ -1872,6 +2538,10 @@ STEXI
+ Send a break on the chardev @var{id}.
+ 
+ ETEXI
++SRST
++``chardev-send-break`` *id*
++  Send a break on the chardev *id*.
++ERST
+ 
+     {
+         .name       = "qemu-io",
+@@ -1889,6 +2559,10 @@ STEXI
+ Executes a qemu-io command on the given block device.
+ 
+ ETEXI
++SRST
++``qemu-io`` *device* *command*
++  Executes a qemu-io command on the given block device.
++ERST
+ 
+     {
+         .name       = "cpu-add",
+@@ -1905,6 +2579,12 @@ Add CPU with id @var{id}.  This command is deprecated, please
+ +use @code{device_add} instead. For details, refer to
+ 'docs/cpu-hotplug.rst'.
+ ETEXI
++SRST
++``cpu-add`` *id*
++  Add CPU with id *id*.  This command is deprecated, please
++  +use ``device_add`` instead. For details, refer to
++  'docs/cpu-hotplug.rst'.
++ERST
+ 
+     {
+         .name       = "qom-list",
+@@ -1919,6 +2599,10 @@ STEXI
+ @item qom-list [@var{path}]
+ Print QOM properties of object at location @var{path}
+ ETEXI
++SRST
++``qom-list`` [*path*]
++  Print QOM properties of object at location *path*
++ERST
+ 
+     {
+         .name       = "qom-set",
+@@ -1933,6 +2617,10 @@ STEXI
+ @item qom-set @var{path} @var{property} @var{value}
+ Set QOM property @var{property} of object at location @var{path} to value @var{value}
+ ETEXI
++SRST
++``qom-set`` *path* *property* *value*
++  Set QOM property *property* of object at location *path* to value *value*
++ERST
+ 
+     {
+         .name       = "info",
 -- 
 2.20.1
 
