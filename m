@@ -2,99 +2,101 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D861EC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4113C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0F2F246A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:37:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D3CE24691
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:41:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFBb4Hh5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F2F246A8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsCcw+j9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D3CE24691
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7d1k-0003gf-TZ
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:37:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60879)
+	id 1j7d5C-0005U4-Qz
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:41:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j7d0v-0002Fa-Vn
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:37:03 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j7d4T-0004fd-UT
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j7d0u-00010f-SC
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:37:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47717
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1j7d4S-000340-SR
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:40:41 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36864
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7d0u-00010S-OS
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:37:00 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7d4S-000336-Ol
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:40:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582886220;
+ s=mimecast20190719; t=1582886440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GPXnCKjG5yRGfukRRtYFa7a5EdQwWRhC2QlXB6jTSow=;
- b=LFBb4Hh5TiLiZKV2/SvySzFEDp6niyhGFoRt4aK9Lqq8y6C98LbPx+lRi9ZofNNCxlEsx9
- xQdzyEKYbZXCVFfXkqQe9J2eYeZ4pbYdNcV7m7MDaSjlfwsIz2k/E81rEYa8l8ucSEnWEX
- X2Sm0nESIRuO46X9QDJ37PaQLysqhTI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-wnJeDJFRMZKi7-LhxgQA2Q-1; Fri, 28 Feb 2020 05:36:58 -0500
-X-MC-Unique: wnJeDJFRMZKi7-LhxgQA2Q-1
-Received: by mail-wm1-f69.google.com with SMTP id w3so539596wmg.4
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:36:58 -0800 (PST)
+ bh=YjXZYgVMYS9HYhIynJ+DtQWdZtpQygbf+02zwFFdriI=;
+ b=OsCcw+j93vwtoK5PNLH/4RnSchXqWOyfQA5nvyrOMUDLBzMb042tOF5p9mIo7rHz1rrZGi
+ 72kcSPnX2sWE0wYRs8WGapdIPHiGIjF/pU6ClE34AmamQ0lZ0hfRFIkVM7aDkBDM+foWwg
+ hIhL4UissmdgrqHqLMxFSMOn7h95+Ig=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-OIXS2_DONZaHXIyPsNDUQA-1; Fri, 28 Feb 2020 05:40:35 -0500
+X-MC-Unique: OIXS2_DONZaHXIyPsNDUQA-1
+Received: by mail-wm1-f72.google.com with SMTP id d129so991165wmd.2
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:40:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=GPXnCKjG5yRGfukRRtYFa7a5EdQwWRhC2QlXB6jTSow=;
- b=DW7EW1DtAMoCeSPKk4/XWPjFhDW/sVoqI8WgyGoawDRlyt1veIDTevW5bIOoB5h+2w
- 5e45OWxFHhAcvuXWHpRs7YNSpzGqAd1tSB/R+i6g/eErGsJ3Oe5QCbjrHUO4oF0H+yM8
- lphsYk+Uu/dApHCffQAiDHkdGf2WQYY8LLYwu0YrkR9PRIuLaTg3C4oX77VEOue44Yhx
- 8bvm0L3JzL2LcQGTJaIDFFbDWCE4wLxduNO7lyJmxnyUMa54JwmIn79lbGyuu7KHuAeW
- P5UGx2rXGkTceTztJGYZevd0I5fXhDMmBAqmZbU/PHlbR/qTlg3RXy0hd9uobotvsZD1
- fD+A==
-X-Gm-Message-State: APjAAAX7a+CasaIEJH6Pfy2VWvc252MfZNDYM9KZIKp9WVYa3VLwM94T
- E+OLR9e+FwJ3XKpYUXamiQwWhKIdhL9aQ3zU0YFeCDbmTuSSfaGFCQaRqnd59oaInTkRcQ3+pQO
- gA9vEQA2JgORc2B4=
-X-Received: by 2002:adf:c54e:: with SMTP id s14mr4052857wrf.385.1582886217832; 
- Fri, 28 Feb 2020 02:36:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxIXSfEABddIXqeoBMaZDoEDz0aU8DYZ1EXJET4epnQNZsOIgXagwfgmZjyXG1gIPo+BGaBcg==
-X-Received: by 2002:adf:c54e:: with SMTP id s14mr4052838wrf.385.1582886217594; 
- Fri, 28 Feb 2020 02:36:57 -0800 (PST)
+ bh=heyyN7weG3TiKSqFTiBsmETw+4JQx1i7XhKY4p5O9nc=;
+ b=h2cEbGA6ER3i4aqq5MGxryvfti6pwoEmdyLX4ddysoHFx7mLdBcTxLP3mxH3GUvRP0
+ cGyeOwDUGq4pmvd/dn0va4AvrNQpZMWqhwDnERzth2xSbK6fBI1d5A04Q4JvgtRyPogQ
+ FEbGdCGpu9a77gpeR/a6v0qth41YAPzs6Qo9BjccOZPZYPzkR0b8oILVH6DEzZdNLHrX
+ /D/Kj8Z1+z7J/+BlTyzY224SgfeBwiEk2kA7znGrlmbdf9O6fl3fxgX+VbeyvoIcS1I6
+ xdm0q/0bbLXsZ9Z/8Mj0Ryq2z+/vhlTQHVNgxWofFTwIU601YRLtB2Dkq9u6xlWtOoTk
+ UgcQ==
+X-Gm-Message-State: APjAAAVR2w7VZc0xNrjcIy39oPPbJ6Vb9VEPK9gOOWBUc2/d0uLPIPVy
+ T7J1LT5JfEzwRyQTvDaYGRp9Rh9wX9R8N8CjHjIOWwhK1yFkJCbRxxBvCfRV2n5WN5VE/BQGlp4
+ q1ZanevevOp9Oam0=
+X-Received: by 2002:a5d:494c:: with SMTP id r12mr4032637wrs.50.1582886434069; 
+ Fri, 28 Feb 2020 02:40:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwcg138t5RVp7omIEz+5Xw0Iqho0rWsIess+bRxzm91Tw9rUl/8JBfEiChp+RXw9FdaS4UlwA==
+X-Received: by 2002:a5d:494c:: with SMTP id r12mr4032611wrs.50.1582886433781; 
+ Fri, 28 Feb 2020 02:40:33 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f?
  ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
- by smtp.gmail.com with ESMTPSA id b14sm1241888wrn.75.2020.02.28.02.36.56
+ by smtp.gmail.com with ESMTPSA id t187sm1677423wmt.25.2020.02.28.02.40.32
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Feb 2020 02:36:57 -0800 (PST)
-Subject: Re: [PATCH 0/5] vfio/pci: Fix up breakage against split irqchip and
- INTx
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200226225048.216508-1-peterx@redhat.com>
+ Fri, 28 Feb 2020 02:40:33 -0800 (PST)
+Subject: Re: [PATCH v2] hw/i386/intel_iommu: Simplify
+ vtd_find_as_from_bus_num() logic
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200226201030.22583-1-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cf2fab93-d1bc-8a4c-3a26-f14f12bdc07d@redhat.com>
-Date: Fri, 28 Feb 2020 11:36:55 +0100
+Message-ID: <ba1d3a0b-f1ae-21d2-45e9-a3c1fae650df@redhat.com>
+Date: Fri, 28 Feb 2020 11:40:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200226225048.216508-1-peterx@redhat.com>
+In-Reply-To: <20200226201030.22583-1-philmd@redhat.com>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,45 +108,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: Liu Yi L <yi.l.liu@intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-trivial@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/02/20 23:50, Peter Xu wrote:
-> VFIO INTx is not working with split irqchip.  On new kernels KVM_IRQFD
-> will directly fail with resamplefd attached so QEMU will automatically
-> fallback to the INTx slow path.  However on old kernels it's still
-> broken.
-> 
-> Only until recently I noticed that this could also break PXE boot for
-> assigned NICs [1].  My wild guess is that the PXE ROM will be mostly
-> using INTx as well, which means we can't bypass that even if we
-> enables MSI for the guest kernel.
-> 
-> This series tries to first fix this issue function-wise, then speed up
-> for the INTx again with resamplefd (mostly following the ideas
-> proposed by Paolo one year ago [2]).  My TCP_RR test shows that:
-> 
->   - Before this series: this is broken, no number to show
-> 
->   - After patch 1 (enable slow path): get 63% perf comparing to full
->     kernel irqchip
+On 26/02/20 21:10, Philippe Mathieu-Daud=C3=A9 wrote:
+> The vtd_find_as_from_bus_num() function was introduced (in commit
+> dbaabb25f) in a code format that could return an incorrect pointer,
+> which was later fixed by commit a2e1cd41ccf.
+> We could have avoid this by writing the if() statement differently.
+> Do it now, in case this function is re-used. The code is easier to
+> review (harder to miss bugs).
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Since v2: Re-worded commit description, patch sent without -w.
+>=20
+> This patch is easier to review with 'git-diff -w' (--ignore-all-space):
+>=20
+> @@ -987,14 +987,17 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, =
+uint32_t level)
+>  static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_=
+num)
+>  {
+>      VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
+> -    if (!vtd_bus) {
+> +    GHashTableIter iter;
+> +
+> +    if (vtd_bus) {
+> +        return vtd_bus;
+> +    }
+> +
+>      /*
+>       * Iterate over the registered buses to find the one which
+>       * currently hold this bus number, and update the bus_num
+>       * lookup table:
+>       */
+> -        GHashTableIter iter;
+> -
+>      g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+>      while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
+>          if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> @@ -1002,9 +1005,8 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUS=
+tate *s, uint8_t bus_num)
+>              return vtd_bus;
+>          }
+>      }
+> -        vtd_bus =3D NULL;
+> -    }
+> -    return vtd_bus;
+> +
+> +    return NULL;
+>  }
+> ---
+>  hw/i386/intel_iommu.c | 34 ++++++++++++++++++----------------
+>  1 file changed, 18 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 6258c58ac9..e720a8939c 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -987,24 +987,26 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, =
+uint32_t level)
+>  static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_=
+num)
+>  {
+>      VTDBus *vtd_bus =3D s->vtd_as_by_bus_num[bus_num];
+> -    if (!vtd_bus) {
+> -        /*
+> -         * Iterate over the registered buses to find the one which
+> -         * currently hold this bus number, and update the bus_num
+> -         * lookup table:
+> -         */
+> -        GHashTableIter iter;
+> +    GHashTableIter iter;
+> =20
+> -        g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> -        while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
+> -            if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> -                s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> -                return vtd_bus;
+> -            }
+> -        }
+> -        vtd_bus =3D NULL;
+> +    if (vtd_bus) {
+> +        return vtd_bus;
+>      }
+> -    return vtd_bus;
+> +
+> +    /*
+> +     * Iterate over the registered buses to find the one which
+> +     * currently hold this bus number, and update the bus_num
+> +     * lookup table:
+> +     */
+> +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> +    while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
+> +        if (pci_bus_num(vtd_bus->bus) =3D=3D bus_num) {
+> +            s->vtd_as_by_bus_num[bus_num] =3D vtd_bus;
+> +            return vtd_bus;
+> +        }
+> +    }
+> +
+> +    return NULL;
+>  }
+> =20
+>  /* Given the @iova, get relevant @slptep. @slpte_level will be the last =
+level
+>=20
 
-Oh, I thought something like patch 1 had already been applied.
-
-One comment: because you're bypassing IOAPIC when raising the irq, the
-IOAPIC's remote_irr for example will not be set.  Most OSes probably
-don't care, but it's at least worth a comment.
+Queued, thanks.
 
 Paolo
-
->   - After whole series (enable fast path partly, irq injection will be
->     the same as fast path, however userspace needs to intercept for
->     EOI broadcast to resamplefd, though should still be faster than
->     the MMIO trick for intx eoi): get 93% perf comparing to full
->     kernel irqchip, which is a 46% performance boost
 
 
