@@ -2,86 +2,86 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AF7C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1ECC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:43:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A5D12469D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:42:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B19DB2469D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mOwx7m6T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5D12469D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tbgMcmQ5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B19DB2469D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7hmy-00041Z-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:42:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46882)
+	id 1j7hn4-0004Kf-RK
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:43:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hh6-0000zP-Dd
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:55 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hh2-0000ts-D6
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hh2-0004xC-Vx
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:52 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39743)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hh1-0004vy-7v
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:48 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40578)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7hh2-0004wY-LT
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:48 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id y17so3434273wrn.6
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:36:48 -0800 (PST)
+ id 1j7hh1-0004tw-0W
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:47 -0500
+Received: by mail-wr1-x435.google.com with SMTP id r17so3419902wrj.7
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:36:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=z3C2gVUXa0TRMaDINOw4N8/0RWYLpNqFjlSdp1pgt/g=;
- b=mOwx7m6TUIGsRMLCIwzLnBbHDzcDU5/mPlhBuU0bbIynE2jiQmLs19U38FnvsaremX
- 2qNURyCsD840PhVpX9lD+AyOUcU1iDlLJKdyNplIq8rmA70yl8RZWU2JBsi3mkTCBZc+
- C/7IRdecTp7mWfn5o0VlkvyQK+xJCdmKdI9Vtm3Qdm/7CYVaGmjz1t6D58CRIUsoQiFS
- Y4sXOQhw9R6hlip3XcQHkjFOzxgVPcENBOSwag9lGMJo0eU6a+wq8GOOKfdqsWLDhXC7
- xGCOOj1r81nmvqZY1NmzJTNazWDeLxukot2jOJ+FRs4p5W/S7FkqEkKuX/uzW+h+pW8J
- VwKQ==
+ bh=2CrKzOLXegxkCSm3B7uStBknOAUSCC2J5ztyfqF/dF8=;
+ b=tbgMcmQ5o1b7NV7NmTDfwXLN1wh1m4VKuLKv2MSwn5EZwr2I3oEVHm7Scy2xf3Rdh/
+ 0iFrEO4lCoawo0cWTWVHNnoEJWCBc60A1Yks6wMsKCJl+ps+Daw9Q72nN2WGIzov7S0X
+ 5uuP3Kas2W3e10BGq+nbI2VABqeyKzOejouJtlsCiXQ8TwO1raSwhifHteIBD1BtPDen
+ GCyM+EVX0g1G7eElZxCFqe+wktGrkxIGE5v78kisIFZdTuPJTOrXBkKD0GsCmTN2XCK2
+ 9WKJa06s9mz0gEZhO9CYH5eQBK3ifJFIFGBDqp/os6r0hiHLzx9QsDiJMmWUrk0OT3/l
+ MYRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=z3C2gVUXa0TRMaDINOw4N8/0RWYLpNqFjlSdp1pgt/g=;
- b=kWKcUpiNZQrzUeKyD1G5nemH+2PrFMlLEpZtjcKXPlpchEIk5PUSx/6ugTNlXiq6ef
- daMGFLEOsrfyKXiD+IXjk0Fx8+RCJcsIRuFvSxVC1JjtEAEno1N62i7x95PDpOinQvYa
- ylgycmmewAZ44yxw1kKo4YFxKAuPlIemXY9v06pzc69i9eRaom+I5XMFmuAyACj+Vc/3
- mxhJYhtwNtAHt2nNU5JEE/82SucqZgG8Mlq44DHNw3Z6NXm+b0yOwfrVvWKWr17zc/Gf
- YBb/EsLrKpVW46awlLCeZotRywFTreaJ7xOKUTJgAA5uQUbbmFNJwF3Mg7hW8qRFS0C4
- bcjw==
-X-Gm-Message-State: APjAAAXaQRxyBkWb771SLrEhFdtCit4uiHUn40vrdYYLjiV9wcl4A2Xc
- OGZi5KkKVLGpMGEKLZpnoPbuYeR58lToRg==
-X-Google-Smtp-Source: APXvYqwWL/zgbHGQ9MlsconsKHuUUnHLSzcgo8vWSq7ypkBMBLwuIgD39QtQKpan/TtCDTVs8AlFhA==
-X-Received: by 2002:adf:a18b:: with SMTP id u11mr5529160wru.148.1582904206600; 
- Fri, 28 Feb 2020 07:36:46 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.36.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=2CrKzOLXegxkCSm3B7uStBknOAUSCC2J5ztyfqF/dF8=;
+ b=DWamWupkgaZMDatNOi2kPB3MDcdhNDQI3UAijvo0pV8Jv112dHsOGJMP/hvzAD98lB
+ qcum54EPrLifKPnMbw1l8/ppqvojIxomoLvNv2qJBLqIBdbjl3zyEvTH2YA/EJnjPQ2V
+ zkgXOhk3VXnnYyX7XDGWuvK+FOK0IIpJ3ZF68W+sgG0LjJ9ELvcLC6flmi0StoVy4nmh
+ +MeQCi9BLAsorxZrvefLkfL3pB9w3HbhHPLEYRN3lZs8mMYI+56ASDsxI5xIVF/llNhv
+ iersOT7JYAXG7NuptZn413lzdp6IT3VZgLXbU2WXF8MpB9kJh4FCD5s0AQbzdPMq/rWL
+ +Eng==
+X-Gm-Message-State: APjAAAWQ3lF/v8S2IoQK8WAcBOic5WUIRk7Jvn7+W3j06wnY4wg5fXvY
+ N9pFOKjqnQHfpdwEGX2AV8W6i8au4RTZGQ==
+X-Google-Smtp-Source: APXvYqxp1Ne6wRf/vUsm3GWCIkUzvHE7n6uQ6RBp/YlFPrnANVim6iySnbXqLLhbIzlBUxE8R+Z07w==
+X-Received: by 2002:a5d:4d04:: with SMTP id z4mr5808736wrt.157.1582904205041; 
  Fri, 28 Feb 2020 07:36:45 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.36.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 07:36:44 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 15/33] docs/system: Convert qemu-cpu-models.texi to rST
-Date: Fri, 28 Feb 2020 15:36:01 +0000
-Message-Id: <20200228153619.9906-16-peter.maydell@linaro.org>
+Subject: [PATCH v3 14/33] docs: Create defs.rst.inc as a place to define
+ substitutions
+Date: Fri, 28 Feb 2020 15:36:00 +0000
+Message-Id: <20200228153619.9906-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228153619.9906-1-peter.maydell@linaro.org>
 References: <20200228153619.9906-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,686 +99,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kashyap Chamarthy <kchamart@redhat.com>
+Rather than accumulating generally useful rST substitution
+definitions in individual rST files, create a defs.rst.inc where we
+can define these.  To start with it has the |qemu_system| definition
+from qemu-block-drivers.rst.
 
-This doc was originally written by Daniel P. Berrangé
-<berrange@redhat.com>, introduced via commit[1]: 2544e9e4aa (docs: add
-guidance on configuring CPU models for x86, 2018-06-27).
+Add a comment noting a pitfall where putting literal markup in the
+definition of |qemu_system| makes it misrender manpage output; this
+means the point-of-use must handle the literal markup (which is
+almost always done by having it inside a parsed-literal block).
 
-In this patch:
-
-  - 1-1 conversion of Texinfo to rST, besides a couple of minor
-    tweaks that are too trivial to mention.   (Thanks to Stephen
-    Finucane on IRC for the suggestion to use rST "definition lists"
-    instead of bullets in some places.)
-
-    Further modifications will be done via a separate patch.
-
-  - rST and related infra changes: manual page generation, Makefile
-    fixes, clean up references to qemu-cpu-models.texi, update year in
-    the copyright notice, etc.
-
-[1] https://git.qemu.org/?p=qemu.git;a=commit;h=2544e9e4aa
-
-As part of the conversion, we use a more generic 'author' attribution
-for the manpage than we previously had, as agreed with the original
-author Dan Berrange.
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20200226113034.6741-15-pbonzini@redhat.com
-[Move macros to defs.rst.inc, split in x86 and MIPS parts,
- make qemu-cpu-models.rst a standalone document. - Paolo]
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[PMM: Move defs.rst.inc setup to its own commit;
- fix minor issues with MAINTAINERS file updates;
- drop copyright date change; keep capitalization of
- "QEMU Project developers" consistent with other uses;
- minor Makefile fixups]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Makefile                            |   8 +-
- MAINTAINERS                         |   2 +
- docs/system/conf.py                 |   6 +-
- docs/system/cpu-models-mips.rst.inc | 105 ++++++++
- docs/system/cpu-models-x86.rst.inc  | 365 ++++++++++++++++++++++++++++
- docs/system/qemu-cpu-models.rst     |  20 ++
- docs/system/qemu-cpu-models.texi    |  28 ---
- 7 files changed, 500 insertions(+), 34 deletions(-)
- create mode 100644 docs/system/cpu-models-mips.rst.inc
- create mode 100644 docs/system/cpu-models-x86.rst.inc
- create mode 100644 docs/system/qemu-cpu-models.rst
- delete mode 100644 docs/system/qemu-cpu-models.texi
+ Makefile                           |  1 +
+ docs/conf.py                       |  6 ++++++
+ docs/defs.rst.inc                  | 11 +++++++++++
+ docs/system/qemu-block-drivers.rst |  2 --
+ 4 files changed, 18 insertions(+), 2 deletions(-)
+ create mode 100644 docs/defs.rst.inc
 
 diff --git a/Makefile b/Makefile
-index 26bbd334438..f8642cd28a1 100644
+index 7e60a435426..26bbd334438 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -354,7 +354,7 @@ endif
- DOCS+=$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
--DOCS+=docs/system/qemu-cpu-models.7
-+DOCS+=$(MANUAL_BUILDDIR)/system/qemu-cpu-models.7
- DOCS+=$(MANUAL_BUILDDIR)/index.html
- ifdef CONFIG_VIRTFS
- DOCS+=$(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1
-@@ -780,7 +780,6 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
--	rm -f docs/system/qemu-cpu-models.7
- 	rm -rf .doctrees
- 	$(call clean-manual,devel)
- 	$(call clean-manual,interop)
-@@ -861,7 +860,7 @@ ifdef CONFIG_POSIX
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
--	$(INSTALL_DATA) docs/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
-+	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
- ifeq ($(CONFIG_TOOLS),y)
- 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-img.1 "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
-@@ -1083,7 +1082,7 @@ $(MANUAL_BUILDDIR)/user/index.html: $(call manual-deps,user)
+@@ -1052,6 +1052,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
+ build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(if $(V),,-q) -W -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+ # We assume all RST files in the manual's directory are used in it
+ manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) \
++              $(SRC_PATH)/docs/defs.rst.inc \
+               $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
+ # Macro to write out the rule and dependencies for building manpages
+ # Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,extradeps])
+diff --git a/docs/conf.py b/docs/conf.py
+index 7588bf192ee..960043cb860 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -132,6 +132,12 @@ suppress_warnings = ["ref.option"]
+ # style document building; our Makefile always sets the variable.
+ confdir = os.getenv('CONFDIR', "/etc/qemu")
+ rst_epilog = ".. |CONFDIR| replace:: ``" + confdir + "``\n"
++# We slurp in the defs.rst.inc and literally include it into rst_epilog,
++# because Sphinx's include:: directive doesn't work with absolute paths
++# and there isn't any one single relative path that will work for all
++# documents and for both via-make and direct sphinx-build invocation.
++with open(os.path.join(qemu_docdir, 'defs.rst.inc')) as f:
++    rst_epilog += f.read()
  
- $(call define-manpage-rule,interop,qemu-ga.8)
+ # -- Options for HTML output ----------------------------------------------
  
--$(call define-manpage-rule,system,qemu-block-drivers.7)
-+$(call define-manpage-rule,system,qemu-block-drivers.7 qemu-cpu-models.7)
- 
- $(call define-manpage-rule,tools,\
-        qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
-@@ -1112,7 +1111,6 @@ docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/qga-qapi-doc.texi
- 
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-info.texi
- qemu.1: docs/system/qemu-option-trace.texi
--docs/system/qemu-cpu-models.7: docs/system/qemu-cpu-models.texi docs/system/cpu-models-x86.texi docs/system/cpu-models-mips.texi
- 
- html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
- info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 74b025fb806..1712eb90851 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -216,6 +216,7 @@ F: target/mips/
- F: default-configs/*mips*
- F: disas/*mips*
- F: docs/system/cpu-models-mips.texi
-+F: docs/system/cpu-models-mips.rst.inc
- F: hw/intc/mips_gic.c
- F: hw/mips/
- F: hw/misc/mips_*
-@@ -321,6 +322,7 @@ F: tests/tcg/x86_64/
- F: hw/i386/
- F: disas/i386.c
- F: docs/system/cpu-models-x86.texi
-+F: docs/system/cpu-models-x86.rst.inc
- T: git https://github.com/ehabkost/qemu.git x86-next
- 
- Xtensa TCG CPUs
-diff --git a/docs/system/conf.py b/docs/system/conf.py
-index 7ca115f5e03..23cab3fb364 100644
---- a/docs/system/conf.py
-+++ b/docs/system/conf.py
-@@ -13,10 +13,14 @@ exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
- # This slightly misuses the 'description', but is the best way to get
- # the manual title to appear in the sidebar.
- html_theme_options['description'] = u'System Emulation User''s Guide'
-+
- # One entry per manual page. List of tuples
- # (source start file, name, description, authors, manual section).
- man_pages = [
-     ('qemu-block-drivers', 'qemu-block-drivers',
-      u'QEMU block drivers reference',
--     ['Fabrice Bellard and the QEMU Project developers'], 7)
-+     ['Fabrice Bellard and the QEMU Project developers'], 7),
-+    ('qemu-cpu-models', 'qemu-cpu-models',
-+     u'QEMU CPU Models',
-+     ['The QEMU Project developers'], 7)
- ]
-diff --git a/docs/system/cpu-models-mips.rst.inc b/docs/system/cpu-models-mips.rst.inc
+diff --git a/docs/defs.rst.inc b/docs/defs.rst.inc
 new file mode 100644
-index 00000000000..499b5b6fedb
+index 00000000000..ae80d2f35d8
 --- /dev/null
-+++ b/docs/system/cpu-models-mips.rst.inc
-@@ -0,0 +1,105 @@
-+Supported CPU model configurations on MIPS hosts
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+QEMU supports variety of MIPS CPU models:
-+
-+Supported CPU models for MIPS32 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are supported for use on MIPS32 hosts.
-+Administrators / applications are recommended to use the CPU model that
-+matches the generation of the host CPUs in use. In a deployment with a
-+mixture of host CPU models between machines, if live migration
-+compatibility is required, use the newest CPU model that is compatible
-+across all desired hosts.
-+
-+``mips32r6-generic``
-+    MIPS32 Processor (Release 6, 2015)
-+
-+``P5600``
-+    MIPS32 Processor (P5600, 2014)
-+
-+``M14K``, ``M14Kc``
-+    MIPS32 Processor (M14K, 2009)
-+
-+``74Kf``
-+    MIPS32 Processor (74K, 2007)
-+
-+``34Kf``
-+    MIPS32 Processor (34K, 2006)
-+
-+``24Kc``, ``24KEc``, ``24Kf``
-+    MIPS32 Processor (24K, 2003)
-+
-+``4Kc``, ``4Km``, ``4KEcR1``, ``4KEmR1``, ``4KEc``, ``4KEm``
-+    MIPS32 Processor (4K, 1999)
-+
-+
-+Supported CPU models for MIPS64 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are supported for use on MIPS64 hosts.
-+Administrators / applications are recommended to use the CPU model that
-+matches the generation of the host CPUs in use. In a deployment with a
-+mixture of host CPU models between machines, if live migration
-+compatibility is required, use the newest CPU model that is compatible
-+across all desired hosts.
-+
-+``I6400``
-+    MIPS64 Processor (Release 6, 2014)
-+
-+``Loongson-2F``
-+    MIPS64 Processor (Loongson 2, 2008)
-+
-+``Loongson-2E``
-+    MIPS64 Processor (Loongson 2, 2006)
-+
-+``mips64dspr2``
-+    MIPS64 Processor (Release 2, 2006)
-+
-+``MIPS64R2-generic``, ``5KEc``, ``5KEf``
-+    MIPS64 Processor (Release 2, 2002)
-+
-+``20Kc``
-+    MIPS64 Processor (20K, 2000
-+
-+``5Kc``, ``5Kf``
-+    MIPS64 Processor (5K, 1999)
-+
-+``VR5432``
-+    MIPS64 Processor (VR, 1998)
-+
-+``R4000``
-+    MIPS64 Processor (MIPS III, 1991)
-+
-+
-+Supported CPU models for nanoMIPS hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are supported for use on nanoMIPS hosts.
-+Administrators / applications are recommended to use the CPU model that
-+matches the generation of the host CPUs in use. In a deployment with a
-+mixture of host CPU models between machines, if live migration
-+compatibility is required, use the newest CPU model that is compatible
-+across all desired hosts.
-+
-+``I7200``
-+    MIPS I7200 (nanoMIPS, 2018)
-+
-+Preferred CPU models for MIPS hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are preferred for use on different MIPS hosts:
-+
-+``MIPS III``
-+    R4000
-+
-+``MIPS32R2``
-+    34Kf
-+
-+``MIPS64R6``
-+    I6400
-+
-+``nanoMIPS``
-+    I7200
-+
-diff --git a/docs/system/cpu-models-x86.rst.inc b/docs/system/cpu-models-x86.rst.inc
-new file mode 100644
-index 00000000000..cbad930c700
---- /dev/null
-+++ b/docs/system/cpu-models-x86.rst.inc
-@@ -0,0 +1,365 @@
-+Recommendations for KVM CPU model configuration on x86 hosts
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The information that follows provides recommendations for configuring
-+CPU models on x86 hosts. The goals are to maximise performance, while
-+protecting guest OS against various CPU hardware flaws, and optionally
-+enabling live migration between hosts with heterogeneous CPU models.
-+
-+
-+Two ways to configure CPU models with QEMU / KVM
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+(1) **Host passthrough**
-+
-+    This passes the host CPU model features, model, stepping, exactly to
-+    the guest. Note that KVM may filter out some host CPU model features
-+    if they cannot be supported with virtualization. Live migration is
-+    unsafe when this mode is used as libvirt / QEMU cannot guarantee a
-+    stable CPU is exposed to the guest across hosts. This is the
-+    recommended CPU to use, provided live migration is not required.
-+
-+(2) **Named model**
-+
-+    QEMU comes with a number of predefined named CPU models, that
-+    typically refer to specific generations of hardware released by
-+    Intel and AMD.  These allow the guest VMs to have a degree of
-+    isolation from the host CPU, allowing greater flexibility in live
-+    migrating between hosts with differing hardware.  @end table
-+
-+In both cases, it is possible to optionally add or remove individual CPU
-+features, to alter what is presented to the guest by default.
-+
-+Libvirt supports a third way to configure CPU models known as "Host
-+model".  This uses the QEMU "Named model" feature, automatically picking
-+a CPU model that is similar the host CPU, and then adding extra features
-+to approximate the host model as closely as possible. This does not
-+guarantee the CPU family, stepping, etc will precisely match the host
-+CPU, as they would with "Host passthrough", but gives much of the
-+benefit of passthrough, while making live migration safe.
-+
-+
-+Preferred CPU models for Intel x86 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are preferred for use on Intel hosts.
-+Administrators / applications are recommended to use the CPU model that
-+matches the generation of the host CPUs in use. In a deployment with a
-+mixture of host CPU models between machines, if live migration
-+compatibility is required, use the newest CPU model that is compatible
-+across all desired hosts.
-+
-+``Skylake-Server``, ``Skylake-Server-IBRS``
-+    Intel Xeon Processor (Skylake, 2016)
-+
-+``Skylake-Client``, ``Skylake-Client-IBRS``
-+    Intel Core Processor (Skylake, 2015)
-+
-+``Broadwell``, ``Broadwell-IBRS``, ``Broadwell-noTSX``, ``Broadwell-noTSX-IBRS``
-+    Intel Core Processor (Broadwell, 2014)
-+
-+``Haswell``, ``Haswell-IBRS``, ``Haswell-noTSX``, ``Haswell-noTSX-IBRS``
-+    Intel Core Processor (Haswell, 2013)
-+
-+``IvyBridge``, ``IvyBridge-IBR``
-+    Intel Xeon E3-12xx v2 (Ivy Bridge, 2012)
-+
-+``SandyBridge``, ``SandyBridge-IBRS``
-+    Intel Xeon E312xx (Sandy Bridge, 2011)
-+
-+``Westmere``, ``Westmere-IBRS``
-+    Westmere E56xx/L56xx/X56xx (Nehalem-C, 2010)
-+
-+``Nehalem``, ``Nehalem-IBRS``
-+    Intel Core i7 9xx (Nehalem Class Core i7, 2008)
-+
-+``Penryn``
-+    Intel Core 2 Duo P9xxx (Penryn Class Core 2, 2007)
-+
-+``Conroe``
-+    Intel Celeron_4x0 (Conroe/Merom Class Core 2, 2006)
-+
-+
-+Important CPU features for Intel x86 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following are important CPU features that should be used on Intel
-+x86 hosts, when available in the host CPU. Some of them require explicit
-+configuration to enable, as they are not included by default in some, or
-+all, of the named CPU models listed above. In general all of these
-+features are included if using "Host passthrough" or "Host model".
-+
-+``pcid``
-+  Recommended to mitigate the cost of the Meltdown (CVE-2017-5754) fix.
-+
-+  Included by default in Haswell, Broadwell & Skylake Intel CPU models.
-+
-+  Should be explicitly turned on for Westmere, SandyBridge, and
-+  IvyBridge Intel CPU models. Note that some desktop/mobile Westmere
-+  CPUs cannot support this feature.
-+
-+``spec-ctrl``
-+  Required to enable the Spectre v2 (CVE-2017-5715) fix.
-+
-+  Included by default in Intel CPU models with -IBRS suffix.
-+
-+  Must be explicitly turned on for Intel CPU models without -IBRS
-+  suffix.
-+
-+  Requires the host CPU microcode to support this feature before it
-+  can be used for guest CPUs.
-+
-+``stibp``
-+  Required to enable stronger Spectre v2 (CVE-2017-5715) fixes in some
-+  operating systems.
-+
-+  Must be explicitly turned on for all Intel CPU models.
-+
-+  Requires the host CPU microcode to support this feature before it can
-+  be used for guest CPUs.
-+
-+``ssbd``
-+  Required to enable the CVE-2018-3639 fix.
-+
-+  Not included by default in any Intel CPU model.
-+
-+  Must be explicitly turned on for all Intel CPU models.
-+
-+  Requires the host CPU microcode to support this feature before it
-+  can be used for guest CPUs.
-+
-+``pdpe1gb``
-+  Recommended to allow guest OS to use 1GB size pages.
-+
-+  Not included by default in any Intel CPU model.
-+
-+  Should be explicitly turned on for all Intel CPU models.
-+
-+  Note that not all CPU hardware will support this feature.
-+
-+``md-clear``
-+  Required to confirm the MDS (CVE-2018-12126, CVE-2018-12127,
-+  CVE-2018-12130, CVE-2019-11091) fixes.
-+
-+  Not included by default in any Intel CPU model.
-+
-+  Must be explicitly turned on for all Intel CPU models.
-+
-+  Requires the host CPU microcode to support this feature before it
-+  can be used for guest CPUs.
-+
-+
-+Preferred CPU models for AMD x86 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPU models are preferred for use on Intel hosts.
-+Administrators / applications are recommended to use the CPU model that
-+matches the generation of the host CPUs in use. In a deployment with a
-+mixture of host CPU models between machines, if live migration
-+compatibility is required, use the newest CPU model that is compatible
-+across all desired hosts.
-+
-+``EPYC``, ``EPYC-IBPB``
-+    AMD EPYC Processor (2017)
-+
-+``Opteron_G5``
-+    AMD Opteron 63xx class CPU (2012)
-+
-+``Opteron_G4``
-+    AMD Opteron 62xx class CPU (2011)
-+
-+``Opteron_G3``
-+    AMD Opteron 23xx (Gen 3 Class Opteron, 2009)
-+
-+``Opteron_G2``
-+    AMD Opteron 22xx (Gen 2 Class Opteron, 2006)
-+
-+``Opteron_G1``
-+    AMD Opteron 240 (Gen 1 Class Opteron, 2004)
-+
-+
-+Important CPU features for AMD x86 hosts
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following are important CPU features that should be used on AMD x86
-+hosts, when available in the host CPU. Some of them require explicit
-+configuration to enable, as they are not included by default in some, or
-+all, of the named CPU models listed above. In general all of these
-+features are included if using "Host passthrough" or "Host model".
-+
-+``ibpb``
-+  Required to enable the Spectre v2 (CVE-2017-5715) fix.
-+
-+  Included by default in AMD CPU models with -IBPB suffix.
-+
-+  Must be explicitly turned on for AMD CPU models without -IBPB suffix.
-+
-+  Requires the host CPU microcode to support this feature before it
-+  can be used for guest CPUs.
-+
-+``stibp``
-+  Required to enable stronger Spectre v2 (CVE-2017-5715) fixes in some
-+  operating systems.
-+
-+  Must be explicitly turned on for all AMD CPU models.
-+
-+  Requires the host CPU microcode to support this feature before it
-+  can be used for guest CPUs.
-+
-+``virt-ssbd``
-+  Required to enable the CVE-2018-3639 fix
-+
-+  Not included by default in any AMD CPU model.
-+
-+  Must be explicitly turned on for all AMD CPU models.
-+
-+  This should be provided to guests, even if amd-ssbd is also provided,
-+  for maximum guest compatibility.
-+
-+  Note for some QEMU / libvirt versions, this must be force enabled when
-+  when using "Host model", because this is a virtual feature that
-+  doesn't exist in the physical host CPUs.
-+
-+``amd-ssbd``
-+  Required to enable the CVE-2018-3639 fix
-+
-+  Not included by default in any AMD CPU model.
-+
-+  Must be explicitly turned on for all AMD CPU models.
-+
-+  This provides higher performance than ``virt-ssbd`` so should be
-+  exposed to guests whenever available in the host. ``virt-ssbd`` should
-+  none the less also be exposed for maximum guest compatibility as some
-+  kernels only know about ``virt-ssbd``.
-+
-+``amd-no-ssb``
-+  Recommended to indicate the host is not vulnerable CVE-2018-3639
-+
-+  Not included by default in any AMD CPU model.
-+
-+  Future hardware generations of CPU will not be vulnerable to
-+  CVE-2018-3639, and thus the guest should be told not to enable
-+  its mitigations, by exposing amd-no-ssb. This is mutually
-+  exclusive with virt-ssbd and amd-ssbd.
-+
-+``pdpe1gb``
-+  Recommended to allow guest OS to use 1GB size pages
-+
-+  Not included by default in any AMD CPU model.
-+
-+  Should be explicitly turned on for all AMD CPU models.
-+
-+  Note that not all CPU hardware will support this feature.
-+
-+
-+Default x86 CPU models
-+^^^^^^^^^^^^^^^^^^^^^^
-+
-+The default QEMU CPU models are designed such that they can run on all
-+hosts.  If an application does not wish to do perform any host
-+compatibility checks before launching guests, the default is guaranteed
-+to work.
-+
-+The default CPU models will, however, leave the guest OS vulnerable to
-+various CPU hardware flaws, so their use is strongly discouraged.
-+Applications should follow the earlier guidance to setup a better CPU
-+configuration, with host passthrough recommended if live migration is
-+not needed.
-+
-+``qemu32``, ``qemu64``
-+    QEMU Virtual CPU version 2.5+ (32 & 64 bit variants)
-+
-+``qemu64`` is used for x86_64 guests and ``qemu32`` is used for i686
-+guests, when no ``-cpu`` argument is given to QEMU, or no ``<cpu>`` is
-+provided in libvirt XML.
-+
-+Other non-recommended x86 CPUs
-+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-+
-+The following CPUs models are compatible with most AMD and Intel x86
-+hosts, but their usage is discouraged, as they expose a very limited
-+featureset, which prevents guests having optimal performance.
-+
-+``kvm32``, ``kvm64``
-+    Common KVM processor (32 & 64 bit variants).
-+
-+    Legacy models just for historical compatibility with ancient QEMU
-+    versions.
-+
-+``486``, ``athlon``, ``phenom``, ``coreduo``, ``core2duo``, ``n270``, ``pentium``, ``pentium2``, ``pentium3``
-+    Various very old x86 CPU models, mostly predating the introduction
-+    of hardware assisted virtualization, that should thus not be
-+    required for running virtual machines.
-+
-+
-+Syntax for configuring CPU models
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The examples below illustrate the approach to configuring the various
-+CPU models / features in QEMU and libvirt.
-+
-+QEMU command line
-+^^^^^^^^^^^^^^^^^
-+
-+Host passthrough:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| -cpu host
-+
-+Host passthrough with feature customization:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| -cpu host,-vmx,...
-+
-+Named CPU models:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| -cpu Westmere
-+
-+Named CPU models with feature customization:
-+
-+.. parsed-literal::
-+
-+  |qemu_system| -cpu Westmere,+pcid,...
-+
-+Libvirt guest XML
-+^^^^^^^^^^^^^^^^^
-+
-+Host passthrough::
-+
-+    <cpu mode='host-passthrough'/>
-+
-+Host passthrough with feature customization::
-+
-+    <cpu mode='host-passthrough'>
-+        <feature name="vmx" policy="disable"/>
-+        ...
-+    </cpu>
-+
-+Host model::
-+
-+    <cpu mode='host-model'/>
-+
-+Host model with feature customization::
-+
-+    <cpu mode='host-model'>
-+        <feature name="vmx" policy="disable"/>
-+        ...
-+    </cpu>
-+
-+Named model::
-+
-+    <cpu mode='custom'>
-+        <model name="Westmere"/>
-+    </cpu>
-+
-+Named model with feature customization::
-+
-+    <cpu mode='custom'>
-+        <model name="Westmere"/>
-+        <feature name="pcid" policy="require"/>
-+        ...
-+    </cpu>
-diff --git a/docs/system/qemu-cpu-models.rst b/docs/system/qemu-cpu-models.rst
-new file mode 100644
-index 00000000000..53d7538c473
---- /dev/null
-+++ b/docs/system/qemu-cpu-models.rst
-@@ -0,0 +1,20 @@
-+:orphan:
-+
-+QEMU / KVM CPU model configuration
-+==================================
-+
-+Synopsis
-+''''''''
-+
-+QEMU CPU Modelling Infrastructure manual
-+
-+Description
-+'''''''''''
-+
-+.. include:: cpu-models-x86.rst.inc
-+.. include:: cpu-models-mips.rst.inc
-+
-+See also
-+''''''''
-+
-+The HTML documentation of QEMU for more precise information and Linux user mode emulator invocation.
-diff --git a/docs/system/qemu-cpu-models.texi b/docs/system/qemu-cpu-models.texi
-deleted file mode 100644
-index f399daf9448..00000000000
---- a/docs/system/qemu-cpu-models.texi
-+++ /dev/null
-@@ -1,28 +0,0 @@
--@c man begin SYNOPSIS
--QEMU / KVM CPU model configuration
--@c man end
++++ b/docs/defs.rst.inc
+@@ -0,0 +1,11 @@
++..
++   Generally useful rST substitution definitions. This is included for
++   all rST files as part of the epilogue by docs/conf.py.  conf.py
++   also defines some dynamically generated substitutions like CONFDIR.
++
++   Note that |qemu_system| is intended to be used inside a parsed-literal
++   block: the definition must not include extra literal formatting with
++   ``..``: this works in the HTML output but the manpages will end up
++   misrendered with following normal text incorrectly in boldface.
++
++.. |qemu_system| replace:: qemu-system-x86_64
+diff --git a/docs/system/qemu-block-drivers.rst b/docs/system/qemu-block-drivers.rst
+index 7ca890ea23a..bd99d4fa8eb 100644
+--- a/docs/system/qemu-block-drivers.rst
++++ b/docs/system/qemu-block-drivers.rst
+@@ -3,8 +3,6 @@
+ QEMU block drivers reference
+ ============================
+ 
+-.. |qemu_system| replace:: qemu-system-x86_64
 -
--@set qemu_system_x86 qemu-system-x86_64
--
--@c man begin DESCRIPTION
--
--@include cpu-models-x86.texi
--@include cpu-models-mips.texi
--
--@c man end
--
--@ignore
--
--@setfilename qemu-cpu-models
--@settitle QEMU / KVM CPU model configuration
--
--@c man begin SEEALSO
--The HTML documentation of QEMU for more precise information and Linux
--user mode emulator invocation.
--@c man end
--
--@c man begin AUTHOR
--Daniel P. Berrange
--@c man end
--
--@end ignore
+ Synopsis
+ --------
+ 
 -- 
 2.20.1
 
