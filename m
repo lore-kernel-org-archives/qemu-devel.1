@@ -2,91 +2,82 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D99C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C396EC3F2D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69D902469F
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DDBB246A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:27:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ErKD3UmJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D902469F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pnHbY0kv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DDBB246A8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7cpB-0002FI-JY
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:24:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59231)
+	id 1j7crS-0003Nq-OB
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:27:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59490)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1j7coX-0001n2-OA
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:24:14 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7cqt-0002vl-VQ
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:26:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1j7coW-0001PP-8c
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:24:13 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23544
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1j7coW-0001PC-3U
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:24:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582885451;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RkPiR9lv2uyp1qaPqDpOB3fbNamtSf/yhv749dzP71I=;
- b=ErKD3UmJmu0fA0hFL8zp268auLPeitGIcbPXfDJ9AW7tiinGf00FGcXsYc4yhx7HVvldM5
- NZ33rkiJUe7rw5GT3jXeKFJuD+bZi+Uv7lunJT7k6Wbt4lVP1ceaj6QYtWe7yq1EbFOyzm
- 4FO59geZIVvT30aLQN9vknpRc/20yyY=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-9D_gZ-fZMY-XutHLc7frbQ-1; Fri, 28 Feb 2020 05:24:09 -0500
-X-MC-Unique: 9D_gZ-fZMY-XutHLc7frbQ-1
-Received: by mail-ot1-f71.google.com with SMTP id d16so1495352otf.5
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:24:09 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7cqs-0002Jj-KU
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:26:39 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:41105)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j7cqs-0002JV-EA
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:26:38 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id v19so2090272ote.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:26:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KKr3AjB/F4dFrrGe2ZMuhk0ZYyBKFSGg3navKvsNvS0=;
+ b=pnHbY0kvY+5mVDFeXN7eb17j1bGBTUP7/lLezcAG3MHutIjNUxfJzmVicXVl5lt2zv
+ Mlebzvs3ItoYsTh4+8xHeGOnbD1u82IM8ZHNR/YFwQaBC8stAAipUaXaAtsp3Se3RaSF
+ 9ptuN5+815a5zpbkCK9U0j/aF7/12pyaP8SQxq9G3osXS2hR78K20TR9CvUOm+nMHluM
+ Il6e3Hjc9vlmu7b1J2bfv8qODQZ9ASjV1Q6nqcACbBPi1ZXegrW7IHDkjlgYc3yqMgQP
+ GyRLG9x9f4jqhUpfwr8MqGSiY8fPK45rPeowFjnUPlvnADRxWkM7IWEeygfeUKKEsXNp
+ 7gdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=RkPiR9lv2uyp1qaPqDpOB3fbNamtSf/yhv749dzP71I=;
- b=mTDLzN/f9v8tWE+8Syf93BMPQWKMXODxcgnqLOH4zcnqIGy1F8emlzwd9BNrm5lChr
- ejvO4jY/YrUKzbap+gjjRvHnD2Tnt73jFn3908mcac0oH7qbxS/SXsFQcD9goJRhc8k4
- I0mh96jQiXdkaYtQuyM/n6ETRBgsALOrdByGt+u9ykYD99/tYNoR6do57X0Ki8HlApwJ
- mctlNuMLjZxq4NH7IdpKQTBx4T+ZCggwM8fr9+CvbLgPGezE+X56j2ReylossLBrI8PG
- EuoWJnP7+h6THosXM6AyHdRAtrM3aZNoqwnagpM4Ovh2724hs6KBXbM0VzfzB2PNGeVT
- WKAQ==
-X-Gm-Message-State: APjAAAX4B4+EDyaerVX6mnYZ1L0bsQdMMdSZln9Ogb4jmboPu2F44EWs
- VkaoQxAcPN6ZOjGB+ZgzaJ7pq02LxvaaeYgpVUypOFpsAqEmHmyLuKBOiSxLI/B/wsdONYSRfFv
- O4jteyzFOfNyXf3XcEd7/DCEogBi26ug=
-X-Received: by 2002:aca:3805:: with SMTP id f5mr2612827oia.6.1582885448867;
- Fri, 28 Feb 2020 02:24:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwBsojn90q3ynt7xGi04SLQcni8APaq+bwTkR3BGzRN1k8JMXw4mlWAWnJz4tEVWuAGtcLiPNKsiBGoZssYXbs=
-X-Received: by 2002:aca:3805:: with SMTP id f5mr2612817oia.6.1582885448626;
- Fri, 28 Feb 2020 02:24:08 -0800 (PST)
+ bh=KKr3AjB/F4dFrrGe2ZMuhk0ZYyBKFSGg3navKvsNvS0=;
+ b=QtnHck3WYF9Kj3dBzyuLUWeHmZHQJWBeINw+v/gnEX78rieOfDNyBd0tpK42usj3xK
+ 9uTF070EFqdaUKZg57HWeV0bWrZZW9QJilMVWM7jm9zEQ1pv8Bcru+TURpWTSBkwmGre
+ RHq17wTO+9H+vudvyHfZTz5RC62QqFSNr+an0c2FlLIC8r1UjAn6iMIbEygQqSJqPPPX
+ 6NOhVUA/lcVPx7ymTj+9W3o2V1m5A+pt8ZJAWdWUooyq9mq5gPbqKJUOqesZDW9bt//x
+ ufhzUbugxjse7EzVnjzV2QEGvssDbd5TGT17RMpvH8jTK470bFboe/30+24XALgZtgV8
+ Hucw==
+X-Gm-Message-State: APjAAAX+RKLNiGo4BGZBPGGTmhvdHjFB3+j2zJhz3A9d8s96nvF6eck6
+ Eei346SzY1cDbF3KVtA5omWbt4pxMAqUCQ18obGk8A==
+X-Google-Smtp-Source: APXvYqypNTtw8UZcBzwCZWVHNSQEeUz5wo/CC5fpLYXsIQdzwnDoRwTI9xEL36HelRRL5nLFMGX34MY6zAXQf05w6PA=
+X-Received: by 2002:a9d:68d9:: with SMTP id i25mr2693017oto.135.1582885597395; 
+ Fri, 28 Feb 2020 02:26:37 -0800 (PST)
 MIME-Version: 1.0
-References: <20200228100726.8414-1-philmd@redhat.com>
- <20200228100726.8414-4-philmd@redhat.com>
-In-Reply-To: <20200228100726.8414-4-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Fri, 28 Feb 2020 11:23:57 +0100
-Message-ID: <CAMxuvawyv=gSjQNApqGwhwz_V18GrNmJ1s5KnJg=zKLtpeXuRQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/4] qga: Improve error report by calling
- error_setg_win32()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+References: <MN2PR02MB5935836FBB0AC02F56278FE3CAEA0@MN2PR02MB5935.namprd02.prod.outlook.com>
+ <CAFEAcA_iXuc_r=wJWhHjZ1ROvfCwsxbU0yyiwJpqaxDfFtfmbQ@mail.gmail.com>
+ <MN2PR02MB5935FCFCAB2C3CECE898B290CAE80@MN2PR02MB5935.namprd02.prod.outlook.com>
+In-Reply-To: <MN2PR02MB5935FCFCAB2C3CECE898B290CAE80@MN2PR02MB5935.namprd02.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 28 Feb 2020 10:26:26 +0000
+Message-ID: <CAFEAcA9h29YvbXSZxq4xFg_NbiYr-amqF9QGBS8nBvhvLi1WhQ@mail.gmail.com>
+Subject: Re: Implementing IOMMU support for SDHCI
+To: Sai Pavan Boddu <saipava@xilinx.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Edgar Iglesias <edgari@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 28, 2020 at 11:07 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Use error_setg_win32() which adds a hint similar to strerror(errno)).
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v3: Keep slog() in qmp_guest_shutdown() (Marc-Andr=C3=A9)
-> ---
->  qga/channel-win32.c  | 3 ++-
->  qga/commands-win32.c | 8 +++++---
->  2 files changed, 7 insertions(+), 4 deletions(-)
+On Fri, 28 Feb 2020 at 10:08, Sai Pavan Boddu <saipava@xilinx.com> wrote:
+> [Sai Pavan Boddu] Our idea is to create dma helper function which can als=
+o pass the MemTxAttr i.e like
+> dma_memory_rw_attr (AddressSpace *as, dma_addr_t addr,
+>                                      void *buf, dma_addr_t len,
+>                                      DMADirection dir,
+>                                      MemTxAttrs attr)
+> which needs to be used in sdhci,  with "AddressSpace *as" pointing to smm=
+u.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Yes, you want to be able to pass MemTxAttrs from devices using
+the dma APIs. (Or you could just call dma_barrier() yourself
+before directly using an address_space_* function.) Plumbing
+that through is straightforward.
 
+As an aside, we are enormously inconsistent about whether
+devices use dma_memory_* functions or just directly
+do address_space_* calls. I think the intention is that
+the dma_memory_* include necessary memory barriers, but it's
+not clear to me at least when the barriers are necessary or
+why we have this family of functions that some devices use
+and most just don't.
 
->
-> diff --git a/qga/channel-win32.c b/qga/channel-win32.c
-> index c86f4388db..99648c95b6 100644
-> --- a/qga/channel-win32.c
-> +++ b/qga/channel-win32.c
-> @@ -308,7 +308,8 @@ static gboolean ga_channel_open(GAChannel *c, GAChann=
-elMethod method,
->      }
->
->      if (method =3D=3D GA_CHANNEL_ISA_SERIAL && !SetCommTimeouts(c->handl=
-e,&comTimeOut)) {
-> -        g_critical("error setting timeout for com port: %lu",GetLastErro=
-r());
-> +        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError())=
-;
-> +        g_critical("error setting timeout for com port: %s", emsg);
->          CloseHandle(c->handle);
->          return false;
->      }
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 2461fd19bf..9c744d6405 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -315,8 +315,9 @@ void qmp_guest_shutdown(bool has_mode, const char *mo=
-de, Error **errp)
->      }
->
->      if (!ExitWindowsEx(shutdown_flag, SHTDN_REASON_FLAG_PLANNED)) {
-> -        slog("guest-shutdown failed: %lu", GetLastError());
-> -        error_setg(errp, QERR_UNDEFINED_ERROR);
-> +        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError())=
-;
-> +        slog("guest-shutdown failed: %s", emsg);
-> +        error_setg_win32(errp, GetLastError(), "guest-shutdown failed");
->      }
->  }
->
-> @@ -1319,7 +1320,8 @@ static DWORD WINAPI do_suspend(LPVOID opaque)
->      DWORD ret =3D 0;
->
->      if (!SetSuspendState(*mode =3D=3D GUEST_SUSPEND_MODE_DISK, TRUE, TRU=
-E)) {
-> -        slog("failed to suspend guest, %lu", GetLastError());
-> +        g_autofree gchar *emsg =3D g_win32_error_message(GetLastError())=
-;
-> +        slog("failed to suspend guest: %s", emsg);
->          ret =3D -1;
->      }
->      g_free(mode);
-> --
-> 2.21.1
->
+> I see we don=E2=80=99t need QOM variant of MemTxAttr for this functionali=
+ty,
+>but thought it would be good to use  " object_add_link_property/
+>object_set_link_property " to set the values from machine file's.
+>I would drop this idea, and look for other options to set the attributes.
 
+The attributes of a transaction are set by the thing generating
+the transactions (either the CPU, or the DMA device, whatever it
+is). Typically they're either fixed, or possibly configurable
+at a hardware level, or sometimes configurable by software.
+I don't think any of those scenarios are ones where you'd want
+the board model to be passing in a MemTxAttr at device creation
+time.
+
+thanks
+-- PMM
 
