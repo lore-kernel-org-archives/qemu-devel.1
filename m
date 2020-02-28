@@ -2,72 +2,67 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFD1C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 01:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1867C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 01:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F034024697
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 01:46:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F034024697
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7705A24690
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 01:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7705A24690
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7Ujm-0005DR-Ts
-	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 20:46:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50165)
+	id 1j7Uoi-0007zd-Bu
+	for qemu-devel@archiver.kernel.org; Thu, 27 Feb 2020 20:51:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50586)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j7Uiq-0004oW-Ee
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 20:45:53 -0500
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j7Unz-0007Rg-BH
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 20:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j7Uil-0003sZ-Hr
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 20:45:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43924)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j7Uil-0003r8-5D
- for qemu-devel@nongnu.org; Thu, 27 Feb 2020 20:45:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j7Uii-0002u6-Q2
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 01:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C1C942E80C3
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 01:45:40 +0000 (UTC)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j7Unw-0007Mz-QM
+ for qemu-devel@nongnu.org; Thu, 27 Feb 2020 20:51:07 -0500
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:34959)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1j7Unw-0007Db-15; Thu, 27 Feb 2020 20:51:04 -0500
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.450971-0.0173873-0.531642;
+ DS=CONTINUE|ham_enroll_verification|0.0810743-0.000531321-0.918394;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=9; RT=9; SR=0; TI=SMTPD_---.GtT9WG3_1582854653; 
+Received: from 192.168.3.18(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GtT9WG3_1582854653)
+ by smtp.aliyun-inc.com(10.147.41.143);
+ Fri, 28 Feb 2020 09:50:53 +0800
+Subject: Re: [PATCH v4 1/5] target/riscv: add vector unit stride load and
+ store instructions
+To: Richard Henderson <richard.henderson@linaro.org>, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+References: <20200225103508.7651-1-zhiwei_liu@c-sky.com>
+ <20200225103508.7651-2-zhiwei_liu@c-sky.com>
+ <4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Message-ID: <287bde05-421c-f49c-2404-fdee183c9e12@c-sky.com>
+Date: Fri, 28 Feb 2020 09:50:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Feb 2020 01:37:40 -0000
-From: Nick <1865099@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ripeip
-X-Launchpad-Bug-Reporter: Nick (ripeip)
-X-Launchpad-Bug-Modifier: Nick (ripeip)
-Message-Id: <158285386018.14752.8472308411300592530.malonedeb@soybean.canonical.com>
-Subject: [Bug 1865099] [NEW] cannot run x64 based system on x64 host with
- Intel Haxm
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 67021a168be60882bde06b9c77abb66e74a5296c
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+In-Reply-To: <4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org>
+Content-Type: multipart/alternative;
+ boundary="------------6091AF5C174EB126FE31EAF0"
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,1295 +71,682 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1865099 <1865099@bugs.launchpad.net>
+Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, linux-csky@vger.kernel.org,
+ wxy194768@alibaba-inc.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-i am trying to run Windows 10 x64 on Windows 10 x64 host with intel haxm
-as kernel accelerator, but the system never boots, as far i read the
-documentation everything should be fine...
-
-the logs are qemu:
+This is a multi-part message in MIME format.
+--------------6091AF5C174EB126FE31EAF0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-`
-D:\vm>qemu-system-x86_64 -d guest_errors,out_asm,in_asm,op,op_opt,op_ind,in=
-t,exec,cpu,fpu,mmu,pcall,cpu_reset,unimp,page,nochain -cpu core2duo -smp 4 =
--accel hax -drive file=3Dw10.img,index=3D0,media=3Ddisk,format=3Draw -cdrom=
- "E:\test\W10x64ProEn-UK.iso" -m 4G -L Bios -usbdevice mouse -usbdevice key=
-board -boot menu=3Don -rtc base=3Dlocaltime,clock=3Dhost -name windows
-qemu-system-x86_64: -usbdevice mouse: '-usbdevice' is deprecated, please us=
-e '-device usb-...' instead
-qemu-system-x86_64: -usbdevice keyboard: '-usbdevice' is deprecated, please=
- use '-device usb-...' instead
-HAX is working and emulator runs in fast virt mode.
-CPU Reset (CPU 0)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 00000000 00000000
-CS =3D0000 00000000 00000000 00000000
-SS =3D0000 00000000 00000000 00000000
-DS =3D0000 00000000 00000000 00000000
-FS =3D0000 00000000 00000000 00000000
-GS =3D0000 00000000 00000000 00000000
-LDT=3D0000 00000000 00000000 00000000
-TR =3D0000 00000000 00000000 00000000
-GDT=3D     00000000 00000000
-IDT=3D     00000000 00000000
-CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D0000000000000000 DR7=3D0000000000000000
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 1)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 00000000 00000000
-CS =3D0000 00000000 00000000 00000000
-SS =3D0000 00000000 00000000 00000000
-DS =3D0000 00000000 00000000 00000000
-FS =3D0000 00000000 00000000 00000000
-GS =3D0000 00000000 00000000 00000000
-LDT=3D0000 00000000 00000000 00000000
-TR =3D0000 00000000 00000000 00000000
-GDT=3D     00000000 00000000
-IDT=3D     00000000 00000000
-CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D0000000000000000 DR7=3D0000000000000000
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 2)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 00000000 00000000
-CS =3D0000 00000000 00000000 00000000
-SS =3D0000 00000000 00000000 00000000
-DS =3D0000 00000000 00000000 00000000
-FS =3D0000 00000000 00000000 00000000
-GS =3D0000 00000000 00000000 00000000
-LDT=3D0000 00000000 00000000 00000000
-TR =3D0000 00000000 00000000 00000000
-GDT=3D     00000000 00000000
-IDT=3D     00000000 00000000
-CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D0000000000000000 DR7=3D0000000000000000
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 3)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 00000000 00000000
-CS =3D0000 00000000 00000000 00000000
-SS =3D0000 00000000 00000000 00000000
-DS =3D0000 00000000 00000000 00000000
-FS =3D0000 00000000 00000000 00000000
-GS =3D0000 00000000 00000000 00000000
-LDT=3D0000 00000000 00000000 00000000
-TR =3D0000 00000000 00000000 00000000
-GDT=3D     00000000 00000000
-IDT=3D     00000000 00000000
-CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D0000000000000000 DR7=3D0000000000000000
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 0)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 1)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 2)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 3)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 1)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 2)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-CPU Reset (CPU 3)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D1
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009b00
-SS =3D0000 00000000 0000ffff 00009300
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008b00
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D00000000000000000000000000000000 XMM01=3D00000000000000000000000000=
-000000
-XMM02=3D00000000000000000000000000000000 XMM03=3D00000000000000000000000000=
-000000
-XMM04=3D00000000000000000000000000000000 XMM05=3D00000000000000000000000000=
-000000
-XMM06=3D00000000000000000000000000000000 XMM07=3D00000000000000000000000000=
-000000
-CR0 update: CR0=3D0x60000010
-VCPU shutdown request
-VCPU shutdown request
-VCPU shutdown request
-`
+
+On 2020/2/28 3:17, Richard Henderson wrote:
+> On 2/25/20 2:35 AM, LIU Zhiwei wrote:
+>> +static bool vext_check_reg(DisasContext *s, uint32_t reg, bool widen)
+>> +{
+>> +    int legal = widen ? 2 << s->lmul : 1 << s->lmul;
+>> +
+>> +    return !((s->lmul == 0x3 && widen) || (reg % legal));
+>> +}
+>> +
+>> +static bool vext_check_overlap_mask(DisasContext *s, uint32_t vd, bool vm)
+>> +{
+>> +    return !(s->lmul > 1 && vm == 0 && vd == 0);
+>> +}
+>> +
+>> +static bool vext_check_nf(DisasContext *s, uint32_t nf)
+>> +{
+>> +    return s->lmul * (nf + 1) <= 8;
+>> +}
+> Some commentary would be good here, quoting the rule being applied.  E.g. "The
+> destination vector register group for a masked vector instruction can only
+> overlap the source mask regis-
+> ter (v0) when LMUL=1. (Section 5.3)"
+Good idea.
+>> +static bool ld_us_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
+>> +{
+>> +    uint8_t nf = a->nf + 1;
+> Perhaps NF should have the +1 done during decode, so that it cannot be
+> forgotten here or elsewhere.
+
+Perhaps not. It will  not be used elsewhere. And it will need one more 
+bit in FIELD().
+>   E.g.
+>
+> %nf      31:3  !function=ex_plus_1
+> @r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... \
+>           &r2nfvm %nf %rs1 %rd
+>
+> Where ex_plus_1 is the obvious modification of ex_shift_1().
+>> +static inline uint32_t vext_nf(uint32_t desc)
+>> +{
+>> +    return (simd_data(desc) >> 11) & 0xf;
+>> +}
+>> +
+>> +static inline uint32_t vext_mlen(uint32_t desc)
+>> +{
+>> +    return simd_data(desc) & 0xff;
+>> +}
+>> +
+>> +static inline uint32_t vext_vm(uint32_t desc)
+>> +{
+>> +    return (simd_data(desc) >> 8) & 0x1;
+>> +}
+>> +
+>> +static inline uint32_t vext_lmul(uint32_t desc)
+>> +{
+>> +    return (simd_data(desc) >> 9) & 0x3;
+>> +}
+> You should use FIELD() to define the fields, and then use FIELD_EX32 and
+> FIELD_DP32 to reference them.
+Nice, I will find some place to define the fields.
+>> +/*
+>> + * This function checks watchpoint before real load operation.
+>> + *
+>> + * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
+>> + * In user mode, there is no watchpoint support now.
+>> + *
+>> + * It will triggle an exception if there is no mapping in TLB
+> trigger.
+Yes.
+>> + * and page table walk can't fill the TLB entry. Then the guest
+>> + * software can return here after process the exception or never return.
+>> + */
+>> +static void probe_read_access(CPURISCVState *env, target_ulong addr,
+>> +        target_ulong len, uintptr_t ra)
+>> +{
+>> +    while (len) {
+>> +        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
+>> +        const target_ulong curlen = MIN(pagelen, len);
+>> +
+>> +        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
+>> +        addr += curlen;
+>> +        len -= curlen;
+>> +    }
+>> +}
+>> +
+>> +static void probe_write_access(CPURISCVState *env, target_ulong addr,
+>> +        target_ulong len, uintptr_t ra)
+>> +{
+>> +    while (len) {
+>> +        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
+>> +        const target_ulong curlen = MIN(pagelen, len);
+>> +
+>> +        probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
+>> +        addr += curlen;
+>> +        len -= curlen;
+>> +    }
+>> +}
+> A loop is overkill -- the access cannot span to 3 pages.
+Yes, I will just do as you suggest!
+
+In the unit stride load, without mask,  the max access len is checked . 
+It is 512 in bytes.
+And current target page is 4096 in bytes.
+
+#define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
+
+> These two functions
+> can be merged using probe_access and MMU_DATA_{LOAD,STORE}.
+>
+>> +
+>> +#ifdef HOST_WORDS_BIGENDIAN
+>> +static void vext_clear(void *tail, uint32_t cnt, uint32_t tot)
+>> +{
+>> +    /*
+>> +     * Split the remaining range to two parts.
+>> +     * The first part is in the last uint64_t unit.
+>> +     * The second part start from the next uint64_t unit.
+>> +     */
+>> +    int part1 = 0, part2 = tot - cnt;
+>> +    if (cnt % 64) {
+>> +        part1 = 64 - (cnt % 64);
+>> +        part2 = tot - cnt - part1;
+>> +        memset(tail & ~(63ULL), 0, part1);
+>> +        memset((tail + 64) & ~(63ULL), 0, part2);
+> You're confusing bit and byte offsets -- cnt and tot are both byte offsets.
+Yes, I will fix it.
+>> +static inline int vext_elem_mask(void *v0, int mlen, int index)
+>> +{
+>> +
+>> +    int idx = (index * mlen) / 8;
+>> +    int pos = (index * mlen) % 8;
+>> +
+>> +    switch (mlen) {
+>> +    case 8:
+>> +        return *((uint8_t *)v0 + H1(index)) & 0x1;
+>> +    case 16:
+>> +        return *((uint16_t *)v0 + H2(index)) & 0x1;
+>> +    case 32:
+>> +        return *((uint32_t *)v0 + H4(index)) & 0x1;
+>> +    case 64:
+>> +        return *((uint64_t *)v0 + index) & 0x1;
+>> +    default:
+>>
+>> 	
+>> 	
+>> 	
+>> 	
+>> 	
+>> 	
+>> 	
+>>
+>> +        return (*((uint8_t *)v0 + H1(idx)) >> pos) & 0x1;
+>> +    }
+> This is not what I had in mind, and looks wrong as well.
+>
+>      int idx = (index * mlen) / 64;
+>      int pos = (index * mlen) % 64;
+>      return (((uint64_t *)v0)[idx] >> pos) & 1;
+>
+> You also might consider passing log2(mlen), so the multiplication could be
+> strength-reduced to a shift.
+I don't think so. For example, when mlen is 8 bits and index is 0, it 
+will reduce to
+
+return (((uint64_t *)v0)[0]) & 1
+
+And it's not right.
+
+The right bit is first bit in vector register 0. And in host big endianess,
+it will be  the first bit of the seventh byte.
+>
+>> +#define GEN_VEXT_LD_ELEM(NAME, MTYPE, ETYPE, H, LDSUF)              \
+>> +static void vext_##NAME##_ld_elem(CPURISCVState *env, abi_ptr addr, \
+>> +        uint32_t idx, void *vd, uintptr_t retaddr)                  \
+>> +{                                                                   \
+>> +    int mmu_idx = cpu_mmu_index(env, false);                        \
+>> +    MTYPE data;                                                     \
+>> +    ETYPE *cur = ((ETYPE *)vd + H(idx));                            \
+>> +    data = cpu_##LDSUF##_mmuidx_ra(env, addr, mmu_idx, retaddr);    \
+>> +    *cur = data;                                                    \
+>> +}                                                                   \
+> If you're going to use cpu_mmu_index, you might as well use cpu_SUFF_data_ra(),
+> which does not require the mmu_idx parameter.
+Good.
+>> +#define GEN_VEXT_ST_ELEM(NAME, ETYPE, H, STSUF)                       \
+>> +static void vext_##NAME##_st_elem(CPURISCVState *env, abi_ptr addr,   \
+>> +        uint32_t idx, void *vd, uintptr_t retaddr)                    \
+>> +{                                                                     \
+>> +    int mmu_idx = cpu_mmu_index(env, false);                          \
+>> +    ETYPE data = *((ETYPE *)vd + H(idx));                             \
+>> +    cpu_##STSUF##_mmuidx_ra(env, addr, data, mmu_idx, retaddr);       \
+>> +}
+> Likewise.
+>
+>> +/*
+>> + *** unit-stride: load vector element from continuous guest memory
+>> + */
+>> +static inline void vext_ld_us_mask(void *vd, void *v0, target_ulong base,
+>> +        CPURISCVState *env, uint32_t desc,
+>> +        vext_ld_elem_fn ld_elem,
+>> +        vext_ld_clear_elem clear_elem,
+>> +        uint32_t esz, uint32_t msz, uintptr_t ra)
+>> +{
+>> +    uint32_t i, k;
+>> +    uint32_t mlen = vext_mlen(desc);
+> You don't need to pass mlen, since it's
+Yes.
+>> +/* unit-stride: store vector element to guest memory */
+>> +static void vext_st_us_mask(void *vd, void *v0, target_ulong base,
+>> +        CPURISCVState *env, uint32_t desc,
+>> +        vext_st_elem_fn st_elem,
+>> +        uint32_t esz, uint32_t msz, uintptr_t ra)
+>> +{
+>> +    uint32_t i, k;
+>> +    uint32_t nf = vext_nf(desc);
+>> +    uint32_t mlen = vext_mlen(desc);
+>> +    uint32_t vlmax = vext_maxsz(desc) / esz;
+>> +
+>> +    /* probe every access*/
+>> +    for (i = 0; i < env->vl; i++) {
+>> +        if (!vext_elem_mask(v0, mlen, i)) {
+>> +            continue;
+>> +        }
+>> +        probe_write_access(env, base + nf * i * msz, nf * msz, ra);
+>> +    }
+>> +    /* store bytes to guest memory */
+>> +    for (i = 0; i < env->vl; i++) {
+>> +        k = 0;
+>> +        if (!vext_elem_mask(v0, mlen, i)) {
+>> +            continue;
+>> +        }
+>> +        while (k < nf) {
+>> +            target_ulong addr = base + (i * nf + k) * msz;
+>> +            st_elem(env, addr, i + k * vlmax, vd, ra);
+>> +            k++;
+>> +        }
+>> +    }
+>> +}
+> I'll note that vext_ld_us_mask and vext_st_us_mask are identical, except for:
+>
+> 1) probe_read/write_access (which I already suggested merging, using
+> MMUAccessType),
+>
+> 2) the name of the ld_elem/st_elem variable (the function types are already
+> identical), and
+>
+> 3) the clear loop at the end of the load (which could be conditional on
+> clear_elem != NULL; after inlining, this should be optimized away).
+Good idea. Thanks.
+
+Zhiwei
+>> +static void vext_st_us(void *vd, target_ulong base,
+>> +        CPURISCVState *env, uint32_t desc,
+>> +        vext_st_elem_fn st_elem,
+>> +        uint32_t esz, uint32_t msz, uintptr_t ra)
+> Similarly.
+>
+>
+> r~
 
 
-intel haxm (kernel logs):
+--------------6091AF5C174EB126FE31EAF0
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
+
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <br>
+    <br>
+    <div class="moz-cite-prefix">On 2020/2/28 3:17, Richard Henderson
+      wrote:<br>
+    </div>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">On 2/25/20 2:35 AM, LIU Zhiwei wrote:
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static bool vext_check_reg(DisasContext *s, uint32_t reg, bool widen)
++{
++    int legal = widen ? 2 &lt;&lt; s-&gt;lmul : 1 &lt;&lt; s-&gt;lmul;
++
++    return !((s-&gt;lmul == 0x3 &amp;&amp; widen) || (reg % legal));
++}
++
++static bool vext_check_overlap_mask(DisasContext *s, uint32_t vd, bool vm)
++{
++    return !(s-&gt;lmul &gt; 1 &amp;&amp; vm == 0 &amp;&amp; vd == 0);
++}
++
++static bool vext_check_nf(DisasContext *s, uint32_t nf)
++{
++    return s-&gt;lmul * (nf + 1) &lt;= 8;
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Some commentary would be good here, quoting the rule being applied.  E.g. "The
+destination vector register group for a masked vector instruction can only
+overlap the source mask regis-
+ter (v0) when LMUL=1. (Section 5.3)"
+</pre>
+    </blockquote>
+    Good idea.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static bool ld_us_op(DisasContext *s, arg_r2nfvm *a, uint8_t seq)
++{
++    uint8_t nf = a-&gt;nf + 1;
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Perhaps NF should have the +1 done during decode, so that it cannot be
+forgotten here or elsewhere. </pre>
+    </blockquote>
+    <br>
+    Perhaps not. It will  not be used elsewhere. And it will need one
+    more bit in FIELD().<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap=""> E.g.
+
+%nf      31:3  !function=ex_plus_1
+@r2_nfvm ... ... vm:1 ..... ..... ... ..... ....... \
+         &amp;r2nfvm %nf %rs1 %rd
+
+Where ex_plus_1 is the obvious modification of ex_shift_1().
+</pre>
+    </blockquote>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static inline uint32_t vext_nf(uint32_t desc)
++{
++    return (simd_data(desc) &gt;&gt; 11) &amp; 0xf;
++}
++
++static inline uint32_t vext_mlen(uint32_t desc)
++{
++    return simd_data(desc) &amp; 0xff;
++}
++
++static inline uint32_t vext_vm(uint32_t desc)
++{
++    return (simd_data(desc) &gt;&gt; 8) &amp; 0x1;
++}
++
++static inline uint32_t vext_lmul(uint32_t desc)
++{
++    return (simd_data(desc) &gt;&gt; 9) &amp; 0x3;
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+You should use FIELD() to define the fields, and then use FIELD_EX32 and
+FIELD_DP32 to reference them.
+</pre>
+    </blockquote>
+    Nice, I will find some place to define the fields.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/*
++ * This function checks watchpoint before real load operation.
++ *
++ * In softmmu mode, the TLB API probe_access is enough for watchpoint check.
++ * In user mode, there is no watchpoint support now.
++ *
++ * It will triggle an exception if there is no mapping in TLB
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+trigger.
+</pre>
+    </blockquote>
+    Yes.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+ * and page table walk can't fill the TLB entry. Then the guest
++ * software can return here after process the exception or never return.
++ */
++static void probe_read_access(CPURISCVState *env, target_ulong addr,
++        target_ulong len, uintptr_t ra)
++{
++    while (len) {
++        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
++        const target_ulong curlen = MIN(pagelen, len);
++
++        probe_read(env, addr, curlen, cpu_mmu_index(env, false), ra);
++        addr += curlen;
++        len -= curlen;
++    }
++}
++
++static void probe_write_access(CPURISCVState *env, target_ulong addr,
++        target_ulong len, uintptr_t ra)
++{
++    while (len) {
++        const target_ulong pagelen = -(addr | TARGET_PAGE_MASK);
++        const target_ulong curlen = MIN(pagelen, len);
++
++        probe_write(env, addr, curlen, cpu_mmu_index(env, false), ra);
++        addr += curlen;
++        len -= curlen;
++    }
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+A loop is overkill -- the access cannot span to 3 pages.  </pre>
+    </blockquote>
+    Yes, I will just do as you suggest!<br>
+    <br>
+    In the unit stride load, without mask,  the max access len is
+    checked . It is 512 in bytes.<br>
+    And current target page is 4096 in bytes.<br>
+    <br>
+    #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */<br>
+    <br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">These two functions
+can be merged using probe_access and MMU_DATA_{LOAD,STORE}.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+
++#ifdef HOST_WORDS_BIGENDIAN
++static void vext_clear(void *tail, uint32_t cnt, uint32_t tot)
++{
++    /*
++     * Split the remaining range to two parts.
++     * The first part is in the last uint64_t unit.
++     * The second part start from the next uint64_t unit.
++     */
++    int part1 = 0, part2 = tot - cnt;
++    if (cnt % 64) {
++        part1 = 64 - (cnt % 64);
++        part2 = tot - cnt - part1;
++        memset(tail &amp; ~(63ULL), 0, part1);
++        memset((tail + 64) &amp; ~(63ULL), 0, part2);
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+You're confusing bit and byte offsets -- cnt and tot are both byte offsets.
+</pre>
+    </blockquote>
+    Yes, I will fix it.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static inline int vext_elem_mask(void *v0, int mlen, int index)
++{
++
++    int idx = (index * mlen) / 8;
++    int pos = (index * mlen) % 8;
++
++    switch (mlen) {
++    case 8:
++        return *((uint8_t *)v0 + H1(index)) &amp; 0x1;
++    case 16:
++        return *((uint16_t *)v0 + H2(index)) &amp; 0x1;
++    case 32:
++        return *((uint32_t *)v0 + H4(index)) &amp; 0x1;
++    case 64:
++        return *((uint64_t *)v0 + index) &amp; 0x1;
++    default:</pre>
+        <table width="100%" cellspacing="2" cellpadding="2" border="1">
+          <tbody>
+            <tr>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+              <td valign="top"><br>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pre class="moz-quote-pre" wrap="">
++        return (*((uint8_t *)v0 + H1(idx)) &gt;&gt; pos) &amp; 0x1;
++    }
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+This is not what I had in mind, and looks wrong as well.
+
+    int idx = (index * mlen) / 64;
+    int pos = (index * mlen) % 64;
+    return (((uint64_t *)v0)[idx] &gt;&gt; pos) &amp; 1;
+
+You also might consider passing log2(mlen), so the multiplication could be
+strength-reduced to a shift.</pre>
+    </blockquote>
+    I don't think so. For example, when mlen is 8 bits and index is 0,
+    it will reduce to<br>
+    <pre class="moz-quote-pre" wrap="">return (((uint64_t *)v0)[0]) &amp; 1</pre>
+    And it's not right. <br>
+    <br>
+    The right bit is first bit in vector register 0. And in host big
+    endianess, <br>
+    it will be  the first bit of the seventh byte. <br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+#define GEN_VEXT_LD_ELEM(NAME, MTYPE, ETYPE, H, LDSUF)              \
++static void vext_##NAME##_ld_elem(CPURISCVState *env, abi_ptr addr, \
++        uint32_t idx, void *vd, uintptr_t retaddr)                  \
++{                                                                   \
++    int mmu_idx = cpu_mmu_index(env, false);                        \
++    MTYPE data;                                                     \
++    ETYPE *cur = ((ETYPE *)vd + H(idx));                            \
++    data = cpu_##LDSUF##_mmuidx_ra(env, addr, mmu_idx, retaddr);    \
++    *cur = data;                                                    \
++}                                                                   \
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+If you're going to use cpu_mmu_index, you might as well use cpu_SUFF_data_ra(),
+which does not require the mmu_idx parameter.
+</pre>
+    </blockquote>
+    Good.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+#define GEN_VEXT_ST_ELEM(NAME, ETYPE, H, STSUF)                       \
++static void vext_##NAME##_st_elem(CPURISCVState *env, abi_ptr addr,   \
++        uint32_t idx, void *vd, uintptr_t retaddr)                    \
++{                                                                     \
++    int mmu_idx = cpu_mmu_index(env, false);                          \
++    ETYPE data = *((ETYPE *)vd + H(idx));                             \
++    cpu_##STSUF##_mmuidx_ra(env, addr, data, mmu_idx, retaddr);       \
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Likewise.
+
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/*
++ *** unit-stride: load vector element from continuous guest memory
++ */
++static inline void vext_ld_us_mask(void *vd, void *v0, target_ulong base,
++        CPURISCVState *env, uint32_t desc,
++        vext_ld_elem_fn ld_elem,
++        vext_ld_clear_elem clear_elem,
++        uint32_t esz, uint32_t msz, uintptr_t ra)
++{
++    uint32_t i, k;
++    uint32_t mlen = vext_mlen(desc);
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+You don't need to pass mlen, since it's
+</pre>
+    </blockquote>
+    Yes.<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+/* unit-stride: store vector element to guest memory */
++static void vext_st_us_mask(void *vd, void *v0, target_ulong base,
++        CPURISCVState *env, uint32_t desc,
++        vext_st_elem_fn st_elem,
++        uint32_t esz, uint32_t msz, uintptr_t ra)
++{
++    uint32_t i, k;
++    uint32_t nf = vext_nf(desc);
++    uint32_t mlen = vext_mlen(desc);
++    uint32_t vlmax = vext_maxsz(desc) / esz;
++
++    /* probe every access*/
++    for (i = 0; i &lt; env-&gt;vl; i++) {
++        if (!vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        probe_write_access(env, base + nf * i * msz, nf * msz, ra);
++    }
++    /* store bytes to guest memory */
++    for (i = 0; i &lt; env-&gt;vl; i++) {
++        k = 0;
++        if (!vext_elem_mask(v0, mlen, i)) {
++            continue;
++        }
++        while (k &lt; nf) {
++            target_ulong addr = base + (i * nf + k) * msz;
++            st_elem(env, addr, i + k * vlmax, vd, ra);
++            k++;
++        }
++    }
++}
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I'll note that vext_ld_us_mask and vext_st_us_mask are identical, except for:
+
+1) probe_read/write_access (which I already suggested merging, using
+MMUAccessType),
+
+2) the name of the ld_elem/st_elem variable (the function types are already
+identical), and
+
+3) the clear loop at the end of the load (which could be conditional on
+clear_elem != NULL; after inlining, this should be optimized away).
+</pre>
+    </blockquote>
+    Good idea. Thanks.<br>
+    <br>
+    Zhiwei<br>
+    <blockquote type="cite"
+      cite="mid:4cfb56d6-34a5-0e35-87a0-2aefaafa4221@linaro.org">
+      <pre class="moz-quote-pre" wrap="">
+</pre>
+      <blockquote type="cite">
+        <pre class="moz-quote-pre" wrap="">+static void vext_st_us(void *vd, target_ulong base,
++        CPURISCVState *env, uint32_t desc,
++        vext_st_elem_fn st_elem,
++        uint32_t esz, uint32_t msz, uintptr_t ra)
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+Similarly.
 
 
-`haxm_warning: Ignored guest CR8 write, val=3D0x0
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored guest CR8 write, val=3D0x2
-haxm_warning: Ignored guest CR8 write, val=3D0x0
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored guest CR8 write, val=3D0x2
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored guest CR8 write, val=3D0x2
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored guest CR8 write, val=3D0xf
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored unsupported CR8 read, returning 0
-haxm_warning: Ignored guest CR8 write, val=3D0x2
-haxm_warning: Ignored guest CR8 write, val=3D0x0
-haxm_panic: Triple fault
-haxm_warning: 4000 VMX_PIN_CONTROLS: 1f
-haxm_warning: 4002 VMX_PRIMARY_PROCESSOR_CONTROLS: 969861fe
-haxm_warning: 401e VMX_SECONDARY_PROCESSOR_CONTROLS: aa
-haxm_warning: 4004 VMX_EXCEPTION_BITMAP: 40000
-haxm_warning: 4006 VMX_PAGE_FAULT_ERROR_CODE_MASK: 0
-haxm_warning: 4008 VMX_PAGE_FAULT_ERROR_CODE_MATCH: 0
-haxm_warning: 400c VMX_EXIT_CONTROLS: 236fff
-haxm_warning: 400e VMX_EXIT_MSR_STORE_COUNT: 0
-haxm_warning: 4010 VMX_EXIT_MSR_LOAD_COUNT: 0
-haxm_warning: 4012 VMX_ENTRY_CONTROLS: 93ff
-haxm_warning: 4014 VMX_ENTRY_MSR_LOAD_COUNT: 0
-haxm_warning: 4016 VMX_ENTRY_INTERRUPT_INFO: 8
-haxm_warning: 4018 VMX_ENTRY_EXCEPTION_ERROR_CODE: 0
-haxm_warning: 401a VMX_ENTRY_INSTRUCTION_LENGTH: 0
-haxm_warning: 401c VMX_TPR_THRESHOLD: 0
-haxm_warning: 6000 VMX_CR0_MASK: ffffffffe0000020
-haxm_warning: 6002 VMX_CR4_MASK: ffffffffffc8f860
-haxm_warning: 6004 VMX_CR0_READ_SHADOW: 80050031
-haxm_warning: 6006 VMX_CR4_READ_SHADOW: 6a0
-haxm_warning: 400a VMX_CR3_TARGET_COUNT: 0
-haxm_warning: 6008 VMX_CR3_TARGET_VAL_BASE: 0
-haxm_warning: 0000 VMX_VPID: 1
-haxm_warning: 2000 VMX_IO_BITMAP_A: 26e7b9000
-haxm_warning: 2002 VMX_IO_BITMAP_B: 26e7b7000
-haxm_warning: 2004 VMX_MSR_BITMAP: 26e7b6000
-haxm_warning: 2006 VMX_EXIT_MSR_STORE_ADDRESS: 0
-haxm_warning: 2008 VMX_EXIT_MSR_LOAD_ADDRESS: 0
-haxm_warning: 200a VMX_ENTRY_MSR_LOAD_ADDRESS: 0
-haxm_warning: 2010 VMX_TSC_OFFSET: fff957a04c01d76b
-haxm_warning: 2012 VMX_VAPIC_PAGE: 0
-haxm_warning: 2014 VMX_APIC_ACCESS_PAGE: 0
-haxm_warning: 201a VMX_EPTP: 1fb1f001e
-haxm_warning: 482e VMX_PREEMPTION_TIMER: 0
-haxm_warning: 4400 VMX_INSTRUCTION_ERROR_CODE: 0
-haxm_warning: 4402 VM_EXIT_INFO_REASON: 2
-haxm_warning: 4404 VM_EXIT_INFO_INTERRUPT_INFO: 0
-haxm_warning: 4406 VM_EXIT_INFO_EXCEPTION_ERROR_CODE: 0
-haxm_warning: 4408 VM_EXIT_INFO_IDT_VECTORING: 0
-haxm_warning: 440a VM_EXIT_INFO_IDT_VECTORING_ERROR_CODE: 0
-haxm_warning: 440c VM_EXIT_INFO_INSTRUCTION_LENGTH: 1
-haxm_warning: 440e VM_EXIT_INFO_INSTRUCTION_INFO: 0
-haxm_warning: 6400 VM_EXIT_INFO_QUALIFICATION: 0
-haxm_warning: 6402 VM_EXIT_INFO_IO_ECX: 60
-haxm_warning: 6404 VM_EXIT_INFO_IO_ESI: 1
-haxm_warning: 6406 VM_EXIT_INFO_IO_EDI: 1
-haxm_warning: 6408 VM_EXIT_INFO_IO_EIP: 191f405c
-haxm_warning: 640a VM_EXIT_INFO_GUEST_LINEAR_ADDRESS: 0
-haxm_warning: 2400 VM_EXIT_INFO_GUEST_PHYSICAL_ADDRESS: 1ea07ff0
-haxm_warning: 6c16 HOST_RIP: fffff80602e01a73
-haxm_warning: 6c14 HOST_RSP: ffff9b0aae6b74e0
-haxm_warning: 6c00 HOST_CR0: 80050033
-haxm_warning: 6c02 HOST_CR3: 12f527002
-haxm_warning: 6c04 HOST_CR4: 372678
-haxm_warning: 0c02 HOST_CS_SELECTOR: 10
-haxm_warning: 0c06 HOST_DS_SELECTOR: 28
-haxm_warning: 0c00 HOST_ES_SELECTOR: 28
-haxm_warning: 0c08 HOST_FS_SELECTOR: 0
-haxm_warning: 0c0a HOST_GS_SELECTOR: 0
-haxm_warning: 0c04 HOST_SS_SELECTOR: 18
-haxm_warning: 0c0c HOST_TR_SELECTOR: 40
-haxm_warning: 6c06 HOST_FS_BASE: 0
-haxm_warning: 6c08 HOST_GS_BASE: ffffad001d939000
-haxm_warning: 6c0a HOST_TR_BASE: ffffad001d5f7000
-haxm_warning: 6c0c HOST_GDTR_BASE: ffffad001d5f8fb0
-haxm_warning: 6c0e HOST_IDTR_BASE: ffffad001d5f6000
-haxm_warning: 4c00 HOST_SYSENTER_CS: 0
-haxm_warning: 6c10 HOST_SYSENTER_ESP: 0
-haxm_warning: 6c12 HOST_SYSENTER_EIP: 0
-haxm_warning: 681e GUEST_RIP: fffff807167c9370
-haxm_warning: 6820 GUEST_RFLAGS: 10082
-haxm_warning: 681c GUEST_RSP: fffff8071aa67708
-haxm_warning: 6800 GUEST_CR0: 80050031
-haxm_warning: 6802 GUEST_CR3: 1aa000
-haxm_warning: 6804 GUEST_CR4: 26e0
-haxm_warning: 0800 GUEST_ES_SELECTOR: 2b
-haxm_warning: 0802 GUEST_CS_SELECTOR: 10
-haxm_warning: 0804 GUEST_SS_SELECTOR: 0
-haxm_warning: 0806 GUEST_DS_SELECTOR: 2b
-haxm_warning: 0808 GUEST_FS_SELECTOR: 53
-haxm_warning: 080a GUEST_GS_SELECTOR: 2b
-haxm_warning: 080c GUEST_LDTR_SELECTOR: 0
-haxm_warning: 080e GUEST_TR_SELECTOR: 40
-haxm_warning: 4814 GUEST_ES_AR: c0f3
-haxm_warning: 4816 GUEST_CS_AR: 209b
-haxm_warning: 4818 GUEST_SS_AR: 1c000
-haxm_warning: 481a GUEST_DS_AR: c0f3
-haxm_warning: 481c GUEST_FS_AR: 40f3
-haxm_warning: 481e GUEST_GS_AR: c0f3
-haxm_warning: 4820 GUEST_LDTR_AR: 1c000
-haxm_warning: 4822 GUEST_TR_AR: 8b
-haxm_warning: 6806 GUEST_ES_BASE: 0
-haxm_warning: 6808 GUEST_CS_BASE: 0
-haxm_warning: 680a GUEST_SS_BASE: 0
-haxm_warning: 680c GUEST_DS_BASE: 0
-haxm_warning: 680e GUEST_FS_BASE: 0
-haxm_warning: 6810 GUEST_GS_BASE: fffff807128d3000
-haxm_warning: 6812 GUEST_LDTR_BASE: 0
-haxm_warning: 6814 GUEST_TR_BASE: fffff8071aa5c000
-haxm_warning: 6816 GUEST_GDTR_BASE: fffff8071aa5dfb0
-haxm_warning: 6818 GUEST_IDTR_BASE: fffff8071aa5b000
-haxm_warning: 4800 GUEST_ES_LIMIT: ffffffff
-haxm_warning: 4802 GUEST_CS_LIMIT: 0
-haxm_warning: 4804 GUEST_SS_LIMIT: ffffffff
-haxm_warning: 4806 GUEST_DS_LIMIT: ffffffff
-haxm_warning: 4808 GUEST_FS_LIMIT: 3c00
-haxm_warning: 480a GUEST_GS_LIMIT: ffffffff
-haxm_warning: 480c GUEST_LDTR_LIMIT: ffffffff
-haxm_warning: 480e GUEST_TR_LIMIT: 67
-haxm_warning: 4810 GUEST_GDTR_LIMIT: 57
-haxm_warning: 4812 GUEST_IDTR_LIMIT: fff
-haxm_warning: 2800 GUEST_VMCS_LINK_PTR: ffffffffffffffff
-haxm_warning: 2802 GUEST_DEBUGCTL: 0
-haxm_warning: 2804 GUEST_PAT: 0
-haxm_warning: 2806 GUEST_EFER: d01
-haxm_warning: 2808 GUEST_PERF_GLOBAL_CTRL: 0
-haxm_warning: 280a GUEST_PDPTE0: 3380050011
-haxm_warning: 280c GUEST_PDPTE1: 4000
-haxm_warning: 280e GUEST_PDPTE2: 3380050011
-haxm_warning: 2810 GUEST_PDPTE3: 3380050011
-haxm_warning: 681a GUEST_DR7: 400
-haxm_warning: 6822 GUEST_PENDING_DBE: 0
-haxm_warning: 482a GUEST_SYSENTER_CS: 0
-haxm_warning: 6824 GUEST_SYSENTER_ESP: 0
-haxm_warning: 6826 GUEST_SYSENTER_EIP: 0
-haxm_warning: 4828 GUEST_SMBASE: 0
-haxm_warning: 4824 GUEST_INTERRUPTIBILITY: 0
-haxm_warning: 4826 GUEST_ACTIVITY_STATE: 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: vcpu has panicked, id:0
-haxm_error: log_host_cr4_vmxe: 0
-haxm_error: log_host_cr4 0
-haxm_error: log_vmxon_res 0
-haxm_error: log_vmxon_addr 26e7ad000
-haxm_error: log_vmxon_err_type1 0
-haxm_error: log_vmxon_err_type2 0
-haxm_error: log_vmxon_err_type3 0
-haxm_error: log_vmclear_err 0
-haxm_error: log_vmptrld_err 0
-haxm_error: log_vmoff_no 0
-haxm_error: log_vmxoff_res 0
-haxm_error: ...........hax_teardown_vm
-`
+r~
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1865099
-
-Title:
-  cannot run x64 based system on x64 host with Intel Haxm
-
-Status in QEMU:
-  New
-
-Bug description:
-  i am trying to run Windows 10 x64 on Windows 10 x64 host with intel
-  haxm as kernel accelerator, but the system never boots, as far i read
-  the documentation everything should be fine...
-
-  the logs are qemu:
-
-  =
-
-  `
-  D:\vm>qemu-system-x86_64 -d guest_errors,out_asm,in_asm,op,op_opt,op_ind,=
-int,exec,cpu,fpu,mmu,pcall,cpu_reset,unimp,page,nochain -cpu core2duo -smp =
-4 -accel hax -drive file=3Dw10.img,index=3D0,media=3Ddisk,format=3Draw -cdr=
-om "E:\test\W10x64ProEn-UK.iso" -m 4G -L Bios -usbdevice mouse -usbdevice k=
-eyboard -boot menu=3Don -rtc base=3Dlocaltime,clock=3Dhost -name windows
-  qemu-system-x86_64: -usbdevice mouse: '-usbdevice' is deprecated, please =
-use '-device usb-...' instead
-  qemu-system-x86_64: -usbdevice keyboard: '-usbdevice' is deprecated, plea=
-se use '-device usb-...' instead
-  HAX is working and emulator runs in fast virt mode.
-  CPU Reset (CPU 0)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 00000000 00000000
-  CS =3D0000 00000000 00000000 00000000
-  SS =3D0000 00000000 00000000 00000000
-  DS =3D0000 00000000 00000000 00000000
-  FS =3D0000 00000000 00000000 00000000
-  GS =3D0000 00000000 00000000 00000000
-  LDT=3D0000 00000000 00000000 00000000
-  TR =3D0000 00000000 00000000 00000000
-  GDT=3D     00000000 00000000
-  IDT=3D     00000000 00000000
-  CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D0000000000000000 DR7=3D0000000000000000
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 1)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 00000000 00000000
-  CS =3D0000 00000000 00000000 00000000
-  SS =3D0000 00000000 00000000 00000000
-  DS =3D0000 00000000 00000000 00000000
-  FS =3D0000 00000000 00000000 00000000
-  GS =3D0000 00000000 00000000 00000000
-  LDT=3D0000 00000000 00000000 00000000
-  TR =3D0000 00000000 00000000 00000000
-  GDT=3D     00000000 00000000
-  IDT=3D     00000000 00000000
-  CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D0000000000000000 DR7=3D0000000000000000
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 2)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 00000000 00000000
-  CS =3D0000 00000000 00000000 00000000
-  SS =3D0000 00000000 00000000 00000000
-  DS =3D0000 00000000 00000000 00000000
-  FS =3D0000 00000000 00000000 00000000
-  GS =3D0000 00000000 00000000 00000000
-  LDT=3D0000 00000000 00000000 00000000
-  TR =3D0000 00000000 00000000 00000000
-  GDT=3D     00000000 00000000
-  IDT=3D     00000000 00000000
-  CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D0000000000000000 DR7=3D0000000000000000
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 3)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00000000
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 00000000 00000000
-  CS =3D0000 00000000 00000000 00000000
-  SS =3D0000 00000000 00000000 00000000
-  DS =3D0000 00000000 00000000 00000000
-  FS =3D0000 00000000 00000000 00000000
-  GS =3D0000 00000000 00000000 00000000
-  LDT=3D0000 00000000 00000000 00000000
-  TR =3D0000 00000000 00000000 00000000
-  GDT=3D     00000000 00000000
-  IDT=3D     00000000 00000000
-  CR0=3D00000000 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D0000000000000000 DR7=3D0000000000000000
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D0000 FSW=3D0000 [ST=3D0] FTW=3Dff MXCSR=3D00000000
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 0)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 1)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 2)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 3)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 1)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 2)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  CPU Reset (CPU 3)
-  EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D000006fb
-  ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-  EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-  ES =3D0000 00000000 0000ffff 00009300
-  CS =3Df000 ffff0000 0000ffff 00009b00
-  SS =3D0000 00000000 0000ffff 00009300
-  DS =3D0000 00000000 0000ffff 00009300
-  FS =3D0000 00000000 0000ffff 00009300
-  GS =3D0000 00000000 0000ffff 00009300
-  LDT=3D0000 00000000 0000ffff 00008200
-  TR =3D0000 00000000 0000ffff 00008b00
-  GDT=3D     00000000 0000ffff
-  IDT=3D     00000000 0000ffff
-  CR0=3D60000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-  DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=
-=3D0000000000000000
-  DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-  CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC
-  EFER=3D0000000000000000
-  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
-00000000
-  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
-00000000
-  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
-00000000
-  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
-00000000
-  CR0 update: CR0=3D0x60000010
-  VCPU shutdown request
-  VCPU shutdown request
-  VCPU shutdown request
-  `
-
-  =
-
-  intel haxm (kernel logs):
-
-  =
-
-  `haxm_warning: Ignored guest CR8 write, val=3D0x0
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored guest CR8 write, val=3D0x2
-  haxm_warning: Ignored guest CR8 write, val=3D0x0
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored guest CR8 write, val=3D0x2
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored guest CR8 write, val=3D0x2
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored guest CR8 write, val=3D0xf
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored unsupported CR8 read, returning 0
-  haxm_warning: Ignored guest CR8 write, val=3D0x2
-  haxm_warning: Ignored guest CR8 write, val=3D0x0
-  haxm_panic: Triple fault
-  haxm_warning: 4000 VMX_PIN_CONTROLS: 1f
-  haxm_warning: 4002 VMX_PRIMARY_PROCESSOR_CONTROLS: 969861fe
-  haxm_warning: 401e VMX_SECONDARY_PROCESSOR_CONTROLS: aa
-  haxm_warning: 4004 VMX_EXCEPTION_BITMAP: 40000
-  haxm_warning: 4006 VMX_PAGE_FAULT_ERROR_CODE_MASK: 0
-  haxm_warning: 4008 VMX_PAGE_FAULT_ERROR_CODE_MATCH: 0
-  haxm_warning: 400c VMX_EXIT_CONTROLS: 236fff
-  haxm_warning: 400e VMX_EXIT_MSR_STORE_COUNT: 0
-  haxm_warning: 4010 VMX_EXIT_MSR_LOAD_COUNT: 0
-  haxm_warning: 4012 VMX_ENTRY_CONTROLS: 93ff
-  haxm_warning: 4014 VMX_ENTRY_MSR_LOAD_COUNT: 0
-  haxm_warning: 4016 VMX_ENTRY_INTERRUPT_INFO: 8
-  haxm_warning: 4018 VMX_ENTRY_EXCEPTION_ERROR_CODE: 0
-  haxm_warning: 401a VMX_ENTRY_INSTRUCTION_LENGTH: 0
-  haxm_warning: 401c VMX_TPR_THRESHOLD: 0
-  haxm_warning: 6000 VMX_CR0_MASK: ffffffffe0000020
-  haxm_warning: 6002 VMX_CR4_MASK: ffffffffffc8f860
-  haxm_warning: 6004 VMX_CR0_READ_SHADOW: 80050031
-  haxm_warning: 6006 VMX_CR4_READ_SHADOW: 6a0
-  haxm_warning: 400a VMX_CR3_TARGET_COUNT: 0
-  haxm_warning: 6008 VMX_CR3_TARGET_VAL_BASE: 0
-  haxm_warning: 0000 VMX_VPID: 1
-  haxm_warning: 2000 VMX_IO_BITMAP_A: 26e7b9000
-  haxm_warning: 2002 VMX_IO_BITMAP_B: 26e7b7000
-  haxm_warning: 2004 VMX_MSR_BITMAP: 26e7b6000
-  haxm_warning: 2006 VMX_EXIT_MSR_STORE_ADDRESS: 0
-  haxm_warning: 2008 VMX_EXIT_MSR_LOAD_ADDRESS: 0
-  haxm_warning: 200a VMX_ENTRY_MSR_LOAD_ADDRESS: 0
-  haxm_warning: 2010 VMX_TSC_OFFSET: fff957a04c01d76b
-  haxm_warning: 2012 VMX_VAPIC_PAGE: 0
-  haxm_warning: 2014 VMX_APIC_ACCESS_PAGE: 0
-  haxm_warning: 201a VMX_EPTP: 1fb1f001e
-  haxm_warning: 482e VMX_PREEMPTION_TIMER: 0
-  haxm_warning: 4400 VMX_INSTRUCTION_ERROR_CODE: 0
-  haxm_warning: 4402 VM_EXIT_INFO_REASON: 2
-  haxm_warning: 4404 VM_EXIT_INFO_INTERRUPT_INFO: 0
-  haxm_warning: 4406 VM_EXIT_INFO_EXCEPTION_ERROR_CODE: 0
-  haxm_warning: 4408 VM_EXIT_INFO_IDT_VECTORING: 0
-  haxm_warning: 440a VM_EXIT_INFO_IDT_VECTORING_ERROR_CODE: 0
-  haxm_warning: 440c VM_EXIT_INFO_INSTRUCTION_LENGTH: 1
-  haxm_warning: 440e VM_EXIT_INFO_INSTRUCTION_INFO: 0
-  haxm_warning: 6400 VM_EXIT_INFO_QUALIFICATION: 0
-  haxm_warning: 6402 VM_EXIT_INFO_IO_ECX: 60
-  haxm_warning: 6404 VM_EXIT_INFO_IO_ESI: 1
-  haxm_warning: 6406 VM_EXIT_INFO_IO_EDI: 1
-  haxm_warning: 6408 VM_EXIT_INFO_IO_EIP: 191f405c
-  haxm_warning: 640a VM_EXIT_INFO_GUEST_LINEAR_ADDRESS: 0
-  haxm_warning: 2400 VM_EXIT_INFO_GUEST_PHYSICAL_ADDRESS: 1ea07ff0
-  haxm_warning: 6c16 HOST_RIP: fffff80602e01a73
-  haxm_warning: 6c14 HOST_RSP: ffff9b0aae6b74e0
-  haxm_warning: 6c00 HOST_CR0: 80050033
-  haxm_warning: 6c02 HOST_CR3: 12f527002
-  haxm_warning: 6c04 HOST_CR4: 372678
-  haxm_warning: 0c02 HOST_CS_SELECTOR: 10
-  haxm_warning: 0c06 HOST_DS_SELECTOR: 28
-  haxm_warning: 0c00 HOST_ES_SELECTOR: 28
-  haxm_warning: 0c08 HOST_FS_SELECTOR: 0
-  haxm_warning: 0c0a HOST_GS_SELECTOR: 0
-  haxm_warning: 0c04 HOST_SS_SELECTOR: 18
-  haxm_warning: 0c0c HOST_TR_SELECTOR: 40
-  haxm_warning: 6c06 HOST_FS_BASE: 0
-  haxm_warning: 6c08 HOST_GS_BASE: ffffad001d939000
-  haxm_warning: 6c0a HOST_TR_BASE: ffffad001d5f7000
-  haxm_warning: 6c0c HOST_GDTR_BASE: ffffad001d5f8fb0
-  haxm_warning: 6c0e HOST_IDTR_BASE: ffffad001d5f6000
-  haxm_warning: 4c00 HOST_SYSENTER_CS: 0
-  haxm_warning: 6c10 HOST_SYSENTER_ESP: 0
-  haxm_warning: 6c12 HOST_SYSENTER_EIP: 0
-  haxm_warning: 681e GUEST_RIP: fffff807167c9370
-  haxm_warning: 6820 GUEST_RFLAGS: 10082
-  haxm_warning: 681c GUEST_RSP: fffff8071aa67708
-  haxm_warning: 6800 GUEST_CR0: 80050031
-  haxm_warning: 6802 GUEST_CR3: 1aa000
-  haxm_warning: 6804 GUEST_CR4: 26e0
-  haxm_warning: 0800 GUEST_ES_SELECTOR: 2b
-  haxm_warning: 0802 GUEST_CS_SELECTOR: 10
-  haxm_warning: 0804 GUEST_SS_SELECTOR: 0
-  haxm_warning: 0806 GUEST_DS_SELECTOR: 2b
-  haxm_warning: 0808 GUEST_FS_SELECTOR: 53
-  haxm_warning: 080a GUEST_GS_SELECTOR: 2b
-  haxm_warning: 080c GUEST_LDTR_SELECTOR: 0
-  haxm_warning: 080e GUEST_TR_SELECTOR: 40
-  haxm_warning: 4814 GUEST_ES_AR: c0f3
-  haxm_warning: 4816 GUEST_CS_AR: 209b
-  haxm_warning: 4818 GUEST_SS_AR: 1c000
-  haxm_warning: 481a GUEST_DS_AR: c0f3
-  haxm_warning: 481c GUEST_FS_AR: 40f3
-  haxm_warning: 481e GUEST_GS_AR: c0f3
-  haxm_warning: 4820 GUEST_LDTR_AR: 1c000
-  haxm_warning: 4822 GUEST_TR_AR: 8b
-  haxm_warning: 6806 GUEST_ES_BASE: 0
-  haxm_warning: 6808 GUEST_CS_BASE: 0
-  haxm_warning: 680a GUEST_SS_BASE: 0
-  haxm_warning: 680c GUEST_DS_BASE: 0
-  haxm_warning: 680e GUEST_FS_BASE: 0
-  haxm_warning: 6810 GUEST_GS_BASE: fffff807128d3000
-  haxm_warning: 6812 GUEST_LDTR_BASE: 0
-  haxm_warning: 6814 GUEST_TR_BASE: fffff8071aa5c000
-  haxm_warning: 6816 GUEST_GDTR_BASE: fffff8071aa5dfb0
-  haxm_warning: 6818 GUEST_IDTR_BASE: fffff8071aa5b000
-  haxm_warning: 4800 GUEST_ES_LIMIT: ffffffff
-  haxm_warning: 4802 GUEST_CS_LIMIT: 0
-  haxm_warning: 4804 GUEST_SS_LIMIT: ffffffff
-  haxm_warning: 4806 GUEST_DS_LIMIT: ffffffff
-  haxm_warning: 4808 GUEST_FS_LIMIT: 3c00
-  haxm_warning: 480a GUEST_GS_LIMIT: ffffffff
-  haxm_warning: 480c GUEST_LDTR_LIMIT: ffffffff
-  haxm_warning: 480e GUEST_TR_LIMIT: 67
-  haxm_warning: 4810 GUEST_GDTR_LIMIT: 57
-  haxm_warning: 4812 GUEST_IDTR_LIMIT: fff
-  haxm_warning: 2800 GUEST_VMCS_LINK_PTR: ffffffffffffffff
-  haxm_warning: 2802 GUEST_DEBUGCTL: 0
-  haxm_warning: 2804 GUEST_PAT: 0
-  haxm_warning: 2806 GUEST_EFER: d01
-  haxm_warning: 2808 GUEST_PERF_GLOBAL_CTRL: 0
-  haxm_warning: 280a GUEST_PDPTE0: 3380050011
-  haxm_warning: 280c GUEST_PDPTE1: 4000
-  haxm_warning: 280e GUEST_PDPTE2: 3380050011
-  haxm_warning: 2810 GUEST_PDPTE3: 3380050011
-  haxm_warning: 681a GUEST_DR7: 400
-  haxm_warning: 6822 GUEST_PENDING_DBE: 0
-  haxm_warning: 482a GUEST_SYSENTER_CS: 0
-  haxm_warning: 6824 GUEST_SYSENTER_ESP: 0
-  haxm_warning: 6826 GUEST_SYSENTER_EIP: 0
-  haxm_warning: 4828 GUEST_SMBASE: 0
-  haxm_warning: 4824 GUEST_INTERRUPTIBILITY: 0
-  haxm_warning: 4826 GUEST_ACTIVITY_STATE: 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: vcpu has panicked, id:0
-  haxm_error: log_host_cr4_vmxe: 0
-  haxm_error: log_host_cr4 0
-  haxm_error: log_vmxon_res 0
-  haxm_error: log_vmxon_addr 26e7ad000
-  haxm_error: log_vmxon_err_type1 0
-  haxm_error: log_vmxon_err_type2 0
-  haxm_error: log_vmxon_err_type3 0
-  haxm_error: log_vmclear_err 0
-  haxm_error: log_vmptrld_err 0
-  haxm_error: log_vmoff_no 0
-  haxm_error: log_vmxoff_res 0
-  haxm_error: ...........hax_teardown_vm
-  `
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1865099/+subscriptions
+--------------6091AF5C174EB126FE31EAF0--
 
