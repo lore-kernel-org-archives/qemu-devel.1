@@ -2,88 +2,73 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C22C3F2D0
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6746EC3F2CF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:16:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 143C5246A2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:10:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CncMMIG3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143C5246A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C467246A2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 09:16:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C467246A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7bet-00017u-6V
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:10:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48642)
+	id 1j7bkl-000302-Eq
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 04:16:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j7beJ-0000gL-BN
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:09:36 -0500
+ (envelope-from <bounces@canonical.com>) id 1j7bkB-0002Yd-Hm
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j7beH-00042L-89
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:09:34 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57908
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j7beH-00040q-1H
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:09:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582880972;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FWl0WKcJ9dQO0k55Ts5hv7Wk7YLffW+ijB8JO79CDXs=;
- b=CncMMIG3wKkqTPMUjSsXJZ18WW8lPFVLVZRuPzwDdhdL1rNJY8AzWPCcGQf90sge0eZeXX
- wiC0s6Uw93C/B5+iV5IGdYLyrIdNEyTjA6J99EF0Owzbcf/VRFAsrWM42YsTAW/lK2fRbc
- 918CFGVIlj83Gt37zOVROibf6fFgvjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-iSzOCTmNOnWBblBUuWyXCg-1; Fri, 28 Feb 2020 04:09:30 -0500
-X-MC-Unique: iSzOCTmNOnWBblBUuWyXCg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EB2613E4;
- Fri, 28 Feb 2020 09:09:29 +0000 (UTC)
-Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B763090539;
- Fri, 28 Feb 2020 09:09:28 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [PATCH v2 3/3] savevm: check RAM is pagesize aligned
-In-Reply-To: <CAL1e-=h+SkEPy1VVvdNeo9T1mAT5-dA7orsj0TFtfDsTofwzFg@mail.gmail.com>
- (Aleksandar Markovic's message of "Thu, 27 Feb 2020 22:00:27 +0100")
-References: <20200103074000.1006389-1-marcandre.lureau@redhat.com>
- <20200103074000.1006389-4-marcandre.lureau@redhat.com>
- <8736cqi07g.fsf@secure.laptop>
- <CAJ+F1CLgg6Yz=2V8_eCVtsJ1zPm=1-piz-Nw05KGXkSqWytLgA@mail.gmail.com>
- <87r1yfc1q1.fsf@secure.laptop>
- <CAL1e-=h+SkEPy1VVvdNeo9T1mAT5-dA7orsj0TFtfDsTofwzFg@mail.gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Fri, 28 Feb 2020 10:09:23 +0100
-Message-ID: <87mu9384e4.fsf@secure.laptop>
+ (envelope-from <bounces@canonical.com>) id 1j7bkA-0006bV-6o
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:15:39 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45046)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j7bk9-0006b4-Vx
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 04:15:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j7bk8-0007R1-Fb
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 09:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6D31D2E8073
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 09:15:36 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 28 Feb 2020 09:07:53 -0000
+From: Olaf Seibert <1865048@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: oseibert-sys11 xanclic
+X-Launchpad-Bug-Reporter: Olaf Seibert (oseibert-sys11)
+X-Launchpad-Bug-Modifier: Olaf Seibert (oseibert-sys11)
+References: <158281763694.13572.4793000469968260846.malonedeb@gac.canonical.com>
+Message-Id: <158288087335.13901.4198281883735897716.malone@gac.canonical.com>
+Subject: [Bug 1865048] Re: qemu-img --force-share does not disable file locking
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="9eff1c37c1740693bdcba94d8f8c608164af5689";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: dc466c9ebb3d19774221d188632f3d89c732e6f8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,95 +77,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1865048 <1865048@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
-> On Thursday, February 27, 2020, Juan Quintela <quintela@redhat.com> wrote=
-:
->
->  Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
->  > Hi Juan
->  >
->  > On Wed, Jan 8, 2020 at 2:08 PM Juan Quintela <quintela@redhat.com> wro=
-te:
->  >>
->  >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->  >> n> Check the host pointer is correctly aligned, otherwise we may fail
->  >> > during migration in ram_block_discard_range().
->  >> >
->  >> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->  >>
->  >> Reviewed-by: Juan Quintela <quintela@redhat.com>
->  >>
->  >> queued
->  >>
->  >
->  > Did it get lost? thanks
->
->  I dropped it in the past, because it made "make check" for mips fail.
->  (I put it on my ToDo list to investigate and forgot about it)
->
-> Thank you for caring for mips.
->
-> Do you perhaps remember what was tgevtest and environment for the failing=
- test?
+Hi Maz,
 
+thanks for the information!
 
-And here we are again.
-I only compile on an x86 32bit host when I am going to do a pull
-request.
+The situation we're in is where we are suspecting the file locking on a
+shared network file system to be broken, so we were looking for ways to
+avoid any locking. I had tried some variations on your image-opts style
+invocation, but did not find any variant where the automatic file format
+detection would be preserved. For instance, with --image-opts
+driver=3Dfile,filename=3Dfoo.qcow2,locking=3Doff it would think the file is
+raw. But the one you give seems to do what I want to experiment with, so
+thanks again!
 
-qemu-system-mips64el: /mnt/code/qemu/full/migration/savevm.c:2923: vmstate_=
-register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qemu_ram
-_get_host_addr(rb), qemu_ram_pagesize(rb))' failed.
-Broken pipe
-/mnt/code/qemu/full/tests/qtest/libqtest.c:175: kill_qemu() detected QEMU d=
-eath from signal 6 (Aborted) (core dumped)
-  TEST    check-qtest-aarch64: tests/qtest/qom-test
-ERROR - too few tests run (expected 4, got 0)
-make: *** [/mnt/code/qemu/full/tests/Makefile.include:632: check-qtest-mips=
-64el] Error 1
-make: *** Waiting for unfinished jobs....
+-Olaf.
 
+-- =
 
-As you can see, this is mips tcg running in a 32bit host.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1865048
 
-$ export QTEST_QEMU_BINARY=3D./mips64el-softmmu/qemu-system-mips64el=20
-$ ./tests/qtest/qom-test
-/mips64el/qom/pica61: OK
-/mips64el/qom/mipssim: OK
-/mips64el/qom/mips: OK
-/mips64el/qom/fulong2e: OK
-/mips64el/qom/malta: OK
-/mips64el/qom/boston: OK
-/mips64el/qom/none: OK
-/mips64el/qom/magnum: qemu-system-mips64el: /mnt/code/qemu/full/migration/s=
-avevm.c:2923: vmstate_register_ram: Assertion `QEMU_PTR_IS_ALIGNED(qemu_ram=
-_get_host_addr(rb), qemu_ram_pagesize(rb))' failed.
-Broken pipe
-/mnt/code/qemu/full/tests/qtest/libqtest.c:175: kill_qemu() detected QEMU d=
-eath from signal 6 (Aborted) (core dumped)
-Aborted (core dumped)
-$=20
+Title:
+  qemu-img --force-share does not disable file locking
 
-Can you take a look at this?
+Status in QEMU:
+  Invalid
 
-mips64-softmmu also fails on the same place, mips[el]-softmmu passes,
-but they don't use magnum.
+Bug description:
+  The new option "--force-share" for qemu-img does not disable file
+  locking.
 
-Code is supposed to be right, I will expect that the problem is in the
-magnum board, but this is qemu + mips + migration.  Anything can happen.
+  I tried it with version qemu-img version 2.11.1(Debian 1:2.11+dfsg-
+  1ubuntu7.21~cloud0) and I traced the source code of the current git
+  trunk.
 
-Marc, I have to drop it again.
+  Sample to demonstrate:
 
-Later, Juan.
+  # strace qemu-img info --force-share testfile.qcow2   2>&1 | grep F_RDLCK
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
+  fcntl(11, F_OFD_SETLK, {l_type=3DF_RDLCK, l_whence=3DSEEK_SET, l_start=3D=
+100, l_len=3D1}) =3D 0
 
+  I traced the passing of the --force-share option through the source
+  code (I used commit 6c599282f8 as of Mon Feb 17 13:32:25 2020 +0000)
+
+  qemu-img.c:img_info()
+          force_share =3D true;
+  qemu-img.c:collect_image_info_list(force_share)
+  qemu-img.c:img_open(force_share)
+  qemu-img.c:img_open_file(force_share)
+          qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
+  block/block-backend.c:blk_new_open(options)
+  block.c:bdrv_open(options)
+  block.c:bdrv_open_inheritoptions()
+  block.c:bdrv_open_common(options)
+          bs->force_share =3D qemu_opt_get_bool(opts, BDRV_OPT_FORCE_SHARE,=
+ false);
+  block.c:bdrv_open_driver(bs)
+  include/block/block_int.h:int (*bdrv_file_open)(BlockDriverState *bs, QDi=
+ct *options, int flags,
+  block/file-posix.c:.bdrv_file_open =3D raw_open,
+  block/file-posix.c:raw_open_common(bs)
+          locking =3D qapi_enum_parse(&OnOffAuto_lookup,
+                                qemu_opt_get(opts, "locking"),
+                                ON_OFF_AUTO_AUTO, &local_err);
+          ignoring bs->force_share
+
+  At the end, bs->force_share is ignored in determining the locking
+  value.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1865048/+subscriptions
 
