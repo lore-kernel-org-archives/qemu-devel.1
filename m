@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7139FC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2C07C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37D6420732
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C02B20732
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:40:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nM4d+fck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D6420732
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EVBok5pl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C02B20732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7igG-0000hm-C8
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:40:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56399)
+	id 1j7igK-0000sM-Ln
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:40:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7if4-0007Ei-8B
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:51 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7if9-0007Kx-97
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7if3-0001nR-0M
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:50 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40083)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7if8-0001qz-A3
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:55 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:34219)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7if2-0001my-QH
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:48 -0500
-Received: by mail-wm1-x334.google.com with SMTP id d138so2302924wmd.5
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:38:48 -0800 (PST)
+ id 1j7if8-0001qW-3p
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:54 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id z15so3707575wrl.1
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:38:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=A5mwcI/ZKfr3Tx2KU66kVPbnF23MRJiSSiyB+hKM2CQ=;
- b=nM4d+fcknakBsqL9wyxhzJT2RzyVjLOGS2qg/4JqBsOAh82YqanlOr51BWUbEBceEz
- eq5T5m7uuryLQOaPUFORQIccCk2yG/1jQuMnenT8HKyBl+f6CaCx980uxkkq6fF3mKTO
- dH/W7qejJdrRLq5phLA6zVgOuVT4TI0nRsuHV5E7uhXbkINPEzifQRw45vBWrH1bYvfJ
- HVb/k3oyzSwkSxtLH8QxUZPN3YYsbyG241SvuXq09Mv3+xyAki0nyL99z32jlIx1hoPj
- rckezZavDsA7OQYalPesDckOZS2fbRtb7Y4nS1AMh/XZhcUegr9iNsd0ME9S8GiG4Rej
- yyqQ==
+ bh=qGZ+hkeDo4DLkuBIrqEdZXUncCd+tIHU06Z8m9ZQiI8=;
+ b=EVBok5plp2swBkBlt3cKGXscx9khXWHu7NM5IMfEpOTL0EmFeRCyJ1FbmTAyGMxDTc
+ dA9fQYIbHa/s9kc4W9Jz7jbYPolRmwPxZuVAT0k/v5AGtOfdoks4rWD0c9jIqNOmOBFD
+ wwdvPksgGMIKro2NBPwFh6UCuvv2nBW2rs9CcZ4KItAza7EHI9Laj0FaGjEv9OHj+A3z
+ O0TUhkvBam6/RawsvLZu2O940oWNfibfSXIPFRoSUlXtJRDh12ykyfPJ6AM87S4QrMTH
+ TVEt+T6o35Uk9D0HTFyWNbxSihIt2WRZxCkf6B8RrUHozV3eyAuco/OV1iUpqMoDTW+P
+ m+Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=A5mwcI/ZKfr3Tx2KU66kVPbnF23MRJiSSiyB+hKM2CQ=;
- b=XhD9rF2bV6fP+wmhbGNUNpzIQTmtJgQoTPtpVglOubf1eMoD6FLTWzkRfWZTTf2PSS
- N1Qfx1gvEJOwkzZc6Vs1lacLmkibX84RVb3dcjnzu2gmQnKdJ4YCZu4fDANA/yICpWMQ
- RGhZj+OZaUO+aYWaT9EnvOuxy7tqX7tiO3aS/Hy4g6KvXwAn7rljNEvXpuNDSdqtYsrV
- a/m7St2qQ2FKDyCO0n+VKovuH6E852XuFh6i+vdE37Qzx+tOScss2BLe1EzJ42fSLKeD
- 3MJBMqEtd7GXMjwrmaUan7ivqQzssY3+jgiokXgmVQ8oCPaRpL1MNTGE60dP5bHHSJEg
- Az5w==
-X-Gm-Message-State: APjAAAUZzGATT2v10HVi9ZMHHbRRQZAI9OCqUe7NwaHLu3l07m0xhWYf
- UArB6XFNBgmlH1N0ZuP7apsZMYrMXMZ6uA==
-X-Google-Smtp-Source: APXvYqzu/nX+vUqm+o7lq7cOBxBXzkS6R7+0elAYGTOeBvXadvnOwFlnWqwYmIO0ps65jlZ6wwTUWQ==
-X-Received: by 2002:a7b:cbcf:: with SMTP id n15mr5572752wmi.21.1582907927354; 
- Fri, 28 Feb 2020 08:38:47 -0800 (PST)
+ bh=qGZ+hkeDo4DLkuBIrqEdZXUncCd+tIHU06Z8m9ZQiI8=;
+ b=cs+h13HvB1YP7MlWa0fEX7b4zcIjPy0M4DSOgS4SKBUFDe01uaVZpv0Sk2F2dph9Fr
+ jiC4yrln9r3iz3U2thasvoAgpX/4VNlZd0KtL7CnzMJR6RVfHYYqaiKJFPKNw9ldPc00
+ ao2X4fSVI0YqqktryvDHF21Ho0t+hL1wGav70Wg0PlFpFb2T7yPEzktvVIWA/NAm6/5a
+ YaWCjhX8r81vh93B8zCj8zYQTRjZQE2w7PLQbl70ZN/R2si+4FQ1lkmu7dBclrIDrUCA
+ DGhe7mdiTUI0geq8VKAyzRgrAvkOd1GZLgdqntkAa6L2zGsKr68fzvc2Xf10znQXoPwW
+ 854g==
+X-Gm-Message-State: APjAAAVPDrJHUHC1NYUpkgVpvNNFrSoVcCpFxCaxpRmuQZorxzIwqKHI
+ n8JYXjaHHFZ/XJEYGv8hTo8xxzpr+o4vcQ==
+X-Google-Smtp-Source: APXvYqySh1vMh7hJzIrc+Pbqo6HGOSx+T+4ogT2M+kzaYoZibKdJ93b1L6xATqyY2S/hWhgjvGte3Q==
+X-Received: by 2002:a5d:4450:: with SMTP id x16mr5491088wrr.242.1582907932781; 
+ Fri, 28 Feb 2020 08:38:52 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.38.46
+ by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.38.51
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:38:46 -0800 (PST)
+ Fri, 28 Feb 2020 08:38:52 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/33] arm_gic: Mask the un-supported priority bits
-Date: Fri, 28 Feb 2020 16:38:11 +0000
-Message-Id: <20200228163840.23585-5-peter.maydell@linaro.org>
+Subject: [PULL 09/33] target/arm: Add isar_feature_aa32_{fpsp_v2, fpsp_v3,
+ fpdp_v3}
+Date: Fri, 28 Feb 2020 16:38:16 +0000
+Message-Id: <20200228163840.23585-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
 References: <20200228163840.23585-1-peter.maydell@linaro.org>
@@ -81,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,140 +98,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-The GICv2 allows the implementation to implement a variable number
-of priority bits; unimplemented bits in the priority registers
-are read as zeros, writes ignored. We were previously always
-implementing a full 8 bits of priority, which is allowed but not
-what the real hardware typically does (which is usually to have
-4 or 5 bits of priority).
+We will shortly use these to test for VFPv2 and VFPv3
+in different situations.
 
-Add a new device property to allow the number of implemented
-property bits to be specified.
-
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Message-id: 1582537164-764-2-git-send-email-sai.pavan.boddu@xilinx.com
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: improved commit message]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200224222232.13807-4-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/intc/arm_gic.h        |  2 ++
- include/hw/intc/arm_gic_common.h |  1 +
- hw/intc/arm_gic.c                | 33 ++++++++++++++++++++++++++++++--
- hw/intc/arm_gic_common.c         |  1 +
- 4 files changed, 35 insertions(+), 2 deletions(-)
+ target/arm/cpu.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/hw/intc/arm_gic.h b/include/hw/intc/arm_gic.h
-index ed703a17203..303b9748cbb 100644
---- a/include/hw/intc/arm_gic.h
-+++ b/include/hw/intc/arm_gic.h
-@@ -68,6 +68,8 @@
- 
- /* Number of SGI target-list bits */
- #define GIC_TARGETLIST_BITS 8
-+#define GIC_MAX_PRIORITY_BITS 8
-+#define GIC_MIN_PRIORITY_BITS 4
- 
- #define TYPE_ARM_GIC "arm_gic"
- #define ARM_GIC(obj) \
-diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_common.h
-index b5585fec451..6e0d6b8a889 100644
---- a/include/hw/intc/arm_gic_common.h
-+++ b/include/hw/intc/arm_gic_common.h
-@@ -96,6 +96,7 @@ typedef struct GICState {
-     uint16_t priority_mask[GIC_NCPU_VCPU];
-     uint16_t running_priority[GIC_NCPU_VCPU];
-     uint16_t current_pending[GIC_NCPU_VCPU];
-+    uint32_t n_prio_bits;
- 
-     /* If we present the GICv2 without security extensions to a guest,
-      * the guest can configure the GICC_CTLR to configure group 1 binary point
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 1d7da7baa20..c60dc6b5e6e 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -641,6 +641,23 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-     return ret;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 1e6eac0cd2a..f7a90f512e3 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3470,12 +3470,30 @@ static inline bool isar_feature_aa32_fpshvec(const ARMISARegisters *id)
+     return FIELD_EX32(id->mvfr0, MVFR0, FPSHVEC) > 0;
  }
  
-+static uint32_t gic_fullprio_mask(GICState *s, int cpu)
++static inline bool isar_feature_aa32_fpsp_v2(const ARMISARegisters *id)
 +{
-+    /*
-+     * Return a mask word which clears the unimplemented priority
-+     * bits from a priority value for an interrupt. (Not to be
-+     * confused with the group priority, whose mask depends on BPR.)
-+     */
-+    int priBits;
-+
-+    if (gic_is_vcpu(cpu)) {
-+        priBits = GIC_VIRT_MAX_GROUP_PRIO_BITS;
-+    } else {
-+        priBits = s->n_prio_bits;
-+    }
-+    return ~0U << (8 - priBits);
++    /* Return true if CPU supports single precision floating point, VFPv2 */
++    return FIELD_EX32(id->mvfr0, MVFR0, FPSP) > 0;
 +}
 +
- void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-                       MemTxAttrs attrs)
++static inline bool isar_feature_aa32_fpsp_v3(const ARMISARegisters *id)
++{
++    /* Return true if CPU supports single precision floating point, VFPv3 */
++    return FIELD_EX32(id->mvfr0, MVFR0, FPSP) >= 2;
++}
++
+ static inline bool isar_feature_aa32_fpdp_v2(const ARMISARegisters *id)
  {
-@@ -651,6 +668,8 @@ void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-         val = 0x80 | (val >> 1); /* Non-secure view */
-     }
- 
-+    val &= gic_fullprio_mask(s, cpu);
-+
-     if (irq < GIC_INTERNAL) {
-         s->priority1[irq][cpu] = val;
-     } else {
-@@ -669,7 +688,7 @@ static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
-         }
-         prio = (prio << 1) & 0xff; /* Non-secure view */
-     }
--    return prio;
-+    return prio & gic_fullprio_mask(s, cpu);
+     /* Return true if CPU supports double precision floating point, VFPv2 */
+     return FIELD_EX32(id->mvfr0, MVFR0, FPDP) > 0;
  }
  
- static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
-@@ -684,7 +703,7 @@ static void gic_set_priority_mask(GICState *s, int cpu, uint8_t pmask,
-             return;
-         }
-     }
--    s->priority_mask[cpu] = pmask;
-+    s->priority_mask[cpu] = pmask & gic_fullprio_mask(s, cpu);
- }
- 
- static uint32_t gic_get_priority_mask(GICState *s, int cpu, MemTxAttrs attrs)
-@@ -2055,6 +2074,16 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (s->n_prio_bits > GIC_MAX_PRIORITY_BITS ||
-+       (s->virt_extn ? s->n_prio_bits < GIC_VIRT_MAX_GROUP_PRIO_BITS :
-+        s->n_prio_bits < GIC_MIN_PRIORITY_BITS)) {
-+        error_setg(errp, "num-priority-bits cannot be greater than %d"
-+                   " or less than %d", GIC_MAX_PRIORITY_BITS,
-+                   s->virt_extn ? GIC_VIRT_MAX_GROUP_PRIO_BITS :
-+                   GIC_MIN_PRIORITY_BITS);
-+        return;
-+    }
++static inline bool isar_feature_aa32_fpdp_v3(const ARMISARegisters *id)
++{
++    /* Return true if CPU supports double precision floating point, VFPv3 */
++    return FIELD_EX32(id->mvfr0, MVFR0, FPDP) >= 2;
++}
 +
-     /* This creates distributor, main CPU interface (s->cpuiomem[0]) and if
-      * enabled, virtualization extensions related interfaces (main virtual
-      * interface (s->vifaceiomem[0]) and virtual CPU interface).
-diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-index e6c4fe7a5a4..7b44d5625b6 100644
---- a/hw/intc/arm_gic_common.c
-+++ b/hw/intc/arm_gic_common.c
-@@ -357,6 +357,7 @@ static Property arm_gic_common_properties[] = {
-     DEFINE_PROP_BOOL("has-security-extensions", GICState, security_extn, 0),
-     /* True if the GIC should implement the virtualization extensions */
-     DEFINE_PROP_BOOL("has-virtualization-extensions", GICState, virt_extn, 0),
-+    DEFINE_PROP_UINT32("num-priority-bits", GICState, n_prio_bits, 8),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+ /*
+  * We always set the FP and SIMD FP16 fields to indicate identical
+  * levels of support (assuming SIMD is implemented at all), so
 -- 
 2.20.1
 
