@@ -2,79 +2,79 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1DCC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B262CC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6572C2468D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:42:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C4B12468D
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 16:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FLhh6Nc1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6572C2468D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iO7pGM6v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4B12468D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7iiw-0007AC-G5
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:42:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56404)
+	id 1j7ij2-0007Ui-L3
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 11:42:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7if4-0007F8-Ry
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:51 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifG-0007aB-72
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7if3-0001nu-TU
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:50 -0500
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:39579)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7ifE-0001v1-RY
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:02 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7if3-0001nW-JE
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:38:49 -0500
-Received: by mail-wm1-x329.google.com with SMTP id c84so3870038wme.4
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:38:49 -0800 (PST)
+ id 1j7ifE-0001uT-Kw
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 11:39:00 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id y17so3670815wrn.6
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 08:39:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=DrxWiG6jWEHbV7tbIEKAcwRWenD5JqrAAvIabuixUV4=;
- b=FLhh6Nc1M8OwUxXdRxn7WVIr76Wq+ZLJdnHwRId/lhEzFeSu8oYgmwH67ytHAsCuEj
- lzBRc2DQHdG5AuAIjHXXLWIEWe27cMfY592s9NRmMWicnwh1cl+9TJ3tSiF2ep9rzugc
- Jxmh8OYuV+up/esxLgoDRZhWSrNin5b4rebLlpi21a41cDsHfObwQCu2oVowzVQ/NHBW
- Xn36E4Xb6hz9QGY9C3Q4k5AcFyA3+4j9lSpXVCOsfhJs1SMjZ8dqNxJegCyvE2yzGiaj
- CP1sw50h58mRt0+vnbnw0vcksvoppOzBcOfAscnmhrtixfdQw5cLTITdb55dYclvA1Tv
- ePdA==
+ bh=jvv1988l+MhveUC13kevwwKHJA6IhCtxQBKlOzO9REg=;
+ b=iO7pGM6vHbpoUcRx2yCWAvXtxsR4l+11Fh4bm0GhEjJDB7fO0MV35ukOqDlIAEWN+C
+ tRgD1IGgp9gSek+qahQulVpuSLrAEuuituWPdz7BEOVoYxR5d+hd80Jwv7XLhdpKdQ76
+ 8nMLlKY5ieXl6m+16HZWL2Fu0ZYIr1JGHGpGD/mxPLsiEY3Ydhi2lBbqephqgCg9QW3j
+ soVZsQp5WVO37vHmWQJupkYQ8laknHNyvUgftHK8TH+B0gk8WFEqu8EJYqypzF9xQpOd
+ tQc/bgDGTeqOkwo7Sf/1TPH4v/CF7A2VWsgGxSHRK1/LLTVWCsJeI9mtFj8hoKPZJGbm
+ ly8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=DrxWiG6jWEHbV7tbIEKAcwRWenD5JqrAAvIabuixUV4=;
- b=bEXH1ej5+jY6joIhFD6ys0ff9FNx8RTR5bpsPjmB+vvPW2TuBm23hlXbyAeyRyd5mp
- IQn3mKOkB2OSZ25exm7WgXY/FJ+3DVpXbNk8KUQibLB/5dhUcXxBi+CBTusUIGNd7uHC
- OXvLlgqG+ePDJjuudVkH2KCS5aB1avD7qqeTvk1Q35Jl5aATFSyZsYXvtXJuuyTNpa6R
- tOL8EVb9zcqTsKK4HExGOU65JYUDawOmd4zWoh+VD+tRJfetuUD1RZDB3v4ubcb/dAsb
- OY4UKS32nphNUNjc2e5wfGsQA3odKUcQ+UhG9J6ACgmqvqwwWHWhBwWVIzxTfWQv4AxN
- DZcg==
-X-Gm-Message-State: APjAAAWUadUdKwq3OhcHIpJDmio+O0FdmdsVOYSEdkPfvZBVpWUDvqIQ
- O1U3kkj2R/TlevmUYWFsk2NqBZyWjX7kqQ==
-X-Google-Smtp-Source: APXvYqySDumxWxAKkOcEUnjrG8pJ5z03AVFrXsqnooDRJNvnScd2VPV3TBtFPnvWJA0HWxA3vizPkg==
-X-Received: by 2002:a05:600c:4151:: with SMTP id
- h17mr5955408wmm.189.1582907928407; 
- Fri, 28 Feb 2020 08:38:48 -0800 (PST)
+ bh=jvv1988l+MhveUC13kevwwKHJA6IhCtxQBKlOzO9REg=;
+ b=sxUKMUp+ZCD8G5+8svLoD8AWtzIH7iJBlR2b0vKC2qOS+zrj28nahHV9aqf83HEJ1u
+ RatO4KMrsmrN2B0+oy8Y0JlrrV/P6T1YG/NiNxcFIVzCfrLREVVYqbLMkXDcxXSQqIwZ
+ VTaJyMY1vDmJw6XVFB9zSqmQ0Cv2IHHW8ie+LkmlhpYNEneOi8C3c+k8N+AazP+MM4tQ
+ HqCvyJanbfU5bYzMXDmOGtmJKXnPem2QwrSOOKFq28ZFfmVlhjZa4mh/rlQNcE4VyD0+
+ BeD3XxwCwsOcpdZMlifrBrlEngR2V1r6+EuXcTVPW5h2rNKDkrBw8H4Vp8YCAI4+9CbY
+ ULEA==
+X-Gm-Message-State: APjAAAUn7fjpbYPICV/UbJHkIIIDcDz+aUDQl0xgKklpjRRt1QIaFiMI
+ EFK+yj46hIH7p2kY+JCg93Bhb7iaXVqTiw==
+X-Google-Smtp-Source: APXvYqzM7uROXKdlxY8Pczv1StD86gWuHdFMz4bPNrX3XcmXSJxMlUz7W2kypPrOKGx3Zx7ZbIQR3g==
+X-Received: by 2002:adf:f012:: with SMTP id j18mr5550390wro.314.1582907939349; 
+ Fri, 28 Feb 2020 08:38:59 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.38.47
+ by smtp.gmail.com with ESMTPSA id c9sm13335214wrq.44.2020.02.28.08.38.58
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 08:38:47 -0800 (PST)
+ Fri, 28 Feb 2020 08:38:58 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/33] cpu/a9mpcore: Set number of GIC priority bits to 5
-Date: Fri, 28 Feb 2020 16:38:12 +0000
-Message-Id: <20200228163840.23585-6-peter.maydell@linaro.org>
+Subject: [PULL 14/33] target/arm: Replace ARM_FEATURE_VFP4 with
+ isar_feature_aa32_simdfmac
+Date: Fri, 28 Feb 2020 16:38:21 +0000
+Message-Id: <20200228163840.23585-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228163840.23585-1-peter.maydell@linaro.org>
 References: <20200228163840.23585-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::329
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,42 +98,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-All A9 CPUs have a GIC with 5 bits of priority.
+All remaining tests for VFP4 are for fused multiply-add insns.
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Since the MVFR1 field is used for both VFP and NEON, move its adjustment
+from the !has_neon block to the (!has_vfp && !has_neon) block.
+
+Test for vfp of the appropraite width alongside the test for simdfmac
+within translate-vfp.inc.c.  Within disas_neon_data_insn, we have
+already tested for ARM_FEATURE_NEON.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1582537164-764-3-git-send-email-sai.pavan.boddu@xilinx.com
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200224222232.13807-10-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/cpu/a9mpcore.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/arm/cpu.h               | 12 ++++++++++++
+ target/arm/cpu.c               |  6 +++++-
+ target/arm/translate-vfp.inc.c | 22 ++++++++++++++++++----
+ target/arm/translate.c         |  2 +-
+ 4 files changed, 36 insertions(+), 6 deletions(-)
 
-diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-index 1f8bc8a196f..b4f6a7e8a54 100644
---- a/hw/cpu/a9mpcore.c
-+++ b/hw/cpu/a9mpcore.c
-@@ -16,6 +16,8 @@
- #include "hw/qdev-properties.h"
- #include "hw/core/cpu.h"
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index b94d2a5ace4..b29b0eddfc3 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3514,6 +3514,18 @@ static inline bool isar_feature_aa32_fp16_dpconv(const ARMISARegisters *id)
+     return FIELD_EX32(id->mvfr1, MVFR1, FPHP) > 1;
+ }
  
-+#define A9_GIC_NUM_PRIORITY_BITS    5
++/*
++ * Note that this ID register field covers both VFP and Neon FMAC,
++ * so should usually be tested in combination with some other
++ * check that confirms the presence of whichever of VFP or Neon is
++ * relevant, to avoid accidentally enabling a Neon feature on
++ * a VFP-no-Neon core or vice-versa.
++ */
++static inline bool isar_feature_aa32_simdfmac(const ARMISARegisters *id)
++{
++    return FIELD_EX32(id->mvfr1, MVFR1, SIMDFMAC) != 0;
++}
 +
- static void a9mp_priv_set_irq(void *opaque, int irq, int level)
+ static inline bool isar_feature_aa32_vsel(const ARMISARegisters *id)
  {
-     A9MPPrivState *s = (A9MPPrivState *)opaque;
-@@ -68,6 +70,8 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
-     gicdev = DEVICE(&s->gic);
-     qdev_prop_set_uint32(gicdev, "num-cpu", s->num_cpu);
-     qdev_prop_set_uint32(gicdev, "num-irq", s->num_irq);
-+    qdev_prop_set_uint32(gicdev, "num-priority-bits",
-+                         A9_GIC_NUM_PRIORITY_BITS);
+     return FIELD_EX32(id->mvfr2, MVFR2, FPMISC) >= 1;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 5be4c258096..dc45865c7a7 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1512,7 +1512,6 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         u = FIELD_DP32(u, MVFR1, SIMDINT, 0);
+         u = FIELD_DP32(u, MVFR1, SIMDSP, 0);
+         u = FIELD_DP32(u, MVFR1, SIMDHP, 0);
+-        u = FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
+         cpu->isar.mvfr1 = u;
  
-     /* Make the GIC's TZ support match the CPUs. We assume that
-      * either all the CPUs have TZ, or none do.
+         u = cpu->isar.mvfr2;
+@@ -1535,6 +1534,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         u = cpu->isar.mvfr0;
+         u = FIELD_DP32(u, MVFR0, SIMDREG, 0);
+         cpu->isar.mvfr0 = u;
++
++        /* Despite the name, this field covers both VFP and Neon */
++        u = cpu->isar.mvfr1;
++        u = FIELD_DP32(u, MVFR1, SIMDFMAC, 0);
++        cpu->isar.mvfr1 = u;
+     }
+ 
+     if (arm_feature(env, ARM_FEATURE_M) && !cpu->has_dsp) {
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
+index f88a95438fc..03ba8d7aac0 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc.c
+@@ -1803,11 +1803,18 @@ static bool trans_VFM_sp(DisasContext *s, arg_VFM_sp *a)
+ 
+     /*
+      * Present in VFPv4 only.
++     * Note that we can't rely on the SIMDFMAC check alone, because
++     * in a Neon-no-VFP core that ID register field will be non-zero.
++     */
++    if (!dc_isar_feature(aa32_simdfmac, s) ||
++        !dc_isar_feature(aa32_fpsp_v2, s)) {
++        return false;
++    }
++    /*
+      * In v7A, UNPREDICTABLE with non-zero vector length/stride; from
+      * v8A, must UNDEF. We choose to UNDEF for both v7A and v8A.
+      */
+-    if (!arm_dc_feature(s, ARM_FEATURE_VFP4) ||
+-        (s->vec_len != 0 || s->vec_stride != 0)) {
++    if (s->vec_len != 0 || s->vec_stride != 0) {
+         return false;
+     }
+ 
+@@ -1861,11 +1868,18 @@ static bool trans_VFM_dp(DisasContext *s, arg_VFM_dp *a)
+ 
+     /*
+      * Present in VFPv4 only.
++     * Note that we can't rely on the SIMDFMAC check alone, because
++     * in a Neon-no-VFP core that ID register field will be non-zero.
++     */
++    if (!dc_isar_feature(aa32_simdfmac, s) ||
++        !dc_isar_feature(aa32_fpdp_v2, s)) {
++        return false;
++    }
++    /*
+      * In v7A, UNPREDICTABLE with non-zero vector length/stride; from
+      * v8A, must UNDEF. We choose to UNDEF for both v7A and v8A.
+      */
+-    if (!arm_dc_feature(s, ARM_FEATURE_VFP4) ||
+-        (s->vec_len != 0 || s->vec_stride != 0)) {
++    if (s->vec_len != 0 || s->vec_stride != 0) {
+         return false;
+     }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 79880adaad2..0489e0cdaa6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -5150,7 +5150,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+             }
+             break;
+         case NEON_3R_VFM_VQRDMLSH:
+-            if (!arm_dc_feature(s, ARM_FEATURE_VFP4)) {
++            if (!dc_isar_feature(aa32_simdfmac, s)) {
+                 return 1;
+             }
+             break;
 -- 
 2.20.1
 
