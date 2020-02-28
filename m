@@ -2,87 +2,99 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9023C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8DDC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:00:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 942EC2469C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:56:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A70B6246A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 11:00:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="He25rWxQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942EC2469C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhI3B+Nf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70B6246A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7dJJ-00016h-Kh
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:56:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34664)
+	id 1j7dNk-0002NW-TR
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 06:00:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j7dId-0000Ra-G7
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:55:20 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1j7dN4-0001tD-Q7
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j7dIc-0004NE-4J
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:55:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42975
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1j7dN3-0007si-J1
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:59:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25196
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j7dIc-0004Md-0C
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:55:18 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j7dN3-0007rf-FA
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:59:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582887317;
+ s=mimecast20190719; t=1582887592;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zvnElAPP5HAL5nqrU6/6YvEE4v3u0M9bgUvkSNi/DuI=;
- b=He25rWxQcpus7lEiMy7g63To0s8Pv8L+lKdLtJWt+hxTuD4+lF4l/W+v3ULlnoV2JXgEJx
- oStsyw1JexQV7FDrgnzxMItLv1uXzylMxVDff1zrJqEQzIhFJfqM+22LfQdO+2YA0/Cwsz
- xhak0391rOSjOsPo3Lkji9udtYZJqoU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-455-9IByQCJrN8-EUjU8dSaPqg-1; Fri, 28 Feb 2020 05:55:15 -0500
-X-MC-Unique: 9IByQCJrN8-EUjU8dSaPqg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E8DCDBA3;
- Fri, 28 Feb 2020 10:55:14 +0000 (UTC)
-Received: from linux.fritz.box (unknown [10.36.118.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4110819C7F;
- Fri, 28 Feb 2020 10:55:11 +0000 (UTC)
-Date: Fri, 28 Feb 2020 11:55:09 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
- iscsi_open()
-Message-ID: <20200228105509.GB5274@linux.fritz.box>
-References: <20200226084647.20636-1-kuhn.chenqun@huawei.com>
- <20200226084647.20636-3-kuhn.chenqun@huawei.com>
- <20200226095444.GB6096@linux.fritz.box>
- <7412CDE03601674DA8197E2EBD8937E83B6638BE@dggemm531-mbx.china.huawei.com>
- <20200227103054.GB7493@linux.fritz.box>
- <7412CDE03601674DA8197E2EBD8937E83B664140@dggemm531-mbx.china.huawei.com>
+ bh=SwIMjCU+2zfimt6H8jJg5Qr0kzmow+224QZINRgNck8=;
+ b=UhI3B+NfrsDwb3EYEE9BHYKp2W2l9yTpW9Ha13nWAU6BSMqgUGaXTVaBcjKFu+9W4NOoGk
+ AdorY6Zlx4axTrPYyuzyAsccVmK5V3Pd1UiMjkwbD5Qnohofw52I0W7EfKofZ3tNDJkAJS
+ G72KFMbnJVrmBI/nOcYd8Frz8whw7yw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-h5RQQtvTO3qgdWdN6LHSmQ-1; Fri, 28 Feb 2020 05:59:51 -0500
+X-MC-Unique: h5RQQtvTO3qgdWdN6LHSmQ-1
+Received: by mail-wm1-f70.google.com with SMTP id d129so1009057wmd.2
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 02:59:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SwIMjCU+2zfimt6H8jJg5Qr0kzmow+224QZINRgNck8=;
+ b=fIfAFK40V+lqoiasWhl/IzTP6qmhCQWc1uC5yzXhXe1yilQX9qDsL5I6Xx65Fp58ZA
+ hyM2mepsye7/s7whmPL/+rvWoKmXLpD/j1BmVkEFTvEzSB066gGWe4L8bJL9kunTEEYx
+ 8qkRBm+OhjimGnrW6+zT9kQVUp0nLeywUAPVCKTnoBsqzHhYaj5EIRGLXkRzxujU3v4O
+ UBKtrTHfTjj+e0W5TuVB/B46l+KFsIG+YsGdAtZ4j+6Zx16k9q7/KaQoMzLewb89jKyO
+ ind4/VW/cRdniGeqF5ZGqkbry+R3dHJXzcjVx9gLsrp1/dcIBtPD8b1JyKRP2Z7slWGo
+ c+FQ==
+X-Gm-Message-State: APjAAAXvbE2xmwpewnPJ8bMYxg1m8dsq6UemT0cCfUW7N6iT8AGJipFR
+ 5prci5MPAvJpLRNKdSkCALA3IOp9KNZNn5g6gTQ1+zUftzpGbUEAwXcaCjlcHE6ILeYI2k+SKZ/
+ NwRRbcSm6RuVVfnI=
+X-Received: by 2002:adf:f091:: with SMTP id n17mr4158625wro.387.1582887589815; 
+ Fri, 28 Feb 2020 02:59:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyGBNuibJAQ65LPCXe72XW6QZemVuhcD0VR+8ExC+VER5yozcBLpPDB5EccHrhySsehS5osSg==
+X-Received: by 2002:adf:f091:: with SMTP id n17mr4158606wro.387.1582887589484; 
+ Fri, 28 Feb 2020 02:59:49 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:d0d9:ea10:9775:f33f?
+ ([2001:b07:6468:f312:d0d9:ea10:9775:f33f])
+ by smtp.gmail.com with ESMTPSA id t10sm11975840wru.59.2020.02.28.02.59.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 28 Feb 2020 02:59:48 -0800 (PST)
+Subject: Re: [PATCH] WHPX: Use QEMU values for trapped CPUID
+To: Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+References: <SN4PR2101MB0880A8323EAD0CD0E8E2F423C0EB0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <da8ebdd7-26e8-ee3d-39f6-5744e49abcc7@redhat.com>
+Date: Fri, 28 Feb 2020 11:59:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <7412CDE03601674DA8197E2EBD8937E83B664140@dggemm531-mbx.china.huawei.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <SN4PR2101MB0880A8323EAD0CD0E8E2F423C0EB0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,127 +106,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>, Peter Lieven <pl@kamp.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.02.2020 um 08:30 hat Chenqun (kuhn) geschrieben:
-> >-----Original Message-----
-> >From: Kevin Wolf [mailto:kwolf@redhat.com]
-> >Sent: Thursday, February 27, 2020 6:31 PM
-> >To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>
-> >Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org;
-> >peter.maydell@linaro.org; Zhanghailiang <zhang.zhanghailiang@huawei.com>=
-;
-> >Euler Robot <euler.robot@huawei.com>; Ronnie Sahlberg
-> ><ronniesahlberg@gmail.com>; Paolo Bonzini <pbonzini@redhat.com>; Peter
-> >Lieven <pl@kamp.de>; Max Reitz <mreitz@redhat.com>
-> >Subject: Re: [PATCH v2 02/13] block/iscsi:Remove redundant statement in
-> >iscsi_open()
-> >
-> >Am 27.02.2020 um 02:49 hat Chenqun (kuhn) geschrieben:
-> >> >-----Original Message-----
-> >> >From: Kevin Wolf [mailto:kwolf@redhat.com]
-> >> >Sent: Wednesday, February 26, 2020 5:55 PM
-> >> >To: Chenqun (kuhn) <kuhn.chenqun@huawei.com>
-> >> >Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org;
-> >> >peter.maydell@linaro.org; Zhanghailiang
-> >> ><zhang.zhanghailiang@huawei.com>; Euler Robot
-> >> ><euler.robot@huawei.com>; Ronnie Sahlberg
-> ><ronniesahlberg@gmail.com>;
-> >> >Paolo Bonzini <pbonzini@redhat.com>; Peter Lieven <pl@kamp.de>; Max
-> >> >Reitz <mreitz@redhat.com>
-> >> >Subject: Re: [PATCH v2 02/13] block/iscsi:Remove redundant statement
-> >> >in
-> >> >iscsi_open()
-> >> >
-> >> >Am 26.02.2020 um 09:46 hat kuhn.chenqun@huawei.com geschrieben:
-> >> >> From: Chen Qun <kuhn.chenqun@huawei.com>
-> >> >>
-> >> >> Clang static code analyzer show warning:
-> >> >>   block/iscsi.c:1920:9: warning: Value stored to 'flags' is never r=
-ead
-> >> >>         flags &=3D ~BDRV_O_RDWR;
-> >> >>         ^        ~~~~~~~~~~~~
-> >> >>
-> >> >> Reported-by: Euler Robot <euler.robot@huawei.com>
-> >> >> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> >> >
-> >> >Hmm, I'm not so sure about this one because if we remove the line,
-> >> >flags will be inconsistent with bs->open_flags. It feels like setting
-> >> >a trap for anyone who wants to add code using flags in the future.
-> >> Hi Kevin,
-> >> I find it exists since 8f3bf50d34037266.   :  )
-> >
-> >Yes, it has existed from the start with auto-read-only.
-> >
-> >> It's not a big deal,  just upset clang static code analyzer.
-> >> As you said, it could be a trap for the future.
-> >
-> >What's interesting is that we do have one user of the flags later in the=
- function,
-> >but it uses bs->open_flags instead:
-> >
-> >    ret =3D iscsi_allocmap_init(iscsilun, bs->open_flags);
-> >
-> >Maybe this should be using flags? (The value of the bits we're intereste=
-d in is
-> >the same, but when flags is passed as a parameter, I would expect it to =
-be
-> >used.)
-> >
-> Hi Kevin,
-> I have a question: are 'flags' exactly the same as 'bs-> open_flags'?=20
-> In the function bdrv_open_common() at block.c file,  the existence of sta=
-tement( open_flags =3D bdrv_open_flags(bs, bs->open_flags); ) makes them a =
-little different.
-> Will this place affect them inconsistently ?
+On 27/02/20 22:01, Sunil Muthuswamy wrote:
+> Currently, WHPX is using some default values for the trapped CPUID
+> functions. These were not in sync with the QEMU values because the
+> CPUID values were never set with WHPX during VCPU initialization.
+> Additionally, at the moment, WHPX doesn't support setting CPUID
+> values in the hypervisor at runtime (i.e. after the partition has
+> been setup). That is needed to be able to set the CPUID values in
+> the hypervisor during VCPU init.
+> Until that support comes, use the QEMU values for the trapped CPUIDs.
+> 
+> Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+> ---
+>  target/i386/whpx-all.c | 42 ++++++++++++++++++------------------------
+>  1 file changed, 18 insertions(+), 24 deletions(-)
+> 
+> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> index 35601b8176..4fe5a78b29 100644
+> --- a/target/i386/whpx-all.c
+> +++ b/target/i386/whpx-all.c
+> @@ -980,38 +980,32 @@ static int whpx_vcpu_run(CPUState *cpu)
+>              WHV_REGISTER_VALUE reg_values[5];
+>              WHV_REGISTER_NAME reg_names[5];
+>              UINT32 reg_count = 5;
+> -            UINT64 rip, rax, rcx, rdx, rbx;
+> +            UINT64 cpuid_fn, rip = 0, rax = 0, rcx = 0, rdx = 0, rbx = 0;
+> +            X86CPU *x86_cpu = X86_CPU(cpu);
+> +            CPUX86State *env = &x86_cpu->env;
+>  
+>              memset(reg_values, 0, sizeof(reg_values));
+>  
+>              rip = vcpu->exit_ctx.VpContext.Rip +
+>                    vcpu->exit_ctx.VpContext.InstructionLength;
+> -            switch (vcpu->exit_ctx.CpuidAccess.Rax) {
+> -            case 1:
+> -                rax = vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+> -                /* Advertise that we are running on a hypervisor */
+> -                rcx =
+> -                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx |
+> -                    CPUID_EXT_HYPERVISOR;
+> -
+> -                rdx = vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> -                rbx = vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+> -                break;
+> +            cpuid_fn = vcpu->exit_ctx.CpuidAccess.Rax;
+> +
+> +            /*
+> +             * Ideally, these should be supplied to the hypervisor during VCPU
+> +             * initialization and it should be able to satisfy this request.
+> +             * But, currently, WHPX doesn't support setting CPUID values in the
+> +             * hypervisor once the partition has been setup, which is too late
+> +             * since VCPUs are realized later. For now, use the values from
+> +             * QEMU to satisfy these requests, until WHPX adds support for
+> +             * being able to set these values in the hypervisor at runtime.
+> +             */
+> +            cpu_x86_cpuid(env, cpuid_fn, 0, (UINT32 *)&rax, (UINT32 *)&rbx,
+> +                (UINT32 *)&rcx, (UINT32 *)&rdx);
+> +            switch (cpuid_fn) {
+>              case 0x80000001:
+> -                rax = vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+>                  /* Remove any support of OSVW */
+> -                rcx =
+> -                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx &
+> -                    ~CPUID_EXT3_OSVW;
+> -
+> -                rdx = vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> -                rbx = vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+> +                rcx &= ~CPUID_EXT3_OSVW;
+>                  break;
+> -            default:
+> -                rax = vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
+> -                rcx = vcpu->exit_ctx.CpuidAccess.DefaultResultRcx;
+> -                rdx = vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
+> -                rbx = vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
+>              }
+>  
+>              reg_names[0] = WHvX64RegisterRip;
+> 
 
-Not exactly the same, that's why I said "value of the bits we're
-interested in is the same". bdrv_open_flags() basically just filters out
-things that are handled by the generic block layer and none of the block
-driver's business.
+Queued if you need that, thanks.
 
-To be precise, iscsi_allocmap_init() only checks BDRV_O_NOCACHE, which
-is the same in both.
-
-> Is it safer if we assign bs-> open_flags to flags?
-
-This would add back the flags that we consciously filtered out before,
-so I would say no.
-
-Kevin
-
-> Modify just like=EF=BC=9A
-> @@ -1917,7 +1917,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *=
-options, int flags,
->          if (ret < 0) {
->              goto out;
->          }
-> -        flags &=3D ~BDRV_O_RDWR;
-> +        flags =3D bs->open_flags;
->      }
->=20
->      iscsi_readcapacity_sync(iscsilun, &local_err);
-> @@ -2002,7 +2002,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *=
-options, int flags,
->          iscsilun->cluster_size =3D iscsilun->bl.opt_unmap_gran *
->              iscsilun->block_size;
->          if (iscsilun->lbprz) {
-> -            ret =3D iscsi_allocmap_init(iscsilun, bs->open_flags);
-> +            ret =3D iscsi_allocmap_init(iscsilun, flags);
->          }
->      }
->=20
-> Thanks.
->=20
->=20
->=20
+Paolo
 
 
