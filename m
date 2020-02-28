@@ -7,82 +7,80 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E35C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0840C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 934312469D
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF14A2469F
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 15:47:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uZz+uuBH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934312469D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A7hu8HOD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF14A2469F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7hqg-0002f3-Ov
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:46:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47045)
+	id 1j7hr4-0003DV-Sh
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 10:47:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hhR-0001lC-PC
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:16 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hhF-0001Hb-57
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j7hhP-00059h-0o
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:13 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:46217)
+ (envelope-from <peter.maydell@linaro.org>) id 1j7hhC-000534-P5
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:01 -0500
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:37893)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j7hhO-00059J-Nc
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:37:10 -0500
-Received: by mail-wr1-x433.google.com with SMTP id j7so3362297wrp.13
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:37:10 -0800 (PST)
+ id 1j7hhC-00052W-GQ
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 10:36:58 -0500
+Received: by mail-wm1-x330.google.com with SMTP id n64so2334884wme.3
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 07:36:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NfNAqvVGpd6lOEZCOJbEpK/Y2QR3vNHt0snLS0x/OAY=;
- b=uZz+uuBHtpf5qzusJDDfqGkSOpXlQEUYrBR8b64pG5Jpr8H4mxOz8LohH/2dwgt7d6
- gP18RMqBNtIJFxwX2fB295YAfRGMUZZlO3PcggrWOF4VGu9C1QMo4QN2diOVl+yCJ6WY
- pI+9Pl6ebDcQGvzvVJasfDCyIvqdenmvatsNH6WvvbiYu9n06JgXsSKIRicHJo3SpGng
- 62s1Tu6fRBCnqUqtprYqVceBT8pPh5Nsh0zsVDfpGV2yhRnC0aQvBnFQZ+9wES9IMdx0
- zWEQLsS97EwtfXY1NEGpzLoT+WagtgKvX0jjKdyNghUGa8fOS5SPX9GCag8RTnDecWWl
- ZtWQ==
+ bh=vy2tBOWYvGgZJ+EoyqfTKazPEYFTguAlNL/SQIXy0Uc=;
+ b=A7hu8HODzojg5LINbXct6E19CeerHxLOsQmUTMwgzkGuKM9KI9xkPBUohXlxZLcBlA
+ VK0yT31ZMkt9Xp2aHTvcEsgwhwHp4IU/plKjMAnu24+g8Zmt3WlKcku1eaXgUuLOQfMw
+ UQswobw14gzyY77Mt9UKSjHv4qpbRSDmh3iD/PCWW6sDg7adHlOowYzyaFFIfUrv9YKV
+ i0HzPcLNuwUqkXzHqUOy4UCFhRKDVN4QzEBwCVV1dX7H2Q/546hQAnE1w6mUZX8nzNZf
+ 9eOtLqxrfCKTRf7WW+LOtZ9tRRLoE6Zsc4jEJD78RcDk+PZnsr5dITIWXkgS7cEs2lNk
+ i2oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=NfNAqvVGpd6lOEZCOJbEpK/Y2QR3vNHt0snLS0x/OAY=;
- b=smCkqm4iSksNQdU0lCVgc+L2I6JPIDHTkkzimhymGoIS28NK4ml0SgWtFytU2z5z0H
- FxfUpEStbrFHs5816hZqxCEPNHPt8HakIYR8PcKx4MZli9dMIQdlHGpV5/GNpNSJHSLw
- zvih87ags6jmDmm+LpJVQShyrrNwP8yaQ3xfaqSK1CtGy+E8tQWY9mDxnYmYKamdfwlk
- hFSOeZ/McXaa1MEM/qUz9GnVJpa/Rsl3yygfDPf6P5y2lOt2Cwt0CBsUZKU8kVAmJr8F
- ISKLdN2T7P7WZkLlqOkL0OzcWsQXmwndz0Jqd9qmTM8csMpc13nRsBqjl4uJ0F/BvshW
- 4pEg==
-X-Gm-Message-State: APjAAAUMTUWIi9KJn1x5pN1ab6G+CfJcjKiMhBwcTQd/3ME2S+DPaUWq
- 1C8Gp9i2VLUZkrJ9KZcxroBBT6ZCvkn66g==
-X-Google-Smtp-Source: APXvYqyFDAK1N+8qwiZunJMF5yqiTH7tLN0zQGG0VSpN41KY/bC4f2VRP8raJEY4w+Dk+InC44D9HQ==
-X-Received: by 2002:adf:ee03:: with SMTP id y3mr5517712wrn.5.1582904228751;
- Fri, 28 Feb 2020 07:37:08 -0800 (PST)
+ bh=vy2tBOWYvGgZJ+EoyqfTKazPEYFTguAlNL/SQIXy0Uc=;
+ b=DwfHnvnc4pOyIV6K3lM7PSMbQknsFTs+ZM9tT9kc2eubqQS0EKs77Hte4IMTup6rfX
+ pWbtE/ZgoNKoYVLSuTuTd+pZwJvYsFqSzb5knVjykZKeCD1ZX1/mza0oe/I6K4Tcn3Bj
+ 6pdLp1aWpchAOK+FCidS6aZYfjYQJS1sUjRamYRbann8RfY5vZkKPSXZ/jtfLyWHu0Q4
+ tG0f8BZ0hUMOJlJUUauetYNJNnsgWOzUtjDgE4E7RjpqcHDHpiCb+KuvyV9Ntq4YGYtY
+ 0HPKSsx/7s3i4x5nvVuHE1LipK77o5puYCQ/i0WrMNIeZsuKX0z7hwpVclHFQH7+LCTg
+ hapA==
+X-Gm-Message-State: APjAAAWKMlrCz3knJqqyiznUoKl3LLzFY7cOHWjHfdIHovm/8/L1se3I
+ BRrlp3R8Q7WTc/cju/6GbVnUjPR5trfpVg==
+X-Google-Smtp-Source: APXvYqwczPLp2N2/9ROjpXV8849D2uzvoSs3fEv5P+4qlw7UkQdux+FsYUYV60MQwtcz/pexfqg9cw==
+X-Received: by 2002:a1c:a405:: with SMTP id n5mr3048936wme.125.1582904216689; 
+ Fri, 28 Feb 2020 07:36:56 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.37.07
+ by smtp.gmail.com with ESMTPSA id u23sm2659452wmu.14.2020.02.28.07.36.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 07:37:07 -0800 (PST)
+ Fri, 28 Feb 2020 07:36:56 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 28/33] docs: Split out sections for the manpage into
- .rst.inc files
-Date: Fri, 28 Feb 2020 15:36:14 +0000
-Message-Id: <20200228153619.9906-29-peter.maydell@linaro.org>
+Subject: [PATCH v3 21/33] hmp-commands-info.hx: Add rST documentation fragments
+Date: Fri, 28 Feb 2020 15:36:07 +0000
+Message-Id: <20200228153619.9906-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200228153619.9906-1-peter.maydell@linaro.org>
 References: <20200228153619.9906-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,518 +98,775 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sphinx doesn't have very good facilities for marking chunks
-of documentation as "put this in the manpage only". So instead
-we move the parts we want to put into both the HTML manuals
-and the manpage into their own .rst.inc files, which we can
-include from both the main manual rst files and a new toplevel
-rst file that will be the skeleton of the qemu.1 manpage.
+Add the rST versions of the documentation fragments.  Once we've
+converted fully from Texinfo to rST we can remove the ETEXI
+fragments; for the moment we need both.
 
-In this commit, just split out the parts of the documentation
-that go in the manpage.
+Note that most of the SRST fragments are 2-space indented so that the
+'info foo' documentation entries appear as a sublist under the 'info'
+entry in the top level list.
+
+Again, all we need to do to put the documentation in the Sphinx manual
+is a one-line hxtool-doc invocation.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- ...vocation.rst => device-url-syntax.rst.inc} |  16 --
- docs/system/invocation.rst                    | 228 +-----------------
- docs/system/keys.rst                          |  36 +--
- docs/system/{keys.rst => keys.rst.inc}        |   5 -
- docs/system/mux-chardev.rst                   |  28 +--
- .../{mux-chardev.rst => mux-chardev.rst.inc}  |   5 -
- ...rget-i386.rst => target-i386-desc.rst.inc} |  22 --
- docs/system/target-i386.rst                   |  63 +----
- 8 files changed, 4 insertions(+), 399 deletions(-)
- copy docs/system/{invocation.rst => device-url-syntax.rst.inc} (96%)
- copy docs/system/{keys.rst => keys.rst.inc} (90%)
- copy docs/system/{mux-chardev.rst => mux-chardev.rst.inc} (87%)
- copy docs/system/{target-i386.rst => target-i386-desc.rst.inc} (76%)
+ Makefile                |   2 +-
+ docs/system/monitor.rst |   4 +-
+ hmp-commands-info.hx    | 271 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 273 insertions(+), 4 deletions(-)
 
-diff --git a/docs/system/invocation.rst b/docs/system/device-url-syntax.rst.inc
-similarity index 96%
-copy from docs/system/invocation.rst
-copy to docs/system/device-url-syntax.rst.inc
-index d77dd13d4f7..88d7a372a74 100644
---- a/docs/system/invocation.rst
-+++ b/docs/system/device-url-syntax.rst.inc
-@@ -1,19 +1,3 @@
--.. _sec_005finvocation:
--
--Invocation
------------
--
--.. parsed-literal::
--
--   |qemu_system| [options] [disk_image]
--
--disk_image is a raw hard disk image for IDE hard disk 0. Some targets do
--not need a disk image.
--
--.. hxtool-doc:: qemu-options.hx
--
--Device URL Syntax
--~~~~~~~~~~~~~~~~~
+diff --git a/Makefile b/Makefile
+index 22427376b48..98ef06ab8e8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1071,7 +1071,7 @@ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+ 	$(call build-manual,specs,html)
  
- In addition to using normal file images for the emulated storage
- devices, QEMU can also use networked resources such as iSCSI devices.
-diff --git a/docs/system/invocation.rst b/docs/system/invocation.rst
-index d77dd13d4f7..4ba38fc23d2 100644
---- a/docs/system/invocation.rst
-+++ b/docs/system/invocation.rst
-@@ -15,230 +15,4 @@ not need a disk image.
- Device URL Syntax
- ~~~~~~~~~~~~~~~~~
+-$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PATH)/hmp-commands.hx
++$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/hmp-commands-info.hx
+ 	$(call build-manual,system,html)
  
--In addition to using normal file images for the emulated storage
--devices, QEMU can also use networked resources such as iSCSI devices.
--These are specified using a special URL syntax.
--
--``iSCSI``
--   iSCSI support allows QEMU to access iSCSI resources directly and use
--   as images for the guest storage. Both disk and cdrom images are
--   supported.
--
--   Syntax for specifying iSCSI LUNs is
--   "iscsi://<target-ip>[:<port>]/<target-iqn>/<lun>"
--
--   By default qemu will use the iSCSI initiator-name
--   'iqn.2008-11.org.linux-kvm[:<name>]' but this can also be set from
--   the command line or a configuration file.
--
--   Since version Qemu 2.4 it is possible to specify a iSCSI request
--   timeout to detect stalled requests and force a reestablishment of the
--   session. The timeout is specified in seconds. The default is 0 which
--   means no timeout. Libiscsi 1.15.0 or greater is required for this
--   feature.
--
--   Example (without authentication):
--
--   .. parsed-literal::
--
--      |qemu_system| -iscsi initiator-name=iqn.2001-04.com.example:my-initiator \
--                       -cdrom iscsi://192.0.2.1/iqn.2001-04.com.example/2 \
--                       -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
--
--   Example (CHAP username/password via URL):
--
--   .. parsed-literal::
--
--      |qemu_system| -drive file=iscsi://user%password@192.0.2.1/iqn.2001-04.com.example/1
--
--   Example (CHAP username/password via environment variables):
--
--   .. parsed-literal::
--
--      LIBISCSI_CHAP_USERNAME="user" \
--      LIBISCSI_CHAP_PASSWORD="password" \
--      |qemu_system| -drive file=iscsi://192.0.2.1/iqn.2001-04.com.example/1
--
--``NBD``
--   QEMU supports NBD (Network Block Devices) both using TCP protocol as
--   well as Unix Domain Sockets. With TCP, the default port is 10809.
--
--   Syntax for specifying a NBD device using TCP, in preferred URI form:
--   "nbd://<server-ip>[:<port>]/[<export>]"
--
--   Syntax for specifying a NBD device using Unix Domain Sockets;
--   remember that '?' is a shell glob character and may need quoting:
--   "nbd+unix:///[<export>]?socket=<domain-socket>"
--
--   Older syntax that is also recognized:
--   "nbd:<server-ip>:<port>[:exportname=<export>]"
--
--   Syntax for specifying a NBD device using Unix Domain Sockets
--   "nbd:unix:<domain-socket>[:exportname=<export>]"
--
--   Example for TCP
--
--   .. parsed-literal::
--
--      |qemu_system| --drive file=nbd:192.0.2.1:30000
--
--   Example for Unix Domain Sockets
--
--   .. parsed-literal::
--
--      |qemu_system| --drive file=nbd:unix:/tmp/nbd-socket
--
--``SSH``
--   QEMU supports SSH (Secure Shell) access to remote disks.
--
--   Examples:
--
--   .. parsed-literal::
--
--      |qemu_system| -drive file=ssh://user@host/path/to/disk.img
--      |qemu_system| -drive file.driver=ssh,file.user=user,file.host=host,file.port=22,file.path=/path/to/disk.img
--
--   Currently authentication must be done using ssh-agent. Other
--   authentication methods may be supported in future.
--
--``Sheepdog``
--   Sheepdog is a distributed storage system for QEMU. QEMU supports
--   using either local sheepdog devices or remote networked devices.
--
--   Syntax for specifying a sheepdog device
--
--   ::
--
--      sheepdog[+tcp|+unix]://[host:port]/vdiname[?socket=path][#snapid|#tag]
--
--   Example
--
--   .. parsed-literal::
--
--      |qemu_system| --drive file=sheepdog://192.0.2.1:30000/MyVirtualMachine
--
--   See also https://sheepdog.github.io/sheepdog/.
--
--``GlusterFS``
--   GlusterFS is a user space distributed file system. QEMU supports the
--   use of GlusterFS volumes for hosting VM disk images using TCP, Unix
--   Domain Sockets and RDMA transport protocols.
--
--   Syntax for specifying a VM disk image on GlusterFS volume is
--
--   .. parsed-literal::
--
--      URI:
--      gluster[+type]://[host[:port]]/volume/path[?socket=...][,debug=N][,logfile=...]
--
--      JSON:
--      'json:{"driver":"qcow2","file":{"driver":"gluster","volume":"testvol","path":"a.img","debug":N,"logfile":"...",
--                                       "server":[{"type":"tcp","host":"...","port":"..."},
--                                                 {"type":"unix","socket":"..."}]}}'
--
--   Example
--
--   .. parsed-literal::
--
--      URI:
--      |qemu_system| --drive file=gluster://192.0.2.1/testvol/a.img,
--                                     file.debug=9,file.logfile=/var/log/qemu-gluster.log
--
--      JSON:
--      |qemu_system| 'json:{"driver":"qcow2",
--                                "file":{"driver":"gluster",
--                                         "volume":"testvol","path":"a.img",
--                                         "debug":9,"logfile":"/var/log/qemu-gluster.log",
--                                         "server":[{"type":"tcp","host":"1.2.3.4","port":24007},
--                                                   {"type":"unix","socket":"/var/run/glusterd.socket"}]}}'
--      |qemu_system| -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
--                                            file.debug=9,file.logfile=/var/log/qemu-gluster.log,
--                                            file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
--                                            file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
--
--   See also http://www.gluster.org.
--
--``HTTP/HTTPS/FTP/FTPS``
--   QEMU supports read-only access to files accessed over http(s) and
--   ftp(s).
--
--   Syntax using a single filename:
--
--   ::
--
--      <protocol>://[<username>[:<password>]@]<host>/<path>
--
--   where:
--
--   ``protocol``
--      'http', 'https', 'ftp', or 'ftps'.
--
--   ``username``
--      Optional username for authentication to the remote server.
--
--   ``password``
--      Optional password for authentication to the remote server.
--
--   ``host``
--      Address of the remote server.
--
--   ``path``
--      Path on the remote server, including any query string.
--
--   The following options are also supported:
--
--   ``url``
--      The full URL when passing options to the driver explicitly.
--
--   ``readahead``
--      The amount of data to read ahead with each range request to the
--      remote server. This value may optionally have the suffix 'T', 'G',
--      'M', 'K', 'k' or 'b'. If it does not have a suffix, it will be
--      assumed to be in bytes. The value must be a multiple of 512 bytes.
--      It defaults to 256k.
--
--   ``sslverify``
--      Whether to verify the remote server's certificate when connecting
--      over SSL. It can have the value 'on' or 'off'. It defaults to
--      'on'.
--
--   ``cookie``
--      Send this cookie (it can also be a list of cookies separated by
--      ';') with each outgoing request. Only supported when using
--      protocols such as HTTP which support cookies, otherwise ignored.
--
--   ``timeout``
--      Set the timeout in seconds of the CURL connection. This timeout is
--      the time that CURL waits for a response from the remote server to
--      get the size of the image to be downloaded. If not set, the
--      default timeout of 5 seconds is used.
--
--   Note that when passing options to qemu explicitly, ``driver`` is the
--   value of <protocol>.
--
--   Example: boot from a remote Fedora 20 live ISO image
--
--   .. parsed-literal::
--
--      |qemu_system_x86| --drive media=cdrom,file=https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
--
--      |qemu_system_x86| --drive media=cdrom,file.driver=http,file.url=http://archives.fedoraproject.org/pub/fedora/linux/releases/20/Live/x86_64/Fedora-Live-Desktop-x86_64-20-1.iso,readonly
--
--   Example: boot from a remote Fedora 20 cloud image using a local
--   overlay for writes, copy-on-read, and a readahead of 64k
--
--   .. parsed-literal::
--
--      qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"http",, "file.url":"http://archives.fedoraproject.org/pub/archive/fedora/linux/releases/20/Images/x86_64/Fedora-x86_64-20-20131211.1-sda.qcow2",, "file.readahead":"64k"}' /tmp/Fedora-x86_64-20-20131211.1-sda.qcow2
--
--      |qemu_system_x86| -drive file=/tmp/Fedora-x86_64-20-20131211.1-sda.qcow2,copy-on-read=on
--
--   Example: boot from an image stored on a VMware vSphere server with a
--   self-signed certificate using a local overlay for writes, a readahead
--   of 64k and a timeout of 10 seconds.
--
--   .. parsed-literal::
--
--      qemu-img create -f qcow2 -o backing_file='json:{"file.driver":"https",, "file.url":"https://user:password@vsphere.example.com/folder/test/test-flat.vmdk?dcPath=Datacenter&dsName=datastore1",, "file.sslverify":"off",, "file.readahead":"64k",, "file.timeout":10}' /tmp/test.qcow2
--
--      |qemu_system_x86| -drive file=/tmp/test.qcow2
-+.. include:: device-url-syntax.rst.inc
-diff --git a/docs/system/keys.rst b/docs/system/keys.rst
-index bf99ee8d5be..e596ae6c4e7 100644
---- a/docs/system/keys.rst
-+++ b/docs/system/keys.rst
-@@ -3,38 +3,4 @@
- Keys in the graphical frontends
- -------------------------------
+ $(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
+diff --git a/docs/system/monitor.rst b/docs/system/monitor.rst
+index 52b0f18cfec..0bcd5da2164 100644
+--- a/docs/system/monitor.rst
++++ b/docs/system/monitor.rst
+@@ -21,9 +21,7 @@ The following commands are available:
  
--During the graphical emulation, you can use special key combinations to
--change modes. The default key mappings are shown below, but if you use
--``-alt-grab`` then the modifier is Ctrl-Alt-Shift (instead of Ctrl-Alt)
--and if you use ``-ctrl-grab`` then the modifier is the right Ctrl key
--(instead of Ctrl-Alt):
--
--Ctrl-Alt-f
--   Toggle full screen
--
--Ctrl-Alt-+
--   Enlarge the screen
--
--Ctrl-Alt\--
--   Shrink the screen
--
--Ctrl-Alt-u
--   Restore the screen's un-scaled dimensions
--
--Ctrl-Alt-n
--   Switch to virtual console 'n'. Standard console mappings are:
--
--   *1*
--      Target system display
--
--   *2*
--      Monitor
--
--   *3*
--      Serial port
--
--Ctrl-Alt
--   Toggle mouse and keyboard grab.
--
--In the virtual consoles, you can use Ctrl-Up, Ctrl-Down, Ctrl-PageUp and
--Ctrl-PageDown to move in the back log.
-+.. include:: keys.rst.inc
-diff --git a/docs/system/keys.rst b/docs/system/keys.rst.inc
-similarity index 90%
-copy from docs/system/keys.rst
-copy to docs/system/keys.rst.inc
-index bf99ee8d5be..bd9b8e5f6f5 100644
---- a/docs/system/keys.rst
-+++ b/docs/system/keys.rst.inc
-@@ -1,8 +1,3 @@
--.. _pcsys_005fkeys:
--
--Keys in the graphical frontends
---------------------------------
--
- During the graphical emulation, you can use special key combinations to
- change modes. The default key mappings are shown below, but if you use
- ``-alt-grab`` then the modifier is Ctrl-Alt-Shift (instead of Ctrl-Alt)
-diff --git a/docs/system/mux-chardev.rst b/docs/system/mux-chardev.rst
-index e50172c0815..413a6b34460 100644
---- a/docs/system/mux-chardev.rst
-+++ b/docs/system/mux-chardev.rst
-@@ -3,30 +3,4 @@
- Keys in the character backend multiplexer
- -----------------------------------------
+ .. hxtool-doc:: hmp-commands.hx
  
--During emulation, if you are using a character backend multiplexer
--(which is the default if you are using ``-nographic``) then several
--commands are available via an escape sequence. These key sequences all
--start with an escape character, which is Ctrl-a by default, but can be
--changed with ``-echr``. The list below assumes you're using the default.
+-..
+-  TODO: convert and reference hmp-commands-info.hx
 -
--Ctrl-a h
--   Print this help
--
--Ctrl-a x
--   Exit emulator
--
--Ctrl-a s
--   Save disk data back to file (if -snapshot)
--
--Ctrl-a t
--   Toggle console timestamps
--
--Ctrl-a b
--   Send break (magic sysrq in Linux)
--
--Ctrl-a c
--   Rotate between the frontends connected to the multiplexer (usually
--   this switches between the monitor and the console)
--
--Ctrl-a Ctrl-a
--   Send the escape character to the frontend
-+.. include:: mux-chardev.rst.inc
-diff --git a/docs/system/mux-chardev.rst b/docs/system/mux-chardev.rst.inc
-similarity index 87%
-copy from docs/system/mux-chardev.rst
-copy to docs/system/mux-chardev.rst.inc
-index e50172c0815..84ea12cbf58 100644
---- a/docs/system/mux-chardev.rst
-+++ b/docs/system/mux-chardev.rst.inc
-@@ -1,8 +1,3 @@
--.. _mux_005fkeys:
--
--Keys in the character backend multiplexer
-------------------------------------------
--
- During emulation, if you are using a character backend multiplexer
- (which is the default if you are using ``-nographic``) then several
- commands are available via an escape sequence. These key sequences all
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386-desc.rst.inc
-similarity index 76%
-copy from docs/system/target-i386.rst
-copy to docs/system/target-i386-desc.rst.inc
-index 92e2038b11e..47a169e0ae2 100644
---- a/docs/system/target-i386.rst
-+++ b/docs/system/target-i386-desc.rst.inc
-@@ -1,13 +1,3 @@
--.. _QEMU-PC-System-emulator:
--
--x86 (PC) System emulator
--------------------------
--
--.. _pcsys_005fdevices:
--
--Peripherals
--~~~~~~~~~~~
--
- The QEMU PC System emulator simulates the following peripherals:
++.. hxtool-doc:: hmp-commands-info.hx
  
- -  i440FX host PCI bridge and PIIX3 PCI to ISA bridge
-@@ -70,15 +60,3 @@ Alternatively:
- Or some other unclaimed IRQ.
+ Integer expressions
+ ~~~~~~~~~~~~~~~~~~~
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 257ee7d7a3f..1730f866cde 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -4,6 +4,12 @@ HXCOMM discarded from C version
+ HXCOMM DEF(command, args, callback, arg_string, help) is used to construct
+ HXCOMM monitor info commands
+ HXCOMM HXCOMM can be used for comments, discarded from both texi and C
++HXCOMM
++HXCOMM In this file, generally SRST fragments should have two extra
++HXCOMM spaces of indent, so that the documentation list item for "info foo"
++HXCOMM appears inside the documentation list item for the top level
++HXCOMM "info" documentation entry. The exception is the first SRST
++HXCOMM fragment that defines that top level entry.
  
- CS4231A is the chip used in Windows Sound System and GUSMAX products
--
--.. include:: cpu-models-x86.rst.inc
--
--.. _pcsys_005freq:
--
--OS requirements
--~~~~~~~~~~~~~~~
--
--On x86_64 hosts, the default set of CPU features enabled by the KVM
--accelerator require the host to be running Linux v4.5 or newer. Red Hat
--Enterprise Linux 7 is also supported, since the required
--functionality was backported.
-diff --git a/docs/system/target-i386.rst b/docs/system/target-i386.rst
-index 92e2038b11e..51be03d881f 100644
---- a/docs/system/target-i386.rst
-+++ b/docs/system/target-i386.rst
-@@ -8,68 +8,7 @@ x86 (PC) System emulator
- Peripherals
- ~~~~~~~~~~~
+ STEXI
+ @table @option
+@@ -12,6 +18,11 @@ STEXI
+ Show various information about the system state.
+ @table @option
+ ETEXI
++SRST
++``info`` *subcommand*
++  Show various information about the system state.
++
++ERST
  
--The QEMU PC System emulator simulates the following peripherals:
--
---  i440FX host PCI bridge and PIIX3 PCI to ISA bridge
--
---  Cirrus CLGD 5446 PCI VGA card or dummy VGA card with Bochs VESA
--   extensions (hardware level, including all non standard modes).
--
---  PS/2 mouse and keyboard
--
---  2 PCI IDE interfaces with hard disk and CD-ROM support
--
---  Floppy disk
--
---  PCI and ISA network adapters
--
---  Serial ports
--
---  IPMI BMC, either and internal or external one
--
---  Creative SoundBlaster 16 sound card
--
---  ENSONIQ AudioPCI ES1370 sound card
--
---  Intel 82801AA AC97 Audio compatible sound card
--
---  Intel HD Audio Controller and HDA codec
--
---  Adlib (OPL2) - Yamaha YM3812 compatible chip
--
---  Gravis Ultrasound GF1 sound card
--
---  CS4231A compatible sound card
--
---  PCI UHCI, OHCI, EHCI or XHCI USB controller and a virtual USB-1.1
--   hub.
--
--SMP is supported with up to 255 CPUs.
--
--QEMU uses the PC BIOS from the Seabios project and the Plex86/Bochs LGPL
--VGA BIOS.
--
--QEMU uses YM3812 emulation by Tatsuyuki Satoh.
--
--QEMU uses GUS emulation (GUSEMU32 http://www.deinmeister.de/gusemu/) by
--Tibor \"TS\" Schütz.
--
--Note that, by default, GUS shares IRQ(7) with parallel ports and so QEMU
--must be told to not have parallel ports to have working GUS.
--
--.. parsed-literal::
--
--   |qemu_system_x86| dos.img -soundhw gus -parallel none
--
--Alternatively:
--
--.. parsed-literal::
--
--   |qemu_system_x86| dos.img -device gus,irq=5
--
--Or some other unclaimed IRQ.
--
--CS4231A is the chip used in Windows Sound System and GUSMAX products
-+.. include:: target-i386-desc.rst.inc
+     {
+         .name       = "version",
+@@ -27,6 +38,10 @@ STEXI
+ @findex info version
+ Show the version of QEMU.
+ ETEXI
++SRST
++  ``info version``
++    Show the version of QEMU.
++ERST
  
- .. include:: cpu-models-x86.rst.inc
+     {
+         .name       = "network",
+@@ -41,6 +56,10 @@ STEXI
+ @findex info network
+ Show the network state.
+ ETEXI
++SRST
++  ``info network``
++    Show the network state.
++ERST
  
+     {
+         .name       = "chardev",
+@@ -56,6 +75,10 @@ STEXI
+ @findex info chardev
+ Show the character devices.
+ ETEXI
++SRST
++  ``info chardev``
++    Show the character devices.
++ERST
+ 
+     {
+         .name       = "block",
+@@ -71,6 +94,10 @@ STEXI
+ @findex info block
+ Show info of one block device or all block devices.
+ ETEXI
++SRST
++  ``info block``
++    Show info of one block device or all block devices.
++ERST
+ 
+     {
+         .name       = "blockstats",
+@@ -85,6 +112,10 @@ STEXI
+ @findex info blockstats
+ Show block device statistics.
+ ETEXI
++SRST
++  ``info blockstats``
++    Show block device statistics.
++ERST
+ 
+     {
+         .name       = "block-jobs",
+@@ -99,6 +130,10 @@ STEXI
+ @findex info block-jobs
+ Show progress of ongoing block device operations.
+ ETEXI
++SRST
++  ``info block-jobs``
++    Show progress of ongoing block device operations.
++ERST
+ 
+     {
+         .name       = "registers",
+@@ -113,6 +148,10 @@ STEXI
+ @findex info registers
+ Show the cpu registers.
+ ETEXI
++SRST
++  ``info registers``
++    Show the cpu registers.
++ERST
+ 
+ #if defined(TARGET_I386)
+     {
+@@ -130,6 +169,10 @@ STEXI
+ @findex info lapic
+ Show local APIC state
+ ETEXI
++SRST
++  ``info lapic``
++    Show local APIC state
++ERST
+ 
+ #if defined(TARGET_I386)
+     {
+@@ -146,6 +189,10 @@ STEXI
+ @findex info ioapic
+ Show io APIC state
+ ETEXI
++SRST
++  ``info ioapic``
++    Show io APIC state
++ERST
+ 
+     {
+         .name       = "cpus",
+@@ -160,6 +207,10 @@ STEXI
+ @findex info cpus
+ Show infos for each CPU.
+ ETEXI
++SRST
++  ``info cpus``
++    Show infos for each CPU.
++ERST
+ 
+     {
+         .name       = "history",
+@@ -175,6 +226,10 @@ STEXI
+ @findex info history
+ Show the command line history.
+ ETEXI
++SRST
++  ``info history``
++    Show the command line history.
++ERST
+ 
+     {
+         .name       = "irq",
+@@ -189,6 +244,10 @@ STEXI
+ @findex info irq
+ Show the interrupts statistics (if available).
+ ETEXI
++SRST
++  ``info irq``
++    Show the interrupts statistics (if available).
++ERST
+ 
+     {
+         .name       = "pic",
+@@ -203,6 +262,10 @@ STEXI
+ @findex info pic
+ Show PIC state.
+ ETEXI
++SRST
++  ``info pic``
++    Show PIC state.
++ERST
+ 
+     {
+         .name       = "rdma",
+@@ -217,6 +280,10 @@ STEXI
+ @findex info rdma
+ Show RDMA state.
+ ETEXI
++SRST
++  ``info rdma``
++    Show RDMA state.
++ERST
+ 
+     {
+         .name       = "pci",
+@@ -231,6 +298,10 @@ STEXI
+ @findex info pci
+ Show PCI information.
+ ETEXI
++SRST
++  ``info pci``
++    Show PCI information.
++ERST
+ 
+ #if defined(TARGET_I386) || defined(TARGET_SH4) || defined(TARGET_SPARC) || \
+     defined(TARGET_PPC) || defined(TARGET_XTENSA) || defined(TARGET_M68K)
+@@ -248,6 +319,10 @@ STEXI
+ @findex info tlb
+ Show virtual to physical memory mappings.
+ ETEXI
++SRST
++  ``info tlb``
++    Show virtual to physical memory mappings.
++ERST
+ 
+ #if defined(TARGET_I386) || defined(TARGET_RISCV)
+     {
+@@ -264,6 +339,10 @@ STEXI
+ @findex info mem
+ Show the active virtual memory mappings.
+ ETEXI
++SRST
++  ``info mem``
++    Show the active virtual memory mappings.
++ERST
+ 
+     {
+         .name       = "mtree",
+@@ -280,6 +359,10 @@ STEXI
+ @findex info mtree
+ Show memory tree.
+ ETEXI
++SRST
++  ``info mtree``
++    Show memory tree.
++ERST
+ 
+ #if defined(CONFIG_TCG)
+     {
+@@ -296,6 +379,10 @@ STEXI
+ @findex info jit
+ Show dynamic compiler info.
+ ETEXI
++SRST
++  ``info jit``
++    Show dynamic compiler info.
++ERST
+ 
+ #if defined(CONFIG_TCG)
+     {
+@@ -312,6 +399,10 @@ STEXI
+ @findex info opcount
+ Show dynamic compiler opcode counters
+ ETEXI
++SRST
++  ``info opcount``
++    Show dynamic compiler opcode counters
++ERST
+ 
+     {
+         .name       = "sync-profile",
+@@ -334,6 +425,20 @@ sorted by total wait time.
+ When different objects that share the same call site are coalesced, the "Object"
+ field shows---enclosed in brackets---the number of objects being coalesced.
+ ETEXI
++SRST
++  ``info sync-profile [-m|-n]`` [*max*]
++    Show synchronization profiling info, up to *max* entries (default: 10),
++    sorted by total wait time.
++
++    ``-m``
++      sort by mean wait time
++    ``-n``
++      do not coalesce objects with the same call site
++
++    When different objects that share the same call site are coalesced,
++    the "Object" field shows---enclosed in brackets---the number of objects
++    being coalesced.
++ERST
+ 
+     {
+         .name       = "kvm",
+@@ -348,6 +453,10 @@ STEXI
+ @findex info kvm
+ Show KVM information.
+ ETEXI
++SRST
++  ``info kvm``
++    Show KVM information.
++ERST
+ 
+     {
+         .name       = "numa",
+@@ -362,6 +471,10 @@ STEXI
+ @findex info numa
+ Show NUMA information.
+ ETEXI
++SRST
++  ``info numa``
++    Show NUMA information.
++ERST
+ 
+     {
+         .name       = "usb",
+@@ -376,6 +489,10 @@ STEXI
+ @findex info usb
+ Show guest USB devices.
+ ETEXI
++SRST
++  ``info usb``
++    Show guest USB devices.
++ERST
+ 
+     {
+         .name       = "usbhost",
+@@ -390,6 +507,10 @@ STEXI
+ @findex info usbhost
+ Show host USB devices.
+ ETEXI
++SRST
++  ``info usbhost``
++    Show host USB devices.
++ERST
+ 
+     {
+         .name       = "profile",
+@@ -404,6 +525,10 @@ STEXI
+ @findex info profile
+ Show profiling information.
+ ETEXI
++SRST
++  ``info profile``
++    Show profiling information.
++ERST
+ 
+     {
+         .name       = "capture",
+@@ -418,6 +543,10 @@ STEXI
+ @findex info capture
+ Show capture information.
+ ETEXI
++SRST
++  ``info capture``
++    Show capture information.
++ERST
+ 
+     {
+         .name       = "snapshots",
+@@ -432,6 +561,10 @@ STEXI
+ @findex info snapshots
+ Show the currently saved VM snapshots.
+ ETEXI
++SRST
++  ``info snapshots``
++    Show the currently saved VM snapshots.
++ERST
+ 
+     {
+         .name       = "status",
+@@ -447,6 +580,10 @@ STEXI
+ @findex info status
+ Show the current VM status (running|paused).
+ ETEXI
++SRST
++  ``info status``
++    Show the current VM status (running|paused).
++ERST
+ 
+     {
+         .name       = "mice",
+@@ -461,6 +598,10 @@ STEXI
+ @findex info mice
+ Show which guest mouse is receiving events.
+ ETEXI
++SRST
++  ``info mice``
++    Show which guest mouse is receiving events.
++ERST
+ 
+ #if defined(CONFIG_VNC)
+     {
+@@ -477,6 +618,10 @@ STEXI
+ @findex info vnc
+ Show the vnc server status.
+ ETEXI
++SRST
++  ``info vnc``
++    Show the vnc server status.
++ERST
+ 
+ #if defined(CONFIG_SPICE)
+     {
+@@ -493,6 +638,10 @@ STEXI
+ @findex info spice
+ Show the spice server status.
+ ETEXI
++SRST
++  ``info spice``
++    Show the spice server status.
++ERST
+ 
+     {
+         .name       = "name",
+@@ -508,6 +657,10 @@ STEXI
+ @findex info name
+ Show the current VM name.
+ ETEXI
++SRST
++  ``info name``
++    Show the current VM name.
++ERST
+ 
+     {
+         .name       = "uuid",
+@@ -523,6 +676,10 @@ STEXI
+ @findex info uuid
+ Show the current VM UUID.
+ ETEXI
++SRST
++  ``info uuid``
++    Show the current VM UUID.
++ERST
+ 
+     {
+         .name       = "cpustats",
+@@ -537,6 +694,10 @@ STEXI
+ @findex info cpustats
+ Show CPU statistics.
+ ETEXI
++SRST
++  ``info cpustats``
++    Show CPU statistics.
++ERST
+ 
+ #if defined(CONFIG_SLIRP)
+     {
+@@ -553,6 +714,10 @@ STEXI
+ @findex info usernet
+ Show user network stack connection states.
+ ETEXI
++SRST
++  ``info usernet``
++    Show user network stack connection states.
++ERST
+ 
+     {
+         .name       = "migrate",
+@@ -567,6 +732,10 @@ STEXI
+ @findex info migrate
+ Show migration status.
+ ETEXI
++SRST
++  ``info migrate``
++    Show migration status.
++ERST
+ 
+     {
+         .name       = "migrate_capabilities",
+@@ -581,6 +750,10 @@ STEXI
+ @findex info migrate_capabilities
+ Show current migration capabilities.
+ ETEXI
++SRST
++  ``info migrate_capabilities``
++    Show current migration capabilities.
++ERST
+ 
+     {
+         .name       = "migrate_parameters",
+@@ -595,6 +768,10 @@ STEXI
+ @findex info migrate_parameters
+ Show current migration parameters.
+ ETEXI
++SRST
++  ``info migrate_parameters``
++    Show current migration parameters.
++ERST
+ 
+     {
+         .name       = "migrate_cache_size",
+@@ -609,6 +786,10 @@ STEXI
+ @findex info migrate_cache_size
+ Show current migration xbzrle cache size.
+ ETEXI
++SRST
++  ``info migrate_cache_size``
++    Show current migration xbzrle cache size.
++ERST
+ 
+     {
+         .name       = "balloon",
+@@ -623,6 +804,10 @@ STEXI
+ @findex info balloon
+ Show balloon information.
+ ETEXI
++SRST
++  ``info balloon``
++    Show balloon information.
++ERST
+ 
+     {
+         .name       = "qtree",
+@@ -637,6 +822,10 @@ STEXI
+ @findex info qtree
+ Show device tree.
+ ETEXI
++SRST
++  ``info qtree``
++    Show device tree.
++ERST
+ 
+     {
+         .name       = "qdm",
+@@ -651,6 +840,10 @@ STEXI
+ @findex info qdm
+ Show qdev device model list.
+ ETEXI
++SRST
++  ``info qdm``
++    Show qdev device model list.
++ERST
+ 
+     {
+         .name       = "qom-tree",
+@@ -666,6 +859,10 @@ STEXI
+ @findex info qom-tree
+ Show QOM composition tree.
+ ETEXI
++SRST
++  ``info qom-tree``
++    Show QOM composition tree.
++ERST
+ 
+     {
+         .name       = "roms",
+@@ -680,6 +877,10 @@ STEXI
+ @findex info roms
+ Show roms.
+ ETEXI
++SRST
++  ``info roms``
++    Show roms.
++ERST
+ 
+     {
+         .name       = "trace-events",
+@@ -696,6 +897,10 @@ STEXI
+ @findex info trace-events
+ Show available trace-events & their state.
+ ETEXI
++SRST
++  ``info trace-events``
++    Show available trace-events & their state.
++ERST
+ 
+     {
+         .name       = "tpm",
+@@ -710,6 +915,10 @@ STEXI
+ @findex info tpm
+ Show the TPM device.
+ ETEXI
++SRST
++  ``info tpm``
++    Show the TPM device.
++ERST
+ 
+     {
+         .name       = "memdev",
+@@ -725,6 +934,10 @@ STEXI
+ @findex info memdev
+ Show memory backends
+ ETEXI
++SRST
++  ``info memdev``
++    Show memory backends
++ERST
+ 
+     {
+         .name       = "memory-devices",
+@@ -739,6 +952,10 @@ STEXI
+ @findex info memory-devices
+ Show memory devices.
+ ETEXI
++SRST
++  ``info memory-devices``
++    Show memory devices.
++ERST
+ 
+     {
+         .name       = "iothreads",
+@@ -754,6 +971,10 @@ STEXI
+ @findex info iothreads
+ Show iothread's identifiers.
+ ETEXI
++SRST
++  ``info iothreads``
++    Show iothread's identifiers.
++ERST
+ 
+     {
+         .name       = "rocker",
+@@ -768,6 +989,10 @@ STEXI
+ @findex info rocker
+ Show rocker switch.
+ ETEXI
++SRST
++  ``info rocker`` *name*
++    Show rocker switch.
++ERST
+ 
+     {
+         .name       = "rocker-ports",
+@@ -782,6 +1007,10 @@ STEXI
+ @findex info rocker-ports
+ Show rocker ports.
+ ETEXI
++SRST
++  ``info rocker-ports`` *name*-ports
++    Show rocker ports.
++ERST
+ 
+     {
+         .name       = "rocker-of-dpa-flows",
+@@ -796,6 +1025,10 @@ STEXI
+ @findex info rocker-of-dpa-flows
+ Show rocker OF-DPA flow tables.
+ ETEXI
++SRST
++  ``info rocker-of-dpa-flows`` *name* [*tbl_id*]
++    Show rocker OF-DPA flow tables.
++ERST
+ 
+     {
+         .name       = "rocker-of-dpa-groups",
+@@ -810,6 +1043,10 @@ STEXI
+ @findex info rocker-of-dpa-groups
+ Show rocker OF-DPA groups.
+ ETEXI
++SRST
++  ``info rocker-of-dpa-groups`` *name* [*type*]
++    Show rocker OF-DPA groups.
++ERST
+ 
+ #if defined(TARGET_S390X)
+     {
+@@ -826,6 +1063,10 @@ STEXI
+ @findex info skeys
+ Display the value of a storage key (s390 only)
+ ETEXI
++SRST
++  ``info skeys`` *address*
++    Display the value of a storage key (s390 only)
++ERST
+ 
+ #if defined(TARGET_S390X)
+     {
+@@ -842,6 +1083,11 @@ STEXI
+ @findex info cmma
+ Display the values of the CMMA storage attributes for a range of pages (s390 only)
+ ETEXI
++SRST
++  ``info cmma`` *address*
++    Display the values of the CMMA storage attributes for a range of
++    pages (s390 only)
++ERST
+ 
+     {
+         .name       = "dump",
+@@ -856,6 +1102,10 @@ STEXI
+ @findex info dump
+ Display the latest dump status.
+ ETEXI
++SRST
++  ``info dump``
++    Display the latest dump status.
++ERST
+ 
+     {
+         .name       = "ramblock",
+@@ -870,6 +1120,10 @@ STEXI
+ @findex info ramblock
+ Dump all the ramblocks of the system.
+ ETEXI
++SRST
++  ``info ramblock``
++    Dump all the ramblocks of the system.
++ERST
+ 
+     {
+         .name       = "hotpluggable-cpus",
+@@ -885,6 +1139,10 @@ STEXI
+ @findex info hotpluggable-cpus
+ Show information about hotpluggable CPUs
+ ETEXI
++SRST
++  ``info hotpluggable-cpus``
++    Show information about hotpluggable CPUs
++ERST
+ 
+     {
+         .name       = "vm-generation-id",
+@@ -899,6 +1157,10 @@ STEXI
+ @findex info vm-generation-id
+ Show Virtual Machine Generation ID
+ ETEXI
++SRST
++  ``info vm-generation-id``
++    Show Virtual Machine Generation ID
++ERST
+ 
+     {
+         .name       = "memory_size_summary",
+@@ -915,6 +1177,11 @@ STEXI
+ Display the amount of initially allocated and present hotpluggable (if
+ enabled) memory in bytes.
+ ETEXI
++SRST
++  ``info memory_size_summary``
++    Display the amount of initially allocated and present hotpluggable (if
++    enabled) memory in bytes.
++ERST
+ 
+ #if defined(TARGET_I386)
+     {
+@@ -931,6 +1198,10 @@ STEXI
+ @findex info sev
+ Show SEV information.
+ ETEXI
++SRST
++  ``info sev``
++    Show SEV information.
++ERST
+ 
+ STEXI
+ @end table
 -- 
 2.20.1
 
