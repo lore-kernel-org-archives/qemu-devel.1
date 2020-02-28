@@ -2,85 +2,85 @@ Return-Path: <SRS0=EIn8=4Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984C7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C29B3C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:37:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21892246A8
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D92E246A8
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Feb 2020 10:37:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dy9s4uJE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21892246A8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRdr2HvC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D92E246A8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7d0c-0001Bh-4T
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:36:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60762)
+	id 1j7d0u-0001oA-Ir
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 05:37:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j7czc-00087K-7P
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:35:41 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j7czh-0008Ej-7b
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:35:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j7cza-0000Q6-Sx
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:35:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44568
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j7cza-0000Pg-OD
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:35:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582886138;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2/Mf2NJUD9wQauMEhExSsVeDfUrUIjqWPPYz3rMDenY=;
- b=dy9s4uJEHcO6HZk12fcWPnWpgkVr4RizLo37BcL5kfncc5d2GdYC9Zsj95O4cJEWHvZi/C
- Hj7X8DTw6CzxqpvPlOIPfxxi3of4w7sj6qm1nWh4e9jBzrE2BrcAe14IeYskHR4B1GY/eb
- h0g0Cg746/nFAIhjGHQFe3SnRRla2YU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-qYlcrakOPIOy8_fyATVQxg-1; Fri, 28 Feb 2020 05:35:30 -0500
-X-MC-Unique: qYlcrakOPIOy8_fyATVQxg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD5D0107ACC5;
- Fri, 28 Feb 2020 10:35:27 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 529795C557;
- Fri, 28 Feb 2020 10:35:25 +0000 (UTC)
-Date: Fri, 28 Feb 2020 10:35:21 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Subject: Re: [PATCH] qom/object: Comment to use g_slist_free on
- object_class_get_list result
-Message-ID: <20200228103521.GC1657361@redhat.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1j7czf-0000SG-On
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 05:35:45 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35388)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1j7czc-0000QQ-LS; Fri, 28 Feb 2020 05:35:40 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m3so2651766wmi.0;
+ Fri, 28 Feb 2020 02:35:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ghUp1vyXOG4NGhx1HURHUGKmKGGxA08KgIlXrkb2U9U=;
+ b=YRdr2HvCyPzRhvZZ3esnQXuOtM4FiQ15/khlFGi1aUfGxXxyoEU7RZ6fraGSBBbpTX
+ yyAB2viJL9xHrdy9hh2x0GmSyCeBuU/xMLedJ1WMzrfQHb4HFWVuf625h9dqTHw6Dz13
+ Jfu82SMasGRrVAqh1fOH+swy1XIHYIVKlGbLndf5qOk4OxmiqoJ3Zud1YYqbCHT1entU
+ 29hP+Ung7A46OckEa81q+bHrHv3/+N4NNq0yLDsoER+bsgOIVIDpQoTq3YtOUoAmVDW/
+ fUbkCHLfwmEKHIBczWBlEIPZxbF/gYMudAY3t9dk5nWjbmgdgpLYO6du9xfBoeVmnPEe
+ /HgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ghUp1vyXOG4NGhx1HURHUGKmKGGxA08KgIlXrkb2U9U=;
+ b=IsYtHV0UYBBncYufZVLZem+/7IQhXMilO+HyWgm+8PF2A022tpL9WXJZTQKjaJPY5P
+ lAXVuNAsKJkXJIUJC6HbSkMywZb2VNZdzYVtxawwAv0V+qG3DSGraUjV8z8BoWU+APHT
+ +ozn6Ox+OZIgzfnlZxGhSVoAJwsfcEeV5pS6ELbg8Dthay1pytew+8y0yNHxCjPmMHRq
+ RlcIbTlr81kMtCChtNFUbV/V/w3Y7uL+Ih4mZ0D6VXtb0sbvPHKOP/21VV+KOe4GdBrh
+ X8+YLSRRBAa64Khq1Jxr/IVUYt9A6ADtilX3LMm5LRTNwJJV0Amxw/ytU8apEw2QoNuT
+ SpBA==
+X-Gm-Message-State: APjAAAXx/x+2ve2Xbme7mdQ9DjxqROlBfgYFYTelLFN+rBU13DP6w96I
+ QNIFgTj6BDgpTWA5YLkvs7EGAleTNGvdYfl5uiU=
+X-Google-Smtp-Source: APXvYqzIDj6lykJrx2zul6fgrbI3Hzf4sgO5kqFJhJbFEXQrOVPxxErEjft/67RJ+YJy4VF4fPlLLIIyqtM9RY3VNh4=
+X-Received: by 2002:a7b:ce0b:: with SMTP id m11mr4309472wmc.4.1582886139297;
+ Fri, 28 Feb 2020 02:35:39 -0800 (PST)
+MIME-Version: 1.0
 References: <20200227190942.8834-1-philmd@redhat.com>
  <20200228094652.GB1657361@redhat.com>
  <CAJ+F1CL-fbX=dXpopMMT1o-WH1JhrqrzpM55J9cGoGDNpDq=AQ@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL-fbX=dXpopMMT1o-WH1JhrqrzpM55J9cGoGDNpDq=AQ@mail.gmail.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ <cc93fc81-3e4d-b8d0-afa7-2c35ac502785@redhat.com>
+In-Reply-To: <cc93fc81-3e4d-b8d0-afa7-2c35ac502785@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 28 Feb 2020 11:35:27 +0100
+Message-ID: <CAJ+F1CLsRTuWjV3mx1i9OdZaj+YYh5CMqHoedUMbakspTT-wcA@mail.gmail.com>
+Subject: Re: [PATCH] qom/object: Comment to use g_slist_free on
+ object_class_get_list result
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,69 +92,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- qemu trival <qemu-trivial@nongnu.org>, Pan Nengyuan <pannengyuan@huawei.com>,
- QEMU <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu trival <qemu-trivial@nongnu.org>,
+ Pan Nengyuan <pannengyuan@huawei.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Feb 28, 2020 at 11:06:38AM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, Feb 28, 2020 at 10:47 AM Daniel P. Berrang=C3=A9 <berrange@redhat=
-.com> wrote:
+Hi
+
+On Fri, Feb 28, 2020 at 11:09 AM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 2/28/20 11:06 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi
 > >
-> > On Thu, Feb 27, 2020 at 08:09:42PM +0100, Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> > > Document the list returned by object_class_get_list() must be
-> > > released with g_slist_free() to avoid memory leaks.
-> > >
-> > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > ---
-> > >  include/qom/object.h | 6 ++++++
-> > >  1 file changed, 6 insertions(+)
-> > >
-> > > diff --git a/include/qom/object.h b/include/qom/object.h
-> > > index 29546496c1..5517b56508 100644
-> > > --- a/include/qom/object.h
-> > > +++ b/include/qom/object.h
-> > > @@ -984,6 +984,9 @@ void object_class_foreach(void (*fn)(ObjectClass =
+> > On Fri, Feb 28, 2020 at 10:47 AM Daniel P. Berrang=C3=A9 <berrange@redh=
+at.com> wrote:
+> >>
+> >> On Thu, Feb 27, 2020 at 08:09:42PM +0100, Philippe Mathieu-Daud=C3=A9 =
+wrote:
+> >>> Document the list returned by object_class_get_list() must be
+> >>> released with g_slist_free() to avoid memory leaks.
+> >>>
+> >>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >>> ---
+> >>>   include/qom/object.h | 6 ++++++
+> >>>   1 file changed, 6 insertions(+)
+> >>>
+> >>> diff --git a/include/qom/object.h b/include/qom/object.h
+> >>> index 29546496c1..5517b56508 100644
+> >>> --- a/include/qom/object.h
+> >>> +++ b/include/qom/object.h
+> >>> @@ -984,6 +984,9 @@ void object_class_foreach(void (*fn)(ObjectClass =
 *klass, void *opaque),
-> > >   * @include_abstract: Whether to include abstract classes.
-> > >   *
-> > >   * Returns: A singly-linked list of the classes in reverse hashtable=
- order.
-> > > + *
-> > > + * The returned list must be released with g_slist_free()
-> > > + * when no longer required.
+> >>>    * @include_abstract: Whether to include abstract classes.
+> >>>    *
+> >>>    * Returns: A singly-linked list of the classes in reverse hashtabl=
+e order.
+> >>> + *
+> >>> + * The returned list must be released with g_slist_free()
+> >>> + * when no longer required.
+> >>
+> >> I'd suggest
+> >>
+> >>    "The returned list, but not its elements, must be released with
+> >>     g_slist_free() or g_autoptr when no longer required"
 > >
-> > I'd suggest
+> > As gobject-introspection annotations: "Returns: (transfer container)
+> > (element-type ObjectClass): A list of #ObjectClass"
+>
+> Are you suggesting to replace "Returns: A singly-linked list of the
+> classes in reverse hashtable order." by the line you quoted?
+
+No, just a remark. I doubt this is compatible with kernel-doc at this
+point, and we are not using GI.
+
+fwiw, I don't think "in reverse hashtable order" is really meaningful anywa=
+y.
+
+>
 > >
-> >   "The returned list, but not its elements, must be released with
-> >    g_slist_free() or g_autoptr when no longer required"
->=20
-> As gobject-introspection annotations: "Returns: (transfer container)
-> (element-type ObjectClass): A list of #ObjectClass"
+> >>
+> >>>    */
+> >>>   GSList *object_class_get_list(const char *implements_type,
+> >>>                                 bool include_abstract);
+> >>> @@ -995,6 +998,9 @@ GSList *object_class_get_list(const char *impleme=
+nts_type,
+> >>>    *
+> >>>    * Returns: A singly-linked list of the classes in alphabetical
+> >>>    * case-insensitive order.
+> >>> + *
+> >>> + * The returned list must be released with g_slist_free()
+> >>> + * when no longer required.
+> >>>    */
+> >>>   GSList *object_class_get_list_sorted(const char *implements_type,
+> >>>                                 bool include_abstract);
+> >>> --
+> >>> 2.21.1
+> >>>
+> >>>
+> >>
+> >> Regards,
+> >> Daniel
+> >> --
+> >> |: https://berrange.com      -o-    https://www.flickr.com/photos/dber=
+range :|
+> >> |: https://libvirt.org         -o-            https://fstop138.berrang=
+e.com :|
+> >> |: https://entangle-photo.org    -o-    https://www.instagram.com/dber=
+range :|
+> >>
+> >>
+> >
+> >
+>
 
-If we were using Gobject introspection and/or Gtk-Doc, then I'd certainly
-suggest that syntax, but AFAIK this is not something that fits with our
-intented docs tools. There might be sense in having our docs tools parse
-these kind of annotations as it is useful to have it in standardized
-format. I think we should decide on this before actually adding them to
-the docs though.
 
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Marc-Andr=C3=A9 Lureau
 
