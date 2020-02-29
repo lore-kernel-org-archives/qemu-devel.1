@@ -2,110 +2,58 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E0BC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 11:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFEEC3F2CE
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 12:36:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3EB4246AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 11:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3EB4246AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id DFB7E246A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 12:36:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB7E246A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j80l4-0005e5-50
-	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 06:58:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55633)
+	id 1j81Ll-0005Uu-4S
+	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 07:36:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1j80kB-0004gG-Sd
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 06:57:21 -0500
+ (envelope-from <robert.hu@linux.intel.com>) id 1j81KW-0004eN-Sr
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 07:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1j80kA-0002Dd-5k
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 06:57:19 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:55124
- helo=v2201612906741603.powersrv.de)
+ (envelope-from <robert.hu@linux.intel.com>) id 1j81KV-00080Y-QQ
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 07:34:52 -0500
+Received: from mga17.intel.com ([192.55.52.151]:29706)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>)
- id 1j80k9-0002CZ-Ru; Sat, 29 Feb 2020 06:57:18 -0500
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id DDECADBACF3;
- Sat, 29 Feb 2020 12:57:15 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id IJyla46lEHsD; Sat, 29 Feb 2020 12:57:14 +0100 (CET)
-Received: from macbook02.fritz.box (pD9EC3042.dip0.t-ipconnect.de
- [217.236.48.66])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 39F16DBAC73;
- Sat, 29 Feb 2020 12:57:14 +0100 (CET)
-Subject: Re: [PATCH] l2tpv3: fix RFC number typo in qemu-options.hx
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200229111727.350893-1-stefanha@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <ae5cd213-ada2-1b20-064c-a0bc63d3622d@weilnetz.de>
-Date: Sat, 29 Feb 2020 12:57:07 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200229111727.350893-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9M06oy5AiPKJ80t69hIt6k4UIEC8UoM8s"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 37.120.169.71
+ (Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+ id 1j81KV-0007yM-Ii
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 07:34:51 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 29 Feb 2020 04:34:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,499,1574150400"; d="scan'208";a="242654289"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org)
+ ([10.239.48.212])
+ by orsmga006.jf.intel.com with ESMTP; 29 Feb 2020 04:34:45 -0800
+From: Robert Hoo <robert.hu@linux.intel.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, richard.henderson@linaro.org,
+ laurent@vivier.eu, philmd@redhat.com, berrange@redhat.com
+Subject: [PATCH v4 0/2] Add AVX512F optimization option and
+ buffer_zero_avx512()
+Date: Sat, 29 Feb 2020 20:34:33 +0800
+Message-Id: <1582979675-22550-1-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,98 +65,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, jasowang@redhat.com,
- Henrik Johansson <henrikjohansson@rocketmail.com>
+Cc: robert.hu@intel.com, chao.p.peng@intel.com,
+ Robert Hoo <robert.hu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9M06oy5AiPKJ80t69hIt6k4UIEC8UoM8s
-Content-Type: multipart/mixed; boundary="9gd7Nk3DtNIB21Ul05OR93CQ24yTEWEPd"
+1) Introduce {enable,disable}-avx512f configure option
 
---9gd7Nk3DtNIB21Ul05OR93CQ24yTEWEPd
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+2) Implement new buffer_zero_avx512() with AVX512F instructions
 
-Am 29.02.20 um 12:17 schrieb Stefan Hajnoczi:
+Changes in v4:
+In init_cpuid_cache(), stringently test AVX512F OS level enablement.
 
-> The L2TPv3 RFC number is 3931:
-> https://tools.ietf.org/html/rfc3931
->
-> Reported-by: Henrik Johansson <henrikjohansson@rocketmail.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qemu-options.hx | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index ac315c1ac4..55a539e04f 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2330,7 +2330,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
->      "                Linux kernel 3.3+ as well as most routers can tal=
-k\n"
->      "                L2TPv3. This transport allows connecting a VM to =
-a VM,\n"
->      "                VM to a router and even VM to Host. It is a nearl=
-y-universal\n"
-> -    "                standard (RFC3391). Note - this implementation us=
-es static\n"
-> +    "                standard (RFC3931). Note - this implementation us=
-es static\n"
->      "                pre-configured tunnels (same as the Linux kernel)=
-=2E\n"
->      "                use 'src=3D' to specify source address\n"
->      "                use 'dst=3D' to specify destination address\n"
-> @@ -2737,7 +2737,7 @@ Example (send packets from host's 1.2.3.4):
->  @end example
-> =20
->  @item -netdev l2tpv3,id=3D@var{id},src=3D@var{srcaddr},dst=3D@var{dsta=
-ddr}[,srcport=3D@var{srcport}][,dstport=3D@var{dstport}],txsession=3D@var=
-{txsession}[,rxsession=3D@var{rxsession}][,ipv6][,udp][,cookie64][,counte=
-r][,pincounter][,txcookie=3D@var{txcookie}][,rxcookie=3D@var{rxcookie}][,=
-offset=3D@var{offset}]
-> -Configure a L2TPv3 pseudowire host network backend. L2TPv3 (RFC3391) i=
-s a
-> +Configure a L2TPv3 pseudowire host network backend. L2TPv3 (RFC3931) i=
-s a
->  popular protocol to transport Ethernet (and other Layer 2) data frames=
- between
->  two systems. It is present in routers, firewalls and the Linux kernel
->  (from version 3.3 onwards).
+Changes in v3:
+In init_accel(), init length_to_accel value in every accel case, because
+in unit test, it will be invoked several times with different accel cases.
+(Thanks Richard's careful review)
+
+Changes in v2:
+1. Fixes wrong definition of CACHE_SSE2 in v1.
+2. Fixes not handle <256 length case in buffer_zero_avx512() implementaion.
+(Follow Richard's suggestion: handle the case in select_accel_fn(), and have a
+global variable alongside buffer_accel)
+3. Changes avx512f configuration option's default status to disabled.
+4. Ran 'make check-unit' on this patch, on both a Ivybridge machine and a
+CascadeLake machine.
 
 
-Thank you, Stefan and Henrik.
+Robert Hoo (2):
+  configure: add configure option avx512f_opt
+  util: add util function buffer_zero_avx512()
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+ configure            | 41 +++++++++++++++++++++++++++++
+ include/qemu/cpuid.h |  3 +++
+ util/bufferiszero.c  | 74 +++++++++++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 108 insertions(+), 10 deletions(-)
 
+-- 
+1.8.3.1
 
-
-
---9gd7Nk3DtNIB21Ul05OR93CQ24yTEWEPd--
-
---9M06oy5AiPKJ80t69hIt6k4UIEC8UoM8s
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEESSNv6nXJXWmOwreK4Iwh1Wd0UK0FAl5aUZkACgkQ4Iwh1Wd0
-UK1obw//TBEcus+NOACZz00D4nlNE+2pEvs/PZVHYU6YNJ0phhGWRMnEGzJw9oZE
-goz5t/DlmyAnJF+ZlFBYCe0zY/ow9TDEoN4QunyCll9K5VSIl7HsHZBKGLVNekf2
-jJRFe5qeWSlufrEGDKdoeeRTOCxVpGKgZI+9m2wck7SId67iEsSuxL4KuSC0FmUD
-9N2+BYHM/Edb9ueGpzOIAmRSGc+Fnn+oQYcNIX3kSf+7NTrGdfosF9/mzMWafk/n
-KEgCYueN4p9DIhw2td/nWluiAyteZtp5rvmqJz2Uo5nVSDHS5jjbGRy97oo5uSxL
-sEcm0jA5DA6e2y76YMB9qJRrAyr1cPgPcx+IK/2H8jwPS15LXg72X7ajsCsGlAB5
-AeWUr/IynRCVXST5MRoYH4gO4dBGYUN7JQ5JmWLtrenG+/d+2ixbP775J1WHlhBK
-PZukpxj2ECErb2Gzzg+O9aZbm1VLQSavsMlFmHkdL3QHuihR8Zw0IxSJxx5oU1nk
-Q+5j33D34CIy9TGp3DrUCCe+9NuNO1N2zua44rM6Ib3A47KBNyPg8ID0fWEB6xtq
-YzMqwcioiJ9So2L9BOH5x9RBB17aAlDSmOJZqOngh187qxJxegLWaxWu8Cs0diY8
-Tmig0MzVuGbdOrq2evVU3+gnSW+xyE95ra0Ri2nXk44ErWZitBw=
-=oT0i
------END PGP SIGNATURE-----
-
---9M06oy5AiPKJ80t69hIt6k4UIEC8UoM8s--
 
