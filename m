@@ -2,88 +2,86 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93BAC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB3DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:48:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6528246A8
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECD05246A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:48:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u9WwVTAY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6528246A8
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hBxoo4eP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD05246A8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7sAB-0004Eb-Pd
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:47:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42739)
+	id 1j7sBR-0006aN-6O
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:48:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6i-00076w-Dr
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:01 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6g-00076k-T2
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6h-0003BY-BY
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:00 -0500
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:35872)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6e-00037g-TW
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:58 -0500
+Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:50604)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7s6h-00038c-4y
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:59 -0500
-Received: by mail-pl1-x630.google.com with SMTP id a6so1963337plm.3
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:59 -0800 (PST)
+ id 1j7s6e-00036X-O0
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:56 -0500
+Received: by mail-pj1-x1032.google.com with SMTP id r67so2036300pjb.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=yoR4lHIMH0qpeMnLjOHbbbErJmJaq6BNdKSX4fGfFYE=;
- b=u9WwVTAYzRYg3KP4fU5p87GW67pe0yNzYMuOPrhid+PwGKRQnT/i+nEfA1U79/ddSp
- L8eu4ixwWumA20LPF7uWJ2A225oKetz4cRdxff7HtEOy0OjliXE5CS8bLOKOQBpOJpCZ
- ifZ8V4lRn/xPJDkgHXWVMnkdesAIztNUQt/czPfH2lJexZe/sq9nA1e6HHWKNc8j+W11
- 0azNHWJ/7IBoJx0Jaf8dH37X2oEfYaaTOLLRuplhja8EaEXzYOXwuNKyoLZIAaom7GrA
- vGgIWFRmrAdJXr0DOOz6q6CVDdGEjPq4c0LBfNt4XwOTpVUkpXbanN1xmFt1m2KGXnbb
- /tZA==
+ bh=eSileXcCP7W6yOgW27jNaouMctoAYA46YTtTPUHqQM0=;
+ b=hBxoo4eP/HgO4S21xvK31T0j3Nh2JMEg+IlxlwwVWGgifMfZzDDuZUEZNJxoxE4ENF
+ xb3Ms9DJf8Off0hO1BfIn366jo4yIbGgyIAh/6CSBZNxzuGZuYGRtlzy9g3hrKEJsLwA
+ Os2XH96G65lse6r1/JxG8a+yMOfYje7z1/HwnAYbdxZv0wUhYYffR/9N67YJS6Tt7x54
+ RUdFi1QI6763LqCZphqdxzFgrVFL2Dv8N0sG24VLFngU9kE4lQpICPSvziZOc4qYnVWd
+ 2s2iFzY+B4/uZMZmijZ9WGgK8dVu4AHLEWD4zficMvfZc5kTFAZ2Ns+6QIGJPUQ6VMQt
+ FoCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=yoR4lHIMH0qpeMnLjOHbbbErJmJaq6BNdKSX4fGfFYE=;
- b=crnmamHFTzQiKU1Wyj42TaOte4YibVRdPFwPpfMGPd8HvMiiSjIw/o+PTooFS2QbO7
- dFsi5tK9to6OYMp6uLyC9MPEEk8CDSWPO2RnP0vpmcTYcs0/kwLIQD36snXQqLNn+Tpy
- AmCtoppFbc0u3a/+gy+iCvD9NlO+zm27wRPCQiEKUwmlqEBxVNW3i/pnp/y3xt167G1j
- xmjmZXe46Yx7S206S4ZdDG0qNmuKdnIBTJ6YvamfkZtzOfFOMZtZHYfXK3Y2FaMby8rQ
- qITXjKZ8H3eMzx7f6ur478ubGeoYFuZ/URoD2fIMq6XecAwPSmTp0uRQ5EOjeBy0Mkbb
- RX0Q==
-X-Gm-Message-State: APjAAAWo2BeJRswPYQdmEk6tLfg5GLuaVFjBW77iHhFaWTa/EZxduw3C
- TKkpfIc6h6Dc7Vodq9IcSjDDEPxNrek=
-X-Google-Smtp-Source: APXvYqw09I/s86W6TGDp3ADpS+xkOCrpnlhBnr8CB3kiWkFU3YUy8ImY1Ejg22fqmNATTO0RxxPilA==
-X-Received: by 2002:a17:90a:6545:: with SMTP id
- f5mr8094175pjs.42.1582944236626; 
- Fri, 28 Feb 2020 18:43:56 -0800 (PST)
+ bh=eSileXcCP7W6yOgW27jNaouMctoAYA46YTtTPUHqQM0=;
+ b=M6Vq2ERN0OC7zNBeH+jHlFhpmGJSDK+OvW1Mj+bkzTo0hHMPBRlcPQn3Aw3VT/ewzR
+ 1aK7hOKWZMZLEYqTembhzk/GHmvIS3YM5JyRuNB3Kt8sWZQfCEj4qs/YFwTz/LUsiz6z
+ F6kr2xOTKI43drMp4cdbSq5cIEQ0EV96kB18bmUdhi7ZyEsd9jWBK/aXrDDyXW32mRHM
+ kdYHWzWMhro+TKN1rN93Nn8ms/4VeMImmF1WLfo1/l2dqdJm2fy0uhtNaS5E/HxbY1CB
+ q5atqyP6leX/h/j6w/NLA5GFhno7Bp96rJfh6wOSy4hZDD/F06YLhqR28QJchL16DCr3
+ SACA==
+X-Gm-Message-State: APjAAAVFVtKFbr/0kikpdvM2GrC7J5s/ZgltSxwFdHold2fKUbWpyFs2
+ NAFX5azZvxyf76AUbRW4+ee6Ol5Bt94=
+X-Google-Smtp-Source: APXvYqwIeJyLdXOjUSTTGFSzQJYuWXBzosVrsqLIQuN9t+jkWx0gHhiWN31dIKyJiuRg/3XkEnVsgw==
+X-Received: by 2002:a17:902:41:: with SMTP id 59mr7130672pla.39.1582944235311; 
+ Fri, 28 Feb 2020 18:43:55 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.55
+ by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 18:43:55 -0800 (PST)
+ Fri, 28 Feb 2020 18:43:54 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 5/8] accel/tcg: use units.h for defining code gen buffer sizes
-Date: Fri, 28 Feb 2020 18:43:44 -0800
-Message-Id: <20200229024347.22826-6-richard.henderson@linaro.org>
+Subject: [PULL 4/8] tcg/arm: Expand epilogue inline
+Date: Fri, 28 Feb 2020 18:43:43 -0800
+Message-Id: <20200229024347.22826-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200229024347.22826-1-richard.henderson@linaro.org>
 References: <20200229024347.22826-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::630
+X-Received-From: 2607:f8b0:4864:20::1032
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,83 +93,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
 
-It's easier to read.
+It is, after all, just two instructions.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200228192415.19867-2-alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Profiling on a cortex-a15, using -d nochain to increase the number
+of exit_tb that are executed, shows a minor improvement of 0.5%.
+
+Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- accel/tcg/translate-all.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ tcg/arm/tcg-target.inc.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index a08ab11f65..238b0e575b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qemu-common.h"
- 
- #define NO_CPU_IO_DEFS
-@@ -901,33 +902,33 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
- 
- /* Minimum size of the code gen buffer.  This number is randomly chosen,
-    but not so small that we can't have a fair number of TB's live.  */
--#define MIN_CODE_GEN_BUFFER_SIZE     (1024u * 1024)
-+#define MIN_CODE_GEN_BUFFER_SIZE     (1 * MiB)
- 
- /* Maximum size of the code gen buffer we'd like to use.  Unless otherwise
-    indicated, this is constrained by the range of direct branches on the
-    host cpu, as used by the TCG implementation of goto_tb.  */
- #if defined(__x86_64__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (2ul * 1024 * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
- #elif defined(__sparc__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (2ul * 1024 * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
- #elif defined(__powerpc64__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (2ul * 1024 * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
- #elif defined(__powerpc__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (32u * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (32 * MiB)
- #elif defined(__aarch64__)
--# define MAX_CODE_GEN_BUFFER_SIZE  (2ul * 1024 * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (2 * GiB)
- #elif defined(__s390x__)
-   /* We have a +- 4GB range on the branches; leave some slop.  */
--# define MAX_CODE_GEN_BUFFER_SIZE  (3ul * 1024 * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (3 * GiB)
- #elif defined(__mips__)
-   /* We have a 256MB branch region, but leave room to make sure the
-      main executable is also within that region.  */
--# define MAX_CODE_GEN_BUFFER_SIZE  (128ul * 1024 * 1024)
-+# define MAX_CODE_GEN_BUFFER_SIZE  (128 * MiB)
- #else
- # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index e1aa740ba4..6aa7757aac 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -1745,7 +1745,6 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
  #endif
+ }
  
--#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32u * 1024 * 1024)
-+#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)
+-static tcg_insn_unit *tb_ret_addr;
+ static void tcg_out_epilogue(TCGContext *s);
  
- #define DEFAULT_CODE_GEN_BUFFER_SIZE \
-   (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
+ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+@@ -1756,14 +1755,8 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+ 
+     switch (opc) {
+     case INDEX_op_exit_tb:
+-        /* Reuse the zeroing that exists for goto_ptr.  */
+-        a0 = args[0];
+-        if (a0 == 0) {
+-            tcg_out_goto(s, COND_AL, s->code_gen_epilogue);
+-        } else {
+-            tcg_out_movi32(s, COND_AL, TCG_REG_R0, args[0]);
+-            tcg_out_goto(s, COND_AL, tb_ret_addr);
+-        }
++        tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R0, args[0]);
++        tcg_out_epilogue(s);
+         break;
+     case INDEX_op_goto_tb:
+         {
+@@ -2309,7 +2302,6 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+      */
+     s->code_gen_epilogue = s->code_ptr;
+     tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R0, 0);
+-    tb_ret_addr = s->code_ptr;
+     tcg_out_epilogue(s);
+ }
+ 
 -- 
 2.20.1
 
