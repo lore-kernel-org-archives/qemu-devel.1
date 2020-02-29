@@ -2,73 +2,88 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB1FC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 00:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342B1C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55919246AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 00:21:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55919246AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DA1F22468D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HHcmzm0v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1F22468D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7psZ-0004Dl-7A
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 19:21:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59247)
+	id 1j7qwU-0006Tb-TS
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 20:29:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j7pry-0003mI-PE
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 19:20:40 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7qvR-0004iy-Oo
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j7prx-0001co-FC
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 19:20:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42180)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7qvQ-0005xL-Gj
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:17 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:46307)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j7prx-0001bx-9q
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 19:20:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j7prv-0006o2-QD
- for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 00:20:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8F2382E8076
- for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 00:20:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 29 Feb 2020 00:14:40 -0000
-From: maro <1759522@bugs.launchpad.net>
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j7qvQ-0005x7-C3
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:16 -0500
+Received: by mail-pl1-x642.google.com with SMTP id y8so1896452pll.13
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 17:28:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NIwyaFC2Y+T01ApiS+7Vr1E7LRIA76ZwzglT2YIUDQQ=;
+ b=HHcmzm0vWqT25PAnzMhzksW1lARVaWQu7Es1jrgKl5hgbc70jK1VlhrQo7BoYVwC5/
+ hC/ojSi2QRBsmyQlAldsqE2Rw9xCoBh1UCfHxJah3uayd/kEOkXid2i5qOPMdNljfQvr
+ ZSy0k+gydTI+ShXy9/4sIgpOB7X/B8whyUSDZPTvEO14uMgh5Fe53/vK92MS0W0xZFlr
+ BchZuCEVBuLQMMMQCR5woViVhFI03hh43f1hZywVmLWASqA4ojy5CrxqbDugLzrZJlfZ
+ B7Zhb1Y3XwCdAs8xSbkUBZ3lbvfSVHn3JIrBshSkRs4gC98Lt2P3ABSKxBJ3ICSC2LtS
+ hJuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NIwyaFC2Y+T01ApiS+7Vr1E7LRIA76ZwzglT2YIUDQQ=;
+ b=HvSRFSjam1gnWikaZziFh5WBMlctc2pXuCmhchbPSHAHxOnDnonj8qlcim17H8fABu
+ fu24cI909kkyssmpa2U2r91qc9BxHM5pHGFuFIhNb1rBySKJAvIEgMjzbTttQKmaezDy
+ q5OAkcwVkq15zxxuZmW+jX4A0DgY1B8ZJfLA/3MhPRoexofZpoYM1FPOeXcsi5pJP2+K
+ vXPCto9fPTYNwmzebRojxq8DpoE0jiPU/sE/py/CP4E1bTB8diiT6z/TW9ec2iSB29jJ
+ UBi1Ju7oFcUXAp//pGXdexDQBzSQEUAXxUeKzmFV1JgvvLSgUSTobrdfTgeaCTbKqojG
+ 8WwA==
+X-Gm-Message-State: APjAAAVamw9YymyecaE9pRimiBur1ptNOYF5Z+97QPleMavq2puyOg1O
+ msAzUMp+yQ2N3X074JwQ7/Ii3GxdVXM=
+X-Google-Smtp-Source: APXvYqxvdFJIbNKfEBMsVuo/qU5cSS1o6OWo69Gfq6XLYinHKc/IcX12amBzR6ngQpqfD1b1RYWgFg==
+X-Received: by 2002:a17:90a:d350:: with SMTP id
+ i16mr7694558pjx.38.1582939694747; 
+ Fri, 28 Feb 2020 17:28:14 -0800 (PST)
+Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
+ [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id r3sm4606313pfq.126.2020.02.28.17.28.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Feb 2020 17:28:13 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: atmgnd maro the.netadmin voltagex
-X-Launchpad-Bug-Reporter: Zixuan Wang (the.netadmin)
-X-Launchpad-Bug-Modifier: maro (maro)
-References: <152222836105.21062.2375148895134658603.malonedeb@chaenomeles.canonical.com>
-Message-Id: <158293528081.6414.785953810547926980.malone@chaenomeles.canonical.com>
-Subject: [Bug 1759522] Re: windows qemu-img create vpc/vhdx error
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 09c50ef14dcea4d237e195698d4372200c3d0cca
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v5 00/12] target/arm: Honor more HCR_EL2 traps
+Date: Fri, 28 Feb 2020 17:27:59 -0800
+Message-Id: <20200229012811.24129-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,126 +92,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1759522 <1759522@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I also discovered just a few days ago the problem that sparse VHD/VHDX
-image files are not being accepted by Windows.
+Changes for v5:
+  * Patch 1 was broken for aa32.  Not just the masking vs the "other"
+    32-bit register that Peter noticed, but more explicitly in that
+    "ri" was dereferenced as NULL -- hcr_write{high,low} did not pass
+    along the structure.  Oops.
 
-It appears that qemu-img on Windows always tries to create images as
-sparse files. Only in some cases (e.g. when operating on a NTFS file
-system) will the file actually be a sparse file.
+    Break out a new helper that is passed a starting mask, which is
+    used to preserve bits from the "other" 32-bit register.
 
-Being a sparse file seems to be no issue when using these file with QEMU
-itself. Most file formats that qemu-img is able to create will be
-unknown to Windows own tools, but the one exception are VHD/VHDX files.
+    Check the aa64 isar registers only if aarch64 is enabled.
 
-As long as a file carries the sparse attribute it will be "un-
-acceptable" to the Windows tools (e.g. diskpart/diskmgmt). As a crude
-work-around I've noticed that a copy of such a file will have "lost" the
-sparse attribute, and therefore can be mounted. Likewise any copy of a
-file created on a different system will not be a sparse file (and hence
-the issue does not arise).
+  * Add HCR bits from armv8.6.
+  * Remove EL2 & EL3 from user-only.
 
-I'm attaching a log file (with a few comments) of some steps that
-demonstrate the problem, and how I worked around it. The test was done
-with qemu-img v4.1.0, but I'm fairly certain that this issue has been
-present since "forever" (and a quick re-test with v4.2.0 confirmed that
-it has not "gone away").
+  * Mask hcr_el2 bits that are res0 in aa32.
+    This didn't work at first because we weren't configuring SCR_RW
+    for user-only, so aarch64-linux-user thought EL2 was aa32, which
+    disabled pauth.  Rather than find other corner cases like this,
+    I think it makes more sense for user-only to only contend with EL1.
 
-So, a simple work-around exists, but I see myself unable to suggest a
-patch. I guess the patch should be specific to prevent the creation of
-sparse VHD/VHDX files on Windows. But from the superficial reading I did
-I could not work out whether the image format information would be
-available in 'raw_co_create()' (of: 'block/file-win32.c').
+Patches 1-5, 12 require review.
 
-** Attachment added: "sparse-VHD_issue.log"
-   https://bugs.launchpad.net/qemu/+bug/1759522/+attachment/5332081/+files/=
-sparse-VHD_issue.log
 
--- =
+r~
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1759522
 
-Title:
-  windows qemu-img create vpc/vhdx error
+Richard Henderson (12):
+  target/arm: Improve masking of HCR/HCR2 RES0 bits
+  target/arm: Add HCR_EL2 bit definitions from ARMv8.6
+  target/arm: Disable has_el2 and has_el3 for user-only
+  target/arm: Remove EL2 and EL3 setup from user-only
+  target/arm: Improve masking in arm_hcr_el2_eff
+  target/arm: Honor the HCR_EL2.{TVM,TRVM} bits
+  target/arm: Honor the HCR_EL2.TSW bit
+  target/arm: Honor the HCR_EL2.TACR bit
+  target/arm: Honor the HCR_EL2.TPCP bit
+  target/arm: Honor the HCR_EL2.TPU bit
+  target/arm: Honor the HCR_EL2.TTLB bit
+  tests/tcg/aarch64: Add newline in pauth-1 printf
 
-Status in QEMU:
-  New
+ target/arm/cpu.h            |   7 +
+ target/arm/cpu.c            |  12 +-
+ target/arm/helper.c         | 358 +++++++++++++++++++++++++-----------
+ tests/tcg/aarch64/pauth-1.c |   2 +-
+ 4 files changed, 262 insertions(+), 117 deletions(-)
 
-Bug description:
-  On windows, using qemu-img (version 2.11.90) to create vpc/vhdx
-  virtual disk tends to fail. Here's the way to reproduce:
+-- 
+2.20.1
 
-  1. Install qemu-w64-setup-20180321.exe
-
-  2. Use `qemu-img create -f vhdx -o subformat=3Dfixed disk.vhdx 512M` to c=
-reate a vhdx:
-     Formatting 'disk.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576=
- block_size=3D0 subformat=3Dfixed
-
-  3. Execute `qemu-img info disk.vhdx` gives the result, (note the `disk si=
-ze` is incorrect):
-     image: disk.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 1.4M
-     cluster_size: 8388608
-
-  4. On Windows 10 (V1709), double click disk.vhdx gives an error:
-     Make sure the file is in an NTFS volume and isn't in a compressed fold=
-er or volume.
-
-     Using Disk Management -> Action -> Attach VHD gives an error:
-     The requested operation could not be completed due to a virtual disk s=
-ystem limitation. Virtual hard disk files must be uncompressed and uneccryp=
-ted and must not be sparse.
-
-  Comparison with Windows 10 created VHDX:
-
-  1. Using Disk Management -> Action -> Create VHD:
-     File name: win.vhdx
-     Virtual hard disk size: 512MB
-     Virtual hard disk format: VHDX
-     Virtual hard disk type: Fixed size
-
-  2. Detach VHDX
-
-  3. Execute `qemu-img info win.vhdx` gives the result:
-     image: win.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 516M
-     cluster_size: 33554432
-
-  Comparison with qemu-img under Ubuntu:
-
-  1. Version: qemu-img version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
-  Copyright (c) 2004-2008 Fabrice Bellard
-
-  2. qemu-img create -f vhdx -o subformat=3Dfixed lin.vhdx 512M
-     Formatting 'lin.vhdx', fmt=3Dvhdx size=3D536870912 log_size=3D1048576 =
-block_size=3D0 subformat=3Dfixed
-
-  3. qemu-img info lin.vhdx
-     image: lin.vhdx
-     file format: vhdx
-     virtual size: 512M (536870912 bytes)
-     disk size: 520M
-     cluster_size: 8388608
-
-  4. Load lin.vhdx under Windows 10 is ok
-
-  The same thing happens on `vpc` format with or without
-  `oformat=3Dfixed`, it seems that windows version of qemu-img has some
-  incorrect operation? My guess is that windows version of qemu-img
-  doesn't handle the description field of vpc/vhdx, which leads to an
-  incorrect `disk size` field.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1759522/+subscriptions
 
