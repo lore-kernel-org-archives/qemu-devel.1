@@ -2,90 +2,79 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED34EC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 19:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4F7C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 20:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC73A24677
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 19:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 861D024688
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 20:07:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gT4V6fbr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC73A24677
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="klxmiVYJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 861D024688
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j88Bc-0007aq-Ry
-	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 14:54:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45455)
+	id 1j88Ov-000381-La
+	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 15:07:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j88Av-00075X-9h
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 14:53:26 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j88O7-0002RX-M0
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 15:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j88Au-0007KT-6Z
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 14:53:25 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35268)
+ (envelope-from <richard.henderson@linaro.org>) id 1j88O6-0005Lo-MZ
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 15:07:03 -0500
+Received: from mail-ed1-x529.google.com ([2a00:1450:4864:20::529]:47100)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j88Au-0007KF-0D
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 14:53:24 -0500
-Received: by mail-pg1-x543.google.com with SMTP id 7so3316368pgr.2
- for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 11:53:23 -0800 (PST)
+ id 1j88O6-0005Jp-5n
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 15:07:02 -0500
+Received: by mail-ed1-x529.google.com with SMTP id y3so1324782edj.13
+ for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 12:07:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+D2xWd22fCONtEOqQ3xwazCpKlOAdruXcWTXQzxS1+A=;
- b=gT4V6fbrk3Kfyv65hU2PcZzxbefzJkPdIARvDrMpN+EUv2Njl1FFkcDmsAroC4gvUd
- I78CxeskXQno1KAOsWIiXTDForhf2otCpnqh4g3bTiUwm/XsanoEQRq5EAKpCrPMWaAs
- Bl5B5UcNFF01SxD+tiKhs7J59yY3wDsG2pkQBK6Jk+y49gdqV5FTKmubkOgJpkeMTBkj
- VByNoUYYBPiHpifWEPHExBQTzpsWbtOPzKiGitrqQyEAFiTZEb4cidQfKpstUWFLuebq
- daXMBf7uVkKG1BCeeaJ5ZAHg7slLEm8ssz+g+ShHIBLjkWBVbANmlG+3lV01iwXybWht
- YllQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SoOfSQSJDR8dzp5cdCwa65yHauHzBT4X8KXID6OZpdU=;
+ b=klxmiVYJz9IXlb6XGyQYKW4tSVh9fCY5TeKP11qpl4UzyhfZAPo/QoEVJlLJ0fXCY8
+ 7X07Ec0SCt7yh4yKUAfzoydMi71N+uR6M5pesjReQBUYE4t14Kbescr8z+HdGFbBfaoj
+ FPKXwKW6w77OcGK4ZxYSMkZHhSLjvSzclQk338q2Ndas+h38TA6YlRVWobvltrdd7Nlk
+ Qmwbbv7cW4X5vLT3KsmjVj/Yj/eYejjnvYKsukyysRCE+Rq5cZ7qaCrdxWfhFRc07f/B
+ a7sSFZ3EJmlRlCsPKl/9nuaPbsTaOfZeKCSsUXVqd4feX2fpq/eTqnGYSm7UV8uD71T5
+ EN2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+D2xWd22fCONtEOqQ3xwazCpKlOAdruXcWTXQzxS1+A=;
- b=Us5LHSzVt+I5roaBRcKPpklgQjM0XL3XVDcUMyx3O5C+b+MdKgVdGVPonm8NtUgM3y
- Jp4okocdTz+6Pf7JpTERwSiWwYTRIvTSI3HlFVOkjb/dMfEVqEgQwIqpbiF95dGVTIfx
- ILNwaOw+BGaKyndwdTYfpRBwsc8xRPRSlP0iEtATuYZhR0fKxhsUBIkSjFsASeaPgPk5
- 4RRQvumhW2UuUI7S/MEf2JIySBstXD566+B2+uafFJ32CRVAnIyOeX2EGJFaxR8kXKpX
- 6ya/5782U2Uud592aWXWDnhQOnJsYZ+Qe/B7ulBIrIPGXNZ2naAFIuZqTDg0wgd3+GVu
- xDSA==
-X-Gm-Message-State: APjAAAVMU60CLKSXX1iNm4aatQJjsKVdjFk9PYY2SpYmYp505QuInw0w
- N4xzc4mes2JOJEoCvVyN35e5tA==
-X-Google-Smtp-Source: APXvYqycpU59jgKQNNYDOosqjfA3q2YFlbAOOOepk0XZW65cvBjMl5ONH1adkItZxjG3LWxpXn+//Q==
-X-Received: by 2002:a63:cf41:: with SMTP id b1mr10843754pgj.53.1583006002900; 
- Sat, 29 Feb 2020 11:53:22 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- b71sm3360199pfb.156.2020.02.29.11.53.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 29 Feb 2020 11:53:22 -0800 (PST)
-Subject: Re: [PATCH v2 00/18] hw: Clean up hw/i386 headers (and few alpha/hppa)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200228114649.12818-1-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a55dde10-01b4-9fe9-03b0-d9c6070767c6@linaro.org>
-Date: Sat, 29 Feb 2020 11:53:20 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SoOfSQSJDR8dzp5cdCwa65yHauHzBT4X8KXID6OZpdU=;
+ b=s1Rg5uCdQZAnL4iugp7/SBVi4nSwb8j0yR2Ee4OzAIS8bnuyutHzlOtwJYXmCakqBK
+ JowpQ0o4dRrHppeODuQvPKz0Mn5nrCTnZjIUWX6PQGqEaAXOEY/oYkyMFHbWkVoCgZiZ
+ goEses3aTNbsYGPaCV/Y8Yr/e/ulpOyfQDn8sJlAE4ticq1AqTIa2I4gkvVtZY2VyUjQ
+ RsFDH6RVTUfdpTLMV7LHLVpfa1veIr5T+fSyxnyzlYpNqoF+qP+Yi3jhgkkInHf29Dul
+ UPg/71/zCMwElPMiygN/aRXmK5d9LIokJIfwLmAAHWbNhNmeMdXDugiIQwXkX7VT/Ii8
+ 6Z3w==
+X-Gm-Message-State: ANhLgQ2zWHk4Bb5OuAJXzpu7jEsO6Mo+CtzpAAAD2p/7EdXzck6LBVSa
+ 1pLgm4lJksXpK+6HscjIbLTc+tD/vo0l7ll8WaehIg==
+X-Google-Smtp-Source: ADFU+vv6VAXumPMu1OMUZizzD9VrT2YPW37RrxCmVGzwrhbLUcDS9B1fwaowcrDVC/lMgUwKhMQ4r4bAH9xL11Qxerw=
+X-Received: by 2002:aa7:c2cb:: with SMTP id m11mr1947868edp.116.1583006819897; 
+ Sat, 29 Feb 2020 12:06:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200228114649.12818-1-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20200228092420.103757-1-quintela@redhat.com>
+ <20200228092420.103757-7-quintela@redhat.com>
+In-Reply-To: <20200228092420.103757-7-quintela@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Sat, 29 Feb 2020 12:06:48 -0800
+Message-ID: <CAFXwXr=9R9FZ5wD5Lk=cbP=Qt93KOokrcOjxj_JKevmso9qdgg@mail.gmail.com>
+Subject: Re: [PULL 06/15] configure: Enable test and libs for zstd
+To: Juan Quintela <quintela@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2a00:1450:4864:20::529
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,34 +86,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2/28/20 3:46 AM, Philippe Mathieu-Daudé wrote:
-> Philippe Mathieu-Daudé (18):
->   vl: Add missing "hw/boards.h" include
->   hw/southbridge/ich9: Removed unused headers
->   hw/i386/ioapic_internal: Remove unused "hw/i386/ioapic.h" header
->   hw/timer: Remove unused "ui/console.h" header
->   hw/usb/dev-storage: Remove unused "ui/console.h" header
->   hw/i386/intel_iommu: Remove unused includes
->   hw/alpha/alpha_sys: Remove unused "hw/ide.h" header
->   hw/alpha/dp264: Include "net/net.h"
->   hw/hppa/machine: Include "net/net.h"
->   hw/acpi/cpu_hotplug: Include "hw/pci/pci.h"
->   hw/timer/hpet: Include "exec/address-spaces.h"
->   hw/pci-host/q35: Include "qemu/range.h"
->   hw/i2c/smbus_ich9: Include "qemu/range.h"
->   hw/pci-host/piix: Include "qemu/range.h"
->   hw/acpi: Include "hw/mem/nvdimm.h"
->   hw/i386: Include "hw/mem/nvdimm.h"
->   hw/pci-host/q35: Remove unused includes
+> +##########################################
+> +# zstd check
+> +
+> +if test "$zstd" != "no" ; then
+> +    if $pkg_config --exist libzstd ; then
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+The option is spelled --exists.  This is generating an error during configure.
 
 r~
-
 
