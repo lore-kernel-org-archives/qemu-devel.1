@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C974DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2264DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:45:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 948B12469D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:45:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E36292469D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:45:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sIsrjMY6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 948B12469D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wJgvO2M9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E36292469D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7s7g-0000JR-PF
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:45:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42715)
+	id 1j7s7p-0000fN-3n
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:45:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6g-00076g-LB
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:59 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6l-0007A3-4K
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6e-000378-Js
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:58 -0500
-Received: from mail-pl1-x62e.google.com ([2607:f8b0:4864:20::62e]:41617)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6k-0003I9-2B
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:03 -0500
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:41219)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7s6e-00034V-EP
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:56 -0500
-Received: by mail-pl1-x62e.google.com with SMTP id t14so1950681plr.8
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:55 -0800 (PST)
+ id 1j7s6j-0003GO-S9
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:02 -0500
+Received: by mail-pg1-x536.google.com with SMTP id b1so2454210pgm.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:44:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vSmE5SkJs7bKw32GyNmYKHJ7/xdEHXIomHMfGHtsHSw=;
- b=sIsrjMY62M5uoJsoSqolyGqkaDW2hQ/NhnqnCqy7UYdo4NPZKErLWMP0QNdggmmp+u
- p9thnGwGo35b53VXBcTTx0znZWvxEQYs+hMi3bzszSH/vblJnu1g2y6d41jmGZXEa2rO
- hwZi8W3FDCqIu3UTZrO44Hd9adkk5+KBYm4YdKB7IUoYWB9hOj7PWXg2/rEsxBOC/Oj7
- 10OMAIG0SZ3mggshw9Ao2A7IMOX6u0JlokNqt75BlcqxZjzPcqCn5q6DI46UMeQNW7Hy
- 4gScqBMsuhACsaQVwXC6Url8/ueotV6joNau6o5lkRrOomh4i3U65+ZOOGKA56cDeDj6
- soUA==
+ bh=VlxVvw9Nxub+F/a7czDjW6LNfb9GxIjz3UCnfFm+v5Q=;
+ b=wJgvO2M9voJAm3Ydd5wUA9lnxPBEBL1Q2ejMnIk70UHL1CL5a5zMFW5TNkOW8igFS+
+ ky+ScSqWxtaLN2NYww8rAlA6zMTljABd/rDUvYP2FbFu7UnoBRiKLsBVw24TuRKWv8xL
+ mK9g4iojiFoi9yEdK1uh0ZZZHDeR7Pbr4nok94JV7bLDEYeAnLd3s+vPwokZF6zCJ3gP
+ Kp4ITdaw6j0guFoq9ZfiNiwblSYuuOsSayw3Ao1jtL34QgaIAr3Ce40ODpE8wQdBLGC2
+ rCzl2a3V0Br7KHdAtQ9vlUPIiYTCn5NJwJg6oUdDXV+g9VCqvD6iDtCmhL4Y0X/BxJDa
+ 4yxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vSmE5SkJs7bKw32GyNmYKHJ7/xdEHXIomHMfGHtsHSw=;
- b=p75pxC9TN73Rm1IHeAnhVcWqE4Pd0hsOy9g5vpcVaNtXgVyGNdEg10W60HhNfO2aOf
- 3zA73cWmKjrGI7IefiehaQ1eCNOl746HZ1Pd4QulI+gBiIakhssFsJ2z5yJzXLElJ/UA
- Oeq5bI3P0t/DGp3eZha1bqrf4Wsc+Rq/oUiHgxe7DCNlZtq98En60Fr5ZjJfUPY8IZ2W
- iIjqUT3ImtFJ3vBo+0cEOWECKIigQVuQuBMkpe7t3nl7IHC6IkfkMC/0O4E3jSWsnJdQ
- Ns2oerR/VBzbU6WcLi3jaB0vAfG0cyrfR9GidgmiK5gis0FA3lyMy921W/gn+76S4yRt
- 0m6A==
-X-Gm-Message-State: APjAAAVOX8lHxWhMCEUfLfDLWWAq6biDVuwgnChsiAWqRdhzL/h8VLg1
- cofz4VQEDznWavde0LKQu1ppWV5lYCI=
-X-Google-Smtp-Source: APXvYqzGcKXhU+9d7yaAyappzbsP5xPoJpCoDZDowmv0P5dQds05WWb8Ueh2BIG6hdisJzS8XfzMHA==
-X-Received: by 2002:a17:902:8204:: with SMTP id
- x4mr6682194pln.225.1582944233921; 
- Fri, 28 Feb 2020 18:43:53 -0800 (PST)
+ bh=VlxVvw9Nxub+F/a7czDjW6LNfb9GxIjz3UCnfFm+v5Q=;
+ b=nkKx6E/ZQRiRkZdia85eP9cAjHw7mTNdgmN+hSHp5ednXRF4e1kBB7p4G+GcpYu7IL
+ ztnsCt3t4j9//MoF3iRL6uyKJxUcejxmBGfEgaILabHhQGbfbIyrRKciZjSHG4uHzk3p
+ DGxkMbbfWjWQB2tYm10O91VvI4Xn1+xyWcC6Af6HwOzizp8QiqxudRvQ2PbPQfMPC8Vf
+ 5x8a6Bl1ZPiRYE3LGsleBxo/e4GTIA7mtloNSwu0+P3q4jd83kiK9A31lEglsAXCSXKG
+ /2GkVwCzgb0vcqNyWBh97nDbnPedyN6yWEM1C+87eSp7Y17fAFegBhlNWAFaVddlPLpe
+ A0hA==
+X-Gm-Message-State: APjAAAX9CfXYlI4TJAeezIG5AsW6iFFRPkxfiAdyw1cWh5UCntsWYiuk
+ b3omWC4L4sEfsrsLdl5F14lTk9g+SkM=
+X-Google-Smtp-Source: APXvYqyIdmEi+uWeXPTuAwabJYNuamrmjnlK2whuuk2R6G29sylVc586dgw+oGpqNXeclMDtMqCEFQ==
+X-Received: by 2002:a63:5522:: with SMTP id j34mr6715600pgb.97.1582944240355; 
+ Fri, 28 Feb 2020 18:44:00 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.52
+ by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 18:43:53 -0800 (PST)
+ Fri, 28 Feb 2020 18:43:59 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/8] tcg/arm: Split out tcg_out_epilogue
-Date: Fri, 28 Feb 2020 18:43:42 -0800
-Message-Id: <20200229024347.22826-4-richard.henderson@linaro.org>
+Subject: [PULL 8/8] accel/tcg: increase default code gen buffer size for 64 bit
+Date: Fri, 28 Feb 2020 18:43:47 -0800
+Message-Id: <20200229024347.22826-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200229024347.22826-1-richard.henderson@linaro.org>
 References: <20200229024347.22826-1-richard.henderson@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::62e
+X-Received-From: 2607:f8b0:4864:20::536
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,77 +94,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <rth@twiddle.net>
+From: Alex Bennée <alex.bennee@linaro.org>
 
-We will shortly use this function from tcg_out_op as well.
+While 32mb is certainly usable a full system boot ends up flushing the
+codegen buffer nearly 100 times. Increase the default on 64 bit hosts
+to take advantage of all that spare memory. After this change I can
+boot my tests system without any TB flushes.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
+As we usually run more CONFIG_USER binaries at a time in typical usage
+we aren't quite as profligate for user-mode code generation usage. We
+also bring the static code gen defies to the same place to keep all
+the reasoning in the comments together.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Message-Id: <20200228192415.19867-5-alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/arm/tcg-target.inc.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ accel/tcg/translate-all.c | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index fffb6611e2..e1aa740ba4 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1746,6 +1746,7 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is64)
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 4ce5d1b393..78914154bf 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -892,15 +892,6 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+     }
  }
  
- static tcg_insn_unit *tb_ret_addr;
-+static void tcg_out_epilogue(TCGContext *s);
- 
- static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-                 const TCGArg *args, const int *const_args)
-@@ -2284,19 +2285,17 @@ static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
-       + TCG_TARGET_STACK_ALIGN - 1) \
-      & -TCG_TARGET_STACK_ALIGN)
- 
-+#define STACK_ADDEND  (FRAME_SIZE - PUSH_SIZE)
-+
- static void tcg_target_qemu_prologue(TCGContext *s)
- {
--    int stack_addend;
+-#if defined(CONFIG_USER_ONLY) && TCG_TARGET_REG_BITS == 32
+-/*
+- * For user mode on smaller 32 bit systems we may run into trouble
+- * allocating big chunks of data in the right place. On these systems
+- * we utilise a static code generation buffer directly in the binary.
+- */
+-#define USE_STATIC_CODE_GEN_BUFFER
+-#endif
 -
-     /* Calling convention requires us to save r4-r11 and lr.  */
-     /* stmdb sp!, { r4 - r11, lr } */
-     tcg_out32(s, (COND_AL << 28) | 0x092d4ff0);
+ /* Minimum size of the code gen buffer.  This number is randomly chosen,
+    but not so small that we can't have a fair number of TB's live.  */
+ #define MIN_CODE_GEN_BUFFER_SIZE     (1 * MiB)
+@@ -929,7 +920,33 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+ # define MAX_CODE_GEN_BUFFER_SIZE  ((size_t)-1)
+ #endif
  
-     /* Reserve callee argument and tcg temp space.  */
--    stack_addend = FRAME_SIZE - PUSH_SIZE;
--
-     tcg_out_dat_rI(s, COND_AL, ARITH_SUB, TCG_REG_CALL_STACK,
--                   TCG_REG_CALL_STACK, stack_addend, 1);
-+                   TCG_REG_CALL_STACK, STACK_ADDEND, 1);
-     tcg_set_frame(s, TCG_REG_CALL_STACK, TCG_STATIC_CALL_ARGS_SIZE,
-                   CPU_TEMP_BUF_NLONGS * sizeof(long));
++#if TCG_TARGET_REG_BITS == 32
+ #define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (32 * MiB)
++#ifdef CONFIG_USER_ONLY
++/*
++ * For user mode on smaller 32 bit systems we may run into trouble
++ * allocating big chunks of data in the right place. On these systems
++ * we utilise a static code generation buffer directly in the binary.
++ */
++#define USE_STATIC_CODE_GEN_BUFFER
++#endif
++#else /* TCG_TARGET_REG_BITS == 64 */
++#ifdef CONFIG_USER_ONLY
++/*
++ * As user-mode emulation typically means running multiple instances
++ * of the translator don't go too nuts with our default code gen
++ * buffer lest we make things too hard for the OS.
++ */
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (128 * MiB)
++#else
++/*
++ * We expect most system emulation to run one or two guests per host.
++ * Users running large scale system emulation may want to tweak their
++ * runtime setup via the tb-size control on the command line.
++ */
++#define DEFAULT_CODE_GEN_BUFFER_SIZE_1 (1 * GiB)
++#endif
++#endif
  
-@@ -2310,11 +2309,15 @@ static void tcg_target_qemu_prologue(TCGContext *s)
-      */
-     s->code_gen_epilogue = s->code_ptr;
-     tcg_out_movi(s, TCG_TYPE_PTR, TCG_REG_R0, 0);
--
--    /* TB epilogue */
-     tb_ret_addr = s->code_ptr;
-+    tcg_out_epilogue(s);
-+}
-+
-+static void tcg_out_epilogue(TCGContext *s)
-+{
-+    /* Release local stack frame.  */
-     tcg_out_dat_rI(s, COND_AL, ARITH_ADD, TCG_REG_CALL_STACK,
--                   TCG_REG_CALL_STACK, stack_addend, 1);
-+                   TCG_REG_CALL_STACK, STACK_ADDEND, 1);
- 
-     /* ldmia sp!, { r4 - r11, pc } */
-     tcg_out32(s, (COND_AL << 28) | 0x08bd8ff0);
+ #define DEFAULT_CODE_GEN_BUFFER_SIZE \
+   (DEFAULT_CODE_GEN_BUFFER_SIZE_1 < MAX_CODE_GEN_BUFFER_SIZE \
 -- 
 2.20.1
 
