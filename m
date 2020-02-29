@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075BAC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8CBC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:47:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA3792469D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:46:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE427246A8
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:47:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uWS17Ysv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA3792469D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iUNDmyal"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE427246A8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7s9X-0003gG-UO
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:46:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42740)
+	id 1j7s9q-0003pj-0w
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:47:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6i-00076x-EH
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:01 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6e-00076S-Jm
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6h-0003C9-Gi
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:44:00 -0500
-Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:52087)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6c-00033K-Db
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:55 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:35321)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7s6h-0003AZ-B5
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:59 -0500
-Received: by mail-pj1-x1031.google.com with SMTP id fa20so2037279pjb.1
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:59 -0800 (PST)
+ id 1j7s6c-00031Z-82
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:54 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id g6so1963974plt.2
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gyGZkMpj+rKptKzAhufEEODcd3xDbylCrKGIVqFxQus=;
- b=uWS17YsviCNsgh8jF/jSG25FEsS1KRGPZuO2hVt5uvXo361D0qtV4UQGReX5fTG9lu
- Ss746eBJXVMQGBtILMWYxXIzxGnZRS3/9H/bckqSDBjX31tmkuvQbLsDtXnPrlW2zJsP
- iqna7q103QVpIPDO25avlUo7oJtkqk7cvGny6f1zfD+rShtmz2Pt3+iCdPenWjyQFDG/
- VcJIVhVJowwGen6NKxDQSnt5D3RHuOutiEAsBeSlRgaeT/BI5c50ltl0EKQtYZn1heM1
- 9/T6hTD2jBT6UkvCrrx9BDF2hljKOq+zM5fCePR45wWJAnOeLVC7vHUcKR3maOOLSeMG
- eO8A==
+ bh=A1rWgDcZdMUvykrNCtRPCIuuNASTYFpt0ciGUShM3Kc=;
+ b=iUNDmyal666Idq4K/Sza2k1RrSTMcZGZQZxnekRDp3+6YuoWSv2nl70AOzBUuvuVVi
+ k2xVa0AYms/GBQLV4GZMObuITuHmEtC1Rt62OUisTvEUF35oMXFPsxy8eSfUJOFz15ct
+ LvW0FehECdHso91qVTZC6JrQ3F5III16ZTwszudRGxs/lej5d8N3vRgYzhHLn/Gev+0+
+ hT0cnGu98QZ6p6VgRZ7oXy7Zhc5nJnh2yuiBRrV2HnnF07WAd4fmiYE1zqPDI4MpvYOE
+ +7pzZRDVxO0JVPfjVBV563pX8GX11J09he43qzhdTQa1x5YC+xkg3yLnqu2+ddnT04JW
+ lEOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gyGZkMpj+rKptKzAhufEEODcd3xDbylCrKGIVqFxQus=;
- b=aLd7tP+oQ35HorjO78/o7z6ymbh2kjtJXVlb90gYGleafGhJcAwaMvDJ2G+bO/JtYA
- sYNMij7yTNAkQCdxQmu0yviULukKJnmm3QSWN/u98jb1tSAyjoqs9Li0RIEoeVoL6hcC
- 7latzHtKx2n1C0EMYG3xtXRepcznfCrvPb4zncH+WsuaP1lVZLAYJbQGBv9p1LrQRW7n
- stWMx/c770bt7IvEGEWR/CNgj4MJTAUAX6hQqsTY4fp6p50ZTp3q7DRJqbSoHVjJtsMV
- tyOSaj7VIXj6pQpK7q9GWwKBgad8iWw2+dYPNLfBzspRM+Jj8ZcSFNBY2+AAvDE3KN2y
- kCNw==
-X-Gm-Message-State: APjAAAWCl4WJVvu9rgz0o8/6bJmKAYb1hYpV5t0ifOHNTDKsbEktqUoM
- B/ABMnx+klRDJNob/GL900OAz5HINy0=
-X-Google-Smtp-Source: APXvYqw52+dxMlfv5P25OvlpSUtYsZbcFD5DxLNkPkLFvQNNfGUrpzfstSs4z6OZLTUHkdxgMj5gxA==
-X-Received: by 2002:a17:902:c20b:: with SMTP id
- 11mr6119149pll.175.1582944238030; 
- Fri, 28 Feb 2020 18:43:58 -0800 (PST)
+ bh=A1rWgDcZdMUvykrNCtRPCIuuNASTYFpt0ciGUShM3Kc=;
+ b=bkN81vip6JAto2twiEdjcMRSBV32NuBypFwKS8QKHPQi2MNI/O+bbobA1NAPINB3Rw
+ 4V/2Z+CrrWR891178MVYOKUZG9V0AhKBI+RSdQgOy4Gz2UdGJRytdPBhia0BV8bPZaxn
+ zjT+c1bnkleNsZPiCAUlTlhh3cIzsP2vZR8RQJgvU6U9V8Vpa0V5S0wKn/lvg+f01whT
+ NuVo8nE4hnX2e+1IV9nCgES4azAmwlvHj5UwPU9tAmcsani0zo7nZPvxTOJ0fW9b6OcF
+ vc/RFMz9VZmTSZbMaxtNR6CFoRLcZvEwPc8EiKB7YLPEg8NUjCxAETOuHW6FcCyJ6DsV
+ h7GQ==
+X-Gm-Message-State: APjAAAXTXAnc4t3nktuR+Gim51HJGTzD9fQAE06JCCeuKzl4ScCi3Kv+
+ DDiAR4qJ82WpZOuwZwpgZYwL8RM9PD4=
+X-Google-Smtp-Source: APXvYqzeBp6sccnE4u402S70mAkiIiL0EGoOzuFm9M2u/qk0we3lKKU5E3a8FBGN0ufPeMJHRhXHnQ==
+X-Received: by 2002:a17:90a:ff15:: with SMTP id
+ ce21mr7814400pjb.124.1582944232773; 
+ Fri, 28 Feb 2020 18:43:52 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.56
+ by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 18:43:57 -0800 (PST)
+ Fri, 28 Feb 2020 18:43:52 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 6/8] accel/tcg: remove link between guest ram and TCG cache size
-Date: Fri, 28 Feb 2020 18:43:45 -0800
-Message-Id: <20200229024347.22826-7-richard.henderson@linaro.org>
+Subject: [PULL 2/8] compiler.h: Don't use compile-time assert when
+ __NO_INLINE__ is defined
+Date: Fri, 28 Feb 2020 18:43:41 -0800
+Message-Id: <20200229024347.22826-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200229024347.22826-1-richard.henderson@linaro.org>
 References: <20200229024347.22826-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1031
+X-Received-From: 2607:f8b0:4864:20::62d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,55 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>, peter.maydell@linaro.org,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+From: Zenghui Yu <yuzenghui@huawei.com>
 
-Basing the TB cache size on the ram_size was always a little heuristic
-and was broken by a1b18df9a4 which caused ram_size not to be fully
-realised at the time we initialise the TCG translation cache.
+Our robot reported the following compile-time warning while compiling
+Qemu with -fno-inline cflags:
 
-The current DEFAULT_CODE_GEN_BUFFER_SIZE may still be a little small
-but follow-up patches will address that.
+In function 'load_memop',
+    inlined from 'load_helper' at /qemu/accel/tcg/cputlb.c:1578:20,
+    inlined from 'full_ldub_mmu' at /qemu/accel/tcg/cputlb.c:1624:12:
+/qemu/accel/tcg/cputlb.c:1502:9: error: call to 'qemu_build_not_reached' declared with attribute error: code path is reachable
+         qemu_build_not_reached();
+         ^~~~~~~~~~~~~~~~~~~~~~~~
+    [...]
 
-Fixes: a1b18df9a4
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Message-Id: <20200228192415.19867-3-alex.bennee@linaro.org>
+It looks like a false-positive because only (MO_UB ^ MO_BSWAP) will
+hit the default case in load_memop() while need_swap (size > 1) has
+already ensured that MO_UB is not involved.
+
+So the thing is that compilers get confused by the -fno-inline and
+just can't accurately evaluate memop_size(op) at compile time, and
+then the qemu_build_not_reached() is wrongly triggered by (MO_UB ^
+MO_BSWAP).  Let's carefully don't use the compile-time assert when
+no functions will be inlined into their callers.
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Message-Id: <20200205141545.180-1-yuzenghui@huawei.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/translate-all.c | 8 --------
- 1 file changed, 8 deletions(-)
+ include/qemu/compiler.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 238b0e575b..5b66af783b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -938,15 +938,7 @@ static inline size_t size_code_gen_buffer(size_t tb_size)
- {
-     /* Size the buffer.  */
-     if (tb_size == 0) {
--#ifdef USE_STATIC_CODE_GEN_BUFFER
-         tb_size = DEFAULT_CODE_GEN_BUFFER_SIZE;
--#else
--        /* ??? Needs adjustments.  */
--        /* ??? If we relax the requirement that CONFIG_USER_ONLY use the
--           static buffer, we could size this on RESERVED_VA, on the text
--           segment size of the executable, or continue to use the default.  */
--        tb_size = (unsigned long)(ram_size / 4);
--#endif
-     }
-     if (tb_size < MIN_CODE_GEN_BUFFER_SIZE) {
-         tb_size = MIN_CODE_GEN_BUFFER_SIZE;
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 85c02c16d3..c76281f354 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -236,7 +236,7 @@
+  * supports QEMU_ERROR, this will be reported at compile time; otherwise
+  * this will be reported at link time due to the missing symbol.
+  */
+-#ifdef __OPTIMIZE__
++#if defined(__OPTIMIZE__) && !defined(__NO_INLINE__)
+ extern void QEMU_NORETURN QEMU_ERROR("code path is reachable")
+     qemu_build_not_reached(void);
+ #else
 -- 
 2.20.1
 
