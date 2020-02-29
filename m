@@ -2,88 +2,86 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B949C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFF2C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:44:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F6862469D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:44:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CF022469D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 02:44:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xytwpTq9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6862469D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aQKwZYNX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF022469D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7s7b-0008VU-E9
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:44:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42682)
+	id 1j7s7d-00009S-5Q
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 21:44:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6d-00076R-4D
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6d-00076Q-5z
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7s6b-00031j-MZ
+ (envelope-from <richard.henderson@linaro.org>) id 1j7s6b-00031e-MU
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:54 -0500
-Received: from mail-pl1-x631.google.com ([2607:f8b0:4864:20::631]:43915)
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42314)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7s6b-0002z9-Fo
+ id 1j7s6b-0002y0-G4
  for qemu-devel@nongnu.org; Fri, 28 Feb 2020 21:43:53 -0500
-Received: by mail-pl1-x631.google.com with SMTP id p11so1946346plq.10
+Received: by mail-pl1-x644.google.com with SMTP id u3so1946593plr.9
  for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 18:43:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=y86kGv51d7MIe9EUA91Ip3mHFnX72SJuw4wm5LrzN7Y=;
- b=xytwpTq9ApDp6icUVBSMnHhllCuXLfMChXfGzk7TPNxyid+H95ZLPTCaqkxBUiJgFR
- k8ai6yM16ObljfzrME1n1FJk//F1twlIx6HcVqXYKYfdep2k1InR1elaePvhKFBquOdY
- IzhsO/YBe8gWP6eANg2wqL8efAqwiKf8PYOxdGqB6vZT7q5lakTksIzl2QM+ZhF2oVFy
- G7Km9toE+Ib+JOv9UXnO4Kauct60xSxHgOJCo5L40XsHFARvrZDxM/Iem0U4o8nkzADl
- zCiQkuXMYx1uR/X+LhAgG5KaJzhZsvPJfOKri8Qz13B0o9V6we9VnA/eZV0O0RVhbNCA
- idgQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+bGP5zTQ9CEVKQuxiSM93QKGtD6GSUP/eq+pny3GVwY=;
+ b=aQKwZYNXDnggzddPYOxjzztEfwGsMlgXPSdiHilUn1v4ug4wBy2iEoUQFfmluE0K9a
+ E2W9ZhrP5l2gP79Lp9gyN+pxy/tZ+VZlnH3sM5u81OAubq4iMv5sfPAQof221PApXhy0
+ ki8RqCVsAdnIX2MvD0C6ABSt3pZ6HFQvuvoeLYPsO4mfoMcb24AB5+x2Jnxf900jkM0i
+ PEhW2VzFIvD614Ji45vDvlumcs1w9BDLI7SGX66x3IwXj8fhRUH2rDWrj4O/SmGlR9ff
+ ItG/wSVt3NSVacWZfDJXz3yC3/KhEOZGV94c66W36l8DSkasVfoIbcpjTF2eu4Nz8zvx
+ TiPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=y86kGv51d7MIe9EUA91Ip3mHFnX72SJuw4wm5LrzN7Y=;
- b=VVQSGqYcVGEdRPiFmb7zwG8xAAqtXrKgFXRcx49j3qzhZSxIelilKX5bQf6Z0Vdf03
- 8a8bg1JpVugAQwekDLtEvG2hB9DbmeQorzRfga5caEbPzM/uU1vy97g6Xu1VfA8mwDCn
- LIwZUc2QTxP/dRWYQXU6U69jXGBQ9Nu9K/QPkfqylCo+f7jRA0fml7vQDloldUQ5P2yM
- kodqK1eCgPX5BCMrCNZiEwccuQtgjJ0XmoC14Swo8Mqniek4+pOkfnLkfVUi/kBYLG4y
- dlORqjBkhg3DVHUB1yWd5r9O0kAzF9MxPx2JTw2yWLG0pYAzSu18ysCjnypTF3KVc0I+
- 6x7Q==
-X-Gm-Message-State: APjAAAXomwCB456ttZ9dnTGwOsRX8qRdX9TosjV+Zw57yv0lY+6kl6Mo
- GwM3852WYT0fs0YRx8ebzEgpQhls74I=
-X-Google-Smtp-Source: APXvYqw2a+1OjvyxVOmqitVYLB6RQH/0wCl4Rk2yL2UwZrNwTLdeldHHkZio6n3PXIQ7tBOQm60vlg==
-X-Received: by 2002:a17:902:b498:: with SMTP id
- y24mr6817446plr.343.1582944231603; 
- Fri, 28 Feb 2020 18:43:51 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+bGP5zTQ9CEVKQuxiSM93QKGtD6GSUP/eq+pny3GVwY=;
+ b=RJEIvrGWZyBm7LAb5IEwE4006RxHb+Hb8VW0AUop7WM1JedqUuLBOYEoUU4nbA5ySp
+ ozknARyBGJK/BzXQ8kLf77+aVr+utq5efP/iLdY1FD0Vdsq4pY5Fn/59bza09finnodv
+ H7DAlnXNF0hMLqYFYAPFTa8GH4isK69hURgM8NoeA1BE58JhwAg9fyWpwD0mXN0EJhMF
+ gMkYEQ0Qu4fBy/heFCeU5QP/vbLPx0/hisRupDBAzwJrxNjn9KiIQeRDppMMyBeBTuTJ
+ laj8K6mwFo+OevfUUf0ydSImsH0Pdd0L0lvm88rDztAdXqH/9WI7pBMJMmaL+eOrBpQB
+ tBoQ==
+X-Gm-Message-State: APjAAAVRZGgEiTi1pt7ZJGS+kZ460LkX8rKdLAtEYhzXyaxRbHxTdKGe
+ yYK65vl+pwcK7rQKi3VSe0pyYR6qgSo=
+X-Google-Smtp-Source: APXvYqx7GcoKu99PpwrT4VrqHMXK4jstJ7zYduE0QfuJBZetr5aTKXHTnvGKywZu5rZDD2NiWAqyQA==
+X-Received: by 2002:a17:90a:cf11:: with SMTP id
+ h17mr7982984pju.103.1582944230190; 
+ Fri, 28 Feb 2020 18:43:50 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.50
+ by smtp.gmail.com with ESMTPSA id k9sm3649321pjo.19.2020.02.28.18.43.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 18:43:50 -0800 (PST)
+ Fri, 28 Feb 2020 18:43:49 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] accel/tcg: fix race in cpu_exec_step_atomic (bug 1863025)
-Date: Fri, 28 Feb 2020 18:43:40 -0800
-Message-Id: <20200229024347.22826-2-richard.henderson@linaro.org>
+Subject: [PULL 0/8] tcg patch queue
+Date: Fri, 28 Feb 2020 18:43:39 -0800
+Message-Id: <20200229024347.22826-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200229024347.22826-1-richard.henderson@linaro.org>
-References: <20200229024347.22826-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::631
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,98 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Yifan <me@yifanlu.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+The following changes since commit e0175b71638cf4398903c0d25f93fe62e0606389:
 
-The bug describes a race whereby cpu_exec_step_atomic can acquire a TB
-which is invalidated by a tb_flush before we execute it. This doesn't
-affect the other cpu_exec modes as a tb_flush by it's nature can only
-occur on a quiescent system. The race was described as:
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200228' into staging (2020-02-28 16:39:27 +0000)
 
-  B2. tcg_cpu_exec => cpu_exec => tb_find => tb_gen_code
-  B3. tcg_tb_alloc obtains a new TB
+are available in the Git repository at:
 
-      C3. TB obtained with tb_lookup__cpu_state or tb_gen_code
-          (same TB as B2)
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20200228
 
-          A3. start_exclusive critical section entered
-          A4. do_tb_flush is called, TB memory freed/re-allocated
-          A5. end_exclusive exits critical section
+for you to fetch changes up to 600e17b261555c56a048781b8dd5ba3985650013:
 
-  B2. tcg_cpu_exec => cpu_exec => tb_find => tb_gen_code
-  B3. tcg_tb_alloc reallocates TB from B2
+  accel/tcg: increase default code gen buffer size for 64 bit (2020-02-28 17:43:31 -0800)
 
-      C4. start_exclusive critical section entered
-      C5. cpu_tb_exec executes the TB code that was free in A4
+----------------------------------------------------------------
+Fix race in cpu_exec_step_atomic.
+Work around compile failure with -fno-inine.
+Expand tcg/arm epilogue inline.
+Adjustments to the default code gen buffer size.
 
-The simplest fix is to widen the exclusive period to include the TB
-lookup. As a result we can drop the complication of checking we are in
-the exclusive region before we end it.
+----------------------------------------------------------------
+Alex Bennée (5):
+      accel/tcg: fix race in cpu_exec_step_atomic (bug 1863025)
+      accel/tcg: use units.h for defining code gen buffer sizes
+      accel/tcg: remove link between guest ram and TCG cache size
+      accel/tcg: only USE_STATIC_CODE_GEN_BUFFER on 32 bit hosts
+      accel/tcg: increase default code gen buffer size for 64 bit
 
-Cc: Yifan <me@yifanlu.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1863025
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200214144952.15502-1-alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/cpu-exec.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+Richard Henderson (2):
+      tcg/arm: Split out tcg_out_epilogue
+      tcg/arm: Expand epilogue inline
 
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 2560c90eec..d95c4848a4 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -240,6 +240,8 @@ void cpu_exec_step_atomic(CPUState *cpu)
-     uint32_t cf_mask = cflags & CF_HASH_MASK;
- 
-     if (sigsetjmp(cpu->jmp_env, 0) == 0) {
-+        start_exclusive();
-+
-         tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, cf_mask);
-         if (tb == NULL) {
-             mmap_lock();
-@@ -247,8 +249,6 @@ void cpu_exec_step_atomic(CPUState *cpu)
-             mmap_unlock();
-         }
- 
--        start_exclusive();
--
-         /* Since we got here, we know that parallel_cpus must be true.  */
-         parallel_cpus = false;
-         cc->cpu_exec_enter(cpu);
-@@ -271,14 +271,15 @@ void cpu_exec_step_atomic(CPUState *cpu)
-         qemu_plugin_disable_mem_helpers(cpu);
-     }
- 
--    if (cpu_in_exclusive_context(cpu)) {
--        /* We might longjump out of either the codegen or the
--         * execution, so must make sure we only end the exclusive
--         * region if we started it.
--         */
--        parallel_cpus = true;
--        end_exclusive();
--    }
-+
-+    /*
-+     * As we start the exclusive region before codegen we must still
-+     * be in the region if we longjump out of either the codegen or
-+     * the execution.
-+     */
-+    g_assert(cpu_in_exclusive_context(cpu));
-+    parallel_cpus = true;
-+    end_exclusive();
- }
- 
- struct tb_desc {
--- 
-2.20.1
+Zenghui Yu (1):
+      compiler.h: Don't use compile-time assert when __NO_INLINE__ is defined
 
+ include/qemu/compiler.h   |  2 +-
+ accel/tcg/cpu-exec.c      | 21 ++++++++--------
+ accel/tcg/translate-all.c | 61 ++++++++++++++++++++++++++++-------------------
+ tcg/arm/tcg-target.inc.c  | 29 ++++++++++------------
+ 4 files changed, 60 insertions(+), 53 deletions(-)
 
