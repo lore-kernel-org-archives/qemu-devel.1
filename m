@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15601C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A745AC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5C502468D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7256E2468D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 01:29:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TvRi+YXc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5C502468D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kC4x9yEL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7256E2468D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j7qwe-0006qQ-0f
-	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 20:29:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36990)
+	id 1j7qwk-0007BL-M9
+	for qemu-devel@archiver.kernel.org; Fri, 28 Feb 2020 20:29:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j7qvW-0004kt-BO
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:23 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j7qvX-0004nI-KD
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j7qvV-00060k-CJ
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:22 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:37814)
+ (envelope-from <richard.henderson@linaro.org>) id 1j7qvW-00061c-Hi
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:23 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:37815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j7qvV-000608-7O
- for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:21 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id o2so67187pjp.2
- for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 17:28:21 -0800 (PST)
+ id 1j7qvW-00060v-C9
+ for qemu-devel@nongnu.org; Fri, 28 Feb 2020 20:28:22 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id o2so67206pjp.2
+ for <qemu-devel@nongnu.org>; Fri, 28 Feb 2020 17:28:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lD3FYS9OIbqt/7rZmxRR9Ucvpf5WCTg8Pk1gx8FKewE=;
- b=TvRi+YXcZh9gcJikXK9coMz/2htbtC9rHOisjlUaVrG63xZ3frhynSwcyMQDvAXS34
- Nz24MnTDsoq6FtwQbQug/V7b2uj3Rtf+3fqYjn05ctDxwEEPpkqIdE7DZyj3waqix/at
- t4Ko+cXIJnxvay7RODwZhdmcxaJnT+o9CixVftYyEedMGZiUT0QSjr50+YbyVk7cpXoA
- VIzow+zV8UU0ocrDttICXwfrfhy93OONuZlm45rZtx/BH1PHXGWQVh1LmXq7ICQCzobe
- BVHCKX8BQas1pEcstmd4RsMG7ynaarQ+oZEaGqlhbIXULiHZBCUAIXY/2zJv8W1g65LV
- /pIA==
+ bh=mxAcyusf4U5zXXtEjloBwTbqgFt78dWHMSy3qfj6epQ=;
+ b=kC4x9yELE0eX35wwUWRIifYggbo9L7N656Qz267eMcpSg3z+VZP+kzXpacnrDpqAzs
+ NbpnH72gZchXusZ7NXLHwPsAF/ks4ClutNc68Mpz6LEXRETnhFHNIBU+XLJAT8QOFqZ6
+ mTb/WqfrH8jaf+u9LTeeH+T5FzqYK1CtoDRBuA4DZy19ZDmJA440ood0BCrxs0jYZkVB
+ cvO5Mo87wR3Ty4GjetisAnzlYTIfAygcmOhFEbB7pPsj/XqhmuLr+KHrDKC69xdceCYR
+ XD+csDvBI00NXmgXbhMCx5j3rajWotb8T+UukWjj6LPx1JXkMefbvom0z/thaXyk65Nv
+ WHUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lD3FYS9OIbqt/7rZmxRR9Ucvpf5WCTg8Pk1gx8FKewE=;
- b=aDbNGXANU/fCCi2ovucbUbEK8+IitkeNppYL0f/C7BYizc9kONFt5A/EnsAB6WxTEf
- 0fDLSn7Kzg/AEAvYahnthHDcfC0rKcg0lQerSwajTqMVtzMFTEv2CgDeq1ZhTlS5ApKp
- 9b8C6Gjk9bQyUsr7yHmO9NxElagFk3oKm0urAuvujb1qTQcWBzWJ4Lv56wJXIaIvoRbW
- ixGwLeQdVmst6MsvYskF6YUE9R8RkGVoF4vTmzTQEtdd1MpWFfTgcXRJT7OZjwVJ29Xt
- MqWt6RR8lWeBda6BBoP9SFt8pWPjr66jqGkMLbkoRhiDp5UQXz3YlmFZwIbeM1+Up09z
- HZuA==
-X-Gm-Message-State: APjAAAVROOdH6JdVAWowYOXs4kqZgJew8gOvcYfpvb6NDGr7JduMFuIB
- 5qo5mErfHyTZDgW2tfx6s5+BcYvp6j8=
-X-Google-Smtp-Source: APXvYqw5uR3jvCpfNT8/CxYprqUDl+y9pACxnaEH92QuUahNJGDKMn4fR9B5R10iQEqCNVB0piZNGA==
-X-Received: by 2002:a17:902:523:: with SMTP id
- 32mr6715470plf.148.1582939699893; 
- Fri, 28 Feb 2020 17:28:19 -0800 (PST)
+ bh=mxAcyusf4U5zXXtEjloBwTbqgFt78dWHMSy3qfj6epQ=;
+ b=YtWl6Nm5u1RbJxX5zQVdsjnGMTMxi7/kDqP6vzCLzkuUOMs5fWV+VOApXtZCWXNzOZ
+ OZAt/tA8t3V5APFTXei3o6C7SZuVEGoM+GDVqMBa8kOKJX0cEwOrWO0La2krUpHWHuKl
+ xmGkXL/mwBpOs1LBBaWMkjAPbAQLacS7oCNr+gBXO6VTiISLv9i8DkDLVCwQ34Tzlfjc
+ o+JzTFTPstH4guVLmlQDtInGF89udtpsuk0YMPB3/skcYoERT26hN38bGoQ35xwrWJc+
+ K22W9Fm698GAjGTzHKPbvfarJ7JiTafyxjlREj7aV3bLz73a5A5cFQigVGkLmd6oCPz/
+ 9vhA==
+X-Gm-Message-State: APjAAAVmy/sEgAnG/2MbMGCNghjzLW6KzTu/ZzQEvBpTHrV2/YzZkUEh
+ RgOc2yl5cAhKlbgnoAYnuD/i4gB5PiY=
+X-Google-Smtp-Source: APXvYqwpkAshVZF92eAvC29ab0gq8iFGnhR5fbwx1SmUwlAGyRUtmbwtaFpEtV4eg7WmmY4hAw2HYw==
+X-Received: by 2002:a17:902:8308:: with SMTP id
+ bd8mr6710737plb.210.1582939701020; 
+ Fri, 28 Feb 2020 17:28:21 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id r3sm4606313pfq.126.2020.02.28.17.28.18
+ by smtp.gmail.com with ESMTPSA id r3sm4606313pfq.126.2020.02.28.17.28.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Feb 2020 17:28:19 -0800 (PST)
+ Fri, 28 Feb 2020 17:28:20 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 04/12] target/arm: Remove EL2 and EL3 setup from user-only
-Date: Fri, 28 Feb 2020 17:28:03 -0800
-Message-Id: <20200229012811.24129-5-richard.henderson@linaro.org>
+Subject: [PATCH v5 05/12] target/arm: Improve masking in arm_hcr_el2_eff
+Date: Fri, 28 Feb 2020 17:28:04 -0800
+Message-Id: <20200229012811.24129-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200229012811.24129-1-richard.henderson@linaro.org>
 References: <20200229012811.24129-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,38 +99,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have disabled EL2 and EL3 for user-only, which means that these
-registers "don't exist" and should not be set.
+Update the {TGE,E2H} == '11' masking to ARMv8.6.
+If EL2 is configured for aarch32, disable all of
+the bits that are RES0 in aarch32 mode.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.c | 6 ------
- 1 file changed, 6 deletions(-)
+ target/arm/helper.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 33c28fe868..af541431e6 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -191,19 +191,13 @@ static void arm_cpu_reset(CPUState *s)
-         /* Enable all PAC keys.  */
-         env->cp15.sctlr_el[1] |= (SCTLR_EnIA | SCTLR_EnIB |
-                                   SCTLR_EnDA | SCTLR_EnDB);
--        /* Enable all PAC instructions */
--        env->cp15.hcr_el2 |= HCR_API;
--        env->cp15.scr_el3 |= SCR_API;
-         /* and to the FP/Neon instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 20, 2, 3);
-         /* and to the SVE instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 16, 2, 3);
--        env->cp15.cptr_el[3] |= CPTR_EZ;
-         /* with maximum vector length */
-         env->vfp.zcr_el[1] = cpu_isar_feature(aa64_sve, cpu) ?
-                              cpu->sve_max_vq - 1 : 0;
--        env->vfp.zcr_el[2] = env->vfp.zcr_el[1];
--        env->vfp.zcr_el[3] = env->vfp.zcr_el[1];
-         /*
-          * Enable TBI0 and TBI1.  While the real kernel only enables TBI0,
-          * turning on both here will produce smaller code and otherwise
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index e68e16b85b..ef3f02d194 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5196,14 +5196,37 @@ uint64_t arm_hcr_el2_eff(CPUARMState *env)
+          * Since the v8.4 language applies to the entire register, and
+          * appears to be backward compatible, use that.
+          */
+-        ret = 0;
+-    } else if (ret & HCR_TGE) {
+-        /* These bits are up-to-date as of ARMv8.4.  */
++        return 0;
++    }
++
++    /*
++     * For a cpu that supports both aarch64 and aarch32, we can set bits
++     * in HCR_EL2 (e.g. via EL3) that are RES0 when we enter EL2 as aa32.
++     * Ignore all of the bits in HCR+HCR2 that are not valid for aarch32.
++     */
++    if (!arm_el_is_aa64(env, 2)) {
++        uint64_t aa32_valid;
++
++        /*
++         * These bits are up-to-date as of ARMv8.6.
++         * For HCR, it's easiest to list just the 2 bits that are invalid.
++         * For HCR2, list those that are valid.
++         */
++        aa32_valid = MAKE_64BIT_MASK(0, 32) & ~(HCR_RW | HCR_TDZ);
++        aa32_valid |= (HCR_CD | HCR_ID | HCR_TERR | HCR_TEA | HCR_MIOCNCE |
++                       HCR_TID4 | HCR_TICAB | HCR_TOCU | HCR_TTLBIS);
++        ret &= aa32_valid;
++    }
++
++    if (ret & HCR_TGE) {
++        /* These bits are up-to-date as of ARMv8.6.  */
+         if (ret & HCR_E2H) {
+             ret &= ~(HCR_VM | HCR_FMO | HCR_IMO | HCR_AMO |
+                      HCR_BSU_MASK | HCR_DC | HCR_TWI | HCR_TWE |
+                      HCR_TID0 | HCR_TID2 | HCR_TPCP | HCR_TPU |
+-                     HCR_TDZ | HCR_CD | HCR_ID | HCR_MIOCNCE);
++                     HCR_TDZ | HCR_CD | HCR_ID | HCR_MIOCNCE |
++                     HCR_TID4 | HCR_TICAB | HCR_TOCU | HCR_ENSCXT |
++                     HCR_TTLBIS | HCR_TTLBOS | HCR_TID5);
+         } else {
+             ret |= HCR_FMO | HCR_IMO | HCR_AMO;
+         }
 -- 
 2.20.1
 
