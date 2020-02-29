@@ -2,91 +2,73 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CEFC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD23C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:26:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14C5824680
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:13:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpP+BFjb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C5824680
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E2ADD2468A
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:26:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2ADD2468A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j82sC-0001lh-8Q
-	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 09:13:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40828)
+	id 1j834I-0005YP-Vq
+	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 09:26:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j82ra-0001Bc-GY
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:13:07 -0500
+ (envelope-from <bounces@canonical.com>) id 1j833g-00055T-TR
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j82rZ-0008Rg-67
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:13:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44098
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j82rY-0008RN-TY
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:13:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1582985584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NfAoHMeHy21DgDIQC+tNwfEBV0hb4sHTNIirwraMjTs=;
- b=DpP+BFjbcB8codDSpcqQc6s2L2Y5EPxSyaehBaHLtjrU6ivx3T/RX9cJ/+iHIsJvPY5JN3
- SJWFL0k/LXJu7wpiLWZDLD2oOmj156gNTZ0inUvOsjm/dozilL8xDF3QldDcsQsgClbRvg
- nZrfwrHax8VBFa713K1YMilFfpSOtvg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-ZFNISdz_OuynlCGsVc6p8g-1; Sat, 29 Feb 2020 09:12:58 -0500
-X-MC-Unique: ZFNISdz_OuynlCGsVc6p8g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B00913E4;
- Sat, 29 Feb 2020 14:12:57 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C70410002CD;
- Sat, 29 Feb 2020 14:12:52 +0000 (UTC)
-Subject: Re: [PATCH v4 00/10] vTPM for aarch64
-To: Stefan Berger <stefanb@linux.ibm.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200226205942.11424-1-eric.auger@redhat.com>
- <4fb16117-f9d3-61af-9198-931590a46e3d@linux.ibm.com>
- <ee98e8ab-06df-e422-1ca5-f3f6a48145f2@redhat.com>
- <2413ead7-3707-acc6-7900-bb3896082051@linux.ibm.com>
- <8ae6ca7b-34b5-b752-2bfd-4b7c2c9663f5@redhat.com>
- <61c4ec54-e7ab-21a2-c446-b45d906ca4e1@linux.ibm.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ad2af8fd-6869-98a5-659d-6537767eb73c@redhat.com>
-Date: Sat, 29 Feb 2020 15:12:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <bounces@canonical.com>) id 1j833f-0006S3-Jh
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:36 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57716)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1j833f-0006Rh-EV
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1j833e-00054k-52
+ for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 14:25:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 04FFD2E8031
+ for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 14:25:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <61c4ec54-e7ab-21a2-c446-b45d906ca4e1@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Sat, 29 Feb 2020 14:19:23 -0000
+From: Thierry Briot <1865188@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier tebounet
+X-Launchpad-Bug-Reporter: Thierry Briot (tebounet)
+X-Launchpad-Bug-Modifier: Thierry Briot (tebounet)
+References: <158291064909.26276.9623855364402088462.malonedeb@gac.canonical.com>
+Message-Id: <158298596329.12121.1076288751040713667.malone@soybean.canonical.com>
+Subject: [Bug 1865188] Re: Switching from the monitor to the emulated machine
+ with a French keyboard (AZERTY)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="e0878392dc799b267dea80578fa65500a5d74155";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 3d16128beab03bb8373ec7eaf201df702e0dcee0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,72 +77,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, lersek@redhat.com, ardb@kernel.org,
- philmd@redhat.com
+Reply-To: Bug 1865188 <1865188@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+Thank you for your reply. It works well with "Ctrl-A c" to swith to and
+from QEMU monitor in xterm terminal.
 
-On 2/28/20 6:52 PM, Stefan Berger wrote:
-> On 2/28/20 9:49 AM, Auger Eric wrote:
->> Hi Stefan,
->> On 2/28/20 3:37 PM, Stefan Berger wrote:
->>> On 2/27/20 3:07 AM, Auger Eric wrote:
->>>> Hi Stefan,
->>>> On 2/26/20 11:44 PM, Stefan Berger wrote:
->>>>> On 2/26/20 3:59 PM, Eric Auger wrote:
->>>>>> This series adds the capability to instantiate an MMIO TPM TIS
->>>>>> in ARM virt. It is candidate to qemu 5.0.
->>>>> I queued it now here:
->>>>> https://github.com/stefanberger/qemu-tpm/commits/tpm-next
->>>>>
->>>>> I will send the PR within a few days. Thanks!
->>>> Thank you. I will just ping Peter to make sure he has no comments on
->>>>
->>>> [PATCH v4 06/10] hw/arm/virt: vTPM support
->>>
->>> The little dent is now an arm boot failure:
->>>
->>>
->>> https://travis-ci.org/stefanberger/qemu-tpm/jobs/655573347?utm_medium=
-=3Dnotification&utm_source=3Demail
->>>
->> is this really related to the sysbus TPM-TIS addition? I have the
->> impression cubieboard acceptance tests (ARM 32b) are failing. I touched
->> ARM virt machine.
->=20
-> I hadn't seen this one here before:
->=20
-> https://travis-ci.org/qemu/qemu/jobs/656327906
->=20
->=20
-> We're good.
-Thanks for the confirmation.
+The problem is elsewhere, with the option -monitor. With "-monitor <tty
+device>", whether <tty device> is or not the tty from which qemu is
+started, the characters I type are misinterpreted. Maybe I must report
+this bug ?
 
-Best Regards
+Now, I remove the -monitor option, and I add "-serial
+mon:telnet::4444,server" before "-serial mon:stdio". I enter the
+following command in a first xterm, and "telnet localhost 4444" in a
+second xterm. So, qemu monitor works fine in the first xterm, and HP-UX
+installation menu is correctly displayed in the second xterm.
 
-Eric
->=20
->=20
-> =C2=A0=C2=A0 Stefan
->=20
->=20
->=20
->>
->> Thanks
->>
->> Eric
->>>
->>>
->>> Have a look at the raw log.
->>>
->>>
->>> =C2=A0=C2=A0=C2=A0 Stefan
->>>
->>>
->>>
->=20
+The command :
+sudo ./qemu-system-hppa  -boot d -drive if=3Dscsi,bus=3D0,index=3D5,file=3D=
+../../hpux_11.00.img,format=3Draw  -serial mon:telnet::4444,server -serial =
+mon:stdio -nographic -m 512 -d nochain -cdrom ../../distri/11.00/'HP-UX 11.=
+0 (2002-06).iso' -D qemu.log -net nic,model=3Dtulip  -net tap
 
+Now, I will try to use the graphic mode.
+Have a nice day,
+Thierry Briot
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1865188
+
+Title:
+  Switching from the monitor to the emulated machine with a French
+  keyboard (AZERTY)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  I run qemu in an xterm terminal, with TERM=3Dvt100. My keyboard is french=
+ AZERTY.
+
+  sudo ./qemu-system-hppa -monitor /dev/pts/2 -k fr  -boot d -drive
+  if=3Dscsi,bus=3D0,index=3D5,file=3D../../hpux_11iv1.img,format=3Draw -ser=
+ial
+  mon:stdio -D qemu1.log -nographic -m 512 -d nochain -cdrom
+  ../../distri/11iv1/'HP-
+  UX_11iv1_B.11.11_TCOE_September_2005_1of4_Core_OS
+  _Install&Recovery_B6821-10046.iso' -net nic,model=3Dtulip  -net tap
+
+  When I want to use the monitor (to change cdrom during the hp-ux
+  installation process), the characters I type are misinterpreted. For
+  example, I enter "2" at hp-ux prompt, I see : "412691;82;22".
+  Impossible to switch from monitor to hp-ux with Ctrl+Alt+1 and
+  Ctrl+Alt+2.
+
+  I tried with Debian and Fedora host, TERM=3Dxterm and TERM=3Dvt100, qemu =
+options -alt-grab and -ctrl-grab, -monitor in the same terminal or an other=
+ terminal than hp-ux. Nothing works.
+  Best regards.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1865188/+subscriptions
 
