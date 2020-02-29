@@ -2,73 +2,63 @@ Return-Path: <SRS0=0Zkw=4R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD23C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E170AC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 15:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2ADD2468A
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 14:26:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2ADD2468A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B3D2A246AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Feb 2020 15:08:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D2A246AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j834I-0005YP-Vq
-	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 09:26:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42373)
+	id 1j83ik-0003Oa-ND
+	for qemu-devel@archiver.kernel.org; Sat, 29 Feb 2020 10:08:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1j833g-00055T-TR
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:38 -0500
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j83hl-00027g-QN
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 10:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1j833f-0006S3-Jh
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:36 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57716)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1j833f-0006Rh-EV
- for qemu-devel@nongnu.org; Sat, 29 Feb 2020 09:25:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1j833e-00054k-52
- for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 14:25:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 04FFD2E8031
- for <qemu-devel@nongnu.org>; Sat, 29 Feb 2020 14:25:34 +0000 (UTC)
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1j83hk-0006Zp-Fv
+ for qemu-devel@nongnu.org; Sat, 29 Feb 2020 10:07:01 -0500
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:41665)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1j83hj-0006Uq-Vn; Sat, 29 Feb 2020 10:07:00 -0500
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.09570916|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.0847261-0.00699878-0.908275;
+ DS=CONTINUE|ham_system_inform|0.0333957-0.000332124-0.966272;
+ FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
+ RN=11; RT=11; SR=0; TI=SMTPD_---.GuBq59D_1582988809; 
+Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.GuBq59D_1582988809)
+ by smtp.aliyun-inc.com(10.147.40.200);
+ Sat, 29 Feb 2020 23:06:50 +0800
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
+To: richard.henderson@linaro.org, alistair23@gmail.com,
+ chihmin.chao@sifive.com, palmer@dabbelt.com
+Subject: [PATCH v6 1/4] target/riscv: add vector extension field in
+ CPURISCVState
+Date: Sat, 29 Feb 2020 23:04:10 +0800
+Message-Id: <20200229150413.24950-2-zhiwei_liu@c-sky.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200229150413.24950-1-zhiwei_liu@c-sky.com>
+References: <20200229150413.24950-1-zhiwei_liu@c-sky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 29 Feb 2020 14:19:23 -0000
-From: Thierry Briot <1865188@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier tebounet
-X-Launchpad-Bug-Reporter: Thierry Briot (tebounet)
-X-Launchpad-Bug-Modifier: Thierry Briot (tebounet)
-References: <158291064909.26276.9623855364402088462.malonedeb@gac.canonical.com>
-Message-Id: <158298596329.12121.1076288751040713667.malone@soybean.canonical.com>
-Subject: [Bug 1865188] Re: Switching from the monitor to the emulated machine
- with a French keyboard (AZERTY)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="e0878392dc799b267dea80578fa65500a5d74155";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3d16128beab03bb8373ec7eaf201df702e0dcee0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 121.197.200.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,72 +67,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1865188 <1865188@bugs.launchpad.net>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, linux-csky@vger.kernel.org,
+ wenmeng_zhang@c-sky.com, Alistair Francis <alistair.francis@wdc.com>,
+ wxy194768@alibaba-inc.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thank you for your reply. It works well with "Ctrl-A c" to swith to and
-from QEMU monitor in xterm terminal.
+The 32 vector registers will be viewed as a continuous memory block.
+It avoids the convension between element index and (regno, offset).
+Thus elements can be directly accessed by offset from the first vector
+base address.
 
-The problem is elsewhere, with the option -monitor. With "-monitor <tty
-device>", whether <tty device> is or not the tty from which qemu is
-started, the characters I type are misinterpreted. Maybe I must report
-this bug ?
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/riscv/cpu.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Now, I remove the -monitor option, and I add "-serial
-mon:telnet::4444,server" before "-serial mon:stdio". I enter the
-following command in a first xterm, and "telnet localhost 4444" in a
-second xterm. So, qemu monitor works fine in the first xterm, and HP-UX
-installation menu is correctly displayed in the second xterm.
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index de0a8d893a..2e8d01c155 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -64,6 +64,7 @@
+ #define RVA RV('A')
+ #define RVF RV('F')
+ #define RVD RV('D')
++#define RVV RV('V')
+ #define RVC RV('C')
+ #define RVS RV('S')
+ #define RVU RV('U')
+@@ -93,9 +94,20 @@ typedef struct CPURISCVState CPURISCVState;
+ 
+ #include "pmp.h"
+ 
++#define RV_VLEN_MAX 512
++
+ struct CPURISCVState {
+     target_ulong gpr[32];
+     uint64_t fpr[32]; /* assume both F and D extensions */
++
++    /* vector coprocessor state. */
++    uint64_t vreg[32 * RV_VLEN_MAX / 64] QEMU_ALIGNED(16);
++    target_ulong vxrm;
++    target_ulong vxsat;
++    target_ulong vl;
++    target_ulong vstart;
++    target_ulong vtype;
++
+     target_ulong pc;
+     target_ulong load_res;
+     target_ulong load_val;
+-- 
+2.23.0
 
-The command :
-sudo ./qemu-system-hppa  -boot d -drive if=3Dscsi,bus=3D0,index=3D5,file=3D=
-../../hpux_11.00.img,format=3Draw  -serial mon:telnet::4444,server -serial =
-mon:stdio -nographic -m 512 -d nochain -cdrom ../../distri/11.00/'HP-UX 11.=
-0 (2002-06).iso' -D qemu.log -net nic,model=3Dtulip  -net tap
-
-Now, I will try to use the graphic mode.
-Have a nice day,
-Thierry Briot
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1865188
-
-Title:
-  Switching from the monitor to the emulated machine with a French
-  keyboard (AZERTY)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-  I run qemu in an xterm terminal, with TERM=3Dvt100. My keyboard is french=
- AZERTY.
-
-  sudo ./qemu-system-hppa -monitor /dev/pts/2 -k fr  -boot d -drive
-  if=3Dscsi,bus=3D0,index=3D5,file=3D../../hpux_11iv1.img,format=3Draw -ser=
-ial
-  mon:stdio -D qemu1.log -nographic -m 512 -d nochain -cdrom
-  ../../distri/11iv1/'HP-
-  UX_11iv1_B.11.11_TCOE_September_2005_1of4_Core_OS
-  _Install&Recovery_B6821-10046.iso' -net nic,model=3Dtulip  -net tap
-
-  When I want to use the monitor (to change cdrom during the hp-ux
-  installation process), the characters I type are misinterpreted. For
-  example, I enter "2" at hp-ux prompt, I see : "412691;82;22".
-  Impossible to switch from monitor to hp-ux with Ctrl+Alt+1 and
-  Ctrl+Alt+2.
-
-  I tried with Debian and Fedora host, TERM=3Dxterm and TERM=3Dvt100, qemu =
-options -alt-grab and -ctrl-grab, -monitor in the same terminal or an other=
- terminal than hp-ux. Nothing works.
-  Best regards.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1865188/+subscriptions
 
