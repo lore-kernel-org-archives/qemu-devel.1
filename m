@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25973C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE205C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5D7220CC7
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:53:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBEF2246B6
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rUaY0DpF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5D7220CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQ+dymuj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBEF2246B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8WX8-00078j-HZ
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:53:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57898)
+	id 1j8WXm-000090-V1
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:54:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU9-0001Jj-FJ
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:55 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTy-00013N-8Q
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU7-0006WV-AL
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:53 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53253)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTw-0006H2-S1
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:42 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41769)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j8WU7-0006VS-3Q; Sun, 01 Mar 2020 16:50:51 -0500
-Received: by mail-wm1-x341.google.com with SMTP id f15so9065518wml.3;
- Sun, 01 Mar 2020 13:50:50 -0800 (PST)
+ id 1j8WTw-0006F2-LT; Sun, 01 Mar 2020 16:50:40 -0500
+Received: by mail-wr1-x443.google.com with SMTP id v4so10056472wrs.8;
+ Sun, 01 Mar 2020 13:50:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vR+19Al6A28NFlWsP/WCkkDCw4IWTkTu+AkaGrWBuwQ=;
- b=rUaY0DpFPjcxBlJjKdeSIG5hsvzMi4ryEsLxYtPqyMhSNcs02a4vnZw8+EEQUB2zsg
- TIk3GFgtJwFxP4jx8udiYl91oCFJTJIPznCak+Y9ND5BUA8DlVrhdlygKYyPOBncwifr
- +OiO4Kcf1warhu2r2IrwPj7nfp7zkH4Trcd+FKbPosSaeBGAfOnUG8jLX7tbB/M07ud4
- Kwr120VRLk3iVgRxF80D+CoNPckaSAgTHomeyI6/s99G2CX3lxqRPsBdzNgUpJrlM+Mw
- GMeZPXY9QQXvTgYMDGQMzWJlSABrLyEjL7y7KEBgR6mLwXA8XlckgIdX/HtytDe4BQgL
- DkGQ==
+ bh=f9EeKoshn+W4ruJkmiJc8a12kPGrCM1oFv4DDEOMVFY=;
+ b=SQ+dymujMwNz15LtZqZrkYuX1u5oXCy9u9v3mLam7I6MGlZvwEH+gx7ALhA+UpEct4
+ 7QEYBOTnKrzgjIisUmlzvpZ8Gm+VG12QoAntO9LKbLlxlY0aq0nIU1aR4rM5bMo969xN
+ etWAGciCg0osSGt+L9ehEYWcrzHD98tNUXQe2UveWf6sdkrgr9Dz3QQ1ZdSlVKy9sg4H
+ I+F/ucviwRrKxJtSsDvrd+g4WDt3H/qhKxEsvHAfXjz4w1/c4DY0lSNbV3JtFD6XBFI6
+ l7BSgxYxQ0DSarIWHhIqs/Ql4XQWnpoGsHM0rGOfR2gzVl++8G22LTyGqpGNs1v+/ADU
+ nb9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vR+19Al6A28NFlWsP/WCkkDCw4IWTkTu+AkaGrWBuwQ=;
- b=tYme+TYwQ0Rzhk+WgvHaZyS99FjBg5hz/6qr3dO0b4zyQxe6A2n74VNeHTYPTmfbFt
- VFAHRCggJYsYShhTMYr3JHv/Q86X/Xs1C1fzD7QfU6Xi5CqyiR2sza+Oifo6vcz6d4Zy
- qAgvC2bcwFuscZWuymHbbPkwLxVzLNEXxdhsUROdzO5MsazGIaS0eNtlHI5BDgNA0eG0
- tDQpB+6lJgaKygg3iWBVOPKvLSSZqFH6w59T7N+Qq5Bg9teKdaKThQeMEAYFHPuqcasC
- 10lxexzsuTo2r4baUfKbJW7sjrFwo4Id5Pna9ma5HqKqbwFrDxMJ+TIYexYE/TWhjWi6
- 1oAA==
-X-Gm-Message-State: APjAAAUAsO/Xzrqf/4Fn115Vi622EkHta2uA7lzsS8GpG22cUo4EwKHH
- iMnF3QZXtM/dunr5Tyfx5VKffXSk
-X-Google-Smtp-Source: APXvYqyUZeGIXaJV7VbRdETVwlsu8XVvnfhjVADh+qyztX4xq0Tt6BEe0qLDfn1UZ/uV6oGrBCtEdw==
-X-Received: by 2002:a7b:c750:: with SMTP id w16mr15562793wmk.46.1583099449626; 
- Sun, 01 Mar 2020 13:50:49 -0800 (PST)
+ bh=f9EeKoshn+W4ruJkmiJc8a12kPGrCM1oFv4DDEOMVFY=;
+ b=q21jVxLqHVSxJkNXXclM4APTIQobAURpOJJOeWGZJgM1hAueyy6xc8mW2MucCy7ZXE
+ MUP3H4L696Gt8curB7RJa1zixanmijSy7lLhPeAfcqjhZMB+2rX0TIhJme7gE8fIpqor
+ FH2knPjU8AnCM1RK7/JQFW6H3zR8IUt0bADb2TKILelrgUGsZSFdSK8q5UZUeHved3IG
+ ganCkQPmgGqfFXr+54bvDn4+sWi7nvGjDfcb2wJR3yZ6uFO8X0cWZgd+keOmNda9kjMP
+ c8OJS61ee9qHVT6Xn2lamtEWMx+B9lhECrgvmK6wQMj8SCjS/HX5oG/GtLC7kyvRGJ2a
+ m9+A==
+X-Gm-Message-State: APjAAAVUIM0CYo8m+gNOu7f0RpZoJiIHdZgMruMvdHB/CSHDvYq8KheS
+ EfgI4vTCjzN4v6xNgxDQ4k3iq4Ha
+X-Google-Smtp-Source: APXvYqz/CYniTP7iKpYZ4IdDTdcSn34eXhAh8Ik7Xk8xdWo5TbJlOZ66ryJOg74I2NxGSv3HwOaJ2w==
+X-Received: by 2002:a05:6000:10c5:: with SMTP id
+ b5mr13297651wrx.203.1583099439312; 
+ Sun, 01 Mar 2020 13:50:39 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.48
+ by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Mar 2020 13:50:49 -0800 (PST)
+ Sun, 01 Mar 2020 13:50:38 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 16/18] tests/boot_linux_console: Add a SLOW test booting
- Ubuntu on OrangePi PC
-Date: Sun,  1 Mar 2020 22:50:27 +0100
-Message-Id: <20200301215029.15196-17-nieklinnenbank@gmail.com>
+Subject: [PATCH v6 04/18] hw/arm/allwinner-h3: add USB host controller
+Date: Sun,  1 Mar 2020 22:50:15 +0100
+Message-Id: <20200301215029.15196-5-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200301215029.15196-1-nieklinnenbank@gmail.com>
 References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,137 +95,185 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
  qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The Allwinner H3 System on Chip contains multiple USB 2.0 bus
+connections which provide software access using the Enhanced
+Host Controller Interface (EHCI) and Open Host Controller
+Interface (OHCI) interfaces. This commit adds support for
+both interfaces in the Allwinner H3 System on Chip.
 
-This test boots Ubuntu Bionic on a OrangePi PC board.
-
-As it requires 1GB of storage, and is slow, this test is disabled
-on automatic CI testing.
-
-It is useful for workstation testing. Currently Avocado timeouts too
-quickly, so we can't run userland commands.
-
-The kernel image and DeviceTree blob are built by the Armbian
-project (based on Debian):
-https://www.armbian.com/orange-pi-pc/
-
-The Ubuntu image is downloaded from:
-https://dl.armbian.com/orangepipc/Bionic_current
-
-This test can be run using:
-
-  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
-    avocado --show=app,console run -t machine:orangepi-pc \
-      tests/acceptance/boot_linux_console.py
-  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
-  console: DRAM: 1024 MiB
-  console: Failed to set core voltage! Can't set CPU frequency
-  console: Trying to boot from MMC1
-  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
-  console: CPU:   Allwinner H3 (SUN8I 0000)
-  console: Model: Xunlong Orange Pi PC
-  console: DRAM:  1 GiB
-  console: MMC:   mmc@1c0f000: 0
-  [...]
-  console: Uncompressing Linux... done, booting the kernel.
-  console: Booting Linux on physical CPU 0x0
-  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
-  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
-  console: CPU: div instructions available: patching division code
-  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
-  console: OF: fdt: Machine model: Xunlong Orange Pi PC
-  [...]
-  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
-  console: done.
-  console: Begin: Running /scripts/local-bottom ... done.
-  console: Begin: Running /scripts/init-bottom ... done.
-  console: systemd[1]: systemd 237 running in system mode. (...)
-  console: systemd[1]: Detected architecture arm.
-  console: Welcome to Ubuntu 18.04.3 LTS!
-  console: systemd[1]: Set hostname to <orangepipc>.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
-[NL: changed test to boot from SD card via BootROM, added check for 7z]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ hw/usb/hcd-ehci.h             |  1 +
+ include/hw/arm/allwinner-h3.h |  8 +++++++
+ hw/arm/allwinner-h3.c         | 44 +++++++++++++++++++++++++++++++++++
+ hw/usb/hcd-ehci-sysbus.c      | 17 ++++++++++++++
+ hw/arm/Kconfig                |  2 ++
+ 5 files changed, 72 insertions(+)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 7ef69c7bac..a70ac4a6cc 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -19,7 +19,13 @@ from avocado_qemu import exec_command_and_wait_for_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-+from avocado.utils.path import find_command, CmdNotFoundError
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index 0298238f0b..edb59311c4 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -342,6 +342,7 @@ typedef struct EHCIPCIState {
+ #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+ #define TYPE_PLATFORM_EHCI "platform-ehci-usb"
+ #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
++#define TYPE_AW_H3_EHCI "aw-h3-ehci-usb"
+ #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+ #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+ #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
+index abdc20871a..4f4dcbcd17 100644
+--- a/include/hw/arm/allwinner-h3.h
++++ b/include/hw/arm/allwinner-h3.h
+@@ -56,6 +56,14 @@ enum {
+     AW_H3_SRAM_A1,
+     AW_H3_SRAM_A2,
+     AW_H3_SRAM_C,
++    AW_H3_EHCI0,
++    AW_H3_OHCI0,
++    AW_H3_EHCI1,
++    AW_H3_OHCI1,
++    AW_H3_EHCI2,
++    AW_H3_OHCI2,
++    AW_H3_EHCI3,
++    AW_H3_OHCI3,
+     AW_H3_CCU,
+     AW_H3_PIT,
+     AW_H3_UART0,
+diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+index 1fff3c317b..c205f06738 100644
+--- a/hw/arm/allwinner-h3.c
++++ b/hw/arm/allwinner-h3.c
+@@ -28,6 +28,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/char/serial.h"
+ #include "hw/misc/unimp.h"
++#include "hw/usb/hcd-ehci.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/arm/allwinner-h3.h"
  
-+P7ZIP_AVAILABLE = True
-+try:
-+    find_command('7z')
-+except CmdNotFoundError:
-+    P7ZIP_AVAILABLE = False
+@@ -36,6 +37,14 @@ const hwaddr allwinner_h3_memmap[] = {
+     [AW_H3_SRAM_A1]    = 0x00000000,
+     [AW_H3_SRAM_A2]    = 0x00044000,
+     [AW_H3_SRAM_C]     = 0x00010000,
++    [AW_H3_EHCI0]      = 0x01c1a000,
++    [AW_H3_OHCI0]      = 0x01c1a400,
++    [AW_H3_EHCI1]      = 0x01c1b000,
++    [AW_H3_OHCI1]      = 0x01c1b400,
++    [AW_H3_EHCI2]      = 0x01c1c000,
++    [AW_H3_OHCI2]      = 0x01c1c400,
++    [AW_H3_EHCI3]      = 0x01c1d000,
++    [AW_H3_OHCI3]      = 0x01c1d400,
+     [AW_H3_CCU]        = 0x01c20000,
+     [AW_H3_PIT]        = 0x01c20c00,
+     [AW_H3_UART0]      = 0x01c28000,
+@@ -144,6 +153,14 @@ enum {
+     AW_H3_GIC_SPI_UART3     =  3,
+     AW_H3_GIC_SPI_TIMER0    = 18,
+     AW_H3_GIC_SPI_TIMER1    = 19,
++    AW_H3_GIC_SPI_EHCI0     = 72,
++    AW_H3_GIC_SPI_OHCI0     = 73,
++    AW_H3_GIC_SPI_EHCI1     = 74,
++    AW_H3_GIC_SPI_OHCI1     = 75,
++    AW_H3_GIC_SPI_EHCI2     = 76,
++    AW_H3_GIC_SPI_OHCI2     = 77,
++    AW_H3_GIC_SPI_EHCI3     = 78,
++    AW_H3_GIC_SPI_OHCI3     = 79,
+ };
  
- class BootLinuxConsole(Test):
-     """
-@@ -613,6 +619,48 @@ class BootLinuxConsole(Test):
-         exec_command_and_wait_for_pattern(self, 'reboot',
-                                                 'reboot: Restarting system')
+ /* Allwinner H3 general constants */
+@@ -284,6 +301,33 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+     qdev_init_nofail(DEVICE(&s->ccu));
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
  
-+    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
-+    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
-+    def test_arm_orangepi_bionic(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:orangepi-pc
-+        """
++    /* Universal Serial Bus */
++    sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_EHCI0));
++    sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI1],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_EHCI1));
++    sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI2],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_EHCI2));
++    sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI3],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_EHCI3));
 +
-+        # This test download a 196MB compressed image and expand it to 932MB...
-+        image_url = ('https://dl.armbian.com/orangepipc/archive/'
-+                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
-+        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
-+        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
-+        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
-+        image_path = os.path.join(self.workdir, image_name)
-+        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
++    sysbus_create_simple("sysbus-ohci", s->memmap[AW_H3_OHCI0],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_OHCI0));
++    sysbus_create_simple("sysbus-ohci", s->memmap[AW_H3_OHCI1],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_OHCI1));
++    sysbus_create_simple("sysbus-ohci", s->memmap[AW_H3_OHCI2],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_OHCI2));
++    sysbus_create_simple("sysbus-ohci", s->memmap[AW_H3_OHCI3],
++                         qdev_get_gpio_in(DEVICE(&s->gic),
++                                          AW_H3_GIC_SPI_OHCI3));
 +
-+        self.vm.set_console()
-+        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
-+                         '-nic', 'user',
-+                         '-no-reboot')
-+        self.vm.launch()
+     /* UART0. For future clocktree API: All UARTS are connected to APB2_CLK. */
+     serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
+                    qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART0),
+diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
+index 5b7991cffe..3730736540 100644
+--- a/hw/usb/hcd-ehci-sysbus.c
++++ b/hw/usb/hcd-ehci-sysbus.c
+@@ -131,6 +131,22 @@ static const TypeInfo ehci_exynos4210_type_info = {
+     .class_init    = ehci_exynos4210_class_init,
+ };
+ 
++static void ehci_aw_h3_class_init(ObjectClass *oc, void *data)
++{
++    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200 '
-+                               'loglevel=7 '
-+                               'nosmp '
-+                               'systemd.default_timeout_start_sec=9000 '
-+                               'systemd.mask=armbian-zram-config.service '
-+                               'systemd.mask=armbian-ramlog.service')
++    sec->capsbase = 0x0;
++    sec->opregbase = 0x10;
++    set_bit(DEVICE_CATEGORY_USB, dc->categories);
++}
 +
-+        self.wait_for_console_pattern('U-Boot SPL')
-+        self.wait_for_console_pattern('Autoboot in ')
-+        exec_command_and_wait_for_pattern(self, ' ', '=>')
-+        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
-+                                                kernel_command_line + "'", '=>')
-+        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++static const TypeInfo ehci_aw_h3_type_info = {
++    .name          = TYPE_AW_H3_EHCI,
++    .parent        = TYPE_SYS_BUS_EHCI,
++    .class_init    = ehci_aw_h3_class_init,
++};
 +
-+        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
-+                                      'to <orangepipc>')
-+        self.wait_for_console_pattern('Starting Load Kernel Modules...')
-+
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
+ static void ehci_tegra2_class_init(ObjectClass *oc, void *data)
+ {
+     SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
+@@ -252,6 +268,7 @@ static void ehci_sysbus_register_types(void)
+     type_register_static(&ehci_type_info);
+     type_register_static(&ehci_platform_type_info);
+     type_register_static(&ehci_exynos4210_type_info);
++    type_register_static(&ehci_aw_h3_type_info);
+     type_register_static(&ehci_tegra2_type_info);
+     type_register_static(&ehci_ppc4xx_type_info);
+     type_register_static(&ehci_fusbh200_type_info);
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index a7034218f0..5d78deba11 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -303,6 +303,8 @@ config ALLWINNER_H3
+     select ARM_TIMER
+     select ARM_GIC
+     select UNIMP
++    select USB_OHCI
++    select USB_EHCI_SYSBUS
+ 
+ config RASPI
+     bool
 -- 
 2.17.1
 
