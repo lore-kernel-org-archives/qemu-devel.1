@@ -2,85 +2,94 @@ Return-Path: <SRS0=SwYc=4S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B49BC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9842AC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:40:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD31D24699
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:23:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TocZwJ2U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD31D24699
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC1A246BE
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:40:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC1A246BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8UB2-00077B-UX
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 14:23:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43356)
+	id 1j8USK-0002nw-K1
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 14:40:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcfaracco@gmail.com>) id 1j8UA8-0006gr-GO
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:22:05 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8URg-0002EO-C1
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:40:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcfaracco@gmail.com>) id 1j8UA6-00074q-Ih
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:22:03 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:35089)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcfaracco@gmail.com>) id 1j8UA5-00074S-Ti
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:22:02 -0500
-Received: by mail-qt1-x841.google.com with SMTP id 88so5995524qtc.2
- for <qemu-devel@nongnu.org>; Sun, 01 Mar 2020 11:22:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=RUBCpEoaOsnBdTu6/lHguw83X8XCmYmpQ2ki8zPmxz8=;
- b=TocZwJ2U9RfZZFTFqJKHZSYOXaKJ/C6IRsZ9KvzBTeOB4ZOvM4c/3iUlodg6NFb4Fj
- kTzXdxv18VdaiSkNZrSmQs/jk7zNKp7iDnz7QrTYxqRmyX0MQMSYSh3HqyjzDzz/3+rX
- wQv8f+Vo/HOBckK6p1hJezthsU826sNHkpBjC7VKtn9oyqoroGiL+cj+sCZSMRKm2iHg
- TyUcLje5lnXpeYy3yAUnbRu9JHrFeHss/thKMIJA3kRcpABWaQmLacyCqrrDK/EqJ6id
- gBnwDoCBEhzKANMrhf2HHPtEyDKIlNrB8GTto6hIY4QzrIzy8JjyLFicTOfS7VwmM94K
- BSfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=RUBCpEoaOsnBdTu6/lHguw83X8XCmYmpQ2ki8zPmxz8=;
- b=BvqqBKWkFw76q1p+O0mloWR4SY7IPhTZPFK8JQFtuZEaWuFAPUf/l0js087n7X3v0B
- lfOGqrSGTsKJBbxshhVdImZzLPSG4zvJZC5q6qyJUm1gJ2+HpNADx9XDWfhwdEJW99+I
- FTpo8TRJIrjt54t82uBiqlPh2BRR8PO39kvwprTO1wcw5mjVBdtlklVEXa+fd1FWZe3l
- 5MB9rTd3NG7qposXOdjn/x8h6VqWtzovRAiH8PRxPAyWI12v8acqd3+Lyu8fLtkUp+wc
- Y/uq96j6l/zInhXuFXJA1oCLTgzy1ljxg+o4+VDLmqwSHseg07wBR8hykJw9haLwOMNc
- Uwsg==
-X-Gm-Message-State: APjAAAXjrGORlR8qr21Nt+eCw4ORmr+7tUfSf18Eu+NcDNyv+VO/LSDB
- GNcJRI4oUIBXHZU4xLsvBCpdDaYP
-X-Google-Smtp-Source: APXvYqxr49Al5tk/bLErP4hPscXhxzhuL2egiE1YREJ8M2+Idbx54UCS1XmSxVhURS19zpZZI/Hv6g==
-X-Received: by 2002:ac8:65d1:: with SMTP id t17mr10918067qto.302.1583090520184; 
- Sun, 01 Mar 2020 11:22:00 -0800 (PST)
-Received: from localhost.localdomain ([2804:431:c7cb:f65:3196:5ed7:3478:df97])
- by smtp.gmail.com with ESMTPSA id
- i16sm8685071qkh.120.2020.03.01.11.21.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Mar 2020 11:21:59 -0800 (PST)
-From: Julio Faracco <jcfaracco@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] i386: Fix GCC warning with snprintf when HAX is enabled
-Date: Sun,  1 Mar 2020 16:21:56 -0300
-Message-Id: <20200301192156.19357-1-jcfaracco@gmail.com>
-X-Mailer: git-send-email 2.24.1
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8URf-0007NL-A5
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:40:12 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:53110
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j8URf-0007MA-4X; Sun, 01 Mar 2020 14:40:11 -0500
+Received: from host86-135-55-139.range86-135.btcentralplus.com
+ ([86.135.55.139] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j8URs-0008M2-7A; Sun, 01 Mar 2020 19:40:24 +0000
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
+ <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+Date: Sun, 1 Mar 2020 19:40:02 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.135.55.139
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,81 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When HAX is enabled (--enable-hax), GCC 9.2.1 reports issues with
-snprintf(). This commit is checking if snprintf returns an error. This
-is a simple way to avoid this warnings. An `assert()` boundary checks
-were added before snprintf too.
+On 01/03/2020 18:53, BALATON Zoltan wrote:
 
-For more details, one example of warning:
-  CC      i386-softmmu/target/i386/hax-posix.o
-qemu/target/i386/hax-posix.c: In function ‘hax_host_open_vm’:
-qemu/target/i386/hax-posix.c:124:56: error: ‘%02d’ directive output may be
-truncated writing between 2 and 11 bytes into a region of size 3
-[-Werror=format-truncation=]
-  124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-      |                                                        ^~~~
-qemu/target/i386/hax-posix.c:124:41: note: directive argument in the range
-[-2147483648, 64]
-  124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-      |                                         ^~~~~~~~~~~~~~~~~~~~
-In file included from /usr/include/stdio.h:867,
-                 from qemu/include/qemu/osdep.h:99,
-                 from qemu/target/i386/hax-posix.c:14:
-/usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output
-between 17 and 26 bytes into a destination of size 17
-   67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
-      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   68 |        __bos (__s), __fmt, __va_arg_pack ());
-      |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> On Sun, 1 Mar 2020, BALATON Zoltan wrote:
+>> is not legacy mode but "not 100% native mode". The prog-if is set to 0x8a which
+>> corresponds to native mode but this is what the Linux fixup function does, firmware
+>> sets it to 0x8f which means native mode.
+> 
+> I mean, 0x8a legacy mode and 0x8f native mode, I see firmware poking 0x8f and Amiga
+> like OSes reading that yet expecting legacy interrupts. Linux fixes up prog-if so its
+> driver detects legacy interrupts but still uses ioports from PCI BARs.
 
-Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
----
-v1-v2: Add assert() as Richard Henderson suggested.
-v2-v3: Fix code syntax alignment with vm_id and snprintf() function.
----
- target/i386/hax-posix.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+I see. Note that it is also possible to have a prog-if value of 0x80 which is where
+the hardware is locked into legacy mode via a pull-down resistor. Perhaps this is the
+case for Pegasos, since it would explain why attempts to switch the mode via prog-if
+are ignored?
 
-diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-index a5426a6dac..2151c9ed45 100644
---- a/target/i386/hax-posix.c
-+++ b/target/i386/hax-posix.c
-@@ -121,7 +121,12 @@ static char *hax_vm_devfs_string(int vm_id)
-         return NULL;
-     }
- 
--    snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-+    assert(vm_id < 0);
-+
-+    if (snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d",
-+                 vm_id) < 0)
-+        return NULL;
-+
-     return name;
- }
- 
-@@ -140,8 +145,12 @@ static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
-         return NULL;
-     }
- 
--    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
--             vm_id, vcpu_id);
-+    assert(vm_id < 0 || vcpu_id < 0);
-+
-+    if (snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
-+                 vm_id, vcpu_id) < 0)
-+        return NULL;
-+
-     return name;
- }
- 
--- 
-2.24.1
+I don't see the PCI BARs being a problem since native drivers wouldn't touch the
+memory/IO space enable bits, and the BARs are disabled by default. It could just be
+that the VIA chipset simply doesn't lock the PCI memory/IO space bits in
+compatibility mode if an OS does decide to use them and program the BARs as it would
+in native mode.
 
+
+ATB,
+
+Mark.
 
