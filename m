@@ -2,59 +2,84 @@ Return-Path: <SRS0=SwYc=4S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B4CC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92144C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE04924695
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:35:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE04924695
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 606BE20CC7
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:51:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlW80JAV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 606BE20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8WF7-0006hb-3U
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:35:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55988)
+	id 1j8WUp-0002SF-CM
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:51:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j8WEU-0006ED-P4
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:34:44 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTw-000138-4q
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j8WET-0002Jk-Fb
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:34:42 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:62889)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j8WET-0002JM-9g
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:34:41 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 64081746381;
- Sun,  1 Mar 2020 22:34:38 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 465ED74637E; Sun,  1 Mar 2020 22:34:38 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 44AF574569F;
- Sun,  1 Mar 2020 22:34:38 +0100 (CET)
-Date: Sun, 1 Mar 2020 22:34:38 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v2 1/2] dp264: use pci_create() to initialise the cmd646
- device
-In-Reply-To: <20200301190520.18520-2-mark.cave-ayland@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003012232020.79908@zero.eik.bme.hu>
-References: <20200301190520.18520-1-mark.cave-ayland@ilande.co.uk>
- <20200301190520.18520-2-mark.cave-ayland@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTu-0006E6-KY
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:39 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37650)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j8WTu-0006Ch-BR; Sun, 01 Mar 2020 16:50:38 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id l5so10088483wrx.4;
+ Sun, 01 Mar 2020 13:50:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8FQGGCzpTRCBI7Uyr8JD1rNFQShK+SGtm1N0afW83mQ=;
+ b=OlW80JAVrZviFhZY3EwxW2dxF/ARyVdIFyi2r/xs+cRH+xFwptSuVXAVOz/b3H+VjE
+ 41m1gvLVYz4Js/gol/YT3z+UjUvgxLUr4Y9YCIGhGYqi2QKAuf1MwQGS5qXThw2IFL9+
+ YYc2OzdLN3/98LuzjgC/Tnz5tG7x/qsTibDvgPUU1U45w/TBBhGhCpkyQOV2r0wtyo0i
+ yv6lMaQvIyNx/UyNbHHwg+uBqVv9uuXWqiLuMCxWpldSyv0RHU+SsXkd2dInV/Smx1fr
+ pN1co1Mp8OmUJU3CfcWgkOU0po11z3EAQapyxW5S5Jo7bVIYKBy8GLER6fjgcSUL3EwY
+ +9IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8FQGGCzpTRCBI7Uyr8JD1rNFQShK+SGtm1N0afW83mQ=;
+ b=Ed8TIcpeGcv7ns1zvMbNgi7ZeQ/Hz2LuoBIKterB/78D+JZRpqakfKhyxE32xzB8e4
+ 2tjNhOiLNNSWQDRbsslVPC/A8dG+DUQ3/zzAtnTAjesPiM9C9+QdzuAKWXUqE0vb9qzb
+ xY50EcyMdBO83QYTRiDrbYUP2z7O5EvReXDaNuLQDHMpc3vmE5QtiKdRs6kguQOB4Jm7
+ NROIOOCTAugN9avwyt6HgAu4ORe5DEUNAMZmAv+6nSG4jwaxLbl653dPJZlQCA1JG2WL
+ Kjaftipp/oje5iOhON06NlWZIqFuD+hYFAYpcV/cfG7H7aGBV6Fky/3R9w16dv36u+/8
+ 3Luw==
+X-Gm-Message-State: APjAAAVxQPnW7tgXBv6E0ocS9nRqRuHAjllUH4ZBhdFsD2K/y9pQ6a1A
+ fQmeNpEDRxhFJiAgooNqZlxUQVuV
+X-Google-Smtp-Source: APXvYqxpHPUOKA6Urdwt3ZM157u6D83+F0RHBhm2nkfaIfqvftAoMlht21UoyzVLGGJRXHNCAu5OlQ==
+X-Received: by 2002:a5d:414d:: with SMTP id c13mr15380815wrq.40.1583099435904; 
+ Sun, 01 Mar 2020 13:50:35 -0800 (PST)
+Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
+ by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 01 Mar 2020 13:50:35 -0800 (PST)
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 00/18] Add Allwinner H3 SoC and Orange Pi PC Machine
+Date: Sun,  1 Mar 2020 22:50:11 +0100
+Message-Id: <20200301215029.15196-1-nieklinnenbank@gmail.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,54 +91,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
+ b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
+ qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 1 Mar 2020, Mark Cave-Ayland wrote:
-> Remove the call to pci_cmd646_ide_init() since global device init functions
-> are deprecated in preference of using qdev directly.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> hw/alpha/dp264.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index 8d71a30617..50e75aeee3 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -16,6 +16,7 @@
-> #include "sysemu/sysemu.h"
-> #include "hw/rtc/mc146818rtc.h"
-> #include "hw/ide.h"
-> +#include "hw/ide/pci.h"
-> #include "hw/timer/i8254.h"
-> #include "hw/isa/superio.h"
-> #include "hw/dma/i8257.h"
-> @@ -100,9 +101,13 @@ static void clipper_init(MachineState *machine)
->     /* IDE disk setup.  */
->     {
->         DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-> +        PCIDevice *pci_dev;
-> +
->         ide_drive_get(hd, ARRAY_SIZE(hd));
->
-> -        pci_cmd646_ide_init(pci_bus, hd, 0);
-> +        pci_dev = pci_create(pci_bus, -1, "cmd646-ide");
-> +        qdev_init_nofail(DEVICE(pci_dev));
+Dear QEMU developers,
 
-You could just use pci_create_simple here now that you don't set 
-properties.
+Hereby I would like to contribute the following set of patches to QEMU
+which add support for the Allwinner H3 System on Chip and the
+Orange Pi PC machine. The following features and devices are supported:
 
-Regards,
-BALATON Zoltan
+ * SMP (Quad Core Cortex A7)
+ * Generic Interrupt Controller configuration
+ * SRAM mappings
+ * SDRAM controller
+ * Real Time Clock
+ * Timer device (re-used from Allwinner A10)
+ * UART
+ * SD/MMC storage controller
+ * EMAC ethernet
+ * USB 2.0 interfaces
+ * Clock Control Unit
+ * System Control module
+ * Security Identifier device
 
-> +        pci_ide_create_devs(pci_dev, hd);
->     }
->
->     /* Load PALcode.  Given that this is not "real" cpu palcode,
->
+Functionality related to graphical output such as HDMI, GPU,
+Display Engine and audio are not included. Recently released
+mainline Linux kernels (4.19 up to latest master), mainline U-Boot
+and NetBSD 9.0 are known to work.
+
+For full details on how to use the Orange Pi PC machine, see the file
+docs/orangepi.rst which is included as a patch in this series.
+
+The contents of this patch series is available on Github at:
+
+  https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v6
+
+The followings are currently known issues in this series:
+
+  - RTC date & time is not persistent
+  - boot0 custom Allwinner bootloader not yet working
+  - Watchdog not yet implemented, affects U-Boot 'reset' and shutdown/reboot
+     -> This is part of the existing A10 timer that needs to be generalized first
+
+Looking forward to your review comments. I will do my best
+to update the patches where needed.
+
+===== CHANGELOG =====
+v6:
+ * hw/arm/orangepi.c: remove usage of memory_region_allocate_system_memory and OrangePiState
+ * hw/misc/allwinner-cpucfg.c: add missing break statement in write function after REG_CLK_GATING
+
+v5: https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04525.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v5
+
+v4: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg03960.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v4
+
+v3: https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg01534.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v3
+
+v2: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03265.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v2
+
+v1: https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00320.html
+    https://github.com/nieklinnenbank/qemu/tree/allwinner-h3-v1
+
+With kind regards,
+
+Niek Linnenbank
+
+Niek Linnenbank (13):
+  hw/arm: add Allwinner H3 System-on-Chip
+  hw/arm: add Xunlong Orange Pi PC machine
+  hw/arm/allwinner-h3: add Clock Control Unit
+  hw/arm/allwinner-h3: add USB host controller
+  hw/arm/allwinner-h3: add System Control module
+  hw/arm/allwinner: add CPU Configuration module
+  hw/arm/allwinner: add Security Identifier device
+  hw/arm/allwinner: add SD/MMC host controller
+  hw/arm/allwinner-h3: add EMAC ethernet device
+  hw/arm/allwinner-h3: add Boot ROM support
+  hw/arm/allwinner-h3: add SDRAM controller device
+  hw/arm/allwinner: add RTC device support
+  docs: add Orange Pi PC document
+
+Philippe Mathieu-Daudé (5):
+  tests/boot_linux_console: Add a quick test for the OrangePi PC board
+  tests/boot_linux_console: Add initrd test for the Orange Pi PC board
+  tests/boot_linux_console: Add a SD card test for the OrangePi PC board
+  tests/boot_linux_console: Add a SLOW test booting Ubuntu on OrangePi
+    PC
+  tests/boot_linux_console: Test booting NetBSD via U-Boot on OrangePi
+    PC
+
+ docs/orangepi.rst                      | 226 +++++++
+ default-configs/arm-softmmu.mak        |   1 +
+ hw/usb/hcd-ehci.h                      |   1 +
+ include/hw/arm/allwinner-a10.h         |   4 +
+ include/hw/arm/allwinner-h3.h          | 161 +++++
+ include/hw/misc/allwinner-cpucfg.h     |  52 ++
+ include/hw/misc/allwinner-h3-ccu.h     |  66 ++
+ include/hw/misc/allwinner-h3-dramc.h   | 106 +++
+ include/hw/misc/allwinner-h3-sysctrl.h |  67 ++
+ include/hw/misc/allwinner-sid.h        |  60 ++
+ include/hw/net/allwinner-sun8i-emac.h  |  99 +++
+ include/hw/rtc/allwinner-rtc.h         | 134 ++++
+ include/hw/sd/allwinner-sdhost.h       | 135 ++++
+ hw/arm/allwinner-a10.c                 |  19 +
+ hw/arm/allwinner-h3.c                  | 466 +++++++++++++
+ hw/arm/cubieboard.c                    |  15 +
+ hw/arm/orangepi.c                      | 128 ++++
+ hw/misc/allwinner-cpucfg.c             | 271 ++++++++
+ hw/misc/allwinner-h3-ccu.c             | 242 +++++++
+ hw/misc/allwinner-h3-dramc.c           | 358 ++++++++++
+ hw/misc/allwinner-h3-sysctrl.c         | 140 ++++
+ hw/misc/allwinner-sid.c                | 168 +++++
+ hw/net/allwinner-sun8i-emac.c          | 871 +++++++++++++++++++++++++
+ hw/rtc/allwinner-rtc.c                 | 411 ++++++++++++
+ hw/sd/allwinner-sdhost.c               | 854 ++++++++++++++++++++++++
+ hw/usb/hcd-ehci-sysbus.c               |  17 +
+ MAINTAINERS                            |   9 +
+ hw/arm/Kconfig                         |  12 +
+ hw/arm/Makefile.objs                   |   1 +
+ hw/misc/Makefile.objs                  |   5 +
+ hw/misc/trace-events                   |  19 +
+ hw/net/Kconfig                         |   3 +
+ hw/net/Makefile.objs                   |   1 +
+ hw/net/trace-events                    |  10 +
+ hw/rtc/Makefile.objs                   |   1 +
+ hw/rtc/trace-events                    |   4 +
+ hw/sd/Makefile.objs                    |   1 +
+ hw/sd/trace-events                     |   7 +
+ tests/acceptance/boot_linux_console.py | 224 +++++++
+ 39 files changed, 5369 insertions(+)
+ create mode 100644 docs/orangepi.rst
+ create mode 100644 include/hw/arm/allwinner-h3.h
+ create mode 100644 include/hw/misc/allwinner-cpucfg.h
+ create mode 100644 include/hw/misc/allwinner-h3-ccu.h
+ create mode 100644 include/hw/misc/allwinner-h3-dramc.h
+ create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
+ create mode 100644 include/hw/misc/allwinner-sid.h
+ create mode 100644 include/hw/net/allwinner-sun8i-emac.h
+ create mode 100644 include/hw/rtc/allwinner-rtc.h
+ create mode 100644 include/hw/sd/allwinner-sdhost.h
+ create mode 100644 hw/arm/allwinner-h3.c
+ create mode 100644 hw/arm/orangepi.c
+ create mode 100644 hw/misc/allwinner-cpucfg.c
+ create mode 100644 hw/misc/allwinner-h3-ccu.c
+ create mode 100644 hw/misc/allwinner-h3-dramc.c
+ create mode 100644 hw/misc/allwinner-h3-sysctrl.c
+ create mode 100644 hw/misc/allwinner-sid.c
+ create mode 100644 hw/net/allwinner-sun8i-emac.c
+ create mode 100644 hw/rtc/allwinner-rtc.c
+ create mode 100644 hw/sd/allwinner-sdhost.c
+
+-- 
+2.17.1
+
 
