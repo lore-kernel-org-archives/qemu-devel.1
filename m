@@ -2,56 +2,58 @@ Return-Path: <SRS0=SwYc=4S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21348C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56908C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E43D3246A1
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:06:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E43D3246A1
+	by mail.kernel.org (Postfix) with ESMTPS id 2F520214DB
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 19:06:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F520214DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8Tux-0001VD-5F
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 14:06:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41972)
+	id 1j8Tv6-0001lo-6Y
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 14:06:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8Tu8-0000jB-Hx
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:33 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8TuF-0000p7-PS
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8Tu7-0001Cx-HN
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:32 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:53054
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8TuE-0001E7-Nt
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:39 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:53070
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8Tu7-0001Cf-BX
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:31 -0500
+ id 1j8TuE-0001Dz-II
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 14:05:38 -0500
 Received: from host86-135-55-139.range86-135.btcentralplus.com
  ([86.135.55.139] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8TuK-0008Fy-8r; Sun, 01 Mar 2020 19:05:48 +0000
+ id 1j8TuV-0008Fy-Bj; Sun, 01 Mar 2020 19:05:59 +0000
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org,
 	rth@twiddle.net,
 	jsnow@redhat.com
-Date: Sun,  1 Mar 2020 19:05:18 +0000
-Message-Id: <20200301190520.18520-1-mark.cave-ayland@ilande.co.uk>
+Date: Sun,  1 Mar 2020 19:05:20 +0000
+Message-Id: <20200301190520.18520-3-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200301190520.18520-1-mark.cave-ayland@ilande.co.uk>
+References: <20200301190520.18520-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.135.55.139
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 0/2] cmd646: remove pci_cmd646_ide_init() function
+Subject: [PATCH v2 2/2] cmd646: remove unused pci_cmd646_ide_init() function
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
@@ -72,30 +74,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The recent cmd646 discussions reminded me of this patch I've had sitting in an
-old branch for a while.
-
-The DP264 machine is the last remaining user of the deprecated
-pci_cmd646_ide_init() init function. Switch it over to using qdev via pci_create()
-and then remove the now-unused pci_cmd646_ide_init() function.
-
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-v2:
-- Rebase onto master
-- Remove setting "secondary" property to 0 for dp264 since this is already the default
-- Add R-B tags from Richard
-
-
-Mark Cave-Ayland (2):
-  dp264: use pci_create() to initialise the cmd646 device
-  cmd646: remove unused pci_cmd646_ide_init() function
-
- hw/alpha/dp264.c |  7 ++++++-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
  hw/ide/cmd646.c  | 12 ------------
  include/hw/ide.h |  2 --
- 3 files changed, 6 insertions(+), 15 deletions(-)
+ 2 files changed, 14 deletions(-)
 
+diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
+index 335c060673..d953932104 100644
+--- a/hw/ide/cmd646.c
++++ b/hw/ide/cmd646.c
+@@ -317,18 +317,6 @@ static void pci_cmd646_ide_exitfn(PCIDevice *dev)
+     }
+ }
+ 
+-void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
+-                         int secondary_ide_enabled)
+-{
+-    PCIDevice *dev;
+-
+-    dev = pci_create(bus, -1, "cmd646-ide");
+-    qdev_prop_set_uint32(&dev->qdev, "secondary", secondary_ide_enabled);
+-    qdev_init_nofail(&dev->qdev);
+-
+-    pci_ide_create_devs(dev, hd_table);
+-}
+-
+ static Property cmd646_ide_properties[] = {
+     DEFINE_PROP_UINT32("secondary", PCIIDEState, secondary, 0),
+     DEFINE_PROP_END_OF_LIST(),
+diff --git a/include/hw/ide.h b/include/hw/ide.h
+index 28d8a06439..0c7080ed92 100644
+--- a/include/hw/ide.h
++++ b/include/hw/ide.h
+@@ -12,8 +12,6 @@ ISADevice *isa_ide_init(ISABus *bus, int iobase, int iobase2, int isairq,
+                         DriveInfo *hd0, DriveInfo *hd1);
+ 
+ /* ide-pci.c */
+-void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
+-                         int secondary_ide_enabled);
+ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
+ PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
 -- 
 2.20.1
 
