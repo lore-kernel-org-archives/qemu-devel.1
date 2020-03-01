@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DD5C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC9EC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D34E24697
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:58:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 646B924697
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEBtVBhX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D34E24697
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agDflG0U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 646B924697
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8WbH-0006Am-MK
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:58:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57809)
+	id 1j8Wc1-0007Sg-B0
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:59:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU6-0001Cu-42
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:51 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU8-0001Gl-4E
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU4-0006UM-IX
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:50 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43228)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU6-0006VG-Am
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:52 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55592)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j8WU4-0006Tf-Au; Sun, 01 Mar 2020 16:50:48 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id e10so8636927wrr.10;
- Sun, 01 Mar 2020 13:50:48 -0800 (PST)
+ id 1j8WU6-0006Us-3F; Sun, 01 Mar 2020 16:50:50 -0500
+Received: by mail-wm1-x344.google.com with SMTP id 6so608633wmi.5;
+ Sun, 01 Mar 2020 13:50:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zay2CMCI6rS/TelvVAzMjELUkYNv61sz+75/jzgsL7Q=;
- b=NEBtVBhXTfWDMEoAjbpV8UtaScp8dRnlIUnzPdrpZN4ydZ+HflhDrY4kXq3pNJzXup
- xvpxnQRcJ8AkiogTOr9JMTdpzyW9ZIZlGi/RSJx7uR628pDlkfce0ewrZFM/V/Xx2NI0
- ronlMONHZ28d81qyI9cxFaWscpVNIjFfY0oY+nFP7PL0yS9SoKis4HD9i7CkKAM77KBF
- W55z1NU2FvsqAasObd9Utuu9b3zP/4RDGxm9Czkx45cgiY7B5sMfHkjzkSzxhqNAv7xC
- EbrrtdgecRe4iVz6fmCfPnZDG/E1PwZP0wRqzuiOvXqerGTaGkEBbal9A2E2cVWoW7XI
- H1Kg==
+ bh=FU9N2QwY0KBXx2FL+IQpwvRT5WjHXUfq+3rdC6n0pFg=;
+ b=agDflG0URUJYxehXjEr0iQosRiRMDCZw1+VD1dpq9lEnyQb48Ph2XZ0YuvglX4yBkq
+ 8skZYMDXt41LZqQ2u1KfycC7y+f3TjmsAjjMLLBy1HTN7IJP9QF7hrdp7KLG8Umm4moF
+ eySO2krkiLI+WfQMxuBt2UDx7G7Y9OAg/FQOKmi85K7runH6AcuME4sR+TcH2Kj54WW8
+ qzSzea2G0sv6eAfywROOse4xZjnv9ZTKsfbGMEXIz2XVcK2/ZzpMwOuV9/qh4qiNciAB
+ 4Txdg9Lq6Ywe9wYtvi6OZPavxbih8wEYJG++Z5gYoo+aD4Og+tl9BGp9OcVGW4uDaROJ
+ JYeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zay2CMCI6rS/TelvVAzMjELUkYNv61sz+75/jzgsL7Q=;
- b=kCj4nnDLpNmMo5K0Vaxk4ngBHi2dJ4Q/XpYBxD9oXCZs5tzwqlUPB+ilRKooTZvCCR
- gQ6Gypv6ouQEYLoIET9OjuvKySSo7IzWqQIwXy7y2167pFkUokYoTtNtTZCvUVqA1GaS
- +4uqmLSun/YVtl+yAO2RoqCLipBUPfCuHysiY+P2YAFjNGawXCi70B+qM5oip3cv6lvk
- LjLR8RtpboBWghUDNpBBT5dCUs+kcdfaimmPjGW3MzrH3Kaa/yUjeWmi0DPt9YnJ6/Vq
- s6f9hQa4dQXdeVEqZCH31UGOHKJNPTobN+815yO2+FOWDetggwfcQ58NMfw92xaG2FmF
- VgDQ==
-X-Gm-Message-State: APjAAAWpbOTQYKyzBCV66va2f7NylNgX4Ibhf4By9L2wHiIrzuiC4I98
- l6YDKjMKOkXEooFoLpm/1uXpyhMa
-X-Google-Smtp-Source: APXvYqwH5BcDxs2y7NdbmpF7EMBVovY7VZr5WgxSl6BbMABG9Eyrtm2us0KQBCAXKW7Vq78HVgmLWw==
-X-Received: by 2002:adf:ef49:: with SMTP id c9mr17043352wrp.97.1583099446913; 
- Sun, 01 Mar 2020 13:50:46 -0800 (PST)
+ bh=FU9N2QwY0KBXx2FL+IQpwvRT5WjHXUfq+3rdC6n0pFg=;
+ b=ScAgklgM5iwn4YDmJ2R2WDpmbd78uoWitoRLCYMDj495Th85Mca5mfXyUMA5mYxJ+1
+ OIEFmPvW3XvBZ9t9q2dLh2WMk+JtMufW0phptk30TJB65ilidqvo7eC6p5pmVESjyWWu
+ ho4pWYebZUuFOAoDs27QeLTCtZKGGlfvQCWw5jTri/wVDLViHk8FU+3XXE0wjLPKMnz8
+ DCp0bOoJl3as7taHOhYBzehaU4jKtbCrQS11fMacv9+6idh+sqV3XgJcl/66Xgw3VCw7
+ TJ9K3PhYTFRGN6roLVCkeypL3EcyyRjIhh7XTt5LzGqJ3xBP7gVYXW6xm+1EP95lg15k
+ 0j4w==
+X-Gm-Message-State: APjAAAXDac3K+5BO+RGJ4xIJnNZxS1a/Z/JbwsI4WlYSerslH6q93/P7
+ 9eMcKz60eKMYi8Nnxw2BrbDvt/AL
+X-Google-Smtp-Source: APXvYqwiK6f0JOAi5keD7ZXNa906XVo7KAy4nYOFk6qmNPA2OErYWkik5eoynGdSjWjrC+soOp/WLw==
+X-Received: by 2002:a7b:c34f:: with SMTP id l15mr15849923wmj.103.1583099448722; 
+ Sun, 01 Mar 2020 13:50:48 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.46
+ by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Mar 2020 13:50:46 -0800 (PST)
+ Sun, 01 Mar 2020 13:50:48 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 13/18] tests/boot_linux_console: Add a quick test for the
+Subject: [PATCH v6 15/18] tests/boot_linux_console: Add a SD card test for the
  OrangePi PC board
-Date: Sun,  1 Mar 2020 22:50:24 +0100
-Message-Id: <20200301215029.15196-14-nieklinnenbank@gmail.com>
+Date: Sun,  1 Mar 2020 22:50:26 +0100
+Message-Id: <20200301215029.15196-16-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200301215029.15196-1-nieklinnenbank@gmail.com>
 References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,60 +104,83 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This test boots a Linux kernel on a OrangePi PC board and verify
-the serial output is working.
-
 The kernel image and DeviceTree blob are built by the Armbian
 project (based on Debian):
 https://www.armbian.com/orange-pi-pc/
+
+The SD image is from the kernelci.org project:
+https://kernelci.org/faq/#the-code
 
 If ARM is a target being built, "make check-acceptance" will
 automatically include this test by the use of the "arch:arm" tags.
 
 Alternatively, this test can be run using:
 
-  $ make check-venv
-  $ ./tests/venv/bin/avocado --show=console,app run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
-  JOB ID     : 2e4d15eceb13c33672af406f08171e6e9de1414a
-  JOB LOG    : ~/job-results/job-2019-12-17T05.46-2e4d15e/job.log
-  (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi:
+  $ avocado --show=console run -t machine:orangepi-pc tests/acceptance/boot_linux_console.py
   console: Uncompressing Linux... done, booting the kernel.
   console: Booting Linux on physical CPU 0x0
   console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
-  console: CPU: div instructions available: patching division code
-  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
-  console: OF: fdt: Machine model: Xunlong Orange Pi PC
-  console: Memory policy: Data cache writealloc
-  console: OF: reserved mem: failed to allocate memory for node 'cma@4a000000'
-  console: cma: Failed to reserve 128 MiB
-  console: psci: probing for conduit method from DT.
-  console: psci: PSCIv0.2 detected in firmware.
-  console: psci: Using standard PSCI v0.2 function IDs
-  console: psci: Trusted OS migration not required
-  console: random: get_random_bytes called from start_kernel+0x8d/0x3c2 with crng_init=0
-  console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308 u73728
-  console: Built 1 zonelists, mobility grouping on.  Total pages: 32480
-  console: Kernel command line: printk.time=0 console=ttyS0,115200
-  PASS (8.59 s)
-  JOB TIME   : 8.81 s
+  [...]
+  console: sunxi-wdt 1c20ca0.watchdog: Watchdog enabled (timeout=16 sec, nowayout=0)
+  console: sunxi-mmc 1c0f000.mmc: Linked as a consumer to regulator.2
+  console: sunxi-mmc 1c0f000.mmc: Got CD GPIO
+  console: ledtrig-cpu: registered to indicate activity on CPUs
+  console: hidraw: raw HID events driver (C) Jiri Kosina
+  console: usbcore: registered new interface driver usbhid
+  console: usbhid: USB HID core driver
+  console: Initializing XFRM netlink socket
+  console: sunxi-mmc 1c0f000.mmc: initialized, max. request size: 16384 KB
+  console: NET: Registered protocol family 10
+  console: mmc0: host does not support reading read-only switch, assuming write-enable
+  console: mmc0: Problem switching card into high-speed mode!
+  console: mmc0: new SD card at address 4567
+  console: mmcblk0: mmc0:4567 QEMU! 60.0 MiB
+  [...]
+  console: EXT4-fs (mmcblk0): mounting ext2 file system using the ext4 subsystem
+  console: EXT4-fs (mmcblk0): mounted filesystem without journal. Opts: (null)
+  console: VFS: Mounted root (ext2 filesystem) on device 179:0.
+  console: Run /sbin/init as init process
+  console: EXT4-fs (mmcblk0): re-mounted. Opts: block_validity,barrier,user_xattr,acl
+  console: Starting syslogd: OK
+  console: Starting klogd: OK
+  console: Populating /dev using udev: udevd[203]: starting version 3.2.7
+  console: /bin/sh: can't access tty; job control turned off
+  console: cat /proc/partitions
+  console: / # cat /proc/partitions
+  console: major minor  #blocks  name
+  console: 1        0       4096 ram0
+  console: 1        1       4096 ram1
+  console: 1        2       4096 ram2
+  console: 1        3       4096 ram3
+  console: 179        0      61440 mmcblk0
+  console: reboot
+  console: / # reboot
+  console: umount: devtmpfs busy - remounted read-only
+  console: EXT4-fs (mmcblk0): re-mounted. Opts: (null)
+  console: The system is going down NOW!
+  console: Sent SIGTERM to all processes
+  console: Sent SIGKILL to all processes
+  console: Requesting system reboot
+  console: reboot: Restarting system
+  JOB TIME   : 68.64 s
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 [NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- tests/acceptance/boot_linux_console.py | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index 34d37eba3b..6f5af582f3 100644
+index dabc8ef2af..7ef69c7bac 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -507,6 +507,31 @@ class BootLinuxConsole(Test):
+@@ -572,6 +572,47 @@ class BootLinuxConsole(Test):
          exec_command_and_wait_for_pattern(self, 'reboot',
                                                  'reboot: Restarting system')
  
-+    def test_arm_orangepi(self):
++    def test_arm_orangepi_sd(self):
 +        """
 +        :avocado: tags=arch:arm
 +        :avocado: tags=machine:orangepi-pc
@@ -170,17 +193,33 @@ index 34d37eba3b..6f5af582f3 100644
 +                                            '/boot/vmlinuz-4.20.7-sunxi')
 +        dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
 +        dtb_path = self.extract_from_deb(deb_path, dtb_path)
++        rootfs_url = ('http://storage.kernelci.org/images/rootfs/buildroot/'
++                      'kci-2019.02/armel/base/rootfs.ext2.xz')
++        rootfs_hash = '692510cb625efda31640d1de0a8d60e26040f061'
++        rootfs_path_xz = self.fetch_asset(rootfs_url, asset_hash=rootfs_hash)
++        rootfs_path = os.path.join(self.workdir, 'rootfs.cpio')
++        archive.lzma_uncompress(rootfs_path_xz, rootfs_path)
 +
 +        self.vm.set_console()
 +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200n8 '
-+                               'earlycon=uart,mmio32,0x1c28000')
++                               'console=ttyS0,115200 '
++                               'root=/dev/mmcblk0 rootwait rw '
++                               'panic=-1 noreboot')
 +        self.vm.add_args('-kernel', kernel_path,
 +                         '-dtb', dtb_path,
-+                         '-append', kernel_command_line)
++                         '-drive', 'file=' + rootfs_path + ',if=sd,format=raw',
++                         '-append', kernel_command_line,
++                         '-no-reboot')
 +        self.vm.launch()
-+        console_pattern = 'Kernel command line: %s' % kernel_command_line
-+        self.wait_for_console_pattern(console_pattern)
++        shell_ready = "/bin/sh: can't access tty; job control turned off"
++        self.wait_for_console_pattern(shell_ready)
++
++        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
++                                                'Allwinner sun8i Family')
++        exec_command_and_wait_for_pattern(self, 'cat /proc/partitions',
++                                                'mmcblk0')
++        exec_command_and_wait_for_pattern(self, 'reboot',
++                                                'reboot: Restarting system')
 +
      def test_s390x_s390_ccw_virtio(self):
          """
