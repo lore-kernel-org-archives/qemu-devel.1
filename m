@@ -2,60 +2,78 @@ Return-Path: <SRS0=SwYc=4S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9596AC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 16:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1413C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 17:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6944521775
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 16:43:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6944521775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 6D5252087F
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 17:06:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFrpcICa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5252087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8Rgv-00073c-LB
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 11:43:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54503)
+	id 1j8S2Z-0006zU-Eh
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 12:06:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j8RgA-0006Tf-GE
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 11:42:59 -0500
+ (envelope-from <groeck7@gmail.com>) id 1j8S1P-0005qc-Di
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 12:04:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j8Rg9-0003gD-9M
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 11:42:58 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:11409)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j8Rg6-0003dZ-Dg; Sun, 01 Mar 2020 11:42:54 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 3F47474637E;
- Sun,  1 Mar 2020 17:42:52 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0BBBB74637D; Sun,  1 Mar 2020 17:42:52 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 081AB74569F;
- Sun,  1 Mar 2020 17:42:52 +0100 (CET)
-Date: Sun, 1 Mar 2020 17:42:51 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-In-Reply-To: <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+ (envelope-from <groeck7@gmail.com>) id 1j8S1O-0001hW-I8
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 12:04:55 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35201)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>)
+ id 1j8S1M-0001eZ-DC; Sun, 01 Mar 2020 12:04:52 -0500
+Received: by mail-pl1-x643.google.com with SMTP id g6so3230186plt.2;
+ Sun, 01 Mar 2020 09:04:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=lc1bYhcnqPFlmGbgR5g3n8tVkAtrQ0yFMcwg1XhjNQ0=;
+ b=ZFrpcICaWwXThfkufMdPHgSpHrfyorhQjdKSLmHNJSlewSa09bKkJDa0xCZ3RI1tbw
+ qQVI+HTmF5Tmkkqg6M3jZAB+OXoAMTQxbFctpOe3mstkaDRHTiN9nnqFHs6jRYe5lKLO
+ +a/p6bIsKccitkJGGgdFftx3H2ZizRRNE3iaE9W24l4PkAPtXrw4u2rq7Ha113y35AoC
+ WGaMHL6BZC9OhwPl78rtzBM4pZEkTGMiRTr0W2uZEFliixuadMozibkMpTRjdyH2T2Yp
+ RuENomUk4+StVIDlR2dE7aVyaYddGUbnw/MTzK6z6x8qAjT/zKZK6hnHtO+LtoEC/JWb
+ rQnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=lc1bYhcnqPFlmGbgR5g3n8tVkAtrQ0yFMcwg1XhjNQ0=;
+ b=qILtqOA2dKVjPGkBBYouckqWRVskHgw6oep9jaH/ytJzfizmoTY7QbEIxKhKjKFOBa
+ yhDBfdvD2bPDe5cOwLR+nU/zGR2FRE2d+8C0EUhKl+GuB/hVzXhnbP4FJTKBJPr9Ueaq
+ c6J1qIHCNfS+3/OvK9CbxZw3O60xnZmD8ubx4fsE91P/QcmH7IKsX9eNFOApPPuoPJRz
+ iHKLtdvmPRWFwEp5CzIU9cu9rCCHCNJxaonKv8y1elSOoSrirl0+equHrHwRfyJHDyWL
+ wXOBVYnYM+MiMV3nPnpxvzjczuczOoSblpZFa9nztheq4cCsH6Aeuqvl0YBiurRE2Dx9
+ r5KA==
+X-Gm-Message-State: APjAAAV9L08978BaxcmFZb6iLc/0M6VLJj29pF+EdeEje1RL+NmuPpI3
+ tV5yA23n6oXVhEO/wpEzYSE=
+X-Google-Smtp-Source: APXvYqz18YfqhuaSUVg2FbqUBrLAUBRZc/gjCG8MLhGufEcqPzplD84sKzK1dDoExs35aNd+y/Fvnw==
+X-Received: by 2002:a17:902:7046:: with SMTP id
+ h6mr13075808plt.231.1583082290624; 
+ Sun, 01 Mar 2020 09:04:50 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id y5sm17791710pfr.169.2020.03.01.09.04.49
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 01 Mar 2020 09:04:49 -0800 (PST)
+From: Guenter Roeck <linux@roeck-us.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH 0/3] Wire up USB controllers on fsl-imx6 and fsl-imx6ul
+Date: Sun,  1 Mar 2020 09:04:40 -0800
+Message-Id: <20200301170443.12904-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,99 +85,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Guenter Roeck <linux@roeck-us.net>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 1 Mar 2020, Mark Cave-Ayland wrote:
-> On 01/03/2020 11:35, Mark Cave-Ayland wrote:
->> On 29/02/2020 23:02, BALATON Zoltan wrote:
->>
->>> Some machines operate in "non 100% native mode" where interrupts are
->>> fixed at legacy IDE interrupts and some guests expect this behaviour
->>> without checking based on knowledge about hardware. Even Linux has
->>> arch specific workarounds for this that are activated on such boards
->>> so this needs to be emulated as well.
->>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> ---
->>>  hw/ide/via.c            | 60 +++++++++++++++++++++++++++++++++++------
->>>  hw/mips/mips_fulong2e.c |  2 +-
->>>  include/hw/ide.h        |  3 ++-
->>>  3 files changed, 55 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/ide/via.c b/hw/ide/via.c
->>> index 096de8dba0..17418c5822 100644
->>> --- a/hw/ide/via.c
->>> +++ b/hw/ide/via.c
->>> @@ -1,9 +1,10 @@
->>>  /*
->>> - * QEMU IDE Emulation: PCI VIA82C686B support.
->>> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
->>>   *
->>>   * Copyright (c) 2003 Fabrice Bellard
->>>   * Copyright (c) 2006 Openedhand Ltd.
->>>   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
->>> + * Copyright (c) 2019-2020 BALATON Zoltan
->>>   *
->>>   * Permission is hereby granted, free of charge, to any person obtaining a copy
->>>   * of this software and associated documentation files (the "Software"), to deal
->>> @@ -25,6 +26,8 @@
->>>   */
->>>
->>>  #include "qemu/osdep.h"
->>> +#include "qemu/range.h"
->>> +#include "hw/qdev-properties.h"
->>>  #include "hw/pci/pci.h"
->>>  #include "migration/vmstate.h"
->>>  #include "qemu/module.h"
->>> @@ -111,14 +114,43 @@ static void via_ide_set_irq(void *opaque, int n, int level)
->>>      } else {
->>>          d->config[0x70 + n * 8] &= ~0x80;
->>>      }
->>> -
->>>      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
->>> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
->>> -    if (n) {
->>> -        qemu_set_irq(isa_get_irq(NULL, n), level);
->>> +
->>> +    /*
->>> +     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
->>> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
->>> +     * Some guest drivers expect this, often without checking.
->>> +     */
->>> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
->>> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
->>> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
->>> +    } else {
->>> +        n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
->>> +        if (n) {
->>> +            qemu_set_irq(isa_get_irq(NULL, n), level);
->>> +        }
->>>      }
->>>  }
->
-> The other part I'm not sure about is that I can't see how via_ide_set_irq() can ever
-> raise a native PCI IRQ - comparing with my experience on cmd646, should there not be
-> a pci_set_irq(d, level) at the end?
+This patch series wires up the USB controllers on fsl-imx6 and fsl-imx6ul
+emulations.
 
-According to my tests with several guests it seems the via-ide does not 
-seem to use PCI interrupts as described in the previous reply, only either 
-legacy IRQ14 and 15 or one ISA IRQ line set by a config reg in native mode 
-(except on Pegasos2). This may be due to how it's internally connected in 
-the southbridge chip it's part of or some other platform specific quirk, 
-I'm not sure.
+The first patch is a prerequisite for the following patches. It provides
+a dummy implementation of a register widely used on i.MX systems, and
+specifically the reset behavior of this register. This is needed to make
+the USB ports operational without full implementation of an emulation
+of its PHY controller.
 
-The CMD646 may be a more conformant PCI device and use PCI interrupts 
-(unless that also has some kind of legacy mode and similar interconnection 
-with ISA interrupts). If it's really using PCI interrupt and Solaris still 
-does not get expexted IRQ then maybe the routing is not matching real 
-hardware somehow? Maybe it would help finding out what interrupt the 
-Solaris driver is checking to find out why it misses the IRQ.
+----------------------------------------------------------------
+Guenter Roeck (3):
+      Add dummy i.MXS STMP register support
+      arm: fsl-imx6ul: Wire up USB controllers
+      hw/arm/fsl-imx6: Wire up USB controllers
 
-Regards,
-BALATON Zoltan
+ hw/arm/Kconfig              |   3 ++
+ hw/arm/fsl-imx6.c           |  36 +++++++++++++
+ hw/arm/fsl-imx6ul.c         |  35 +++++++++++++
+ hw/misc/Kconfig             |   3 ++
+ hw/misc/Makefile.objs       |   1 +
+ hw/misc/stmp.c              | 121 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/fsl-imx6.h   |   3 ++
+ include/hw/arm/fsl-imx6ul.h |   7 +++
+ include/hw/misc/stmp.h      |  47 +++++++++++++++++
+ 9 files changed, 256 insertions(+)
+ create mode 100644 hw/misc/stmp.c
+ create mode 100644 include/hw/misc/stmp.h
 
