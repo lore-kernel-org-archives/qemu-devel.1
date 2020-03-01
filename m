@@ -2,93 +2,65 @@ Return-Path: <SRS0=SwYc=4S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E00FC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 17:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A56C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 18:02:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBBEF246B7
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 17:59:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HLampV6Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBEF246B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 87696246BE
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 18:02:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87696246BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8SsT-0000zu-4C
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 12:59:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34509)
+	id 1j8SvO-0002z2-OU
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 13:02:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35109)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j8Srf-0000Qh-GD
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 12:58:56 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j8Sul-0002ZR-Cz
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 13:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j8Sre-0003Ei-Jg
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 12:58:55 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40692)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j8Sre-0003EQ-Ce
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 12:58:54 -0500
-Received: by mail-pg1-x541.google.com with SMTP id t24so4213643pgj.7
- for <qemu-devel@nongnu.org>; Sun, 01 Mar 2020 09:58:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=iAWv6LM87Bsw6cBMylrOKGFMgug9eK+rPqjr9mDSqiM=;
- b=HLampV6YM2YIZHGGCsbXPcY6UFSkNeIxNNXqJDMaPLw2SURLTzYEodRoAj+kvwZTS+
- A644r0wdr7eEI6e1TfzKzajZByRGXkgdXAJKuYAH0ane85UP9wT9dNbMO5StJF0ZxaAV
- mhMy6uAKeGmvOuHy2agB9HQSwZXS0P5S+0J/jg9N/dT/TLK1INTkVk3U3Fd7G8G04QTz
- k0bhWWOGx+Jej1JtQNfikXA0QwzHQOfaz91PFXt6i4+ntjm2bV+/nFlo2MzLw5Hk5RqV
- k6Q61hDdvfE5sSWVtnXoxCsNtEr7obrhnM4gcIno/UpABavzk2+euwAbZy5XhCko72SK
- ORWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iAWv6LM87Bsw6cBMylrOKGFMgug9eK+rPqjr9mDSqiM=;
- b=qjfl9mSRJrWa/ZPGy0byRPZwoRCKrO2Chsa6TyTCgwx3MStF2vK7oTsrFd1bcwNTri
- Knd8XngIfwth4Fsiw0KvTleSWEU8Jet/E9wylpZybpmzO0nHDe99qW2/a2Wif9w2pRUq
- aLGH0KuYs9GGSHZmxEdgIXuRdrJOCI43Drj3wy0THYf9rlO3O/PBfCujYk9x3gh5TE4M
- JUsJSvcTB/9odoSY7JeVz3t7btRUWlVK2mDOrfuRQmPhcr7CfwlDXtCZxD4x0AHsnhuU
- fdU6blNYCR70wN7f0XrySZ9J1q9n+1uN7XZgD22lXV31WK265X+nKb24/BOtl+vctF1c
- 6A+Q==
-X-Gm-Message-State: APjAAAWEmci+Xp4CvsphGViK/7ICQuVNITbabABvBByqnlvlihGygcpA
- OeOlyfu7hRbXo3GNJ0r/aAZ6FA==
-X-Google-Smtp-Source: APXvYqwx9HI2eHF4l7rOmmH0+IBq2I4B485DeEqMDXtyx35KdgnNa0K33xOgisL6wTV84T9VKAOqJQ==
-X-Received: by 2002:a63:7ce:: with SMTP id 197mr15655740pgh.429.1583085533136; 
- Sun, 01 Mar 2020 09:58:53 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- o66sm3654585pfb.93.2020.03.01.09.58.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 01 Mar 2020 09:58:52 -0800 (PST)
-Subject: Re: [PATCH v2 6/6] hw/arm/virt: kvm: allow gicv3 by default if v2
- cannot work
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200301104040.15186-1-eric.auger@redhat.com>
- <20200301104040.15186-7-eric.auger@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eae4a0f8-3821-a0cc-1dc2-b54b05d6611a@linaro.org>
-Date: Sun, 1 Mar 2020 09:58:50 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <balaton@eik.bme.hu>) id 1j8Suj-0004J3-Lq
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 13:02:06 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:32646)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1j8Suj-0004Hi-Ft
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 13:02:05 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id DDDD3746383;
+ Sun,  1 Mar 2020 19:02:02 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id B530D746381; Sun,  1 Mar 2020 19:02:02 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id B28E874637E;
+ Sun,  1 Mar 2020 19:02:02 +0100 (CET)
+Date: Sun, 1 Mar 2020 19:02:02 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: jasper.lowell@bt.com
+Subject: Re: [PATCH] hw/ide: Remove status register read side effect
+In-Reply-To: <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
+Message-ID: <alpine.BSF.2.22.395.2003011847220.28669@zero.eik.bme.hu>
+References: <20200221065015.337915-1-jasper.lowell@bt.com>
+ <f432a118-f6be-d6ff-fe37-35b6244f3b97@ilande.co.uk>
+ <alpine.LMD.2.03.2002222042370.1577@eik.bme.hu>
+ <alpine.LMD.2.03.2002222101580.1577@eik.bme.hu>
+ <5f336bc8838b5bfebfcc5829a3fae0a34a2ebac0.camel@bt.com>
+ <alpine.BSF.2.22.395.2002231522530.69746@zero.eik.bme.hu>
+ <5ca992b3a358610c897d923009fe9f7a8febc17f.camel@bt.com>
+ <alpine.BSF.2.22.395.2002251515290.22173@zero.eik.bme.hu>
+ <2e972e94627a39cf45504ed244828d065d743910.camel@bt.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200301104040.15186-7-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,34 +72,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maz@kernel.org, drjones@redhat.com
+Cc: jsnow@redhat.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/1/20 2:40 AM, Eric Auger wrote:
-> At the moment if the end-user does not specify the gic-version along
-> with KVM acceleration, v2 is set by default. However most of the
-> systems now have GICv3 and sometimes they do not support GICv2
-> compatibility.
-> 
-> This patch keeps the default v2 selection in all cases except
-> in the KVM accelerated mode when either
-> - the host does not support GICv2 in-kernel emulation or
-> - number of VCPUS exceeds 8.
-> 
-> Those cases did not work anyway so we do not break any compatibility.
-> Now we get v3 selected in such a case.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hw/arm/virt.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+Hello,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Wed, 26 Feb 2020, jasper.lowell@bt.com wrote:
+> According to the CMD646U2 specification:
+> "When an IDE port is in PCI IDE Legacy Mode, the PCI646U2 is compatible
+> with standard ISA IDE. The IDE task file registers are mapped to the
+> standard ISA port addresses, and IDE drive interrupts occur at IRQ14
+> (primary) or IRQ15 (secondary)."
+>
+> In legacy mode, IRQ14 and IRQ15 mirror the state of INTRQ on each of
+> the selected IDE devices. QEMU appears to emulate this correctly.
 
+So CMD646 also seems to have a legacy mode. I've also seen a CMD PCI0640B 
+spec which is proabably a similar chip which says for interrupt handling:
 
-r~
+"When DSA1 is pulled low during reset, both IDE ports are in PCI IDE 
+Legacy Mode. When DSA1 has no pull-down during reset, each IDE port may 
+independently be set to PCI IDE Legacy Mode or Native Mode via the 
+Programming Interface Byte (configuration register PROGIF, Index 9h). When 
+an IDE port is in PCI IDE Legacy Mode, the PCI-0640B is compatible with 
+standard ISA IDE. The IDE task file registers are mapped to the standard 
+ISA port addresses, and IDE drive interrupts occur at IRQ14 (primary) or 
+IRQ15 (secondary).
+
+When an IDE port is in PCI IDE Native Mode, the IDE task file registers 
+may be mapped to non-standard port addresses, and IDE drive interrupts 
+occur at PCI INTA. Therefore, if both IDE ports are in PCI IDE Native 
+Mode, drive interrupts from both IDE ports are multiplexed into PCI INTA. 
+In this case, the interrupt status bits must be polled to determine which 
+IDE port generated the interrupt, or whether the interrupt was generated 
+by another PCI device sharing INTA on the bus."
+
+This same explanation also appears in CMD646 doc. So what mode is the 
+PROG_IF config reg set to and do the interrupts raised match that? 
+cmd646_update_irq() only seems to raise PCI interrupt, should it also have 
+an option to use INT 14 and 15 in legacy mode similar to what my patch 
+does for via-ide?
+
+Additionally Solaris may also get info from the OF device tree so that may 
+also have to match the device config.
+
+I'm not sure this helps but I don't have any better idea.
+
+Regards,
+BALATON Zoltan
 
 
