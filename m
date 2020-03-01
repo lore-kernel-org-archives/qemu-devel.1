@@ -8,71 +8,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C3DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25973C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7171820CC7
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5D7220CC7
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 21:53:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZGcWTg5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7171820CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rUaY0DpF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5D7220CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8WWd-0006TN-KN
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:53:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57653)
+	id 1j8WX8-00078j-HZ
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 16:53:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTy-00013U-NF
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:45 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU9-0001Jj-FJ
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1j8WTw-0006Gu-NH
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:42 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:36619)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j8WU7-0006WV-AL
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 16:50:53 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53253)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1j8WTw-0006Ew-FV; Sun, 01 Mar 2020 16:50:40 -0500
-Received: by mail-wr1-x436.google.com with SMTP id j16so10113266wrt.3;
- Sun, 01 Mar 2020 13:50:40 -0800 (PST)
+ id 1j8WU7-0006VS-3Q; Sun, 01 Mar 2020 16:50:51 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f15so9065518wml.3;
+ Sun, 01 Mar 2020 13:50:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L1FnAzdtR9MNO/HQBAnrBs6oX00SyfNqXXnCXADIrV8=;
- b=HZGcWTg5yEVsRbwbx0O8M39BBgmFipGvWUPQwUnxO2bCjGS2tL/V2LJw+OXWwWt9rn
- cD+0he2O7YZMbL+E4WZiCAq9YXa+dag1YpnYyySgWli7qyPPMNCu0tGqedERS38CanZ6
- 1nh4A/zbJbdlj6kqdymLfLNV9L7V31xH8vs9w7rmB2oucHYjPwdLEQBJc6R7fvpq7/nB
- mRi2WG0Uh0KlF5FORy57ZZuYoecDXUPvjuu03vlfVp2P1KqqHOQ8pI0HViKdyX4g7MvW
- uKQ7uqLflE86xSwjqzKkbxPhP2q6V6FxuHi/gFeQ3+rHP80xiSSYuShkwMVmIonA7h8+
- oXRA==
+ bh=vR+19Al6A28NFlWsP/WCkkDCw4IWTkTu+AkaGrWBuwQ=;
+ b=rUaY0DpFPjcxBlJjKdeSIG5hsvzMi4ryEsLxYtPqyMhSNcs02a4vnZw8+EEQUB2zsg
+ TIk3GFgtJwFxP4jx8udiYl91oCFJTJIPznCak+Y9ND5BUA8DlVrhdlygKYyPOBncwifr
+ +OiO4Kcf1warhu2r2IrwPj7nfp7zkH4Trcd+FKbPosSaeBGAfOnUG8jLX7tbB/M07ud4
+ Kwr120VRLk3iVgRxF80D+CoNPckaSAgTHomeyI6/s99G2CX3lxqRPsBdzNgUpJrlM+Mw
+ GMeZPXY9QQXvTgYMDGQMzWJlSABrLyEjL7y7KEBgR6mLwXA8XlckgIdX/HtytDe4BQgL
+ DkGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=L1FnAzdtR9MNO/HQBAnrBs6oX00SyfNqXXnCXADIrV8=;
- b=cd8wZTS24lsNizZCrJd6nMKL0x6o0WhuwinPs0/1JNLI3a9XgjPSDXGSQ+FPkSbrfp
- 29ehouLCjoXK968rUAkSRqV3vnUveGEdEiHLTlvTL+n2tsx1tmy0JR7uJcwOAAk0+5el
- n0/XrsW0WOWfIMwRdF2+tVU/zC1grKeRQXwd03IfHPnK7g4EtlFgDl+iOsFeltO4jMf8
- 1zAz+6VJWEh+3xOFPQDowSre+SnjBQrWSLEYzcOjYvrLEEK3cIm+/8IM0Bz7+SAqnXei
- lfORx0aIJ5Ui86UfsDJV/xZD+rmAtNa1IxVOi3Ghob23xqoZXfHpoAn6i2MmYBR8ihSA
- fiXg==
-X-Gm-Message-State: APjAAAUZTETsyGww16nkTwmnq4Lnbs2vqasyVHaEmiIcN6mAIUxo11X5
- uGseEAQBauCHZ7Uz7GP+HEDxwHTm
-X-Google-Smtp-Source: APXvYqzthzUj8DLLXs/AcbMOar/YNiZgB5tB04TURMOkloBe8syyGbKSzEcX9AdM0jVG7ZU7PbqF+A==
-X-Received: by 2002:adf:dfcc:: with SMTP id q12mr17654496wrn.171.1583099438586; 
- Sun, 01 Mar 2020 13:50:38 -0800 (PST)
+ bh=vR+19Al6A28NFlWsP/WCkkDCw4IWTkTu+AkaGrWBuwQ=;
+ b=tYme+TYwQ0Rzhk+WgvHaZyS99FjBg5hz/6qr3dO0b4zyQxe6A2n74VNeHTYPTmfbFt
+ VFAHRCggJYsYShhTMYr3JHv/Q86X/Xs1C1fzD7QfU6Xi5CqyiR2sza+Oifo6vcz6d4Zy
+ qAgvC2bcwFuscZWuymHbbPkwLxVzLNEXxdhsUROdzO5MsazGIaS0eNtlHI5BDgNA0eG0
+ tDQpB+6lJgaKygg3iWBVOPKvLSSZqFH6w59T7N+Qq5Bg9teKdaKThQeMEAYFHPuqcasC
+ 10lxexzsuTo2r4baUfKbJW7sjrFwo4Id5Pna9ma5HqKqbwFrDxMJ+TIYexYE/TWhjWi6
+ 1oAA==
+X-Gm-Message-State: APjAAAUAsO/Xzrqf/4Fn115Vi622EkHta2uA7lzsS8GpG22cUo4EwKHH
+ iMnF3QZXtM/dunr5Tyfx5VKffXSk
+X-Google-Smtp-Source: APXvYqyUZeGIXaJV7VbRdETVwlsu8XVvnfhjVADh+qyztX4xq0Tt6BEe0qLDfn1UZ/uV6oGrBCtEdw==
+X-Received: by 2002:a7b:c750:: with SMTP id w16mr15562793wmk.46.1583099449626; 
+ Sun, 01 Mar 2020 13:50:49 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.37
+ by smtp.gmail.com with ESMTPSA id e8sm25033124wrr.69.2020.03.01.13.50.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Mar 2020 13:50:37 -0800 (PST)
+ Sun, 01 Mar 2020 13:50:49 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 03/18] hw/arm/allwinner-h3: add Clock Control Unit
-Date: Sun,  1 Mar 2020 22:50:14 +0100
-Message-Id: <20200301215029.15196-4-nieklinnenbank@gmail.com>
+Subject: [PATCH v6 16/18] tests/boot_linux_console: Add a SLOW test booting
+ Ubuntu on OrangePi PC
+Date: Sun,  1 Mar 2020 22:50:27 +0100
+Message-Id: <20200301215029.15196-17-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200301215029.15196-1-nieklinnenbank@gmail.com>
 References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
@@ -81,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::436
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,431 +95,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, jasowang@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  b.galvani@gmail.com, Niek Linnenbank <nieklinnenbank@gmail.com>,
  qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Clock Control Unit is responsible for clock signal generation,
-configuration and distribution in the Allwinner H3 System on Chip.
-This commit adds support for the Clock Control Unit which emulates
-a simple read/write register interface.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+This test boots Ubuntu Bionic on a OrangePi PC board.
+
+As it requires 1GB of storage, and is slow, this test is disabled
+on automatic CI testing.
+
+It is useful for workstation testing. Currently Avocado timeouts too
+quickly, so we can't run userland commands.
+
+The kernel image and DeviceTree blob are built by the Armbian
+project (based on Debian):
+https://www.armbian.com/orange-pi-pc/
+
+The Ubuntu image is downloaded from:
+https://dl.armbian.com/orangepipc/Bionic_current
+
+This test can be run using:
+
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
+  console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
+  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi PC
+  console: DRAM:  1 GiB
+  console: MMC:   mmc@1c0f000: 0
+  [...]
+  console: Uncompressing Linux... done, booting the kernel.
+  console: Booting Linux on physical CPU 0x0
+  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
+  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
+  console: CPU: div instructions available: patching division code
+  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+  console: OF: fdt: Machine model: Xunlong Orange Pi PC
+  [...]
+  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+  console: done.
+  console: Begin: Running /scripts/local-bottom ... done.
+  console: Begin: Running /scripts/init-bottom ... done.
+  console: systemd[1]: systemd 237 running in system mode. (...)
+  console: systemd[1]: Detected architecture arm.
+  console: Welcome to Ubuntu 18.04.3 LTS!
+  console: systemd[1]: Set hostname to <orangepipc>.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[NL: rename in commit message Raspbian to Armbian, remove vm.set_machine()]
+[NL: changed test to boot from SD card via BootROM, added check for 7z]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/arm/allwinner-h3.h      |   3 +
- include/hw/misc/allwinner-h3-ccu.h |  66 ++++++++
- hw/arm/allwinner-h3.c              |   9 +-
- hw/misc/allwinner-h3-ccu.c         | 242 +++++++++++++++++++++++++++++
- hw/misc/Makefile.objs              |   1 +
- 5 files changed, 320 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/misc/allwinner-h3-ccu.h
- create mode 100644 hw/misc/allwinner-h3-ccu.c
+ tests/acceptance/boot_linux_console.py | 48 ++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index 2aac9b78ec..abdc20871a 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -39,6 +39,7 @@
- #include "hw/arm/boot.h"
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/arm_gic.h"
-+#include "hw/misc/allwinner-h3-ccu.h"
- #include "target/arm/cpu.h"
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 7ef69c7bac..a70ac4a6cc 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -19,7 +19,13 @@ from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
++from avocado.utils.path import find_command, CmdNotFoundError
  
- /**
-@@ -55,6 +56,7 @@ enum {
-     AW_H3_SRAM_A1,
-     AW_H3_SRAM_A2,
-     AW_H3_SRAM_C,
-+    AW_H3_CCU,
-     AW_H3_PIT,
-     AW_H3_UART0,
-     AW_H3_UART1,
-@@ -97,6 +99,7 @@ typedef struct AwH3State {
-     ARMCPU cpus[AW_H3_NUM_CPUS];
-     const hwaddr *memmap;
-     AwA10PITState timer;
-+    AwH3ClockCtlState ccu;
-     GICState gic;
-     MemoryRegion sram_a1;
-     MemoryRegion sram_a2;
-diff --git a/include/hw/misc/allwinner-h3-ccu.h b/include/hw/misc/allwinner-h3-ccu.h
-new file mode 100644
-index 0000000000..eec59649f3
---- /dev/null
-+++ b/include/hw/misc/allwinner-h3-ccu.h
-@@ -0,0 +1,66 @@
-+/*
-+ * Allwinner H3 Clock Control Unit emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_MISC_ALLWINNER_H3_CCU_H
-+#define HW_MISC_ALLWINNER_H3_CCU_H
-+
-+#include "qom/object.h"
-+#include "hw/sysbus.h"
-+
-+/**
-+ * @name Constants
-+ * @{
-+ */
-+
-+/** Size of register I/O address space used by CCU device */
-+#define AW_H3_CCU_IOSIZE        (0x400)
-+
-+/** Total number of known registers */
-+#define AW_H3_CCU_REGS_NUM      (AW_H3_CCU_IOSIZE / sizeof(uint32_t))
-+
-+/** @} */
-+
-+/**
-+ * @name Object model
-+ * @{
-+ */
-+
-+#define TYPE_AW_H3_CCU    "allwinner-h3-ccu"
-+#define AW_H3_CCU(obj) \
-+    OBJECT_CHECK(AwH3ClockCtlState, (obj), TYPE_AW_H3_CCU)
-+
-+/** @} */
-+
-+/**
-+ * Allwinner H3 CCU object instance state.
-+ */
-+typedef struct AwH3ClockCtlState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    /** Maps I/O registers in physical memory */
-+    MemoryRegion iomem;
-+
-+    /** Array of hardware registers */
-+    uint32_t regs[AW_H3_CCU_REGS_NUM];
-+
-+} AwH3ClockCtlState;
-+
-+#endif /* HW_MISC_ALLWINNER_H3_CCU_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index 7958f37685..1fff3c317b 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -36,6 +36,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_SRAM_A1]    = 0x00000000,
-     [AW_H3_SRAM_A2]    = 0x00044000,
-     [AW_H3_SRAM_C]     = 0x00010000,
-+    [AW_H3_CCU]        = 0x01c20000,
-     [AW_H3_PIT]        = 0x01c20c00,
-     [AW_H3_UART0]      = 0x01c28000,
-     [AW_H3_UART1]      = 0x01c28400,
-@@ -77,7 +78,6 @@ struct AwH3Unimplemented {
-     { "usb2-phy",  0x01c1c000, 4 * KiB },
-     { "usb3-phy",  0x01c1d000, 4 * KiB },
-     { "smc",       0x01c1e000, 4 * KiB },
--    { "ccu",       0x01c20000, 1 * KiB },
-     { "pio",       0x01c20800, 1 * KiB },
-     { "owa",       0x01c21000, 1 * KiB },
-     { "pwm",       0x01c21400, 1 * KiB },
-@@ -172,6 +172,9 @@ static void allwinner_h3_init(Object *obj)
-                               "clk0-freq", &error_abort);
-     object_property_add_alias(obj, "clk1-freq", OBJECT(&s->timer),
-                               "clk1-freq", &error_abort);
-+
-+    sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
-+                          TYPE_AW_H3_CCU);
- }
++P7ZIP_AVAILABLE = True
++try:
++    find_command('7z')
++except CmdNotFoundError:
++    P7ZIP_AVAILABLE = False
  
- static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -277,6 +280,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_C],
-                                 &s->sram_c);
+ class BootLinuxConsole(Test):
+     """
+@@ -613,6 +619,48 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
  
-+    /* Clock Control Unit */
-+    qdev_init_nofail(DEVICE(&s->ccu));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
++    def test_arm_orangepi_bionic(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:orangepi-pc
++        """
 +
-     /* UART0. For future clocktree API: All UARTS are connected to APB2_CLK. */
-     serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
-                    qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART0),
-diff --git a/hw/misc/allwinner-h3-ccu.c b/hw/misc/allwinner-h3-ccu.c
-new file mode 100644
-index 0000000000..18d1074545
---- /dev/null
-+++ b/hw/misc/allwinner-h3-ccu.c
-@@ -0,0 +1,242 @@
-+/*
-+ * Allwinner H3 Clock Control Unit emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++        # This test download a 196MB compressed image and expand it to 932MB...
++        image_url = ('https://dl.armbian.com/orangepipc/archive/'
++                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
++        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
++        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
++        image_path = os.path.join(self.workdir, image_name)
++        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
 +
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "hw/misc/allwinner-h3-ccu.h"
++        self.vm.set_console()
++        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
++                         '-nic', 'user',
++                         '-no-reboot')
++        self.vm.launch()
 +
-+/* CCU register offsets */
-+enum {
-+    REG_PLL_CPUX             = 0x0000, /* PLL CPUX Control */
-+    REG_PLL_AUDIO            = 0x0008, /* PLL Audio Control */
-+    REG_PLL_VIDEO            = 0x0010, /* PLL Video Control */
-+    REG_PLL_VE               = 0x0018, /* PLL VE Control */
-+    REG_PLL_DDR              = 0x0020, /* PLL DDR Control */
-+    REG_PLL_PERIPH0          = 0x0028, /* PLL Peripherals 0 Control */
-+    REG_PLL_GPU              = 0x0038, /* PLL GPU Control */
-+    REG_PLL_PERIPH1          = 0x0044, /* PLL Peripherals 1 Control */
-+    REG_PLL_DE               = 0x0048, /* PLL Display Engine Control */
-+    REG_CPUX_AXI             = 0x0050, /* CPUX/AXI Configuration */
-+    REG_APB1                 = 0x0054, /* ARM Peripheral Bus 1 Config */
-+    REG_APB2                 = 0x0058, /* ARM Peripheral Bus 2 Config */
-+    REG_DRAM_CFG             = 0x00F4, /* DRAM Configuration */
-+    REG_MBUS                 = 0x00FC, /* MBUS Reset */
-+    REG_PLL_TIME0            = 0x0200, /* PLL Stable Time 0 */
-+    REG_PLL_TIME1            = 0x0204, /* PLL Stable Time 1 */
-+    REG_PLL_CPUX_BIAS        = 0x0220, /* PLL CPUX Bias */
-+    REG_PLL_AUDIO_BIAS       = 0x0224, /* PLL Audio Bias */
-+    REG_PLL_VIDEO_BIAS       = 0x0228, /* PLL Video Bias */
-+    REG_PLL_VE_BIAS          = 0x022C, /* PLL VE Bias */
-+    REG_PLL_DDR_BIAS         = 0x0230, /* PLL DDR Bias */
-+    REG_PLL_PERIPH0_BIAS     = 0x0234, /* PLL Peripherals 0 Bias */
-+    REG_PLL_GPU_BIAS         = 0x023C, /* PLL GPU Bias */
-+    REG_PLL_PERIPH1_BIAS     = 0x0244, /* PLL Peripherals 1 Bias */
-+    REG_PLL_DE_BIAS          = 0x0248, /* PLL Display Engine Bias */
-+    REG_PLL_CPUX_TUNING      = 0x0250, /* PLL CPUX Tuning */
-+    REG_PLL_DDR_TUNING       = 0x0260, /* PLL DDR Tuning */
-+};
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'loglevel=7 '
++                               'nosmp '
++                               'systemd.default_timeout_start_sec=9000 '
++                               'systemd.mask=armbian-zram-config.service '
++                               'systemd.mask=armbian-ramlog.service')
 +
-+#define REG_INDEX(offset)    (offset / sizeof(uint32_t))
++        self.wait_for_console_pattern('U-Boot SPL')
++        self.wait_for_console_pattern('Autoboot in ')
++        exec_command_and_wait_for_pattern(self, ' ', '=>')
++        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
++                                                kernel_command_line + "'", '=>')
++        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
 +
-+/* CCU register flags */
-+enum {
-+    REG_DRAM_CFG_UPDATE      = (1 << 16),
-+};
++        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
++                                      'to <orangepipc>')
++        self.wait_for_console_pattern('Starting Load Kernel Modules...')
 +
-+enum {
-+    REG_PLL_ENABLE           = (1 << 31),
-+    REG_PLL_LOCK             = (1 << 28),
-+};
-+
-+
-+/* CCU register reset values */
-+enum {
-+    REG_PLL_CPUX_RST         = 0x00001000,
-+    REG_PLL_AUDIO_RST        = 0x00035514,
-+    REG_PLL_VIDEO_RST        = 0x03006207,
-+    REG_PLL_VE_RST           = 0x03006207,
-+    REG_PLL_DDR_RST          = 0x00001000,
-+    REG_PLL_PERIPH0_RST      = 0x00041811,
-+    REG_PLL_GPU_RST          = 0x03006207,
-+    REG_PLL_PERIPH1_RST      = 0x00041811,
-+    REG_PLL_DE_RST           = 0x03006207,
-+    REG_CPUX_AXI_RST         = 0x00010000,
-+    REG_APB1_RST             = 0x00001010,
-+    REG_APB2_RST             = 0x01000000,
-+    REG_DRAM_CFG_RST         = 0x00000000,
-+    REG_MBUS_RST             = 0x80000000,
-+    REG_PLL_TIME0_RST        = 0x000000FF,
-+    REG_PLL_TIME1_RST        = 0x000000FF,
-+    REG_PLL_CPUX_BIAS_RST    = 0x08100200,
-+    REG_PLL_AUDIO_BIAS_RST   = 0x10100000,
-+    REG_PLL_VIDEO_BIAS_RST   = 0x10100000,
-+    REG_PLL_VE_BIAS_RST      = 0x10100000,
-+    REG_PLL_DDR_BIAS_RST     = 0x81104000,
-+    REG_PLL_PERIPH0_BIAS_RST = 0x10100010,
-+    REG_PLL_GPU_BIAS_RST     = 0x10100000,
-+    REG_PLL_PERIPH1_BIAS_RST = 0x10100010,
-+    REG_PLL_DE_BIAS_RST      = 0x10100000,
-+    REG_PLL_CPUX_TUNING_RST  = 0x0A101000,
-+    REG_PLL_DDR_TUNING_RST   = 0x14880000,
-+};
-+
-+static uint64_t allwinner_h3_ccu_read(void *opaque, hwaddr offset,
-+                                      unsigned size)
-+{
-+    const AwH3ClockCtlState *s = AW_H3_CCU(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    switch (offset) {
-+    case 0x308 ... AW_H3_CCU_IOSIZE:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    return s->regs[idx];
-+}
-+
-+static void allwinner_h3_ccu_write(void *opaque, hwaddr offset,
-+                                   uint64_t val, unsigned size)
-+{
-+    AwH3ClockCtlState *s = AW_H3_CCU(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
-+
-+    switch (offset) {
-+    case REG_DRAM_CFG:    /* DRAM Configuration */
-+        val &= ~REG_DRAM_CFG_UPDATE;
-+        break;
-+    case REG_PLL_CPUX:    /* PLL CPUX Control */
-+    case REG_PLL_AUDIO:   /* PLL Audio Control */
-+    case REG_PLL_VIDEO:   /* PLL Video Control */
-+    case REG_PLL_VE:      /* PLL VE Control */
-+    case REG_PLL_DDR:     /* PLL DDR Control */
-+    case REG_PLL_PERIPH0: /* PLL Peripherals 0 Control */
-+    case REG_PLL_GPU:     /* PLL GPU Control */
-+    case REG_PLL_PERIPH1: /* PLL Peripherals 1 Control */
-+    case REG_PLL_DE:      /* PLL Display Engine Control */
-+        if (val & REG_PLL_ENABLE) {
-+            val |= REG_PLL_LOCK;
-+        }
-+        break;
-+    case 0x308 ... AW_H3_CCU_IOSIZE:
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented write offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
-+    }
-+
-+    s->regs[idx] = (uint32_t) val;
-+}
-+
-+static const MemoryRegionOps allwinner_h3_ccu_ops = {
-+    .read = allwinner_h3_ccu_read,
-+    .write = allwinner_h3_ccu_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static void allwinner_h3_ccu_reset(DeviceState *dev)
-+{
-+    AwH3ClockCtlState *s = AW_H3_CCU(dev);
-+
-+    /* Set default values for registers */
-+    s->regs[REG_INDEX(REG_PLL_CPUX)] = REG_PLL_CPUX_RST;
-+    s->regs[REG_INDEX(REG_PLL_AUDIO)] = REG_PLL_AUDIO_RST;
-+    s->regs[REG_INDEX(REG_PLL_VIDEO)] = REG_PLL_VIDEO_RST;
-+    s->regs[REG_INDEX(REG_PLL_VE)] = REG_PLL_VE_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR)] = REG_PLL_DDR_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH0)] = REG_PLL_PERIPH0_RST;
-+    s->regs[REG_INDEX(REG_PLL_GPU)] = REG_PLL_GPU_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH1)] = REG_PLL_PERIPH1_RST;
-+    s->regs[REG_INDEX(REG_PLL_DE)] = REG_PLL_DE_RST;
-+    s->regs[REG_INDEX(REG_CPUX_AXI)] = REG_CPUX_AXI_RST;
-+    s->regs[REG_INDEX(REG_APB1)] = REG_APB1_RST;
-+    s->regs[REG_INDEX(REG_APB2)] = REG_APB2_RST;
-+    s->regs[REG_INDEX(REG_DRAM_CFG)] = REG_DRAM_CFG_RST;
-+    s->regs[REG_INDEX(REG_MBUS)] = REG_MBUS_RST;
-+    s->regs[REG_INDEX(REG_PLL_TIME0)] = REG_PLL_TIME0_RST;
-+    s->regs[REG_INDEX(REG_PLL_TIME1)] = REG_PLL_TIME1_RST;
-+    s->regs[REG_INDEX(REG_PLL_CPUX_BIAS)] = REG_PLL_CPUX_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_AUDIO_BIAS)] = REG_PLL_AUDIO_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_VIDEO_BIAS)] = REG_PLL_VIDEO_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_VE_BIAS)] = REG_PLL_VE_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR_BIAS)] = REG_PLL_DDR_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH0_BIAS)] = REG_PLL_PERIPH0_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_GPU_BIAS)] = REG_PLL_GPU_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH1_BIAS)] = REG_PLL_PERIPH1_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_DE_BIAS)] = REG_PLL_DE_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_CPUX_TUNING)] = REG_PLL_CPUX_TUNING_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR_TUNING)] = REG_PLL_DDR_TUNING_RST;
-+}
-+
-+static void allwinner_h3_ccu_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwH3ClockCtlState *s = AW_H3_CCU(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_ccu_ops, s,
-+                          TYPE_AW_H3_CCU, AW_H3_CCU_IOSIZE);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_h3_ccu_vmstate = {
-+    .name = "allwinner-h3-ccu",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AwH3ClockCtlState, AW_H3_CCU_REGS_NUM),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void allwinner_h3_ccu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = allwinner_h3_ccu_reset;
-+    dc->vmsd = &allwinner_h3_ccu_vmstate;
-+}
-+
-+static const TypeInfo allwinner_h3_ccu_info = {
-+    .name          = TYPE_AW_H3_CCU,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_h3_ccu_init,
-+    .instance_size = sizeof(AwH3ClockCtlState),
-+    .class_init    = allwinner_h3_ccu_class_init,
-+};
-+
-+static void allwinner_h3_ccu_register(void)
-+{
-+    type_register_static(&allwinner_h3_ccu_info);
-+}
-+
-+type_init(allwinner_h3_ccu_register)
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index da993f45b7..5e635b74d5 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -28,6 +28,7 @@ common-obj-$(CONFIG_MACIO) += macio/
- 
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
- 
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
- common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.17.1
 
