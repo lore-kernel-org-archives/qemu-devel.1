@@ -6,44 +6,45 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F18CC3F2CE
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 11:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 056A0C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 11:42:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D12B214DB
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 11:36:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D12B214DB
+	by mail.kernel.org (Postfix) with ESMTPS id BA06420880
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Mar 2020 11:42:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA06420880
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8MtJ-0008A2-Gm
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 06:36:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57618)
+	id 1j8Mz8-0001WF-0H
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 06:42:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8Mse-0007el-8N
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 06:35:33 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8MyW-0000wl-6b
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 06:41:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8Msc-00021w-Kp
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 06:35:32 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52532
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8MyV-0004Iq-2f
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 06:41:36 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52556
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8MsZ-00020r-EL; Sun, 01 Mar 2020 06:35:27 -0500
+ id 1j8MyS-0004HJ-PG; Sun, 01 Mar 2020 06:41:32 -0500
 Received: from host86-135-55-139.range86-135.btcentralplus.com
  ([86.135.55.139] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8Msk-0007EY-CY; Sun, 01 Mar 2020 11:35:44 +0000
+ id 1j8Mye-0007GP-VA; Sun, 01 Mar 2020 11:41:49 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
  qemu-block@nongnu.org
 References: <cover.1583017348.git.balaton@eik.bme.hu>
  <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
  3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
@@ -68,12 +69,12 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
-Date: Sun, 1 Mar 2020 11:35:16 +0000
+Message-ID: <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+Date: Sun, 1 Mar 2020 11:41:23 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
+In-Reply-To: <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -96,182 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
+Cc: John Snow <jsnow@redhat.com>, philmd@redhat.com,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
- Richard Henderson <rth@twiddle.net>
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/02/2020 23:02, BALATON Zoltan wrote:
-
-> Some machines operate in "non 100% native mode" where interrupts are
-> fixed at legacy IDE interrupts and some guests expect this behaviour
-> without checking based on knowledge about hardware. Even Linux has
-> arch specific workarounds for this that are activated on such boards
-> so this needs to be emulated as well.
+On 01/03/2020 11:35, Mark Cave-Ayland wrote:
+> On 29/02/2020 23:02, BALATON Zoltan wrote:
 > 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/ide/via.c            | 60 +++++++++++++++++++++++++++++++++++------
->  hw/mips/mips_fulong2e.c |  2 +-
->  include/hw/ide.h        |  3 ++-
->  3 files changed, 55 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/ide/via.c b/hw/ide/via.c
-> index 096de8dba0..17418c5822 100644
-> --- a/hw/ide/via.c
-> +++ b/hw/ide/via.c
-> @@ -1,9 +1,10 @@
->  /*
-> - * QEMU IDE Emulation: PCI VIA82C686B support.
-> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
->   *
->   * Copyright (c) 2003 Fabrice Bellard
->   * Copyright (c) 2006 Openedhand Ltd.
->   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
-> + * Copyright (c) 2019-2020 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -25,6 +26,8 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/range.h"
-> +#include "hw/qdev-properties.h"
->  #include "hw/pci/pci.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
-> @@ -111,14 +114,43 @@ static void via_ide_set_irq(void *opaque, int n, int level)
->      } else {
->          d->config[0x70 + n * 8] &= ~0x80;
->      }
-> -
->      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
-> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
-> -    if (n) {
-> -        qemu_set_irq(isa_get_irq(NULL, n), level);
-> +
-> +    /*
-> +     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
-> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
-> +     * Some guest drivers expect this, often without checking.
-> +     */
-> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
-> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
-> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
-> +    } else {
-> +        n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
-> +        if (n) {
-> +            qemu_set_irq(isa_get_irq(NULL, n), level);
-> +        }
->      }
->  }
->  
-> +static uint32_t via_ide_config_read(PCIDevice *d, uint32_t address, int len)
-> +{
-> +    /*
-> +     * The pegasos2 firmware writes to PCI_INTERRUPT_LINE but on real
-> +     * hardware it's fixed at 14 and won't change. Some guests also expect
-> +     * legacy interrupts, without reading PCI_INTERRUPT_LINE but Linux
-> +     * depends on this to read 14. We set it to 14 in the reset method and
-> +     * also set the wmask to 0 to emulate this but that turns out to be not
-> +     * enough. QEMU resets the PCI bus after this device and
-> +     * pci_do_device_reset() called from pci_device_reset() will zero
-> +     * PCI_INTERRUPT_LINE so this config_read function is to counter that and
-> +     * restore the correct value, otherwise this should not be needed.
-> +     */
-> +    if (range_covers_byte(address, len, PCI_INTERRUPT_LINE)) {
-> +        pci_set_byte(d->config + PCI_INTERRUPT_LINE, 14);
-> +    }
-> +    return pci_default_read_config(d, address, len);
-> +}
+>> Some machines operate in "non 100% native mode" where interrupts are
+>> fixed at legacy IDE interrupts and some guests expect this behaviour
+>> without checking based on knowledge about hardware. Even Linux has
+>> arch specific workarounds for this that are activated on such boards
+>> so this needs to be emulated as well.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>  hw/ide/via.c            | 60 +++++++++++++++++++++++++++++++++++------
+>>  hw/mips/mips_fulong2e.c |  2 +-
+>>  include/hw/ide.h        |  3 ++-
+>>  3 files changed, 55 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/ide/via.c b/hw/ide/via.c
+>> index 096de8dba0..17418c5822 100644
+>> --- a/hw/ide/via.c
+>> +++ b/hw/ide/via.c
+>> @@ -1,9 +1,10 @@
+>>  /*
+>> - * QEMU IDE Emulation: PCI VIA82C686B support.
+>> + * QEMU VIA southbridge IDE emulation (VT82C686B, VT8231)
+>>   *
+>>   * Copyright (c) 2003 Fabrice Bellard
+>>   * Copyright (c) 2006 Openedhand Ltd.
+>>   * Copyright (c) 2010 Huacai Chen <zltjiangshi@gmail.com>
+>> + * Copyright (c) 2019-2020 BALATON Zoltan
+>>   *
+>>   * Permission is hereby granted, free of charge, to any person obtaining a copy
+>>   * of this software and associated documentation files (the "Software"), to deal
+>> @@ -25,6 +26,8 @@
+>>   */
+>>  
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/range.h"
+>> +#include "hw/qdev-properties.h"
+>>  #include "hw/pci/pci.h"
+>>  #include "migration/vmstate.h"
+>>  #include "qemu/module.h"
+>> @@ -111,14 +114,43 @@ static void via_ide_set_irq(void *opaque, int n, int level)
+>>      } else {
+>>          d->config[0x70 + n * 8] &= ~0x80;
+>>      }
+>> -
+>>      level = (d->config[0x70] & 0x80) || (d->config[0x78] & 0x80);
+>> -    n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
+>> -    if (n) {
+>> -        qemu_set_irq(isa_get_irq(NULL, n), level);
+>> +
+>> +    /*
+>> +     * Some machines operate in "non 100% native mode" where PCI_INTERRUPT_LINE
+>> +     * is not used but IDE always uses ISA IRQ 14 and 15 even in native mode.
+>> +     * Some guest drivers expect this, often without checking.
+>> +     */
+>> +    if (!(pci_get_byte(d->config + PCI_CLASS_PROG) & (n ? 4 : 1)) ||
+>> +        PCI_IDE(d)->flags & BIT(PCI_IDE_LEGACY_IRQ)) {
+>> +        qemu_set_irq(isa_get_irq(NULL, (n ? 15 : 14)), level);
+>> +    } else {
+>> +        n = pci_get_byte(d->config + PCI_INTERRUPT_LINE);
+>> +        if (n) {
+>> +            qemu_set_irq(isa_get_irq(NULL, n), level);
+>> +        }
+>>      }
+>>  }
 
-This all seems quite strange: so what you're saying is that the VIA is programmed
-into PCI native mode, but at least on the Pegasos then it should still be generating
-interrupts on both the PCI bus and the compatibility IRQs?
+The other part I'm not sure about is that I can't see how via_ide_set_irq() can ever
+raise a native PCI IRQ - comparing with my experience on cmd646, should there not be
+a pci_set_irq(d, level) at the end?
 
->  static void via_ide_reset(DeviceState *dev)
->  {
->      PCIIDEState *d = PCI_IDE(dev);
-> @@ -169,7 +201,8 @@ static void via_ide_realize(PCIDevice *dev, Error **errp)
->  
->      pci_config_set_prog_interface(pci_conf, 0x8f); /* native PCI ATA mode */
->      pci_set_long(pci_conf + PCI_CAPABILITY_LIST, 0x000000c0);
-> -    dev->wmask[PCI_INTERRUPT_LINE] = 0xf;
-> +    dev->wmask[PCI_CLASS_PROG] = 5;
-> +    dev->wmask[PCI_INTERRUPT_LINE] = 0;
->  
->      memory_region_init_io(&d->data_bar[0], OBJECT(d), &pci_ide_data_le_ops,
->                            &d->bus[0], "via-ide0-data", 8);
-> @@ -213,14 +246,23 @@ static void via_ide_exitfn(PCIDevice *dev)
->      }
->  }
->  
-> -void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn)
-> +void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-> +                  bool legacy_irq)
->  {
->      PCIDevice *dev;
->  
-> -    dev = pci_create_simple(bus, devfn, "via-ide");
-> +    dev = pci_create(bus, devfn, "via-ide");
-> +    qdev_prop_set_bit(&dev->qdev, "legacy-irq", legacy_irq);
-> +    qdev_init_nofail(&dev->qdev);
->      pci_ide_create_devs(dev, hd_table);
->  }
->  
-> +static Property via_ide_properties[] = {
-> +    DEFINE_PROP_BIT("legacy-irq", PCIIDEState, flags, PCI_IDE_LEGACY_IRQ,
-> +                    false),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void via_ide_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> @@ -229,10 +271,12 @@ static void via_ide_class_init(ObjectClass *klass, void *data)
->      dc->reset = via_ide_reset;
->      k->realize = via_ide_realize;
->      k->exit = via_ide_exitfn;
-> +    k->config_read = via_ide_config_read;
->      k->vendor_id = PCI_VENDOR_ID_VIA;
->      k->device_id = PCI_DEVICE_ID_VIA_IDE;
->      k->revision = 0x06;
->      k->class_id = PCI_CLASS_STORAGE_IDE;
-> +    device_class_set_props(dc, via_ide_properties);
->      set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
->  }
->  
-> diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> index 4727b1d3a4..150182c62a 100644
-> --- a/hw/mips/mips_fulong2e.c
-> +++ b/hw/mips/mips_fulong2e.c
-> @@ -257,7 +257,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
->      isa_create_simple(isa_bus, TYPE_VT82C686B_SUPERIO);
->  
->      ide_drive_get(hd, ARRAY_SIZE(hd));
-> -    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1));
-> +    via_ide_init(pci_bus, hd, PCI_DEVFN(slot, 1), false);
->  
->      pci_create_simple(pci_bus, PCI_DEVFN(slot, 2), "vt82c686b-usb-uhci");
->      pci_create_simple(pci_bus, PCI_DEVFN(slot, 3), "vt82c686b-usb-uhci");
-> diff --git a/include/hw/ide.h b/include/hw/ide.h
-> index d88c5ee695..2a7001ccba 100644
-> --- a/include/hw/ide.h
-> +++ b/include/hw/ide.h
-> @@ -18,7 +18,8 @@ PCIDevice *pci_piix3_xen_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
->  PCIDevice *pci_piix3_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
->  PCIDevice *pci_piix4_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
->  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux);
-> -void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn);
-> +void via_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
-> +                  bool legacy_irq);
->  
->  /* ide-mmio.c */
->  void mmio_ide_init_drives(DeviceState *dev, DriveInfo *hd0, DriveInfo *hd1);
 
 ATB,
 
