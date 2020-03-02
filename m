@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0012C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37513C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:03:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD03821D56
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0766521D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:03:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZJ0/OEYL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD03821D56
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VhZvQJ5+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0766521D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8pOB-0004Er-Sn
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:01:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39197)
+	id 1j8pPK-00062C-86
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:03:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j8pL1-0006nN-Lh
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:44 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j8pKu-0006b5-Kj
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j8pL0-0007cJ-Kl
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:43 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37803)
+ (envelope-from <richard.henderson@linaro.org>) id 1j8pKt-0007YJ-IH
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:36 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35002)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j8pL0-0007bv-Fb
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:42 -0500
-Received: by mail-pg1-x544.google.com with SMTP id z12so184921pgl.4
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 09:58:42 -0800 (PST)
+ id 1j8pKt-0007Xv-DF
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:58:35 -0500
+Received: by mail-pg1-x543.google.com with SMTP id 7so189880pgr.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 09:58:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dr35bRmDl5K2ZK/zV6tEHz3P5CK2kUhrH8hqSGr33Rw=;
- b=ZJ0/OEYLqfjbDLH2HPXWjjFaocOmukBiVGnzk0V+U8OA7hE/kfZ68Gr/1lSpMROAFk
- pRJKWCQxNS2/QIjxSFwbS60hW2/8hgQVGzJ+HYitny4NgKJec0USwyK6z0jMVKPHmS0Y
- Sm5ao3zmmc12Nw9vumEe9JcG/wPKSFjiOiasKfYEiTdNoK9JBVX9/LdpttrrDM9B+nuF
- ZDDnG9rMyp4g3fkU6g20pbGSK4pl7siJ3vRDjPSeDFYkR7QTxtBEE1L6w5hwKW9MgCsF
- PQH9aerx8NzYc2WB9Gk0QWHs4oZv+oxICiBhKl+uG1/z9Tm6qbU+NvexHSw74WUWlayl
- doYQ==
+ bh=nnZb8apL5HPwafrnPocDxPavn/5fOqQOkEGFTZ+nDV0=;
+ b=VhZvQJ5+cEChkiR9dxCzGSXsj/jtGkqJTGx1BXvvtyqFUGAMI57XDLSJoLzR0/1vS8
+ 7v56MN29PvZvjR+d/fTNJRIlIvVUutbWdPLmlq7gzoIboMHF6LSCI3W7PUiZpVY9PGwj
+ JMYJBBJrAiOoA2oRCAOGULv5+Z1I27T7XTeKf39B12c0Asr2A/9zSU23x4vtJN/l67iK
+ lbyRkdqsGW3DZyI0xjVtI5krWchs/EgAOARB6FCCWvL3CMbE/OphCGVjYLFhjBT6FOSj
+ oTBPvGS839DwAw2RAzxcDk/irP8MdkWwoNus9P1o78joaP/y10xj1oXziOIiV8xAj6GP
+ ADLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dr35bRmDl5K2ZK/zV6tEHz3P5CK2kUhrH8hqSGr33Rw=;
- b=VAkjxsW8NpCO7A6ic5ahUjWWnpr2DiX5Me/jZ6SqBA2rQxTxD56U7AR5HY619AxT1L
- +DcdLGUC40M4HbrsjTPw6Wk5yzIVZJEb5Ic3+wcxVJyr/I7HT3KcUtnP4mQXEvsa1kQy
- tCKSpEmxwUGfu5wkH3PEAKbe5BsQLSYEh918hTPYJtQ9jUz+L/zBGnHcVBlD0YXdDJif
- q5s32u68d0gWaXbrLEvglMKHa+NurfeboUmvm5N7tgjuwae6wcy/oD3tQmCbG1C29a3E
- 3mDDFhX/8GRWjm2+RSlLlkjhUgUvH3IgWzHLi611bCEA+DuJmbS+iWv7rDpMua7zFS+x
- XvuA==
-X-Gm-Message-State: ANhLgQ3OTj73yOGS7qLVeSmLL5xKN+YI0sUHJvKOFCYXAkZj7Y9VYwl8
- z20zN1D6sFwpmTaqLqjuA8e1g6JtQBQ=
-X-Google-Smtp-Source: ADFU+vvEJ6ha4LdilaG5Om6dsFOZqlnpl/z5zZXDvqpA0yV8uiT3FM1wjO/myfIwoBC2PmS1HjkahA==
-X-Received: by 2002:aa7:80d1:: with SMTP id a17mr209275pfn.143.1583171921259; 
- Mon, 02 Mar 2020 09:58:41 -0800 (PST)
+ bh=nnZb8apL5HPwafrnPocDxPavn/5fOqQOkEGFTZ+nDV0=;
+ b=uRhlumADpCHutZ2+xbvQSCfLSNcnVU7BBa6NXMcoJEG3PW0bpjsnXCA2eIzCSMIIEi
+ MbWeDA0DWxVLRDIdx8qh/XU9ZjmeqH0SY9ZfAqBll3jaPK7dXMHviF+b2QW1owkmAw3y
+ ilvBPoJmLP4J6emL8xQZ6h+swv8I9P4bvVcKGcy+oRjnegTgkXkddhyvrtREjpr9Ghiz
+ D8H5zTnQAVu4HZjtGYcWVUJxmj/r+TMaLwSPZ1up9maBytd57+jOZFuw3YSufNNoxMaK
+ /PHDMiVOb+CTwvBBED5tRm6I4bSDLDR6gVA18weq8dylhafWlWUZ7VVt5i58lNuuDCBU
+ 3YWA==
+X-Gm-Message-State: ANhLgQ2fKAWTEtoRhQ6GXAiAYlC+FN1+bVTRbn51mt0mW4imDJjHdYxK
+ C4gKmHZxxs8JDIzoh4/nPuVXv+jR/UY=
+X-Google-Smtp-Source: ADFU+vvg6dJKI/XrHGdFfkH+p+bdEdoFrykbN7Qp43o9/OvYUe0zs8q497rq0h86U/qugrP2/Fh0Ag==
+X-Received: by 2002:a62:1dd8:: with SMTP id d207mr234054pfd.78.1583171914087; 
+ Mon, 02 Mar 2020 09:58:34 -0800 (PST)
 Received: from localhost.localdomain (97-126-123-70.tukw.qwest.net.
  [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id s18sm99510pjp.24.2020.03.02.09.58.40
+ by smtp.gmail.com with ESMTPSA id s18sm99510pjp.24.2020.03.02.09.58.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 09:58:40 -0800 (PST)
+ Mon, 02 Mar 2020 09:58:33 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 8/9] target/arm: Check addresses for disabled regimes
-Date: Mon,  2 Mar 2020 09:58:28 -0800
-Message-Id: <20200302175829.2183-9-richard.henderson@linaro.org>
+Subject: [PATCH v2 2/9] target/arm: Optimize cpu_mmu_index
+Date: Mon,  2 Mar 2020 09:58:22 -0800
+Message-Id: <20200302175829.2183-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200302175829.2183-1-richard.henderson@linaro.org>
 References: <20200302175829.2183-1-richard.henderson@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,58 +98,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We fail to validate the upper bits of a virtual address on a
-translation disabled regime, as per AArch64.TranslateAddressS1Off.
+We now cache the core mmu_idx in env->hflags.  Rather than recompute
+from scratch, extract the field.  All of the uses of cpu_mmu_index
+within target/arm are within helpers, and env->hflags is always stable
+within a translation block from whence helpers are called.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ target/arm/cpu.h    | 23 +++++++++++++----------
+ target/arm/helper.c |  5 -----
+ 2 files changed, 13 insertions(+), 15 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0b84742b66..8f1b949c88 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2936,16 +2936,6 @@ typedef enum ARMMMUIdxBit {
+ 
+ #define MMU_USER_IDX 0
+ 
+-/**
+- * cpu_mmu_index:
+- * @env: The cpu environment
+- * @ifetch: True for code access, false for data access.
+- *
+- * Return the core mmu index for the current translation regime.
+- * This function is used by generic TCG code paths.
+- */
+-int cpu_mmu_index(CPUARMState *env, bool ifetch);
+-
+ /* Indexes used when registering address spaces with cpu_address_space_init */
+ typedef enum ARMASIdx {
+     ARMASIdx_NS = 0,
+@@ -3225,6 +3215,19 @@ FIELD(TBFLAG_A64, BTYPE, 10, 2)         /* Not cached. */
+ FIELD(TBFLAG_A64, TBID, 12, 2)
+ FIELD(TBFLAG_A64, UNPRIV, 14, 1)
+ 
++/**
++ * cpu_mmu_index:
++ * @env: The cpu environment
++ * @ifetch: True for code access, false for data access.
++ *
++ * Return the core mmu index for the current translation regime.
++ * This function is used by generic TCG code paths.
++ */
++static inline int cpu_mmu_index(CPUARMState *env, bool ifetch)
++{
++    return FIELD_EX32(env->hflags, TBFLAG_ANY, MMUIDX);
++}
++
+ static inline bool bswap_code(bool sctlr_b)
+ {
+ #ifdef CONFIG_USER_ONLY
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index addbec91d8..0ef32d3c24 100644
+index 37ffe06c05..addbec91d8 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -11634,7 +11634,38 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
-     /* Definitely a real MMU, not an MPU */
+@@ -12128,11 +12128,6 @@ ARMMMUIdx arm_mmu_idx(CPUARMState *env)
+     return arm_mmu_idx_el(env, arm_current_el(env));
+ }
  
-     if (regime_translation_disabled(env, mmu_idx)) {
--        /* MMU disabled. */
-+        /*
-+         * MMU disabled.  S1 addresses are still checked for bounds.
-+         * C.f. AArch64.TranslateAddressS1Off.
-+         */
-+        if (is_a64(env) && mmu_idx != ARMMMUIdx_Stage2) {
-+            int pamax = arm_pamax(env_archcpu(env));
-+            uint64_t tcr = regime_tcr(env, mmu_idx)->raw_tcr;
-+            int addrtop, tbi;
-+
-+            tbi = aa64_va_parameter_tbi(tcr, mmu_idx);
-+            if (access_type == MMU_INST_FETCH) {
-+                tbi &= ~aa64_va_parameter_tbid(tcr, mmu_idx);
-+            }
-+            tbi = (tbi >> extract64(address, 55, 1)) & 1;
-+            addrtop = (tbi ? 55 : 63);
-+
-+            if (extract64(address, pamax, addrtop - pamax + 1) != 0) {
-+                fi->type = ARMFault_AddressSize;
-+                fi->level = 0;
-+                fi->stage2 = false;
-+                return 1;
-+            }
-+
-+            /*
-+             * The ARM pseudocode copies bits [51:0] to addrdesc.paddress.
-+             * Except for TBI, we've just validated everything above PAMax
-+             * is zero.  So we only need to drop TBI.
-+             */
-+            if (tbi) {
-+                address = extract64(address, 0, 56);
-+            }
-+        }
-         *phys_ptr = address;
-         *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-         *page_size = TARGET_PAGE_SIZE;
+-int cpu_mmu_index(CPUARMState *env, bool ifetch)
+-{
+-    return arm_to_core_mmu_idx(arm_mmu_idx(env));
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ ARMMMUIdx arm_stage1_mmu_idx(CPUARMState *env)
+ {
 -- 
 2.20.1
 
