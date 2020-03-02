@@ -2,104 +2,99 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BEBC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3000DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E5A72465E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7FD3217F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:51:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGFVWZB5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5A72465E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGCxVwrS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7FD3217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8uhB-0002xO-He
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:41:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36968)
+	id 1j8uqn-0005mP-4l
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:51:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8ugR-0002Ig-TS
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:41:13 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8upv-00053X-JZ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8ugQ-0007PF-4e
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:41:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57041
+ (envelope-from <philmd@redhat.com>) id 1j8upu-00016T-JQ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:50:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51597
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8ugQ-0007P8-1A
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:41:10 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8upu-000161-Fw
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:50:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583192469;
+ s=mimecast20190719; t=1583193057;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=G+oSe8zzqVcSq0vLPv045MHe/kV45bAOCLegyyb3jAI=;
- b=MGFVWZB5IaYfMxQdhgxTA9rKFJZ7gXU54t8+5lKlr4UPU2F5UEolVN5QNqyGwTnQkt2Uzl
- sBkv6HpHTKimAP1uwn5vkBFr1CwrBmSjvm3lHCTnnwmQkIaJZMBWITVCAIaE97BcCHtI63
- 7L2G5rJXVGBDIEP+odCvX+Np2FuzN/M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-50BvCIzZM7uJdGQjYe-wlw-1; Mon, 02 Mar 2020 18:40:57 -0500
-X-MC-Unique: 50BvCIzZM7uJdGQjYe-wlw-1
-Received: by mail-wr1-f70.google.com with SMTP id m18so382075wro.22
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:40:57 -0800 (PST)
+ bh=FF3wICewQaa3RiS39JV3wDaDsjE5d8HV95Cf+aKZo7E=;
+ b=gGCxVwrSrS6rnNx2fqHf6c8Sz4R270HpM+FCHA+KsjbblVER5MRq3ITA5z9AcP75ILJazF
+ hK77FqKQFuASpCAGTtm/iTEochQxf/payYoUFT3bw92tB5Dy1cwdASjvYOS+d3r4vs5jyv
+ VvrcovsWC+PiKBO2iffeygb2VWdu0Fs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-e0JQ_F-3MEqiIMah9z2roA-1; Mon, 02 Mar 2020 18:50:56 -0500
+X-MC-Unique: e0JQ_F-3MEqiIMah9z2roA-1
+Received: by mail-wm1-f70.google.com with SMTP id f207so334087wme.6
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:50:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KuZJ4N+CT8yOv9ErLnVGZrsEX55Cl7IkMYcUe46guzs=;
- b=LD68nZn8dknwjIk98VtIlirDpxP1aNlTzfEj7ov4Kv5B3otYtDURAWhqFNlPjVeD9D
- Q3bk6OoDDGG6xVys4teLz1t52XIfFW8f45TdwgqXLmuC+LTnXo/AKPQ9/MwIwBpYegWn
- doLhhGpC95MXICz5uEE+UcHyn0mUT7JCZ28SNva2jbJUdCu5qkyUw9AiPNrcsniTNsl4
- GFL2qIXKmI8jqkLl/Re0MC0HH9Wlx7TDSW6k6Qcx5OsfbTc1pWSZ1814L1SoVJkO1YuH
- g7zmlI3XFG6h73OJIq/HFK0o5Ebdb4ee2T/sniMdoTqdhMMDqBgc4nnVg+Gemxd/bcnL
- uCjQ==
-X-Gm-Message-State: ANhLgQ1XHwOtFWk7HwWoPnOTcD1uR6CiiOohfggKG2oQ+EnggzEuCSjo
- ppsTiqbN7LXSp7cWc/IM/7iTJI8F8FR2VVPRc59BK+ozAS2leJPLL6pXDEdZjrTu6QfEYrX96D3
- O4xkCQd2U2ebqUJE=
-X-Received: by 2002:adf:f052:: with SMTP id t18mr1732334wro.192.1583192456338; 
- Mon, 02 Mar 2020 15:40:56 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvi6ZWzr+cnI6tXYB8wTmVZn4dHx3yqWdLKDS5I9+lCUmWnVBQ0Ttm+xzCKF/MtdDfguO+lqQ==
-X-Received: by 2002:adf:f052:: with SMTP id t18mr1732321wro.192.1583192456141; 
- Mon, 02 Mar 2020 15:40:56 -0800 (PST)
+ bh=KHLvqzpa6iNoZylNgF3tRer/Y3+oc/9BwRdnj0JoSOw=;
+ b=PqU1C23VMfxfdKzRWkCYc4E/dH+K4s0dMHM+p4iPtoanWgezax/hmLq4YmUh2yerVa
+ LMGyEkOZNz3uRNBRWP/VUjFmVepsxaj+g6pUuSP9z4X0D8bxRVrCAYShlUb+Ik+LX5j5
+ ffQGPQMUFDEdmRO7NVdjg1g31kpv55eUKAs1z0Sm6LVETw0yM4uVdatAIMYimxxWTPif
+ BrMiMNK3t0YFw9Xg+8+um2zA3du/Hi9lHE7cmSQlEyDpe2VTuj8mzzFonhZWK8dWiqyj
+ ZzWKWLXnpyln63aUIwbfMuyJ2I049eYeN3n2hafg6wX8cxwcKf5ZkNGV5lZc7TU/m4Eu
+ EHcg==
+X-Gm-Message-State: ANhLgQ1pCMSRjNAfhqE828X5MKMPref8Yq4C66N71JGXdMmkY+MoNDys
+ lVrFCH7kRsgku3iKeZ+LKsH69wOilWMJ4mOvTu0H5oac5mg+R/LNisH1jU0XArS/DBTfNRWdG9e
+ JzBxjYvPjMYHK/lM=
+X-Received: by 2002:a7b:c109:: with SMTP id w9mr749270wmi.14.1583193054815;
+ Mon, 02 Mar 2020 15:50:54 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vspJinB9C9sNnEwMwpo9oMaLSyS9tXFxJou/Zk5Et4OCatKWJASWxpCYNwz6zKVXHls/8K99w==
+X-Received: by 2002:a7b:c109:: with SMTP id w9mr749252wmi.14.1583193054576;
+ Mon, 02 Mar 2020 15:50:54 -0800 (PST)
 Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
  ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id c8sm21155359wru.7.2020.03.02.15.40.55
+ by smtp.gmail.com with ESMTPSA id k16sm31111203wrd.17.2020.03.02.15.50.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 15:40:55 -0800 (PST)
-Subject: Re: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux
- logos displayed on framebuffer
-To: Aleksandar Markovic <amarkovic@wavecomp.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-References: <1582810056-22646-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1582810056-22646-6-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAFEAcA_ZL8kd+DaHz-debq7A2simEdB8GNzty890sfc=SjrByw@mail.gmail.com>
- <BN6PR2201MB12519E5CF54B5C921CD4404AC6E70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ Mon, 02 Mar 2020 15:50:53 -0800 (PST)
+Subject: Re: [PATCH v2 3/9] target/arm: Introduce core_to_aa64_mmu_idx
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200302175829.2183-1-richard.henderson@linaro.org>
+ <20200302175829.2183-4-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <741a03d4-4aa0-4782-771b-98468042c060@redhat.com>
-Date: Tue, 3 Mar 2020 00:40:54 +0100
+Message-ID: <a4ec9841-0c60-23bd-3f1a-5a21b697c082@redhat.com>
+Date: Tue, 3 Mar 2020 00:50:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB12519E5CF54B5C921CD4404AC6E70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <20200302175829.2183-4-richard.henderson@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,136 +106,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 9:58 PM, Aleksandar Markovic wrote:
->> From: Peter Maydell <peter.maydell@linaro.org>
->> Sent: Monday, March 2, 2020 9:26 PM
->> To: Aleksandar Markovic
->> Cc: QEMU Developers; Aleksandar Markovic; Philippe Mathieu-Daud=E9
->> Subject: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux l=
-ogos displayed on framebuffer
->>
->> On Thu, 27 Feb 2020 at 13:28, Aleksandar Markovic
->> <aleksandar.markovic@rt-rk.com> wrote:
->>>
->>> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->>>
->>> Add a test that verifies that each core properly displays the Tux
->>> logo on the framebuffer device.
->>>
->>> We simply follow the OpenCV "Template Matching with Multiple Objects"
->>> tutorial, replacing Lionel Messi by Tux:
->>> https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html
->>
->> Hi -- this doesn't seem to work on my system:
->>
+On 3/2/20 6:58 PM, Richard Henderson wrote:
+> If by context we know that we're in AArch64 mode, we need not
+> test for M-profile when reconstructing the full ARMMMUIdx.
 >=20
-> Thank you for bringing this to our attention.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   target/arm/internals.h     | 6 ++++++
+>   target/arm/translate-a64.c | 2 +-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
 >=20
-> It looks like an honest mistake to me. Too bad
-> none of us tested the case of environment like
-> yours, even though it looked reasonable to test it.
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 9f96a2359f..e633aff36e 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -783,6 +783,12 @@ static inline ARMMMUIdx core_to_arm_mmu_idx(CPUARMSt=
+ate *env, int mmu_idx)
+>       }
+>   }
+>  =20
+> +static inline ARMMMUIdx core_to_aa64_mmu_idx(int mmu_idx)
+> +{
+> +    /* AArch64 is always a-profile. */
+> +    return mmu_idx | ARM_MMU_IDX_A;
 
-I'm sorry I missed that, I'm pretty sure I tested it as we noticed this=20
-"bug" in Avocado more than 1 year ago already (bug =3D class decorator not=
-=20
-working). I suppose I forgot to test that on Travis-CI and all my=20
-systems have opencv2 installed.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
->=20
-> Philippe, Peter's solution looks good to me. What
-> do you think?
-
-Yes this is correct. Alex suggested it earlier and I resend his patch=20
-fixed which is exactly the diff Peter pasted (I am just noticing it now):
-https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00389.html
-
->=20
-> Peter, would you like me to submit a patch with your
-> proposal, authored by you, and than soon send it as
-> a part of a small pull request?
->=20
-> Thanks again,
-> Aleksandar
->=20
->>   (38/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine=
-.test_integratorcp_console:
->> SKIP: untrusted code
->>   (39/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine=
-.test_framebuffer_tux_logo:
->> SKIP: Python NumPy not installed
->>   (40/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n800:
->> SKIP: untrusted code
->>   (41/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n810:
->> SKIP: untrusted code
->>   (42/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test=
-_bootrom_framebuffer_size:
->> PASS (3.47 s)
->>   (43/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test=
-_bootrom_framebuffer_ocr_with_tesseract_v3:
->> SKIP: tesseract v3 OCR tool not available
->>   (44/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test=
-_bootrom_framebuffer_ocr_with_tesseract_v4:
->> SKIP: tesseract v4 OCR tool not available
->>   (45/74) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer=
-.test_mips_malta_i6400_framebuffer_logo_1core:
->> ERROR: name 'cv2' is not defined (5.43 s)
->>
->> It looks like the @skipUnless directive on the class didn't
->> have any effect. Moving it to the individual test functions seems
->> to cause them to be skipped as intended (as the integratorcp
->> framebuffer test is):
->>
->> diff --git a/tests/acceptance/machine_mips_malta.py
->> b/tests/acceptance/machine_mips_malta.py
->> index 92b4f28a112..98463f77573 100644
->> --- a/tests/acceptance/machine_mips_malta.py
->> +++ b/tests/acceptance/machine_mips_malta.py
->> @@ -30,8 +30,6 @@ except ImportError:
->>       CV2_AVAILABLE =3D False
->>
->>
->> -@skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> -@skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->>   class MaltaMachineFramebuffer(Test):
->>
->>       timeout =3D 30
->> @@ -91,6 +89,8 @@ class MaltaMachineFramebuffer(Test):
->>               cv2.imwrite(debug_png, screendump_bgr)
->>           self.assertGreaterEqual(tuxlogo_count, cpu_cores_count)
->>
->> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->>       def test_mips_malta_i6400_framebuffer_logo_1core(self):
->>           """
->>           :avocado: tags=3Darch:mips64el
->> @@ -99,6 +99,8 @@ class MaltaMachineFramebuffer(Test):
->>           """
->>           self.do_test_i6400_framebuffer_logo(1)
->>
->> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->>       def test_mips_malta_i6400_framebuffer_logo_7cores(self):
->>           """
->>           :avocado: tags=3Darch:mips64el
->> @@ -108,6 +110,8 @@ class MaltaMachineFramebuffer(Test):
->>           """
->>           self.do_test_i6400_framebuffer_logo(7)
->>
->> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->>       def test_mips_malta_i6400_framebuffer_logo_8cores(self):
->>           """
->>           :avocado: tags=3Darch:mips64el
->>
->> thanks
->> -- PMM
->=20
+> +}
+> +
+>   int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx);
+>  =20
+>   /*
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 579180af0a..c910a49b4e 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -14300,7 +14300,7 @@ static void aarch64_tr_init_disas_context(DisasCo=
+ntextBase *dcbase,
+>       dc->condexec_mask =3D 0;
+>       dc->condexec_cond =3D 0;
+>       core_mmu_idx =3D FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
+> -    dc->mmu_idx =3D core_to_arm_mmu_idx(env, core_mmu_idx);
+> +    dc->mmu_idx =3D core_to_aa64_mmu_idx(core_mmu_idx);
+>       dc->tbii =3D FIELD_EX32(tb_flags, TBFLAG_A64, TBII);
+>       dc->tbid =3D FIELD_EX32(tb_flags, TBFLAG_A64, TBID);
+>       dc->current_el =3D arm_mmu_idx_to_el(dc->mmu_idx);
 >=20
 
 
