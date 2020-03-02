@@ -2,82 +2,90 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528FAC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4A7C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:19:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EE69214DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:18:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18533214DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:19:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mvs7TwaS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EE69214DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SnbbzUC3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18533214DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8k1e-0000xv-9G
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:18:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41867)
+	id 1j8k2F-00025g-53
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:18:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j8k0M-0007yT-K3
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:17:04 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j8k1K-0000tu-Jr
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j8k0L-0001Ng-Fe
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:17:02 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34991)
+ (envelope-from <alex.bennee@linaro.org>) id 1j8k1J-0001Sw-GA
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:02 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:47071)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j8k0L-0001NP-Av
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:17:01 -0500
-Received: by mail-ot1-x343.google.com with SMTP id v10so2179624otp.2
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:16:58 -0800 (PST)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j8k1J-0001Si-9B
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:01 -0500
+Received: by mail-wr1-x442.google.com with SMTP id j7so12214596wrp.13
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:18:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=aon4dE9H7+TmS7pGG/pcDTA8szPkhUqc8rzDeR3ly/A=;
- b=Mvs7TwaSwOZ/43N7mu8WAkFspbfIO5dS/BqFSO4KUlTv0h9nveMzBLROGWv/s9f6TQ
- JzdrHmQr5htp0aTF4RDKSMtxv8ri9QqpQtbvwyXD/4QbG9uoVteH5z0BNff1u27A1xm3
- kYNN6XXb9s4pWpqghmVQbAA7YoPO5qqJJbSvMf8H0jzvEWUn87sCiRbkorvkTeclQlqD
- kEw/Zvm2IKm/ZGMOpjWuFtwnVZLufHM73T9MLlm+lQufIfI4lMXBURDHgxnHFC5YbDPI
- l2ilPxmtRpwUFR26DDVyGucNbfxi8BEihdeyI+sVoyWVJmRv0VXZlWQnSyr3HTmxnQly
- w9Jg==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=XdruoThp7NMZfN1+sDb1UztO4Q1oOK0aayWaVPmQedg=;
+ b=SnbbzUC3X4LeTxqxGFKkRLcLQqmX3X5ZH87nW85HWzHmR8eNkAx35qSgMxP7QCTXun
+ fBWi2Qqy+PZpOGWHq1uRLQNfQc3XAcEMt7KfRB8ntdjAaN1T4l7XlJuUPm4N+rHF2n4Q
+ GBcWAAz4ap8O66AYXTeGn4a33v+R6qOdtPXl1wjvkh0njWYCGxVroR/8v0DqEA0Yleuu
+ PLOmJFItzSHd7ZwlWcoli9/8TlEjfuPvFJD+dQxwWfd0nNKeoedgqzmcDfgCY9Wnvt4x
+ feSoqbul72xVuphHlPGQLlBxDCQOnrhiQ1xVTlmUASV1JKO+gNVwhfcga9DHGny+OMwq
+ 0ECw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=aon4dE9H7+TmS7pGG/pcDTA8szPkhUqc8rzDeR3ly/A=;
- b=e4NIP8rNvT5s95Dp2jEvyaKV6iLboKjcftFhDHCTk7X61FrjjKX261ZOwiz9sXqfM8
- I3BRHHvw6vZt56jWiCUGI9w9HkZ2PqN/nnwwzcAsY/Jk5nPGMKv9o1yODR4nl3FDNsZQ
- hZAiR4TLp+W7tfms1J3OAvOtn2DVGlOlHrgGN8vNpfq03g+IXBmBO+hAQx1LcdBxivU7
- vcLziN7QC1UyS19Fu4+c8bvzf6pSFT1gKyGOPQ0ufIahMVMTgwzdHW9+/BXR2AAW4gdt
- bciHn5YuXtZ8v2EPA+z2yglW3r/SGRkxTAfdpDPU87vauWSbBdvoxQxZ4XJ3UwK593QD
- mbog==
-X-Gm-Message-State: APjAAAV6kAFhmlblvKM6If1oISGoI/t3bUVQiNMvVyoaO1XYEW71BKhG
- X3mO+FkORo0WeITAFB8/xMt+331GRg2nJdjwGSUO4Q==
-X-Google-Smtp-Source: APXvYqxb+VSGj7yX4xmz44nJs52J+vJWr84y+kJ/OvqndTE1BxhuAJS1oYvkOn9TC2t1pHAXI+FI83VEuewK/iC8zYc=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr12279365otq.221.1583151417584; 
- Mon, 02 Mar 2020 04:16:57 -0800 (PST)
-MIME-Version: 1.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=XdruoThp7NMZfN1+sDb1UztO4Q1oOK0aayWaVPmQedg=;
+ b=GZs8tr8oNUf5sonxUp1F3v717Gkl1Tx1XplBzu/aqokftaUADbjray9aYBTXcaql9u
+ 9xhzQx1NW/qO5Xmgu7d2ul+cLS8eIOdqRSRN9mNWLH1XWw6VAJblmWUlIvKs8LZCufyg
+ DL3GqU65Gjyv1fQLPGIdOSXuzCJOgi391wD0GazvuRB2vsFqUWjl54Mqf0ISJR/D64ut
+ Dyz77sb2N6VWBWbclVYY0RZFnpeDEDAAjKnmEESKSbYzf8blmhXqCZotnRzLGEgaMdgG
+ MZfVVcrqo9JrVnp7d06TMwOw7zcPByeKZiHDUbtCOJ9Aw7K67JZhohSAw6/I82p9hRxB
+ K2QA==
+X-Gm-Message-State: ANhLgQ2k0FQfU5XZVFiv1P83gdTxTsrRqRP2ugs6qVuJSSqpArfI97OL
+ gHuIGFnadNoP2Jly/r6wMlzs6Q==
+X-Google-Smtp-Source: ADFU+vvCK9AokoAl6jIszwxdt98RW76wmoUGlWlF59S3R6hzOqkNHyXv405Hg5k/arY13+U79eGfMg==
+X-Received: by 2002:a5d:55d1:: with SMTP id i17mr7419818wrw.326.1583151480234; 
+ Mon, 02 Mar 2020 04:18:00 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 90sm27370541wro.79.2020.03.02.04.17.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Mar 2020 04:17:59 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AB73E1FF87;
+ Mon,  2 Mar 2020 12:17:58 +0000 (GMT)
 References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-6-peter.maydell@linaro.org> <87wo83atnf.fsf@linaro.org>
-In-Reply-To: <87wo83atnf.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Mar 2020 12:16:46 +0000
-Message-ID: <CAFEAcA-WYXtkkCshv_eDV5Rj8ER4yfDmf5V=HaT-Jo5cSJr0vA@mail.gmail.com>
-Subject: Re: [PATCH v3 05/33] qemu-doc: split qemu-doc.texi in multiple files
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+ <20200228153619.9906-23-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 22/33] doc/scripts/hxtool.py: Strip trailing ':' from
+ DEFHEADING/ARCHHEADING
+In-reply-to: <20200228153619.9906-23-peter.maydell@linaro.org>
+Date: Mon, 02 Mar 2020 12:17:58 +0000
+Message-ID: <87pndv9ci1.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,66 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
  Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2 Mar 2020 at 11:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> In hxtool files, section headings defined with the DEFHEADING
+> and ARCHHEADING macros have a trailing ':'
+>   DEFHEADING(Standard options:)
 >
+> This is for the benefit of the --help output. For consistency
+> with the rest of the rST documentation, strip any trailing ':'
+> when we construct headings with the Sphinx hxtool extension.
+> This makes the table of contents look neater.
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
+> This only affects generation of documentation from qemu-options.hx,
+> which we will start doing in a later commit.
 >
-> > From: Paolo Bonzini <pbonzini@redhat.com>
-> >
-> > In order to facilitate the reorganization of qemu-doc.texi content,
-> > as well as the conversion to rST/Sphinx, split it in multiple .texi
-> > files that are included from docs/system.
-> >
-> > The "other devices" section is renamed to ivshmem and placed last.
-> >
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Message-id: 20200226113034.6741-6-pbonzini@redhat.com
-> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> >  Makefile                         |   16 +
-> >  docs/system/build-platforms.texi |   67 ++
-> >  docs/system/gdb.texi             |   71 ++
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  docs/sphinx/hxtool.py | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 >
-> The gdb test would be better served in docs/core if we could have
-> optional sections on invocation rendering depending on if it's built
-> with system emulation or linux-user docs. Is that something that's
-> already supported?
+> diff --git a/docs/sphinx/hxtool.py b/docs/sphinx/hxtool.py
+> index 5d6736f3002..7dd223fe362 100644
+> --- a/docs/sphinx/hxtool.py
+> +++ b/docs/sphinx/hxtool.py
+> @@ -60,8 +60,9 @@ def parse_defheading(file, lnum, line):
+>      # empty we ignore the directive -- these are used only to add
+>      # blank lines in the plain-text content of the --help output.
+>      #
+> -    # Return the heading text
+> -    match =3D re.match(r'DEFHEADING\((.*)\)', line)
+> +    # Return the heading text. We strip out any trailing ':' for
+> +    # consistency with other headings in the rST documentation.
+> +    match =3D re.match(r'DEFHEADING\((.*?):?\)', line)
+>      if match is None:
+>          serror(file, lnum, "Invalid DEFHEADING line")
+>      return match.group(1)
+> @@ -72,8 +73,9 @@ def parse_archheading(file, lnum, line):
+>      # though note that the 'some string' could be the empty string.
+>      # As with DEFHEADING, empty string ARCHHEADINGs will be ignored.
+>      #
+> -    # Return the heading text
+> -    match =3D re.match(r'ARCHHEADING\((.*),.*\)', line)
+> +    # Return the heading text. We strip out any trailing ':' for
+> +    # consistency with other headings in the rST documentation.
+> +    match =3D re.match(r'ARCHHEADING\((.*?):?,.*\)', line)
+>      if match is None:
+>          serror(file, lnum, "Invalid ARCHHEADING line")
+>      return match.group(1)
 
-No, for three reasons:
 
-(1) we build all the docs, always -- there's no concept
-of "skip some bits of docs if some configure feature was
-disabled"
-
-(2) there is no docs/core -- the subdirectories of docs/
-correspond to the "manuals" which we want to present to
-the user, like "Manual for system emulation users" and
-"Manual for user-mode users" and "Manual for the
-standalone tools"; a "core" manual wouldn't fit into this
-classification, and we already have slightly more manuals
-than I'm entirely comfortable with.
-
-(3) Sphinx's support for conditional documentation is
-not very good, as it is implemented at the "wrong"
-end of the pipeline (ie it's not like a preprocessor
-ifdef, but instead is just "suppress the output", so
-manual pieces inside a disabled ifdef still turn up
-in places like the index and table of contents). The
-best you can do is to mess around with the include
-directive, but if we do that too much then things get
-awkward to understand and maintain. (We do it a bit
-in this series to handle "manpage vs manual" stuff.)
-
-thanks
--- PMM
+--=20
+Alex Benn=C3=A9e
 
