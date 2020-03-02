@@ -2,81 +2,89 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0738C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1831AC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B533B2080C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:20:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7B33214DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:23:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDpaZWer"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B533B2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJCvGCjq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B33214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8lwA-0007Hl-Qa
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 09:20:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58836)
+	id 1j8lyK-0000da-2O
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 09:23:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1j8lvV-0006iJ-B0
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:20:10 -0500
+ (envelope-from <armbru@redhat.com>) id 1j8lxf-0000B5-Dh
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1j8lvU-0002b8-0S
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:20:09 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44081)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1j8lvT-0002a0-Je; Mon, 02 Mar 2020 09:20:07 -0500
-Received: by mail-lf1-x143.google.com with SMTP id 7so8192790lfz.11;
- Mon, 02 Mar 2020 06:20:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KJrtEdPJ2SAb4JoHKL3JdyltZQZyjNQylqk3c3NRDOI=;
- b=HDpaZWerVHaZs56omrBVz/2XvkuwraB3CtAd0uBNpSIGGdg0yww4Y9HJjqwsVVMgms
- NKOcdr4whJ1E1bB7RdV5EEvyU3eUFy6JMHUa1cx/1LqFBWAvyZRZoav321ZDPXhrQuGi
- QTfb+apJV5PUtNNCp7tUk3LLIxcsGGs1Q5fxtGDLtdYC7hfgsNXZ+wFjH3VaXyWonU+y
- TKU1do+KPvNcB43ksO0gAik9g1wRROAurELAC1oG7tmEtZhcBQ4EanYeuE9PNT+zMXnh
- zy1fIbOTUtzgtkrIV9H8g/r9Q8EPJEHEtdPMN1+v8SeOq8iCYpgbfHET6iy5eyd7A0nz
- sWVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KJrtEdPJ2SAb4JoHKL3JdyltZQZyjNQylqk3c3NRDOI=;
- b=poWB7FZ9/Tu5y6nlhF2Dp7LK1gT/FcqDgSeSMzGuniENea2WCV4UlialHrC1csLHf7
- l70iqq1rPpSxVMge+xLWstHj7D97i978cUX6vucAeU9UwDlHOURUkjdlT+NC2msQoZfL
- nxz+FVj6Gamk+wI2eJe+FXvKsOZZ3FVvJmY46ipEboh6AC+xCiovsW3d+wVzgfvtgtO+
- OB2fkvl2qhH+/e4sCqoYikMJAGGeda6O63CMduMKsR0SViaoVii3l91qmJymFZli+LUr
- zZzWNYUfUrBP/syLvyhTWNXu8+SISr/LklG9d32NrjVBNbhcsFnutTMMjm8Atxqo6yoH
- XnMA==
-X-Gm-Message-State: ANhLgQ1sgnLPKL/eEn5Byg7IwVB9KcG0GKUDy119RS+aULItukz9jTIb
- 07KuaoRrBzAUVQz8D4PNBnT0MF6ThPy+i9vrgE8=
-X-Google-Smtp-Source: ADFU+vsKn8d3EIosn7+llY7DEsvnDT6tGX8EhlAuJSuoHJJxBNHFXInotGpVwZCgOm8dXSBiRpE+ytalXpiFoSUSBds=
-X-Received: by 2002:a19:ee0d:: with SMTP id g13mr11164993lfb.179.1583158805747; 
- Mon, 02 Mar 2020 06:20:05 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1j8lxd-0003Sn-8O
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:22:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60665
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j8lxd-0003SX-4c
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:22:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583158940;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zbWN5TeQTHiNWHSlF813QOo8N8pbB0mrB0UCapINWJc=;
+ b=BJCvGCjqcBMi35/ccRKl7XRES/LROXshp9LTUzHal6Zf34xMv1kBjz745nEF5JSTVLoIQE
+ pxh4H6tKezbx6EOFMXqyTxAsqJas+VQbpvJ4KcYSiV+igDVcFKW8a+IssDFsAduCjQDsno
+ r7T67fzybODnKE0KfO4xrCq8yjxzqWQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-H_F3ui1APaykVYqkGWdqxA-1; Mon, 02 Mar 2020 09:22:18 -0500
+X-MC-Unique: H_F3ui1APaykVYqkGWdqxA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A68758018A6;
+ Mon,  2 Mar 2020 14:22:17 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C83CC8D574;
+ Mon,  2 Mar 2020 14:22:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 4C0E411386A6; Mon,  2 Mar 2020 15:22:13 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org>
+ <20200221100700.GA5254@linux.fritz.box>
+ <87pne751g9.fsf@dusky.pond.sub.org>
+ <CAJ+F1CKbZiVk0DCQxMojxu8FyEskg5Cw32B08Vi9emaEMw79fQ@mail.gmail.com>
+Date: Mon, 02 Mar 2020 15:22:13 +0100
+In-Reply-To: <CAJ+F1CKbZiVk0DCQxMojxu8FyEskg5Cw32B08Vi9emaEMw79fQ@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 24 Feb 2020
+ 17:20:33 +0100")
+Message-ID: <87imjm96qy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
- <20200302130715.29440-11-kuhn.chenqun@huawei.com>
-In-Reply-To: <20200302130715.29440-11-kuhn.chenqun@huawei.com>
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Mon, 2 Mar 2020 08:19:52 -0600
-Message-ID: <CAJy5ezqf08b=FVGY9WHYuOif5Kb8VpENQxomKNg2MXP3y_CDXw@mail.gmail.com>
-Subject: Re: [PATCH v3 09/12] dma/xlnx-zdma: Remove redundant statement in
- zdma_write_dst()
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Content-Type: multipart/alternative; boundary="0000000000003d5c32059fdfe24c"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,224 +96,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
- QEMU Trivial <qemu-trivial@nongnu.org>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel <qemu-devel@nongnu.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- Euler Robot <euler.robot@huawei.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ David Alan Gilbert <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003d5c32059fdfe24c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-On Mon, 2 Mar. 2020, 07:09 Chen Qun, <kuhn.chenqun@huawei.com> wrote:
+> Hi
+>
+> On Fri, Feb 21, 2020 at 5:50 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
+>>
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>
+>> > Am 20.02.2020 um 17:01 hat Markus Armbruster geschrieben:
+>> >> >> >  void qmp_screendump(const char *filename, bool has_device, cons=
+t char *device,
+>> >> >> >                      bool has_head, int64_t head, Error **errp)
+>> >> >> >  {
+>> >> >> >      QemuConsole *con;
+>> >> >> >      DisplaySurface *surface;
+>> >> >> > +    g_autoptr(pixman_image_t) image =3D NULL;
+>> >> >> >      int fd;
+>> >> >> >
+>> >> >> >      if (has_device) {
+>> >> >> > @@ -365,7 +375,15 @@ void qmp_screendump(const char *filename, b=
+ool has_device, const char *device,
+>> >> >> >          }
+>> >> >> >      }
+>> >> >> >
+>> >> >> > -    graphic_hw_update(con);
+>> >> >> > +    if (qemu_in_coroutine()) {
+>> >> >> > +        assert(!con->screendump_co);
+>> >> >> > +        con->screendump_co =3D qemu_coroutine_self();
+>> >> >> > +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>> >> >> > +                                graphic_hw_update_bh, con);
+>> >> >> > +        qemu_coroutine_yield();
+>> >> >> > +        con->screendump_co =3D NULL;
+>> >> >> > +    }
+>> >> >>
+>> >> >> What if multiple QMP monitors simultaneously screendump?  Hmm, it =
+works
+>> >> >> because all execute one after another in the same coroutine
+>> >> >> qmp_dispatcher_co.  Implicit mutual exclusion.
+>> >> >>
+>> >> >> Executing them one after another is bad, because it lets an ill-be=
+haved
+>> >> >> QMP command starve *all* QMP monitors.  We do it only out of
+>> >> >> (reasonable!) fear of implicit mutual exclusion requirements like =
+the
+>> >> >> one you add.
+>> >> >>
+>> >> >> Let's not add more if we can help it.
+>> >> >
+>> >> > The situation is not worse than the current blocking handling.
+>> >>
+>> >> Really?
+>> >>
+>> >> What makes executing multiple qmp_screendump() concurrently (in separ=
+ate
+>> >> threads) or interleaved (in separate coroutines in the same thread)
+>> >> unsafe before this patch?
+>> >
+>> > QMP command handlers are guaranteed to run in the main thread with the
+>> > BQL held, so there is no concurrency. If you want to change this, you
+>> > would have much more complicated problems to solve than in this handle=
+r.
+>> > I'm not sure it's fair to require thread-safety from one handler when
+>> > no other handler is thread safe (except accidentally) and nobody seems
+>> > to plan actually calling them from multiple threads.
+>>
+>> "Let's not [...] if we can help it." is hardly a "change this or else no
+>> merge" demand.  It is a challenge to find a more elegant solution.
+>>
+>> >> >> Your screendump_co is per QemuConsole instead of per QMP monitor o=
+nly
+>> >> >> because you need to find the coroutine in graphic_hw_update_done()=
+.  Can
+>> >> >> we somehow pass it via function arguments?
+>> >> >
+>> >> > I think it could be done later, so I suggest a TODO.
+>> >>
+>> >> We should avoid making our dependence on implicit mutual exclusion
+>> >> worse.  When we do it anyway, a big, fat, ugly comment is definitely
+>> >> called for.
+>> >
+>> > Anyway, what I really wanted to add:
+>> >
+>> > This should be easy to solve by having a CoQueue instead of a single
+>>
+>> Ah, challenge accepted!  Exactly the outcome I was hoping for :)
+>>
+>> > Coroutine pointer. The coroutine would just call qemu_co_queue_wait(),
+>> > which adds itself to the queue before it yields and the update
+>> > completion would wake up all coroutines that are currently queued with
+>> > qemu_co_queue_restart_all().
+>> >
+>> > qemu_co_queue_wait() takes a lock as its second parameter. You don't
+>> > need it in this context and can just pass NULL. (This is a lock that
+>> > would be dropped while the coroutine is sleeping and automatically
+>> > reacquired afterwards.)
+>> >
+>> >> >> In case avoiding the mutual exclusion is impractical: please expla=
+in it
+>> >> >> in a comment to make it somewhat less implicit.
+>> >>
+>> >> It is anything but: see appended patch.
+>> >
+>> > This works, too, but it requires an additional struct. I think the que=
+ue
+>> > is easier. (Note there is a difference in the mechanism: Your patch
+>> > waits for the specific update it triggered, while the CoQueue would wa=
+it
+>> > for _any_ update to complete. I assume effectively the result is the
+>> > same.)
+>>
+>> Your idea sounds much nicer to me.  Thanks!
+>
+> Similar to the NULL check you asked to remove,
+> having a CoQueue there would lead to think that several concurrently
+> running screendump are possible.
+>
+> Is this a direction we are willing to take?
 
-> Clang static code analyzer show warning:
-> hw/dma/xlnx-zdma.c:399:13: warning: Value stored to 'dst_type' is never
-> read
->             dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
-> ZDMA_CH_DST_DSCR_WORD3,
->
+Let's take a step back.
 
+The actual problem is to find the coroutine in graphic_hw_update_done(),
+so you can wake it.
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Your solution stores the coroutine in the QemuConsole, because that's
+readily available in graphic_hw_update_done().
 
+However, it really, really doesn't belong there, it belongs to the
+monitor.  Works anyway only because QMP commands execute one after the
+other.
 
+Kevin suggested using a CoQueue to avoid this unspoken dependency.  You
+object, because it could make readers assume multiple screendump
+commands could run concurrently, which is not the case.
 
-            ^
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-> v1->v2: move the 'dst_type' declaration.(Base on Philippe's suggestion).
-> ---
->  hw/dma/xlnx-zdma.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-> index 8fb83f5b07..eeacad59ce 100644
-> --- a/hw/dma/xlnx-zdma.c
-> +++ b/hw/dma/xlnx-zdma.c
-> @@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s,
-> bool type,
->  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
->  {
->      uint32_t dst_size, dlen;
-> -    bool dst_intr, dst_type;
-> +    bool dst_intr;
->      unsigned int ptype =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0,
-> POINT_TYPE);
->      unsigned int rw_mode =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MO=
-DE);
->      unsigned int burst_type =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_A=
-TTR,
-> @@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t
-> *buf, uint32_t len)
->      while (len) {
->          dst_size =3D FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WO=
-RD2,
->                                SIZE);
-> -        dst_type =3D FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WO=
-RD3,
-> -                              TYPE);
->          if (dst_size =3D=3D 0 && ptype =3D=3D PT_MEM) {
->              uint64_t next;
-> +            bool dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
-> +                                       ZDMA_CH_DST_DSCR_WORD3,
-> +                                       TYPE);
-> +
->              next =3D zdma_update_descr_addr(s, dst_type,
->                                            R_ZDMA_CH_DST_CUR_DSCR_LSB);
->              zdma_load_descriptor(s, next, &s->dsc_dst);
->              dst_size =3D FIELD_EX32(s->dsc_dst.words[2],
-> ZDMA_CH_DST_DSCR_WORD2,
->                                    SIZE);
-> -            dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
-> ZDMA_CH_DST_DSCR_WORD3,
-> -                                  TYPE);
->          }
->
->          /* Match what hardware does by ignoring the dst_size and only
-> using
-> --
-> 2.23.0
->
->
->
+Alright, let's KISS: since there's just one main loop, there's just one
+coroutine: @qmp_dispatcher_co.  Let's use that, so the dependency on
+"one command after the other" is explicit and obvious.
 
---0000000000003d5c32059fdfe24c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">On Mon, 2 Mar. 2020, 07:09 Chen Qun, &lt;<a href=3D"ma=
-ilto:kuhn.chenqun@huawei.com">kuhn.chenqun@huawei.com</a>&gt; wrote:<br></d=
-iv><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
-:1px #ccc solid;padding-left:1ex">Clang static code analyzer show warning:<=
-br>
-hw/dma/xlnx-zdma.c:399:13: warning: Value stored to &#39;dst_type&#39; is n=
-ever read<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;dsc=
-_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,<br></blockquote></div></div><div dir=
-=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex"></blockquote></div></div><div dir=3D"auto"><br></div><=
-div dir=3D"auto">Reviewed-by: Edgar E. Iglesias &lt;<a href=3D"mailto:edgar=
-.iglesias@xilinx.com">edgar.iglesias@xilinx.com</a>&gt;</div><div dir=3D"au=
-to"><br></div><div dir=3D"auto"><br></div><div dir=3D"auto"><br></div><div =
-dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
-<br>
-Reported-by: Euler Robot &lt;<a href=3D"mailto:euler.robot@huawei.com" targ=
-et=3D"_blank" rel=3D"noreferrer">euler.robot@huawei.com</a>&gt;<br>
-Signed-off-by: Chen Qun &lt;<a href=3D"mailto:kuhn.chenqun@huawei.com" targ=
-et=3D"_blank" rel=3D"noreferrer">kuhn.chenqun@huawei.com</a>&gt;<br>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com" target=3D"_blank" rel=3D"noreferrer">philmd@redhat.com</a>&gt;<br>
-Reviewed-by: Francisco Iglesias &lt;<a href=3D"mailto:frasse.iglesias@gmail=
-.com" target=3D"_blank" rel=3D"noreferrer">frasse.iglesias@gmail.com</a>&gt=
-;<br>
-Reviewed-by: Alistair Francis &lt;<a href=3D"mailto:alistair.francis@wdc.co=
-m" target=3D"_blank" rel=3D"noreferrer">alistair.francis@wdc.com</a>&gt;<br=
->
----<br>
-Cc: Alistair Francis &lt;<a href=3D"mailto:alistair@alistair23.me" target=
-=3D"_blank" rel=3D"noreferrer">alistair@alistair23.me</a>&gt;<br>
-Cc: &quot;Edgar E. Iglesias&quot; &lt;<a href=3D"mailto:edgar.iglesias@gmai=
-l.com" target=3D"_blank" rel=3D"noreferrer">edgar.iglesias@gmail.com</a>&gt=
-;<br>
-Cc: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D=
-"_blank" rel=3D"noreferrer">peter.maydell@linaro.org</a>&gt;<br>
-Cc: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" ta=
-rget=3D"_blank" rel=3D"noreferrer">philmd@redhat.com</a>&gt;<br>
-<br>
-v1-&gt;v2: move the &#39;dst_type&#39; declaration.(Base on Philippe&#39;s =
-suggestion).<br>
----<br>
-=C2=A0hw/dma/xlnx-zdma.c | 10 +++++-----<br>
-=C2=A01 file changed, 5 insertions(+), 5 deletions(-)<br>
-<br>
-diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c<br>
-index 8fb83f5b07..eeacad59ce 100644<br>
---- a/hw/dma/xlnx-zdma.c<br>
-+++ b/hw/dma/xlnx-zdma.c<br>
-@@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s, boo=
-l type,<br>
-=C2=A0static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)<b=
-r>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0uint32_t dst_size, dlen;<br>
--=C2=A0 =C2=A0 bool dst_intr, dst_type;<br>
-+=C2=A0 =C2=A0 bool dst_intr;<br>
-=C2=A0 =C2=A0 =C2=A0unsigned int ptype =3D ARRAY_FIELD_EX32(s-&gt;regs, ZDM=
-A_CH_CTRL0, POINT_TYPE);<br>
-=C2=A0 =C2=A0 =C2=A0unsigned int rw_mode =3D ARRAY_FIELD_EX32(s-&gt;regs, Z=
-DMA_CH_CTRL0, MODE);<br>
-=C2=A0 =C2=A0 =C2=A0unsigned int burst_type =3D ARRAY_FIELD_EX32(s-&gt;regs=
-, ZDMA_CH_DATA_ATTR,<br>
-@@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf,=
- uint32_t len)<br>
-=C2=A0 =C2=A0 =C2=A0while (len) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dst_size =3D FIELD_EX32(s-&gt;dsc_dst.wor=
-ds[2], ZDMA_CH_DST_DSCR_WORD2,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0SIZE);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;dsc_dst.words[3]=
-, ZDMA_CH_DST_DSCR_WORD3,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (dst_size =3D=3D 0 &amp;&amp; ptype =
-=3D=3D PT_MEM) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t next;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bool dst_type =3D FIELD_EX32(s-&=
-gt;dsc_dst.words[3],<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ZDMA_CH_D=
-ST_DSCR_WORD3,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TYPE);<br=
->
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0next =3D zdma_update_descr_=
-addr(s, dst_type,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0R_ZDMA_CH_DST_CUR_DSCR_LSB);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0zdma_load_descriptor(s, nex=
-t, &amp;s-&gt;dsc_dst);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dst_size =3D FIELD_EX32(s-&=
-gt;dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0SIZE);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;ds=
-c_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Match what hardware does by ignoring t=
-he dst_size and only using<br>
--- <br>
-2.23.0<br>
-<br>
-<br>
-</blockquote></div></div></div>
-
---0000000000003d5c32059fdfe24c--
 
