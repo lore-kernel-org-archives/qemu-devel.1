@@ -2,91 +2,100 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD120C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6167C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779B920842
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:18:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F7F920842
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sRjzzTUd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779B920842
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hdu1kTYH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F7F920842
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8j64-0000DA-NF
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:18:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60964)
+	id 1j8j7G-0001aZ-Qs
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:20:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8j5O-00085I-JV
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:18:13 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8j6E-0000YA-Ge
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8j5L-0004b0-Fd
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:18:10 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38915)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8j5L-0004an-4x
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:18:07 -0500
-Received: by mail-wr1-x441.google.com with SMTP id y17so12082994wrn.6
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 03:18:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=LMC6Wz87yHAwlLy4e/dbJp7wjJvq3UjVDeryA/NNdzY=;
- b=sRjzzTUdUKFgmAWB+M4TKjsobpXCM7WovlqZPgxSX5VyjRHAY/sLGt591LC2Im7ycf
- Qu1FjELpxdat/srWdtjUS0u0mfAy1EpM8xeesFaclJr2J59zJGLWSxsgLi7n5CGhGYNo
- MpPNy5QbRAEtBl/Bu+o7cazvs4PuZ+DW0f/JhUTUrvd17ivKHHj4NuIBVRPkO24+YZxU
- 9pBOMMenSblU7pkrgjEKwfWHkUdwV1T9vFwTfjZhPOmnlulnTj3FaL99i5Qsc0GPAhVW
- D1C5oLcyuVqorkwkB5mJUN4C2u9loQnQlhwQQvPjLhGKvma2gTqIKiUMWkQO2qTwZ2gq
- qmPQ==
+ (envelope-from <philmd@redhat.com>) id 1j8j6D-0004ig-4a
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41752
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8j6D-0004iY-1K
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583147940;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LyYbusHqkV7O2CQidgGkMeNh+438YXMlYqcU1o8X5oU=;
+ b=Hdu1kTYHynKz3RaoDjf7PmeTk55Frc11wnraFhBr1RERrqjfuCD+IP6aIs42BWmlfvgbU0
+ qEKrrKExP4E9rC8PommA1PRAKNoRMfLd15oyJo98OvtTxNYqXPyL1YlNgw+73xEeyBdK7H
+ g00vOqLQYCbgOMleNnsVz4tjzuPpEMM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-162-WTuqZhvMO6SKe2t0S8OFCg-1; Mon, 02 Mar 2020 06:18:57 -0500
+X-MC-Unique: WTuqZhvMO6SKe2t0S8OFCg-1
+Received: by mail-wr1-f72.google.com with SMTP id j14so3241279wru.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 03:18:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=LMC6Wz87yHAwlLy4e/dbJp7wjJvq3UjVDeryA/NNdzY=;
- b=eZGM4Xc7otehx1Gr4yu+krN8qq5vqSxmsDQc8nZ0lA7T/YWBxvoZ6D3IHwiRgFTYOU
- lWCQMil+PX7xkssqbuP0CINBqOK7xxV6I8ZHTz56f6+1RyrXPoYX4rktKRX38c6dbl96
- bFB3t/M+zMURd2lXFJuVVyoGbq2jdVHm/hC3lYWgBVRUlYh4aMYLyjLi8+LV//vU+x7y
- V4KIiKZn6HQmbzQyfvds6cZjfxR28FPzrpBaW5a0L7VgqYWcFdohF0OJVg4Qlt1101YG
- gJPLsq6PasaTf+qzB5x1qZmq2Jc4M8Ka7EBnZxN5IOFChZ2+uKNUv3JMC4i40LHqddUm
- cUvg==
-X-Gm-Message-State: APjAAAUYsKTHvhlCKt4owFVZdyyI/Pw1MRbwYFomQx89fhbsI6hFlu8Q
- pB64NUSQY8rCRvv74o4wMxBayg==
-X-Google-Smtp-Source: APXvYqzOk6FMkqCUPYLa8JNZahRhXBqi/s1Q4gtG4cc3d0J/Xlm3rJIRyVDN8YQNAoRi4myfzpfKXg==
-X-Received: by 2002:adf:ce06:: with SMTP id p6mr20581633wrn.134.1583147885409; 
- Mon, 02 Mar 2020 03:18:05 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s8sm28687667wrt.57.2020.03.02.03.18.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 03:18:03 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2C1F41FF87;
- Mon,  2 Mar 2020 11:18:03 +0000 (GMT)
-References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-5-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 04/33] qemu-doc: split CPU models doc between MIPS
- and x86 parts
-In-reply-to: <20200228153619.9906-5-peter.maydell@linaro.org>
-Date: Mon, 02 Mar 2020 11:18:03 +0000
-Message-ID: <87zhczatuc.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YQA6g/jSFAX204Wo4d/KbsPMP3CGdZr6T6ta2cKO92o=;
+ b=Y1MpplkaDM518JTYyBi2VWac+2Zrf/MyvK91Qj51lmUw2a4DCcWlU2YRJPeVZNYUd0
+ TQ1p3gLZaZsjJEFG7KmlR+59OdD9BUGiAGUqbB5CFtFsr8HifF2soRycom1ibIJ2ShmM
+ KdIMmx13mxbl1SvZ7z0J4nib5W/n82iG5MaSWCnfR93n+DmKHyi/n1yGbrjyO6IYFa0B
+ G9GrPkYE7cplkw4zCbe9kJfhVstxbRWdiIQsoQHUWDFCdYQ+8Iv6G5kP4yPoR07u2p/3
+ p7bBwjRA9H+hXi3eWQ5ar/0vtTu+CqYzLI0aZVQgnsHF74mYDJ+mVWV89CG2NvC8dULq
+ /D8Q==
+X-Gm-Message-State: APjAAAX+KrullVBgo2pH7q/0/B2OA259LWs/5KwaWV3+6SLd13mxDcBN
+ LQDJANYkqWCZSBsOjhCe6a1KsG7+Q4vnxcaWLHimYaZkPRjfUbVByOJ5FDj87HgwOxqIzJy1Kd/
+ NaO2qEogZWW+PxVY=
+X-Received: by 2002:a5d:4484:: with SMTP id j4mr23544914wrq.153.1583147935733; 
+ Mon, 02 Mar 2020 03:18:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy9X9uhbY5jh297bfFjWdhTfQYzQgnLM/XgkL6jndHiGTjQ/0KsuE3Jq6JO0SlEB1gr38FSAQ==
+X-Received: by 2002:a5d:4484:: with SMTP id j4mr23544886wrq.153.1583147935459; 
+ Mon, 02 Mar 2020 03:18:55 -0800 (PST)
+Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
+ ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
+ by smtp.gmail.com with ESMTPSA id j5sm27807803wrx.56.2020.03.02.03.18.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Mar 2020 03:18:54 -0800 (PST)
+Subject: Re: [PATCH v3 2/6] hw/arm/virt: Introduce VirtGICType enum type
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+References: <20200302105516.5972-1-eric.auger@redhat.com>
+ <20200302105516.5972-3-eric.auger@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ff498491-820a-498a-2951-6e46951dd23e@redhat.com>
+Date: Mon, 2 Mar 2020 12:18:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200302105516.5972-3-eric.auger@redhat.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,735 +107,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: maz@kernel.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> From: Paolo Bonzini <pbonzini@redhat.com>
->
-> The MIPS CPU models end up in the middle of the PC documentation.  Move
-> them to a separate file so that they can be placed in the right section.
->
-> The man page still includes both x86 and MIPS content.
-
-We really need to flesh that out one day - it's not like ARM hasn't got
-it's own tweaks.
-
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Message-id: 20200226113034.6741-5-pbonzini@redhat.com
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 3/2/20 11:55 AM, Eric Auger wrote:
+> We plan to introduce yet another value for the gic version (nosel).
+> As we already use exotic values such as 0 and -1, let's introduce
+> a dedicated enum type and let vms->gic_version take this
+> type.
+>=20
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>=20
 > ---
->  Makefile                                      |  11 +-
->  MAINTAINERS                                   |   3 +-
->  docs/system/cpu-models-mips.texi              | 157 +++++++++++++
->  .../cpu-models-x86.texi}                      | 221 ++----------------
->  docs/system/qemu-cpu-models.texi              |  28 +++
+>=20
+> v2 -> v3:
+> - replaced defines by enum VirtGICType
+> - use that new type for vms->gic_version
+> ---
+>   hw/arm/virt.c         | 30 +++++++++++++++---------------
+>   include/hw/arm/virt.h | 11 +++++++++--
 
-I wonder if there is something that should go to docs/core? AFAICT the
-CPU modelling covers two things:
+Please have a look at scripts/git.orderfile, it helps making review=20
+easier/quicker.
 
-  - system KVM modelling which deals with feature bits and presenting a
-    common base for the purposes of migration
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-  - TCG modelling which covers what CPUs we can emulate which affects
-    both linux-user and system emulation
+>   2 files changed, 24 insertions(+), 17 deletions(-)
+>=20
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index c093f0ab85..b449a445de 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -298,7 +298,7 @@ static void fdt_add_timer_nodes(const VirtMachineStat=
+e *vms)
+>           irqflags =3D GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+>       }
+>  =20
+> -    if (vms->gic_version =3D=3D 2) {
+> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_2) {
+>           irqflags =3D deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+>                                GIC_FDT_IRQ_PPI_CPU_WIDTH,
+>                                (1 << vms->smp_cpus) - 1);
+> @@ -439,7 +439,7 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+>       qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 0x2);
+>       qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 0x2);
+>       qemu_fdt_setprop(vms->fdt, nodename, "ranges", NULL, 0);
+> -    if (vms->gic_version =3D=3D 3) {
+> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
+>           int nb_redist_regions =3D virt_gicv3_redist_region_count(vms);
+>  =20
+>           qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
+> @@ -518,7 +518,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState =
+*vms)
+>           }
+>       }
+>  =20
+> -    if (vms->gic_version =3D=3D 2) {
+> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_2) {
+>           irqflags =3D deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+>                                GIC_FDT_IRQ_PPI_CPU_WIDTH,
+>                                (1 << vms->smp_cpus) - 1);
+> @@ -1469,7 +1469,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSta=
+te *vms, int idx)
+>            * purposes are to make TCG consistent (with 64-bit KVM hosts)
+>            * and to improve SGI efficiency.
+>            */
+> -        if (vms->gic_version =3D=3D 3) {
+> +        if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
+>               clustersz =3D GICV3_TARGETLIST_BITS;
+>           } else {
+>               clustersz =3D GIC_TARGETLIST_BITS;
+> @@ -1560,15 +1560,15 @@ static void machvirt_init(MachineState *machine)
+>       /* We can probe only here because during property set
+>        * KVM is not available yet
+>        */
+> -    if (vms->gic_version <=3D 0) {
+> -        /* "host" or "max" */
+> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_HOST ||
+> +        vms->gic_version =3D=3D VIRT_GIC_VERSION_MAX) {
+>           if (!kvm_enabled()) {
+> -            if (vms->gic_version =3D=3D 0) {
+> +            if (vms->gic_version =3D=3D VIRT_GIC_VERSION_HOST) {
+>                   error_report("gic-version=3Dhost requires KVM");
+>                   exit(1);
+>               } else {
+>                   /* "max": currently means 3 for TCG */
+> -                vms->gic_version =3D 3;
+> +                vms->gic_version =3D VIRT_GIC_VERSION_3;
+>               }
+>           } else {
+>               vms->gic_version =3D kvm_arm_vgic_probe();
+> @@ -1627,7 +1627,7 @@ static void machvirt_init(MachineState *machine)
+>       /* The maximum number of CPUs depends on the GIC version, or on how
+>        * many redistributors we can fit into the memory map.
+>        */
+> -    if (vms->gic_version =3D=3D 3) {
+> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
+>           virt_max_cpus =3D
+>               vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+>           virt_max_cpus +=3D
+> @@ -1855,7 +1855,7 @@ static void virt_set_its(Object *obj, bool value, E=
+rror **errp)
+>   static char *virt_get_gic_version(Object *obj, Error **errp)
+>   {
+>       VirtMachineState *vms =3D VIRT_MACHINE(obj);
+> -    const char *val =3D vms->gic_version =3D=3D 3 ? "3" : "2";
+> +    const char *val =3D vms->gic_version =3D=3D VIRT_GIC_VERSION_3 ? "3"=
+ : "2";
+>  =20
+>       return g_strdup(val);
+>   }
+> @@ -1865,13 +1865,13 @@ static void virt_set_gic_version(Object *obj, con=
+st char *value, Error **errp)
+>       VirtMachineState *vms =3D VIRT_MACHINE(obj);
+>  =20
+>       if (!strcmp(value, "3")) {
+> -        vms->gic_version =3D 3;
+> +        vms->gic_version =3D VIRT_GIC_VERSION_3;
+>       } else if (!strcmp(value, "2")) {
+> -        vms->gic_version =3D 2;
+> +        vms->gic_version =3D VIRT_GIC_VERSION_2;
+>       } else if (!strcmp(value, "host")) {
+> -        vms->gic_version =3D 0; /* Will probe later */
+> +        vms->gic_version =3D VIRT_GIC_VERSION_HOST; /* Will probe later =
+*/
+>       } else if (!strcmp(value, "max")) {
+> -        vms->gic_version =3D -1; /* Will probe later */
+> +        vms->gic_version =3D VIRT_GIC_VERSION_MAX; /* Will probe later *=
+/
+>       } else {
+>           error_setg(errp, "Invalid gic-version value");
+>           error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
+> @@ -2139,7 +2139,7 @@ static void virt_instance_init(Object *obj)
+>                                       "physical address space above 32 bi=
+ts",
+>                                       NULL);
+>       /* Default GIC type is v2 */
+> -    vms->gic_version =3D 2;
+> +    vms->gic_version =3D VIRT_GIC_VERSION_2;
+>       object_property_add_str(obj, "gic-version", virt_get_gic_version,
+>                           virt_set_gic_version, NULL);
+>       object_property_set_description(obj, "gic-version",
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 02f500cb8e..c0827cacdf 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -95,6 +95,13 @@ typedef enum VirtIOMMUType {
+>       VIRT_IOMMU_VIRTIO,
+>   } VirtIOMMUType;
+>  =20
+> +typedef enum VirtGICType {
+> +    VIRT_GIC_VERSION_MAX,
+> +    VIRT_GIC_VERSION_HOST,
+> +    VIRT_GIC_VERSION_2,
+> +    VIRT_GIC_VERSION_3,
+> +} VirtGICType;
+> +
+>   typedef struct MemMapEntry {
+>       hwaddr base;
+>       hwaddr size;
+> @@ -123,7 +130,7 @@ typedef struct {
+>       bool highmem_ecam;
+>       bool its;
+>       bool virt;
+> -    int32_t gic_version;
+> +    VirtGICType gic_version;
+>       VirtIOMMUType iommu;
+>       uint16_t virtio_iommu_bdf;
+>       struct arm_boot_info bootinfo;
+> @@ -162,7 +169,7 @@ static inline int virt_gicv3_redist_region_count(Virt=
+MachineState *vms)
+>       uint32_t redist0_capacity =3D
+>                   vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+>  =20
+> -    assert(vms->gic_version =3D=3D 3);
+> +    assert(vms->gic_version =3D=3D VIRT_GIC_VERSION_3);
+>  =20
+>       return vms->smp_cpus > redist0_capacity ? 2 : 1;
+>   }
+>=20
 
-Anyway we can "fix it in post" as they say in the movies ;-)
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
->  qemu-doc.texi                                 |  12 +-
->  6 files changed, 213 insertions(+), 219 deletions(-)
->  create mode 100644 docs/system/cpu-models-mips.texi
->  rename docs/{qemu-cpu-models.texi =3D> system/cpu-models-x86.texi} (71%)
->  create mode 100644 docs/system/qemu-cpu-models.texi
->
-> diff --git a/Makefile b/Makefile
-> index faa0ffa05b0..f75a7b51938 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -354,7 +354,7 @@ endif
->  DOCS+=3D$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
->  DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt doc=
-s/interop/qemu-qmp-ref.7
->  DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/=
-interop/qemu-ga-ref.7
-> -DOCS+=3Ddocs/qemu-cpu-models.7
-> +DOCS+=3Ddocs/system/qemu-cpu-models.7
->  DOCS+=3D$(MANUAL_BUILDDIR)/index.html
->  ifdef CONFIG_VIRTFS
->  DOCS+=3D$(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1
-> @@ -780,7 +780,7 @@ distclean: clean
->  	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
->  	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
->  	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
-> -	rm -f docs/qemu-cpu-models.7
-> +	rm -f docs/system/qemu-cpu-models.7
->  	rm -rf .doctrees
->  	$(call clean-manual,devel)
->  	$(call clean-manual,interop)
-> @@ -861,7 +861,7 @@ ifdef CONFIG_POSIX
->  	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
->  	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
->  	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DESTD=
-IR)$(mandir)/man7"
-> -	$(INSTALL_DATA) docs/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
-> +	$(INSTALL_DATA) docs/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
->  ifeq ($(CONFIG_TOOLS),y)
->  	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-img.1 "$(DESTDIR)$(mandir=
-)/man1"
->  	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
-> @@ -1111,7 +1111,7 @@ docs/interop/qemu-ga-qapi.texi: qga/qapi-generated/=
-qga-qapi-doc.texi
->=20=20
->  qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-i=
-nfo.texi
->  qemu.1: qemu-option-trace.texi
-> -docs/qemu-cpu-models.7: docs/qemu-cpu-models.texi
-> +docs/system/qemu-cpu-models.7: docs/system/qemu-cpu-models.texi docs/sys=
-tem/cpu-models-x86.texi docs/system/cpu-models-mips.texi
->=20=20
->  html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-=
-ref.html sphinxdocs
->  info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-=
-ref.info
-> @@ -1123,7 +1123,8 @@ qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.t=
-xt: \
->  	qemu-tech.texi qemu-option-trace.texi \
->  	qemu-deprecated.texi qemu-monitor.texi \
->  	qemu-monitor-info.texi \
-> -	docs/qemu-cpu-models.texi docs/security.texi
-> +	docs/system/cpu-models-x86.texi docs/system/cpu-models-mips.texi \
-> +	docs/security.texi
->=20=20
->  docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
->      docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b66c46dcb9f..8c6d8f533ce 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -215,6 +215,7 @@ S: Maintained
->  F: target/mips/
->  F: default-configs/*mips*
->  F: disas/*mips*
-> +F: docs/system/cpu-models-mips.texi
->  F: hw/intc/mips_gic.c
->  F: hw/mips/
->  F: hw/misc/mips_*
-> @@ -319,7 +320,7 @@ F: tests/tcg/i386/
->  F: tests/tcg/x86_64/
->  F: hw/i386/
->  F: disas/i386.c
-> -F: docs/qemu-cpu-models.texi
-> +F: docs/system/cpu-models-x86.texi
->  T: git https://github.com/ehabkost/qemu.git x86-next
->=20=20
->  Xtensa TCG CPUs
-> diff --git a/docs/system/cpu-models-mips.texi b/docs/system/cpu-models-mi=
-ps.texi
-> new file mode 100644
-> index 00000000000..6a0370cb693
-> --- /dev/null
-> +++ b/docs/system/cpu-models-mips.texi
-> @@ -0,0 +1,157 @@
-> +@node recommendations_cpu_models_MIPS
-> +@section Supported CPU model configurations on MIPS hosts
-> +
-> +QEMU supports variety of MIPS CPU models:
-> +
-> +@menu
-> +* cpu_models_MIPS32::               Supported CPU models for MIPS32 hosts
-> +* cpu_models_MIPS64::               Supported CPU models for MIPS64 hosts
-> +* cpu_models_nanoMIPS::             Supported CPU models for nanoMIPS ho=
-sts
-> +* preferred_cpu_models_MIPS::       Preferred CPU models for MIPS hosts
-> +@end menu
-> +
-> +@node cpu_models_MIPS32
-> +@subsection Supported CPU models for MIPS32 hosts
-> +
-> +The following CPU models are supported for use on MIPS32 hosts. Administ=
-rators /
-> +applications are recommended to use the CPU model that matches the gener=
-ation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> +between machines, if live migration compatibility is required, use the n=
-ewest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{mips32r6-generic}
-> +
-> +MIPS32 Processor (Release 6, 2015)
-> +
-> +
-> +@item @code{P5600}
-> +
-> +MIPS32 Processor (P5600, 2014)
-> +
-> +
-> +@item @code{M14K}
-> +@item @code{M14Kc}
-> +
-> +MIPS32 Processor (M14K, 2009)
-> +
-> +
-> +@item @code{74Kf}
-> +
-> +MIPS32 Processor (74K, 2007)
-> +
-> +
-> +@item @code{34Kf}
-> +
-> +MIPS32 Processor (34K, 2006)
-> +
-> +
-> +@item @code{24Kc}
-> +@item @code{24KEc}
-> +@item @code{24Kf}
-> +
-> +MIPS32 Processor (24K, 2003)
-> +
-> +
-> +@item @code{4Kc}
-> +@item @code{4Km}
-> +@item @code{4KEcR1}
-> +@item @code{4KEmR1}
-> +@item @code{4KEc}
-> +@item @code{4KEm}
-> +
-> +MIPS32 Processor (4K, 1999)
-> +@end table
-> +
-> +@node cpu_models_MIPS64
-> +@subsection Supported CPU models for MIPS64 hosts
-> +
-> +The following CPU models are supported for use on MIPS64 hosts. Administ=
-rators /
-> +applications are recommended to use the CPU model that matches the gener=
-ation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> +between machines, if live migration compatibility is required, use the n=
-ewest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{I6400}
-> +
-> +MIPS64 Processor (Release 6, 2014)
-> +
-> +
-> +@item @code{Loongson-2F}
-> +
-> +MIPS64 Processor (Loongson 2, 2008)
-> +
-> +
-> +@item @code{Loongson-2E}
-> +
-> +MIPS64 Processor (Loongson 2, 2006)
-> +
-> +
-> +@item @code{mips64dspr2}
-> +
-> +MIPS64 Processor (Release 2, 2006)
-> +
-> +
-> +@item @code{MIPS64R2-generic}
-> +@item @code{5KEc}
-> +@item @code{5KEf}
-> +
-> +MIPS64 Processor (Release 2, 2002)
-> +
-> +
-> +@item @code{20Kc}
-> +
-> +MIPS64 Processor (20K, 2000)
-> +
-> +
-> +@item @code{5Kc}
-> +@item @code{5Kf}
-> +
-> +MIPS64 Processor (5K, 1999)
-> +
-> +
-> +@item @code{VR5432}
-> +
-> +MIPS64 Processor (VR, 1998)
-> +
-> +
-> +@item @code{R4000}
-> +
-> +MIPS64 Processor (MIPS III, 1991)
-> +@end table
-> +
-> +@node cpu_models_nanoMIPS
-> +@subsection Supported CPU models for nanoMIPS hosts
-> +
-> +The following CPU models are supported for use on nanoMIPS hosts. Admini=
-strators /
-> +applications are recommended to use the CPU model that matches the gener=
-ation
-> +of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> +between machines, if live migration compatibility is required, use the n=
-ewest
-> +CPU model that is compatible across all desired hosts.
-> +
-> +@table @option
-> +@item @code{I7200}
-> +
-> +MIPS I7200 (nanoMIPS, 2018)
-> +
-> +@end table
-> +
-> +@node preferred_cpu_models_MIPS
-> +@subsection Preferred CPU models for MIPS hosts
-> +
-> +The following CPU models are preferred for use on different MIPS hosts:
-> +
-> +@table @option
-> +@item @code{MIPS III}
-> +R4000
-> +
-> +@item @code{MIPS32R2}
-> +34Kf
-> +
-> +@item @code{MIPS64R6}
-> +I6400
-> +
-> +@item @code{nanoMIPS}
-> +I7200
-> +@end table
-> diff --git a/docs/qemu-cpu-models.texi b/docs/system/cpu-models-x86.texi
-> similarity index 71%
-> rename from docs/qemu-cpu-models.texi
-> rename to docs/system/cpu-models-x86.texi
-> index f88a1def0d0..0cd64b0522e 100644
-> --- a/docs/qemu-cpu-models.texi
-> +++ b/docs/system/cpu-models-x86.texi
-> @@ -1,16 +1,5 @@
-> -@c man begin SYNOPSIS
-> -QEMU / KVM CPU model configuration
-> -@c man end
-> -
-> -@set qemu_system_x86 qemu-system-x86_64
-> -
-> -@c man begin DESCRIPTION
-> -
-> -@menu
-> -* recommendations_cpu_models_x86::  Recommendations for KVM CPU model co=
-nfiguration on x86 hosts
-> -* recommendations_cpu_models_MIPS:: Supported CPU model configurations o=
-n MIPS hosts
-> -* cpu_model_syntax_apps::           Syntax for configuring CPU models
-> -@end menu
-> +@node cpu_models_x86
-> +@section Recommendations for KVM CPU model configuration on x86 hosts
->=20=20
->  QEMU / KVM virtualization supports two ways to configure CPU models
->=20=20
-> @@ -45,9 +34,6 @@ stepping, etc will precisely match the host CPU, as the=
-y would with "Host
->  passthrough", but gives much of the benefit of passthrough, while making
->  live migration safe.
->=20=20
-> -@node recommendations_cpu_models_x86
-> -@subsection Recommendations for KVM CPU model configuration on x86 hosts
-> -
->  The information that follows provides recommendations for configuring
->  CPU models on x86 hosts. The goals are to maximise performance, while
->  protecting guest OS against various CPU hardware flaws, and optionally
-> @@ -60,10 +46,11 @@ enabling live migration between hosts with heterogene=
-ous CPU models.
->  * important_cpu_features_amd_x86::       Important CPU features for AMD =
-x86 hosts
->  * default_cpu_models_x86::               Default x86 CPU models
->  * other_non_recommended_cpu_models_x86:: Other non-recommended x86 CPUs
-> +* cpu_model_syntax_apps::                Syntax for configuring CPU mode=
-ls
->  @end menu
->=20=20
->  @node preferred_cpu_models_intel_x86
-> -@subsubsection Preferred CPU models for Intel x86 hosts
-> +@subsection Preferred CPU models for Intel x86 hosts
->=20=20
->  The following CPU models are preferred for use on Intel hosts. Administr=
-ators /
->  applications are recommended to use the CPU model that matches the gener=
-ation
-> @@ -136,7 +123,7 @@ Intel Celeron_4x0 (Conroe/Merom Class Core 2, 2006)
->  @end table
->=20=20
->  @node important_cpu_features_intel_x86
-> -@subsubsection Important CPU features for Intel x86 hosts
-> +@subsection Important CPU features for Intel x86 hosts
->=20=20
->  The following are important CPU features that should be used on Intel x86
->  hosts, when available in the host CPU. Some of them require explicit
-> @@ -218,7 +205,7 @@ can be used for guest CPUs.
->=20=20
->=20=20
->  @node preferred_cpu_models_amd_x86
-> -@subsubsection Preferred CPU models for AMD x86 hosts
-> +@subsection Preferred CPU models for AMD x86 hosts
->=20=20
->  The following CPU models are preferred for use on Intel hosts. Administr=
-ators /
->  applications are recommended to use the CPU model that matches the gener=
-ation
-> @@ -260,7 +247,7 @@ AMD Opteron 240 (Gen 1 Class Opteron, 2004)
->  @end table
->=20=20
->  @node important_cpu_features_amd_x86
-> -@subsubsection Important CPU features for AMD x86 hosts
-> +@subsection Important CPU features for AMD x86 hosts
->=20=20
->  The following are important CPU features that should be used on AMD x86
->  hosts, when available in the host CPU. Some of them require explicit
-> @@ -349,7 +336,7 @@ Note that not all CPU hardware will support this feat=
-ure.
->=20=20
->=20=20
->  @node default_cpu_models_x86
-> -@subsubsection Default x86 CPU models
-> +@subsection Default x86 CPU models
->=20=20
->  The default QEMU CPU models are designed such that they can run on all h=
-osts.
->  If an application does not wish to do perform any host compatibility che=
-cks
-> @@ -372,7 +359,7 @@ qemu64 is used for x86_64 guests and qemu32 is used f=
-or i686 guests, when no
->=20=20
->=20=20
->  @node other_non_recommended_cpu_models_x86
-> -@subsubsection Other non-recommended x86 CPUs
-> +@subsection Other non-recommended x86 CPUs
->=20=20
->  The following CPUs models are compatible with most AMD and Intel x86 hos=
-ts, but
->  their usage is discouraged, as they expose a very limited featureset, wh=
-ich
-> @@ -403,177 +390,13 @@ hardware assisted virtualization, that should thus=
- not be required for
->  running virtual machines.
->  @end table
->=20=20
-> -@node recommendations_cpu_models_MIPS
-> -@subsection Supported CPU model configurations on MIPS hosts
-> -
-> -QEMU supports variety of MIPS CPU models:
-> -
-> -@menu
-> -* cpu_models_MIPS32::               Supported CPU models for MIPS32 hosts
-> -* cpu_models_MIPS64::               Supported CPU models for MIPS64 hosts
-> -* cpu_models_nanoMIPS::             Supported CPU models for nanoMIPS ho=
-sts
-> -* preferred_cpu_models_MIPS::       Preferred CPU models for MIPS hosts
-> -@end menu
-> -
-> -@node cpu_models_MIPS32
-> -@subsubsection Supported CPU models for MIPS32 hosts
-> -
-> -The following CPU models are supported for use on MIPS32 hosts. Administ=
-rators /
-> -applications are recommended to use the CPU model that matches the gener=
-ation
-> -of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> -between machines, if live migration compatibility is required, use the n=
-ewest
-> -CPU model that is compatible across all desired hosts.
-> -
-> -@table @option
-> -@item @code{mips32r6-generic}
-> -
-> -MIPS32 Processor (Release 6, 2015)
-> -
-> -
-> -@item @code{P5600}
-> -
-> -MIPS32 Processor (P5600, 2014)
-> -
-> -
-> -@item @code{M14K}
-> -@item @code{M14Kc}
-> -
-> -MIPS32 Processor (M14K, 2009)
-> -
-> -
-> -@item @code{74Kf}
-> -
-> -MIPS32 Processor (74K, 2007)
-> -
-> -
-> -@item @code{34Kf}
-> -
-> -MIPS32 Processor (34K, 2006)
-> -
-> -
-> -@item @code{24Kc}
-> -@item @code{24KEc}
-> -@item @code{24Kf}
-> -
-> -MIPS32 Processor (24K, 2003)
-> -
-> -
-> -@item @code{4Kc}
-> -@item @code{4Km}
-> -@item @code{4KEcR1}
-> -@item @code{4KEmR1}
-> -@item @code{4KEc}
-> -@item @code{4KEm}
-> -
-> -MIPS32 Processor (4K, 1999)
-> -@end table
-> -
-> -@node cpu_models_MIPS64
-> -@subsubsection Supported CPU models for MIPS64 hosts
-> -
-> -The following CPU models are supported for use on MIPS64 hosts. Administ=
-rators /
-> -applications are recommended to use the CPU model that matches the gener=
-ation
-> -of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> -between machines, if live migration compatibility is required, use the n=
-ewest
-> -CPU model that is compatible across all desired hosts.
-> -
-> -@table @option
-> -@item @code{I6400}
-> -
-> -MIPS64 Processor (Release 6, 2014)
-> -
-> -
-> -@item @code{Loongson-2F}
-> -
-> -MIPS64 Processor (Loongson 2, 2008)
-> -
-> -
-> -@item @code{Loongson-2E}
-> -
-> -MIPS64 Processor (Loongson 2, 2006)
-> -
-> -
-> -@item @code{mips64dspr2}
-> -
-> -MIPS64 Processor (Release 2, 2006)
-> -
-> -
-> -@item @code{MIPS64R2-generic}
-> -@item @code{5KEc}
-> -@item @code{5KEf}
-> -
-> -MIPS64 Processor (Release 2, 2002)
-> -
-> -
-> -@item @code{20Kc}
-> -
-> -MIPS64 Processor (20K, 2000)
-> -
-> -
-> -@item @code{5Kc}
-> -@item @code{5Kf}
-> -
-> -MIPS64 Processor (5K, 1999)
-> -
-> -
-> -@item @code{VR5432}
-> -
-> -MIPS64 Processor (VR, 1998)
-> -
-> -
-> -@item @code{R4000}
-> -
-> -MIPS64 Processor (MIPS III, 1991)
-> -@end table
-> -
-> -@node cpu_models_nanoMIPS
-> -@subsubsection Supported CPU models for nanoMIPS hosts
-> -
-> -The following CPU models are supported for use on nanoMIPS hosts. Admini=
-strators /
-> -applications are recommended to use the CPU model that matches the gener=
-ation
-> -of the host CPUs in use. In a deployment with a mixture of host CPU mode=
-ls
-> -between machines, if live migration compatibility is required, use the n=
-ewest
-> -CPU model that is compatible across all desired hosts.
-> -
-> -@table @option
-> -@item @code{I7200}
-> -
-> -MIPS I7200 (nanoMIPS, 2018)
-> -
-> -@end table
-> -
-> -@node preferred_cpu_models_MIPS
-> -@subsubsection Preferred CPU models for MIPS hosts
-> -
-> -The following CPU models are preferred for use on different MIPS hosts:
-> -
-> -@table @option
-> -@item @code{MIPS III}
-> -R4000
-> -
-> -@item @code{MIPS32R2}
-> -34Kf
-> -
-> -@item @code{MIPS64R6}
-> -I6400
-> -
-> -@item @code{nanoMIPS}
-> -I7200
-> -@end table
-> -
->  @node cpu_model_syntax_apps
->  @subsection Syntax for configuring CPU models
->=20=20
->  The example below illustrate the approach to configuring the various
-> -CPU models / features in QEMU and libvirt
-> +CPU models / features in QEMU and libvirt.
->=20=20
-> -@menu
-> -* cpu_model_syntax_qemu::    QEMU command line
-> -* cpu_model_syntax_libvirt:: Libvirt guest XML
-> -@end menu
-> -
-> -@node cpu_model_syntax_qemu
-> -@subsubsection QEMU command line
-> +QEMU command line:
->=20=20
->  @table @option
->=20=20
-> @@ -603,8 +426,8 @@ With feature customization:
->=20=20
->  @end table
->=20=20
-> -@node cpu_model_syntax_libvirt
-> -@subsubsection Libvirt guest XML
-> +
-> +Libvirt guest XML:
->=20=20
->  @table @option
->=20=20
-> @@ -657,21 +480,3 @@ With feature customization:
->  @end example
->=20=20
->  @end table
-> -
-> -@c man end
-> -
-> -@ignore
-> -
-> -@setfilename qemu-cpu-models
-> -@settitle QEMU / KVM CPU model configuration
-> -
-> -@c man begin SEEALSO
-> -The HTML documentation of QEMU for more precise information and Linux
-> -user mode emulator invocation.
-> -@c man end
-> -
-> -@c man begin AUTHOR
-> -Daniel P. Berrange
-> -@c man end
-> -
-> -@end ignore
-> diff --git a/docs/system/qemu-cpu-models.texi b/docs/system/qemu-cpu-mode=
-ls.texi
-> new file mode 100644
-> index 00000000000..f399daf9448
-> --- /dev/null
-> +++ b/docs/system/qemu-cpu-models.texi
-> @@ -0,0 +1,28 @@
-> +@c man begin SYNOPSIS
-> +QEMU / KVM CPU model configuration
-> +@c man end
-> +
-> +@set qemu_system_x86 qemu-system-x86_64
-> +
-> +@c man begin DESCRIPTION
-> +
-> +@include cpu-models-x86.texi
-> +@include cpu-models-mips.texi
-> +
-> +@c man end
-> +
-> +@ignore
-> +
-> +@setfilename qemu-cpu-models
-> +@settitle QEMU / KVM CPU model configuration
-> +
-> +@c man begin SEEALSO
-> +The HTML documentation of QEMU for more precise information and Linux
-> +user mode emulator invocation.
-> +@c man end
-> +
-> +@c man begin AUTHOR
-> +Daniel P. Berrange
-> +@c man end
-> +
-> +@end ignore
-> diff --git a/qemu-doc.texi b/qemu-doc.texi
-> index e555dea4ef6..617a701b678 100644
-> --- a/qemu-doc.texi
-> +++ b/qemu-doc.texi
-> @@ -139,7 +139,7 @@ accelerator is required to use more than one host CPU=
- for emulation.
->  * pcsys_keys::         Keys in the graphical frontends
->  * mux_keys::           Keys in the character backend multiplexer
->  * pcsys_monitor::      QEMU Monitor
-> -* cpu_models::         CPU models
-> +* cpu_models_x86::     Supported CPU model configurations on x86 hosts
->  * disk_images::        Disk Images
->  * pcsys_network::      Network emulation
->  * pcsys_other_devs::   Other Devices
-> @@ -614,10 +614,7 @@ The monitor understands integers expressions for eve=
-ry integer
->  argument. You can use register names to get the value of specifics
->  CPU registers by prefixing them with @emph{$}.
->=20=20
-> -@node cpu_models
-> -@section CPU models
-> -
-> -@include docs/qemu-cpu-models.texi
-> +@include docs/system/cpu-models-x86.texi
->=20=20
->  @node disk_images
->  @section Disk Images
-> @@ -1864,6 +1861,7 @@ Set the emulated machine type. The default is sun4u.
->  @cindex system emulation (MIPS)
->=20=20
->  @menu
-> +* recommendations_cpu_models_MIPS:: Supported CPU model configurations o=
-n MIPS hosts
->  * nanoMIPS System emulator ::
->  @end menu
->=20=20
-> @@ -1980,6 +1978,10 @@ PC style serial port
->  MIPSnet network emulation
->  @end itemize
->=20=20
-> +@lowersections
-> +@include docs/system/cpu-models-mips.texi
-> +@raisesections
-> +
->  @node nanoMIPS System emulator
->  @subsection nanoMIPS System emulator
->  @cindex system emulation (nanoMIPS)
-
-
---=20
-Alex Benn=C3=A9e
 
