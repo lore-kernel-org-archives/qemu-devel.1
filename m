@@ -2,91 +2,65 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C86C3F2D4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34ECC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:34:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56FF246A1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:33:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cncm+BiK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56FF246A1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 790E6246A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:34:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 790E6246A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8gVn-0002Ix-4A
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 03:33:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38956)
+	id 1j8gXH-0003M9-MD
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 03:34:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8gUq-0001lS-Vy
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:32:17 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1j8gWC-0002ph-Tx
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:33:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8gUp-0005fY-U2
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:32:16 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39548)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8gUp-0005f2-Ll
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:32:15 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y17so11366029wrn.6
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 00:32:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=+/esAd3rTsyYEC9JcW/pfHjjcfdaslwGsH3PMyp5Xxw=;
- b=cncm+BiKYaXDJtFMOTWQmqQnvAxg9eAgUqdVd+lcn9/IoIeeXYh5Q2TTRvHWIBkGx8
- 9XRNLuxJw0iC+DNYbaMZBlG//6pWSSISPtljl7x+vJmKo6bfXC8kMI/IV5a3lb54VIsG
- 8PaQg8vBHauE2OJa2IPRl4sSm8RqFNTxPJ4L1rwVJxoTxG/7c4C72ZARaFgpptlA7+6j
- ItMn3RL6fe9Q09g42gg8TaIyRFeHROA5VSWXFudN4MNu+hp5wyk1nWdbO07mCARWYfpS
- F68O+AT/IqsxgeLkMsow/oBMRnhtLu/9OFkbQM2gf1TPpdeBYDWpiUH4niWnhwgVrP99
- MK4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=+/esAd3rTsyYEC9JcW/pfHjjcfdaslwGsH3PMyp5Xxw=;
- b=DOZR9WcIWc4Tiwz2bRjvoMs8otwAd/lU5U5Iv/e1+tuauUiUeWKzKq3qkb1J2mfcRg
- Ry6oITRZbNllZDMMYvCWBcGr21QYFMiuorrAmtbT6yKjO1CUpGV8czdO4q0cGtxWijTp
- ERAxnuUGZ4bGNpMtU0NBE/kp3MUP8men5ekNzp4OnE/ZqeBHIcR+8BobFRu6YqM68vqP
- rcVJcUjgsnXUrpKEnenNdtiKhdFY2CrlAhtpPRtyEWD5GJcu8KlBiHCfr9CGh36yWi+f
- Ow0c32Oe7sAJR1it0WQQ5Ro5803JZBWg1oRfq5+B8smx03CjKoHle/PK8RYNbfmZhrxO
- lb7w==
-X-Gm-Message-State: ANhLgQ1oMIL3HWrOTQ/PX22htGhN0B8qRSo9eVNRPWFJmcVde3cNe4I2
- NHr7r5r3n6uc+j1HIoUym/srcQ==
-X-Google-Smtp-Source: ADFU+vtizs2f5KpxOG/ZxQA0FutKMwtA4tDpC1xulNydo3pfhpn4ueaJOHeN9qOAuevJ9ycEiwAtNA==
-X-Received: by 2002:a5d:5643:: with SMTP id j3mr7826435wrw.337.1583137934389; 
- Mon, 02 Mar 2020 00:32:14 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t133sm16014595wmf.31.2020.03.02.00.32.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 00:32:12 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 269561FF87;
- Mon,  2 Mar 2020 08:32:12 +0000 (GMT)
-References: <20200228092420.103757-1-quintela@redhat.com>
- <20200228092420.103757-7-quintela@redhat.com>
- <CAFXwXr=9R9FZ5wD5Lk=cbP=Qt93KOokrcOjxj_JKevmso9qdgg@mail.gmail.com>
- <878skj1908.fsf@secure.laptop>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: quintela@redhat.com
-Subject: Re: [PULL 06/15] configure: Enable test and libs for zstd
-In-reply-to: <878skj1908.fsf@secure.laptop>
-Date: Mon, 02 Mar 2020 08:32:12 +0000
-Message-ID: <87zhcz40oj.fsf@linaro.org>
+ (envelope-from <guoheyi@huawei.com>) id 1j8gWB-0006Cq-ER
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:33:40 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:45076 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1j8gWA-00069B-QB
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:33:39 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 82321C3592C6EF5382B9;
+ Mon,  2 Mar 2020 16:33:26 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.228) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0;
+ Mon, 2 Mar 2020 16:33:16 +0800
+Subject: Re: [PATCH] hw/smbios: add options for type 4 max_speed and
+ current_speed
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200225075046.30151-1-guoheyi@huawei.com>
+ <4bd58f6e-e522-d920-bc9a-8198147e8856@redhat.com>
+ <6e6c6c8b-c67c-6433-2bb8-d246c5f49b62@huawei.com>
+ <20200228103950.6fd7ecb5@redhat.com>
+ <6ee4aed5-211a-e290-9252-f02420e19f34@huawei.com>
+ <20200302092005.14ad6033@redhat.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <ddc16bb2-f9ef-fc84-b53b-01b518691380@huawei.com>
+Date: Mon, 2 Mar 2020 16:33:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200302092005.14ad6033@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.173.221.228]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,46 +72,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "open
- list:Block layer core" <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org
- Developers" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: wanghaibin.wang@huawei.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Juan Quintela <quintela@redhat.com> writes:
-
-> Richard Henderson <richard.henderson@linaro.org> wrote:
->>> +##########################################
->>> +# zstd check
->>> +
->>> +if test "$zstd" !=3D "no" ; then
->>> +    if $pkg_config --exist libzstd ; then
+On 2020/3/2 16:20, Igor Mammedov wrote:
+> On Sat, 29 Feb 2020 08:17:48 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> Hi Igor,
 >>
->> The option is spelled --exists.  This is generating an error during conf=
-igure.
+>> On 2020/2/28 17:39, Igor Mammedov wrote:
+>>> On Thu, 27 Feb 2020 17:12:21 +0800
+>>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>>  =20
+>>>> On 2020/2/25 17:24, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>> On 2/25/20 8:50 AM, Heyi Guo wrote:
+>>>>>> Common VM users sometimes care about CPU speed, so we add two new
+>>>>>> options to allow VM vendors to present CPU speed to their users.
+>>>>>> Normally these information can be fetched from host smbios.
+>>>>>>
+>>>>>> Strictly speaking, the "max speed" and "current speed" in type 4
+>>>>>> are not really for the max speed and current speed of processor, f=
+or
+>>>>>> "max speed" identifies a capability of the system, and "current sp=
+eed"
+>>>>>> identifies the processor's speed at boot (see smbios spec), but so=
+me
+>>>>>> applications do not tell the differences.
+>>>>>>
+>>>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>>>>>
+>>>>>> ---
+>>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>>>> ---
+>>>>>>   =C2=A0 hw/smbios/smbios.c | 22 +++++++++++++++++++---
+>>>>>>   =C2=A0 qemu-options.hx=C2=A0=C2=A0=C2=A0 |=C2=A0 3 ++-
+>>>>>>   =C2=A0 2 files changed, 21 insertions(+), 4 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+>>>>>> index ffd98727ee..1d5439643d 100644
+>>>>>> --- a/hw/smbios/smbios.c
+>>>>>> +++ b/hw/smbios/smbios.c
+>>>>>> @@ -94,6 +94,8 @@ static struct {
+>>>>>>   =C2=A0 =C2=A0 static struct {
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *sock_pfx, *manufactur=
+er, *version, *serial, *asset,
+>>>>>> *part;
+>>>>>> +=C2=A0=C2=A0=C2=A0 uint32_t max_speed;
+>>>>>> +=C2=A0=C2=A0=C2=A0 uint32_t current_speed;
+>>>>>>   =C2=A0 } type4;
+>>>>>>   =C2=A0 =C2=A0 static struct {
+>>>>>> @@ -272,6 +274,14 @@ static const QemuOptDesc
+>>>>>> qemu_smbios_type4_opts[] =3D {
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name =3D=
+ "version",
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .type =3D=
+ QEMU_OPT_STRING,
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .help =3D=
+ "version number",
+>>>>>> +=C2=A0=C2=A0=C2=A0 },{
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name =3D "max_speed",
+>>> I'd suggest to use - instead of _ in option name
+>> Thanks for your comments. However I can see other options like
+>> "sock_pfx" and "loc_pfx" also use "_" in option names. Should we keep
+>> consistent with the context?
+> For new options one should use '-',
+> that way we won't have to build wrappers around it if it becomes
+> a qom property in the future.
+
+Thanks for the explanation. I'll fix that in v2.
+
+Thanks,
+
+Heyi
+
+
 >
-> Ooops, you are right.
+>> Thanks,
+>>
+>> Heyi
+>>
+>>
+>>>  =20
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .type =3D QEMU_OPT_NUM=
+BER,
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .help =3D "max speed i=
+n MHz",
+>>>>>> +=C2=A0=C2=A0=C2=A0 },{
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name =3D "current_spe=
+ed",
+>>> ditto
+>>>  =20
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .type =3D QEMU_OPT_NUM=
+BER,
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .help =3D "speed at sy=
+stem boot in MHz",
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },{
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name =3D=
+ "serial",
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .type =3D=
+ QEMU_OPT_STRING,
+>>>>>> @@ -586,9 +596,8 @@ static void
+>>>>>> smbios_build_type_4_table(MachineState *ms, unsigned instance)
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMBIOS_TABLE_SET_STR(4, processor=
+_version_str, type4.version);
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 t->voltage =3D 0;
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 t->external_clock =3D cpu_to_le16=
+(0); /* Unknown */
+>>>>>> -=C2=A0=C2=A0=C2=A0 /* SVVP requires max_speed and current_speed t=
+o not be unknown. */
+>>>>>> -=C2=A0=C2=A0=C2=A0 t->max_speed =3D cpu_to_le16(2000); /* 2000 MH=
+z */
+>>>>>> -=C2=A0=C2=A0=C2=A0 t->current_speed =3D cpu_to_le16(2000); /* 200=
+0 MHz */
+>>>>>> +=C2=A0=C2=A0=C2=A0 t->max_speed =3D cpu_to_le16(type4.max_speed);
+>>>>>> +=C2=A0=C2=A0=C2=A0 t->current_speed =3D cpu_to_le16(type4.current=
+_speed);
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 t->status =3D 0x41; /* Socket pop=
+ulated, CPU enabled */
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 t->processor_upgrade =3D 0x01; /*=
+ Other */
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 t->l1_cache_handle =3D cpu_to_le1=
+6(0xFFFF); /* N/A */
+>>>>>> @@ -1129,6 +1138,13 @@ void smbios_entry_add(QemuOpts *opts, Error
+>>>>>> **errp)
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 save_opt(&type4.serial, opts, "serial");
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 save_opt(&type4.asset, opts, "asset");
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 save_opt(&type4.part, opts, "part");
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ /*
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 * SVVP requires max_speed and current_speed to not be
+>>>>>> unknown, and
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 * we set the default value to 2000MHz as we did before.
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 */
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ type4.max_speed =3D qemu_opt_get_number(opts, "max_speed",
+>>>>>> 2000);
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ type4.current_speed =3D qemu_opt_get_number(opts,
+>>>>>> "current_speed",
+>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 2000);
+>>>>> Maybe check speeds are <=3D UINT16_MAX else set errp?
+>>>> OK; I can do that in the v2. But I would wait for the maintainers to
+>>>> provide more comments :)
+>>>>
+>>>> Thanks,
+>>>>
+>>>> Heyi
+>>>>  =20
+>>>>>     =20
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 return;
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 11:
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
+>>>>>> diff --git a/qemu-options.hx b/qemu-options.hx
+>>>>>> index ac315c1ac4..bc9ef0fda8 100644
+>>>>>> --- a/qemu-options.hx
+>>>>>> +++ b/qemu-options.hx
+>>>>>> @@ -2233,6 +2233,7 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 specify SMBIOS =
+type 3 fields\n"
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-smbios
+>>>>>> type=3D4[,sock_pfx=3Dstr][,manufacturer=3Dstr][,version=3Dstr][,se=
+rial=3Dstr]\n"
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [,asset=3Dstr][,part=3Dstr]=
+\n"
+>>>>>> +=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [,max_speed=3D%d][,current_speed=3D%d]\=
+n"
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 specify SMBIOS =
+type 4 fields\n"
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "-smbios
+>>>>>> type=3D17[,loc_pfx=3Dstr][,bank=3Dstr][,manufacturer=3Dstr][,seria=
+l=3Dstr]\n"
+>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [,asset=3Dstr][,part=3D=
+str][,speed=3D%d]\n"
+>>>>>> @@ -2255,7 +2256,7 @@ Specify SMBIOS type 2 fields
+>>>>>>   =C2=A0 @item -smbios
+>>>>>> type=3D3[,manufacturer=3D@var{str}][,version=3D@var{str}][,serial=3D=
+@var{str}][,asset=3D@var{str}][,sku=3D@var{str}]
+>>>>>>   =C2=A0 Specify SMBIOS type 3 fields
+>>>>>>   =C2=A0 -@item -smbios
+>>>>>> type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}][,versio=
+n=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}=
+]
+>>>>>> +@item -smbios
+>>>>>> type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str}][,versio=
+n=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}=
+][,max_speed=3D@var{%d}][,current_speed=3D@var{%d}]
+>>>>>>   =C2=A0 Specify SMBIOS type 4 fields
+>>>>>>   =C2=A0 =C2=A0 @item -smbios
+>>>>>> type=3D17[,loc_pfx=3D@var{str}][,bank=3D@var{str}][,manufacturer=3D=
+@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@var{str}][,s=
+peed=3D@var{%d}]
+>>>>>>     =20
+>>>>> .
+>>> .
+>>
 >
-> Sending a patch.  Just wondering why I didn't saw that error :-(
+> .
 
-I was only noticing when re-directing output - otherwise you miss it in
-a fairly long scrollback.
-
->
-> Thanks, Juan.
-
-
---=20
-Alex Benn=C3=A9e
 
