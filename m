@@ -2,90 +2,114 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21513C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EF8C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:20:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1BF320842
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:18:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1BF320842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 3D19C21D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:20:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D19C21D56
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m00nbsd.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8qZk-0003Ev-3c
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:18:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54667)
+	id 1j8qc5-0004ml-Dl
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:20:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8qZ3-0002VN-4l
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:17:18 -0500
+ (envelope-from <max@m00nbsd.net>) id 1j8qWC-0000x1-MG
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:14:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8qZ1-0001Gn-W9
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:17:17 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:55246
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8qZ1-0001F2-P4; Mon, 02 Mar 2020 14:17:15 -0500
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j8qZD-0003RU-IO; Mon, 02 Mar 2020 19:17:33 +0000
-To: Peter Maydell <peter.maydell@linaro.org>,
- Pan Nengyuan <pannengyuan@huawei.com>
-References: <20200227025055.14341-1-pannengyuan@huawei.com>
- <20200227025055.14341-6-pannengyuan@huawei.com>
- <CAFEAcA8yvrYrBONtW46iswbEvMF-WC-j7fHOOfcoEC_RV66BkQ@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <c2b9eab3-f589-ecb6-0115-f8e673d52998@ilande.co.uk>
-Date: Mon, 2 Mar 2020 19:17:05 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <max@m00nbsd.net>) id 1j8qWB-0007cW-A8
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:14:20 -0500
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:48477)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <max@m00nbsd.net>) id 1j8qWB-0007SY-0r
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:14:19 -0500
+Received: from mxplan6.mail.ovh.net (unknown [10.109.138.227])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 8E3B92A5622E;
+ Mon,  2 Mar 2020 20:14:09 +0100 (CET)
+Received: from m00nbsd.net (37.59.142.99) by DAG3EX2.mxp6.local (172.16.2.22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Mon, 2 Mar 2020
+ 20:14:08 +0100
+Subject: Re: [PATCH v2 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
+To: Kamil Rytarowski <n54@gmx.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <slp@redhat.com>,
+ <peter.maydell@linaro.org>
+References: <20200107124903.16505-1-n54@gmx.com>
+ <20200128140945.929-1-n54@gmx.com> <20200128140945.929-3-n54@gmx.com>
+ <e3279b9d-e6f9-43f3-3ebb-b31ba8ff5f7e@redhat.com>
+ <4e29b732-ce95-02f1-ec9c-31f1ce33cda0@gmx.com>
+ <4ece50db-33c7-4630-6b0f-52197b2ae845@redhat.com>
+ <5b289981-1e54-2301-af36-86361415bf6b@gmx.com>
+From: Maxime Villard <max@m00nbsd.net>
+Autocrypt: addr=max@m00nbsd.net; keydata=
+ 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
+Message-ID: <bd4bb6d3-be33-2f97-8ee5-695b41b5eff1@m00nbsd.net>
+Date: Mon, 2 Mar 2020 20:14:05 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8yvrYrBONtW46iswbEvMF-WC-j7fHOOfcoEC_RV66BkQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5b289981-1e54-2301-af36-86361415bf6b@gmx.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v3 5/6] hw/misc/mos6522: move timer_new from init() into
- realize() to avoid memleaks
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG4EX2.mxp6.local (172.16.2.32) To DAG3EX2.mxp6.local
+ (172.16.2.22)
+X-Ovh-Tracer-GUID: 4c8f012f-e978-46a5-b540-3c6a0f3c7665
+X-Ovh-Tracer-Id: 6557522535184469868
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddtgedguddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffggjggtgfhisehtkeertddttdejnecuhfhrohhmpeforgigihhmvgcugghilhhlrghrugcuoehmrgigsehmtddtnhgsshgurdhnvghtqeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghniedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehmrgigsehmtddtnhgsshgurdhnvghtpdhrtghpthhtohepnhehgeesghhmgidrtghomh
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 79.137.123.220
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,108 +121,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Euler Robot <euler.robot@huawei.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/03/2020 13:21, Peter Maydell wrote:
-
-> On Thu, 27 Feb 2020 at 02:35, Pan Nengyuan <pannengyuan@huawei.com> wrote:
+Le 02/03/2020 =C3=A0 19:05, Kamil Rytarowski a =C3=A9crit=C2=A0:
+> On 02.03.2020 18:12, Paolo Bonzini wrote:
+>> On 03/02/20 12:56, Kamil Rytarowski wrote:
+>>> On 03.02.2020 12:41, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>> @@ -1768,6 +1785,7 @@ disabled with --disable-FEATURE, default is
+>>>>> enabled if available:
+>>>>> =C2=A0=C2=A0=C2=A0 hax=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 HAX acceleration support
+>>>>> =C2=A0=C2=A0=C2=A0 hvf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 Hypervisor.framework acceleration support
+>>>>> =C2=A0=C2=A0=C2=A0 whpx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Windows Hypervisor Platform acceleration support
+>>>>> +=C2=A0 nvmm=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 NetBSD Virtual Machine Monitor acceleration support
+>>>>> =C2=A0=C2=A0=C2=A0 rdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 Enable RDMA-based migration
+>>>>> =C2=A0=C2=A0=C2=A0 pvrdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 Enable PVRDMA support
+>>>>> =C2=A0=C2=A0=C2=A0 vde=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 support for vde network
+>>>>> @@ -2757,6 +2775,20 @@ if test "$whpx" !=3D "no" ; then
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
+>>>>> =C2=A0 fi
+>>>>>
+>>>>
+>>>> Maybe you can add something like:
+>>>>
+>>>> if test "$targetos" =3D "NetBSD"; then
+>>>> =C2=A0=C2=A0=C2=A0 nvmm=3D"check"
+>>>> fi
+>>>>
+>>>> to build by default with NVMM if available.
+>>>
+>>> I will add nvmm=3Dyes to the NetBSD) targetos check section.
 >>
->> There are some memleaks when we call 'device_list_properties'. This patch move timer_new from init into realize to fix it.
->> Meanwhile, add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
+>> No, nvmm=3Dyes instead should fail the build if nvmm.h is not availabl=
+e.
+>> That is not a good default.
 >>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->> Cc: Laurent Vivier <laurent@vivier.eu>
->> ---
->> v2->v1:
->> - no changes in this patch.
->> v3->v2:
->> - remove null check in reset, and add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
-> 
-> Hi; this is really fixing two bugs in one patch:
-> 
->> ---
->>  hw/misc/mac_via.c | 5 +++++
->>  hw/misc/mos6522.c | 6 ++++++
->>  2 files changed, 11 insertions(+)
+>> Paolo
 >>
->> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
->> index b7d0012794..1d72d4ef35 100644
->> --- a/hw/misc/mac_via.c
->> +++ b/hw/misc/mac_via.c
->> @@ -879,6 +879,11 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
->>      sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
->>                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
 >>
->> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized",
->> +                             &error_abort);
->> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized",
->> +                             &error_abort);
->> +
->>      /* Pass through mos6522 output IRQs */
->>      ms = MOS6522(&m->mos6522_via1);
->>      object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
-> 
-> This is fixing a bug in mac_via where it failed to actually
-> realize devices it was using. That's a dependency for the bug
-> you're trying to fix, but it's a separate one and should be
-> in its own patch.
+>=20
+> Most users will get nvmm.h in place now and this is still a tunable.
+>=20
+> I have got no opinion what to put there, nvmm=3Dcheck still works.
 
-Sigh. Thanks for this - I actually discovered this a little while back and have some
-local patches to do the same, but due to lack of time I never managed to tidy them up
-for submission.
+I would keep "yes", for consistency with the other entries. Changing all
+entries to "check" should be done in a separate commit, unrelated to
+NVMM.
 
-> You also want to pass the error back up to the caller, rather
-> than using error_abort. To do that, at the top of the function:
-> 
->     Error *err = NULL;
-> 
-> and then here you can do:
->     object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
->     if (err) {
->         error_propagate(errp, err);
->         return;
->     }
-> 
-> The existing code which inits the mos6522 objects and
-> calls object_property_add_alias on them which is in
-> the mac_via realize function should be moved to the init
-> function. (init should init child objects and set up
-> properties; realize should realize them.)
-
-And I believe at some point I had a patch lying around to do this too...
-
-> This is all fixing the incorrect creation of the mos6522
-> devices in mac_via (which has been wrong since the mac_via
-> was first added in commit 6dca62a0000f9), so that can all
-> be one patch I think.
-> 
->> +static void mos6522_realize(DeviceState *dev, Error **errp)
->> +{
->> +    MOS6522State *s = MOS6522(dev);
->>
->>      s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer1, s);
->>      s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer2, s);
->> @@ -502,6 +507,7 @@ static void mos6522_class_init(ObjectClass *oc, void *data)
->>
->>      dc->reset = mos6522_reset;
->>      dc->vmsd = &vmstate_mos6522;
->> +    dc->realize = mos6522_realize;
->>      device_class_set_props(dc, mos6522_properties);
->>      mdc->parent_reset = dc->reset;
->>      mdc->set_sr_int = mos6522_set_sr_int;
-> 
-> The changes to hw/misc/mos_6522.c are good, but should be in
-> their own patch.
-
-
-ATB,
-
-Mark.
+> diff --git a/configure b/configure
+> index d4a837cf9d..b3560d88bb 100755
+> --- a/configure
+> +++ b/configure
+> @@ -836,7 +836,7 @@ DragonFly)
+>  NetBSD)
+>    bsd=3D"yes"
+>    hax=3D"yes"
+> -  nvmm=3D"yes"
+> +  nvmm=3D"check"
+>    make=3D"${MAKE-gmake}"
+>    audio_drv_list=3D"oss try-sdl"
+>    audio_possible_drivers=3D"oss sdl"
+>=20
 
