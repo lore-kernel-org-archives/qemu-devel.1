@@ -2,101 +2,95 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38816C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:51:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3936DC3F2D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:02:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB7C621556
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:51:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hw6vI7FU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB7C621556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EEB992072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:02:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB992072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8q9m-0005V3-VY
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:51:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48321)
+	id 1j8qKQ-0008Kg-TL
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:02:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8q8w-0004ye-4e
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:50:19 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8qIk-0007Vq-K0
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8q8v-0001RF-4S
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:50:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60789
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8q8v-0001RA-12
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:50:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583175016;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wv0Zh3X6MlzdzxJ8ZjfmlNNthA+g25ppMBxQfnNmSDE=;
- b=Hw6vI7FUnbdNcL/yE+LxbZKTUp/csdRW3nxujpIxeG3dkAfrKAn14Agv8Tze2bOk9VgywR
- ZXUrEdZC82Q9Bzzxw7llX6B6rPQreBPA2JOZp+npLOTyyW/+fbBPf470PqQniHcrUxwVRk
- fqGJ/0Rxc9L1ZZyPBo2q4WE+sZrObrU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-4BZ2sllrOvizl5rrylQSpg-1; Mon, 02 Mar 2020 13:50:12 -0500
-X-MC-Unique: 4BZ2sllrOvizl5rrylQSpg-1
-Received: by mail-wr1-f70.google.com with SMTP id d7so109493wrr.0
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:50:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=a3+LvL2AOpAv3a3cHcuLvXbTMmyrF/QEvF9LigkcKCg=;
- b=GFsiDnPYNBt2n5Zu+MMmDiTicuGeIs4p8ZZFg++bhonq9cEIoYc07q2eHoAOAzJKCW
- VZB8e1/HByalQlcNSu3GNJJTdWkA8jSRfSvxQxSVSZikTi2XeJx0cfWHMMD03bo78WBq
- wf6AZIBp21TkawuZcPHg2nuY9wnyFWfpoIF4XQ2kGaTg/dluVWPZwHzbdmhmQNqUEwZR
- d6C5z0jGAfxYLUoNwpMT++oWnmkrM8cm5zIfx84kosMTJMnCp+QuBjtyG+j6idRKdPlN
- HLqpeSfAmKdAlBtB88UY4SCpcyN5kkwvJBDqSSbFHdAtqZc35/1hoE8Sp3DP3YIhQoMp
- 6Xcw==
-X-Gm-Message-State: ANhLgQ3MZfzyvSvPgWLFgWVrJ63PVtSh/ZCwiQL474HyhsiHVLMr35kV
- W2X2R3HOt4DcQR13xEundMHv28FcH63wyioc0KI2wp26hPVC1yG9Ea9+9eE3qTAdqRqnRq+IpiS
- qg8TqZWI8BXq87AY=
-X-Received: by 2002:a5d:6503:: with SMTP id x3mr905854wru.241.1583175011568;
- Mon, 02 Mar 2020 10:50:11 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vtgAFrLPtYxeaiH2R+GPxjJG0nahR2ppnUYwavjcy4a+I08fzCW12KYKzY4zEPkduREmx0Rsw==
-X-Received: by 2002:a5d:6503:: with SMTP id x3mr905829wru.241.1583175011275;
- Mon, 02 Mar 2020 10:50:11 -0800 (PST)
-Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
- ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id g25sm1086674wmh.3.2020.03.02.10.50.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 10:50:10 -0800 (PST)
-Subject: Re: [PATCH v1 01/10] tests/vm: use $(PYTHON) consistently
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200302181907.32110-1-alex.bennee@linaro.org>
- <20200302181907.32110-2-alex.bennee@linaro.org>
- <2f430da1-6429-746c-92e0-58b1fed5ffcb@redhat.com> <877e028ur2.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6a629127-b5a9-6be0-384e-08085056d795@redhat.com>
-Date: Mon, 2 Mar 2020 19:50:09 +0100
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j8qIj-0006JC-1p
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:00:26 -0500
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:55176
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j8qIi-0006Fn-R1; Mon, 02 Mar 2020 14:00:24 -0500
+Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
+ helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1j8qIl-0003Md-Ly; Mon, 02 Mar 2020 19:00:32 +0000
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
+ <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
+ <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
+ <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
+ <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
+ <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
+Date: Mon, 2 Mar 2020 19:00:02 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <877e028ur2.fsf@linaro.org>
+In-Reply-To: <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.162.6.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:41c9:1:41f::167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,63 +102,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Puhov <peter.puhov@linaro.org>,
- qemu-devel@nongnu.org, Robert Foley <robert.foley@linaro.org>
+Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 7:41 PM, Alex Benn=C3=A9e wrote:
->=20
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->=20
->> On 3/2/20 7:18 PM, Alex Benn=C3=A9e wrote:
->>> From: Robert Foley <robert.foley@linaro.org>
->>> Change Makefile.include to use $(PYTHON) so for vm-boot-ssh to be
->>> consistent with other cases like vm-build.
->>
->> So what you are trying to fix here is when you have two python3
->> installed (one from the distribution and one manually built), and you
->> want to use the manually built?
->=20
-> No - just consistency with the rest of the build system.
+On 01/03/2020 21:30, BALATON Zoltan wrote:
 
-This patch was first posted on 2/5/20 but it shouldn't be necessary since:
-
-commit c88ee46cdb9888fbe9ea45c174743d6f7544b737
-Date:   Thu Jan 30 17:32:24 2020 +0100
-
-     tests: Explicit usage of Python 3
-
-     Use the program search path to find the Python 3 interpreter.
-
-Anyway consistency is good:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->=20
->>
->>> Signed-off-by: Robert Foley <robert.foley@linaro.org>
->>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Message-Id: <20200219163537.22098-2-robert.foley@linaro.org>
->>> ---
->>>    tests/vm/Makefile.include | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
->>> index 9e7c46a4735..778e5067554 100644
->>> --- a/tests/vm/Makefile.include
->>> +++ b/tests/vm/Makefile.include
->>> @@ -80,7 +80,7 @@ vm-boot-serial-%: $(IMAGES_DIR)/%.img
->>>      vm-boot-ssh-%: $(IMAGES_DIR)/%.img
->>>    =09$(call quiet-command, \
->>> -=09=09$(SRC_PATH)/tests/vm/$* \
->>> +=09=09$(PYTHON) $(SRC_PATH)/tests/vm/$* \
->>>    =09=09$(if $(J),--jobs $(J)) \
->>>    =09=09--image "$<" \
->>>    =09=09--interactive \
+> On Sun, 1 Mar 2020, Mark Cave-Ayland wrote:
+>> On 01/03/2020 18:53, BALATON Zoltan wrote:
+>>> On Sun, 1 Mar 2020, BALATON Zoltan wrote:
+>>>> is not legacy mode but "not 100% native mode". The prog-if is set to 0x8a which
+>>>> corresponds to native mode but this is what the Linux fixup function does, firmware
+>>>> sets it to 0x8f which means native mode.
 >>>
->=20
->=20
+>>> I mean, 0x8a legacy mode and 0x8f native mode, I see firmware poking 0x8f and Amiga
+>>> like OSes reading that yet expecting legacy interrupts. Linux fixes up prog-if so its
+>>> driver detects legacy interrupts but still uses ioports from PCI BARs.
+>>
+>> I see. Note that it is also possible to have a prog-if value of 0x80 which is where
+>> the hardware is locked into legacy mode via a pull-down resistor. Perhaps this is the
+>> case for Pegasos, since it would explain why attempts to switch the mode via prog-if
+>> are ignored?
+> 
+> I've seen such option in CMD646 docs but couldn't find similar in VT8231. Genesi has
+> published the schematics of Pegasos II (linked from my
+> https://osdn.net/projects/qmiga/wiki/SubprojectPegasos2 page) so we could check if
+> you can tell which pin is that. But we get 0x8a in Linux lspci output on real
+> hardware for prog-if which is explained by firmare setting it to 0x8f then Linux
+> fixup function clearing bits 0 and 2 so does not seem it started as 0x80 because then
+> firmware should not be able to set it to 0x8f either.
 
+I had a quick look at the schematics linked from the page above, and they confirm
+that the VIA IDE interface is connected directly to IRQs 14 and 15 and not to the PCI
+interrupt pins. So on that basis the best explanation as to what is happening is the
+comment in the link you provided here:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/powerpc/platforms/chrp/pci.c?h=v4.14.172#n353
+
+/* Pegasos2 firmware version 20040810 configures the built-in IDE controller
+ * in legacy mode, but sets the PCI registers to PCI native mode.
+ * The chip can only operate in legacy mode, so force the PCI class into legacy
+ * mode as well. The same fixup must be done to the class-code property in
+ * the IDE node /pci@80000000/ide@C,1
+ */
+
+Given that the DT is wrong, then we should assume that all OSs would have to
+compensate for this in the same way as Linux, and therefore this should be handled
+automatically.
+
+AFAICT this then only leaves the question: why does the firmware set
+PCI_INTERRUPT_LINE to 9, which is presumably why you are seeing problems running
+MorphOS under QEMU.
+
+Could it be that setting prog-if to 0x8a legacy mode also resets PCI_INTERRUPT_LINE
+to 14? You should be able to confirm this easily on real hardware using the Forth
+config-* words on the IDE node and reading the prog-if byte before and after.
+
+
+ATB,
+
+Mark.
 
