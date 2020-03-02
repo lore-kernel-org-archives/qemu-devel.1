@@ -2,96 +2,84 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BF7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC37DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EF7F2166E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:53:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A8FF2166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y792sYJ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EF7F2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="1lqz0wf5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A8FF2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8ihy-0006rS-Gn
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:53:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
+	id 1j8ikA-0000Hs-OK
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:56:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57681)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1j8ihG-0006Qw-CQ
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:53:15 -0500
+ (envelope-from <rvkagan@yandex-team.ru>) id 1j8ijC-0007Q9-GM
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1j8ihF-0003Sb-09
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:53:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20647
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <rvkagan@yandex-team.ru>) id 1j8ijB-0003ww-8S
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:14 -0500
+Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:51336)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1j8ihE-0003SN-SL
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:53:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583146392;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QTungxCJA5mw3iAhaP68NT0WzGbF847ZV9sohD68qhs=;
- b=Y792sYJ/hzwTS/Xfo2bezPXYK6WanMShqbajLyPbMZohpDiXy9gD6y+d8mXwSwEslzCtDy
- /QYY1s6yeb3Db1d2JCtmdToJZ5xy/2//4L7YeB0Er12AfMHPmIpcws/e4IbfzwzAqncnfF
- 6pvlwb696dyISgFVmgpqcH2wq6J6koU=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-9KRiwaaZP7eZWSy4BPFJBg-1; Mon, 02 Mar 2020 05:53:10 -0500
-X-MC-Unique: 9KRiwaaZP7eZWSy4BPFJBg-1
-Received: by mail-qv1-f71.google.com with SMTP id z39so8357520qve.5
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 02:53:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=oiXakJUq85bGtTpNtxcz1EhuJ5nu6tcf/1k1Q+3y8T8=;
- b=JIoxBIQD6hDMSO48HUg6C2wPjh4lMi+kRWIQ8xIwg10g9xhOJH7wpMGfGWusK96013
- DLgw4nlNN8L9zyUHy0HiYSJe7WozhR0ft8LijU+F7ETBwZiEsgelRd8oe6vK7BXaAF+S
- Sz/kSpd5f4MhZX5yfCbZ6J/Xb833/I36AsyX0HNg17Dqbxe3W3bUdonJALFHDfeIJZ5s
- qn68kp+nbUgqyvK6otczsN4hHyqdTiAv3fdyPgdXD2oHPgPS0tNrOll4zLaL9y4eu+qb
- hb42N3bmZhDOG0Cn1/zkE1pIAEqNmfgN764SduG/9upN/UVG4mWeAy+MDHUtDhgJmSBp
- bIbg==
-X-Gm-Message-State: APjAAAVsoRpd5DB5ai7Mj+8VaoCQQBu6+quGRR3gGJfOv+U/NaAOx6no
- ZKkHQBuDHX0KPKqYa7NewHAwdBABZI1H8S1Uh/DPoOZ0tHtnaAkqaxj1W7iaJd68MY5LCto+/nn
- bjmiq6z704Q2sxsQ=
-X-Received: by 2002:ad4:53a8:: with SMTP id j8mr14602246qvv.149.1583146389974; 
- Mon, 02 Mar 2020 02:53:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw39lzaXOelu69xuvhzJ5fsTV6cpACjqgZUiUO2wUdjVU+orVHKsYSte06q2m841ENOsGhm4w==
-X-Received: by 2002:ad4:53a8:: with SMTP id j8mr14602226qvv.149.1583146389654; 
- Mon, 02 Mar 2020 02:53:09 -0800 (PST)
-Received: from redhat.com (bzq-79-180-48-224.red.bezeqint.net. [79.180.48.224])
- by smtp.gmail.com with ESMTPSA id b2sm9628413qkj.9.2020.03.02.02.53.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 02:53:08 -0800 (PST)
-Date: Mon, 2 Mar 2020 05:53:03 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
-Message-ID: <20200302055232-mutt-send-email-mst@kernel.org>
-References: <20200207095412.794912-1-lvivier@redhat.com>
- <20200301071119-mutt-send-email-mst@kernel.org>
- <c68547be-3131-8069-70d9-f0a1758784d7@redhat.com>
+ (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
+ id 1j8ij5-0003t2-TD; Mon, 02 Mar 2020 05:55:08 -0500
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::119])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 128AC2E1675;
+ Mon,  2 Mar 2020 13:55:04 +0300 (MSK)
+Received: from vla1-5a8b76e65344.qloud-c.yandex.net
+ (vla1-5a8b76e65344.qloud-c.yandex.net [2a02:6b8:c0d:3183:0:640:5a8b:76e6])
+ by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ YynEHQvKqL-t3D078Xn; Mon, 02 Mar 2020 13:55:04 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1583146504; bh=Jh/qFUN2zJdPMEi3evDZc5XATzJ8NgGWbUI48ZU2yrA=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=1lqz0wf5P8iUMYfHDMcre3tnLjTku6th2T6IBdSdnRq5ZGu5feXaGyeUpRRicoCtg
+ orECIb0J4mfT32UOB7561wNhIbExzyUeAYiQGZYZANdOrZpF7SpabPy5hboFS6kwvE
+ PBsT2YExul272/gAMxT2qtY7WDRf1KWXkDMUHbAs=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:408:8942:9144:3fd0:c0de])
+ by vla1-5a8b76e65344.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ 4LMWzUudYi-t33uBFxR; Mon, 02 Mar 2020 13:55:03 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+Date: Mon, 2 Mar 2020 13:55:02 +0300
+From: Roman Kagan <rvkagan@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] block: make BlockConf.*_size properties 32-bit
+Message-ID: <20200302105502.GA96019@rvkaganb>
+Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
+ Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20200211115401.43230-1-rvkagan@yandex-team.ru>
+ <c79721ac-357f-6b9f-6d71-53f2cb72ef6e@redhat.com>
+ <20200213080151.GA85593@rvkaganb>
+ <d869f498-0d6b-1a7f-72b5-bc5f2088b119@redhat.com>
+ <20200213135544.GA103102@rvkaganb>
 MIME-Version: 1.0
-In-Reply-To: <c68547be-3131-8069-70d9-f0a1758784d7@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20200213135544.GA103102@rvkaganb>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 5.45.199.163
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,67 +91,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 02, 2020 at 10:50:16AM +0100, Laurent Vivier wrote:
-> On 01/03/2020 13:12, Michael S. Tsirkin wrote:
-> > On Fri, Feb 07, 2020 at 10:54:11AM +0100, Laurent Vivier wrote:
-> >> vhost-user-bridge is not a test. Move it to contrib/ and
-> >> add it to the tools list.
-> >>
-> >> It will be built only if tools (--enable-tools) and
-> >> vhost-user (--enable-vhost-user) are enabled (both are set
-> >> by default).
-> >>
-> >> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> >> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> >=20
-> >=20
-> > I had to drop this series from my tree since it cause failures
-> > on OSX. Pls use something like travis CI to test when you repost
-> > a fixed version. Thanks!
-> >=20
->=20
-> Do you have a link to the error logs?
->=20
+On Thu, Feb 13, 2020 at 04:55:44PM +0300, Roman Kagan wrote:
+> On Thu, Feb 13, 2020 at 06:47:10AM -0600, Eric Blake wrote:
+> > On 2/13/20 2:01 AM, Roman Kagan wrote:
+> > > On Wed, Feb 12, 2020 at 03:44:19PM -0600, Eric Blake wrote:
+> > > > On 2/11/20 5:54 AM, Roman Kagan wrote:
+> > > > > Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
+> > > > > 32-bit for logical_block_size, physical_block_size, and min_io_size.
+> > > > > However, the properties in BlockConf are defined as uint16_t limiting
+> > > > > the values to 32768.
+> > > > > 
+> > > > > This appears unnecessary tight, and we've seen bigger block sizes handy
+> > > > > at times.
+> > > > 
+> > > > What larger sizes?  I could see 64k or maybe even 1M block sizes,...
+> > > 
+> > > We played exactly with these two :)
+> > > 
+> > > > > 
+> > > > > Make them 32 bit instead and lift the limitation.
+> > > > > 
+> > > > > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
+> > > > > ---
+> > > > >    hw/core/qdev-properties.c    | 21 ++++++++++++---------
+> > > > >    include/hw/block/block.h     |  8 ++++----
+> > > > >    include/hw/qdev-properties.h |  2 +-
+> > > > >    3 files changed, 17 insertions(+), 14 deletions(-)
+> > > > > 
+> > > > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> > > > > index 7f93bfeb88..5f84e4a3b8 100644
+> > > > > --- a/hw/core/qdev-properties.c
+> > > > > +++ b/hw/core/qdev-properties.c
+> > > > > @@ -716,30 +716,32 @@ const PropertyInfo qdev_prop_pci_devfn = {
+> > > > >    /* --- blocksize --- */
+> > > > > +#define MIN_BLOCK_SIZE 512
+> > > > > +#define MAX_BLOCK_SIZE 2147483648
+> > > > 
+> > > > ...but 2G block sizes are going to have tremendous performance problems.
+> > > > 
+> > > > I'm not necessarily opposed to the widening to a 32-bit type, but think you
+> > > > need more justification or a smaller number for the max block size,
+> > > 
+> > > I thought any smaller value would just be arbitrary and hard to reason
+> > > about, so I went ahead with the max value that fit in the type and could
+> > > be made visibile to the guest.
+> > 
+> > You've got bigger problems than what is visible to the guest. block/qcow2.c
+> > operates on a cluster at a time; if you are stating that it now requires
+> > reading multiple clusters to operate on one, qcow2 will have to do lots of
+> > wasteful read-modify-write cycles.
+> 
+> I'm failing to see how this is supposed to happen.  The guest will issue
+> requests bigger than the cluster size; why would it cause RMW?
+> 
+> Big logical_block_size would cause RMW in the guest if it wants to
+> perform smaller writes, but that's up to the user to take this tradeoff,
+> isn't it?
+> 
+> > You really need a strong reason to
+> > support a maximum larger than 2M other than just "so the guest can
+> > experiment with it".
+> 
+> Do I get you right that your suggestion is to cap the block size
+> property at 2MB?
+> 
 > Thanks,
-> Laurent
+> Roman.
 
+Ping?
 
-Peter sent me this:
-
-
-Hi; this fails to build on OSX:
-
-  CC      contrib/libvhost-user/libvhost-user.o
-/Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.c:27:1=
-0:
-fatal error: 'sys/eventfd.h' file not found
-#include <sys/eventfd.h>
-         ^~~~~~~~~~~~~~~
-In file included from
-/Users/pm215/src/qemu-for-merges/contrib/vhost-user-bridge/main.c:37:
-/Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.h:21:1=
-0:
-fatal error: 'linux/vhost.h' file not found
-#include <linux/vhost.h>
-         ^~~~~~~~~~~~~~~
-1 error generated.
-
-thanks
--- PMM
-
-But pls do test on OSX before reposting.
-
---=20
-MST
-
+> > > 
+> > > Besides this is a property that is set explicitly, so I don't see a
+> > > problem leaving this up to the user.
+> > > 
+> > > > particularly since qcow2 refuses to use cluster sizes larger than 2M and it
+> > > > makes no sense to allow a block size larger than a cluster size.
+> > > 
+> > > This still doesn't contradict passing a bigger value to the guest, for
+> > > experimenting if nothing else.
+> > > 
+> > > Thanks,
+> > > Roman.
+> > > 
+> > 
+> > -- 
+> > Eric Blake, Principal Software Engineer
+> > Red Hat, Inc.           +1-919-301-3226
+> > Virtualization:  qemu.org | libvirt.org
+> > 
+> 
 
