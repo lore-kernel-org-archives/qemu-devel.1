@@ -2,117 +2,126 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2777FC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB8AC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:03:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0009720863
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:57:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0009720863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 778EF217F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:03:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9nYTHKQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 778EF217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8mVv-00007e-7i
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 09:57:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36047)
+	id 1j8maz-0001zx-Nv
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:03:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1j8mUu-0007xY-Dz
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:56:45 -0500
+ (envelope-from <david@redhat.com>) id 1j8mZz-0001Zj-VD
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1j8mUt-0007l7-8v
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:56:44 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:33599)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1j8mUq-0007hE-8e; Mon, 02 Mar 2020 09:56:40 -0500
-Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MLRgp-1irWcr3k6l-00IXt8; Mon, 02 Mar 2020 15:56:35 +0100
-To: Lirong Yuan <yuanzi@google.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200222010925.32858-1-yuanzi@google.com>
- <CADjx4CKoSuu2zWn7BRhpxLL3TaimR7fX99u_r41egctwA1LVTQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH] linux-user: Add an argument QEMU_MMAP_BASE to set custom
- mmap base address in qemu user mode
-Message-ID: <553af2a0-2092-fe7f-ad7a-3b7ecebbe0a5@vivier.eu>
-Date: Mon, 2 Mar 2020 15:56:32 +0100
+ (envelope-from <david@redhat.com>) id 1j8mZy-00013K-D2
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:01:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50202
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j8mZy-00011o-9a
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:01:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583161316;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=SQw3lbDMsxaDXO/gMtzwBJAV+RYwJ8MRN4jioZwlcDY=;
+ b=g9nYTHKQwWA0PcO/CJb9ErKU5gJlcyB6OMCGA1HDMTjWclPvTfsDAtqSzMuXMWjC3Xqj8E
+ 1IdEd918Ba+DvXLBdIdfZoL883cT/OkCpB14tFG89Vk+GZ2YuvuFrnFOsf3+qX2i+8XanZ
+ 4JU+0oydFk3Nh6WKGfFYKvc43kAZpzE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-222-4UMAZ7JXPxGrTowM-bfX-g-1; Mon, 02 Mar 2020 10:01:55 -0500
+X-MC-Unique: 4UMAZ7JXPxGrTowM-bfX-g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 295DE1937FC0;
+ Mon,  2 Mar 2020 15:01:54 +0000 (UTC)
+Received: from [10.36.116.114] (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F206B5C1B0;
+ Mon,  2 Mar 2020 15:01:35 +0000 (UTC)
+Subject: Re: [PATCH v3 12/15] util: vfio-helpers: Implement ram_block_resized()
+To: Peter Xu <peterx@redhat.com>
+References: <20200228194257.GV180973@xz-x1>
+ <509A885B-055F-4EEF-96FA-2EDA759F4F2C@redhat.com>
+ <20200228210152.GD180973@xz-x1>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
+ dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
+ QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
+ XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
+ Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
+ PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
+ WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
+ UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
+ jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
+ B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABtCREYXZpZCBIaWxk
+ ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT6JAlgEEwEIAEICGwMFCQlmAYAGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl3pImkCGQEACgkQTd4Q
+ 9wD/g1o+VA//SFvIHUAvul05u6wKv/pIR6aICPdpF9EIgEU448g+7FfDgQwcEny1pbEzAmiw
+ zAXIQ9H0NZh96lcq+yDLtONnXk/bEYWHHUA014A1wqcYNRY8RvY1+eVHb0uu0KYQoXkzvu+s
+ Dncuguk470XPnscL27hs8PgOP6QjG4jt75K2LfZ0eAqTOUCZTJxA8A7E9+XTYuU0hs7QVrWJ
+ jQdFxQbRMrYz7uP8KmTK9/Cnvqehgl4EzyRaZppshruKMeyheBgvgJd5On1wWq4ZUV5PFM4x
+ II3QbD3EJfWbaJMR55jI9dMFa+vK7MFz3rhWOkEx/QR959lfdRSTXdxs8V3zDvChcmRVGN8U
+ Vo93d1YNtWnA9w6oCW1dnDZ4kgQZZSBIjp6iHcA08apzh7DPi08jL7M9UQByeYGr8KuR4i6e
+ RZI6xhlZerUScVzn35ONwOC91VdYiQgjemiVLq1WDDZ3B7DIzUZ4RQTOaIWdtXBWb8zWakt/
+ ztGhsx0e39Gvt3391O1PgcA7ilhvqrBPemJrlb9xSPPRbaNAW39P8ws/UJnzSJqnHMVxbRZC
+ Am4add/SM+OCP0w3xYss1jy9T+XdZa0lhUvJfLy7tNcjVG/sxkBXOaSC24MFPuwnoC9WvCVQ
+ ZBxouph3kqc4Dt5X1EeXVLeba+466P1fe1rC8MbcwDkoUo65Ag0EVcufkQEQAOfX3n0g0fZz
+ Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
+ T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
+ 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
+ CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
+ NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
+ 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
+ 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
+ lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
+ AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
+ N7eop7uh+6bezi+rugUI+w6DABEBAAGJAiUEGAECAA8FAlXLn5ECGwwFCQlmAYAACgkQTd4Q
+ 9wD/g1qA6w/+M+ggFv+JdVsz5+ZIc6MSyGUozASX+bmIuPeIecc9UsFRatc91LuJCKMkD9Uv
+ GOcWSeFpLrSGRQ1Z7EMzFVU//qVs6uzhsNk0RYMyS0B6oloW3FpyQ+zOVylFWQCzoyyf227y
+ GW8HnXunJSC+4PtlL2AY4yZjAVAPLK2l6mhgClVXTQ/S7cBoTQKP+jvVJOoYkpnFxWE9pn4t
+ H5QIFk7Ip8TKr5k3fXVWk4lnUi9MTF/5L/mWqdyIO1s7cjharQCstfWCzWrVeVctpVoDfJWp
+ 4LwTuQ5yEM2KcPeElLg5fR7WB2zH97oI6/Ko2DlovmfQqXh9xWozQt0iGy5tWzh6I0JrlcxJ
+ ileZWLccC4XKD1037Hy2FLAjzfoWgwBLA6ULu0exOOdIa58H4PsXtkFPrUF980EEibUp0zFz
+ GotRVekFAceUaRvAj7dh76cToeZkfsjAvBVb4COXuhgX6N4pofgNkW2AtgYu1nUsPAo+NftU
+ CxrhjHtLn4QEBpkbErnXQyMjHpIatlYGutVMS91XTQXYydCh5crMPs7hYVsvnmGHIaB9ZMfB
+ njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
+ FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
+Organization: Red Hat GmbH
+Message-ID: <b67aa65d-4cda-8481-426f-3ffd758b7c24@redhat.com>
+Date: Mon, 2 Mar 2020 16:01:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <CADjx4CKoSuu2zWn7BRhpxLL3TaimR7fX99u_r41egctwA1LVTQ@mail.gmail.com>
+In-Reply-To: <20200228210152.GD180973@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8KpmKQYmJZolQ3kGR/j5e/nf+OLWg/zMQFyAhRH3xxcTDm50AFz
- pVKv7wgutbJg/q/i8CTuRIHIjoTyhQddYlhAhKkSJA+h8lNzgizIedRcQQ6SVczDCIMSoFu
- wbs1CyJS2iGl98A3oCKKG/GKsKj0+kKiR+vBhEBUbPIiU+Q+I1urVanhINO42FmArUJ+91+
- 6htHxbVMMwLb1TPuRaTCQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Qhvy+nXr5eY=:uf4SPpftey6uUvf8SUdp9X
- Rm4O6/4j5hu6uFpECUbwQAmHDNtuXidQwdebp6nsnJs5NxVQ5gN477x1CkD/WRuDVFU/4a3tD
- KIs1yclRbhnEELPsrHxI4P3kwZiWy3TbJkTIGtfE1ksuLaz6AKc1wV76rUf6171veDP1nRE18
- VDfpMn4OgMbh8maAUwSQVFuaEUk4ypLqYU9HUtc1OAm5GcKix8If7qm+5B41Xk4OyUEfXJi0D
- 2OBtU4eK+NWkTIXSZ786LL67zl7tVCrNzrvrmWhqwLZFDAFCK07lRZo9YJKDCxYOQOeBnVgHT
- 3xBWzLaBzDZeaZwBFRuaRJrx5gucwse1mpw+hpeZCSs5MlqYEuZ4phI5w8XXILmUEr22he5PX
- LSLPGq0js92niT+zDFQGQHcL64dlvMjMOjjaF+Yk64KV1VDi+klvmNNpd5xsaGSYFXq6N9znf
- BFv9/wPRddw+xGfcvatfIvD8GBu9cHlC38mmM2SvG//yboby9wHjV+bRcGPituI1qh6P4EMxm
- 2ej0aE3FXYI1Dfm1pACSXcMRf89adkNcLbkKlo4wSuuf+Xga3XhUg8qGqBXDHSjc7Tx60M5Qz
- 7tRKKYM9QqyfZfgXsysye+Bu1qUohMcPRpcYGdubdReu3DDJ7eI+iYzRUzbCDeqeA4CXMjrmN
- YgGfRRTDSB0Cy8BYW+kGYz+2ehF7kAXasjjUHFJVsD/LcYaNDisJiGd616i5e6LnnqTvgQGAN
- na3w/5094pDukcvMzgY78+hQ+ghZuTMm/D1NxrnVffcO3OSSUfa8gYtWmrcams70O7V2dYZqX
- c+bLM3BI2Goo8xgt5cSFN85OJmBO/f292fH4XObBv3DMBUKt1rWR5WqeWJ/LVmY//x1cPpm
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.134
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,105 +133,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Kotrasinski <i.kotrasinsk@partner.samsung.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/02/2020 à 01:43, Lirong Yuan a écrit :
-> On Fri, Feb 21, 2020 at 5:09 PM Lirong Yuan <yuanzi@google.com> wrote:
+On 28.02.20 22:01, Peter Xu wrote:
+> On Fri, Feb 28, 2020 at 09:16:28PM +0100, David Hildenbrand wrote:
 >>
->> This change allows us to set custom base address for guest programs. It is needed to allow qemu to work with Thread Sanitizer (TSan), which has specific boundary definitions for memory mappings on different platforms:
->> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsan/rtl/tsan_platform.h
+>=20
+> [...]
+>=20
+>>>> @@ -631,7 +658,7 @@ int qemu_vfio_dma_map(QEMUVFIOState *s, void *host=
+, size_t size,
+>>>>                 qemu_vfio_remove_mapping(s, mapping);
+>>>>                 goto out;
+>>>>             }
+>>>> -            s->low_water_mark +=3D size;
+>>>> +            s->low_water_mark +=3D max_size;
+>>>
+>>> I think it's fine to only increase the low water mark here, however
+>>> imo it would be better to also cache the max size in IOVAMapping too,
+>>> then in resize() we double check new_size <=3D max_size?  It also makes
+>>> IOVAMapping more self contained.
+>>>
+>>
+>> I=E2=80=98ll have a look how much additional code that will imply - if i=
+t=E2=80=98s simple, I=E2=80=98ll do it.
+>=20
+> AFAICT it'll be as simple as introducing IOVAMapping.max_size, then
+> pass max_size into qemu_vfio_add_mapping().  Thanks,
+>=20
 
-Could you give more details and some examples?
+Yeah, was answering from my mobile without code at hand :) added! Thanks!
 
+--=20
 Thanks,
-Laurent
 
->> Signed-off-by: Lirong Yuan <yuanzi@google.com>
->> ---
->>  linux-user/main.c | 12 ++++++++++++
->>  linux-user/mmap.c |  3 ++-
->>  linux-user/qemu.h |  5 +++++
->>  3 files changed, 19 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/main.c b/linux-user/main.c
->> index fba833aac9..c01af6bfee 100644
->> --- a/linux-user/main.c
->> +++ b/linux-user/main.c
->> @@ -336,6 +336,16 @@ static void handle_arg_guest_base(const char *arg)
->>      have_guest_base = 1;
->>  }
->>
->> +static void handle_arg_mmap_base(const char *arg)
->> +{
->> +    int err = qemu_strtoul(arg, NULL, 0, &mmap_base);
->> +    if (err) {
->> +        fprintf(stderr, "Invalid mmap_base: %s, err: %d\n", arg, err);
->> +        exit(EXIT_FAILURE);
->> +    }
->> +    mmap_next_start = mmap_base;
->> +}
->> +
->>  static void handle_arg_reserved_va(const char *arg)
->>  {
->>      char *p;
->> @@ -440,6 +450,8 @@ static const struct qemu_argument arg_table[] = {
->>       "uname",      "set qemu uname release string to 'uname'"},
->>      {"B",          "QEMU_GUEST_BASE",  true,  handle_arg_guest_base,
->>       "address",    "set guest_base address to 'address'"},
->> +    {"mmap_base",  "QEMU_MMAP_BASE",   true,  handle_arg_mmap_base,
->> +     "",           "begin allocating guest pages at this host address"},
->>      {"R",          "QEMU_RESERVED_VA", true,  handle_arg_reserved_va,
->>       "size",       "reserve 'size' bytes for guest virtual address space"},
->>      {"d",          "QEMU_LOG",         true,  handle_arg_log,
->> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
->> index 8685f02e7e..3f35543acf 100644
->> --- a/linux-user/mmap.c
->> +++ b/linux-user/mmap.c
->> @@ -189,6 +189,7 @@ static int mmap_frag(abi_ulong real_start,
->>  # define TASK_UNMAPPED_BASE  0x40000000
->>  #endif
->>  abi_ulong mmap_next_start = TASK_UNMAPPED_BASE;
->> +abi_ulong mmap_base = TASK_UNMAPPED_BASE;
->>
->>  unsigned long last_brk;
->>
->> @@ -299,7 +300,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size, abi_ulong align)
->>
->>              if ((addr & (align - 1)) == 0) {
->>                  /* Success.  */
->> -                if (start == mmap_next_start && addr >= TASK_UNMAPPED_BASE) {
->> +                if (start == mmap_next_start && addr >= mmap_base) {
->>                      mmap_next_start = addr + size;
->>                  }
->>                  return addr;
->> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
->> index 560a68090e..83c00cfea2 100644
->> --- a/linux-user/qemu.h
->> +++ b/linux-user/qemu.h
->> @@ -161,6 +161,11 @@ void task_settid(TaskState *);
->>  void stop_all_tasks(void);
->>  extern const char *qemu_uname_release;
->>  extern unsigned long mmap_min_addr;
->> +/*
->> + * mmap_base is minimum address to use when allocating guest pages. All guest
->> + * pages will be allocated at this (guest) address or higher addresses.
->> + */
->> +extern abi_ulong mmap_base;
->>
->>  /* ??? See if we can avoid exposing so much of the loader internals.  */
->>
->> --
->> 2.25.0.265.gbab2e86ba0-goog
->>
-> 
-> Friendly ping~
-> 
-> Link to the page for the patch on patchwork:
-> http://patchwork.ozlabs.org/patch/1242370/
-> 
+David / dhildenb
 
 
