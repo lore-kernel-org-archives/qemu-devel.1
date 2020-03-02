@@ -2,64 +2,81 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5583EC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 01:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E84C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 01:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CEDE24699
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 01:39:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CEDE24699
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0FE782468D
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 01:59:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwuwUXeN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE782468D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8a3O-0003qN-6I
-	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 20:39:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52257)
+	id 1j8aMZ-0007BH-Dh
+	for qemu-devel@archiver.kernel.org; Sun, 01 Mar 2020 20:59:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Colin.Xu@intel.com>) id 1j8a2M-0003IT-AL
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 20:38:30 -0500
+ (envelope-from <jcfaracco@gmail.com>) id 1j8aLz-0006j9-Gg
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 20:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Colin.Xu@intel.com>) id 1j8a2L-0002gE-9I
- for qemu-devel@nongnu.org; Sun, 01 Mar 2020 20:38:26 -0500
-Received: from mga05.intel.com ([192.55.52.43]:23348)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Colin.Xu@intel.com>)
- id 1j8a2H-0002ae-Ou; Sun, 01 Mar 2020 20:38:21 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 01 Mar 2020 17:38:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,506,1574150400"; d="scan'208";a="386114239"
-Received: from unknown (HELO [10.239.160.52]) ([10.239.160.52])
- by orsmga004.jf.intel.com with ESMTP; 01 Mar 2020 17:38:10 -0800
-Subject: Re: [PATCH V2] MAINTAINERS: Add entry for Guest X86 HAXM CPUs
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- philmd@redhat.com
-References: <20200228012046.6629-1-colin.xu@intel.com>
- <9c32d7c2-d8af-45c6-4578-34c79bd7a2a0@redhat.com>
-From: Colin Xu <Colin.Xu@intel.com>
-Message-ID: <e6db0da6-6e18-cb9e-1fce-f4de4bb82e8a@intel.com>
-Date: Mon, 2 Mar 2020 09:38:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <jcfaracco@gmail.com>) id 1j8aLy-0004Bx-Iq
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 20:58:43 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33190)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jcfaracco@gmail.com>) id 1j8aLy-0004Bk-A9
+ for qemu-devel@nongnu.org; Sun, 01 Mar 2020 20:58:42 -0500
+Received: by mail-lj1-x243.google.com with SMTP id f13so1070176ljp.0
+ for <qemu-devel@nongnu.org>; Sun, 01 Mar 2020 17:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=GS8uRJURWtQVkmGAxB6eQljx4MiB+B/tzRfhaUt7SZE=;
+ b=FwuwUXeNLJ8COvIa3ZXmiBNTfmOgQ050vyjThpNlV3ieGQHdnlo/aXwBVhFNhB2+8h
+ Nzw4guceBoJpenuV4+9mcPH+GMpo/BXOIgdnEqP5ZH18dh7LAdgUuWxoAVHF3H1o7JOw
+ JOSo9oDlcbRA+RLtEvAf7+Eac9ydH3G06kbewpd5OjPe25fMXSfC8FysYAsW+AWzQFcz
+ CzWuM7cRq4huLu7T5XEXc6U58HQxPRRC0XetbP6Ptu+KBB6PYVhIEUQVIQ35Kt3xWXvk
+ wTEuOsKbfnyYYBNpS9AZnFME+ZdiU+kyZ5Zd5cPDbNynChVI3SPA34aErrkMPG4NyiQV
+ fsbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=GS8uRJURWtQVkmGAxB6eQljx4MiB+B/tzRfhaUt7SZE=;
+ b=ZIFT9M9uL3JtdAgDGkdFc6OcyUQA/msVdk5MU0l4Lb4VRhkLoFjsmo7OqyTC5hAPFo
+ trRD0cAXFNieFpSfXfX9bAkYzUS1FWPUOqo7/p5QcXgYCbl8tTylD0uNF3JFoF+AFVFV
+ bvY2mjikRX+LfXDfTTOptVG0LAE0Bbsay+rWTzDjoKBYfMbOwqdHZEh9untFNh3I0bV1
+ b5mCvVNdMeYZ2/sprYmX/0jEMR1xV2xPawrSYnm0/ob3sD8EPNoFiJBoNVj7uFuowEY/
+ rYsbFRTVC8oZgdr5wgSNLmExkLRcVLawOTzombWHLWreo73pPlz/kECGtwWa+LS+Eomv
+ BE6Q==
+X-Gm-Message-State: ANhLgQ1MirIOK0wUAE9zxncl+E6zVTn29YBUvsoiicrQferevBO/+l4F
+ RkRmgBFxfIpCawJZhyb/vQK7GDTF4ebJzdqxkAc=
+X-Google-Smtp-Source: ADFU+vsvkTqbGRWuj7yIje8mlmmF4DL4mLS/sYFEGSV51TM2IAXzk9pE1wa1w/qUsvNoskDs4kumcWLWA8GhsibBbe0=
+X-Received: by 2002:a2e:9d11:: with SMTP id t17mr10340598lji.169.1583114320802; 
+ Sun, 01 Mar 2020 17:58:40 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <9c32d7c2-d8af-45c6-4578-34c79bd7a2a0@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20200301192156.19357-1-jcfaracco@gmail.com>
+ <52fadd00-d59a-0096-52a2-f44f49a85d7b@redhat.com>
+In-Reply-To: <52fadd00-d59a-0096-52a2-f44f49a85d7b@redhat.com>
+From: Julio Faracco <jcfaracco@gmail.com>
+Date: Sun, 1 Mar 2020 22:58:29 -0300
+Message-ID: <CAENf94+9qHNvCnG05C70=NwUHwwjo050s8oTt0ZB5Q1jpCU7+g@mail.gmail.com>
+Subject: Re: [PATCH v3] i386: Fix GCC warning with snprintf when HAX is enabled
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,59 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Colin.Xu@intel.com
-Cc: qemu-trivial@nongnu.org, wenchao.wang@intel.com, hang.yuan@intel.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Sorry my ignorance, Paolo.
+But why should I remove MAX_{VM,VCPU}_ID?
 
-On 2020-02-28 19:00, Paolo Bonzini wrote:
-> On 28/02/20 02:20, Colin Xu wrote:
->> HAXM covers below files:
->> include/sysemu/hax.h
->> target/i386/hax-*
->>
->> V2: Add HAXM github page for wiki and issue tracking.
->>
->> Cc: Wenchao Wang <wenchao.wang@intel.com>
->> Cc: Hang Yuan <hang.yuan@intel.com>
->> Reviewed-by: Hang Yuan <hang.yuan@intel.com>
->> Signed-off-by: Colin Xu <colin.xu@intel.com>
->> ---
->>   MAINTAINERS | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index df1786db3207..c45f1421eab5 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -435,6 +435,17 @@ F: include/hw/block/dataplane/xen*
->>   F: include/hw/xen/
->>   F: include/sysemu/xen-mapcache.h
->>   
->> +Guest CPU Cores (HAXM)
->> +---------------------
->> +X86 HAXM CPUs
->> +M: Wenchao Wang <wenchao.wang@intel.com>
->> +M: Colin Xu <colin.xu@intel.com>
->> +L: haxm-team@intel.com
->> +W: https://github.com/intel/haxm/issues
->> +S: Maintained
->> +F: include/sysemu/hax.h
->> +F: target/i386/hax-*
->> +
->>   Hosts
->>   -----
->>   LINUX
->>
-> Queued, thanks.
+Did you mean that check?
+    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
+        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_id)=
+;
+        return NULL;
+    }
+
+Wouldn't it be dangerous?
+
+--
+Julio Cesar Faracco
+
+Em dom., 1 de mar. de 2020 =C3=A0s 21:05, Paolo Bonzini
+<pbonzini@redhat.com> escreveu:
+>
+> On 01/03/20 20:21, Julio Faracco wrote:
+> > +    assert(vm_id < 0);
+> > +
+> > +    if (snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d",
+> > +                 vm_id) < 0)
+> > +        return NULL;
+> > +
+> >      return name;
+> >  }
+> >
+> > @@ -140,8 +145,12 @@ static char *hax_vcpu_devfs_string(int vm_id, int =
+vcpu_id)
+> >          return NULL;
+> >      }
+> >
+> > -    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
+> > -             vm_id, vcpu_id);
+> > +    assert(vm_id < 0 || vcpu_id < 0);
+> > +
+> > +    if (snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02=
+d",
+> > +                 vm_id, vcpu_id) < 0)
+>
+>
+> Can you just replace snprintf with g_strdup_printf instead?  Then you
+> can also remove MAX_VM_ID and MAX_VCPU_ID.
 >
 > Paolo
-Thanks a lot!
-
--- 
-Best Regards,
-Colin Xu
-
+>
 
