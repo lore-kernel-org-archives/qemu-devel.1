@@ -2,80 +2,82 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE4BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B52AC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FA1D214DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 267D121D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:27:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qHVvGymj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA1D214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qIgOxgH5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267D121D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8rVS-0005Ds-T8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 15:17:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35951)
+	id 1j8rfF-000073-Cn
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 15:27:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37453)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcfaracco@gmail.com>) id 1j8rUk-0004m3-NT
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:16:57 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8reT-000896-AY
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcfaracco@gmail.com>) id 1j8rUj-0007w0-8z
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:16:54 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43894)
+ (envelope-from <peter.maydell@linaro.org>) id 1j8reR-0002j2-Na
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:26:57 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:40533)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcfaracco@gmail.com>) id 1j8rUj-0007uq-14
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:16:53 -0500
-Received: by mail-lj1-x242.google.com with SMTP id e3so880701lja.10
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 12:16:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j8reR-0002in-HW
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:26:55 -0500
+Received: by mail-oi1-x234.google.com with SMTP id j80so580400oih.7
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 12:26:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=WGAVUk2LLxV/xl0K5AduPPkNv1HJe31VrWTebw+PVpo=;
- b=qHVvGymjNKBxNhVLAbba1KqrCgNPJHQ+08ALVlyapY1n2UpNRkZNm2MjI/AR4LHKot
- /fi3v5h/XkeZXY4caX1pFVBWy5qsKXkokjyCPFZ6GyMie02hS2RocGgkMtQQYRHLbG7V
- nbcIDlQnXUkMqT3L4d7/jjS+d4WqXot9n4IWYWJIksW87qCCK7I657pZRzhLz0pdyM1+
- tBbT+G8Q6h3K8IFYPORXAECE5enw4xKOYveL1k7Oos1vgZ67+V7DoLuGLsOfFmNXKchv
- oa+XGBS2/n1vmMrutC6OcudMBajk8VAEVWAKPNxRAcq+8ZCwdYYwfuXXnkyYf2xzXgEF
- aFng==
+ bh=tFjBFDX+CYCuWQeFwI4hjQmG3H4hz4hHH6LqWbQXrBI=;
+ b=qIgOxgH5KsT8F53wBTglZF5/eaKZEqcEhitCafmKlhsrpW4vVaYofqEo2LogqZQfd8
+ LhISJGgEdQiwAEMo8W+ZlxD3Fe5vOz05G0749ruMI6+74bO7h/5S5a1RgjSeC2B4evFf
+ UruWIeMZgLBHpgPg3AfGjMrHbyU/fCdluz48k9S+keDqa7BJj9SsFCVwuHZBRlgaYuRs
+ 5eC1W0X8Ab/d19OR2xbLYR9apHRNySeteP0qEU4K5jVkuY9I+e5URxgv0Cig3HDXwQP3
+ W1N+uD5TEqvc4YbAoBkwXr7His0qbh8Y+MjB5ZEuSFto6CyyrqbLAs7EL8Hbnq9phPaD
+ 8IDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=WGAVUk2LLxV/xl0K5AduPPkNv1HJe31VrWTebw+PVpo=;
- b=ZV1Q3ETTL6hGTCJvYaOAGiGLvkGOXZzHU/FaZ+uAEKu/1ZyZDgSVhSzZ7xKEPpcBa+
- z5WuGiDaEMx1x2wMlK62APG+JgGKSk3ZXrqmYVN0hU4fBR0JtSX0c0Wy3Gjp/Npv6fr8
- ttVEVYQe1u5Yq2FjGmh66aPAbVWTBEpxyu4OZ7iY8pL++TpPbBFWECzEnws/APL9u3y4
- RoJjPoDNASdZ3pPedmrOoVmf4P9DPp0KpxcMw2UoUKZXK+nlrzqCvOg6y8BWhElLQI2R
- THIhcEeRVDm1r/BHV7tQhQe08vxI3BKf2bvsGEme8vVUmFiHM+KOzre7cQPUOMRPG2bB
- AGsA==
-X-Gm-Message-State: ANhLgQ1oLdeJgOVnbf785zrmuIdvnqGa/AAbE9uyBWLoeaG6m1Nnos3y
- bUPyA8uPUOntfYGzFPEtMzjuh4jotLNPwbQjbWXNatUI
-X-Google-Smtp-Source: ADFU+vungvHCb0ZteATcBTgF0s9+2041YoVbjRaTglQEHYUz/TexU/nIXAFi0w241FYxyRHNxDo6d5RVFphw818MRJ4=
-X-Received: by 2002:a2e:7213:: with SMTP id n19mr373990ljc.148.1583180210918; 
- Mon, 02 Mar 2020 12:16:50 -0800 (PST)
+ bh=tFjBFDX+CYCuWQeFwI4hjQmG3H4hz4hHH6LqWbQXrBI=;
+ b=LydlD1Sq5G6ZMx7NyiTIDhqQeZfz1OjYva9c+co8ImGeoZT4tEHaPRkKZvUTPsY4Ch
+ WeAKwv0jV+xpQCQN6IwoqlymjDGa8q6SPHcqRKe1dTRl9eAWJ30qJ8dMgdH9lTPjqZRM
+ 31MqbwlXPCTqRLqzgWcHMnftZN71GksqfG9XW+XoGax5VSXCHlBjw4b8+7mgMum0vfGl
+ Sc7WHbX8XDrhg4Bt02Rbm3EPoIIPFpfUDTLbgqDF14wKZAnmbLfApRLv6zxd1ZpX90Wx
+ x1Mc5FwzwGSegCgQDG6KVYtIsPCFwHu6ir8USz+1RrTe4rXMZpZaiKP9sBQ3dF88GQmf
+ LqrA==
+X-Gm-Message-State: ANhLgQ0dKcPru8o0y3ouAqRZ1ptQEnKZy/s1tQIzHsZcrSPu/9h8AMat
+ Nwc+U89mwHMLnCltmY2bb1uQ/2KczpWNwr2TkxetgA==
+X-Google-Smtp-Source: ADFU+vuAbUk9qYE65Rds5Hts+m14pzebWpZnS2fb4oAM8yr34VZgBoGFhsIYA2znLE0H6k4l5rikrVLcM4K8k2hAd2M=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr162263oid.98.1583180814500;
+ Mon, 02 Mar 2020 12:26:54 -0800 (PST)
 MIME-Version: 1.0
-References: <20200302201320.6465-1-jcfaracco@gmail.com>
-In-Reply-To: <20200302201320.6465-1-jcfaracco@gmail.com>
-From: Julio Faracco <jcfaracco@gmail.com>
-Date: Mon, 2 Mar 2020 17:16:39 -0300
-Message-ID: <CAENf94KQnG_+cCL1z4Rj0jX7aA3g3=d0KdX4bSwZ3bU4tjq+sA@mail.gmail.com>
-Subject: Re: [PATCH v4] i386: Fix GCC warning with snprintf when HAX is enabled
-To: QEMU Developers <qemu-devel@nongnu.org>
+References: <1582810056-22646-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1582810056-22646-6-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1582810056-22646-6-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Mar 2020 20:26:43 +0000
+Message-ID: <CAFEAcA_ZL8kd+DaHz-debq7A2simEdB8GNzty890sfc=SjrByw@mail.gmail.com>
+Subject: Re: [PULL 5/5] tests/acceptance: Count multiple Tux logos displayed
+ on framebuffer
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::234
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,169 +89,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Em seg., 2 de mar. de 2020 =C3=A0s 17:13, Julio Faracco
-<jcfaracco@gmail.com> escreveu:
+On Thu, 27 Feb 2020 at 13:28, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
 >
-> When HAX is enabled (--enable-hax), GCC 9.2.1 reports issues with
-> snprintf(). Replacing old snprintf() by g_strdup_printf() fixes the
-> problem with boundary checks of vm_id and vcpu_id and finally the
-> warnings produced by GCC.
+> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >
-> For more details, one example of warning:
->   CC      i386-softmmu/target/i386/hax-posix.o
-> qemu/target/i386/hax-posix.c: In function =E2=80=98hax_host_open_vm=E2=80=
-=99:
-> qemu/target/i386/hax-posix.c:124:56: error: =E2=80=98%02d=E2=80=99 direct=
-ive output may be
-> truncated writing between 2 and 11 bytes into a region of size 3
-> [-Werror=3Dformat-truncation=3D]
->   124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_=
-id);
->       |                                                        ^~~~
-> qemu/target/i386/hax-posix.c:124:41: note: directive argument in the rang=
-e
-> [-2147483648, 64]
->   124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_=
-id);
->       |                                         ^~~~~~~~~~~~~~~~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from qemu/include/qemu/osdep.h:99,
->                  from qemu/target/i386/hax-posix.c:14:
-> /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_chk=
-=E2=80=99 output
-> between 17 and 26 bytes into a destination of size 17
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL =
-- 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Add a test that verifies that each core properly displays the Tux
+> logo on the framebuffer device.
 >
-> Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
-> ---
-> v1-v2: Add assert() as Richard Henderson suggested.
-> v2-v3: Fix code syntax alignment with vm_id and snprintf() function.
-> v3-v4: Replacing snprintf() by g_strdup_printf() from linux and windows.
-> ---
-> ---
->  target/i386/hax-posix.c   | 33 ++-------------------------------
->  target/i386/hax-windows.c | 33 ++-------------------------------
->  2 files changed, 4 insertions(+), 62 deletions(-)
->
-> diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-> index a5426a6dac..3bad89f133 100644
-> --- a/target/i386/hax-posix.c
-> +++ b/target/i386/hax-posix.c
-> @@ -108,41 +108,12 @@ int hax_mod_version(struct hax_state *hax, struct h=
-ax_module_version *version)
->
->  static char *hax_vm_devfs_string(int vm_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID) {
-> -        fprintf(stderr, "Too big VM id\n");
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VM_DEVFS "/dev/hax_vm/vmxx"
-> -    name =3D g_strdup(HAX_VM_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
->  }
->
->  static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
-> -        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_=
-id);
-> -        return NULL;
-> -    }
+> We simply follow the OpenCV "Template Matching with Multiple Objects"
+> tutorial, replacing Lionel Messi by Tux:
+> https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html
 
-We probably need a V5 to remove definitions from hax-i386.h:
-#define MAX_VM_ID 0x40
-#define MAX_VCPU_ID 0x40
+Hi -- this doesn't seem to work on my system:
 
-That's why I asked about IF last patch. ;-)
+ (38/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine.tes=
+t_integratorcp_console:
+SKIP: untrusted code
+ (39/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine.tes=
+t_framebuffer_tux_logo:
+SKIP: Python NumPy not installed
+ (40/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n800:
+SKIP: untrusted code
+ (41/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n810:
+SKIP: untrusted code
+ (42/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_boo=
+trom_framebuffer_size:
+PASS (3.47 s)
+ (43/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_boo=
+trom_framebuffer_ocr_with_tesseract_v3:
+SKIP: tesseract v3 OCR tool not available
+ (44/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_boo=
+trom_framebuffer_ocr_with_tesseract_v4:
+SKIP: tesseract v4 OCR tool not available
+ (45/74) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.tes=
+t_mips_malta_i6400_framebuffer_logo_1core:
+ERROR: name 'cv2' is not defined (5.43 s)
 
-> -
-> -#define HAX_VCPU_DEVFS "/dev/hax_vmxx/vcpuxx"
-> -    name =3D g_strdup(HAX_VCPU_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
-> -             vm_id, vcpu_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
->  }
->
->  int hax_host_create_vm(struct hax_state *hax, int *vmid)
-> diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-> index 5729ad9b48..0ba488c468 100644
-> --- a/target/i386/hax-windows.c
-> +++ b/target/i386/hax-windows.c
-> @@ -185,41 +185,12 @@ int hax_mod_version(struct hax_state *hax, struct h=
-ax_module_version *version)
->
->  static char *hax_vm_devfs_string(int vm_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID) {
-> -        fprintf(stderr, "Too big VM id\n");
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VM_DEVFS "\\\\.\\hax_vmxx"
-> -    name =3D g_strdup(HAX_VM_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VM_DEVFS, "\\\\.\\hax_vm%02d", vm_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
->  }
->
->  static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
-> -        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_=
-id);
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VCPU_DEVFS "\\\\.\\hax_vmxx_vcpuxx"
-> -    name =3D g_strdup(HAX_VCPU_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VCPU_DEVFS, "\\\\.\\hax_vm%02d_vcpu%02d",
-> -             vm_id, vcpu_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
->  }
->
->  int hax_host_create_vm(struct hax_state *hax, int *vmid)
-> --
-> 2.24.1
->
+It looks like the @skipUnless directive on the class didn't
+have any effect. Moving it to the individual test functions seems
+to cause them to be skipped as intended (as the integratorcp
+framebuffer test is):
+
+diff --git a/tests/acceptance/machine_mips_malta.py
+b/tests/acceptance/machine_mips_malta.py
+index 92b4f28a112..98463f77573 100644
+--- a/tests/acceptance/machine_mips_malta.py
++++ b/tests/acceptance/machine_mips_malta.py
+@@ -30,8 +30,6 @@ except ImportError:
+     CV2_AVAILABLE =3D False
+
+
+-@skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
+-@skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+ class MaltaMachineFramebuffer(Test):
+
+     timeout =3D 30
+@@ -91,6 +89,8 @@ class MaltaMachineFramebuffer(Test):
+             cv2.imwrite(debug_png, screendump_bgr)
+         self.assertGreaterEqual(tuxlogo_count, cpu_cores_count)
+
++    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
++    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+     def test_mips_malta_i6400_framebuffer_logo_1core(self):
+         """
+         :avocado: tags=3Darch:mips64el
+@@ -99,6 +99,8 @@ class MaltaMachineFramebuffer(Test):
+         """
+         self.do_test_i6400_framebuffer_logo(1)
+
++    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
++    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+     def test_mips_malta_i6400_framebuffer_logo_7cores(self):
+         """
+         :avocado: tags=3Darch:mips64el
+@@ -108,6 +110,8 @@ class MaltaMachineFramebuffer(Test):
+         """
+         self.do_test_i6400_framebuffer_logo(7)
+
++    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
++    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+     def test_mips_malta_i6400_framebuffer_logo_8cores(self):
+         """
+         :avocado: tags=3Darch:mips64el
+
+thanks
+-- PMM
 
