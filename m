@@ -2,83 +2,79 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78B7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0037C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:42:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A327B217F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:40:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F2DF21D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:42:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1H+FSHD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A327B217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lz2Hi9WV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2DF21D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8nBG-0004dl-TF
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:40:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42815)
+	id 1j8nCl-0005k4-Mo
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:42:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1j8nAb-00042h-MP
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:39:50 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8nCA-0005Ke-W3
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:41:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1j8nAa-0007g7-LX
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:39:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55187
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j8nAa-0007fx-IG
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:39:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583163588;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QYMJe/MFc/S2NejK1TN23Qm3FDpllO6QY6wZcPmoYWo=;
- b=Y1H+FSHD6bsj1Nb74ynDR+IwJ3i9wD0XmJ40vKh6zJNR4OY5gGFigc9SvT7DDrOb9MgvJu
- MVUvatEMRreN80vtJIbLjML686KwXbduYwE3LAF/RnBe79DiueYlTwGcF15dNDDfrONA6r
- W9OYpZIfnHiwaLYs+0WlSg993k2OjyA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-_wBzrDycOxm527NRNdCZIA-1; Mon, 02 Mar 2020 10:39:44 -0500
-X-MC-Unique: _wBzrDycOxm527NRNdCZIA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C620D8010EB;
- Mon,  2 Mar 2020 15:39:42 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-7.ams2.redhat.com [10.36.117.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D74855DA75;
- Mon,  2 Mar 2020 15:39:40 +0000 (UTC)
-Date: Mon, 2 Mar 2020 16:39:39 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v0 0/2] allow to set 'drive' property on a realized block
- device
-Message-ID: <20200302153939.GE4965@linux.fritz.box>
-References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
- <20200302133837.GC4965@linux.fritz.box>
- <20b9cc1f-8fbe-99fc-bbdb-5605b1c186a9@virtuozzo.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j8nC9-0008J6-OZ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:41:26 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:35003)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j8nC9-0008Iq-Ij
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:41:25 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id v10so2863434otp.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 07:41:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jUkERWRGFv3wMH2pX+xN65NMrzb8iPadHK6G1RUJ5VU=;
+ b=lz2Hi9WVgnpzMYGrJwqGbAxrFtxYyP79UED+DT8zJaiMR4I/VlS74LuObzGKa4XXgk
+ +4Fvop739a/+4XKzI+5tupCL67fDiQgDjfxQ0+bbwh7zkT7x4Q7ORzk7XYnTINnt1jxj
+ jtjcShAQ1B1VCQ9X7bhOgKpVM01Kz3dxMe2uAuXUMXZiSCEw4T6CCRv9mFvL4a0SLP7u
+ wydnMRuoHDVu9LgTcEkTlkzeRY4Krh/Myls3xf01TqXduLUUdvoNa4UH4zrFG16DsEFR
+ x6sVIshuGohPBSxptjm0R/0CI+wEJ8OhpgauNMoM7MVSJH7OhKIjMFau57TZHvizcfjk
+ 6LqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jUkERWRGFv3wMH2pX+xN65NMrzb8iPadHK6G1RUJ5VU=;
+ b=d19aULdED88VciJo00yNVXU02HodJUJ3HYMg9xnRmD4myHlFiXcxuWZx7mIV00ZhM/
+ a3d0MMO3cnFm279oHoMUfeKRgvD3xtRIgHQgcwUsfsfOCeIAy5nUCkNRIcwlyM75uGw6
+ utnJpk3mdGPDjIs8Y6WvF3RMdvRuLyIUhGpYfBhfTGFtpN6qZTdpHYyVODLsTnSx2j0i
+ a7710+I4xDDyqIidVIyll2M+JWo4E28qxXljSVxSr89vaO5/9tfLB3y2M2wi1os4aE6K
+ 2eEVOFJLU4N+2pDul4Btdf6VlDqVZO02g7KD6JiPXD/+KNZTj6dyuKDPt26SY3jtk0F8
+ jG6Q==
+X-Gm-Message-State: ANhLgQ3k8gbM4r3HLE5TXM5dDDj81iD35OPOL/7xbMlsp2Gwq+g6lanJ
+ b8LKfsORl3dBWspDFayzbnllXg7NOWps2mwQHiiD0g==
+X-Google-Smtp-Source: ADFU+vs1Ld6zJhxMzC0G52HF5I9yjrcSKwqasBJav3FWnLju0dknEb1+FvZ2gVcAKdr7lsgJEJSN7tilUhCJrd4WGKQ=
+X-Received: by 2002:a9d:75ca:: with SMTP id c10mr2489140otl.97.1583163684298; 
+ Mon, 02 Mar 2020 07:41:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20b9cc1f-8fbe-99fc-bbdb-5605b1c186a9@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <1582631466-13880-1-git-send-email-pbonzini@redhat.com>
+ <1582631466-13880-12-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1582631466-13880-12-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Mar 2020 15:41:13 +0000
+Message-ID: <CAFEAcA_0y0NsHfkK2V4-PTYe0fiOHE6x00i9z7am5+Kvg86PNg@mail.gmail.com>
+Subject: Re: [PULL 012/136] arm/cubieboard: use memdev for RAM
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,52 +86,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, berrange@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- pbonzini@redhat.com, den@virtuozzo.com
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 02.03.2020 um 14:55 hat Denis Plotnikov geschrieben:
->=20
->=20
-> On 02.03.2020 16:38, Kevin Wolf wrote:
-> > Am 10.11.2019 um 20:03 hat Denis Plotnikov geschrieben:
-> > > This allows to replace the file on a block device and is useful
-> > > to workaround the cases (migration) when the VM image is placed on
-> > > some shared storage with exclusive file opening model but the image
-> > > should be open form more than one app.
-> > >=20
-> > > The previous version of approaching the workaround was based on the
-> > > "blockdev-change-medium" command modification but had some flaws:
-> > >    * semantics: blockdev-change-medium is aimed to be used with remov=
-able devices
-> > >      only
-> > >    * interface: it can't accept all possible combination of parameter=
-s for
-> > >      the "drive" replacement (creation).
-> > >=20
-> > > More details here: http://patchwork.ozlabs.org/patch/1179329/
-> > >=20
-> > > The current series suggests another approach:
-> > > 1. blockdev-add
-> > > 2. qom-set disk.drive =3D the blockdev added (this is what the series=
- adds)
-> > Are you still planning to send another version?
-> >=20
-> > Kevin
-> Not in the near future :) There is an unresolved problem with
-> bitmap-migration is case of block dev replacement.
-> Still don't know how to do it in the proper way.
+On Tue, 25 Feb 2020 at 11:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: Igor Mammedov <imammedo@redhat.com>
+>
+> memory_region_allocate_system_memory() API is going away, so
+> replace it with memdev allocated MemoryRegion. The later is
+> initialized by generic code, so board only needs to opt in
+> to memdev scheme by providing
+>   MachineClass::default_ram_id
+> and using MachineState::ram instead of manually initializing
+> RAM memory region.
+>
+> PS:
+> While at it, get rid of no longer needed CubieBoardState wrapper.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Message-Id: <20200219160953.13771-13-imammedo@redhat.com>
+> ---
+>  hw/arm/cubieboard.c | 25 ++++++++-----------------
+>  1 file changed, 8 insertions(+), 17 deletions(-)
+>
+> diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
+> index 6dc2f1d..089f9a3 100644
+> --- a/hw/arm/cubieboard.c
+> +++ b/hw/arm/cubieboard.c
+> @@ -28,52 +28,42 @@ static struct arm_boot_info cubieboard_binfo = {
+>      .board_id = 0x1008,
+>  };
+>
+> -typedef struct CubieBoardState {
+> -    AwA10State *a10;
+> -    MemoryRegion sdram;
+> -} CubieBoardState;
+> -
+>  static void cubieboard_init(MachineState *machine)
+>  {
+> -    CubieBoardState *s = g_new(CubieBoardState, 1);
+> +    AwA10State *a10 = AW_A10(object_new(TYPE_AW_A10));
+>      Error *err = NULL;
+>
+> -    s->a10 = AW_A10(object_new(TYPE_AW_A10));
 
-I seem to remember that in some discussion a while ago we came to the
-conclusion that we need a way for the managemnt tool to provide a
-mapping from source node-names to destination node-names.
+Hi Igor, I just noticed this, and I don't think it's the
+right thing. The board model should have its own state
+structure which contains any objects it creates. Just
+because there happens currently to be only a single
+object in this case doesn't mean we want to lose the
+structure. In particular, we now just leak the
+pointer to the TYPE_AW_A10 object, rather than having
+it be tracked by being pointed to from the MachineState.
+Being able to avoid just leaking pointers to objects like
+that is one of the reasons I like having a MachineState now.
 
-Or is the problem you mean unrelated to identifying the node to which a
-bitmap should belong?
+Could you send a patch that reverts this bit, please
+(and any of the other boards where you did this in
+the course of this refactoring)?
 
-Kevin
-
+thanks
+-- PMM
 
