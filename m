@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B1BC3F2D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B427DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98A1B20836
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8131E20842
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:20:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HyTDue8F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A1B20836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cBcVfexS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8131E20842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36907 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8pg9-00042W-P9
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:20:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43484)
+	id 1j8pgM-0004X2-LX
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:20:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8pep-0002Qf-W3
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:17 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j8pfD-0002W9-36
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8pep-00017Y-1k
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:11 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35877)
+ (envelope-from <alex.bennee@linaro.org>) id 1j8pfB-0001D2-Ty
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:34 -0500
+Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:35331)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8peo-00016l-Ra
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:10 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j16so1008289wrt.3
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:19:10 -0800 (PST)
+ id 1j8pfB-00019u-O6
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:19:33 -0500
+Received: by mail-wm1-x331.google.com with SMTP id m3so100420wmi.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:19:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ypGQ7p6JhBF1xniDHKxYj04bd6tWT9PMX3hkKC2YjOA=;
- b=HyTDue8Fh0MTVFLh3fmkpnayOWqYSG/5iYgbPC48G1HzoVh4a73ZHCo/xFpOaIs5WM
- TaWpuFTWgY1GWJiP6HdX8igNvKdlI5198zMe4qXp8MtkYQH8fiDtcTrfP5Y6tj7B2fr9
- pCCRAlZQsSzBmPQjGwdhKVHZzZEJNnMOhPNCWiz87aMaqujbqmZdF1ekjoA6NNZwWR4G
- ZNQeJHlHyF+xt24uXMCdlHisst3ssU5kFgDLeTCDtzYDhcYbINlddmW34GiWo1SONvXx
- k8BWy8qgWaHJna6tg9ql5TKT+KhbyBiuMKEljQlCWZckVd1KTiB+7cuDSsS+PtNT+NUk
- WLgQ==
+ bh=x+xzICjnYoZ7kFe0us/GQm6SY8Zr24nak+KbUFj0hp8=;
+ b=cBcVfexSFHIorNR7WzVAEXvpXrC3SRLxsPcFM0Pt278BKNF8arXVz7AIAb2JX0ENZv
+ zsfSufMu8rkPY2AygRBvFvn47TsGqSweFmXz5HOp1j1uT3smay4A3RF0qchbhslaJICQ
+ E/B7qZUyeh7/on2owCdOf3y6LWWjEpfGiqAjuYn7zHXGh1ubaXGBWFhL08qqtKr7RC18
+ S5vO8pcQArDUfD3ytqeZd2fzbRTljSzzwPkzY1ht4nrZqCQGcKLxHBvBDwjafuIilri7
+ sqitM85OAVrn2CLkTFuRyHaos5n4xQmwW2Ei6CjMsAAFHvqPuhovJHOnLnv10gAaUJZt
+ wDqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ypGQ7p6JhBF1xniDHKxYj04bd6tWT9PMX3hkKC2YjOA=;
- b=i3nDzW2MsES8njuc+8IKVG7HXKeuLSQRBs7/fZmPPywsbpVIY9iAjmVI2L2O5fNd9h
- FdAvPsGM6lc5ikwxd75uUmBVM5+ER82lDpDXHS2Eg5vvwXkvrojK6B8xXDw43sTo/lOI
- e441Ppya9DyzVoBg3vIsys0ujqEV/DJ57/t9B7SyAdpxw3VZIYlmsxwWp1oMDWfKwLDK
- g1JKgNMMsPbOGzP6gdbwlDrO4W9+eAaXQSjCSTDjbzkYWitRW2c278U94FY8UsoMs7CK
- kkLE3/aTzdoyDiPrt+AX+d8TZXgXPK0Xd53dHeuxbAP4V1+HbWKpWCSS+TVZtMQzQkFA
- +xyQ==
-X-Gm-Message-State: ANhLgQ3fmHTG33uMYqH6mPWW0Gm6q5gh9Dlj+S7kR7L7AMWNhD4LciIU
- FXGcG2Dmj2v1tCM3qNnZKUL2FA==
-X-Google-Smtp-Source: ADFU+vvPzl1qISXuBElhaf/Xg+P5ENgNq0dNGPoRMZe9u1rb2d+emiP6G3dKERRS6QvukbJpWWpyHw==
-X-Received: by 2002:a5d:4fce:: with SMTP id h14mr798919wrw.177.1583173149793; 
- Mon, 02 Mar 2020 10:19:09 -0800 (PST)
+ bh=x+xzICjnYoZ7kFe0us/GQm6SY8Zr24nak+KbUFj0hp8=;
+ b=A9vC6jxOMLImF4TBTWXLHM3LWZhhItLy2UXjYv3lSR9NHpBmpYaSX0qRmnu9ooL2pj
+ rHpUSCdtWrrVsJHmWsYx8s5soMkOxUgHpfrLNS6gOZqwRKt8R2S3r1TJ5SeilmzXI6wO
+ yPwV8+KYeZnGGk4VwQMHdC0l4eTpBsuJaPUEyNFWQhovcgl+RmElRUa/weA9FBodAX0k
+ MFBZc7ktkRAgnlsYkC9JEC3j6Ye+92IxfjT62llmoXhfkj2RIFiAlpB7QgSTSqA3Hfq2
+ ScSO/ekKGGj3ONcYnrXmXW4ZZA/quD9KEri9cvzLnWBUewK3p01ipXp8ss/wPaIPwXxk
+ VDFw==
+X-Gm-Message-State: ANhLgQ2M4s0veVWVQEQ3DJyYaVj+kVOtc37fa6O6jLZEfhcmu390HFuI
+ vr2t5bO2Sp+xtx6aQt4q/jYk4Q==
+X-Google-Smtp-Source: ADFU+vsy+Cw0ADx1w+Zh5rhwzPgKlf/DEmpUpJz1O0STlKZuRzxCzBIewKT1maLOVwh7qgxH4gQ2/A==
+X-Received: by 2002:a1c:ba87:: with SMTP id k129mr113188wmf.102.1583173154654; 
+ Mon, 02 Mar 2020 10:19:14 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f195sm314306wmf.17.2020.03.02.10.19.08
+ by smtp.gmail.com with ESMTPSA id i7sm335893wma.32.2020.03.02.10.19.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 10:19:08 -0800 (PST)
+ Mon, 02 Mar 2020 10:19:10 -0800 (PST)
 Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 92B7A1FF8C;
- Mon,  2 Mar 2020 18:19:07 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 12CFB1FF93;
+ Mon,  2 Mar 2020 18:19:08 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 01/10] tests/vm: use $(PYTHON) consistently
-Date: Mon,  2 Mar 2020 18:18:58 +0000
-Message-Id: <20200302181907.32110-2-alex.bennee@linaro.org>
+Subject: [PATCH  v1 06/10] travis: enable tools build on OS X
+Date: Mon,  2 Mar 2020 18:19:03 +0000
+Message-Id: <20200302181907.32110-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200302181907.32110-1-alex.bennee@linaro.org>
 References: <20200302181907.32110-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,41 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Puhov <peter.puhov@linaro.org>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Robert Foley <robert.foley@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+From: Laurent Vivier <lvivier@redhat.com>
 
-Change Makefile.include to use $(PYTHON) so for vm-boot-ssh to be
-consistent with other cases like vm-build.
+As we can build tools on OS X we should check we don't break build
+when we submit new codes.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200219163537.22098-2-robert.foley@linaro.org>
+Message-Id: <20200302154630.45620-3-lvivier@redhat.com>
 ---
- tests/vm/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 9e7c46a4735..778e5067554 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -80,7 +80,7 @@ vm-boot-serial-%: $(IMAGES_DIR)/%.img
+diff --git a/.travis.yml b/.travis.yml
+index 9867272177d..70a24bf2fc8 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -273,6 +273,7 @@ jobs:
  
- vm-boot-ssh-%: $(IMAGES_DIR)/%.img
- 	$(call quiet-command, \
--		$(SRC_PATH)/tests/vm/$* \
-+		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
- 		$(if $(J),--jobs $(J)) \
- 		--image "$<" \
- 		--interactive \
+     - name: "OSX Xcode 10.3"
+       env:
++        - BASE_CONFIG="--disable-docs --enable-tools"
+         - CONFIG="--target-list=i386-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,x86_64-softmmu"
+       os: osx
+       osx_image: xcode10.3
 -- 
 2.20.1
 
