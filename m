@@ -2,52 +2,80 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9015C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE16DC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E13B217F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:01:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E13B217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF72217F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:01:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YvyR82LY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF72217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8khB-0002Jv-P3
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 08:01:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47385)
+	id 1j8khe-00036m-QD
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 08:01:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1j8kfr-0001ZR-Go
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:59:56 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8kgH-000218-V9
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:00:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1j8kfp-0008Vi-O1
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:59:55 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:37128)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1j8kfp-0008Uw-CB
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:59:53 -0500
-Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id C161FC0111;
- Mon,  2 Mar 2020 15:59:50 +0300 (MSK)
-Subject: [PATCH] icount: make dma reads deterministic
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 02 Mar 2020 15:59:50 +0300
-Message-ID: <158315399043.847.4021939910752786131.stgit@pasha-Precision-3630-Tower>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <peter.maydell@linaro.org>) id 1j8kgG-0000Em-KP
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:00:21 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34779)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j8kgG-0000Ei-EG
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:00:20 -0500
+Received: by mail-oi1-x242.google.com with SMTP id g6so8456232oiy.1
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 05:00:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xby5q01aLjHzvujUl/skvG3fkUFiPGKQcXWLdOtmXJY=;
+ b=YvyR82LYdiePfLGTczPdlG1fLmn3MAUpZXg0kVjq4AeBVux57mGJV4e/Ts6fgJZXWY
+ px6LseBsTt/75iK0skAiIyq5Pq/r/giRADd99q4n3Xw4RdbpABmglz7dhF0MwFWya85a
+ BYTFp7acD6Bx6hnvjZoTPjB98F7DD1nv7p5ceKBC7Zgtx3e4rmc56U6JL3p7zJJjhwaZ
+ qEJWY+v798sqo38oPuF+b2qXcfxJOE0ersgVPOVxB1YeZuw+rjKxE7/FMz3Onl0AJm4N
+ 0ZenLyGFItZpQtgnq859ltaTYODwpWLJE/XMVWmlvIZmAfgwNx9mKm2QII+b0e6YbTQg
+ zemg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xby5q01aLjHzvujUl/skvG3fkUFiPGKQcXWLdOtmXJY=;
+ b=udrLOZzWfM+GPoz4LhqTpf1DitcHQ1bWClaUohQD76dDA2stMTCGiXU+FhElf99LPn
+ uArTnCQ1drx1gtK4s8MX9rYaqrM86rPYdmDatRnv/u47waMs/AdRKiav0Sfrrs6GEDYz
+ yJMO6MiT6fNg59sdj6XSBNdQ4myNvidm9qDgbdq9mTyazT4wxDj3rRI2QtydjBzzGC2F
+ 7LyhE1+rw6yub93K2BQde2SIepMigVP4svkoaySVKMg0mgNuMTEP2uODUuMDgIqrvNv+
+ PcY1zZppYsH6HxPYcHfOmhBMO5WDbSCZrxFtvwKPmrpPJvrAZO1hmA5IwHzJCBFhJu1v
+ Mseg==
+X-Gm-Message-State: APjAAAUorly8hpSeTprFVs/tBnGWCPLuGzQWeGF07+WSoGTYmfVhoC9B
+ 3oKfL0jp0HeJzT7Nl3bZBgx2N8EdXtm4Fi1xwXYosw==
+X-Google-Smtp-Source: APXvYqzMs/U1HArR5TFrm2hQ2pt7ZborUdssDPX9Jcjodr7OBrtvVhqG+pIKeiWoFtm5vgTkiSSlRcve1wUxn51uAQI=
+X-Received: by 2002:aca:b2c5:: with SMTP id
+ b188mr11565585oif.163.1583154019338; 
+ Mon, 02 Mar 2020 05:00:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 83.149.199.45
+References: <20200229024347.22826-1-richard.henderson@linaro.org>
+In-Reply-To: <20200229024347.22826-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Mar 2020 13:00:08 +0000
+Message-ID: <CAFEAcA-V1gjaq37P5secqnBe9_gH3na8CQU7WJ8NsNG+HX_b0w@mail.gmail.com>
+Subject: Re: [PULL 0/8] tcg patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,152 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, dovgaluk@ispras.ru, jsnow@redhat.com,
- pavel.dovgaluk@ispras.ru, mreitz@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Windows guest sometimes makes DMA requests with overlapping
-target addresses. This leads to the following structure of iov for
-the block driver:
+On Sat, 29 Feb 2020 at 02:43, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit e0175b71638cf4398903c0d25f93fe62e0606389:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200228' into staging (2020-02-28 16:39:27 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20200228
+>
+> for you to fetch changes up to 600e17b261555c56a048781b8dd5ba3985650013:
+>
+>   accel/tcg: increase default code gen buffer size for 64 bit (2020-02-28 17:43:31 -0800)
+>
+> ----------------------------------------------------------------
+> Fix race in cpu_exec_step_atomic.
+> Work around compile failure with -fno-inine.
+> Expand tcg/arm epilogue inline.
+> Adjustments to the default code gen buffer size.
+>
 
-addr size1
-addr size2
-addr size3
 
-It means that three adjacent disk blocks should be read into the same
-memory buffer. Windows does not expects anything from these bytes
-(should it be data from the first block, or the last one, or some mix),
-but uses them somehow. It leads to non-determinism of the guest execution,
-because block driver does not preserve any order of reading.
+Applied, thanks.
 
-This situation was discusses in the mailing list at least twice:
-https://lists.gnu.org/archive/html/qemu-devel/2010-09/msg01996.html
-https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg05185.html
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-This patch makes such disk reads deterministic in icount mode.
-It skips SG parts that were already affected by prior reads
-within the same request. Parts that are non identical, but are just
-overlapped, are trimmed.
-
-Examples for different SG part sequences:
-
-1)
-A1 1000
-A1 1000
-->
-A1 1000
-
-2)
-A1 1000
-A2 1000
-A1 1000
-A3 1000
-->
-Two requests with different offsets, because second A1/1000 should be skipped.
-A1 1000
-A2 1000
---
-A3 1000
-
-3)
-A1 800
-A2 1000
-A1 1000
-->
-First 800 bytes of third SG are skipped.
-A1 800
-A2 1000
---
-A1+800 800
-
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- dma-helpers.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 53 insertions(+), 4 deletions(-)
-
-diff --git a/dma-helpers.c b/dma-helpers.c
-index e8a26e81e1..d71512f707 100644
---- a/dma-helpers.c
-+++ b/dma-helpers.c
-@@ -13,6 +13,7 @@
- #include "trace-root.h"
- #include "qemu/thread.h"
- #include "qemu/main-loop.h"
-+#include "sysemu/cpus.h"
- 
- /* #define DEBUG_IOMMU */
- 
-@@ -139,17 +140,65 @@ static void dma_blk_cb(void *opaque, int ret)
-     dma_blk_unmap(dbs);
- 
-     while (dbs->sg_cur_index < dbs->sg->nsg) {
-+        bool skip = false;
-         cur_addr = dbs->sg->sg[dbs->sg_cur_index].base + dbs->sg_cur_byte;
-         cur_len = dbs->sg->sg[dbs->sg_cur_index].len - dbs->sg_cur_byte;
--        mem = dma_memory_map(dbs->sg->as, cur_addr, &cur_len, dbs->dir);
--        if (!mem)
--            break;
--        qemu_iovec_add(&dbs->iov, mem, cur_len);
-+
-+        /*
-+         * Make reads deterministic in icount mode.
-+         * Windows sometimes issues disk read requests with
-+         * overlapping SGs. It leads to non-determinism, because
-+         * resulting buffer contents may be mixed from several
-+         * sectors.
-+         * This code crops SGs that were already read in this request.
-+         */
-+        if (use_icount
-+            && dbs->dir == DMA_DIRECTION_FROM_DEVICE) {
-+            int i;
-+            for (i = 0 ; i < dbs->sg_cur_index ; ++i) {
-+                if (dbs->sg->sg[i].base <= cur_addr
-+                    && dbs->sg->sg[i].base + dbs->sg->sg[i].len > cur_addr) {
-+                    cur_len = MIN(cur_len,
-+                        dbs->sg->sg[i].base + dbs->sg->sg[i].len - cur_addr);
-+                    skip = true;
-+                    break;
-+                } else if (cur_addr <= dbs->sg->sg[i].base
-+                    && cur_addr + cur_len > dbs->sg->sg[i].base) {
-+                    cur_len = dbs->sg->sg[i].base - cur_addr;
-+                    break;
-+                }
-+            }
-+        }
-+
-+        assert(cur_len);
-+        if (!skip) {
-+            mem = dma_memory_map(dbs->sg->as, cur_addr, &cur_len, dbs->dir);
-+            if (!mem)
-+                break;
-+            qemu_iovec_add(&dbs->iov, mem, cur_len);
-+        } else {
-+            if (dbs->iov.size != 0) {
-+                break;
-+            }
-+            /* skip this SG */
-+            dbs->offset += cur_len;
-+        }
-+
-         dbs->sg_cur_byte += cur_len;
-         if (dbs->sg_cur_byte == dbs->sg->sg[dbs->sg_cur_index].len) {
-             dbs->sg_cur_byte = 0;
-             ++dbs->sg_cur_index;
-         }
-+
-+        /*
-+         * All remaining SGs were skipped.
-+         * This is not reschedule case, because we already
-+         * performed the reads, and the last SGs were skipped.
-+         */
-+        if (dbs->sg_cur_index == dbs->sg->nsg && dbs->iov.size == 0) {
-+            dma_complete(dbs, ret);
-+            return;
-+        }
-     }
- 
-     if (dbs->iov.size == 0) {
-
+-- PMM
 
