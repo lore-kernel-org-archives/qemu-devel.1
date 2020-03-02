@@ -2,81 +2,63 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F5AC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B488AC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D95D21739
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:45:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d5nfF6Ei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D95D21739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8476B214DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:48:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8476B214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8jWA-00046r-Of
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:45:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37523)
+	id 1j8jYY-0005GJ-NI
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:48:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j8jVM-0003T0-9W
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:45:01 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1j8jXu-0004o2-O1
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j8jVL-00056x-1m
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:45:00 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36903)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j8jVK-00056h-SM
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:44:58 -0500
-Received: by mail-ot1-x342.google.com with SMTP id b3so9379018otp.4
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 03:44:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HzUbiyFOIAhKBOLtvU0wcuoLQzSWzvKiUf4HyRWED/k=;
- b=d5nfF6EiGCLrlhk/zQoYA4Oi3l/X+sYzzgck+sTDOOhqWVFaSPkboNAI21ta9aFg7K
- brD54B+LFgeYwuOhjg1wb+yd8riCXo5ZbeheWJSXW29YPSy4ygpz6moFr0MIL9aKFx/V
- 4K4J8MT7mEz0tqSTwJJAL2gz9SnCDQRGmMzqFiR/3VpimSLNvh0uhA+rlvvJUNgE5lQz
- DXQgitj+F5pyAwDsYyqBR1fWzHyOn1x+1PxI5f6msa4ng9+wi2bx36MfieA+kdX/M4jj
- BUNIi52eFBudEelw2Lwr/DRD3zlBo9Xa/vc93kXP4NIalR7d0xpSeXkRtKYJDN9PMOEX
- gtwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HzUbiyFOIAhKBOLtvU0wcuoLQzSWzvKiUf4HyRWED/k=;
- b=tzsBe2Q5Ybh78VswUm6FD5wR80vCmMHOgZ9WF7JU69xqN/iOAUZ7NK4zWKQVuuHtjw
- DQ/IlHkbistw7OdjE/YLb898XzpRS1PF8TTNmSz1TMP8Lcr+8eiEz1X6iRJj93RNhjBI
- nIk9dVLGuSCmyVNlIPmv5cAxtg2QYzEmok8ktamwrmwgUL9VTOkdwMSGZ4sxoIcLwJ0C
- dZTZFSL1e37LMsLh8a642iC/xNtiqsy4OUWcFlvtDzy7lwP5MSV2HvZttvCqHnc2XsqC
- rkOVWfYArsA3DZivGdgHv2gW6x/yNVutJ/x//6yFuyGKfrQvmo73oHPN+Id1Yhzo+ajh
- KA0Q==
-X-Gm-Message-State: ANhLgQ1rxRHxjoWDM7qpi+9zNanq8WYS/1HwzAvmnIHy4a8lwte2O26r
- jRhCZByAHP/wB1BAXSgGJ9neB8fvajtnaD3vQjnbhw==
-X-Google-Smtp-Source: ADFU+vufiAMFrPoxGCo+uzmhllwQOL0PsOQliH8YD0TxXfqqGuH9VCP1pJc31L56fe9E9ys7lqkUuW6j2bmjwVRJyDQ=
-X-Received: by 2002:a05:6830:1406:: with SMTP id
- v6mr3688045otp.232.1583149497899; 
- Mon, 02 Mar 2020 03:44:57 -0800 (PST)
+ (envelope-from <tao3.xu@intel.com>) id 1j8jXt-00068b-1m
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:47:37 -0500
+Received: from mga04.intel.com ([192.55.52.120]:26635)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1j8jXs-00066R-PW
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:47:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Mar 2020 03:47:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,507,1574150400"; d="scan'208";a="273688687"
+Received: from yli41-mobl1.ccr.corp.intel.com (HELO [10.249.199.10])
+ ([10.249.199.10])
+ by fmsmga002.fm.intel.com with ESMTP; 02 Mar 2020 03:47:29 -0800
+Subject: Re: [PATCH v3 2/4] target/i386: Remove monitor from some CPU models
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200212081328.7385-1-tao3.xu@intel.com>
+ <20200212081328.7385-3-tao3.xu@intel.com>
+ <20200228213909.GA481504@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <06a6cd99-7d11-7eee-c337-c71e756fc53f@intel.com>
+Date: Mon, 2 Mar 2020 19:47:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200228125351.29482-1-philmd@redhat.com>
-In-Reply-To: <20200228125351.29482-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Mar 2020 11:44:47 +0000
-Message-ID: <CAFEAcA-AUSLBirS+1_JHCVQAH5-ZJz+YL+Qp8StALRW7b6EzJg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] hw/arm: Remove big-endian checks on machine code
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200228213909.GA481504@habkost.net>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,35 +70,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 28 Feb 2020 at 12:53, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> We only build the little-endian softmmu configurations.
-> Checking for big endian is pointless, remove the unused code.
->
-> Philippe Mathieu-Daud=C3=A9 (5):
->   hw/arm/gumstix: Simplify since the machines are little-endian only
->   hw/arm/mainstone: Simplify since the machines are little-endian only
->   hw/arm/omap_sx1: Simplify since the machines are little-endian only
->   hw/arm/z2: Simplify since the machines are little-endian only
->   hw/arm/musicpal: Simplify since the machines are little-endian only
->
->  hw/arm/gumstix.c   | 16 ++--------------
->  hw/arm/mainstone.c |  8 +-------
->  hw/arm/musicpal.c  | 10 ----------
->  hw/arm/omap_sx1.c  | 11 ++---------
->  hw/arm/z2.c        |  8 +-------
->  5 files changed, 6 insertions(+), 47 deletions(-)
+On 2/29/2020 5:39 AM, Eduardo Habkost wrote:
+> On Wed, Feb 12, 2020 at 04:13:26PM +0800, Tao Xu wrote:
+>> Add new version of Snowridge, Denverton, Opteron_G3, EPYC, and Dhyana
+>> CPU model to uremove MONITOR/MWAIT featre.
+>>
+>> After QEMU/KVM use "-overcommit cpu-pm=on" to expose MONITOR/MWAIT
+>> (commit id 6f131f13e68d648a8e4f083c667ab1acd88ce4cd), the MONITOR/MWAIT
+>> feature in these CPU model is unused.
+>>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> 
+> What exactly is the problem you are trying to fix?
+> 
+> No CPU model will ever have monitor=on set by default with KVM,
+> because kvm_default_props has a monitor=off element.
+> 
 
-
-
-Applied to target-arm.next, thanks.
-
--- PMM
+Maybe it is not a fix. For example, when we boot a guest with Denverton
+cpu model, guest cannot detect MONITOR/MWAIT and boot with no warning, 
+because of "monitor=off" by default. The MONITOR/MWAIT feature in these 
+CPU model is unused,but no harm. I am wondering if we should remove it 
+from existing CPU models.
 
