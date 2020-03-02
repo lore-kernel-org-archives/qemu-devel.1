@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD259C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A70C3F2D8
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95C0C20870
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:06:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C0C20870
+	by mail.kernel.org (Postfix) with ESMTPS id DC4212086A
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:07:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC4212086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8hyQ-00069U-G6
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:06:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50762)
+	id 1j8hyW-0006Rl-UI
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:07:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j8hxU-0004UN-Vt
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:05:57 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j8hxV-0004WT-NW
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:05:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j8hxU-0007lJ-37
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:05:56 -0500
-Received: from relay.sw.ru ([185.231.240.75]:48174)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j8hxU-0007lq-Ji
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:05:57 -0500
+Received: from relay.sw.ru ([185.231.240.75]:48184)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j8hxR-0007jL-SY; Mon, 02 Mar 2020 05:05:54 -0500
+ id 1j8hxR-0007jH-ST; Mon, 02 Mar 2020 05:05:54 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1j8hxI-000350-1e; Mon, 02 Mar 2020 13:05:44 +0300
+ id 1j8hxI-000350-Gj; Mon, 02 Mar 2020 13:05:44 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 2/5] block/nbd-client: drop max_block restriction from discard
-Date: Mon,  2 Mar 2020 13:05:34 +0300
-Message-Id: <20200302100537.29058-3-vsementsov@virtuozzo.com>
+Subject: [PATCH 5/5] block/io: auto-no-fallback for write-zeroes
+Date: Mon,  2 Mar 2020 13:05:37 +0300
+Message-Id: <20200302100537.29058-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200302100537.29058-1-vsementsov@virtuozzo.com>
 References: <20200302100537.29058-1-vsementsov@virtuozzo.com>
@@ -65,26 +65,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-NBD spec is updated, so that max_block doesn't relate to
-NBD_CMD_TRIM. So, drop the restriction.
+NBD driver may has max_pwrite_zeroes but doesn't has
+max_pwrite_zeroes_no_fallback limit. This means, that (when
+BDRV_REQ_NO_FALLBACK is supported) it is beneficial to try send request
+with BDRV_REQ_NO_FALLBACK instead of splitting the request accordingly
+to max_pwrite_zeroes.
+
+If failed, fallback to old behavior.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd.c | 1 -
- 1 file changed, 1 deletion(-)
+ block/io.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index 2a58d6b91c..a62761ea5a 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1955,7 +1955,6 @@ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+diff --git a/block/io.c b/block/io.c
+index c64566b4cf..48d71b0883 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1752,17 +1752,28 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+     int head = 0;
+     int tail = 0;
+ 
+-    int max_write_zeroes = MIN_NON_ZERO((flags & BDRV_REQ_NO_FALLBACK) ?
+-                                        bs->bl.max_pwrite_zeroes_no_fallback :
+-                                        bs->bl.max_pwrite_zeroes, INT_MAX);
++    int max_write_zeroes;
+     int alignment = MAX(bs->bl.pwrite_zeroes_alignment,
+                         bs->bl.request_alignment);
+     int max_transfer = MIN_NON_ZERO(bs->bl.max_transfer, MAX_BOUNCE_BUFFER);
++    bool auto_no_fallback;
+ 
+     if (!drv) {
+         return -ENOMEDIUM;
      }
  
-     bs->bl.request_alignment = min;
--    bs->bl.max_pdiscard = max;
-     bs->bl.max_pwrite_zeroes = max;
-     bs->bl.max_transfer = max;
++    if (!(flags & BDRV_REQ_NO_FALLBACK) &&
++        (bs->supported_zero_flags & BDRV_REQ_NO_FALLBACK) &&
++        bs->bl.max_pwrite_zeroes &&
++        bs->bl.max_pwrite_zeroes < bytes &&
++        (bs->bl.max_pwrite_zeroes < bs->bl.max_pwrite_zeroes_no_fallback ||
++         bs->bl.max_pwrite_zeroes_no_fallback == 0))
++    {
++        assert(drv->bdrv_co_pwrite_zeroes);
++        flags |= BDRV_REQ_NO_FALLBACK;
++        auto_no_fallback = true;
++    }
++
+     if ((flags & ~bs->supported_zero_flags) & BDRV_REQ_NO_FALLBACK) {
+         return -ENOTSUP;
+     }
+@@ -1770,7 +1781,11 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+     assert(alignment % bs->bl.request_alignment == 0);
+     head = offset % alignment;
+     tail = (offset + bytes) % alignment;
+-    max_write_zeroes = QEMU_ALIGN_DOWN(max_write_zeroes, alignment);
++    max_write_zeroes =
++        QEMU_ALIGN_DOWN(MIN_NON_ZERO((flags & BDRV_REQ_NO_FALLBACK) ?
++                                     bs->bl.max_pwrite_zeroes_no_fallback :
++                                     bs->bl.max_pwrite_zeroes, INT_MAX),
++                        alignment);
+     assert(max_write_zeroes >= bs->bl.request_alignment);
  
+     while (bytes > 0 && !ret) {
+@@ -1801,6 +1816,13 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+         if (drv->bdrv_co_pwrite_zeroes) {
+             ret = drv->bdrv_co_pwrite_zeroes(bs, offset, num,
+                                              flags & bs->supported_zero_flags);
++            if (ret == -ENOTSUP && auto_no_fallback) {
++                flags &= ~BDRV_REQ_NO_FALLBACK;
++                max_write_zeroes =
++                    QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_pwrite_zeroes,
++                                                 INT_MAX), alignment);
++                continue;
++            }
+             if (ret != -ENOTSUP && (flags & BDRV_REQ_FUA) &&
+                 !(bs->supported_zero_flags & BDRV_REQ_FUA)) {
+                 need_flush = true;
 -- 
 2.21.0
 
