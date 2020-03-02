@@ -2,88 +2,82 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2796C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFF8C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE352173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DCDE2173E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:43:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W7AqDkqF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE352173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P/9i1P1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCDE2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8kOy-00032J-Qh
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:42:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
+	id 1j8kPw-00045e-Gh
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:43:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8kO5-0002JF-JE
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:41:34 -0500
+ (envelope-from <kchamart@redhat.com>) id 1j8kP6-0003Ho-VX
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:42:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8kO4-0003eA-J7
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:41:33 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52424)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8kO4-0003di-C4
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:41:32 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p9so11019282wmc.2
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:41:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Y18CsOOMaOHPkI+ohzeYI9YcP17yQSLbt1d7wtpVxFI=;
- b=W7AqDkqFntcG1GW4NW/Mc4p7NsR/M1rn7kVhsGou2SxD/3rpZKtCCD2bHfdH5wxe12
- 2jKoK+AMSbSGOXt0GCt0VnHuAnAxjDwV0Z7UUc/HDGQjJjk/8JJq2jgzfkSO8tgXrsaB
- +rMfv55zXBKSHyCzF8OBKDAg/jAm/3NV5Q4MRPuv37HhuPfjQuMCcsqKC9MUVCqwiKM/
- 43wy5kERmBhc0il0JAN0fFg9Hgz9DDoH8462tRhwvfIdPmAAEXB4LXzKdcz4CS+b13Aa
- lo2TsQquPC6FxqXkXwU91ht1lkoUHYHbmH/81QYY0jCDtdC7zj5ejpavhgZOvA5irm71
- JI5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Y18CsOOMaOHPkI+ohzeYI9YcP17yQSLbt1d7wtpVxFI=;
- b=eqcGOJBw67qTJ+MaqD29p72WSI9ZwShCxymVEYJk1x2Zg+jvTDKkYEWB9uCrfVy45T
- M/ZdqX4YlNx2OF3JxGmhLd003tNCK2VFlDjkgkx7jO6GQYCp6UF8Qv6sw/ym9t57R0jU
- ltKwP6s7oyQQJhILWmmGXMIRJ0gAuo2EvSVbUItoKkhLmJ9HnWmtZopJi4znk4AeFS7p
- D/GMMqYkvdXbb0ESeTsZsNlxnlJeilz71bbJwzrQJIk5IHOFMIX0unAJjXHiqtNs7hik
- aBJSTN05aAPdPZk0wClO9mK/UPegEWdOr+omjafK8Q6GXwbVjEP0ieVdghg5MDiK3z7E
- iHEg==
-X-Gm-Message-State: APjAAAU+aG1FhClMRcTJkyPWTNWbVQCw4VqBOcxvgAXS5zWND5p8+K8v
- 8DRpRumoyx6Svhd99QEzUxDX6w==
-X-Google-Smtp-Source: APXvYqzIJPk9zNZSOsAESNsMaOGY1gHLOWjw95NJ8gFUVsoGV2lPrStTeLpWTg+Y8+1LCbj4lLR38Q==
-X-Received: by 2002:a1c:a706:: with SMTP id q6mr18662517wme.23.1583152891004; 
- Mon, 02 Mar 2020 04:41:31 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z14sm28035542wru.31.2020.03.02.04.41.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 04:41:29 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 122761FF87;
- Mon,  2 Mar 2020 12:41:29 +0000 (GMT)
-References: <20200228153619.9906-1-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ (envelope-from <kchamart@redhat.com>) id 1j8kP5-0004LP-JJ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:42:36 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25765
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1j8kP5-0004LL-De
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:42:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583152955;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XKBuXnpCgf/tFbuK7SnTY0CTULCUyE/bhjiuF4rGfV0=;
+ b=P/9i1P1pHysG8pofeKJoe4kyJTuGmV/DtHJI0uszAYxPWW6Qes7E2KrxwOOmOUfDXavUPD
+ A4cLMJwDgm1uRc6KyTipgaUi69zfYSLdeKUXCLj9KRpMyd7WACr4mgLvIQOYq2U40Tn6qJ
+ yl13WfuvgRZr7eY+iOLvvmYH9LBopeE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-ciwMdTZ-OFCRuU48ik8B9g-1; Mon, 02 Mar 2020 07:42:33 -0500
+X-MC-Unique: ciwMdTZ-OFCRuU48ik8B9g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A35E8017CC;
+ Mon,  2 Mar 2020 12:42:32 +0000 (UTC)
+Received: from paraplu.localdomain (unknown [10.36.118.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EA8A19C4F;
+ Mon,  2 Mar 2020 12:42:32 +0000 (UTC)
+Received: by paraplu.localdomain (Postfix, from userid 1001)
+ id 11FA13E0489; Mon,  2 Mar 2020 13:42:30 +0100 (CET)
+Date: Mon, 2 Mar 2020 13:42:29 +0100
+From: Kashyap Chamarthy <kchamart@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 00/33] Convert qemu-doc to rST
-In-reply-to: <20200228153619.9906-1-peter.maydell@linaro.org>
-Date: Mon, 02 Mar 2020 12:41:29 +0000
-Message-ID: <87o8tf7wue.fsf@linaro.org>
+Subject: Re: [PATCH v3 32/33] docs: Remove old texinfo sources
+Message-ID: <20200302124229.GW24572@paraplu>
+References: <20200228153619.9906-1-peter.maydell@linaro.org>
+ <20200228153619.9906-33-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200228153619.9906-33-peter.maydell@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,31 +89,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Feb 28, 2020 at 03:36:18PM +0000, Peter Maydell wrote:
+> We can now delete the old .texi files, which we have been keeping in
+> the tree as a parallel set of documentation to the new rST sources.
+> The only remaining use of Texinfo is the autogenerated manuals
+> and HTML documents created from the QAPI JSON doc comments.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  MAINTAINERS                        |   5 +-
+>  docs/system/build-platforms.texi   |  67 ----
+>  docs/system/cpu-models-mips.texi   | 157 ----------
+>  docs/system/cpu-models-x86.texi    | 482 -----------------------------
+>  docs/system/deprecated.texi        | 377 ----------------------
+>  docs/system/gdb.texi               |  71 -----
+>  docs/system/images.texi            |  88 ------
+>  docs/system/invocation.texi        | 240 --------------
+>  docs/system/ivshmem.texi           |  60 ----
+>  docs/system/keys.texi              |  43 ---
+>  docs/system/license.texi           |   9 -
+>  docs/system/linuxboot.texi         |  27 --
+>  docs/system/managed-startup.texi   |  35 ---
+>  docs/system/monitor.texi           |  34 --
+>  docs/system/mux-chardev.texi       |  44 ---
+>  docs/system/net.texi               |  96 ------
+>  docs/system/qemu-option-trace.texi |  28 --
+>  docs/system/quickstart.texi        |  12 -
+>  docs/system/security.texi          | 167 ----------
+>  docs/system/target-arm.texi        | 245 ---------------
+>  docs/system/target-i386.texi       |  91 ------
+>  docs/system/target-m68k.texi       |  25 --
+>  docs/system/target-mips.texi       | 150 ---------
+>  docs/system/target-ppc.texi        |  52 ----
+>  docs/system/target-sparc.texi      |  68 ----
+>  docs/system/target-sparc64.texi    |  38 ---
+>  docs/system/target-xtensa.texi     |  35 ---
+>  docs/system/tls.texi               | 329 --------------------
+>  docs/system/usb.texi               | 115 -------
+>  docs/system/vnc-security.texi      | 196 ------------
+>  qemu-doc.texi                      | 201 ------------
+>  31 files changed, 1 insertion(+), 3586 deletions(-)
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Nice diff-stat; "negative code" for the win! :-)
 
-> Hi; this series does a complete conversion of qemu-doc from
-> Texinfo to rST, including the hxtool-generated parts and
-> creation of the qemu.1 manpage from rST.
->
-> It's marked v3 because it's a development of the v2 that
-> Paolo sent out earlier this week.
-<snip>
+(Yes, yes, we do add them back in a different form elsewhere...)
 
-I should mention the whole thing is:
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
 
-by virtue of my custom rtd branch:
-
-  https://qemu-stsquad.readthedocs.io/en/doc-updates/index.html
+[...]
 
 --=20
-Alex Benn=C3=A9e
+/kashyap
+
 
