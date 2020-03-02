@@ -2,119 +2,91 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6DAEC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF98C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FAC52166E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8766C2166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VaHDPJIT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FAC52166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ffT/2LRm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8766C2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8jCq-0005sZ-PU
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:25:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33820)
+	id 1j8jDn-00076Y-Oe
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:26:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j8jBp-0005C7-4W
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:24:50 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j8jCv-0006KE-IQ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j8jBn-00065X-IL
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:24:49 -0500
-Received: from mail-am6eur05on2134.outbound.protection.outlook.com
- ([40.107.22.134]:3577 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j8jBi-000657-ON; Mon, 02 Mar 2020 06:24:43 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P3k1KDxLsrTGDliJtFXlFTBXySxmPTrmAIpa8muZY21TW2Gg4T5RfniWorlEUzFG9JtzIHV4XUnWSPj/sH794tknWinjoTaVcVCAC0tgPPkoZZFFUu9OKQtPUX8zebVt/Byp1JuRwvNWwTd/W6jPEVk6oSPw4a5RCYTSYu4eB4jrdRoX54c00SpxIXqyWHZpSs8ijpGGOscCaWg4NymycPt/ggaJmmD0WBU8S/DCwymBuVWlAVe21do5Cn4lrJhvd5DwT63CVTg2ytvXEBAPgNvD2FeLu5nlUkgnnQtSBOP4CwdvqZ89/hyDizUK99kW1DDTCdPojP/LHdC7FUP1KA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3i9PoVaGysnW8PsoZvaZdbJVnxYF7pjmO1+WwaKDaPk=;
- b=kEcz/qbP8FARWAueZOzoiGXdN8E8RCoeG0SBFNG8S++B/ONQikCFVGKr848uAywy66VqEKj8K80lPPkJnQ8dsV4XKELUaZl+0m7ds8AML1w1WtuOJI1v16JdP23pW7kGfy4rfLUk89IsM7UxRXrgxrTp+whlNYEvoTDeaEnUddUJALLVUh4G3JQrbQwLu6bm5aSIO8Pw6cCRN4DZKwregZsPzPTXuQS93B7TNh1FYO/EqA5/V2ONv+5qOG7QjT5qU9OWeF0T/Y2+ADQdtuZ48u/yP9Y81EVhOHegcmyFekAI4M8L8AOrlPiISA3KkForT0THH/qd3JGSfoTVX4ApRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3i9PoVaGysnW8PsoZvaZdbJVnxYF7pjmO1+WwaKDaPk=;
- b=VaHDPJITUuFyp7Vx6+FqWuEWZMw01BhvqyVRceO6BxlVEyqnKhE2aILp9Qr/7aT/kChMo0Romy6Q2vK4kTJZGElpOBNcgJFuPt/lxAb6sRHvKyRFmxsmcMX8aPIRU5b99uSFQWhW2UR04FGyxGI6wwQuUnLlE9QxrEZ7P4FDxMg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4150.eurprd08.prod.outlook.com (20.179.2.210) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Mon, 2 Mar 2020 11:24:40 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2772.019; Mon, 2 Mar 2020
- 11:24:40 +0000
-Subject: Re: [PATCH v2 1/4] qcow2: introduce compression type feature
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200302082111.21205-1-dplotnikov@virtuozzo.com>
- <20200302082111.21205-2-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200302142438579
-Message-ID: <6190af16-d08e-fb0b-f090-a3d64986a960@virtuozzo.com>
-Date: Mon, 2 Mar 2020 14:24:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200302082111.21205-2-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR0502CA0005.eurprd05.prod.outlook.com
- (2603:10a6:3:e3::15) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <alex.bennee@linaro.org>) id 1j8jCu-0006VI-01
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:25:57 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37405)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j8jCt-0006Uv-KH
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:25:55 -0500
+Received: by mail-wm1-x343.google.com with SMTP id a141so10294241wme.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 03:25:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=iNoGXR8/KdZDH/mGYHq1LeISZaWgYX59zE3MiiQbJfg=;
+ b=ffT/2LRmOIOzef/IuiF6oXnmLoipXTGcjAoTZSCDNsVZ0WsgmFxBSi8xgNek0HDy5K
+ EJceUAfU78ZUTaqb3W67IAyYPu/yZEInqGPfaG0+g1pIPkoCFEgXc6pD4o9FzsAMMFWm
+ 3x0P7l8jPdElwrbjY1F/7tE9EfJww2NyqAwSB8tozaXIpoM5VtKUDknffFiEqVS7SRmg
+ iTdJ0iLd7Xi2gLhYXAVLxpMnVMg6bgYgUGIkITzFwQUfvQlFJQaRSBkR1ndi/n1sZwd1
+ pNkt9pjcfNm7FJRU0BqF1Sn2SLe47NoWWt7xpzRamXzKeX3EnXKmt5bpGwE2ZaI3cEbd
+ mDTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=iNoGXR8/KdZDH/mGYHq1LeISZaWgYX59zE3MiiQbJfg=;
+ b=rtlY/2SEbyAG9ffyGy760JU6P4WA5I52AO7zjOmg58E48Fmu73izY06IU9Z9nCjtn7
+ cyGhk2xTVp3mz7qM7vqP5jIw1QdDxSl0fzyREaSqCOxZ8W6ALNmY+tY9qd9g0SWTC9y+
+ PYEvFm9slCh6X/z1fvJ7eekz7O6YjlXtUekH0TtS0EG5lHoAT9moUhIIEHT6g6bx5o2I
+ DyWMOD6GhkW2OXTvY5xU/CW69+kGrXjHkGCC/2sPqHgE3CSe1empTjb0LkGZB3Z+ddR5
+ lW4hDsxi8fxdaK0glVfOseGeQ/andgoRzf0yM4t+tT+wtD7cfR1Wd1Xp5l1P6ZjfnSv8
+ g/Mg==
+X-Gm-Message-State: ANhLgQ0sWqHT6C2uNfIhHifomroRYoA81fIKvP83Z0E2KGVJR8g1vOVP
+ jQtqOSy4JT1W+wrAoBb7kOvlcQ==
+X-Google-Smtp-Source: ADFU+vuQRHeI09T3t5EEzwTYgucKp90pBEznE1vEUldXJsxKuVcoyT0B7haK7wWsJguyh7Sa883rVw==
+X-Received: by 2002:a05:600c:351:: with SMTP id
+ u17mr5948381wmd.22.1583148354269; 
+ Mon, 02 Mar 2020 03:25:54 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a5sm15609634wmb.37.2020.03.02.03.25.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Mar 2020 03:25:53 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 989001FF87;
+ Mon,  2 Mar 2020 11:25:52 +0000 (GMT)
+References: <20200228153619.9906-1-peter.maydell@linaro.org>
+ <20200228153619.9906-7-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 06/33] qemu-doc: extract common system emulator
+ documentation from the PC section
+In-reply-to: <20200228153619.9906-7-peter.maydell@linaro.org>
+Date: Mon, 02 Mar 2020 11:25:52 +0000
+Message-ID: <87tv37athb.fsf@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0502CA0005.eurprd05.prod.outlook.com (2603:10a6:3:e3::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.14 via Frontend Transport; Mon, 2 Mar 2020 11:24:39 +0000
-X-Tagtoolbar-Keys: D20200302142438579
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7c3ec573-c0fc-444c-92ff-08d7be9c4c7f
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4150:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4150D71B661D0CE2E54DDD6CC1E70@AM6PR08MB4150.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-Forefront-PRVS: 033054F29A
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(39850400004)(376002)(346002)(396003)(199004)(189003)(316002)(8676002)(26005)(478600001)(2616005)(956004)(81156014)(16526019)(186003)(6486002)(19627235002)(81166006)(8936002)(66946007)(2906002)(4326008)(31686004)(16576012)(36756003)(31696002)(66556008)(52116002)(5660300002)(86362001)(66476007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4150;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mcYtOaaYbC4qH+jh1lsbnBQNRJL6AkXQb+HVXwFn2tNGim8O+COJbK5U3RJR184YFwO7eEiza290YMW6qQIq+pLsqzGmic6zdXQ7v4sDIjff5Hv9eVygyZBD27erN8VvY7NNInYr8HTpj9eXF6rDgHb3flxDMtkPU3sNTmBe7z3/TdqF6XrRJzwft2Y6kOKrAOMmSrN9FarxBoXN2t37fKel1GjoMVXCxaOS6ZRW6PGLNM4PT4uft0y+8tEbSxlsbi5Zcw1GK/mU07XfH+mRwBtSgx1iP/JeLGBEY1Q0xcooCCZQgKLafCJAM8edlF7MYO+GEXA/US4nXPPodsV4BPPqF/JEwr3hHUIpB9OHeSxuEs6qHAksAwz9Is93ztpv7yVWIvqPIy3O1q3oWVCkdz3CtcFa5T8gGTk7lwME83y0gUX+74l917Am5dep/QL7
-X-MS-Exchange-AntiSpam-MessageData: G2BFooSaC+REztz/IXZQUOEwmUbRC0xiaDWwxiRJZvd+j4HltZUgoL86C3yD8OVjx42CbPxMEq763j7BF5iQ+9vpfjgNEA16ySvTtrpB08i/DB8SaTadJiy4kQ4RRo4vM8P2uCjqTHWWvpg5jDwSDQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c3ec573-c0fc-444c-92ff-08d7be9c4c7f
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2020 11:24:40.5758 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UOfjG4V8tRUuU2RpppDX2y1ut2zHYtGPM/Vj3+ViS3mi5pyf7P2Fh+49Eo+vOT8uqc1wTPrW5sNeL9iEgTeRu5NpIhUw3jOGqGXH1lk/yuM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4150
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.22.134
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,266 +98,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.com, qemu-block@nongnu.org, armbru@redhat.com,
- mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.03.2020 11:21, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type
-> feature to qcow2 allowing the use different compression methods for
-> image clusters (de)compressing.
-> 
-> It is implied that the compression type is set on the image creation and
-> can be changed only later by image conversion, thus compression type
-> defines the only compression algorithm used for the image, and thus,
-> for all image clusters.
-> 
-> The goal of the feature is to add support of other compression methods
-> to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
-> 
-> The default compression is ZLIB. Images created with ZLIB compression type
-> are backward compatible with older qemu versions.
-> 
-> Adding of the compression type breaks a number of tests because now the
-> compression type is reported on image creation and there are some changes
-> in the qcow2 header in size and offsets.
-> 
-> The tests are fixed in the following ways:
->      * filter out compression_type for all the tests
->      * fix header size, feature table size and backing file offset
->        affected tests: 031, 036, 061, 080
->        header_size +=8: 1 byte compression type
->                         7 bytes padding
->        feature_table += 48: incompatible feture compression type
->        backing_file_offset += 56 (8 + 48 -> header_change + fature_table_change)
->      * add "compression type" for test output matching when it isn't filtered
->        affected tests: 049, 060, 061, 065, 144, 182, 242, 255
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-I'm almost OK with this patch. Some notes below and:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Seems, new option should be handled in qcow2_amend_options among other unsupported ones (otherwise qcow2_amend_options aborts).
+> From: Paolo Bonzini <pbonzini@redhat.com>
+>
+> Move the section on PC peripherals together with other targets.
+> While some x86-specific information remains in the main system
+> emulation chapter, it can be tackled more easily a section at a
+> time.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Message-id: 20200226113034.6741-7-pbonzini@redhat.com
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->   qapi/block-core.json             |  22 ++++++-
->   block/qcow2.h                    |  18 ++++-
->   include/block/block_int.h        |   1 +
->   block/qcow2.c                    | 109 +++++++++++++++++++++++++++++++
->   tests/qemu-iotests/031.out       |  14 ++--
->   tests/qemu-iotests/036.out       |   4 +-
->   tests/qemu-iotests/049.out       | 102 ++++++++++++++---------------
->   tests/qemu-iotests/060.out       |   1 +
->   tests/qemu-iotests/061.out       |  34 ++++++----
->   tests/qemu-iotests/065           |  20 +++---
->   tests/qemu-iotests/080           |   2 +-
->   tests/qemu-iotests/144.out       |   4 +-
->   tests/qemu-iotests/182.out       |   2 +-
->   tests/qemu-iotests/242.out       |   5 ++
->   tests/qemu-iotests/255.out       |   8 +--
->   tests/qemu-iotests/common.filter |   3 +-
->   16 files changed, 255 insertions(+), 94 deletions(-)
-> 
-
-[..]
-
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -146,6 +146,12 @@ typedef struct QCowHeader {
->   
->       uint32_t refcount_order;
->       uint32_t header_length;
+>  docs/system/quickstart.texi |   2 +-
+>  qemu-doc.texi               | 102 ++++++++++++++++++++----------------
+>  2 files changed, 57 insertions(+), 47 deletions(-)
+>
+> diff --git a/docs/system/quickstart.texi b/docs/system/quickstart.texi
+> index 8cd5b4bc6e5..ed7295de7a2 100644
+> --- a/docs/system/quickstart.texi
+> +++ b/docs/system/quickstart.texi
+> @@ -2,7 +2,7 @@
+>  @section Quick Start
+>  @cindex quick start
+>=20=20
+> -Download and uncompress a hard disk image with Linux installed (e.g.
+> +Download and uncompress a PC hard disk image with Linux installed (e.g.
+>  @file{linux.img}) and type:
+>=20=20
+>  @example
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 33d24caf946..88e84300e91 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -36,8 +36,8 @@
+>=20=20
+>  @menu
+>  * Introduction::
+> -* QEMU PC System emulator::
+> -* QEMU System emulator for non PC targets::
+> +* QEMU System emulator::
+> +* QEMU System emulator targets::
+>  * System requirements::
+>  * Security::
+>  * Implementation notes::
+> @@ -127,19 +127,16 @@ accelerator is required to use more than one host C=
+PU for emulation.
+>=20=20
+>  @end itemize
+>=20=20
+> -
+> -@node QEMU PC System emulator
+> -@chapter QEMU PC System emulator
+> -@cindex system emulation (PC)
+> +@node QEMU System emulator
+> +@chapter QEMU System emulator
+> +@cindex system emulation
+>=20=20
+>  @menu
+> -* pcsys_introduction:: Introduction
+> -* pcsys_quickstart::   Quick Start
+> +* pcsys_quickstart::   Quick start
+>  * sec_invocation::     Invocation
+>  * pcsys_keys::         Keys in the graphical frontends
+>  * mux_keys::           Keys in the character backend multiplexer
+>  * pcsys_monitor::      QEMU Monitor
+> -* cpu_models_x86::     Supported CPU model configurations on x86 hosts
+>  * disk_images::        Disk Images
+>  * pcsys_network::      Network emulation
+>  * pcsys_usb::          USB emulation
+> @@ -150,13 +147,57 @@ accelerator is required to use more than one host C=
+PU for emulation.
+>  * gdb_usage::          GDB usage
+>  @end menu
+>=20=20
+> -@node pcsys_introduction
+> -@section Introduction
+> +@include docs/system/quickstart.texi
+> +@include docs/system/invocation.texi
+> +@include docs/system/keys.texi
+> +@include docs/system/mux-chardev.texi
+> +@include docs/system/monitor.texi
+> +@include docs/system/images.texi
+> +@include docs/system/net.texi
+> +@include docs/system/usb.texi
+> +@include docs/system/ivshmem.texi
+> +@include docs/system/linuxboot.texi
+> +@include docs/system/vnc-security.texi
+> +@include docs/system/tls.texi
+> +@include docs/system/gdb.texi
 > +
-> +    /* Additional fields */
-> +    uint8_t  compression_type;
+> +@node QEMU System emulator targets
+> +@chapter QEMU System emulator targets
+> +@cindex system emulation (PC)
 > +
-> +    /* header must be a multiple of 8 */
-> +    uint8_t  padding[7];
->   } QEMU_PACKED QCowHeader;
->   
->   typedef struct QEMU_PACKED QCowSnapshotHeader {
-> @@ -216,13 +222,16 @@ enum {
->       QCOW2_INCOMPAT_DIRTY_BITNR      = 0,
->       QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
->       QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
-> +    QCOW2_INCOMPAT_COMPRESSION_BITNR= 3,
-
-checkpatch complains. I think, you can just use one space before '=' and don't
-care about alignment.
-
->       QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
->       QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
->       QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-> +    QCOW2_INCOMPAT_COMPRESSION      = 1 << QCOW2_INCOMPAT_COMPRESSION_BITNR,
->   
->       QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
->                                       | QCOW2_INCOMPAT_CORRUPT
-> -                                    | QCOW2_INCOMPAT_DATA_FILE,
-> +                                    | QCOW2_INCOMPAT_DATA_FILE
-> +                                    | QCOW2_INCOMPAT_COMPRESSION,
->   };
->   
->   /* Compatible feature bits */
-> @@ -369,6 +378,13 @@ typedef struct BDRVQcow2State {
->   
->       bool metadata_preallocation_checked;
->       bool metadata_preallocation;
-> +    /*
-> +     * Compression type used for the image. Default: 0 - ZLIB
-> +     * The image compression type is set on image creation.
-> +     * The only way to change the compression type is to convert the image
-> +     * with the desired compression type set
-> +     */
-> +    Qcow2CompressionType compression_type;
->   } BDRVQcow2State;
->   
->   typedef struct Qcow2COWRegion {
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 6f9fd5e20e..2c6bb9dc99 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -57,6 +57,7 @@
->   #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
->   #define BLOCK_OPT_DATA_FILE         "data_file"
->   #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
-> +#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
->   
->   #define BLOCK_PROBE_BUF_SIZE        512
->   
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 3c754f616b..fc5232a5d6 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1242,6 +1242,50 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
->       return ret;
->   }
->   
-> +static int validate_compression_type(BDRVQcow2State *s, Error **errp)
-> +{
-> +    /*
-> +     * Sanity check
-> +     * according to qcow2 spec, the compression type is 1-byte field
-> +     * but in BDRVQcow2State the compression_type is enum sizeof(int)
-> +     * so, the max compression_type value is 255.
-> +     */
-> +    if (s->compression_type > 0xff) {
-
-This code is unreachable, I'd prefer assertion.
-
-> +        error_setg(errp, "qcow2: compression type value is too big");
-> +        return -EINVAL;
-> +    }
+> +QEMU is a generic emulator and it emulates many machines. Most of the
+> +options are similar for all machines. Specific information about the
+> +various targets are mentioned in the following sections.
 > +
-> +    switch (s->compression_type) {
-> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
-> +        break;
+> +@menu
+> +* x86 (PC) System emulator::
+> +* PowerPC System emulator::
+> +* Sparc32 System emulator::
+> +* Sparc64 System emulator::
+> +* MIPS System emulator::
+> +* ARM System emulator::
+> +* ColdFire System emulator::
+> +* Cris System emulator::
+> +* Microblaze System emulator::
+> +* SH4 System emulator::
+> +* Xtensa System emulator::
+> +@end menu
 > +
-> +    default:
-> +        error_setg(errp, "qcow2: unknown compression type: %u",
-> +                   s->compression_type);
-> +        return -ENOTSUP;
-> +    }
+> +@node x86 (PC) System emulator
+> +@section x86 (PC) System emulator
+> +@cindex system emulation (PC)
 > +
-> +    /*
-> +     * if the compression type differs from QCOW2_COMPRESSION_TYPE_ZLIB
-> +     * the incompatible feature flag must be set
-> +     */
-> +    if (s->compression_type == QCOW2_COMPRESSION_TYPE_ZLIB) {
-> +        if (s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION) {
-> +            error_setg(errp, "qcow2: Compression type incompatible feature "
-> +                             "bit must not be set");
-> +            return -EINVAL;
-> +        }
-> +    } else {
-> +        if (!(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION)) {
-> +            error_setg(errp, "qcow2: Compression type incompatible feature "
-> +                             "bit must be set");
-> +            return -EINVAL;
-> +        }
-> +    }
+> +@menu
+> +* pcsys_devices::      Peripherals
+> +* cpu_models_x86::     Supported CPU model configurations on x86 hosts
+> +@end menu
 > +
-> +    return 0;
-> +}
-> +
+> +@node pcsys_devices
+> +@subsection Peripherals
+>=20=20
+>  @c man begin DESCRIPTION
+>=20=20
+> -The QEMU PC System emulator simulates the
+> -following peripherals:
+> +The QEMU PC System emulator simulates the following peripherals:
+>=20=20
+>  @itemize @minus
+>  @item
+> @@ -222,40 +263,9 @@ CS4231A is the chip used in Windows Sound System and=
+ GUSMAX products
+>=20=20
+>  @c man end
+>=20=20
+> -@include docs/system/quickstart.texi
+> -@include docs/system/invocation.texi
+> -@include docs/system/keys.texi
+> -@include docs/system/mux-chardev.texi
+> -@include docs/system/monitor.texi
+> +@lowersections
+>  @include docs/system/cpu-models-x86.texi
+> -@include docs/system/images.texi
+> -@include docs/system/net.texi
+> -@include docs/system/usb.texi
+> -@include docs/system/ivshmem.texi
+> -@include docs/system/linuxboot.texi
+> -@include docs/system/vnc-security.texi
+> -@include docs/system/tls.texi
+> -@include docs/system/gdb.texi
+> -
+> -@node QEMU System emulator for non PC targets
+> -@chapter QEMU System emulator for non PC targets
+> -
+> -QEMU is a generic emulator and it emulates many non PC
+> -machines. Most of the options are similar to the PC emulator. The
+> -differences are mentioned in the following sections.
+> -
+> -@menu
+> -* PowerPC System emulator::
+> -* Sparc32 System emulator::
+> -* Sparc64 System emulator::
+> -* MIPS System emulator::
+> -* ARM System emulator::
+> -* ColdFire System emulator::
+> -* Cris System emulator::
+> -* Microblaze System emulator::
+> -* SH4 System emulator::
+> -* Xtensa System emulator::
+> -@end menu
+> +@raisesections
+>=20=20
+>  @node PowerPC System emulator
+>  @section PowerPC System emulator
 
 
-[..]
-
-> @@ -3379,6 +3453,27 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
->           }
->       }
->   
-> +    if (qcow2_opts->has_compression_type &&
-> +        qcow2_opts->compression_type != QCOW2_COMPRESSION_TYPE_ZLIB) {
-> +
-> +        ret = -EINVAL;
-> +
-> +        if (version < 3) {
-> +            error_setg(errp, "Compression type is only supported with "
-
-Hmm. "Non-zlib compression type is only.." would be a bit more honest :)
-
-> +                       "compatibility level 1.1 and above (use version=v3 or "
-> +                       "greater)");
-> +            goto out;
-> +        }
-> +
-> +        switch (qcow2_opts->compression_type) {
-> +        default:
-> +            error_setg(errp, "Unknown compression type");
-> +            goto out;
-> +        }
-> +
-> +        compression_type = qcow2_opts->compression_type;
-> +    }
-> +
-
-
-[..]
-
-> --- a/tests/qemu-iotests/065
-> +++ b/tests/qemu-iotests/065
-> @@ -88,23 +88,25 @@ class TestQMP(TestImageInfoSpecific):
->   class TestQCow2(TestQemuImgInfo):
->       '''Testing a qcow2 version 2 image'''
->       img_options = 'compat=0.10'
-> -    json_compare = { 'compat': '0.10', 'refcount-bits': 16 }
-> -    human_compare = [ 'compat: 0.10', 'refcount bits: 16' ]
-> +    json_compare = { 'compat': '0.10', 'refcount-bits': 16, 'compression-type': 'zlib' }
-> +    human_compare = [ 'compat: 0.10', 'compression type: zlib', 'refcount bits: 16' ]
-
-over-80 line (and several below).
-
->   
->   class TestQCow3NotLazy(TestQemuImgInfo):
->       '''Testing a qcow2 version 3 image with lazy refcounts disabled'''
->       img_options = 'compat=1.1,lazy_refcounts=off'
->       json_compare = { 'compat': '1.1', 'lazy-refcounts': False,
-> -                     'refcount-bits': 16, 'corrupt': False }
-> -    human_compare = [ 'compat: 1.1', 'lazy refcounts: false',
-> +                     'refcount-bits': 16, 'corrupt': False,
-> +                     'compression-type': 'zlib' }
-> +    human_compare = [ 'compat: 1.1', 'compression type: zlib', 'lazy refcounts: false',
->                         'refcount bits: 16', 'corrupt: false' ]
->   
->   class TestQCow3Lazy(TestQemuImgInfo):
->       '''Testing a qcow2 version 3 image with lazy refcounts enabled'''
->       img_options = 'compat=1.1,lazy_refcounts=on'
->       json_compare = { 'compat': '1.1', 'lazy-refcounts': True,
-> -                     'refcount-bits': 16, 'corrupt': False }
-> -    human_compare = [ 'compat: 1.1', 'lazy refcounts: true',
-> +                     'refcount-bits': 16, 'corrupt': False,
-> +                     'compression-type': 'zlib' }
-> +    human_compare = [ 'compat: 1.1', 'compression type: zlib', 'lazy refcounts: true',
->                         'refcount bits: 16', 'corrupt: false' ]
->   
-
-[..]
-
-
--- 
-Best regards,
-Vladimir
+--=20
+Alex Benn=C3=A9e
 
