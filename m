@@ -2,141 +2,135 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F96AC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DE5C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A7022469C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:43:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE88F20866
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="NW78oHT3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7022469C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfC66UBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE88F20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8hbY-0005Go-Dc
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 04:43:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46422)
+	id 1j8hjO-0008Lg-0Y
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 04:51:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <saipava@xilinx.com>) id 1j8hZ1-00028t-KK
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:40:41 -0500
+ (envelope-from <lvivier@redhat.com>) id 1j8hid-0007jI-2b
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <saipava@xilinx.com>) id 1j8hZ0-0006rt-2G
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:40:39 -0500
-Received: from mail-eopbgr750041.outbound.protection.outlook.com
- ([40.107.75.41]:9026 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1j8hYz-0006qj-Qv
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:40:38 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=atRQMDbI6aII/auppwe39IIwWWZE8YCjr+71qsqEQriOk3TSUW4ezx5MPF69ymGXnlGWoKMATn2BVvSAFH+fS8dqw4xz/5isy0++5PtSeamYwz7CVJ+69rVliz0REkNx/h2o7qQ7uKu+vIQBCXmUdeHpChRa+MvfndGfALHMOxOyuBkibFJXSlq4ud4vRm32tXrd0p5mP/9lV4Kl1XPCXBjHAN0gzbdxW4vSIdu3SA7MJixl9ij5r9DRHU/U2QW7HLeMnDqCip7qHWozeP01NlEdVof6FwJf0S/fOAE+NMzuDmHNxWHNGdhOw6QcjZaiqQUtGRg5rq6WEUP4TMnmHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+mMVYEEb3PD36GPTXfPy0X4/PCJVwrRbWfMTG7jDNkc=;
- b=VKJR9XXrGN5y2MZGwh1ONvPSuVBpX25Ql65gXtxLYbZnXdNm5qfYsVqjZE1jxB5gr4ZqAXzpfDUN509fFajloSdqWl6yMtvzqmHRmGt34JjYhFr+yBvq2F9mqLDued1u6j4GynXzg4yNKGIVbkqwiD9SXVUE3W6Q13KNy0jLTZbtDOUm05+fRinuM9DPrwomX9Xhu8xMOyH891BwOJxTKUC6lKL++yykJ77gDvXOl/pnWBSXuOXGmErLpT0O0unxqNeId5HG6yAxWw/PX7RC+1nOoMq37l6bhZbmSjZThAT/qNWLWP5en1dZMG6zGs2sIdA61C3ryz+srthoMhrcIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=weilnetz.de smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+mMVYEEb3PD36GPTXfPy0X4/PCJVwrRbWfMTG7jDNkc=;
- b=NW78oHT3R3IHRdrY8GQvcscgOFnETNvKSkO4md/yV+BBYzXYO/u//7EJIdTkwy3MDDqfsvxhf0HMw0orJUIGMDdDgKaVrlpZOLonu04GdpcM/JaeWBXMZ+RI4lhCzliGmfVzHLX8dQxrksFySwGhksbzFT/kIaas8HvqD2YKGsc=
-Received: from BL0PR0102CA0010.prod.exchangelabs.com (2603:10b6:207:18::23) by
- BYAPR02MB5128.namprd02.prod.outlook.com (2603:10b6:a03:70::25) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.18; Mon, 2 Mar 2020 09:40:31 +0000
-Received: from BL2NAM02FT034.eop-nam02.prod.protection.outlook.com
- (2603:10b6:207:18:cafe::47) by BL0PR0102CA0010.outlook.office365.com
- (2603:10b6:207:18::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.14 via Frontend
- Transport; Mon, 2 Mar 2020 09:40:31 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; weilnetz.de; dkim=none (message not signed)
- header.d=none;weilnetz.de; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT034.mail.protection.outlook.com (10.152.77.161) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2772.15
- via Frontend Transport; Mon, 2 Mar 2020 09:40:30 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j8hYs-0006QZ-38; Mon, 02 Mar 2020 01:40:30 -0800
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1j8hYm-0003GO-Ud; Mon, 02 Mar 2020 01:40:24 -0800
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 0229eJ3s020904; 
- Mon, 2 Mar 2020 01:40:19 -0800
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1j8hYg-00036u-PZ; Mon, 02 Mar 2020 01:40:19 -0800
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 0CF1B13C01F2; Mon,  2 Mar 2020 15:05:28 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Yang Zhong <yang.zhong@intel.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Anthony Liguori <anthony@codemonkey.ws>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Gonglei <arei.gonglei@huawei.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Vikram Garhwal <fnu.vikram@xilinx.com>
-Subject: [PATCH 2/3] usb/hcd-xhci: Move qemu-xhci device to hcd-xhci-pci.c
-Date: Mon,  2 Mar 2020 15:05:23 +0530
-Message-Id: <1583141724-6229-3-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1583141724-6229-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1583141724-6229-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(376002)(346002)(396003)(136003)(39860400002)(189003)(199004)(2906002)(7416002)(6636002)(36756003)(336012)(26005)(478600001)(81166006)(8676002)(81156014)(426003)(2616005)(356004)(6666004)(8936002)(42186006)(316002)(70586007)(110136005)(5660300002)(70206006)(6266002)(186003)(4326008)(921003)(2004002)(1121003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:BYAPR02MB5128; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
+ (envelope-from <lvivier@redhat.com>) id 1j8hib-00025a-6v
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27186
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j8hib-00025J-2g
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583142632;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=5cDhTW3jq2J/6UnOfVpsFBVolj91AqAKupVk48dDfXc=;
+ b=YfC66UBdyZq6Fb4PLbwgz+GYn1ri16L4A2v8yQ9zqKqQA2Mgy4qcrwnRJjcNAbbO6KivfG
+ zEoxz/gUHfDGsvM5P081Oc7YfFgxpAIT9xcj+fYke59xRBWat/y9f7on6+sQ5IxVTrTES9
+ iCb94TwJPBF9NbRcvx5FtbQdZh1GpnA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-88mpDOAhMaK4sRuGlbgGwA-1; Mon, 02 Mar 2020 04:50:28 -0500
+X-MC-Unique: 88mpDOAhMaK4sRuGlbgGwA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 523898017CC
+ for <qemu-devel@nongnu.org>; Mon,  2 Mar 2020 09:50:27 +0000 (UTC)
+Received: from [10.36.117.17] (ovpn-117-17.ams2.redhat.com [10.36.117.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2AEAC5DA2C;
+ Mon,  2 Mar 2020 09:50:16 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200207095412.794912-1-lvivier@redhat.com>
+ <20200301071119-mutt-send-email-mst@kernel.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <c68547be-3131-8069-70d9-f0a1758784d7@redhat.com>
+Date: Mon, 2 Mar 2020 10:50:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9d34cf96-3665-4ec1-3c43-08d7be8dbf8c
-X-MS-TrafficTypeDiagnostic: BYAPR02MB5128:
-X-Microsoft-Antispam-PRVS: <BYAPR02MB5128811F1455D95B7C5FD24DCAE70@BYAPR02MB5128.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-Forefront-PRVS: 033054F29A
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ggZdbu4S4NSnEV3rSYPNH5pC/KQG71AJHtsJzF9P42jmcu+yQYfbqiUQ2KdQlcE0FarHmPfCIGI8iMnj4xKKtOW3GoVUBh3tdQc8J15Jiwfm4EMtz6uCyPeBB/RNpQ/RfMpGfUaHYArBSr0j+GwmuFF3ptNIpXSt321kKjLVQT5H/68Fi5rHBVFHQR33/PTkZDhnhFNzEzactLQPHb3BgsCyZTTWev6SWCCTu5FSChA+clma+C2TZ27XJGT7vn7ETB8cMaaNer5YLLAcOX3dZfytzOsjRZO358gyx584HhkVH3pTQZZf1x2yKkhLxYrBlRHLo4hoMQTm0U9aZ+AGcgJElfv4vGQMC/9GmUd3EnGT6G+odDOI+rSD4psTsbleCzHew6af+CCaeeXl2ApiwF6nBpeWPSkL9XBBjnloa6DdwyU/nAbNDeGlGqxdWIPnkjhVyPLj83tcjRb0br+lrDtyG6Hl5154YHeSCkaXPHZRHPcwN2fjhceOmO/AmskRRvC1qRDbvZ0OKKh5sqGy0CbC6kRDxDkZC3tsMIh5abVAaDRoGkfedqFLlJaCLdnNyL/4JGaN5i4SQ1zBcatw4DB01R+zO6bxPTnfTtX1aV0=
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2020 09:40:30.7117 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d34cf96-3665-4ec1-3c43-08d7be8dbf8c
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5128
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.75.41
+In-Reply-To: <20200301071119-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,183 +142,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move pci specific devices to new file. This set the environment to move all
-pci specific hooks in hcd-xhci.c to hcd-xhci-pci.c.
+On 01/03/2020 13:12, Michael S. Tsirkin wrote:
+> On Fri, Feb 07, 2020 at 10:54:11AM +0100, Laurent Vivier wrote:
+>> vhost-user-bridge is not a test. Move it to contrib/ and
+>> add it to the tools list.
+>>
+>> It will be built only if tools (--enable-tools) and
+>> vhost-user (--enable-vhost-user) are enabled (both are set
+>> by default).
+>>
+>> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+>=20
+> I had to drop this series from my tree since it cause failures
+> on OSX. Pls use something like travis CI to test when you repost
+> a fixed version. Thanks!
+>=20
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
----
- hw/usb/hcd-xhci-pci.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/usb/hcd-xhci.c     | 40 ++------------------------------
- hw/usb/hcd-xhci.h     |  2 ++
- 3 files changed, 68 insertions(+), 38 deletions(-)
- create mode 100644 hw/usb/hcd-xhci-pci.c
+Do you have a link to the error logs?
 
-diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
-new file mode 100644
-index 0000000..26af683
---- /dev/null
-+++ b/hw/usb/hcd-xhci-pci.c
-@@ -0,0 +1,64 @@
-+/*
-+ * USB xHCI controller with PCI system bus emulation
-+ *
-+ * Copyright (c) 2011 Securiforest
-+ * Date: 2011-05-11 ;  Author: Hector Martin <hector@marcansoft.com>
-+ * Based on usb-ohci.c, emulates Renesas NEC USB 3.0
-+ * Date: 2020-03-01; Author: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-+ * Moved the pci specific content for hcd-xhci.c to hcd-xhci-pci.c
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/pci/pci.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/pci/msi.h"
-+#include "hw/pci/msix.h"
-+#include "hcd-xhci.h"
-+#include "trace.h"
-+#include "qapi/error.h"
-+
-+static void qemu_xhci_class_init(ObjectClass *klass, void *data)
-+{
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
-+    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
-+    k->revision     = 0x01;
-+}
-+
-+static void qemu_xhci_instance_init(Object *obj)
-+{
-+    XHCIState *xhci = XHCI(obj);
-+
-+    xhci->msi      = ON_OFF_AUTO_OFF;
-+    xhci->msix     = ON_OFF_AUTO_AUTO;
-+    xhci->numintrs = MAXINTRS;
-+    xhci->numslots = MAXSLOTS;
-+    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
-+}
-+
-+static const TypeInfo qemu_xhci_info = {
-+    .name          = TYPE_QEMU_XHCI,
-+    .parent        = TYPE_XHCI,
-+    .class_init    = qemu_xhci_class_init,
-+    .instance_init = qemu_xhci_instance_init,
-+};
-+
-+static void xhci_register_types(void)
-+{
-+    type_register_static(&qemu_xhci_info);
-+}
-+
-+type_init(xhci_register_types)
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 6e88670..ba07ca2 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -429,12 +429,12 @@ static const char *ep_state_name(uint32_t state)
-                        ARRAY_SIZE(ep_state_names));
- }
- 
--static bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     return xhci->flags & (1 << bit);
- }
- 
--static void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit)
- {
-     xhci->flags |= (1 << bit);
- }
-@@ -3691,13 +3691,6 @@ static Property xhci_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--static void xhci_instance_init(Object *obj)
--{
--    /* QEMU_PCI_CAP_EXPRESS initialization does not depend on QEMU command
--     * line, therefore, no need to wait to realize like other devices */
--    PCI_DEVICE(obj)->cap_present |= QEMU_PCI_CAP_EXPRESS;
--}
--
- static void xhci_class_init(ObjectClass *klass, void *data)
- {
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-@@ -3717,7 +3710,6 @@ static const TypeInfo xhci_info = {
-     .parent        = TYPE_PCI_DEVICE,
-     .instance_size = sizeof(XHCIState),
-     .class_init    = xhci_class_init,
--    .instance_init = xhci_instance_init,
-     .abstract      = true,
-     .interfaces = (InterfaceInfo[]) {
-         { INTERFACE_PCIE_DEVICE },
-@@ -3726,37 +3718,9 @@ static const TypeInfo xhci_info = {
-     },
- };
- 
--static void qemu_xhci_class_init(ObjectClass *klass, void *data)
--{
--    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--
--    k->vendor_id    = PCI_VENDOR_ID_REDHAT;
--    k->device_id    = PCI_DEVICE_ID_REDHAT_XHCI;
--    k->revision     = 0x01;
--}
--
--static void qemu_xhci_instance_init(Object *obj)
--{
--    XHCIState *xhci = XHCI(obj);
--
--    xhci->msi      = ON_OFF_AUTO_OFF;
--    xhci->msix     = ON_OFF_AUTO_AUTO;
--    xhci->numintrs = MAXINTRS;
--    xhci->numslots = MAXSLOTS;
--    xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
--}
--
--static const TypeInfo qemu_xhci_info = {
--    .name          = TYPE_QEMU_XHCI,
--    .parent        = TYPE_XHCI,
--    .class_init    = qemu_xhci_class_init,
--    .instance_init = qemu_xhci_instance_init,
--};
--
- static void xhci_register_types(void)
- {
-     type_register_static(&xhci_info);
--    type_register_static(&qemu_xhci_info);
- }
- 
- type_init(xhci_register_types)
-diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
-index 18bed7e..ca03481 100644
---- a/hw/usb/hcd-xhci.h
-+++ b/hw/usb/hcd-xhci.h
-@@ -232,4 +232,6 @@ struct XHCIState {
-     bool nec_quirks;
- };
- 
-+bool xhci_get_flag(XHCIState *xhci, enum xhci_flags bit);
-+void xhci_set_flag(XHCIState *xhci, enum xhci_flags bit);
- #endif
--- 
-2.7.4
+Thanks,
+Laurent
 
 
