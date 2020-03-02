@@ -2,137 +2,119 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E22C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 21:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D661C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 21:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42F4220866
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 21:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8F51208C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 21:21:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="MyunkfZ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42F4220866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="L+/ZojBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8F51208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8sOp-000859-5Q
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 16:14:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43918)
+	id 1j8sVT-0001N6-17
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 16:21:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <n54@gmx.com>) id 1j8sLK-0006ye-C4
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:11:15 -0500
+ (envelope-from <amarkovic@wavecomp.com>) id 1j8sUk-0000wd-2G
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <n54@gmx.com>) id 1j8sLJ-0000Ua-7b
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:11:14 -0500
-Received: from mout.gmx.net ([212.227.15.15]:58775)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <n54@gmx.com>) id 1j8sLI-0000Rv-Uz
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:11:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1583183462;
- bh=qZXe2B+402l3kQShwKwEPmJMA2r3HmJ4JbuDGPRFqiU=;
- h=X-UI-Sender-Class:To:Cc:References:From:Subject:Date:In-Reply-To;
- b=MyunkfZ0EeRjeOpxYvgd09OaoQStXmZLJQDayZ/UIClL7e7a6EIlZjG8nG425WaJ0
- AKlJdylcKiIpcgFHemF7DYW14kgOLRKy0Us63VzaNYEv8/iTJuZhyABKsH8+Xo7GTV
- ikItjMSwwlkEG/EcNGOf0cFFTWpue9gYEXEh7Qqo=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.0.241] ([89.71.135.231]) by mail.gmx.com (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MatVh-1jgIHd0YGZ-00cTZv; Mon, 02
- Mar 2020 22:11:02 +0100
-To: Paolo Bonzini <pbonzini@redhat.com>, Maxime Villard <max@m00nbsd.net>
-References: <20200107124903.16505-1-n54@gmx.com>
- <20200128140945.929-1-n54@gmx.com> <20200128140945.929-3-n54@gmx.com>
- <e3279b9d-e6f9-43f3-3ebb-b31ba8ff5f7e@redhat.com>
- <4e29b732-ce95-02f1-ec9c-31f1ce33cda0@gmx.com>
- <4ece50db-33c7-4630-6b0f-52197b2ae845@redhat.com>
- <5b289981-1e54-2301-af36-86361415bf6b@gmx.com>
- <bd4bb6d3-be33-2f97-8ee5-695b41b5eff1@m00nbsd.net>
- <CABgObfZ5AdBmU7R8ycFwTLxEHXQw_GrXwJ0BMvDWgJEvKevcGg@mail.gmail.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Autocrypt: addr=n54@gmx.com; prefer-encrypt=mutual; keydata=
- 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
- 4XSbcg==
-Subject: Re: [PATCH v2 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
-Message-ID: <8413a29d-3983-4176-5c6c-735a87ab7701@gmx.com>
-Date: Mon, 2 Mar 2020 22:10:01 +0100
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <CABgObfZ5AdBmU7R8ycFwTLxEHXQw_GrXwJ0BMvDWgJEvKevcGg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <amarkovic@wavecomp.com>) id 1j8sUf-00037F-8Q
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:20:57 -0500
+Received: from mail-eopbgr700127.outbound.protection.outlook.com
+ ([40.107.70.127]:18475 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1j8sUb-00032c-Px
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 16:20:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fLrnOXmMKxS0/dlfxBoBkvXVJWhwxCWqM8no/tgo11PH97N6S63PkqpM6pFavPTKuG87OjsKX8jX8N2yRXFGfcFHV8nmgQn7NlMfV0J0s3FA6WopRFDW0KOVQhSWvc2UgfKsxk0BhNLVhM5yppN+wTirNfiHmuMAwL/SRnN9NVeaZcbqWRE4bc5a/6AsesnmKxIPvFab9zkv7HdP+9Qyj9/ZXDEEZgq21mpVFXrDLUeRtsGYGY9M5kLtHijLql2wPqCdEmLRrHarNPlwXzeE3jXqMujkoXAbOo/phbpsRRaVZAvYUPLs8xEgiichCZ1D+qdd2rSG3wqkRpkHzgPu8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5Cq9RlJ52SrC7jlGBmnNkYFIKCg91mOJnI6z5hiPMMU=;
+ b=a1+TvhVk+lLAgYHh0KupN8Kq+LN6hfMZC4lqAH1u88wwbsfn+4oWNjgJ+WGCmVqOE68/8r/bvmqtSytvscqhwOp1KAI8wBySZw4P7X4vwnaYMQYGAGrZyfU0LZFATB5ZkNHzClt2UE5KcAD7nXwm1+m9+g6RmDfFPSHvWlc7bCfJmkXEX4wS6fjjTLfl07y2Gp6uNJ0ihltpDYX2hqDcAHQKsvHduZsXBcSEWjmDsRsX5EU3YBxty9XWErhWYwGFQhFAnP9SQEFzLxGLv5SCXP/cZ1LNrRfZVG+YyLa9lGYimkM3AEFN805IN/99YkfSlhzJjPo3VuQa8eYFNCsJuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5Cq9RlJ52SrC7jlGBmnNkYFIKCg91mOJnI6z5hiPMMU=;
+ b=L+/ZojBdViOmZ8NN4+uEzQB7vqW7FlIKB+KECvp697iJdl6ALlkNMqszpJ4b21vL51Sa5OVg5Ean4Rs4xv8oQ9lR9Qwo/Lczl6Il35U3INJJV4YsHv8MBysQKy64d3yufigoI2sJxy9VNwRcqJm4RH5gM7U0FWzG9dRA3hUexd0=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ (2603:10b6:405:23::11) by BN6PR2201MB1410.namprd22.prod.outlook.com
+ (2603:10b6:405:24::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.18; Mon, 2 Mar
+ 2020 21:20:46 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::c804:a036:269:9290]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::c804:a036:269:9290%4]) with mapi id 15.20.2750.027; Mon, 2 Mar 2020
+ 21:20:46 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Aleksandar Markovic
+ <aleksandar.markovic@rt-rk.com>, =?iso-8859-1?Q?Alex_Benn=E9e?=
+ <alex.bennee@linaro.org>
+Subject: Re: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux
+ logos displayed on framebuffer
+Thread-Topic: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux
+ logos displayed on framebuffer
+Thread-Index: AQHV8NDsSXS+4lEPokm25atMOLoJfKg1x17xgAAHYKA=
+Date: Mon, 2 Mar 2020 21:20:46 +0000
+Message-ID: <BN6PR2201MB12510B153B53049B80046D09C6E70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <1582810056-22646-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1582810056-22646-6-git-send-email-aleksandar.markovic@rt-rk.com>,
+ <CAFEAcA_ZL8kd+DaHz-debq7A2simEdB8GNzty890sfc=SjrByw@mail.gmail.com>,
+ <BN6PR2201MB12519E5CF54B5C921CD4404AC6E70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+In-Reply-To: <BN6PR2201MB12519E5CF54B5C921CD4404AC6E70@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 83522e07-8445-48fa-ba4e-08d7beef92b6
+x-ms-traffictypediagnostic: BN6PR2201MB1410:
+x-microsoft-antispam-prvs: <BN6PR2201MB1410A92CD9D0EDD21A8A48E4C6E70@BN6PR2201MB1410.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 033054F29A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(396003)(136003)(376002)(346002)(366004)(189003)(199004)(66476007)(66946007)(5660300002)(52536014)(66446008)(91956017)(4326008)(66556008)(64756008)(2906002)(86362001)(966005)(508600001)(33656002)(55016002)(9686003)(71200400001)(76116006)(8676002)(186003)(7696005)(53546011)(2940100002)(54906003)(81166006)(81156014)(6506007)(8936002)(316002)(110136005)(26005)(55236004)(586874002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1410;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5mF+xxpBs9UlmMBVk1cKbtL54GTejBHYE8r6nfthwIZvCO2RiIRfVrUHInSIV1MBx0UW/at+KQROeNi+T3Jn9luhQCV5Vl7iqDKj+cd3/V19BfkrPNedqRt5o2lLiZksOg8rTlN25iylicUVlhxrLBWCksYAUPEvbyLv98adt+p+dSnunZZqWDhonYPpgGcNZMcJIoV8IY7YUxDRk67uS/9bIgKnu3t+F9/zSzSStRJCPJgVjAwd0kUuuFN2dwWczDEnvaB/OddwM7kmfwNIz4Ve1RnKns9eaY+iYccVhfmJVwgf/s5DWDXK/DSv1BjAaIzG1qp8Bk+aZPujMyU0h10Avtfe2OpgCDVvFPOUSqWo5Wco8qez+OJO9BJtvjqi0K7qhgdR/z+G7KfPfRqvJEFOsKDU9th5LAhsp5cNCMXuL7ElSr9DkFC1WpTTw704UaXmLapQcbqv00DJ7bVuLYK9lLtuxyQabs3iC0n8gLmnKrVF9PNxel+LX+ZFiRN3oLVdnVkymKyV3pf5x5xra8cN9wD7EugjUOetSBFnytRSMpw0F4y207y6lXDOZtvN/NvC2ejOyx6nY8Df6D4y2w==
+x-ms-exchange-antispam-messagedata: 8qhZZgUs36SwLS1sMRvCN/klUaI/VdNv/QqMD5G0quLW/fXDNKqsdDROgB7xzYwJMrXUmzicq7VGIObecMmfszavl1TphTJtN150RJzWsbt+Hrfq54XsU5av/kStat+WOs1JpqUJSkAy49LM3s42LQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:k9XhB/L94D0XXJsU/uxzZC7JwUJazDXGF8NylWAVmIcDf1gtuXv
- 2VjUrNd8pGXX0VMJcSIs+3PsvQmwgUriI5UsCFswVclYQbr/lQ2lKFF1/UEQlwyiGSndaRm
- LUOaeHZBmZ5YXKVQGqoD5pQK9i1075Xvp/ivbbljR98+VxcIzic/Wfvh/+t3RvKZ5k2YJ7M
- z7dkArvzZWyfKwU2A7KHA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ocDD93A6hBU=:gxW6BHCssBkFm5nquFuMHS
- lPue8E2ghuJpolRhv8oZuMKxQKaFkFIiFc+vWD29eBUQOTdHhPXwYC1My//AIu3+pxN31lHLa
- D9D5n/ojs+kywOg5p/KXZ1N0ZTXXLFLrLOkX+TzrTrFb4V6QlYDg6FjJAZySdaISR58YZn6JK
- YEq3d1DUsaACjS2Xv04I7RmI27B9xd/aG9IDbn8vwrwLJpYzSbuUAYeRkdtO1QDXnmaky0+Ta
- fqtBRbaKT1PMYq1X6BfY312GagB7spLJMEOudIm5XmQjPdzsquL81itQ2woMTWYcxwGR8Zz8t
- H+Hs/3LF08NrTEVUyWRTfxZpRJ4hDu89yQyzukTPBGSIoXtBEZ3mz455FeSro/7kYrbl5m2z+
- zRSA+YOFGEVqjj4oCjYm2Yg7KePsRZ6SzbdcQQBaBZJ889I0w3HIhu+mRCPoJSW4N1Wan0CzZ
- H9FUe2iLzrnRyJ4nD4eEqgJG1Oc0wznLbJkx08JtBP87jxTu+remmCis0sSLf4oxRkmtZ0pcx
- KqCmlNTAZVZ94PoERE/6lAmgpKnH99IOSztJv7W835kJ1iaJbC/O/rOLCqri05AJeUGJmCYKN
- SOP+fS8WQWdODIhWiNAohGuI0WKm4c51JU97YhAqeO+Jfjc8WYoKkhWziVU0fkv4QoAqdUINV
- JFp94l+xlN26/yJTRzk56ZEVIXry2qquX/s7QunaQEEM7Y280cNOADsdV/C3+EmgtVPH68RWT
- P4detV1uvzHaaGJ3Y0k+Nu4LXZsa4mpfN4wa6UX0F88dhDhHERlwdv+i7O08r1QW8GkwToaSE
- XSjB7Z2RpoqyOWJOpk9dnNFAl4o9eR9UrCcJ0l70dryAARrQZrVxYz2/FvjjvS1OCfm+rcnps
- hmmul3W89v4wzLcjeSa4xbczz71WMfTpNvrJMaZC8bo6Dd11dKFj56fWjpwKgV9EdNxse3V5O
- OO3UHsjnt2s5YN6Yac+e5Wp5b2oGiUMwS0spMedgZdmuYwbcxSyHCkEpGhQ0vFTgbs7y3c6jg
- Re9eTsKeY78ncfRKfYVQpuiOBZt6PCI2TTqp6FfT6NWQ20LCqrUDrJvmIIAfkFSJ2bTnw04Qq
- 4xH4HNBgjV0i0JkRupFlQsjX0+xQ+E7+11fVDWVXvDitxWLkmqc8L0QEqOC7exlaD/cQFyzw7
- 3Qc8OJcFmD27LGWP4qgTqf4zKERQ8x+gK1ChrmYeN5H+ujt7pKeTdva27GInTUozCkGJ4=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.15
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83522e07-8445-48fa-ba4e-08d7beef92b6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 21:20:46.2385 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ygTgEtmRYd+tTbR/G94/THmZjZ/T2WzZuVVu+qkfSyyypi9LmZwiJ3jKQ7atb3s3rMWT3h+pk1aqzxcSV2TdkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1410
+X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
+ [fuzzy]
+X-Received-From: 40.107.70.127
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,106 +126,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, rth@twiddle.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02.03.2020 20:40, Paolo Bonzini wrote:
->
->
-> Il lun 2 mar 2020, 20:14 Maxime Villard <max@m00nbsd.net
-> <mailto:max@m00nbsd.net>> ha scritto:
->
->     Le 02/03/2020 =C3=A0 19:05, Kamil Rytarowski a =C3=A9crit=C2=A0:
->     > On 02.03.2020 18:12, Paolo Bonzini wrote:
->     >> On 03/02/20 12:56, Kamil Rytarowski wrote:
->     >>> On 03.02.2020 12:41, Philippe Mathieu-Daud=C3=A9 wrote:
->     >>>>> @@ -1768,6 +1785,7 @@ disabled with --disable-FEATURE, default=
- is
->     >>>>> enabled if available:
->     >>>>> =C2=A0=C2=A0=C2=A0 hax=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HAX acceleration support
->     >>>>> =C2=A0=C2=A0=C2=A0 hvf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Hypervisor.framework acceleration suppor=
-t
->     >>>>> =C2=A0=C2=A0=C2=A0 whpx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 Windows Hypervisor Platform acceleration
->     support
->     >>>>> +=C2=A0 nvmm=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 NetBSD Virtual Machine Monitor acceleration
->     support
->     >>>>> =C2=A0=C2=A0=C2=A0 rdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable RDMA-based migration
->     >>>>> =C2=A0=C2=A0=C2=A0 pvrdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 Enable PVRDMA support
->     >>>>> =C2=A0=C2=A0=C2=A0 vde=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 support for vde network
->     >>>>> @@ -2757,6 +2775,20 @@ if test "$whpx" !=3D "no" ; then
->     >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
->     >>>>> =C2=A0 fi
->     >>>>>
->     >>>>
->     >>>> Maybe you can add something like:
->     >>>>
->     >>>> if test "$targetos" =3D "NetBSD"; then
->     >>>> =C2=A0=C2=A0=C2=A0 nvmm=3D"check"
->     >>>> fi
->     >>>>
->     >>>> to build by default with NVMM if available.
->     >>>
->     >>> I will add nvmm=3Dyes to the NetBSD) targetos check section.
->     >>
->     >> No, nvmm=3Dyes instead should fail the build if nvmm.h is not
->     available.
->     >> That is not a good default.
->     >>
->     >> Paolo
->     >>
->     >>
->     >
->     > Most users will get nvmm.h in place now and this is still a tunabl=
-e.
->     >
->     > I have got no opinion what to put there, nvmm=3Dcheck still works.
->
->     I would keep "yes", for consistency with the other entries. Changing=
- all
->     entries to "check" should be done in a separate commit, unrelated to
->     NVMM.
->
->
-> The difference is that KVM for example does not need external includes
-> or libraries.
->
-> Paolo
->
-
-We don't support this scenario and after a year there might be no
-supported release without NVMM.
-
-The only concern is about using qemu on !amd64, but we have there not
-many users of qemu for understandable reasons.
-
-For AArch64 we plan to implement a dedicated NVMM backend.
-
->
->     > diff --git a/configure b/configure
->     > index d4a837cf9d..b3560d88bb 100755
->     > --- a/configure
->     > +++ b/configure
->     > @@ -836,7 +836,7 @@ DragonFly)
->     >=C2=A0 NetBSD)
->     >=C2=A0 =C2=A0 bsd=3D"yes"
->     >=C2=A0 =C2=A0 hax=3D"yes"
->     > -=C2=A0 nvmm=3D"yes"
->     > +=C2=A0 nvmm=3D"check"
->     >=C2=A0 =C2=A0 make=3D"${MAKE-gmake}"
->     >=C2=A0 =C2=A0 audio_drv_list=3D"oss try-sdl"
->     >=C2=A0 =C2=A0 audio_possible_drivers=3D"oss sdl"
->     >
->
-
+=0A=
+=0A=
+________________________________________=0A=
+From: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
+Sent: Monday, March 2, 2020 9:58 PM=0A=
+To: Peter Maydell; Aleksandar Markovic=0A=
+Cc: QEMU Developers; Philippe Mathieu-Daud=E9=0A=
+Subject: Re: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux =
+logos displayed on framebuffer=0A=
+=0A=
+> From: Peter Maydell <peter.maydell@linaro.org>=0A=
+> Sent: Monday, March 2, 2020 9:26 PM=0A=
+> To: Aleksandar Markovic=0A=
+> Cc: QEMU Developers; Aleksandar Markovic; Philippe Mathieu-Daud=E9=0A=
+> Subject: [EXTERNAL]Re: [PULL 5/5] tests/acceptance: Count multiple Tux lo=
+gos displayed on framebuffer=0A=
+>=0A=
+> On Thu, 27 Feb 2020 at 13:28, Aleksandar Markovic=0A=
+> <aleksandar.markovic@rt-rk.com> wrote:=0A=
+> >=0A=
+> > From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>=0A=
+> >=0A=
+> > Add a test that verifies that each core properly displays the Tux=0A=
+> > logo on the framebuffer device.=0A=
+> >=0A=
+> > We simply follow the OpenCV "Template Matching with Multiple Objects"=
+=0A=
+> > tutorial, replacing Lionel Messi by Tux:=0A=
+> > https://docs.opencv.org/4.2.0/d4/dc6/tutorial_py_template_matching.html=
+=0A=
+>=0A=
+> Hi -- this doesn't seem to work on my system:=0A=
+>=0A=
+=0A=
+It appears Alex send a similar, but different patch already:=0A=
+=0A=
+https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg00324.html=0A=
+=0A=
+What do we do, Alex?=0A=
+=0A=
+Thanks again,=0A=
+Aleksandar=0A=
+=0A=
+>  (38/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine.t=
+est_integratorcp_console:=0A=
+> SKIP: untrusted code=0A=
+>  (39/74) tests/acceptance/machine_arm_integratorcp.py:IntegratorMachine.t=
+est_framebuffer_tux_logo:=0A=
+> SKIP: Python NumPy not installed=0A=
+>  (40/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n800:=0A=
+> SKIP: untrusted code=0A=
+>  (41/74) tests/acceptance/machine_arm_n8x0.py:N8x0Machine.test_n810:=0A=
+> SKIP: untrusted code=0A=
+>  (42/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_b=
+ootrom_framebuffer_size:=0A=
+> PASS (3.47 s)=0A=
+>  (43/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_b=
+ootrom_framebuffer_ocr_with_tesseract_v3:=0A=
+> SKIP: tesseract v3 OCR tool not available=0A=
+>  (44/74) tests/acceptance/machine_m68k_nextcube.py:NextCubeMachine.test_b=
+ootrom_framebuffer_ocr_with_tesseract_v4:=0A=
+> SKIP: tesseract v4 OCR tool not available=0A=
+>  (45/74) tests/acceptance/machine_mips_malta.py:MaltaMachineFramebuffer.t=
+est_mips_malta_i6400_framebuffer_logo_1core:=0A=
+> ERROR: name 'cv2' is not defined (5.43 s)=0A=
+>=0A=
+> It looks like the @skipUnless directive on the class didn't=0A=
+> have any effect. Moving it to the individual test functions seems=0A=
+> to cause them to be skipped as intended (as the integratorcp=0A=
+> framebuffer test is):=0A=
+>=0A=
+> diff --git a/tests/acceptance/machine_mips_malta.py=0A=
+> b/tests/acceptance/machine_mips_malta.py=0A=
+> index 92b4f28a112..98463f77573 100644=0A=
+> --- a/tests/acceptance/machine_mips_malta.py=0A=
+> +++ b/tests/acceptance/machine_mips_malta.py=0A=
+> @@ -30,8 +30,6 @@ except ImportError:=0A=
+>      CV2_AVAILABLE =3D False=0A=
+>=0A=
+>=0A=
+> -@skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')=0A=
+> -@skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')=0A=
+>  class MaltaMachineFramebuffer(Test):=0A=
+>=0A=
+>      timeout =3D 30=0A=
+> @@ -91,6 +89,8 @@ class MaltaMachineFramebuffer(Test):=0A=
+>              cv2.imwrite(debug_png, screendump_bgr)=0A=
+>          self.assertGreaterEqual(tuxlogo_count, cpu_cores_count)=0A=
+>=0A=
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')=0A=
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')=0A=
+>      def test_mips_malta_i6400_framebuffer_logo_1core(self):=0A=
+>          """=0A=
+>          :avocado: tags=3Darch:mips64el=0A=
+> @@ -99,6 +99,8 @@ class MaltaMachineFramebuffer(Test):=0A=
+>          """=0A=
+>          self.do_test_i6400_framebuffer_logo(1)=0A=
+>=0A=
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')=0A=
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')=0A=
+>      def test_mips_malta_i6400_framebuffer_logo_7cores(self):=0A=
+>          """=0A=
+>          :avocado: tags=3Darch:mips64el=0A=
+> @@ -108,6 +110,8 @@ class MaltaMachineFramebuffer(Test):=0A=
+>          """=0A=
+>          self.do_test_i6400_framebuffer_logo(7)=0A=
+>=0A=
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')=0A=
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')=0A=
+>      def test_mips_malta_i6400_framebuffer_logo_8cores(self):=0A=
+>          """=0A=
+>          :avocado: tags=3Darch:mips64el=0A=
+>=0A=
+> thanks=0A=
+> -- PMM=0A=
 
