@@ -2,101 +2,63 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D3DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFB0C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:28:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52D2524673
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:27:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/TvrfQK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D2524673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B40924673
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:28:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B40924673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8uSh-0005li-JC
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:26:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34978)
+	id 1j8uTz-0006uK-Qr
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:28:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35191)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8uS0-00053K-H0
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:26:17 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1j8uSj-0005yk-7x
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:27:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8uRz-0000uJ-Gj
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:26:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20552
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1j8uSh-00023K-LC
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:27:01 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25725)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8uRz-0000tw-DA
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:26:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583191575;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LBq3ctE2emrc2Sarh5ssYvL+A2SwU+l45frWrTXGuLI=;
- b=R/TvrfQKnpOw1I1g0PkItO1fbmL8oh0LXdbf07yIQ7Tp1f4gp8VsfI6BEHKuf5DjVOc4ty
- DXeHfKUQeKnGN3MNYCO3Nd5w7FwcVpvu1NmGsMInpOcjK9OmK04K9mq6eqeYW6M0VMEBOU
- MsE1ElAR6lYbBjy//LN/WZpBUvBCwns=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-rqSDEz2eMPGR9K1cd_aSZQ-1; Mon, 02 Mar 2020 18:26:13 -0500
-X-MC-Unique: rqSDEz2eMPGR9K1cd_aSZQ-1
-Received: by mail-wr1-f71.google.com with SMTP id w11so371653wrp.20
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:26:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HYGCpIEaBPODM6i3plpteorL7m1/E518vMfDgreoWU4=;
- b=qNiXpdzh1IOMlDM1L0NCSXBEwnQVszWcOxVTtJ/MyrfnGyy65fJiJTB+5acIomnhPP
- nE3BuB3Y/NBGUud07eGaxcXOp+a2Q+xpJzy6UcwTseDAB1bH5eMINJh2uwFN/STBLozt
- sxGnlmlBWZR1+XC7AG75Ttte75GZg6YTJs0ADwDVSWkAOo9H5l3feDt8vNKbOhiU7ZGZ
- xdOmrQIoaoBuxzXg9EMKH/1Xud8fYlK4taSZeWVySGdiIv58M1PC1OjdbwuKUhyHw5Sa
- v/TTJALpfR+5dGqsewpfnawFuofJ8+Vvn96fvYRlFycVRcnwYDOU+LcitjfBRjY9m6sQ
- CwZQ==
-X-Gm-Message-State: ANhLgQ3MaRdUSd6SH60fjpzCgdMBcMTWUzkRrpN1LChAN+t1F/D+3whM
- kxZJL99UxVa5ZoMhPXc+LuXmYMzP6Pmjge5dj91bcSwG866ZIT6xQOo8wzYxN65jJTPL0vmgpiI
- rUXlbnqsewvwWtF4=
-X-Received: by 2002:a5d:42c6:: with SMTP id t6mr1894783wrr.394.1583191572334; 
- Mon, 02 Mar 2020 15:26:12 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuCMzTVJYlnDivxJXkgvrNV7LSsTiMyp37TSLR2qIXORvrETCZcvguZheb/NK1zGmRBuxOxZA==
-X-Received: by 2002:a5d:42c6:: with SMTP id t6mr1894773wrr.394.1583191572166; 
- Mon, 02 Mar 2020 15:26:12 -0800 (PST)
-Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
- ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id a6sm803700wmh.32.2020.03.02.15.26.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 15:26:11 -0800 (PST)
-Subject: Re: [PATCH] hw/artist: Reduce default artist screen size to 800x600
- pixel
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
- Sven Schnelle <svens@stackframe.org>
-References: <20200302191409.GA4512@ls3530.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e7a15230-6406-14f3-9fa3-f31809a05df5@redhat.com>
-Date: Tue, 3 Mar 2020 00:26:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1j8uSe-0001yU-2i; Mon, 02 Mar 2020 18:26:56 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 41AD4747DCF;
+ Tue,  3 Mar 2020 00:26:54 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 0FE2E7476D5; Tue,  3 Mar 2020 00:26:54 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 0D7AC74637E;
+ Tue,  3 Mar 2020 00:26:54 +0100 (CET)
+Date: Tue, 3 Mar 2020 00:26:54 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH 1/2] ide: Make room for flags in PCIIDEState and add one
+ for legacy IRQ routing
+In-Reply-To: <ff8e0d07-9237-b8b4-a117-88e86926bf28@ilande.co.uk>
+Message-ID: <alpine.BSF.2.22.395.2003030017210.47473@zero.eik.bme.hu>
+References: <cover.1583017348.git.balaton@eik.bme.hu>
+ <775825dba26f6b36ab067f253e4ab5dc3a3d15dc.1583017348.git.balaton@eik.bme.hu>
+ <d85cd8c6-99a3-8430-41cc-486aad1ad8de@ilande.co.uk>
+ <alpine.BSF.2.22.395.2003011619100.95594@zero.eik.bme.hu>
+ <87pndvch3t.fsf@dusky.pond.sub.org>
+ <ff8e0d07-9237-b8b4-a117-88e86926bf28@ilande.co.uk>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-In-Reply-To: <20200302191409.GA4512@ls3530.fritz.box>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,36 +70,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-block@nongnu.org, philmd@redhat.com,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 8:14 PM, Helge Deller wrote:
-> Reduce the default emulated screen size to 800x600 pixel instead of
-> 1280x1024 pixel. With the bigger screen size the emulated graphic card
-> isn't fully visible on my laptop display, and if people want bigger
-> sizes it's possible to define it on the command line.
->=20
-> Signed-off-by: Helge Deller <deller@gmx.de>
->=20
-> diff --git a/hw/display/artist.c b/hw/display/artist.c
-> index 65be9e3554..74cff24d7b 100644
-> --- a/hw/display/artist.c
-> +++ b/hw/display/artist.c
-> @@ -1418,8 +1412,8 @@ static const VMStateDescription vmstate_artist =3D =
-{
->   };
->=20
->   static Property artist_properties[] =3D {
-> -    DEFINE_PROP_UINT16("width",        ARTISTState, width, 1280),
-> -    DEFINE_PROP_UINT16("height",       ARTISTState, height, 1024),
-> +    DEFINE_PROP_UINT16("width",        ARTISTState, width, 800),
-> +    DEFINE_PROP_UINT16("height",       ARTISTState, height, 600),
->       DEFINE_PROP_UINT16("depth",        ARTISTState, depth, 8),
->       DEFINE_PROP_END_OF_LIST(),
->   };
->=20
+On Mon, 2 Mar 2020, Mark Cave-Ayland wrote:
+> On 02/03/2020 08:10, Markus Armbruster wrote:
+>> BALATON Zoltan <balaton@eik.bme.hu> writes:
+>>> On Sun, 1 Mar 2020, Mark Cave-Ayland wrote:
+>>>> On 29/02/2020 23:02, BALATON Zoltan wrote:
+>>>>> We'll need a flag for implementing some device specific behaviour in
+>>>>> via-ide but we already have a currently CMD646 specific field that can
+>>>>> be repurposed for this and leave room for furhter flags if needed in
+>>>>> the future. This patch changes the "secondary" field to "flags" and
+>>>>> define the flags for CMD646 and via-ide and change CMD646 and its
+>>>>> users accordingly.
+>>>>>
+>>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>>> ---
+>>>>>  hw/alpha/dp264.c     |  2 +-
+>>>>>  hw/ide/cmd646.c      | 12 ++++++------
+>>>>>  hw/sparc64/sun4u.c   |  9 ++-------
+>>>>>  include/hw/ide.h     |  4 ++--
+>>>>>  include/hw/ide/pci.h |  7 ++++++-
+>>>>>  5 files changed, 17 insertions(+), 17 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+>> [...]
+>>>>> @@ -317,20 +317,20 @@ static void pci_cmd646_ide_exitfn(PCIDevice *dev)
+>>>>>      }
+>>>>>  }
+>>>>>
+>>>>> -void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
+>>>>> -                         int secondary_ide_enabled)
+>>>>> +void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
+>>>>> +                         bool secondary_ide_enabled)
+>>>>>  {
+>>>>>      PCIDevice *dev;
+>>>>>
+>>>>> -    dev = pci_create(bus, -1, "cmd646-ide");
+>>>>> -    qdev_prop_set_uint32(&dev->qdev, "secondary", secondary_ide_enabled);
+>>>>> +    dev = pci_create(bus, devfn, "cmd646-ide");
+>>>>> +    qdev_prop_set_bit(&dev->qdev, "secondary", secondary_ide_enabled);
+>>>>>      qdev_init_nofail(&dev->qdev);
+>>>>>
+>>>>>      pci_ide_create_devs(dev, hd_table);
+>>>>>  }
+>>>>
+>>>> Note that legacy init functions such as pci_cmd646_ide_init() should be removed where
+>>>> possible, and in fact I posted a patch last week to completely remove it. This is
+>>>> because using qdev directly allows each board to wire up the device as required,
+>>>> rather than pushing it down into a set of init functions with different defaults.
+>>>>
+>>>> Given that you're working in this area, I'd highly recommend doing the same for
+>>>> via_ide_init() too.
+>>>
+>>> I could do that, however these ide init functions seem to exist for
+>>> piix, cmd646 and via-ide so that pci_ide_create_devs function is kept
+>>> local to hw/ide. Nothing else called that func apart from sun4u so
+>>> I've chosen this way to keep consistency (also keeps property type at
+>>> one place instead of needing to change each board that sets
+>>> property). If the consensus is that getting rid of these init funcs
+>>> even if that means pci_ide_create_devs will not be local to ide any
+>>> more I can go that way but would like to hear opinion of ide
+>>> maintainer as well.
+>>
+>> I think Mark's point is that modelling a device and wiring up a device
+>> model are separate things, and the latter belongs to the board.
+>>
+>> pci_cmd646_ide_init() is a helper for boards.  Similar helpers exist
+>> elsewhere.
+>>
+>> In the oldest stratum of qdev code, such helpers were static inline
+>> functions in the device model's .h.  That way, they're kind of separate
+>> from the device model proper, in the .c, and kind of in the board code
+>> where they belong, via inlining.  I've always considered that a terrible
+>> idea; it's "kind of" as in "not really".  Over time, practice moved
+>> first to putting the helpers into .c, then to open-coding the wiring
+>> where it belongs: in the boards.
+>>
+>> A few helper functions have survived, e.g. in hw/lm32/milkymist-hw.h,
+>> and the IDE helpers we're discussing here.
+>>
+>> Of course, when the code to wire up certain devices gets overly
+>> repetitive, factoring out common code into helpers can make sense.  But
+>> where to put them?  I can't see an obvious home for common board
+>> helpers.  We tend to put these wiring helpers into a device model's .c
+>> code for want of a better place.  Tolerable, I think.
+>
+> Right, thanks for the more detailed explanation of what I was trying to say above.
+>
+> As you say having helpers can definitely help avoid repetitive code, however there
+> was a case a few releases back when someone flipped a qdev property in a device
+> _init() helper function used to initialise one of the more common devices and it
+> broke several of the older machines.
+>
+> So now I'm mainly of the opinion that if the helper is just instantiating a device,
+> setting qdev properties and then returning the device then you're better off moving
+> the initialisation into the board code to prevent problems like this occurring again
+> (and certainly this nudges us towards building machines from config files since all
+> the configuration/wiring is now done at board level).
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+The conflicting interests here seem to be
 
+1. Keeping pci_ide_create_devs() local to hw/ide
+2. keeping things related to the board in board code and getting rid of 
+init functions
+
+I can't decide which of the above is more important or nicer but the patch 
+I've proposed at least kept consistency with existing practice. If it's 
+decided that board code should use pci_ide_create_devs directly instead we 
+could either address that in a separate clean up series also getting rid 
+of the piix init functions at the same time later or if Mark's series gets 
+merged first I can rebase on that.
+
+Regards,
+BALATON Zoltan
 
