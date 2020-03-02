@@ -2,135 +2,103 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33DE5C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90BA1C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE88F20866
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C15321D56
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 09:51:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfC66UBd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE88F20866
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RldNSO45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C15321D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8hjO-0008Lg-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 04:51:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47838)
+	id 1j8hji-0000Lu-Io
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 04:51:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1j8hid-0007jI-2b
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:35 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8hiq-0007sU-0W
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1j8hib-00025a-6v
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27186
+ (envelope-from <philmd@redhat.com>) id 1j8hip-00028F-2G
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47238
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j8hib-00025J-2g
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:33 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8hio-000283-V0
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 04:50:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583142632;
+ s=mimecast20190719; t=1583142646;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5cDhTW3jq2J/6UnOfVpsFBVolj91AqAKupVk48dDfXc=;
- b=YfC66UBdyZq6Fb4PLbwgz+GYn1ri16L4A2v8yQ9zqKqQA2Mgy4qcrwnRJjcNAbbO6KivfG
- zEoxz/gUHfDGsvM5P081Oc7YfFgxpAIT9xcj+fYke59xRBWat/y9f7on6+sQ5IxVTrTES9
- iCb94TwJPBF9NbRcvx5FtbQdZh1GpnA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-88mpDOAhMaK4sRuGlbgGwA-1; Mon, 02 Mar 2020 04:50:28 -0500
-X-MC-Unique: 88mpDOAhMaK4sRuGlbgGwA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 523898017CC
- for <qemu-devel@nongnu.org>; Mon,  2 Mar 2020 09:50:27 +0000 (UTC)
-Received: from [10.36.117.17] (ovpn-117-17.ams2.redhat.com [10.36.117.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2AEAC5DA2C;
- Mon,  2 Mar 2020 09:50:16 +0000 (UTC)
-Subject: Re: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200207095412.794912-1-lvivier@redhat.com>
- <20200301071119-mutt-send-email-mst@kernel.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <c68547be-3131-8069-70d9-f0a1758784d7@redhat.com>
-Date: Mon, 2 Mar 2020 10:50:16 +0100
+ in-reply-to:in-reply-to:references:references;
+ bh=D8mBJhHVdcAVUE9oLq1BT7ideKFqwm7FLqkX8oW8qNs=;
+ b=RldNSO45If+7oGh5icHDVRglKJ6ndy0tSt47azv6m4zXRvZt3CgzFBheqD9xZXHzdhw/P/
+ djmYS4qRA7GtJDLrQnVdxBVmxGJ8II8CkqtIVxNqTbZ5rpYn51ec7wr/nccMQYayuyZs6H
+ tbRbBUDk+y3+DWpQWGeFseoJ6RM413I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-bn65j3zUPmG5KoaHqZog0g-1; Mon, 02 Mar 2020 04:50:44 -0500
+X-MC-Unique: bn65j3zUPmG5KoaHqZog0g-1
+Received: by mail-wr1-f71.google.com with SMTP id y28so5515476wrd.23
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 01:50:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=a4f4PojD3BlLpNDcFzl37Py5rGVa6O2F9R8hLCBC5r4=;
+ b=PsnIIsOC/mgRSpTDJKBPIJIn3fr765l8nE+GC44F4gsQYr1PJAmun4FrUlssipjvmL
+ bb09a3OmuK4eFFEglYLm0bYC199UDMPtSdVVT5rDpEd2stMapPXQcyBVu69GhXJI6MdR
+ ibei0q+XSdxXIXiUBo91mywSJ60rU89BmhfZv5nfxYgoh8zaGZU+U9qiGrYoglHOLxFb
+ yv+eZDC+EuEeKjOYgcQ5VNIaNpK/nivRR0GU1xdfNn+PbPNswV27TE7lp0Xnn1OLqDKO
+ CcOBGk71JrY+IySZnRc9mmqe8GdMyyjnH/mlRj+bUOCIIfY2bY1Wp4Bs9pkR4NVs5N6N
+ wvKg==
+X-Gm-Message-State: APjAAAWbvVcDouVDZVSMukPV32aAvDRmSWtPJsPoC5ndC4X+IaZxmops
+ SVEoFTOd+AN9SnXBBp2gmJ6Ls50O5+Hke6IVvICNLW4rsAPW3ee8L+faeWWOiq6AG51nxSdL5fZ
+ a/BxOLHUB3hZzfzc=
+X-Received: by 2002:a1c:994b:: with SMTP id b72mr19918663wme.83.1583142643370; 
+ Mon, 02 Mar 2020 01:50:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzhofVf7pDv2axhM23+bV2IQzLbeYvDvOKwGBWQ1+DnXUzWyxqJk1R+soP1gHfWLrKdkUmeCQ==
+X-Received: by 2002:a1c:994b:: with SMTP id b72mr19918640wme.83.1583142643113; 
+ Mon, 02 Mar 2020 01:50:43 -0800 (PST)
+Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
+ ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
+ by smtp.gmail.com with ESMTPSA id j20sm15621030wmj.46.2020.03.02.01.50.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Mar 2020 01:50:42 -0800 (PST)
+Subject: Re: [PULL 4/9] hw/display/artist: Avoid drawing line when nothing to
+ display
+To: Sven Schnelle <svens@stackframe.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20200218193929.11404-1-richard.henderson@linaro.org>
+ <20200218193929.11404-5-richard.henderson@linaro.org>
+ <20200229093111.GA24534@t470p.stackframe.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <886c3773-cda8-fbfe-4535-3874d028f2e3@redhat.com>
+Date: Mon, 2 Mar 2020 10:50:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200301071119-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200229093111.GA24534@t470p.stackframe.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,37 +110,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/03/2020 13:12, Michael S. Tsirkin wrote:
-> On Fri, Feb 07, 2020 at 10:54:11AM +0100, Laurent Vivier wrote:
->> vhost-user-bridge is not a test. Move it to contrib/ and
->> add it to the tools list.
+On 2/29/20 10:31 AM, Sven Schnelle wrote:
+> On Tue, Feb 18, 2020 at 11:39:24AM -0800, Richard Henderson wrote:
+>> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >>
->> It will be built only if tools (--enable-tools) and
->> vhost-user (--enable-vhost-user) are enabled (both are set
->> by default).
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Message-Id: <20200214001303.12873-5-f4bug@amsat.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>   hw/display/artist.c | 3 +++
+>>   1 file changed, 3 insertions(+)
 >>
->> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> diff --git a/hw/display/artist.c b/hw/display/artist.c
+>> index 97c811b35e..5492079116 100644
+>> --- a/hw/display/artist.c
+>> +++ b/hw/display/artist.c
+>> @@ -579,6 +579,9 @@ static void draw_line(ARTISTState *s, int x1, int y1=
+, int x2, int y2,
+>>       } else {
+>>           dy =3D y1 - y2;
+>>       }
+>> +    if (!dx || !dy) {
+>> +        return;
+>> +    }
+>>  =20
+>>       c1 =3D false;
+>>       if (dy > dx) {
+>> --=20
+>> 2.20.1
+>>
+>>
 >=20
->=20
-> I had to drop this series from my tree since it cause failures
-> on OSX. Pls use something like travis CI to test when you repost
-> a fixed version. Thanks!
->=20
+> I noticed that this change causes 1px wide lines to disappear. So i would=
+ propose
+> to revert that change.
 
-Do you have a link to the error logs?
+Maybe "if (!dx && !dy) { return; }"?
 
-Thanks,
-Laurent
+>=20
+> Regards
+> Sven
+>=20
 
 
