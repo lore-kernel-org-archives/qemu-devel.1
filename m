@@ -2,87 +2,89 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C07C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855D2C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2684E21D56
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5093F2173E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:33:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KSu2o5+S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2684E21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A192xGTc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5093F2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8kG6-0006PM-BM
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:33:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44315)
+	id 1j8kGH-0006gu-H1
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:33:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j8kFI-0005hY-RQ
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:29 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j8kFS-0005n2-HN
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j8kFH-00064k-UD
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54824
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j8kFH-000646-Qf
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583152346;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7ZYlFsjgZkWhr6ABExReOoPa5md/+qAKcLtQu3csC/w=;
- b=KSu2o5+S1rU9eXV9G7reYYumOU2XxdnXh5Cptd/RyDrDhx2e6F2qcCb2nBz+NQJNWYp8LV
- YSq2DOUaTmsYHfbNWHECP9Q9q4wwTQVtqaDeZKW9cJonSon3TAL67I2xF5d6RuKWcziv9A
- 9CffO+zzACiBDqKBlImhSUNusNvvwjY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-ZKdfylv9MG-_YRDxcWGe7A-1; Mon, 02 Mar 2020 07:32:25 -0500
-X-MC-Unique: ZKdfylv9MG-_YRDxcWGe7A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1D35800D6C;
- Mon,  2 Mar 2020 12:32:23 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C128C91D6C;
- Mon,  2 Mar 2020 12:32:21 +0000 (UTC)
-Date: Mon, 2 Mar 2020 12:32:19 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [edk2-devel] A problem with live migration of UEFI virtual
- machines
-Message-ID: <20200302123219.GE2798@work-vm>
-References: <tencent_BC7FD00363690990994E90F8@qq.com>
- <87sgjhxbtc.fsf@zen.linaroharston>
- <20200224152810.GX635661@redhat.com>
- <8b0ec286-9322-ee00-3729-6ec7ee8260a6@redhat.com>
- <3E8BB07B-8730-4AB8-BCB6-EA183FB589C5@apple.com>
- <465a5a84-cac4-de39-8956-e38771807450@redhat.com>
- <8F42F6F1-A65D-490D-9F2F-E12746870B29@apple.com>
- <6666a886-720d-1ead-8f7e-13e65dcaaeb4@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1j8kFR-0006BO-Hp
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:38 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35466)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j8kFR-0006Ay-AH
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:32:37 -0500
+Received: by mail-wr1-x442.google.com with SMTP id r7so12374522wro.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:32:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=BRMDXWgfpF54NFk2HNW6Zxr/UQoii9W1VXMuBWGjx9E=;
+ b=A192xGTcOlLyuEyfRkB/nlobhFndnTbZpB2quAom18NWlgQCCvB2R/tVtvXTB/gDnu
+ tVxwcPvzF6XCB8iO1D+J9otg7HTiFiiBJLK9pt50iNM5SpcZPDft7oygKD+h/fo0GVwR
+ IfbClsXMTz6/Mblo8yxdlWuH401cj2ipC4sgrxnn6bd+MYVtZkxijpZccBJiIz9eM5cM
+ FBg/7FxjFhY2ANLVRCHwH78st0G8DREiKuDAWBxLsZDT3YSNsf1FyEklewPuN+pYvwuK
+ GHY5hmWOO2UzmC3GMBLlYbadWyB9qWRiIUpkBD0IvLAqSNifOPsvdRhjGIBUmcw6cl2q
+ 977A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=BRMDXWgfpF54NFk2HNW6Zxr/UQoii9W1VXMuBWGjx9E=;
+ b=jdqOmx77XCQPs/XMgKvW9ppPXgIF4y2hU/8T4GIqdWYKkmL9Vq7IFKJDprOzhkD2Wi
+ 6c/nT8J/CLq/gfgHvJYewIVlsmkT994A6UFf+qObjdwsHiPMUa1c8Yi+Kb12XKWh2Fp+
+ saMLTbf/AuosefsBdQQjqFxBMhh5d6GBpYWl26UgUj7S8qxv3vqjZdp+FRA56vcFrGny
+ p/JxNg2N1qcolLrlVQB3ZxPPiVSaa1eobQMcp1hQRT8LLJS4PQW5ckycE/E+011M+yvA
+ CHi9jN6zsrgQaQ8dRzxR5oJrruiksgOfwFwm9bC4V3VsAFdhrdyzBgHVHgp01VvO775G
+ eYBw==
+X-Gm-Message-State: APjAAAUOo3HrH7l2RbEMvLZcXhPL9MuaRIKXhPcvk4uzGUTKlc2esCUM
+ EROVvdHGunUjNuyuLP8z5XKykA==
+X-Google-Smtp-Source: APXvYqydvwTf3OrZdrZPcm+9S0H1b/cgKtE8V7xOeIhiZoyFQI65dKVJW5hhq7kYryYlc2HYXby+oA==
+X-Received: by 2002:adf:f84a:: with SMTP id d10mr22598385wrq.208.1583152356397; 
+ Mon, 02 Mar 2020 04:32:36 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z12sm1457263wrs.43.2020.03.02.04.32.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Mar 2020 04:32:35 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 83A241FF87;
+ Mon,  2 Mar 2020 12:32:34 +0000 (GMT)
+References: <20200228153619.9906-1-peter.maydell@linaro.org>
+ <20200228153619.9906-32-peter.maydell@linaro.org>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 31/33] docs: Stop building qemu-doc
+In-reply-to: <20200228153619.9906-32-peter.maydell@linaro.org>
+Date: Mon, 02 Mar 2020 12:32:34 +0000
+Message-ID: <87zhcz7x99.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <6666a886-720d-1ead-8f7e-13e65dcaaeb4@redhat.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,38 +96,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, devel@edk2.groups.io, Andrew Fish <afish@apple.com>,
- qemu-devel@nongnu.org, zhoujianjay <zhoujianjay@gmail.com>,
- discuss <discuss@edk2.groups.io>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- wuchenye1995 <wuchenye1995@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Laszlo Ersek (lersek@redhat.com) wrote:
 
-> The interesting question is, what happens when you power down the VM on
-> the destination host (=3D post migration), and launch it again there, fro=
-m
-> zero. In that case, the firmware executable file comes from the
-> *destination host* (it was never persistently migrated from the source
-> host, i.e. never written out on the dst). It simply comes from the OVMF
-> package that had been installed on the destination host, by the
-> sysadmin. However, the varstore pflash does reflect the permanent result
-> of the previous migration. So this is where things can fall apart, if
-> both firmware binaries (on the src host and on the dst host) don't agree
-> about the internal structure of the varstore pflash.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-My guess is that overtime we're going to need to find a way to handle
-this, otherwise we're going to find people having to maintain old
-versions of OVMF just to keep variable store compatiiblity.
+> Stop building the old texinfo qemu-doc; all its contents are
+> now available in the Sphinx-generated manuals and manpages.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Dave
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> Thanks
-> Laszlo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+--=20
+Alex Benn=C3=A9e
 
