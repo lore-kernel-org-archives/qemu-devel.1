@@ -2,91 +2,81 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E8DC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0738C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 213902173E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:19:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B533B2080C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 14:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eUgZEOKD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 213902173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDpaZWer"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B533B2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8luu-00060x-0V
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 09:19:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58703)
+	id 1j8lwA-0007Hl-Qa
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 09:20:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8luB-0005Ng-8g
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:18:48 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1j8lvV-0006iJ-B0
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:20:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8lu9-0002Dq-Re
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:18:46 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44512)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1j8lvU-0002b8-0S
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:20:09 -0500
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44081)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8lu9-0002Cb-KR
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 09:18:45 -0500
-Received: by mail-wr1-x442.google.com with SMTP id n7so4897505wrt.11
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 06:18:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=3Z3xFnxh5R5BwsfWXMLVASRGndlhSRgMifovTn/CNd4=;
- b=eUgZEOKDiQJAqNigAAOUmLr2PUqZQ0M1pm0lN1gXPmdmPx4nhpcTwFb1SM2jILSruE
- 6RDYYd3AQ/tNmUqQ/xFVXLD0HB43o82WZ9GKAD+MJEqivE+tDv03Rw2DDkXW0f9APLh0
- /HztSXein1wTcgmjTkJ57o3P8AUPVqsqkIlxVBAeBB36SNO6TPnDQjvJ32pC8fgKRvRW
- +kjpLiMRmIxJGt0rjffhX/O6If46Yei0BmoXutHbGWL3fdbk0E5/aikJHsmCe6QAIGQn
- 3B+3pzR4iAtHlXDurpT6TcOF9/7ZVGYyZzTVax0D1E1rn7L/cn9XPf5PEOx6aA6b8EAa
- nXvQ==
+ (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1j8lvT-0002a0-Je; Mon, 02 Mar 2020 09:20:07 -0500
+Received: by mail-lf1-x143.google.com with SMTP id 7so8192790lfz.11;
+ Mon, 02 Mar 2020 06:20:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KJrtEdPJ2SAb4JoHKL3JdyltZQZyjNQylqk3c3NRDOI=;
+ b=HDpaZWerVHaZs56omrBVz/2XvkuwraB3CtAd0uBNpSIGGdg0yww4Y9HJjqwsVVMgms
+ NKOcdr4whJ1E1bB7RdV5EEvyU3eUFy6JMHUa1cx/1LqFBWAvyZRZoav321ZDPXhrQuGi
+ QTfb+apJV5PUtNNCp7tUk3LLIxcsGGs1Q5fxtGDLtdYC7hfgsNXZ+wFjH3VaXyWonU+y
+ TKU1do+KPvNcB43ksO0gAik9g1wRROAurELAC1oG7tmEtZhcBQ4EanYeuE9PNT+zMXnh
+ zy1fIbOTUtzgtkrIV9H8g/r9Q8EPJEHEtdPMN1+v8SeOq8iCYpgbfHET6iy5eyd7A0nz
+ sWVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=3Z3xFnxh5R5BwsfWXMLVASRGndlhSRgMifovTn/CNd4=;
- b=jY9mq7+duiNnB+6ItQGKLJ6PZb3YQ8vH2ezSB/u5xk/JPKc+qz97rmaV/B37U18+Kx
- I9XtSSzYaRuKn+4i9L+oXf1jGkjGbE+rL6Wrj2fbveUEDfCFDDPmgaZ5CkVr3HxXW7Sq
- gMPeuoceCaXuRvFcFGSXmxDYMJc9qgNQyz/lZUZ9gefeK11F4CA1VEZUgrb66J+ebzui
- kYDJ5xlLdW67v5y6cMc1rhGJwDtrEFOkXbdqjtLVUM5es34fRiuY9KwEtQrnvsRqR1EI
- srHULiH0kcrH0Fys8ZjGd4X43qovYFsrWbsVpNHhpRG/6r6nV7HQJmU9d2fCBakk1iEo
- D3Sg==
-X-Gm-Message-State: APjAAAUU9wqoqR82NZl06gsHImtKh0mL9tqmGBst6QZOmIc/hGP8opmg
- jh6gGxajB9orYlr3bcU3EVK5BA==
-X-Google-Smtp-Source: APXvYqx2D0UN2UuXIlrtdL4aZ9NwSTCHVhiDO40ziYWyf4znaiKM8VhsIqcjp/e60q43bRqv1vV/6w==
-X-Received: by 2002:adf:94a3:: with SMTP id 32mr24166854wrr.276.1583158724101; 
- Mon, 02 Mar 2020 06:18:44 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a184sm16420903wmf.29.2020.03.02.06.18.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 06:18:42 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 025961FF87;
- Mon,  2 Mar 2020 14:18:37 +0000 (GMT)
-References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-6-peter.maydell@linaro.org>
- <87wo83atnf.fsf@linaro.org>
- <CAFEAcA-WYXtkkCshv_eDV5Rj8ER4yfDmf5V=HaT-Jo5cSJr0vA@mail.gmail.com>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 05/33] qemu-doc: split qemu-doc.texi in multiple files
-In-reply-to: <CAFEAcA-WYXtkkCshv_eDV5Rj8ER4yfDmf5V=HaT-Jo5cSJr0vA@mail.gmail.com>
-Date: Mon, 02 Mar 2020 14:18:36 +0000
-Message-ID: <87lfoi96wz.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KJrtEdPJ2SAb4JoHKL3JdyltZQZyjNQylqk3c3NRDOI=;
+ b=poWB7FZ9/Tu5y6nlhF2Dp7LK1gT/FcqDgSeSMzGuniENea2WCV4UlialHrC1csLHf7
+ l70iqq1rPpSxVMge+xLWstHj7D97i978cUX6vucAeU9UwDlHOURUkjdlT+NC2msQoZfL
+ nxz+FVj6Gamk+wI2eJe+FXvKsOZZ3FVvJmY46ipEboh6AC+xCiovsW3d+wVzgfvtgtO+
+ OB2fkvl2qhH+/e4sCqoYikMJAGGeda6O63CMduMKsR0SViaoVii3l91qmJymFZli+LUr
+ zZzWNYUfUrBP/syLvyhTWNXu8+SISr/LklG9d32NrjVBNbhcsFnutTMMjm8Atxqo6yoH
+ XnMA==
+X-Gm-Message-State: ANhLgQ1sgnLPKL/eEn5Byg7IwVB9KcG0GKUDy119RS+aULItukz9jTIb
+ 07KuaoRrBzAUVQz8D4PNBnT0MF6ThPy+i9vrgE8=
+X-Google-Smtp-Source: ADFU+vsKn8d3EIosn7+llY7DEsvnDT6tGX8EhlAuJSuoHJJxBNHFXInotGpVwZCgOm8dXSBiRpE+ytalXpiFoSUSBds=
+X-Received: by 2002:a19:ee0d:: with SMTP id g13mr11164993lfb.179.1583158805747; 
+ Mon, 02 Mar 2020 06:20:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
+ <20200302130715.29440-11-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200302130715.29440-11-kuhn.chenqun@huawei.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Mon, 2 Mar 2020 08:19:52 -0600
+Message-ID: <CAJy5ezqf08b=FVGY9WHYuOif5Kb8VpENQxomKNg2MXP3y_CDXw@mail.gmail.com>
+Subject: Re: [PATCH v3 09/12] dma/xlnx-zdma: Remove redundant statement in
+ zdma_write_dst()
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Content-Type: multipart/alternative; boundary="0000000000003d5c32059fdfe24c"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,84 +88,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Euler Robot <euler.robot@huawei.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000003d5c32059fdfe24c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Mon, 2 Mar. 2020, 07:09 Chen Qun, <kuhn.chenqun@huawei.com> wrote:
 
-> On Mon, 2 Mar 2020 at 11:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->>
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>
->> > From: Paolo Bonzini <pbonzini@redhat.com>
->> >
->> > In order to facilitate the reorganization of qemu-doc.texi content,
->> > as well as the conversion to rST/Sphinx, split it in multiple .texi
->> > files that are included from docs/system.
->> >
->> > The "other devices" section is renamed to ivshmem and placed last.
->> >
->> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> > Message-id: 20200226113034.6741-6-pbonzini@redhat.com
->> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> > ---
->> >  Makefile                         |   16 +
->> >  docs/system/build-platforms.texi |   67 ++
->> >  docs/system/gdb.texi             |   71 ++
->>
->> The gdb test would be better served in docs/core if we could have
->> optional sections on invocation rendering depending on if it's built
->> with system emulation or linux-user docs. Is that something that's
->> already supported?
+> Clang static code analyzer show warning:
+> hw/dma/xlnx-zdma.c:399:13: warning: Value stored to 'dst_type' is never
+> read
+>             dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
+> ZDMA_CH_DST_DSCR_WORD3,
 >
-> No, for three reasons:
+
+
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+
+
+            ^
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >
-> (1) we build all the docs, always -- there's no concept
-> of "skip some bits of docs if some configure feature was
-> disabled"
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 >
-> (2) there is no docs/core -- the subdirectories of docs/
-> correspond to the "manuals" which we want to present to
-> the user, like "Manual for system emulation users" and
-> "Manual for user-mode users" and "Manual for the
-> standalone tools"; a "core" manual wouldn't fit into this
-> classification, and we already have slightly more manuals
-> than I'm entirely comfortable with.
-
-I wasn't clear. I don't want an additional document but I'd like to
-include information on the gdbstub in both the system and linux-user
-manuals. Another candidate for documentation which is common to both
-would be the notes about TCG CPU emulation.
-
-> (3) Sphinx's support for conditional documentation is
-> not very good, as it is implemented at the "wrong"
-> end of the pipeline (ie it's not like a preprocessor
-> ifdef, but instead is just "suppress the output", so
-> manual pieces inside a disabled ifdef still turn up
-> in places like the index and table of contents). The
-> best you can do is to mess around with the include
-> directive, but if we do that too much then things get
-> awkward to understand and maintain. (We do it a bit
-> in this series to handle "manpage vs manual" stuff.)
-
-In the case of the gdbstub the only real difference is the invocation
-section (-s vs -g). I guess we could just reference both in the section.
-It's not like the linux-user documents can't acknowledge the existence
-of system emulation and visa-versa.
-
+> v1->v2: move the 'dst_type' declaration.(Base on Philippe's suggestion).
+> ---
+>  hw/dma/xlnx-zdma.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> thanks
-> -- PMM
+> diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
+> index 8fb83f5b07..eeacad59ce 100644
+> --- a/hw/dma/xlnx-zdma.c
+> +++ b/hw/dma/xlnx-zdma.c
+> @@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s,
+> bool type,
+>  static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
+>  {
+>      uint32_t dst_size, dlen;
+> -    bool dst_intr, dst_type;
+> +    bool dst_intr;
+>      unsigned int ptype =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0,
+> POINT_TYPE);
+>      unsigned int rw_mode =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MO=
+DE);
+>      unsigned int burst_type =3D ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_A=
+TTR,
+> @@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t
+> *buf, uint32_t len)
+>      while (len) {
+>          dst_size =3D FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WO=
+RD2,
+>                                SIZE);
+> -        dst_type =3D FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WO=
+RD3,
+> -                              TYPE);
+>          if (dst_size =3D=3D 0 && ptype =3D=3D PT_MEM) {
+>              uint64_t next;
+> +            bool dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
+> +                                       ZDMA_CH_DST_DSCR_WORD3,
+> +                                       TYPE);
+> +
+>              next =3D zdma_update_descr_addr(s, dst_type,
+>                                            R_ZDMA_CH_DST_CUR_DSCR_LSB);
+>              zdma_load_descriptor(s, next, &s->dsc_dst);
+>              dst_size =3D FIELD_EX32(s->dsc_dst.words[2],
+> ZDMA_CH_DST_DSCR_WORD2,
+>                                    SIZE);
+> -            dst_type =3D FIELD_EX32(s->dsc_dst.words[3],
+> ZDMA_CH_DST_DSCR_WORD3,
+> -                                  TYPE);
+>          }
+>
+>          /* Match what hardware does by ignoring the dst_size and only
+> using
+> --
+> 2.23.0
+>
+>
+>
 
+--0000000000003d5c32059fdfe24c
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---=20
-Alex Benn=C3=A9e
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">On Mon, 2 Mar. 2020, 07:09 Chen Qun, &lt;<a href=3D"ma=
+ilto:kuhn.chenqun@huawei.com">kuhn.chenqun@huawei.com</a>&gt; wrote:<br></d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex">Clang static code analyzer show warning:<=
+br>
+hw/dma/xlnx-zdma.c:399:13: warning: Value stored to &#39;dst_type&#39; is n=
+ever read<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;dsc=
+_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,<br></blockquote></div></div><div dir=
+=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquot=
+e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
+id;padding-left:1ex"></blockquote></div></div><div dir=3D"auto"><br></div><=
+div dir=3D"auto">Reviewed-by: Edgar E. Iglesias &lt;<a href=3D"mailto:edgar=
+.iglesias@xilinx.com">edgar.iglesias@xilinx.com</a>&gt;</div><div dir=3D"au=
+to"><br></div><div dir=3D"auto"><br></div><div dir=3D"auto"><br></div><div =
+dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
+<br>
+Reported-by: Euler Robot &lt;<a href=3D"mailto:euler.robot@huawei.com" targ=
+et=3D"_blank" rel=3D"noreferrer">euler.robot@huawei.com</a>&gt;<br>
+Signed-off-by: Chen Qun &lt;<a href=3D"mailto:kuhn.chenqun@huawei.com" targ=
+et=3D"_blank" rel=3D"noreferrer">kuhn.chenqun@huawei.com</a>&gt;<br>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
+t.com" target=3D"_blank" rel=3D"noreferrer">philmd@redhat.com</a>&gt;<br>
+Reviewed-by: Francisco Iglesias &lt;<a href=3D"mailto:frasse.iglesias@gmail=
+.com" target=3D"_blank" rel=3D"noreferrer">frasse.iglesias@gmail.com</a>&gt=
+;<br>
+Reviewed-by: Alistair Francis &lt;<a href=3D"mailto:alistair.francis@wdc.co=
+m" target=3D"_blank" rel=3D"noreferrer">alistair.francis@wdc.com</a>&gt;<br=
+>
+---<br>
+Cc: Alistair Francis &lt;<a href=3D"mailto:alistair@alistair23.me" target=
+=3D"_blank" rel=3D"noreferrer">alistair@alistair23.me</a>&gt;<br>
+Cc: &quot;Edgar E. Iglesias&quot; &lt;<a href=3D"mailto:edgar.iglesias@gmai=
+l.com" target=3D"_blank" rel=3D"noreferrer">edgar.iglesias@gmail.com</a>&gt=
+;<br>
+Cc: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D=
+"_blank" rel=3D"noreferrer">peter.maydell@linaro.org</a>&gt;<br>
+Cc: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" ta=
+rget=3D"_blank" rel=3D"noreferrer">philmd@redhat.com</a>&gt;<br>
+<br>
+v1-&gt;v2: move the &#39;dst_type&#39; declaration.(Base on Philippe&#39;s =
+suggestion).<br>
+---<br>
+=C2=A0hw/dma/xlnx-zdma.c | 10 +++++-----<br>
+=C2=A01 file changed, 5 insertions(+), 5 deletions(-)<br>
+<br>
+diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c<br>
+index 8fb83f5b07..eeacad59ce 100644<br>
+--- a/hw/dma/xlnx-zdma.c<br>
++++ b/hw/dma/xlnx-zdma.c<br>
+@@ -373,7 +373,7 @@ static uint64_t zdma_update_descr_addr(XlnxZDMA *s, boo=
+l type,<br>
+=C2=A0static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)<b=
+r>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0uint32_t dst_size, dlen;<br>
+-=C2=A0 =C2=A0 bool dst_intr, dst_type;<br>
++=C2=A0 =C2=A0 bool dst_intr;<br>
+=C2=A0 =C2=A0 =C2=A0unsigned int ptype =3D ARRAY_FIELD_EX32(s-&gt;regs, ZDM=
+A_CH_CTRL0, POINT_TYPE);<br>
+=C2=A0 =C2=A0 =C2=A0unsigned int rw_mode =3D ARRAY_FIELD_EX32(s-&gt;regs, Z=
+DMA_CH_CTRL0, MODE);<br>
+=C2=A0 =C2=A0 =C2=A0unsigned int burst_type =3D ARRAY_FIELD_EX32(s-&gt;regs=
+, ZDMA_CH_DATA_ATTR,<br>
+@@ -387,17 +387,17 @@ static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf,=
+ uint32_t len)<br>
+=C2=A0 =C2=A0 =C2=A0while (len) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dst_size =3D FIELD_EX32(s-&gt;dsc_dst.wor=
+ds[2], ZDMA_CH_DST_DSCR_WORD2,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0SIZE);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;dsc_dst.words[3]=
+, ZDMA_CH_DST_DSCR_WORD3,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (dst_size =3D=3D 0 &amp;&amp; ptype =
+=3D=3D PT_MEM) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t next;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bool dst_type =3D FIELD_EX32(s-&=
+gt;dsc_dst.words[3],<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ZDMA_CH_D=
+ST_DSCR_WORD3,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TYPE);<br=
+>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0next =3D zdma_update_descr_=
+addr(s, dst_type,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0R_ZDMA_CH_DST_CUR_DSCR_LSB);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0zdma_load_descriptor(s, nex=
+t, &amp;s-&gt;dsc_dst);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dst_size =3D FIELD_EX32(s-&=
+gt;dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0SIZE);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dst_type =3D FIELD_EX32(s-&gt;ds=
+c_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TYPE);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Match what hardware does by ignoring t=
+he dst_size and only using<br>
+-- <br>
+2.23.0<br>
+<br>
+<br>
+</blockquote></div></div></div>
+
+--0000000000003d5c32059fdfe24c--
 
