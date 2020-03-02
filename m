@@ -2,96 +2,87 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43E0C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F084C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:52:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81FF924686
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:41:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E16222086A
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:52:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beJRAEAq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81FF924686
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZSncIyps"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16222086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8qwj-00061E-DF
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:41:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58290)
+	id 1j8r74-0001p6-2F
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:52:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j8qvw-0005Qs-TO
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:40:58 -0500
+ (envelope-from <yuanzi@google.com>) id 1j8r6P-0001EJ-TR
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j8qvv-00023f-NS
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:40:56 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42723
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j8qvv-00023W-Ip
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:40:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583178055;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=loCJ5YJU+wlUCSxyXywh6VOhf41XGO53mHah08OLEkw=;
- b=beJRAEAqkLNuqaNsCk82SDKs2cPyt7fdPFwbsBchzvlC0odt7iS4cHUT06kvsdCBzhlu8W
- D0N21HwdmUEhHh7zxWYdIEMVEAtFZN4lRPvDjDAzhyChlNaYL0nRTT8+ySkwUPnt57y8qo
- J8o6eNQRYa8SSmwEl/6BxybO30tSajQ=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-Qq20LC4GOLi_XYzI03qpsQ-1; Mon, 02 Mar 2020 14:40:50 -0500
-X-MC-Unique: Qq20LC4GOLi_XYzI03qpsQ-1
-Received: by mail-ed1-f70.google.com with SMTP id x13so352465eds.19
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 11:40:50 -0800 (PST)
+ (envelope-from <yuanzi@google.com>) id 1j8r6O-0005xZ-4g
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:51:45 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33714)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuanzi@google.com>) id 1j8r6N-0005wz-U5
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:51:44 -0500
+Received: by mail-oi1-x241.google.com with SMTP id q81so516641oig.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 11:51:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=CPU6WXksZG4f0bISEHl6i4goefrQl7QPIiINsl5Ddj0=;
+ b=ZSncIyps0jtinPpotZkfVkN3NpaPsG5FJR1WqJSgTbXRyv8CLAwosQ3YxA4OSkVOna
+ rZBDmums2TxTRdlQq90PM6J2JFL0mjtJUsZ1TcbHFvtOrezx0LlOj1k8KdxVcglmiBHz
+ YX/Edi4E344xmGRgO7CVf1KDaClZo8lab3pPMLZOTEdHfyoGmRIx4RCDpR79Iam3qofa
+ ZaPaJF5s1Re06/SllM3QJ6vUg2cb7EFZ+5Q4BrHPRG2tc9WBx0YgIsMFh9Nv95m8dDCl
+ bTTD4ZoOjwAs4I+Chl59N37CLbPePwQ+5232DYcAC9Tdi2NFwxkj+VRh1AckVUZq+04M
+ fMmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Rej9j7Oj4Ih8b0H7aNGA5q+y30UjTifsKe5+DDM2m+M=;
- b=H/yaJWTpVkZZB8xEAjztm6ik7Od4cDcA58Es1/ffcAZ+Xbkp9AVpSlIFBUw6KQQfrS
- HxMEmoP35sbpzYku2OOKjy1foxx/xZ6lYn6Es5a3K/1Sz59R/VsuAaIdtQH/ObSGwsaS
- JuWhRaCD5tNov2FzMdzowk5lARDcoAinvrJs+ZwujefrGMGPZJMvbzvXPIS9xk1IizJ/
- WTFh6EBiShjwFVPA/KfBh3NF/nQHfwqoXfpyF9/H74DxYDZKP1o56z0iZTV2bmR7avO8
- wb0k3jJNRu4d2YVYrT+Vi3Vprih/3wsGvSqzX6r6RkbuPD8jBRDjIdcfFJuA++QziErj
- wswg==
-X-Gm-Message-State: ANhLgQ1HLlIh8xOJWUHboRW3M5y+OHnA1TPSEXJ8x3HmsYJvLrlZBbgO
- +GaybXb+BEic7zVqU9CvHSGxvjL/ba2GMJLYyLa+X2+mU+ouU5ZiotgoVmlBr2/hUl1oWXt9yb5
- 7OYxsauKifqUYHxCXrWAUCbGB0et8SPQ=
-X-Received: by 2002:a17:906:528b:: with SMTP id
- c11mr840666ejm.247.1583178049736; 
- Mon, 02 Mar 2020 11:40:49 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vv4rkjsinxjc7v42c/yPyQzrT7GtIZU30uNHNiXmnSdKUTKel1ooy1TPtRy3x/0LxqJ9m8trEItmRDAlNjE0+I=
-X-Received: by 2002:a17:906:528b:: with SMTP id
- c11mr840643ejm.247.1583178049506; 
- Mon, 02 Mar 2020 11:40:49 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=CPU6WXksZG4f0bISEHl6i4goefrQl7QPIiINsl5Ddj0=;
+ b=tT3vAvU6cRHPsO6wPIKPNrAxAiy/viBtIGajCIrxd7sTQCI1P19SE3zuIb77QRyGuf
+ k2igd+ixoj+ijeKt2yexyHdS0Pn+SZMKqfDmyHv/KwbueIonei++yXBWMwbqNorNu4X6
+ ElybdAMFOPfD0aqx/mCA0b8JBumOIqpLwGw1Fm22PzJxOXuYHa7En1d1zhuzw/aF4DEk
+ cuHUyv3rO4PTnf7eUZDkPOC/46PHBHr43qV+YUZ1TEGLz5NDw31fVnC948azQLYsvmUq
+ fYWCE/X+2iY3nTDRIBXOvoOMxe4QE02dc72tVLoZCIjV/IjU+J5jerZciuupVe/lqeMZ
+ uOwQ==
+X-Gm-Message-State: ANhLgQ0WcER6NdgKLxZ4z/kYvg+umNBOu0Ccu+93LOIpoYyx3LF+m1+O
+ nYeO9cAc4dkFFW3COvxC9Q6x3bCY58q0DlMLC9QeNA==
+X-Google-Smtp-Source: ADFU+vse3nd+vQ1g6Ypt3pFh0h3S/gexGxK4mtFf2b64b8nXbCK9nuc+BGZ6TGRStNSgAtI+FMG6LDQZJPpRd7qhMds=
+X-Received: by 2002:a05:6808:8:: with SMTP id u8mr44731oic.37.1583178702483;
+ Mon, 02 Mar 2020 11:51:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20200107124903.16505-1-n54@gmx.com>
- <20200128140945.929-1-n54@gmx.com>
- <20200128140945.929-3-n54@gmx.com>
- <e3279b9d-e6f9-43f3-3ebb-b31ba8ff5f7e@redhat.com>
- <4e29b732-ce95-02f1-ec9c-31f1ce33cda0@gmx.com>
- <4ece50db-33c7-4630-6b0f-52197b2ae845@redhat.com>
- <5b289981-1e54-2301-af36-86361415bf6b@gmx.com>
- <bd4bb6d3-be33-2f97-8ee5-695b41b5eff1@m00nbsd.net>
-In-Reply-To: <bd4bb6d3-be33-2f97-8ee5-695b41b5eff1@m00nbsd.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 2 Mar 2020 20:40:36 +0100
-Message-ID: <CABgObfZ5AdBmU7R8ycFwTLxEHXQw_GrXwJ0BMvDWgJEvKevcGg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
-To: Maxime Villard <max@m00nbsd.net>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000041e7fd059fe45d9a"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200222010925.32858-1-yuanzi@google.com>
+ <CADjx4CKoSuu2zWn7BRhpxLL3TaimR7fX99u_r41egctwA1LVTQ@mail.gmail.com>
+ <553af2a0-2092-fe7f-ad7a-3b7ecebbe0a5@vivier.eu>
+ <CADjx4CJSDkA3aDxhp2yZJBnKtUe4YntfpdEKp91VS0JiUhE+2Q@mail.gmail.com>
+ <0f138812-b036-f99b-3d50-b871863d22f2@vivier.eu>
+In-Reply-To: <0f138812-b036-f99b-3d50-b871863d22f2@vivier.eu>
+From: Lirong Yuan <yuanzi@google.com>
+Date: Mon, 2 Mar 2020 11:51:31 -0800
+Message-ID: <CADjx4CJ1Z7kbntP+QH6WOiZSSa7g0nU596e6iiHWWbCAqebP+A@mail.gmail.com>
+Subject: Re: [PATCH] linux-user: Add an argument QEMU_MMAP_BASE to set custom
+ mmap base address in qemu user mode
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, 
+ qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,181 +94,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, slp@redhat.com,
- qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000041e7fd059fe45d9a
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-Il lun 2 mar 2020, 20:14 Maxime Villard <max@m00nbsd.net> ha scritto:
-
-> Le 02/03/2020 =C3=A0 19:05, Kamil Rytarowski a =C3=A9crit :
-> > On 02.03.2020 18:12, Paolo Bonzini wrote:
-> >> On 03/02/20 12:56, Kamil Rytarowski wrote:
-> >>> On 03.02.2020 12:41, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>>>> @@ -1768,6 +1785,7 @@ disabled with --disable-FEATURE, default is
-> >>>>> enabled if available:
-> >>>>>     hax             HAX acceleration support
-> >>>>>     hvf             Hypervisor.framework acceleration support
-> >>>>>     whpx            Windows Hypervisor Platform acceleration suppor=
-t
-> >>>>> +  nvmm            NetBSD Virtual Machine Monitor acceleration
-> support
-> >>>>>     rdma            Enable RDMA-based migration
-> >>>>>     pvrdma          Enable PVRDMA support
-> >>>>>     vde             support for vde network
-> >>>>> @@ -2757,6 +2775,20 @@ if test "$whpx" !=3D "no" ; then
-> >>>>>       fi
-> >>>>>   fi
-> >>>>>
+On Mon, Mar 2, 2020 at 10:39 AM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Le 02/03/2020 =C3=A0 18:53, Lirong Yuan a =C3=A9crit :
+> > On Mon, Mar 2, 2020 at 6:56 AM Laurent Vivier <laurent@vivier.eu> wrote=
+:
+> >>
+> >> Le 29/02/2020 =C3=A0 01:43, Lirong Yuan a =C3=A9crit :
+> >>> On Fri, Feb 21, 2020 at 5:09 PM Lirong Yuan <yuanzi@google.com> wrote=
+:
 > >>>>
-> >>>> Maybe you can add something like:
+> >>>> This change allows us to set custom base address for guest programs.=
+ It is needed to allow qemu to work with Thread Sanitizer (TSan), which has=
+ specific boundary definitions for memory mappings on different platforms:
+> >>>> https://github.com/llvm/llvm-project/blob/master/compiler-rt/lib/tsa=
+n/rtl/tsan_platform.h
+> >>
+> >> Could you give more details and some examples?
+> >>
+> >> Thanks,
+> >> Laurent
+> >>
+> >>>> Signed-off-by: Lirong Yuan <yuanzi@google.com>
+> >>>> ---
+> >>>>  linux-user/main.c | 12 ++++++++++++
+> >>>>  linux-user/mmap.c |  3 ++-
+> >>>>  linux-user/qemu.h |  5 +++++
+> >>>>  3 files changed, 19 insertions(+), 1 deletion(-)
 > >>>>
-> >>>> if test "$targetos" =3D "NetBSD"; then
-> >>>>     nvmm=3D"check"
-> >>>> fi
+> >>>> diff --git a/linux-user/main.c b/linux-user/main.c
+> >>>> index fba833aac9..c01af6bfee 100644
+> >>>> --- a/linux-user/main.c
+> >>>> +++ b/linux-user/main.c
+> >>>> @@ -336,6 +336,16 @@ static void handle_arg_guest_base(const char *a=
+rg)
+> >>>>      have_guest_base =3D 1;
+> >>>>  }
 > >>>>
-> >>>> to build by default with NVMM if available.
+> >>>> +static void handle_arg_mmap_base(const char *arg)
+> >>>> +{
+> >>>> +    int err =3D qemu_strtoul(arg, NULL, 0, &mmap_base);
+> >>>> +    if (err) {
+> >>>> +        fprintf(stderr, "Invalid mmap_base: %s, err: %d\n", arg, er=
+r);
+> >>>> +        exit(EXIT_FAILURE);
+> >>>> +    }
+> >>>> +    mmap_next_start =3D mmap_base;
+> >>>> +}
+> >>>> +
+> >>>>  static void handle_arg_reserved_va(const char *arg)
+> >>>>  {
+> >>>>      char *p;
+> >>>> @@ -440,6 +450,8 @@ static const struct qemu_argument arg_table[] =
+=3D {
+> >>>>       "uname",      "set qemu uname release string to 'uname'"},
+> >>>>      {"B",          "QEMU_GUEST_BASE",  true,  handle_arg_guest_base=
+,
+> >>>>       "address",    "set guest_base address to 'address'"},
+> >>>> +    {"mmap_base",  "QEMU_MMAP_BASE",   true,  handle_arg_mmap_base,
+> >>>> +     "",           "begin allocating guest pages at this host addre=
+ss"},
+> >>>>      {"R",          "QEMU_RESERVED_VA", true,  handle_arg_reserved_v=
+a,
+> >>>>       "size",       "reserve 'size' bytes for guest virtual address =
+space"},
+> >>>>      {"d",          "QEMU_LOG",         true,  handle_arg_log,
+> >>>> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+> >>>> index 8685f02e7e..3f35543acf 100644
+> >>>> --- a/linux-user/mmap.c
+> >>>> +++ b/linux-user/mmap.c
+> >>>> @@ -189,6 +189,7 @@ static int mmap_frag(abi_ulong real_start,
+> >>>>  # define TASK_UNMAPPED_BASE  0x40000000
+> >>>>  #endif
+> >>>>  abi_ulong mmap_next_start =3D TASK_UNMAPPED_BASE;
+> >>>> +abi_ulong mmap_base =3D TASK_UNMAPPED_BASE;
+> >>>>
+> >>>>  unsigned long last_brk;
+> >>>>
+> >>>> @@ -299,7 +300,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulo=
+ng size, abi_ulong align)
+> >>>>
+> >>>>              if ((addr & (align - 1)) =3D=3D 0) {
+> >>>>                  /* Success.  */
+> >>>> -                if (start =3D=3D mmap_next_start && addr >=3D TASK_=
+UNMAPPED_BASE) {
+> >>>> +                if (start =3D=3D mmap_next_start && addr >=3D mmap_=
+base) {
+> >>>>                      mmap_next_start =3D addr + size;
+> >>>>                  }
+> >>>>                  return addr;
+> >>>> diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+> >>>> index 560a68090e..83c00cfea2 100644
+> >>>> --- a/linux-user/qemu.h
+> >>>> +++ b/linux-user/qemu.h
+> >>>> @@ -161,6 +161,11 @@ void task_settid(TaskState *);
+> >>>>  void stop_all_tasks(void);
+> >>>>  extern const char *qemu_uname_release;
+> >>>>  extern unsigned long mmap_min_addr;
+> >>>> +/*
+> >>>> + * mmap_base is minimum address to use when allocating guest pages.=
+ All guest
+> >>>> + * pages will be allocated at this (guest) address or higher addres=
+ses.
+> >>>> + */
+> >>>> +extern abi_ulong mmap_base;
+> >>>>
+> >>>>  /* ??? See if we can avoid exposing so much of the loader internals=
+.  */
+> >>>>
+> >>>> --
+> >>>> 2.25.0.265.gbab2e86ba0-goog
+> >>>>
 > >>>
-> >>> I will add nvmm=3Dyes to the NetBSD) targetos check section.
-> >>
-> >> No, nvmm=3Dyes instead should fail the build if nvmm.h is not availabl=
-e.
-> >> That is not a good default.
-> >>
-> >> Paolo
-> >>
+> >>> Friendly ping~
+> >>>
+> >>> Link to the page for the patch on patchwork:
+> >>> http://patchwork.ozlabs.org/patch/1242370/
+> >>>
 > >>
 > >
-> > Most users will get nvmm.h in place now and this is still a tunable.
+> > Hi Laurent,
 > >
-> > I have got no opinion what to put there, nvmm=3Dcheck still works.
->
-> I would keep "yes", for consistency with the other entries. Changing all
-> entries to "check" should be done in a separate commit, unrelated to
-> NVMM.
->
-
-The difference is that KVM for example does not need external includes or
-libraries.
-
-Paolo
-
-
-> > diff --git a/configure b/configure
-> > index d4a837cf9d..b3560d88bb 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -836,7 +836,7 @@ DragonFly)
-> >  NetBSD)
-> >    bsd=3D"yes"
-> >    hax=3D"yes"
-> > -  nvmm=3D"yes"
-> > +  nvmm=3D"check"
-> >    make=3D"${MAKE-gmake}"
-> >    audio_drv_list=3D"oss try-sdl"
-> >    audio_possible_drivers=3D"oss sdl"
+> > Sure! We tried to run a program with TSAN enabled
+> > (https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual)
+> > in qemu, and got this error message:
+> > "FATAL: ThreadSanitizer: unexpected memory mapping
+> > 0x004000000000-0x004000253000"
 > >
+> > The root cause is that the default guest base address that qemu uses
+> > is 0x4000000000 (1ul<<38), and does not align with TSAN's expectation:
+> > https://github.com/qemu/qemu/blob/c81acb643a61db199b9198add7972d8a8496b=
+27c/linux-user/mmap.c#L187
+> > https://github.com/llvm/llvm-project/blob/e7de00cf974a4e30d4900518ae847=
+3a117efbd6c/compiler-rt/lib/tsan/rtl/tsan_platform.h#L150
+> >
+> > By setting QEMU_GUEST_BASE, we can place the guest program at a
+> > different base address in the host program. However, the h2g function
+> > (in |open_self_maps| in syscall.c) translates the address back to be
+> > based at 0x4000000000. E.g. the base address
+> > 0x4000000000+QEMU_GUEST_BASE will be converted to 0x4000000000 with
+> > function h2g:
+> > https://github.com/qemu/qemu/blob/c81acb643a61db199b9198add7972d8a8496b=
+27c/linux-user/syscall.c#L7076
+> >
+> > One solution then, is to update |open_self_maps| in syscall.c to not
+> > use h2g. However this changes the meaning of QEMU_GUEST_BASE and could
+> > break existing programs that set non-zero QEMU_GUEST_BASE.
+> >
+> > So, how did qemu pick the base address 0x4000000000 then? Looking at
+> > the blame output in github, one recent change for the base address was
+> > committed 10 years ago:
+> > https://github.com/qemu/qemu/c|open_self_maps| in
+> > syscall.commit/14f24e1465edc44b9b4d89fbbea66e06088154e1
+> >
+> > Another one was committed 12 years ago:
+> > https://github.com/qemu/qemu/commit/a03e2d421e7f33316750d6b7396d1a7e14b=
+18d53
+> >
+> > The description of the first change is "place the default mapping base
+> > for 64-bit guests (on 64-bit hosts) outside the low 4G". It would seem
+> > that minimum requirements for the base address are:
+> > 1) addr >=3D 4G (for 64-bit)
+> > 2) addr < lowest address used by the host qemu program by some margin
+> >
+> > Given that
+> > 1) only TSAN explicitly check for the validity of addresses
+> > 2) 0x4000000000 is not a valid address for programs on aarch64
+> > (according to TSAN)
+> > 3) different architectures have different valid addresses,
+> > it would seem that adding an argument for changing the hard-coded base
+> > address is a viable solution.
 >
+> Thank you for the detailed explanation.
 >
+> Could you show me an example of the QEMU command line you use?
+>
+> I'm wondering if hardcoding directly the good value would be a better
+> solution?
+>
+> Richard, do you have some thoughts on this?
+>
+> Thanks,
+> Laurent
 
---00000000000041e7fd059fe45d9a
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Sure! First we compile a simple race program with TSAN enabled:
+( Simple race program is here:
+https://github.com/google/sanitizers/wiki/ThreadSanitizerCppManual#usage
+)
+$ clang++ simple_race.cc -fsanitize=3Dthread -fPIE -pie -g -o simple_race
 
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il lun 2 mar 2020, 20:14 Maxime Villard &lt;<a href=3D=
-"mailto:max@m00nbsd.net">max@m00nbsd.net</a>&gt; ha scritto:<br></div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">Le 02/03/2020 =C3=A0 19:05, Kamil Rytarowski a =
-=C3=A9crit=C2=A0:<br>
-&gt; On 02.03.2020 18:12, Paolo Bonzini wrote:<br>
-&gt;&gt; On 03/02/20 12:56, Kamil Rytarowski wrote:<br>
-&gt;&gt;&gt; On 03.02.2020 12:41, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt;&gt;&gt;&gt;&gt; @@ -1768,6 +1785,7 @@ disabled with --disable-FEATURE,=
- default is<br>
-&gt;&gt;&gt;&gt;&gt; enabled if available:<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 hax=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 HAX acceleration support<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 hvf=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Hypervisor.framework acceleratio=
-n support<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 whpx=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Windows Hypervisor Platform accelerati=
-on support<br>
-&gt;&gt;&gt;&gt;&gt; +=C2=A0 nvmm=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 NetBSD Virtual Machine Monitor acceleration suppor=
-t<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 rdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable RDMA-based migration<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 pvrdma=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable PVRDMA support<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 vde=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 support for vde network<br>
-&gt;&gt;&gt;&gt;&gt; @@ -2757,6 +2775,20 @@ if test &quot;$whpx&quot; !=3D =
-&quot;no&quot; ; then<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi<br>
-&gt;&gt;&gt;&gt;&gt; =C2=A0 fi<br>
-&gt;&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; Maybe you can add something like:<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; if test &quot;$targetos&quot; =3D &quot;NetBSD&quot;; then=
-<br>
-&gt;&gt;&gt;&gt; =C2=A0=C2=A0=C2=A0 nvmm=3D&quot;check&quot;<br>
-&gt;&gt;&gt;&gt; fi<br>
-&gt;&gt;&gt;&gt;<br>
-&gt;&gt;&gt;&gt; to build by default with NVMM if available.<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt; I will add nvmm=3Dyes to the NetBSD) targetos check section.<b=
-r>
-&gt;&gt;<br>
-&gt;&gt; No, nvmm=3Dyes instead should fail the build if nvmm.h is not avai=
-lable.<br>
-&gt;&gt; That is not a good default.<br>
-&gt;&gt;<br>
-&gt;&gt; Paolo<br>
-&gt;&gt;<br>
-&gt;&gt;<br>
-&gt; <br>
-&gt; Most users will get nvmm.h in place now and this is still a tunable.<b=
-r>
-&gt; <br>
-&gt; I have got no opinion what to put there, nvmm=3Dcheck still works.<br>
-<br>
-I would keep &quot;yes&quot;, for consistency with the other entries. Chang=
-ing all<br>
-entries to &quot;check&quot; should be done in a separate commit, unrelated=
- to<br>
-NVMM.<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"a=
-uto">The difference is that KVM for example does not need external includes=
- or libraries.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</di=
-v><div dir=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_quote">=
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-&gt; diff --git a/configure b/configure<br>
-&gt; index d4a837cf9d..b3560d88bb 100755<br>
-&gt; --- a/configure<br>
-&gt; +++ b/configure<br>
-&gt; @@ -836,7 +836,7 @@ DragonFly)<br>
-&gt;=C2=A0 NetBSD)<br>
-&gt;=C2=A0 =C2=A0 bsd=3D&quot;yes&quot;<br>
-&gt;=C2=A0 =C2=A0 hax=3D&quot;yes&quot;<br>
-&gt; -=C2=A0 nvmm=3D&quot;yes&quot;<br>
-&gt; +=C2=A0 nvmm=3D&quot;check&quot;<br>
-&gt;=C2=A0 =C2=A0 make=3D&quot;${MAKE-gmake}&quot;<br>
-&gt;=C2=A0 =C2=A0 audio_drv_list=3D&quot;oss try-sdl&quot;<br>
-&gt;=C2=A0 =C2=A0 audio_possible_drivers=3D&quot;oss sdl&quot;<br>
-&gt; <br>
-<br>
-</blockquote></div></div></div>
+Next we run a script for executing the program, and it exports
+environment variables:
+QEMU_CPU=3Dmax
+QEMU_MMAP_BASE=3D0x0000005500000000
 
---00000000000041e7fd059fe45d9a--
+And runs the QEMU program:
+$ qemu-aarch64 simple_race
 
+I changed the default value for all other programs that I am working
+with, and so far we haven't seen any problems.
+For the patch, it might be better to err on the safe side and not
+change the hard-coded value, as it might cause potential breakages for
+other users.
+Though I don't know much about how the default value might be used or
+depended on by other programs, so if you see no concerns for updating
+the value, I'd be happy to change it too.
 
