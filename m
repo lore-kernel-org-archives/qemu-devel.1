@@ -7,94 +7,95 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3000DC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94436C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7FD3217F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 595E0217F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGCxVwrS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7FD3217F4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H5THGtS4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 595E0217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8uqn-0005mP-4l
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:51:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37688)
+	id 1j8ur1-0006CP-Hb
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:52:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8upv-00053X-JZ
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:51:00 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8uq8-0005C9-On
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:51:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8upu-00016T-JQ
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:50:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51597
+ (envelope-from <philmd@redhat.com>) id 1j8uq7-00017a-Na
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:51:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50829
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8upu-000161-Fw
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:50:58 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8uq7-00017T-Ju
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:51:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583193057;
+ s=mimecast20190719; t=1583193071;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FF3wICewQaa3RiS39JV3wDaDsjE5d8HV95Cf+aKZo7E=;
- b=gGCxVwrSrS6rnNx2fqHf6c8Sz4R270HpM+FCHA+KsjbblVER5MRq3ITA5z9AcP75ILJazF
- hK77FqKQFuASpCAGTtm/iTEochQxf/payYoUFT3bw92tB5Dy1cwdASjvYOS+d3r4vs5jyv
- VvrcovsWC+PiKBO2iffeygb2VWdu0Fs=
+ bh=iuPz6n+BeBVA7+PsSxRCyYsGG4BT486cTX3EaSuJfTU=;
+ b=H5THGtS4lTZaKYkwrCe7VUqaXV7SksbCOwpO2zfi+BRGtFDuRJJj1IUdiREoQjd85xD6CW
+ yWxXOtNyTnMlDAgoBu3lCvWofMAu1i/Jh/i3I92p0GLM0vSPZ3xGvmspwqQ3/1CcgS0CzM
+ ELYANEPc9SpDPIAVEyS24SUDpL+48o4=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-e0JQ_F-3MEqiIMah9z2roA-1; Mon, 02 Mar 2020 18:50:56 -0500
-X-MC-Unique: e0JQ_F-3MEqiIMah9z2roA-1
-Received: by mail-wm1-f70.google.com with SMTP id f207so334087wme.6
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:50:55 -0800 (PST)
+ us-mta-472-XNzxF-gmMhuSYVTdkEoYVA-1; Mon, 02 Mar 2020 18:51:09 -0500
+X-MC-Unique: XNzxF-gmMhuSYVTdkEoYVA-1
+Received: by mail-wm1-f70.google.com with SMTP id c5so331896wmd.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:51:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KHLvqzpa6iNoZylNgF3tRer/Y3+oc/9BwRdnj0JoSOw=;
- b=PqU1C23VMfxfdKzRWkCYc4E/dH+K4s0dMHM+p4iPtoanWgezax/hmLq4YmUh2yerVa
- LMGyEkOZNz3uRNBRWP/VUjFmVepsxaj+g6pUuSP9z4X0D8bxRVrCAYShlUb+Ik+LX5j5
- ffQGPQMUFDEdmRO7NVdjg1g31kpv55eUKAs1z0Sm6LVETw0yM4uVdatAIMYimxxWTPif
- BrMiMNK3t0YFw9Xg+8+um2zA3du/Hi9lHE7cmSQlEyDpe2VTuj8mzzFonhZWK8dWiqyj
- ZzWKWLXnpyln63aUIwbfMuyJ2I049eYeN3n2hafg6wX8cxwcKf5ZkNGV5lZc7TU/m4Eu
- EHcg==
-X-Gm-Message-State: ANhLgQ1pCMSRjNAfhqE828X5MKMPref8Yq4C66N71JGXdMmkY+MoNDys
- lVrFCH7kRsgku3iKeZ+LKsH69wOilWMJ4mOvTu0H5oac5mg+R/LNisH1jU0XArS/DBTfNRWdG9e
- JzBxjYvPjMYHK/lM=
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr749270wmi.14.1583193054815;
- Mon, 02 Mar 2020 15:50:54 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vspJinB9C9sNnEwMwpo9oMaLSyS9tXFxJou/Zk5Et4OCatKWJASWxpCYNwz6zKVXHls/8K99w==
-X-Received: by 2002:a7b:c109:: with SMTP id w9mr749252wmi.14.1583193054576;
- Mon, 02 Mar 2020 15:50:54 -0800 (PST)
+ bh=n36ZH3tfqOtKU4lEeXMPPAyLS3rveIOnCwDlc1J1iLM=;
+ b=hzJsnABjf92FBQ2qS0zeTxII02/s410e93B3iG++PHZobJesQjjVZYZWtNuAN6Mzq6
+ 3rIQMlsNe8hf5phWERhNIqMdy2N08GnQtJdcjgwVb8q7kSGI/sB622tmZxvYWCKPbSlE
+ zht8fQPQS7FU13/QE4570GR1BqSTxjrPLOjcPp9xQMO0nGaVOWbj8jLXjfYUT4jNXVP9
+ 5HJKKu1GGu9fWRLIaZ7s1dpdWW2DGM06RmPR/M0d15zZc4erhBAq/dYmtBttxe6H36Ho
+ fkeXYAnyH8UJgNO97vuAQZjaMRYHC/NtQD83xtPKji4B9ClnSYoiG479jtQHOU5dRwgJ
+ b9sw==
+X-Gm-Message-State: ANhLgQ0AcrLSQN+RYXMnPQ+/PXtT38aun3KkqnjRkLiKZn/wzLck+7Px
+ WTmsy77MWtb6vKKE4fPWly5nnJAG8R3VMl93DNKi2lW+wegeE9PGMZD197KMzm5/I6GTkcierQZ
+ 1gwQBZz9lYBZ4ULQ=
+X-Received: by 2002:a1c:5457:: with SMTP id p23mr771042wmi.45.1583193067496;
+ Mon, 02 Mar 2020 15:51:07 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vsI5VJnR8XcvTmOT9jrKw9X1fkrAKTJACUROr3u1r5nHjmcjbPmmsrsM4MEJgQpPYyUov3nOA==
+X-Received: by 2002:a1c:5457:: with SMTP id p23mr770991wmi.45.1583193066708;
+ Mon, 02 Mar 2020 15:51:06 -0800 (PST)
 Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
  ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id k16sm31111203wrd.17.2020.03.02.15.50.53
+ by smtp.gmail.com with ESMTPSA id j5sm30794631wrx.56.2020.03.02.15.51.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 15:50:53 -0800 (PST)
-Subject: Re: [PATCH v2 3/9] target/arm: Introduce core_to_aa64_mmu_idx
+ Mon, 02 Mar 2020 15:51:06 -0800 (PST)
+Subject: Re: [PATCH v2 1/9] target/arm: Replicate TBI/TBID bits for single
+ range regimes
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200302175829.2183-1-richard.henderson@linaro.org>
- <20200302175829.2183-4-richard.henderson@linaro.org>
+ <20200302175829.2183-2-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a4ec9841-0c60-23bd-3f1a-5a21b697c082@redhat.com>
-Date: Tue, 3 Mar 2020 00:50:52 +0100
+Message-ID: <e7cb1c45-6143-3301-1404-3145d6dcecdc@redhat.com>
+Date: Tue, 3 Mar 2020 00:51:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200302175829.2183-4-richard.henderson@linaro.org>
+In-Reply-To: <20200302175829.2183-2-richard.henderson@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,50 +113,44 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 3/2/20 6:58 PM, Richard Henderson wrote:
-> If by context we know that we're in AArch64 mode, we need not
-> test for M-profile when reconstructing the full ARMMMUIdx.
+> Replicate the single TBI bit from TCR_EL2 and TCR_EL3 so that
+> we can unconditionally use pointer bit 55 to index into our
+> composite TBI1:TBI0 field.
 >=20
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   target/arm/internals.h     | 6 ++++++
->   target/arm/translate-a64.c | 2 +-
->   2 files changed, 7 insertions(+), 1 deletion(-)
+>   target/arm/helper.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 9f96a2359f..e633aff36e 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -783,6 +783,12 @@ static inline ARMMMUIdx core_to_arm_mmu_idx(CPUARMSt=
-ate *env, int mmu_idx)
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 6be9ffa09e..37ffe06c05 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -10316,7 +10316,8 @@ static int aa64_va_parameter_tbi(uint64_t tcr, AR=
+MMMUIdx mmu_idx)
+>       } else if (mmu_idx =3D=3D ARMMMUIdx_Stage2) {
+>           return 0; /* VTCR_EL2 */
+>       } else {
+> -        return extract32(tcr, 20, 1);
+> +        /* Replicate the single TBI bit so we always have 2 bits.  */
+> +        return extract32(tcr, 20, 1) * 3;
 >       }
 >   }
 >  =20
-> +static inline ARMMMUIdx core_to_aa64_mmu_idx(int mmu_idx)
-> +{
-> +    /* AArch64 is always a-profile. */
-> +    return mmu_idx | ARM_MMU_IDX_A;
+> @@ -10327,7 +10328,8 @@ static int aa64_va_parameter_tbid(uint64_t tcr, A=
+RMMMUIdx mmu_idx)
+>       } else if (mmu_idx =3D=3D ARMMMUIdx_Stage2) {
+>           return 0; /* VTCR_EL2 */
+>       } else {
+> -        return extract32(tcr, 29, 1);
+> +        /* Replicate the single TBID bit so we always have 2 bits.  */
+> +        return extract32(tcr, 29, 1) * 3;
+>       }
+>   }
+>  =20
+>=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> +}
-> +
->   int arm_mmu_idx_to_el(ARMMMUIdx mmu_idx);
->  =20
->   /*
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 579180af0a..c910a49b4e 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -14300,7 +14300,7 @@ static void aarch64_tr_init_disas_context(DisasCo=
-ntextBase *dcbase,
->       dc->condexec_mask =3D 0;
->       dc->condexec_cond =3D 0;
->       core_mmu_idx =3D FIELD_EX32(tb_flags, TBFLAG_ANY, MMUIDX);
-> -    dc->mmu_idx =3D core_to_arm_mmu_idx(env, core_mmu_idx);
-> +    dc->mmu_idx =3D core_to_aa64_mmu_idx(core_mmu_idx);
->       dc->tbii =3D FIELD_EX32(tb_flags, TBFLAG_A64, TBII);
->       dc->tbid =3D FIELD_EX32(tb_flags, TBFLAG_A64, TBID);
->       dc->current_el =3D arm_mmu_idx_to_el(dc->mmu_idx);
->=20
 
 
