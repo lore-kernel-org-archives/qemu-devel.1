@@ -2,97 +2,134 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6167C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA8CC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F7F920842
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9F5320842
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 11:20:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hdu1kTYH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F7F920842
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YuEMV6S+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F5320842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8j7G-0001aZ-Qs
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:20:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32951)
+	id 1j8j7V-00021C-Q1
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 06:20:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8j6E-0000YA-Ge
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:03 -0500
+ (envelope-from <lvivier@redhat.com>) id 1j8j6k-00014L-F4
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8j6D-0004ig-4a
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41752
+ (envelope-from <lvivier@redhat.com>) id 1j8j6j-00054R-B4
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40933
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8j6D-0004iY-1K
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:01 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j8j6j-00053q-7J
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 06:19:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583147940;
+ s=mimecast20190719; t=1583147972;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LyYbusHqkV7O2CQidgGkMeNh+438YXMlYqcU1o8X5oU=;
- b=Hdu1kTYHynKz3RaoDjf7PmeTk55Frc11wnraFhBr1RERrqjfuCD+IP6aIs42BWmlfvgbU0
- qEKrrKExP4E9rC8PommA1PRAKNoRMfLd15oyJo98OvtTxNYqXPyL1YlNgw+73xEeyBdK7H
- g00vOqLQYCbgOMleNnsVz4tjzuPpEMM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-WTuqZhvMO6SKe2t0S8OFCg-1; Mon, 02 Mar 2020 06:18:57 -0500
-X-MC-Unique: WTuqZhvMO6SKe2t0S8OFCg-1
-Received: by mail-wr1-f72.google.com with SMTP id j14so3241279wru.8
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 03:18:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YQA6g/jSFAX204Wo4d/KbsPMP3CGdZr6T6ta2cKO92o=;
- b=Y1MpplkaDM518JTYyBi2VWac+2Zrf/MyvK91Qj51lmUw2a4DCcWlU2YRJPeVZNYUd0
- TQ1p3gLZaZsjJEFG7KmlR+59OdD9BUGiAGUqbB5CFtFsr8HifF2soRycom1ibIJ2ShmM
- KdIMmx13mxbl1SvZ7z0J4nib5W/n82iG5MaSWCnfR93n+DmKHyi/n1yGbrjyO6IYFa0B
- G9GrPkYE7cplkw4zCbe9kJfhVstxbRWdiIQsoQHUWDFCdYQ+8Iv6G5kP4yPoR07u2p/3
- p7bBwjRA9H+hXi3eWQ5ar/0vtTu+CqYzLI0aZVQgnsHF74mYDJ+mVWV89CG2NvC8dULq
- /D8Q==
-X-Gm-Message-State: APjAAAX+KrullVBgo2pH7q/0/B2OA259LWs/5KwaWV3+6SLd13mxDcBN
- LQDJANYkqWCZSBsOjhCe6a1KsG7+Q4vnxcaWLHimYaZkPRjfUbVByOJ5FDj87HgwOxqIzJy1Kd/
- NaO2qEogZWW+PxVY=
-X-Received: by 2002:a5d:4484:: with SMTP id j4mr23544914wrq.153.1583147935733; 
- Mon, 02 Mar 2020 03:18:55 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy9X9uhbY5jh297bfFjWdhTfQYzQgnLM/XgkL6jndHiGTjQ/0KsuE3Jq6JO0SlEB1gr38FSAQ==
-X-Received: by 2002:a5d:4484:: with SMTP id j4mr23544886wrq.153.1583147935459; 
- Mon, 02 Mar 2020 03:18:55 -0800 (PST)
-Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
- ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id j5sm27807803wrx.56.2020.03.02.03.18.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 03:18:54 -0800 (PST)
-Subject: Re: [PATCH v3 2/6] hw/arm/virt: Introduce VirtGICType enum type
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-References: <20200302105516.5972-1-eric.auger@redhat.com>
- <20200302105516.5972-3-eric.auger@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ff498491-820a-498a-2951-6e46951dd23e@redhat.com>
-Date: Mon, 2 Mar 2020 12:18:48 +0100
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=bDl4+5rskkvnYx2twCmBGECw4o4LgHbKxprEtQYsPyE=;
+ b=YuEMV6S+QZNHaeHeVPjnSnTiCzjo/g6mbgbs9Yf8YJO9ak30sTlPsaX6qhWClNBsGAv9KG
+ Ln4UuV7c9WM/3KzgTojqOC6NRh4b8J6/4FYvAnzRF80Kk05Ne51GMGRuOql2mDbl523+Y+
+ xX/mid8VWAd/f7TFiZIB4Lec7wFgaqs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-eOOCTZmVNkybwM5HhAE8hQ-1; Mon, 02 Mar 2020 06:19:29 -0500
+X-MC-Unique: eOOCTZmVNkybwM5HhAE8hQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 581D5800D50
+ for <qemu-devel@nongnu.org>; Mon,  2 Mar 2020 11:19:28 +0000 (UTC)
+Received: from [10.36.117.17] (ovpn-117-17.ams2.redhat.com [10.36.117.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E127A8F340;
+ Mon,  2 Mar 2020 11:19:18 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] tests/vhost-user-bridge: move to contrib/
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200207095412.794912-1-lvivier@redhat.com>
+ <20200301071119-mutt-send-email-mst@kernel.org>
+ <c68547be-3131-8069-70d9-f0a1758784d7@redhat.com>
+ <20200302055232-mutt-send-email-mst@kernel.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <cf4bf124-9335-291f-4773-37e511eb78fa@redhat.com>
+Date: Mon, 2 Mar 2020 12:19:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200302105516.5972-3-eric.auger@redhat.com>
+In-Reply-To: <20200302055232-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
@@ -107,186 +144,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maz@kernel.org, drjones@redhat.com
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 11:55 AM, Eric Auger wrote:
-> We plan to introduce yet another value for the gic version (nosel).
-> As we already use exotic values such as 0 and -1, let's introduce
-> a dedicated enum type and let vms->gic_version take this
-> type.
+On 02/03/2020 11:53, Michael S. Tsirkin wrote:
+> On Mon, Mar 02, 2020 at 10:50:16AM +0100, Laurent Vivier wrote:
+>> On 01/03/2020 13:12, Michael S. Tsirkin wrote:
+>>> On Fri, Feb 07, 2020 at 10:54:11AM +0100, Laurent Vivier wrote:
+>>>> vhost-user-bridge is not a test. Move it to contrib/ and
+>>>> add it to the tools list.
+>>>>
+>>>> It will be built only if tools (--enable-tools) and
+>>>> vhost-user (--enable-vhost-user) are enabled (both are set
+>>>> by default).
+>>>>
+>>>> Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>
+>>>
+>>> I had to drop this series from my tree since it cause failures
+>>> on OSX. Pls use something like travis CI to test when you repost
+>>> a fixed version. Thanks!
+>>>
+>>
+>> Do you have a link to the error logs?
+>>
+>> Thanks,
+>> Laurent
 >=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >=20
-> ---
+> Peter sent me this:
 >=20
-> v2 -> v3:
-> - replaced defines by enum VirtGICType
-> - use that new type for vms->gic_version
-> ---
->   hw/arm/virt.c         | 30 +++++++++++++++---------------
->   include/hw/arm/virt.h | 11 +++++++++--
+>=20
+> Hi; this fails to build on OSX:
+>=20
+>   CC      contrib/libvhost-user/libvhost-user.o
+> /Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.c:27=
+:10:
+> fatal error: 'sys/eventfd.h' file not found
+> #include <sys/eventfd.h>
+>          ^~~~~~~~~~~~~~~
+> In file included from
+> /Users/pm215/src/qemu-for-merges/contrib/vhost-user-bridge/main.c:37:
+> /Users/pm215/src/qemu-for-merges/contrib/libvhost-user/libvhost-user.h:21=
+:10:
+> fatal error: 'linux/vhost.h' file not found
+> #include <linux/vhost.h>
+>          ^~~~~~~~~~~~~~~
+> 1 error generated.
+>=20
+> thanks
+> -- PMM
+>=20
+> But pls do test on OSX before reposting.
+>=20
 
-Please have a look at scripts/git.orderfile, it helps making review=20
-easier/quicker.
+Thank you.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+I will fix and test the new patch with Travis CI.
 
->   2 files changed, 24 insertions(+), 17 deletions(-)
->=20
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index c093f0ab85..b449a445de 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -298,7 +298,7 @@ static void fdt_add_timer_nodes(const VirtMachineStat=
-e *vms)
->           irqflags =3D GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
->       }
->  =20
-> -    if (vms->gic_version =3D=3D 2) {
-> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_2) {
->           irqflags =3D deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
->                                GIC_FDT_IRQ_PPI_CPU_WIDTH,
->                                (1 << vms->smp_cpus) - 1);
-> @@ -439,7 +439,7 @@ static void fdt_add_gic_node(VirtMachineState *vms)
->       qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 0x2);
->       qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 0x2);
->       qemu_fdt_setprop(vms->fdt, nodename, "ranges", NULL, 0);
-> -    if (vms->gic_version =3D=3D 3) {
-> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
->           int nb_redist_regions =3D virt_gicv3_redist_region_count(vms);
->  =20
->           qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-> @@ -518,7 +518,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState =
-*vms)
->           }
->       }
->  =20
-> -    if (vms->gic_version =3D=3D 2) {
-> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_2) {
->           irqflags =3D deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
->                                GIC_FDT_IRQ_PPI_CPU_WIDTH,
->                                (1 << vms->smp_cpus) - 1);
-> @@ -1469,7 +1469,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineSta=
-te *vms, int idx)
->            * purposes are to make TCG consistent (with 64-bit KVM hosts)
->            * and to improve SGI efficiency.
->            */
-> -        if (vms->gic_version =3D=3D 3) {
-> +        if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
->               clustersz =3D GICV3_TARGETLIST_BITS;
->           } else {
->               clustersz =3D GIC_TARGETLIST_BITS;
-> @@ -1560,15 +1560,15 @@ static void machvirt_init(MachineState *machine)
->       /* We can probe only here because during property set
->        * KVM is not available yet
->        */
-> -    if (vms->gic_version <=3D 0) {
-> -        /* "host" or "max" */
-> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_HOST ||
-> +        vms->gic_version =3D=3D VIRT_GIC_VERSION_MAX) {
->           if (!kvm_enabled()) {
-> -            if (vms->gic_version =3D=3D 0) {
-> +            if (vms->gic_version =3D=3D VIRT_GIC_VERSION_HOST) {
->                   error_report("gic-version=3Dhost requires KVM");
->                   exit(1);
->               } else {
->                   /* "max": currently means 3 for TCG */
-> -                vms->gic_version =3D 3;
-> +                vms->gic_version =3D VIRT_GIC_VERSION_3;
->               }
->           } else {
->               vms->gic_version =3D kvm_arm_vgic_probe();
-> @@ -1627,7 +1627,7 @@ static void machvirt_init(MachineState *machine)
->       /* The maximum number of CPUs depends on the GIC version, or on how
->        * many redistributors we can fit into the memory map.
->        */
-> -    if (vms->gic_version =3D=3D 3) {
-> +    if (vms->gic_version =3D=3D VIRT_GIC_VERSION_3) {
->           virt_max_cpus =3D
->               vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->           virt_max_cpus +=3D
-> @@ -1855,7 +1855,7 @@ static void virt_set_its(Object *obj, bool value, E=
-rror **errp)
->   static char *virt_get_gic_version(Object *obj, Error **errp)
->   {
->       VirtMachineState *vms =3D VIRT_MACHINE(obj);
-> -    const char *val =3D vms->gic_version =3D=3D 3 ? "3" : "2";
-> +    const char *val =3D vms->gic_version =3D=3D VIRT_GIC_VERSION_3 ? "3"=
- : "2";
->  =20
->       return g_strdup(val);
->   }
-> @@ -1865,13 +1865,13 @@ static void virt_set_gic_version(Object *obj, con=
-st char *value, Error **errp)
->       VirtMachineState *vms =3D VIRT_MACHINE(obj);
->  =20
->       if (!strcmp(value, "3")) {
-> -        vms->gic_version =3D 3;
-> +        vms->gic_version =3D VIRT_GIC_VERSION_3;
->       } else if (!strcmp(value, "2")) {
-> -        vms->gic_version =3D 2;
-> +        vms->gic_version =3D VIRT_GIC_VERSION_2;
->       } else if (!strcmp(value, "host")) {
-> -        vms->gic_version =3D 0; /* Will probe later */
-> +        vms->gic_version =3D VIRT_GIC_VERSION_HOST; /* Will probe later =
-*/
->       } else if (!strcmp(value, "max")) {
-> -        vms->gic_version =3D -1; /* Will probe later */
-> +        vms->gic_version =3D VIRT_GIC_VERSION_MAX; /* Will probe later *=
-/
->       } else {
->           error_setg(errp, "Invalid gic-version value");
->           error_append_hint(errp, "Valid values are 3, 2, host, max.\n");
-> @@ -2139,7 +2139,7 @@ static void virt_instance_init(Object *obj)
->                                       "physical address space above 32 bi=
-ts",
->                                       NULL);
->       /* Default GIC type is v2 */
-> -    vms->gic_version =3D 2;
-> +    vms->gic_version =3D VIRT_GIC_VERSION_2;
->       object_property_add_str(obj, "gic-version", virt_get_gic_version,
->                           virt_set_gic_version, NULL);
->       object_property_set_description(obj, "gic-version",
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 02f500cb8e..c0827cacdf 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -95,6 +95,13 @@ typedef enum VirtIOMMUType {
->       VIRT_IOMMU_VIRTIO,
->   } VirtIOMMUType;
->  =20
-> +typedef enum VirtGICType {
-> +    VIRT_GIC_VERSION_MAX,
-> +    VIRT_GIC_VERSION_HOST,
-> +    VIRT_GIC_VERSION_2,
-> +    VIRT_GIC_VERSION_3,
-> +} VirtGICType;
-> +
->   typedef struct MemMapEntry {
->       hwaddr base;
->       hwaddr size;
-> @@ -123,7 +130,7 @@ typedef struct {
->       bool highmem_ecam;
->       bool its;
->       bool virt;
-> -    int32_t gic_version;
-> +    VirtGICType gic_version;
->       VirtIOMMUType iommu;
->       uint16_t virtio_iommu_bdf;
->       struct arm_boot_info bootinfo;
-> @@ -162,7 +169,7 @@ static inline int virt_gicv3_redist_region_count(Virt=
-MachineState *vms)
->       uint32_t redist0_capacity =3D
->                   vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->  =20
-> -    assert(vms->gic_version =3D=3D 3);
-> +    assert(vms->gic_version =3D=3D VIRT_GIC_VERSION_3);
->  =20
->       return vms->smp_cpus > redist0_capacity ? 2 : 1;
->   }
->=20
+Laurent
 
 
