@@ -2,81 +2,87 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA942C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EA2C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:37:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1A362084E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:34:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D32B221556
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:37:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vQ8SQ0vG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1A362084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IwkjEvQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32B221556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8n5M-0000Ac-SP
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:34:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
+	id 1j8n88-0002Ew-2k
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:37:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j8n4E-0007bP-Gj
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:33:15 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j8n7W-0001mp-9D
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j8n4D-0005pB-EE
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:33:14 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j8n4D-0005ov-96
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:33:13 -0500
-Received: by mail-ot1-x342.google.com with SMTP id b3so10124498otp.4
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 07:33:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YkLw5iFYwtgAxG69XoDXapikUPoI3cTv7TsRqAXNEkA=;
- b=vQ8SQ0vGFffkQM8fgG1oNh+i8WBA9qoh1n+1wRhq1b/Psz0mhGV8QoENtNNZ1PKBS1
- vv0z9cLYTD/ap47Nv2da7lEktoF9lPbyjXvtigfvVnS9wySg+MYKnt2GN9kATTTud5GI
- Fbft+86i76hgHXMHRV76rGlQf6J+teubIuDd/kWRURJppMULLFGWge9wTcXoFEmJ3QmD
- 2DKdWdhhF+AfeOP+x7t7yFfrTdUeRY2tR2w3ZwzwNR46ID2PfqthooMbXfjem1AqyZ3T
- CsB04EMlHDCg9k3xIvv/Uz7FvdHuEqGPDUkJgc5s/izqjqUp/AhyEf80449J1N5nBq69
- +xRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YkLw5iFYwtgAxG69XoDXapikUPoI3cTv7TsRqAXNEkA=;
- b=TekOAGc+cVsJKohKDnvLze6WRCGzAJv4i6Bfc9Jkn7uboM4yAZiFmNKC90hEwZPoUe
- 3AU/OvB1iNy/PUIRPgyPcHkaL2B7ON37+kxtPKOojXwe30Mr91BbwDv0WdN3FZqhIkZx
- ftlmvpv612gk2MhECTzeeA0mB1gR9CA3V0+RO9l7T+aeDtJY1BWAGBk7setTYrhinuM7
- gg9Li6qerz5yDLw+x7WSBCMF+Dx4Unnx//IvwLTNtfFvyRJKwMHIuTPUv8E1XpRk+yIq
- 72aXmzUCRenpoLQRLDA3dtQMPKentnE7QY7xT7sKxQSKN4yHX1oJGFyZpRBOVnR2jq4b
- nOVg==
-X-Gm-Message-State: ANhLgQ2dqA5/h/GhVYaFCQL97FIpQZzoX1o5xTk7gI6ZG8x/SIJDZ8aA
- 9DINOgnz+Yx/+1mKzqhjS1jOK8btTaC+qAOKGNRqFA==
-X-Google-Smtp-Source: ADFU+vv3hFEP5x9/kSOprfKNy3aolerUiYz/G81wJgtdiROfRYpO4SQLtmilBnswmp9CepJyEw5bPy7BADe8N2FS1Fg=
-X-Received: by 2002:a05:6830:1406:: with SMTP id
- v6mr4404067otp.232.1583163192261; 
- Mon, 02 Mar 2020 07:33:12 -0800 (PST)
+ (envelope-from <kwolf@redhat.com>) id 1j8n7U-0006gs-Gd
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:36:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51998
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j8n7U-0006gc-9f
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:36:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583163395;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z+1/atCbfReh1bvdA0kDbqj22x71e+Gk58oW8+0XwFU=;
+ b=IwkjEvQAwnh+twsB8Tw3sDWm1BsM7xluGKjHjzogGtyISt3tmJV9kptb20rkyHZgTVbqpU
+ 1wvFZbPyeGUHmEbVaVFZ1vvtGVCTox9yKMAb78IbGUSna8Wj723e+XVkGCj6Kb3iZ//JDN
+ aWiNXHtP8rLWyqmO7/sWbUhL1f9RuYo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231--kDHGD8MPTK6R1_vdUrGnw-1; Mon, 02 Mar 2020 10:36:33 -0500
+X-MC-Unique: -kDHGD8MPTK6R1_vdUrGnw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B31C1DBB3;
+ Mon,  2 Mar 2020 15:36:32 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-7.ams2.redhat.com [10.36.117.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B8B315DA75;
+ Mon,  2 Mar 2020 15:36:27 +0000 (UTC)
+Date: Mon, 2 Mar 2020 16:36:26 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] console: make QMP screendump use coroutine
+Message-ID: <20200302153626.GD4965@linux.fritz.box>
+References: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+ <87a75dn1gd.fsf@dusky.pond.sub.org>
+ <CAJ+F1C+M3yPreBLOHXkt16b5aghesT7qYkEPbS_3Dm7vGTaMKA@mail.gmail.com>
+ <87blptckoi.fsf@dusky.pond.sub.org>
+ <20200221100700.GA5254@linux.fritz.box>
+ <87pne751g9.fsf@dusky.pond.sub.org>
+ <CAJ+F1CKbZiVk0DCQxMojxu8FyEskg5Cw32B08Vi9emaEMw79fQ@mail.gmail.com>
+ <87imjm96qy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200227220149.6845-1-nieklinnenbank@gmail.com>
- <20200227220149.6845-3-nieklinnenbank@gmail.com>
-In-Reply-To: <20200227220149.6845-3-nieklinnenbank@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Mar 2020 15:33:01 +0000
-Message-ID: <CAFEAcA9cbCNYo_RP7VnHxuR7LNjdwViE6NCVCuoea1Q2SsrvEg@mail.gmail.com>
-Subject: Re: [PATCH v1 2/4] hw/arm/cubieboard: restrict allowed CPU type to
- ARM Cortex-A8
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <87imjm96qy.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,53 +94,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, David Alan Gilbert <dgilbert@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 27 Feb 2020 at 22:01, Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
->
-> The Cubieboard has an ARM Cortex-A8. Prevent changing the CPU
-> to a different type which could break user programs.
->
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> ---
->  hw/arm/cubieboard.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-> index 0195925c73..010375f0a8 100644
-> --- a/hw/arm/cubieboard.c
-> +++ b/hw/arm/cubieboard.c
-> @@ -30,9 +30,17 @@ static struct arm_boot_info cubieboard_binfo = {
->
->  static void cubieboard_init(MachineState *machine)
->  {
-> -    AwA10State *a10 = AW_A10(object_new(TYPE_AW_A10));
-> +    AwA10State *a10;
->      Error *err = NULL;
->
-> +    /* Only allow Cortex-A8 for this board */
-> +    if (strcmp(machine->cpu_type, ARM_CPU_TYPE_NAME("cortex-a8")) != 0) {
-> +        error_report("This board can only be used with cortex-a8 CPU");
-> +        exit(1);
-> +    }
-> +
-> +    a10 = AW_A10(object_new(TYPE_AW_A10));
-> +
->      object_property_set_int(OBJECT(&a10->emac), 1, "phy-addr", &err);
->      if (err != NULL) {
->          error_reportf_err(err, "Couldn't set phy address: ");
+Am 02.03.2020 um 15:22 hat Markus Armbruster geschrieben:
+> Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> writes:
+>=20
+> > Hi
+> >
+> > On Fri, Feb 21, 2020 at 5:50 PM Markus Armbruster <armbru@redhat.com> w=
+rote:
+> >>
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >>
+> >> > Am 20.02.2020 um 17:01 hat Markus Armbruster geschrieben:
+> >> >> >> >  void qmp_screendump(const char *filename, bool has_device, co=
+nst char *device,
+> >> >> >> >                      bool has_head, int64_t head, Error **errp=
+)
+> >> >> >> >  {
+> >> >> >> >      QemuConsole *con;
+> >> >> >> >      DisplaySurface *surface;
+> >> >> >> > +    g_autoptr(pixman_image_t) image =3D NULL;
+> >> >> >> >      int fd;
+> >> >> >> >
+> >> >> >> >      if (has_device) {
+> >> >> >> > @@ -365,7 +375,15 @@ void qmp_screendump(const char *filename,=
+ bool has_device, const char *device,
+> >> >> >> >          }
+> >> >> >> >      }
+> >> >> >> >
+> >> >> >> > -    graphic_hw_update(con);
+> >> >> >> > +    if (qemu_in_coroutine()) {
+> >> >> >> > +        assert(!con->screendump_co);
+> >> >> >> > +        con->screendump_co =3D qemu_coroutine_self();
+> >> >> >> > +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+> >> >> >> > +                                graphic_hw_update_bh, con);
+> >> >> >> > +        qemu_coroutine_yield();
+> >> >> >> > +        con->screendump_co =3D NULL;
+> >> >> >> > +    }
+> >> >> >>
+> >> >> >> What if multiple QMP monitors simultaneously screendump?  Hmm, i=
+t works
+> >> >> >> because all execute one after another in the same coroutine
+> >> >> >> qmp_dispatcher_co.  Implicit mutual exclusion.
+> >> >> >>
+> >> >> >> Executing them one after another is bad, because it lets an ill-=
+behaved
+> >> >> >> QMP command starve *all* QMP monitors.  We do it only out of
+> >> >> >> (reasonable!) fear of implicit mutual exclusion requirements lik=
+e the
+> >> >> >> one you add.
+> >> >> >>
+> >> >> >> Let's not add more if we can help it.
+> >> >> >
+> >> >> > The situation is not worse than the current blocking handling.
+> >> >>
+> >> >> Really?
+> >> >>
+> >> >> What makes executing multiple qmp_screendump() concurrently (in sep=
+arate
+> >> >> threads) or interleaved (in separate coroutines in the same thread)
+> >> >> unsafe before this patch?
+> >> >
+> >> > QMP command handlers are guaranteed to run in the main thread with t=
+he
+> >> > BQL held, so there is no concurrency. If you want to change this, yo=
+u
+> >> > would have much more complicated problems to solve than in this hand=
+ler.
+> >> > I'm not sure it's fair to require thread-safety from one handler whe=
+n
+> >> > no other handler is thread safe (except accidentally) and nobody see=
+ms
+> >> > to plan actually calling them from multiple threads.
+> >>
+> >> "Let's not [...] if we can help it." is hardly a "change this or else =
+no
+> >> merge" demand.  It is a challenge to find a more elegant solution.
+> >>
+> >> >> >> Your screendump_co is per QemuConsole instead of per QMP monitor=
+ only
+> >> >> >> because you need to find the coroutine in graphic_hw_update_done=
+().  Can
+> >> >> >> we somehow pass it via function arguments?
+> >> >> >
+> >> >> > I think it could be done later, so I suggest a TODO.
+> >> >>
+> >> >> We should avoid making our dependence on implicit mutual exclusion
+> >> >> worse.  When we do it anyway, a big, fat, ugly comment is definitel=
+y
+> >> >> called for.
+> >> >
+> >> > Anyway, what I really wanted to add:
+> >> >
+> >> > This should be easy to solve by having a CoQueue instead of a single
+> >>
+> >> Ah, challenge accepted!  Exactly the outcome I was hoping for :)
+> >>
+> >> > Coroutine pointer. The coroutine would just call qemu_co_queue_wait(=
+),
+> >> > which adds itself to the queue before it yields and the update
+> >> > completion would wake up all coroutines that are currently queued wi=
+th
+> >> > qemu_co_queue_restart_all().
+> >> >
+> >> > qemu_co_queue_wait() takes a lock as its second parameter. You don't
+> >> > need it in this context and can just pass NULL. (This is a lock that
+> >> > would be dropped while the coroutine is sleeping and automatically
+> >> > reacquired afterwards.)
+> >> >
+> >> >> >> In case avoiding the mutual exclusion is impractical: please exp=
+lain it
+> >> >> >> in a comment to make it somewhat less implicit.
+> >> >>
+> >> >> It is anything but: see appended patch.
+> >> >
+> >> > This works, too, but it requires an additional struct. I think the q=
+ueue
+> >> > is easier. (Note there is a difference in the mechanism: Your patch
+> >> > waits for the specific update it triggered, while the CoQueue would =
+wait
+> >> > for _any_ update to complete. I assume effectively the result is the
+> >> > same.)
+> >>
+> >> Your idea sounds much nicer to me.  Thanks!
+> >
+> > Similar to the NULL check you asked to remove,
+> > having a CoQueue there would lead to think that several concurrently
+> > running screendump are possible.
+> >
+> > Is this a direction we are willing to take?
+>=20
+> Let's take a step back.
+>=20
+> The actual problem is to find the coroutine in graphic_hw_update_done(),
+> so you can wake it.
+>=20
+> Your solution stores the coroutine in the QemuConsole, because that's
+> readily available in graphic_hw_update_done().
+>=20
+> However, it really, really doesn't belong there, it belongs to the
+> monitor.  Works anyway only because QMP commands execute one after the
+> other.
+>=20
+> Kevin suggested using a CoQueue to avoid this unspoken dependency.  You
+> object, because it could make readers assume multiple screendump
+> commands could run concurrently, which is not the case.
+>=20
+> Alright, let's KISS: since there's just one main loop, there's just one
+> coroutine: @qmp_dispatcher_co.  Let's use that, so the dependency on
+> "one command after the other" is explicit and obvious.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Ugh... If you choose that this is the way to go, please add an assertion
+at least that we are indeed in qmp_dispatcher_co before yielding.
 
-except that we're not preventing the user changing the
-CPU type, we're just giving a helpful error message instead
-of ignoring the bogus -cpu option.
+Kevin
 
-thanks
--- PMM
 
