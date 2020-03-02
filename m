@@ -2,83 +2,101 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D47C5C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D48C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:47:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4F762072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:43:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A449E2166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykEVUPzT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4F762072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c13Tm42g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A449E2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8q2I-000253-UB
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:43:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47182)
+	id 1j8q6U-0003zW-SC
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:47:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j8q1P-00010X-08
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:31 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8q5c-0003WB-Kq
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j8q1O-0006bg-56
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:30 -0500
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:38932)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j8q1N-0006bN-W0
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:30 -0500
-Received: by mail-ot1-x32c.google.com with SMTP id x97so274635ota.6
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:42:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=pLoozhXvDFBpxaihsnJnBPua4MwyOChZI+phtNSrSA8=;
- b=ykEVUPzTfVUC4rKSJiyrsb4/wXp1oMQGaO6hpwW9VRUCi3jQiSY+gVS3kV/BpSpt6I
- rl93v34n1/Jpk3kDJDwyg4+nx792LVdD+ZAExGbG/hmW9Y6qjCdUqPvbgqcOrOeFu2Zc
- yqbUlihIdWxJIjM+tJlsNcqSQwIxC+CIJVKZdUE2V2r9/9xjyuEyuwbvJr1a483aTrvQ
- SBtW06CQomIxfTXAvSXlTcFVd9urXDjEV4ClraMEVlFjrQ0+nA7UroYHg7zAWVozaJUJ
- XiWMIyYHbjA9iGcncKCTomZqEHGcUEoI/AV+aDeQylIA5wGCN2j3YOLHPAY8jx/V67+u
- ix3g==
+ (envelope-from <philmd@redhat.com>) id 1j8q5a-0008Kb-Cr
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:46:51 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44723
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8q5Z-0008Ie-0g
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:46:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583174807;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uOgiW1RpaYCbmNnzkWKYkmQxLIJ5yc0wSSwavdZypgM=;
+ b=c13Tm42gmCmChuQZAmw5R7duiN8/q81st6NVFVS7pfnsSXv6Mv+pSEiLXeRpD/RBDNVm5z
+ De/nztxjet+VU5yWiHBrpi+jvXHs8p1+msrbZkF8P+/vpJ9yIn5LliFvZpBndcny7j3Jka
+ vg96Z7ezb+2Fe8gaNeUT2PxZpQuQhWk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215-Z2wdYonwNCKb_O5tlPzZBQ-1; Mon, 02 Mar 2020 13:46:45 -0500
+X-MC-Unique: Z2wdYonwNCKb_O5tlPzZBQ-1
+Received: by mail-wr1-f69.google.com with SMTP id m13so102327wrw.3
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:46:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=pLoozhXvDFBpxaihsnJnBPua4MwyOChZI+phtNSrSA8=;
- b=ds7CYUni4aCtrNgLl6JQBRs6DqSh7ig/B4WafVTZaBzQgB9Ug9qHtLi3WxyAIOQaXQ
- hqiFpbA/LCIbFF0IOUu4mVFjrc+9OThimIHzdZSfvLba8GNt7DFYecEkvnHSo35mN2D1
- DkcCHa8DUg3vZSoqp8wnhxoimggzzCfGse9XFWvIjlCxjI1voxsBOrQEJTkBvZ/f+iZj
- 6ACBfcP9RHv3zZBNrCyOxK3HA6kTTqu7vz37qboj0x68dRXrwY1a6quBPL3kyPQkS2NS
- hkD4jWtVovtSrY7Z56EuOsNraxYDdMuw2Uo1hWV3NyL/TDP/voaTz5MKOz26hXdfVzgq
- cOrw==
-X-Gm-Message-State: ANhLgQ28f6Er/uVdrX3YESpUiMAsTZEduXVrAoDCKZ+dpI6kMHVAoeSN
- ae25g/+Q//bsIyDN3g8G6KMJMJF23+fQ91y0IKdCog==
-X-Google-Smtp-Source: ADFU+vvp1XVp5VsKBE8FOopN4jjueGxlGfwe/DA3avAUCoOK7e0AuJGravEWgA9yhgoIrJ0gp9K0bG8rVT+ZCePuXiQ=
-X-Received: by 2002:a05:6830:1184:: with SMTP id
- u4mr386717otq.221.1583174549174; 
- Mon, 02 Mar 2020 10:42:29 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4G23sQWUc0ZIkgDa7bP5bU52DLbHTEgEh+S/Mo3+yb4=;
+ b=bxbzSof5W2v0sCHQ5x76j3LzXlWU9wU3nbKZ6AfbMPC4mbwquq4p5uqZpYfqOrAepY
+ uqkRRCgZam/tFY6qtaqNERXSZzsImNzBP+0A1x1iv/L7Np9XFdYXHcJ1iAan5YJRdUYE
+ SE08f3LjS4HOd8muGQl1z3UWau81Nma1LGZpz6H38BNKXBWgYIQuz0r3mBrZ2xkll8Zp
+ u11kp+4foR4WRBSS0HJ3asih1hcXlxBUk6h66WZ8jExw97Qjr54wchdRw8lsDcBNQfhG
+ 2cFWUBLZ0aBCiQYVNBAWs8l7iO8PzJn4MFjgxAKDuRwUO+L5V/LsMhWFO9gTvvSn4BBh
+ PAXA==
+X-Gm-Message-State: ANhLgQ22PEwIMoGjLMub4p5P+nzg43d5CZa82gghnKyjVoMlkO3HYZ5I
+ 3fEmI21YB4Vh2t2t4jHReMy9Ds5R4PhU/sBZ8JKYwYawrjc0q/aeVx37quzBibDE+9r5DuvuIR2
+ veo5ZIou3aRpdfoo=
+X-Received: by 2002:a1c:ac46:: with SMTP id v67mr342450wme.153.1583174803819; 
+ Mon, 02 Mar 2020 10:46:43 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vv0LEHEtJSy+zw9aEXHv/pyUbqn2MzZ6Edu4WunIc7T5yVaK2DB/RSVNwjqLCPMcwNhX64ZtA==
+X-Received: by 2002:a1c:ac46:: with SMTP id v67mr342441wme.153.1583174803618; 
+ Mon, 02 Mar 2020 10:46:43 -0800 (PST)
+Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
+ ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
+ by smtp.gmail.com with ESMTPSA id i7sm460689wma.32.2020.03.02.10.46.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Mar 2020 10:46:43 -0800 (PST)
+Subject: Re: [PATCH v1 06/10] travis: enable tools build on OS X
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20200302181907.32110-1-alex.bennee@linaro.org>
+ <20200302181907.32110-7-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <723eeada-15fa-902d-e7ae-56eae7f4246a@redhat.com>
+Date: Mon, 2 Mar 2020 19:46:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <CAFEAcA9rQ4_o53zfsdcGZWse3eYWksYJdYHLeUFhq6TcBX3_zw@mail.gmail.com>
- <20200302174551.GK4440@habkost.net>
- <c73a059c-6d6f-607d-0cdb-fbc515b45edf@redhat.com>
-In-Reply-To: <c73a059c-6d6f-607d-0cdb-fbc515b45edf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Mar 2020 18:42:18 +0000
-Message-ID: <CAFEAcA-GwNG0rvw3gVZMs2Nz05FUjzoiT-H+-FkwQAZzgC2tAw@mail.gmail.com>
-Subject: Re: CPU reset vs DeviceState reset
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200302181907.32110-7-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,21 +108,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2 Mar 2020 at 18:19, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
-> wrote:
-> Without verifying the code base/commits, my understanding is that was
-> required to use cpu object with linux-user before Markus added support
-> for anonymous object container for QOM objects on linux-user. So now we
-> could make CPUClass inherits of DeviceClass.
+On 3/2/20 7:19 PM, Alex Benn=C3=A9e wrote:
+> From: Laurent Vivier <lvivier@redhat.com>
+>=20
+> As we can build tools on OS X we should check we don't break build
+> when we submit new codes.
+>=20
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20200302154630.45620-3-lvivier@redhat.com>
+> ---
+>   .travis.yml | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 9867272177d..70a24bf2fc8 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -273,6 +273,7 @@ jobs:
+>  =20
+>       - name: "OSX Xcode 10.3"
+>         env:
+> +        - BASE_CONFIG=3D"--disable-docs --enable-tools"
+>           - CONFIG=3D"--target-list=3Di386-softmmu,ppc-softmmu,ppc64-soft=
+mmu,m68k-softmmu,x86_64-softmmu"
+>         os: osx
+>         osx_image: xcode10.3
+>=20
 
-CPUClass already does inherit from DeviceClass...
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-thanks
--- PMM
 
