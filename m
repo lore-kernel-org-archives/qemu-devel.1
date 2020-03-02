@@ -2,119 +2,85 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A75C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A581C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 243FA21556
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C877B214DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:15:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="gydTYSCl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 243FA21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOMCBjRZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C877B214DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8rJ3-0007sm-AT
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 15:04:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33912)
+	id 1j8rT4-0003rd-VR
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 15:15:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sunilmut@microsoft.com>) id 1j8rIF-00078m-Pr
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:04:01 -0500
+ (envelope-from <jcfaracco@gmail.com>) id 1j8rRQ-0002ip-Ap
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sunilmut@microsoft.com>) id 1j8rIE-00024j-M5
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:03:59 -0500
-Received: from mail-bn8nam11on2114.outbound.protection.outlook.com
- ([40.107.236.114]:60480 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
- id 1j8rIE-00022g-Hf
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:03:58 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a1hbfAUxSZh2obdSUQmeeMa508uZbLW06wpfrDW/j4a0WHOD+xCH4gBYIrFhvwNCOOrvwhXTOBs1JKdRuTIb5Azur2mMjkw3VuGVFI+I2nPiZtmi6DrxWm61BX04WHNU6F+UB7s6PBtGcZ3PCdafNe23U/GX4LgXh3M7OypwuzSNnj816avPQkX9jKNKY6JoxxLsRwNpZc8sdRLE/uhZnJdXFKEWIrtcfxxotoRFPn9clzCcn5Z/g3WNaENeOBt9wVtwlwSmataxjI43egd8IZxVXM2zs/gEx7Udkjl0TlUP7eYbuNHghVKaHrFTjEniY7KmXMk42Q/qA8NpdAAhug==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qMML/CTueYHNz4PYdg+r4YOO/yDEaE7Tw/58FO1cNjA=;
- b=FLnNA6jJevHXl0bIk+TdR55bI7k91q1hftsEnQU5mRr1AYLgMXGhd929uTOqYxP2D0klE+CMycDOoF2ojbrOr0zVteKf7rbMyTHVkq/x+kUYBDszW+T/h44jqC1xVkMY1skL6PeHZsUJLfwDwL0YcmGbO8sRUjSQzrzMSDGE1Cndc9fnMGV6R9DfJnBRfqrklTEPDozJOawbP9+LRW/7PDCQ7L9RpG6J+JKmtbBsrFDIqi9Op9gOkjDZAvoo7HBbrNGOCV9eLq8Uj6DdwRm8QOK/hJOaudh4KoUxa0igi0bv+xchXUcyyRO7CnjTMAOYd15H02dL1xu5OFjKUd+72Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qMML/CTueYHNz4PYdg+r4YOO/yDEaE7Tw/58FO1cNjA=;
- b=gydTYSClw2thpLR5/yEUe/sf1uioZkbMdmLykJaN/XoZS+GtHTg1GqwgB9oL8fJbTW1BGBOwk26YeNO1Ym3K1QJYWuIKJd2GTMVz0XfehR/4WEZW/TUuaIiMp4UquWp1hBAdWXQPmc2aObYEm/I/8vkCZkaEpkfU2UwPMEc89+0=
-Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
- (2603:10b6:803:51::33) by SN4PR2101MB0735.namprd21.prod.outlook.com
- (2603:10b6:803:51::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.0; Mon, 2 Mar
- 2020 20:03:55 +0000
-Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
- ([fe80::b1fc:af97:6a7b:4fe]) by SN4PR2101MB0880.namprd21.prod.outlook.com
- ([fe80::b1fc:af97:6a7b:4fe%5]) with mapi id 15.20.2814.001; Mon, 2 Mar 2020
- 20:03:55 +0000
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
- Eduardo Habkost <ehabkost@redhat.com>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil
- <sw@weilnetz.de>, "Justin Terry (SF)" <juterry@microsoft.com>
-Subject: RE: [PATCH] WHPX: Use proper synchronization primitives while
- processing
-Thread-Topic: [PATCH] WHPX: Use proper synchronization primitives while
- processing
-Thread-Index: AdXrRhI7Cc8PiKCvTlmOyf8oQX8z/gFh4vkg
-Date: Mon, 2 Mar 2020 20:03:55 +0000
-Message-ID: <SN4PR2101MB08809732CE13BD1F8AF116E6C0E70@SN4PR2101MB0880.namprd21.prod.outlook.com>
-References: <SN4PR2101MB0880A1C19D64131DE3D261B5C0EC0@SN4PR2101MB0880.namprd21.prod.outlook.com>
-In-Reply-To: <SN4PR2101MB0880A1C19D64131DE3D261B5C0EC0@SN4PR2101MB0880.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sunilmut@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:9:13f8:4346:c8dc:67a9]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: dbcab71c-5a87-4223-1d96-08d7bee4d68f
-x-ms-traffictypediagnostic: SN4PR2101MB0735:|SN4PR2101MB0735:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR2101MB073580C4B2CE7D92FF87C883C0E70@SN4PR2101MB0735.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:346;
-x-forefront-prvs: 033054F29A
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(189003)(199004)(10290500003)(186003)(53546011)(6506007)(81166006)(8676002)(81156014)(4326008)(66476007)(66556008)(52536014)(107886003)(66946007)(5660300002)(2906002)(8936002)(64756008)(66446008)(54906003)(478600001)(55016002)(71200400001)(8990500004)(9686003)(76116006)(86362001)(7696005)(33656002)(316002)(110136005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:SN4PR2101MB0735;
- H:SN4PR2101MB0880.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: p/3LfIkktETi6QC/A4tbCzIHanCpb3GxgyXFzS+sSCgF6Y+8fPd6E0mhMXr9EXTamjDafDiYh/TOCxHOg8Nm4R4py24CH4blFELZ0CTEGkhbF8BghAp/XqkDLkoYPoFAjHU8GaVkK9bEo4Mx807Co0hQNWn/j/qyufQ4nexyHzvKghT5J2pI/s6ntHk8XpeGHxy8JiRce6Ln1N5XPTQfbiXU74nOg1tDlOsvgwkpXBWKmFMmoel9sTpKFvOpIDM6OMcZZs5jdoziVrGIeqhiEkysTOfPotMlVF7bH4Pgjk9p4jsW9pyxyo4Xjw1a7/MavpxP2cG4uvSw6oAs6JqKM4zbjx4YXBRY9YG8PKjG0O67l6kCCqQvDU132dhyRZ7WxvRfmfunRLs/264OMKxvN5R0iSqTkK2/bJHDr8fBs7tx4D71X3dBzQAo6tAoo7aM
-x-ms-exchange-antispam-messagedata: SLSHt0wUWBxSr4pofzQzqjRGOrj7YfQISAWfvsV8qFGZoxb5YHfZHZDRjZcn3z4UbbESNWvILIEQRuyQXSbHUoY8alQ0eoXO2KgF9Dv0BPNBlBh7+VKT/7cVqKWA11GLmMrXU7odTg+1cwq45yM3uiKgAJAipCuIF0qQzH8tvnQMAvuBJEf/DdYg38UhBJYOrdiMy0Fz/Y5WDN7VCz0Grg==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <jcfaracco@gmail.com>) id 1j8rRP-0006oh-4B
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:13:28 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:33691)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jcfaracco@gmail.com>) id 1j8rRP-0006oU-0C
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 15:13:27 -0500
+Received: by mail-qk1-x744.google.com with SMTP id p62so1051849qkb.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 12:13:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=tVH7ua6nWnbcHDgoFSIHFCuc2MlGrp9bq3Bqf0UePNM=;
+ b=FOMCBjRZgVTXLy9LobIkiJTbnnBK4Eq2uXdxid5mUk7wuwPttLScoIr7jJUR7Hg80R
+ cxkrGPtaneG2wF3aeCeBYwigKsoBpcHV3Xn3mzdQ/ZtwgHQ1GextqXZ4oEWSLm2c328G
+ BYVDsJFPqwYuAYaR+t/VMdUr6c4jIg1B1C03oKpfGf7U9UR9gFSq6mYRwmHxZ/dqO24Q
+ hyw1VtwnHO+SnKFU80SltpU2RlKHJNcCYECHlbqkLc3csZd8uZodrpnjCbBvIochCygc
+ rn2EVgB1qe0IZZ/DBN3V2N77cXRvJl7iicLawQYjiHL0Fwz35Oh8pn4awtQvYdCrojCb
+ u1+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=tVH7ua6nWnbcHDgoFSIHFCuc2MlGrp9bq3Bqf0UePNM=;
+ b=ZKuuJHWiE64sCAK3SIDUJL/e0vdqpIZwRlTheiAKz+4uc7S3NF+yemds6wwVGfOaFn
+ MvRffvvFQLA6wag70Yy0aMg2raw0SpUXW0TdjOSkyuC/p9egvPr1nTQNc9Ih9nLER46l
+ Djal31ezmuzXKGm0Z/Kd92CaatGvMc+PDdZZW8YVVX1iYrME1P/DtVUk320QUBcV6OE/
+ WMgfhMLRgRtUchZ7AVPiioqpab5+naeKQgKkboGY4GAXnp2+wgr7PwIXSiMDfOh9tyUO
+ dQnVxL2PIaC8e/XLQ5oPlVzxKLq7rvQlahg1Ym/1kOC2B8wn5iOEy7+lglkCkUl/cAnX
+ dAhA==
+X-Gm-Message-State: ANhLgQ2Tv72Wj4KazIhR6PnRqpf6C5F4L/k32nArTlY/u8+2k2cRp4y7
+ G92MNRAzqVb813SHgzhWT+2l73tX
+X-Google-Smtp-Source: ADFU+vvxB46CnE4PhM/7pNmfNu5xtfBRbNfq2HLH2a5Nx1tU0xLhINPeKwnBKOZQqZbzoqiPejivxA==
+X-Received: by 2002:a37:de0d:: with SMTP id h13mr966922qkj.332.1583180005360; 
+ Mon, 02 Mar 2020 12:13:25 -0800 (PST)
+Received: from localhost.localdomain ([2804:431:c7cb:1f67:aa55:feb:954c:c891])
+ by smtp.gmail.com with ESMTPSA id
+ w48sm11421565qtc.40.2020.03.02.12.13.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Mar 2020 12:13:24 -0800 (PST)
+From: Julio Faracco <jcfaracco@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4] i386: Fix GCC warning with snprintf when HAX is enabled
+Date: Mon,  2 Mar 2020 17:13:20 -0300
+Message-Id: <20200302201320.6465-1-jcfaracco@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbcab71c-5a87-4223-1d96-08d7bee4d68f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 20:03:55.6749 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gu0JR1kRi8hjH51FUBFW5ujn0ngoP2SInhS6cqFhM+b68GqryOqSaVPMDw3invwFnXjrCIqeTwNruHMIr/j5eRpKKHpsNnyoBfFSIY/8h0U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0735
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.236.114
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,81 +92,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Sunil Muthuswamy
-> Sent: Monday, February 24, 2020 11:28 AM
-> To: Paolo Bonzini <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.n=
-et>; Eduardo Habkost <ehabkost@redhat.com>
-> Cc: qemu-devel@nongnu.org; Stefan Weil <sw@weilnetz.de>; Justin Terry (SF=
-) <juterry@microsoft.com>
-> Subject: [PATCH] WHPX: Use proper synchronization primitives while proces=
-sing
->=20
-> WHPX wasn't using the proper synchronization primitives while
-> processing async events, which can cause issues with SMP.
->=20
-> Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
-> ---
->  target/i386/whpx-all.c | 17 +++++++----------
->  1 file changed, 7 insertions(+), 10 deletions(-)
->=20
-> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-> index 35601b8176..868ade5fd0 100644
-> --- a/target/i386/whpx-all.c
-> +++ b/target/i386/whpx-all.c
-> @@ -841,9 +841,8 @@ static void whpx_vcpu_process_async_events(CPUState *=
-cpu)
->=20
->      if ((cpu->interrupt_request & CPU_INTERRUPT_INIT) &&
->          !(env->hflags & HF_SMM_MASK)) {
-> -
-> +        whpx_cpu_synchronize_state(cpu);
->          do_cpu_init(x86_cpu);
-> -        cpu->vcpu_dirty =3D true;
->          vcpu->interruptable =3D true;
->      }
->=20
-> @@ -859,17 +858,13 @@ static void whpx_vcpu_process_async_events(CPUState=
- *cpu)
->      }
->=20
->      if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-> -        if (!cpu->vcpu_dirty) {
-> -            whpx_get_registers(cpu);
-> -        }
-> +        whpx_cpu_synchronize_state(cpu);
->          do_cpu_sipi(x86_cpu);
->      }
->=20
->      if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
->          cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
-> -        if (!cpu->vcpu_dirty) {
-> -            whpx_get_registers(cpu);
-> -        }
-> +        whpx_cpu_synchronize_state(cpu);
->          apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
->                                        env->tpr_access_type);
->      }
-> @@ -1067,8 +1062,10 @@ static int whpx_vcpu_run(CPUState *cpu)
->=20
->  static void do_whpx_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data=
- arg)
->  {
-> -    whpx_get_registers(cpu);
-> -    cpu->vcpu_dirty =3D true;
-> +    if (!cpu->vcpu_dirty) {
-> +        whpx_get_registers(cpu);
-> +        cpu->vcpu_dirty =3D true;
-> +    }
->  }
->=20
->  static void do_whpx_cpu_synchronize_post_reset(CPUState *cpu,
-> --
-> 2.17.1
+When HAX is enabled (--enable-hax), GCC 9.2.1 reports issues with
+snprintf(). Replacing old snprintf() by g_strdup_printf() fixes the
+problem with boundary checks of vm_id and vcpu_id and finally the
+warnings produced by GCC.
 
-Can we please get this reviewed/queued till I figure out the GPG key thing?
+For more details, one example of warning:
+  CC      i386-softmmu/target/i386/hax-posix.o
+qemu/target/i386/hax-posix.c: In function ‘hax_host_open_vm’:
+qemu/target/i386/hax-posix.c:124:56: error: ‘%02d’ directive output may be
+truncated writing between 2 and 11 bytes into a region of size 3
+[-Werror=format-truncation=]
+  124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
+      |                                                        ^~~~
+qemu/target/i386/hax-posix.c:124:41: note: directive argument in the range
+[-2147483648, 64]
+  124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
+      |                                         ^~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/stdio.h:867,
+                 from qemu/include/qemu/osdep.h:99,
+                 from qemu/target/i386/hax-posix.c:14:
+/usr/include/bits/stdio2.h:67:10: note: ‘__builtin___snprintf_chk’ output
+between 17 and 26 bytes into a destination of size 17
+   67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL - 1,
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   68 |        __bos (__s), __fmt, __va_arg_pack ());
+      |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
+---
+v1-v2: Add assert() as Richard Henderson suggested.
+v2-v3: Fix code syntax alignment with vm_id and snprintf() function.
+v3-v4: Replacing snprintf() by g_strdup_printf() from linux and windows.
+---
+---
+ target/i386/hax-posix.c   | 33 ++-------------------------------
+ target/i386/hax-windows.c | 33 ++-------------------------------
+ 2 files changed, 4 insertions(+), 62 deletions(-)
+
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index a5426a6dac..3bad89f133 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -108,41 +108,12 @@ int hax_mod_version(struct hax_state *hax, struct hax_module_version *version)
+ 
+ static char *hax_vm_devfs_string(int vm_id)
+ {
+-    char *name;
+-
+-    if (vm_id > MAX_VM_ID) {
+-        fprintf(stderr, "Too big VM id\n");
+-        return NULL;
+-    }
+-
+-#define HAX_VM_DEVFS "/dev/hax_vm/vmxx"
+-    name = g_strdup(HAX_VM_DEVFS);
+-    if (!name) {
+-        return NULL;
+-    }
+-
+-    snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
+-    return name;
++    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
+ }
+ 
+ static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
+ {
+-    char *name;
+-
+-    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
+-        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_id);
+-        return NULL;
+-    }
+-
+-#define HAX_VCPU_DEVFS "/dev/hax_vmxx/vcpuxx"
+-    name = g_strdup(HAX_VCPU_DEVFS);
+-    if (!name) {
+-        return NULL;
+-    }
+-
+-    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
+-             vm_id, vcpu_id);
+-    return name;
++    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
+ }
+ 
+ int hax_host_create_vm(struct hax_state *hax, int *vmid)
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 5729ad9b48..0ba488c468 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -185,41 +185,12 @@ int hax_mod_version(struct hax_state *hax, struct hax_module_version *version)
+ 
+ static char *hax_vm_devfs_string(int vm_id)
+ {
+-    char *name;
+-
+-    if (vm_id > MAX_VM_ID) {
+-        fprintf(stderr, "Too big VM id\n");
+-        return NULL;
+-    }
+-
+-#define HAX_VM_DEVFS "\\\\.\\hax_vmxx"
+-    name = g_strdup(HAX_VM_DEVFS);
+-    if (!name) {
+-        return NULL;
+-    }
+-
+-    snprintf(name, sizeof HAX_VM_DEVFS, "\\\\.\\hax_vm%02d", vm_id);
+-    return name;
++    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
+ }
+ 
+ static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
+ {
+-    char *name;
+-
+-    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
+-        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_id);
+-        return NULL;
+-    }
+-
+-#define HAX_VCPU_DEVFS "\\\\.\\hax_vmxx_vcpuxx"
+-    name = g_strdup(HAX_VCPU_DEVFS);
+-    if (!name) {
+-        return NULL;
+-    }
+-
+-    snprintf(name, sizeof HAX_VCPU_DEVFS, "\\\\.\\hax_vm%02d_vcpu%02d",
+-             vm_id, vcpu_id);
+-    return name;
++    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
+ }
+ 
+ int hax_host_create_vm(struct hax_state *hax, int *vmid)
+-- 
+2.24.1
+
 
