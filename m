@@ -6,75 +6,79 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE81C3F2D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47C5C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4386B24673
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4F762072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:43:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LcIcchFU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4386B24673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykEVUPzT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4F762072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8q1W-0000wF-Ec
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:42:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47074)
+	id 1j8q2I-000253-UB
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:43:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47182)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1j8q0e-0008Ox-MN
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:41:45 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8q1P-00010X-08
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1j8q0d-0006Fe-Pi
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:41:44 -0500
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:43874)
+ (envelope-from <peter.maydell@linaro.org>) id 1j8q1O-0006bg-56
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:30 -0500
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:38932)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1j8q0d-0006Ey-LE
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:41:43 -0500
-Received: by mail-oi1-x235.google.com with SMTP id p125so224745oif.10
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:41:43 -0800 (PST)
+ id 1j8q1N-0006bN-W0
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:42:30 -0500
+Received: by mail-ot1-x32c.google.com with SMTP id x97so274635ota.6
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:42:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8sWl7qXgM9ihdhjKFMdbKfh1ROfYoA/z90r6aWj2sI4=;
- b=LcIcchFU8xFf1PF9QSetPzLwa03POyd7dSmsxh3pRnVhy72rmSOiVzMVYEH91hcQ59
- pKvC4KLnPC3jj4jaMXR2FSIO6XF4w5Jsxprg2jjK4tHPztjmwcpCIGUa077ZXNLBYuTw
- rpnHnKZnXiV/i+7Usevylq+xjP0pNabEu+08ZJ51Hz3Y+eM22cFdeSW5jNqdzYO7cbZ2
- 92PZSeEA5oXbVYfW97C8LL69gqiAfW6et0lT1mzy+hnoXCUnRuVsGSUQpBQRZVZ7QEKp
- 2raH20z7AuXNQYTOMhQCAKNbLMUDmbY5+luXNNVpg8eamklFIqqP7moo6lQgDcZnua/a
- VEVw==
+ :cc:content-transfer-encoding;
+ bh=pLoozhXvDFBpxaihsnJnBPua4MwyOChZI+phtNSrSA8=;
+ b=ykEVUPzTfVUC4rKSJiyrsb4/wXp1oMQGaO6hpwW9VRUCi3jQiSY+gVS3kV/BpSpt6I
+ rl93v34n1/Jpk3kDJDwyg4+nx792LVdD+ZAExGbG/hmW9Y6qjCdUqPvbgqcOrOeFu2Zc
+ yqbUlihIdWxJIjM+tJlsNcqSQwIxC+CIJVKZdUE2V2r9/9xjyuEyuwbvJr1a483aTrvQ
+ SBtW06CQomIxfTXAvSXlTcFVd9urXDjEV4ClraMEVlFjrQ0+nA7UroYHg7zAWVozaJUJ
+ XiWMIyYHbjA9iGcncKCTomZqEHGcUEoI/AV+aDeQylIA5wGCN2j3YOLHPAY8jx/V67+u
+ ix3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8sWl7qXgM9ihdhjKFMdbKfh1ROfYoA/z90r6aWj2sI4=;
- b=lEAVAtpzETC9mCVdXzOCKQ08dy4ukqlGZ+MrCnrp/AcBNHYHe5boULXHNIl5ZkDPJ8
- qtCJCCZ26x+ixvNL6XaeJEDo2wJD2qFHnIRlpn8cbVTMnIL+o8w1eX+oxRzwR4rLOuCI
- X7337LO60JqQb0jnRMZ3CiJt787PjP2q/6vjko1g2T0Ln8gOF54w4rNf5iQRllh4VimR
- 3TP1N37Zh8vq59AfmEU3RwiH8hTzB97jLCXkFtUiNo/2zsH22LS5ngZYyoP/mS0gINhJ
- IB5kz9XpdrSgRiRl0ALg8FwALog15PhP2zDS+s8t6qCnrPe0RnC4Z50pSM9W4BVDZ/ba
- QYcw==
-X-Gm-Message-State: ANhLgQ0JXNmTvgtKcz/xUBq77OqIxx+VTAaXsdC4c6aH8VB5eFhVN6KJ
- y4UTJWSQadIzb11bat+ga05HdRgy6OalYTQGS6fGag==
-X-Google-Smtp-Source: ADFU+vssMYVGSwP8DmRe0ABUj6WAAc1qWjKTGEEphQQu6q/y2inMr6DdS/nggF9Dyy8xTS8knxL7Iq0AW8LlE2G5uqE=
-X-Received: by 2002:a05:6808:289:: with SMTP id z9mr347074oic.48.1583174502791; 
- Mon, 02 Mar 2020 10:41:42 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pLoozhXvDFBpxaihsnJnBPua4MwyOChZI+phtNSrSA8=;
+ b=ds7CYUni4aCtrNgLl6JQBRs6DqSh7ig/B4WafVTZaBzQgB9Ug9qHtLi3WxyAIOQaXQ
+ hqiFpbA/LCIbFF0IOUu4mVFjrc+9OThimIHzdZSfvLba8GNt7DFYecEkvnHSo35mN2D1
+ DkcCHa8DUg3vZSoqp8wnhxoimggzzCfGse9XFWvIjlCxjI1voxsBOrQEJTkBvZ/f+iZj
+ 6ACBfcP9RHv3zZBNrCyOxK3HA6kTTqu7vz37qboj0x68dRXrwY1a6quBPL3kyPQkS2NS
+ hkD4jWtVovtSrY7Z56EuOsNraxYDdMuw2Uo1hWV3NyL/TDP/voaTz5MKOz26hXdfVzgq
+ cOrw==
+X-Gm-Message-State: ANhLgQ28f6Er/uVdrX3YESpUiMAsTZEduXVrAoDCKZ+dpI6kMHVAoeSN
+ ae25g/+Q//bsIyDN3g8G6KMJMJF23+fQ91y0IKdCog==
+X-Google-Smtp-Source: ADFU+vvp1XVp5VsKBE8FOopN4jjueGxlGfwe/DA3avAUCoOK7e0AuJGravEWgA9yhgoIrJ0gp9K0bG8rVT+ZCePuXiQ=
+X-Received: by 2002:a05:6830:1184:: with SMTP id
+ u4mr386717otq.221.1583174549174; 
+ Mon, 02 Mar 2020 10:42:29 -0800 (PST)
 MIME-Version: 1.0
 References: <CAFEAcA9rQ4_o53zfsdcGZWse3eYWksYJdYHLeUFhq6TcBX3_zw@mail.gmail.com>
  <20200302174551.GK4440@habkost.net>
-In-Reply-To: <20200302174551.GK4440@habkost.net>
+ <c73a059c-6d6f-607d-0cdb-fbc515b45edf@redhat.com>
+In-Reply-To: <c73a059c-6d6f-607d-0cdb-fbc515b45edf@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Mar 2020 18:41:31 +0000
-Message-ID: <CAFEAcA8AY4ZPuWh=oPd4heepAAZziLP1DLNHhrC_3jLuMXnBcQ@mail.gmail.com>
+Date: Mon, 2 Mar 2020 18:42:18 +0000
+Message-ID: <CAFEAcA-GwNG0rvw3gVZMs2Nz05FUjzoiT-H+-FkwQAZzgC2tAw@mail.gmail.com>
 Subject: Re: CPU reset vs DeviceState reset
-To: Eduardo Habkost <ehabkost@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::235
+X-Received-From: 2607:f8b0:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,32 +90,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2 Mar 2020 at 17:45, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> My impression is that this is just historical legacy, but I'm not
-> sure how much work a conversion to the new system would require.
-> I see lots of cpu_reset() calls scattered around the code.
+On Mon, 2 Mar 2020 at 18:19, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> Without verifying the code base/commits, my understanding is that was
+> required to use cpu object with linux-user before Markus added support
+> for anonymous object container for QOM objects on linux-user. So now we
+> could make CPUClass inherits of DeviceClass.
 
-I think we can just make the cpu_reset() function be a
-wrapper that calls device_cold_reset(DEVICE(cpu)).
-We would need to update the prototypes for
-
-> To make it worse, TYPE_CPU do have a DeviceClass::reset method
-> implemented, but cpu_reset() won't call it because it bypasses
-> the Device reset system completely.  I will do some git
-> archaeology work to try to find out why the code is this way.
-
-At least for Arm CPUs, I don't think it does (well, it
-has the default DeviceState base class reset method
-which does nothing). Is there somewhere I missed?
-
-(I'm currently attempting to wrestle Coccinelle into
-doing the conversion of the target/ code automatically.)
+CPUClass already does inherit from DeviceClass...
 
 thanks
 -- PMM
