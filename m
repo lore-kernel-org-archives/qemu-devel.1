@@ -6,86 +6,87 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A56DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D92C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:20:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09E2D21739
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:20:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1089921739
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 12:20:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sM313SSy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E2D21739
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MSfK5Gd8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1089921739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8k3Q-0004F9-7B
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:20:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42045)
+	id 1j8k3Z-0004VB-7Y
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 07:20:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42183)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j8k1y-0001vV-Cp
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:43 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j8k2f-00033Y-4Z
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:19:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j8k1w-0001Wi-Jy
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:42 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50515)
+ (envelope-from <alex.bennee@linaro.org>) id 1j8k2d-0001j9-5l
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:19:25 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45647)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j8k1w-0001WS-C0
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:18:40 -0500
-Received: by mail-wm1-x342.google.com with SMTP id a5so10936019wmb.0
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:18:40 -0800 (PST)
+ id 1j8k2c-0001j3-U9
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 07:19:23 -0500
+Received: by mail-wr1-x444.google.com with SMTP id v2so12222034wrp.12
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 04:19:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=1LDY01giTz+RuIzVY2+lKm8+sZab6Cfbiq5jvenVBCw=;
- b=sM313SSyuOtRPsEf6co4sHgG85TDv8WS/7wMeJrFPqdSQ6wZTyANDuvKioCwsbuEJ2
- 8rZZfTszulNeKi+z0hy9U5cqbnAR2Ye3xOP5n99Ivl7ZlUveCLzs6VQ6KF+My4ICwZZG
- /BpjRzqWe7g78DffzLhv1qzblbIHA097bhmJsL/lUuoN5pnS9w84S1IYHInmBMcWKvA4
- 4hSnEM2RO4p27cKH/2jPASuRJNWNpv4Ihfh5a+lbRwS/691patdAy7DwwZpFBwf7ooUQ
- prPpawsH2PruIsrnIMIt4erwMbsJkRTUHMHcWn6sU8IPpkysAepYKiqBcqw0X6Kww/C8
- x2fA==
+ bh=RoYS2YHDc+x44MnCwwVgyh19ZPeRbg3AkQPH614Eexo=;
+ b=MSfK5Gd8NM7qqI6AC1Kv3Fgk8YMg68f9E+PMzAlUVPgkG80KOK2tk28jgoiU8E1QOA
+ v9XhiiGbPp/86/Bj6tKxFlICgnuY0uZC20j1kQO5pYhaFH+RrSaoITArJ48SirNkVgzW
+ SxCFniSE/ZVzeWncMIu2T9Kw4Jz8fOtzOFJXhkN+JFf1wBmjIDC8u/ZOT1UF72Y7W8uO
+ tTbhAQiGQhMrJdYXkaD+S8yMJrs85g7YrP8mp+Xx2RUBIauZJZ4hFHB0FDpGvmtGfjUF
+ MBzAtImXUZ4/+BFfEuEHCadA3q+7lMwjcVtLWMDHDMyi0ibEXHAJNY/3MrbEQoHVyXz/
+ PbJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=1LDY01giTz+RuIzVY2+lKm8+sZab6Cfbiq5jvenVBCw=;
- b=UCeexZBI9JMj2JtDJSzANg9TROQkVtr05TfpbaVg/n1c3HB6DR/dukL1kCT57PAGot
- od7Q0vTrRVwYzEDwlyi/gmvulOINWLLFgVa+M4r7+fgxkBBdWkhJ2pQnKo9LzUICBvPq
- dbWPcJ+SbeMFpLOO73y49TUGQKtyt60gSUOCD5eGQA68PR0uqv5vJOXA5b9glXMs07Lw
- Gb5eGqipvX9SE6sF8EshL0/lEpmgBMWqBHsSL+WcTjWuaee2sINy0UyZ5lymA6IMXlXK
- dNMfS3bA6fiE7zUupXzYhwBlYtoJX34yCLY4TVNEXzaADk3DM1VrYInTcImob8OQUvr2
- gCYg==
-X-Gm-Message-State: APjAAAVM1bmVu6u1ciiFewtkb0bcPi7mHjDNeH2Ae7WBetjvdk+b36pP
- D7dxPaQXMh1Jb+dfz9ifVJjp/w==
-X-Google-Smtp-Source: APXvYqzD8n3q/+b+JdJSBF5wUjiIwM6UfW+x6+Z3BtxrsEgfAzijHsnCd0DcsMZEHRBxbHz3eWMYew==
-X-Received: by 2002:a7b:c183:: with SMTP id y3mr19479917wmi.0.1583151518891;
- Mon, 02 Mar 2020 04:18:38 -0800 (PST)
+ bh=RoYS2YHDc+x44MnCwwVgyh19ZPeRbg3AkQPH614Eexo=;
+ b=Y4UJYGeJyPWgXLmFKWLohX2mXb06PfSPaOCYmLccjhJiiU4hAEDA68fJNU10O18F0w
+ eoy8WCb62zHSE8qH3VbIkHMoHNX9fy97aNeNPNOkhAfUXC/rBAQaV3qckwSeF5ojYAkC
+ vO1pgivzYqx00UuQTRjwRvH+1unHgB6wR//7jS3S/BNsWuEh3sW0klyTY6sdiFPFsk/A
+ M+9XHdXddnaD3t+SOCTcp3IurwRnBNQ6x+fVo6DWfb5KFGpPXJlhZk7nO2hZsrstaHKD
+ VDy0reK2+0wdrGY/xrRF7qgwdMUc5zgg0uMvBfsW/2PJevnskD66NOxgyWsDzbdQ1plt
+ 34Zw==
+X-Gm-Message-State: APjAAAURuOYfaslIs/tskwwZ/Plmc9e6zZ4cHEnrMzfqyJYWL/RRgE9I
+ szCiWdLJgMjoh8f66UdyWls5sw==
+X-Google-Smtp-Source: APXvYqwd0bl2Y+yZuN2CxNGwVuvdic8FX+NPY4T4fFyjSn47xgluyop/JaCULIcH5MAXc9qdC9eAXg==
+X-Received: by 2002:adf:9071:: with SMTP id
+ h104mr19472212wrh.359.1583151561832; 
+ Mon, 02 Mar 2020 04:19:21 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w22sm15198941wmk.34.2020.03.02.04.18.37
+ by smtp.gmail.com with ESMTPSA id s15sm28289682wrp.4.2020.03.02.04.19.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 04:18:37 -0800 (PST)
+ Mon, 02 Mar 2020 04:19:20 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 53C1B1FF87;
- Mon,  2 Mar 2020 12:18:37 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 195291FF87;
+ Mon,  2 Mar 2020 12:19:20 +0000 (GMT)
 References: <20200228153619.9906-1-peter.maydell@linaro.org>
- <20200228153619.9906-24-peter.maydell@linaro.org>
+ <20200228153619.9906-25-peter.maydell@linaro.org>
 User-agent: mu4e 1.3.9; emacs 27.0.90
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v3 23/33] docs: Roll semihosting option information into
- qemu-options.hx
-In-reply-to: <20200228153619.9906-24-peter.maydell@linaro.org>
-Date: Mon, 02 Mar 2020 12:18:37 +0000
-Message-ID: <87mu8z9cgy.fsf@linaro.org>
+Subject: Re: [PATCH v3 24/33] docs: Roll -prom-env and -g target-specific
+ info into qemu-options.hx
+In-reply-to: <20200228153619.9906-25-peter.maydell@linaro.org>
+Date: Mon, 02 Mar 2020 12:19:20 +0000
+Message-ID: <87k1439cfr.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,214 +107,259 @@ Sender: "Qemu-devel"
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Currently the per-target documentation for those targets that
-> implement semihosting includes a bit of text that goes into both the
-> manual and the manpage about options specific to the target.  This
-> text is redundant with the earlier generic option description of the
-> semihosting option produced from qemu-options.hx. To avoid having
-> to create a lot of stub include files to include into the rST
-> generated qemu.1 manpage, roll target-specific bits of information
-> into the qemu-options.hx text, so the user doesn't have to look
-> in two places for this information.
+> The SPARC and PPC targets currently have a fragment of target-specific
+> information about the -g and -prom options which would be better placed
+> as part of the general documentation of those options in qemu-options.hx.
+> Move the relevant information to those locations.
+>
+> SPARC also has a bit of text about the -M option which is out of
+> date and provides no useful information over the generic documentation
+> of that option, so just delete it.
+>
+> The motivation here is again to avoid having to awkwardly include
+> this text into the rST version of the qemu.1 manpage.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
-> Yes, it would in theory make sense to do this before generating
-> the rst from the texi docs, but I didn't realize this was a
-> good idea until well after Paolo had done that part.
-> ---
->  docs/system/target-arm.rst     | 10 ----------
->  docs/system/target-arm.texi    | 18 ------------------
->  docs/system/target-m68k.rst    | 11 -----------
->  docs/system/target-m68k.texi   | 19 -------------------
->  docs/system/target-xtensa.rst  | 12 ------------
->  docs/system/target-xtensa.texi | 20 --------------------
->  qemu-options.hx                | 18 ++++++++++++++++++
->  7 files changed, 18 insertions(+), 90 deletions(-)
+>  docs/system/target-ppc.rst      | 14 --------------
+>  docs/system/target-ppc.texi     | 25 -------------------------
+>  docs/system/target-sparc.rst    | 19 -------------------
+>  docs/system/target-sparc.texi   | 27 ---------------------------
+>  docs/system/target-sparc64.rst  | 12 ------------
+>  docs/system/target-sparc64.texi | 22 ----------------------
+>  qemu-options.hx                 | 19 +++++++++++++++++++
+>  7 files changed, 19 insertions(+), 119 deletions(-)
 >
-> diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-> index 0490be55871..d2a3b44ce88 100644
-> --- a/docs/system/target-arm.rst
-> +++ b/docs/system/target-arm.rst
-> @@ -215,13 +215,3 @@ emulation includes the following elements:
+> diff --git a/docs/system/target-ppc.rst b/docs/system/target-ppc.rst
+> index 43fadf3c00b..a2f04c533c2 100644
+> --- a/docs/system/target-ppc.rst
+> +++ b/docs/system/target-ppc.rst
+> @@ -43,19 +43,5 @@ the g3beige and mac99 PowerMac and the 40p machines. O=
+penBIOS is a free
+>  (GPL v2) portable firmware implementation. The goal is to implement a
+>  100% IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
 >=20=20
->  A Linux 2.6 test image is available on the QEMU web site. More
->  information is available in the QEMU mailing-list archive.
+> -The following options are specific to the PowerPC emulation:
 > -
-> -The following options are specific to the ARM emulation:
+> -``-g WxH[xDEPTH]``
+> -   Set the initial VGA graphic mode. The default is 800x600x32.
 > -
-> -``-semihosting``
-> -   Enable semihosting syscall emulation.
+> -``-prom-env string``
+> -   Set OpenBIOS variables in NVRAM, for example:
 > -
-> -   On ARM this implements the \"Angel\" interface.
+> -   ::
 > -
-> -   Note that this allows guest direct access to the host filesystem, so
-> -   should only be used with trusted guest OS.
-> diff --git a/docs/system/target-arm.texi b/docs/system/target-arm.texi
-> index c56b5f6ebfe..eb80dd35f0b 100644
-> --- a/docs/system/target-arm.texi
-> +++ b/docs/system/target-arm.texi
-> @@ -243,21 +243,3 @@ Three on-chip UARTs
->  A Linux 2.6 test image is available on the QEMU web site. More
->  information is available in the QEMU mailing-list archive.
+> -      qemu-system-ppc -prom-env 'auto-boot?=3Dfalse' \
+> -       -prom-env 'boot-device=3Dhd:2,\yaboot' \
+> -       -prom-env 'boot-args=3Dconf=3Dhd:2,\yaboot.conf'
+> -
+>  More information is available at
+>  http://perso.magic.fr/l_indien/qemu-ppc/.
+> diff --git a/docs/system/target-ppc.texi b/docs/system/target-ppc.texi
+> index 55f98f65b12..5c83d4f68e7 100644
+> --- a/docs/system/target-ppc.texi
+> +++ b/docs/system/target-ppc.texi
+> @@ -47,31 +47,6 @@ for the g3beige and mac99 PowerMac and the 40p machine=
+s. OpenBIOS is a free
+>  (GPL v2) portable firmware implementation. The goal is to implement a 10=
+0%
+>  IEEE 1275-1994 (referred to as Open Firmware) compliant firmware.
 >=20=20
 > -@c man begin OPTIONS
 > -
-> -The following options are specific to the ARM emulation:
+> -The following options are specific to the PowerPC emulation:
 > -
 > -@table @option
 > -
-> -@item -semihosting
-> -Enable semihosting syscall emulation.
+> -@item -g @var{W}x@var{H}[x@var{DEPTH}]
 > -
-> -On ARM this implements the "Angel" interface.
+> -Set the initial VGA graphic mode. The default is 800x600x32.
 > -
-> -Note that this allows guest direct access to the host filesystem,
-> -so should only be used with trusted guest OS.
+> -@item -prom-env @var{string}
+> -
+> -Set OpenBIOS variables in NVRAM, for example:
+> -
+> -@example
+> -qemu-system-ppc -prom-env 'auto-boot?=3Dfalse' \
+> - -prom-env 'boot-device=3Dhd:2,\yaboot' \
+> - -prom-env 'boot-args=3Dconf=3Dhd:2,\yaboot.conf'
+> -@end example
 > -
 > -@end table
 > -
 > -@c man end
 > -
-> diff --git a/docs/system/target-m68k.rst b/docs/system/target-m68k.rst
-> index 50b7dd9d639..d28d3b92e5e 100644
-> --- a/docs/system/target-m68k.rst
-> +++ b/docs/system/target-m68k.rst
-> @@ -19,14 +19,3 @@ The AN5206 emulation includes the following devices:
->  -  MCF5206 ColdFire V2 Microprocessor.
+> -
+>  More information is available at
+>  @url{http://perso.magic.fr/l_indien/qemu-ppc/}.
 >=20=20
->  -  Two on-chip UARTs.
+> diff --git a/docs/system/target-sparc.rst b/docs/system/target-sparc.rst
+> index 589c88d1756..b55f8d09e9c 100644
+> --- a/docs/system/target-sparc.rst
+> +++ b/docs/system/target-sparc.rst
+> @@ -60,22 +60,3 @@ QEMU web site. There are still issues with NetBSD and =
+OpenBSD, but most
+>  kernel versions work. Please note that currently older Solaris kernels
+>  don't work probably due to interface issues between OpenBIOS and
+>  Solaris.
 > -
-> -The following options are specific to the ColdFire emulation:
+> -The following options are specific to the Sparc32 emulation:
 > -
-> -``-semihosting``
-> -   Enable semihosting syscall emulation.
+> -``-g WxHx[xDEPTH]``
+> -   Set the initial graphics mode. For TCX, the default is 1024x768x8
+> -   with the option of 1024x768x24. For cgthree, the default is
+> -   1024x768x8 with the option of 1152x900x8 for people who wish to use
+> -   OBP.
 > -
-> -   On M68K this implements the \"ColdFire GDB\" interface used by
-> -   libgloss.
+> -``-prom-env string``
+> -   Set OpenBIOS variables in NVRAM, for example:
 > -
-> -   Note that this allows guest direct access to the host filesystem, so
-> -   should only be used with trusted guest OS.
-> diff --git a/docs/system/target-m68k.texi b/docs/system/target-m68k.texi
-> index a77b19ea0f1..dcce7bc8c56 100644
-> --- a/docs/system/target-m68k.texi
-> +++ b/docs/system/target-m68k.texi
-> @@ -23,22 +23,3 @@ MCF5206 ColdFire V2 Microprocessor.
->  @item
->  Two on-chip UARTs.
->  @end itemize
+> -   ::
 > -
+> -      qemu-system-sparc -prom-env 'auto-boot?=3Dfalse' \
+> -       -prom-env 'boot-device=3Dsd(0,2,0):d' -prom-env 'boot-args=3Dlinu=
+x single'
+> -
+> -``-M [SS-4|SS-5|SS-10|SS-20|SS-600MP|LX|Voyager|SPARCClassic] [|SPARCboo=
+k]``
+> -   Set the emulated machine type. Default is SS-5.
+> diff --git a/docs/system/target-sparc.texi b/docs/system/target-sparc.texi
+> index 7748001f734..99fbf820b42 100644
+> --- a/docs/system/target-sparc.texi
+> +++ b/docs/system/target-sparc.texi
+> @@ -64,32 +64,5 @@ most kernel versions work. Please note that currently =
+older Solaris kernels
+>  don't work probably due to interface issues between OpenBIOS and
+>  Solaris.
+>=20=20
 > -@c man begin OPTIONS
 > -
-> -The following options are specific to the ColdFire emulation:
+> -The following options are specific to the Sparc32 emulation:
 > -
 > -@table @option
 > -
-> -@item -semihosting
-> -Enable semihosting syscall emulation.
+> -@item -g @var{W}x@var{H}x[x@var{DEPTH}]
 > -
-> -On M68K this implements the "ColdFire GDB" interface used by libgloss.
+> -Set the initial graphics mode. For TCX, the default is 1024x768x8 with t=
+he
+> -option of 1024x768x24. For cgthree, the default is 1024x768x8 with the o=
+ption
+> -of 1152x900x8 for people who wish to use OBP.
 > -
-> -Note that this allows guest direct access to the host filesystem,
-> -so should only be used with trusted guest OS.
+> -@item -prom-env @var{string}
+> -
+> -Set OpenBIOS variables in NVRAM, for example:
+> -
+> -@example
+> -qemu-system-sparc -prom-env 'auto-boot?=3Dfalse' \
+> - -prom-env 'boot-device=3Dsd(0,2,0):d' -prom-env 'boot-args=3Dlinux sing=
+le'
+> -@end example
+> -
+> -@item -M [SS-4|SS-5|SS-10|SS-20|SS-600MP|LX|Voyager|SPARCClassic] [|SPAR=
+Cbook]
+> -
+> -Set the emulated machine type. Default is SS-5.
 > -
 > -@end table
 > -
-> -@c man end
-> -
-> diff --git a/docs/system/target-xtensa.rst b/docs/system/target-xtensa.rst
-> index 43cab8dc4da..8d703ad769e 100644
-> --- a/docs/system/target-xtensa.rst
-> +++ b/docs/system/target-xtensa.rst
-> @@ -25,15 +25,3 @@ The Avnet LX60/LX110/LX200 emulation supports:
->  -  16550 UART
+>  @c man end
 >=20=20
->  -  OpenCores 10/100 Mbps Ethernet MAC
+> diff --git a/docs/system/target-sparc64.rst b/docs/system/target-sparc64.=
+rst
+> index ca76ba9c488..97e334b9308 100644
+> --- a/docs/system/target-sparc64.rst
+> +++ b/docs/system/target-sparc64.rst
+> @@ -35,15 +35,3 @@ QEMU emulates the following peripherals:
+>  -  2 PCI IDE interfaces with hard disk and CD-ROM support
+>=20=20
+>  -  Floppy disk
 > -
-> -The following options are specific to the Xtensa emulation:
+> -The following options are specific to the Sparc64 emulation:
 > -
-> -``-semihosting``
-> -   Enable semihosting syscall emulation.
+> -``-prom-env string``
+> -   Set OpenBIOS variables in NVRAM, for example:
 > -
-> -   Xtensa semihosting provides basic file IO calls, such as
-> -   open/read/write/seek/select. Tensilica baremetal libc for ISS and
-> -   linux platform \"sim\" use this interface.
+> -   ::
 > -
-> -   Note that this allows guest direct access to the host filesystem, so
-> -   should only be used with trusted guest OS.
-> diff --git a/docs/system/target-xtensa.texi b/docs/system/target-xtensa.t=
-exi
-> index 40327de6fa7..1e6c04dccd6 100644
-> --- a/docs/system/target-xtensa.texi
-> +++ b/docs/system/target-xtensa.texi
-> @@ -33,23 +33,3 @@ A range of Xtensa CPUs, default is the DC232B
->  @item
->  OpenCores 10/100 Mbps Ethernet MAC
+> -      qemu-system-sparc64 -prom-env 'auto-boot?=3Dfalse'
+> -
+> -``-M [sun4u|sun4v|niagara]``
+> -   Set the emulated machine type. The default is sun4u.
+> diff --git a/docs/system/target-sparc64.texi b/docs/system/target-sparc64=
+.texi
+> index 4db4ca3842b..d381d3af719 100644
+> --- a/docs/system/target-sparc64.texi
+> +++ b/docs/system/target-sparc64.texi
+> @@ -36,25 +36,3 @@ PC-compatible serial ports
+>  Floppy disk
 >  @end itemize
-> -
+>=20=20
 > -@c man begin OPTIONS
 > -
-> -The following options are specific to the Xtensa emulation:
+> -The following options are specific to the Sparc64 emulation:
 > -
 > -@table @option
 > -
-> -@item -semihosting
-> -Enable semihosting syscall emulation.
+> -@item -prom-env @var{string}
 > -
-> -Xtensa semihosting provides basic file IO calls, such as open/read/write=
-/seek/select.
-> -Tensilica baremetal libc for ISS and linux platform "sim" use this inter=
-face.
+> -Set OpenBIOS variables in NVRAM, for example:
 > -
-> -Note that this allows guest direct access to the host filesystem,
-> -so should only be used with trusted guest OS.
+> -@example
+> -qemu-system-sparc64 -prom-env 'auto-boot?=3Dfalse'
+> -@end example
+> -
+> -@item -M [sun4u|sun4v|niagara]
+> -
+> -Set the emulated machine type. The default is sun4u.
 > -
 > -@end table
 > -
 > -@c man end
 > -
 > diff --git a/qemu-options.hx b/qemu-options.hx
-> index 5fbfa2797cb..4bc8048f60b 100644
+> index 4bc8048f60b..3b230a17164 100644
 > --- a/qemu-options.hx
 > +++ b/qemu-options.hx
-> @@ -4116,6 +4116,12 @@ STEXI
->  @item -semihosting
->  @findex -semihosting
->  Enable semihosting mode (ARM, M68K, Xtensa, MIPS, Nios II only).
+> @@ -1962,6 +1962,13 @@ STEXI
+>  @item -g @var{width}x@var{height}[x@var{depth}]
+>  @findex -g
+>  Set the initial graphical resolution and depth (PPC, SPARC only).
 > +
-> +Note that this allows guest direct access to the host filesystem, so
-> +should only be used with a trusted guest OS.
+> +For PPC the default is 800x600x32.
 > +
-> +See the -semihosting-config option documentation for further information
-> +about the facilities this enables.
+> +For SPARC with the TCX graphics device, the default is 1024x768x8 with t=
+he
+> +option of 1024x768x24. For cgthree, the default is 1024x768x8 with the o=
+ption
+> +of 1152x900x8 for people who wish to use OBP.
+> +
 >  ETEXI
->  DEF("semihosting-config", HAS_ARG, QEMU_OPTION_semihosting_config,
->      "-semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,c=
-hardev=3Did][,arg=3Dstr[,...]]\n" \
-> @@ -4126,6 +4132,18 @@ STEXI
->  @item -semihosting-config [enable=3Don|off][,target=3Dnative|gdb|auto][,=
-chardev=3Did][,arg=3Dstr[,...]]
->  @findex -semihosting-config
->  Enable and configure semihosting (ARM, M68K, Xtensa, MIPS, Nios II only).
+>=20=20
+>  DEF("vnc", HAS_ARG, QEMU_OPTION_vnc ,
+> @@ -4107,6 +4114,18 @@ STEXI
+>  @item -prom-env @var{variable}=3D@var{value}
+>  @findex -prom-env
+>  Set OpenBIOS nvram @var{variable} to given @var{value} (PPC, SPARC only).
 > +
-> +Note that this allows guest direct access to the host filesystem, so
-> +should only be used with a trusted guest OS.
+> +@example
+> +qemu-system-sparc -prom-env 'auto-boot?=3Dfalse' \
+> + -prom-env 'boot-device=3Dsd(0,2,0):d' -prom-env 'boot-args=3Dlinux sing=
+le'
+> +@end example
 > +
-> +On Arm this implements the standard semihosting API, version 2.0.
+> +@example
+> +qemu-system-ppc -prom-env 'auto-boot?=3Dfalse' \
+> + -prom-env 'boot-device=3Dhd:2,\yaboot' \
+> + -prom-env 'boot-args=3Dconf=3Dhd:2,\yaboot.conf'
+> +@end example
 > +
-> +On M68K this implements the "ColdFire GDB" interface used by libgloss.
-> +
-> +Xtensa semihosting provides basic file IO calls, such as
-> +open/read/write/seek/select. Tensilica baremetal libc for ISS and
-> +linux platform "sim" use this interface.
-> +
->  @table @option
->  @item target=3D@code{native|gdb|auto}
->  Defines where the semihosting calls will be addressed, to QEMU (@code{na=
-tive})
+>  ETEXI
+>  DEF("semihosting", 0, QEMU_OPTION_semihosting,
+>      "-semihosting    semihosting mode\n",
 
 
 --=20
