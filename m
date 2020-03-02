@@ -2,85 +2,122 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B5BC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD87C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:00:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 863BD2086A
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3937720866
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 20:00:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="golW2RMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863BD2086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="EhU8Q2Zh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3937720866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8rA6-0003Tm-Nt
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:55:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60901)
+	id 1j8rEY-0005js-CB
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 15:00:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuanzi@google.com>) id 1j8r9N-0002ic-Ay
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:54:50 -0500
+ (envelope-from <sunilmut@microsoft.com>) id 1j8rDr-0005Gh-9L
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuanzi@google.com>) id 1j8r9M-0007Tm-0s
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:54:49 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45309)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuanzi@google.com>) id 1j8r9L-0007TD-Pz
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:54:47 -0500
-Received: by mail-oi1-x241.google.com with SMTP id v19so441715oic.12
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 11:54:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=bHIo6qnClAR+iMy8cEUG59UjFII6pb5wsYL2Zu81ya4=;
- b=golW2RMrG2tBH5CFfsuC3nF96GE0R414iFqOoCGCPh2GlAXux1DQopS6iJHq0NiH1M
- wLL97MAJtSq5mspzT1XgN1ipod+NXbAvVLzOWCf5F5/X2klIA6V0HGrjXyck6qgZ62sx
- Wls9KtJ2chugzE69vxtHk7NKQjuBGAUjGRAc2owLnO+yBVMrgI11CA6TU3fOnaqyfF9Z
- e9Zxau6VplOgB7aVWT/bHAV2MNh5boOpCPyZMhMbz5Dxr8gtxMgrT9T2rwdGYmBfKuvw
- OSCHJtGx/FY570S/8CbbEKhpXKZJ0zdAwJoFKfOGohDAVkoBR+pfPjfXqlznwtINrmUU
- zdgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=bHIo6qnClAR+iMy8cEUG59UjFII6pb5wsYL2Zu81ya4=;
- b=AGRJtvCc30qgOSQVQPl7UJZ7lfNkvZDFg9fq/YfO3UplpnByJcj1/nI5fgmQwAicbt
- zppFO+3zpzIdcl1BfLQOcIyNe6uM+MWvCRGNcHWXEnjfx1UNODKkWPY0ac0MwZqDyxmz
- nd1N52/Mm9rPnZe/wuPDixtvDfuYrGkGaLuC7dpYLFWKk08Qen/5UA7SH2KnXlVVaH4k
- 8hNXCiCFviBq9Et8fGGXqNHTo6ia2Nc2cbhmyNl2RWkD/rJyuh2/r/ZRgYkiguLfTE0s
- tBY/dhQewkRSlA7FcJIOa/yaWN/l20CZwoTCbA+la0SFmbxbFn2AmxUt3dB+d9N0GtBS
- SbwA==
-X-Gm-Message-State: ANhLgQ2zzEIIE6CFtsYtx1rcuk1WeSWef4r2G/cBsIQ65De5XJpXw2Pa
- tC0I/OwnSeJEvnjff/a/YVle6YNh8rz4tKzKmXaAWA==
-X-Google-Smtp-Source: ADFU+vt2BKi8l6Bj7HvIygAC65sbB7DzWuBdotVZvhkMn2k5MK/loisUC/ECMhlBhFFqIj3emiCGq2j+pqhFbNIaAoY=
-X-Received: by 2002:aca:62c4:: with SMTP id w187mr76148oib.38.1583178876049;
- Mon, 02 Mar 2020 11:54:36 -0800 (PST)
-MIME-Version: 1.0
-References: <20200221202857.126170-1-yuanzi@google.com>
- <f9ef0046-9d0f-c53d-bf58-417df31705a6@vivier.eu>
- <CADjx4C+YyTL9W0us5-vvGdeXyiHKcSZt2odV_p3+E4NCLTYSSg@mail.gmail.com>
- <66e63949-7224-8bed-afb5-d914ac5969bc@vivier.eu>
-In-Reply-To: <66e63949-7224-8bed-afb5-d914ac5969bc@vivier.eu>
-From: Lirong Yuan <yuanzi@google.com>
-Date: Mon, 2 Mar 2020 11:54:21 -0800
-Message-ID: <CADjx4CL3kXtc4ZvCz7Z+pL5=pMr-e9AcGg1o9+TYt7yh0zB34w@mail.gmail.com>
-Subject: Re: [PATCH] linux-user: Add AT_EXECFN and AT_EXECFD auxval
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, 
- Riku Voipio <riku.voipio@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <sunilmut@microsoft.com>) id 1j8rDp-00018M-Lm
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:59:26 -0500
+Received: from mail-bn8nam11on20707.outbound.protection.outlook.com
+ ([2a01:111:f400:7eae::707]:20064
+ helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
+ id 1j8rDp-000186-9T
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:59:25 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m+SLAj1GwpRpqjQV6zpMdYKkj6QjDkrZzDUqjUhaXoFjbZ87ORc1lznt8t5nGKrmGg8qMD4VOEWNpoKJMfRPkYemvvtT228Ngk4bDd6Ax+yp9F/NHgeLCj/XZXrRuQz766AjL9J6fzqNzAkKzyF7miDxKdtzyM8Ih7O83ocdoLRZBNSgWRGBPDbWxscBUMBn80MJrHFuXw2K+Pj9mrt+B7wTJr+g7Sn1px7U+dybvZxWQWpOxkgOght2kgr98sgYJ7mnJ06Ys0T+dvy65/1DpKwRzuJkBduQCCXkdqoFCYhOEbmfDT05PSxfz5jtW/WApsgb57olTIb2ekefR/gJqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WIZrW+IP9vg3OLESfqq81prp5m2KtO9CVuNIe2D/Cg4=;
+ b=hMfJsvIexA97TyhvL3cxrxEqeW7+0h3hxHBBXZWSXwB7DhTSt4BVl5SxqWZP6xTxwgO4KQB3zygHcFCOw0kpkBQVMslp5Yshf01bl2zD/SmrOGt1wj0gjbCsUkpCcRlq1b98Ciap99vULwTPiNHo9bhUBFwzMq8BkxhJXIVIcmIbsQb/sGZ19medeaY87jllcskLZIOGWmS9cfBw90RLR3Ncob5WJd5f6w3t2AenKX46/l60JbtNh9q0siRXjD/stMJCWm6Frx1F1D1adh9DKub637r2fUZOUwMRqUlxdUg67QKt37Fuwc2GqOsFe6D3sz9EQTBrQFw2dzOeggpAVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WIZrW+IP9vg3OLESfqq81prp5m2KtO9CVuNIe2D/Cg4=;
+ b=EhU8Q2ZhGJAadmcrYz+RccffgbPGnMcYr/LZHQsPyFIjyW8N1nwjQ4OKjq4EwCGuwBsWLYJ0TJF6d9D/2kqgkfYN6YWOQpT8oQDVPNaR6XeRnkP+buuH+fYaDbsmYAQSsLS7cfsam6RRGjVcykXZn3ffSxS3cjebF3/yZeMaPpo=
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ (2603:10b6:803:51::33) by SN4PR2101MB0735.namprd21.prod.outlook.com
+ (2603:10b6:803:51::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.0; Mon, 2 Mar
+ 2020 19:59:22 +0000
+Received: from SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::b1fc:af97:6a7b:4fe]) by SN4PR2101MB0880.namprd21.prod.outlook.com
+ ([fe80::b1fc:af97:6a7b:4fe%5]) with mapi id 15.20.2814.001; Mon, 2 Mar 2020
+ 19:59:22 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefan Weil
+ <sw@weilnetz.de>
+Subject: RE: [EXTERNAL] Re: PATCH] WHPX: TSC get and set should be dependent
+ on VM state
+Thread-Topic: [EXTERNAL] Re: PATCH] WHPX: TSC get and set should be dependent
+ on VM state
+Thread-Index: AdXs5oCBJsjFayPuQg++a0KvVJgCQQBPaQ8AABVvfKAAGpE0AAB6DlkQ
+Date: Mon, 2 Mar 2020 19:59:22 +0000
+Message-ID: <SN4PR2101MB088094833D95758F871BE401C0E70@SN4PR2101MB0880.namprd21.prod.outlook.com>
+References: <SN4PR2101MB08804D23439166E81FF151F7C0EA0@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <37e639a1-eb9f-b769-d61c-112d148bcff3@redhat.com>
+ <SN4PR2101MB0880FE16EE36BF356552A9DDC0E80@SN4PR2101MB0880.namprd21.prod.outlook.com>
+ <4277f568-2b20-f7c4-5764-f516c8e281a9@redhat.com>
+In-Reply-To: <4277f568-2b20-f7c4-5764-f516c8e281a9@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sunilmut@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:9:13f8:4346:c8dc:67a9]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 15192c0b-4ae4-44c4-fb29-08d7bee433e9
+x-ms-traffictypediagnostic: SN4PR2101MB0735:
+x-microsoft-antispam-prvs: <SN4PR2101MB0735F99AB856566B391C9D3EC0E70@SN4PR2101MB0735.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 033054F29A
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(39860400002)(376002)(346002)(366004)(136003)(396003)(189003)(199004)(10290500003)(186003)(6506007)(81166006)(8676002)(81156014)(4326008)(66476007)(4744005)(66556008)(52536014)(66946007)(5660300002)(2906002)(8936002)(64756008)(66446008)(54906003)(478600001)(55016002)(71200400001)(8990500004)(9686003)(76116006)(86362001)(7696005)(33656002)(316002)(110136005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:SN4PR2101MB0735;
+ H:SN4PR2101MB0880.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mJelP3bfY0qAr7IQwINBopX/bXsBYCk4d/3wKRwwf6nq1CuuXUkehfnvvpheZs4FBN59fjMFHoMpIWm6fp8dKT5vweqIWaetLiYJOKrJu7S0nXqQeFk5zQ+H5ZDVLOA6eTGQP+s6JEc/j2znUDT5d4M+mfBoICdLsaaOcxsgCIVAqIMzetGzTU1FZRkUSpU5t1BUXtbqh0zwL3eZFgQNNwmds1jGIEKpFz4LMpbbIbhWj/WuVaHXxtDGtwIVKImy8ZEAVSQuqccpiJALyagKZ8/CIRY+N4o9hXh44xwhQbWXPIrrCxPk0Ykn/FxVGhIN6FGedjYeVQ1Fqx+4yEsOHQUMWV2PuOxCgLJx0Ji8F3BDRI6fPPwHSczo7qyCUJ/vulSGKbPBq6PqSsMNa9yX9AtYTgZAHK4nwpYmCSlKEEok4Pi1i7+C2psa2bjSKGKi
+x-ms-exchange-antispam-messagedata: QN4sV7z8Lhph2vHv9EqFTR3LWPGDUQE0W6J9BNkpWoJEUECLOWoH2KkeLoNBYwn/28otMxGPE0ySppPlCQTxC38M3uvMWPJZDz7lMirfPZUDqW9GpQRt8cVeGT2G/vJhq3PKUeX90RIxqcpVxUv0yrZa3GJlMLHbRa0pDmrDcTa7O1VxKDiwQ7yzQ6wo3NuwKFtb1UT9oxTUMsyXPKrCiw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15192c0b-4ae4-44c4-fb29-08d7bee433e9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 19:59:22.7608 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FYv3n48qQZtpgrcAkBT9aMP8GVRnLBxsmz8PJ/lGZQFOX9e5YkKbCiYXOXJIID4P9bdd0E8jh81m+SYcA/wDORCuFcuDz8qTfmqP3AV8o48=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR2101MB0735
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2a01:111:f400:7eae::707
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,152 +133,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 2, 2020 at 10:31 AM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 02/03/2020 =C3=A0 19:18, Lirong Yuan a =C3=A9crit :
-> > On Mon, Mar 2, 2020 at 6:39 AM Laurent Vivier <laurent@vivier.eu> wrote=
-:
-> >>
-> >> Le 21/02/2020 =C3=A0 21:28, Lirong Yuan a =C3=A9crit :
-> >>> This change adds the support for AT_EXECFN and AT_EXECFD auxval.
-> >>
-> >> Why do we need AT_EXECFD?
-> >>
-> >> AT_EXECFD is normally only used with binfmt_misc so I don't see any us=
-e
-> >> cases for it with QEMU.
-> >>
-> >> For AT_EXECFN, according to kernel commit
-> >>
-> >>   651910874633 execve filename: document and export via auxiliary vect=
-or
-> >>
-> >> It sould be like readlink("/proc/self/exe",), and thus I think we shou=
-ld
-> >> use realpath() like we have in syscall.c for TARGET_NR_readlink:
-> >>
-> >>  8843     case TARGET_NR_readlink:
-> >> ...
-> >>  8854                 char real[PATH_MAX], *temp;
-> >>  8855                 temp =3D realpath(exec_path, real);
-> >> ...
-> >>
-> >> Thanks,
-> >> Laurent
-> >>
-> >>>
-> >>> Signed-off-by: Lirong Yuan <yuanzi@google.com>
-> >>> ---
-> >>>  linux-user/elfload.c | 13 +++++++++----
-> >>>  1 file changed, 9 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> >>> index f3080a1635..7e0f3042f1 100644
-> >>> --- a/linux-user/elfload.c
-> >>> +++ b/linux-user/elfload.c
-> >>> @@ -1568,7 +1568,7 @@ struct exec
-> >>>                                   ~(abi_ulong)(TARGET_ELF_EXEC_PAGESI=
-ZE-1))
-> >>>  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-=
-1))
-> >>>
-> >>> -#define DLINFO_ITEMS 15
-> >>> +#define DLINFO_ITEMS 17
-> >>>
-> >>>  static inline void memcpy_fromfs(void * to, const void * from, unsig=
-ned long n)
-> >>>  {
-> >>> @@ -1888,11 +1888,14 @@ static abi_ulong loader_build_fdpic_loadmap(s=
-truct image_info *info, abi_ulong s
-> >>>      return sp;
-> >>>  }
-> >>>
-> >>> -static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
-> >>> +static abi_ulong create_elf_tables(struct linux_binprm *bprm,
-> >>>                                     struct elfhdr *exec,
-> >>>                                     struct image_info *info,
-> >>>                                     struct image_info *interp_info)
-> >>>  {
-> >>> +    abi_ulong p =3D bprm->p;
-> >>> +    int argc =3D bprm->argc;
-> >>> +    int envc =3D bprm->envc;
-> >>>      abi_ulong sp;
-> >>>      abi_ulong u_argc, u_argv, u_envp, u_auxv;
-> >>>      int size;
-> >>> @@ -2032,6 +2035,8 @@ static abi_ulong create_elf_tables(abi_ulong p,=
- int argc, int envc,
-> >>>      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
-> >>>      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
-> >>>      NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
-> >>> +    NEW_AUX_ENT(AT_EXECFN, info->file_string);
-> >>> +    NEW_AUX_ENT(AT_EXECFD, bprm->fd);
-> >>>
-> >>>  #ifdef ELF_HWCAP2
-> >>>      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
-> >>> @@ -2870,8 +2875,8 @@ int load_elf_binary(struct linux_binprm *bprm, =
-struct image_info *info)
-> >>>  #endif
-> >>>      }
-> >>>
-> >>> -    bprm->p =3D create_elf_tables(bprm->p, bprm->argc, bprm->envc, &=
-elf_ex,
-> >>> -                                info, (elf_interpreter ? &interp_inf=
-o : NULL));
-> >>> +    bprm->p =3D create_elf_tables(bprm, &elf_ex, info,
-> >>> +                                (elf_interpreter ? &interp_info : NU=
-LL));
-> >>>      info->start_stack =3D bprm->p;
-> >>>
-> >>>      /* If we have an interpreter, set that as the program's entry po=
-int.
-> >>>
+> >> Looks good.  Do you want me to queue this until you can have your GPG
+> >> key signed?  (And also, I can help you sign it of course).
 > >>
 > >
-> > Hi Laurent,
->
-> Hi Lirong,
->
-> > I added support for AT_EXECFD because I thought it might be useful to
-> > implement all types that getauxval could take as an argument.
-> > Would you prefer that it be removed?
->
-> I think providing the AT_EXECFD to the target binary could make it think
-> it has been run directly by binfmt_misc (as an interpreter itself), and
-> that is not the case (qemu is run by binfmt_misc and is the interpreter).
->
-> So I would prefer you remove it.
->
-> > For AT_EXECFN, there are two questions that we considered:
-> > 1) What should it return?
-> > Since QEMU is emulating running the guest program, the function should
-> > return the file name of the guest program (info->file_string), rather
-> > than the QEMU program itself, which we get from
-> > qemu_getauxval(AT_EXECFN).
+> > Yes, please. Thanks.
 > >
-> > 2) Should it return the full path or as is?
-> > We tested the behavior of getauxval with a simple test program on
-> > Linux, and it turned out that it returned file path as is. For
-> > example,
-> > $ ./test
-> > getauxval(AT_EXECFN): ./test
-> > $ /usr/local/home/tmp/test
-> > getauxval(AT_EXECFN): /usr/local/home/tmp/test
->
-> If you have compared the result with the real one it's fine for me.
->
-> Resend tou patch without the AT_EXECFD part and it will be good.
->
-> Thanks,
-> Laurent
->
+> > I haven't used GPG keys before. What would I be using it for?
+>=20
+> You'd be using it to include a signed tags in a pull requests; that is,
+> the git tag that you ask to pull has a cryptographic signature attached
+> to it.
 
-Hi Laurent,
+Great. Is there a link that I can use to read up on how to get the GPG key
+and how to include the signature or what process should I be following?
 
-Thank you so much for the review! :)
+> Paolo
 
-Resent the v2 patch without AT_EXECFD:
-http://patchwork.ozlabs.org/patch/1247861/
-
-Thanks,
-Lirong
 
