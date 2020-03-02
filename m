@@ -2,84 +2,84 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA374C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 673A6C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4E4C2146E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31DA32146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:12:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adBbp1J4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4E4C2146E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hmJk1iJR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DA32146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8mj9-0006MI-W4
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:11:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37605)
+	id 1j8mk2-0007OC-D3
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:12:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j8mi3-0005On-SJ
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:21 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j8mig-0005tU-Eq
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j8mi2-0003tX-JF
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25459
+ (envelope-from <eric.auger@redhat.com>) id 1j8mif-00046A-FS
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:58 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34481
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j8mi2-0003t9-EV
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:18 -0500
+ id 1j8mif-00045z-BW
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:10:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583161817;
+ s=mimecast20190719; t=1583161857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PNix4A4drFTzRf6rvfVEOs/bmCR/EkjR6i/NDRTXRSs=;
- b=adBbp1J4g1ZyNTqZweuj0iidv61dzPCBhRYzAd/cVwdI9MEMQJMPoq8C5uyLMF0kCFFvdh
- k85BoDSi6pO+CtZ6UJwNgHKna/PT7lr0gO7p3AbBlqNkamcRTczLDcvLMmKHElr3KM7YVF
- 1ETZhgs9Do/AKvugmkDwlSsEcxhbtDA=
+ bh=RgJDnF/rESmmV2RfOYOeUzbb0dk+p/svr2gi+YBczEk=;
+ b=hmJk1iJRigywBcYSdU5rvj1sXDpr6T4f0Ii8NVfAA5vl0h/rntA3oQcrUwPAoWg7DouZxb
+ vDuoWeUmjDwqqqFiqVfGGdJjRYpOk4ueSw0dwFx7mSYELMd+j15eboa/RJJZcLCPl9oHPO
+ ITbZ6x54wub/4EqJVANm0kmEPjf1RLA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-DsDYW7TLOmuuRVTahU-MJw-1; Mon, 02 Mar 2020 10:10:15 -0500
-X-MC-Unique: DsDYW7TLOmuuRVTahU-MJw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-376-LslynhpkMhmch3izmUYyMA-1; Mon, 02 Mar 2020 10:10:55 -0500
+X-MC-Unique: LslynhpkMhmch3izmUYyMA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5DE5910753FE
- for <qemu-devel@nongnu.org>; Mon,  2 Mar 2020 15:10:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FC358010E8
+ for <qemu-devel@nongnu.org>; Mon,  2 Mar 2020 15:10:54 +0000 (UTC)
 Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EE91A7386E;
- Mon,  2 Mar 2020 15:10:01 +0000 (UTC)
-Subject: Re: [PATCH v2 0/5] vfio/pci: Fix up breakage against split irqchip
- and INTx
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B8FC19C4F;
+ Mon,  2 Mar 2020 15:10:47 +0000 (UTC)
+Subject: Re: [PATCH v2 5/5] Revert "vfio/pci: Disable INTx fast path if using
+ split irqchip"
 To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
 References: <20200228161503.382656-1-peterx@redhat.com>
+ <20200228161503.382656-6-peterx@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b1afbf77-714a-c86a-bdb9-a1b4a6d1e85f@redhat.com>
-Date: Mon, 2 Mar 2020 16:09:59 +0100
+Message-ID: <6ffe70cb-a2d3-ef4e-6e66-11c8dc619eeb@redhat.com>
+Date: Mon, 2 Mar 2020 16:10:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200228161503.382656-1-peterx@redhat.com>
+In-Reply-To: <20200228161503.382656-6-peterx@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,88 +100,44 @@ Sender: "Qemu-devel"
 
 Hi Peter,
 
-On 2/28/20 5:14 PM, Peter Xu wrote:
-> v2:
-> - pick tags
-> - don't register resamplefd with KVM kernel when the userspace
->   resamplefd path is enabled (should enable fast path on new kernels)
-> - fix resamplefd mem leak
-> - fix commit message of patch 4 [Eric]
-> - let kvm_resample_fd_notify() return a boolean, skip ioapic check if
->   returned true
-> - more comments here and there in the code to state the fact that
->   userspace ioapic irr & remote-irr are bypassed [Paolo]
+On 2/28/20 5:15 PM, Peter Xu wrote:
+> With the resamplefd list introduced, we can savely enable VFIO INTx
+> fast path again with split irqchip so it can still be faster than the
+> complete slow path.
 > 
-> VFIO INTx is not working with split irqchip.  On new kernels KVM_IRQFD
-> will directly fail with resamplefd attached so QEMU will automatically
-> fallback to the INTx slow path.  However on old kernels it's still
-> broken.
-> 
-> Only until recently I noticed that this could also break PXE boot for
-> assigned NICs [1].  My wild guess is that the PXE ROM will be mostly
-> using INTx as well, which means we can't bypass that even if we
-> enables MSI for the guest kernel.
-> 
-> This series tries to first fix this issue function-wise, then speed up
-> for the INTx again with resamplefd (mostly following the ideas
-> proposed by Paolo one year ago [2]).  My TCP_RR test shows that:
-> 
->   - Before this series: this is broken, no number to show
-> 
->   - After patch 1 (enable slow path): get 63% perf comparing to full
->     kernel irqchip
-> 
->   - After whole series (enable fast path partly, irq injection will be
->     the same as fast path, however userspace needs to intercept for
->     EOI broadcast to resamplefd, though should still be faster than
->     the MMIO trick for intx eoi): get 93% perf comparing to full
->     kernel irqchip, which is a 46% performance boost
-> 
-> I think we can consider to apply patch 1 even sooner than the rest of
-> the series to unbreak intx+split first.
-> 
-> The whole test matrix for reference:
-> 
->   |----------+---------+-------------------+--------------+--------------------|
->   | IRQ type | irqchip | TCP_STREAM (Gbps) | TCP_RR (pps) | note               |
->   |----------+---------+-------------------+--------------+--------------------|
->   | msi      | on      |              9.39 |        17567 |                    |
->   | nomsi    | on      |              9.29 |        14056 |                    |
->   | msi      | split   |              9.36 |        17330 |                    |
->   | nomsi    | split   |                 / |            / | currently broken   |
->   | nomsi    | split   |              8.98 |         8977 | after patch 1      |
->   | nomsi    | split   |              9.21 |        13142 | after whole series |
->   |----------+---------+-------------------+--------------+--------------------|
-> 
-> Any review comment is welcomed.  Thanks,
-> 
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1786404
-> [2] https://patchwork.kernel.org/patch/10738541/#22609933
-
-For the whole series:
-Tested-by: Eric Auger <eric.auger@redhat.com>
-
-using a 5.2-rc1 kernel with reverted "654f1f13ea56  kvm: Check
-irqchip mode before assign irqfd" and guest booting with nomsi.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Thanks
 
 Eric
-
+> ---
+>  hw/vfio/pci.c | 12 ------------
+>  1 file changed, 12 deletions(-)
 > 
-> Peter Xu (5):
->   vfio/pci: Disable INTx fast path if using split irqchip
->   vfio/pci: Use kvm_irqchip_add_irqfd_notifier_gsi() for irqfds
->   KVM: Pass EventNotifier into kvm_irqchip_assign_irqfd
->   KVM: Kick resamplefd for split kernel irqchip
->   Revert "vfio/pci: Disable INTx fast path if using split irqchip"
-> 
->  accel/kvm/kvm-all.c    | 101 +++++++++++++++++++++++++++++++++++++----
->  accel/kvm/trace-events |   1 +
->  hw/intc/ioapic.c       |  23 +++++++++-
->  hw/vfio/pci.c          |  37 ++++++---------
->  include/sysemu/kvm.h   |   7 +++
->  5 files changed, 137 insertions(+), 32 deletions(-)
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 09703362df..1c0aa27386 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -124,18 +124,6 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>          return;
+>      }
+>  
+> -    if (kvm_irqchip_is_split()) {
+> -        /*
+> -         * VFIO INTx is currently not working with split kernel
+> -         * irqchip for level triggered interrupts.  Go the slow path
+> -         * as long as split is enabled so we can be at least
+> -         * functional (even with poor performance).
+> -         *
+> -         * TODO: Remove this after all things fixed up.
+> -         */
+> -        return;
+> -    }
+> -
+>      /* Get to a known interrupt state */
+>      qemu_set_fd_handler(irq_fd, NULL, NULL, vdev);
+>      vfio_mask_single_irqindex(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX);
 > 
 
 
