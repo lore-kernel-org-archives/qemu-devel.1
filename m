@@ -2,59 +2,81 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B960EC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E98AC3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:22:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E2BE2064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:17:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E2BE2064A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4803E2086A
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 13:22:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xb2Ovmrm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4803E2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8kwj-000448-R0
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 08:17:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48815)
+	id 1j8l1d-0007KE-Bh
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 08:22:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51307)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j8knl-0006Gv-Uf
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:08:06 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8l10-0006dy-4R
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:21:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1j8knk-0003Pa-QF
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:08:05 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:51768 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1j8knj-0003Mq-K9; Mon, 02 Mar 2020 08:08:04 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 64C489648BA4CAF3AFE9;
- Mon,  2 Mar 2020 21:07:58 +0800 (CST)
-Received: from huawei.com (10.133.205.93) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Mon, 2 Mar 2020
- 21:07:52 +0800
-From: Chen Qun <kuhn.chenqun@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v3 12/12] monitor/hmp-cmds: Remove redundant statement in
- hmp_rocker_of_dpa_groups()
-Date: Mon, 2 Mar 2020 21:07:15 +0800
-Message-ID: <20200302130715.29440-14-kuhn.chenqun@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
-References: <20200302130715.29440-1-kuhn.chenqun@huawei.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j8l0y-0006sO-U6
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:21:45 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37571)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j8l0y-0006rZ-OI
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 08:21:44 -0500
+Received: by mail-oi1-x242.google.com with SMTP id 5so4635989oiy.4
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 05:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lgi8huHg7JypWseRljj3J6mY8B1BwBwq3IJ94gGxoA0=;
+ b=Xb2OvmrmYu9aAncfEJ3FXgchR8e6EecGnmNUXBG6Ok3T2ViMI9ws6DXys8b8jXaXXA
+ /fCwfq67aZNnFJzLUFyRu8BRB3Olno2JFv+LLYDj0fTtMSvEmRWtIR43l7fiD5zCpeho
+ BrnFfM1ydCr/ooWvUaB9CSa0LGj+kHAukOmREbLVr6sNbuptr+EWjnax5VDAcc87kSg7
+ dIDv6x3CcUoRo6SXebg5eaNLNnkOOsAoYOBtQFOMzu8urXCXjZZjZfeTRLyxWpR2HLKm
+ 63KZoWfVTD5EtGSmiqkZ6yMJJQDgJS//eO/hUUVd3BgVj9axE8pAf9qb8Pi2s0Ck9uLW
+ 5HXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lgi8huHg7JypWseRljj3J6mY8B1BwBwq3IJ94gGxoA0=;
+ b=K9GdkPt1aZktTinBMxlEEWl27QijyoYDiPZt7mtRAzZ0ZVtfGxVECRg4o7gcfGJC/e
+ uStzBEUUXgb00nHpMRLvH+1O87zHLG7ADShedJ5aBkPefD5PY+nY9bkPUSw/AlZPvVOX
+ qLOSnP7Z86SZC35TI4rvrfqiUgcLapN8vZ7Tc7bU6pwWj81GapcLBE6LGrO3hNAj78Rj
+ 4ZUm6IhR5oJ4jumjDVCOmsfhfPx3MyPVqdxjjJD8Zahu38y+3wQj2N2llLO5iMfB7F60
+ MwxiKPk0Cl+iBpM/M4RLdqewc1+wOwJy1ueAQq12Ho0TtUZd4v7ve/nBn2BnesMdeqWW
+ YKfg==
+X-Gm-Message-State: APjAAAX4s3fKS8PYlTjmME3hUG3Ve9rsbgeGKlW01WEdClLHwW3ANtlh
+ ZsAWktmhW8kmUu34O6Po7zAJ7L4v9kpFUQkFm3dgRQ==
+X-Google-Smtp-Source: APXvYqx3x7SoA8HTX0unJ2qMGw0FCQwU5FVWcQ9lX5pDXx29oU4SrNv9Bmmc/bGPFwznhlT09cQCqt60V9v7rUvE1vY=
+X-Received: by 2002:aca:b2c5:: with SMTP id
+ b188mr11625368oif.163.1583155303743; 
+ Mon, 02 Mar 2020 05:21:43 -0800 (PST)
 MIME-Version: 1.0
+References: <20200227025055.14341-1-pannengyuan@huawei.com>
+ <20200227025055.14341-6-pannengyuan@huawei.com>
+In-Reply-To: <20200227025055.14341-6-pannengyuan@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Mar 2020 13:21:32 +0000
+Message-ID: <CAFEAcA8yvrYrBONtW46iswbEvMF-WC-j7fHOOfcoEC_RV66BkQ@mail.gmail.com>
+Subject: Re: [PATCH v3 5/6] hw/misc/mos6522: move timer_new from init() into
+ realize() to avoid memleaks
+To: Pan Nengyuan <pannengyuan@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Originating-IP: [10.133.205.93]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,73 +88,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, zhang.zhanghailiang@huawei.com, "Dr. David
- Alan Gilbert" <dgilbert@redhat.com>, Euler Robot <euler.robot@huawei.com>,
- Chen Qun <kuhn.chenqun@huawei.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Euler Robot <euler.robot@huawei.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Clang static code analyzer show warning:
-monitor/hmp-cmds.c:2867:17: warning: Value stored to 'set' is never read
-                set =3D true;
-                ^     ~~~~
+On Thu, 27 Feb 2020 at 02:35, Pan Nengyuan <pannengyuan@huawei.com> wrote:
+>
+> There are some memleaks when we call 'device_list_properties'. This patch move timer_new from init into realize to fix it.
+> Meanwhile, add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
+>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> ---
+> v2->v1:
+> - no changes in this patch.
+> v3->v2:
+> - remove null check in reset, and add calls to mos6522_realize() in mac_via_realize to make this move to be valid.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Hi; this is really fixing two bugs in one patch:
 
-v1->v2: move the 'set' declaration to the for() statement(Base on Philipp=
-e's suggestion).
----
- monitor/hmp-cmds.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+> ---
+>  hw/misc/mac_via.c | 5 +++++
+>  hw/misc/mos6522.c | 6 ++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index b7d0012794..1d72d4ef35 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -879,6 +879,11 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+>      sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
+>                            sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
+>
+> +    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized",
+> +                             &error_abort);
+> +    object_property_set_bool(OBJECT(&m->mos6522_via2), true, "realized",
+> +                             &error_abort);
+> +
+>      /* Pass through mos6522 output IRQs */
+>      ms = MOS6522(&m->mos6522_via1);
+>      object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 53bc3f76c4..c6b0495822 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -2808,7 +2808,6 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const Q=
-Dict *qdict)
-     const char *name =3D qdict_get_str(qdict, "name");
-     uint8_t type =3D qdict_get_try_int(qdict, "type", 9);
-     Error *err =3D NULL;
--    bool set =3D false;
-=20
-     list =3D qmp_query_rocker_of_dpa_groups(name, type !=3D 9, type, &er=
-r);
-     if (err !=3D NULL) {
-@@ -2820,6 +2819,7 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const Q=
-Dict *qdict)
-=20
-     for (g =3D list; g; g =3D g->next) {
-         RockerOfDpaGroup *group =3D g->value;
-+        bool set =3D false;
-=20
-         monitor_printf(mon, "0x%08x", group->id);
-=20
-@@ -2864,14 +2864,11 @@ void hmp_rocker_of_dpa_groups(Monitor *mon, const=
- QDict *qdict)
-=20
-         if (group->has_set_eth_dst) {
-             if (!set) {
--                set =3D true;
-                 monitor_printf(mon, " set");
-             }
-             monitor_printf(mon, " dst %s", group->set_eth_dst);
-         }
-=20
--        set =3D false;
--
-         if (group->has_ttl_check && group->ttl_check) {
-             monitor_printf(mon, " check TTL");
-         }
---=20
-2.23.0
+This is fixing a bug in mac_via where it failed to actually
+realize devices it was using. That's a dependency for the bug
+you're trying to fix, but it's a separate one and should be
+in its own patch.
 
+You also want to pass the error back up to the caller, rather
+than using error_abort. To do that, at the top of the function:
 
+    Error *err = NULL;
+
+and then here you can do:
+    object_property_set_bool(OBJECT(&m->mos6522_via1), true, "realized", &err);
+    if (err) {
+        error_propagate(errp, err);
+        return;
+    }
+
+The existing code which inits the mos6522 objects and
+calls object_property_add_alias on them which is in
+the mac_via realize function should be moved to the init
+function. (init should init child objects and set up
+properties; realize should realize them.)
+
+This is all fixing the incorrect creation of the mos6522
+devices in mac_via (which has been wrong since the mac_via
+was first added in commit 6dca62a0000f9), so that can all
+be one patch I think.
+
+> +static void mos6522_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MOS6522State *s = MOS6522(dev);
+>
+>      s->timers[0].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer1, s);
+>      s->timers[1].timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, mos6522_timer2, s);
+> @@ -502,6 +507,7 @@ static void mos6522_class_init(ObjectClass *oc, void *data)
+>
+>      dc->reset = mos6522_reset;
+>      dc->vmsd = &vmstate_mos6522;
+> +    dc->realize = mos6522_realize;
+>      device_class_set_props(dc, mos6522_properties);
+>      mdc->parent_reset = dc->reset;
+>      mdc->set_sr_int = mos6522_set_sr_int;
+
+The changes to hw/misc/mos_6522.c are good, but should be in
+their own patch.
+
+thanks
+-- PMM
 
