@@ -7,95 +7,96 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE33AC3F2D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EBDC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8E224676
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:30:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E81D424676
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 18:31:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cpyDaL3r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8E224676
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtdevFKq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81D424676
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8ppi-0000bd-A9
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:30:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45237)
+	id 1j8pqv-00022a-15
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 13:31:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j8pou-00006m-2y
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:29:37 -0500
+ (envelope-from <philmd@redhat.com>) id 1j8ppT-0000at-71
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j8pos-00019D-4w
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:29:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26586
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1j8ppS-0001PC-1U
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:30:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28330
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8pos-00018r-1I
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:29:34 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j8ppR-0001Oy-Tf
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 13:30:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583173773;
+ s=mimecast20190719; t=1583173809;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xENLVUo8rBArLiFGrmSxFv8kTLvay15iCVpIgL7FFTU=;
- b=cpyDaL3rfyhF6liLj6qjXKF9GUXWecyMk+fDZELGLCJzUY5krHAjeeLTThXvJKhTzchEhu
- 5Yv3+H5EIsgbYj/GW1pczh90RdSC6JHeZfHAQPOlNL5x69z6Kvdw3ZJ2wa2Uw4fdTJlWKJ
- ahmDaHWuE4Dc4x4UP094l4VNbLnTjrE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-Zu0nk7GKM-y0KeuVGzNRTA-1; Mon, 02 Mar 2020 13:29:32 -0500
-X-MC-Unique: Zu0nk7GKM-y0KeuVGzNRTA-1
-Received: by mail-wm1-f72.google.com with SMTP id m4so74456wmi.5
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:29:31 -0800 (PST)
+ bh=iQ4A+MEHLJkFfuRT0BgolUdJS063jUQBK2A5XeH+cb8=;
+ b=DtdevFKqe252rXiya3HyfpGpuDKGMJUplXxS+0GSLjwdjHxWc1yzDWfBCLE1tNl025q77F
+ F+/uXZDM1yvhawezVeWYg5wfq8lKWSAhw7/vwsRghX4mwX7ZSXBPGqAgrbpK2WLw8il37h
+ lzmRV1ys4iMYkaeK03yDff2hJhEP53g=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-GLkXeWLBOjqEg2cZ6XVUpw-1; Mon, 02 Mar 2020 13:30:07 -0500
+X-MC-Unique: GLkXeWLBOjqEg2cZ6XVUpw-1
+Received: by mail-wr1-f71.google.com with SMTP id w18so85847wro.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 10:30:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=T8oKM+NnnMHrd0iLqLpJ6QH/oueRqI6Hbgsp5BRig2w=;
- b=uFcjfOB0GQqIzt8FKNSRX51qGPIJhAvaOQvT1xadWr9g4cBx2O+8i+jqdNW1oEPpX1
- mKwxy7+Tt0FPPkAHfaVqxf6kqEesRtgcNYEjsIvrh7zlwFMEmYUnibvTzwxL9TXVcOM2
- A4WascBgDrcgohY4Bs0dDomvl+409cHjoLmnvLHlAyFniS7G/lnmPzaY+sM1oR9HMFcz
- EnOnnwm9EAzAQnBHLVgSA6MFwDQa+zakUhhj0gS72X1eYjoCSovVRMCiJkgdcnfomhZK
- O6g+46SYMd8WUZWyZdGyhQnaciVaCWoFUuZHwUDsNRDigwPY2xUVrUQ8urqs7/y1DvxM
- eJgw==
-X-Gm-Message-State: ANhLgQ2vi1KAdVcT4Qq03Uux+7b2+2IP/8610lZ0Df5Ifoo2kMMv+5JW
- MCEcsDVIcQ3oZ7nPJSWa9UETCr6xDg91Y/Gzglu7mi7GBvAtuP3zWNTVsbCitkRd/8wgqg69uWv
- r3XSmMCaXKlCEfKo=
-X-Received: by 2002:a1c:9602:: with SMTP id y2mr322519wmd.23.1583173770768;
- Mon, 02 Mar 2020 10:29:30 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vvDmV/lyMICyoOpXwnAiuVjaPF/6U5Ll0yCjuH9AQlxt5ew56tsZfHXILpr453VBxvSdK+K2Q==
-X-Received: by 2002:a1c:9602:: with SMTP id y2mr322503wmd.23.1583173770530;
- Mon, 02 Mar 2020 10:29:30 -0800 (PST)
+ bh=8p2XBdclySkvIcyGV9gmvXkIgnrD3b/KzCVsgVOt1Dg=;
+ b=a+IfTtDHjvhNPIpFPoCPqgtn8OUH6ZmReKWiZ4WkY6ovpAZiuHX2U72PgS3nMBsMm9
+ +ikVJ7M88k/sK97ORplxKqev3bfkRU0RQgA05AcsyrHipRhrza4ztykRTdDjB4vLVrCs
+ 5Vwiv+iTgRCeMCCpcUOLEJ30lMQ+XqqzWZmGjjI7g/qHiIWK2H6BqzmVv0JDsZNReYMo
+ cOdCrxkgUUwwH8OZkvw1i+U8D6BpyJLhG6nrvmcKx1ID8HJdgbOkRQuVf7cbN5wBjF86
+ EDFKGfXp105r40PSRrYuN/CoHWGr4Y01rBDLEy1nuCgTZrOUpqHkX+JpswxallSU88OR
+ yIww==
+X-Gm-Message-State: ANhLgQ3Ha2q8E9F5JcwEgYs7mrtKe/AaCSX1mWlzLIUsEVaguIJq8hgB
+ pZjMSAqW+GYPpive8JTp1kJbkImxZP/RSUK/WE/FrCNbaW0ZJepYQhdyPkKATV+r0LLoI7HJPoq
+ eZEx7jjegxB8es1w=
+X-Received: by 2002:adf:e546:: with SMTP id z6mr860158wrm.423.1583173806461;
+ Mon, 02 Mar 2020 10:30:06 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtuO+8a36XiqR3Sl8a5eUTAAhyWRy82HylZOEtf4cwilr4XC4N/2k/4TfFDvW04L8LhJqd5qg==
+X-Received: by 2002:adf:e546:: with SMTP id z6mr860139wrm.423.1583173806269;
+ Mon, 02 Mar 2020 10:30:06 -0800 (PST)
 Received: from ?IPv6:2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0?
  ([2a01:e35:2fb0:49e0:3f7b:4b69:b9c:cdc0])
- by smtp.gmail.com with ESMTPSA id f127sm364589wma.4.2020.03.02.10.29.29
+ by smtp.gmail.com with ESMTPSA id e11sm28431353wrm.80.2020.03.02.10.30.05
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 10:29:29 -0800 (PST)
-Subject: Re: [PATCH v1 01/10] tests/vm: use $(PYTHON) consistently
+ Mon, 02 Mar 2020 10:30:05 -0800 (PST)
+Subject: Re: [PATCH v1 02/10] tests/vm: Debug mode shows ssh output.
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20200302181907.32110-1-alex.bennee@linaro.org>
- <20200302181907.32110-2-alex.bennee@linaro.org>
+ <20200302181907.32110-3-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2f430da1-6429-746c-92e0-58b1fed5ffcb@redhat.com>
-Date: Mon, 2 Mar 2020 19:29:29 +0100
+Message-ID: <b4b7d958-543d-e1b4-6ca4-ec96aaa2b2c6@redhat.com>
+Date: Mon, 2 Mar 2020 19:30:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200302181907.32110-2-alex.bennee@linaro.org>
+In-Reply-To: <20200302181907.32110-3-alex.bennee@linaro.org>
 Content-Language: en-US
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,36 +117,42 @@ Sender: "Qemu-devel"
 On 3/2/20 7:18 PM, Alex Benn=C3=A9e wrote:
 > From: Robert Foley <robert.foley@linaro.org>
 >=20
-> Change Makefile.include to use $(PYTHON) so for vm-boot-ssh to be
-> consistent with other cases like vm-build.
-
-So what you are trying to fix here is when you have two python3=20
-installed (one from the distribution and one manually built), and you=20
-want to use the manually built?
-
+> Add changes to tests/vm/basevm.py so that during debug mode we show ssh o=
+utput.
 >=20
 > Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Reviewed-by: Peter Puhov <peter.puhov@linaro.org>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Message-Id: <20200219163537.22098-2-robert.foley@linaro.org>
+> Message-Id: <20200219163537.22098-3-robert.foley@linaro.org>
 > ---
->   tests/vm/Makefile.include | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   tests/vm/basevm.py | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> index 9e7c46a4735..778e5067554 100644
-> --- a/tests/vm/Makefile.include
-> +++ b/tests/vm/Makefile.include
-> @@ -80,7 +80,7 @@ vm-boot-serial-%: $(IMAGES_DIR)/%.img
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 4dee6647e6e..c99725b8c0d 100644
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -120,11 +120,16 @@ class BaseVM(object):
+>           return fname
 >  =20
->   vm-boot-ssh-%: $(IMAGES_DIR)/%.img
->   =09$(call quiet-command, \
-> -=09=09$(SRC_PATH)/tests/vm/$* \
-> +=09=09$(PYTHON) $(SRC_PATH)/tests/vm/$* \
->   =09=09$(if $(J),--jobs $(J)) \
->   =09=09--image "$<" \
->   =09=09--interactive \
+>       def _ssh_do(self, user, cmd, check):
+> -        ssh_cmd =3D ["ssh", "-q", "-t",
+> +        ssh_cmd =3D ["ssh",
+> +                   "-t",
+>                      "-o", "StrictHostKeyChecking=3Dno",
+>                      "-o", "UserKnownHostsFile=3D" + os.devnull,
+>                      "-o", "ConnectTimeout=3D1",
+>                      "-p", self.ssh_port, "-i", self._ssh_key_file]
+> +        # If not in debug mode, set ssh to quiet mode to
+> +        # avoid printing the results of commands.
+> +        if not self.debug:
+> +            ssh_cmd.append("-q")
+>           for var in self.envvars:
+>               ssh_cmd +=3D ['-o', "SendEnv=3D%s" % var ]
+>           assert not isinstance(cmd, str)
 >=20
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
