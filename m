@@ -2,46 +2,48 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87888C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86ED1C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:22:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D2B6246A1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:22:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D2B6246A1
+	by mail.kernel.org (Postfix) with ESMTPS id 6016E246A1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 08:22:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6016E246A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8gLY-0006Ax-Hj
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 03:22:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37373)
+	id 1j8gLa-0006Gt-DE
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 03:22:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j8gKc-0004Mp-3R
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j8gKc-0004Mo-2P
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j8gKa-0001a7-R9
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j8gKa-0001Yi-Gp
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 03:21:42 -0500
-Received: from relay.sw.ru ([185.231.240.75]:44694)
+Received: from relay.sw.ru ([185.231.240.75]:44684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j8gKa-0001U4-KV; Mon, 02 Mar 2020 03:21:40 -0500
+ id 1j8gKZ-0001U3-PL; Mon, 02 Mar 2020 03:21:40 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j8gKP-0002Ot-1g; Mon, 02 Mar 2020 11:21:29 +0300
+ id 1j8gKP-0002Ot-HO; Mon, 02 Mar 2020 11:21:29 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/4] qcow2: Implement zstd cluster compression method
-Date: Mon,  2 Mar 2020 11:21:07 +0300
-Message-Id: <20200302082111.21205-1-dplotnikov@virtuozzo.com>
+Subject: [PATCH v2 4/4] iotests: 287: add qcow2 compression type test
+Date: Mon,  2 Mar 2020 11:21:11 +0300
+Message-Id: <20200302082111.21205-5-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200302082111.21205-1-dplotnikov@virtuozzo.com>
+References: <20200302082111.21205-1-dplotnikov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
@@ -61,58 +63,209 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
-  * rework compression type setting [Vladimir]
-  * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
-  * fix zstd availability checking in zstd iotest [Vladimir]
-  * remove unnecessry casting [Eric]
-  * remove rudundant checks [Eric]
-  * fix compressed cluster layout in qcow2 spec [Vladimir]
-  * fix wording [Eric, Vladimir]
-  * fix compression type filtering in iotests [Eric]
+The test checks fulfilling qcow2 requiriements for the compression
+type feature and zstd compression type operability.
 
-v1:
-  the initial series
-
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
-zstd comression method is faster than the only available zlib.
-The series adds zstd to the methods available for clusters compression.
-
-The implementation is done with respect to the recently added compression
-type additional header to the qcow2 specification.
-
-Denis Plotnikov (4):
-  qcow2: introduce compression type feature
-  qcow2: rework the cluster compression routine
-  qcow2: add zstd cluster compression
-  iotests: 287: add qcow2 compression type test
-
- docs/interop/qcow2.txt           |  20 ++++
- configure                        |  29 +++++
- qapi/block-core.json             |  23 +++-
- block/qcow2.h                    |  18 ++-
- include/block/block_int.h        |   1 +
- block/qcow2-threads.c            | 197 ++++++++++++++++++++++++++++---
- block/qcow2.c                    | 116 ++++++++++++++++++
- tests/qemu-iotests/031.out       |  14 +--
- tests/qemu-iotests/036.out       |   4 +-
- tests/qemu-iotests/049.out       | 102 ++++++++--------
- tests/qemu-iotests/060.out       |   1 +
- tests/qemu-iotests/061.out       |  34 +++---
- tests/qemu-iotests/065           |  20 ++--
- tests/qemu-iotests/080           |   2 +-
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/242.out       |   5 +
- tests/qemu-iotests/255.out       |   8 +-
- tests/qemu-iotests/287           | 127 ++++++++++++++++++++
- tests/qemu-iotests/287.out       |  43 +++++++
- tests/qemu-iotests/common.filter |   3 +-
- tests/qemu-iotests/group         |   1 +
- 22 files changed, 666 insertions(+), 108 deletions(-)
+ tests/qemu-iotests/287     | 127 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/287.out |  43 +++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 171 insertions(+)
  create mode 100755 tests/qemu-iotests/287
  create mode 100644 tests/qemu-iotests/287.out
 
+diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
+new file mode 100755
+index 0000000000..39cb665c85
+--- /dev/null
++++ b/tests/qemu-iotests/287
+@@ -0,0 +1,127 @@
++#!/usr/bin/env bash
++#
++# Test case for an image using zstd compression
++#
++# Copyright (c) 2020 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=dplotnikov@virtuozzo.com
++
++seq="$(basename $0)"
++echo "QA output created by $seq"
++
++status=1	# failure is the default!
++
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# standard environment
++. ./common.rc
++. ./common.filter
++
++# This tests qocw2-specific low-level functionality
++_supported_fmt qcow2
++_supported_proto file
++_supported_os Linux
++
++# Check if we can run this test.
++IMGOPTS='compression_type=zstd'
++
++_make_test_img 64M | grep "Invalid parameter 'zstd'" 2>&1 1>/dev/null
++
++ZSTD_SUPPORTED=$?
++
++if (($ZSTD_SUPPORTED==0)); then
++    _notrun "ZSTD is disabled"
++fi
++
++# Test: when compression is zlib the incompatible bit is unset
++echo
++echo "=== Testing compression type incompatible bit setting for zlib ==="
++echo
++
++IMGOPTS='compression_type=zlib' _make_test_img 64M
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++# Test: when compression differs from zlib the incompatible bit is set
++echo
++echo "=== Testing compression type incompatible bit setting for zstd ==="
++echo
++
++IMGOPTS='compression_type=zstd' _make_test_img 64M
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++
++# Test: an image can't be openned if compression type is zlib and
++#       incompatible feature compression type is set
++echo
++echo "=== Testing zlib with incompatible bit set  ==="
++echo
++
++IMGOPTS='compression_type=zlib' _make_test_img 64M
++$PYTHON qcow2.py "$TEST_IMG" set-feature-bit incompatible 3
++# to make sure the bit was actually set
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
++if (($?==0)); then
++    echo "Error: The image openned successfully. The image must not be openned"
++fi
++
++# Test: an image can't be openned if compression type is NOT zlib and
++#       incompatible feature compression type is UNSET
++echo
++echo "=== Testing zstd with incompatible bit unset  ==="
++echo
++
++IMGOPTS='compression_type=zstd' _make_test_img 64M
++$PYTHON qcow2.py "$TEST_IMG" set-header incompatible_features 0
++# to make sure the bit was actually unset
++$PYTHON qcow2.py "$TEST_IMG" dump-header | grep incompatible_features
++$QEMU_IMG info "$TEST_IMG" 2>1 1>/dev/null
++if (($?==0)); then
++    echo "Error: The image openned successfully. The image must not be openned"
++fi
++# Test: check compression type values
++echo
++echo "=== Testing compression type values  ==="
++echo
++# zlib=0
++IMGOPTS='compression_type=zlib' _make_test_img 64M
++od -j104 -N1 -An -vtu1 "$TEST_IMG"
++
++# zstd=1
++IMGOPTS='compression_type=zstd' _make_test_img 64M
++od -j104 -N1 -An -vtu1 "$TEST_IMG"
++
++# Test: using zstd compression, write to and read from an image
++echo
++echo "=== Testing reading and writing with zstd ==="
++echo
++
++CLUSTER_SIZE=65536
++IMGOPTS='compression_type=zstd' _make_test_img 64M
++$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -P 0xAC 65536 65536 " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
++$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/287.out b/tests/qemu-iotests/287.out
+new file mode 100644
+index 0000000000..8e51c3078d
+--- /dev/null
++++ b/tests/qemu-iotests/287.out
+@@ -0,0 +1,43 @@
++QA output created by 287
++
++=== Testing compression type incompatible bit setting for zlib ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     []
++
++=== Testing compression type incompatible bit setting for zstd ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     [3]
++
++=== Testing zlib with incompatible bit set  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     [3]
++
++=== Testing zstd with incompatible bit unset  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++incompatible_features     []
++
++=== Testing compression type values  ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++   0
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++   1
++
++=== Testing reading and writing with zstd ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++wrote 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++read 65536/65536 bytes at offset 65536
++64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++0001fffe:  ac ac 00 00 00 00 00 00  ........
++read 8/8 bytes at offset 131070
++8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++0000fffe:  00 00 ac ac ac ac ac ac  ........
++read 8/8 bytes at offset 65534
++8 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0317667695..5edbadef40 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -293,3 +293,4 @@
+ 283 auto quick
+ 284 rw
+ 286 rw quick
++287 auto quick
 -- 
 2.17.0
 
