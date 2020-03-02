@@ -1,64 +1,80 @@
 Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFB0C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF414C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B40924673
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:28:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B40924673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 776C524677
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 23:31:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hokUvzcy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 776C524677
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8uTz-0006uK-Qr
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:28:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35191)
+	id 1j8uXV-0008Fm-NV
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 18:31:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1j8uSj-0005yk-7x
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:27:02 -0500
+ (envelope-from <hsp.cat7@gmail.com>) id 1j8uWm-0007jE-Du
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:31:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1j8uSh-00023K-LC
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:27:01 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:25725)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
- id 1j8uSe-0001yU-2i; Mon, 02 Mar 2020 18:26:56 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 41AD4747DCF;
- Tue,  3 Mar 2020 00:26:54 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0FE2E7476D5; Tue,  3 Mar 2020 00:26:54 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 0D7AC74637E;
- Tue,  3 Mar 2020 00:26:54 +0100 (CET)
-Date: Tue, 3 Mar 2020 00:26:54 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH 1/2] ide: Make room for flags in PCIIDEState and add one
- for legacy IRQ routing
-In-Reply-To: <ff8e0d07-9237-b8b4-a117-88e86926bf28@ilande.co.uk>
-Message-ID: <alpine.BSF.2.22.395.2003030017210.47473@zero.eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <775825dba26f6b36ab067f253e4ab5dc3a3d15dc.1583017348.git.balaton@eik.bme.hu>
- <d85cd8c6-99a3-8430-41cc-486aad1ad8de@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011619100.95594@zero.eik.bme.hu>
- <87pndvch3t.fsf@dusky.pond.sub.org>
- <ff8e0d07-9237-b8b4-a117-88e86926bf28@ilande.co.uk>
-User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
+ (envelope-from <hsp.cat7@gmail.com>) id 1j8uWl-0003Jg-1e
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:31:12 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33258)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1j8uWk-0003Fk-QI
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 18:31:10 -0500
+Received: by mail-ot1-x342.google.com with SMTP id a20so1191384otl.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 15:31:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4/hwPPxySr/Sg7prvUBxw8vzCIOTTkUQdkQZndiaTKc=;
+ b=hokUvzcyxSjNEk58qzfneOdTPD6nKTjh4yxV/YCJsq8cEaar5AJJJzr9nXf+PriHFi
+ yEFhddG2Vifs2GHFuS/2Aav14Kkn9uWn1M3odqle+JvRKyCRkaCzo7h/HfWo1QDPn/uz
+ 1IU+u+J764znsw04Ie5/un/s+DIcuj3PBdj6Ecbme4SYRGYv3FO7j6HTP4HiJpMJJkzb
+ zIX6HtXYf0Y9EsGuaEfUMFGPbl/zOiUtvVl83qHMXl702kuhPJdDUKfHDyAQevW78Ja8
+ ybA6r46+ZquC3BIUhzbBS0UEnC2kvG6K6A9cz16uSCKlpfOXf692uD18MXYGQF+rute6
+ LCZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4/hwPPxySr/Sg7prvUBxw8vzCIOTTkUQdkQZndiaTKc=;
+ b=rB0HSdu12LgrE1hGp9iNNH8tBV+UKrn0h/zYBloQHwYtIwAlisxNsqgjwPaHu9fzr0
+ rgbZYfGcjQuq/tjEqh79ThUJ534E6PkkhNlB5tvxfe2Hygk3qaOeWxiKiyvxDTaCOQFI
+ 4SMcCu71ZOO2eApMJvKBQ0dZqGfugO+P0Bq1bfxah4CSlISsqfLgzfFlH+wtBue6WV84
+ oV3X8OuKTat4Au7lVOc9K2y7DbcNUAjkXorP4VaNgvi6Lq7Im7+L4d20NOKCX4d8tN35
+ SsOpw+rSDaF3wpxHVLb5mYosykA5md6k+y1sidUdVIjtewMCgVT6vfZOrmpHztGf1ecj
+ 0CJw==
+X-Gm-Message-State: ANhLgQ1rQ49blDOqTXdTH/0nZQxCSPhKA5OdU/g4nU0MR/OpdBvw4qCE
+ VbLg/oALDhqBhFYl7eA07o4lczl6/So10IwevJA=
+X-Google-Smtp-Source: ADFU+vvoyvTvy6OPvoKe8xW4MjOB4APSaY/UDUqsbHSJuGSPLtsjfE1k5Q6Xhc3J1ircCJuBLhGFVrbxd0NY1wosMl4=
+X-Received: by 2002:a05:6830:1e76:: with SMTP id
+ m22mr1301624otr.295.1583191869704; 
+ Mon, 02 Mar 2020 15:31:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+References: <417bfe2f-e3c1-d83d-b437-47859daf524d@t-online.de>
+In-Reply-To: <417bfe2f-e3c1-d83d-b437-47859daf524d@t-online.de>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Tue, 3 Mar 2020 00:30:58 +0100
+Message-ID: <CABLmASHxx+x6rDo-Vk_wwKrHoq2+10oyH49AeKnmJXdQJSJnGw@mail.gmail.com>
+Subject: Re: [PATCH 0/5] mostly changes related to audio float samples
+To: =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>
+Content-Type: multipart/alternative; boundary="000000000000014fca059fe7952f"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,124 +86,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2 Mar 2020, Mark Cave-Ayland wrote:
-> On 02/03/2020 08:10, Markus Armbruster wrote:
->> BALATON Zoltan <balaton@eik.bme.hu> writes:
->>> On Sun, 1 Mar 2020, Mark Cave-Ayland wrote:
->>>> On 29/02/2020 23:02, BALATON Zoltan wrote:
->>>>> We'll need a flag for implementing some device specific behaviour in
->>>>> via-ide but we already have a currently CMD646 specific field that can
->>>>> be repurposed for this and leave room for furhter flags if needed in
->>>>> the future. This patch changes the "secondary" field to "flags" and
->>>>> define the flags for CMD646 and via-ide and change CMD646 and its
->>>>> users accordingly.
->>>>>
->>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>>> ---
->>>>>  hw/alpha/dp264.c     |  2 +-
->>>>>  hw/ide/cmd646.c      | 12 ++++++------
->>>>>  hw/sparc64/sun4u.c   |  9 ++-------
->>>>>  include/hw/ide.h     |  4 ++--
->>>>>  include/hw/ide/pci.h |  7 ++++++-
->>>>>  5 files changed, 17 insertions(+), 17 deletions(-)
->>>>>
->>>>> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
->> [...]
->>>>> @@ -317,20 +317,20 @@ static void pci_cmd646_ide_exitfn(PCIDevice *dev)
->>>>>      }
->>>>>  }
->>>>>
->>>>> -void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table,
->>>>> -                         int secondary_ide_enabled)
->>>>> +void pci_cmd646_ide_init(PCIBus *bus, DriveInfo **hd_table, int devfn,
->>>>> +                         bool secondary_ide_enabled)
->>>>>  {
->>>>>      PCIDevice *dev;
->>>>>
->>>>> -    dev = pci_create(bus, -1, "cmd646-ide");
->>>>> -    qdev_prop_set_uint32(&dev->qdev, "secondary", secondary_ide_enabled);
->>>>> +    dev = pci_create(bus, devfn, "cmd646-ide");
->>>>> +    qdev_prop_set_bit(&dev->qdev, "secondary", secondary_ide_enabled);
->>>>>      qdev_init_nofail(&dev->qdev);
->>>>>
->>>>>      pci_ide_create_devs(dev, hd_table);
->>>>>  }
->>>>
->>>> Note that legacy init functions such as pci_cmd646_ide_init() should be removed where
->>>> possible, and in fact I posted a patch last week to completely remove it. This is
->>>> because using qdev directly allows each board to wire up the device as required,
->>>> rather than pushing it down into a set of init functions with different defaults.
->>>>
->>>> Given that you're working in this area, I'd highly recommend doing the same for
->>>> via_ide_init() too.
->>>
->>> I could do that, however these ide init functions seem to exist for
->>> piix, cmd646 and via-ide so that pci_ide_create_devs function is kept
->>> local to hw/ide. Nothing else called that func apart from sun4u so
->>> I've chosen this way to keep consistency (also keeps property type at
->>> one place instead of needing to change each board that sets
->>> property). If the consensus is that getting rid of these init funcs
->>> even if that means pci_ide_create_devs will not be local to ide any
->>> more I can go that way but would like to hear opinion of ide
->>> maintainer as well.
->>
->> I think Mark's point is that modelling a device and wiring up a device
->> model are separate things, and the latter belongs to the board.
->>
->> pci_cmd646_ide_init() is a helper for boards.  Similar helpers exist
->> elsewhere.
->>
->> In the oldest stratum of qdev code, such helpers were static inline
->> functions in the device model's .h.  That way, they're kind of separate
->> from the device model proper, in the .c, and kind of in the board code
->> where they belong, via inlining.  I've always considered that a terrible
->> idea; it's "kind of" as in "not really".  Over time, practice moved
->> first to putting the helpers into .c, then to open-coding the wiring
->> where it belongs: in the boards.
->>
->> A few helper functions have survived, e.g. in hw/lm32/milkymist-hw.h,
->> and the IDE helpers we're discussing here.
->>
->> Of course, when the code to wire up certain devices gets overly
->> repetitive, factoring out common code into helpers can make sense.  But
->> where to put them?  I can't see an obvious home for common board
->> helpers.  We tend to put these wiring helpers into a device model's .c
->> code for want of a better place.  Tolerable, I think.
+--000000000000014fca059fe7952f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 2, 2020 at 8:08 PM Volker R=C3=BCmelin <vr_qemu@t-online.de> wr=
+ote:
+
+> Patch "audio: change naming scheme of FLOAT_CONV macros" and
+> patch "audio: consistency changes" should have been a review
+> for ed2a4a7941 "audio: proper support for float samples in
+> mixeng", but I was too slow.
 >
-> Right, thanks for the more detailed explanation of what I was trying to say above.
+> Patch "audio: change mixing engine float range to [-1.f, 1.f]"
+> definitely needs to be tested by macOS users. I verified
+> PulseAudio, SDL2 and ALSA (actually libasound) work, but I
+> don't want to introduce a regression for CoreAudio. I spent
+> some time on https://developer.apple.com but I couldn't find
+> the answer if CoreAudio uses the [-1.f, 1.f] range too. The
+> results from my favorite search engine suggest the answer is
+> yes.
 >
-> As you say having helpers can definitely help avoid repetitive code, however there
-> was a case a few releases back when someone flipped a qdev property in a device
-> _init() helper function used to initialise one of the more common devices and it
-> broke several of the older machines.
+> @Howard:
+> I need your help once again. Can you please test if you can
+> hear (or see) clipping with my patches? Don't forget to set all
+> volume controls in the guest and on the host to 100% or 0dB to
+> get a reliable result. Compared to qemu without these patches I
+> expect the playback volume is a bit louder, but there's still
+> no clipping.
 >
-> So now I'm mainly of the opinion that if the helper is just instantiating a device,
-> setting qdev properties and then returning the device then you're better off moving
-> the initialisation into the board code to prevent problems like this occurring again
-> (and certainly this nudges us towards building machines from config files since all
-> the configuration/wiring is now done at board level).
+> Volker R=C3=BCmelin (5):
+>   qapi/audio: add documentation for AudioFormat
+>   audio: change naming scheme of FLOAT_CONV macros
+>   audio: consistency changes
+>   audio: change mixing engine float range to [-1.f, 1.f]
+>   audio: fix saturation nonlinearity in clip_* functions
+>
+>  audio/mixeng.c          | 26 +++++++++++++-------------
+>  audio/mixeng_template.h | 22 ++++++++++------------
+>  qapi/audio.json         | 14 ++++++++++++++
+>  3 files changed, 37 insertions(+), 25 deletions(-)
+>
+> --
+> 2.16.4
+>
+> Hi,
 
-The conflicting interests here seem to be
+I applied these to Mark's screamer branch to create a new OSX build.
+Testing was done by playing system sounds, and an MP3/Internet radio with
+QuickTime/iTunes. With or without 6dB, the max volume is way out of my
+comfort zone. I hear no real difference in quality compared to a build from
+the current screamer branch. If any, it might sound a bit better. That
+means there still is some minimal crackling (clipping?) in the high volume
+parts of the audio I played with OSX guests, not Mac OS 9.x guests.
 
-1. Keeping pci_ide_create_devs() local to hw/ide
-2. keeping things related to the board in board code and getting rid of 
-init functions
+So as there is no regression,
+tested by: howard spoelstra <hsp.cat7@gmail.com>
 
-I can't decide which of the above is more important or nicer but the patch 
-I've proposed at least kept consistency with existing practice. If it's 
-decided that board code should use pci_ide_create_devs directly instead we 
-could either address that in a separate clean up series also getting rid 
-of the piix init functions at the same time later or if Mark's series gets 
-merged first I can rebase on that.
+--000000000000014fca059fe7952f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-BALATON Zoltan
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Mar 2, 2020 at 8:08 PM Volker=
+ R=C3=BCmelin &lt;<a href=3D"mailto:vr_qemu@t-online.de">vr_qemu@t-online.d=
+e</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
+>Patch &quot;audio: change naming scheme of FLOAT_CONV macros&quot; and<br>
+patch &quot;audio: consistency changes&quot; should have been a review<br>
+for ed2a4a7941 &quot;audio: proper support for float samples in<br>
+mixeng&quot;, but I was too slow.<br>
+<br>
+Patch &quot;audio: change mixing engine float range to [-1.f, 1.f]&quot;<br=
+>
+definitely needs to be tested by macOS users. I verified<br>
+PulseAudio, SDL2 and ALSA (actually libasound) work, but I<br>
+don&#39;t want to introduce a regression for CoreAudio. I spent<br>
+some time on <a href=3D"https://developer.apple.com" rel=3D"noreferrer" tar=
+get=3D"_blank">https://developer.apple.com</a> but I couldn&#39;t find<br>
+the answer if CoreAudio uses the [-1.f, 1.f] range too. The<br>
+results from my favorite search engine suggest the answer is<br>
+yes.<br>
+<br>
+@Howard:<br>
+I need your help once again. Can you please test if you can<br>
+hear (or see) clipping with my patches? Don&#39;t forget to set all<br>
+volume controls in the guest and on the host to 100% or 0dB to<br>
+get a reliable result. Compared to qemu without these patches I<br>
+expect the playback volume is a bit louder, but there&#39;s still<br>
+no clipping.<br>
+<br>
+Volker R=C3=BCmelin (5):<br>
+=C2=A0 qapi/audio: add documentation for AudioFormat<br>
+=C2=A0 audio: change naming scheme of FLOAT_CONV macros<br>
+=C2=A0 audio: consistency changes<br>
+=C2=A0 audio: change mixing engine float range to [-1.f, 1.f]<br>
+=C2=A0 audio: fix saturation nonlinearity in clip_* functions<br>
+<br>
+=C2=A0audio/mixeng.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 26 +++++++++++++--=
+-----------<br>
+=C2=A0audio/mixeng_template.h | 22 ++++++++++------------<br>
+=C2=A0qapi/audio.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 14 ++++++++++++++<=
+br>
+=C2=A03 files changed, 37 insertions(+), 25 deletions(-)<br>
+<br>
+-- <br>
+2.16.4<br>
+<br></blockquote><div>Hi,</div><div><br></div><div>I applied these to Mark&=
+#39;s screamer branch to create a new OSX build. Testing was done by playin=
+g system sounds, and an MP3/Internet radio with QuickTime/iTunes. With or w=
+ithout 6dB, the max volume is way out of my comfort zone. I hear no real di=
+fference in quality compared to a build from the current screamer branch. I=
+f any, it might sound a bit better. That means there still is some minimal =
+crackling (clipping?) in the high volume parts of the audio I played with O=
+SX guests, not Mac OS 9.x guests.=C2=A0=C2=A0</div><div><br></div><div>So a=
+s there is no regression,<br></div><div>tested by: howard spoelstra &lt;<a =
+href=3D"mailto:hsp.cat7@gmail.com">hsp.cat7@gmail.com</a>&gt;<br></div></di=
+v></div>
+
+--000000000000014fca059fe7952f--
 
