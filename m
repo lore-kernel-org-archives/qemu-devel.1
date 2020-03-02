@@ -2,84 +2,78 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC37DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13472C3F2D2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A8FF2166E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D10C42166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 10:56:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="1lqz0wf5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A8FF2166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgNpgems"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10C42166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8ikA-0000Hs-OK
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:56:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57681)
+	id 1j8ikU-0000vT-22
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 05:56:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57728)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rvkagan@yandex-team.ru>) id 1j8ijC-0007Q9-GM
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:15 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j8ijS-0007jG-09
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rvkagan@yandex-team.ru>) id 1j8ijB-0003ww-8S
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:14 -0500
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:51336)
+ (envelope-from <eric.auger@redhat.com>) id 1j8ijQ-000429-Ll
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39628
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rvkagan@yandex-team.ru>)
- id 1j8ij5-0003t2-TD; Mon, 02 Mar 2020 05:55:08 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 128AC2E1675;
- Mon,  2 Mar 2020 13:55:04 +0300 (MSK)
-Received: from vla1-5a8b76e65344.qloud-c.yandex.net
- (vla1-5a8b76e65344.qloud-c.yandex.net [2a02:6b8:c0d:3183:0:640:5a8b:76e6])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- YynEHQvKqL-t3D078Xn; Mon, 02 Mar 2020 13:55:04 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1583146504; bh=Jh/qFUN2zJdPMEi3evDZc5XATzJ8NgGWbUI48ZU2yrA=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=1lqz0wf5P8iUMYfHDMcre3tnLjTku6th2T6IBdSdnRq5ZGu5feXaGyeUpRRicoCtg
- orECIb0J4mfT32UOB7561wNhIbExzyUeAYiQGZYZANdOrZpF7SpabPy5hboFS6kwvE
- PBsT2YExul272/gAMxT2qtY7WDRf1KWXkDMUHbAs=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:408:8942:9144:3fd0:c0de])
- by vla1-5a8b76e65344.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- 4LMWzUudYi-t33uBFxR; Mon, 02 Mar 2020 13:55:03 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-Date: Mon, 2 Mar 2020 13:55:02 +0300
-From: Roman Kagan <rvkagan@yandex-team.ru>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] block: make BlockConf.*_size properties 32-bit
-Message-ID: <20200302105502.GA96019@rvkaganb>
-Mail-Followup-To: Roman Kagan <rvkagan@yandex-team.ru>,
- Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20200211115401.43230-1-rvkagan@yandex-team.ru>
- <c79721ac-357f-6b9f-6d71-53f2cb72ef6e@redhat.com>
- <20200213080151.GA85593@rvkaganb>
- <d869f498-0d6b-1a7f-72b5-bc5f2088b119@redhat.com>
- <20200213135544.GA103102@rvkaganb>
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j8ijQ-00041w-IZ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 05:55:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583146528;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=y6ylNIp5+a3tQJdTZkzfrzqY+ZPI6Z84ofOgeIdgybQ=;
+ b=HgNpgems7eFLPnn74y5NOdpelALGfxUCERG0MaPAB7/x7gw4i+5GK+wYOiNpHJnP857m2B
+ F7puxcl4AW59ACLOMWiLTr/YtfLEOpfedNihgynJQ87JqCMEDxQinNnfKZD9c+ZKb5aYyd
+ IvC5SUupwoCeB1vrrJpO13TpDFl0zc4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-qRVLFL1cNYeQH1KuYb_Vag-1; Mon, 02 Mar 2020 05:55:24 -0500
+X-MC-Unique: qRVLFL1cNYeQH1KuYb_Vag-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CB68107ACC4;
+ Mon,  2 Mar 2020 10:55:23 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AFC4727198;
+ Mon,  2 Mar 2020 10:55:18 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org
+Subject: [PATCH v3 0/6] hw/arm/virt: kvm: allow gicv3 by default if v2 cannot
+ work
+Date: Mon,  2 Mar 2020 11:55:10 +0100
+Message-Id: <20200302105516.5972-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200213135544.GA103102@rvkaganb>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.45.199.163
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,101 +85,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: maz@kernel.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Feb 13, 2020 at 04:55:44PM +0300, Roman Kagan wrote:
-> On Thu, Feb 13, 2020 at 06:47:10AM -0600, Eric Blake wrote:
-> > On 2/13/20 2:01 AM, Roman Kagan wrote:
-> > > On Wed, Feb 12, 2020 at 03:44:19PM -0600, Eric Blake wrote:
-> > > > On 2/11/20 5:54 AM, Roman Kagan wrote:
-> > > > > Devices (virtio-blk, scsi, etc.) and the block layer are happy to use
-> > > > > 32-bit for logical_block_size, physical_block_size, and min_io_size.
-> > > > > However, the properties in BlockConf are defined as uint16_t limiting
-> > > > > the values to 32768.
-> > > > > 
-> > > > > This appears unnecessary tight, and we've seen bigger block sizes handy
-> > > > > at times.
-> > > > 
-> > > > What larger sizes?  I could see 64k or maybe even 1M block sizes,...
-> > > 
-> > > We played exactly with these two :)
-> > > 
-> > > > > 
-> > > > > Make them 32 bit instead and lift the limitation.
-> > > > > 
-> > > > > Signed-off-by: Roman Kagan <rvkagan@yandex-team.ru>
-> > > > > ---
-> > > > >    hw/core/qdev-properties.c    | 21 ++++++++++++---------
-> > > > >    include/hw/block/block.h     |  8 ++++----
-> > > > >    include/hw/qdev-properties.h |  2 +-
-> > > > >    3 files changed, 17 insertions(+), 14 deletions(-)
-> > > > > 
-> > > > > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > > > > index 7f93bfeb88..5f84e4a3b8 100644
-> > > > > --- a/hw/core/qdev-properties.c
-> > > > > +++ b/hw/core/qdev-properties.c
-> > > > > @@ -716,30 +716,32 @@ const PropertyInfo qdev_prop_pci_devfn = {
-> > > > >    /* --- blocksize --- */
-> > > > > +#define MIN_BLOCK_SIZE 512
-> > > > > +#define MAX_BLOCK_SIZE 2147483648
-> > > > 
-> > > > ...but 2G block sizes are going to have tremendous performance problems.
-> > > > 
-> > > > I'm not necessarily opposed to the widening to a 32-bit type, but think you
-> > > > need more justification or a smaller number for the max block size,
-> > > 
-> > > I thought any smaller value would just be arbitrary and hard to reason
-> > > about, so I went ahead with the max value that fit in the type and could
-> > > be made visibile to the guest.
-> > 
-> > You've got bigger problems than what is visible to the guest. block/qcow2.c
-> > operates on a cluster at a time; if you are stating that it now requires
-> > reading multiple clusters to operate on one, qcow2 will have to do lots of
-> > wasteful read-modify-write cycles.
-> 
-> I'm failing to see how this is supposed to happen.  The guest will issue
-> requests bigger than the cluster size; why would it cause RMW?
-> 
-> Big logical_block_size would cause RMW in the guest if it wants to
-> perform smaller writes, but that's up to the user to take this tradeoff,
-> isn't it?
-> 
-> > You really need a strong reason to
-> > support a maximum larger than 2M other than just "so the guest can
-> > experiment with it".
-> 
-> Do I get you right that your suggestion is to cap the block size
-> property at 2MB?
-> 
-> Thanks,
-> Roman.
+At the moment if the end-user does not specify the gic-version along
+with KVM acceleration, v2 is set by default. However most of the
+systems now have GICv3 and sometimes they do not support GICv2
+compatibility. In that case we now end up with the following error:
 
-Ping?
+"qemu-system-aarch64: Initialization of device kvm-arm-gic failed:
+error creating in-kernel VGIC: No such device
+Perhaps the host CPU does not support GICv2?"
 
-> > > 
-> > > Besides this is a property that is set explicitly, so I don't see a
-> > > problem leaving this up to the user.
-> > > 
-> > > > particularly since qcow2 refuses to use cluster sizes larger than 2M and it
-> > > > makes no sense to allow a block size larger than a cluster size.
-> > > 
-> > > This still doesn't contradict passing a bigger value to the guest, for
-> > > experimenting if nothing else.
-> > > 
-> > > Thanks,
-> > > Roman.
-> > > 
-> > 
-> > -- 
-> > Eric Blake, Principal Software Engineer
-> > Red Hat, Inc.           +1-919-301-3226
-> > Virtualization:  qemu.org | libvirt.org
-> > 
-> 
+since "1904f9b5f1  hw/intc/arm_gic_kvm: Don't assume kernel can
+provide a GICv2" which already allowed to output an explicit error
+message.
+
+This patch keeps the default v2 selection in all cases except
+in the KVM accelerated mode when v2 cannot work:
+- either because the host does not support v2 in-kernel emulation or
+- because more than 8 vcpus were requested.
+
+Those cases did not work anyway so we do not break any compatibility.
+Now we get v3 selected in such a case.
+
+Best Regards
+
+Eric
+
+This series can be found at:
+https://github.com/eauger/qemu/tree/v4.2.0-gic-version-v3
+
+History:
+
+v2 -> v3:
+- replaced defines by VirtGICType enum type
+- fixed some style issue
+- collected Richard and Dres's R-b
+  except on "hw/arm/virt: Introduce VirtGICType enum type" just
+  to make sure this matches their expectation.
+
+RFC -> v2:
+- 1904f9b5f1  hw/intc/arm_gic_kvm: Don't assume kernel can
+  provide a GICv2" now has landed upstream
+- Fix gic-version description
+- Introduce finalize_gic_version and use switch/cases
+- take into account smp value
+
+Eric Auger (6):
+  hw/arm/virt: Document 'max' value in gic-version property description
+  hw/arm/virt: Introduce VirtGICType enum type
+  hw/arm/virt: Introduce finalize_gic_version()
+  target/arm/kvm: Let kvm_arm_vgic_probe() return a bitmap
+  hw/arm/virt: kvm: Check the chosen gic version is supported by the
+    host
+  hw/arm/virt: kvm: allow gicv3 by default if v2 cannot work
+
+ hw/arm/virt.c         | 125 +++++++++++++++++++++++++++++++-----------
+ include/hw/arm/virt.h |  12 +++-
+ target/arm/kvm.c      |  14 +++--
+ target/arm/kvm_arm.h  |   3 +
+ 4 files changed, 114 insertions(+), 40 deletions(-)
+
+--=20
+2.20.1
+
 
