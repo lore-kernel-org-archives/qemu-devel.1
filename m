@@ -2,78 +2,83 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0C3C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 17:46:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0DAC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 17:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E778214DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 17:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A4E3214DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 17:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyEk6A1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E778214DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZ6OhR4k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A4E3214DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8p9L-0001h7-Oh
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 12:46:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36911)
+	id 1j8pBg-0002hh-NB
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 12:49:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37435)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1j8p8h-00014T-4A
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:45:59 -0500
+ (envelope-from <berrange@redhat.com>) id 1j8pB4-0002IH-1f
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:48:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1j8p8f-0002qA-Pi
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:45:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59570
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1j8pB1-0004Tp-VM
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:48:25 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33413
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1j8p8f-0002nz-Ll
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:45:57 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j8pB1-0004Tj-R2
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 12:48:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583171156;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1583171303;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Nr7nuAl31PMIsroQ+gCPuBVXXnxaiJSGvWvB9ftKfxY=;
- b=OyEk6A1hKdoPy/h4+/YAtPgR2EdhhkrftMF7guppXcy1z7fK5J8Rm/xM170gsno6QYRxcZ
- 3UyGj9Gp/64EBLTroWj/v1lFUUOWR23YG4KXm8/z0sAOqEk76FPcNJ5kpBLAigwtmgGpQu
- R21BTPDfDvnSgirkB00TCJplv3ZlsJs=
+ bh=tUCwVeofdQK87zg+rQHTzbms1WdFy3LxWL164VKI59Q=;
+ b=WZ6OhR4kWSlLkvzEgqzxWqR39eq/e+soATpn8M8t21r8gU+DzUfFGshLGIVD1t/SB7OwLT
+ ImQHZpgl+P2ALtRdZbBQXvtgK6EW+AMGaIOfEj6ghur0KCdks7y7wT0fBfR+mX9wJlkgDN
+ fPBJ5M79RwnNvdVUyWxp3kdl3is5SNc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-eYYJG-JHNL60820hFNHnNg-1; Mon, 02 Mar 2020 12:45:54 -0500
-X-MC-Unique: eYYJG-JHNL60820hFNHnNg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-398-4OYk-KtGOb-EcyCoqLMLUA-1; Mon, 02 Mar 2020 12:48:06 -0500
+X-MC-Unique: 4OYk-KtGOb-EcyCoqLMLUA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6138813E5;
- Mon,  2 Mar 2020 17:45:53 +0000 (UTC)
-Received: from localhost (ovpn-126-231.rdu2.redhat.com [10.10.126.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D2FFE9CA3;
- Mon,  2 Mar 2020 17:45:52 +0000 (UTC)
-Date: Mon, 2 Mar 2020 12:45:51 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: CPU reset vs DeviceState reset
-Message-ID: <20200302174551.GK4440@habkost.net>
-References: <CAFEAcA9rQ4_o53zfsdcGZWse3eYWksYJdYHLeUFhq6TcBX3_zw@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22557107ACCC;
+ Mon,  2 Mar 2020 17:48:04 +0000 (UTC)
+Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D37D85C1C3;
+ Mon,  2 Mar 2020 17:47:48 +0000 (UTC)
+Date: Mon, 2 Mar 2020 17:47:45 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
+Message-ID: <20200302174745.GP1679990@redhat.com>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
+ <acc40fcd-2871-df80-d420-b9f12dfcf19c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9rQ4_o53zfsdcGZWse3eYWksYJdYHLeUFhq6TcBX3_zw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <acc40fcd-2871-df80-d420-b9f12dfcf19c@redhat.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,42 +90,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
+ thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ dgilbert@redhat.com, liran.alon@oracle.com, stefanha@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
+ thanos.makatos@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-My impression is that this is just historical legacy, but I'm not
-sure how much work a conversion to the new system would require.
-I see lots of cpu_reset() calls scattered around the code.
-
-To make it worse, TYPE_CPU do have a DeviceClass::reset method
-implemented, but cpu_reset() won't call it because it bypasses
-the Device reset system completely.  I will do some git
-archaeology work to try to find out why the code is this way.
-
-
-On Mon, Mar 02, 2020 at 05:20:33PM +0000, Peter Maydell wrote:
-> Hi; I've just noticed that although TYPE_CPU is a subclass of
-> TYPE_DEVICE, it seems to implement its own reset method
-> ('reset' field in CPUClass struct) rather than just using the
-> DeviceClass's 'reset'.
+On Mon, Mar 02, 2020 at 06:36:13PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> typo "multi" in patch subject.
 >=20
-> Is there a reason for doing this, or is it just historical legacy
-> from TYPE_CPU originally not being a subclass of TYPE_DEVICE?
+> On 2/24/20 9:55 PM, Jagannathan Raman wrote:
+> > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> >=20
+> > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> > ---
+> >   v4 -> v5:
+> >    - Added "exec" suboption to get the executable's name
+> >    - Addressed feedback about variable names
+> >    - Removed redundant check for spawning a process
+> >=20
+> >   hw/proxy/qemu-proxy.c         | 68 +++++++++++++++++++++++++++++++++-=
+---------
+> >   include/hw/proxy/qemu-proxy.h |  2 +-
+> >   2 files changed, 54 insertions(+), 16 deletions(-)
+> >=20
+> > diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+> > index 828bbd7..d792e86 100644
+> > --- a/hw/proxy/qemu-proxy.c
+> > +++ b/hw/proxy/qemu-proxy.c
+> > @@ -19,19 +19,50 @@
+> >   static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+> > +static int add_argv(char *opts_str, char **argv, int argc)
+> > +{
+> > +    int max_args =3D 64;
+> > +
+> > +    if (argc < max_args - 1) {
+> > +        argv[argc++] =3D opts_str;
+> > +        argv[argc] =3D 0;
+> > +    } else {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return argc;
+> > +}
+> > +
+> > +static int make_argv(char *opts_str, char **argv, int argc)
+> > +{
+> > +    int max_args =3D 64;
+> > +
+> > +    char *p2 =3D strtok(opts_str, " ");
+> > +    while (p2 && argc < max_args - 1) {
+> > +        argv[argc++] =3D p2;
+> > +        p2 =3D strtok(0, " ");
+> > +    }
+> > +    argv[argc] =3D 0;
 >=20
-> I ask because I'd like to be able to use 3-phase reset in the Arm
-> CPU, and I'm wondering whether it would be better to make TYPE_CPU
-> just use Device's reset system, or to treat TYPE_CPU as its own
-> base class and implement Resettable there. The former seems more
-> straightforward, unless I'm missing something that means we
-> really do need to have the reset method be different.
->=20
-> thanks
-> -- PMM
->=20
+> Is there a GLib function to do that?
 
+g_shell_parse_argv() perhaps
+
+  https://developer.gnome.org/glib/stable/glib-Shell-related-Utilities.html
+
+
+Though my preference would be to avoid the need to do this at all, by
+not accepting a raw shell command line string in the first place.
+
+
+Regards,
+Daniel
 --=20
-Eduardo
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
