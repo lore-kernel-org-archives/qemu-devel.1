@@ -2,78 +2,79 @@ Return-Path: <SRS0=YPEG=4T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA04C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02624C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 16:07:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0233F21556
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 15:48:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BFB4721739
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 16:07:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eT5kVYU2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0233F21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i/+R/S4p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB4721739
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8nJH-0003DW-7z
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 10:48:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44132)
+	id 1j8nbS-0000hD-Ti
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 11:07:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47000)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1j8nHP-0000zv-6o
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:46:52 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j8nan-00007D-GV
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 11:06:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1j8nHO-0002CN-AH
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:46:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57559
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j8nHO-0002C3-5O
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 10:46:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583164009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dOp5FGIaF1MS/iTTwHH3gmeKIz4xY36hDfbRPRQKoKY=;
- b=eT5kVYU2bxqZJ7Xt8qPiyleClGQTt+NH6E4Lf+kaIshfB2gfkdbo15Kp/0P+Y4qVuKduLE
- Jf4R7cv0T0029C9cQDVj7dPhZCzin1sQP+C3NJ26zEpeQ0SdRR5t1POItUpPO9lXc/cEPH
- YKZKrqySbY9R2SRjf0GAZzzXovEESfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-Y5iMKAcMOZiMb5F1qxi8rQ-1; Mon, 02 Mar 2020 10:46:46 -0500
-X-MC-Unique: Y5iMKAcMOZiMb5F1qxi8rQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F4611416;
- Mon,  2 Mar 2020 15:46:43 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-117-17.ams2.redhat.com [10.36.117.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 433625D9C9;
- Mon,  2 Mar 2020 15:46:41 +0000 (UTC)
-From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/3] virtiofsd: add it to the tools list
-Date: Mon,  2 Mar 2020 16:46:29 +0100
-Message-Id: <20200302154630.45620-2-lvivier@redhat.com>
-In-Reply-To: <20200302154630.45620-1-lvivier@redhat.com>
-References: <20200302154630.45620-1-lvivier@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1j8nam-0005iq-Gi
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 11:06:53 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:39774)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j8nam-0005hw-AX
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 11:06:52 -0500
+Received: by mail-oi1-x244.google.com with SMTP id r16so10768578oie.6
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 08:06:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uwBp1BC/e+YqE2Z+qU+tY2wILWfkCO4jHo1fvAz565Y=;
+ b=i/+R/S4peD+idb/yJGVYpIRlYpyi7QJr+GPvHv7MtOMVOqfAnm26teIG72jTncw2Ay
+ 16Q/wjLKLyC8aURPZD8a8mQguxOvqpI0+5094lUOOZsNKHcQNEvGW+Tv9vszkfbKhdXU
+ hnATSknI12xRtFNY++OwftMMOyhFYns1y0O0f5w5EadTe5DOspl+qV4yhc/yPZ+NXCdo
+ ZQvdGCpii7fQciKuxjtRzYSNlcuQ+KxJ+Gf3xcMNQqg9joORH5Yam51xaFus+SMo/1a4
+ wRZcCsEVMm/CNz9NGwxhwWfFWsd8/bFMyjRNX3WfA20Wvf539DDjhs+unxr7GBOKX4eB
+ AhUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uwBp1BC/e+YqE2Z+qU+tY2wILWfkCO4jHo1fvAz565Y=;
+ b=Au9kSc8dKVwqOBPsKRpCdSlHCEHVinQKWeOk86nvB5f3WmBxNLHOUnQq4pjXNQ4gjJ
+ rYqt59PQf8/IwohlRbqWYKgj/WSyd4yz/lucLA1Ee1xa/h7XxhLUrIEk9Eg562aTIX1q
+ WZjG+YErypDZ0L77gtR6ePnKDKakj+HF214dnPvWagSVbpQEjGDQEH738tGsdKWcganp
+ f/lVUqEetRht8Qi4h1Q4ZFoSy5J58NMOvr0xaIMLh87VnCuyQdM/MlqQSqU5IuSlpPSu
+ sYyyG1pplC3L5HnjXloj2ozaAV+8BuxdkN+PItimrP2+izaY8TZk+V3TFvzBCoDUlfsU
+ oD6A==
+X-Gm-Message-State: ANhLgQ3kAacXIKR6apQL2NfWyd03XuvbEEbdP+4rFPlnkZaqwOs6+0uN
+ kz0JFreSUQ8nHd2y+SNK66MYIbn9nzLbiTha9wCDjg==
+X-Google-Smtp-Source: ADFU+vuv+FxLrSlN7SIJVaWs/B6QGdKJvyBKRRe2JjjEECYxGERVxf1aFseoui/k1UzGonk0vYZhXVgRVOoSl6XP1LQ=
+X-Received: by 2002:aca:b2c5:: with SMTP id b188mr121936oif.163.1583165211392; 
+ Mon, 02 Mar 2020 08:06:51 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20200227220149.6845-1-nieklinnenbank@gmail.com>
+In-Reply-To: <20200227220149.6845-1-nieklinnenbank@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Mar 2020 16:06:39 +0000
+Message-ID: <CAFEAcA8uEd_RqNi6iQDxZmGaAGpYoy=bgXFJVj-ow0Ci_Vz+DQ@mail.gmail.com>
+Subject: Re: [PATCH v1 0/4] hw/arm/cubieboard: correct CPU type and add
+ machine argument checks
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,54 +86,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-it will be built only when tools are enabled (always enabled by default)
+On Thu, 27 Feb 2020 at 22:01, Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
+>
+> These patches change the Cubieboard machine definition to use the
+> correct CPU type, which is ARM Cortex-A8 instead of ARM Cortex-A9.
+>
+> Additionally, add some sanity checks for the machine input
+> arguments in the initialization function.
+>
+> Niek Linnenbank (4):
+>   hw/arm/cubieboard: use ARM Cortex-A8 as the default CPU in machine
+>     definition
+>   hw/arm/cubieboard: restrict allowed CPU type to ARM Cortex-A8
+>   hw/arm/cubieboard: restrict allowed RAM size to 512MiB and 1GiB
+>   hw/arm/cubieboard: report error when using unsupported -bios argument
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 218b8259a49a..ba8ffc9331c3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -327,7 +327,7 @@ HELPERS-y +=3D vhost-user-gpu$(EXESUF)
- vhost-user-json-y +=3D contrib/vhost-user-gpu/50-qemu-gpu.json
- endif
-=20
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_TOOLS),y=
-yyy)
- HELPERS-y +=3D virtiofsd$(EXESUF)
- vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
- endif
-@@ -697,7 +697,7 @@ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADD=
-S)
- =09$(call LINK, $^)
-=20
- # relies on Linux-specific syscalls
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
-+ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG)$(CONFIG_TOOLS),y=
-yyy)
- virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS)
- =09$(call LINK, $^)
- endif
---=20
-2.24.1
+Applied to target-arm.next, thanks. (I tweaked a couple of commit
+messages as mentioned in replies to those patches.)
 
+-- PMM
 
