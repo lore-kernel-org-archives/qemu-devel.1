@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CA4C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1121C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:12:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA97D20842
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:12:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA97D20842
+	by mail.kernel.org (Postfix) with ESMTPS id CD86C20842
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Mar 2020 19:12:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD86C20842
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8qUg-0007R3-TJ
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:12:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53360)
+	id 1j8qUi-0007TB-18
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 14:12:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <volker.ruemelin@t-online.de>) id 1j8qSI-0003vB-EP
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:10:19 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <volker.ruemelin@t-online.de>) id 1j8qSH-0005Gj-FC
+ (envelope-from <volker.ruemelin@t-online.de>) id 1j8qSH-0003uY-Qh
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:10:18 -0500
-Received: from mailout04.t-online.de ([194.25.134.18]:45714)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <volker.ruemelin@t-online.de>) id 1j8qSG-0005Fm-Rl
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:10:17 -0500
+Received: from mailout01.t-online.de ([194.25.134.80]:48544)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <volker.ruemelin@t-online.de>)
- id 1j8qSH-0005Ex-8t
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:10:17 -0500
-Received: from fwd24.aul.t-online.de (fwd24.aul.t-online.de [172.20.26.129])
- by mailout04.t-online.de (Postfix) with SMTP id D70FE41FE4B1;
+ id 1j8qSG-0005Er-LG
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 14:10:16 -0500
+Received: from fwd02.aul.t-online.de (fwd02.aul.t-online.de [172.20.26.148])
+ by mailout01.t-online.de (Postfix) with SMTP id C08C3421E456;
  Mon,  2 Mar 2020 20:10:15 +0100 (CET)
 Received: from linpower.localnet
- (JO0NbqZUghBncFwrVZOZcq8S8rgE5SI7sQyfrCrv5rMj+y2ddSFvFUlCGUDY4TvZKF@[79.208.28.226])
- by fwd24.t-online.de
+ (r44a3+ZUYh1HEwfogxLXoOS8jYkKsHoyDYbDBU25v+w2CCzIul-DdxdwLPlrojDght@[79.208.28.226])
+ by fwd02.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1j8qSA-0GSSUi0; Mon, 2 Mar 2020 20:10:10 +0100
+ esmtp id 1j8qSF-03bHiC0; Mon, 2 Mar 2020 20:10:15 +0100
 Received: by linpower.localnet (Postfix, from userid 1000)
- id 906E221B1C0; Mon,  2 Mar 2020 20:10:04 +0100 (CET)
+ id 9473621B1C2; Mon,  2 Mar 2020 20:10:04 +0100 (CET)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>,
  Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 3/5] audio: consistency changes
-Date: Mon,  2 Mar 2020 20:10:02 +0100
-Message-Id: <20200302191004.5991-3-vr_qemu@t-online.de>
+Subject: [PATCH 5/5] audio: fix saturation nonlinearity in clip_* functions
+Date: Mon,  2 Mar 2020 20:10:04 +0100
+Message-Id: <20200302191004.5991-5-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <417bfe2f-e3c1-d83d-b437-47859daf524d@t-online.de>
 References: <417bfe2f-e3c1-d83d-b437-47859daf524d@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-ID: JO0NbqZUghBncFwrVZOZcq8S8rgE5SI7sQyfrCrv5rMj+y2ddSFvFUlCGUDY4TvZKF
-X-TOI-MSGID: df0916cc-babe-4635-b357-2682298f46c3
+X-ID: r44a3+ZUYh1HEwfogxLXoOS8jYkKsHoyDYbDBU25v+w2CCzIul-DdxdwLPlrojDght
+X-TOI-MSGID: 2c7527be-66b1-4209-a59d-a0184378cd26
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 194.25.134.18
+X-Received-From: 194.25.134.80
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,30 +80,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Change the clip_natural_float_from_mono() function in
-audio/mixeng.c to be consistent with the clip_*_from_mono()
-functions in audio/mixeng_template.h.
+The current positive limit for the saturation nonlinearity is
+only correct if the type of the result has 8 bits or less.
 
 Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 ---
- audio/mixeng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ audio/mixeng_template.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/audio/mixeng.c b/audio/mixeng.c
-index b57fad83bf..725b529be7 100644
---- a/audio/mixeng.c
-+++ b/audio/mixeng.c
-@@ -316,7 +316,7 @@ static void clip_natural_float_from_mono(void *dst, c=
-onst struct st_sample *src,
-     float *out =3D (float *)dst;
+diff --git a/audio/mixeng_template.h b/audio/mixeng_template.h
+index fc8e1d4d9e..bc8509e423 100644
+--- a/audio/mixeng_template.h
++++ b/audio/mixeng_template.h
+@@ -83,10 +83,9 @@ static inline int64_t glue (conv_, ET) (IN_T v)
 =20
-     while (samples--) {
--        *out++ =3D CLIP_NATURAL_FLOAT(src->l) + CLIP_NATURAL_FLOAT(src->=
-r);
-+        *out++ =3D CLIP_NATURAL_FLOAT(src->l + src->r);
-         src++;
+ static inline IN_T glue (clip_, ET) (int64_t v)
+ {
+-    if (v >=3D 0x7f000000) {
++    if (v >=3D 0x7fffffffLL) {
+         return IN_MAX;
+-    }
+-    else if (v < -2147483648LL) {
++    } else if (v < -2147483648LL) {
+         return IN_MIN;
      }
- }
+=20
 --=20
 2.16.4
 
