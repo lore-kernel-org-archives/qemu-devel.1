@@ -2,83 +2,89 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B022FC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AF9C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A4AE24673
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB56D24677
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v8Rfav7J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4AE24673
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dtBEhQ/y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB56D24677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vlL-0002pT-Ju
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:50:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44676)
+	id 1j8vlc-0003eN-Tl
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:50:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vk5-0000w1-RF
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:03 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkC-0000x5-4F
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vk4-00045Z-Hb
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:01 -0500
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:40903)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkA-00047u-9e
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:07 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54550)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vk4-00045D-AR
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:00 -0500
-Received: by mail-pf1-x42b.google.com with SMTP id l184so554434pfl.7
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:48:59 -0800 (PST)
+ id 1j8vkA-00047M-3i
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:06 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id dw13so549943pjb.4
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to; bh=hXvy4ghHCmI2AOaSUkFYWx1NZe3mIB7WOFd3+5BTrq0=;
- b=v8Rfav7JJfplslGmutDpYe5vA5Hagf7kEaLBPbPnFhkgIR3TEufwQM/d1xkTHuPFhr
- i1HEAUyjq1EOv+VaNlugsQRjbABAbIqvVVSiMHHKNGAfPB3lRnBFLIcXmxhDpx5RsU7l
- SaJV3VlhPK1mvW1KusDtd3HX1wSC4r4qrTZTFunBNKtOA0aTc76VsJD69VCBPp1K00eZ
- kHHY0cIIgqnIdQNVRJbtOfLrHnFJeCE6dzWwZ8u9Z5MykWx8heVDhj6av8h+lyWT8bxa
- KcxTBmIkfaZCKg330Sk0XzmcVYS8OMuolchewAxBjewOOG1XRgY6mCUoKoqH+EB1Z8X6
- Vawg==
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=qaIXh/9YL5Y0Dx2E5H6658/HQOPDjXc++/K5S1NANzA=;
+ b=dtBEhQ/y4Q0M72y1cr6UqwUDsaFkah4RZWAy7puhOYKQA6a9e07H/cc0dHL2b29jWH
+ RRGqwBm2+xBgAjevVAr9OUWiJ4wuy8qwif0Ltzl2Qfu1R84P5rQc4qGXyoUl1smseCzX
+ ni+qv44DqFRR6CsOPslrcBh7g8g3luLD0iW/MsKdmYHWWMUxhYoMan9CS5PkEBUnG4+F
+ N4IXM39Wve6PbT29E0Fs8ET5evionQ7tl+cHfkFUvjnqHwjIrIiT07l8Pbt2wmPrh0US
+ tZTcPWb9zYImICbPzVi6Aj6Y+y6fGja21oh1uDYm0jmp0It4pVpER7T0JL/xv8Tk34Ld
+ heaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=hXvy4ghHCmI2AOaSUkFYWx1NZe3mIB7WOFd3+5BTrq0=;
- b=Ao3Akk4fx/K/JTxBFkQh4LQihwr7vAdPoDtyIJg9mkVh2gUGx1WsVTT4G/FR5UhLTU
- auaNrgbcYVACbTfg6H8RE7BZkW7er9Kp8ENnOFd+T0BIneyctCK/UdjjZkI4ySvy63Kl
- NnINJfbRUje8cSdKl56Y1YGCMT+R0gybG7Ou/56t14P1ThSCtMwb/TlEYrwfRaT10Zma
- +WobSFk+9v9W67F6awhwvL9TvWL2UflgTpBDTDt3Nzfn2t5hs1i0AHiBBdRVkKJR/smH
- QsTsUPIx3vmMeH6yHR4LDkSGnKHNPwk3kwGL3Imh3QOshGm66XFRN1W9EDL6R5fokL+M
- LVAQ==
-X-Gm-Message-State: ANhLgQ1WZAKat6WPTZ1njtf3O0vd7ZY9M5CA5h9U+dAkifES2Lujz6Xs
- hdWPPrx1b27WgK6SxoZNJE/KQg==
-X-Google-Smtp-Source: ADFU+vsY8r3dEgMHJA9VO05T39SXyLZI3Z4FCXwj3vb0xd8G5Mx7QA9S9UjolcxML8FcSFWrKaeqNA==
-X-Received: by 2002:a63:384e:: with SMTP id h14mr1497701pgn.295.1583196538019; 
- Mon, 02 Mar 2020 16:48:58 -0800 (PST)
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=qaIXh/9YL5Y0Dx2E5H6658/HQOPDjXc++/K5S1NANzA=;
+ b=Xrn+ymhih5G4UB8o4F+kDjmRGR4G77Ib+zr0GRJpEakFZt6uLCCWS899sNRW4ego0e
+ GAwV4pwm0cMu3DQObnIugfCZJgzq6S3GVjHl+RwDAaf9bZT3OFWXYlko422hMBeELSel
+ sbk7DgpUMsVf41iYg4DRpT3B1zjPTN7p6EIc6jFHY/BkmB7OWgFaiEEj/yPvtBMIVjll
+ OJ/k5+kLAQLgCMRX7KiPa/vL6YkMoztWx+TCycz7wohQAzuOgq3EUxZ2VU8oWM3YoqLL
+ 8HuQiVM4fXbpmfzo78dwmnAgwdYGbgGGjfvJ29sunxdbVwTmIJLzVQV/AkFb5zOwYUiH
+ D76A==
+X-Gm-Message-State: ANhLgQ3V7dJcbIQFo7EsOOF8A0o60PoNjaTIwcdg8pTZUE3TW7OnwjsF
+ V5/f8fGxcXOth5jFYFCly2fCJg==
+X-Google-Smtp-Source: ADFU+vsZMEe60WYpEducGhkcNOC3MURK33rI2JVPpzf+KzxXoJT99DiHtP49K6GkA8vyTIkOinitug==
+X-Received: by 2002:a17:902:7895:: with SMTP id
+ q21mr1728126pll.222.1583196544759; 
+ Mon, 02 Mar 2020 16:49:04 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id q6sm22038928pfh.127.2020.03.02.16.48.57
+ by smtp.gmail.com with ESMTPSA id w2sm14035542pfb.138.2020.03.02.16.49.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:48:57 -0800 (PST)
-Subject: [PULL] RISC-V Patches for the 5.0 Soft Freeze, Part 3
-Date: Mon,  2 Mar 2020 16:48:10 -0800
-Message-Id: <20200303004848.136788-1-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:04 -0800 (PST)
+Subject: [PULL 04/38] target/riscv: Add support for the new execption numbers
+Date: Mon,  2 Mar 2020 16:48:14 -0800
+Message-Id: <20200303004848.136788-5-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
+References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42b
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,92 +100,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 8b6b68e05b43f976714ca1d2afe01a64e1d82cba:
+From: Alistair Francis <alistair.francis@wdc.com>
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-02-27 19:15:15 +0000)
+The v0.5 Hypervisor spec add new execption numbers, let's add support
+for those.
 
-are available in the Git repository at:
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
+---
+ target/riscv/cpu.c        |  8 ++++++++
+ target/riscv/cpu_bits.h   | 35 +++++++++++++++++++----------------
+ target/riscv/cpu_helper.c |  7 +++++--
+ target/riscv/csr.c        |  7 +++++--
+ 4 files changed, 37 insertions(+), 20 deletions(-)
 
-  git@github.com:palmer-dabbelt/qemu.git tags/riscv-for-master-5.0-sf3
-
-for you to fetch changes up to 5f3616ccceb5d5c49f99838c78498e581fb42fc5:
-
-  hw/riscv: Provide rdtime callback for TCG in CLINT emulation (2020-02-27 13:46:37 -0800)
-
-----------------------------------------------------------------
-RISC-V Patches for the 5.0 Soft Freeze, Part 3
-
-This pull request is almost entirely an implementation of the draft hypervisor
-extension.  This extension is still in draft and is expected to have
-incompatible changes before being frozen, but we've had good luck managing
-other RISC-V draft extensions in QEMU so far.
-
-Additionally, there's a fix to PCI addressing and some improvements to the
-M-mode timer.
-
-This boots linux and passes make check for me.
-
-----------------------------------------------------------------
-Alistair Francis (35):
-      target/riscv: Convert MIP CSR to target_ulong
-      target/riscv: Add the Hypervisor extension
-      target/riscv: Add the Hypervisor CSRs to CPUState
-      target/riscv: Add support for the new execption numbers
-      target/riscv: Rename the H irqs to VS irqs
-      target/riscv: Add the virtulisation mode
-      target/riscv: Add the force HS exception mode
-      target/riscv: Fix CSR perm checking for HS mode
-      target/riscv: Print priv and virt in disas log
-      target/riscv: Dump Hypervisor registers if enabled
-      target/riscv: Add Hypervisor CSR access functions
-      target/riscv: Add Hypervisor virtual CSRs accesses
-      target/riscv: Add Hypervisor machine CSRs accesses
-      target/riscv: Add virtual register swapping function
-      target/riscv: Set VS bits in mideleg for Hyp extension
-      target/riscv: Extend the MIE CSR to support virtulisation
-      target/riscv: Extend the SIP CSR to support virtulisation
-      target/riscv: Add support for virtual interrupt setting
-      target/ricsv: Flush the TLB on virtulisation mode changes
-      target/riscv: Generate illegal instruction on WFI when V=1
-      target/riscv: Add hypvervisor trap support
-      target/riscv: Add Hypervisor trap return support
-      target/riscv: Add hfence instructions
-      target/riscv: Remove the hret instruction
-      target/riscv: Only set TB flags with FP status if enabled
-      target/riscv: Disable guest FP support based on virtual status
-      target/riscv: Mark both sstatus and msstatus_hs as dirty
-      target/riscv: Respect MPRV and SPRV for floating point ops
-      target/riscv: Allow specifying MMU stage
-      target/riscv: Implement second stage MMU
-      target/riscv: Raise the new execptions when 2nd stage translation fails
-      target/riscv: Set htval and mtval2 on execptions
-      target/riscv: Add support for the 32-bit MSTATUSH CSR
-      target/riscv: Add the MSTATUS_MPV_ISSET helper macro
-      target/riscv: Allow enabling the Hypervisor extension
-
-Anup Patel (2):
-      target/riscv: Emulate TIME CSRs for privileged mode
-      hw/riscv: Provide rdtime callback for TCG in CLINT emulation
-
-Bin Meng (1):
-      riscv: virt: Allow PCI address 0
-
- hw/riscv/sifive_clint.c                        |   6 +-
- hw/riscv/sifive_e.c                            |   2 +-
- hw/riscv/sifive_u.c                            |   2 +-
- hw/riscv/spike.c                               |   9 +-
- hw/riscv/virt.c                                |   3 +-
- include/hw/riscv/sifive_clint.h                |   3 +-
- target/riscv/cpu.c                             |  57 ++-
- target/riscv/cpu.h                             |  63 +++-
- target/riscv/cpu_bits.h                        | 111 ++++--
- target/riscv/cpu_helper.c                      | 486 ++++++++++++++++++++++---
- target/riscv/csr.c                             | 455 ++++++++++++++++++++++-
- target/riscv/gdbstub.c                         |  11 +-
- target/riscv/insn32.decode                     |  22 +-
- target/riscv/insn_trans/trans_privileged.inc.c |  45 ++-
- target/riscv/op_helper.c                       |  71 +++-
- target/riscv/translate.c                       |  35 ++
- 16 files changed, 1240 insertions(+), 141 deletions(-)
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index efbd676edb..2f62f5ea19 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -67,6 +67,14 @@ const char * const riscv_excp_names[] = {
+     "load_page_fault",
+     "reserved",
+     "store_page_fault"
++    "reserved",
++    "reserved",
++    "reserved",
++    "reserved",
++    "guest_exec_page_fault",
++    "guest_load_page_fault",
++    "reserved",
++    "guest_store_page_fault"
+ };
+ 
+ const char * const riscv_intr_names[] = {
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 25c0fb258d..9ce73c36de 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -488,22 +488,25 @@
+ #define DEFAULT_RSTVEC      0x1000
+ 
+ /* Exception causes */
+-#define EXCP_NONE                          -1 /* sentinel value */
+-#define RISCV_EXCP_INST_ADDR_MIS           0x0
+-#define RISCV_EXCP_INST_ACCESS_FAULT       0x1
+-#define RISCV_EXCP_ILLEGAL_INST            0x2
+-#define RISCV_EXCP_BREAKPOINT              0x3
+-#define RISCV_EXCP_LOAD_ADDR_MIS           0x4
+-#define RISCV_EXCP_LOAD_ACCESS_FAULT       0x5
+-#define RISCV_EXCP_STORE_AMO_ADDR_MIS      0x6
+-#define RISCV_EXCP_STORE_AMO_ACCESS_FAULT  0x7
+-#define RISCV_EXCP_U_ECALL                 0x8
+-#define RISCV_EXCP_S_ECALL                 0x9
+-#define RISCV_EXCP_H_ECALL                 0xa
+-#define RISCV_EXCP_M_ECALL                 0xb
+-#define RISCV_EXCP_INST_PAGE_FAULT         0xc /* since: priv-1.10.0 */
+-#define RISCV_EXCP_LOAD_PAGE_FAULT         0xd /* since: priv-1.10.0 */
+-#define RISCV_EXCP_STORE_PAGE_FAULT        0xf /* since: priv-1.10.0 */
++#define EXCP_NONE                                -1 /* sentinel value */
++#define RISCV_EXCP_INST_ADDR_MIS                 0x0
++#define RISCV_EXCP_INST_ACCESS_FAULT             0x1
++#define RISCV_EXCP_ILLEGAL_INST                  0x2
++#define RISCV_EXCP_BREAKPOINT                    0x3
++#define RISCV_EXCP_LOAD_ADDR_MIS                 0x4
++#define RISCV_EXCP_LOAD_ACCESS_FAULT             0x5
++#define RISCV_EXCP_STORE_AMO_ADDR_MIS            0x6
++#define RISCV_EXCP_STORE_AMO_ACCESS_FAULT        0x7
++#define RISCV_EXCP_U_ECALL                       0x8
++#define RISCV_EXCP_S_ECALL                      0x9
++#define RISCV_EXCP_VS_ECALL                      0xa
++#define RISCV_EXCP_M_ECALL                       0xb
++#define RISCV_EXCP_INST_PAGE_FAULT               0xc /* since: priv-1.10.0 */
++#define RISCV_EXCP_LOAD_PAGE_FAULT               0xd /* since: priv-1.10.0 */
++#define RISCV_EXCP_STORE_PAGE_FAULT              0xf /* since: priv-1.10.0 */
++#define RISCV_EXCP_INST_GUEST_PAGE_FAULT         0x14
++#define RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT       0x15
++#define RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT  0x17
+ 
+ #define RISCV_EXCP_INT_FLAG                0x80000000
+ #define RISCV_EXCP_INT_MASK                0x7fffffff
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 85403da9c8..a10582b310 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -528,13 +528,16 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+     static const int ecall_cause_map[] = {
+         [PRV_U] = RISCV_EXCP_U_ECALL,
+         [PRV_S] = RISCV_EXCP_S_ECALL,
+-        [PRV_H] = RISCV_EXCP_H_ECALL,
++        [PRV_H] = RISCV_EXCP_VS_ECALL,
+         [PRV_M] = RISCV_EXCP_M_ECALL
+     };
+ 
+     if (!async) {
+         /* set tval to badaddr for traps with address information */
+         switch (cause) {
++        case RISCV_EXCP_INST_GUEST_PAGE_FAULT:
++        case RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT:
++        case RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT:
+         case RISCV_EXCP_INST_ADDR_MIS:
+         case RISCV_EXCP_INST_ACCESS_FAULT:
+         case RISCV_EXCP_LOAD_ADDR_MIS:
+@@ -556,7 +559,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+         }
+     }
+ 
+-    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 16 ?
++    trace_riscv_trap(env->mhartid, async, cause, env->pc, tval, cause < 23 ?
+         (async ? riscv_intr_names : riscv_excp_names)[cause] : "(unknown)");
+ 
+     if (env->priv <= PRV_S &&
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 0e34c292c5..ca27359c7e 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -242,11 +242,14 @@ static const target_ulong delegable_excps =
+     (1ULL << (RISCV_EXCP_STORE_AMO_ACCESS_FAULT)) |
+     (1ULL << (RISCV_EXCP_U_ECALL)) |
+     (1ULL << (RISCV_EXCP_S_ECALL)) |
+-    (1ULL << (RISCV_EXCP_H_ECALL)) |
++    (1ULL << (RISCV_EXCP_VS_ECALL)) |
+     (1ULL << (RISCV_EXCP_M_ECALL)) |
+     (1ULL << (RISCV_EXCP_INST_PAGE_FAULT)) |
+     (1ULL << (RISCV_EXCP_LOAD_PAGE_FAULT)) |
+-    (1ULL << (RISCV_EXCP_STORE_PAGE_FAULT));
++    (1ULL << (RISCV_EXCP_STORE_PAGE_FAULT)) |
++    (1ULL << (RISCV_EXCP_INST_GUEST_PAGE_FAULT)) |
++    (1ULL << (RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT)) |
++    (1ULL << (RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT));
+ static const target_ulong sstatus_v1_9_mask = SSTATUS_SIE | SSTATUS_SPIE |
+     SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
+     SSTATUS_SUM | SSTATUS_SD;
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
 
