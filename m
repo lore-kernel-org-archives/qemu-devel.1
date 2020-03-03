@@ -6,76 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20879C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF37C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E56C520838
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA0CC20838
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYpt6b1E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E56C520838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wg70C+Ch"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0CC20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Ad5-0002Fz-4Z
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:42:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56926)
+	id 1j9AeK-0004an-V7
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:44:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9AVu-0004LH-6E
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:23 -0500
+ (envelope-from <armbru@redhat.com>) id 1j9AVv-0004N3-9d
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9AVs-00032Q-RL
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39853
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1j9AVt-00033b-W3
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36026
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVs-000322-Lw
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:20 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVt-000335-Pu
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583253320;
+ s=mimecast20190719; t=1583253321;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Lv+Y3uORPyKTvnxkqiYkWuE9C0PyzcV1+KlOv2igoQI=;
- b=HYpt6b1EXadBYdnev/O5LVYkANgDA+Rf7mlNz5EE8HtuHfMeiAHT5ZcHGCPsc0+XMIPb5Z
- PZC0SbKBzdKEKr1Vp26Z3CSZd2yVi9ZS3UclRTaNzliD6jGBopHdnGw9FrFXQm0jgiInkw
- aUJghnNt3B+8kPg4+YvyiV9uZSS3b6s=
+ bh=a/UYmOCxGxuVgibBYUMX0KvNJvGmm4H8hzsqVMEI/UA=;
+ b=Wg70C+Ch9HFL64BIS5weu3T7sxOUqj7OmhEmpcHJaijYKwNjLIOImj7sdZXQB1GVlrFmz2
+ FcBPThJVV/qawYquv6n9r6g8t6JSxMoNHwoT2uic+un+dy+RhCernvOGMs2HcQ14YdNsh1
+ 2hCxIX7vgxHcVdcORepupG05nsjFz3c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-B7V98d0cNGiM_2T2Om8Nyg-1; Tue, 03 Mar 2020 11:35:18 -0500
-X-MC-Unique: B7V98d0cNGiM_2T2Om8Nyg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-365-6gIg3OULOzi4R4V0_Q0TgQ-1; Tue, 03 Mar 2020 11:35:11 -0500
+X-MC-Unique: 6gIg3OULOzi4R4V0_Q0TgQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8B96801F7D;
- Tue,  3 Mar 2020 16:35:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5510E1005516;
+ Tue,  3 Mar 2020 16:35:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
  [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B99B710027B1;
- Tue,  3 Mar 2020 16:35:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4210591D71;
+ Tue,  3 Mar 2020 16:35:07 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 201361130356; Tue,  3 Mar 2020 17:35:06 +0100 (CET)
+ id B88701138611; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 30/30] qapi: New -compat deprecated-input=crash
-Date: Tue,  3 Mar 2020 17:35:05 +0100
-Message-Id: <20200303163505.32041-31-armbru@redhat.com>
+Subject: [PATCH v2 03/30] docs/devel/qapi-code-gen: Clarify allow-oob
+ introspection
+Date: Tue,  3 Mar 2020 17:34:38 +0100
+Message-Id: <20200303163505.32041-4-armbru@redhat.com>
 In-Reply-To: <20200303163505.32041-1-armbru@redhat.com>
 References: <20200303163505.32041-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,89 +94,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Policy "crash" calls abort() when deprecated input is received.
-
-Bugs in integration tests may mask the error from policy "reject".
-Provide a larger hammer: crash outright.  Masking that seems unlikely.
+Mention SchemaInfo variant member "allow-oob" defaults to false.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/compat.json             | 3 ++-
- qapi/qmp-dispatch.c          | 1 +
- qapi/qobject-input-visitor.c | 1 +
- qemu-options.hx              | 4 +++-
- 4 files changed, 7 insertions(+), 2 deletions(-)
+ docs/devel/qapi-code-gen.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/compat.json b/qapi/compat.json
-index fd6f8e932c..ec24567639 100644
---- a/qapi/compat.json
-+++ b/qapi/compat.json
-@@ -11,11 +11,12 @@
- #
- # @accept: Accept silently
- # @reject: Reject with an error
-+# @crash: abort() the process
- #
- # Since: 5.0
- ##
- { 'enum': 'CompatPolicyInput',
--  'data': [ 'accept', 'reject' ] }
-+  'data': [ 'accept', 'reject', 'crash' ] }
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 59d6973e1e..5906602504 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -988,9 +988,9 @@ The SchemaInfo for a command has meta-type "command", a=
+nd variant
+ members "arg-type", "ret-type" and "allow-oob".  On the wire, the
+ "arguments" member of a client's "execute" command must conform to the
+ object type named by "arg-type".  The "return" member that the server
+-passes in a success response conforms to the type named by
+-"ret-type".  When "allow-oob" is set, it means the command supports
+-out-of-band execution.
++passes in a success response conforms to the type named by "ret-type".
++When "allow-oob" is true, it means the command supports out-of-band
++execution.  It defaults to false.
 =20
- ##
- # @CompatPolicyOutput:
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 516ee9b0b7..2c8fac02cd 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -141,6 +141,7 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *requ=
-est,
-                       "Deprecated command %s disabled by policy",
-                       command);
-             goto out;
-+        case COMPAT_POLICY_INPUT_CRASH:
-         default:
-             abort();
-         }
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 6ea93f5a7a..a74c901be9 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -654,6 +654,7 @@ static bool qobject_input_deprecated(Visitor *v, const =
-char *name,
-         error_setg(errp, "Deprecated parameter '%s' disabled by policy",
-                    name);
-         return false;
-+    case COMPAT_POLICY_INPUT_CRASH:
-     default:
-         abort();
-     }
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d02d6bfc15..7e49f778f4 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3361,7 +3361,7 @@ STEXI
- ETEXI
-=20
- DEF("compat", HAS_ARG, QEMU_OPTION_compat,
--    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
-t|hide]\n"
-+    "-compat [deprecated-input=3Daccept|reject|crash][,deprecated-output=
-=3Daccept|hide]\n"
-     "                Policy for handling deprecated management interfaces\=
-n",
-     QEMU_ARCH_ALL)
- STEXI
-@@ -3373,6 +3373,8 @@ Set policy for handling deprecated management interfa=
-ces (experimental):
- Accept deprecated commands and arguments
- @item deprecated-input=3Dreject
- Reject deprecated commands and arguments
-+@item deprecated-input=3Dcrash
-+Crash on deprecated command
- @item deprecated-output=3Daccept (default)
- Emit deprecated command results and events
- @item deprecated-output=3Dhide
+ If the command takes no arguments, "arg-type" names an object type
+ without members.  Likewise, if the command returns nothing, "ret-type"
 --=20
 2.21.1
 
