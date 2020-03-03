@@ -7,64 +7,62 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2654CC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF64C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 22:05:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFEA420870
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:59:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8835E20848
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 22:05:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLijXcXC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFEA420870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IMZCYT05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8835E20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9FZr-0006W0-2H
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:59:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48071)
+	id 1j9Ff0-00086H-Pd
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 17:05:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9FZ1-0005yB-Ve
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:58:57 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9Fdu-0007df-5l
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9FZ0-0004Gd-Dn
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:58:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33712
+ (envelope-from <jsnow@redhat.com>) id 1j9Fdr-0001ud-V6
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:03:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31493
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9FZ0-0004Fd-AF
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:58:54 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9Fdn-0001n8-KI
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:03:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583272733;
+ s=mimecast20190719; t=1583273021;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DoR5S5H1gPvmFt8lnqHqEDowTg/9pu5ThpG0sqgzkWY=;
- b=MLijXcXCbzlExO+sgmFlDFaha6UNVwQvJ4FAbZOKzYkvERBp8ek8RpdREWZdOei/q3tqCW
- +wenrrJn2Ktfcqwu96QVKZ3u+QWXzf7u4isIBKjSXIc2lZmTTwllhJq5nm5LvmvYoFb+Qu
- fR34kzlprMmo6w5lWS/lC00SN5M59iw=
+ bh=sp6YvkJSSaudtBjuyIVA/eHRNunav+tgYRyj2BL+RXg=;
+ b=IMZCYT057VDOFz5UPUfgtiV2YUEa8ZCsHiPfw9LlRYxJUGfXq31yiWG4Xl9IISxDNH/I5V
+ exRXpqiLdkAh3WL+1Cs6sP5xdWQFP3FyHfpjT8h7guq2OkuDJEEw5GP/TD7qvnwWeIWy9X
+ csSgfrYt70XhJp41s9Y/ujZaNiub3NA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-1vhH-7fBP06ITYGTL5Yinw-1; Tue, 03 Mar 2020 16:58:50 -0500
-X-MC-Unique: 1vhH-7fBP06ITYGTL5Yinw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-433-GA1B0yE6NZGK0jsdjNgc5A-1; Tue, 03 Mar 2020 17:03:30 -0500
+X-MC-Unique: GA1B0yE6NZGK0jsdjNgc5A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 525F213F7;
- Tue,  3 Mar 2020 21:58:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E1F3107ACC4;
+ Tue,  3 Mar 2020 22:03:29 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A755F101E5AE;
- Tue,  3 Mar 2020 21:58:47 +0000 (UTC)
-Subject: Re: [PATCH 5/6] qmp.py: change event_wait to use a dict
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20200225005641.5478-1-jsnow@redhat.com>
- <20200225005641.5478-6-jsnow@redhat.com>
- <b9cf1087-a616-0345-0f81-d6d8247039e5@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0ADA15D9C9;
+ Tue,  3 Mar 2020 22:03:27 +0000 (UTC)
+Subject: Re: [PATCH 4/4] qapi: Brush off some (py)lint
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20200227144531.24309-1-armbru@redhat.com>
+ <20200227144531.24309-5-armbru@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -140,14 +138,14 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ebdba459-b638-976a-5b14-a130c737db05@redhat.com>
-Date: Tue, 3 Mar 2020 16:58:45 -0500
+Message-ID: <6b7e0d73-6840-3a6a-9d33-0adcec0d4c84@redhat.com>
+Date: Tue, 3 Mar 2020 17:03:27 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <b9cf1087-a616-0345-0f81-d6d8247039e5@virtuozzo.com>
+In-Reply-To: <20200227144531.24309-5-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
@@ -166,204 +164,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2/27/20 6:25 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 25.02.2020 3:56, John Snow wrote:
->> It's easier to work with than a list of tuples, because we can check the
->> keys for membership.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 python/qemu/machine.py=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-| 10 +++++-----
->> =C2=A0 tests/qemu-iotests/040=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-| 12 ++++++------
->> =C2=A0 tests/qemu-iotests/260=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0 5 +++--
->> =C2=A0 tests/qemu-iotests/iotests.py | 16 ++++++++--------
->> =C2=A0 4 files changed, 22 insertions(+), 21 deletions(-)
->>
->> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
->> index 183d8f3d38..748de5f322 100644
->> --- a/python/qemu/machine.py
->> +++ b/python/qemu/machine.py
->> @@ -476,21 +476,21 @@ def event_wait(self, name, timeout=3D60.0,
->> match=3DNone):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 timeout: QEMUMoni=
-torProtocol.pull_event timeout parameter.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match: Optional m=
-atch criteria. See event_match for details.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.events_wait([(na=
-me, match)], timeout)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.events_wait({nam=
-e: match}, timeout)
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def events_wait(self, events, time=
-out=3D60.0):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events_wait waits=
- for and returns a named event from QMP
->> with a timeout.
->> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events: a sequence of=
- (name, match_criteria) tuples.
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events: a mapping containing=
- {name: match_criteria}.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The match criteria are optional and may be N=
-one.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 See event_match for details.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 timeout: QEMUMoni=
-torProtocol.pull_event timeout parameter.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def _match(event)=
-:
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for =
-name, match in events:
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 if event['event'] =3D=3D name and self.event_match(ev=
-ent,
->> match):
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return True
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name=
- =3D event['event']
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if n=
-ame in events:
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return self.event_match(event, events[name])
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 return False
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Search c=
-ached events
->> diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
->> index 32c82b4ec6..90b59081ff 100755
->> --- a/tests/qemu-iotests/040
->> +++ b/tests/qemu-iotests/040
->> @@ -485,12 +485,12 @@ class TestErrorHandling(iotests.QMPTestCase):
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def run_job(self, expected_events,=
- error_pauses_job=3DFalse):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match_device =3D =
-{'data': {'device': 'job0'}}
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events =3D [
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_COMPLETED', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_CANCELLED', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_ERROR', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_READY', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ]
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events =3D {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_COMPLETED': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_CANCELLED': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_ERROR': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_READY': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 completed =
-=3D False
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log =3D []
->> diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
->> index 30c0de380d..b2fb045ddd 100755
->> --- a/tests/qemu-iotests/260
->> +++ b/tests/qemu-iotests/260
->> @@ -65,8 +65,9 @@ def test(persistent, restart):
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm.qmp_log('block-commit', device=
-=3D'drive0', top=3Dtop,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 filters=3D[iotests.filter_qmp_testfiles])
->> -=C2=A0=C2=A0=C2=A0 ev =3D vm.events_wait((('BLOCK_JOB_READY', None),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- ('BLOCK_JOB_COMPLETED', None)))
->> +=C2=A0=C2=A0=C2=A0 ev =3D vm.events_wait({
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLOCK_JOB_READY': None,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLOCK_JOB_COMPLETED': None =
-})
+On 2/27/20 9:45 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+I wrote some pylint cleanup for iotests recently, too. Are you targeting
+a subset of pylint errors to clean here?
+
+(Do any files pass 100%?)
+
+Consider checking in a pylintrc file that lets others run the same
+subset of pylint tests as you are doing so that we can prevent future
+regressions.
+
+Take a peek at [PATCH v6 0/9] iotests: use python logging=E2=80=8B
+
+Thanks for this series. I had a very similar series sitting waiting to
+go out, but this goes further in a few places.
+
+--js
+
+> ---
+>  scripts/qapi/commands.py   | 2 +-
+>  scripts/qapi/expr.py       | 3 +--
+>  scripts/qapi/gen.py        | 9 ++++++---
+>  scripts/qapi/introspect.py | 2 --
+>  scripts/qapi/parser.py     | 6 ++----
+>  scripts/qapi/schema.py     | 9 ++++-----
+>  6 files changed, 14 insertions(+), 17 deletions(-)
 >=20
-> may be better to keep it 2-lines. Or, otherwise, put closing "})" on a
-> separate line too.
+> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+> index 8bb6316061..0e13e82989 100644
+> --- a/scripts/qapi/commands.py
+> +++ b/scripts/qapi/commands.py
+> @@ -274,7 +274,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
+isitor):
+> =20
+>  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+>  ''',
+> -                       c_prefix=3Dc_name(self._prefix, protect=3DFalse))=
+)
+> +                             c_prefix=3Dc_name(self._prefix, protect=3DF=
+alse)))
+>          self._genc.preamble_add(mcgen('''
+>  #include "qemu/osdep.h"
+>  #include "%(prefix)sqapi-commands.h"
+> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+> index d7a289eded..fecf466fa7 100644
+> --- a/scripts/qapi/expr.py
+> +++ b/scripts/qapi/expr.py
+> @@ -35,7 +35,6 @@ def check_name_is_str(name, info, source):
+>  def check_name_str(name, info, source,
+>                     allow_optional=3DFalse, enum_member=3DFalse,
+>                     permit_upper=3DFalse):
+> -    global valid_name
+>      membername =3D name
+> =20
+>      if allow_optional and name.startswith('*'):
+> @@ -249,7 +248,7 @@ def check_union(expr, info):
+>  def check_alternate(expr, info):
+>      members =3D expr['data']
+> =20
+> -    if len(members) =3D=3D 0:
+> +    if not members:
+>          raise QAPISemError(info, "'data' must not be empty")
+>      for (key, value) in members.items():
+>          source =3D "'data' member '%s'" % key
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index e17354392b..33690bfa3b 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -45,10 +45,10 @@ class QAPIGen:
+> =20
+>      def write(self, output_dir):
+>          pathname =3D os.path.join(output_dir, self.fname)
+> -        dir =3D os.path.dirname(pathname)
+> -        if dir:
+> +        odir =3D os.path.dirname(pathname)
+> +        if odir:
+>              try:
+> -                os.makedirs(dir)
+> +                os.makedirs(odir)
+>              except os.error as e:
+>                  if e.errno !=3D errno.EEXIST:
+>                      raise
+> @@ -261,6 +261,9 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+>              genc.write(output_dir)
+>              genh.write(output_dir)
+> =20
+> +    def _begin_system_module(self, name):
+> +        pass
+> +
+>      def _begin_user_module(self, name):
+>          pass
+> =20
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index 0cc655fd9f..b5537eddc0 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -10,8 +10,6 @@ This work is licensed under the terms of the GNU GPL, v=
+ersion 2.
+>  See the COPYING file in the top-level directory.
+>  """
+> =20
+> -import string
+> -
+>  from qapi.common import *
+>  from qapi.gen import QAPISchemaMonolithicCVisitor
+>  from qapi.schema import (QAPISchemaArrayType, QAPISchemaBuiltinType,
+> diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+> index 340f7c4633..abadacbb0e 100644
+> --- a/scripts/qapi/parser.py
+> +++ b/scripts/qapi/parser.py
+> @@ -282,8 +282,7 @@ class QAPISchemaParser:
+>                  doc.end_comment()
+>                  self.accept()
+>                  return doc
+> -            else:
+> -                doc.append(self.val)
+> +            doc.append(self.val)
+>              self.accept(False)
+> =20
+>          raise QAPIParseError(self, "documentation comment must end with =
+'##'")
+> @@ -492,7 +491,7 @@ class QAPIDoc:
+>              raise QAPIParseError(self._parser,
+>                                   "'%s' can't follow '%s' section"
+>                                   % (name, self.sections[0].name))
+> -        elif self._is_section_tag(name):
+> +        if self._is_section_tag(name):
+>              line =3D line[len(name)+1:]
+>              self._start_section(name[:-1])
+> =20
+> @@ -556,7 +555,6 @@ class QAPIDoc:
+>              raise QAPISemError(feature.info,
+>                                 "feature '%s' lacks documentation"
+>                                 % feature.name)
+> -            self.features[feature.name] =3D QAPIDoc.ArgSection(feature.n=
+ame)
+>          self.features[feature.name].connect(feature)
+> =20
+>      def check_expr(self, expr):
+> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+> index e132442c04..cfbb9758c4 100644
+> --- a/scripts/qapi/schema.py
+> +++ b/scripts/qapi/schema.py
+> @@ -19,7 +19,7 @@ import re
+>  from collections import OrderedDict
+> =20
+>  from qapi.common import c_name, pointer_suffix
+> -from qapi.error import QAPIError, QAPIParseError, QAPISemError
+> +from qapi.error import QAPIError, QAPISemError
+>  from qapi.expr import check_exprs
+>  from qapi.parser import QAPISchemaParser
+> =20
+> @@ -96,14 +96,14 @@ class QAPISchemaVisitor:
+>      def visit_end(self):
+>          pass
+> =20
+> -    def visit_module(self, fname):
+> +    def visit_module(self, name):
+>          pass
+> =20
+>      def visit_needed(self, entity):
+>          # Default to visiting everything
+>          return True
+> =20
+> -    def visit_include(self, fname, info):
+> +    def visit_include(self, name, info):
+>          pass
+> =20
+>      def visit_builtin_type(self, name, info, json_type):
+> @@ -576,7 +576,7 @@ class QAPISchemaObjectTypeVariants:
+>              assert self.tag_member.ifcond =3D=3D []
+>          if self._tag_name:    # flat union
+>              # branches that are not explicitly covered get an empty type
+> -            cases =3D set([v.name for v in self.variants])
+> +            cases =3D {v.name for v in self.variants}
+>              for m in self.tag_member.type.members:
+>                  if m.name not in cases:
+>                      v =3D QAPISchemaObjectTypeVariant(m.name, self.info,
+> @@ -1098,7 +1098,6 @@ class QAPISchema:
+> =20
+>      def visit(self, visitor):
+>          visitor.visit_begin(self)
+> -        module =3D None
+>          for mod in self._module_dict.values():
+>              mod.visit(visitor)
+>          visitor.visit_end()
 >=20
 
-Sure.
-
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 log(filter_qmp_event(ev))
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ev['event'] =3D=3D 'BLOCK_JOB_COMPLET=
-ED'):
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vm.shutdown()
->> diff --git a/tests/qemu-iotests/iotests.py
->> b/tests/qemu-iotests/iotests.py
->> index 5d2990a0e4..3390fab021 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -604,14 +604,14 @@ def run_job(self, job, auto_finalize=3DTrue,
->> auto_dismiss=3DFalse,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 """
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match_device =3D =
-{'data': {'device': job}}
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 match_id =3D {'da=
-ta': {'id': job}}
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events =3D [
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_COMPLETED', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_CANCELLED', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_ERROR', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_READY', match_device),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('BL=
-OCK_JOB_PENDING', match_id),
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ('JO=
-B_STATUS_CHANGE', match_id)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ]
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 events =3D {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_COMPLETED': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_CANCELLED': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_ERROR': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_READY': match_device,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BLO=
-CK_JOB_PENDING': match_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'JOB=
-_STATUS_CHANGE': match_id,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error =3D None
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while True:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 ev =3D filter_qmp_event(self.events_wait(events,
->> timeout=3Dwait))
->>
->=20
->=20
-> Not sure that I like new interface more (neither that it is faster), but
-> it works too:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-
-It's a little bit of cross-contamination from the JobRunner series I
-posted. This patch really belongs with that series instead.
-
-It's not likely to be faster on the order of ~6 events, but logistically
-it's just a little cleaner to read.
-
-Thanks for the reviews!
+--=20
+=E2=80=94js
 
 
