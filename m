@@ -6,77 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B492EC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BB8C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72BB920863
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B6D020863
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8Kd5MeD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BB920863
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fA4598Yn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B6D020863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9AiH-00040J-Kb
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:48:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57037)
+	id 1j9AjN-0005vm-JM
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:49:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9AVy-0004Tm-5T
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:29 -0500
+ (envelope-from <armbru@redhat.com>) id 1j9AVy-0004U2-90
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9AVu-00034F-OC
+ (envelope-from <armbru@redhat.com>) id 1j9AVv-00035K-QY
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41111
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50584
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVu-00033p-Hy
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:22 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVv-00034h-Kw
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583253322;
+ s=mimecast20190719; t=1583253323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=55JvxPt0KHUT+9UFXjq8IhzL9/3jplVc8pPi6x2GFII=;
- b=J8Kd5MeDy68w2yaPu86w+FikczsTX02VLJ1m76EsG8H68zdStRIx6eBfOwsrqflXTWGU1S
- tx+QvN6veKPyP7NVZi986TKfUI0iRIkNCP5BPrGJ69iWkX/G4aSO6Z5Mnm+gUXB808wFQf
- Hrbf9SCdbJRRjbrA8cf6Ndbn2g0N7xo=
+ bh=namzcJL7H+P9R7eVK9JjD1sr8RCU31GMrX+vUBSmwYI=;
+ b=fA4598YnVPM50FYf3np13HAsbP3F9PKu3PjYLv+NVbISUOcLgQvBWcuWS1vMqs+VZ0cjfl
+ y6MruisiHQ4vFUNYXQexp/QcsGGvVkHGzxWfEOYRhldu91h8POz4lCu5KYd+CwqHTTGxkJ
+ Hr/gdU72Iico4J885PCeoyYwkTZirRE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-gXYbJzKMOqSgsKz7ekC1SA-1; Tue, 03 Mar 2020 11:35:20 -0500
-X-MC-Unique: gXYbJzKMOqSgsKz7ekC1SA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-158-zDuHqB5AMaGDb2pmo0JuUA-1; Tue, 03 Mar 2020 11:35:19 -0500
+X-MC-Unique: zDuHqB5AMaGDb2pmo0JuUA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 731BE18CA24E;
- Tue,  3 Mar 2020 16:35:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CE881005510;
+ Tue,  3 Mar 2020 16:35:16 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
  [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D15A25DA7C;
- Tue,  3 Mar 2020 16:35:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B11D373876;
+ Tue,  3 Mar 2020 16:35:15 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 12B26113287B; Tue,  3 Mar 2020 17:35:06 +0100 (CET)
+ id 1CE6211326E1; Tue,  3 Mar 2020 17:35:06 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 26/30] qapi: Mark deprecated QMP parts with feature
- 'deprecated'
-Date: Tue,  3 Mar 2020 17:35:01 +0100
-Message-Id: <20200303163505.32041-27-armbru@redhat.com>
+Subject: [PATCH v2 29/30] qapi: Implement -compat deprecated-input=reject
+Date: Tue,  3 Mar 2020 17:35:04 +0100
+Message-Id: <20200303163505.32041-30-armbru@redhat.com>
 In-Reply-To: <20200303163505.32041-1-armbru@redhat.com>
 References: <20200303163505.32041-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,582 +92,380 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add feature 'deprecated' to the deprecated QMP commands, so their
-deprecation becomes visible in output of query-qmp-schema.  Looks like
-this:
+This policy makes deprecated commands fail like this:
 
-    {"name": "query-cpus",
-     "ret-type": "[164]",
-     "meta-type": "command",
-     "arg-type": "0",
----> "features": ["deprecated"]}
+    ---> {"execute": "query-cpus"}
+    <--- {"error": {"class": "CommandNotFound", "desc": "Deprecated command=
+ query-cpus disabled by policy"}}
 
-Management applications could conceivably use this for static
-checking.
+When the command is removed, the error will change to
 
-The deprecated commands are change, cpu-add, migrate-set-cache-size,
-migrate_set_downtime, migrate_set_speed, query-cpus, query-events,
-query-migrate-cache-size.
+    <--- {"error": {"class": "CommandNotFound", "desc": "The command query-=
+cpus has not been found"}}
 
-The deprecated command arguments are block-commit arguments @base and
-@top, and block_set_io_throttle, blockdev-change-medium,
-blockdev-close-tray, blockdev-open-tray, eject argument @device.
+It makes commands with deprecated arguments fail like this:
 
-The deprecated command results are query-cpus-fast result @arch,
-query-block result @dirty-bitmaps, query-named-block-nodes result
-@encryption_key_missing and result @dirty-bitmaps's member @status.
-Same for query-block result @inserted, which mirrors
-query-named-block-nodes.
+    ---> {"execute": "block-commit", "arguments": {"device": "virtio0", "to=
+p": "/tmp/snap1.qcow2"}}
+    <--- {"error": {"class": "GenericError", "desc": "Deprecated parameter =
+'top' disabled by policy"}}
+
+When the argument is removed, the error will change to
+
+    <--- {"error": {"class": "GenericError", "desc": "Parameter 'top' is un=
+expected"}}
+
+The policy thus permits "testing the future".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/block-core.json | 69 +++++++++++++++++++++++++++++++++-----------
- qapi/block.json      |  9 ++++--
- qapi/control.json    | 11 ++++---
- qapi/machine.json    | 34 ++++++++++++----------
- qapi/migration.json  | 36 +++++++++++++++--------
- qapi/misc.json       | 13 +++++----
- 6 files changed, 115 insertions(+), 57 deletions(-)
+ include/qapi/qmp/dispatch.h          |  1 +
+ include/qapi/qobject-input-visitor.h |  9 +++++
+ include/qapi/visitor-impl.h          |  2 +-
+ include/qapi/visitor.h               |  2 +-
+ qapi/qapi-visit-core.c               |  4 +--
+ qapi/qmp-dispatch.c                  | 13 ++++++++
+ qapi/qobject-input-visitor.c         | 28 ++++++++++++++++
+ qapi/qobject-output-visitor.c        |  3 +-
+ tests/test-qmp-cmds.c                | 49 ++++++++++++++++++++++++++++
+ scripts/qapi/commands.py             | 12 ++++---
+ scripts/qapi/visit.py                | 10 +++---
+ 11 files changed, 120 insertions(+), 13 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 85e27bb61f..bade02760c 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -297,7 +297,7 @@
- #
- # @encrypted: true if the backing device is encrypted
- #
--# @encryption_key_missing: Deprecated; always false
-+# @encryption_key_missing: always false
- #
- # @detect_zeroes: detect and optimize zero writes (Since 2.1)
- #
-@@ -363,13 +363,19 @@
- # @dirty-bitmaps: dirty bitmaps information (only present if node
- #                 has one or more dirty bitmaps) (Since 4.2)
- #
-+# Features:
-+# @deprecated: Member @encryption_key_missing is deprecated.  It is
-+#     always false.
-+#
- # Since: 0.14.0
- #
- ##
- { 'struct': 'BlockDeviceInfo',
-   'data': { 'file': 'str', '*node-name': 'str', 'ro': 'bool', 'drv': 'str'=
-,
-             '*backing_file': 'str', 'backing_file_depth': 'int',
--            'encrypted': 'bool', 'encryption_key_missing': 'bool',
-+            'encrypted': 'bool',
-+            'encryption_key_missing': { 'type': 'bool',
-+                                        'features': [ 'deprecated' ] },
-             'detect_zeroes': 'BlockdevDetectZeroesOptions',
-             'bps': 'int', 'bps_rd': 'int', 'bps_wr': 'int',
-             'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
-@@ -475,7 +481,7 @@
- #
- # @granularity: granularity of the dirty bitmap in bytes (since 1.4)
- #
--# @status: Deprecated in favor of @recording and @locked. (since 2.4)
-+# @status: current status of the dirty bitmap (since 2.4)
- #
- # @recording: true if the bitmap is recording new writes from the guest.
- #             Replaces `active` and `disabled` statuses. (since 4.0)
-@@ -492,11 +498,17 @@
- #                @busy to be false. This bitmap cannot be used. To remove
- #                it, use @block-dirty-bitmap-remove. (Since 4.0)
- #
-+# Features:
-+# @deprecated: Member @status is deprecated.  Use @recording and
-+#     @locked instead.
-+#
- # Since: 1.3
- ##
- { 'struct': 'BlockDirtyInfo',
-   'data': {'*name': 'str', 'count': 'int', 'granularity': 'uint32',
--           'recording': 'bool', 'busy': 'bool', 'status': 'DirtyBitmapStat=
-us',
-+           'recording': 'bool', 'busy': 'bool',
-+           'status': { 'type': 'DirtyBitmapStatus',
-+                       'features': [ 'deprecated' ] },
-            'persistent': 'bool', '*inconsistent': 'bool' } }
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 9aa426a398..ef256f2bb7 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -24,6 +24,7 @@ typedef enum QmpCommandOptions
+     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
+     QCO_ALLOW_OOB             =3D  (1U << 1),
+     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
++    QCO_DEPRECATED            =3D  (1U << 3),
+ } QmpCommandOptions;
 =20
- ##
-@@ -659,7 +671,6 @@
- #
- # @dirty-bitmaps: dirty bitmaps information (only present if the
- #                 driver has one or more dirty bitmaps) (Since 2.0)
--#                 Deprecated in 4.2; see BlockDeviceInfo instead.
- #
- # @io-status: @BlockDeviceIoStatus. Only present if the device
- #             supports it and the VM is configured to stop on errors
-@@ -669,13 +680,18 @@
- # @inserted: @BlockDeviceInfo describing the device if media is
- #            present
- #
-+# Features:
-+# @deprecated: Member @dirty-bitmaps is deprecated.  Use @inserted
-+#     member @dirty-bitmaps instead.
-+#
- # Since:  0.14.0
- ##
- { 'struct': 'BlockInfo',
-   'data': {'device': 'str', '*qdev': 'str', 'type': 'str', 'removable': 'b=
-ool',
-            'locked': 'bool', '*inserted': 'BlockDeviceInfo',
-            '*tray_open': 'bool', '*io-status': 'BlockDeviceIoStatus',
--           '*dirty-bitmaps': ['BlockDirtyInfo'] } }
-+           '*dirty-bitmaps': { 'type': ['BlockDirtyInfo'],
-+                               'features': [ 'deprecated' ] } } }
+ typedef struct QmpCommand
+diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-in=
+put-visitor.h
+index 95985e25e5..cbc54de4ac 100644
+--- a/include/qapi/qobject-input-visitor.h
++++ b/include/qapi/qobject-input-visitor.h
+@@ -58,6 +58,15 @@ typedef struct QObjectInputVisitor QObjectInputVisitor;
+  */
+ Visitor *qobject_input_visitor_new(QObject *obj);
 =20
- ##
- # @BlockMeasureInfo:
-@@ -1616,7 +1632,7 @@
- # @base: Same as @base-node, except that it is a file name rather than a n=
-ode
- #        name. This must be the exact filename string that was used to ope=
-n the
- #        node; other strings, even if addressing the same file, are not
--#        accepted (deprecated, use @base-node instead)
-+#        accepted
- #
- # @top-node: The node name of the backing image within the image chain
- #            which contains the topmost data to be committed down. If
-@@ -1625,7 +1641,7 @@
- # @top: Same as @top-node, except that it is a file name rather than a nod=
-e
- #       name. This must be the exact filename string that was used to open=
- the
- #       node; other strings, even if addressing the same file, are not
--#       accepted (deprecated, use @base-node instead)
-+#       accepted
- #
- # @backing-file: The backing file string to write into the overlay
- #                image of 'top'.  If 'top' is the active layer,
-@@ -1679,6 +1695,10 @@
- #                list without user intervention.
- #                Defaults to true. (Since 3.1)
- #
-+# Features:
-+# @deprecated: Members @base and @top are deprecated.  Use @base-node
-+#     and @top-node instead.
-+#
- # Returns: - Nothing on success
- #          - If @device does not exist, DeviceNotFound
- #          - Any other error returns a GenericError.
-@@ -1695,7 +1715,9 @@
- ##
- { 'command': 'block-commit',
-   'data': { '*job-id': 'str', 'device': 'str', '*base-node': 'str',
--            '*base': 'str', '*top-node': 'str', '*top': 'str',
-+            '*base': { 'type': 'str', 'features': [ 'deprecated' ] },
-+            '*top-node': 'str',
-+            '*top': { 'type': 'str', 'features': [ 'deprecated' ] },
-             '*backing-file': 'str', '*speed': 'int',
-             '*on-error': 'BlockdevOnError',
-             '*filter-node-name': 'str',
-@@ -2433,7 +2455,7 @@
- #
- # A set of parameters describing block throttling.
- #
--# @device: Block device name (deprecated, use @id instead)
-+# @device: Block device name
- #
- # @id: The name or QOM path of the guest device (since: 2.8)
- #
-@@ -2501,10 +2523,14 @@
- #
- # @group: throttle group name (Since 2.4)
- #
-+# Features:
-+# @deprecated: Member @device is deprecated.  Use @id instead.
-+#
- # Since: 1.1
- ##
- { 'struct': 'BlockIOThrottle',
--  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
-+  'data': { '*device': { 'type': 'str', 'features': [ 'deprecated' ] },
-+            '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
-             'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': '=
-int',
-             '*bps_max': 'int', '*bps_rd_max': 'int',
-             '*bps_wr_max': 'int', '*iops_max': 'int',
-@@ -4776,7 +4802,7 @@
- #   to it
- # - if the guest device does not have an actual tray
- #
--# @device: Block device name (deprecated, use @id instead)
-+# @device: Block device name
- #
- # @id: The name or QOM path of the guest device (since: 2.8)
- #
-@@ -4785,6 +4811,9 @@
- #         immediately); if true, the tray will be opened regardless of whe=
-ther
- #         it is locked
- #
-+# Features:
-+# @deprecated: Member @device is deprecated.  Use @id instead.
-+#
- # Since: 2.5
- #
- # Example:
-@@ -4803,7 +4832,7 @@
- #
- ##
- { 'command': 'blockdev-open-tray',
--  'data': { '*device': 'str',
-+  'data': { '*device': { 'type': 'str', 'features': [ 'deprecated' ] },
-             '*id': 'str',
-             '*force': 'bool' } }
++/*
++ * Create a QObject input visitor for @obj for use with QMP
++ *
++ * This is like qobject_input_visitor_new(), except it obeys the
++ * policy for handling deprecated management interfaces set with
++ * -compat.
++ */
++Visitor *qobject_input_visitor_new_qmp(QObject *obj);
++
+ /*
+  * Create a QObject input visitor for @obj for use with keyval_parse()
+  *
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index a6b26b7a5b..ccc159a0d2 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -111,7 +111,7 @@ struct Visitor
+     void (*optional)(Visitor *v, const char *name, bool *present);
 =20
-@@ -4816,10 +4845,13 @@
- #
- # If the tray was already closed before, this will be a no-op.
- #
--# @device: Block device name (deprecated, use @id instead)
-+# @device: Block device name
- #
- # @id: The name or QOM path of the guest device (since: 2.8)
- #
-+# Features:
-+# @deprecated: Member @device is deprecated.  Use @id instead.
-+#
- # Since: 2.5
- #
- # Example:
-@@ -4838,7 +4870,7 @@
- #
- ##
- { 'command': 'blockdev-close-tray',
--  'data': { '*device': 'str',
-+  'data': { '*device': { 'type': 'str', 'features': [ 'deprecated' ] },
-             '*id': 'str' } }
+     /* Optional */
+-    bool (*deprecated)(Visitor *v, const char *name);
++    bool (*deprecated)(Visitor *v, const char *name, Error **errp);
 =20
- ##
-@@ -4945,7 +4977,7 @@
- # combines blockdev-open-tray, blockdev-remove-medium, blockdev-insert-med=
-ium
- # and blockdev-close-tray).
- #
--# @device: Block device name (deprecated, use @id instead)
-+# @device: Block device name
- #
- # @id: The name or QOM path of the guest device
- #      (since: 2.8)
-@@ -4958,6 +4990,9 @@
- # @read-only-mode: change the read-only mode of the device; defaults
- #                  to 'retain'
- #
-+# Features:
-+# @deprecated: Member @device is deprecated.  Use @id instead.
-+#
- # Since: 2.5
- #
- # Examples:
-@@ -4992,7 +5027,7 @@
- #
- ##
- { 'command': 'blockdev-change-medium',
--  'data': { '*device': 'str',
-+  'data': { '*device': { 'type': 'str', 'features': [ 'deprecated' ] },
-             '*id': 'str',
-             'filename': 'str',
-             '*format': 'str',
-diff --git a/qapi/block.json b/qapi/block.json
-index da19834db4..8314ef21d1 100644
---- a/qapi/block.json
-+++ b/qapi/block.json
-@@ -185,15 +185,18 @@
- ##
- # @eject:
- #
--# Ejects a device from a removable drive.
-+# Ejects the medium from a removable block device.
- #
--# @device: Block device name (deprecated, use @id instead)
-+# @device: Block device name
- #
- # @id: The name or QOM path of the guest device (since: 2.8)
- #
- # @force: If true, eject regardless of whether the drive is locked.
- #         If not specified, the default value is false.
- #
-+# Features:
-+# @deprecated: Member @device is deprecated.  Use @id instead.
-+#
- # Returns: - Nothing on success
- #          - If @device is not a valid block device, DeviceNotFound
- # Notes:    Ejecting a device with no media results in success
-@@ -206,7 +209,7 @@
- # <- { "return": {} }
- ##
- { 'command': 'eject',
--  'data': { '*device': 'str',
-+  'data': { '*device': { 'type': 'str', 'features': [ 'deprecated' ] },
-             '*id': 'str',
-             '*force': 'bool' } }
+     /* Must be set */
+     VisitorType type;
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index c89d51b2a4..2a3c4d0407 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -456,7 +456,7 @@ bool visit_optional(Visitor *v, const char *name, bool =
+*present);
+  * visit_start_struct() and visit_end_struct(), since only objects
+  * have deprecated members.
+  */
+-bool visit_deprecated(Visitor *v, const char *name);
++bool visit_deprecated(Visitor *v, const char *name, Error **errp);
 =20
-diff --git a/qapi/control.json b/qapi/control.json
-index 759c20e76f..cdb058eca0 100644
---- a/qapi/control.json
-+++ b/qapi/control.json
-@@ -174,13 +174,15 @@
- #
- # Return information on QMP events.
- #
-+# Features:
-+# @deprecated: This command is deprecated, because its output doesn't
-+#     reflect compile-time configuration.  Use 'query-qmp-schema'
-+#     instead.
-+#
- # Returns: A list of @EventInfo.
- #
- # Since: 1.2.0
- #
--# Note: This command is deprecated, because its output doesn't reflect
--#       compile-time configuration.  Use query-qmp-schema instead.
--#
- # Example:
- #
- # -> { "execute": "query-events" }
-@@ -198,7 +200,8 @@
- # Note: This example has been shortened as the real response is too long.
- #
- ##
--{ 'command': 'query-events', 'returns': ['EventInfo'] }
-+{ 'command': 'query-events', 'returns': ['EventInfo'],
-+  'features': [ 'deprecated' ] }
+ /*
+  * Visit an enum value.
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 501b3ccdef..71e4978a6f 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -137,11 +137,11 @@ bool visit_optional(Visitor *v, const char *name, boo=
+l *present)
+     return *present;
+ }
 =20
- ##
- # @quit:
-diff --git a/qapi/machine.json b/qapi/machine.json
-index 6c11e3cf3a..0da3f3adc4 100644
---- a/qapi/machine.json
-+++ b/qapi/machine.json
-@@ -184,8 +184,11 @@
- # This command causes vCPU threads to exit to userspace, which causes
- # a small interruption to guest CPU execution. This will have a negative
- # impact on realtime guests and other latency sensitive guest workloads.
--# It is recommended to use @query-cpus-fast instead of this command to
--# avoid the vCPU interruption.
-+#
-+# Features:
-+# @deprecated: This command is deprecated, because it interferes with
-+#     the guest.  Use 'query-cpus-fast' instead to avoid the vCPU
-+#     interruption.
- #
- # Returns: a list of @CpuInfo for each virtual CPU
- #
-@@ -216,12 +219,9 @@
- #       ]
- #    }
- #
--# Notes: This interface is deprecated (since 2.12.0), and it is strongly
--#        recommended that you avoid using it. Use @query-cpus-fast to
--#        obtain information about virtual CPUs.
--#
- ##
--{ 'command': 'query-cpus', 'returns': ['CpuInfo'] }
-+{ 'command': 'query-cpus', 'returns': ['CpuInfo'],
-+  'features': [ 'deprecated' ] }
+-bool visit_deprecated(Visitor *v, const char *name)
++bool visit_deprecated(Visitor *v, const char *name, Error **errp)
+ {
+     trace_visit_deprecated(v, name);
+     if (v->deprecated) {
+-        return v->deprecated(v, name);
++        return v->deprecated(v, name, errp);
+     }
+     return true;
+ }
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 80beab517f..516ee9b0b7 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -132,6 +132,19 @@ QDict *qmp_dispatch(QmpCommandList *cmds, QObject *req=
+uest,
+                   "The command %s has not been found", command);
+         goto out;
+     }
++    if (cmd->options & QCO_DEPRECATED) {
++        switch (compat_policy.deprecated_input) {
++        case COMPAT_POLICY_INPUT_ACCEPT:
++            break;
++        case COMPAT_POLICY_INPUT_REJECT:
++            error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
++                      "Deprecated command %s disabled by policy",
++                      command);
++            goto out;
++        default:
++            abort();
++        }
++    }
+     if (!cmd->enabled) {
+         error_set(&err, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "The command %s has been disabled for this instance",
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 32236cbcb1..6ea93f5a7a 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -14,6 +14,7 @@
 =20
- ##
- # @CpuInfoFast:
-@@ -237,12 +237,14 @@
- # @props: properties describing to which node/socket/core/thread
- #         virtual CPU belongs to, provided if supported by board
- #
--# @arch: base architecture of the cpu; deprecated since 3.0.0 in favor
--#        of @target
-+# @arch: base architecture of the cpu
- #
- # @target: the QEMU system emulation target, which determines which
- #          additional fields will be listed (since 3.0)
- #
-+# Features:
-+# @deprecated: Member @arch is deprecated.  Use @target instead.
-+#
- # Since: 2.12
- #
- ##
-@@ -251,7 +253,8 @@
-                       'qom-path'     : 'str',
-                       'thread-id'    : 'int',
-                       '*props'       : 'CpuInstanceProperties',
--                      'arch'         : 'CpuInfoArch',
-+                      'arch'         : { 'type': 'CpuInfoArch',
-+                                         'features': [ 'deprecated' ] },
-                       'target'       : 'SysEmuTarget' },
-   'discriminator' : 'target',
-   'data'          : { 's390x'        : 'CpuInfoS390' } }
-@@ -307,21 +310,22 @@
- #
- # @id: ID of CPU to be created, valid values [0..max_cpus)
- #
-+# Features:
-+# @deprecated: This command is deprecated.  Use `device_add` instead.
-+#     See the `query-hotpluggable-cpus` command for details.
-+#
- # Returns: Nothing on success
- #
- # Since: 1.5
- #
--# Note: This command is deprecated.  The `device_add` command should be
--#       used instead.  See the `query-hotpluggable-cpus` command for
--#       details.
--#
- # Example:
- #
- # -> { "execute": "cpu-add", "arguments": { "id": 2 } }
- # <- { "return": {} }
- #
- ##
--{ 'command': 'cpu-add', 'data': {'id': 'int'} }
-+{ 'command': 'cpu-add', 'data': {'id': 'int'},
-+  'features': [ 'deprecated' ] }
+ #include "qemu/osdep.h"
+ #include <math.h>
++#include "qapi/compat-policy.h"
+ #include "qapi/error.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/visitor-impl.h"
+@@ -43,6 +44,7 @@ typedef struct StackObject {
 =20
- ##
- # @MachineInfo:
-diff --git a/qapi/migration.json b/qapi/migration.json
-index d44d99cd78..b8b5eb195f 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1196,9 +1196,11 @@
- #
- # @value: maximum downtime in seconds
- #
--# Returns: nothing on success
-+# Features:
-+# @deprecated: This command is deprecated.  Use
-+#     'migrate-set-parameters' instead.
- #
--# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-+# Returns: nothing on success
- #
- # Since: 0.14.0
- #
-@@ -1208,7 +1210,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'} }
-+{ 'command': 'migrate_set_downtime', 'data': {'value': 'number'},
-+  'features': [ 'deprecated' ] }
+ struct QObjectInputVisitor {
+     Visitor visitor;
++    CompatPolicyInput deprecated_policy;
 =20
- ##
- # @migrate_set_speed:
-@@ -1217,9 +1220,11 @@
- #
- # @value: maximum speed in bytes per second.
- #
--# Returns: nothing on success
-+# Features:
-+# @deprecated: This command is deprecated.  Use
-+#     'migrate-set-parameters' instead.
- #
--# Notes: This command is deprecated in favor of 'migrate-set-parameters'
-+# Returns: nothing on success
- #
- # Since: 0.14.0
- #
-@@ -1229,7 +1234,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'migrate_set_speed', 'data': {'value': 'int'} }
-+{ 'command': 'migrate_set_speed', 'data': {'value': 'int'},
-+  'features': [ 'deprecated' ] }
+     /* Root of visit at visitor creation. */
+     QObject *root;
+@@ -640,6 +642,23 @@ static void qobject_input_optional(Visitor *v, const c=
+har *name, bool *present)
+     *present =3D true;
+ }
 =20
- ##
- # @migrate-set-cache-size:
-@@ -1238,13 +1244,15 @@
- #
- # @value: cache size in bytes
- #
-+# Features:
-+# @deprecated: This command is deprecated.  Use
-+#     'migrate-set-parameters' instead.
-+#
- # The size will be rounded down to the nearest power of 2.
- # The cache size can be modified before and during ongoing migration
- #
- # Returns: nothing on success
- #
--# Notes: This command is deprecated in favor of 'migrate-set-parameters'
--#
- # Since: 1.2
- #
- # Example:
-@@ -1254,17 +1262,20 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'} }
-+{ 'command': 'migrate-set-cache-size', 'data': {'value': 'int'},
-+  'features': [ 'deprecated' ] }
++static bool qobject_input_deprecated(Visitor *v, const char *name,
++                                     Error **errp)
++{
++    QObjectInputVisitor *qiv =3D to_qiv(v);
++
++    switch (qiv->deprecated_policy) {
++    case COMPAT_POLICY_INPUT_ACCEPT:
++        return true;
++    case COMPAT_POLICY_INPUT_REJECT:
++        error_setg(errp, "Deprecated parameter '%s' disabled by policy",
++                   name);
++        return false;
++    default:
++        abort();
++    }
++}
++
+ static void qobject_input_free(Visitor *v)
+ {
+     QObjectInputVisitor *qiv =3D to_qiv(v);
+@@ -674,6 +693,7 @@ static QObjectInputVisitor *qobject_input_visitor_base_=
+new(QObject *obj)
+     v->visitor.end_list =3D qobject_input_end_list;
+     v->visitor.start_alternate =3D qobject_input_start_alternate;
+     v->visitor.optional =3D qobject_input_optional;
++    v->visitor.deprecated =3D qobject_input_deprecated;
+     v->visitor.free =3D qobject_input_free;
 =20
- ##
- # @query-migrate-cache-size:
- #
- # Query migration XBZRLE cache size
- #
-+# Features:
-+# @deprecated: This command is deprecated.  Use
-+#     'query-migrate-parameters' instead.
-+#
- # Returns: XBZRLE cache size in bytes
- #
--# Notes: This command is deprecated in favor of 'query-migrate-parameters'
--#
- # Since: 1.2
- #
- # Example:
-@@ -1273,7 +1284,8 @@
- # <- { "return": 67108864 }
- #
- ##
--{ 'command': 'query-migrate-cache-size', 'returns': 'int' }
-+{ 'command': 'query-migrate-cache-size', 'returns': 'int',
-+  'features': [ 'deprecated' ] }
+     v->root =3D qobject_ref(obj);
+@@ -696,6 +716,14 @@ Visitor *qobject_input_visitor_new(QObject *obj)
+     return &v->visitor;
+ }
 =20
- ##
- # @migrate:
-diff --git a/qapi/misc.json b/qapi/misc.json
-index c18fe681fb..99b90ac80b 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -872,14 +872,14 @@
- #       If @device is 'vnc' and @target is 'password', this is the new VNC
- #       password to set.  See change-vnc-password for additional notes.
- #
-+# Features:
-+# @deprecated: This command is deprecated.  For changing block
-+#     devices, use 'blockdev-change-medium' instead; for changing VNC
-+#     parameters, use 'change-vnc-password' instead.
-+#
- # Returns: - Nothing on success.
- #          - If @device is not a valid block device, DeviceNotFound
- #
--# Notes: This interface is deprecated, and it is strongly recommended that=
- you
--#        avoid using it.  For changing block devices, use
--#        blockdev-change-medium; for changing VNC parameters, use
--#        change-vnc-password.
--#
- # Since: 0.14.0
- #
- # Example:
-@@ -900,7 +900,8 @@
- #
- ##
- { 'command': 'change',
--  'data': {'device': 'str', 'target': 'str', '*arg': 'str'} }
-+  'data': {'device': 'str', 'target': 'str', '*arg': 'str'},
-+  'features': [ 'deprecated' ] }
++Visitor *qobject_input_visitor_new_qmp(QObject *obj)
++{
++    QObjectInputVisitor *v =3D to_qiv(qobject_input_visitor_new(obj));
++
++    v->deprecated_policy =3D compat_policy.deprecated_input;
++    return &v->visitor;
++}
++
+ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
+ {
+     QObjectInputVisitor *v =3D qobject_input_visitor_base_new(obj);
+diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.c
+index 84cee17596..73983ca5cc 100644
+--- a/qapi/qobject-output-visitor.c
++++ b/qapi/qobject-output-visitor.c
+@@ -201,7 +201,8 @@ static void qobject_output_type_null(Visitor *v, const =
+char *name,
+     qobject_output_add(qov, name, qnull());
+ }
 =20
- ##
- # @xen-set-global-dirty-log:
+-static bool qobject_output_deprecated(Visitor *v, const char *name)
++static bool qobject_output_deprecated(Visitor *v, const char *name,
++                                      Error **errp)
+ {
+     QObjectOutputVisitor *qov =3D to_qov(v);
+=20
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 82d599630c..4ca658acf9 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -277,6 +277,51 @@ static void test_dispatch_cmd_io(void)
+     qobject_unref(ret3);
+ }
+=20
++static void test_dispatch_cmd_deprecated(void)
++{
++    const char *cmd =3D "{ 'execute': 'test-command-features1' }";
++    QDict *ret;
++
++    memset(&compat_policy, 0, sizeof(compat_policy));
++
++    /* accept */
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 0);
++    qobject_unref(ret);
++
++    compat_policy.has_deprecated_input =3D true;
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_ACCEPT;
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 0);
++    qobject_unref(ret);
++
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_REJECT;
++    do_qmp_dispatch_error(false, ERROR_CLASS_COMMAND_NOT_FOUND, cmd);
++}
++
++static void test_dispatch_cmd_arg_deprecated(void)
++{
++    const char *cmd =3D "{ 'execute': 'test-features0',"
++        " 'arguments': { 'fs1': { 'foo': 42 } } }";
++    QDict *ret;
++
++    memset(&compat_policy, 0, sizeof(compat_policy));
++
++    /* accept */
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 1);
++    qobject_unref(ret);
++
++    compat_policy.has_deprecated_input =3D true;
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_ACCEPT;
++    ret =3D qobject_to(QDict, do_qmp_dispatch(false, cmd));
++    assert(ret && qdict_size(ret) =3D=3D 1);
++    qobject_unref(ret);
++
++    compat_policy.deprecated_input =3D COMPAT_POLICY_INPUT_REJECT;
++    do_qmp_dispatch_error(false, ERROR_CLASS_GENERIC_ERROR, cmd);
++}
++
+ static void test_dispatch_cmd_ret_deprecated(void)
+ {
+     const char *cmd =3D "{ 'execute': 'test-features0' }";
+@@ -375,6 +420,10 @@ int main(int argc, char **argv)
+     g_test_add_func("/qmp/dispatch_cmd_io", test_dispatch_cmd_io);
+     g_test_add_func("/qmp/dispatch_cmd_success_response",
+                     test_dispatch_cmd_success_response);
++    g_test_add_func("/qmp/dispatch_cmd_deprecated",
++                    test_dispatch_cmd_deprecated);
++    g_test_add_func("/qmp/dispatch_cmd_arg_deprecated",
++                    test_dispatch_cmd_arg_deprecated);
+     g_test_add_func("/qmp/dispatch_cmd_ret_deprecated",
+                     test_dispatch_cmd_ret_deprecated);
+     g_test_add_func("/qmp/dealloc_types", test_dealloc_types);
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 35b79c554d..3fb4ed42ed 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -132,7 +132,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+         push_indent()
+=20
+     ret +=3D mcgen('''
+-    v =3D qobject_input_visitor_new(QOBJECT(args));
++    v =3D qobject_input_visitor_new_qmp(QOBJECT(args));
+     visit_start_struct(v, NULL, NULL, 0, &err);
+     if (err) {
+         goto out;
+@@ -194,9 +194,13 @@ out:
+     return ret
+=20
+=20
+-def gen_register_command(name, success_response, allow_oob, allow_preconfi=
+g):
++def gen_register_command(name, features,
++                         success_response, allow_oob, allow_preconfig):
+     options =3D []
+=20
++    if 'deprecated' in [f.name for f in features]:
++        options +=3D ['QCO_DEPRECATED']
++
+     if not success_response:
+         options +=3D ['QCO_NO_SUCCESS_RESP']
+     if allow_oob:
+@@ -302,8 +306,8 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)=
+;
+             self._genh.add(gen_command_decl(name, arg_type, boxed, ret_typ=
+e))
+             self._genh.add(gen_marshal_decl(name))
+             self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
+-            self._regy.add(gen_register_command(name, success_response,
+-                                                allow_oob, allow_preconfig=
+))
++            self._regy.add(gen_register_command(
++                name, features, success_response, allow_oob, allow_preconf=
+ig))
+=20
+=20
+ def gen_commands(schema, output_dir, prefix):
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 21df3abed2..9119eb015b 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -66,15 +66,12 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
+)s *obj, Error **errp)
+             push_indent()
+         if deprecated:
+             ret +=3D mcgen('''
+-    if (visit_deprecated(v, "%(name)s")) {
++    if (visit_deprecated(v, "%(name)s", &err)) {
+ ''',
+                          name=3Dmemb.name)
+             push_indent()
+         ret +=3D mcgen('''
+     visit_type_%(c_type)s(v, "%(name)s", &obj->%(c_name)s, &err);
+-    if (err) {
+-        goto out;
+-    }
+ ''',
+                      c_type=3Dmemb.type.c_name(), name=3Dmemb.name,
+                      c_name=3Dc_name(memb.name))
+@@ -82,6 +79,11 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)=
+s *obj, Error **errp)
+             pop_indent()
+             ret +=3D mcgen('''
+     }
++''')
++        ret +=3D mcgen('''
++    if (err) {
++        goto out;
++    }
+ ''')
+         if memb.optional:
+             pop_indent()
 --=20
 2.21.1
 
