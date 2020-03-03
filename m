@@ -2,97 +2,158 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A79C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22667C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A9C20848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:41:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A9C20848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id E045B20848
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:13:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLkBnFsD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E045B20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ELw-0005Hv-90
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 15:41:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46371)
+	id 1j9ErK-0007ai-37
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:13:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51064)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j9ELI-0004ls-Fi
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 15:40:41 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9EqY-0006hn-Rh
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:13:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1j9ELG-0002c0-TC
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 15:40:40 -0500
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57654
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j9ELG-0002b0-NC; Tue, 03 Mar 2020 15:40:38 -0500
-Received: from host86-162-6-80.range86-162.btcentralplus.com ([86.162.6.80]
- helo=[192.168.1.65]) by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1j9ELN-0007ki-G6; Tue, 03 Mar 2020 20:40:50 +0000
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <cover.1583017348.git.balaton@eik.bme.hu>
- <32bb2eab213344151ca342bab5db2cf8c2758fb7.1583017348.git.balaton@eik.bme.hu>
- <f7f6bca9-ce20-cc3d-5366-1e947d729c21@ilande.co.uk>
- <bdbef976-a853-7178-8163-579e4bf9e2e0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011731130.95594@zero.eik.bme.hu>
- <57ff6676-5054-d3f6-f4fc-6ff02b09019f@ilande.co.uk>
- <alpine.BSF.2.22.395.2003011902490.28669@zero.eik.bme.hu>
- <alpine.BSF.2.22.395.2003011951370.28669@zero.eik.bme.hu>
- <38cb0f83-79fc-7021-38fc-c1e28c3c0fa0@ilande.co.uk>
- <alpine.BSF.2.22.395.2003012202330.79908@zero.eik.bme.hu>
- <9ce6d135-4169-96ae-c457-1131b4510c49@ilande.co.uk>
- <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <2a39ccab-e4d4-8172-9a1d-0bc089e0104c@ilande.co.uk>
-Date: Tue, 3 Mar 2020 20:40:20 +0000
+ (envelope-from <jsnow@redhat.com>) id 1j9EqW-0006uW-II
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:12:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28622
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9EqW-0006uB-Eu
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:12:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583269975;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=DnYKvEGqDqudLQITOTDu6CYeRgm0xehwDZjD6ljf/ns=;
+ b=hLkBnFsDCu694yDZTfS5JhvRBibi8Fs5OIKR1jTRnN+CDte7S2jLs1mEvl2+WDEI3Wkatq
+ IUiIpBVztUXFRX2Xb5lX93+1Iaz+GViZszqhuJHhFulo3ZjMCK+Qi9wEhb6mXs6yMmrVSX
+ NLOCSG0Y3CZ++Z/zbIbCTO1d0wuH8rU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-ref_LpLDNwiLLdsLIiU6EA-1; Tue, 03 Mar 2020 16:12:52 -0500
+X-MC-Unique: ref_LpLDNwiLLdsLIiU6EA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B50B800D48;
+ Tue,  3 Mar 2020 21:12:51 +0000 (UTC)
+Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D625119C4F;
+ Tue,  3 Mar 2020 21:12:50 +0000 (UTC)
+Subject: Re: [PATCH v6 2/9] iotests: add script_initialize
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+References: <20200227000639.9644-1-jsnow@redhat.com>
+ <20200227000639.9644-3-jsnow@redhat.com>
+ <54340b90-9b8e-6636-af38-c64b9ad9fee9@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4956bbaf-a909-0baf-4c4f-1cb3db5d0d22@redhat.com>
+Date: Tue, 3 Mar 2020 16:12:50 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2003022145430.47473@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <54340b90-9b8e-6636-af38-c64b9ad9fee9@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.162.6.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 2/2] via-ide: Also emulate non 100% native mode
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:41c9:1:41f::167
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,117 +165,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>, John Snow <jsnow@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/03/2020 21:40, BALATON Zoltan wrote:
 
->> I had a quick look at the schematics linked from the page above, and they confirm
->> that the VIA IDE interface is connected directly to IRQs 14 and 15 and not to the PCI
->> interrupt pins.
-> 
-> Where did you see that? What I got from trying to look this up in the schematics was
-> that VT8231 has two pins named IRQ14 and IRQ15 (but described as Primary and
-> Secondary Channel Interrupt Request in doc) where the interrupt lines of the two IDE
-> ports/channels are connected but how they are routed within the chip after that was
-> not clear. The chip doc says that in native mode the interrupt should be configurable
-> and use a single interrupt for both channels and in legacy mode they use the usual 14
-> and 15 but this is not what guest drivers expect so I think not how really works on
-> PegasosII. It is true however that connection to PCI interrupts aren't mentioned so
-> it always uses ISA IRQ numbers, it just depends on legacy vs. native mode which line
-> is raised. But that was never really a question for VT8231 and maybe only CMD646
-> could have such interconnection with PCI interrupts. (Proabable reason is that
-> via-ide is part of a southbridge chip where it has connections to ISA bus while
-> CMD646 is a PCI IDE controller but I could be wrong as my knowledge is limited about
-> these.)
 
-Presumably the VIA southbridge has its own internal pair of cascaded 8259s so the IRQ
-line from the drive is connected to IRQ14/15 as per an typical ISA PC. You can see
-this in the "Common Hardware Reference Platform: I/O Device Reference" PDF section 4.1.
-
->> So on that basis the best explanation as to what is happening is the
->> comment in the link you provided here:
->> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/powerpc/platforms/chrp/pci.c?h=v4.14.172#n353
+On 2/27/20 8:47 AM, Max Reitz wrote:
+> On 27.02.20 01:06, John Snow wrote:
+>> Like script_main, but doesn't require a single point of entry.
+>> Replace all existing initialization sections with this drop-in replacement.
 >>
+>> This brings debug support to all existing script-style iotests.
 >>
->> /* Pegasos2 firmware version 20040810 configures the built-in IDE controller
->> * in legacy mode, but sets the PCI registers to PCI native mode.
->> * The chip can only operate in legacy mode, so force the PCI class into legacy
->> * mode as well. The same fixup must be done to the class-code property in
->> * the IDE node /pci@80000000/ide@C,1
->> */
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  tests/qemu-iotests/149        |  3 +-
+>>  tests/qemu-iotests/194        |  4 +-
+>>  tests/qemu-iotests/202        |  4 +-
+>>  tests/qemu-iotests/203        |  4 +-
+>>  tests/qemu-iotests/206        |  2 +-
+>>  tests/qemu-iotests/207        |  6 ++-
+>>  tests/qemu-iotests/208        |  2 +-
+>>  tests/qemu-iotests/209        |  2 +-
+>>  tests/qemu-iotests/210        |  6 ++-
+>>  tests/qemu-iotests/211        |  6 ++-
+>>  tests/qemu-iotests/212        |  6 ++-
+>>  tests/qemu-iotests/213        |  6 ++-
+>>  tests/qemu-iotests/216        |  4 +-
+>>  tests/qemu-iotests/218        |  2 +-
+>>  tests/qemu-iotests/219        |  2 +-
+>>  tests/qemu-iotests/222        |  7 ++--
+>>  tests/qemu-iotests/224        |  4 +-
+>>  tests/qemu-iotests/228        |  6 ++-
+>>  tests/qemu-iotests/234        |  4 +-
+>>  tests/qemu-iotests/235        |  4 +-
+>>  tests/qemu-iotests/236        |  2 +-
+>>  tests/qemu-iotests/237        |  2 +-
+>>  tests/qemu-iotests/238        |  2 +
+>>  tests/qemu-iotests/242        |  2 +-
+>>  tests/qemu-iotests/246        |  2 +-
+>>  tests/qemu-iotests/248        |  2 +-
+>>  tests/qemu-iotests/254        |  2 +-
+>>  tests/qemu-iotests/255        |  2 +-
+>>  tests/qemu-iotests/256        |  2 +-
+>>  tests/qemu-iotests/258        |  7 ++--
+>>  tests/qemu-iotests/260        |  4 +-
+>>  tests/qemu-iotests/262        |  4 +-
+>>  tests/qemu-iotests/264        |  4 +-
+>>  tests/qemu-iotests/277        |  2 +
+>>  tests/qemu-iotests/280        |  8 ++--
+>>  tests/qemu-iotests/283        |  4 +-
+>>  tests/qemu-iotests/iotests.py | 73 +++++++++++++++++++++++------------
+>>  37 files changed, 128 insertions(+), 80 deletions(-)
 > 
-> I'm not sure that it makes much sense that the firmware configures the chip one way
-> then puts info about a different way in the device tree. There could be bugs but this
-> is not likely. Especially because I see in traces that the firmware does try to
-> configure the device in native mode. These are the first few accesses of the firmware
-> to via-ide:
-
-But that is exactly what is happening! The comment above clearly indicates the
-firmware incorrectly sets the IDE controller in native mode which is in exact
-agreement with the trace you provide below. And in fact if you look at
-https://www.powerdeveloper.org/platforms/pegasos/devicetree you can see the nvramrc
-hack that was released in order to fix the device tree to boot Linux which alters the
-class-code and sets interrupts to 14 (which I believe is invalid, but seemingly good
-enough here).
-
-> pci_cfg_write via-ide 12:1 @0x9 <- 0xf
-> pci_cfg_write via-ide 12:1 @0x40 <- 0xb
-> pci_cfg_write via-ide 12:1 @0x41 <- 0xf2
-> pci_cfg_write via-ide 12:1 @0x43 <- 0x35
-> pci_cfg_write via-ide 12:1 @0x44 <- 0x18
-> pci_cfg_write via-ide 12:1 @0x45 <- 0x1c
-> pci_cfg_write via-ide 12:1 @0x46 <- 0xc0
-> pci_cfg_write via-ide 12:1 @0x50 <- 0x17171717
-> pci_cfg_write via-ide 12:1 @0x54 <- 0x14
-> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
-> pci_cfg_read via-ide 12:1 @0x0 -> 0x5711106
-> pci_cfg_read via-ide 12:1 @0x8 -> 0x1018f06
-> pci_cfg_read via-ide 12:1 @0xc -> 0x0
-> pci_cfg_read via-ide 12:1 @0x2c -> 0x11001af4
-> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
-> pci_cfg_read via-ide 12:1 @0x4 -> 0x2800080
-> pci_cfg_read via-ide 12:1 @0x3c -> 0x10e
-> pci_cfg_write via-ide 12:1 @0x3c <- 0x109
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
 > 
-> The very first write is to turn on native mode, so I think it's not about what the
-> firmware does but something about how hardware is wired on Pegasos II or the VT8231
-> chip itself that only allows legacy interrupts instead of 100% native mode for IDE.
+> [...]
 > 
->> Given that the DT is wrong, then we should assume that all OSs would have to
->> compensate for this in the same way as Linux, and therefore this should be handled
->> automatically.
->>
->> AFAICT this then only leaves the question: why does the firmware set
->> PCI_INTERRUPT_LINE to 9, which is presumably why you are seeing problems running
->> MorphOS under QEMU.
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+>> index e8a0ea14fc..fdcf8a940c 100644
+>> --- a/tests/qemu-iotests/iotests.py
+>> +++ b/tests/qemu-iotests/iotests.py
 > 
-> Linux does try to handle both true native mode and half-native mode. It only uses
-> half-native mode if finds IRQ14 on Pegasos, otherwise skips Pegasos specific fixup
-> and uses true native mode setup. I don't know what MorphOS does but I think it justs
-> knows that Pegasos2 has this quirk and does not look at the device tree at all.
+> [...]
 > 
->> Could it be that setting prog-if to 0x8a legacy mode also resets PCI_INTERRUPT_LINE
->> to 14? You should be able to confirm this easily on real hardware using the Forth
->> config-* words on the IDE node and reading the prog-if byte before and after.
+>> @@ -1092,13 +1105,18 @@ def execute_unittest(output, verbosity, debug):
+>>  
+>>              sys.stderr.write(out)
+>>  
+>> -def execute_test(test_function=None,
+>> -                 supported_fmts=[],
+>> -                 supported_platforms=None,
+>> -                 supported_cache_modes=[], supported_aio_modes={},
+>> -                 unsupported_fmts=[], supported_protocols=[],
+>> -                 unsupported_protocols=[]):
+>> -    """Run either unittest or script-style tests."""
+>> +def execute_setup_common(supported_fmts: Collection[str] = (),
 > 
-> I don't have direct access to real hardware and would also need to come up with some
-> Forth to verify that but given the above trace that the firmware does before we can
-> enter any Forth we would likely find @0x9 = 0x8f and @0x3c = 0x0e because after
-> booting Linux we see 0x8a and 0x0e and Linux only touches the two mode bits.
+> First time I see something like this, but I suppose it means any
+> collection (i.e. list or tuple in this case) that has str values?
+> 
+> Max
+> 
 
-Again to summarise: this is a known bug in Pegasos2 firmware and the VIA is a
-standard chip, so let's try and figure out exactly what is happening using a real
-firmware and emulate that behaviour in QEMU. This should then make all guests happy,
-regardless of architecture, without requiring the introduction of feature bits or
-risk of introducing other incompatibilities.
+Yes. Testing the waters for idiomatic type annotations. We chose our
+python version to allow us to use them, so I'm pushing on that boundary.
 
+A Collection in this case is a Python ABC that collects the Sized,
+Iterable and Container ABCs.
 
-ATB,
+Roughly:
+Sized: provides __len__          (len(x))
+Iterable: provides __iter__      ("for x in y")
+Container: provides __contains__ ("if 'x' in y")
 
-Mark.
+In this case, we want Iterable (to enumerate the atoms) and Sized (to
+provide truth-testing that returns False when the collection has a size
+of zero.) "Collection" is the nearest available type that describes all
+of the desired types of duck, without becoming overly specific for
+features of the type we are not using.
+
+More information:
+https://docs.python.org/3.6/library/collections.abc.html#module-collections.abc
+
+>> +                         supported_platforms: Collection[str] = (),
+>> +                         supported_cache_modes: Collection[str] = (),
+>> +                         supported_aio_modes: Collection[str] = (),
+>> +                         unsupported_fmts: Collection[str] = (),
+>> +                         supported_protocols: Collection[str] = (),
+>> +                         unsupported_protocols: Collection[str] = ()) -> bool:
+> 
+
 
