@@ -2,82 +2,82 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1576DC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE000C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3E9820838
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E09720838
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:42:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axvnGX+4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E9820838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ShALh36O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E09720838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9AcV-00015y-0P
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:42:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56875)
+	id 1j9AcZ-0001Jq-Q2
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:42:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9AVs-0004JF-IE
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:22 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9AVr-000313-1c
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46859
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVq-00030m-TX
+ (envelope-from <armbru@redhat.com>) id 1j9AVp-0004HF-Mz
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:18 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1j9AVo-0002zT-El
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25726
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVo-0002zG-B6
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583253318;
+ s=mimecast20190719; t=1583253316;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Jlo30X4GLrqRRWhmO6ugS7pBjmrmoB9UDccQD7F+uNk=;
- b=axvnGX+4rMh3N2ewFLso6adhUs20u+jnI7e8m77x3EwFhmJ1ZPcrUXVoZUBlr3iDBEi5+i
- o5DelCTw9j7Ti99kl7BFSrQEux28TUNUzqzT5roNgFh6M83HweAy9uY/GDuEqbenUC5qQm
- zELYf3cP3qCVmEb3UPWXPeBPX+ceZhQ=
+ bh=txscctFiVA2U4b7jVQ1yKyvWF3aho58FNzAJU1Evot4=;
+ b=ShALh36OqSM5X8iVsf1aJysgM/P0YS+clK2IK7y63c1gHfFWdIWsD044uUcTrEbj5OpIr+
+ 35OGfA2vUeSY7CBW7DsdUgMD6zMIwqUZJmKbGQj/ZhIUnqI/c8cwa7imhd+bCZGxo92riy
+ mP2Ml5kGzohR3FCXDN5YPUjNLPvNvJ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-bibwdYNwOHm8gQG9b_sQ5Q-1; Tue, 03 Mar 2020 11:35:17 -0500
-X-MC-Unique: bibwdYNwOHm8gQG9b_sQ5Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-279-NBOcvYgcNuqaZVzHUJtVWg-1; Tue, 03 Mar 2020 11:35:14 -0500
+X-MC-Unique: NBOcvYgcNuqaZVzHUJtVWg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C40718CA240;
- Tue,  3 Mar 2020 16:35:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CB2D8017DF;
+ Tue,  3 Mar 2020 16:35:13 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
  [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A3D7B5DA2C;
- Tue,  3 Mar 2020 16:35:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 972D291D63;
+ Tue,  3 Mar 2020 16:35:11 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 16126113278C; Tue,  3 Mar 2020 17:35:06 +0100 (CET)
+ id C905A113525C; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 27/30] qemu-options: New -compat to set policy for
- deprecated interfaces
-Date: Tue,  3 Mar 2020 17:35:02 +0100
-Message-Id: <20200303163505.32041-28-armbru@redhat.com>
+Subject: [PATCH v2 08/30] tests/test-qmp-event: Simplify test data setup
+Date: Tue,  3 Mar 2020 17:34:43 +0100
+Message-Id: <20200303163505.32041-9-armbru@redhat.com>
 In-Reply-To: <20200303163505.32041-1-armbru@redhat.com>
 References: <20200303163505.32041-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,253 +94,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Policy is separate for input and output.
+Building expected data with qdict_put() & friends is tedious to write
+and hard to read.  Parse them from string literals with
+qdict_from_jsonf_nofail() instead.
 
-Input policy can be "accept" (accept silently), or "reject" (reject
-the request with an error).
-
-Output policy can be "accept" (pass on unchanged), or "hide" (filter
-out the deprecated parts).
-
-Default is "accept".  Policies other than "accept" are implemented
-later in this series.
-
-For now, -compat covers only syntactic aspects of QMP, i.e. stuff
-tagged with feature 'deprecated'.  We may want to extend it to cover
-semantic aspects, CLI, and experimental features.
-
-The option is experimental.
+While there, use initializers instead of assignments for initializing
+aggregate event arguments.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/compat.json             | 51 ++++++++++++++++++++++++++++++++++++
- qapi/qapi-schema.json        |  1 +
- include/qapi/compat-policy.h | 20 ++++++++++++++
- qapi/qmp-dispatch.c          |  3 +++
- softmmu/vl.c                 | 17 ++++++++++++
- qapi/Makefile.objs           |  8 +++---
- qemu-options.hx              | 21 +++++++++++++++
- 7 files changed, 117 insertions(+), 4 deletions(-)
- create mode 100644 qapi/compat.json
- create mode 100644 include/qapi/compat-policy.h
+ tests/test-qmp-event.c | 93 ++++++++++++------------------------------
+ 1 file changed, 27 insertions(+), 66 deletions(-)
 
-diff --git a/qapi/compat.json b/qapi/compat.json
-new file mode 100644
-index 0000000000..fd6f8e932c
---- /dev/null
-+++ b/qapi/compat.json
-@@ -0,0 +1,51 @@
-+# -*- Mode: Python -*-
-+
-+##
-+# =3D Compatibility policy
-+##
-+
-+##
-+# @CompatPolicyInput:
-+#
-+# Policy for handling "funny" input.
-+#
-+# @accept: Accept silently
-+# @reject: Reject with an error
-+#
-+# Since: 5.0
-+##
-+{ 'enum': 'CompatPolicyInput',
-+  'data': [ 'accept', 'reject' ] }
-+
-+##
-+# @CompatPolicyOutput:
-+#
-+# Policy for handling "funny" output.
-+#
-+# @accept: Pass on unchanged
-+# @hide: Filter out
-+#
-+# Since: 5.0
-+##
-+{ 'enum': 'CompatPolicyOutput',
-+  'data': [ 'accept', 'hide' ] }
-+
-+##
-+# @CompatPolicy:
-+#
-+# Policy for handling deprecated management interfaces.
-+#
-+# This is intended for testing users of the management interfaces.
-+#
-+# Limitation: covers only syntactic aspects of QMP, i.e. stuff tagged
-+# with feature 'deprecated'.  We may want to extend it to cover
-+# semantic aspects, CLI, and experimental features.
-+#
-+# @deprecated-input: how to handle deprecated input (default 'accept')
-+# @deprecated-output: how to handle deprecated output (default 'accept')
-+#
-+# Since: 5.0
-+##
-+{ 'struct': 'CompatPolicy',
-+  'data': { '*deprecated-input': 'CompatPolicyInput',
-+            '*deprecated-output': 'CompatPolicyOutput' } }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index fe980ce437..fa800042e0 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -98,6 +98,7 @@
- { 'include': 'migration.json' }
- { 'include': 'transaction.json' }
- { 'include': 'trace.json' }
-+{ 'include': 'compat.json' }
- { 'include': 'control.json' }
- { 'include': 'introspect.json' }
- { 'include': 'qom.json' }
-diff --git a/include/qapi/compat-policy.h b/include/qapi/compat-policy.h
-new file mode 100644
-index 0000000000..8efb2c58aa
---- /dev/null
-+++ b/include/qapi/compat-policy.h
-@@ -0,0 +1,20 @@
-+/*
-+ * Policy for handling "funny" management interfaces
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QAPI_COMPAT_POLICY_H
-+#define QAPI_COMPAT_POLICY_H
-+
-+#include "qapi/qapi-types-compat.h"
-+
-+extern CompatPolicy compat_policy;
-+
-+#endif
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index fb53687ce9..80beab517f 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -12,6 +12,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qapi/compat-policy.h"
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index eee7e08ab6..430001e622 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -17,6 +17,7 @@
  #include "qapi/error.h"
- #include "qapi/qmp/dispatch.h"
- #include "qapi/qmp/qdict.h"
-@@ -19,6 +20,8 @@
- #include "sysemu/runstate.h"
  #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qmp-event.h"
+@@ -124,17 +125,13 @@ static void event_prepare(TestEventData *data,
+     /* Global variable test_event_data was used to pass the expectation, s=
+o
+        test cases can't be executed at same time. */
+     g_mutex_lock(&test_event_lock);
+-
+-    data->expect =3D qdict_new();
+     test_event_data =3D data;
+ }
 =20
-+CompatPolicy compat_policy;
-+
- static QDict *qmp_dispatch_check_obj(const QObject *request, bool allow_oo=
-b,
-                                      QObject **id, Error **errp)
+ static void event_teardown(TestEventData *data,
+                            const void *unused)
  {
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 5549f4b619..0d6b769587 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -26,6 +26,7 @@
- #include "qemu-common.h"
- #include "qemu/units.h"
- #include "hw/qdev-properties.h"
-+#include "qapi/compat-policy.h"
- #include "qapi/error.h"
- #include "qemu-version.h"
- #include "qemu/cutils.h"
-@@ -104,6 +105,7 @@
- #include "sysemu/replay.h"
- #include "qapi/qapi-events-run-state.h"
- #include "qapi/qapi-visit-block-core.h"
-+#include "qapi/qapi-visit-compat.h"
- #include "qapi/qapi-visit-ui.h"
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-run-state.h"
-@@ -3748,6 +3750,21 @@ void qemu_init(int argc, char **argv, char **envp)
-                     qemu_opt_get_bool(opts, "mem-lock", false);
-                 enable_cpu_pm =3D qemu_opt_get_bool(opts, "cpu-pm", false)=
-;
-                 break;
-+            case QEMU_OPTION_compat:
-+                {
-+                    CompatPolicy *opts;
-+                    Visitor *v;
-+
-+                    v =3D qobject_input_visitor_new_str(optarg, NULL,
-+                                                      &error_fatal);
-+
-+                    visit_type_CompatPolicy(v, NULL, &opts, &error_fatal);
-+                    QAPI_CLONE_MEMBERS(CompatPolicy, &compat_policy, opts)=
-;
-+
-+                    qapi_free_CompatPolicy(opts);
-+                    visit_free(v);
-+                    break;
-+                }
-             case QEMU_OPTION_msg:
-                 opts =3D qemu_opts_parse_noisily(qemu_find_opts("msg"), op=
-targ,
-                                                false);
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 20fcc37c2c..6c71e5c701 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -5,10 +5,10 @@ util-obj-y +=3D opts-visitor.o qapi-clone-visitor.o
- util-obj-y +=3D qmp-event.o
- util-obj-y +=3D qapi-util.o
+-    qobject_unref(data->expect);
+     test_event_data =3D NULL;
+-
+     g_mutex_unlock(&test_event_lock);
+ }
 =20
--QAPI_COMMON_MODULES =3D audio authz block-core block char common control c=
-rypto
--QAPI_COMMON_MODULES +=3D dump error introspect job machine migration misc
--QAPI_COMMON_MODULES +=3D net qdev qom rdma rocker run-state sockets tpm
--QAPI_COMMON_MODULES +=3D trace transaction ui
-+QAPI_COMMON_MODULES =3D audio authz block-core block char common compat
-+QAPI_COMMON_MODULES +=3D control crypto dump error introspect job
-+QAPI_COMMON_MODULES +=3D machine migration misc net qdev qom rdma rocker
-+QAPI_COMMON_MODULES +=3D run-state sockets tpm trace transaction ui
- QAPI_TARGET_MODULES =3D machine-target misc-target
- QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
+@@ -152,90 +149,54 @@ static void event_test_add(const char *testpath,
+ static void test_event_a(TestEventData *data,
+                          const void *unused)
+ {
+-    QDict *d;
+-    d =3D data->expect;
+-    qdict_put_str(d, "event", "EVENT_A");
++    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_A' }");
+     qapi_event_send_event_a();
++    qobject_unref(data->expect);
+ }
 =20
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 084a1c1f8c..d02d6bfc15 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3360,6 +3360,27 @@ STEXI
- @table @option
- ETEXI
+ static void test_event_b(TestEventData *data,
+                          const void *unused)
+ {
+-    QDict *d;
+-    d =3D data->expect;
+-    qdict_put_str(d, "event", "EVENT_B");
++    data->expect =3D qdict_from_jsonf_nofail("{ 'event': 'EVENT_B' }");
+     qapi_event_send_event_b();
++    qobject_unref(data->expect);
+ }
 =20
-+DEF("compat", HAS_ARG, QEMU_OPTION_compat,
-+    "-compat [deprecated-input=3Daccept|reject][,deprecated-output=3Daccep=
-t|hide]\n"
-+    "                Policy for handling deprecated management interfaces\=
-n",
-+    QEMU_ARCH_ALL)
-+STEXI
-+@item -compat [deprecated-input=3D@var{input-policy}][,deprecated-output=
-=3D@var{output-policy}]
-+@findex -compat
-+Set policy for handling deprecated management interfaces (experimental):
-+@table @option
-+@item deprecated-input=3Daccept (default)
-+Accept deprecated commands and arguments
-+@item deprecated-input=3Dreject
-+Reject deprecated commands and arguments
-+@item deprecated-output=3Daccept (default)
-+Emit deprecated command results and events
-+@item deprecated-output=3Dhide
-+Suppress deprecated command results and events
-+@end table
-+Limitation: covers only syntactic aspects of QMP.
-+ETEXI
-+
- DEF("fw_cfg", HAS_ARG, QEMU_OPTION_fwcfg,
-     "-fw_cfg [name=3D]<name>,file=3D<file>\n"
-     "                add named fw_cfg entry with contents from file\n"
+ static void test_event_c(TestEventData *data,
+                          const void *unused)
+ {
+-    QDict *d, *d_data, *d_b;
+-
+-    UserDefOne b;
+-    b.integer =3D 2;
+-    b.string =3D g_strdup("test1");
+-    b.has_enum1 =3D false;
+-
+-    d_b =3D qdict_new();
+-    qdict_put_int(d_b, "integer", 2);
+-    qdict_put_str(d_b, "string", "test1");
+-
+-    d_data =3D qdict_new();
+-    qdict_put_int(d_data, "a", 1);
+-    qdict_put(d_data, "b", d_b);
+-    qdict_put_str(d_data, "c", "test2");
+-
+-    d =3D data->expect;
+-    qdict_put_str(d, "event", "EVENT_C");
+-    qdict_put(d, "data", d_data);
++    UserDefOne b =3D { .integer =3D 2, .string =3D (char *)"test1" };
+=20
++    data->expect =3D qdict_from_jsonf_nofail(
++        "{ 'event': 'EVENT_C', 'data': {"
++        " 'a': 1, 'b': { 'integer': 2, 'string': 'test1' }, 'c': 'test2' }=
+ }");
+     qapi_event_send_event_c(true, 1, true, &b, "test2");
+-
+-    g_free(b.string);
++    qobject_unref(data->expect);
+ }
+=20
+ /* Complex type */
+ static void test_event_d(TestEventData *data,
+                          const void *unused)
+ {
+-    UserDefOne struct1;
+-    EventStructOne a;
+-    QDict *d, *d_data, *d_a, *d_struct1;
+-
+-    struct1.integer =3D 2;
+-    struct1.string =3D g_strdup("test1");
+-    struct1.has_enum1 =3D true;
+-    struct1.enum1 =3D ENUM_ONE_VALUE1;
+-
+-    a.struct1 =3D &struct1;
+-    a.string =3D g_strdup("test2");
+-    a.has_enum2 =3D true;
+-    a.enum2 =3D ENUM_ONE_VALUE2;
+-
+-    d_struct1 =3D qdict_new();
+-    qdict_put_int(d_struct1, "integer", 2);
+-    qdict_put_str(d_struct1, "string", "test1");
+-    qdict_put_str(d_struct1, "enum1", "value1");
+-
+-    d_a =3D qdict_new();
+-    qdict_put(d_a, "struct1", d_struct1);
+-    qdict_put_str(d_a, "string", "test2");
+-    qdict_put_str(d_a, "enum2", "value2");
+-
+-    d_data =3D qdict_new();
+-    qdict_put(d_data, "a", d_a);
+-    qdict_put_str(d_data, "b", "test3");
+-    qdict_put_str(d_data, "enum3", "value3");
+-
+-    d =3D data->expect;
+-    qdict_put_str(d, "event", "EVENT_D");
+-    qdict_put(d, "data", d_data);
++    UserDefOne struct1 =3D {
++        .integer =3D 2, .string =3D (char *)"test1",
++        .has_enum1 =3D true, .enum1 =3D ENUM_ONE_VALUE1,
++    };
++    EventStructOne a =3D {
++        .struct1 =3D &struct1,
++        .string =3D (char *)"test2",
++        .has_enum2 =3D true,
++        .enum2 =3D ENUM_ONE_VALUE2,
++    };
+=20
++    data->expect =3D qdict_from_jsonf_nofail(
++        "{ 'event': 'EVENT_D', 'data': {"
++        " 'a': {"
++        "  'struct1': { 'integer': 2, 'string': 'test1', 'enum1': 'value1'=
+ },"
++        "  'string': 'test2', 'enum2': 'value2' },"
++        " 'b': 'test3', 'enum3': 'value3' } }");
+     qapi_event_send_event_d(&a, "test3", false, NULL, true, ENUM_ONE_VALUE=
+3);
+-
+-    g_free(struct1.string);
+-    g_free(a.string);
++    qobject_unref(data->expect);
+ }
+=20
+ int main(int argc, char **argv)
 --=20
 2.21.1
 
