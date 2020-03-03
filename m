@@ -2,76 +2,80 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52974C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6920C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:26:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21B6A214D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84028214D8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:26:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZOtzucRf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21B6A214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxfsKo/U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84028214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94k7-0002iB-Ab
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:25:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52764)
+	id 1j94lC-0004LD-OA
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:26:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j94WV-0000Ct-RM
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:36 -0500
+ (envelope-from <kraxel@redhat.com>) id 1j94Zi-0008Ba-Ju
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:14:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j94WT-0006J5-K9
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:35 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46212
+ (envelope-from <kraxel@redhat.com>) id 1j94Zh-0008DI-NU
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:14:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39809
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94WT-0006Ix-GH
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:33 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1j94Zh-0008D7-JH
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:14:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583230293;
+ s=mimecast20190719; t=1583230493;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7tCYS//0TKLwQOoO9dQPbfeB/Fl9tpOPw27rbkMxAIQ=;
- b=ZOtzucRfHdkMgVJikIL7pNRdkQsmnFsqrsjtbR+Z2P7YaTNHTvHdGIaab2RFigInyQ/eJB
- XCjPxodq2Ok3VcXPNweeSG1RxHnmTjUEx4a+RMvSvNOnnyYdPA+2Za2THh5EPQerlNuna6
- Q0OK9PLGUd945k/7Qt9v9N3NvmL5vwQ=
+ bh=TeViLLngZ99Nmzkz63sOPAJWkn5vnxgZ4kRRKAS4vVY=;
+ b=KxfsKo/U3WqM0gzfWADefemksngPiw5vDmSf6LU6Qf22WNi79tz7uS4eiY6wsuxdKpcKdt
+ 8RRzTLLrxHCWkd2P71eZwkbKo60EMq8GhfzAjBTexdCihW949we6nbwCCJDm5cTTRdYZcA
+ fFvLkeZVzrVOScLMr2L1jyjmQ0I5ADo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-HpUo4b8aN1q_8y4fCDLxSA-1; Tue, 03 Mar 2020 05:11:31 -0500
-X-MC-Unique: HpUo4b8aN1q_8y4fCDLxSA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-188-4_73X40BMZyWcliTz2e4WQ-1; Tue, 03 Mar 2020 05:14:49 -0500
+X-MC-Unique: 4_73X40BMZyWcliTz2e4WQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 393F6800D50;
- Tue,  3 Mar 2020 10:11:30 +0000 (UTC)
-Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-98.pek2.redhat.com
- [10.72.12.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 970348B775;
- Tue,  3 Mar 2020 10:11:28 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: peter.maydell@linaro.org
-Subject: [PULL V2 20/23] tests/test-replication.c: Add test for for secondary
- node continuing replication
-Date: Tue,  3 Mar 2020 18:10:39 +0800
-Message-Id: <1583230242-14597-21-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
-References: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F50918A6EC0;
+ Tue,  3 Mar 2020 10:14:48 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-150.ams2.redhat.com
+ [10.36.116.150])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D11105D9C9;
+ Tue,  3 Mar 2020 10:14:47 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 4E0BE17535; Tue,  3 Mar 2020 11:14:45 +0100 (CET)
+Date: Tue, 3 Mar 2020 11:14:45 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Subject: Re: [PATCH 3/3] usb/hcd-xhci: Split pci wrapper for xhci base model
+Message-ID: <20200303101445.gvfucibdgj7zhb54@sirius.home.kraxel.org>
+References: <1583141724-6229-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1583141724-6229-4-git-send-email-sai.pavan.boddu@xilinx.com>
+MIME-Version: 1.0
+In-Reply-To: <1583141724-6229-4-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,94 +89,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
- qemu-devel@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Thomas Huth <thuth@redhat.com>, Vikram Garhwal <fnu.vikram@xilinx.com>,
+ Stefan Weil <sw@weilnetz.de>, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, Gonglei <arei.gonglei@huawei.com>,
+ Anthony Liguori <anthony@codemonkey.ws>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lukas Straub <lukasstraub2@web.de>
+On Mon, Mar 02, 2020 at 03:05:24PM +0530, Sai Pavan Boddu wrote:
+> This patch sets the base to use xhci as sysbus model, for which pci
+> specific hooks are moved to hcd-xhci-pci.c. As a part of this requirment
+> msi/msix interrupts handling is moved under XHCIPCIState. Made required
+> changes for qemu-xhci-nec.
 
-This simulates the case that happens when we resume COLO after failover.
+> +static void usb_xhci_pci_realize(struct PCIDevice *dev, Error **errp)
+> +{
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- tests/test-replication.c | 52 ++++++++++++++++++++++++++++++++++++++++++++=
-++++
- 1 file changed, 52 insertions(+)
+> +    s->xhci->as =3D pci_get_address_space(dev);
+> +}
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 4747d8a..cbc37db 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -490,6 +490,56 @@ static void test_secondary_stop(void)
-     teardown_secondary();
- }
-=20
-+static void test_secondary_continuous_replication(void)
-+{
-+    BlockBackend *top_blk, *local_blk;
-+    Error *local_err =3D NULL;
-+
-+    top_blk =3D start_secondary();
-+    replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
-+    g_assert(!local_err);
-+
-+    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-+    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
-+    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
-+
-+    /* replication will backup s_local_disk to s_hidden_disk */
-+    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
-+                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-+
-+    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
-+    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
-+
-+    /* do failover (active commit) */
-+    replication_stop_all(true, &local_err);
-+    g_assert(!local_err);
-+
-+    /* it should ignore all requests from now on */
-+
-+    /* start after failover */
-+    replication_start_all(REPLICATION_MODE_PRIMARY, &local_err);
-+    g_assert(!local_err);
-+
-+    /* checkpoint */
-+    replication_do_checkpoint_all(&local_err);
-+    g_assert(!local_err);
-+
-+    /* stop */
-+    replication_stop_all(true, &local_err);
-+    g_assert(!local_err);
-+
-+    /* read from s_local_disk (0, IMG_SIZE / 2) */
-+    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
-+                  0, IMG_SIZE / 2, false);
-+
-+
-+    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
-+    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
-+                  IMG_SIZE / 2, 0, IMG_SIZE, false);
-+
-+    teardown_secondary();
-+}
-+
- static void test_secondary_do_checkpoint(void)
- {
-     BlockBackend *top_blk, *local_blk;
-@@ -585,6 +635,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/replication/secondary/write", test_secondary_write);
-     g_test_add_func("/replication/secondary/start", test_secondary_start);
-     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
-+    g_test_add_func("/replication/secondary/continuous_replication",
-+                    test_secondary_continuous_replication);
-     g_test_add_func("/replication/secondary/do_checkpoint",
-                     test_secondary_do_checkpoint);
-     g_test_add_func("/replication/secondary/get_error_all",
---=20
-2.5.0
+Ah, here it is.  Should be in patch 1, otherwise the series isn't
+bisecttable due to the temporary breakage.
+
+cheers,
+  Gerd
 
 
