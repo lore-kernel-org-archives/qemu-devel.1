@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22667C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7BAC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E045B20848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:13:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8F0F208C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLkBnFsD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E045B20848
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ah6TMsAS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F0F208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ErK-0007ai-37
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:13:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51064)
+	id 1j9F3x-0003QL-0E
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:26:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9EqY-0006hn-Rh
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:13:00 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9F3G-0002tz-Kd
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9EqW-0006uW-II
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:12:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28622
+ (envelope-from <jsnow@redhat.com>) id 1j9F3E-0001Fa-V9
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:26:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44483
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9EqW-0006uB-Eu
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:12:56 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9F3E-0001FR-Qg
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:26:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583269975;
+ s=mimecast20190719; t=1583270764;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DnYKvEGqDqudLQITOTDu6CYeRgm0xehwDZjD6ljf/ns=;
- b=hLkBnFsDCu694yDZTfS5JhvRBibi8Fs5OIKR1jTRnN+CDte7S2jLs1mEvl2+WDEI3Wkatq
- IUiIpBVztUXFRX2Xb5lX93+1Iaz+GViZszqhuJHhFulo3ZjMCK+Qi9wEhb6mXs6yMmrVSX
- NLOCSG0Y3CZ++Z/zbIbCTO1d0wuH8rU=
+ bh=aNmi+oivqAqmK+gqppqDRFzopxrTz9WNrzFtmTFzkxc=;
+ b=Ah6TMsASwwYSssfkHzsvE64vKkXwyjwm8MsF1W3i8pMVBwI8PJUFq/yySzsEV3uEvAnHpP
+ /K3pnTOfWKSXJJHapTOkbzepgYUKmBnsh83+nscpCqkMnQ2uHnxJzCoccD++sI2uQWmWrw
+ v7XKxDRdMilVLTh7qM4pwDxKPVX6A68=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-ref_LpLDNwiLLdsLIiU6EA-1; Tue, 03 Mar 2020 16:12:52 -0500
-X-MC-Unique: ref_LpLDNwiLLdsLIiU6EA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-1-ptim7MAkM0K72vbpqU0oFQ-1; Tue, 03 Mar 2020 16:26:02 -0500
+X-MC-Unique: ptim7MAkM0K72vbpqU0oFQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B50B800D48;
- Tue,  3 Mar 2020 21:12:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D879DB2E;
+ Tue,  3 Mar 2020 21:26:01 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D625119C4F;
- Tue,  3 Mar 2020 21:12:50 +0000 (UTC)
-Subject: Re: [PATCH v6 2/9] iotests: add script_initialize
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FA2360C87;
+ Tue,  3 Mar 2020 21:26:00 +0000 (UTC)
+Subject: Re: [PATCH v6 1/9] iotests: do a light delinting
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
 References: <20200227000639.9644-1-jsnow@redhat.com>
- <20200227000639.9644-3-jsnow@redhat.com>
- <54340b90-9b8e-6636-af38-c64b9ad9fee9@redhat.com>
+ <20200227000639.9644-2-jsnow@redhat.com>
+ <5c3f3029-37c3-dd97-efb7-ea244742ab51@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -139,18 +139,18 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <4956bbaf-a909-0baf-4c4f-1cb3db5d0d22@redhat.com>
-Date: Tue, 3 Mar 2020 16:12:50 -0500
+Message-ID: <c84ac4a9-7fa4-2dac-ed88-cf7c1441f0c4@redhat.com>
+Date: Tue, 3 Mar 2020 16:25:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <54340b90-9b8e-6636-af38-c64b9ad9fee9@redhat.com>
+In-Reply-To: <5c3f3029-37c3-dd97-efb7-ea244742ab51@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -172,110 +172,161 @@ Sender: "Qemu-devel"
 
 
 
-On 2/27/20 8:47 AM, Max Reitz wrote:
+On 2/27/20 7:59 AM, Max Reitz wrote:
 > On 27.02.20 01:06, John Snow wrote:
->> Like script_main, but doesn't require a single point of entry.
->> Replace all existing initialization sections with this drop-in replacement.
+>> This doesn't fix everything in here, but it does help clean up the
+>> pylint report considerably.
 >>
->> This brings debug support to all existing script-style iotests.
+>> This should be 100% style changes only; the intent is to make pylint
+>> more useful by working on establishing a baseline for iotests that we
+>> can gate against in the future. This will be important if (when?) we
+>> begin adding type hints to our code base.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->>  tests/qemu-iotests/149        |  3 +-
->>  tests/qemu-iotests/194        |  4 +-
->>  tests/qemu-iotests/202        |  4 +-
->>  tests/qemu-iotests/203        |  4 +-
->>  tests/qemu-iotests/206        |  2 +-
->>  tests/qemu-iotests/207        |  6 ++-
->>  tests/qemu-iotests/208        |  2 +-
->>  tests/qemu-iotests/209        |  2 +-
->>  tests/qemu-iotests/210        |  6 ++-
->>  tests/qemu-iotests/211        |  6 ++-
->>  tests/qemu-iotests/212        |  6 ++-
->>  tests/qemu-iotests/213        |  6 ++-
->>  tests/qemu-iotests/216        |  4 +-
->>  tests/qemu-iotests/218        |  2 +-
->>  tests/qemu-iotests/219        |  2 +-
->>  tests/qemu-iotests/222        |  7 ++--
->>  tests/qemu-iotests/224        |  4 +-
->>  tests/qemu-iotests/228        |  6 ++-
->>  tests/qemu-iotests/234        |  4 +-
->>  tests/qemu-iotests/235        |  4 +-
->>  tests/qemu-iotests/236        |  2 +-
->>  tests/qemu-iotests/237        |  2 +-
->>  tests/qemu-iotests/238        |  2 +
->>  tests/qemu-iotests/242        |  2 +-
->>  tests/qemu-iotests/246        |  2 +-
->>  tests/qemu-iotests/248        |  2 +-
->>  tests/qemu-iotests/254        |  2 +-
->>  tests/qemu-iotests/255        |  2 +-
->>  tests/qemu-iotests/256        |  2 +-
->>  tests/qemu-iotests/258        |  7 ++--
->>  tests/qemu-iotests/260        |  4 +-
->>  tests/qemu-iotests/262        |  4 +-
->>  tests/qemu-iotests/264        |  4 +-
->>  tests/qemu-iotests/277        |  2 +
->>  tests/qemu-iotests/280        |  8 ++--
->>  tests/qemu-iotests/283        |  4 +-
->>  tests/qemu-iotests/iotests.py | 73 +++++++++++++++++++++++------------
->>  37 files changed, 128 insertions(+), 80 deletions(-)
-> 
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> 
-> [...]
-> 
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
->> index e8a0ea14fc..fdcf8a940c 100644
+>>  tests/qemu-iotests/iotests.py | 88 ++++++++++++++++++-----------------
+>>  1 file changed, 45 insertions(+), 43 deletions(-)
+>=20
+> I feel like I=E2=80=99m the wrongest person there is for reviewing a Pyth=
+on
+> style-fixing patch, but here I am and so here I go:
+>=20
+
+No, it's good.
+
+>> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.=
+py
+>> index 8815052eb5..e8a0ea14fc 100644
 >> --- a/tests/qemu-iotests/iotests.py
 >> +++ b/tests/qemu-iotests/iotests.py
-> 
+>=20
 > [...]
-> 
->> @@ -1092,13 +1105,18 @@ def execute_unittest(output, verbosity, debug):
->>  
->>              sys.stderr.write(out)
->>  
->> -def execute_test(test_function=None,
->> -                 supported_fmts=[],
->> -                 supported_platforms=None,
->> -                 supported_cache_modes=[], supported_aio_modes={},
->> -                 unsupported_fmts=[], supported_protocols=[],
->> -                 unsupported_protocols=[]):
->> -    """Run either unittest or script-style tests."""
->> +def execute_setup_common(supported_fmts: Collection[str] = (),
-> 
-> First time I see something like this, but I suppose it means any
-> collection (i.e. list or tuple in this case) that has str values?
-> 
-> Max
-> 
+>=20
+>> @@ -245,8 +243,7 @@ def qemu_nbd_early_pipe(*args):
+>>                            ' '.join(qemu_nbd_args + ['--fork'] + list(ar=
+gs))))
+>>      if exitcode =3D=3D 0:
+>>          return exitcode, ''
+>> -    else:
+>> -        return exitcode, subp.communicate()[0]
+>> +    return exitcode, subp.communicate()[0]
+>=20
+> If we want to make such a change (which I don=E2=80=99t doubt we want), I=
+ think
+> it should be the other way around: Make the condition =E2=80=9Cexitcode !=
+=3D 0=E2=80=9D,
+> so the final return is the return for the successful case.  (Just
+> because I think that=E2=80=99s how we usually do it, at least in the qemu=
+ code?)
+>=20
+> [...]
+>=20
 
-Yes. Testing the waters for idiomatic type annotations. We chose our
-python version to allow us to use them, so I'm pushing on that boundary.
+Yes, makes sense. I was behaving a little more mechanically.
 
-A Collection in this case is a Python ABC that collects the Sized,
-Iterable and Container ABCs.
+>> @@ -455,10 +452,9 @@ def file_path(*names, base_dir=3Dtest_dir):
+>>  def remote_filename(path):
+>>      if imgproto =3D=3D 'file':
+>>          return path
+>> -    elif imgproto =3D=3D 'ssh':
+>> +    if imgproto =3D=3D 'ssh':
+>=20
+> This seems like a weird thing to complain about for a coding style
+> check, but whatever.
+>=20
+> (As in, I prefer the elif form)
+>=20
 
-Roughly:
-Sized: provides __len__          (len(x))
-Iterable: provides __iter__      ("for x in y")
-Container: provides __contains__ ("if 'x' in y")
+Honestly, I do too. We can silence the warning instead.
 
-In this case, we want Iterable (to enumerate the atoms) and Sized (to
-provide truth-testing that returns False when the collection has a size
-of zero.) "Collection" is the nearest available type that describes all
-of the desired types of duck, without becoming overly specific for
-features of the type we are not using.
+This warning option doesn't like "if return else return" constructs,
+preferring instead:
 
-More information:
-https://docs.python.org/3.6/library/collections.abc.html#module-collections.abc
+if x:
+    return 0
+return 1
 
->> +                         supported_platforms: Collection[str] = (),
->> +                         supported_cache_modes: Collection[str] = (),
->> +                         supported_aio_modes: Collection[str] = (),
->> +                         unsupported_fmts: Collection[str] = (),
->> +                         supported_protocols: Collection[str] = (),
->> +                         unsupported_protocols: Collection[str] = ()) -> bool:
-> 
+but I have to admit that I often like to see the branches laid out as
+branches, too.
+
+Other Pythonistas (Eduardo, Philippe, Markus?) -- strong feelings one
+way or the other?
+
+>>          return "ssh://%s@127.0.0.1:22%s" % (os.environ.get('USER'), pat=
+h)
+>> -    else:
+>> -        raise Exception("Protocol %s not supported" % (imgproto))
+>> +    raise Exception("Protocol %s not supported" % (imgproto))
+>> =20
+>>  class VM(qtest.QEMUQtestMachine):
+>>      '''A QEMU VM'''
+>=20
+> [...]
+>=20
+>> @@ -756,12 +750,13 @@ def assert_block_path(self, root, path, expected_n=
+ode, graph=3DNone):
+>>              assert node is not None, 'Cannot follow path %s%s' % (root,=
+ path)
+>> =20
+>>              try:
+>> -                node_id =3D next(edge['child'] for edge in graph['edges=
+'] \
+>> -                                             if edge['parent'] =3D=3D n=
+ode['id'] and
+>> -                                                edge['name'] =3D=3D chi=
+ld_name)
+>> +                node_id =3D next(edge['child'] for edge in graph['edges=
+']
+>> +                               if edge['parent'] =3D=3D node['id'] and
+>> +                               edge['name'] =3D=3D child_name)
+>=20
+> I don=E2=80=99t mind the if alignment, but I do mind not aligning the thi=
+rd line
+> to the =E2=80=9Cedge=E2=80=9D above it (i.e. the third line is part of th=
+e condition, so
+> I=E2=80=99d align it to the =E2=80=9Cif=E2=80=9D condition).
+>=20
+> But then again it=E2=80=99s nothing new that I like to disagree with comm=
+only
+> agreed-upon Python coding styles, so.
+>=20
+> [...]
+>=20
+
+OK, that can be addressed by highlighting the sub-expression with
+parentheses:
+
+        node_id =3D next(edge['child'] for edge in graph['edges']
+                       if (edge['parent'] =3D=3D node['id'] and
+                           edge['name'] =3D=3D child_name))
+
+
+>> @@ -891,13 +892,14 @@ def wait_until_completed(self, drive=3D'drive0', c=
+heck_offset=3DTrue, wait=3D60.0,
+>>                          self.assert_qmp(event, 'data/error', error)
+>>                      self.assert_no_active_block_jobs()
+>>                      return event
+>> -                elif event['event'] =3D=3D 'JOB_STATUS_CHANGE':
+>> +                if event['event'] =3D=3D 'JOB_STATUS_CHANGE':
+>>                      self.assert_qmp(event, 'data/id', drive)
+>> =20
+>>      def wait_ready(self, drive=3D'drive0'):
+>>          '''Wait until a block job BLOCK_JOB_READY event'''
+>> -        f =3D {'data': {'type': 'mirror', 'device': drive } }
+>> +        f =3D {'data': {'type': 'mirror', 'device': drive}}
+>>          event =3D self.vm.event_wait(name=3D'BLOCK_JOB_READY', match=3D=
+f)
+>> +        return event
+>=20
+> Why not just =E2=80=9Creturn self.vm.event_wait=E2=80=A6=E2=80=9D?
+>=20
+
+Shrug. Sometimes I name my return variables when working in Python to
+give some semantic clue over what exactly I'm even returning.
+
+I can change it; but the docstring will grow to describe what it returns
+to re-document the same.
+
+--js
 
 
