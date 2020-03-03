@@ -2,80 +2,82 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DFFC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 18:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD50C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 19:53:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC84420848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 18:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02ADA2073B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 19:53:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7vfY7UH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC84420848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XRqwr4+o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02ADA2073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9CZZ-0008LY-2N
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 13:47:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51324)
+	id 1j9DbX-000551-5c
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 14:53:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1j9CYY-0007CA-1Q
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 13:46:15 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j9Dah-0004cn-GA
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1j9CYW-0006Xv-Gr
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 13:46:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50914
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1j9Daf-00023M-A9
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:52:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33883
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1j9CYW-0006XK-DI
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 13:46:12 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9Daf-00022x-5e
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:52:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583261171;
+ s=mimecast20190719; t=1583265148;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wdaek6mH06AiyslCL6zYAbFOzmlp52saOdk1aO6RPWk=;
- b=L7vfY7UHWwrNrLeyR6NjXBWUcF1S3idPp/wcDznkPD7FOzhyqxPf7rEaNuyU/ANh9FdLCD
- 1ydvEHUNz015qw977PFVeW814L8eCUJJQMCcWYh9H1BuomnCTUeFXcPkatZWZBpfz1p1zC
- VPGlivHfO7cVwJZMl18aFU+5hnSARFY=
+ bh=FDC2iERDklNu2GECM/ReQCb7pF5fN9uqXYGqI9qO95g=;
+ b=XRqwr4+oQvm7CnpycaIUCx79uIjYcuPo4o/C+lptXtTMPdgL8H4mu9QbFogUWVMy3Dktwf
+ BWYOQRlIPP3AdiWl4N6cYhiQgpgKotEyl3n2A/FQwQ+67wi38FUK48Y2+BPjktlHYjFD6s
+ NxMZKOD2DsDOlyULid66LxNH5Txe//8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-VEHNHEayPreLKV5sshcqLA-1; Tue, 03 Mar 2020 13:46:07 -0500
-X-MC-Unique: VEHNHEayPreLKV5sshcqLA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-378-ZwvXHhMUNeeNqHLz_ButuQ-1; Tue, 03 Mar 2020 14:52:24 -0500
+X-MC-Unique: ZwvXHhMUNeeNqHLz_ButuQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B88F101FC64;
- Tue,  3 Mar 2020 18:46:03 +0000 (UTC)
-Received: from localhost (ovpn-122-157.rdu2.redhat.com [10.10.122.157])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D69A5C1D4;
- Tue,  3 Mar 2020 18:45:58 +0000 (UTC)
-Date: Tue, 3 Mar 2020 13:45:57 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] cpu: Use DeviceClass reset instead of a special CPUClass
- reset
-Message-ID: <20200303184557.GV4440@habkost.net>
-References: <20200303100511.5498-1-peter.maydell@linaro.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CEFB869ECB;
+ Tue,  3 Mar 2020 19:52:22 +0000 (UTC)
+Received: from work-vm (ovpn-117-2.ams2.redhat.com [10.36.117.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8457828981;
+ Tue,  3 Mar 2020 19:51:52 +0000 (UTC)
+Date: Tue, 3 Mar 2020 19:51:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [PATCH v5 01/50] multi-process: memory: alloc RAM from file at
+ offset
+Message-ID: <20200303195149.GV3170@work-vm>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <e5ab1f93904f30113b358561e207a94076e24653.1582576372.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200303100511.5498-1-peter.maydell@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <e5ab1f93904f30113b358561e207a94076e24653.1582576372.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,81 +89,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
- qemu-ppc@nongnu.org, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Stafford Horne <shorne@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-riscv@nongnu.org,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 03, 2020 at 10:05:11AM +0000, Peter Maydell wrote:
-> The CPUClass has a 'reset' method.  This is a legacy from when
-> TYPE_CPU used not to inherit from TYPE_DEVICE.  We don't need it any
-> more, as we can simply use the TYPE_DEVICE reset.  The 'cpu_reset()'
-> function is kept as the API which most places use to reset a CPU; it
-> is now a wrapper which calls device_cold_reset() and then the
-> tracepoint function.
+* Jagannathan Raman (jag.raman@oracle.com) wrote:
+> Allow RAM MemoryRegion to be created from an offset in a file, instead
+> of allocating at offset of 0 by default. This is needed to synchronize
+> RAM between QEMU & remote process.
+> This will be needed for the following patches.
 >=20
-> This change should not cause CPU objects to be reset more often
-> than they are at the moment, because:
->  * nobody is directly calling device_cold_reset() or
->    qdev_reset_all() on CPU objects
->  * no CPU object is on a qbus, so they will not be reset either
->    by somebody calling qbus_reset_all()/bus_cold_reset(), or
->    by the main "reset sysbus and everything in the qbus tree"
->    reset that most devices are reset by
->=20
-> Note that this does not change the need for each machine or whatever
-> to use qemu_register_reset() to arrange to call cpu_reset() -- that
-> is necessary because CPU objects are not on any qbus, so they don't
-> get reset when the qbus tree rooted at the sysbus bus is reset, and
-> this isn't being changed here.
->=20
-> All the changes to the files under target/ were made using the
-> included Coccinelle script, except:
->=20
-> (1) the deletion of the now-inaccurate and not terribly useful
-> "CPUClass::reset" comments was done with a perl one-liner afterwards:
->   perl -n -i -e '/ CPUClass::reset/ or print' target/*/*.c
->=20
-> (2) this bit of the s390 change was done by hand, because the
-> Coccinelle script is not sophisticated enough to handle the
-> parent_reset call being inside another function:
->=20
-> | @@ -96,8 +96,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_typ=
-e type)
-> |     S390CPU *cpu =3D S390_CPU(s);
-> |     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
-> |     CPUS390XState *env =3D &cpu->env;
-> |+    DeviceState *dev =3D DEVICE(s);
-> |
-> |-    scc->parent_reset(s);
-> |+    scc->parent_reset(dev);
-> |     cpu->env.sigp_order =3D 0;
-> |     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Queued, thanks.
+This looks reasonable to me, so :
 
-However, if you want to do additional arch-specific work on top
-of this patch, feel free to merge it through your tree.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+but can I suggest you take simple things like this and split them out
+into a separate little series;  I think people would probably take them
+even though the current users have a 0 offset.
 
---=20
-Eduardo
+Dave
+
+> ---
+>  exec.c                    | 11 +++++++----
+>  include/exec/ram_addr.h   |  2 +-
+>  include/qemu/mmap-alloc.h |  3 ++-
+>  memory.c                  |  2 +-
+>  util/mmap-alloc.c         |  7 ++++---
+>  util/oslib-posix.c        |  2 +-
+>  6 files changed, 16 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index c930040..e524185 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1841,6 +1841,7 @@ static void *file_ram_alloc(RAMBlock *block,
+>                              ram_addr_t memory,
+>                              int fd,
+>                              bool truncate,
+> +                            off_t offset,
+>                              Error **errp)
+>  {
+>      Error *err =3D NULL;
+> @@ -1893,7 +1894,8 @@ static void *file_ram_alloc(RAMBlock *block,
+>      }
+> =20
+>      area =3D qemu_ram_mmap(fd, memory, block->mr->align,
+> -                         block->flags & RAM_SHARED, block->flags & RAM_P=
+MEM);
+> +                         block->flags & RAM_SHARED, block->flags & RAM_P=
+MEM,
+> +                         offset);
+>      if (area =3D=3D MAP_FAILED) {
+>          error_setg_errno(errp, errno,
+>                           "unable to map backing store for guest RAM");
+> @@ -2322,7 +2324,7 @@ static void ram_block_add(RAMBlock *new_block, Erro=
+r **errp, bool shared)
+>  #ifdef CONFIG_POSIX
+>  RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>                                   uint32_t ram_flags, int fd,
+> -                                 Error **errp)
+> +                                 off_t offset, Error **errp)
+>  {
+>      RAMBlock *new_block;
+>      Error *local_err =3D NULL;
+> @@ -2367,7 +2369,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, M=
+emoryRegion *mr,
+>      new_block->used_length =3D size;
+>      new_block->max_length =3D size;
+>      new_block->flags =3D ram_flags;
+> -    new_block->host =3D file_ram_alloc(new_block, size, fd, !file_size, =
+errp);
+> +    new_block->host =3D file_ram_alloc(new_block, size, fd, !file_size, =
+offset,
+> +                                     errp);
+>      if (!new_block->host) {
+>          g_free(new_block);
+>          return NULL;
+> @@ -2397,7 +2400,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size,=
+ MemoryRegion *mr,
+>          return NULL;
+>      }
+> =20
+> -    block =3D qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
+> +    block =3D qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
+>      if (!block) {
+>          if (created) {
+>              unlink(mem_path);
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index 5e59a3d..1b9f489 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -121,7 +121,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, M=
+emoryRegion *mr,
+>                                     Error **errp);
+>  RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
+>                                   uint32_t ram_flags, int fd,
+> -                                 Error **errp);
+> +                                 off_t offset, Error **errp);
+> =20
+>  RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
+>                                    MemoryRegion *mr, Error **errp);
+> diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+> index e786266..4f57985 100644
+> --- a/include/qemu/mmap-alloc.h
+> +++ b/include/qemu/mmap-alloc.h
+> @@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
+>                      size_t size,
+>                      size_t align,
+>                      bool shared,
+> -                    bool is_pmem);
+> +                    bool is_pmem,
+> +                    off_t start);
+> =20
+>  void qemu_ram_munmap(int fd, void *ptr, size_t size);
+> =20
+> diff --git a/memory.c b/memory.c
+> index aeaa8dc..131bc6c 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1595,7 +1595,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *m=
+r,
+>      mr->destructor =3D memory_region_destructor_ram;
+>      mr->ram_block =3D qemu_ram_alloc_from_fd(size, mr,
+>                                             share ? RAM_SHARED : 0,
+> -                                           fd, &err);
+> +                                           fd, 0, &err);
+>      mr->dirty_log_mask =3D tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>      if (err) {
+>          mr->size =3D int128_zero();
+> diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+> index 27dcccd..a28f702 100644
+> --- a/util/mmap-alloc.c
+> +++ b/util/mmap-alloc.c
+> @@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
+>                      size_t size,
+>                      size_t align,
+>                      bool shared,
+> -                    bool is_pmem)
+> +                    bool is_pmem,
+> +                    off_t start)
+>  {
+>      int flags;
+>      int map_sync_flags =3D 0;
+> @@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
+>      offset =3D QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)gu=
+ardptr;
+> =20
+>      ptr =3D mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+> -               flags | map_sync_flags, fd, 0);
+> +               flags | map_sync_flags, fd, start);
+> =20
+>      if (ptr =3D=3D MAP_FAILED && map_sync_flags) {
+>          if (errno =3D=3D ENOTSUP) {
+> @@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
+>           * we will remove these flags to handle compatibility.
+>           */
+>          ptr =3D mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
+> -                   flags, fd, 0);
+> +                   flags, fd, start);
+>      }
+> =20
+>      if (ptr =3D=3D MAP_FAILED) {
+> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> index 5a291cc..bd221dd 100644
+> --- a/util/oslib-posix.c
+> +++ b/util/oslib-posix.c
+> @@ -205,7 +205,7 @@ void *qemu_memalign(size_t alignment, size_t size)
+>  void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
+>  {
+>      size_t align =3D QEMU_VMALLOC_ALIGN;
+> -    void *ptr =3D qemu_ram_mmap(-1, size, align, shared, false);
+> +    void *ptr =3D qemu_ram_mmap(-1, size, align, shared, false, 0);
+> =20
+>      if (ptr =3D=3D MAP_FAILED) {
+>          return NULL;
+> --=20
+> 1.8.3.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
