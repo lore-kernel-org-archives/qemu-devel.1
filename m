@@ -6,78 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40834C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EF2C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFE9E20838
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B109920838
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5JUXytm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE9E20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FETFhgGO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B109920838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Aee-0005C4-5e
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:44:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56968)
+	id 1j9Aex-0005gi-Sa
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:44:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9AVv-0004Ne-Eo
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:25 -0500
+ (envelope-from <armbru@redhat.com>) id 1j9AW9-0004cd-8v
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9AVt-00032s-92
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46644
+ (envelope-from <armbru@redhat.com>) id 1j9AW7-0003Bf-Ke
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60972
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVt-00032H-3j
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:21 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AW7-0003B8-DZ
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583253320;
+ s=mimecast20190719; t=1583253335;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xege0Pw+GKvVLkCuOgENwHcnrmc+6NSA93kTUN6HE3c=;
- b=C5JUXytmmmw2s3d6iGxqldYRWLrgIoAOq6D/RPG5E7v88BlFGvMLVQ0Vp499fZRQrhkbWl
- qKGPGAFTKT5LE3r5GbCINA0qhbEY0SNYFQ3Nnxg0fmLhS798Xr5sBXtyJM5iIHrFUf9CmC
- e9wJ1W8/jnIcBTpjLET/DfUtU46EaL8=
+ bh=Bp5EbH/Kp4MBinsdHTQ0U4PgrwTqvS1mCzI/+Vn0cXU=;
+ b=FETFhgGOvX60sQX3xB4qpv7GI3vRIDMhgERFlwUP5ed+kPjRAzaKGEH4iNSwPv7O7ik/7a
+ ZKHsW0icH7anwHcuxOr+TnbiTKK0gmsAJ0GiCIzWT6woADrR9axnF7GZHFmkUFE84FkSA3
+ /7moKxO+qxtphPk9sgij5aVQyTfNFDw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-evZ1SL5oM6itc7nlWAW1cg-1; Tue, 03 Mar 2020 11:35:16 -0500
-X-MC-Unique: evZ1SL5oM6itc7nlWAW1cg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-438-OBcPlIGSMzyhrVAli-ipYw-1; Tue, 03 Mar 2020 11:35:15 -0500
+X-MC-Unique: OBcPlIGSMzyhrVAli-ipYw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83ACB107ACCA;
- Tue,  3 Mar 2020 16:35:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6509D1005512;
+ Tue,  3 Mar 2020 16:35:14 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
  [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 656AA5C219;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC7C95D9C9;
  Tue,  3 Mar 2020 16:35:13 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E7B9D1132A06; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
+ id F294B11329C3; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 17/30] qapi/schema: Reorder classes so related ones are
- together
-Date: Tue,  3 Mar 2020 17:34:52 +0100
-Message-Id: <20200303163505.32041-18-armbru@redhat.com>
+Subject: [PATCH v2 20/30] qapi: Add feature flags to struct members
+Date: Tue,  3 Mar 2020 17:34:55 +0100
+Message-Id: <20200303163505.32041-21-armbru@redhat.com>
 In-Reply-To: <20200303163505.32041-1-armbru@redhat.com>
 References: <20200303163505.32041-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,329 +92,272 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move QAPISchemaAlternateType up some, so that all QAPISchemaFOOType
-are together.  Move QAPISchemaObjectTypeVariants right behind its
-users.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/schema.py | 284 ++++++++++++++++++++---------------------
- 1 file changed, 142 insertions(+), 142 deletions(-)
+ docs/devel/qapi-code-gen.txt            |  4 +++-
+ tests/qapi-schema/doc-good.texi         |  2 ++
+ qapi/introspect.json                    |  6 +++++-
+ scripts/qapi/expr.py                    |  3 ++-
+ scripts/qapi/introspect.py              |  2 +-
+ scripts/qapi/schema.py                  | 25 ++++++++++++++++++++-----
+ tests/qapi-schema/doc-good.json         |  5 ++++-
+ tests/qapi-schema/doc-good.out          |  3 +++
+ tests/qapi-schema/qapi-schema-test.json |  2 +-
+ tests/qapi-schema/qapi-schema-test.out  |  1 +
+ tests/qapi-schema/test-qapi.py          |  7 ++++---
+ 11 files changed, 46 insertions(+), 14 deletions(-)
 
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 9fce78dcad..a1ef1cfd61 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -234,7 +234,9 @@ Syntax:
+                '*features': FEATURES }
+     MEMBERS =3D { MEMBER, ... }
+     MEMBER =3D STRING : TYPE-REF
+-           | STRING : { 'type': TYPE-REF, '*if': COND }
++           | STRING : { 'type': TYPE-REF,
++                        '*if': COND,
++                        '*features': FEATURES }
+=20
+ Member 'struct' names the struct type.
+=20
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.t=
+exi
+index 76b396dae6..7f28fb7a0f 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -132,6 +132,8 @@ Not documented
+ @table @asis
+ @item @code{variant1-feat}
+ a feature
++@item @code{member-feat}
++a member feature
+ @end table
+=20
+ @end deftp
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index da3e176899..b1aabd4cfd 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -206,11 +206,15 @@
+ #           Future extension: if present and non-null, the parameter
+ #           is optional, and defaults to this value.
+ #
++# @features: names of features associated with the member, in no
++#            particular order.  (since 5.0)
++#
+ # Since: 2.5
+ ##
+ { 'struct': 'SchemaInfoObjectMember',
+-  'data': { 'name': 'str', 'type': 'str', '*default': 'any' } }
++  'data': { 'name': 'str', 'type': 'str', '*default': 'any',
+ # @default's type must be null or match @type
++            '*features': [ 'str' ] } }
+=20
+ ##
+ # @SchemaInfoObjectVariant:
+diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+index f9c4448980..2942520399 100644
+--- a/scripts/qapi/expr.py
++++ b/scripts/qapi/expr.py
+@@ -167,8 +167,9 @@ def check_type(value, info, source,
+                        allow_optional=3DTrue, permit_upper=3Dpermit_upper)
+         if c_name(key, False) =3D=3D 'u' or c_name(key, False).startswith(=
+'has_'):
+             raise QAPISemError(info, "%s uses reserved name" % key_source)
+-        check_keys(arg, info, key_source, ['type'], ['if'])
++        check_keys(arg, info, key_source, ['type'], ['if', 'features'])
+         check_if(arg, info, key_source)
++        check_features(arg.get('features'), info)
+         check_type(arg['type'], info, key_source, allow_array=3DTrue)
+=20
+=20
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index a3fa9865db..23652be810 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -173,7 +173,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+         obj =3D {'name': member.name, 'type': self._use_type(member.type)}
+         if member.optional:
+             obj['default'] =3D None
+-        return _make_tree(obj, member.ifcond, None)
++        return _make_tree(obj, member.ifcond, member.features)
+=20
+     def _gen_variants(self, tag_name, variants):
+         return {'tag': tag_name,
 diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 2ab6dc67e4..f0fb0d1c4d 100644
+index 8368745a3e..2fb845303b 100644
 --- a/scripts/qapi/schema.py
 +++ b/scripts/qapi/schema.py
-@@ -444,82 +444,72 @@ class QAPISchemaObjectType(QAPISchemaType):
-             self.members, self.variants)
+@@ -668,18 +668,31 @@ class QAPISchemaFeature(QAPISchemaMember):
 =20
 =20
--class QAPISchemaMember:
--    """ Represents object members, enum members and features """
--    role =3D 'member'
--
--    def __init__(self, name, info, ifcond=3DNone):
--        assert isinstance(name, str)
--        self.name =3D name
--        self.info =3D info
--        self.ifcond =3D ifcond or []
--        self.defined_in =3D None
--
--    def set_defined_in(self, name):
--        assert not self.defined_in
--        self.defined_in =3D name
--
--    def check_clash(self, info, seen):
--        cname =3D c_name(self.name)
--        if cname in seen:
--            raise QAPISemError(
--                info,
--                "%s collides with %s"
--                % (self.describe(info), seen[cname].describe(info)))
--        seen[cname] =3D self
--
--    def describe(self, info):
--        role =3D self.role
--        defined_in =3D self.defined_in
--        assert defined_in
--
--        if defined_in.startswith('q_obj_'):
--            # See QAPISchema._make_implicit_object_type() - reverse the
--            # mapping there to create a nice human-readable description
--            defined_in =3D defined_in[6:]
--            if defined_in.endswith('-arg'):
--                # Implicit type created for a command's dict 'data'
--                assert role =3D=3D 'member'
--                role =3D 'parameter'
--            elif defined_in.endswith('-base'):
--                # Implicit type created for a flat union's dict 'base'
--                role =3D 'base ' + role
--            else:
--                # Implicit type created for a simple union's branch
--                assert defined_in.endswith('-wrapper')
--                # Unreachable and not implemented
--                assert False
--        elif defined_in.endswith('Kind'):
--            # See QAPISchema._make_implicit_enum_type()
--            # Implicit enum created for simple union's branches
--            assert role =3D=3D 'value'
--            role =3D 'branch'
--        elif defined_in !=3D info.defn_name:
--            return "%s '%s' of type '%s'" % (role, self.name, defined_in)
--        return "%s '%s'" % (role, self.name)
--
--
--class QAPISchemaEnumMember(QAPISchemaMember):
--    role =3D 'value'
--
--
--class QAPISchemaFeature(QAPISchemaMember):
--    role =3D 'feature'
--
--
--class QAPISchemaObjectTypeMember(QAPISchemaMember):
+ class QAPISchemaObjectTypeMember(QAPISchemaMember):
 -    def __init__(self, name, info, typ, optional, ifcond=3DNone):
--        super().__init__(name, info, ifcond)
--        assert isinstance(typ, str)
--        assert isinstance(optional, bool)
--        self._type_name =3D typ
--        self.type =3D None
--        self.optional =3D optional
-+class QAPISchemaAlternateType(QAPISchemaType):
-+    meta =3D 'alternate'
-+
-+    def __init__(self, name, info, doc, ifcond, features, variants):
-+        super().__init__(name, info, doc, ifcond, features)
-+        assert isinstance(variants, QAPISchemaObjectTypeVariants)
-+        assert variants.tag_member
-+        variants.set_defined_in(name)
-+        variants.tag_member.set_defined_in(self.name)
-+        self.variants =3D variants
++    def __init__(self, name, info, typ, optional, ifcond=3DNone, features=
+=3DNone):
+         super().__init__(name, info, ifcond)
+         assert isinstance(typ, str)
+         assert isinstance(optional, bool)
++        for f in features or []:
++            assert isinstance(f, QAPISchemaFeature)
++            f.set_defined_in(name)
+         self._type_name =3D typ
+         self.type =3D None
+         self.optional =3D optional
++        self.features =3D features or []
 =20
      def check(self, schema):
--        assert self.defined_in
--        self.type =3D schema.resolve_type(self._type_name, self.info,
--                                        self.describe)
-+        super().check(schema)
-+        self.variants.tag_member.check(schema)
-+        # Not calling self.variants.check_clash(), because there's nothing
-+        # to clash with
-+        self.variants.check(schema, {})
-+        # Alternate branch names have no relation to the tag enum values;
-+        # so we have to check for potential name collisions ourselves.
+         assert self.defined_in
+         self.type =3D schema.resolve_type(self._type_name, self.info,
+                                         self.describe)
 +        seen =3D {}
-+        types_seen =3D {}
-+        for v in self.variants.variants:
-+            v.check_clash(self.info, seen)
-+            qtype =3D v.type.alternate_qtype()
-+            if not qtype:
-+                raise QAPISemError(
-+                    self.info,
-+                    "%s cannot use %s"
-+                    % (v.describe(self.info), v.type.describe()))
-+            conflicting =3D set([qtype])
-+            if qtype =3D=3D 'QTYPE_QSTRING':
-+                if isinstance(v.type, QAPISchemaEnumType):
-+                    for m in v.type.members:
-+                        if m.name in ['on', 'off']:
-+                            conflicting.add('QTYPE_QBOOL')
-+                        if re.match(r'[-+0-9.]', m.name):
-+                            # lazy, could be tightened
-+                            conflicting.add('QTYPE_QNUM')
-+                else:
-+                    conflicting.add('QTYPE_QNUM')
-+                    conflicting.add('QTYPE_QBOOL')
-+            for qt in conflicting:
-+                if qt in types_seen:
-+                    raise QAPISemError(
-+                        self.info,
-+                        "%s can't be distinguished from '%s'"
-+                        % (v.describe(self.info), types_seen[qt]))
-+                types_seen[qt] =3D v.name
++        for f in self.features:
++            f.check_clash(self.info, seen)
 +
-+    def connect_doc(self, doc=3DNone):
++    def connect_doc(self, doc):
 +        super().connect_doc(doc)
-+        doc =3D doc or self.doc
 +        if doc:
-+            for v in self.variants.variants:
-+                doc.connect_member(v)
-+
-+    def c_type(self):
-+        return c_name(self.name) + pointer_suffix
-+
-+    def json_type(self):
-+        return 'value'
-+
-+    def visit(self, visitor):
-+        super().visit(visitor)
-+        visitor.visit_alternate_type(
-+            self.name, self.info, self.ifcond, self.features, self.variant=
-s)
++            for f in self.features:
++                doc.connect_feature(f)
 =20
 =20
- class QAPISchemaObjectTypeVariants:
-@@ -613,6 +603,84 @@ class QAPISchemaObjectTypeVariants:
-             v.type.check_clash(info, dict(seen))
+ class QAPISchemaVariant(QAPISchemaObjectTypeMember):
+@@ -963,7 +976,7 @@ class QAPISchema:
+             name, info, doc, ifcond, features,
+             self._make_enum_members(data, info), prefix))
+=20
+-    def _make_member(self, name, typ, ifcond, info):
++    def _make_member(self, name, typ, ifcond, features, info):
+         optional =3D False
+         if name.startswith('*'):
+             name =3D name[1:]
+@@ -971,10 +984,12 @@ class QAPISchema:
+         if isinstance(typ, list):
+             assert len(typ) =3D=3D 1
+             typ =3D self._make_array_type(typ[0], info)
+-        return QAPISchemaObjectTypeMember(name, info, typ, optional, ifcon=
+d)
++        return QAPISchemaObjectTypeMember(name, info, typ, optional, ifcon=
+d,
++                                          self._make_features(features, in=
+fo))
+=20
+     def _make_members(self, data, info):
+-        return [self._make_member(key, value['type'], value.get('if'), inf=
+o)
++        return [self._make_member(key, value['type'], value.get('if'),
++                                  value.get('features'), info)
+                 for (key, value) in data.items()]
+=20
+     def _def_struct_type(self, expr, info, doc):
+@@ -997,7 +1012,7 @@ class QAPISchema:
+             typ =3D self._make_array_type(typ[0], info)
+         typ =3D self._make_implicit_object_type(
+             typ, info, self.lookup_type(typ),
+-            'wrapper', [self._make_member('data', typ, None, info)])
++            'wrapper', [self._make_member('data', typ, None, None, info)])
+         return QAPISchemaVariant(case, info, typ, ifcond)
+=20
+     def _def_union_type(self, expr, info, doc):
+diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good.j=
+son
+index 457b8b2cdf..ddd89d1233 100644
+--- a/tests/qapi-schema/doc-good.json
++++ b/tests/qapi-schema/doc-good.json
+@@ -78,10 +78,13 @@
+ #
+ # Features:
+ # @variant1-feat: a feature
++# @member-feat: a member feature
+ ##
+ { 'struct': 'Variant1',
+   'features': [ 'variant1-feat' ],
+-  'data': { 'var1': { 'type': 'str', 'if': 'defined(IFSTR)' } } }
++  'data': { 'var1': { 'type': 'str',
++                      'features': [ 'member-feat' ],
++                      'if': 'defined(IFSTR)' } } }
+=20
+ ##
+ # @Variant2:
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.ou=
+t
+index 9bcb2b3e91..6757dd26a2 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -21,6 +21,7 @@ object Base
+ object Variant1
+     member var1: str optional=3DFalse
+         if ['defined(IFSTR)']
++        feature member-feat
+     feature variant1-feat
+ object Variant2
+ object Object
+@@ -135,6 +136,8 @@ Another paragraph (but no @var: line)
+=20
+     feature=3Dvariant1-feat
+ a feature
++    feature=3Dmember-feat
++a member feature
+ doc symbol=3DVariant2
+     body=3D
+=20
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qa=
+pi-schema-test.json
+index fa4f3a15da..f576c337af 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -258,7 +258,7 @@
+   'data': { 'foo': 'int' },
+   'features': [] }
+ { 'struct': 'FeatureStruct1',
+-  'data': { 'foo': 'int' },
++  'data': { 'foo': { 'type': 'int', 'features': [ 'member-feature1' ] } },
+   'features': [ 'feature1' ] }
+ { 'struct': 'FeatureStruct2',
+   'data': { 'foo': 'int' },
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qap=
+i-schema-test.out
+index 1cbd0802b3..cd863ae966 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -359,6 +359,7 @@ object FeatureStruct0
+     member foo: int optional=3DFalse
+ object FeatureStruct1
+     member foo: int optional=3DFalse
++        feature member-feature1
+     feature feature1
+ object FeatureStruct2
+     member foo: int optional=3DFalse
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi.p=
+y
+index 8e09e54edb..f396b471eb 100755
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -55,6 +55,7 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('    member %s: %s optional=3D%s'
+                   % (m.name, m.type.name, m.optional))
+             self._print_if(m.ifcond, 8)
++            self._print_features(m.features, indent=3D8)
+         self._print_variants(variants)
+         self._print_if(ifcond)
+         self._print_features(features)
+@@ -96,11 +97,11 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print('%sif %s' % (' ' * indent, ifcond))
+=20
+     @classmethod
+-    def _print_features(cls, features):
++    def _print_features(cls, features, indent=3D4):
+         if features:
+             for f in features:
+-                print('    feature %s' % f.name)
+-                cls._print_if(f.ifcond, 8)
++                print('%sfeature %s' % (' ' * indent, f.name))
++                cls._print_if(f.ifcond, indent + 4)
 =20
 =20
-+class QAPISchemaMember:
-+    """ Represents object members, enum members and features """
-+    role =3D 'member'
-+
-+    def __init__(self, name, info, ifcond=3DNone):
-+        assert isinstance(name, str)
-+        self.name =3D name
-+        self.info =3D info
-+        self.ifcond =3D ifcond or []
-+        self.defined_in =3D None
-+
-+    def set_defined_in(self, name):
-+        assert not self.defined_in
-+        self.defined_in =3D name
-+
-+    def check_clash(self, info, seen):
-+        cname =3D c_name(self.name)
-+        if cname in seen:
-+            raise QAPISemError(
-+                info,
-+                "%s collides with %s"
-+                % (self.describe(info), seen[cname].describe(info)))
-+        seen[cname] =3D self
-+
-+    def describe(self, info):
-+        role =3D self.role
-+        defined_in =3D self.defined_in
-+        assert defined_in
-+
-+        if defined_in.startswith('q_obj_'):
-+            # See QAPISchema._make_implicit_object_type() - reverse the
-+            # mapping there to create a nice human-readable description
-+            defined_in =3D defined_in[6:]
-+            if defined_in.endswith('-arg'):
-+                # Implicit type created for a command's dict 'data'
-+                assert role =3D=3D 'member'
-+                role =3D 'parameter'
-+            elif defined_in.endswith('-base'):
-+                # Implicit type created for a flat union's dict 'base'
-+                role =3D 'base ' + role
-+            else:
-+                # Implicit type created for a simple union's branch
-+                assert defined_in.endswith('-wrapper')
-+                # Unreachable and not implemented
-+                assert False
-+        elif defined_in.endswith('Kind'):
-+            # See QAPISchema._make_implicit_enum_type()
-+            # Implicit enum created for simple union's branches
-+            assert role =3D=3D 'value'
-+            role =3D 'branch'
-+        elif defined_in !=3D info.defn_name:
-+            return "%s '%s' of type '%s'" % (role, self.name, defined_in)
-+        return "%s '%s'" % (role, self.name)
-+
-+
-+class QAPISchemaEnumMember(QAPISchemaMember):
-+    role =3D 'value'
-+
-+
-+class QAPISchemaFeature(QAPISchemaMember):
-+    role =3D 'feature'
-+
-+
-+class QAPISchemaObjectTypeMember(QAPISchemaMember):
-+    def __init__(self, name, info, typ, optional, ifcond=3DNone):
-+        super().__init__(name, info, ifcond)
-+        assert isinstance(typ, str)
-+        assert isinstance(optional, bool)
-+        self._type_name =3D typ
-+        self.type =3D None
-+        self.optional =3D optional
-+
-+    def check(self, schema):
-+        assert self.defined_in
-+        self.type =3D schema.resolve_type(self._type_name, self.info,
-+                                        self.describe)
-+
-+
- class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
-     role =3D 'branch'
-=20
-@@ -621,74 +689,6 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectType=
-Member):
-                                             False, ifcond)
-=20
-=20
--class QAPISchemaAlternateType(QAPISchemaType):
--    meta =3D 'alternate'
--
--    def __init__(self, name, info, doc, ifcond, features, variants):
--        super().__init__(name, info, doc, ifcond, features)
--        assert isinstance(variants, QAPISchemaObjectTypeVariants)
--        assert variants.tag_member
--        variants.set_defined_in(name)
--        variants.tag_member.set_defined_in(self.name)
--        self.variants =3D variants
--
--    def check(self, schema):
--        super().check(schema)
--        self.variants.tag_member.check(schema)
--        # Not calling self.variants.check_clash(), because there's nothing
--        # to clash with
--        self.variants.check(schema, {})
--        # Alternate branch names have no relation to the tag enum values;
--        # so we have to check for potential name collisions ourselves.
--        seen =3D {}
--        types_seen =3D {}
--        for v in self.variants.variants:
--            v.check_clash(self.info, seen)
--            qtype =3D v.type.alternate_qtype()
--            if not qtype:
--                raise QAPISemError(
--                    self.info,
--                    "%s cannot use %s"
--                    % (v.describe(self.info), v.type.describe()))
--            conflicting =3D set([qtype])
--            if qtype =3D=3D 'QTYPE_QSTRING':
--                if isinstance(v.type, QAPISchemaEnumType):
--                    for m in v.type.members:
--                        if m.name in ['on', 'off']:
--                            conflicting.add('QTYPE_QBOOL')
--                        if re.match(r'[-+0-9.]', m.name):
--                            # lazy, could be tightened
--                            conflicting.add('QTYPE_QNUM')
--                else:
--                    conflicting.add('QTYPE_QNUM')
--                    conflicting.add('QTYPE_QBOOL')
--            for qt in conflicting:
--                if qt in types_seen:
--                    raise QAPISemError(
--                        self.info,
--                        "%s can't be distinguished from '%s'"
--                        % (v.describe(self.info), types_seen[qt]))
--                types_seen[qt] =3D v.name
--
--    def connect_doc(self, doc=3DNone):
--        super().connect_doc(doc)
--        doc =3D doc or self.doc
--        if doc:
--            for v in self.variants.variants:
--                doc.connect_member(v)
--
--    def c_type(self):
--        return c_name(self.name) + pointer_suffix
--
--    def json_type(self):
--        return 'value'
--
--    def visit(self, visitor):
--        super().visit(visitor)
--        visitor.visit_alternate_type(
--            self.name, self.info, self.ifcond, self.features, self.variant=
-s)
--
--
- class QAPISchemaCommand(QAPISchemaEntity):
-     meta =3D 'command'
-=20
+ def test_frontend(fname):
 --=20
 2.21.1
 
