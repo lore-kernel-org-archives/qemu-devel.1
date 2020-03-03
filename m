@@ -2,80 +2,71 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDA0C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCA9C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0708F20848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:57:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BkXyGrE5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0708F20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A354420842
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:13:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A354420842
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tarent.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j976x-0007BS-7t
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 07:57:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49506)
+	id 1j97MC-0003dY-Jq
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 08:13:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1j975r-00067P-T5
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:56:16 -0500
+ (envelope-from <t.glaser@tarent.de>) id 1j97LF-0003E4-QU
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1j975q-0007oW-M1
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:56:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21642
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <t.glaser@tarent.de>) id 1j97LE-000846-Jt
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:12:09 -0500
+Received: from lixid.tarent.de ([193.107.123.118]:42918 helo=mail.lixid.net)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1j975q-0007o9-IC
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:56:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583240173;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RsQTum6+umlAP1I+ihQSQbM7D/GXXmIi9gacgAzS8ys=;
- b=BkXyGrE5GmfiaHz4rQsXTI2v/m6+N7foXaHXZLm/MGwkqN+rB7HwYDd0h5ap4ZsHq9gHwt
- Y/DjaRBvwpAhIuXSm5F79GNZu3z0tfNiB5iZfpq8fjKQloVap9XtVOd+OWMjFlRzRDoVt0
- AC2SPJPTQH9YfSjP1Swz4/BE4/RLYiw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-DaMS8oAhOZaqStqx04lt4A-1; Tue, 03 Mar 2020 07:56:11 -0500
-X-MC-Unique: DaMS8oAhOZaqStqx04lt4A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <t.glaser@tarent.de>) id 1j97LD-0007ul-57
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:12:08 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.lixid.net (MTA) with ESMTP id C3643140C1E;
+ Tue,  3 Mar 2020 14:12:04 +0100 (CET)
+Received: from mail.lixid.net ([127.0.0.1])
+ by localhost (mail.lixid.net [127.0.0.1]) (MFA, port 10024) with LMTP
+ id 1HAAvd8im_XG; Tue,  3 Mar 2020 14:12:04 +0100 (CET)
+Received: from tglase.lan.tarent.de (tglase.lan.tarent.de [172.26.3.108])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D0BE1005512;
- Tue,  3 Mar 2020 12:56:10 +0000 (UTC)
-Received: from redhat.com (ovpn-116-72.ams2.redhat.com [10.36.116.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 255325D9C9;
- Tue,  3 Mar 2020 12:56:10 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH] configure: change a typo in zstd config
-In-Reply-To: <20200303124925.28079-1-dplotnikov@virtuozzo.com> (Denis
- Plotnikov's message of "Tue, 3 Mar 2020 15:49:25 +0300")
-References: <20200303124925.28079-1-dplotnikov@virtuozzo.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 03 Mar 2020 13:56:07 +0100
-Message-ID: <878skhvbq0.fsf@secure.laptop>
+ by mail.lixid.net (MTA) with ESMTPS id A91461403F7;
+ Tue,  3 Mar 2020 14:12:04 +0100 (CET)
+Received: by tglase.lan.tarent.de (Postfix, from userid 2339)
+ id 5EC63220D95; Tue,  3 Mar 2020 14:12:04 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by tglase.lan.tarent.de (Postfix) with ESMTP id 4356E220AE3;
+ Tue,  3 Mar 2020 14:12:04 +0100 (CET)
+Date: Tue, 3 Mar 2020 14:12:04 +0100 (CET)
+From: Thorsten Glaser <t.glaser@tarent.de>
+X-X-Sender: tglase@tglase.lan.tarent.de
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: qemu-system-x86_64: warning: Unknown X11 keycode mapping '<null>'.
+In-Reply-To: <20200303104431.GB1773352@redhat.com>
+Message-ID: <alpine.DEB.2.22.394.2003031410520.18659@tglase.lan.tarent.de>
+References: <alpine.DEB.2.22.394.2003020002570.23029@tglase.lan.tarent.de>
+ <20200302102841.GD1679990@redhat.com>
+ <alpine.DEB.2.22.394.2003021336010.14371@tglase.lan.tarent.de>
+ <20200303104431.GB1773352@redhat.com>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+Content-Language: de-DE-1901
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 193.107.123.118
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,40 +78,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Denis Plotnikov <dplotnikov@virtuozzo.com> wrote:
-> Package manager --exist flag is used instead of --exists.
-> Fix it.
->
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On Tue, 3 Mar 2020, Daniel P. Berrang=C3=A9 wrote:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+> AFAICT, this is not the case. On both my Fedora & Debian installs,
+> x11vnc is just a binary that attaches to an existing X11 server
 
-queued.
+Huh, weird. Perhaps this changed over the years and distro releases.
 
-thanks.
+>   $ ls -al /usr/bin/vncserver
 
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index 7b373bc0bb..caa65f5883 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2464,7 +2464,7 @@ fi
->  # zstd check
-> =20
->  if test "$zstd" !=3D "no" ; then
-> -    if $pkg_config --exist libzstd ; then
-> +    if $pkg_config --exists libzstd ; then
->          zstd_cflags=3D"$($pkg_config --cflags libzstd)"
->          zstd_libs=3D"$($pkg_config --libs libzstd)"
->          LIBS=3D"$zstd_libs $LIBS"
+$ realpath $(which vncserver)
+/usr/bin/tightvncserver
 
+This does surprise me, because I also have x11vnc installed and
+vaguely remember using it in standalone server mode for a while.
+
+But, yes, tightvncserver 1:1.3.9-9.1 is also installed, so I=E2=80=99m
+apparently using that.
+
+bye,
+//mirabilos
+--=20
+tarent solutions GmbH
+Rochusstra=C3=9Fe 2-4, D-53123 Bonn =E2=80=A2 http://www.tarent.de/
+Tel: +49 228 54881-393 =E2=80=A2 Fax: +49 228 54881-235
+HRB 5168 (AG Bonn) =E2=80=A2 USt-ID (VAT): DE122264941
+Gesch=C3=A4ftsf=C3=BChrer: Dr. Stefan Barth, Kai Ebenrett, Boris Esser, Ale=
+xander Steeg
+
+**********
+
+Mit der tarent Academy bieten wir auch Trainings und Schulungen in den
+Bereichen Softwareentwicklung, Agiles Arbeiten und Zukunftstechnologien an.
+
+Besuchen Sie uns auf www.tarent.de/academy. Wir freuen uns auf Ihren Kontak=
+t.
+
+**********
 
