@@ -2,62 +2,114 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E96C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 725E3C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:57:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13FB20866
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:56:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13FB20866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 502F3214D8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:57:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502F3214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94IM-0008M0-Rv
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:56:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50298)
+	id 1j94If-0000P8-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:57:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j94He-0007Tl-4D
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:56:15 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j94Hs-0007nq-Iz
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:56:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j94Hc-000895-Ci
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:56:13 -0500
-Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:52418)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j94Hc-00085M-6k
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:56:12 -0500
-Received: from player698.ha.ovh.net (unknown [10.110.208.168])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id BE43F22909F
- for <qemu-devel@nongnu.org>; Tue,  3 Mar 2020 10:56:09 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player698.ha.ovh.net (Postfix) with ESMTPSA id 74A7BFF61C1F;
- Tue,  3 Mar 2020 09:55:48 +0000 (UTC)
-Date: Tue, 3 Mar 2020 10:55:37 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v7 14/17] spapr: Don't attempt to clamp RMA to VRMA
- constraint
-Message-ID: <20200303105537.2c7ece09@bahia.home>
-In-Reply-To: <20200303034351.333043-15-david@gibson.dropbear.id.au>
-References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-15-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1j94Hr-0008Gr-D0
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:56:28 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:56295)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j94Hr-0008Fy-4i; Tue, 03 Mar 2020 04:56:27 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MkpKR-1jnacb282Z-00mKKs; Tue, 03 Mar 2020 10:56:14 +0100
+Subject: Re: [PATCH] hw/unicore32/puv3: Simplify puv3_soc_init()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200221162325.28194-1-philmd@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <87fde6ef-5579-3539-a35a-ecc3b1661175@vivier.eu>
+Date: Tue, 3 Mar 2020 10:56:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3006434229036947942
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddtiedgudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <20200221162325.28194-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:TVTuFw2zLrsJaTxIWKVSErrc/6nxwFFmVyfj/1T15lIpTsnUF4f
+ v8pTO62eMWOXiCf0/jo1fG3LNXfKnnhr9HcDk1LKdD2tBRjBb2w3O3aC6xkoLEk9mBKYZLx
+ oPTiuQmREJKBuCvigDVXd1NlqNWiFtJMKFvkF8SMBwZmVKj78zTpjFSQM9p5Xb7tUHGZjNj
+ lOSx0sYNnHpHJ7UQh0GJQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CE6enpv29Fo=:sMYSLgKPZCbUvelVqX0wj3
+ 9URyUDftm1OKIK9ky1dI+w88OWmcMLbIWh7c0OnPx14LP0rYfk7FQvFPgkoClC0B2UfU2RtUT
+ WQTKLlBzsz/jQ9c952e6jtNzlTqlnzxVu+cQ01ru1TJr2/UzG/sflLJEHBq353tN334BE0ITs
+ RXh5JUA7ZY3g1fJ/KaBORyGKT+qO/IU/nkyDkXe/UsmlODMBbdqznSAt54XzraqAaEW9Ef7hc
+ 7E9pwczKPQsk5cFdgXZC3H9JAN64IGrGLb//dZIk+sCzscqMqvENxvrFCeEvtmQDPGJOYbdnO
+ GxXswSbT9Nc7MD1rMBHTryfZLGfgZu0IBYquJjsA9lJaw37sh9Os9l52UJFJkL2mxIsttB1fv
+ Y9OzISRzaDp7NEPtHSVEkqNJZ/Kb715P/me2vioyrGfTrU/Qw60Ub+iUYyixCNdQnGEI5wm1h
+ jnlTcLlea4zPbVJcbv5aTS+UoMyMPk3HeJmskMnyAVMdZL7D9MlZhMKta47QwZk7QkLjVqfdL
+ lKHpoRD64YU7vBn6GiJGNxjujoBof2R+oFNAJdw2/ew3a5SF5T1XiF9cj8eQDvM4gJuGeCZzt
+ AGmIhze3j/oR6Jq+wAK02OK2rJWrgZGLTxfz9xBfWvoARdTzP7RR1LXdH13xzDqogGzjM00x2
+ NjlwGlHv+sewS9xxTCK2HLC3mqkpuHaoI99AhDDzffB6XDtO7IphvuawAwCEUDbj4Q16bDaKu
+ 8lIjHWQX0/dQD65gHZ0f2hdk7EcGAzXDJTX+Ctdw5RVBN6AOeh3lXExggplXzErjj8ktDzr8T
+ TfLlNlwgy4Z3P11EnmBq9sANkM0cCqKlRVioGTNTDBNiWOlsT77gNnEe+Rp6knleNPb5y4x
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.104.253
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,185 +121,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
- aik@ozlabs.ru, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-ppc@nongnu.org, clg@kaod.org, Igor Mammedov <imammedo@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
+Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  3 Mar 2020 14:43:48 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> The Real Mode Area (RMA) is the part of memory which a guest can access
-> when in real (MMU off) mode.  Of course, for a guest under KVM, the MMU
-> isn't really turned off, it's just in a special translation mode - Virtual
-> Real Mode Area (VRMA) - which looks like real mode in guest mode.
+Le 21/02/2020 à 17:23, Philippe Mathieu-Daudé a écrit :
+> Since commit d8ed887bdc, the puv3_intc_cpu_handler handler takes
+> a pointer to UniCore32CPU in its opaque argument.  Directly pass
+> the cpu pointer.
 > 
-> The mechanics of how this works when using the hash MMU (HPT) put a
-> constraint on the size of the RMA, which depends on the size of the
-> HPT.  So, the latter part of spapr_setup_hpt_and_vrma() clamps the RMA
-> we advertise to the guest based on this VRMA limit.
-> 
-> There are several things wrong with this:
->  1) spapr_setup_hpt_and_vrma() doesn't actually clamp, it takes the minimum
->     of Node 0 memory size and the VRMA limit.  That will *often* work the
->     same as clamping, but there can be other constraints on RMA size which
->     supersede Node 0 memory size.  We have real bugs caused by this
->     (currently worked around in the guest kernel)
->  2) Some callers of spapr_setup_hpt_and_vrma() are in a situation where
->     we're past the point that we can actually advertise an RMA limit to the
->     guest
->  3) But most fundamentally, the VRMA limit depends on host configuration
->     (page size) which shouldn't be visible to the guest, but this partially
->     exposes it.  This can cause problems with migration in certain edge
->     cases, although we will mostly get away with it.
-> 
-> In practice, this clamping is almost never applied anyway.  With 64kiB
-> pages and the normal rules for sizing of the HPT, the theoretical VRMA
-> limit will be 4x(guest memory size) and so never hit.  It will hit with
-> 4kiB pages, where it will be (guest memory size)/4.  However all mainstream
-> distro kernels for POWER have used a 64kiB page size for at least 10 years.
-> 
-> So, simply replace this logic with a check that the RMA we've calculated
-> based only on guest visible configuration will fit within the host implied
-> VRMA limit.  This can break if running HPT guests on a host kernel with
-> 4kiB page size.  As noted that's very rare.  There also exist several
-> possible workarounds:
->   * Change the host kernel to use 64kiB pages
->   * Use radix MMU (RPT) guests instead of HPT
->   * Use 64kiB hugepages on the host to back guest memory
->   * Increase the guest memory size so that the RMA hits one of the fixed
->     limits before the RMA limit.  This is relatively easy on POWER8 which
->     has a 16GiB limit, harder on POWER9 which has a 1TiB limit.
->   * Use a guest NUMA configuration which artificially constrains the RMA
->     within the VRMA limit (the RMA must always fit within Node 0).
-> 
-> Previously, on KVM, we also temporarily reduced the rma_size to 256M so
-> that the we'd load the kernel and initrd safely, regardless of the VRMA
-> limit.  This was a) confusing, b) could significantly limit the size of
-> images we could load and c) introduced a behavioural difference between
-> KVM and TCG.  So we remove that as well.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c         | 28 ++++++++++------------------
->  hw/ppc/spapr_hcall.c   |  4 ++--
->  include/hw/ppc/spapr.h |  3 +--
->  3 files changed, 13 insertions(+), 22 deletions(-)
+>  hw/unicore32/puv3.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 18bf4bc3de..ef7667455c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1569,7 +1569,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
->      spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
+> diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+> index 7e933de228..eec7f561eb 100644
+> --- a/hw/unicore32/puv3.c
+> +++ b/hw/unicore32/puv3.c
+> @@ -48,7 +48,7 @@ static void puv3_intc_cpu_handler(void *opaque, int irq, int level)
+>      }
 >  }
 >  
-> -void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
-> +void spapr_setup_hpt(SpaprMachineState *spapr)
+> -static void puv3_soc_init(CPUUniCore32State *env)
+> +static void puv3_soc_init(UniCore32CPU *cpu)
 >  {
->      int hpt_shift;
+>      qemu_irq cpu_intc, irqs[PUV3_IRQS_NR];
+>      DeviceState *dev;
+> @@ -56,8 +56,7 @@ static void puv3_soc_init(CPUUniCore32State *env)
+>      int i;
 >  
-> @@ -1585,10 +1585,16 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
->      }
->      spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
+>      /* Initialize interrupt controller */
+> -    cpu_intc = qemu_allocate_irq(puv3_intc_cpu_handler,
+> -                                 env_archcpu(env), 0);
+> +    cpu_intc = qemu_allocate_irq(puv3_intc_cpu_handler, cpu, 0);
+>      dev = sysbus_create_simple("puv3_intc", PUV3_INTC_BASE, cpu_intc);
+>      for (i = 0; i < PUV3_IRQS_NR; i++) {
+>          irqs[i] = qdev_get_gpio_in(dev, i);
+> @@ -131,7 +130,7 @@ static void puv3_init(MachineState *machine)
+>      cpu = UNICORE32_CPU(cpu_create(machine->cpu_type));
+>      env = &cpu->env;
 >  
-> -    if (spapr->vrma_adjust) {
-> +    if (kvm_enabled()) {
->          hwaddr vrma_limit = kvmppc_vrma_limit(spapr->htab_shift);
->  
-> -        spapr->rma_size = MIN(spapr_node0_size(MACHINE(spapr)), vrma_limit);
-> +        /* Check our RMA fits in the possible VRMA */
-> +        if (vrma_limit < spapr->rma_size) {
-> +            error_report("Unable to create %" HWADDR_PRIu
-> +                         "MiB RMA (VRMA only allows %" HWADDR_PRIu "MiB",
-> +                         spapr->rma_size / MiB, vrma_limit / MiB);
-> +            exit(EXIT_FAILURE);
-> +        }
->      }
+> -    puv3_soc_init(env);
+> +    puv3_soc_init(cpu);
+>      puv3_board_init(env, ram_size);
+>      puv3_load_kernel(kernel_filename);
 >  }
->  
-> @@ -1628,7 +1634,7 @@ static void spapr_machine_reset(MachineState *machine)
->          spapr->patb_entry = PATE1_GR;
->          spapr_set_all_lpcrs(LPCR_HR | LPCR_UPRT, LPCR_HR | LPCR_UPRT);
->      } else {
-> -        spapr_setup_hpt_and_vrma(spapr);
-> +        spapr_setup_hpt(spapr);
->      }
->  
->      qemu_devices_reset();
-> @@ -2695,20 +2701,6 @@ static void spapr_machine_init(MachineState *machine)
->  
->      spapr->rma_size = node0_size;
->  
-> -    /* With KVM, we don't actually know whether KVM supports an
-> -     * unbounded RMA (PR KVM) or is limited by the hash table size
-> -     * (HV KVM using VRMA), so we always assume the latter
-> -     *
-> -     * In that case, we also limit the initial allocations for RTAS
-> -     * etc... to 256M since we have no way to know what the VRMA size
-> -     * is going to be as it depends on the size of the hash table
-> -     * which isn't determined yet.
-> -     */
-> -    if (kvm_enabled()) {
-> -        spapr->vrma_adjust = 1;
-> -        spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
-> -    }
-> -
->      /* Actually we don't support unbounded RMA anymore since we added
->       * proper emulation of HV mode. The max we can get is 16G which
->       * also happens to be what we configure for PAPR mode so make sure
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index c2b3286625..40c86e91eb 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1458,7 +1458,7 @@ static void spapr_check_setup_free_hpt(SpaprMachineState *spapr,
->          spapr_free_hpt(spapr);
->      } else if (!(patbe_new & PATE1_GR)) {
->          /* RADIX->HASH || NOTHING->HASH : Allocate HPT */
-> -        spapr_setup_hpt_and_vrma(spapr);
-> +        spapr_setup_hpt(spapr);
->      }
->      return;
->  }
-> @@ -1845,7 +1845,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->           * (because the guest isn't going to use radix) then set it up here. */
->          if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
->              /* legacy hash or new hash: */
-> -            spapr_setup_hpt_and_vrma(spapr);
-> +            spapr_setup_hpt(spapr);
->          }
->  
->          if (fdt_bufsize < sizeof(hdr)) {
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index a4216935a1..90dbc55931 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -156,7 +156,6 @@ struct SpaprMachineState {
->      SpaprPendingHpt *pending_hpt; /* in-progress resize */
->  
->      hwaddr rma_size;
-> -    int vrma_adjust;
->      uint32_t fdt_size;
->      uint32_t fdt_initial_size;
->      void *fdt_blob;
-> @@ -795,7 +794,7 @@ void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space);
->  void spapr_events_init(SpaprMachineState *sm);
->  void spapr_dt_events(SpaprMachineState *sm, void *fdt);
->  void close_htab_fd(SpaprMachineState *spapr);
-> -void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
-> +void spapr_setup_hpt(SpaprMachineState *spapr);
->  void spapr_free_hpt(SpaprMachineState *spapr);
->  SpaprTceTable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
->  void spapr_tce_table_enable(SpaprTceTable *tcet,
+> 
 
+I think you can remove totally env as puv3_board_init() doesn't use it.
+
+Thanks,
+Laurent
 
