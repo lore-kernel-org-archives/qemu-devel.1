@@ -2,62 +2,82 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E26C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66998C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D432520842
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:58:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D432520842
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3829E2146E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:08:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EOt/j/xy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3829E2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j93O9-0005Zf-UT
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 03:58:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42247)
+	id 1j93X2-00005o-AT
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:08:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j93NX-00054z-Gb
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:58:16 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1j93WK-00085C-5b
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:07:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j93NW-0005CF-85
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:58:15 -0500
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:52320)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j93NW-0005Be-1Z
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:58:14 -0500
-Received: from player693.ha.ovh.net (unknown [10.110.171.215])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 9D95D86A16
- for <qemu-devel@nongnu.org>; Tue,  3 Mar 2020 09:58:11 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player693.ha.ovh.net (Postfix) with ESMTPSA id 5DDE0FF30B25;
- Tue,  3 Mar 2020 08:57:51 +0000 (UTC)
-Date: Tue, 3 Mar 2020 09:57:43 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v7 10/17] target/ppc: Only calculate RMLS derived RMA
- limit on demand
-Message-ID: <20200303095743.2cf29937@bahia.home>
-In-Reply-To: <20200303034351.333043-11-david@gibson.dropbear.id.au>
-References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-11-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <peter.maydell@linaro.org>) id 1j93WI-00009P-Vc
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:07:19 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:36221)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1j93WI-000091-Qn
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:07:18 -0500
+Received: by mail-ot1-x334.google.com with SMTP id j14so2272641otq.3
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 01:07:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UazVJEFIdb5jexGclQBbRjblNtN3xTwRHhe8i4ijzmk=;
+ b=EOt/j/xyFhTnk3MYsWmBoGfXAG0nNfVWwwhD888PI7UV3xVf06Gkm5mY+f9z1gmEGp
+ qJQ1eZRJy3YznNbCXWUzdrWpSduzokpRcr3dwkb9TRcZ+MLL5GgiV9DYmXbZd/usXtiq
+ /6G94VShL3lu17ZecxmOgSZ7uWLbGrUOFwlP4r6AeMprwF+X9Y7TWtLBLfspZ7LyWXJl
+ 6DBke9FJvW6MstOs0KFp4PwtifKDbe/Y3KPjlopKoAgHPDCvRp/MLy0Mvz3nkArZ2ERM
+ 16Icqb8t46h5gnGWoZHfopYFY2lMGpur5gW5VgwnY/kCa2HmvDJN7hQ4kWj8tMs6fQlt
+ +U0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UazVJEFIdb5jexGclQBbRjblNtN3xTwRHhe8i4ijzmk=;
+ b=Aeam+8C+N3Eka8qmBt2PcqGyqb5eeN7kZWGKdzpvmDrqg8TVTCIvPIMREv8iIZurb2
+ YORRL23iQ0waeYJ1Bn6gcGvvbqRnk/HbymN0lPr/Dlcdv/9zB6wsiskIgYvcsJOMGRrP
+ rGq1SCSHW5THkXMDUKrIL488Y7E/j0dsp0GYcbW87JiKgcozVVhBeklTKo2yHaXAeDjV
+ Bh8I1P6Oa6cUIxIOyl9hi3IjQr3zfm5UaJdbHx13h1E5U0Q0qVIYdKW1cnW6kEI4dYWn
+ PUd2QYm3ukAvUbQHJR/WqWgrq3aYeNnQod1R3bp2Lm+YiysBG8rIPpw2Wug0eA2Y1ssB
+ hSdA==
+X-Gm-Message-State: ANhLgQ0Q/SD7BBO3HKVo1H+2bNOsfvlGIxNLH/INvIvwZRLXHUg720nd
+ YngGbqnCgMAkHQJoXqXSAA4QM6PE+rCQk3MS4lYY8A==
+X-Google-Smtp-Source: ADFU+vsBiHYtk10inaC5d9lk6KRTscWlCiLMJwvYvFRmpM2kkt+d6iB1SOo88bjfIPOXFBFM7lhsnfQiO+u0/rdejFA=
+X-Received: by 2002:a9d:75ca:: with SMTP id c10mr2446793otl.97.1583226437866; 
+ Tue, 03 Mar 2020 01:07:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2027464261083896294
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddthedguddvgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelfedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.73.241
+References: <MN2PR02MB5935836FBB0AC02F56278FE3CAEA0@MN2PR02MB5935.namprd02.prod.outlook.com>
+ <CAFEAcA_iXuc_r=wJWhHjZ1ROvfCwsxbU0yyiwJpqaxDfFtfmbQ@mail.gmail.com>
+ <MN2PR02MB5935FCFCAB2C3CECE898B290CAE80@MN2PR02MB5935.namprd02.prod.outlook.com>
+ <CAFEAcA9h29YvbXSZxq4xFg_NbiYr-amqF9QGBS8nBvhvLi1WhQ@mail.gmail.com>
+ <MN2PR02MB5935222A7AAD7518BD4F5DF8CAE40@MN2PR02MB5935.namprd02.prod.outlook.com>
+In-Reply-To: <MN2PR02MB5935222A7AAD7518BD4F5DF8CAE40@MN2PR02MB5935.namprd02.prod.outlook.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Mar 2020 09:07:06 +0000
+Message-ID: <CAFEAcA9esoLLxeG_oe9d=cSKtJGhyVytLdPNTxXJOT7XJ0dsxw@mail.gmail.com>
+Subject: Re: Implementing IOMMU support for SDHCI
+To: Sai Pavan Boddu <saipava@xilinx.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,87 +89,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
- aik@ozlabs.ru, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-ppc@nongnu.org, clg@kaod.org, Igor Mammedov <imammedo@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Edgar Iglesias <edgari@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  3 Mar 2020 14:43:44 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Tue, 3 Mar 2020 at 06:05, Sai Pavan Boddu <saipava@xilinx.com> wrote:
+> > From: Peter Maydell <peter.maydell@linaro.org>
+> > I don't think any of those scenarios are ones where you'd want the board
+> > model to be passing in a MemTxAttr at device creation time.
+> [Sai Pavan Boddu] Yeah ok, this makes sense. Only things which me might need to configure are master id's and trust zone settings if possible.
+> May be we can set them at soc emulation level i.e "hw/arm/xlnx-zynqmp.c"
 
-> When the LPCR is written, we update the env->rmls field with the RMA limit
-> it implies.  Simplify things by just calculating the value directly from
-> the LPCR value when we need it.
-> 
-> It's possible this is a little slower, but it's unlikely to be significant,
-> since this is only for real mode accesses in a translation configuration
-> that's not used very often, and the whole thing is behind the qemu TLB
-> anyway.  Therefore, keeping the number of state variables down and not
-> having to worry about making sure it's always in sync seems the better
-> option.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+For that kind of thing, a good guide is to look at what the
+hardware does. If the device inside the SoC just has
+a hardcoded master ID, hardcode it in the QEMU device
+model. If it has some signal lines that the SoC has to tie
+off to 1 or 0 to configure it, implement that as a QEMU
+device property (usually with the same name and basic
+semantics as the config signal lines).
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  target/ppc/cpu.h        | 1 -
->  target/ppc/mmu-hash64.c | 9 ++++++---
->  2 files changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 8077fdb068..f9871b1233 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1046,7 +1046,6 @@ struct CPUPPCState {
->      uint64_t insns_flags2;
->  #if defined(TARGET_PPC64)
->      ppc_slb_t vrma_slb;
-> -    target_ulong rmls;
->  #endif
->  
->      int error_code;
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index fcccaabb88..4fd7b7ee74 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -837,8 +837,10 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
->  
->              goto skip_slb_search;
->          } else {
-> +            target_ulong limit = rmls_limit(cpu);
-> +
->              /* Emulated old-style RMO mode, bounds check against RMLS */
-> -            if (raddr >= env->rmls) {
-> +            if (raddr >= limit) {
->                  if (rwx == 2) {
->                      ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
->                  } else {
-> @@ -1000,8 +1002,10 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
->                  return -1;
->              }
->          } else {
-> +            target_ulong limit = rmls_limit(cpu);
-> +
->              /* Emulated old-style RMO mode, bounds check against RMLS */
-> -            if (raddr >= env->rmls) {
-> +            if (raddr >= limit) {
->                  return -1;
->              }
->              return raddr | env->spr[SPR_RMOR];
-> @@ -1091,7 +1095,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
->      CPUPPCState *env = &cpu->env;
->  
->      env->spr[SPR_LPCR] = val & pcc->lpcr_mask;
-> -    env->rmls = rmls_limit(cpu);
->      ppc_hash64_update_vrma(cpu);
->  }
->  
-
+thanks
+-- PMM
 
