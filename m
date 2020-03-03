@@ -2,65 +2,88 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E283DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E022C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A72A224673
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:43:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2216524673
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=jiaxun.yang@flygoat.com header.b="a9dUN8cI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72A224673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sdVKJ7RY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2216524673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8veY-0007Oh-Qj
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:43:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44190)
+	id 1j8vlF-0002ba-6f
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:50:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1j8vdr-0006xU-F9
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:42:36 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vk5-0000w2-RR
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jiaxun.yang@flygoat.com>) id 1j8vdq-0002dQ-9T
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:42:35 -0500
-Received: from sender3-op-o12.zoho.com.cn ([124.251.121.243]:17994)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1j8vdp-0002Zr-Hu
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:42:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1583196117; 
- s=mail; d=flygoat.com; i=jiaxun.yang@flygoat.com;
- h=From:To:Cc:Message-ID:Subject:Date:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type;
- bh=ip62UxsLoBVBHDGOYwMikMPn9kC1/8udU8YlQmWN06Y=;
- b=a9dUN8cIVHJr93jwpvRPcnrQ9cGXVEwlfXY6VfviBvYPxEyR9EzOqw6VhBQwtoM1
- BNJyWC8ocuhwrNFSKLvf8XbR4u5BLjVwJr+HLcDQg6Isx8DOi86ghyUJhdldDZsFFv1
- QGgB2WA9t91tcKLDuVyvaibMXdKAqKAO7O5nz0x4=
-Received: from localhost.localdomain (39.155.141.144 [39.155.141.144]) by
- mx.zoho.com.cn with SMTPS id 1583196112368648.408430311324;
- Tue, 3 Mar 2020 08:41:52 +0800 (CST)
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20200303004137.1099502-1-jiaxun.yang@flygoat.com>
-Subject: [PATCH v1] mips/mips_malta: Allow more than 2G RAM
-Date: Tue,  3 Mar 2020 08:41:37 +0800
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200228032613.1049955-1-jiaxun.yang@flygoat.com>
-References: <20200228032613.1049955-1-jiaxun.yang@flygoat.com>
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vk4-00045j-S1
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:01 -0500
+Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:40048)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1j8vk4-00045V-Mm
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:00 -0500
+Received: by mail-pl1-x634.google.com with SMTP id y1so503447plp.7
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=11a7NIMhd3gpRKr3KvBv9bMb/iOBc4dnUF9RcuuDB/U=;
+ b=sdVKJ7RYKhbzocdUPeMdVkhOGAgNPqFTRxSayEleVtT77FgOH/bl2KLRBVT/FlXMxI
+ 9KxQQzB3WSjL9gZUD6pVma+Daow8iv7Ptuc5EEpvxNz6fQl8VV2cmoBHJO5RJYehVy15
+ U4+T2UuFkgxOSR1hsXhrihSG/6eUxDUw5V4sE2Iwwhwku8sP8MtsivW/rXtEn5OEKH97
+ eJj14a09z6ngBQl0RS7CDiLveI1JvlNIFxw+Eg2Pys3jB1dqGktDOzMFz8fRNPt4vqDs
+ vqg1HXSpZ7a8QG/DRFGPo2bw+axLHVLP7JtA2TD2nRdged5o4Bs8hhK42A2X/KfMpq3N
+ 2AbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=11a7NIMhd3gpRKr3KvBv9bMb/iOBc4dnUF9RcuuDB/U=;
+ b=UhD3sw7f2b4Z2ZHWmhScJSQ/kTVDnsppVfbSrlQ8RfF4j/5FyS4xfwmm5vVYHK+/Mj
+ Ns5EztPDReHc0Moe1HaBc+T9GKkC0vS7OI+WnxvfsYGo24hqQoEzyPv5KgrAFLNANIFq
+ cyycU12SYmiRQOgzh/nkJ91zOk0LaOZeUn3FBgw+DkiQv5pZuqKKF96JnrOUztmSMeep
+ DEe3nSEsRy45mjlteSV8Yl+QrHh86J2byV+QlDfAWaXjmxXj9VKDqe3NtdZdapqujrgJ
+ TI5rOTTvf6KUx3d9NL3JsAiWa4T4t5rqatXY2TYC1I9ayMPkyb/fxzWOXNtpkmrW+Dzz
+ 3oSg==
+X-Gm-Message-State: ANhLgQ33dQ1zGRNxwzLTHvnGgolWKxqElGh2AaQyyg78sJR1+HdLoUCj
+ b0gwWHOS3HBW8t5AMjH+Ke4o5Q==
+X-Google-Smtp-Source: ADFU+vveOm9WETVG6en/Um/PkNxRnF2iSsSH3++tZKX7ih4UuINneoUMaS1ULThCICkRSVNXjkqcZQ==
+X-Received: by 2002:a17:902:302:: with SMTP id 2mr1772352pld.58.1583196539571; 
+ Mon, 02 Mar 2020 16:48:59 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
+ by smtp.gmail.com with ESMTPSA id 72sm12534071pgd.86.2020.03.02.16.48.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Mar 2020 16:48:59 -0800 (PST)
+Subject: [PULL 01/38] target/riscv: Convert MIP CSR to target_ulong
+Date: Mon,  2 Mar 2020 16:48:11 -0800
+Message-Id: <20200303004848.136788-2-palmerdabbelt@google.com>
+X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
+In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
+References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoCNMailClient: External
-Content-Type: text/plain; charset=utf8
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 124.251.121.243
+Content-Transfer-Encoding: 8bit
+Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Palmer Dabbelt <palmerdabbelt@google.com>
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::634
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,108 +95,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, philmd@redhat.com,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, amarkovic@wavecomp.com,
- Yunqiang Su <ysu@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When malta is coupled with MIPS64 cpu which have 64bit
-address space, it is possible to have more than 2G RAM.
+From: Alistair Francis <alistair.francis@wdc.com>
 
-So we removed ram_size check and overwrite memory
-layout for these targets.
+The MIP CSR is a xlen CSR, it was only 32-bits to allow atomic access.
+Now that we don't use atomics for MIP we can change this back to a xlen
+CSR.
 
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Suggested-by: Yunqiang Su <ysu@wavecomp.com>
---
-v1: Do not overwrite cmdline when we don't have highmem.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- hw/mips/mips_malta.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ target/riscv/cpu.c | 2 +-
+ target/riscv/cpu.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 6e7ba9235d..4267958f35 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -98,7 +98,8 @@ typedef struct {
- } MaltaState;
-=20
- static struct _loaderparams {
--    int ram_size, ram_low_size;
-+    unsigned int ram_low_size;
-+    ram_addr_t ram_size;
-     const char *kernel_filename;
-     const char *kernel_cmdline;
-     const char *initrd_filename;
-@@ -1023,6 +1024,7 @@ static int64_t load_kernel(void)
- {
-     int64_t kernel_entry, kernel_high, initrd_size;
-     long kernel_size;
-+    char mem_cmdline[128];
-     ram_addr_t initrd_offset;
-     int big_endian;
-     uint32_t *prom_buf;
-@@ -1099,20 +1101,33 @@ static int64_t load_kernel(void)
-     prom_buf =3D g_malloc(prom_size);
-=20
-     prom_set(prom_buf, prom_index++, "%s", loaderparams.kernel_filename);
-+
-+    memset(&mem_cmdline[0], 0, sizeof(mem_cmdline));
-+    if (loaderparams.ram_size > 0x10000000) {
-+        /*
-+         * Always use cmdline to overwrite mem layout
-+         * as kernel may reject large emesize.
-+         */
-+        sprintf(&mem_cmdline[0],
-+                "mem=3D0x10000000@0x00000000 mem=3D0x%" PRIx64 "@0x9000000=
-0",
-+                loaderparams.ram_size - 0x10000000);
-+    }
-+
-     if (initrd_size > 0) {
-         prom_set(prom_buf, prom_index++,
--                 "rd_start=3D0x%" PRIx64 " rd_size=3D%" PRId64 " %s",
--                 xlate_to_kseg0(NULL, initrd_offset),
-+                 "%s rd_start=3D0x%" PRIx64 " rd_size=3D%" PRId64 " %s",
-+                 &mem_cmdline[0], xlate_to_kseg0(NULL, initrd_offset),
-                  initrd_size, loaderparams.kernel_cmdline);
-     } else {
--        prom_set(prom_buf, prom_index++, "%s", loaderparams.kernel_cmdline=
-);
-+        prom_set(prom_buf, prom_index++, "%s %s", &mem_cmdline[0],
-+                 loaderparams.kernel_cmdline);
-     }
-=20
-     prom_set(prom_buf, prom_index++, "memsize");
-     prom_set(prom_buf, prom_index++, "%u", loaderparams.ram_low_size);
-=20
-     prom_set(prom_buf, prom_index++, "ememsize");
--    prom_set(prom_buf, prom_index++, "%u", loaderparams.ram_size);
-+    prom_set(prom_buf, prom_index++, "%lu", loaderparams.ram_size);
-=20
-     prom_set(prom_buf, prom_index++, "modetty0");
-     prom_set(prom_buf, prom_index++, "38400n8r");
-@@ -1253,12 +1268,14 @@ void mips_malta_init(MachineState *machine)
-     /* create CPU */
-     mips_create_cpu(machine, s, &cbus_irq, &i8259_irq);
-=20
--    /* allocate RAM */
-+#ifdef TARGET_MIPS32
-+    /* MIPS32 won't accept more than 2GiB RAM due to limited address space=
- */
-     if (ram_size > 2 * GiB) {
-         error_report("Too much memory for this machine: %" PRId64 "MB,"
-                      " maximum 2048MB", ram_size / MiB);
-         exit(1);
-     }
-+#endif
-=20
-     /* register RAM at high address where it is undisturbed by IO */
-     memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
---=20
-2.25.1
-
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 8c86ebc109..efbd676edb 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -224,7 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+-    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index de0a8d893a..95de9e58a2 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -121,7 +121,7 @@ struct CPURISCVState {
+     target_ulong mhartid;
+     target_ulong mstatus;
+ 
+-    uint32_t mip;
++    target_ulong mip;
+     uint32_t miclaim;
+ 
+     target_ulong mie;
+-- 
+2.25.0.265.gbab2e86ba0-goog
 
 
