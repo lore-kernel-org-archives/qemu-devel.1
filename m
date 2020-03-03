@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F9AC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09A9C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:07:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CD282465E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:06:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76C492465E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:07:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LsXMuYCz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CD282465E
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MEyA7e84"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76C492465E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8w1G-0002Uj-8u
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:06:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45504)
+	id 1j8w2O-0003qP-KV
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:07:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vl2-0002rP-H2
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:01 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vl6-00032A-Jh
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vl0-0004cD-Ut
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:00 -0500
-Received: from mail-pj1-x1034.google.com ([2607:f8b0:4864:20::1034]:53537)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vl5-0004eJ-6o
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:04 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:42254)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vl0-0004bI-Ie
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:58 -0500
-Received: by mail-pj1-x1034.google.com with SMTP id cx7so551256pjb.3
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:58 -0800 (PST)
+ id 1j8vl5-0004dq-07
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:03 -0500
+Received: by mail-pl1-x644.google.com with SMTP id u3so501436plr.9
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:50:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=xTc+vPkMfohLZfVyEMM5rQlCBaxWcGBV4IgrxO2Qhx8=;
- b=LsXMuYCzMyTQTHPlFrwbuTvpvZakc7vO1yjFBQ42C8uKnJEDUpgeYI/BkJNNpDCBn+
- sJIH0CAzD1X60HerZI4p1QVRlnRmjRJzKBgxuo4huDAeMWQts4gpYAc4bv+sUMbvdnmT
- EsnxIYFqyza1v1pxVMs1n1Y7K8BkNeuPo06OrSB9yfXNGgecsrxTVBKxkGSnx3aXdrb5
- pasVlRhmy0Fc3YLWUBRqJYM1fcxhvvtljmf0D4to2F4ctjZxC3134LjJJKOCHAHR4vtk
- uDDd3LEMtr0g0XxQt+EqDu08boGCv+GmVKTR0i+Qx7rBynlOEjSgZvZ6eb06dWeuGAPp
- cnbQ==
+ bh=hFvs1uriIPG137AabzLSMhSoJyIF8wxeh5khJdI5tCA=;
+ b=MEyA7e84ywbhUOO5Put43vKHTkEfB/3l6JLzrkGv/1Xj8Pt6wR1JBfbVif7w0S7aYK
+ U3dho1Yjmu9WLrEoXITwPOURSE67zZpj0JtdkN1Kb4fhi7oM0t+XuPT61C2faFWHEO+g
+ S+hVEL5YrEMPTmq/wyqDddRCk4Q1XDeOo63FCgIucrmnckTQnLoCbHCiLpldCq2wZAdm
+ oYC73cyaOtp0vSHmhdc8qHveSHUa4LAA4XbNeBZMcE3nQpsm+P18QKkapwhpnurTX6po
+ 9hSvmOnsET+lDcI0DkeJ2bqcL+f/VGZv34w4JL+RjJPnjobn2U+S4hGbgxd9urvN5EEc
+ db/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=xTc+vPkMfohLZfVyEMM5rQlCBaxWcGBV4IgrxO2Qhx8=;
- b=bsmyKUdsj92UP40BR3vqoGyPJzdKflXDOqm3sWGXA5oVvWfoSaDWIDmE8VJZCzfIDL
- LXeJ1zqxCZ1k/aO9b8jYpaQq1F41ZqBJ5s/bKPxnLvQ6AgXLXN1YeOdokunbBsFgE/IG
- fx0ep0/QFQneRf+PYitY+k5kg7EXgEnF2pMEGwIPsbjdZjhB8pzG/bNGTo+73wLBYhNM
- WIPd6ONcPGmcUidmtZNhBheYoKZF3URhceBBa4jzmtqb+XMOxotSvNkqH7oK51g9/k+0
- emjhEnAey2qnPmh0gIBYqbEAmbYCf+qIFQ5isBvtd/Tx1AMqvYnjCpEzKOzvYwYpWuIg
- Qz7A==
-X-Gm-Message-State: ANhLgQ1dsKIvuYsnLGIJptvmYWe56cpFCSxoCFBpQ/OWBxi3Pq7MLTD1
- T310wbvKG2X5oSdi6LX5a7eAKQ==
-X-Google-Smtp-Source: ADFU+vvtiPtMtogZiBGbE3rZUkUtlZF+3JGCrYw2LglTfI24TmZnr550vsdDfG1OLM4xIchTzWufdA==
-X-Received: by 2002:a17:90b:8ce:: with SMTP id
- ds14mr1253412pjb.70.1583196597076; 
- Mon, 02 Mar 2020 16:49:57 -0800 (PST)
+ bh=hFvs1uriIPG137AabzLSMhSoJyIF8wxeh5khJdI5tCA=;
+ b=TRswbt/Tm1gwEDQ8JQhxQwjh2kWRQ7KBofN8tPgcVeazbhE841bJZRk8+68WZZigRc
+ /YZ4005sQHZxawyXO6IA8B0b5lNPmpLyEpWiDQri4hi1JPFtC/A8670iEnxjC9Y/F8QM
+ yhfadoZ1sKCbQrNLd2AXhlQwJx4YABAFYwHL9A3SvA+wwHYmaJsAfQx3yB6qW/OiWbkU
+ e5NhY0Q290O93C1hlIPQx8mtOTYc7Oes1u3b+Z6obYAjLjaahAqQ0V3HtBcnGrv9Kkh6
+ OELQUuEs6TRDkALNT6McRk2SzgVSDIzO8S9YcsWSEG34VYowhFGnTf4Jy2+OHlKQxjIz
+ 4JdA==
+X-Gm-Message-State: ANhLgQ0W2OlArefllSfGUir5/kuLqAcmzxtXTvkNK6+ArRr0EPshHCM/
+ 1YIpPWiNMS3UdTsFrfa5AjsPiw==
+X-Google-Smtp-Source: ADFU+vtCv/gmtcsKjP+S4rxMXxVt4LnuWyboyAcIVD5aVwyK2N/4nWyed2Lg/vvPP2fL11HuKczBrg==
+X-Received: by 2002:a17:90a:348a:: with SMTP id
+ p10mr1299631pjb.120.1583196601863; 
+ Mon, 02 Mar 2020 16:50:01 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id k67sm22159878pga.91.2020.03.02.16.49.56
+ by smtp.gmail.com with ESMTPSA id r13sm22296675pgf.1.2020.03.02.16.50.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:56 -0800 (PST)
-Subject: [PULL 34/38] target/riscv: Add the MSTATUS_MPV_ISSET helper macro
-Date: Mon,  2 Mar 2020 16:48:44 -0800
-Message-Id: <20200303004848.136788-35-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:50:01 -0800 (PST)
+Subject: [PULL 37/38] target/riscv: Emulate TIME CSRs for privileged mode
+Date: Mon,  2 Mar 2020 16:48:47 -0800
+Message-Id: <20200303004848.136788-38-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
+ Anup Patel <anup.patel@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, 
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1034
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,93 +100,197 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <alistair.francis@wdc.com>
+From: Anup Patel <anup.patel@wdc.com>
 
-Add a helper macro MSTATUS_MPV_ISSET() which will determine if the
-MSTATUS_MPV bit is set for both 32-bit and 64-bit RISC-V.
+Currently, TIME CSRs are emulated only for user-only mode. This
+patch add TIME CSRs emulation for privileged mode.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+For privileged mode, the TIME CSRs will return value provided
+by rdtime callback which is registered by QEMU machine/platform
+emulation (i.e. CLINT emulation). If rdtime callback is not
+available then the monitor (i.e. OpenSBI) will trap-n-emulate
+TIME CSRs in software.
+
+We see 25+% performance improvement in hackbench numbers when
+TIME CSRs are not trap-n-emulated.
+
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu_bits.h   | 11 +++++++++++
- target/riscv/cpu_helper.c |  4 ++--
- target/riscv/op_helper.c  |  2 +-
- target/riscv/translate.c  |  2 +-
- 4 files changed, 15 insertions(+), 4 deletions(-)
+ target/riscv/cpu.h        |  5 +++
+ target/riscv/cpu_helper.c |  5 +++
+ target/riscv/csr.c        | 86 +++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 92 insertions(+), 4 deletions(-)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 049032f2ae..7f64ee1174 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -363,8 +363,19 @@
- #define MSTATUS_TVM         0x00100000 /* since: priv-1.10 */
- #define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
- #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
-+#if defined(TARGET_RISCV64)
- #define MSTATUS_MTL         0x4000000000ULL
- #define MSTATUS_MPV         0x8000000000ULL
-+#elif defined(TARGET_RISCV32)
-+#define MSTATUS_MTL         0x00000040
-+#define MSTATUS_MPV         0x00000080
-+#endif
-+
-+#ifdef TARGET_RISCV32
-+# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatush, MSTATUS_MPV)
-+#else
-+# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatus, MSTATUS_MPV)
-+#endif
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index d52f209361..3dcdf92227 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -159,6 +159,7 @@ struct CPURISCVState {
+     target_ulong htval;
+     target_ulong htinst;
+     target_ulong hgatp;
++    uint64_t htimedelta;
  
- #define MSTATUS64_UXL       0x0000000300000000ULL
- #define MSTATUS64_SXL       0x0000000C00000000ULL
+     /* Virtual CSRs */
+     target_ulong vsstatus;
+@@ -201,6 +202,9 @@ struct CPURISCVState {
+     /* physical memory protection */
+     pmp_table_t pmp_state;
+ 
++    /* machine specific rdtime callback */
++    uint64_t (*rdtime_fn)(void);
++
+     /* True if in debugger mode.  */
+     bool debugger;
+ #endif
+@@ -322,6 +326,7 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env);
+ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
+ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value);
+ #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value */
++void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void));
+ #endif
+ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv);
+ 
 diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 10f246ddf8..29a1b37d88 100644
+index 29a1b37d88..5ea5d133aa 100644
 --- a/target/riscv/cpu_helper.c
 +++ b/target/riscv/cpu_helper.c
-@@ -322,7 +322,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-             mode = get_field(env->mstatus, MSTATUS_MPP);
+@@ -258,6 +258,11 @@ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+     return old;
+ }
  
-             if (riscv_has_ext(env, RVH) &&
--                get_field(env->mstatus, MSTATUS_MPV)) {
-+                MSTATUS_MPV_ISSET(env)) {
-                 use_background = true;
-             }
-         }
-@@ -722,7 +722,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         m_mode_two_stage = env->priv == PRV_M &&
-                            access_type != MMU_INST_FETCH &&
-                            get_field(env->mstatus, MSTATUS_MPRV) &&
--                           get_field(env->mstatus, MSTATUS_MPV);
-+                           MSTATUS_MPV_ISSET(env);
++void riscv_cpu_set_rdtime_fn(CPURISCVState *env, uint64_t (*fn)(void))
++{
++    env->rdtime_fn = fn;
++}
++
+ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+ {
+     if (newpriv > PRV_M) {
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 572a478e8c..11d184cd16 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -238,6 +238,32 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
  
-         hs_mode_two_stage = env->priv == PRV_S &&
-                             !riscv_cpu_virt_enabled(env) &&
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index dca68fa96e..8736f689c2 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -146,7 +146,7 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
+ #else /* CONFIG_USER_ONLY */
  
-     target_ulong mstatus = env->mstatus;
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
--    target_ulong prev_virt = get_field(mstatus, MSTATUS_MPV);
-+    target_ulong prev_virt = MSTATUS_MPV_ISSET(env);
-     mstatus = set_field(mstatus,
-         env->priv_ver >= PRIV_VERSION_1_10_0 ?
-         MSTATUS_MIE : MSTATUS_UIE << prev_priv,
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index b51ab92068..43bf7e39a6 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -755,7 +755,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-         ctx->virt_enabled = riscv_cpu_virt_enabled(env);
-         if (env->priv_ver == PRV_M &&
-             get_field(env->mstatus, MSTATUS_MPRV) &&
--            get_field(env->mstatus, MSTATUS_MPV)) {
-+            MSTATUS_MPV_ISSET(env)) {
-             ctx->virt_enabled = true;
-         } else if (env->priv == PRV_S &&
-                    !riscv_cpu_virt_enabled(env) &&
++static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
++
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++    *val = env->rdtime_fn() + delta;
++    return 0;
++}
++
++#if defined(TARGET_RISCV32)
++static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
++
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++    *val = (env->rdtime_fn() + delta) >> 32;
++    return 0;
++}
++#endif
++
+ /* Machine constants */
+ 
+ #define M_MODE_INTERRUPTS  (MIP_MSIP | MIP_MTIP | MIP_MEIP)
+@@ -930,6 +956,56 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
++static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++#if defined(TARGET_RISCV32)
++    *val = env->htimedelta & 0xffffffff;
++#else
++    *val = env->htimedelta;
++#endif
++    return 0;
++}
++
++static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
++{
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++#if defined(TARGET_RISCV32)
++    env->htimedelta = deposit64(env->htimedelta, 0, 32, (uint64_t)val);
++#else
++    env->htimedelta = val;
++#endif
++    return 0;
++}
++
++#if defined(TARGET_RISCV32)
++static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++    *val = env->htimedelta >> 32;
++    return 0;
++}
++
++static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong val)
++{
++    if (!env->rdtime_fn) {
++        return -1;
++    }
++
++    env->htimedelta = deposit64(env->htimedelta, 32, 32, (uint64_t)val);
++    return 0;
++}
++#endif
++
+ /* Virtual CSR Registers */
+ static int read_vsstatus(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -1202,14 +1278,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_INSTRETH] =            { ctr,  read_instreth                       },
+ #endif
+ 
+-    /* User-level time CSRs are only available in linux-user
+-     * In privileged mode, the monitor emulates these CSRs */
+-#if defined(CONFIG_USER_ONLY)
++    /* In privileged mode, the monitor will have to emulate TIME CSRs only if
++     * rdtime callback is not provided by machine/platform emulation */
+     [CSR_TIME] =                { ctr,  read_time                           },
+ #if defined(TARGET_RISCV32)
+     [CSR_TIMEH] =               { ctr,  read_timeh                          },
+ #endif
+-#endif
+ 
+ #if !defined(CONFIG_USER_ONLY)
+     /* Machine Timers and Counters */
+@@ -1275,6 +1349,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_HTVAL] =               { hmode,   read_htval,       write_htval      },
+     [CSR_HTINST] =              { hmode,   read_htinst,      write_htinst     },
+     [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
++    [CSR_HTIMEDELTA] =          { hmode,   read_htimedelta,  write_htimedelta },
++#if defined(TARGET_RISCV32)
++    [CSR_HTIMEDELTAH] =         { hmode,   read_htimedeltah, write_htimedeltah},
++#endif
+ 
+     [CSR_VSSTATUS] =            { hmode,   read_vsstatus,    write_vsstatus   },
+     [CSR_VSIP] =                { hmode,   NULL,     NULL,     rmw_vsip       },
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
