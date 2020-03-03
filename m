@@ -2,81 +2,62 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C810C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 11:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B64C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 11:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A57C2083E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 11:38:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SU4vKKno"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A57C2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ECC0E2083E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 11:38:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECC0E2083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j95sp-0002iM-83
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 06:38:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39571)
+	id 1j95t1-0003LT-5b
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 06:38:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j95rc-0001VD-AC
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:29 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1j95ry-0001im-K1
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j95rb-00070u-5e
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36503
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <guoheyi@huawei.com>) id 1j95rx-00075z-2D
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:50 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3181 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j95rb-00070m-2A
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583235446;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+eQxk25q/RrVlvkJRjwqS+xZaXeXBNTmaocXxTfoT2A=;
- b=SU4vKKno8aXT6RvYq0Jt6rRWsuNdKZ9rAxaGpfCHTiYZSbKrnSdUnv5Kmj7Rn6AwklUjNl
- FIkB8s2qhuq/ebZhsN2BPzkZ2Oc2QuVgct0/JjKA43WCk9C8CZDWPA2lcuOHgUzk8/hMYB
- 8WoYAPnjBE8QP9LXNAuX1gHWuz8SiFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-pwNSoa4LPJWqsye6_oWkaQ-1; Tue, 03 Mar 2020 06:37:24 -0500
-X-MC-Unique: pwNSoa4LPJWqsye6_oWkaQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30F0D19251A6;
- Tue,  3 Mar 2020 11:37:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-2.ams2.redhat.com [10.36.117.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A20D291D6A;
- Tue,  3 Mar 2020 11:37:19 +0000 (UTC)
-Date: Tue, 3 Mar 2020 11:37:17 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Subject: Re: [Virtio-fs] [PATCH v4 0/2] virtiofsd: Fix xattr operations
-Message-ID: <20200303113717.GD3170@work-vm>
-References: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1j95rw-00073G-Nw
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 06:37:49 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 86F7D5D1A363D3CA5615;
+ Tue,  3 Mar 2020 19:37:35 +0800 (CST)
+Received: from [127.0.0.1] (10.173.221.228) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0;
+ Tue, 3 Mar 2020 19:37:25 +0800
+Subject: Re: [PATCH v3] hw/smbios: add options for type 4 max-speed and
+ current-speed
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20200303010158.52994-1-guoheyi@huawei.com>
+ <997b0093-6820-0c27-0d73-55afb97019f1@huawei.com>
+ <20200303093321.262ff477@redhat.com>
+From: Heyi Guo <guoheyi@huawei.com>
+Message-ID: <f9841459-ebd7-c296-f085-1a204424d636@huawei.com>
+Date: Tue, 3 Mar 2020 19:37:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200227055927.24566-1-misono.tomohiro@jp.fujitsu.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20200303093321.262ff477@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.173.221.228]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +69,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, vgoyal@redhat.com
+Cc: wanghaibin.wang@huawei.com,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
-> Currently xattr operations on virtiofs does not work properly in some cas=
-e:
->  - directory ... cannot set
->  - special files (pipe) ... cause hang
->=20
-> This fixes these problems and now xfstests generic/062 passes on virtiofs
-> with -o xattr option (I tested with xfs).
->=20
-> v3 -> v4:
->  - No logic change
->  - Some code style fix/update comments and commit log as suggested by Viv=
-ek
->  - CC qemu-devel ML too
->=20
-> Previous versions can be found in virtiofs ML:
->  v3: https://www.redhat.com/archives/virtio-fs/2020-February/msg00032.htm=
-l
->=20
-> Thanks,
+
+On 2020/3/3 16:33, Igor Mammedov wrote:
+> On Tue, 3 Mar 2020 11:18:56 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> One comment from myself after going through the code...
+>>
+>> On 2020/3/3 9:01, Heyi Guo wrote:
+>>> Common VM users sometimes care about CPU speed, so we add two new
+>>> options to allow VM vendors to present CPU speed to their users.
+>>> Normally these information can be fetched from host smbios.
+>>>
+>>> Strictly speaking, the "max speed" and "current speed" in type 4
+>>> are not really for the max speed and current speed of processor, for
+>>> "max speed" identifies a capability of the system, and "current speed=
+"
+>>> identifies the processor's speed at boot (see smbios spec), but some
+>>> applications do not tell the differences.
+>>>
+>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>>>
+>>> ---
+>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>
+>>> v2 -> v3:
+>>> - Refine comments per Igor's suggestion.
+>>>
+>>> v1 -> v2:
+>>> - change "_" in option names to "-"
+>>> - check if option value is too large to fit in SMBIOS type 4 speed
+>>> fields.
+>>> ---
+>>>    hw/smbios/smbios.c | 29 ++++++++++++++++++++++++++---
+>>>    qemu-options.hx    |  3 ++-
+>>>    2 files changed, 28 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+>>> index ffd98727ee..4c5992241c 100644
+>>> --- a/hw/smbios/smbios.c
+>>> +++ b/hw/smbios/smbios.c
+>>> @@ -94,6 +94,8 @@ static struct {
+>>>   =20
+>>>    static struct {
+>>>        const char *sock_pfx, *manufacturer, *version, *serial, *asset=
+, *part;
+>>> +    uint32_t max_speed;
+>>> +    uint32_t current_speed;
+>> How about defining these two fields as uint16_t, just like "speed" in
+>> type17? Then we can also drop the range check against UIN16_MAX.
+> Well,
+> someone should check if values provided by user make sense anyway
+> so check should be there but in some other form.
+
+Shall we define the temporal variables as uint64_t, and check the values=20
+no larger than UINT16_MAX after invoking qemu_opt_get_number()? So any=20
+value larger than uint64_max will be blocked by qemu option parser, and=20
+value in (uint16_max, uint64_max] will be blocked by ourselves.
 
 Thanks,
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Heyi
 
-and queued.
 
-(I suspect there's some more cleanup involved in the error paths in
-those functions; I'll have a look another time).
-
-Dave
-
-> Misono Tomohiro (2):
->   virtiofsd: passthrough_ll: cleanup getxattr/listxattr
->   virtiofsd: Fix xattr operations
->=20
->  tools/virtiofsd/fuse_virtio.c    |  13 +++
->  tools/virtiofsd/passthrough_ll.c | 139 ++++++++++++++++---------------
->  tools/virtiofsd/seccomp.c        |   6 ++
->  3 files changed, 89 insertions(+), 69 deletions(-)
->=20
-> --=20
-> 2.21.1
->=20
->=20
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>> Please advise.
+>>
+>> Thanks,
+>>
+>> Heyi
+>>
+>>
+>>>    } type4;
+>>>   =20
+>>>    static struct {
+>>> @@ -272,6 +274,14 @@ static const QemuOptDesc qemu_smbios_type4_opts[=
+] =3D {
+>>>            .name =3D "version",
+>>>            .type =3D QEMU_OPT_STRING,
+>>>            .help =3D "version number",
+>>> +    },{
+>>> +        .name =3D "max-speed",
+>>> +        .type =3D QEMU_OPT_NUMBER,
+>>> +        .help =3D "max speed in MHz",
+>>> +    },{
+>>> +        .name =3D "current-speed",
+>>> +        .type =3D QEMU_OPT_NUMBER,
+>>> +        .help =3D "speed at system boot in MHz",
+>>>        },{
+>>>            .name =3D "serial",
+>>>            .type =3D QEMU_OPT_STRING,
+>>> @@ -586,9 +596,8 @@ static void smbios_build_type_4_table(MachineStat=
+e *ms, unsigned instance)
+>>>        SMBIOS_TABLE_SET_STR(4, processor_version_str, type4.version);
+>>>        t->voltage =3D 0;
+>>>        t->external_clock =3D cpu_to_le16(0); /* Unknown */
+>>> -    /* SVVP requires max_speed and current_speed to not be unknown. =
+*/
+>>> -    t->max_speed =3D cpu_to_le16(2000); /* 2000 MHz */
+>>> -    t->current_speed =3D cpu_to_le16(2000); /* 2000 MHz */
+>>> +    t->max_speed =3D cpu_to_le16(type4.max_speed);
+>>> +    t->current_speed =3D cpu_to_le16(type4.current_speed);
+>>>        t->status =3D 0x41; /* Socket populated, CPU enabled */
+>>>        t->processor_upgrade =3D 0x01; /* Other */
+>>>        t->l1_cache_handle =3D cpu_to_le16(0xFFFF); /* N/A */
+>>> @@ -1129,6 +1138,20 @@ void smbios_entry_add(QemuOpts *opts, Error **=
+errp)
+>>>                save_opt(&type4.serial, opts, "serial");
+>>>                save_opt(&type4.asset, opts, "asset");
+>>>                save_opt(&type4.part, opts, "part");
+>>> +            /*
+>>> +             * SVVP requires max_speed and current_speed to be set a=
+nd not being
+>>> +             * 0 which counts as unknown (SMBIOS 3.1.0/Table 21). Se=
+t the
+>>> +             * default value to 2000MHz as we did before.
+>>> +             */
+>>> +            type4.max_speed =3D qemu_opt_get_number(opts, "max-speed=
+", 2000);
+>>> +            type4.current_speed =3D qemu_opt_get_number(opts, "curre=
+nt-speed",
+>>> +                                                      2000);
+>>> +            if (type4.max_speed > UINT16_MAX ||
+>>> +                type4.current_speed > UINT16_MAX) {
+>>> +                error_setg(errp, "SMBIOS CPU speed is too large (> %=
+d)",
+>>> +                           UINT16_MAX);
+>>> +            }
+>>> +
+>>>                return;
+>>>            case 11:
+>>>                qemu_opts_validate(opts, qemu_smbios_type11_opts, &err=
+);
+>>> diff --git a/qemu-options.hx b/qemu-options.hx
+>>> index ac315c1ac4..7a2f7c1f66 100644
+>>> --- a/qemu-options.hx
+>>> +++ b/qemu-options.hx
+>>> @@ -2233,6 +2233,7 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
+>>>        "                specify SMBIOS type 3 fields\n"
+>>>        "-smbios type=3D4[,sock_pfx=3Dstr][,manufacturer=3Dstr][,versi=
+on=3Dstr][,serial=3Dstr]\n"
+>>>        "              [,asset=3Dstr][,part=3Dstr]\n"
+>>> +    "              [,max-speed=3D%d][,current-speed=3D%d]\n"
+>>>        "                specify SMBIOS type 4 fields\n"
+>>>        "-smbios type=3D17[,loc_pfx=3Dstr][,bank=3Dstr][,manufacturer=3D=
+str][,serial=3Dstr]\n"
+>>>        "               [,asset=3Dstr][,part=3Dstr][,speed=3D%d]\n"
+>>> @@ -2255,7 +2256,7 @@ Specify SMBIOS type 2 fields
+>>>    @item -smbios type=3D3[,manufacturer=3D@var{str}][,version=3D@var{=
+str}][,serial=3D@var{str}][,asset=3D@var{str}][,sku=3D@var{str}]
+>>>    Specify SMBIOS type 3 fields
+>>>   =20
+>>> -@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{s=
+tr}][,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=
+=3D@var{str}]
+>>> +@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{s=
+tr}][,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=
+=3D@var{str}][,max-speed=3D@var{%d}][,current-speed=3D@var{%d}]
+>>>    Specify SMBIOS type 4 fields
+>>>   =20
+>>>    @item -smbios type=3D17[,loc_pfx=3D@var{str}][,bank=3D@var{str}][,=
+manufacturer=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D=
+@var{str}][,speed=3D@var{%d}]
+>
+> .
 
 
