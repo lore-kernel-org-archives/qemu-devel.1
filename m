@@ -2,52 +2,84 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37471C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 22:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2070C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:30:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B0902072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 22:46:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0902072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
+	by mail.kernel.org (Postfix) with ESMTPS id 6ACDF20716
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:30:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Med6eRSU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACDF20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9GIh-0006Ap-7f
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 17:46:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42366)
+	id 1j9H06-0000gD-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 18:30:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1j9GHX-0004uc-Sq
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:44:57 -0500
+ (envelope-from <yuanzi@google.com>) id 1j9Gz1-0008Si-2U
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1j9GHT-000160-9C
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:44:55 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:38186)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1j9GHT-00011L-4c
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 17:44:51 -0500
-Received: from localhost (localhost.localdomain [127.0.0.1])
- by kvm5.telegraphics.com.au (Postfix) with ESMTP id E4F742A49D;
- Tue,  3 Mar 2020 17:44:44 -0500 (EST)
-Date: Wed, 4 Mar 2020 09:44:42 +1100 (AEDT)
-From: Finn Thain <fthain@telegraphics.com.au>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [PULL V2 01/23] dp8393x: Mask EOL bit from descriptor
- addresses
-In-Reply-To: <1583230242-14597-2-git-send-email-jasowang@redhat.com>
-Message-ID: <alpine.LNX.2.22.394.2003040842130.9@nippy.intranet>
-References: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
- <1583230242-14597-2-git-send-email-jasowang@redhat.com>
+ (envelope-from <yuanzi@google.com>) id 1j9Gyz-0003y8-Ur
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:50 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40998)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuanzi@google.com>) id 1j9Gyz-0003ww-8w
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:49 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v19so179058ote.8
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 15:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/bW8efiApVzydyaH8AhwyVKf0CkNBkcbqVJgT1JC9+M=;
+ b=Med6eRSU9oGg0ZlErErF8Y6yGXe00JBzMy6G/Wsaj0KIIl9BCwtnFdYn9YOsmy7tqu
+ yeIyE0mNljA5HZwerLQlDZ7iyx9cd41vGCm7R+FmDBQf7c2u4Px9TBcWfUsVpX/OGeBm
+ GDJHTu2YMyFkgbPPwsT1fPiagDMaiL49zqarYLqHyDqLWSBDsy10Ah6juzPapu3Lan8H
+ 9gQr52zZVC4CJQ3L9zLHL3bOa7tVTBld5pjJl1hPWEA33rC7m1jWoOyiC5Q2pvEvf9rA
+ ybc6jF+dgTE44v1PrVSMmC8QOHBy06FgO1CaFAW375E615F+Qpp4F3BmF9CMh5LtoF2u
+ y+9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/bW8efiApVzydyaH8AhwyVKf0CkNBkcbqVJgT1JC9+M=;
+ b=UFhPbXszciIsgG83eWFEsnMyFlhiIn6XOS/vLjaU1yD+omfPnCcPe/ycLABHtEEsny
+ G6Ns1Td7Qi5TmaXzE07z7k5zQ6OFdl0ZIYbxWo0uqTatLKLX+ZuNrObDlRYzRzWo2KVB
+ PPz6nhTmc8YLAxaDg7/9cpfjdW+ERpB9xVI7VHuryjj8n0GKQQEXF/vLy/kul5sz5ACB
+ ZmvIbVY/zUR1W9zQtuYpaYP3SyRR5QuMWeTGT2uGG68WyZAhIAzv5g0ybPwiVotgNlB0
+ aEuxB5nI5IHbAjRXi1AQ1O3nSq3B4w8QNUe2XwAiBiYL6HID70mUVkc1r99uuATo0lY4
+ SgLA==
+X-Gm-Message-State: ANhLgQ1oDOVBgFcGQdCsfXG1Ls11cIxMNDnZuRRGLJlizlcnQS54HoKh
+ YsZi5GWEQ4t+QDiujAUWrLXN6MHRFqLdSdP1xjavHw==
+X-Google-Smtp-Source: ADFU+vuserjoSos3+qe9IqyBew2nBlEPIVLyyRJXC3JRcMAzrau6VzTraLn2xXEuXzLlM5bER7Fi77397JqwipL/b6A=
+X-Received: by 2002:a9d:7842:: with SMTP id c2mr233345otm.252.1583278187261;
+ Tue, 03 Mar 2020 15:29:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 98.124.60.144
+References: <20200302193153.66415-1-yuanzi@google.com>
+ <d9dc23a7-61a8-c28a-47e0-4a4d9590be04@vivier.eu>
+In-Reply-To: <d9dc23a7-61a8-c28a-47e0-4a4d9590be04@vivier.eu>
+From: Lirong Yuan <yuanzi@google.com>
+Date: Tue, 3 Mar 2020 15:29:36 -0800
+Message-ID: <CADjx4C+8304e=AjjgkxSwH7nVhkH_04+aFz-EvJUAeEWJuZYVg@mail.gmail.com>
+Subject: Re: [PATCH v2] linux-user: Add AT_EXECFN auxval
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, 
+ Shu-Chun Weng <scw@google.com>, Josh Kunz <jkz@google.com>,
+ Riku Voipio <riku.voipio@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,126 +91,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jason,
+On Tue, Mar 3, 2020 at 1:40 AM Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> Le 02/03/2020 =C3=A0 20:31, Lirong Yuan a =C3=A9crit :
+> > This change adds the support for AT_EXECFN auxval.
+> >
+> > Signed-off-by: Lirong Yuan <yuanzi@google.com>
+> > ---
+> > Changelog since v1:
+> > - remove implementation for AT_EXECFD auxval.
+> >
+> >  linux-user/elfload.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> > index db748c5877..8198be0446 100644
+> > --- a/linux-user/elfload.c
+> > +++ b/linux-user/elfload.c
+> > @@ -1573,7 +1573,7 @@ struct exec
+> >                                   ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE=
+-1))
+> >  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1)=
+)
+> >
+> > -#define DLINFO_ITEMS 15
+> > +#define DLINFO_ITEMS 16
+> >
+> >  static inline void memcpy_fromfs(void * to, const void * from, unsigne=
+d long n)
+> >  {
+> > @@ -2037,6 +2037,7 @@ static abi_ulong create_elf_tables(abi_ulong p, i=
+nt argc, int envc,
+> >      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+> >      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+> >      NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
+> > +    NEW_AUX_ENT(AT_EXECFN, info->file_string);
+> >
+> >  #ifdef ELF_HWCAP2
+> >      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
+> >
+>
+> Applied to my linux-user branch.
+>
+> Thanks,
+> Laurent
 
-The patch in this pull request (since merged) differs from the patch that 
-I sent. In particular, the change below is missing from commit 88f632fbb1 
-("dp8393x: Mask EOL bit from descriptor addresses") in mainline.
-
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -525,8 +525,8 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                                  * (4 + 3 * s->regs[SONIC_TFC]),
-                                MEMTXATTRS_UNSPECIFIED, s->data,
-                                size);
--            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
--            if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0);
-+            if (s->regs[SONIC_CTDA] & SONIC_DESC_EOL) {
-                 /* EOL detected */
-                 break;
-             }
-
-Please compare with "[PATCH v4 01/14] dp8393x: Mask EOL bit from 
-descriptor addresses" in the mailing list archives: 
-https://lore.kernel.org/qemu-devel/d6e8d06ad4d02f4a30c4caa6001967f806f21a1a.1580290069.git.fthain@telegraphics.com.au/
-
-It appears that this portion of my patch went missing when merge conflicts 
-were resolved. The conflicts were apparently caused by commit 19f7034773 
-("Avoid address_space_rw() with a constant is_write argument").
+Awesome, thanks for the review! :)
 
 Regards,
-Finn
-
-On Tue, 3 Mar 2020, Jason Wang wrote:
-
-> From: Finn Thain <fthain@telegraphics.com.au>
-> 
-> The Least Significant bit of a descriptor address register is used as
-> an EOL flag. It has to be masked when the register value is to be used
-> as an actual address for copying memory around. But when the registers
-> are to be updated the EOL bit should not be masked.
-> 
-> Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-> Tested-by: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  hw/net/dp8393x.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index 7045193..216d44b 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -145,6 +145,9 @@ do { printf("sonic ERROR: %s: " fmt, __func__ , ## __VA_ARGS__); } while (0)
->  #define SONIC_ISR_PINT   0x0800
->  #define SONIC_ISR_LCD    0x1000
->  
-> +#define SONIC_DESC_EOL   0x0001
-> +#define SONIC_DESC_ADDR  0xFFFE
-> +
->  #define TYPE_DP8393X "dp8393x"
->  #define DP8393X(obj) OBJECT_CHECK(dp8393xState, (obj), TYPE_DP8393X)
->  
-> @@ -197,7 +200,8 @@ static uint32_t dp8393x_crba(dp8393xState *s)
->  
->  static uint32_t dp8393x_crda(dp8393xState *s)
->  {
-> -    return (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA];
-> +    return (s->regs[SONIC_URDA] << 16) |
-> +           (s->regs[SONIC_CRDA] & SONIC_DESC_ADDR);
->  }
->  
->  static uint32_t dp8393x_rbwc(dp8393xState *s)
-> @@ -217,7 +221,8 @@ static uint32_t dp8393x_tsa(dp8393xState *s)
->  
->  static uint32_t dp8393x_ttda(dp8393xState *s)
->  {
-> -    return (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA];
-> +    return (s->regs[SONIC_UTDA] << 16) |
-> +           (s->regs[SONIC_TTDA] & SONIC_DESC_ADDR);
->  }
->  
->  static uint32_t dp8393x_wt(dp8393xState *s)
-> @@ -509,7 +514,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
->                                 MEMTXATTRS_UNSPECIFIED, s->data,
->                                 size);
->              s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
-> -            if (dp8393x_get(s, width, 0) & 0x1) {
-> +            if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
->                  /* EOL detected */
->                  break;
->              }
-> @@ -765,13 +770,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->      /* XXX: Check byte ordering */
->  
->      /* Check for EOL */
-> -    if (s->regs[SONIC_LLFA] & 0x1) {
-> +    if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
->          /* Are we still in resource exhaustion? */
->          size = sizeof(uint16_t) * 1 * width;
->          address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
->          address_space_read(&s->as, address, MEMTXATTRS_UNSPECIFIED,
->                             s->data, size);
-> -        if (dp8393x_get(s, width, 0) & 0x1) {
-> +        if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
->              /* Still EOL ; stop reception */
->              return -1;
->          } else {
-> @@ -831,7 +836,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->                         dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
->                         MEMTXATTRS_UNSPECIFIED, s->data, size);
->      s->regs[SONIC_LLFA] = dp8393x_get(s, width, 0);
-> -    if (s->regs[SONIC_LLFA] & 0x1) {
-> +    if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
->          /* EOL detected */
->          s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
->      } else {
-> 
+Lirong
 
