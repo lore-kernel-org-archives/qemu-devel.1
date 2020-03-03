@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B57C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D83C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ADB62146E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:20:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 640CD21556
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JlMqyJ2q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ADB62146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0tt6VMW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640CD21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94fX-0003pW-LF
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:20:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52705)
+	id 1j94gJ-0005X2-It
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:21:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j94WN-0008Jl-42
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:28 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j94WW-0000DZ-0D
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j94WL-0006Gy-Gl
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58115
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jasowang@redhat.com>) id 1j94WT-0006JB-Pw
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:35 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38785
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94WL-0006Gi-DA
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:25 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94WT-0006Iz-N1
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583230284;
+ s=mimecast20190719; t=1583230293;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=M/7mhrmkDMgWbya6uQPhNZ02yGNhHjKbCLFNhsQU/Mo=;
- b=JlMqyJ2qYsk5owf0qilwpXIYtbgotKgr1iVc69yXRBXSFRDDx7sYPuE+7Im8nCiCTanKTf
- HoOlniUMPLQLvhkIil5FZxaRT7MGkRqpembrrEssXvv8e7LciyOz6GOdY1X8TRcOp83cdx
- fMz1mjQxp9WRuC0n8EAvADufky1VF/w=
+ bh=30CA7IrGHM4v2O7WQXzXM07+zf53bwhYkoctQZoaqcs=;
+ b=e0tt6VMWhvrhANlbLcYX1J75C819bppRmF8XlbsjU3mWaMknzxAfXkkRh3wgOJwGioJXLI
+ gijVME8UWGJ/CNf3VvzUzuTvObQe/k2ohEPipIzi0cMREvwkJv6fu4CTu5snJywbY501zQ
+ L8BIXeUu3MEJTzL0AVoCBHDtGE0DSaM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-61Ixa9i_ODG3rJfomLpD_w-1; Tue, 03 Mar 2020 05:11:22 -0500
-X-MC-Unique: 61Ixa9i_ODG3rJfomLpD_w-1
+ us-mta-461-uDSTkXSIO2CIdf0i4gHs0A-1; Tue, 03 Mar 2020 05:11:29 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAB9F189F765;
- Tue,  3 Mar 2020 10:11:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 192121005513;
+ Tue,  3 Mar 2020 10:11:28 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-98.pek2.redhat.com
  [10.72.12.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 13C988B745;
- Tue,  3 Mar 2020 10:11:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 750D98B745;
+ Tue,  3 Mar 2020 10:11:26 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL V2 16/23] NetRxPkt: Introduce support for additional hash types
-Date: Tue,  3 Mar 2020 18:10:35 +0800
-Message-Id: <1583230242-14597-17-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 19/23] block/replication.c: Ignore requests after failover
+Date: Tue,  3 Mar 2020 18:10:38 +0800
+Message-Id: <1583230242-14597-20-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
 References: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: uDSTkXSIO2CIdf0i4gHs0A-1
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
@@ -85,127 +85,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuri Benditovich <yuri.benditovich@daynix.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
+From: Lukas Straub <lukasstraub2@web.de>
 
-Add support for following hash types:
-IPV6 TCP with extension headers
-IPV4 UDP
-IPV6 UDP
-IPV6 UDP with extension headers
+After failover the Secondary side of replication shouldn't change state, be=
+cause
+it now functions as our primary disk.
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-Acked-by: Dmitry Fleytman <dmitry.fleytman@gmail.com>
+In replication_start, replication_do_checkpoint, replication_stop, ignore
+the request if current state is BLOCK_REPLICATION_DONE (sucessful failover)=
+ or
+BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging acti=
+ve
+and hidden images into the base image).
+
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Acked-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/net_rx_pkt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- hw/net/net_rx_pkt.h |  6 +++++-
- hw/net/trace-events |  4 ++++
- 3 files changed, 51 insertions(+), 1 deletion(-)
+ block/replication.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index 98a5030..b2a06bd 100644
---- a/hw/net/net_rx_pkt.c
-+++ b/hw/net/net_rx_pkt.c
-@@ -307,6 +307,20 @@ _net_rx_rss_prepare_tcp(uint8_t *rss_input,
-                           &tcphdr->th_dport, sizeof(uint16_t));
- }
+diff --git a/block/replication.c b/block/replication.c
+index d6681b6..413d954 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -450,6 +450,17 @@ static void replication_start(ReplicationState *rs, Re=
+plicationMode mode,
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
 =20
-+static inline void
-+_net_rx_rss_prepare_udp(uint8_t *rss_input,
-+                        struct NetRxPkt *pkt,
-+                        size_t *bytes_written)
-+{
-+    struct udp_header *udphdr =3D &pkt->l4hdr_info.hdr.udp;
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary is promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
-+    _net_rx_rss_add_chunk(rss_input, bytes_written,
-+                          &udphdr->uh_sport, sizeof(uint16_t));
+     if (s->stage !=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is running or done");
+         aio_context_release(aio_context);
+@@ -574,6 +585,17 @@ static void replication_do_checkpoint(ReplicationState=
+ *rs, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+=20
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
-+    _net_rx_rss_add_chunk(rss_input, bytes_written,
-+                          &udphdr->uh_dport, sizeof(uint16_t));
-+}
+     if (s->mode =3D=3D REPLICATION_MODE_SECONDARY) {
+         secondary_do_checkpoint(s, errp);
+     }
+@@ -590,7 +612,7 @@ static void replication_get_error(ReplicationState *rs,=
+ Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+=20
+-    if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
++    if (s->stage =3D=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+         return;
+@@ -632,6 +654,17 @@ static void replication_stop(ReplicationState *rs, boo=
+l failover, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+=20
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
- uint32_t
- net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
-                          NetRxPktRssType type,
-@@ -347,6 +361,34 @@ net_rx_pkt_calc_rss_hash(struct NetRxPkt *pkt,
-         trace_net_rx_pkt_rss_ip6_ex();
-         _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-         break;
-+    case NetPktRssIpV6TcpEx:
-+        assert(pkt->isip6);
-+        assert(pkt->istcp);
-+        trace_net_rx_pkt_rss_ip6_ex_tcp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-+        _net_rx_rss_prepare_tcp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV4Udp:
-+        assert(pkt->isip4);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip4_udp();
-+        _net_rx_rss_prepare_ip4(&rss_input[0], pkt, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV6Udp:
-+        assert(pkt->isip6);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip6_udp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, false, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-+    case NetPktRssIpV6UdpEx:
-+        assert(pkt->isip6);
-+        assert(pkt->isudp);
-+        trace_net_rx_pkt_rss_ip6_ex_udp();
-+        _net_rx_rss_prepare_ip6(&rss_input[0], pkt, true, &rss_length);
-+        _net_rx_rss_prepare_udp(&rss_input[0], pkt, &rss_length);
-+        break;
-     default:
-         assert(false);
-         break;
-diff --git a/hw/net/net_rx_pkt.h b/hw/net/net_rx_pkt.h
-index 7adf0fa..048e346 100644
---- a/hw/net/net_rx_pkt.h
-+++ b/hw/net/net_rx_pkt.h
-@@ -133,7 +133,11 @@ typedef enum {
-     NetPktRssIpV4Tcp,
-     NetPktRssIpV6Tcp,
-     NetPktRssIpV6,
--    NetPktRssIpV6Ex
-+    NetPktRssIpV6Ex,
-+    NetPktRssIpV6TcpEx,
-+    NetPktRssIpV4Udp,
-+    NetPktRssIpV6Udp,
-+    NetPktRssIpV6UdpEx,
- } NetRxPktRssType;
-=20
- /**
-diff --git a/hw/net/trace-events b/hw/net/trace-events
-index 42066fc..a1da98a 100644
---- a/hw/net/trace-events
-+++ b/hw/net/trace-events
-@@ -92,9 +92,13 @@ net_rx_pkt_l3_csum_validate_csum(size_t l3hdr_off, uint3=
-2_t csl, uint32_t cntr,
-=20
- net_rx_pkt_rss_ip4(void) "Calculating IPv4 RSS  hash"
- net_rx_pkt_rss_ip4_tcp(void) "Calculating IPv4/TCP RSS  hash"
-+net_rx_pkt_rss_ip4_udp(void) "Calculating IPv4/UDP RSS  hash"
- net_rx_pkt_rss_ip6_tcp(void) "Calculating IPv6/TCP RSS  hash"
-+net_rx_pkt_rss_ip6_udp(void) "Calculating IPv6/UDP RSS  hash"
- net_rx_pkt_rss_ip6(void) "Calculating IPv6 RSS  hash"
- net_rx_pkt_rss_ip6_ex(void) "Calculating IPv6/EX RSS  hash"
-+net_rx_pkt_rss_ip6_ex_tcp(void) "Calculating IPv6/EX/TCP RSS  hash"
-+net_rx_pkt_rss_ip6_ex_udp(void) "Calculating IPv6/EX/UDP RSS  hash"
- net_rx_pkt_rss_hash(size_t rss_length, uint32_t rss_hash) "RSS hash for %z=
-u bytes: 0x%X"
- net_rx_pkt_rss_add_chunk(void* ptr, size_t size, size_t input_offset) "Add=
- RSS chunk %p, %zu bytes, RSS input offset %zu bytes"
-=20
+     if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
 --=20
 2.5.0
 
