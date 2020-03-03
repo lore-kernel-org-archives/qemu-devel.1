@@ -2,83 +2,80 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FE0C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2585CC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C6B320836
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:45:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E957120836
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:47:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ExCo3jdq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C6B320836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8ygNard"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E957120836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j953V-0008SG-5y
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:45:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58403)
+	id 1j9553-0001em-41
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:47:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j952a-0007uc-9c
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:44:45 -0500
+ (envelope-from <stefanha@gmail.com>) id 1j954I-0000sP-Kr
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j952Z-0001xM-1b
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:44:44 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35449
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j952Y-0001xD-U7
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:44:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583232281;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GC8qPuMVPmMIY+4ImhSWmzcFZJSYl4iR6BIPqfZZ1qI=;
- b=ExCo3jdquqjvNyPy/cwZiJ3NKZ63MRmm/M21O61go820zyJ1oE6aXjp122/ST4rV/B6kyP
- ZeQthfhuY6cev8W9c7Vn2bYNyd1HHSJkVcoYS7TJwjAsl7cHyjqTJWWN/aLd5CXHPdE+f0
- NZSiyC+11q1tCxjg9/Ndztn6zrg3/4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-IpyWGi8gOHSTUNkB18Mp3Q-1; Tue, 03 Mar 2020 05:44:37 -0500
-X-MC-Unique: IpyWGi8gOHSTUNkB18Mp3Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B824800D50;
- Tue,  3 Mar 2020 10:44:35 +0000 (UTC)
-Received: from redhat.com (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 93B9573860;
- Tue,  3 Mar 2020 10:44:34 +0000 (UTC)
-Date: Tue, 3 Mar 2020 10:44:31 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thorsten Glaser <t.glaser@tarent.de>
-Subject: Re: qemu-system-x86_64: warning: Unknown X11 keycode mapping '<null>'.
-Message-ID: <20200303104431.GB1773352@redhat.com>
-References: <alpine.DEB.2.22.394.2003020002570.23029@tglase.lan.tarent.de>
- <20200302102841.GD1679990@redhat.com>
- <alpine.DEB.2.22.394.2003021336010.14371@tglase.lan.tarent.de>
+ (envelope-from <stefanha@gmail.com>) id 1j954H-0002Y0-HM
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:46:30 -0500
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:40525)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1j954H-0002Xs-C8
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:46:29 -0500
+Received: by mail-qk1-x743.google.com with SMTP id m2so2861133qka.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 02:46:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=e7ZXQWD2g/ZiIeyLYpV0pgiVNJxG9wcvVkwwd7627ak=;
+ b=T8ygNardj8pFPqzlepQ4Ze6O4pDlnXhgTj2az/CN2LKy8CaRFuIGgolFaSuXhnRFFZ
+ itEZbdt327X2c4leaO9xw9Y6bmma6P0LrzwXXhnVL/fqcLLp2+SqRBCjfuXw1yoEaPh8
+ GAVe37JifNxlzkEYOEX84qK/qeFduwPJfAX2o3rPfAP6IYSNyGH9kSj+HbERCyIYv+DA
+ eOh5Xnch/E259umuSy8ZTygQxWlQVNKmN1ljOg+HAaDxgaPAueSGywUfqwYK2k6MUrLc
+ JAGhQd5M4Fo/2q7fH1/CgCqqOCCg2QzW3k51NgDY5PFDpJb4GlrsBxbnwMzWShoC870/
+ WEZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=e7ZXQWD2g/ZiIeyLYpV0pgiVNJxG9wcvVkwwd7627ak=;
+ b=SGLEVD3EGqASvMEHS02oxqy3kYkAu5kqQXOdlqR33rVeOGwFKEeDlBm3uajBhlDtUn
+ X68C/p9V1zrWwGXKP+4WxUCBjP9ntr0roWht7Ys4xa2uiLlzqq/ppzlUwaTq5Uulwqhk
+ 8NhV8KoRO/vRd0/x6xcEIliXiZKiqMWLviTwpdfblc4FoQCuT+g3sWBVJXvkqKLbEqUI
+ E14KgmZoKK/H2O6bbUHgMv5xNq+XwRoQ+ANMSuS2I+fpX2f6S1wS9WzXDk7dGlfrHlTo
+ h1CQQfJdM8o9hqn9PE+YOZKfHUGlOl7a7qoTZIeBu4LU2uo9BF/s1OukmR+VR4Ke65wQ
+ UrTQ==
+X-Gm-Message-State: ANhLgQ3/j58x29WizSCbLKDOjTyseA4/ltG2qJq6pnSUIENjHk1DSTCZ
+ xjOdmmxQTtEGuxucOa8fW5WVMjB3mQod1Uwge18=
+X-Google-Smtp-Source: ADFU+vuNjwFb3ZZPX/YRdTaijOkxXCGo2JOiwpVA8ocWdfnylMxPBq7POXXlZ9KqjdmwgRm2URicHAMhBW9UAcv4Ogg=
+X-Received: by 2002:a37:a28f:: with SMTP id l137mr3441308qke.196.1583232388672; 
+ Tue, 03 Mar 2020 02:46:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.22.394.2003021336010.14371@tglase.lan.tarent.de>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <CAPV47zf2Bz1xNTcD_1M=hf7tyVnCYh8yLagN=r8ocgrz2GT2Hw@mail.gmail.com>
+ <20200302173604.GB682016@stefanha-x1.localdomain>
+ <CAPV47zdPz+Z5=bOFNGjTG8nEWgH4gb78_AE3SGU0TD_7TNmSLw@mail.gmail.com>
+In-Reply-To: <CAPV47zdPz+Z5=bOFNGjTG8nEWgH4gb78_AE3SGU0TD_7TNmSLw@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Tue, 3 Mar 2020 10:46:17 +0000
+Message-ID: <CAJSP0QXd9fhz45OdA190XizdiwYF84UzHhD7QQVdzh9293iH9A@mail.gmail.com>
+Subject: Re: New Hardware model emulation
+To: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::743
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,51 +87,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 02, 2020 at 01:43:12PM +0100, Thorsten Glaser wrote:
-> On Mon, 2 Mar 2020, Daniel P. Berrang=C3=A9 wrote:
->=20
-> > "x11vnc" suggests you had a regular X11 desktop session, and are
-> > exporting it via VNC ?
->=20
-> No, x11vnc is a standalone VNC server.
+On Tue, Mar 3, 2020 at 7:45 AM Priyamvad Acharya
+<priyamvad.agnisys@gmail.com> wrote:
 
-AFAICT, this is not the case. On both my Fedora & Debian installs,
-x11vnc is just a binary that attaches to an existing X11 server
-and exports it - it doesn't provide an X11 itself, like tigervnc
-or tightvnc do.
+Please use Reply-All when replying to mailing list emails so that
+qemu-devel@nongnu.org is included in the CC list.  That way the
+discussion stays on the mailing list.
 
-> > Can you tell me a bit more detail about how you launch this all.
->=20
-> Sure:
->=20
-> $ vncserver -geometry 1000x768 -name nowm :2
-> $ (export DISPLAY=3D:2; exec </dev/null >>.xsession-errors; exec 2>&1; ic=
-ewm-session &)
+> Hi,
+> I have written code to emulate a custom PCI device.
+> Now I want to run custom device with Qemu, so that user application can perform read/write operation with custom PCI device.
+> So what is the method to do it?
 
-Can you tell me output of
+1. Add the source file somewhere below hw/.
+2. Add a make rule to build the object file in Makefile.objs in the
+same directory as the source file.
+3. Compile QEMU and run with -device testpci.
 
-  $ ls -al /usr/bin/vncserver
+> I am new to emulating a custom device model in Qemu, so request you to explain me in that way.
 
-On Debian this is normally a symlink to alternatives. If so,
-also tell me what this reports:
+Reading the source code is necessary to understand how things work.
+You can find many examples of devices in the hw/ directory.  Using
+git-log(1) can be helpful because it shows how new devices were
+introduced.
 
-  $ ls -al /etc/alternatives/vncserver
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Stefan
 
