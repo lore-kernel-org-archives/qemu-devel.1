@@ -2,84 +2,118 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30045C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84ACCC3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:13:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F29662072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:11:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53EDA2072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:13:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Th8dI/jX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29662072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hA8VFpSl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53EDA2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j92ed-0006YQ-3u
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 03:11:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36253)
+	id 1j92gR-0007fE-Fr
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 03:13:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j92du-00064m-5x
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:07 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j92fh-00078N-8j
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j92ds-0003Ld-IU
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:05 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50358
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j92ds-0003LH-Cp
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583223063;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RCwNnUdNZwz9ymgbmW/BL4i9p3W0DN8ijycPRFiWJjI=;
- b=Th8dI/jX9kZebokqmE6vM0YJ6pzHWej1z4O6tYbWSg2B+2Kq5uKCT0t03Rfg4WXkvMca7g
- IZxT0M+LvyR7Bii1M2GCWk8PzOh3gSa2nZoz05Mcx2QQZqef5Qkab1uBukOEcG5IGJ/UuS
- gWK89sPOsc39zRsEnLHUNNSKcVprG3c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-I_IDbCYRPliQ63cZbPLJ1g-1; Tue, 03 Mar 2020 03:11:01 -0500
-X-MC-Unique: I_IDbCYRPliQ63cZbPLJ1g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29FAF100550E;
- Tue,  3 Mar 2020 08:11:00 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
- [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C18D0272A0;
- Tue,  3 Mar 2020 08:10:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5146C11386A6; Tue,  3 Mar 2020 09:10:58 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v5 1/4] qapi: Add a 'coroutine' flag for commands
-References: <20200218154036.28562-1-kwolf@redhat.com>
- <20200218154036.28562-2-kwolf@redhat.com>
-Date: Tue, 03 Mar 2020 09:10:58 +0100
-In-Reply-To: <20200218154036.28562-2-kwolf@redhat.com> (Kevin Wolf's message
- of "Tue, 18 Feb 2020 16:40:33 +0100")
-Message-ID: <87tv35dfjh.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j92fg-0004AW-9x
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:12:57 -0500
+Received: from mail-db3eur04on071e.outbound.protection.outlook.com
+ ([2a01:111:f400:fe0c::71e]:56453
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j92fc-000482-5u; Tue, 03 Mar 2020 03:12:52 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bpjk7gZTrYOiox0HwCmOW2ZJv13N9INM7cEt5G1O1AHSqYoEtIK91bNxXsR4X3iV7PgjG1XlckZewpRHVsbckFCEcsnUSmlh95048evXIyRU0cfhoP8L8rEI4CQQn8Ie85N8O34X47LVbwOy125P2wK58Nf5DyhUK/ZzfyQ8U4XNrjGX6ShVRvhcfFflWTocCd9i64Ys0cAShZeYBDktXhzk54CDM3kUjtZf5F3d5OkjEvnTFLQkSVE4MOpAVrA7DpgTJac1f7PZsjkPRPCYjLKmVUOq55NrYyozGB0A/Io/6M2BLyW93KXg+FDYPnu7MIuhJmYK2HCbrtqVAZ4kfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=469FiHZuZry8HBY8cmslj/6UeoVwRhHUEw0zxLSxSrs=;
+ b=M6KkgsjvTGkVvtsDSN2eEw0EX2bZwofMCZ5H4egR26HIjTHGM9LtsuMCvh2wBD7zb7c/C52utwV81lbqbjBciYJA+UxjNYOSfdt4o0rV/QW55G6UJ5zCEwyKkU7epfB5t59GLsORWlxT79T5m4/GPPR+dx858RzGPcoIpGL6QyB5T7/wtZddE7uYinLFtNQwZuos8Vp5LvE0+QqeZNFlKwITjlLJrZdniOcKcmpPhYrP7hr87PwTUhrbspP8CP4rJZQkpnxIllgl4sxj2fVIcLhtD2jZ+6yKlcDnM65eymoe5qt+c+jHiR8XdI9ukqwL25AprvAT3L9vydLjwfdauA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=469FiHZuZry8HBY8cmslj/6UeoVwRhHUEw0zxLSxSrs=;
+ b=hA8VFpSldK0AokXbCFB0kAYNKqTx5t9dy8dwo5bK8RhancPWLQHFq1jV1M+yKVMUrElpAjmILjo2Zz7ZwAFK+Ilkxfl7ZcCOIdEqTgCQbXNJA83JiPHT7h3960rVCYNmJBPSq+znbj3dt+BH25C+Y2mJMr3eMgapxdMWK89+Hvc=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3287.eurprd08.prod.outlook.com (52.135.161.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.21; Tue, 3 Mar 2020 08:12:49 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2772.019; Tue, 3 Mar 2020
+ 08:12:49 +0000
+Subject: Re: [PATCH v7 00/11] error: auto propagated local_err part I
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+ <87y2shdg00.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200303111246391
+Message-ID: <87abeabb-c8ee-ed6f-6b3a-b3fc24d07b89@virtuozzo.com>
+Date: Tue, 3 Mar 2020 11:12:46 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <87y2shdg00.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HE1PR05CA0146.eurprd05.prod.outlook.com
+ (2603:10a6:7:28::33) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0146.eurprd05.prod.outlook.com (2603:10a6:7:28::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.14 via Frontend Transport; Tue, 3 Mar 2020 08:12:48 +0000
+X-Tagtoolbar-Keys: D20200303111246391
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6451adb3-e14e-4ca2-66b5-08d7bf4aa989
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3287:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3287FE441B1DA4DAFD75BE7CC1E40@AM6PR08MB3287.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 03319F6FEF
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(346002)(396003)(376002)(136003)(39850400004)(366004)(189003)(199004)(16526019)(81156014)(36756003)(86362001)(6916009)(6486002)(7416002)(54906003)(478600001)(16576012)(52116002)(81166006)(8676002)(8936002)(186003)(66946007)(31696002)(66556008)(66476007)(4744005)(4326008)(2616005)(5660300002)(26005)(2906002)(31686004)(316002)(956004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3287;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0+fhlR43Eb8qE71knmAwcIdZfEYV+HMReDGVbQzJhIyfaP6N5th+aMZZKzCMn0xj6g9GDpcOtr3JSxyJRsuRrlum++6ZDAmH56E3Z3ZVoQ16sK9nr1wxbKw43trO3L/5Oi5/hR/Ql7DmQwKQBhxKi45swGwLA1nSgR6Yf4LtD//+9sAl+1HdrmreMN2PY4njlqg0lK2bOOsLLDDT63LjfZfUh3DOmVVLNCkzJyYAHONVd5RKyfgWoGwPsTGlodyyO3+BPmwqhc46dVYHgNefazxXnipu3EbMtOCFjSgQzlXdRUKUobTPf7wc29NKmFGbYoPqVh0rzdWqNx9jHxAYwMd4XV2P74EW3DMDqpL7BRiTmIiYxLWflnBy1lgWcJocww6M/+qqL7qcqSzDV1NYMwNIqd0RpEXV3P6i/ceJ6d1ztUmpoujW9OlYtw+UOUAN
+X-MS-Exchange-AntiSpam-MessageData: gNY935rUtjuY+dLqkQAG2EomnVrdof9fV2ZE8NJPWI/84lkFti0/p3UDeThaiEihHbgO6kDAS2tgYeTvseXHAi0MH6YLt7VFEyiCksj/Mpb4pjaNOcxq0SEeOhueGsgjq+OjLyX/u3qBeDLLLKXVnA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6451adb3-e14e-4ca2-66b5-08d7bf4aa989
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2020 08:12:49.0293 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xs/SFqutS1jlJmj54CFKn+LXdWeRmPK1P2PYuMlAZ1iNZ1VGqy10o5/wM+yz4gAyFuox+D+praoIySRrD7aZfsVr9Zmaj+xKegrAGunkZkM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3287
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe0c::71e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,122 +125,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+03.03.2020 11:01, Markus Armbruster wrote:
+> Hi Vladimir,
+> 
+> I've come to rather like your ERRP_AUTO_PROPAGATE() idea.  What I
+> wouldn't like is a protracted conversion.
+> 
+> Once we're happy with PATCH 1-3, it's a matter of running Coccinelle and
+> reviewing its output.  I'm confident we can converge on PATCH 1-3.
+> 
+> It's two weeks until soft freeze.  We need to decide whether to pursue a
+> partial conversion for 5.0 (basically this series plus the two patches
+> we identified in review of PATCH 1), or delay until 5.1.  In either
+> case, I want the conversion to be finished in 5.1.
+> 
+> Please do not feel pressured to make the 5.0 deadline.
+> 
+> I can queue up patches for 5.1 during the freeze.
+> 
+> How would you like to proceed?
+> 
 
-> This patch adds a new 'coroutine' flag to QMP command definitions that
-> tells the QMP dispatcher that the command handler is safe to be run in a
-> coroutine.
->
-> The documentation of the new flag pretends that this flag is already
-> used as intended, which it isn't yet after this patch. We'll implement
-> this in another patch in this series.
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/devel/qapi-code-gen.txt            | 11 +++++++++++
->  include/qapi/qmp/dispatch.h             |  1 +
->  tests/test-qmp-cmds.c                   |  4 ++++
->  scripts/qapi/commands.py                | 10 +++++++---
->  scripts/qapi/doc.py                     |  2 +-
->  scripts/qapi/expr.py                    | 10 ++++++++--
->  scripts/qapi/introspect.py              |  2 +-
->  scripts/qapi/schema.py                  |  9 ++++++---
->  tests/qapi-schema/test-qapi.py          |  7 ++++---
->  tests/Makefile.include                  |  1 +
->  tests/qapi-schema/oob-coroutine.err     |  2 ++
->  tests/qapi-schema/oob-coroutine.json    |  2 ++
->  tests/qapi-schema/oob-coroutine.out     |  0
->  tests/qapi-schema/qapi-schema-test.json |  1 +
->  tests/qapi-schema/qapi-schema-test.out  |  2 ++
->  15 files changed, 51 insertions(+), 13 deletions(-)
->  create mode 100644 tests/qapi-schema/oob-coroutine.err
->  create mode 100644 tests/qapi-schema/oob-coroutine.json
->  create mode 100644 tests/qapi-schema/oob-coroutine.out
->
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 59d6973e1e..df01bd852b 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -457,6 +457,7 @@ Syntax:
->                  '*gen': false,
->                  '*allow-oob': true,
->                  '*allow-preconfig': true,
-> +                '*coroutine': true,
->                  '*if': COND,
->                  '*features': FEATURES }
-> =20
-> @@ -581,6 +582,16 @@ before the machine is built.  It defaults to false. =
- For example:
->  QMP is available before the machine is built only when QEMU was
->  started with --preconfig.
-> =20
-> +Member 'coroutine' tells the QMP dispatcher whether the command handler
-> +is safe to be run in a coroutine.  It defaults to false.  If it is true,
-> +the command handler is called from coroutine context and may yield while
-> +waiting for an external event (such as I/O completion) in order to avoid
-> +blocking the guest and other background operations.
-> +
-> +It is an error to specify both 'coroutine': true and 'allow-oob': true
-> +for a command.  (We don't currently have a use case for both together an=
-d
-> +without a use case, it's not entirely clear what the semantics should be=
-.)
+Hi Markus! Funny coincidence: exactly now (less than 1 hour ago), I've
+started working for the next version for these series. So, I'm going to
+resend today. Of course, I'd prefer to merge something to 5.0 if at all
+possible.
 
-The parenthesis is new since v4.  I like its contents.  I'm not fond of
-putting complete sentences in parenthesis.  I'll drop them, if you don't
-mind.
 
-> +
->  The optional 'if' member specifies a conditional.  See "Configuring
->  the schema" below for more on this.
-> =20
-[...]
-> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-> index d7a289eded..95cc006cae 100644
-> --- a/scripts/qapi/expr.py
-> +++ b/scripts/qapi/expr.py
-> @@ -89,10 +89,16 @@ def check_flags(expr, info):
->          if key in expr and expr[key] is not False:
->              raise QAPISemError(
->                  info, "flag '%s' may only use false value" % key)
-> -    for key in ['boxed', 'allow-oob', 'allow-preconfig']:
-> +    for key in ['boxed', 'allow-oob', 'allow-preconfig', 'coroutine']:
->          if key in expr and expr[key] is not True:
->              raise QAPISemError(
->                  info, "flag '%s' may only use true value" % key)
-> +    if 'allow-oob' in expr and 'coroutine' in expr:
-> +        # This is not necessarily a fundamental incompatibility, but we =
-don't
-> +        # have a use case and the desired semantics isn't obvious. The s=
-implest
-> +        # solution is to forbid it until we get a use case for it.
-
-Appreciated.  I'll word-wrap, if you don't mind.
-
-> +        raise QAPISemError(info, "flags 'allow-oob' and 'coroutine' "
-> +                                 "are incompatible")
-> =20
-> =20
->  def check_if(expr, info, source):
-> @@ -344,7 +350,7 @@ def check_exprs(exprs):
->                         ['command'],
->                         ['data', 'returns', 'boxed', 'if', 'features',
->                          'gen', 'success-response', 'allow-oob',
-> -                        'allow-preconfig'])
-> +                        'allow-preconfig', 'coroutine'])
->              normalize_members(expr.get('data'))
->              check_command(expr, info)
->          elif meta =3D=3D 'event':
-[...]
-
-R-by stands.
-
+-- 
+Best regards,
+Vladimir
 
