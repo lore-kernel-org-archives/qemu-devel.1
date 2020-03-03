@@ -2,85 +2,81 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B1EC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB8BC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:44:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5BAA208C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:42:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFC7A208C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:44:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byEq3FOn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BAA208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pqBUsGjJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC7A208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j944B-00039L-W9
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:42:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48150)
+	id 1j946F-0004XE-32
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:44:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48610)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1j943G-0002Ms-7L
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:41:24 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j945T-0003y9-SD
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:43:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1j943C-00020G-SY
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:41:21 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37774
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1j943C-0001zx-K1
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:41:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583228477;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0bZsUZX3JwEsEM0cUl/sPAOimjlcxFt+l8FcLrIa9b8=;
- b=byEq3FOnRMlKHjiER1lBBi9KLRQ21XW1msTZmnvCVifYRSwPMARL6oxaYp2yB33/yoYWXj
- 63DoFa3cZgoj/bxJ4V4Pp2VlLNXz8IvA0w3e7gZSfW5YoUK2sihXpP/KJ4YtZbhyWmDh+/
- yoaIpnwRzZrIIITr40Gt8B2B/INOYx0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-Ybd9wDgCP4-umTW-7IWIyw-1; Tue, 03 Mar 2020 04:41:13 -0500
-X-MC-Unique: Ybd9wDgCP4-umTW-7IWIyw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A6BB13E2;
- Tue,  3 Mar 2020 09:41:11 +0000 (UTC)
-Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 811668D568;
- Tue,  3 Mar 2020 09:41:01 +0000 (UTC)
-Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
-To: Zhangfei Gao <zhangfei.gao@gmail.com>
-References: <20200214132745.23392-1-eric.auger@redhat.com>
- <20200227111717.GG1645630@redhat.com>
- <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
- <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <fea625f1-b58e-6da6-8e2a-f32fc9391fc8@redhat.com>
-Date: Tue, 3 Mar 2020 10:40:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j945S-0002l8-Fm
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:43:39 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41783)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j945S-0002l0-Ad
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:43:38 -0500
+Received: by mail-ot1-x341.google.com with SMTP id v19so2336230ote.8
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 01:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=t0T8dZS+FD7WOcLwP+Dts6793g7oyf//scpnHNrrWC4=;
+ b=pqBUsGjJBQu8s9raJJpxz0BTmkfIptxBMcob8/+XF4cNL8fIIhWlz7H9nK4dTWbFXy
+ hNP0bmAY4i8MiFcTvNXKXv+9qSJDSqgdRrEhPvpGl61DMI2AxvluW3noSlAVSndxwFZe
+ pX1LNUbQxcRcyawpvQSkIDNF2nX7xtVmKG02vVYiLoypXfPWzn+VIXhNcUGXCra9o8ao
+ ruqSe2nVmo10d1KOILUWWYR6A547ZmaVRvcqaqrXer0EsxEkkhaGe+AOgEbWAJzNQKIe
+ KdsP8qsSUO6+i+8VZfaWg5mPAYOH3ssGHOYGYJDVnBJGbTb3x3i/185vtL1RXq9WA9iW
+ wkOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=t0T8dZS+FD7WOcLwP+Dts6793g7oyf//scpnHNrrWC4=;
+ b=ASVYIcikehZNKrgUfcRHTr7j/cXRjR+oJulmziVCUfbzjZvmxr2XGF8Wms1mV/NB/O
+ 6SmkyNvHWCHIVW2X0MkoTS+wdth9QTMvRSZiRJQFBVvWyUOZ6HPB33/3EpUA1V2mZqUJ
+ B2gDWevCBIhYV5i6AQlLx+aEsa/acB2GzStBXSazpCXA7N78fr1gMI6Sn8IMXKl3RSRM
+ Vu3vuVTTwTjiacyjCXtHERBqjGM46kPUPullO6vYGg/kQdOM60IrKmBougih2i/bCSQy
+ WpXFOtvOiS9Uv7rdtCQJm89ETYOsIvx/y2djwRcVA7HEZbVueiDljNBnC/X1D9H/Qlwe
+ YIlA==
+X-Gm-Message-State: ANhLgQ2vNGrEOs6DuLYnNACVMcctsR8J6W7YCxB1hLYmQSVNhQzEzbjT
+ cIRnm1LKvk7Dy8GDyhg4dYpeSn4iexZ/m80ucIU=
+X-Google-Smtp-Source: ADFU+vsqkcC9jXZqkHI4r3CA7wObwPuEIu3miu8xcS/5QIpvbcozdhBGDC9NAa7pM9rohX2xTmslKiMlhs5jNDzCgrM=
+X-Received: by 2002:a9d:2184:: with SMTP id s4mr2574869otb.121.1583228617539; 
+ Tue, 03 Mar 2020 01:43:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200302232220.761-1-philmd@redhat.com>
+In-Reply-To: <20200302232220.761-1-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 3 Mar 2020 10:42:57 +0100
+Message-ID: <CAL1e-=jLe0zPCkCOYY_XXgVqAhAdAuiPqzn57mYv8YvVwDRihA@mail.gmail.com>
+Subject: Re: [PATCH] tests/acceptance: move @skipUnless decoration to test
+ itself
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000058c374059ff02360"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,116 +88,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- kenneth-lee-2012@foxmail.com, tnowicki@marvell.com,
- "Michael S. Tsirkin" <mst@redhat.com>, quintela@redhat.com,
- zhangfei.gao@foxmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- "Wangzhou \(B\)" <wangzhou1@hisilicon.com>, jean-philippe@linaro.org,
- eric.auger.pro@gmail.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zhangfei,
-On 3/3/20 4:23 AM, Zhangfei Gao wrote:
-> Hi Eric
->=20
-> On Thu, Feb 27, 2020 at 9:50 PM Auger Eric <eric.auger@redhat.com> wrote:
->>
->> Hi Daniel,
->>
->> On 2/27/20 12:17 PM, Daniel P. Berrang=C3=A9 wrote:
->>> On Fri, Feb 14, 2020 at 02:27:35PM +0100, Eric Auger wrote:
->>>> This series implements the QEMU virtio-iommu device.
->>>>
->>>> This matches the v0.12 spec (voted) and the corresponding
->>>> virtio-iommu driver upstreamed in 5.3. All kernel dependencies
->>>> are resolved for DT integration. The virtio-iommu can be
->>>> instantiated in ARM virt using:
->>>>
->>>> "-device virtio-iommu-pci".
->>>
->>> Is there any more documentation besides this ?
->>
->> not yet in qemu.
->>>
->>> I'm wondering on the intended usage of this, and its relation
->>> or pros/cons vs other iommu devices
->>
->> Maybe if you want to catch up on the topic, looking at the very first
->> kernel RFC may be a good starting point. Motivation, pros & cons were
->> discussed in that thread (hey, April 2017!)
->> https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021217.html
->>
->> on ARM we have SMMUv3 emulation. But the VFIO integration is not
->> possible because SMMU does not have any "caching mode" and my nested
->> paging kernel series is blocked. So the only solution to integrate with
->> VFIO is looming virtio-iommu.
->>
->> In general the pros that were put forward are: virtio-iommu is
->> architecture agnostic, removes the burden to accurately model complex
->> device states, driver can support virtualization specific optimizations
->> without being constrained by production driver maintenance. Cons is perf
->> and mem footprint if we do not consider any optimization.
->>
->> You can have a look at
->>
->> http://events17.linuxfoundation.org/sites/events/files/slides/viommu_arm=
-.pdf
->>
-> Thanks for the patches.
->=20
-> Could I ask one question?
-> To support vSVA and pasid in guest, which direction you recommend,
-> virtio-iommu or vSMMU (your nested paging)
->=20
-> Do we still have any obstacles?
-you can ask the question but not sure I can answer ;-)
+--00000000000058c374059ff02360
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-1) SMMUv3 2stage implementation is blocked by Will at kernel level.
+12:22 AM Uto, 03.03.2020. Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =
+=D1=98=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> It appears ignore the decoration if just applied to the class.
+>
+> Fixes: 0484d9d4fbe9beacd
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> [PMD: Move decorations to each test function]
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
 
-Despite this situation I may/can respin as Marvell said they were
-interested in this effort. If you are also interested in (I know you
-tested it several times and I am grateful to you for that), please reply
-to:
-[PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
-(https://patchwork.kernel.org/cover/11039871/) and say you are
-interested in that work so that maintainers are aware there are
-potential users.
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-At the moment I have not supported multiple CDs because it introduced
-other dependencies.
+Alex, please accept this most complete version. Many thanks, Aleksandar
 
-2) virtio-iommu
+>  tests/acceptance/machine_mips_malta.py | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/acceptance/machine_mips_malta.py
+b/tests/acceptance/machine_mips_malta.py
+> index 92b4f28a11..98463f7757 100644
+> --- a/tests/acceptance/machine_mips_malta.py
+> +++ b/tests/acceptance/machine_mips_malta.py
+> @@ -30,8 +30,6 @@
+>      CV2_AVAILABLE =3D False
+>
+>
+> -@skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
+> -@skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+>  class MaltaMachineFramebuffer(Test):
+>
+>      timeout =3D 30
+> @@ -91,6 +89,8 @@ def do_test_i6400_framebuffer_logo(self,
+cpu_cores_count):
+>              cv2.imwrite(debug_png, screendump_bgr)
+>          self.assertGreaterEqual(tuxlogo_count, cpu_cores_count)
+>
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+>      def test_mips_malta_i6400_framebuffer_logo_1core(self):
+>          """
+>          :avocado: tags=3Darch:mips64el
+> @@ -99,6 +99,8 @@ def test_mips_malta_i6400_framebuffer_logo_1core(self):
+>          """
+>          self.do_test_i6400_framebuffer_logo(1)
+>
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+>      def test_mips_malta_i6400_framebuffer_logo_7cores(self):
+>          """
+>          :avocado: tags=3Darch:mips64el
+> @@ -108,6 +110,8 @@ def
+test_mips_malta_i6400_framebuffer_logo_7cores(self):
+>          """
+>          self.do_test_i6400_framebuffer_logo(7)
+>
+> +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
+> +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
+>      def test_mips_malta_i6400_framebuffer_logo_8cores(self):
+>          """
+>          :avocado: tags=3Darch:mips64el
+> --
+> 2.21.1
+>
+>
 
-So only virtio-iommu dt boot on machvirt is currently supported. For non
-DT, Jean respinned his kernel series
-"[PATCH v2 0/3] virtio-iommu on x86 and non-devicetree platforms" as you
-may know. However non DT integration still is controversial. Michael is
-pushing for putting the binding info the PCI config space. Joerg
-yesterday challenged this solution and said he would prefer ACPI
-integration. ACPI support depends on ACPI spec update & vote anyway.
+--00000000000058c374059ff02360
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-To support PASID at virtio-iommu level you also need virtio-iommu API
-extensions to be proposed and written + kernel works. So that's a long
-road. I will let Jean-Philippe comment on that.
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">12:22 AM Uto, 03.03.2020. Philippe Mathieu-Daud=C3=A9 &lt;<a=
+ href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; From: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">a=
+lex.bennee@linaro.org</a>&gt;<br>
+&gt;<br>
+&gt; It appears ignore the decoration if just applied to the class.<br>
+&gt;<br>
+&gt; Fixes: 0484d9d4fbe9beacd<br>
+&gt; Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@lina=
+ro.org">alex.bennee@linaro.org</a>&gt;<br>
+&gt; [PMD: Move decorations to each test function]<br>
+&gt; Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philm=
+d@redhat.com">philmd@redhat.com</a>&gt;<br>
+&gt; ---</p>
+<p dir=3D"ltr">Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amark=
+ovic@wavecomp.com">amarkovic@wavecomp.com</a>&gt;</p>
+<p dir=3D"ltr">Alex, please accept this most complete version. Many thanks,=
+ Aleksandar<br></p>
+<p dir=3D"ltr">&gt; =C2=A0tests/acceptance/machine_mips_malta.py | 8 ++++++=
+--<br>
+&gt; =C2=A01 file changed, 6 insertions(+), 2 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/tests/acceptance/machine_mips_malta.py b/tests/acceptance=
+/machine_mips_malta.py<br>
+&gt; index 92b4f28a11..98463f7757 100644<br>
+&gt; --- a/tests/acceptance/machine_mips_malta.py<br>
+&gt; +++ b/tests/acceptance/machine_mips_malta.py<br>
+&gt; @@ -30,8 +30,6 @@<br>
+&gt; =C2=A0 =C2=A0 =C2=A0CV2_AVAILABLE =3D False<br>
+&gt;<br>
+&gt;<br>
+&gt; -@skipUnless(NUMPY_AVAILABLE, &#39;Python NumPy not installed&#39;)<br=
+>
+&gt; -@skipUnless(CV2_AVAILABLE, &#39;Python OpenCV not installed&#39;)<br>
+&gt; =C2=A0class MaltaMachineFramebuffer(Test):<br>
+&gt;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0timeout =3D 30<br>
+&gt; @@ -91,6 +89,8 @@ def do_test_i6400_framebuffer_logo(self, cpu_cores_c=
+ount):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cv2.imwrite(debug_png,=
+ screendump_bgr)<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.assertGreaterEqual(tuxlogo_coun=
+t, cpu_cores_count)<br>
+&gt;<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(NUMPY_AVAILABLE, &#39;Python NumPy not inst=
+alled&#39;)<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(CV2_AVAILABLE, &#39;Python OpenCV not insta=
+lled&#39;)<br>
+&gt; =C2=A0 =C2=A0 =C2=A0def test_mips_malta_i6400_framebuffer_logo_1core(s=
+elf):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0:avocado: tags=3Darch:mips64el<br>
+&gt; @@ -99,6 +99,8 @@ def test_mips_malta_i6400_framebuffer_logo_1core(sel=
+f):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.do_test_i6400_framebuffer_logo(=
+1)<br>
+&gt;<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(NUMPY_AVAILABLE, &#39;Python NumPy not inst=
+alled&#39;)<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(CV2_AVAILABLE, &#39;Python OpenCV not insta=
+lled&#39;)<br>
+&gt; =C2=A0 =C2=A0 =C2=A0def test_mips_malta_i6400_framebuffer_logo_7cores(=
+self):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0:avocado: tags=3Darch:mips64el<br>
+&gt; @@ -108,6 +110,8 @@ def test_mips_malta_i6400_framebuffer_logo_7cores(=
+self):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.do_test_i6400_framebuffer_logo(=
+7)<br>
+&gt;<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(NUMPY_AVAILABLE, &#39;Python NumPy not inst=
+alled&#39;)<br>
+&gt; +=C2=A0 =C2=A0 @skipUnless(CV2_AVAILABLE, &#39;Python OpenCV not insta=
+lled&#39;)<br>
+&gt; =C2=A0 =C2=A0 =C2=A0def test_mips_malta_i6400_framebuffer_logo_8cores(=
+self):<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0:avocado: tags=3Darch:mips64el<br>
+&gt; -- <br>
+&gt; 2.21.1<br>
+&gt;<br>
+&gt;<br>
+</p>
 
-I would just say that Intel is working on nested paging solution with
-their emulated intel-iommu. We can help them getting that upstream and
-partly benefit from this work.
-
-> Would you mind give some breakdown.
-> Jean mentioned PASID still not supported in QEMU.
-Do you mean support of multiple CDs in the emulated SMMU? That's a thing
-I could implement quite easily. What is more tricky is how to test it.
-
-Thanks
-
-Eric
->=20
-> Thanks
->=20
-
+--00000000000058c374059ff02360--
 
