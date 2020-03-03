@@ -2,72 +2,69 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27BBC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBBAC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8668E206D5
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:40:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2444720728
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 21:50:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WyFxUXKL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8668E206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPrxcTvW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2444720728
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9FHe-0007mZ-LC
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:40:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55208)
+	id 1j9FQN-0001rf-2n
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 16:49:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9FGm-0007DC-5b
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:40:05 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9FPL-0001KC-Qe
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:48:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9FGl-0001vd-0t
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:40:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55557
+ (envelope-from <jsnow@redhat.com>) id 1j9FPI-0001fc-W5
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:48:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45328
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9FGk-0001uj-SB
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:40:02 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9FPI-0001eX-Qq
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 16:48:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583271602;
+ s=mimecast20190719; t=1583272131;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=QqdHP8jIN/kr9JFG0CdndN0iLGGDovNZLV/Ylhjwt38=;
- b=WyFxUXKL48FVbhx2ZO+jQeJis2YngyGDJdn95k1UouEoiN7qdfTbY8hjIhBcdwvAbuDn/i
- z7PNwIhfiS+M1bNhP7kKIoramQeolh1DpU2iKKIoUZ30ngU153EbK2yhMMYtlj+uU3Rhom
- O4afwiPyuFMgCOhHzg8Q4cjzPR6aWsE=
+ bh=/T5XdfiE2KrIUzEPWhkkHuqfn/x3tAiDuH0dGRLznac=;
+ b=NPrxcTvWHTrxc1MKeJwpD55zVQM4tazj+CSiJl70rFVqTbvpP1Ng6CX6Ww8DPUgaIC5j4o
+ X9exK/ufZIn+dRmcspLa0f7FcfDubLe/7y/uXhSLKVYcsmeJGC8SFux+rJe1ry4/OPPvaL
+ XCeSq0b7p/tU4sYJqkymiBO/B9gzpfE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-9AyLsuutPICSsVPpXlih7A-1; Tue, 03 Mar 2020 16:40:00 -0500
-X-MC-Unique: 9AyLsuutPICSsVPpXlih7A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-428-aP4_x3-yM2qKGYoaxKh4Lw-1; Tue, 03 Mar 2020 16:48:50 -0500
+X-MC-Unique: aP4_x3-yM2qKGYoaxKh4Lw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF33F800D53;
- Tue,  3 Mar 2020 21:39:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0F841084458;
+ Tue,  3 Mar 2020 21:48:48 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 36DF05C1D4;
- Tue,  3 Mar 2020 21:39:57 +0000 (UTC)
-Subject: Re: [PATCH 1/6] block: add bitmap-populate job
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 69B1C8477C;
+ Tue,  3 Mar 2020 21:48:37 +0000 (UTC)
+Subject: Re: [PATCH 2/6] qmp: expose block-dirty-bitmap-populate
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
 References: <20200225005641.5478-1-jsnow@redhat.com>
- <20200225005641.5478-2-jsnow@redhat.com>
- <ede1d2b6-0af9-0002-dc33-b82aa870119f@virtuozzo.com>
- <5c03a2b5-7cba-b347-da80-f9d9acaccb6e@redhat.com>
- <d462c95f-a616-1ddb-f0fd-650be113c384@virtuozzo.com>
- <0343e036-ff72-0fd4-5478-86e40ae54aca@redhat.com>
- <b38ab475-fdb7-41c7-6e2c-ac43fecd608e@virtuozzo.com>
+ <20200225005641.5478-3-jsnow@redhat.com>
+ <f64989f8-555d-6e52-87f0-f387bb21d3eb@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -143,21 +140,20 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <cdaba46d-d08c-64eb-2c39-5128aeecb718@redhat.com>
-Date: Tue, 3 Mar 2020 16:39:56 -0500
+Message-ID: <b7d44832-363d-cf89-fe55-efef68e11f00@redhat.com>
+Date: Tue, 3 Mar 2020 16:48:36 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <b38ab475-fdb7-41c7-6e2c-ac43fecd608e@virtuozzo.com>
+In-Reply-To: <f64989f8-555d-6e52-87f0-f387bb21d3eb@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -179,23 +175,258 @@ Sender: "Qemu-devel"
 
 
 
-On 2/27/20 1:11 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 
-> Still, if user pass disabled bitmap, it will be invalid immediately after
-> job finish.
+On 2/27/20 5:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 25.02.2020 3:56, John Snow wrote:
+>> This is a new job-creating command.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 qapi/block-core.json=C2=A0 | 18 ++++++++++
+>> =C2=A0 qapi/transaction.json |=C2=A0 2 ++
+>> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 78 +++++++++++++++++++++++++++++++++++++++++++
+>> =C2=A0 3 files changed, 98 insertions(+)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index df1797681a..a8be1fb36b 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2293,6 +2293,24 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 '*auto-finalize': 'bool',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 '*auto-dismiss': 'bool' } }
+>> =C2=A0 +##
+>> +# @block-dirty-bitmap-populate:
+>> +#
+>> +# Creates a new job that writes a pattern into a dirty bitmap.
+>> +#
+>> +# Since: 5.0
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "block-dirty-bitmap-populate",
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "arguments": { "node": "drive0", "targe=
+t": "bitmap0",
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "job-id": "job0", "patt=
+ern": "allocate-top" } }
+>> +# <- { "return": {} }
+>> +#
+>> +##
+>> +{ 'command': 'block-dirty-bitmap-populate', 'boxed': true,
+>> +=C2=A0 'data': 'BlockDirtyBitmapPopulate' }
+>> +
+>> =C2=A0 ##
+>> =C2=A0 # @BlockDirtyBitmapSha256:
+>> =C2=A0 #
+>> diff --git a/qapi/transaction.json b/qapi/transaction.json
+>> index 04301f1be7..28521d5c7f 100644
+>> --- a/qapi/transaction.json
+>> +++ b/qapi/transaction.json
+>> @@ -50,6 +50,7 @@
+>> =C2=A0 # - @block-dirty-bitmap-enable: since 4.0
+>> =C2=A0 # - @block-dirty-bitmap-disable: since 4.0
+>> =C2=A0 # - @block-dirty-bitmap-merge: since 4.0
+>> +# - @block-dirty-bitmap-populate: since 5.0
+>> =C2=A0 # - @blockdev-backup: since 2.3
+>> =C2=A0 # - @blockdev-snapshot: since 2.5
+>> =C2=A0 # - @blockdev-snapshot-internal-sync: since 1.7
+>> @@ -67,6 +68,7 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-ena=
+ble': 'BlockDirtyBitmap',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-dis=
+able': 'BlockDirtyBitmap',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-mer=
+ge': 'BlockDirtyBitmapMerge',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'block-dirty-bitmap-populate': 'Bl=
+ockDirtyBitmapPopulate',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-backup': 'Blo=
+ckdevBackup',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-snapshot': 'B=
+lockdevSnapshot',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blockdev-snapshot-inte=
+rnal-sync': 'BlockdevSnapshotInternal',
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 011dcfec27..33c0e35399 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -2314,6 +2314,67 @@ static void
+>> block_dirty_bitmap_remove_commit(BlkActionState *common)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_release_dirty_bitmap(state->bitmap);
+>> =C2=A0 }
+>> =C2=A0 +static void block_dirty_bitmap_populate_prepare(BlkActionState
+>> *common, Error **errp)
+>=20
+> over80 line (not the only)
+>=20
 
-Yes ... In truth, I really want to augment this job to provide a defined
-point-in-time semantic so it can be fully useful in all circumstances.
+OK, will fix all instances.
 
-At the moment, the point-in-time it provides is "at finalize", which may
-or may not be the single most useful semantic. (It matches mirror --
-because that was easier.)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 BlockdevBackupState *state =3D DO_UPCAST(BlockdevBac=
+kupState,
+>> common, common);
+>=20
+> At first glance using *Backup* looks like a mistake. May be rename it,
+> or at least add a comment.
+>=20
 
-The other option is "at start" which matches backup, but will require a
-new filter and some changes to permissions. That was more invasive, so I
-avoided it for now.
+You're right, it's tricky. A rename would be helpful.
 
-(In the interest of a speedy resolution for libvirt, can we add a
-critical_moment=[START|FINALIZE] option to this job *later*?)
+>> +=C2=A0=C2=A0=C2=A0 BlockDirtyBitmapPopulate *bitpop;
+>> +=C2=A0=C2=A0=C2=A0 BlockDriverState *bs;
+>> +=C2=A0=C2=A0=C2=A0 AioContext *aio_context;
+>> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmap *bmap =3D NULL;
+>> +=C2=A0=C2=A0=C2=A0 int job_flags =3D JOB_DEFAULT;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 assert(common->action->type =3D=3D
+>> TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_POPULATE);
+>> +=C2=A0=C2=A0=C2=A0 bitpop =3D common->action->u.block_dirty_bitmap_popu=
+late.data;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 bs =3D bdrv_lookup_bs(bitpop->node, bitpop->node, er=
+rp);
+>> +=C2=A0=C2=A0=C2=A0 if (!bs) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 aio_context =3D bdrv_get_aio_context(bs);
+>> +=C2=A0=C2=A0=C2=A0 aio_context_acquire(aio_context);
+>> +=C2=A0=C2=A0=C2=A0 state->bs =3D bs;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 bmap =3D bdrv_find_dirty_bitmap(bs, bitpop->name);
+>=20
+> Could we use block_dirty_bitmap_lookup ?
+>=20
+
+Yes.
+
+>> +=C2=A0=C2=A0=C2=A0 if (!bmap) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Bitmap '%s=
+' could not be found",
+>> bitpop->name);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>=20
+> aio context lock leaked
+>=20
+
+Good spot.
+
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 /* Paired with .clean() */
+>> +=C2=A0=C2=A0=C2=A0 bdrv_drained_begin(state->bs);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (!bitpop->has_on_error) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->on_error =3D BLOCKDE=
+V_ON_ERROR_REPORT;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 if (!bitpop->has_auto_finalize) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->auto_finalize =3D tr=
+ue;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 if (!bitpop->has_auto_dismiss) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->auto_dismiss =3D tru=
+e;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (!bitpop->auto_finalize) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_flags |=3D JOB_MANUAL_FI=
+NALIZE;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 if (!bitpop->auto_dismiss) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_flags |=3D JOB_MANUAL_DI=
+SMISS;
+>> +=C2=A0=C2=A0=C2=A0 }
+>> +
+>> +=C2=A0=C2=A0=C2=A0 state->job =3D bitpop_job_create(
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->job_id,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bmap,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->pattern,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitpop->on_error,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 job_flags,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NULL, NULL,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 common->block_job_txn,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errp);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 aio_context_release(aio_context);
+>> +}
+>> +
+>> =C2=A0 static void abort_prepare(BlkActionState *common, Error **errp)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Transaction aborted usi=
+ng Abort action");
+>> @@ -2397,6 +2458,13 @@ static const BlkActionOps actions[] =3D {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .commit =3D block=
+_dirty_bitmap_remove_commit,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .abort =3D block_=
+dirty_bitmap_remove_abort,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
+>> +=C2=A0=C2=A0=C2=A0 [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_POPULATE=
+] =3D {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .instance_size =3D sizeof(Bl=
+ockdevBackupState),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .prepare =3D block_dirty_bit=
+map_populate_prepare,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .commit =3D blockdev_backup_=
+commit,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .abort =3D blockdev_backup_a=
+bort,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .clean =3D blockdev_backup_c=
+lean,
+>> +=C2=A0=C2=A0=C2=A0 },
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Where are transactions for MIRROR, COM=
+MIT and STREAM?
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Although these blockjobs use tran=
+saction callbacks like the
+>> backup job,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * these jobs do not necessarily adh=
+ere to transaction semantics.
+>> @@ -3225,6 +3293,16 @@ void qmp_block_dirty_bitmap_merge(const char
+>> *node, const char *target,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 do_block_dirty_bitmap_merge(node, target,=
+ bitmaps, NULL, errp);
+>> =C2=A0 }
+>> =C2=A0 +void qmp_block_dirty_bitmap_populate(BlockDirtyBitmapPopulate *b=
+itpop,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Er=
+ror **errp)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 TransactionAction action =3D {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .type =3D TRANSACTION_ACTION=
+_KIND_BLOCK_DIRTY_BITMAP_POPULATE,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .u.block_dirty_bitmap_popula=
+te.data =3D bitpop,
+>> +=C2=A0=C2=A0=C2=A0 };
+>> +=C2=A0=C2=A0=C2=A0 blockdev_do_action(&action, errp);
+>> +}
+>> +
+>> =C2=A0 BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(con=
+st
+>> char *node,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 const
+>> char *name,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 Error
+>> **errp)
+>>
+>=20
+>=20
+
+--=20
+=E2=80=94js
 
 
