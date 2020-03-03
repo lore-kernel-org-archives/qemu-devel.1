@@ -2,89 +2,69 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93ED8C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE6EC3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FF262080C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:54:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZQRFyjJM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FF262080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C12372080C
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:55:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C12372080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j95Bq-0007qK-KJ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:54:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
+	id 1j95Ci-0000Oy-SC
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:55:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j95BB-0007Ej-Md
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:53:38 -0500
+ (envelope-from <no-reply@patchew.org>) id 1j95C7-0008LN-7L
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j95BA-0005Iv-JQ
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:53:37 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42838)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j95BA-0005Ik-CL
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:53:36 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z11so3694024wro.9
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 02:53:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=vUZGN9nas1z3IOlddykTTfVvNsUtmPQwbKj4DiOisD4=;
- b=ZQRFyjJMEJeGMV6QQxW7crjbpso7cLd90T2eyAMU2YnCbB8GFUud+eHe/MDb6cj3/h
- gTq1A/Wmobi6+hrkaNau3I7ke+0OlTBRuH3wVr7XnWVIpkAnibnL9tSGkekGx+jRLJKb
- EZymDnnHyiLMy4RmFr02qDrsnvz2bPU+ex1HysBfOWdoGZwrluidobz7kDbQmpFbizf4
- BaSg8gN0IqFDhFcDRhUxU49JoQ79zJVV24S7baQoclLfGyZdJ16XosWGcQwAWnLWvYxp
- G1lxpKqY2SXeJ7OA+zVgexe/sszMvDLiQimq+3zIvj9j87Nj2feybW3jf7RBDTB0Emxp
- C94Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=vUZGN9nas1z3IOlddykTTfVvNsUtmPQwbKj4DiOisD4=;
- b=a0ggkx9//93OsP0TcBQl459xeaTcmcw+h2/77iuEJHGvyjVpos2jclANXdenm5CB3O
- u1/DnjegtFRY/N6ExX/Fvlw8tlwl4r/7c8XmMtVxds7ZxgOWNSF0gL+M9bfrgsySBFAP
- 18i6vfPHoNOEHoGqSgRrwqItyxphEANSqUrBdjzFjN3AAQ3apqHovSGQKtbYjb8MViuE
- DuyRWIj2NqOKyaHl4EuPp4hcFrFhK+kQkeJexQKbLlKtT8pXmsQ3PGgvOeyYmVfiRCvV
- hxH43MOx7No04dmQjmDg1GmuwflkOPBVZ0zd9t+H6fzTyAqWaMa/t6naexxI42C6mW/n
- oUpg==
-X-Gm-Message-State: ANhLgQ1vfCxeHuVJPxyw7y+Z5q+pfr8JMKn2B2Q/+6Vph1kNKOrGSKvY
- wJOj6UqzUhTzxFRsotfE8WWsAQ==
-X-Google-Smtp-Source: ADFU+vuBv/6xY3lM9UhouOVS7tRkZ8dIserQTvfO/QL5BUitANPVh1AKvheYiVWaWoGPAzGfe3KZ0w==
-X-Received: by 2002:a5d:61cb:: with SMTP id q11mr4874147wrv.256.1583232815048; 
- Tue, 03 Mar 2020 02:53:35 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c14sm17655649wro.36.2020.03.03.02.53.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Mar 2020 02:53:33 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 867D31FF87;
- Tue,  3 Mar 2020 10:53:32 +0000 (GMT)
-References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
- <20200301215029.15196-2-nieklinnenbank@gmail.com>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: Re: [PATCH v6 01/18] hw/arm: add Allwinner H3 System-on-Chip
-In-reply-to: <20200301215029.15196-2-nieklinnenbank@gmail.com>
-Date: Tue, 03 Mar 2020 10:53:32 +0000
-Message-ID: <87v9nl7lqr.fsf@linaro.org>
+ (envelope-from <no-reply@patchew.org>) id 1j95C5-00060f-QD
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:54:34 -0500
+Resent-Date: Tue, 03 Mar 2020 05:54:34 -0500
+Resent-Message-Id: <E1j95C5-00060f-QD@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21103)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1j95C5-0005yv-HH
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:54:33 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1583232857; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=haincqg3hjB3qwajViI51VFGpG8BrsaMeoFHowdANqcATgZQIytdEofNTiCSeFHyNb+LFNGoOgg2twzsq0nAwr9dZ4cONOskFcZ5jVGxy7Gk9hwqs6e+uQ1H/i4YjMMTZexCkKoXpxdsv6XuiP8o77O3p36DbxGoezy0qy4JHUY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1583232857;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=Jb4OiI5E9euiQWSCZmLAuizfqlo488ZEbtmno2lEa+M=; 
+ b=c5Q7UZGdwJUt8yto8vxH4aSUOJjEj0j/2170KFp6KTWk6tqWd2BL45EW5w35zHeGBWgbaKIXplnSqRHphlF1MDx6yEgrvmEHKVjULEmuNZxhOEuWI34k++DPvlonqOOHwYtldBQnYoK/p7V84OMhV+NUlDcQITXzJExxLxlOVHw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1583232853969190.56296502713758;
+ Tue, 3 Mar 2020 02:54:13 -0800 (PST)
+In-Reply-To: <20200303104724.233375-1-ppandit@redhat.com>
+Subject: Re: [PATCH v3 0/2] net: tulip: add checks to avoid OOB access
+Message-ID: <158323285268.8962.6657028418668892869@abdcc9e1aa82>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ppandit@redhat.com
+Date: Tue, 3 Mar 2020 02:54:13 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,28 +76,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-devel@nongnu.org,
- b.galvani@gmail.com, qemu-arm@nongnu.org, imammedo@redhat.com,
- philmd@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: pjp@fedoraproject.org, jasowang@redhat.com, qemu-devel@nongnu.org,
+ pangpei.lq@antfin.com, svens@stackframe.org, ezrakiez@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Niek Linnenbank <nieklinnenbank@gmail.com> writes:
-
-> The Allwinner H3 is a System on Chip containing four ARM Cortex A7
-> processor cores. Features and specifications include DDR2/DDR3 memory,
-> SD/MMC storage cards, 10/100/1000Mbit Ethernet, USB 2.0, HDMI and
-> various I/O modules. This commit adds support for the Allwinner H3
-> System on Chip.
->
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwMzEwNDcyNC4yMzMz
+NzUtMS1wcGFuZGl0QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MyAwLzJdIG5ldDogdHVsaXA6IGFkZCBjaGVj
+a3MgdG8gYXZvaWQgT09CIGFjY2VzcwpNZXNzYWdlLWlkOiAyMDIwMDMwMzEwNDcyNC4yMzMzNzUt
+MS1wcGFuZGl0QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKZmF0YWw6IHVuYWJsZSB0byBhY2Nlc3MgJ2h0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdS8nOiBGYWlsZWQgY29ubmVjdCB0byBnaXRodWIuY29tOjQ0
+MzsgTm8gcm91dGUgdG8gaG9zdApUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAg
+RmlsZSAicGF0Y2hldy10ZXN0ZXIyL3NyYy9wYXRjaGV3LWNsaSIsIGxpbmUgNTMxLCBpbiB0ZXN0
+X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVhZCJdLCBsb2dm
+LCBUcnVlKQogIEZpbGUgInBhdGNoZXctdGVzdGVyMi9zcmMvcGF0Y2hldy1jbGkiLCBsaW5lIDU0
+LCBpbiBnaXRfY2xvbmVfcmVwbwogICAgc3Rkb3V0PWxvZ2YsIHN0ZGVycj1sb2dmKQogIEZpbGUg
+Ii9vcHQvcmgvcmgtcHl0aG9uMzYvcm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3Mu
+cHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9y
+KHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1sn
+Z2l0JywgJ2ZldGNoJywgJzNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQn
+XScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMTI4LgoKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMzAzMTA0NzI0LjIzMzM3
+NS0xLXBwYW5kaXRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
