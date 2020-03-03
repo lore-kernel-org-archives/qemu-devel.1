@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2F7C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 937A7C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A653821D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C9AD24677
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oFu6s/Qy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A653821D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NQj8IFd9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9AD24677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vol-0001hC-Sx
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:53:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44753)
+	id 1j8vp8-0002L8-JA
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:54:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkC-0000xX-A7
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:10 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkF-00012E-Rl
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkA-00047c-4H
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:07 -0500
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:45562)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkE-0004A2-Mm
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:11 -0500
+Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:35909)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vk8-00046x-EI
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:05 -0500
-Received: by mail-pg1-x52d.google.com with SMTP id m15so653212pgv.12
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:04 -0800 (PST)
+ id 1j8vkE-00049M-Fy
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:10 -0500
+Received: by mail-pj1-x102e.google.com with SMTP id d7so546563pjw.1
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=+WltSHyolw+4rQE+XPimaO0DHQK7HzUxfJXf8ld/qCk=;
- b=oFu6s/Qy+KVjDpayZV7soZUhwXca0iJ0AHS2pQPCjVx3MXEd2Md9Cb2M9s7lKY5C2Y
- wfaCcknXFcvrQ7NkvSdwWFjES1QwHcNF9SkKRQPlXauw9NQ7hVdGgmQcWj33XJ4hzYQ0
- lcOC8QEeSI0fThCSRvyLf6D3G43DCnPlbw0fUQZzCSQs8FfMTvy13avGphyoW9eYrI6U
- S8XfgcDUInzgKKQlcz+50YOZckUwCa7NtgslbW6VgbEFvDvLiCeuP4nYkmEgT2uRBnAu
- BYRlEgw1e1a8LGx7lRxrPvS+OIDWcf/xNgWvRrPITQJjqrUYpQv5DibaKDktaGx/0X53
- YWCA==
+ bh=ANkDW0pV9KWX3pfShIfpn+QJJdRLLaIrASHy4mCGa4o=;
+ b=NQj8IFd9g2uBiB4uWXv4HjYv67DmVCkTfCQjvhPodfwT+H0rNKeLOJEQs7ZPMhb9rm
+ AVL1fKgVUMIPR+tqdbF7yJg3m/uTXB3jeulPinJrtvChX0lzeGitssq8EKGsKhM073xy
+ IUuPw2gCegKQH82IZ/cU8tyF04RqBUj7th/3z6PAfMxMQz3G41kv/z0ECwpG3jdoH7Ru
+ nLBUfd1I0LG9UqKfo/Wve4E/bUY7l1weVgOSXeT2m0/IM1Qf1kqSmTREWQXkro6V00XU
+ uJjAxCctUCokwi1NQu9BK/XmtFxNRD1OdbiQ30ES4dCjOTS3UMas+Uw1VfrTqiPzOFVu
+ dLfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=+WltSHyolw+4rQE+XPimaO0DHQK7HzUxfJXf8ld/qCk=;
- b=L8b6hJd9X6r6MjTWmwo+ygXu3c2xRFp/15ujpSEkNl5RLFHPD8hN+IG4KonGEW114K
- pTK+S+xz/rX2uhPbAkSjvZxM28o5TfhH8PeccmJHP27bQ5OQgmIHMQ4xZ+QanzYsPiVU
- HAn4NDLJlqSZ1f0PV49XVRr0Tv1VmkIeurVbolD+iNBy1MsYmeySDnaM5H36bhJHyaAt
- 1Ax6956bgJqjEynT9Jx4q0jo9Sgp5iT5cPuwBB6si2TNQ6URKFd0pxEMHPc5h6bc9djx
- 7152ruXnZFb5uM2/SOM0nrUWxK86+XBZIa9t2SLVIltu1j4e/JC4lm2bRX8UHvk9gCbP
- exJg==
-X-Gm-Message-State: ANhLgQ0HrM3daEPFxT07sFMdXTWC9x7yewyG5rVkVS6C3AjrWUJwBhkY
- BpOmZqT0R0JEsFj7L/kapdUVpQ==
-X-Google-Smtp-Source: ADFU+vuLG8/8IhkoqL0mK0ULov5VVM4mXoZPyaFd5YrvRg3BPr9yHjnh4iDUXjDhZAgBeiRfNKQ2TQ==
-X-Received: by 2002:aa7:8bdd:: with SMTP id s29mr1565556pfd.208.1583196543314; 
- Mon, 02 Mar 2020 16:49:03 -0800 (PST)
+ bh=ANkDW0pV9KWX3pfShIfpn+QJJdRLLaIrASHy4mCGa4o=;
+ b=g1peTuE42CK/qcdpwgbK2ecduY73PZOBcFSubdpXi4SR44MRkFFZw9SpxOTfWQzkjP
+ sHIlQ5YQoKSjt2oye/tXBUqtRyKGj6rQoKF/uQNgA0/qxfd8HFsnvOSYcoiXVegiX8zC
+ IMQ7hYaO0XqN+IkWFZFvDIcE9GYToIM04z+5DluJ/wpsf1ps8tk6JlNSl6QLCjvniIrF
+ p9w9PM/3hLZ60gyxR6BcY+3wAM2jQSqQ6OkOuIl5Fo9y7Oy3NM3w/ZwUehG5HKhm1ZUe
+ 0AcFYPPvusLFBjxI904vFHEfZbpBsKk++FSf8Po0RNSCDewCHh+Hv/6OdGrkago1lhTM
+ VMUA==
+X-Gm-Message-State: ANhLgQ1gZ/k8GbujvOMt1RfwqisVZ3zUYJjGEaBj+ACim0DUf6U/7kxG
+ sakBM186NKzQdAIe2XGkERxqzOeuX9GbNQ==
+X-Google-Smtp-Source: ADFU+vsUM+d5+NDMvZshjdSzDL+34bBRrCajz6HLvUUwrbef0Je+/Cp93XE7Rkcb1i6FhjJ+bzv2Yw==
+X-Received: by 2002:a17:90b:438b:: with SMTP id
+ in11mr1247550pjb.84.1583196549275; 
+ Mon, 02 Mar 2020 16:49:09 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id bb5sm108161pjb.8.2020.03.02.16.49.02
+ by smtp.gmail.com with ESMTPSA id y23sm22450558pfn.101.2020.03.02.16.49.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:02 -0800 (PST)
-Subject: [PULL 03/38] target/riscv: Add the Hypervisor CSRs to CPUState
-Date: Mon,  2 Mar 2020 16:48:13 -0800
-Message-Id: <20200303004848.136788-4-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:08 -0800 (PST)
+Subject: [PULL 07/38] target/riscv: Add the force HS exception mode
+Date: Mon,  2 Mar 2020 16:48:17 -0800
+Message-Id: <20200303004848.136788-8-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
@@ -83,7 +84,7 @@ From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::52d
+X-Received-From: 2607:f8b0:4864:20::102e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,147 +102,79 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
-Add the Hypervisor CSRs to CPUState and at the same time (to avoid
-bisect issues) update the CSR macros for the v0.5 Hyp spec.
+Add a FORCE_HS_EXCEP mode to the RISC-V virtulisation status. This bit
+specifies if an exeption should be taken to HS mode no matter the
+current delegation status. This is used when an exeption must be taken
+to HS mode, such as when handling interrupts.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu.h      | 21 +++++++++++++++++++++
- target/riscv/cpu_bits.h | 34 +++++++++++++++++++++-------------
- target/riscv/gdbstub.c  | 11 ++++++-----
- 3 files changed, 48 insertions(+), 18 deletions(-)
+ target/riscv/cpu.h        |  2 ++
+ target/riscv/cpu_bits.h   |  6 ++++++
+ target/riscv/cpu_helper.c | 18 ++++++++++++++++++
+ 3 files changed, 26 insertions(+)
 
 diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 010125efd6..c7f7ae5c38 100644
+index a9cbd8584e..42720d65f9 100644
 --- a/target/riscv/cpu.h
 +++ b/target/riscv/cpu.h
-@@ -143,6 +143,27 @@ struct CPURISCVState {
-     target_ulong mcause;
-     target_ulong mtval;  /* since: priv-1.10.0 */
- 
-+    /* Hypervisor CSRs */
-+    target_ulong hstatus;
-+    target_ulong hedeleg;
-+    target_ulong hideleg;
-+    target_ulong hcounteren;
-+    target_ulong htval;
-+    target_ulong htinst;
-+    target_ulong hgatp;
-+
-+    /* Virtual CSRs */
-+    target_ulong vsstatus;
-+    target_ulong vstvec;
-+    target_ulong vsscratch;
-+    target_ulong vsepc;
-+    target_ulong vscause;
-+    target_ulong vstval;
-+    target_ulong vsatp;
-+
-+    target_ulong mtval2;
-+    target_ulong mtinst;
-+
-     target_ulong scounteren;
-     target_ulong mcounteren;
- 
+@@ -273,6 +273,8 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
+ bool riscv_cpu_fp_enabled(CPURISCVState *env);
+ bool riscv_cpu_virt_enabled(CPURISCVState *env);
+ void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
++bool riscv_cpu_force_hs_excep_enabled(CPURISCVState *env);
++void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable);
+ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
+ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
 diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index e99834856c..25c0fb258d 100644
+index 2cdb0de4fe..ad6479796c 100644
 --- a/target/riscv/cpu_bits.h
 +++ b/target/riscv/cpu_bits.h
-@@ -177,8 +177,14 @@
- #define CSR_HSTATUS         0x600
- #define CSR_HEDELEG         0x602
- #define CSR_HIDELEG         0x603
--#define CSR_HCOUNTERNEN     0x606
-+#define CSR_HIE             0x604
-+#define CSR_HCOUNTEREN      0x606
-+#define CSR_HTVAL           0x643
-+#define CSR_HIP             0x644
-+#define CSR_HTINST          0x64A
- #define CSR_HGATP           0x680
-+#define CSR_HTIMEDELTA      0x605
-+#define CSR_HTIMEDELTAH     0x615
+@@ -432,6 +432,12 @@
  
- #if defined(TARGET_RISCV32)
- #define HGATP_MODE           SATP32_MODE
-@@ -191,6 +197,20 @@
- #define HGATP_PPN            SATP64_PPN
- #endif
+ /* Virtulisation Register Fields */
+ #define VIRT_ONOFF          1
++/* This is used to save state for when we take an exception. If this is set
++ * that means that we want to force a HS level exception (no matter what the
++ * delegation is set to). This will occur for things such as a second level
++ * page table fault.
++ */
++#define FORCE_HS_EXCEP      2
  
-+/* Virtual CSRs */
-+#define CSR_VSSTATUS        0x200
-+#define CSR_VSIE            0x204
-+#define CSR_VSTVEC          0x205
-+#define CSR_VSSCRATCH       0x240
-+#define CSR_VSEPC           0x241
-+#define CSR_VSCAUSE         0x242
-+#define CSR_VSTVAL          0x243
-+#define CSR_VSIP            0x244
-+#define CSR_VSATP           0x280
+ /* RV32 satp CSR field masks */
+ #define SATP32_MODE         0x80000000
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index e5311160e7..e36ee7d58e 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -100,6 +100,24 @@ void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable)
+     env->virt = set_field(env->virt, VIRT_ONOFF, enable);
+ }
+ 
++bool riscv_cpu_force_hs_excep_enabled(CPURISCVState *env)
++{
++    if (!riscv_has_ext(env, RVH)) {
++        return false;
++    }
 +
-+#define CSR_MTINST          0x34a
-+#define CSR_MTVAL2          0x34b
++    return get_field(env->virt, FORCE_HS_EXCEP);
++}
 +
- /* Physical Memory Protection */
- #define CSR_PMPCFG0         0x3a0
- #define CSR_PMPCFG1         0x3a1
-@@ -313,17 +333,6 @@
- #define CSR_MHPMCOUNTER30H  0xb9e
- #define CSR_MHPMCOUNTER31H  0xb9f
- 
--/* Legacy Hypervisor Trap Setup (priv v1.9.1) */
--#define CSR_HIE             0x204
--#define CSR_HTVEC           0x205
--
--/* Legacy Hypervisor Trap Handling (priv v1.9.1) */
--#define CSR_HSCRATCH        0x240
--#define CSR_HEPC            0x241
--#define CSR_HCAUSE          0x242
--#define CSR_HBADADDR        0x243
--#define CSR_HIP             0x244
--
- /* Legacy Machine Protection and Translation (priv v1.9.1) */
- #define CSR_MBASE           0x380
- #define CSR_MBOUND          0x381
-@@ -400,7 +409,6 @@
- 
- /* hstatus CSR bits */
- #define HSTATUS_SPRV         0x00000001
--#define HSTATUS_STL          0x00000040
- #define HSTATUS_SPV          0x00000080
- #define HSTATUS_SP2P         0x00000100
- #define HSTATUS_SP2V         0x00000200
-diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
-index 1a72f7be9c..2f32750f2f 100644
---- a/target/riscv/gdbstub.c
-+++ b/target/riscv/gdbstub.c
-@@ -130,6 +130,8 @@ static int csr_register_map[] = {
-     CSR_MCAUSE,
-     CSR_MTVAL,
-     CSR_MIP,
-+    CSR_MTINST,
-+    CSR_MTVAL2,
-     CSR_PMPCFG0,
-     CSR_PMPCFG1,
-     CSR_PMPCFG2,
-@@ -252,12 +254,11 @@ static int csr_register_map[] = {
-     CSR_HEDELEG,
-     CSR_HIDELEG,
-     CSR_HIE,
--    CSR_HTVEC,
--    CSR_HSCRATCH,
--    CSR_HEPC,
--    CSR_HCAUSE,
--    CSR_HBADADDR,
-+    CSR_HCOUNTEREN,
-+    CSR_HTVAL,
-     CSR_HIP,
-+    CSR_HTINST,
-+    CSR_HGATP,
-     CSR_MBASE,
-     CSR_MBOUND,
-     CSR_MIBASE,
++void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable)
++{
++    if (!riscv_has_ext(env, RVH)) {
++        return;
++    }
++
++    env->virt = set_field(env->virt, FORCE_HS_EXCEP, enable);
++}
++
+ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+ {
+     CPURISCVState *env = &cpu->env;
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
