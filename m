@@ -6,65 +6,64 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CDDC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C32E1C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:13:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2322F21556
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94C482166E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:13:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcaiYwmb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2322F21556
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPau8qgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94C482166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94YE-0003mH-8J
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:13:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52499)
+	id 1j94YW-0004l3-Qp
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:13:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1j94W4-0007dz-2Y
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:09 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j94Vw-0007Y6-IT
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1j94W1-0006AT-IY
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:06 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39453
+ (envelope-from <jasowang@redhat.com>) id 1j94Vv-00068S-Ef
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:00 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54752
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94W0-00069g-ER
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:11:04 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94Vv-00068L-BV
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583230263;
+ s=mimecast20190719; t=1583230259;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fq233vp5w5aZrfj8fLdkUXIRg6LJGgiJqm59yH0KHgM=;
- b=YcaiYwmbxiIQJFlUOMfvpIM/5o0pWSm7u28mzWYcp6DYSt/bDsx3zH5/bNlo0EDPsAvRmz
- 7hPnL/EitN0L4WRPLObXnt7euKlTOUoKU4BW435PlDzFah9ktpFcP2LNfaY5CPu/zFUFwK
- ob6weRHFElXY/NPjSnwq7zGFUwCnono=
+ bh=4OQLIIsu9IUkx4F4aWeIGd+dq+m+Lo5MX36L6VEBCAk=;
+ b=bPau8qgXat+82KCiYgD/NOzQ/bxuIHlxXx4MdhHDN4NuwhlWiyVPaGvRxIC5XoeF61m9qy
+ b6EPpyG6wiOy572eTMJXv2BnsAJWifTeepZn+D98DbStlNIbFSGWYDRWKsJ9s37mGAA92t
+ MbsQnodrcYVLzsSxCGb7VRV9UGVD87M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-AY_PeZpPPayfgUpz8w7kIQ-1; Tue, 03 Mar 2020 05:11:01 -0500
-X-MC-Unique: AY_PeZpPPayfgUpz8w7kIQ-1
+ us-mta-386-eDXgoL5DMbKEX7ej6UqnUQ-1; Tue, 03 Mar 2020 05:10:55 -0500
+X-MC-Unique: eDXgoL5DMbKEX7ej6UqnUQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 541D213F5;
- Tue,  3 Mar 2020 10:11:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E67AA8017CC;
+ Tue,  3 Mar 2020 10:10:53 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-98.pek2.redhat.com
  [10.72.12.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF7898D55E;
- Tue,  3 Mar 2020 10:10:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FE648D553;
+ Tue,  3 Mar 2020 10:10:52 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Subject: [PULL V2 06/23] dp8393x: Clear RRRA command register bit only when
- appropriate
-Date: Tue,  3 Mar 2020 18:10:25 +0800
-Message-Id: <1583230242-14597-7-git-send-email-jasowang@redhat.com>
+Subject: [PULL V2 03/23] dp8393x: Clean up endianness hacks
+Date: Tue,  3 Mar 2020 18:10:22 +0800
+Message-Id: <1583230242-14597-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
 References: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
@@ -74,8 +73,7 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,44 +93,58 @@ Sender: "Qemu-devel"
 
 From: Finn Thain <fthain@telegraphics.com.au>
 
-It doesn't make sense to clear the command register bit unless the
-command was actually issued.
+According to the datasheet, section 3.4.4, "in 32-bit mode ... the SONIC
+always writes long words".
+
+Therefore, use the same technique for the 'in_use' field that is used
+everywhere else, and write the full long word.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/dp8393x.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/net/dp8393x.c | 17 ++++++-----------
+ 1 file changed, 6 insertions(+), 11 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 9604623..b5a9c6a 100644
+index 51b71da..1844482 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -352,9 +352,6 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-         s->regs[SONIC_ISR] |=3D SONIC_ISR_RBE;
-         dp8393x_update_irq(s);
+@@ -778,8 +778,6 @@ static ssize_t dp8393x_receive(NetClientState *nc, cons=
+t uint8_t * buf,
+         return -1;
      }
--
--    /* Done */
--    s->regs[SONIC_CR] &=3D ~SONIC_CR_RRRA;
- }
 =20
- static void dp8393x_do_software_reset(dp8393xState *s)
-@@ -565,8 +562,10 @@ static void dp8393x_do_command(dp8393xState *s, uint16=
-_t command)
-         dp8393x_do_start_timer(s);
-     if (command & SONIC_CR_RST)
-         dp8393x_do_software_reset(s);
--    if (command & SONIC_CR_RRRA)
-+    if (command & SONIC_CR_RRRA) {
-         dp8393x_do_read_rra(s);
-+        s->regs[SONIC_CR] &=3D ~SONIC_CR_RRRA;
-+    }
-     if (command & SONIC_CR_LCAM)
-         dp8393x_do_load_cam(s);
- }
+-    /* XXX: Check byte ordering */
+-
+     /* Check for EOL */
+     if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
+         /* Are we still in resource exhaustion? */
+@@ -851,15 +849,12 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
+nst uint8_t * buf,
+         /* EOL detected */
+         s->regs[SONIC_ISR] |=3D SONIC_ISR_RDE;
+     } else {
+-        /* Clear in_use, but it is always 16bit wide */
+-        int offset =3D dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
+-        if (s->big_endian && width =3D=3D 2) {
+-            /* we need to adjust the offset of the 16bit field */
+-            offset +=3D sizeof(uint16_t);
+-        }
+-        s->data[0] =3D 0;
+-        address_space_write(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
+-                            s->data, sizeof(uint16_t));
++        /* Clear in_use */
++        size =3D sizeof(uint16_t) * width;
++        address =3D dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
++        dp8393x_put(s, width, 0, 0);
++        address_space_write(&s->as, address, MEMTXATTRS_UNSPECIFIED,
++                            s->data, size);
+         s->regs[SONIC_CRDA] =3D s->regs[SONIC_LLFA];
+         s->regs[SONIC_ISR] |=3D SONIC_ISR_PKTRX;
+         s->regs[SONIC_RSC] =3D (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[=
+SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
 --=20
 2.5.0
 
