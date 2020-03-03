@@ -2,64 +2,84 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930FAC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 05:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5A9C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 05:48:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F10D20716
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 05:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F10D20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA52220716
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 05:48:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMIfvrQN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA52220716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j90Ix-0003dW-EP
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 00:41:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47350)
+	id 1j90Pg-0005mp-0H
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 00:48:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1j90IA-00036z-L7
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:40:32 -0500
+ (envelope-from <armbru@redhat.com>) id 1j90Ov-0005Jm-6d
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1j90I8-0006FU-1t
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:40:29 -0500
-Received: from mga01.intel.com ([192.55.52.88]:56513)
+ (envelope-from <armbru@redhat.com>) id 1j90Ot-0000UK-Ky
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:47:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50113
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1j90I7-0006Ez-Pt
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:40:28 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 Mar 2020 21:40:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.70,510,1574150400"; d="scan'208";a="233502478"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga008.jf.intel.com with ESMTP; 02 Mar 2020 21:40:22 -0800
-Date: Tue, 3 Mar 2020 00:30:57 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [PATCH v1] memory: remove assert to avoid unnecessary coredump
-Message-ID: <20200303053057.GB18980@joy-OptiPlex-7040>
-References: <20200303031114.21111-1-yi.y.sun@linux.intel.com>
- <20200303033639.GA18980@joy-OptiPlex-7040>
- <20200303052226.GA3409@yi.y.sun>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j90Ot-0000Tq-Bh
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 00:47:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583214446;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0SJm4ctOByyEnQ9FgMX2aJ9svEbpdSenhHnpyGvQkDc=;
+ b=eMIfvrQN/V1L56nqpjIm+17ZQI90ieB7N/t2HBtKc9jImDzh2oRT//87HJGA+S9qBMaQdA
+ Wy4ld87ey9FVVD+acQdgQh/v+fBO4dz4FtBMNYgklpmoJ/LLmXRxHpM01hBH8F51upi7nm
+ 2HVNCVai0MsmM4Lx0Qf0Y5WU1ONBpv0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-S_5Wnwr4ONuB8LZGYilsJQ-1; Tue, 03 Mar 2020 00:47:24 -0500
+X-MC-Unique: S_5Wnwr4ONuB8LZGYilsJQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C7F3107ACCD;
+ Tue,  3 Mar 2020 05:47:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E4D39CA3;
+ Tue,  3 Mar 2020 05:47:18 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0C87011386A6; Tue,  3 Mar 2020 06:47:17 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Volker =?utf-8?Q?R=C3=BCmelin?= <vr_qemu@t-online.de>
+Subject: Re: [PATCH 1/5] qapi/audio: add documentation for AudioFormat
+References: <417bfe2f-e3c1-d83d-b437-47859daf524d@t-online.de>
+ <20200302191004.5991-1-vr_qemu@t-online.de>
+Date: Tue, 03 Mar 2020 06:47:17 +0100
+In-Reply-To: <20200302191004.5991-1-vr_qemu@t-online.de> ("Volker
+ =?utf-8?Q?R=C3=BCmelin=22's?=
+ message of "Mon, 2 Mar 2020 20:10:00 +0100")
+Message-ID: <87k1423s7u.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200303052226.GA3409@yi.y.sun>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.88
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,69 +91,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ John Arbuckle <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 03, 2020 at 01:22:26PM +0800, Yi Sun wrote:
-> On 20-03-02 22:36:39, Yan Zhao wrote:
-> > On Tue, Mar 03, 2020 at 11:11:14AM +0800, Yi Sun wrote:
-> > > It is too strict to use assert to make qemu coredump if
-> > > the notification does not overlap with registered range.
-> > > Skip it is fine enough.
-> > > 
-> > > During test, we found such a case for vhost net device:
-> > >     memory_region_notify_one: entry->iova=0xfee00000, entry_end=0xfeffffff, notifier->start=0xfef00000, notifier->end=0xffffffffffffffff
-> > >
-> > so for range from 0xfef00000 to 0xfefffff,  would notification for this
-> > range get lost?
-> > 
-> Yes, that is an issue although there is no any problem found during test
-> with this fix.
-> 
-> I think we should notify the intersection between entry and notifier. How
-> do you think?
-> 
-no. please refer to the link below.
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg04218.html
+Volker R=C3=BCmelin <vr_qemu@t-online.de> writes:
 
-Thanks
-Yan
+> The review for patch ed2a4a7941 "audio: proper support for
+> float samples in mixeng" suggested this would be a good idea.
+>
+> Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
+> ---
+>  qapi/audio.json | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/qapi/audio.json b/qapi/audio.json
+> index d8c507cced..07e7b05516 100644
+> --- a/qapi/audio.json
+> +++ b/qapi/audio.json
+> @@ -273,6 +273,20 @@
+>  #
+>  # An enumeration of possible audio formats.
+>  #
+> +# @u8: unsigned 8 bit integer
+> +#
+> +# @s8: signed 8 bit integer
+> +#
+> +# @u16: unsigned 16 bit integer
+> +#
+> +# @s16: signed 16 bit integer
+> +#
+> +# @u32: unsigned 32 bit integer
+> +#
+> +# @s32: signed 32 bit integer
+> +#
+> +# @f32: single precision floating point (since 5.0)
 
-> > Thanks
-> > Yan
-> > 
-> > > Skip this notification but not coredump makes everything
-> > > work well.
-> > > 
-> > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > > ---
-> > >  memory.c | 5 ++---
-> > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/memory.c b/memory.c
-> > > index 06484c2bff..62ad0f3377 100644
-> > > --- a/memory.c
-> > > +++ b/memory.c
-> > > @@ -1921,12 +1921,11 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-> > >       * Skip the notification if the notification does not overlap
-> > >       * with registered range.
-> > >       */
-> > > -    if (notifier->start > entry_end || notifier->end < entry->iova) {
-> > > +    if (notifier->start > entry_end || notifier->end < entry->iova ||
-> > > +        entry->iova < notifier->start || entry_end > notifier->end) {
-> > >          return;
-> > >      }
-> > >  
-> > > -    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> > > -
-> > >      if (entry->perm & IOMMU_RW) {
-> > >          request_flags = IOMMU_NOTIFIER_MAP;
-> > >      } else {
-> > > -- 
-> > > 2.15.1
-> > > 
+floating-point
+
+> +#
+>  # Since: 4.0
+>  ##
+>  { 'enum': 'AudioFormat',
+
+Acked-by: Markus Armbruster <armbru@redhat.com>
+
 
