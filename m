@@ -2,83 +2,104 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81064C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 538CCC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:11:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C5AF21D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BF7221D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:11:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6qYTj3z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5AF21D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fC2sxLJx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF7221D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8v6p-0005Tn-G8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:08:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40043)
+	id 1j8vA9-0006qa-BX
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:11:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1j8v64-0004s9-2O
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:07:41 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1j8v9U-0006EM-JF
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1j8v62-0006x8-HO
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:07:40 -0500
-Received: from mail-vs1-xe43.google.com ([2607:f8b0:4864:20::e43]:34961)
+ (envelope-from <richard.henderson@linaro.org>) id 1j8v9T-0007vI-G8
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:12 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41719)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1j8v62-0006wX-BT; Mon, 02 Mar 2020 19:07:38 -0500
-Received: by mail-vs1-xe43.google.com with SMTP id u26so1245979vsg.2;
- Mon, 02 Mar 2020 16:07:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Pxmi9V+EV7M2r8A2RvtIR6kdq4BRtjt6KmNSkeUEWE0=;
- b=G6qYTj3ziRpSUNU69U+vs7hJzRt7wIhbnuQlB3FiQmNhoB7v/X1Rmpa+XHuJJSvCla
- irc6M4jMJvNZemJf9FIOD+7IxznR5e2tYZJa6m4cZJRLeseOEBF/9L2BIuAYkVKH8eUK
- sXxrijztS9zYXAFMZtjY6z0oMVIUcenY2G2Wws7uGgSLpHthHtdkdgAK+5QRol8oCa/y
- l/PQMde6jaYOtxYodIot6y7z+0x9QPVEtQaJJO4Bg823LguntqJ/U1s+JVgFkRMVjuEY
- fpF5ZK8guLsXF3S+mun2s7C+rgXvzsGChw4Rq5khF2JjMyajNtUdM0NORnDaCb7S9cLc
- KK7A==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1j8v9T-0007uE-97
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:11 -0500
+Received: by mail-pg1-x542.google.com with SMTP id b1so619522pgm.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:11:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=HARsVpylA93jQk3wr5knnUeg3ev/jLI7nAcGD3O8xb4=;
+ b=fC2sxLJxb5FXTbVl9425cnwM8p9b62I5TAnN/sF9iKvbiirxiRz2YtzWAuljAGODtm
+ weZcvwHWtozJUP34e8u90QMCpPvAXSAbNalm+ZYHYVlhzFSpVVesJCbLLCj3WtNwb6cz
+ 1kZ0sod6WVgRGKajxji8GZ9bgr13T/e0GagYRBC0jg0y3EVTLyB82p01AS7/bcfUj+to
+ 1tHeq+ngLIwKXQaVIeClCiUX4cu1yfOD+snYLEziu0lFD733ksneESlL+2qhP0/DyQkZ
+ 4Buy6NZhwvGC0KJjyhRKYWDoUGs2NS626iXL32TqZanaT6o9G1HGbliXKEyAsusnBmLM
+ FzEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Pxmi9V+EV7M2r8A2RvtIR6kdq4BRtjt6KmNSkeUEWE0=;
- b=bwsfMQZM88luu8k//7+X9clncTJDnlfjw6qowpXx39Nl8+w1R3v/SmesNJfG/2Z37p
- uryCxej4+JCFz2vQTgqxqBUmdTdHcTCbS5CG4j5bYk8+8e/fO/2FKe5BO/Wk5d6Ev5Uf
- hlCfPFBzQbSLOHZYTk0lbueL88QocRQg30DPfUQpHHsBGVgg4TZLUhw0f+0XcURCzkTp
- Ub3kn8niQ2nhBs/ieu8DHcySDsnB0URtPThIkVf8FtlzN6yIkZ7z5liT/h8mKsc11XnW
- cjGCUokSCbd1JTdiEEw053Ka6/mO6hB05TD4bezgDlROx4RzYmEPmhpmzWIqBtJOTaCW
- XoEQ==
-X-Gm-Message-State: ANhLgQ2kB1G0FccGyRxijSCqJmomoVK/LKEJqa2N1OqV29fHGiCvOBjm
- QagWviMzj3oGMSDJTJ3sFEbBwRUK4YWYOEcGZxM=
-X-Google-Smtp-Source: ADFU+vsYKpSaEIaT6xzbhR7HuWJCMsMB9vH1Xv8kh/nW1oGiRPXb7ML3KKPFV7S+0Gh+9HnPSc69znWbWo+grpHZn1M=
-X-Received: by 2002:a05:6102:3c2:: with SMTP id
- n2mr966350vsq.172.1583194056784; 
- Mon, 02 Mar 2020 16:07:36 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HARsVpylA93jQk3wr5knnUeg3ev/jLI7nAcGD3O8xb4=;
+ b=iBPcHvijPVsG2jUr7sKnRR61b4BvAbyS1/+zNUdoE1kmK6YA+eWHM8Sx24DjC2BaVS
+ qCT7kNqhhSX0lqKxjtHmA46F/Qmxr2CG0C/ZjesqBf0ESqSu9+GPoorzODF/AjDxAZJH
+ h1lx+VaEpFM/HIxlcI4/N/ZrLRzhNfz/wMM/9RF8ZnhNxSWM2t4x2tMmV0Ww3MIPGZyC
+ yWROGyA/MpaB9KXTbYkqxNtMyMqqabndpoEi+4g3Pdz0NfIBvgxTFYXVZrsRfvSiMIvZ
+ qGZ8FfGMpmsaVbpcMjtsOp4SkwO7FNIkK/Lzp78Opnq4flIburgsreeKTwuzgsg9aPuD
+ wpJQ==
+X-Gm-Message-State: ANhLgQ0bFl4rpTwfJsQM8pNuydgo6fVY5jMdl+F90rn9nIIY0T2cXCpX
+ Yaz/pxuYgk00VczWi7Eygwutfw==
+X-Google-Smtp-Source: ADFU+vuWie7Eyed1pn0MdgOOLVGmwm+Brkf9isSyLR4GbeS8Omkb3z4kCRMvnfS6ljVGp7NrPbdd1A==
+X-Received: by 2002:aa7:829a:: with SMTP id s26mr1494647pfm.64.1583194270125; 
+ Mon, 02 Mar 2020 16:11:10 -0800 (PST)
+Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
+ by smtp.gmail.com with ESMTPSA id
+ w128sm21891692pgb.55.2020.03.02.16.11.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Mar 2020 16:11:09 -0800 (PST)
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+ <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+ <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+ <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
+ <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
+ <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87eeuhxw0y.fsf@linaro.org>
+ <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
+ <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
+ <878skpxltm.fsf@linaro.org> <FE03C155-E46D-4925-BA2B-FABBE2518C8C@gmail.com>
+ <2576fd41-8b01-91a0-ca56-792ce65b5092@linaro.org>
+ <alpine.BSF.2.22.395.2003021218180.72848@zero.eik.bme.hu>
+ <d136165f-46c7-8983-9725-2b224742deef@linaro.org>
+ <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ffecedad-d695-ebef-d494-fce307631223@linaro.org>
+Date: Mon, 2 Mar 2020 16:11:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKNw6bwiWKbT=0_Yy4CZNrnSjUtyU_TL0G2HMq1WKstK4g@mail.gmail.com>
- <CAEUhbmUi=6JyQhEeh0348XgDwhkybC-OJ+ErD=RrgrtS7dNsGg@mail.gmail.com>
-In-Reply-To: <CAEUhbmUi=6JyQhEeh0348XgDwhkybC-OJ+ErD=RrgrtS7dNsGg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 2 Mar 2020 15:59:58 -0800
-Message-ID: <CAKmqyKO3imGENC7eOY9F+K_1B-qVQyzBC2xMqMBi9OGX2g7i3g@mail.gmail.com>
-Subject: Re: [PATCH v2] riscv: sifive_u: Add a "serial" property for board
- serial number
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::e43
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,151 +111,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Programmingkid <programmingkidx@gmail.com>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
+ Dino Papararo <skizzato73@msn.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Feb 24, 2020 at 9:02 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Alistair,
->
-> On Tue, Feb 25, 2020 at 5:14 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Sun, Feb 16, 2020 at 5:56 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > At present the board serial number is hard-coded to 1, and passed
-> > > to OTP model during initialization. Firmware (FSBL, U-Boot) uses
-> > > the serial number to generate a unique MAC address for the on-chip
-> > > ethernet controller. When multiple QEMU 'sifive_u' instances are
-> > > created and connected to the same subnet, they all have the same
-> > > MAC address hence it creates a unusable network.
-> > >
-> > > A new "serial" property is introduced to specify the board serial
-> > > number. When not given, the default serial number 1 is used.
-> > >
-> > > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> > >
-> > > ---
-> > >
-> > > Changes in v2:
-> > > - Move setting OTP serial number property from riscv_sifive_u_soc_init()
-> > >   to riscv_sifive_u_soc_realize(), to fix the 'check-qtest-riscv' error.
-> > >   I am not really sure why doing so could fix the 'make check' error.
-> > >   The v1 patch worked fine and nothing seems wrong.
-> > >
-> > >  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
-> > >  include/hw/riscv/sifive_u.h |  1 +
-> > >  2 files changed, 21 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> > > index 0e12b3c..ca561d3 100644
-> > > --- a/hw/riscv/sifive_u.c
-> > > +++ b/hw/riscv/sifive_u.c
-> > > @@ -34,6 +34,7 @@
-> > >  #include "qemu/log.h"
-> > >  #include "qemu/error-report.h"
-> > >  #include "qapi/error.h"
-> > > +#include "qapi/visitor.h"
-> > >  #include "hw/boards.h"
-> > >  #include "hw/loader.h"
-> > >  #include "hw/sysbus.h"
-> > > @@ -434,7 +435,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
-> > >                            TYPE_SIFIVE_U_PRCI);
-> > >      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
-> > >                            TYPE_SIFIVE_U_OTP);
-> > > -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
-> > >      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-> > >                            TYPE_CADENCE_GEM);
-> > >  }
-> > > @@ -453,6 +453,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
-> > >      s->start_in_flash = value;
-> > >  }
-> > >
-> > > +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
-> > > +                                void *opaque, Error **errp)
-> > > +{
-> > > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> > > +}
-> > > +
-> > > +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
-> > > +                                void *opaque, Error **errp)
-> > > +{
-> > > +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> >
-> > This is a little confusing. Maybe it's worth adding a comment that
-> > opaque is s->serial?
->
-> Yes, I can add a comment.
->
-> >
-> > Either that or change opaque to be SiFiveUState *s and then access
-> > serial via the struct.
->
-> Do you mean something like this?
->
-> Calling object_property_add() with opaque as NULL, not &s->serial:
->
-> object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
->                         sifive_u_set_serial, NULL, NULL, NULL);
->
-> Then in the sifive_u_get_serial() or sifive_u_set_serial(), replace
-> opaque with RISCV_U_MACHINE(obj)->serial.
->
-> Wow, it looks we have designed so flexible APIs :)
->
-> >
-> > > +}
-> > > +
-> > >  static void riscv_sifive_u_machine_instance_init(Object *obj)
-> > >  {
-> > >      SiFiveUState *s = RISCV_U_MACHINE(obj);
-> > > @@ -464,11 +476,17 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
-> > >                                      "Set on to tell QEMU's ROM to jump to " \
-> > >                                      "flash. Otherwise QEMU will jump to DRAM",
-> > >                                      NULL);
-> > > +
-> > > +    s->serial = OTP_SERIAL;
-> > > +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
-> > > +                        sifive_u_set_serial, NULL, &s->serial, NULL);
-> > > +    object_property_set_description(obj, "serial", "Board serial number", NULL);
-> > >  }
-> > >
-> > >  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-> > >  {
-> > >      MachineState *ms = MACHINE(qdev_get_machine());
-> > > +    SiFiveUState *us = RISCV_U_MACHINE(ms);
-> >
-> > I don't think the Soc should access the machine like this. What if we
-> > use this Soc on a different machine?
-> >
->
-> Yes, agree. The v1 patch does this in the riscv_sifive_u_init(), but
-> it could not pass the "make check". See the changelog I mentioned. Do
-> you know how to fix the "make check" properly? The issue is quite
-> strange. The v1 patch worked perfectly OK and I did not observe any
-> crash during my normal use, but with "make check" QEMU RISC-V crashes
-> with the v1 patch.
+On 3/2/20 3:16 PM, BALATON Zoltan wrote:
+>> (2) IEEE has a number of implementation choices for corner cases, and we need
+>> to implement the target's choices, not the host's choices.
+> 
+> But how is that related to inexact flag and float_round_nearest_even rounding
+> mode which are the only two things can_use_fpu() function checks for?
 
-I can reproduce the error and I have a fix. I'll send it as soon as I
-finish testing.
+float_round_nearest_even is the default rounding mode, and is what the host fpu
+has been set for.  In order to use hardfloat for a different rounding mode, we
+would need to change the host fpu control register, which is slow.
 
-Do you mind testing this branch:
-https://github.com/alistair23/qemu/tree/mainline/alistair/sifive_serial.next
+Inexact is the only flag that we cannot compute easily from the inputs and
+output.  We check for NaN and Inf as inputs and outputs,
+which is the clue that we may have to raise Invalid or Overflow.
 
-Alistair
 
->
-> > There should be a SoC "serial" property that is set before realise as well.
-> >
->
-> v1 patch: http://patchwork.ozlabs.org/patch/1196127/
->
-> Regards,
-> Bin
+r~
 
