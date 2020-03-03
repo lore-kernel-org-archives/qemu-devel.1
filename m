@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD236C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EF1C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BFC521D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D59021D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ltbIk7D2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BFC521D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p2uFP1f/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D59021D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vxX-0004E3-M8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:02:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45447)
+	id 1j8vyv-0006gx-7a
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:04:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vl0-0002oS-EV
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:00 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkx-0002ie-Tr
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vky-0004Yn-Oc
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:58 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38713)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkt-0004VG-Ql
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:54 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43617)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkx-0004WE-UX
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:56 -0500
-Received: by mail-pf1-x443.google.com with SMTP id q9so560280pfs.5
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:53 -0800 (PST)
+ id 1j8vks-0004Tl-Tx
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:51 -0500
+Received: by mail-pl1-x644.google.com with SMTP id x17so497590plm.10
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=w0rkiSrEP29kyeWR5iSkNuT9vmqTLCQckp24RIRfysc=;
- b=ltbIk7D25Snlht3Gxq1PCQTiotaY+wadEJCQH312niibQLkKCgqbMRERmMq1n9ksag
- lXzPPfwa7v8fCIVxVW/Xa3RiWcLClK6fZ/BnDVGeBxTTHoXfSyqQfp0WNKuLP2r+OFMd
- 8UuR+Ar5AGW3k7lSJeBT9QEdiljeZeSFi08bObHgSqORwiRRH6CkJAwpMGLXEiVIgTHj
- HHIXrx1VyR9XTpRvim3PH9ozG7g6GCEcN4NEVUj2vrhR0UuMQvmI6b/zIqbn8Np/pdOh
- YU3rhpDenj0vC/LQd94va3uCBwhQFvhrX7HkmJRDX7SV4f0PyVRnCWCU2vB77CSQd8od
- VOIA==
+ bh=K4iuwnZKk8MjfgAofzgXfmuGJvew57sqzgzfazcOgLo=;
+ b=p2uFP1f/C7Br/ykLKeSK8IA4rQcKuI/tYyaAGts02769Ux9xbuXth8cdz33/+peND9
+ J042EH+c3Q10H/iABTVu4W0BRVOY8IGQwqCRUV6s8bjD7oSLIBHQR1ziDCadoQwrUpo6
+ wEB2X2369vyIBl051MM8dJG35MMCgbbv9Cmndnwcyiwf4Acq84Nz/MQbmgW85enkjXVR
+ 8GcYK9HILbxMLTmAWiWPgRz9DP30mN5oWE51O7bVFJCNu6XlMh50MffWTgb0LvE++sRE
+ POYF+Ev7LwB0GH4XFGaqCWxHz5Bs5XuYq9VtAG6w/xGX4Jck0+LFb8i1NroqywAITkhP
+ +sIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=w0rkiSrEP29kyeWR5iSkNuT9vmqTLCQckp24RIRfysc=;
- b=t3VgMepTq62s1KOGEIAK+VdbouWZRomSStLrXf2ylyJXNeQIHvPoIVYotApS7kvz+z
- wBYZWD5FsxCBScWNRPwK/SX5ceKlj/id7yXTG8wvwT2vCTXg3ct1tYD900Cps2EmM02b
- 22lP3rU8rVEMf4DAGrB04A+8TqRmnadc913TEIHVWvh8ADYDTD9sgHps7PMnLFVfl1W0
- f/MI8V7KgGSY7VMLAugXZD5gwH8rxoFOvO7WdM3gm0u4d/VRaFP+ekmxtfpg4nb9YvXq
- PLnv5lGKNmG5jPkPhAPL6d7Lj1Kdc2GKRfVQ/c/aRMkhqV+MkK3bSUsHBg40QFhlwMxS
- kFPA==
-X-Gm-Message-State: ANhLgQ2KFsfKrVz/0Oajh8F5TcGuV8iXcJctr2eTIuCF8k9bKseZcIwX
- 4skWWqMa4B/s+YHMSL6GMDW8+A==
-X-Google-Smtp-Source: ADFU+vu4CDhk/Vcb14fa4GvavTH3LG9812Uh3ztyKwAICIYd/6BOYf4W/CPnRC7trbrLaUxnCFAcvQ==
-X-Received: by 2002:a63:2356:: with SMTP id u22mr1451340pgm.245.1583196592667; 
- Mon, 02 Mar 2020 16:49:52 -0800 (PST)
+ bh=K4iuwnZKk8MjfgAofzgXfmuGJvew57sqzgzfazcOgLo=;
+ b=kkqP0cvSfzrI339P0g4B9hw9hHHe71GC/QO3ynry3ZrdNhExCphC0KgIt2O2+S3Py2
+ YgxFVK/FVhPYQlpozG1g5EduZ3cq2MxuBCl1Seq6kkV3zhDVX6rEcljEaKGWn5svNDdW
+ 6HjueCwI1B57qNAlPaihE6c+2Kf0tXdR9G/m1zxxoJ790+WGu5CyxkXdJZimrT0ngcCl
+ xj/x+YHxePWxSFVJ0wg0bWtp+blKURuh1FuqmaeIAOkG/ofubIQ8szozc3qrdJ/7n6GH
+ 7oSOapGKkwe7S60DgDK/e2i/8o3ItJX9B5azmzkJNtiwi475IqycWGfKgSTPdnb1RWd2
+ YTUA==
+X-Gm-Message-State: ANhLgQ2n4FAYHlqtsZOB/xkgObrN2mEoCQzg+dRSZcMKAsGXf2ZaePkH
+ wEYdPbM5f2qvXrsb3exQLK+rCg==
+X-Google-Smtp-Source: ADFU+vukNh3FxGhY8lT6adpRrBhNLhsl4gGteSU5zfzM62/YqJnsnp9l9JYWvoM5rQxXnvcYTQE96w==
+X-Received: by 2002:a17:90a:f0c4:: with SMTP id
+ fa4mr1186814pjb.125.1583196587713; 
+ Mon, 02 Mar 2020 16:49:47 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id 9sm18307328pge.65.2020.03.02.16.49.51
+ by smtp.gmail.com with ESMTPSA id d1sm21802272pgj.79.2020.03.02.16.49.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:52 -0800 (PST)
-Subject: [PULL 31/38] target/riscv: Raise the new execptions when 2nd stage
- translation fails
-Date: Mon,  2 Mar 2020 16:48:41 -0800
-Message-Id: <20200303004848.136788-32-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:47 -0800 (PST)
+Subject: [PULL 28/38] target/riscv: Respect MPRV and SPRV for floating point
+ ops
+Date: Mon,  2 Mar 2020 16:48:38 -0800
+Message-Id: <20200303004848.136788-29-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
@@ -84,7 +85,7 @@ From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,52 +103,45 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
+mark_fs_dirty() is the only place in translate.c that uses the
+virt_enabled bool. Let's respect the contents of MSTATUS.MPRV and
+HSTATUS.SPRV when setting the bool as this is used for performing
+floating point operations when V=0.
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu_helper.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ target/riscv/translate.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 584b0c71fb..9e28b19c29 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -587,16 +587,28 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-     }
-     switch (access_type) {
-     case MMU_INST_FETCH:
--        cs->exception_index = page_fault_exceptions ?
--            RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
-+        if (riscv_cpu_virt_enabled(env) && !first_stage) {
-+            cs->exception_index = RISCV_EXCP_INST_GUEST_PAGE_FAULT;
-+        } else {
-+            cs->exception_index = page_fault_exceptions ?
-+                RISCV_EXCP_INST_PAGE_FAULT : RISCV_EXCP_INST_ACCESS_FAULT;
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 3ce86adb89..b51ab92068 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -751,7 +751,21 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
+     ctx->priv_ver = env->priv_ver;
+ #if !defined(CONFIG_USER_ONLY)
+-    ctx->virt_enabled = riscv_cpu_virt_enabled(env);
++    if (riscv_has_ext(env, RVH)) {
++        ctx->virt_enabled = riscv_cpu_virt_enabled(env);
++        if (env->priv_ver == PRV_M &&
++            get_field(env->mstatus, MSTATUS_MPRV) &&
++            get_field(env->mstatus, MSTATUS_MPV)) {
++            ctx->virt_enabled = true;
++        } else if (env->priv == PRV_S &&
++                   !riscv_cpu_virt_enabled(env) &&
++                   get_field(env->hstatus, HSTATUS_SPRV) &&
++                   get_field(env->hstatus, HSTATUS_SPV)) {
++            ctx->virt_enabled = true;
 +        }
-         break;
-     case MMU_DATA_LOAD:
--        cs->exception_index = page_fault_exceptions ?
--            RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
-+        if (riscv_cpu_virt_enabled(env) && !first_stage) {
-+            cs->exception_index = RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT;
-+        } else {
-+            cs->exception_index = page_fault_exceptions ?
-+                RISCV_EXCP_LOAD_PAGE_FAULT : RISCV_EXCP_LOAD_ACCESS_FAULT;
-+        }
-         break;
-     case MMU_DATA_STORE:
--        cs->exception_index = page_fault_exceptions ?
--            RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-+        if (riscv_cpu_virt_enabled(env) && !first_stage) {
-+            cs->exception_index = RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT;
-+        } else {
-+            cs->exception_index = page_fault_exceptions ?
-+                RISCV_EXCP_STORE_PAGE_FAULT : RISCV_EXCP_STORE_AMO_ACCESS_FAULT;
-+        }
-         break;
-     default:
-         g_assert_not_reached();
++    } else {
++        ctx->virt_enabled = false;
++    }
+ #else
+     ctx->virt_enabled = false;
+ #endif
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
