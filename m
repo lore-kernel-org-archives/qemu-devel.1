@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C55C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61809C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B27721775
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3168121775
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JatxS2pW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B27721775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CbDUKkas"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3168121775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yWr-0002Iz-LQ
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:47:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35186)
+	id 1j8yWt-0002Mb-96
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:47:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35205)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTT-0004hQ-21
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:04 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTT-0004hR-DH
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTR-0002D9-LM
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTR-0002D3-Kp
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:03 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:53899)
+Received: from ozlabs.org ([2401:3900:2:1::2]:52557)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8yTR-0002Ay-Ai; Mon, 02 Mar 2020 22:44:01 -0500
+ id 1j8yTR-0002B0-A3; Mon, 02 Mar 2020 22:44:01 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WjY60F7Sz9sSh; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
+ id 48WjY60c2nz9sSQ; Tue,  3 Mar 2020 14:43:54 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1583207034;
- bh=2iDlgV27rvDSzxSWy0/EmimVtJvGnjVek6UCdsAucUo=;
+ bh=G59jLUazW5mofMddNsZYmRNJtI58lVefWHXbjxNh5RQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=JatxS2pWDVdC5KHqjqsei7SxQwM7w7HsV/bS3pvmDTpqVRbAapgG3+4PJD20mVEhy
- TBxagmUgR7ItDEUcuX98RO/exUImDu91+4JiUVpi2TGyb49iZfWnX9Qhdyv+UTy0SL
- oYI+FErBjFGlKVLyrmKDmTsFmosjMe5Q+Fs63RMk=
+ b=CbDUKkasGlC8+cC/GGm8e4pn9882oG27bs5wmCryQX0L9fHxG4Covgs3hpHfDNOwo
+ 4VIX7iBBRP+L4Pc7FlyCgARBDBhF7RmlYeqFUdoU4RdOt2LcPtHIVDOcmrwc/b2uWL
+ 2ISeCZqkUjDs7KSeHiJlN7RTPJ1c8vn5bjM808ew=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-Subject: [PATCH v7 04/17] target/ppc: Introduce ppc_hash64_use_vrma() helper
-Date: Tue,  3 Mar 2020 14:43:38 +1100
-Message-Id: <20200303034351.333043-5-david@gibson.dropbear.id.au>
+Subject: [PATCH v7 07/17] target/ppc: Use class fields to simplify LPCR masking
+Date: Tue,  3 Mar 2020 14:43:41 +1100
+Message-Id: <20200303034351.333043-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
@@ -81,139 +81,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When running guests under a hypervisor, the hypervisor obviously needs to
-be protected from guest accesses even if those are in what the guest
-considers real mode (translation off).  The POWER hardware provides two
-ways of doing that: The old way has guest real mode accesses simply offse=
-t
-and bounds checked into host addresses.  It works, but requires that a
-significant chunk of the guest's memory - the RMA - be physically
-contiguous in the host, which is pretty inconvenient.  The new way, known
-as VRMA, has guest real mode accesses translated in roughly the normal wa=
-y
-but with some special parameters.
+When we store the Logical Partitioning Control Register (LPCR) we have a
+big switch statement to work out which are valid bits for the cpu model
+we're emulating.
 
-In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes, b=
-ut
-in POWER9 only VRMA mode is supported and LPCR[VPM0] no longer exists.  W=
-e
-handle that difference in behaviour in ppc_hash64_set_isi().. but not in
-other places that we blindly check LPCR[VPM0].
+As well as being ugly, this isn't really conceptually correct, since it i=
+s
+based on the mmu_model variable, whereas the LPCR isn't (only) about the
+MMU, so mmu_model is basically just acting as a proxy for the cpu model.
 
-Correct those instances with a new helper to tell if we should be in VRMA
-mode.
+Handle this in a simpler way, by adding a suitable lpcr_mask to the QOM
+class.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 43 ++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 22 deletions(-)
+ target/ppc/cpu-qom.h            |  1 +
+ target/ppc/mmu-hash64.c         | 36 ++-------------------------------
+ target/ppc/translate_init.inc.c | 27 +++++++++++++++++++++----
+ 3 files changed, 26 insertions(+), 38 deletions(-)
 
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index e499575dc8..15d6b54a7d 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -177,6 +177,7 @@ typedef struct PowerPCCPUClass {
+     uint64_t insns_flags;
+     uint64_t insns_flags2;
+     uint64_t msr_mask;
++    uint64_t lpcr_mask;         /* Available bits in the LPCR */
+     uint64_t lpcr_pm;           /* Power-saving mode Exit Cause Enable b=
+its */
+     powerpc_mmu_t   mmu_model;
+     powerpc_excp_t  excp_model;
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 392f90e0ae..e372c42add 100644
+index caf47ad6fc..0ef330a614 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -668,6 +668,21 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU=
- *cpu,
-     return 0;
+@@ -1095,42 +1095,10 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cp=
+u)
+=20
+ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+ {
++    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    uint64_t lpcr =3D 0;
+=20
+-    /* Filter out bits */
+-    switch (env->mmu_model) {
+-    case POWERPC_MMU_2_03: /* P5p */
+-        lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
+-                      LPCR_LPES0 | LPCR_LPES1 |
+-                      LPCR_RMI | LPCR_HDICE);
+-        break;
+-    case POWERPC_MMU_2_06: /* P7 */
+-        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
+-                      LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+-                      LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
+-                      LPCR_MER | LPCR_TC |
+-                      LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
+-        break;
+-    case POWERPC_MMU_2_07: /* P8 */
+-        lpcr =3D val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
+-                      LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
+-                      LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE=
+1 |
+-                      LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
+-                      LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE);
+-        break;
+-    case POWERPC_MMU_3_00: /* P9 */
+-        lpcr =3D val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
+-                      (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_A=
+IL |
+-                      LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR=
+_LD |
+-                      (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_=
+EEE |
+-                      LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | LPC=
+R_TC |
+-                      LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE);
+-        break;
+-    default:
+-        g_assert_not_reached();
+-    }
+-    env->spr[SPR_LPCR] =3D lpcr;
++    env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
+     ppc_hash64_update_rmls(cpu);
+     ppc_hash64_update_vrma(cpu);
+ }
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index f7acd3d61d..68aa4dfad8 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8476,6 +8476,8 @@ POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data=
+)
+                     (1ull << MSR_DR) |
+                     (1ull << MSR_PMM) |
+                     (1ull << MSR_RI);
++    pcc->lpcr_mask =3D LPCR_RMLS | LPCR_ILE | LPCR_LPES0 | LPCR_LPES1 |
++        LPCR_RMI | LPCR_HDICE;
+     pcc->mmu_model =3D POWERPC_MMU_2_03;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+@@ -8614,6 +8616,12 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data=
+)
+                     (1ull << MSR_PMM) |
+                     (1ull << MSR_RI) |
+                     (1ull << MSR_LE);
++    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
++        LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
++        LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
++        LPCR_MER | LPCR_TC |
++        LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE;
++    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
+     pcc->mmu_model =3D POWERPC_MMU_2_06;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+@@ -8630,7 +8638,6 @@ POWERPC_FAMILY(POWER7)(ObjectClass *oc, void *data)
+     pcc->l1_dcache_size =3D 0x8000;
+     pcc->l1_icache_size =3D 0x8000;
+     pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+-    pcc->lpcr_pm =3D LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2;
  }
 =20
-+static bool ppc_hash64_use_vrma(CPUPPCState *env)
-+{
-+    switch (env->mmu_model) {
-+    case POWERPC_MMU_3_00:
-+        /*
-+         * ISAv3.0 (POWER9) always uses VRMA, the VPM0 field and RMOR
-+         * register no longer exist
-+         */
-+        return true;
-+
-+    default:
-+        return !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-+    }
-+}
-+
- static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
- {
-     CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
-@@ -676,15 +691,7 @@ static void ppc_hash64_set_isi(CPUState *cs, uint64_=
-t error_code)
-     if (msr_ir) {
-         vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
-     } else {
--        switch (env->mmu_model) {
--        case POWERPC_MMU_3_00:
--            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
--            vpm =3D true;
--            break;
--        default:
--            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
--            break;
--        }
-+        vpm =3D ppc_hash64_use_vrma(env);
-     }
-     if (vpm && !msr_hv) {
-         cs->exception_index =3D POWERPC_EXCP_HISI;
-@@ -702,15 +709,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint64_=
-t dar, uint64_t dsisr)
-     if (msr_dr) {
-         vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
-     } else {
--        switch (env->mmu_model) {
--        case POWERPC_MMU_3_00:
--            /* Field deprecated in ISAv3.00 - interrupts always go to hy=
-perv */
--            vpm =3D true;
--            break;
--        default:
--            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
--            break;
--        }
-+        vpm =3D ppc_hash64_use_vrma(env);
-     }
-     if (vpm && !msr_hv) {
-         cs->exception_index =3D POWERPC_EXCP_HDSI;
-@@ -799,7 +798,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-             if (!(eaddr >> 63)) {
-                 raddr |=3D env->spr[SPR_HRMOR];
-             }
--        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+        } else if (ppc_hash64_use_vrma(env)) {
-             /* Emulated VRMA mode */
-             slb =3D &env->vrma_slb;
-             if (!slb->sps) {
-@@ -967,7 +966,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu=
-, target_ulong addr)
-         } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-             /* In HV mode, add HRMOR if top EA bit is clear */
-             return raddr | env->spr[SPR_HRMOR];
--        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+        } else if (ppc_hash64_use_vrma(env)) {
-             /* Emulated VRMA mode */
-             slb =3D &env->vrma_slb;
-             if (!slb->sps) {
-@@ -1056,8 +1055,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-     slb->sps =3D NULL;
+ static void init_proc_POWER8(CPUPPCState *env)
+@@ -8785,6 +8792,13 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data=
+)
+                     (1ull << MSR_TS0) |
+                     (1ull << MSR_TS1) |
+                     (1ull << MSR_LE);
++    pcc->lpcr_mask =3D LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
++        LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
++        LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
++        LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
++        LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE;
++    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
++                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
+     pcc->mmu_model =3D POWERPC_MMU_2_07;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc_hash64_handle_mmu_fault;
+@@ -8802,8 +8816,6 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+     pcc->l1_dcache_size =3D 0x8000;
+     pcc->l1_icache_size =3D 0x8000;
+     pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+-    pcc->lpcr_pm =3D LPCR_P8_PECE0 | LPCR_P8_PECE1 | LPCR_P8_PECE2 |
+-                   LPCR_P8_PECE3 | LPCR_P8_PECE4;
+ }
 =20
-     /* Is VRMA enabled ? */
--    lpcr =3D env->spr[SPR_LPCR];
--    if (!(lpcr & LPCR_VPM0)) {
-+    if (!ppc_hash64_use_vrma(env)) {
-         return;
-     }
+ #ifdef CONFIG_SOFTMMU
+@@ -8995,6 +9007,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data=
+)
+                     (1ull << MSR_PMM) |
+                     (1ull << MSR_RI) |
+                     (1ull << MSR_LE);
++    pcc->lpcr_mask =3D LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
++        (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
++        LPCR_UPRT | LPCR_EVIRT | LPCR_ONL | LPCR_HR | LPCR_LD |
++        (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_EEE |
++                             LPCR_DEE | LPCR_OEE))
++        | LPCR_MER | LPCR_GTSE | LPCR_TC |
++        LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE;
++    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
+OEE;
+     pcc->mmu_model =3D POWERPC_MMU_3_00;
+ #if defined(CONFIG_SOFTMMU)
+     pcc->handle_mmu_fault =3D ppc64_v3_handle_mmu_fault;
+@@ -9014,7 +9034,6 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+     pcc->l1_dcache_size =3D 0x8000;
+     pcc->l1_icache_size =3D 0x8000;
+     pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_lpcr;
+-    pcc->lpcr_pm =3D LPCR_PDEE | LPCR_HDEE | LPCR_EEE | LPCR_DEE | LPCR_=
+OEE;
+ }
 =20
-@@ -1065,6 +1063,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-      * Make one up. Mostly ignore the ESID which will not be needed
-      * for translation
-      */
-+    lpcr =3D env->spr[SPR_LPCR];
-     vsid =3D SLB_VSID_VRMA;
-     vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-     vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
+ #ifdef CONFIG_SOFTMMU
 --=20
 2.24.1
 
