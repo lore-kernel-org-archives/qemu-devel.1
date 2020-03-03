@@ -2,63 +2,55 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926FFC3F2D2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 02:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EB5C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E92E2465E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 02:44:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Bpg019NP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E92E2465E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id A4B3C2072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:18:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B3C2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8xYB-0000Eu-Fj
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 21:44:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56831)
+	id 1j8y4r-0006Dz-OQ
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:18:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8xXY-0008Bl-TC
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 21:44:14 -0500
+ (envelope-from <yi.y.sun@linux.intel.com>) id 1j8y49-0005mS-ML
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8xXX-0004iY-Dl
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 21:44:12 -0500
-Received: from ozlabs.org ([203.11.71.1]:47073)
+ (envelope-from <yi.y.sun@linux.intel.com>) id 1j8y44-00013M-NE
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:17:53 -0500
+Received: from mga14.intel.com ([192.55.52.115]:57394)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8xXW-0004hE-Ah; Mon, 02 Mar 2020 21:44:11 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WhD34rSfz9sSL; Tue,  3 Mar 2020 13:44:03 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583203443;
- bh=BaltiYEh6lHSqfGvxVak8CgajS73EwyljG1wWU8xKFk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Bpg019NP1/sr+bU2jd6N3G2DWbNDjZga2Xv4qcsJKPatGmoolYczcmns/S2x7ZYKy
- SU5AAPy0vqT2jjMdc0PnSR+C8I6553ZVJXKa5dgbKSkQY5RtroRdo7Khsovjeq+2Eu
- YUoI/POLQdhKqOonC7hXW5rgGHRL1MrsCm3Uwv3k=
-Date: Tue, 3 Mar 2020 13:39:32 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Problem with virtual to physical memory translation when KVM is
- enabled.
-Message-ID: <20200303023932.GC35885@umbus.fritz.box>
-References: <CAM2K0nreUP-zW2pJaH7tWSHHQn7WWeUDoeH_HM99wysgOHANXw@mail.gmail.com>
- <CAFEAcA84xCMzUNfYNBNR8ShA58aor_rbYTq7jnmsLQqhvbOH8w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="1ccMZA6j1vT5UqiK"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA84xCMzUNfYNBNR8ShA58aor_rbYTq7jnmsLQqhvbOH8w@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+ (Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
+ id 1j8y44-0000k2-FC
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:17:48 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Mar 2020 19:16:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,509,1574150400"; d="scan'208";a="351722170"
+Received: from yisun1-ubuntu.bj.intel.com ([10.238.156.100])
+ by fmsmga001.fm.intel.com with ESMTP; 02 Mar 2020 19:16:40 -0800
+From: Yi Sun <yi.y.sun@linux.intel.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1] memory: remove assert to avoid unnecessary coredump
+Date: Tue,  3 Mar 2020 11:11:14 +0800
+Message-Id: <20200303031114.21111-1-yi.y.sun@linux.intel.com>
+X-Mailer: git-send-email 2.15.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,80 +62,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wayne Li <waynli329@gmail.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- kvm-ppc <kvm-ppc@vger.kernel.org>, kvm-devel <kvm@vger.kernel.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com, yan.y.zhao@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+It is too strict to use assert to make qemu coredump if
+the notification does not overlap with registered range.
+Skip it is fine enough.
 
---1ccMZA6j1vT5UqiK
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+During test, we found such a case for vhost net device:
+    memory_region_notify_one: entry->iova=0xfee00000, entry_end=0xfeffffff, notifier->start=0xfef00000, notifier->end=0xffffffffffffffff
 
-On Tue, Feb 25, 2020 at 04:16:43PM +0000, Peter Maydell wrote:
-> On Tue, 25 Feb 2020 at 16:10, Wayne Li <waynli329@gmail.com> wrote:
-> > So what could be causing this problem?  I=E2=80=99m guessing it has som=
-ething
-> > to do with the translation lookaside buffers (TLBs)?  But the
-> > translation between virtual and physical memory clearly works when KVM
-> > isn=E2=80=99t enabled.  So what could cause this to stop working when K=
-VM is
-> > enabled?
->=20
-> When you're not using KVM, virtual-to-physical lookups are
-> done using QEMU's emulation code that emulates the MMU.
-> When you are using KVM, virtual-to-physical lookups
-> are done entirely using the host CPU (except for corner
-> cases like when we come out of the kernel and the user
-> does things with the gdb debug stub). So all the page
-> tables and other guest setup of the MMU had better match
-> what the host CPU expects. (I don't know how big the
-> differences between e5500 and e6500 MMU are or whether
-> the PPC architecture/KVM supports emulating the one on
-> the other: some PPC expert will probably be able to tell you.)
+Skip this notification but not coredump makes everything
+work well.
 
-Well, sort of.  Including things like KVM-PR, things get complicated.
-But in any case, the resposibility for translation lies somewhere
-between the cpu itself and the KVM code - qemu is not involved.
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+---
+ memory.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Depending on exactly what the host's MMU looks like and what it has in
-the way of virtualization features, that might make it impossible to
-run a guest expecting a substantially different cpu model from the
-host's.
+diff --git a/memory.c b/memory.c
+index 06484c2bff..62ad0f3377 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1921,12 +1921,11 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+      * Skip the notification if the notification does not overlap
+      * with registered range.
+      */
+-    if (notifier->start > entry_end || notifier->end < entry->iova) {
++    if (notifier->start > entry_end || notifier->end < entry->iova ||
++        entry->iova < notifier->start || entry_end > notifier->end) {
+         return;
+     }
+ 
+-    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
+-
+     if (entry->perm & IOMMU_RW) {
+         request_flags = IOMMU_NOTIFIER_MAP;
+     } else {
+-- 
+2.15.1
 
-Unfortunately, I'm not really at all familiar with the Freescale
-parts, and even less with the KVM implementation for them.  It doesn't
-surprise me that there are substantial bugs there, but I wouldn't
-realy now where to begin to fix them.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---1ccMZA6j1vT5UqiK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl5dw2IACgkQbDjKyiDZ
-s5IK7g//dSOwpQdEGi2arNEycf3azjajh4sBmMPEOHpTQ73sPD3ChSQ0+PnCNfbJ
-ApnfemamUHGfKX5FaOn8+NnSXnUAe7xYXWOojZAX8k5F2deBJifphPkxIKAKHldd
-GWusFDgTixZmc0OthSk3dXYQVCgG8LPU2ImVzUkgTlsWR76/i/w8OY8/hoY65ZQU
-erh6wAph3YzkW6VLr+SsEWlrerb/GyC7fhZUklwfBZ98ZjuBl5I6v5S6xbbQJ/Bm
-OHLnbVyMNu5OQoY4IH1tgo+wu2t0QiD1ZvYMCkrgKTtcqdEr1k3U2UWEglh/RgfC
-QcsUt93llEX8mZV0W/hrC4b3YOxBkQ83beDJE3LN8UKKmBaqEAE9FsN/tcM10teI
-AH4XqXwbOM1vOFEuEh0bJYy/2Zs/drigbXEH4KrCZsgkU6uqcxJ179m2cnLoNSu0
-mvO4+MDg9krXBI449J4rpAyM+uVQnn0xZzXSTh/ntaeP14XDcI3i2BwGlPjM7SMM
-A37rngxrQMokeHqsr3PIgJDXwWwP5VjQcjC+HcKMIdzUvkHM09eDJ1Njvzbn5A4/
-UU8QU1UHZJLiw6ZC8qT/vZQYreH8jVBG+epfl3W1d/Ze1TN2yyBsDsP9lEdvtwII
-I/+FgsvNexcG4gTAprXV7UQnW+KGWV8dIQWcz/RP4s14mmp+nZE=
-=/Qev
------END PGP SIGNATURE-----
-
---1ccMZA6j1vT5UqiK--
 
