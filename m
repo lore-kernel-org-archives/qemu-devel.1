@@ -7,54 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEC9C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC33C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66EF520848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA5EC2465D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TS0me6qK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EF520848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SnQAj5Pd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA5EC2465D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yUQ-0006FO-HS
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:45:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35134)
+	id 1j8yUZ-0006dG-TM
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:45:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTQ-0004h3-LQ
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTQ-0004h1-Im
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTP-0002Ai-BX
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTP-0002Ac-BA
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:00 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40803 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50477 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8yTO-00025k-Fa; Mon, 02 Mar 2020 22:43:59 -0500
+ id 1j8yTO-00026d-HH; Mon, 02 Mar 2020 22:43:59 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WjY56Wp2z9sSM; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
+ id 48WjY54K7Xz9sRf; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1583207033;
- bh=105uZzjK8EWkPkmRVAazKF6ikIMHnp8INylkLfXtmRo=;
+ bh=uBYPx67ppxV/A2wxW6AQ2al+eZLsvjBQ0vEvArcKuk8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TS0me6qKYnfiRrjpKnsgJO2cwuKdjiwOJtliex+pzd85H4X5yZtKGSDXzhsEdh7xx
- dhsfbMBOqO0LHbuEiZQv+fPCOorx3m8VZq6Mp+IUDWW9KPK0grCO7w+MkKjx4uHWyN
- RvS1GXqxsiFINgUP1plx9LuflhlDVAPhfWYG9Xh4=
+ b=SnQAj5Pd6zvjazLUMxnYqZRmsTg+NRwS52sFMtKtIJhWg+DNQPCV0pozz4gf9ejC1
+ xtsPyKQqjkAKtg6CaQjnBfzq6//To055/i8BV5dMat/v3+yZk9B3xXuxZzI/9hFbjS
+ asM3MrVjyJtjV0ZlZZHTzUr1yrh8cxB4Vm7TLaic=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-Subject: [PATCH v7 03/17] target/ppc: Correct handling of real mode accesses
- with vhyp on hash MMU
-Date: Tue,  3 Mar 2020 14:43:37 +1100
-Message-Id: <20200303034351.333043-4-david@gibson.dropbear.id.au>
+Subject: [PATCH v7 01/17] ppc: Remove stub support for 32-bit hypervisor mode
+Date: Tue,  3 Mar 2020 14:43:35 +1100
+Message-Id: <20200303034351.333043-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -82,140 +80,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
-only model the non-hypervisor-privileged parts of the cpu.  Essentially w=
-e
-model the hypervisor's behaviour from the point of view of a guest OS, bu=
+a4f30719a8cd, way back in 2007 noted that "PowerPC hypervisor mode is not
+fundamentally available only for PowerPC 64" and added a 32-bit version
+of the MSR[HV] bit.
+
+But nothing was ever really done with that; there is no meaningful suppor=
 t
-we don't model the hypervisor's execution.
-
-In particular, in this mode, qemu's notion of target physical address is
-a guest physical address from the vcpu's point of view.  So accesses in
-guest real mode don't require translation.  If we were modelling the
-hypervisor mode, we'd need to translate the guest physical address into
-a host physical address.
-
-Currently, we handle this sloppily: we rely on setting up the virtual LPC=
-R
-and RMOR registers so that GPAs are simply HPAs plus an offset, which we
-set to zero.  This is already conceptually dubious, since the LPCR and RM=
-OR
-registers don't exist in the non-hypervisor portion of the CPU.  It gets
-worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
-
-Clean this up by explicitly handling the vhyp case.  While we're there,
-remove some unnecessary nesting of if statements that made the logic to
-select the correct real mode behaviour a bit less clear than it could be.
+for 32-bit hypervisor mode 13 years later.  Let's stop pretending and jus=
+t
+remove the stubs.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Fabiano Rosas <farosas@linux.ibm.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 25 deletions(-)
+ target/ppc/cpu.h                | 21 +++++++--------------
+ target/ppc/translate_init.inc.c |  6 +++---
+ 2 files changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 3e0be4d55f..392f90e0ae 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
-          */
-         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index b283042515..8077fdb068 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -24,8 +24,6 @@
+ #include "exec/cpu-defs.h"
+ #include "cpu-qom.h"
 =20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if (msr_hv || !env->has_hv_mode) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+        } else if (msr_hv || !env->has_hv_mode) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             if (!(eaddr >> 63)) {
-                 raddr |=3D env->spr[SPR_HRMOR];
-             }
--        } else {
--            /* Otherwise, check VPM for RMA vs VRMA */
--            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
--                slb =3D &env->vrma_slb;
--                if (slb->sps) {
--                    goto skip_slb_search;
--                }
--                /* Not much else to do here */
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-+            slb =3D &env->vrma_slb;
-+            if (!slb->sps) {
-+                /* Invalid VRMA setup, machine check */
-                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
-                 env->error_code =3D 0;
-                 return 1;
--            } else if (raddr < env->rmls) {
--                /* RMA. Check bounds in RMLS */
--                raddr |=3D env->spr[SPR_RMOR];
--            } else {
--                /* The access failed, generate the approriate interrupt =
-*/
-+            }
-+
-+            goto skip_slb_search;
-+        } else {
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-                 if (rwx =3D=3D 2) {
-                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
-                 } else {
-@@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
-r eaddr,
-                 }
-                 return 1;
-             }
-+
-+            raddr |=3D env->spr[SPR_RMOR];
-         }
-         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
-ASK,
-                      PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
-@@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
-         /* In real mode the top 4 effective address bits are ignored */
-         raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
-=20
--        /* In HV mode, add HRMOR if top EA bit is clear */
--        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+        if (cpu->vhyp) {
-+            /*
-+             * In virtual hypervisor mode, there's nothing to do:
-+             *   EA =3D=3D GPA =3D=3D qemu guest address
-+             */
-+            return raddr;
-+        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-+            /* In HV mode, add HRMOR if top EA bit is clear */
-             return raddr | env->spr[SPR_HRMOR];
--        }
+-/* #define PPC_EMULATE_32BITS_HYPV */
 -
--        /* Otherwise, check VPM for RMA vs VRMA */
--        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-+            /* Emulated VRMA mode */
-             slb =3D &env->vrma_slb;
-             if (!slb->sps) {
-                 return -1;
-             }
--        } else if (raddr < env->rmls) {
--            /* RMA. Check bounds in RMLS */
--            return raddr | env->spr[SPR_RMOR];
-         } else {
--            return -1;
-+            /* Emulated old-style RMO mode, bounds check against RMLS */
-+            if (raddr >=3D env->rmls) {
-+                return -1;
-+            }
-+            return raddr | env->spr[SPR_RMOR];
-         }
-     } else {
-         slb =3D slb_lookup(cpu, addr);
+ #define TCG_GUEST_DEFAULT_MO 0
+=20
+ #define TARGET_PAGE_BITS_64K 16
+@@ -300,13 +298,12 @@ typedef struct ppc_v3_pate_t {
+ #define MSR_SF   63 /* Sixty-four-bit mode                            hf=
+lags */
+ #define MSR_TAG  62 /* Tag-active mode (POWERx ?)                       =
+     */
+ #define MSR_ISF  61 /* Sixty-four-bit interrupt mode on 630             =
+     */
+-#define MSR_SHV  60 /* hypervisor state                               hf=
+lags */
++#define MSR_HV   60 /* hypervisor state                               hf=
+lags */
+ #define MSR_TS0  34 /* Transactional state, 2 bits (Book3s)             =
+     */
+ #define MSR_TS1  33
+ #define MSR_TM   32 /* Transactional Memory Available (Book3s)          =
+     */
+ #define MSR_CM   31 /* Computation mode for BookE                     hf=
+lags */
+ #define MSR_ICM  30 /* Interrupt computation mode for BookE             =
+     */
+-#define MSR_THV  29 /* hypervisor state for 32 bits PowerPC           hf=
+lags */
+ #define MSR_GS   28 /* guest state for BookE                            =
+     */
+ #define MSR_UCLE 26 /* User-mode cache lock enable for BookE            =
+     */
+ #define MSR_VR   25 /* altivec available                            x hf=
+lags */
+@@ -401,10 +398,13 @@ typedef struct ppc_v3_pate_t {
+=20
+ #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+ #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
+-#define msr_shv  ((env->msr >> MSR_SHV)  & 1)
++#if defined(TARGET_PPC64)
++#define msr_hv   ((env->msr >> MSR_HV)   & 1)
++#else
++#define msr_hv   (0)
++#endif
+ #define msr_cm   ((env->msr >> MSR_CM)   & 1)
+ #define msr_icm  ((env->msr >> MSR_ICM)  & 1)
+-#define msr_thv  ((env->msr >> MSR_THV)  & 1)
+ #define msr_gs   ((env->msr >> MSR_GS)   & 1)
+ #define msr_ucle ((env->msr >> MSR_UCLE) & 1)
+ #define msr_vr   ((env->msr >> MSR_VR)   & 1)
+@@ -449,16 +449,9 @@ typedef struct ppc_v3_pate_t {
+=20
+ /* Hypervisor bit is more specific */
+ #if defined(TARGET_PPC64)
+-#define MSR_HVB (1ULL << MSR_SHV)
+-#define msr_hv  msr_shv
+-#else
+-#if defined(PPC_EMULATE_32BITS_HYPV)
+-#define MSR_HVB (1ULL << MSR_THV)
+-#define msr_hv  msr_thv
++#define MSR_HVB (1ULL << MSR_HV)
+ #else
+ #define MSR_HVB (0ULL)
+-#define msr_hv  (0)
+-#endif
+ #endif
+=20
+ /* DSISR */
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index 2f7125c51f..df3401cf06 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -8764,7 +8764,7 @@ POWERPC_FAMILY(POWER8)(ObjectClass *oc, void *data)
+                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+                         PPC2_TM | PPC2_PM_ISA206;
+     pcc->msr_mask =3D (1ull << MSR_SF) |
+-                    (1ull << MSR_SHV) |
++                    (1ull << MSR_HV) |
+                     (1ull << MSR_TM) |
+                     (1ull << MSR_VR) |
+                     (1ull << MSR_VSX) |
+@@ -8976,7 +8976,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
+     pcc->msr_mask =3D (1ull << MSR_SF) |
+-                    (1ull << MSR_SHV) |
++                    (1ull << MSR_HV) |
+                     (1ull << MSR_TM) |
+                     (1ull << MSR_VR) |
+                     (1ull << MSR_VSX) |
+@@ -9186,7 +9186,7 @@ POWERPC_FAMILY(POWER10)(ObjectClass *oc, void *data=
+)
+                         PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
+                         PPC2_TM | PPC2_ISA300 | PPC2_PRCNTL;
+     pcc->msr_mask =3D (1ull << MSR_SF) |
+-                    (1ull << MSR_SHV) |
++                    (1ull << MSR_HV) |
+                     (1ull << MSR_TM) |
+                     (1ull << MSR_VR) |
+                     (1ull << MSR_VSX) |
 --=20
 2.24.1
 
