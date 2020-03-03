@@ -2,69 +2,76 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3959C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB3CC3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C73E20863
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:11:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C73E20863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BD29A20863
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:12:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFR2rudL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD29A20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94Wf-00006e-QH
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:11:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52331)
+	id 1j94Ww-0000rI-SK
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:12:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1j94Vb-0007Ai-3t
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:43 -0500
+ (envelope-from <jasowang@redhat.com>) id 1j94Vo-0007Jb-KY
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1j94VZ-00062n-Kg
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:38 -0500
-Resent-Date: Tue, 03 Mar 2020 05:10:38 -0500
-Resent-Message-Id: <E1j94VZ-00062n-Kg@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21126)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1j94VZ-00062G-CV; Tue, 03 Mar 2020 05:10:37 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1583230154; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hF05EEDZ/R/RRCiWySf+ahfHfJVv0aSgb8m+jgmudZPbHpwWXUncuFooyiccbKQerxJ9cMKbuWULi32cXZcJRZsu5F6ZKyzDNXZC53Rr3X7urg4Am9XLjIPZ7+HdCurKF/b+iwcxXu22bGCv3AdR8PtE1ormIWr1uFu3m11Pwko=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1583230154;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=7cRha4H6zR8EzAsY+tgWYdZgtgoXcQBzPnkrUERbfWU=; 
- b=bGd2zPP0cR6br5+F/fqdbLoWgG9RmdT9qN0S7Mmk/ort2wRXm33ww5nLvLg6FfYyTb5lo3Bk9ymFWMZ5DlT9kEHQ66zFolUTgDpdT3yT2AIL+eeyNvbR6qUnlHMSzmh2S54kOda+URZO4oqrc6zDe65zLg2EiFXLLTi4KATUI5w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1583230151847454.90347562379486;
- Tue, 3 Mar 2020 02:09:11 -0800 (PST)
-In-Reply-To: <20200303100511.5498-1-peter.maydell@linaro.org>
-Subject: Re: [PATCH] cpu: Use DeviceClass reset instead of a special CPUClass
- reset
-Message-ID: <158323014888.8962.13276626887115773596@abdcc9e1aa82>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
+ (envelope-from <jasowang@redhat.com>) id 1j94Vm-000652-Ii
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:51 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31472
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1j94Vm-00064k-8T
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:10:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583230249;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=a3mtZJnkJVV8Zr5yhb+WtJDXG++/jOC4+RHJP17LVe4=;
+ b=jFR2rudLNVlwsWUynpLJSFT0L19aKYg0o35VhJRpRnVTAWa5urNVgmEmy3XKM+BT3Inx67
+ UPisVzUohEO5fV3gypN9zfns1uoD9NQAQmS5wmVd6LbQnv0Bs0MOxcIaruyrgEaEh/bNOo
+ lroZ/upcg3c82xCVrmJNRfj3iz4j0jQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-sMp8BLnNN7OoFghKR5j9tw-1; Tue, 03 Mar 2020 05:10:47 -0500
+X-MC-Unique: sMp8BLnNN7OoFghKR5j9tw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B65A189F762;
+ Tue,  3 Mar 2020 10:10:46 +0000 (UTC)
+Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-98.pek2.redhat.com
+ [10.72.12.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CF3038D55E;
+ Tue,  3 Mar 2020 10:10:44 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
 To: peter.maydell@linaro.org
-Date: Tue, 3 Mar 2020 02:09:11 -0800 (PST)
-X-ZohoMailClient: External
+Subject: [PULL V2 00/23] Net patches
+Date: Tue,  3 Mar 2020 18:10:19 +0800
+Message-Id: <1583230242-14597-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,32 +83,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: crwulff@gmail.com, sagark@eecs.berkeley.edu, david@redhat.com,
- green@moxielogic.com, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- jcmvbkbc@gmail.com, Alistair.Francis@wdc.com, edgar.iglesias@gmail.com,
- marex@denx.de, palmer@dabbelt.com, aleksandar.rikalo@rt-rk.com,
- rth@twiddle.net, atar4qemu@gmail.com, ehabkost@redhat.com,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, shorne@gmail.com,
- david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
- kbastian@mail.uni-paderborn.de, cohuck@redhat.com, laurent@vivier.eu,
- michael@walle.cc, qemu-ppc@nongnu.org, amarkovic@wavecomp.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDMwMzEwMDUxMS41NDk4
-LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0
-aGUgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9j
-a2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5n
-d0BmZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCgoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAzMDMx
-MDA1MTEuNTQ5OC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy90ZXN0aW5nLmRvY2tlci1taW5n
-d0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+The following changes since commit e0175b71638cf4398903c0d25f93fe62e0606389=
+:
+
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200=
+228' into staging (2020-02-28 16:39:27 +0000)
+
+are available in the git repository at:
+
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to 21843dc48e38c27cbddb85b4719000c70a70b6bc:
+
+  l2tpv3: fix RFC number typo in qemu-options.hx (2020-03-03 18:04:47 +0800=
+)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Bin Meng (1):
+      hw: net: cadence_gem: Fix build errors in DB_PRINT()
+
+Finn Thain (14):
+      dp8393x: Mask EOL bit from descriptor addresses
+      dp8393x: Always use 32-bit accesses
+      dp8393x: Clean up endianness hacks
+      dp8393x: Have dp8393x_receive() return the packet size
+      dp8393x: Update LLFA and CRDA registers from rx descriptor
+      dp8393x: Clear RRRA command register bit only when appropriate
+      dp8393x: Implement packet size limit and RBAE interrupt
+      dp8393x: Don't clobber packet checksum
+      dp8393x: Use long-word-aligned RRA pointers in 32-bit mode
+      dp8393x: Pad frames to word or long word boundary
+      dp8393x: Clear descriptor in_use field to release packet
+      dp8393x: Always update RRA pointers and sequence numbers
+      dp8393x: Don't reset Silicon Revision register
+      dp8393x: Don't stop reception upon RBE interrupt assertion
+
+Lukas Straub (4):
+      block/replication.c: Ignore requests after failover
+      tests/test-replication.c: Add test for for secondary node continuing =
+replication
+      net/filter.c: Add Options to insert filters anywhere in the filter li=
+st
+      colo: Update Documentation for continuous replication
+
+Stefan Hajnoczi (1):
+      l2tpv3: fix RFC number typo in qemu-options.hx
+
+Yuri Benditovich (3):
+      e1000e: Avoid hw_error if legacy mode used
+      NetRxPkt: Introduce support for additional hash types
+      NetRxPkt: fix hash calculation of IPV6 TCP
+
+ block/replication.c        |  35 ++++++-
+ docs/COLO-FT.txt           | 224 +++++++++++++++++++++++++++++++++--------=
+----
+ docs/block-replication.txt |  28 ++++--
+ hw/net/cadence_gem.c       |  11 ++-
+ hw/net/dp8393x.c           | 200 ++++++++++++++++++++++++++--------------
+ hw/net/e1000e_core.c       |  15 +--
+ hw/net/net_rx_pkt.c        |  44 ++++++++-
+ hw/net/net_rx_pkt.h        |   6 +-
+ hw/net/trace-events        |   4 +
+ include/net/filter.h       |   2 +
+ net/filter.c               |  92 ++++++++++++++++++-
+ qemu-options.hx            |  35 +++++--
+ tests/test-replication.c   |  52 +++++++++++
+ 13 files changed, 591 insertions(+), 157 deletions(-)
+
+
 
