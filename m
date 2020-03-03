@@ -2,117 +2,79 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FE0C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60077C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3E9B20714
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D59320CC7
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 20:16:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="aZaxk0y1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E9B20714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5Qe4GyS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D59320CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Dq3-0001j1-W4
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 15:08:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38804)
+	id 1j9Dxm-0004z8-91
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 15:16:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42548)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1j9Dgh-0002sA-3F
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:58:44 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j9Dwx-0004V2-Av
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 15:15:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1j9Dgf-0003Qn-K4
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:58:43 -0500
-Received: from mail-bn8nam11on2067.outbound.protection.outlook.com
- ([40.107.236.67]:13536 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1j9Dgf-0003Qb-Dh
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 14:58:41 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WPgRM/pFVigLnQH3cFb0EK9WWlu4VCYw1WtZmPGIBxAp/0FLwYkkXm0fnF6JC/pfjKk7tHdjKHdrAXByz1GQ+zhV5FjRRfGy+qMTlbc3jHzDNVS8OYsH/H3H2oE/3cQUX3VItdQiBfPmR6VbdU0GXom10FeUYtxhFC67zgsakDg6735fkd+STeYUUkllCB3vtdmv1wau2gvU9TJ1TtWvy5aDmKX9r/DjTB/33gzusiAsvxMzPQloqS+b/3Y3laQNveDFXj81SgBxLMCm8gDnDwq8DYyynf5J5z5F00JYyhrLaENcQZjdeOYmqyzLxAoGtje8p61i8eeKn+hUh1x6cQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hAQb04Z8pY4pWGNtekpdV2h7RNoU2rwJnd2aRbQmSO0=;
- b=GFG+Shzu5U5qKcJH/SVBUNlrYEw1zp7x+fUQLha5xjQ2/28c0PJtxhVVAk7aRNHu8EvwTSDYO92YGVJhvFFgEcBnrF165GTW9K8+//DQWtLpCEB56EBKVDluC0Fa4ts6B47VvEoY0xqkmMfg539aCYUelflnXtevuHUBtMY0jiutgZjZkyNTl6XuMd4QGdSimAHrz3kW6sCm/HXyzLVgKni405m0f2hMoFRGqPVJyp/gdlO+wscPPZ1wMdg3/098Yfr1gEXYoewK7voeBu8iyyrvs3WG6Xp4+TeoFZFz9iIbV1wGIugfOO1JYFR7V85SFLnpNpeEgPnLbdaRBopOYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hAQb04Z8pY4pWGNtekpdV2h7RNoU2rwJnd2aRbQmSO0=;
- b=aZaxk0y1P8eBL7ws63bt/eiZXpejCSOVFTYQeTOgFJCzfvICT1e3zpY7ZZ8nRfydUV8jNWXT+3+Q1OBtCp7EBammbN5nGnV8nkF/kiDqJ0YqR41Gadw3E7Vnt9ibnAXh3qj29NwGanu3Fg9QvFs2TJj1l4xfsh8K8OFQm6s0o30=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2382.namprd12.prod.outlook.com (2603:10b6:802:2e::30)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.18; Tue, 3 Mar
- 2020 19:58:39 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::382f:640c:215f:be93]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::382f:640c:215f:be93%5]) with mapi id 15.20.2772.019; Tue, 3 Mar 2020
- 19:58:39 +0000
-Subject: [PATCH v5 16/16] tests: Update the Unit tests
-From: Babu Moger <babu.moger@amd.com>
-To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com,
- rth@twiddle.net, mst@redhat.com, imammedo@redhat.com
-Date: Tue, 03 Mar 2020 13:58:38 -0600
-Message-ID: <158326551802.40452.18371333088303667854.stgit@naples-babu.amd.com>
-In-Reply-To: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
-References: <158326531474.40452.11433722850425537745.stgit@naples-babu.amd.com>
-User-Agent: StGit/unknown-version
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM6PR02CA0043.namprd02.prod.outlook.com
- (2603:10b6:5:177::20) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1j9Dwu-0001BY-OP
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 15:15:31 -0500
+Received: from mail-il1-x12e.google.com ([2607:f8b0:4864:20::12e]:45269)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1j9Dwu-0001BU-GG; Tue, 03 Mar 2020 15:15:28 -0500
+Received: by mail-il1-x12e.google.com with SMTP id p8so3933508iln.12;
+ Tue, 03 Mar 2020 12:15:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=x0/OgHW8syNUTp4RdLAXqlwfKECnZr120+Xj23NB9d0=;
+ b=Z5Qe4GySC3e3GKdFdX4HkvEddV4zfFQYWOe52RBw0NBHwuE3e1VxyhXobCCevQPVQK
+ FrkxnWSbHUuIva3Pxy2gKn3b4DL0IyKjdZs8trDKHPwbFLAuhZ7ecC/9tfe+1PlDa75O
+ uR5E6Lyk9dq+Z2KwQsXJdC6ePfwW4hHQIa4g04F8snpMovVVcLgvTGsDJ9syMogromDs
+ T8p/L8gukbq/ZeNhw2D5GaJRglsGkwi5rQPYbO5FTBz+WGc+hY9hslUcAC7qPRT7w914
+ Qor6ocxAcDS5FOzHvgB2UkIMGrNnj4DAPpExNMqDB+Pa2+0jzJ5j2BHnzdCJvTrQIWQH
+ ghQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=x0/OgHW8syNUTp4RdLAXqlwfKECnZr120+Xj23NB9d0=;
+ b=FHDBpMUuD2BNfC1OthOMdjiZSgigbpKXxed0v6rKAkDxTT+CpKFGvJawmWP3xUZvjn
+ Se/ijxnVGQvLOGqHpQOk99QYfi1ErE/patdWRNvgxexUd0o0adWl6z4BfGLdmzK0ATkK
+ 5eXRQ8AJ+pmnOM67GLTKD8tvjFwDX/nlZXR6RlGwM6bMD18nfbh71XuF+fby4CxzxF95
+ FNzO9ssPm0euJzDqvIyjAHpmfLypcLa/rgfIyLtfFoZ6jKjGGvhHBLMpgDuEEPc2KTMS
+ WVceLTUquX83cdCk3Fz5GFe7Nu/LFv9tj7gwvxVpI9dSpZV3Cc2A1w9t2VJjGG6xZaBy
+ i5wA==
+X-Gm-Message-State: ANhLgQ2vGuevTzgMBxxkUNVYiSBKvUq9t1ggiB8Wj5Zcq+cPgDL6Y6qt
+ GG/yHqz5QSnROX/5GNlR8ZIKWWrebRWF8wdTbiM=
+X-Google-Smtp-Source: ADFU+vvKzcMvYYvzsHq8RkySZjmVUoX0tIlOWq1uh8q/Wg0OyCFnpr+TpkHCeDOJrqUwWchnKH82siG8jpOlMDMlWtA=
+X-Received: by 2002:a92:d5cf:: with SMTP id d15mr6267383ilq.306.1583266527760; 
+ Tue, 03 Mar 2020 12:15:27 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from naples-babu.amd.com (165.204.78.2) by
- DM6PR02CA0043.namprd02.prod.outlook.com (2603:10b6:5:177::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.14 via Frontend Transport; Tue, 3 Mar 2020 19:58:38 +0000
-X-Originating-IP: [165.204.78.2]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 45a0530c-587e-49c2-e497-08d7bfad4471
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2382:|SN1PR12MB2382:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB23822B47ADCD7C521EA69EEC95E40@SN1PR12MB2382.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
-X-Forefront-PRVS: 03319F6FEF
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(366004)(136003)(396003)(346002)(376002)(39860400002)(189003)(199004)(186003)(8676002)(8936002)(81166006)(81156014)(26005)(16526019)(15650500001)(5660300002)(478600001)(86362001)(52116002)(7696005)(956004)(316002)(2906002)(66946007)(66476007)(44832011)(66556008)(55016002)(4326008)(103116003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:SN1PR12MB2382;
- H:SN1PR12MB2560.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: s52UCjmCXRE/s1MJ5PSX3VPoBTM0lYDP3rVdwEuRAkeMmNfa7yvcLDh8lV5rqhOa+TL6A5ERh8rCGdZQNjxbKz00vt0g3ekCgNKR1EwHVaRBrjsaGnBcYdAebrpmlUAJBPup4hX1lZHuYCdCX5tN6vj9G6QKwihHQNSUBdRicIlMc4TEkLT9CPc/aZy9GsF0a0wVFqLTm9N2/SodtLJTXuM9UmK6KTGq8qInzmxAH00gVfSey8TvLLTtH7nTlBEb+b+Fl9/lR0z25ZnbC9M7+aBDoyl6/DB5aX/839tgH7wZquOf/IXAmNh7oFH8D/lkpkwTIXl50GPephVKAsnPMCRAU2HZdd/udsHE7xWwXCuee4hN9g3E74xca2m/D1ueqc+MGeWxqiz+hfA0BMC8+pYJVEVwMgd0E3GWkfFeIAXFdZWVkWaBR3tS/9rS5UIO
-X-MS-Exchange-AntiSpam-MessageData: N4RDO7Uogw2DKgm7DQNvZZV5SJhfvBR0gXFSrPt4675b0zWD/2s1D0MBF9hS61dPhz4O93t5JDXB7hPYc4EnnA6GEKnzrXSqjh5dtRjdju79/bB0KpCJDngVoum0ckR4qW1TKHwpN9wfJVPOtcnqZQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45a0530c-587e-49c2-e497-08d7bfad4471
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2020 19:58:39.6615 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vVZuMJFgF6csATj7CsHu/gYRgBycvUf4ukEfGLowanrM8BwyFYv+gGaXzSxlE7nd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2382
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.236.67
+References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
+ <20200301215029.15196-7-nieklinnenbank@gmail.com> <87d09t7i8i.fsf@linaro.org>
+In-Reply-To: <87d09t7i8i.fsf@linaro.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Tue, 3 Mar 2020 21:15:16 +0100
+Message-ID: <CAPan3Wo6_15zFSHJwf0hVq9CVUSfOBU+frwSLQX21SWrXW03iA@mail.gmail.com>
+Subject: Re: [PATCH v6 06/18] hw/arm/allwinner: add CPU Configuration module
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000f8d7e3059ff8f6b5"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::12e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,170 +86,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the topology routines have changed, update
-the unit tests to use the new APIs.
+--000000000000f8d7e3059ff8f6b5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
----
- tests/test-x86-cpuid.c |  115 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 68 insertions(+), 47 deletions(-)
+Hi Alex,
 
-diff --git a/tests/test-x86-cpuid.c b/tests/test-x86-cpuid.c
-index 1942287f33..00553c1d77 100644
---- a/tests/test-x86-cpuid.c
-+++ b/tests/test-x86-cpuid.c
-@@ -28,79 +28,100 @@
- 
- static void test_topo_bits(void)
- {
-+    X86CPUTopoInfo topo_info = {0};
-+
-     /* simple tests for 1 thread per core, 1 core per die, 1 die per package */
--    g_assert_cmpuint(apicid_smt_width(1, 1, 1), ==, 0);
--    g_assert_cmpuint(apicid_core_width(1, 1, 1), ==, 0);
--    g_assert_cmpuint(apicid_die_width(1, 1, 1), ==, 0);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 1};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 0);
-+    g_assert_cmpuint(apicid_core_width(&topo_info), ==, 0);
-+    g_assert_cmpuint(apicid_die_width(&topo_info), ==, 0);
- 
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 0), ==, 0);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 1), ==, 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 2), ==, 2);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 1, 1, 3), ==, 3);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), ==, 0);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), ==, 1);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), ==, 2);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 3), ==, 3);
- 
- 
-     /* Test field width calculation for multiple values
-      */
--    g_assert_cmpuint(apicid_smt_width(1, 1, 2), ==, 1);
--    g_assert_cmpuint(apicid_smt_width(1, 1, 3), ==, 2);
--    g_assert_cmpuint(apicid_smt_width(1, 1, 4), ==, 2);
--
--    g_assert_cmpuint(apicid_smt_width(1, 1, 14), ==, 4);
--    g_assert_cmpuint(apicid_smt_width(1, 1, 15), ==, 4);
--    g_assert_cmpuint(apicid_smt_width(1, 1, 16), ==, 4);
--    g_assert_cmpuint(apicid_smt_width(1, 1, 17), ==, 5);
--
--
--    g_assert_cmpuint(apicid_core_width(1, 30, 2), ==, 5);
--    g_assert_cmpuint(apicid_core_width(1, 31, 2), ==, 5);
--    g_assert_cmpuint(apicid_core_width(1, 32, 2), ==, 5);
--    g_assert_cmpuint(apicid_core_width(1, 33, 2), ==, 6);
--
--    g_assert_cmpuint(apicid_die_width(1, 30, 2), ==, 0);
--    g_assert_cmpuint(apicid_die_width(2, 30, 2), ==, 1);
--    g_assert_cmpuint(apicid_die_width(3, 30, 2), ==, 2);
--    g_assert_cmpuint(apicid_die_width(4, 30, 2), ==, 2);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 2};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 1);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 3};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 2);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 4};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 2);
-+
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 14};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 4);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 15};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 4);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 16};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 4);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 1, 17};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 5);
-+
-+
-+    topo_info = (X86CPUTopoInfo) {0, 1, 30, 2};
-+    g_assert_cmpuint(apicid_core_width(&topo_info), ==, 5);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 31, 2};
-+    g_assert_cmpuint(apicid_core_width(&topo_info), ==, 5);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 32, 2};
-+    g_assert_cmpuint(apicid_core_width(&topo_info), ==, 5);
-+    topo_info = (X86CPUTopoInfo) {0, 1, 33, 2};
-+    g_assert_cmpuint(apicid_core_width(&topo_info), ==, 6);
-+
-+    topo_info = (X86CPUTopoInfo) {0, 1, 30, 2};
-+    g_assert_cmpuint(apicid_die_width(&topo_info), ==, 0);
-+    topo_info = (X86CPUTopoInfo) {0, 2, 30, 2};
-+    g_assert_cmpuint(apicid_die_width(&topo_info), ==, 1);
-+    topo_info = (X86CPUTopoInfo) {0, 3, 30, 2};
-+    g_assert_cmpuint(apicid_die_width(&topo_info), ==, 2);
-+    topo_info = (X86CPUTopoInfo) {0, 4, 30, 2};
-+    g_assert_cmpuint(apicid_die_width(&topo_info), ==, 2);
- 
-     /* build a weird topology and see if IDs are calculated correctly
-      */
- 
-     /* This will use 2 bits for thread ID and 3 bits for core ID
-      */
--    g_assert_cmpuint(apicid_smt_width(1, 6, 3), ==, 2);
--    g_assert_cmpuint(apicid_core_offset(1, 6, 3), ==, 2);
--    g_assert_cmpuint(apicid_die_offset(1, 6, 3), ==, 5);
--    g_assert_cmpuint(apicid_pkg_offset(1, 6, 3), ==, 5);
--
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 0), ==, 0);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1), ==, 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2), ==, 2);
--
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 0), ==,
-+    topo_info = (X86CPUTopoInfo) {0, 1, 6, 3};
-+    g_assert_cmpuint(apicid_smt_width(&topo_info), ==, 2);
-+    g_assert_cmpuint(apicid_core_offset(&topo_info), ==, 2);
-+    g_assert_cmpuint(apicid_die_offset(&topo_info), ==, 5);
-+    g_assert_cmpuint(apicid_pkg_offset(&topo_info), ==, 5);
-+
-+    topo_info = (X86CPUTopoInfo) {0, 1, 6, 3};
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 0), ==, 0);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1), ==, 1);
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2), ==, 2);
-+
-+    topo_info = (X86CPUTopoInfo) {0, 1, 6, 3};
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 0), ==,
-                      (1 << 2) | 0);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 1), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 1), ==,
-                      (1 << 2) | 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 1 * 3 + 2), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 1 * 3 + 2), ==,
-                      (1 << 2) | 2);
- 
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 0), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 0), ==,
-                      (2 << 2) | 0);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 1), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 1), ==,
-                      (2 << 2) | 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 2 * 3 + 2), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 2 * 3 + 2), ==,
-                      (2 << 2) | 2);
- 
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 0), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 0), ==,
-                      (5 << 2) | 0);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 1), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 1), ==,
-                      (5 << 2) | 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3, 5 * 3 + 2), ==,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info, 5 * 3 + 2), ==,
-                      (5 << 2) | 2);
- 
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
-                      1 * 6 * 3 + 0 * 3 + 0), ==, (1 << 5));
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
-                      1 * 6 * 3 + 1 * 3 + 1), ==, (1 << 5) | (1 << 2) | 1);
--    g_assert_cmpuint(x86_apicid_from_cpu_idx(1, 6, 3,
-+    g_assert_cmpuint(x86_apicid_from_cpu_idx(&topo_info,
-                      3 * 6 * 3 + 5 * 3 + 2), ==, (3 << 5) | (5 << 2) | 2);
- }
- 
+First thanks for all your reviews, I'll add the tags in the next version of
+this series.
 
+On Tue, Mar 3, 2020 at 1:09 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+
+>
+> Niek Linnenbank <nieklinnenbank@gmail.com> writes:
+>
+> > Various Allwinner System on Chip designs contain multiple processors
+> > that can be configured and reset using the generic CPU Configuration
+> > module interface. This commit adds support for the Allwinner CPU
+> > configuration interface which emulates the following features:
+> >
+> >  * CPU reset
+> >  * CPU status
+> >
+> > Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> <snip>
+> > +
+> > +/* CPUCFG constants */
+> > +enum {
+> > +    CPU_EXCEPTION_LEVEL_ON_RESET =3D 3, /* EL3 */
+> > +};
+> > +
+> > +static void allwinner_cpucfg_cpu_reset(AwCpuCfgState *s, uint8_t cpu_i=
+d)
+> > +{
+> > +    int ret;
+> > +
+> > +    trace_allwinner_cpucfg_cpu_reset(cpu_id, s->entry_addr);
+> > +
+> > +    ret =3D arm_set_cpu_on(cpu_id, s->entry_addr, 0,
+> > +                         CPU_EXCEPTION_LEVEL_ON_RESET, false);
+>
+> According to the arm_set_cpu_on code:
+>
+>     if (!target_aa64 && arm_feature(&target_cpu->env,
+> ARM_FEATURE_AARCH64)) {
+>         /*
+>          * For now we don't support booting an AArch64 CPU in AArch32 mod=
+e
+>          * TODO: We should add this support later
+>          */
+>         qemu_log_mask(LOG_UNIMP,
+>                       "[ARM]%s: Starting AArch64 CPU %" PRId64
+>                       " in AArch32 mode is not supported yet\n",
+>                       __func__, cpuid);
+>         return QEMU_ARM_POWERCTL_INVALID_PARAM;
+>     }
+>
+> Do you really want to reboot in aarch32 mode on a reset? If so we should
+> fix the TODO.
+>
+
+Very good remark, I'll try to clarify what I did here. In earlier version
+of this series, I made this CPU Configuration Module specific
+to the Allwinner H3 SoC, as I thought it was a SoC specific component.
+Later I discovered that the CPU Configuration Module is
+actually a generic Allwinner component and used in multiple SoCs. Taking
+that into account, I renamed it to allwinner-cpucfg.c and
+updated the comments/docs. That way it should be re-usable in future SoC
+modules.
+
+The Allwinner H3 has four ARM Cortex-A7 cores and are 32-bit, so in the
+early version I filled the @target_aa64 parameter with false to
+keep it in 32-bit mode. And for usage in the current Allwinner H3 SoC that
+is sufficient, but as soon as a potential new SoC implementation
+with a 64-bit CPU starts to use this module, the hardcoded @target_aa64
+parameter will become a problem.
+
+And the TODO inside the arm_set_cpu_on() function I was not yet aware of as
+well, so that will also need to be resolved
+indeed once this module is going to be used for a new SoC with a 64-bit CPU=
+.
+
+Maybe I should just use some function to check if the current emulated CPU
+its 32-bit or 64-bit and use that for @target_aa64?
+That way the CPU Configuration Module itself should be ready for 64-bit and
+the TODO for arm_set_cpu_on() can be
+resolved in a later series for newer SoCs.
+
+Regards,
+Niek
+
+
+
+
+
+>
+> --
+> Alex Benn=C3=A9e
+>
+
+
+--=20
+Niek Linnenbank
+
+--000000000000f8d7e3059ff8f6b5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi Alex,</div><div><br></div><div>First thanks for al=
+l your reviews, I&#39;ll add the tags in the next version of this series.<b=
+r></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr=
+">On Tue, Mar 3, 2020 at 1:09 PM Alex Benn=C3=A9e &lt;<a href=3D"mailto:ale=
+x.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; wrote:<br></div><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1p=
+x solid rgb(204,204,204);padding-left:1ex"><br>
+Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com" target=3D"_=
+blank">nieklinnenbank@gmail.com</a>&gt; writes:<br>
+<br>
+&gt; Various Allwinner System on Chip designs contain multiple processors<b=
+r>
+&gt; that can be configured and reset using the generic CPU Configuration<b=
+r>
+&gt; module interface. This commit adds support for the Allwinner CPU<br>
+&gt; configuration interface which emulates the following features:<br>
+&gt;<br>
+&gt;=C2=A0 * CPU reset<br>
+&gt;=C2=A0 * CPU status<br>
+&gt;<br>
+&gt; Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gm=
+ail.com" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
+&lt;snip&gt;<br>
+&gt; +<br>
+&gt; +/* CPUCFG constants */<br>
+&gt; +enum {<br>
+&gt; +=C2=A0 =C2=A0 CPU_EXCEPTION_LEVEL_ON_RESET =3D 3, /* EL3 */<br>
+&gt; +};<br>
+&gt; +<br>
+&gt; +static void allwinner_cpucfg_cpu_reset(AwCpuCfgState *s, uint8_t cpu_=
+id)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 int ret;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 trace_allwinner_cpucfg_cpu_reset(cpu_id, s-&gt;entry_ad=
+dr);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 ret =3D arm_set_cpu_on(cpu_id, s-&gt;entry_addr, 0,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0CPU_EXCEPTION_LEVEL_ON_RESET, false);<br>
+<br>
+According to the arm_set_cpu_on code:<br>
+<br>
+=C2=A0 =C2=A0 if (!target_aa64 &amp;&amp; arm_feature(&amp;target_cpu-&gt;e=
+nv, ARM_FEATURE_AARCH64)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* For now we don&#39;t support booting an=
+ AArch64 CPU in AArch32 mode<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* TODO: We should add this support later<=
+br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(LOG_UNIMP,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 &quot;[ARM]%s: Starting AArch64 CPU %&quot; PRId64<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 &quot; in AArch32 mode is not supported yet\n&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 __func__, cpuid);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return QEMU_ARM_POWERCTL_INVALID_PARAM;<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+Do you really want to reboot in aarch32 mode on a reset? If so we should<br=
+>
+fix the TODO.<br></blockquote><div><br></div><div>Very good remark, I&#39;l=
+l try to clarify what I did here. In earlier version of this series, I made=
+ this CPU Configuration Module specific</div><div>to the Allwinner H3 SoC, =
+as I thought it was a SoC specific component. Later I discovered that the C=
+PU Configuration Module is</div><div>actually a generic Allwinner component=
+ and used in multiple SoCs. Taking that into account, I renamed it to allwi=
+nner-cpucfg.c and</div><div>updated the comments/docs. That way it should b=
+e re-usable in future SoC modules.<br></div><div><br></div><div>The Allwinn=
+er H3 has four ARM Cortex-A7 cores and are 32-bit, so in the early version =
+I filled the @target_aa64 parameter with false to</div><div>keep it in 32-b=
+it mode. And for usage in the current Allwinner H3 SoC that is sufficient, =
+but as soon as a potential new SoC implementation</div><div>with a 64-bit C=
+PU starts to use this module, the hardcoded @target_aa64 parameter will bec=
+ome a problem.</div><div><br></div><div><div>And the TODO inside the arm_se=
+t_cpu_on() function I was not yet aware of as well, so that will also need =
+to be resolved</div><div>indeed once this module is going to be used for a =
+new SoC with a 64-bit CPU.</div></div><div><br></div><div>Maybe I should ju=
+st use some function to check if the current emulated CPU its 32-bit or 64-=
+bit and use that for @target_aa64?</div><div>That way the CPU Configuration=
+ Module itself should be ready for 64-bit and the TODO for arm_set_cpu_on()=
+ can be</div><div>resolved in a later series for newer SoCs.<br></div><div>=
+<br></div><div>Regards,</div><div>Niek<br></div><div><br></div><div><br></d=
+iv><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">
+<br>
+-- <br>
+Alex Benn=C3=A9e<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--000000000000f8d7e3059ff8f6b5--
 
