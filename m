@@ -2,98 +2,113 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932C3C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9070DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60C63214D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:28:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSigYRak"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60C63214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69D2E214D8
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 10:28:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69D2E214D8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j94mU-0006Ex-Ir
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:28:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53966)
+	id 1j94mc-0006VR-Hj
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 05:28:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54099)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j94aq-0002YG-Sk
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:16:06 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j94bh-0004Po-HC
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:16:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j94ap-0000V4-K3
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:16:04 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58319
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j94ap-0000Uy-GY
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:16:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583230563;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iCNTmIqzCz8GEs4yUEV2AFU79BSVBkInDEin/vM7XUA=;
- b=aSigYRakkHGHyHPp1yrnuViKWLXkbLzzo5Mv1M1L94BoWEUVF7sGhfyhm2aMrPIaaeAjmw
- 53tToRyzpf9iuOwkkgIFsqzjW8OltjMZZVACkGi6nj/C4AN5irKr8oH0LnAB3SYhVIzgwa
- ltJVBOcCeEboOfPb5q2ND75Z0Lx3b9I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-8HA9xplDNRuMuFwgJcm00w-1; Tue, 03 Mar 2020 05:16:00 -0500
-X-MC-Unique: 8HA9xplDNRuMuFwgJcm00w-1
-Received: by mail-wr1-f70.google.com with SMTP id f10so1014122wrv.1
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 02:16:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aBenczBTiCbsLPHyrEIt+tC3sP67vYZQWWmU9hIoOUg=;
- b=T63pMq0y6kqljfKGrY2m0adgEHmaOdRyaOrfDUPwfcMft1BeKfUdoYM9yzX5k6X8AZ
- 4Uqh4rGsXj5fCfafczR5S4iFmVKFLlIHCj53duy70IW3PUvtKxgU8ZCa1QtADr0NCqIH
- 8xPKQnDL89n6uA/dEjVEmnGKDDNuW9WbBYeWRQZ0tB6XUAhJG93noUwt5qCsbVXxinQB
- bRqXQJoOv9U8kugECbDf14qs39LjW+A2rBxW6wMFX9/BNu5DBYHTM2idbOVy0N9HBJ6Z
- cCWpqSD2aoA/u0n/tUArHToMyPHUlgG079xtYwLL34DwfbE5WMM5/SAt8DSkNryJCs0D
- gANQ==
-X-Gm-Message-State: ANhLgQ2w1RLI8ZgLOQVrZShJ9nHLbl7Kth1jRlwwQnIEEfiwHc1zi/5W
- rXnaqtIgq/JVrNR/Xh2PhnOsHfljFIsUL3FgGBpLaq6Ka83D9hdRWZOXF874+nMPYA1XRw9aRzB
- ulRFjYSzuflK8lYM=
-X-Received: by 2002:a5d:66ca:: with SMTP id k10mr4635094wrw.194.1583230559427; 
- Tue, 03 Mar 2020 02:15:59 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsr/BwzV/sSMlAbc3emlT8s7sdq089+YdA+wX01AWl1Twoyp+6TfM3R9Ec0zfICeKbU3jvdrw==
-X-Received: by 2002:a5d:66ca:: with SMTP id k10mr4635074wrw.194.1583230559072; 
- Tue, 03 Mar 2020 02:15:59 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993?
- ([2001:b07:6468:f312:9def:34a0:b68d:9993])
- by smtp.gmail.com with ESMTPSA id z16sm32090152wrp.33.2020.03.03.02.15.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Mar 2020 02:15:58 -0800 (PST)
-Subject: Re: [PATCH v4] i386: Fix GCC warning with snprintf when HAX is enabled
-To: Julio Faracco <jcfaracco@gmail.com>, qemu-devel@nongnu.org
-References: <20200302201320.6465-1-jcfaracco@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <029f2134-ba84-baf1-3234-6239a57795bd@redhat.com>
-Date: Tue, 3 Mar 2020 11:15:58 +0100
+ (envelope-from <laurent@vivier.eu>) id 1j94bg-0000mx-Fo
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 05:16:57 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:53521)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j94bg-0000mP-5i; Tue, 03 Mar 2020 05:16:56 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M4KFF-1j9Lil0znl-000KJs; Tue, 03 Mar 2020 11:16:50 +0100
+Subject: Re: [PATCH] vhost-vsock: fix error message output
+To: Nick Erdmann <n@nirf.de>, qemu-devel@nongnu.org
+References: <04df3f47-c93b-1d02-d250-f9bda8dbc0fa@nirf.de>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <3cd04e60-f4d5-6ab8-3ea8-ae8ac30262bf@vivier.eu>
+Date: Tue, 3 Mar 2020 11:16:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200302201320.6465-1-jcfaracco@gmail.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <04df3f47-c93b-1d02-d250-f9bda8dbc0fa@nirf.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:VbT8VQjaXYjXb8bI2jOP5td8AFSVknbv8e7si24U5oZy5vWIxDf
+ R2evLRWsfZhta7H0mYwxpr9j36KHILjUdrjZsNqJtCx6Voczkxc9IV02G7N3azSg7DyiDjl
+ MeH1wQZUuCGc8nCVb8D/Wl6zgtogBPE3uhorLfJKcHva/BZrcfjlQxVYZ8+48cqCCG5HkSs
+ xkpw+bqGo1JWrQ5R7idjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hAReeVOnt3U=:+tt9k7MUaX7XNx1XBnR20N
+ mjA5eRFK/IE6vZKOmCPpuJh7L7hDIP81QsGlkr2XxZV5bR6Hw0C3JclrtmBlDbL/pl+ymHUU/
+ sfioTV1jKlBTX2bmR8WUqso0U2f+4IxOHd6DBo6ozABDD9x28GMbtYXgbr8YzWXD17buANyH7
+ lBHsIHbMizhOM6F65TqEkaM5vwufysNGquiN9uYYwzGu8sZTtWbVauRKay19B85HOurn5/wK0
+ o2NyYQgC4CdwS52yK0b8lMrUpGU+FoU5+s+WDQCZ8Ymib94SEbhI+gDQp2FeeIAqCSPVx0p86
+ kB5uJEiPv5N9xtmngbxUYXJV4bZgu3X7MgJJSltSqezaC4KzhZsvTwelyJv/zrFCGNtWJVqw1
+ 64RjSvfWAzW4YljKfGv6kPyh44E8uiDVTNwWzKbUTxmp+v5hc+crz4iQdtt/cUdvCdUvJfKk7
+ /gfw+hwsB+qBpH2xpoVh74Lt691iWxPHdtCVN5KUPpTqQHChuue6mU4hFDsGdCeD7zpmZb73P
+ JBRyGMwVXO6a4jJAciWAvru3yiqCdI+w4iydj5G8wTm32yXMjHhlWXaEHrpiucXHHFClwz+gV
+ lBPXhsDAVHXcWSWETqt6eylEVzr+vpbxhdoEkTNh3qg+HCEfXBx7Nmm1ZUa6ZY/xZekjeEezY
+ Ujk6FdBSr+soXOxIqydZJ9qBfXFlufnG5nUM3akmEf3Ly7lAUREsBBhAJAK1LH6awAFFSJSDB
+ CR23HOJByXOnhx4CxGZ5MHI9sUN0o5YtBKXddHtXv9Uy8xLnyhO9bsuFvnIkBR0fs86ve1MUd
+ W/qrJq0u7JuCRy7YpolZC2Ap94D8N8bif9e9S6gVlahPtglmXb1B9rvs9Kc2uU/X5xcN+5x
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,162 +120,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/03/20 21:13, Julio Faracco wrote:
-> When HAX is enabled (--enable-hax), GCC 9.2.1 reports issues with
-> snprintf(). Replacing old snprintf() by g_strdup_printf() fixes the
-> problem with boundary checks of vm_id and vcpu_id and finally the
-> warnings produced by GCC.
->=20
-> For more details, one example of warning:
->   CC      i386-softmmu/target/i386/hax-posix.o
-> qemu/target/i386/hax-posix.c: In function =E2=80=98hax_host_open_vm=E2=80=
-=99:
-> qemu/target/i386/hax-posix.c:124:56: error: =E2=80=98%02d=E2=80=99 direct=
-ive output may be
-> truncated writing between 2 and 11 bytes into a region of size 3
-> [-Werror=3Dformat-truncation=3D]
->   124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_=
-id);
->       |                                                        ^~~~
-> qemu/target/i386/hax-posix.c:124:41: note: directive argument in the rang=
-e
-> [-2147483648, 64]
->   124 |     snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_=
-id);
->       |                                         ^~~~~~~~~~~~~~~~~~~~
-> In file included from /usr/include/stdio.h:867,
->                  from qemu/include/qemu/osdep.h:99,
->                  from qemu/target/i386/hax-posix.c:14:
-> /usr/include/bits/stdio2.h:67:10: note: =E2=80=98__builtin___snprintf_chk=
-=E2=80=99 output
-> between 17 and 26 bytes into a destination of size 17
->    67 |   return __builtin___snprintf_chk (__s, __n, __USE_FORTIFY_LEVEL =
-- 1,
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~
->    68 |        __bos (__s), __fmt, __va_arg_pack ());
->       |        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Signed-off-by: Julio Faracco <jcfaracco@gmail.com>
+Le 01/03/2020 à 13:03, Nick Erdmann a écrit :
+> error_setg_errno takes a positive error number, so we should not invert
+> errno's sign.
+> 
+> Signed-off-by: Nick Erdmann <n@nirf.de>
 > ---
-> v1-v2: Add assert() as Richard Henderson suggested.
-> v2-v3: Fix code syntax alignment with vm_id and snprintf() function.
-> v3-v4: Replacing snprintf() by g_strdup_printf() from linux and windows.
-> ---
-> ---
->  target/i386/hax-posix.c   | 33 ++-------------------------------
->  target/i386/hax-windows.c | 33 ++-------------------------------
->  2 files changed, 4 insertions(+), 62 deletions(-)
->=20
-> diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-> index a5426a6dac..3bad89f133 100644
-> --- a/target/i386/hax-posix.c
-> +++ b/target/i386/hax-posix.c
-> @@ -108,41 +108,12 @@ int hax_mod_version(struct hax_state *hax, struct h=
-ax_module_version *version)
-> =20
->  static char *hax_vm_devfs_string(int vm_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID) {
-> -        fprintf(stderr, "Too big VM id\n");
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VM_DEVFS "/dev/hax_vm/vmxx"
-> -    name =3D g_strdup(HAX_VM_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VM_DEVFS, "/dev/hax_vm/vm%02d", vm_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
->  }
-> =20
->  static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
-> -        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_=
-id);
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VCPU_DEVFS "/dev/hax_vmxx/vcpuxx"
-> -    name =3D g_strdup(HAX_VCPU_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VCPU_DEVFS, "/dev/hax_vm%02d/vcpu%02d",
-> -             vm_id, vcpu_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
->  }
-> =20
->  int hax_host_create_vm(struct hax_state *hax, int *vmid)
-> diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-> index 5729ad9b48..0ba488c468 100644
-> --- a/target/i386/hax-windows.c
-> +++ b/target/i386/hax-windows.c
-> @@ -185,41 +185,12 @@ int hax_mod_version(struct hax_state *hax, struct h=
-ax_module_version *version)
-> =20
->  static char *hax_vm_devfs_string(int vm_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID) {
-> -        fprintf(stderr, "Too big VM id\n");
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VM_DEVFS "\\\\.\\hax_vmxx"
-> -    name =3D g_strdup(HAX_VM_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VM_DEVFS, "\\\\.\\hax_vm%02d", vm_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm/vm%02d", vm_id);
->  }
-> =20
->  static char *hax_vcpu_devfs_string(int vm_id, int vcpu_id)
->  {
-> -    char *name;
-> -
-> -    if (vm_id > MAX_VM_ID || vcpu_id > MAX_VCPU_ID) {
-> -        fprintf(stderr, "Too big vm id %x or vcpu id %x\n", vm_id, vcpu_=
-id);
-> -        return NULL;
-> -    }
-> -
-> -#define HAX_VCPU_DEVFS "\\\\.\\hax_vmxx_vcpuxx"
-> -    name =3D g_strdup(HAX_VCPU_DEVFS);
-> -    if (!name) {
-> -        return NULL;
-> -    }
-> -
-> -    snprintf(name, sizeof HAX_VCPU_DEVFS, "\\\\.\\hax_vm%02d_vcpu%02d",
-> -             vm_id, vcpu_id);
-> -    return name;
-> +    return g_strdup_printf("/dev/hax_vm%02d/vcpu%02d", vm_id, vcpu_id);
->  }
-> =20
->  int hax_host_create_vm(struct hax_state *hax, int *vmid)
->=20
+>  hw/virtio/vhost-vsock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+> index 66da96583b..9f9093e196 100644
+> --- a/hw/virtio/vhost-vsock.c
+> +++ b/hw/virtio/vhost-vsock.c
+> @@ -325,7 +325,7 @@ static void vhost_vsock_device_realize(DeviceState
+> *dev, Error **errp)
+>      } else {
+>          vhostfd = open("/dev/vhost-vsock", O_RDWR);
+>          if (vhostfd < 0) {
+> -            error_setg_errno(errp, -errno,
+> +            error_setg_errno(errp, errno,
+>                               "vhost-vsock: failed to open vhost device");
+>              return;
+>          }
+> -- 
+> 2.25.1
+> 
 
-Queued, thanks.
 
-Paolo
-
+Fixes: fc0b9b0e1cbb ("vhost-vsock: add virtio sockets device")
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
