@@ -4,59 +4,111 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3DBC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5E4C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED140205ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED140205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 85494208C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 09:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85494208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j940I-0000YQ-6B
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:38:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47420)
+	id 1j9436-00027P-KK
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 04:41:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1j93zf-0008Oy-2D
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:37:40 -0500
+ (envelope-from <laurent@vivier.eu>) id 1j942S-0001ZY-RN
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:40:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1j93zd-0008S0-H7
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:37:38 -0500
-Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:37286)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1j93zd-0008R3-AQ
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:37:37 -0500
-Received: from player760.ha.ovh.net (unknown [10.110.171.96])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 690E62459A8
- for <qemu-devel@nongnu.org>; Tue,  3 Mar 2020 10:37:34 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player760.ha.ovh.net (Postfix) with ESMTPSA id 3A86BFFEA66C;
- Tue,  3 Mar 2020 09:37:12 +0000 (UTC)
-Date: Tue, 3 Mar 2020 10:37:07 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v7 11/17] target/ppc: Don't store VRMA SLBE persistently
-Message-ID: <20200303103707.2856b74e@bahia.home>
-In-Reply-To: <20200303034351.333043-12-david@gibson.dropbear.id.au>
-References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
- <20200303034351.333043-12-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <laurent@vivier.eu>) id 1j942R-0001k9-NF
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 04:40:32 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:52741)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1j942R-0001jq-Et; Tue, 03 Mar 2020 04:40:31 -0500
+Received: from [192.168.100.1] ([82.252.135.106]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MStKw-1iwS4n3FDa-00UJ1e; Tue, 03 Mar 2020 10:40:23 +0100
+Subject: Re: [PATCH v2] linux-user: Add AT_EXECFN auxval
+To: Lirong Yuan <yuanzi@google.com>, qemu-devel@nongnu.org
+References: <20200302193153.66415-1-yuanzi@google.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d9dc23a7-61a8-c28a-47e0-4a4d9590be04@vivier.eu>
+Date: Tue, 3 Mar 2020 10:40:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2692026679813315046
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedugedruddtiedgtdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+In-Reply-To: <20200302193153.66415-1-yuanzi@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:VqaWaLAIjjs0nnUfakPQXUoNjSe8FXn61Kh2uHK0EP13nr8le4F
+ P18L7f+03/vU2n0i8RpIXDzE9EbWin4HDqBq8e6LQ56mPKWIRDcicuG47ihRM3eI4m5kMpU
+ GN6sqRJbf2oKJC0XMjBPB+n1PRTyKOBp2ZTUeoVJIxKnd08SbeaUCdk9vqXA9LJmOn8EnhS
+ BIQUYNVnGCuFSm/PjdGpg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uV7M9feddg8=:B88iVTfB43+hVBSwtK099Q
+ rzlrrVN76FfomjSosHT356kad7J6dLcTGqTz2UiLFWr1p8MbBY550wwZR/bBqpG6HNGQO6ocr
+ n5B47epSP4eIkhq00JLuwyTIztUOVE/lBQSj+fzXXHJhG20w9QREc/+GoaopwDSc5OFki0vVX
+ f6Y8W12wd3b0EMskxBGJEdeKx/QfP7QEPDApwK2hqeLvFfzESONeSJTSCkGqS6Y6w6cM5mLg2
+ udO5ECynU9kE82K7XV30ikWQdoMHyW2Ye76kgmaG/XYwrvvG+mwynbQvFeg2ZDXMpakFo44ud
+ SPJ8Duj7YxIs8iB7boAL5bNKV81hRnwwESaiigJOIkFonksW0oDqUrst9J8qmhbF3zxSXlItH
+ cf5JjO6lhTBSgoMezuBYK88HLnn6Up8L5+MGHyd/rUyqkwc2FPglYlVOOWwKN+Nw6k5Tbg944
+ PYLeuD0KEv7mKMsSeCyJbbGN9MK/eAHzPJbTvXpK/bfO9nClKh5o8UOa/isHPhQ2dsjCyP6Mo
+ puiBmhwn9SM4R6/mWrkZ1iRnIOf5HlNVGTTXjWLjBf7HG83Ld/fkmgo3d2S2j73J26C98iJMe
+ tm8i4bsiScc4tIoUhhdbZ2dFZ0MtAkRdS/NhKPyQfQGGCVp0aeOlPzz6dQbbRUWYo5powa6MI
+ flxBHhFUCQcE4sUB2DxcMUXMqv/tY7dkM/HjyVJddtoOTE1eEEOD9sw6bs4m8mwS6TgDpibIA
+ tKV7TI2w2bGTuP+ycreQbIT0ppVP/NTuk4nfoPrWwn2fnyb8GLsCJNR1nwVVgM9KvA/JHSdny
+ rXACr8GiQOHQPe0rqB+FgDeOTwKtLUVWpijLHzoUoNheyxr3yKSUUndPFSjy2qKXGAMLND2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.47.94
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,191 +120,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
- aik@ozlabs.ru, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-ppc@nongnu.org, clg@kaod.org, Igor Mammedov <imammedo@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, paulus@samba.org
+Cc: qemu-trivial@nongnu.org, jkz@google.com, Riku Voipio <riku.voipio@iki.fi>,
+ scw@google.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  3 Mar 2020 14:43:45 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> Currently, we construct the SLBE used for VRMA translations when the LPCR
-> is written (which controls some bits in the SLBE), then use it later for
-> translations.
+Le 02/03/2020 à 20:31, Lirong Yuan a écrit :
+> This change adds the support for AT_EXECFN auxval.
 > 
-> This is a bit complex and confusing - simplify it by simply constructing
-> the SLBE directly from the LPCR when we need it.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Lirong Yuan <yuanzi@google.com>
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  target/ppc/cpu.h        |  3 --
->  target/ppc/mmu-hash64.c | 92 ++++++++++++++++-------------------------
->  2 files changed, 35 insertions(+), 60 deletions(-)
+> Changelog since v1:
+> - remove implementation for AT_EXECFD auxval.
 > 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index f9871b1233..5a55fb02bd 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1044,9 +1044,6 @@ struct CPUPPCState {
->      uint32_t flags;
->      uint64_t insns_flags;
->      uint64_t insns_flags2;
-> -#if defined(TARGET_PPC64)
-> -    ppc_slb_t vrma_slb;
-> -#endif
+>  linux-user/elfload.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index db748c5877..8198be0446 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1573,7 +1573,7 @@ struct exec
+>                                   ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE-1))
+>  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1))
 >  
->      int error_code;
->      uint32_t pending_interrupts;
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 4fd7b7ee74..34f6009b1e 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -784,11 +784,41 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
->      return rma_sizes[rmls];
->  }
+> -#define DLINFO_ITEMS 15
+> +#define DLINFO_ITEMS 16
 >  
-> +static int build_vrma_slbe(PowerPCCPU *cpu, ppc_slb_t *slb)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    target_ulong lpcr = env->spr[SPR_LPCR];
-> +    uint32_t vrmasd = (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-> +    target_ulong vsid = SLB_VSID_VRMA | ((vrmasd << 4) & SLB_VSID_LLP_MASK);
-> +    int i;
-> +
-> +    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-> +        const PPCHash64SegmentPageSizes *sps = &cpu->hash64_opts->sps[i];
-> +
-> +        if (!sps->page_shift) {
-> +            break;
-> +        }
-> +
-> +        if ((vsid & SLB_VSID_LLP_MASK) == sps->slb_enc) {
-> +            slb->esid = SLB_ESID_V;
-> +            slb->vsid = vsid;
-> +            slb->sps = sps;
-> +            return 0;
-> +        }
-> +    }
-> +
-> +    error_report("Bad page size encoding in LPCR[VRMASD]; LPCR=0x"
-> +                 TARGET_FMT_lx"\n", lpcr);
-> +
-> +    return -1;
-> +}
-> +
->  int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
->                                  int rwx, int mmu_idx)
+>  static inline void memcpy_fromfs(void * to, const void * from, unsigned long n)
 >  {
->      CPUState *cs = CPU(cpu);
->      CPUPPCState *env = &cpu->env;
-> +    ppc_slb_t vrma_slbe;
->      ppc_slb_t *slb;
->      unsigned apshift;
->      hwaddr ptex;
-> @@ -827,8 +857,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
->              }
->          } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
-> -            slb = &env->vrma_slb;
-> -            if (!slb->sps) {
-> +            slb = &vrma_slbe;
-> +            if (build_vrma_slbe(cpu, slb) != 0) {
->                  /* Invalid VRMA setup, machine check */
->                  cs->exception_index = POWERPC_EXCP_MCHECK;
->                  env->error_code = 0;
-> @@ -976,6 +1006,7 @@ skip_slb_search:
->  hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
->  {
->      CPUPPCState *env = &cpu->env;
-> +    ppc_slb_t vrma_slbe;
->      ppc_slb_t *slb;
->      hwaddr ptex, raddr;
->      ppc_hash_pte64_t pte;
-> @@ -997,8 +1028,8 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
->              return raddr | env->spr[SPR_HRMOR];
->          } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
-> -            slb = &env->vrma_slb;
-> -            if (!slb->sps) {
-> +            slb = &vrma_slbe;
-> +            if (build_vrma_slbe(cpu, slb) != 0) {
->                  return -1;
->              }
->          } else {
-> @@ -1037,65 +1068,12 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
->      cpu->env.tlb_need_flush = TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_FLUSH;
->  }
+> @@ -2037,6 +2037,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+>      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
+>      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
+>      NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
+> +    NEW_AUX_ENT(AT_EXECFN, info->file_string);
 >  
-> -static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
-> -{
-> -    CPUPPCState *env = &cpu->env;
-> -    const PPCHash64SegmentPageSizes *sps = NULL;
-> -    target_ulong esid, vsid, lpcr;
-> -    ppc_slb_t *slb = &env->vrma_slb;
-> -    uint32_t vrmasd;
-> -    int i;
-> -
-> -    /* First clear it */
-> -    slb->esid = slb->vsid = 0;
-> -    slb->sps = NULL;
-> -
-> -    /* Is VRMA enabled ? */
-> -    if (!ppc_hash64_use_vrma(env)) {
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * Make one up. Mostly ignore the ESID which will not be needed
-> -     * for translation
-> -     */
-> -    lpcr = env->spr[SPR_LPCR];
-> -    vsid = SLB_VSID_VRMA;
-> -    vrmasd = (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
-> -    vsid |= (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
-> -    esid = SLB_ESID_V;
-> -
-> -    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
-> -        const PPCHash64SegmentPageSizes *sps1 = &cpu->hash64_opts->sps[i];
-> -
-> -        if (!sps1->page_shift) {
-> -            break;
-> -        }
-> -
-> -        if ((vsid & SLB_VSID_LLP_MASK) == sps1->slb_enc) {
-> -            sps = sps1;
-> -            break;
-> -        }
-> -    }
-> -
-> -    if (!sps) {
-> -        error_report("Bad page size encoding esid 0x"TARGET_FMT_lx
-> -                     " vsid 0x"TARGET_FMT_lx, esid, vsid);
-> -        return;
-> -    }
-> -
-> -    slb->vsid = vsid;
-> -    slb->esid = esid;
-> -    slb->sps = sps;
-> -}
-> -
->  void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
->  {
->      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->      CPUPPCState *env = &cpu->env;
->  
->      env->spr[SPR_LPCR] = val & pcc->lpcr_mask;
-> -    ppc_hash64_update_vrma(cpu);
->  }
->  
->  void helper_store_lpcr(CPUPPCState *env, target_ulong val)
+>  #ifdef ELF_HWCAP2
+>      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
+> 
 
+Applied to my linux-user branch.
+
+Thanks,
+Laurent
 
