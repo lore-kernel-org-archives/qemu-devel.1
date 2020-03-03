@@ -2,91 +2,88 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE94C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BED4C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:06:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA51B21D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C801B21D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:06:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rv/G8zGP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA51B21D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dwNgsOse"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C801B21D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vzX-0007pv-RM
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:04:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45610)
+	id 1j8w0r-0001wI-Vq
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:06:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45466)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vl9-00036j-52
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:08 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vl1-0002q1-0Q
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vl6-0004f5-Os
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:07 -0500
-Received: from mail-pl1-x62c.google.com ([2607:f8b0:4864:20::62c]:42889)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vky-0004ZO-VS
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:58 -0500
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:33909)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vl6-0004eb-Hl
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:04 -0500
-Received: by mail-pl1-x62c.google.com with SMTP id u3so501454plr.9
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:50:04 -0800 (PST)
+ id 1j8vky-0004YB-Lw
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:56 -0500
+Received: by mail-pg1-x52e.google.com with SMTP id t3so678446pgn.1
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=QkFXHaLS5zlcI8OA2QDono5LxTYgDFUD9/bo7kYQTas=;
- b=Rv/G8zGPxbtwWgkO0FUOC2raCL/iRkF3CaxIs8T6Rpf3hDXPywrA6si1Qzt+naSAV7
- TFvR89SVq9S87iRm4nNAd9KDe5hszuBn4ehjdQWvnE4K/cWssJ0ZmtvUvJYoURmsaW3O
- o2GEnInxZOEVhIpVM8DYkkM8/qeCMPj60KOwCX93leoMeTeHBrcD9oHtQiF5/BsKxL1u
- oG9fSTL3EqVhjJVUiLXZf2lptGOvxsRZZnpDIhfdVwQRNcpXS8S/eL6PQRrHRLEh6kZC
- 4dhyk0yujTRk9y6dJT+pN14AeqYV/aY1BTsvVDl8dXNGh2BCrv3Xm98I/H5btMObf6ke
- uTdg==
+ bh=ViExW4PQXJd7LO12BUgC9KxGCs6Dko/AcFtuayQex/Y=;
+ b=dwNgsOseV7Yy/ByVayKIBP7v1+S44/hqWYlOVSEpEI/emU6U9mYThlAI2I9TDDmqi4
+ 2jsSnSZHztrx/dh8zBR9uQG5C6f9PCkuMulMOc9hkrNdc+ORBB0kMLUetFLLvJ0nf4S2
+ 2VKkdzPjQnsbCH3nqZX1cfzQyoOaFrkJ2K4BK1A/KpO7Vczb0Su8DHL8z/9er+Pa61tV
+ sItpLymQVsRaBEb7uLzNkJt8Hv2UjjbpnXeL+Ac27EP/FhNm4FRwY0Z7F0g6jYTcMSpR
+ cWgl/pob+XisJQ2jA3BkrCdxO5JWTCpTTYasSfHsoqrsp9c1S640fECDmoFJ/CfR6REE
+ Uq9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=QkFXHaLS5zlcI8OA2QDono5LxTYgDFUD9/bo7kYQTas=;
- b=CEUxNIrK9gSpnmOh54xLv5oK2YTHPmbSilTLdNZcjRqGTdyu7NQaISQyOh/Ug81iwV
- 6brUDTzKCUmvSvX93jb0fRIMo/ZFu8JkSqJM86wLhMVIoDtc+MyZlavckFl8xETDH/8q
- HItQfuVHz8ty/7vguU1zK18ZxOQSBECRjT3IwGPjZ0Oo1gY2Of7JN6zKKSQT5PBEhx+V
- SF4Z3hcuVvyyXSHRnXAg/cpvNY7JeIBBKpvdz5PQhyzD+elh9E9RyPtBBIiLuQG26wq0
- umBCnTne6bqshgRZp4ZpZltPbi2lzFINsvhyn9J2LNo/GJtX7oT3+n6fe38ZF+zXpGGk
- O9Tw==
-X-Gm-Message-State: ANhLgQ1xz55rocCKNLvjUjOXCO863JCAw4VWlmxe66fAsvqThorRH6q3
- fq3ehhnIWeOxTlhcJ1UGgmcS0g==
-X-Google-Smtp-Source: ADFU+vvDAPOQnKqfImIbbsB7ZdmCppOth4QLMuaewn8JykUc2tk0O0yENetS6cKY/mTTO5zPFsmQsQ==
-X-Received: by 2002:a17:902:fe05:: with SMTP id
- g5mr1719431plj.248.1583196603312; 
- Mon, 02 Mar 2020 16:50:03 -0800 (PST)
+ bh=ViExW4PQXJd7LO12BUgC9KxGCs6Dko/AcFtuayQex/Y=;
+ b=Xv8Pw7UxeFSFf+Ym+rjDec9YvM3JLm4v0LdfG4WWUfz2Kwa+CcdT1+16OONTxy37Og
+ yVh98mzy3ZE4PeVm/jO1HErB/8IhKj/cyNflKCvhgpRqFsBsFRiCXbX5XO4eNhOvtPet
+ E9vE6SoITFRzjzIjyEBK9rbobMoJSf1WBValct6rY9c2hfzTM73XEPwJvne3ykbmB3K5
+ Y7xZFVtCnVT+wtZ18HmDCOAXIhgebizo0C74vYjWZtbA50v4utarno2aUdSz5V7Ond4a
+ 4xZGBJqelobKU4duma9lDwAVdL5/xivuvUz0swtbwlcU6UmFC5kfTkV5aTjTKhFFYgmc
+ NPDw==
+X-Gm-Message-State: ANhLgQ0pPtlHXfKg9j1sjLUH4rMgTB9N+IP52VOGpr8hSnYgL49vMPF0
+ tfdXaXWqtP0P43xh+D8gD8tBlA==
+X-Google-Smtp-Source: ADFU+vtt9UpaViHVKRvJ+5dlGp5uamh5CvGjC4/TuCbjnCV1VLc2upZryUbHAmbEQIj5+10NwuLTFA==
+X-Received: by 2002:a63:564d:: with SMTP id g13mr1485288pgm.157.1583196595567; 
+ Mon, 02 Mar 2020 16:49:55 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id y7sm9656801pfq.15.2020.03.02.16.50.02
+ by smtp.gmail.com with ESMTPSA id c2sm100071pjo.28.2020.03.02.16.49.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:50:02 -0800 (PST)
-Subject: [PULL 38/38] hw/riscv: Provide rdtime callback for TCG in CLINT
- emulation
-Date: Mon,  2 Mar 2020 16:48:48 -0800
-Message-Id: <20200303004848.136788-39-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:55 -0800 (PST)
+Subject: [PULL 33/38] target/riscv: Add support for the 32-bit MSTATUSH CSR
+Date: Mon,  2 Mar 2020 16:48:43 -0800
+Message-Id: <20200303004848.136788-34-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Anup Patel <anup.patel@wdc.com>, Alistair Francis <alistair.francis@wdc.com>, 
+ Alistair Francis <alistair.francis@wdc.com>,
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::62c
+X-Received-From: 2607:f8b0:4864:20::52e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,135 +99,188 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Anup Patel <anup.patel@wdc.com>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-This patch extends CLINT emulation to provide rdtime callback for
-TCG. This rdtime callback will be called wheneven TIME CSRs are
-read in privileged modes.
-
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- hw/riscv/sifive_clint.c         | 6 +++++-
- hw/riscv/sifive_e.c             | 2 +-
- hw/riscv/sifive_u.c             | 2 +-
- hw/riscv/spike.c                | 9 ++++++---
- hw/riscv/virt.c                 | 2 +-
- include/hw/riscv/sifive_clint.h | 3 ++-
- 6 files changed, 16 insertions(+), 8 deletions(-)
+ target/riscv/cpu.c        |  3 +++
+ target/riscv/cpu.h        | 10 ++++++++++
+ target/riscv/cpu_bits.h   |  3 +++
+ target/riscv/cpu_helper.c | 17 +++++++++++++++++
+ target/riscv/csr.c        | 25 +++++++++++++++++++++++++
+ target/riscv/op_helper.c  |  4 ++++
+ 6 files changed, 62 insertions(+)
 
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index e2feee871b..e933d35092 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -227,7 +227,8 @@ type_init(sifive_clint_register_types)
-  * Create CLINT device.
-  */
- DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
--    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base)
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base,
-+    bool provide_rdtime)
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 44ad768a84..b27066f6a7 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -237,6 +237,9 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
++#ifdef TARGET_RISCV32
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatush ", env->mstatush);
++#endif
+     if (riscv_has_ext(env, RVH)) {
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ", env->vsstatus);
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index a8534fdf2b..6f9c29322a 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -127,6 +127,10 @@ struct CPURISCVState {
+ 
+     target_ulong mip;
+ 
++#ifdef TARGET_RISCV32
++    target_ulong mstatush;
++#endif
++
+     uint32_t miclaim;
+ 
+     target_ulong mie;
+@@ -164,6 +168,9 @@ struct CPURISCVState {
+     target_ulong vscause;
+     target_ulong vstval;
+     target_ulong vsatp;
++#ifdef TARGET_RISCV32
++    target_ulong vsstatush;
++#endif
+ 
+     target_ulong mtval2;
+     target_ulong mtinst;
+@@ -176,6 +183,9 @@ struct CPURISCVState {
+     target_ulong stval_hs;
+     target_ulong satp_hs;
+     target_ulong mstatus_hs;
++#ifdef TARGET_RISCV32
++    target_ulong mstatush_hs;
++#endif
+ 
+     target_ulong scounteren;
+     target_ulong mcounteren;
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index a24654d137..049032f2ae 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -135,6 +135,9 @@
+ #define CSR_MTVEC           0x305
+ #define CSR_MCOUNTEREN      0x306
+ 
++/* 32-bit only */
++#define CSR_MSTATUSH        0x310
++
+ /* Legacy Counter Setup (priv v1.9.1) */
+ /* Update to #define CSR_MCOUNTINHIBIT 0x320 for 1.11.0 */
+ #define CSR_MUCOUNTEREN     0x320
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index d3b764e694..10f246ddf8 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -126,6 +126,11 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
+         env->mstatus &= ~mstatus_mask;
+         env->mstatus |= env->mstatus_hs;
+ 
++#if defined(TARGET_RISCV32)
++        env->vsstatush = env->mstatush;
++        env->mstatush |= env->mstatush_hs;
++#endif
++
+         env->vstvec = env->stvec;
+         env->stvec = env->stvec_hs;
+ 
+@@ -149,6 +154,11 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
+         env->mstatus &= ~mstatus_mask;
+         env->mstatus |= env->vsstatus;
+ 
++#if defined(TARGET_RISCV32)
++        env->mstatush_hs = env->mstatush;
++        env->mstatush |= env->vsstatush;
++#endif
++
+         env->stvec_hs = env->stvec;
+         env->stvec = env->vstvec;
+ 
+@@ -939,10 +949,17 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+             if (riscv_cpu_virt_enabled(env)) {
+                 riscv_cpu_swap_hypervisor_regs(env);
+             }
++#ifdef TARGET_RISCV32
++            env->mstatush = set_field(env->mstatush, MSTATUS_MPV,
++                                       riscv_cpu_virt_enabled(env));
++            env->mstatush = set_field(env->mstatush, MSTATUS_MTL,
++                                       riscv_cpu_force_hs_excep_enabled(env));
++#else
+             env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
+                                       riscv_cpu_virt_enabled(env));
+             env->mstatus = set_field(env->mstatus, MSTATUS_MTL,
+                                       riscv_cpu_force_hs_excep_enabled(env));
++#endif
+ 
+             mtval2 = env->guest_phys_fault_addr;
+ 
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 2e6700bbeb..572a478e8c 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -371,6 +371,27 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
+ }
+ 
++#ifdef TARGET_RISCV32
++static int read_mstatush(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->mstatush;
++    return 0;
++}
++
++static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
++{
++    if ((val ^ env->mstatush) & (MSTATUS_MPV)) {
++        tlb_flush(env_cpu(env));
++    }
++
++    val &= MSTATUS_MPV | MSTATUS_MTL;
++
++    env->mstatush = val;
++
++    return 0;
++}
++#endif
++
+ static int read_misa(CPURISCVState *env, int csrno, target_ulong *val)
  {
-     int i;
-     for (i = 0; i < num_harts; i++) {
-@@ -236,6 +237,9 @@ DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
-         if (!env) {
-             continue;
-         }
-+        if (provide_rdtime) {
-+            riscv_cpu_set_rdtime_fn(env, cpu_riscv_read_rtc);
-+        }
-         env->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                   &sifive_clint_timer_cb, cpu);
-         env->timecmp = 0;
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 8a6b0348df..a254cad489 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -164,7 +164,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-         memmap[SIFIVE_E_PLIC].size);
-     sifive_clint_create(memmap[SIFIVE_E_CLINT].base,
-         memmap[SIFIVE_E_CLINT].size, ms->smp.cpus,
--        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, false);
-     create_unimplemented_device("riscv.sifive.e.aon",
-         memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
-     sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 0e12b3ccef..156a003642 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -549,7 +549,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-         serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART1_IRQ));
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, ms->smp.cpus,
--        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, false);
+     *val = env->misa;
+@@ -1214,6 +1235,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_MTVEC] =               { any,  read_mtvec,       write_mtvec       },
+     [CSR_MCOUNTEREN] =          { any,  read_mcounteren,  write_mcounteren  },
  
-     object_property_set_bool(OBJECT(&s->prci), true, "realized", &err);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 8823681783..6e5723a171 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -227,7 +227,8 @@ static void spike_board_init(MachineState *machine)
++#if defined(TARGET_RISCV32)
++    [CSR_MSTATUSH] =            { any,  read_mstatush,    write_mstatush    },
++#endif
++
+     /* Legacy Counter Setup (priv v1.9.1) */
+     [CSR_MUCOUNTEREN] =         { any,  read_mucounteren, write_mucounteren },
+     [CSR_MSCOUNTEREN] =         { any,  read_mscounteren, write_mscounteren },
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 804936e9d5..dca68fa96e 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -153,7 +153,11 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
+         get_field(mstatus, MSTATUS_MPIE));
+     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
+     mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
++#ifdef TARGET_RISCV32
++    env->mstatush = set_field(env->mstatush, MSTATUS_MPV, 0);
++#else
+     mstatus = set_field(mstatus, MSTATUS_MPV, 0);
++#endif
+     env->mstatus = mstatus;
+     riscv_cpu_set_mode(env, prev_priv);
  
-     /* Core Local Interruptor (timer and IPI) */
-     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
--        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
-+        false);
- }
- 
- static void spike_v1_10_0_board_init(MachineState *machine)
-@@ -316,7 +317,8 @@ static void spike_v1_10_0_board_init(MachineState *machine)
- 
-     /* Core Local Interruptor (timer and IPI) */
-     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
--        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
-+        false);
- }
- 
- static void spike_v1_09_1_board_init(MachineState *machine)
-@@ -424,7 +426,8 @@ static void spike_v1_09_1_board_init(MachineState *machine)
- 
-     /* Core Local Interruptor (timer and IPI) */
-     sifive_clint_create(memmap[SPIKE_CLINT].base, memmap[SPIKE_CLINT].size,
--        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        smp_cpus, SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE,
-+        false);
- 
-     g_free(config_string);
- }
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 5d175d5c9e..85ec9e22aa 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -593,7 +593,7 @@ static void riscv_virt_board_init(MachineState *machine)
-         memmap[VIRT_PLIC].size);
-     sifive_clint_create(memmap[VIRT_CLINT].base,
-         memmap[VIRT_CLINT].size, smp_cpus,
--        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-+        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, true);
-     sifive_test_create(memmap[VIRT_TEST].base);
- 
-     for (i = 0; i < VIRTIO_COUNT; i++) {
-diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
-index ae8286c884..4a720bfece 100644
---- a/include/hw/riscv/sifive_clint.h
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -41,7 +41,8 @@ typedef struct SiFiveCLINTState {
- } SiFiveCLINTState;
- 
- DeviceState *sifive_clint_create(hwaddr addr, hwaddr size, uint32_t num_harts,
--    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base);
-+    uint32_t sip_base, uint32_t timecmp_base, uint32_t time_base,
-+    bool provide_rdtime);
- 
- enum {
-     SIFIVE_SIP_BASE     = 0x0,
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
