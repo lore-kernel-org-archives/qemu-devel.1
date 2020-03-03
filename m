@@ -2,91 +2,137 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A796C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 14:00:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 235FDC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 14:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47FEC20848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 14:00:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0E552073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 14:02:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RT/wV2W7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47FEC20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="liMT9Hdo";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="q9FaCbRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E552073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j986F-0000KW-Ew
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 09:00:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59149)
+	id 1j9886-00026k-5Z
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 09:02:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j985Q-0008He-Gi
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:59:53 -0500
+ (envelope-from <prvs=3240045c5=Anup.Patel@wdc.com>)
+ id 1j986t-0000yH-An
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 09:01:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j985P-0005pu-1j
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:59:52 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43376)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j985O-0005pm-QN
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:59:50 -0500
-Received: by mail-wr1-x443.google.com with SMTP id h9so3502569wrr.10
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 05:59:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=G0HZvp1eXD2cp0YekPoUge6e6IUce1YPUQJwHIZW358=;
- b=RT/wV2W7yk4pCp03FgS9ysACPFUR4oluD3RGiW9yGBrjQRsffmUDNMkO4o/3E+XsN0
- E2H0Ujser6CoZk2yfYixWq6T5ZQ1K3pCFSRWmoAfoOS6bhFJlR3iLdPZhtlUWqCcsA9g
- M7nnma8wbsPQTkuSAFmLxda6fpzytWJPcA0DsA6nocMZ6Ci5xsRnotX+KhBAlL+b2Kpx
- 80629PJdMUrVoYX3UF6GJCCjCFk32aIFV5bV3/fx7aU6ivdqyduZ1GUHNO2J+EdaoyJB
- t2QPM1BRdaBcsXkZdXVNRv8jov39BsPVROwIKQIFQhNMxEQc/7Resl6FLfC+LjZSIfVn
- zmMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=G0HZvp1eXD2cp0YekPoUge6e6IUce1YPUQJwHIZW358=;
- b=czx6bsW7Wj0W1ccL/v71ocNMB8ipVx2bS0foLUgzfbSasBP+e9y6p7gQVrcUmBp1Ja
- U7UkCjBpMcDLEm7PoyeOBl4/M0KUQC2loRP1aTs3j9ocOIf9fGUn3S5aHwdPBHjMMFBX
- d3Qo02Y56eT3dnsB3LKYC05bzJ+eyV9L9+NQDyK4w9o8xXPAfXdKRYCEExMOv6qIEoLt
- CBWEEopQjO+zZjvxD/NjyCzMp1Xgv2vr6WDBUoWx1WtIWOjKqLQ3Vp6DrfYoo//Iv1JF
- X0Lyqqlfx6i+3aow2+fLBW8HEIfkbD6nzW6wzFILgAk21os0wVkyD4ZCqty9dpG2dmIM
- hrng==
-X-Gm-Message-State: ANhLgQ3WLgAwYlZwmLmexNuQ6vkubTDxzRU6WRk6AtAxJV1L5+cXeFLw
- h+p/3nbKz6RKDejy9qoKCs2fFQ==
-X-Google-Smtp-Source: ADFU+vu+BSAXSXEBEuwqFoQgg8W4vNFfu0SrUC1pv7BkSU4gkite7SlJOLaMCYK4n0nQBR4CD4FvDg==
-X-Received: by 2002:a5d:658c:: with SMTP id q12mr5964451wru.57.1583243989370; 
- Tue, 03 Mar 2020 05:59:49 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q3sm32469277wrs.1.2020.03.03.05.59.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Mar 2020 05:59:48 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 882821FF87;
- Tue,  3 Mar 2020 13:59:47 +0000 (GMT)
-References: <20200302180937.24148-1-alex.bennee@linaro.org>
- <c6f8e8b0-e391-67a7-4fcb-b88464285f65@redhat.com>
- <810018352.9991598.1583243092838.JavaMail.zimbra@redhat.com>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH] tests/acceptance: move @skipUnless decoration to test
- itself
-In-reply-to: <810018352.9991598.1583243092838.JavaMail.zimbra@redhat.com>
-Date: Tue, 03 Mar 2020 13:59:47 +0000
-Message-ID: <877e017d4c.fsf@linaro.org>
+ (envelope-from <prvs=3240045c5=Anup.Patel@wdc.com>)
+ id 1j986s-0006VK-Au
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 09:01:23 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:28739)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=3240045c5=Anup.Patel@wdc.com>)
+ id 1j986p-0006TC-0G; Tue, 03 Mar 2020 09:01:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1583244079; x=1614780079;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=GCc4iKKy6lLSSEYQbc97PMJrH0hk8z7bF5hcUFEiyY0=;
+ b=liMT9HdoIymgiKcqxLT06THqzLiz0V+54U8RtHzRjZssnbaEnOPYkcif
+ 32dKwl5ATxIYin5RoKqITvF1IhzJ1sQ/SPHrg4WAVwC4wzjDJMUDmyOpu
+ FKbITRXdqoYINhNyg4jB8nQuBOLGXgJr+0/SiGKLmbL6BBCP3J6mHY7Pa
+ S+PtXqtxBCZKK73a3X3SMqUzSLfzrrKCWGzFiREkRfIyVttUkyUR75xXa
+ jcL1b7gc+cuX5fWgIjGrLOP2kcHwLTM9Hku19Vs9thiaKB5o1JZwnM8T+
+ 7Ixp8g8G6bXCns8HcpbrlV9qaq0Ue3DDAVV1v/iACnu886CjHOHisvb5n A==;
+IronPort-SDR: k4c1/z72hkBQ5FU9N9mqR5CTdQzgVHVGyhaNylYuVOkXpSCBYHFb90sdPYJWUTFniIbTiR6z9+
+ S93OdZ4BVHQZv4AUAOZgdI+aA2Mt8NQRgbCdA3AGic9C1scZJrLjRD9ji1SLRRbrg8VZt8EZCQ
+ nWUiyZSguIOUyiWehKmgzvsZtxbeg+j+6myUCQDICrmqFfWKHoaWFC214UyStaX/IybAEd7UwO
+ xjtWGMX+sozGDLANUs4BSswqwTbgdARZuKt61TE6xN8GeXhjjy++0UAcdpMsDJ/S8vO6eXY2L5
+ UII=
+X-IronPort-AV: E=Sophos;i="5.70,511,1574092800"; d="scan'208";a="239494763"
+Received: from mail-bn7nam10lp2104.outbound.protection.outlook.com (HELO
+ NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.104])
+ by ob1.hgst.iphmx.com with ESMTP; 03 Mar 2020 22:01:07 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RuKzwinJjjqYA7evbR5k+TQsI+2IK0O4q8WAWgpE7lxXpIf4rTLQYetzSjoHTzfcXeMfVUkfBtcv7M4JVAv3w3EURUPLxoAT0mMtbrCNyi19QjA7KzZV6dmWSvh/8yk+mhTa2VxT4AFxN/thVw7urFKl2723/vJkXxg112/Msam2lSW9YSoO2X661BYZB3FFF9KYHRbxybqq0TEMz1mAIkzn/L3O7b1668nyvBmAbiVjiT45DG0u5V4ye+RDgOU4nWoXZo4HkLeTS8Q+hTCmmkU2fFEOY36jbxQ35C7SB4J060U2XXDeY6cN4b2MnXfLZ+/pSUoYA9ZRAQfX+VRLeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5Li3wslSnFTZFbsQpl1oExZOCBjgNIMSIhTf6OEhHoo=;
+ b=Sr0vr3P036hrbTc+Jr9Ak61YEpYo/YH2MUnAXMjMfQUv4oUGi1So13MD8X5VO03j+QAFx359UUcpUNCFEhcOUjGOMQbCjW4hiyQfYtGz33KiR37kwn5d/HHk9mxkcnzf23qAYtJFZRQuhFI90h/GUyXi0+hdF14WzlNgvbXz36lj+HVeTL9t15KJnaFyGbWcId3kyD544YB4zzBIQKP7t9ijpBNQuVZa5azMzJUmVur1zpQg9ASk3I8llL7ADGnT2lfzhx2S+tHqCM8cYRvAX3GPDa73lja98Wp8m6JfhdsllJ3I76rwXk3m1X65jHERiamaCznihfzXaElvp9m9VQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5Li3wslSnFTZFbsQpl1oExZOCBjgNIMSIhTf6OEhHoo=;
+ b=q9FaCbRd02pLZTmn/cJvOL/AbjfXM++SG03SYyzdgOS62yl/GhWM1U5bxGYUWO+H6E6aYEuREBsEFQ8C2BT+nlfRDlzieEArrXNy2c9tcwb9bnPt21YKQFopbNfjHk/yuWVIRP5VIpMNGYP3lctw26Ol+Nx0aEvsGR3lF/P4Ul0=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Anup.Patel@wdc.com; 
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com (2603:10b6:208:d8::15)
+ by MN2PR04MB7038.namprd04.prod.outlook.com (2603:10b6:208:1e6::24)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.18; Tue, 3 Mar
+ 2020 14:01:06 +0000
+Received: from MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::159d:10c9:f6df:64c8]) by MN2PR04MB6061.namprd04.prod.outlook.com
+ ([fe80::159d:10c9:f6df:64c8%6]) with mapi id 15.20.2772.019; Tue, 3 Mar 2020
+ 14:01:06 +0000
+From: Anup Patel <anup.patel@wdc.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>
+Subject: [PATCH v2 0/3] RISC-V Spike machine improvements
+Date: Tue,  3 Mar 2020 19:30:34 +0530
+Message-Id: <20200303140037.85311-1-anup.patel@wdc.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: BMXPR01CA0027.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:c::13) To MN2PR04MB6061.namprd04.prod.outlook.com
+ (2603:10b6:208:d8::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from wdc.com (49.207.61.196) by
+ BMXPR01CA0027.INDPRD01.PROD.OUTLOOK.COM (2603:1096:b00:c::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.15 via Frontend Transport; Tue, 3 Mar 2020 14:01:01 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [49.207.61.196]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 2e0fdd04-5288-43f1-b033-08d7bf7b50cb
+X-MS-TrafficTypeDiagnostic: MN2PR04MB7038:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MN2PR04MB7038B11092BADFF7395392F88DE40@MN2PR04MB7038.namprd04.prod.outlook.com>
+WDCIPOUTBOUND: EOP-TRUE
+X-MS-Oob-TLC-OOBClassifiers: OLM:83;
+X-Forefront-PRVS: 03319F6FEF
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(189003)(199004)(186003)(16526019)(26005)(66556008)(66476007)(55016002)(36756003)(1006002)(6666004)(86362001)(55236004)(4326008)(8886007)(478600001)(81166006)(54906003)(66946007)(1076003)(81156014)(316002)(5660300002)(110136005)(2616005)(8936002)(7696005)(52116002)(956004)(44832011)(8676002)(4744005)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR04MB7038;
+ H:MN2PR04MB6061.namprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tVuJMcf7KGAIaCpZ4EdhubT5w80qR9sflNVjOtLEuHpCVcPXy0/A99982sdIp/BU3B4rawHrJP0pRvdSyU14WsE6g8ptMmxzr0mFqdZhxv8uQp+QjL2OsPJiaBgrYy6o5IhSj0N2UHj+8+c8AnOLPRBRnZrPYi7s0gYgN5+CUhZknjbIbQRK6jz7skSRAdsivcxSHT5xTMGWg9gvIzB7n72zLQGMyPSBlIsbg0/rtTlLqRsb3TsnrwL8rc1ObBINGjvtWcdPGn45B+hs7ELg60REPX/NaitHb+hSUTXO6gpVHAxrXavPOd5jIPttIAG3CI+lgZ0NTxwgFU24LXgW494XGbD2z+xQ5zVd15CYDab4DRRnOKfLPX3nPhwXUqZRGmPs+k1uj4mPiT34O3LnrhVAt754cfeXcDEhx+mGNh4daM6d8A6hO+sqPwYfXpdO
+X-MS-Exchange-AntiSpam-MessageData: 0rLOiBhUMK9B7QB4zxPaqkp5GpMFs7t8G1uPyydT/Fr0rW6wbJnCfu5x7qMAGwPUsmiAfwlmzh23Souf2ofxivoq3izqh0K2k5OQHH5vkUEETUjSAVtx6SV2aVBHxll4HKgJ7Pj/0FbsfT6RSIwZzw==
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e0fdd04-5288-43f1-b033-08d7bf7b50cb
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2020 14:01:05.9260 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Hi1RTtYszJX997w79zp67JcmF/IPYSG05lCMBjFI7Xaf4ZaZnN6cGyyfBkgrKnxElD/ARLAjhcDskd+iEzzaEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB7038
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 68.232.141.245
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +144,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, f4bug@amsat.org
+Cc: Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This series improves QEMU Spike machine to:
+1. Allow loading OpenBI firmware using -bios option
+2. Allow more than one CPUs
 
-Cleber Rosa <crosa@redhat.com> writes:
+Changes since v1:
+ - Rebased on QEMU master (commit 2ac031d171ccd18c973014d9978b4a63f0ad5fb0)
 
-> ----- Original Message -----
->> From: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
->> To: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>, qemu-devel@nongnu.org
->> Cc: "Aurelien Jarno" <aurelien@aurel32.net>, f4bug@amsat.org, "Aleksanda=
-r Markovic" <amarkovic@wavecomp.com>
->> Sent: Monday, March 2, 2020 1:14:31 PM
->> Subject: Re: [PATCH] tests/acceptance: move @skipUnless decoration to te=
-st itself
->>=20
->> On 3/2/20 7:09 PM, Alex Benn=C3=A9e wrote:
->> > It appears ignore the decoration if just applied to the class.
->>=20
->> Odd I remember testing this, this might be a feature supported by a
->> newer Avocado version than the one available on Travis-CI.
->>=20
->> >=20
->> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> > ---
->> >   tests/acceptance/machine_mips_malta.py | 4 ++--
->> >   1 file changed, 2 insertions(+), 2 deletions(-)
->> >=20
->> > diff --git a/tests/acceptance/machine_mips_malta.py
->> > b/tests/acceptance/machine_mips_malta.py
->> > index 92b4f28a112..b8fac2a44d5 100644
->> > --- a/tests/acceptance/machine_mips_malta.py
->> > +++ b/tests/acceptance/machine_mips_malta.py
->> > @@ -30,14 +30,14 @@ except ImportError:
->> >       CV2_AVAILABLE =3D False
->> >=20=20=20
->> >=20=20=20
->> > -@skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> > -@skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->> >   class MaltaMachineFramebuffer(Test):
->> >=20=20=20
->> >       timeout =3D 30
->> >=20=20=20
->> >       KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
->> >=20=20=20
->> > +    @skipUnless(NUMPY_AVAILABLE, 'Python NumPy not installed')
->> > +    @skipUnless(CV2_AVAILABLE, 'Python OpenCV not installed')
->> >       def do_test_i6400_framebuffer_logo(self, cpu_cores_count):
->> >           """
->> >           Boot Linux kernel and check Tux logo is displayed on the
->> >           framebuffer.
->> >=20
->>=20
->> Unfortunately you have to also add it to the 7/8cores tests.
->>=20
->>=20
->>=20
->
-> This is true of Avocado < 76.0, but on 76.0 you can decorate the
-> class too:
->
-> https://avocado-framework.readthedocs.io/en/76.0/releases/76_0.html#users=
--test-writers
->
-> Maybe replace this patch and bump Avocado's version?
+Anup Patel (3):
+  hw/riscv: Add optional symbol callback ptr to riscv_load_firmware()
+  hw/riscv/spike: Allow loading firmware separately using -bios option
+  hw/riscv/spike: Allow more than one CPUs
 
-Where is this defined in the source?
+ hw/riscv/boot.c         | 13 ++++++++-----
+ hw/riscv/sifive_u.c     |  2 +-
+ hw/riscv/spike.c        | 26 ++++++++++++++++++++++++--
+ hw/riscv/virt.c         |  2 +-
+ include/hw/riscv/boot.h |  6 ++++--
+ 5 files changed, 38 insertions(+), 11 deletions(-)
 
->
-> - Cleber.
+-- 
+2.17.1
 
-
---=20
-Alex Benn=C3=A9e
 
