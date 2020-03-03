@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27B7C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A52C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:01:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CED620866
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:00:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F91020866
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:01:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xcir3SV3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CED620866
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bO27781t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F91020866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vvd-0007wu-FV
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:00:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45071)
+	id 1j8vvn-0008Jg-5F
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:01:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkV-0001dg-Qy
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:28 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkr-0002Xu-9N
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkU-0004JY-Pm
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:27 -0500
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:38459)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkp-0004T1-Ii
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:48 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40644)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkU-0004J6-Jp
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:26 -0500
-Received: by mail-pf1-x42a.google.com with SMTP id q9so559779pfs.5
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:26 -0800 (PST)
+ id 1j8vkp-0004SY-6j
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:47 -0500
+Received: by mail-pf1-x441.google.com with SMTP id l184so555216pfl.7
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=T6T0TH00iuu/lbxZkL6qr//GeBoSN6TEkkKvvhFc4Gk=;
- b=Xcir3SV3XYPFIKFfijsp7ob8Eu3Q8lLIJQuIKolDD+jnuzg2V5yQCuWLPJVYBShuIS
- 3Cy6yrPWe0NLsccLJKDLoV0bnr0rkF/O1vJh+Azv6xwgvKMxqd3vN4QLjBPfQZ+4Yhpc
- UA33oKwQJasll73LeW1WclzmFoQk5WOKit6wVKBrrVfEgWQBMfjX9oGxHgkeQpvaARGI
- MwGPDomW70wk3L1IxHM5f3zIt2tVvahdhiKEIGCvnSVL4UhNvSYICYIU5JAFScJ+qmxY
- YP42rPKtJo78gpv+4khtARg0RbCLM5WYfgmsGp179pIh3NlJ9WZ58vsD2pr9O57uZgGc
- a3AA==
+ bh=ti9yXoRVYSbU3lnCHfDJy3KSsIWSbEVNqPE18S19cuA=;
+ b=bO27781trIx6Jb8P4cLS9o4ZLvW2fBdDuDDqaN7KAgLIgoe+WgnJasaqZH8+43Dqwg
+ aQt1SjyXG1PW0kJYhQbcETU2l4jkCi+gPtDPWnPa1OdnOqa6/fMutSHyIwKlHY2aMHkz
+ 5c/8nykpstQaytMhtNIVCcEUX477pHGOrvNlx6wm4neE+4qn8THrvQzZiX6DADEVoHzN
+ gLUSDUwqFEBkwSFlBgpFCbAkIU8zcLeJd+HKyy2qsHLoSZvA4OXlFqsKCIGy0KJc792e
+ LYgkVHzo3+JYfE1L+6qC1tVvRiScRM3m7hwRMpe72qz8V3yjCukH01tJjDBWvcCD4bnN
+ ILYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=T6T0TH00iuu/lbxZkL6qr//GeBoSN6TEkkKvvhFc4Gk=;
- b=LgqpW6J9u55kqZddtP3N1NZWyv8DYgXvRXFDpOL4wNW8UJi8dqfcLUdYxHm9EXi89L
- Xok4zAeO/UrB4Hk9pw+1Voxvd5Ce++bUSW7t4UL6G4ZTQRK6IP1ivHMsuBc1SPqmKQec
- Cle1rhFgp7FqGoTvefymqSXRByy5HGBbNNWbdRtnAkeDoIDJFBaIuJIlQmrHKGjaWQjt
- Sv8Q1HVLOlKG7Y5CUKW4Y//lgMu5hUKSEOPyrvL4zf3PznfbHjt/BZWdEYKaMw3UUJTy
- 9ro7gd1G7wkQkFgmcFl9I+n7n+1jwy0mWLgGIMOMfCIPhqAcHiCkWSyJkWCzMn8AzZEP
- rphA==
-X-Gm-Message-State: ANhLgQ39nilPN4nggK6uYyx/3Qk5IFr6mRllJ3T+thaYl+xApOXDRwdn
- 7TmolqhusQ6rMTZ0Axj2lh6Ejw==
-X-Google-Smtp-Source: ADFU+vsMFedByMSjgsn4B1pfm9bu30AF6cPs7U72zXGm93wpWpBacJiVrgqqsfXwMmlgNcsMVMRnBw==
-X-Received: by 2002:aa7:85d8:: with SMTP id z24mr1675019pfn.202.1583196565535; 
- Mon, 02 Mar 2020 16:49:25 -0800 (PST)
+ bh=ti9yXoRVYSbU3lnCHfDJy3KSsIWSbEVNqPE18S19cuA=;
+ b=QLqnXo7NGul1xo1LvxSXDCfEuHHPPabnJIcs/bWRg2KfopHRhmfANyoEsbvQvsH/6X
+ NLUFYP9sOFxpzGabtK+njlhyRjuePbvAhX1UJYVehWDFUBzbzutYCUTTAipKsMJrMjdA
+ gLS14adxEgia7OPf9CEVbAIXzzuaaXCtNI65g4NYTuqN3v8bahpyuRLSB6koiiRXMBcZ
+ 5UkrKg1/aR6iz3vhZJJdxLXh9v7C03UpQI0Nry4VsmjTi9Og/uLKx3QSXTwQS9b2rufX
+ Pk4t0pqa08rajw9O5H53e9NBzh68nMjnvLxjxIOYwRFfHvufNFMe6EW2vMa3VifHGtO4
+ 8nkg==
+X-Gm-Message-State: ANhLgQ3JWb8v9egMji6jrrEBs8oA/3EAm8N5caRbDlcgHSzO6DdjoLBN
+ Pz1SaZPzpbBieIbgRFqiYb/Vhg==
+X-Google-Smtp-Source: ADFU+vsD7mexY3fuWO9RDMDsARNlpQPWv0gp7Nc1oiYnutmm1wMFoxjhEtag0y3u9dsrgjXXnHhhZw==
+X-Received: by 2002:a05:6a00:2b7:: with SMTP id
+ q23mr1555234pfs.43.1583196585979; 
+ Mon, 02 Mar 2020 16:49:45 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id az17sm108552pjb.18.2020.03.02.16.49.24
+ by smtp.gmail.com with ESMTPSA id m16sm21984682pfh.60.2020.03.02.16.49.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:25 -0800 (PST)
-Subject: [PULL 16/38] target/riscv: Extend the MIE CSR to support virtulisation
-Date: Mon,  2 Mar 2020 16:48:26 -0800
-Message-Id: <20200303004848.136788-17-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:45 -0800 (PST)
+Subject: [PULL 27/38] target/riscv: Mark both sstatus and msstatus_hs as dirty
+Date: Mon,  2 Mar 2020 16:48:37 -0800
+Message-Id: <20200303004848.136788-28-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
@@ -83,7 +84,7 @@ From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::42a
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,60 +102,53 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
+Mark both sstatus and vsstatus as dirty (3).
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/csr.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+ target/riscv/translate.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index c0e942684d..918678789a 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -244,8 +244,10 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
- #define S_MODE_INTERRUPTS  (MIP_SSIP | MIP_STIP | MIP_SEIP)
- #define VS_MODE_INTERRUPTS (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)
- 
--static const target_ulong delegable_ints = S_MODE_INTERRUPTS;
--static const target_ulong all_ints = M_MODE_INTERRUPTS | S_MODE_INTERRUPTS;
-+static const target_ulong delegable_ints = S_MODE_INTERRUPTS |
-+                                           VS_MODE_INTERRUPTS;
-+static const target_ulong all_ints = M_MODE_INTERRUPTS | S_MODE_INTERRUPTS |
-+                                     VS_MODE_INTERRUPTS;
- static const target_ulong delegable_excps =
-     (1ULL << (RISCV_EXCP_INST_ADDR_MIS)) |
-     (1ULL << (RISCV_EXCP_INST_ACCESS_FAULT)) |
-@@ -630,13 +632,27 @@ static int write_sstatus(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_sie(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    *val = env->mie & env->mideleg;
-+    if (riscv_cpu_virt_enabled(env)) {
-+        /* Tell the guest the VS bits, shifted to the S bit locations */
-+        *val = (env->mie & env->mideleg & VS_MODE_INTERRUPTS) >> 1;
-+    } else {
-+        *val = env->mie & env->mideleg;
-+    }
-     return 0;
- }
- 
- static int write_sie(CPURISCVState *env, int csrno, target_ulong val)
- {
--    target_ulong newval = (env->mie & ~env->mideleg) | (val & env->mideleg);
-+    target_ulong newval;
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index eff064dc44..3ce86adb89 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -44,6 +44,8 @@ typedef struct DisasContext {
+     /* pc_succ_insn points to the instruction following base.pc_next */
+     target_ulong pc_succ_insn;
+     target_ulong priv_ver;
++    bool virt_enabled;
++    uint32_t opcode;
+     uint32_t mstatus_fs;
+     uint32_t misa;
+     uint32_t mem_idx;
+@@ -395,6 +397,12 @@ static void mark_fs_dirty(DisasContext *ctx)
+     tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
+     tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS | MSTATUS_SD);
+     tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
 +
-+    if (riscv_cpu_virt_enabled(env)) {
-+        /* Shift the guests S bits to VS */
-+        newval = (env->mie & ~VS_MODE_INTERRUPTS) |
-+                 ((val << 1) & VS_MODE_INTERRUPTS);
-+    } else {
-+        newval = (env->mie & ~S_MODE_INTERRUPTS) | (val & S_MODE_INTERRUPTS);
++    if (ctx->virt_enabled) {
++        tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus_hs));
++        tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS | MSTATUS_SD);
++        tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus_hs));
 +    }
-+
-     return write_mie(env, CSR_MIE, newval);
+     tcg_temp_free(tmp);
  }
- 
+ #else
+@@ -742,6 +750,11 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+     ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
+     ctx->priv_ver = env->priv_ver;
++#if !defined(CONFIG_USER_ONLY)
++    ctx->virt_enabled = riscv_cpu_virt_enabled(env);
++#else
++    ctx->virt_enabled = false;
++#endif
+     ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
+     ctx->ext_ifencei = cpu->cfg.ext_ifencei;
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
