@@ -7,85 +7,84 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EF1C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5996DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D59021D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 247D921D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 01:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p2uFP1f/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D59021D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bJBQgFqt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247D921D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vyv-0006gx-7a
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:04:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45380)
+	id 1j8vz7-00071a-A2
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 20:04:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkx-0002ie-Tr
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:57 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vl4-0002xj-V4
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkt-0004VG-Ql
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:54 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:43617)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vl3-0004d4-0R
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:02 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:43789)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vks-0004Tl-Tx
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:51 -0500
-Received: by mail-pl1-x644.google.com with SMTP id x17so497590plm.10
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:48 -0800 (PST)
+ id 1j8vl2-0004cV-En
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:50:00 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id x17so497780plm.10
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=K4iuwnZKk8MjfgAofzgXfmuGJvew57sqzgzfazcOgLo=;
- b=p2uFP1f/C7Br/ykLKeSK8IA4rQcKuI/tYyaAGts02769Ux9xbuXth8cdz33/+peND9
- J042EH+c3Q10H/iABTVu4W0BRVOY8IGQwqCRUV6s8bjD7oSLIBHQR1ziDCadoQwrUpo6
- wEB2X2369vyIBl051MM8dJG35MMCgbbv9Cmndnwcyiwf4Acq84Nz/MQbmgW85enkjXVR
- 8GcYK9HILbxMLTmAWiWPgRz9DP30mN5oWE51O7bVFJCNu6XlMh50MffWTgb0LvE++sRE
- POYF+Ev7LwB0GH4XFGaqCWxHz5Bs5XuYq9VtAG6w/xGX4Jck0+LFb8i1NroqywAITkhP
- +sIw==
+ bh=Kl0RWvUMkBe+VYlgiEkGt81O6Pkp3L6zJLT5spvKIuw=;
+ b=bJBQgFqt97ZdGncAuZKbAnzA5hvv9AdnbySlcwxoPGz0a69LG+ay8auZTf5d1S4fPs
+ PJ4Yox0PKIGLMi2CZrz4AyAcwlZRjFsSjYOuyiib7vhyV4a106iXuAdFPNWfT343jAc/
+ W94EAAuj0rALw/W58dKtI0GwdSku9RRBeMmQszauIh2llw1FFlz9F611OQZZuHWYNs29
+ myj9l8SG5UGACvn/77HkGqGYI2VWE+SBa5IY3OvM4UbHyEpMN/jE/MTEv7kG79lzcwa0
+ D+6vR/MWQVDnXC546CrechIz9Hq+v873jbjupswTUUUGdwoePU/sp8VqgOuc7RulhIU7
+ 4lpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=K4iuwnZKk8MjfgAofzgXfmuGJvew57sqzgzfazcOgLo=;
- b=kkqP0cvSfzrI339P0g4B9hw9hHHe71GC/QO3ynry3ZrdNhExCphC0KgIt2O2+S3Py2
- YgxFVK/FVhPYQlpozG1g5EduZ3cq2MxuBCl1Seq6kkV3zhDVX6rEcljEaKGWn5svNDdW
- 6HjueCwI1B57qNAlPaihE6c+2Kf0tXdR9G/m1zxxoJ790+WGu5CyxkXdJZimrT0ngcCl
- xj/x+YHxePWxSFVJ0wg0bWtp+blKURuh1FuqmaeIAOkG/ofubIQ8szozc3qrdJ/7n6GH
- 7oSOapGKkwe7S60DgDK/e2i/8o3ItJX9B5azmzkJNtiwi475IqycWGfKgSTPdnb1RWd2
- YTUA==
-X-Gm-Message-State: ANhLgQ2n4FAYHlqtsZOB/xkgObrN2mEoCQzg+dRSZcMKAsGXf2ZaePkH
- wEYdPbM5f2qvXrsb3exQLK+rCg==
-X-Google-Smtp-Source: ADFU+vukNh3FxGhY8lT6adpRrBhNLhsl4gGteSU5zfzM62/YqJnsnp9l9JYWvoM5rQxXnvcYTQE96w==
-X-Received: by 2002:a17:90a:f0c4:: with SMTP id
- fa4mr1186814pjb.125.1583196587713; 
- Mon, 02 Mar 2020 16:49:47 -0800 (PST)
+ bh=Kl0RWvUMkBe+VYlgiEkGt81O6Pkp3L6zJLT5spvKIuw=;
+ b=opOjPJMAvGw339ZWJ/gWu9foAhNfCPylc5m4oHnpJVg6bVzbRc+d4SBW2DV6tfQYxt
+ E484LJ4iXjcNE5sOs5x1W5Iy39ZkD0tRn01CnwzZ7uj0wLh5Xfc6mOaS113RtMenfDrE
+ uEtSgnwxp9G6GSGVYcCXd/8fw0UwqzqZveJ0kRCdyAhrekpgwYNMX06fbcXMbWOhZAiQ
+ zTchYBhau3nkezc/+WVnr+qFs+1x5nRE0/PouEHXakYgxy8vxBGQGovmHDAOomGfgoHS
+ UN69RffFqmDGOUwWeav2V7K06Q319M9MXvmqa2UaVGwobCA1/pADHhdAxW+y0mp6h1yl
+ Ylvg==
+X-Gm-Message-State: ANhLgQ3SMvYBT/q8AsSoCS1L18FO2akK5mo7ozgNRL2c+OUDjJLZn3s8
+ 6Vd17Yf3GIHrIp7dcOisDHWazw==
+X-Google-Smtp-Source: ADFU+vs+SvkmuHzZji7iX/7IJ5QRxrDm4mdgx6LWA9fJZy7izOUga5jqqGlLZ8Pxe2mOTv+mGILBCg==
+X-Received: by 2002:a17:902:ac8b:: with SMTP id
+ h11mr1682096plr.131.1583196598902; 
+ Mon, 02 Mar 2020 16:49:58 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id d1sm21802272pgj.79.2020.03.02.16.49.46
+ by smtp.gmail.com with ESMTPSA id p24sm22823478pff.69.2020.03.02.16.49.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:47 -0800 (PST)
-Subject: [PULL 28/38] target/riscv: Respect MPRV and SPRV for floating point
- ops
-Date: Mon,  2 Mar 2020 16:48:38 -0800
-Message-Id: <20200303004848.136788-29-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:58 -0800 (PST)
+Subject: [PULL 35/38] target/riscv: Allow enabling the Hypervisor extension
+Date: Mon,  2 Mar 2020 16:48:45 -0800
+Message-Id: <20200303004848.136788-36-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::62d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,45 +102,49 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
-mark_fs_dirty() is the only place in translate.c that uses the
-virt_enabled bool. Let's respect the contents of MSTATUS.MPRV and
-HSTATUS.SPRV when setting the bool as this is used for performing
-floating point operations when V=0.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/translate.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ target/riscv/cpu.c | 5 +++++
+ target/riscv/cpu.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 3ce86adb89..b51ab92068 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -751,7 +751,21 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
-     ctx->priv_ver = env->priv_ver;
- #if !defined(CONFIG_USER_ONLY)
--    ctx->virt_enabled = riscv_cpu_virt_enabled(env);
-+    if (riscv_has_ext(env, RVH)) {
-+        ctx->virt_enabled = riscv_cpu_virt_enabled(env);
-+        if (env->priv_ver == PRV_M &&
-+            get_field(env->mstatus, MSTATUS_MPRV) &&
-+            get_field(env->mstatus, MSTATUS_MPV)) {
-+            ctx->virt_enabled = true;
-+        } else if (env->priv == PRV_S &&
-+                   !riscv_cpu_virt_enabled(env) &&
-+                   get_field(env->hstatus, HSTATUS_SPRV) &&
-+                   get_field(env->hstatus, HSTATUS_SPV)) {
-+            ctx->virt_enabled = true;
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index b27066f6a7..c47d10b739 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -453,6 +453,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+         if (cpu->cfg.ext_u) {
+             target_misa |= RVU;
+         }
++        if (cpu->cfg.ext_h) {
++            target_misa |= RVH;
 +        }
-+    } else {
-+        ctx->virt_enabled = false;
-+    }
- #else
-     ctx->virt_enabled = false;
- #endif
+ 
+         set_misa(env, RVXLEN | target_misa);
+     }
+@@ -488,6 +491,8 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("c", RISCVCPU, cfg.ext_c, true),
+     DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
++    /* This is experimental so mark with 'x-' */
++    DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 6f9c29322a..d52f209361 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -258,6 +258,7 @@ typedef struct RISCVCPU {
+         bool ext_c;
+         bool ext_s;
+         bool ext_u;
++        bool ext_h;
+         bool ext_counters;
+         bool ext_ifencei;
+         bool ext_icsr;
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
