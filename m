@@ -2,82 +2,63 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90D1C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEC9C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A4D221D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:24:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66EF520848
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E23py1SZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4D221D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TS0me6qK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66EF520848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yA4-0000Lb-Nl
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:24:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60702)
+	id 1j8yUQ-0006FO-HS
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:45:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhangfei.gao@gmail.com>) id 1j8y9T-0008CO-6P
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:23:24 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTQ-0004h3-LQ
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhangfei.gao@gmail.com>) id 1j8y9S-0002OZ-4Z
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:23:23 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46842)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhangfei.gao@gmail.com>)
- id 1j8y9R-0002OR-Uj; Mon, 02 Mar 2020 22:23:22 -0500
-Received: by mail-io1-xd43.google.com with SMTP id x21so1892854iox.13;
- Mon, 02 Mar 2020 19:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=0ou9io8uf3VKDbGKlHf2x7eRKMOVTLIyuGgxw2ob+co=;
- b=E23py1SZEh9w5zXhNH8E8Awsbd5qwG6oheW3LQqnOEgVUE76VOeNhImNk6crl8ycW5
- 3eXRXgLNRlDwRSMaglEMzQa1Lkjqzzz0elubCIWL5ZkDbNHk2ZH10K5pjdyGQN4L09IY
- Ux2YetF7NL6R/eHa5EGPrUKeFhQeUL41aGPODZAQ1DMD4F1YDNY8+KNpA+PxMFIgJC07
- 6qA3W4KG8WlMAI92MEy/ru+Jh4wXKVTeptNEAB6cnNN2ANe9VBl267X43OFYHTJ1G8O3
- O1ugo2Y0vC5UWSWrbeU6eSXZgUi8cM2JqVo4TEf6glKPibrrnUfj6xxWpYn/aZtJuCEE
- gYnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=0ou9io8uf3VKDbGKlHf2x7eRKMOVTLIyuGgxw2ob+co=;
- b=nQ4StbkQgMs7gGWi4ubXkWw0426IwIW7tJczJ4Zhi6l55bRjUpoCI1mqaU27PB/uJD
- oPUN+ytS5q29OmBCi/GRibfts2H33wl1YGi+ZTijj4sDR/yATp6ID60RjXhLrGFyqD7u
- jOSOmog1A4mGzoBysua88lsj41xKrVpnPme0ioWW8hw2v5+uboieMhRvaLEwG5StE8pe
- PouH7fieslik4OsIim4iUcX6lSUrklFbl6zrqcpFEqjXl/xOV8eMfIOPKXW9XT4HpNql
- H6Sl/Vf/6qMu4jiQD8NOAx8CouMh32cHALTNl01ojzMEoZTPbu/HCgWOrGJvsFgZVAwH
- YQcg==
-X-Gm-Message-State: ANhLgQ10mGQBsRQYZYUQXXEPu1DdIL8jtL0285UZJQFky5A+33UYyYd8
- B45hCG1Yjm+tfGv9lqyHFqrtB0gedCLveebgQe4=
-X-Google-Smtp-Source: ADFU+vvqDUZ8NzvS7rgMQP3FDX4PFSBnMvSyD3tfYbwvc/9u+ToEgKA0dlyhS9S1GKqSwbTsBRx00T7asjCalrNhy/U=
-X-Received: by 2002:a5d:80d6:: with SMTP id h22mr2222820ior.129.1583205800885; 
- Mon, 02 Mar 2020 19:23:20 -0800 (PST)
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTP-0002Ai-BX
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:00 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:40803 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1j8yTO-00025k-Fa; Mon, 02 Mar 2020 22:43:59 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 48WjY56Wp2z9sSM; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1583207033;
+ bh=105uZzjK8EWkPkmRVAazKF6ikIMHnp8INylkLfXtmRo=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=TS0me6qKYnfiRrjpKnsgJO2cwuKdjiwOJtliex+pzd85H4X5yZtKGSDXzhsEdh7xx
+ dhsfbMBOqO0LHbuEiZQv+fPCOorx3m8VZq6Mp+IUDWW9KPK0grCO7w+MkKjx4uHWyN
+ RvS1GXqxsiFINgUP1plx9LuflhlDVAPhfWYG9Xh4=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
+Subject: [PATCH v7 03/17] target/ppc: Correct handling of real mode accesses
+ with vhyp on hash MMU
+Date: Tue,  3 Mar 2020 14:43:37 +1100
+Message-Id: <20200303034351.333043-4-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
+References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-References: <20200214132745.23392-1-eric.auger@redhat.com>
- <20200227111717.GG1645630@redhat.com>
- <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
-In-Reply-To: <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
-From: Zhangfei Gao <zhangfei.gao@gmail.com>
-Date: Tue, 3 Mar 2020 11:23:10 +0800
-Message-ID: <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
-Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,72 +70,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- kenneth-lee-2012@foxmail.com, tnowicki@marvell.com,
- "Michael S. Tsirkin" <mst@redhat.com>, quintela@redhat.com,
- zhangfei.gao@foxmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- "Wangzhou \(B\)" <wangzhou1@hisilicon.com>, jean-philippe@linaro.org,
- eric.auger.pro@gmail.com
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>, farosas@linux.ibm.com,
+ aik@ozlabs.ru, "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Paolo Bonzini <pbonzini@redhat.com>, paulus@samba.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric
+On ppc we have the concept of virtual hypervisor ("vhyp") mode, where we
+only model the non-hypervisor-privileged parts of the cpu.  Essentially w=
+e
+model the hypervisor's behaviour from the point of view of a guest OS, bu=
+t
+we don't model the hypervisor's execution.
 
-On Thu, Feb 27, 2020 at 9:50 PM Auger Eric <eric.auger@redhat.com> wrote:
->
-> Hi Daniel,
->
-> On 2/27/20 12:17 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Feb 14, 2020 at 02:27:35PM +0100, Eric Auger wrote:
-> >> This series implements the QEMU virtio-iommu device.
-> >>
-> >> This matches the v0.12 spec (voted) and the corresponding
-> >> virtio-iommu driver upstreamed in 5.3. All kernel dependencies
-> >> are resolved for DT integration. The virtio-iommu can be
-> >> instantiated in ARM virt using:
-> >>
-> >> "-device virtio-iommu-pci".
-> >
-> > Is there any more documentation besides this ?
->
-> not yet in qemu.
-> >
-> > I'm wondering on the intended usage of this, and its relation
-> > or pros/cons vs other iommu devices
->
-> Maybe if you want to catch up on the topic, looking at the very first
-> kernel RFC may be a good starting point. Motivation, pros & cons were
-> discussed in that thread (hey, April 2017!)
-> https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021217.html
->
-> on ARM we have SMMUv3 emulation. But the VFIO integration is not
-> possible because SMMU does not have any "caching mode" and my nested
-> paging kernel series is blocked. So the only solution to integrate with
-> VFIO is looming virtio-iommu.
->
-> In general the pros that were put forward are: virtio-iommu is
-> architecture agnostic, removes the burden to accurately model complex
-> device states, driver can support virtualization specific optimizations
-> without being constrained by production driver maintenance. Cons is perf
-> and mem footprint if we do not consider any optimization.
->
-> You can have a look at
->
-> http://events17.linuxfoundation.org/sites/events/files/slides/viommu_arm.=
-pdf
->
-Thanks for the patches.
+In particular, in this mode, qemu's notion of target physical address is
+a guest physical address from the vcpu's point of view.  So accesses in
+guest real mode don't require translation.  If we were modelling the
+hypervisor mode, we'd need to translate the guest physical address into
+a host physical address.
 
-Could I ask one question?
-To support vSVA and pasid in guest, which direction you recommend,
-virtio-iommu or vSMMU (your nested paging)
+Currently, we handle this sloppily: we rely on setting up the virtual LPC=
+R
+and RMOR registers so that GPAs are simply HPAs plus an offset, which we
+set to zero.  This is already conceptually dubious, since the LPCR and RM=
+OR
+registers don't exist in the non-hypervisor portion of the CPU.  It gets
+worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
 
-Do we still have any obstacles?
-Would you mind give some breakdown.
-Jean mentioned PASID still not supported in QEMU.
+Clean this up by explicitly handling the vhyp case.  While we're there,
+remove some unnecessary nesting of if statements that made the logic to
+select the correct real mode behaviour a bit less clear than it could be.
 
-Thanks
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
+ 1 file changed, 35 insertions(+), 25 deletions(-)
+
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 3e0be4d55f..392f90e0ae 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
+ddr eaddr,
+          */
+         raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
+=20
+-        /* In HV mode, add HRMOR if top EA bit is clear */
+-        if (msr_hv || !env->has_hv_mode) {
++        if (cpu->vhyp) {
++            /*
++             * In virtual hypervisor mode, there's nothing to do:
++             *   EA =3D=3D GPA =3D=3D qemu guest address
++             */
++        } else if (msr_hv || !env->has_hv_mode) {
++            /* In HV mode, add HRMOR if top EA bit is clear */
+             if (!(eaddr >> 63)) {
+                 raddr |=3D env->spr[SPR_HRMOR];
+             }
+-        } else {
+-            /* Otherwise, check VPM for RMA vs VRMA */
+-            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
+-                slb =3D &env->vrma_slb;
+-                if (slb->sps) {
+-                    goto skip_slb_search;
+-                }
+-                /* Not much else to do here */
++        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++            /* Emulated VRMA mode */
++            slb =3D &env->vrma_slb;
++            if (!slb->sps) {
++                /* Invalid VRMA setup, machine check */
+                 cs->exception_index =3D POWERPC_EXCP_MCHECK;
+                 env->error_code =3D 0;
+                 return 1;
+-            } else if (raddr < env->rmls) {
+-                /* RMA. Check bounds in RMLS */
+-                raddr |=3D env->spr[SPR_RMOR];
+-            } else {
+-                /* The access failed, generate the approriate interrupt =
+*/
++            }
++
++            goto skip_slb_search;
++        } else {
++            /* Emulated old-style RMO mode, bounds check against RMLS */
++            if (raddr >=3D env->rmls) {
+                 if (rwx =3D=3D 2) {
+                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
+                 } else {
+@@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vadd=
+r eaddr,
+                 }
+                 return 1;
+             }
++
++            raddr |=3D env->spr[SPR_RMOR];
+         }
+         tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE_M=
+ASK,
+                      PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
+@@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
+pu, target_ulong addr)
+         /* In real mode the top 4 effective address bits are ignored */
+         raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
+=20
+-        /* In HV mode, add HRMOR if top EA bit is clear */
+-        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
++        if (cpu->vhyp) {
++            /*
++             * In virtual hypervisor mode, there's nothing to do:
++             *   EA =3D=3D GPA =3D=3D qemu guest address
++             */
++            return raddr;
++        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
++            /* In HV mode, add HRMOR if top EA bit is clear */
+             return raddr | env->spr[SPR_HRMOR];
+-        }
+-
+-        /* Otherwise, check VPM for RMA vs VRMA */
+-        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
++            /* Emulated VRMA mode */
+             slb =3D &env->vrma_slb;
+             if (!slb->sps) {
+                 return -1;
+             }
+-        } else if (raddr < env->rmls) {
+-            /* RMA. Check bounds in RMLS */
+-            return raddr | env->spr[SPR_RMOR];
+         } else {
+-            return -1;
++            /* Emulated old-style RMO mode, bounds check against RMLS */
++            if (raddr >=3D env->rmls) {
++                return -1;
++            }
++            return raddr | env->spr[SPR_RMOR];
+         }
+     } else {
+         slb =3D slb_lookup(cpu, addr);
+--=20
+2.24.1
+
 
