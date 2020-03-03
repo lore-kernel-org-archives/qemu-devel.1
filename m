@@ -2,54 +2,53 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,TVD_SUBJ_WIPE_DEBT,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFDAC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF12C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0646621775
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B0DD21775
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:47:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DWGETtlX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0646621775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="l3qnHMeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B0DD21775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yWV-0001Ty-53
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:47:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35180)
+	id 1j8yWc-0001q0-6m
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:47:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTS-0004hP-TD
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:03 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTR-0002DK-UR
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTQ-0004h0-O7
  for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:02 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46657 helo=ozlabs.org)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTP-0002AM-6i
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:00 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:60509 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8yTR-0002B9-JX; Mon, 02 Mar 2020 22:44:01 -0500
+ id 1j8yTO-00026R-HL; Mon, 02 Mar 2020 22:43:59 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WjY60zGSz9sSm; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
+ id 48WjY56wz2z9sSN; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583207034;
- bh=/vRF7LH21Z9YI4tvoah84Uft6k1d+ANzUl5tBCjdNnw=;
+ d=gibson.dropbear.id.au; s=201602; t=1583207033;
+ bh=RZjMlsbNKA6+ViTuycxwZ7IU6OPn0vl7+MnQX6dTb5A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=DWGETtlXgzF/PESfABuObp+rDEyfOUmsC7/+E+MBpEeFHGDUV8dS7z0e3HdQV8leP
- NO3n4vovVJ1TqLSUBTdxKM0sUFUu4B+fdnmdk+LEEbx1sdyNtKuQDOV2i1MINcsIgO
- mkxoObd5IQAZ/HIzAg63UDCs4galKDEPjXfsj4G8=
+ b=l3qnHMeBVzoY4M0fOB+pMKoTXSs1S90xktvuX2s6M4elihIV+DArUbpHH+tIPHiYg
+ euX15cR2h9AqRthFFZLdDiUgnIs05jpDsuHUFyB4gArLdEyjDB2NWp2jXxLR+9aHC5
+ i5W9p6rYveZepzc7pmwdRRRqyi72JifRg1hWdIgY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-Subject: [PATCH v7 06/17] target/ppc: Remove RMOR register from POWER9 &
- POWER10
-Date: Tue,  3 Mar 2020 14:43:40 +1100
-Message-Id: <20200303034351.333043-7-david@gibson.dropbear.id.au>
+Subject: [PATCH v7 05/17] spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+Date: Tue,  3 Mar 2020 14:43:39 +1100
+Message-Id: <20200303034351.333043-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
@@ -82,63 +81,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we create the Real Mode Offset Register (RMOR) on all Book3S cp=
-us
-from POWER7 onwards.  However the translation mode which the RMOR control=
-s
-is no longer supported in POWER9, and so the register has been removed fr=
-om
-the architecture.
+For the "pseries" machine, we use "virtual hypervisor" mode where we
+only model the CPU in non-hypervisor privileged mode.  This means that
+we need guest physical addresses within the modelled cpu to be treated
+as absolute physical addresses.
 
-Remove it from our model on POWER9 and POWER10.
+We used to do that by clearing LPCR[VPM0] and setting LPCR[RMLS] to a hig=
+h
+limit so that the old offset based translation for guest mode applied,
+which does what we need.  However, POWER9 has removed support for that
+translation mode, which meant we had some ugly hacks to keep it working.
+
+We now explicitly handle this sort of translation for virtual hypervisor
+mode, so the hacks aren't necessary.  We don't need to set VPM0 and RMLS
+from the machine type code - they're now ignored in vhyp mode.  On the cp=
+u
+side we don't need to allow LPCR[RMLS] to be set on POWER9 in vhyp mode -
+that was only there to allow the hack on the machine side.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- target/ppc/translate_init.inc.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/ppc/spapr_cpu_core.c | 10 +---------
+ target/ppc/mmu-hash64.c |  8 --------
+ 2 files changed, 1 insertion(+), 17 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index aecad96db3..f7acd3d61d 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8015,12 +8015,16 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  &spr_read_generic, &spr_write_generic,
-                  0x00000000);
--    spr_register_hv(env, SPR_RMOR, "RMOR",
-+    spr_register_hv(env, SPR_HRMOR, "HRMOR",
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  &spr_read_generic, &spr_write_generic,
-                  0x00000000);
--    spr_register_hv(env, SPR_HRMOR, "HRMOR",
-+}
-+
-+static void gen_spr_rmor(CPUPPCState *env)
-+{
-+    spr_register_hv(env, SPR_RMOR, "RMOR",
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  &spr_read_generic, &spr_write_generic,
-@@ -8497,6 +8501,7 @@ static void init_proc_POWER7(CPUPPCState *env)
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index d09125d9af..36ed3a2b66 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -50,22 +50,14 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+      * the settings below ensure proper operations with TCG in absence o=
+f
+      * a real hypervisor.
+      *
+-     * Clearing VPM0 will also cause us to use RMOR in mmu-hash64.c for
+-     * real mode accesses, which thankfully defaults to 0 and isn't
+-     * accessible in guest mode.
+-     *
+      * Disable Power-saving mode Exit Cause exceptions for the CPU, so
+      * we don't get spurious wakups before an RTAS start-cpu call.
+      * For the same reason, set PSSCR_EC.
+      */
+-    lpcr &=3D ~(LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_=
+pm);
++    lpcr &=3D ~(LPCR_VPM1 | LPCR_ISL | LPCR_KBV | pcc->lpcr_pm);
+     lpcr |=3D LPCR_LPES0 | LPCR_LPES1;
+     env->spr[SPR_PSSCR] |=3D PSSCR_EC;
 =20
-     /* POWER7 Specific Registers */
-     gen_spr_book3s_ids(env);
-+    gen_spr_rmor(env);
-     gen_spr_amr(env);
-     gen_spr_book3s_purr(env);
-     gen_spr_power5p_common(env);
-@@ -8637,6 +8642,7 @@ static void init_proc_POWER8(CPUPPCState *env)
+-    /* Set RMLS to the max (ie, 16G) */
+-    lpcr &=3D ~LPCR_RMLS;
+-    lpcr |=3D 1ull << LPCR_RMLS_SHIFT;
+-
+     ppc_store_lpcr(cpu, lpcr);
 =20
-     /* POWER8 Specific Registers */
-     gen_spr_book3s_ids(env);
-+    gen_spr_rmor(env);
-     gen_spr_amr(env);
-     gen_spr_iamr(env);
-     gen_spr_book3s_purr(env);
+     /* Set a full AMOR so guest can use the AMR as it sees fit */
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index e372c42add..caf47ad6fc 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -1126,14 +1126,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong =
+val)
+                       (LPCR_PECE_L_MASK & (LPCR_PDEE | LPCR_HDEE | LPCR_=
+EEE |
+                       LPCR_DEE | LPCR_OEE)) | LPCR_MER | LPCR_GTSE | LPC=
+R_TC |
+                       LPCR_HEIC | LPCR_LPES0 | LPCR_HVICE | LPCR_HDICE);
+-        /*
+-         * If we have a virtual hypervisor, we need to bring back RMLS. =
+It
+-         * doesn't exist on an actual P9 but that's all we know how to
+-         * configure with softmmu at the moment
+-         */
+-        if (cpu->vhyp) {
+-            lpcr |=3D (val & LPCR_RMLS);
+-        }
+         break;
+     default:
+         g_assert_not_reached();
 --=20
 2.24.1
 
