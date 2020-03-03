@@ -2,62 +2,61 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E62C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C707DC3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A214D20848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9037F20848
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:45:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="O8UlsR8g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A214D20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="P/Ih99KI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9037F20848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yUe-0006nU-Q8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:45:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35131)
+	id 1j8yUm-00076V-OX
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:45:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTQ-0004h2-Iq
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:02 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTW-0004iR-FG
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTP-0002AR-6n
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:00 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:36999 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTU-0002G9-VT
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:06 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:33891)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8yTO-00026Q-EG; Mon, 02 Mar 2020 22:43:59 -0500
+ id 1j8yTU-0002DO-KF; Mon, 02 Mar 2020 22:44:04 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WjY55Kkzz9sSL; Tue,  3 Mar 2020 14:43:53 +1100 (AEDT)
+ id 48WjY62wLMz9sSv; Tue,  3 Mar 2020 14:43:54 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1583207033;
- bh=+B1mCWC4t6yy2Tx65wsvNsRLsoZ3PfvGpSRZfwW2BjM=;
+ d=gibson.dropbear.id.au; s=201602; t=1583207034;
+ bh=CNGNoWBDg1Acq743/KcXwSIZ8/xFmXqw93dt9AzxOCA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O8UlsR8gsVwFlOGQaLFH+lELbjuhslpgh68zdKEJNI+GXC/wybW8vPlto8JwcxKWf
- j27xHt9+OvSfWMgqnjktI9GhqemIiVBMibD/vQ/1O1WqtXMq6NUgdnJspJukyv1URH
- ldktS/YqlH3DFVCw8YPOBMewDG2GUGxqFBKxXk6A=
+ b=P/Ih99KI1vvRjAFWZmH+nurbZFZkZvTmaByA2tcvMS+NaaC8xvCj/EF3C2AO92/b9
+ h0aOIRrCwpBFfST9pkTu6L4u3YlXG9C3co376GXAHsJHyqmgtBKplEIF3g97j8VGhx
+ /XbcFPS3eLtalc6DXHVdhRFcB1/dyA0KZLvMDnlo=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-Subject: [PATCH v7 02/17] ppc: Remove stub of PPC970 HID4 implementation
-Date: Tue,  3 Mar 2020 14:43:36 +1100
-Message-Id: <20200303034351.333043-3-david@gibson.dropbear.id.au>
+Subject: [PATCH v7 13/17] spapr,ppc: Simplify signature of kvmppc_rma_size()
+Date: Tue,  3 Mar 2020 14:43:47 +1100
+Message-Id: <20200303034351.333043-14-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,126 +74,114 @@ Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  Paolo Bonzini <pbonzini@redhat.com>, paulus@samba.org,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Cedric Le Goater <clg@fr.ibm.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capabilit=
-y.
-However, it can be (and often was) strapped into "Apple mode", where the
-hypervisor capabilities were disabled (essentially putting it always in
-hypervisor mode).
+This function calculates the maximum size of the RMA as implied by the
+host's page size of structure of the VRMA (there are a number of other
+constraints on the RMA size which will supersede this one in many
+circumstances).
 
-That's actually the only mode of the 970 we support in qemu, and we're
-unlikely to change that any time soon.  However, we do have a partial
-implementation of the 970's HID4 register which affects things only
-relevant for hypervisor mode.
+The current interface takes the current RMA size estimate, and clamps it
+to the VRMA derived size.  The only current caller passes in an arguably
+wrong value (it will match the current RMA estimate in some but not all
+cases).
 
-That stub is also really ugly, since it attempts to duplicate the effects
-of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
-in a really confusing way.
+We want to fix that, but for now just keep concerns separated by having t=
+he
+KVM helper function just return the VRMA derived limit, and let the calle=
+r
+combine it with other constraints.  We call the new function
+kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
 
-Just get rid of it.
+The helper should only ever be called in the KVM enabled case, so replace
+its !CONFIG_KVM stub with an assert() rather than a dummy value.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- target/ppc/mmu-hash64.c         | 29 +----------------------------
- target/ppc/translate_init.inc.c | 20 ++++++++------------
- 2 files changed, 9 insertions(+), 40 deletions(-)
+ hw/ppc/spapr.c       | 5 +++--
+ target/ppc/kvm.c     | 5 ++---
+ target/ppc/kvm_ppc.h | 7 +++----
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index da8966ccf5..3e0be4d55f 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong =
-val)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 510494ad87..18bf4bc3de 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1586,8 +1586,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *sp=
+apr)
+     spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
 =20
-     /* Filter out bits */
-     switch (env->mmu_model) {
--    case POWERPC_MMU_64B: /* 970 */
--        if (val & 0x40) {
--            lpcr |=3D LPCR_LPES0;
--        }
--        if (val & 0x8000000000000000ull) {
--            lpcr |=3D LPCR_LPES1;
--        }
--        if (val & 0x20) {
--            lpcr |=3D (0x4ull << LPCR_RMLS_SHIFT);
--        }
--        if (val & 0x4000000000000000ull) {
--            lpcr |=3D (0x2ull << LPCR_RMLS_SHIFT);
--        }
--        if (val & 0x2000000000000000ull) {
--            lpcr |=3D (0x1ull << LPCR_RMLS_SHIFT);
--        }
--        env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
--
--        /*
--         * XXX We could also write LPID from HID4 here
--         * but since we don't tag any translation on it
--         * it doesn't actually matter
--         *
--         * XXX For proper emulation of 970 we also need
--         * to dig HRMOR out of HID5
--         */
--        break;
-     case POWERPC_MMU_2_03: /* P5p */
-         lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
-                       LPCR_LPES0 | LPCR_LPES1 |
-@@ -1154,7 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
-al)
-         }
-         break;
-     default:
--        ;
-+        g_assert_not_reached();
+     if (spapr->vrma_adjust) {
+-        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(MACHINE(spa=
+pr)),
+-                                          spapr->htab_shift);
++        hwaddr vrma_limit =3D kvmppc_vrma_limit(spapr->htab_shift);
++
++        spapr->rma_size =3D MIN(spapr_node0_size(MACHINE(spapr)), vrma_l=
+imit);
      }
-     env->spr[SPR_LPCR] =3D lpcr;
-     ppc_hash64_update_rmls(cpu);
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index df3401cf06..aecad96db3 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -7895,25 +7895,21 @@ static void spr_write_lpcr(DisasContext *ctx, int=
- sprn, int gprn)
- {
-     gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
  }
--
--static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
--{
--#if defined(TARGET_PPC64)
--    spr_write_generic(ctx, sprn, gprn);
--    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
--#endif
--}
--
- #endif /* !defined(CONFIG_USER_ONLY) */
 =20
- static void gen_spr_970_lpar(CPUPPCState *env)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 7f44b1aa1a..597f72be1b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2113,7 +2113,7 @@ void kvmppc_error_append_smt_possible_hint(Error *c=
+onst *errp)
+=20
+=20
+ #ifdef TARGET_PPC64
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
  {
- #if !defined(CONFIG_USER_ONLY)
--    /* Logical partitionning */
--    /* PPC970: HID4 is effectively the LPCR */
-+    /*
-+     * PPC970: HID4 covers things later controlled by the LPCR and
-+     * RMOR in later CPUs, but with a different encoding.  We only
-+     * support the 970 in "Apple mode" which has all hypervisor
-+     * facilities disabled by strapping, so we can basically just
-+     * ignore it
-+     */
-     spr_register(env, SPR_970_HID4, "HID4",
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_970_hid4,
-+                 &spr_read_generic, &spr_write_generic,
-                  0x00000000);
- #endif
+     struct kvm_ppc_smmu_info info;
+     long rampagesize, best_page_shift;
+@@ -2140,8 +2140,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, uns=
+igned int hash_shift)
+         }
+     }
+=20
+-    return MIN(current_size,
+-               1ULL << (best_page_shift + hash_shift - 7));
++    return 1ULL << (best_page_shift + hash_shift - 7);
  }
+ #endif
+=20
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 9e4f2357cc..332fa0aa1c 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -47,7 +47,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t =
+page_shift,
+                               int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+-uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)=
+;
++uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
+ bool kvmppc_has_cap_spapr_vfio(void);
+ #endif /* !CONFIG_USER_ONLY */
+ bool kvmppc_has_cap_epr(void);
+@@ -255,10 +255,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
+     return 0;
+ }
+=20
+-static inline uint64_t kvmppc_rma_size(uint64_t current_size,
+-                                       unsigned int hash_shift)
++static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
+ {
+-    return ram_size;
++    g_assert_not_reached();
+ }
+=20
+ static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
 --=20
 2.24.1
 
