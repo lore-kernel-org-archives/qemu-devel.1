@@ -2,104 +2,65 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 538CCC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A757C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BF7221D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:11:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fC2sxLJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF7221D56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF1CE2467E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:19:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1CE2467E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vA9-0006qa-BX
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:11:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40471)
+	id 1j8vHj-0000W1-5p
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:19:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1j8v9U-0006EM-JF
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:13 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1j8vH9-00006m-Vl
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:19:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1j8v9T-0007vI-G8
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:12 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41719)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1j8v9T-0007uE-97
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:11:11 -0500
-Received: by mail-pg1-x542.google.com with SMTP id b1so619522pgm.8
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:11:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HARsVpylA93jQk3wr5knnUeg3ev/jLI7nAcGD3O8xb4=;
- b=fC2sxLJxb5FXTbVl9425cnwM8p9b62I5TAnN/sF9iKvbiirxiRz2YtzWAuljAGODtm
- weZcvwHWtozJUP34e8u90QMCpPvAXSAbNalm+ZYHYVlhzFSpVVesJCbLLCj3WtNwb6cz
- 1kZ0sod6WVgRGKajxji8GZ9bgr13T/e0GagYRBC0jg0y3EVTLyB82p01AS7/bcfUj+to
- 1tHeq+ngLIwKXQaVIeClCiUX4cu1yfOD+snYLEziu0lFD733ksneESlL+2qhP0/DyQkZ
- 4Buy6NZhwvGC0KJjyhRKYWDoUGs2NS626iXL32TqZanaT6o9G1HGbliXKEyAsusnBmLM
- FzEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HARsVpylA93jQk3wr5knnUeg3ev/jLI7nAcGD3O8xb4=;
- b=iBPcHvijPVsG2jUr7sKnRR61b4BvAbyS1/+zNUdoE1kmK6YA+eWHM8Sx24DjC2BaVS
- qCT7kNqhhSX0lqKxjtHmA46F/Qmxr2CG0C/ZjesqBf0ESqSu9+GPoorzODF/AjDxAZJH
- h1lx+VaEpFM/HIxlcI4/N/ZrLRzhNfz/wMM/9RF8ZnhNxSWM2t4x2tMmV0Ww3MIPGZyC
- yWROGyA/MpaB9KXTbYkqxNtMyMqqabndpoEi+4g3Pdz0NfIBvgxTFYXVZrsRfvSiMIvZ
- qGZ8FfGMpmsaVbpcMjtsOp4SkwO7FNIkK/Lzp78Opnq4flIburgsreeKTwuzgsg9aPuD
- wpJQ==
-X-Gm-Message-State: ANhLgQ0bFl4rpTwfJsQM8pNuydgo6fVY5jMdl+F90rn9nIIY0T2cXCpX
- Yaz/pxuYgk00VczWi7Eygwutfw==
-X-Google-Smtp-Source: ADFU+vuWie7Eyed1pn0MdgOOLVGmwm+Brkf9isSyLR4GbeS8Omkb3z4kCRMvnfS6ljVGp7NrPbdd1A==
-X-Received: by 2002:aa7:829a:: with SMTP id s26mr1494647pfm.64.1583194270125; 
- Mon, 02 Mar 2020 16:11:10 -0800 (PST)
-Received: from [192.168.1.11] (97-126-123-70.tukw.qwest.net. [97.126.123.70])
- by smtp.gmail.com with ESMTPSA id
- w128sm21891692pgb.55.2020.03.02.16.11.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Mar 2020 16:11:09 -0800 (PST)
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87eeuhxw0y.fsf@linaro.org>
- <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
- <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
- <878skpxltm.fsf@linaro.org> <FE03C155-E46D-4925-BA2B-FABBE2518C8C@gmail.com>
- <2576fd41-8b01-91a0-ca56-792ce65b5092@linaro.org>
- <alpine.BSF.2.22.395.2003021218180.72848@zero.eik.bme.hu>
- <d136165f-46c7-8983-9725-2b224742deef@linaro.org>
- <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ffecedad-d695-ebef-d494-fce307631223@linaro.org>
-Date: Mon, 2 Mar 2020 16:11:06 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <tao3.xu@intel.com>) id 1j8vH8-0002Xl-5f
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:19:07 -0500
+Received: from mga17.intel.com ([192.55.52.151]:39107)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1j8vH7-0002XL-Tf
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:19:06 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Mar 2020 16:19:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.70,509,1574150400"; d="scan'208";a="233392153"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.238.4.86])
+ ([10.238.4.86])
+ by orsmga008.jf.intel.com with ESMTP; 02 Mar 2020 16:19:00 -0800
+Subject: Re: [PATCH v3 2/4] target/i386: Remove monitor from some CPU models
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20200212081328.7385-1-tao3.xu@intel.com>
+ <20200212081328.7385-3-tao3.xu@intel.com>
+ <20200228213909.GA481504@habkost.net>
+ <06a6cd99-7d11-7eee-c337-c71e756fc53f@intel.com>
+ <20200302171901.GI4440@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <37b090a9-234d-834f-0c48-70c62787d517@intel.com>
+Date: Tue, 3 Mar 2020 08:18:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20200302171901.GI4440@habkost.net>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,33 +72,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Programmingkid <programmingkidx@gmail.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, luigi burdo <intermediadc@hotmail.com>,
- Dino Papararo <skizzato73@msn.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/2/20 3:16 PM, BALATON Zoltan wrote:
->> (2) IEEE has a number of implementation choices for corner cases, and we need
->> to implement the target's choices, not the host's choices.
+On 3/3/2020 1:19 AM, Eduardo Habkost wrote:
+> On Mon, Mar 02, 2020 at 07:47:28PM +0800, Tao Xu wrote:
+>> On 2/29/2020 5:39 AM, Eduardo Habkost wrote:
+>>> On Wed, Feb 12, 2020 at 04:13:26PM +0800, Tao Xu wrote:
+>>>> Add new version of Snowridge, Denverton, Opteron_G3, EPYC, and Dhyana
+>>>> CPU model to uremove MONITOR/MWAIT featre.
+>>>>
+>>>> After QEMU/KVM use "-overcommit cpu-pm=on" to expose MONITOR/MWAIT
+>>>> (commit id 6f131f13e68d648a8e4f083c667ab1acd88ce4cd), the MONITOR/MWAIT
+>>>> feature in these CPU model is unused.
+>>>>
+>>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>>>
+>>> What exactly is the problem you are trying to fix?
+>>>
+>>> No CPU model will ever have monitor=on set by default with KVM,
+>>> because kvm_default_props has a monitor=off element.
+>>>
+>>
+>> Maybe it is not a fix. For example, when we boot a guest with Denverton
+>> cpu model, guest cannot detect MONITOR/MWAIT and boot with no warning,
+>> because of "monitor=off" by default. The MONITOR/MWAIT feature in these CPU
+>> model is unused,but no harm. I am wondering if we should remove it from
+>> existing CPU models.
 > 
-> But how is that related to inexact flag and float_round_nearest_even rounding
-> mode which are the only two things can_use_fpu() function checks for?
-
-float_round_nearest_even is the default rounding mode, and is what the host fpu
-has been set for.  In order to use hardfloat for a different rounding mode, we
-would need to change the host fpu control register, which is slow.
-
-Inexact is the only flag that we cannot compute easily from the inputs and
-output.  We check for NaN and Inf as inputs and outputs,
-which is the clue that we may have to raise Invalid or Overflow.
-
-
-r~
+> As monitor=off is on kvm_default_props, changing the CPU model
+> table will only affect other accelerators (e.g. TCG, where
+> MONITOR/MWAIT support is advertised as supported).
+> 
+> We shouldn't be dictating policy for other accelerators just
+> because KVM doesn't support it.  Removing the feature on
+> kvm_default_props is sufficient.
+> 
+I understand, thanks.
 
