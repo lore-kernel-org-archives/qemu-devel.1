@@ -6,78 +6,77 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F4FC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEEFC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:39:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFAF1215A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:39:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65F7C215A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 16:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cS0XFo8N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFAF1215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BH/0nQK9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65F7C215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9AZg-0002Ym-Tf
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:39:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56830)
+	id 1j9Aa5-0003Ba-Ib
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 11:39:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1j9AVq-0004I5-N2
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:19 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1j9AVp-000307-Hi
+ (envelope-from <armbru@redhat.com>) id 1j9AVp-0004Ga-5U
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59592
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVp-0002zr-Dw
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1j9AVn-0002z6-Ry
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55051
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j9AVn-0002yv-OQ
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 11:35:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583253317;
+ s=mimecast20190719; t=1583253315;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iQ4eJHnp2DxKvrJF29stLYX3uThsxgfJxa46sj2Ia6g=;
- b=cS0XFo8NzybNfiyjXtKS4t1i0VWMUXFEW1Dg2+qXZ8cZxaT8cZiTkG51S2THOZUAD89l8k
- 9bppZJAzgv7c+Epg5ciTePcEG5HpJwPV/uWJOBzuitlSj0p48D9R0HpKQfKhIkIMW0337b
- MdBQlHLj/LEp4CUELODDG1hBJPSoo60=
+ bh=VNM4FcuvpDlHlX1gsPH6mZYVPEgw3i0rjSojdcghyfE=;
+ b=BH/0nQK90s7NvJbu1ZGgo3i+hoRo/9x/T77YuUwIkfwsl0zcUvq5sirXQHTFR+ys+sC1K4
+ 6KLXAb9WPEqwvHrrgNuV+68D6WmYClus9rp9HO3JcWVkUYow7RELQ3aPBprIRPUq3GPKTB
+ OWJRW04RsfPHN9rDYPQEMihxdtYy3sU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-SQ-tv8YPNzSA75yZOjvYsw-1; Tue, 03 Mar 2020 11:35:11 -0500
-X-MC-Unique: SQ-tv8YPNzSA75yZOjvYsw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-373-fwm9goPfMby_M_ayFfNR2A-1; Tue, 03 Mar 2020 11:35:13 -0500
+X-MC-Unique: fwm9goPfMby_M_ayFfNR2A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B662800D5F;
- Tue,  3 Mar 2020 16:35:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88BF0800D5F;
+ Tue,  3 Mar 2020 16:35:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
  [10.36.116.129])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C3B710013A1;
- Tue,  3 Mar 2020 16:35:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E82F5D9C9;
+ Tue,  3 Mar 2020 16:35:11 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B293C11385ED; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
+ id CC33011336BC; Tue,  3 Mar 2020 17:35:05 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/30] qemu-doc: Belatedly document QMP command arg &
- result deprecation
-Date: Tue,  3 Mar 2020 17:34:36 +0100
-Message-Id: <20200303163505.32041-2-armbru@redhat.com>
+Subject: [PATCH v2 09/30] tests/test-qmp-event: Use qobject_is_equal()
+Date: Tue,  3 Mar 2020 17:34:44 +0100
+Message-Id: <20200303163505.32041-10-armbru@redhat.com>
 In-Reply-To: <20200303163505.32041-1-armbru@redhat.com>
 References: <20200303163505.32041-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,113 +93,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A number of deprecated QMP arguments and results were missed in commit
-eb22aeca65 "docs: document deprecation policy & deprecated features in
-appendix" (v2.10.0):
-
-* Commit b33945cfff "block: Accept device model name for
-  blockdev-open/close-tray" (v2.8.0) deprecated blockdev-open-tray,
-  blockdev-close-tray argument @device.
-
-* Commit fbe2d8163e "block: Accept device model name for eject"
-  (v2.8.0) deprecated eject argument @device.
-
-* Commit 70e2cb3bd7 "block: Accept device model name for
-  blockdev-change-medium" (v2.8.0) deprecated blockdev-change-medium
-  argument @device.
-
-* Commit 7a9877a026 "block: Accept device model name for
-  block_set_io_throttle" (v2.8.0) deprecated block_set_io_throttle
-  argument @device.
-
-* Commit c01c214b69 "block: remove all encryption handling APIs"
-  (v2.10.0) deprecated query-named-block-nodes result
-  @encryption_key_missing and query-block result @inserted member
-  @encryption_key_missing.
-
-* Commit c42e8742f5 "block: Use JSON null instead of "" to disable
-  backing file" (v2.10.0) deprecated blockdev-add empty string
-  argument @backing.
-
-Since then, we missed a few more:
-
-* Commit 3c605f4074 "commit: Add top-node/base-node options" (v3.1.0)
-  deprecated block-commit arguments @base and @top.
-
-* Commit 4db6ceb0b5 "block/dirty-bitmap: add recording and busy
-  properties" (v4.0.0) deprecated query-named-block-nodes result
-  @dirty-bitmaps member @status, not just query-block.
-
-Make up for all that.
+Locally defined helper qdict_cmp_simple() implements just enough of a
+comparison to serve here.  Replace it by qobject_is_equal(), which
+implements all of it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qemu-deprecated.texi | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
+ tests/test-qmp-event.c | 66 +-----------------------------------------
+ 1 file changed, 1 insertion(+), 65 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 66eca3a1de..b9ef56fd97 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -150,19 +150,51 @@ Use @option{-display sdl,show-cursor=3Don} or
+diff --git a/tests/test-qmp-event.c b/tests/test-qmp-event.c
+index 430001e622..d64066139c 100644
+--- a/tests/test-qmp-event.c
++++ b/tests/test-qmp-event.c
+@@ -28,73 +28,9 @@ typedef struct TestEventData {
+     QDict *expect;
+ } TestEventData;
 =20
- Use ``blockdev-change-medium'' or ``change-vnc-password'' instead.
+-typedef struct QDictCmpData {
+-    QDict *expect;
+-    bool result;
+-} QDictCmpData;
+-
+ TestEventData *test_event_data;
+ static GMutex test_event_lock;
 =20
-+@subsection blockdev-open-tray, blockdev-close-tray argument device (since=
- 2.8.0)
-+
-+Use argument ``id'' instead.
-+
-+@subsection eject argument device (since 2.8.0)
-+
-+Use argument ``id'' instead.
-+
-+@subsection blockdev-change-medium argument device (since 2.8.0)
-+
-+Use argument ``id'' instead.
-+
-+@subsection block_set_io_throttle argument device (since 2.8.0)
-+
-+Use argument ``id'' instead.
-+
- @subsection migrate_set_downtime and migrate_set_speed (since 2.8.0)
+-/* Only compares bool, int, string */
+-static
+-void qdict_cmp_do_simple(const char *key, QObject *obj1, void *opaque)
+-
+-{
+-    QObject *obj2;
+-    QDictCmpData d_new, *d =3D opaque;
+-    int64_t val1, val2;
+-
+-    if (!d->result) {
+-        return;
+-    }
+-
+-    obj2 =3D qdict_get(d->expect, key);
+-    if (!obj2) {
+-        d->result =3D false;
+-        return;
+-    }
+-
+-    if (qobject_type(obj1) !=3D qobject_type(obj2)) {
+-        d->result =3D false;
+-        return;
+-    }
+-
+-    switch (qobject_type(obj1)) {
+-    case QTYPE_QBOOL:
+-        d->result =3D (qbool_get_bool(qobject_to(QBool, obj1)) =3D=3D
+-                     qbool_get_bool(qobject_to(QBool, obj2)));
+-        return;
+-    case QTYPE_QNUM:
+-        g_assert(qnum_get_try_int(qobject_to(QNum, obj1), &val1));
+-        g_assert(qnum_get_try_int(qobject_to(QNum, obj2), &val2));
+-        d->result =3D val1 =3D=3D val2;
+-        return;
+-    case QTYPE_QSTRING:
+-        d->result =3D g_strcmp0(qstring_get_str(qobject_to(QString, obj1))=
+,
+-                              qstring_get_str(qobject_to(QString, obj2))) =
+=3D=3D 0;
+-        return;
+-    case QTYPE_QDICT:
+-        d_new.expect =3D qobject_to(QDict, obj2);
+-        d_new.result =3D true;
+-        qdict_iter(qobject_to(QDict, obj1), qdict_cmp_do_simple, &d_new);
+-        d->result =3D d_new.result;
+-        return;
+-    default:
+-        abort();
+-    }
+-}
+-
+-static bool qdict_cmp_simple(QDict *a, QDict *b)
+-{
+-    QDictCmpData d;
+-
+-    d.expect =3D b;
+-    d.result =3D true;
+-    qdict_iter(a, qdict_cmp_do_simple, &d);
+-    return d.result;
+-}
+-
+ void test_qapi_event_emit(test_QAPIEvent event, QDict *d)
+ {
+     QDict *t;
+@@ -115,7 +51,7 @@ void test_qapi_event_emit(test_QAPIEvent event, QDict *d=
+)
 =20
- Use ``migrate-set-parameters'' instead.
+     qdict_del(d, "timestamp");
 =20
-+@subsection query-named-block-nodes result encryption_key_missing (since 2=
-.10.0)
-+
-+Always false.
-+
-+@subsection query-block result inserted.encryption_key_missing (since 2.10=
-.0)
-+
-+Always false.
-+
-+@subsection blockdev-add empty string argument backing (since 2.10.0)
-+
-+Use argument ``null'' instead.
-+
- @subsection migrate-set-cache-size and query-migrate-cache-size (since 2.1=
-1.0)
+-    g_assert(qdict_cmp_simple(d, test_event_data->expect));
++    g_assert(qobject_is_equal(QOBJECT(d), QOBJECT(test_event_data->expect)=
+));
 =20
- Use ``migrate-set-parameters'' and ``query-migrate-parameters'' instead.
-=20
--@subsection query-block result field dirty-bitmaps[i].status (since 4.0)
-+@subsection block-commit arguments base and top (since 3.1.0)
-+
-+Use arguments ``base-node'' and ``top-node'' instead.
-+
-+@subsection query-named-block-nodes and query-block result dirty-bitmaps[i=
-].status (since 4.0)
-=20
- The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
--the query-block command is deprecated. Two new boolean fields,
--``recording'' and ``busy'' effectively replace it.
-+these commands is deprecated. Two new boolean fields, ``recording'' and
-+``busy'' effectively replace it.
-=20
- @subsection query-block result field dirty-bitmaps (Since 4.2)
+ }
 =20
 --=20
 2.21.1
