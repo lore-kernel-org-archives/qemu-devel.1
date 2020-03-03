@@ -1,150 +1,83 @@
 Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 123FDC3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 589CAC3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:46:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5D8420848
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D8420848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 137B72073B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 12:46:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcRkH0fz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137B72073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j96tf-00082z-Ut
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 07:43:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47860)
+	id 1j96w8-00013m-8u
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 07:46:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1j96t1-0007c3-AF
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:43:00 -0500
+ (envelope-from <priyamvad.agnisys@gmail.com>) id 1j96vL-0000Rs-Ca
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1j96t0-0002kl-3O
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:42:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64672
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1j96sz-0002kU-V6
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:42:58 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 023Ccf8L011179
- for <qemu-devel@nongnu.org>; Tue, 3 Mar 2020 07:42:56 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2yfmyrq2md-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 07:42:55 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 3 Mar 2020 12:42:54 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 3 Mar 2020 12:42:51 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 023Cfq6C50856286
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 3 Mar 2020 12:41:52 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4F4B511C04C;
- Tue,  3 Mar 2020 12:42:50 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 158FC11C050;
- Tue,  3 Mar 2020 12:42:50 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.219])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  3 Mar 2020 12:42:50 +0000 (GMT)
-Subject: Re: [PATCH v5 07/18] s390x: protvirt: Inhibit balloon when switching
- to protected mode
-To: Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>
-References: <20200226122038.61481-1-frankja@linux.ibm.com>
- <20200226122038.61481-8-frankja@linux.ibm.com>
- <ed51d194-1b63-1c54-953a-d2031336a90e@redhat.com>
- <9e8c83c2-5d17-2887-4073-698c12c40e79@de.ibm.com>
- <53287b24-6cab-2110-226c-f10cef3c8eb0@redhat.com>
- <556c23cb-7648-f4f6-aef4-728a164d9502@linux.ibm.com>
- <20200226192404.57b6ef61.cohuck@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Tue, 3 Mar 2020 13:42:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (envelope-from <priyamvad.agnisys@gmail.com>) id 1j96vJ-0003wL-JI
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:45:23 -0500
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:40903)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <priyamvad.agnisys@gmail.com>)
+ id 1j96vJ-0003vh-5R
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 07:45:21 -0500
+Received: by mail-lf1-x143.google.com with SMTP id p5so2610670lfc.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 04:45:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EWZMZUn4u7MXn/RjQmM8fUvsuLdlPL7FWFi77YgUC6Q=;
+ b=GcRkH0fz8Chsp7+Nrg4E5TuCqvMoR7n99nYpisgFGyQU+VAfMCiyDWaj6biNWzr4e1
+ VrFWA/JrL/Le5qA4H6oi7N4pgX0oCVf177+RwM59xgB49hpnqtTkUMEGmLndVbHsxpEk
+ 1JTdrLzTalOs5g0tuvnXg0MtRaU151R7ix+8HA6oVrjOmwv43ZUCBQR1mO39z2beTMQ4
+ TwljL7YCJEUHBm529ZfvjvL0m3eRHVcIAAi4782TAMff44T99hx+FrJ5GYxjrSpb82bD
+ 5KsqeoM1SgBGmw4aSl0dRoG0lM7bIepHLKZlyoIaER3hI51XHVxAMvUBQZpbgMpjc+GE
+ pCvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EWZMZUn4u7MXn/RjQmM8fUvsuLdlPL7FWFi77YgUC6Q=;
+ b=qXBGS3P9faRwFdDPxE14Pm/+sStNjSmyXWcubDQLFXLL2Cdoe/+8Y+4C0v0QbS+Jct
+ nR5zJhz80Df2NviZQlaTgMHyQvD4eVJMijKV/rUdYKja/pGmCvN7yr3WvNXqY1gNoFSM
+ AXZmrncJDkcAJDqDne2CRkoeIj+iSD9h3jnchigCRzCfDKllrTsIdQ5zfClbQATX0VDQ
+ W4BW/GnstoKFY4LHMZfjJ6OS4Nyr+x6Sr4BDz+pLhsJFUsXvBiDYq0Z4jUPsx6wt9Pzo
+ B10joAzrOeQeerJf5Av9JF2I7/mtyUPmpinr6spe79XTbNbyoryeqEpdzWwvJfJDsAUG
+ ZOgA==
+X-Gm-Message-State: ANhLgQ2vFgCQ5h6Epzx1cK4aKzGQjS4975Fan/nItPBRWMRgiNGSXdVZ
+ JFB5CIuAFPeO9FK2x0svmNd088kR0jIvLpJ1GaU=
+X-Google-Smtp-Source: ADFU+vvob4xzgZG4D7jGSitXhIW7v439wp9JrAYaI8oeJywVdtYi9fHgCEYlS+oAKewHL6iNsreOM4ezfWj94dzpUJk=
+X-Received: by 2002:ac2:4c82:: with SMTP id d2mr2790085lfl.78.1583239519312;
+ Tue, 03 Mar 2020 04:45:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200226192404.57b6ef61.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20030312-0008-0000-0000-00000358E814
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030312-0009-0000-0000-00004A7A16F1
-Message-Id: <1f8e0553-5593-15bb-3a79-1b2bb8557aa9@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-03_04:2020-03-03,
- 2020-03-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=999 malwarescore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2003030096
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
+References: <CAPV47zf2Bz1xNTcD_1M=hf7tyVnCYh8yLagN=r8ocgrz2GT2Hw@mail.gmail.com>
+ <20200302173604.GB682016@stefanha-x1.localdomain>
+ <CAPV47zdPz+Z5=bOFNGjTG8nEWgH4gb78_AE3SGU0TD_7TNmSLw@mail.gmail.com>
+ <CAJSP0QXd9fhz45OdA190XizdiwYF84UzHhD7QQVdzh9293iH9A@mail.gmail.com>
+In-Reply-To: <CAJSP0QXd9fhz45OdA190XizdiwYF84UzHhD7QQVdzh9293iH9A@mail.gmail.com>
+From: Priyamvad Acharya <priyamvad.agnisys@gmail.com>
+Date: Tue, 3 Mar 2020 18:15:07 +0530
+Message-ID: <CAPV47zdueruup1R0yCv9adLSTJTF-qmZiUotyL3G7udL732AuQ@mail.gmail.com>
+Subject: Re: New Hardware model emulation
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000024b235059ff2ad51"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,89 +89,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--00000000000024b235059ff2ad51
+Content-Type: multipart/alternative; boundary="00000000000024b233059ff2ad4f"
+
+--00000000000024b233059ff2ad4f
+Content-Type: text/plain; charset="UTF-8"
+
+Thanks Stefan for explaining the method.
+After following above method when I run below command to compile my custom
+device in Qemu source code , I get the output on terminal which is attached
+in a file for your reference.
+
+Command:- make -j8 -C build
+
+Most of the lines in attached file indicate that error might be due to
+helper.c file.
+
+How to resolve it?
+
+My qemu version:4.2.50
 
 
-On 26.02.20 19:24, Cornelia Huck wrote:
-> On Wed, 26 Feb 2020 16:30:32 +0100
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> On 2/26/20 4:16 PM, David Hildenbrand wrote:
->>> On 26.02.20 16:06, Christian Borntraeger wrote:  
->>>>
->>>>
->>>> On 26.02.20 15:59, David Hildenbrand wrote:  
->>>>> On 26.02.20 13:20, Janosch Frank wrote:  
->>>>>> Ballooning in protected VMs can only be done when the guest shares the
->>>>>> pages it gives to the host. Hence, until we have a solution for this
->>>>>> in the guest kernel, we inhibit ballooning when switching into
->>>>>> protected mode and reverse that once we move out of it.  
->>>>>
->>>>> I don't understand what you mean here, sorry. zapping a page will mean
->>>>> that a fresh one will be faulted in when accessed. And AFAIK, that means
->>>>> it will be encrypted again when needed.
->>>>>
->>>>> Is that more like the UV will detect this as an integrity issue and
->>>>> crash the VM?  
->>>>
->>>> yes, the UV will detect a fresh page as an integrity issue.
->>>> Only if the page was defined to be shared by the guest, we would avoid the
->>>> integrity check.
->>>>  
->>>
->>> Please make that clearer in the patch description. With that
->>>
->>> Reviewed-by: David Hildenbrand <david@redhat.com>
->>>   
->>
->> How about:
->> s390x: protvirt: Inhibit balloon when switching to protected mode
->>
->> Ballooning in protected VMs can only be done when the guest shares the
->> pages it gives to the host. If pages are not shared, the integrity
->> checks will fail once those pages have been altered and are given back
->> to the guest.
-> 
-> This makes sense to me...
-> 
->>
->> Hence, until we have a solution for this in the guest kernel, we
->> inhibit ballooning when switching into protected mode and reverse that
->> once we move out of it.
-> 
-> ...however, I'm scratching my head here.
-> 
-> If we have a future guest that knows how to handle this, how do we
-> know? We know that the current Linux driver clears
-> VIRTIO_F_IOMMU_PLATFORM during feature negotiation, and presumably a
-> guest that knows how to handle this will not do that. But it still
-> won't work as expected, as we inhibit ballooning...
-> 
-> So, either
-> - we don't inhibit ballooning now; any guest that clears the (required)
->   virtio feature bit won't be able to drive the virtio-balloon device
->   anyway, but a future guest that negotiates the bit would work; or
-> - we inhibit ballooning now; no guest can therefore use ballooning,
->   regardless what they are doing or not doing (this includes guests
->   that negotiate the feature bit, but fail to handle pages properly).
-> 
-> Or is there some other reason why we need to inhibit ballooning for
-> protected vms?
+Thanks,
+Priyamvad Acharya
 
+On Tue, 3 Mar 2020 at 16:16, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-So here is my proposal.
-1. we block ballooning now in QEMU (take this patch now)
-2. Later Halil will provide a change to virtio that removes the blocker and adds
-VIRTIO_F_IOMMU_PLATFORM automatically by QEMU when doing the protvirt switch. This
-is ok as the guest balloon driver will reject to work with the IOMMU change
-(see 
-https://lore.kernel.org/qemu-devel/20200227132402.67a38047.pasic@linux.ibm.com/)
-3. later we can fix the guest balloon driver to do the right thing for this
-case (e.g. do the make shared call)
+> On Tue, Mar 3, 2020 at 7:45 AM Priyamvad Acharya
+> <priyamvad.agnisys@gmail.com> wrote:
+>
+> Please use Reply-All when replying to mailing list emails so that
+> qemu-devel@nongnu.org is included in the CC list.  That way the
+> discussion stays on the mailing list.
+>
+> > Hi,
+> > I have written code to emulate a custom PCI device.
+> > Now I want to run custom device with Qemu, so that user application can
+> perform read/write operation with custom PCI device.
+> > So what is the method to do it?
+>
+> 1. Add the source file somewhere below hw/.
+> 2. Add a make rule to build the object file in Makefile.objs in the
+> same directory as the source file.
+> 3. Compile QEMU and run with -device testpci.
+>
+> > I am new to emulating a custom device model in Qemu, so request you to
+> explain me in that way.
+>
+> Reading the source code is necessary to understand how things work.
+> You can find many examples of devices in the hw/ directory.  Using
+> git-log(1) can be helpful because it shows how new devices were
+> introduced.
+>
+> Stefan
+>
 
+--00000000000024b233059ff2ad4f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Thanks Stefan for explaining the method.</div><div>Af=
+ter following above method when I run below command to compile my custom de=
+vice in Qemu source code , I get the output on terminal which is attached i=
+n a file for your reference.</div><div><br></div><div>Command:- make -j8 -C=
+ build</div><div><br></div><div>Most of the lines in attached file indicate=
+ that error might be due to helper.c file.</div><div><br></div><div>How to =
+resolve it?</div><div><br></div><div>My qemu version:4.2.50<br></div><div><=
+br></div><div><br></div><div>Thanks,</div><div>Priyamvad Acharya<br></div><=
+/div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">O=
+n Tue, 3 Mar 2020 at 16:16, Stefan Hajnoczi &lt;<a href=3D"mailto:stefanha@=
+gmail.com">stefanha@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"=
+gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
+4,204,204);padding-left:1ex">On Tue, Mar 3, 2020 at 7:45 AM Priyamvad Achar=
+ya<br>
+&lt;<a href=3D"mailto:priyamvad.agnisys@gmail.com" target=3D"_blank">priyam=
+vad.agnisys@gmail.com</a>&gt; wrote:<br>
+<br>
+Please use Reply-All when replying to mailing list emails so that<br>
+<a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@nongn=
+u.org</a> is included in the CC list.=C2=A0 That way the<br>
+discussion stays on the mailing list.<br>
+<br>
+&gt; Hi,<br>
+&gt; I have written code to emulate a custom PCI device.<br>
+&gt; Now I want to run custom device with Qemu, so that user application ca=
+n perform read/write operation with custom PCI device.<br>
+&gt; So what is the method to do it?<br>
+<br>
+1. Add the source file somewhere below hw/.<br>
+2. Add a make rule to build the object file in Makefile.objs in the<br>
+same directory as the source file.<br>
+3. Compile QEMU and run with -device testpci.<br>
+<br>
+&gt; I am new to emulating a custom device model in Qemu, so request you to=
+ explain me in that way.<br>
+<br>
+Reading the source code is necessary to understand how things work.<br>
+You can find many examples of devices in the hw/ directory.=C2=A0 Using<br>
+git-log(1) can be helpful because it shows how new devices were<br>
+introduced.<br>
+<br>
+Stefan<br>
+</blockquote></div>
+
+--00000000000024b233059ff2ad4f--
+
+--00000000000024b235059ff2ad51
+Content-Type: text/plain; charset="US-ASCII"; name="qemu_arm_build_hello_err1.txt"
+Content-Disposition: attachment; filename="qemu_arm_build_hello_err1.txt"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k7bvq3tc0>
+X-Attachment-Id: f_k7bvq3tc0
+
+dGFyZ2V0L2FybS9hcm0tc2VtaS5vOiBJbiBmdW5jdGlvbiBgZG9fYXJtX3NlbWlob3N0aW5nJzoK
+L2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2Fy
+bS9hcm0tc2VtaS5jOjc4NDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgcWVtdV9zZW1paG9zdGlu
+Z19jb25zb2xlX291dGMnCi9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRl
+ZC9xZW11L3RhcmdldC9hcm0vYXJtLXNlbWkuYzo3ODc6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8g
+YHFlbXVfc2VtaWhvc3RpbmdfY29uc29sZV9vdXRzJwovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9x
+ZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL2FybS1zZW1pLmM6ODE1OiB1bmRlZmlu
+ZWQgcmVmZXJlbmNlIHRvIGBxZW11X3NlbWlob3N0aW5nX2NvbnNvbGVfaW5jJwp0YXJnZXQvYXJt
+L2NwdS5vOiBJbiBmdW5jdGlvbiBgYXJtX3Y3bV9jcHVfZXhlY19pbnRlcnJ1cHQnOgovbGhvbWUv
+cHJpeWFtdmFkL2RlYmlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL2NwdS5j
+OjQ4MzogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgYXJtdjdtX252aWNfY2FuX3Rha2VfcGVuZGlu
+Z19leGNlcHRpb24nCnRhcmdldC9hcm0vbV9oZWxwZXIubzogSW4gZnVuY3Rpb24gYHY3bV9zdGFj
+a193cml0ZSc6Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11
+L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoyNjA6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3
+bV9udmljX3NldF9wZW5kaW5nX2Rlcml2ZWQnCi9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVf
+YXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoyNjM6IHVuZGVmaW5lZCBy
+ZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX3NldF9wZW5kaW5nX2xhenlmcCcKdGFyZ2V0L2FybS9t
+X2hlbHBlci5vOiBJbiBmdW5jdGlvbiBgdjdtX3N0YWNrX3JlYWQnOgovbGhvbWUvcHJpeWFtdmFk
+L2RlYmlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL21faGVscGVyLmM6MzI5
+OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19zZXRfcGVuZGluZycKdGFyZ2V0
+L2FybS9tX2hlbHBlci5vOiBJbiBmdW5jdGlvbiBgaGVscGVyX3Y3bV9wcmVzZXJ2ZV9mcF9zdGF0
+ZSc6Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3Rhcmdl
+dC9hcm0vbV9oZWxwZXIuYzozNTY6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmlj
+X3NldF9wZW5kaW5nX2xhenlmcCcKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91
+cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjM2MDogdW5kZWZpbmVkIHJlZmVyZW5j
+ZSB0byBgYXJtdjdtX252aWNfc2V0X3BlbmRpbmdfbGF6eWZwJwovbGhvbWUvcHJpeWFtdmFkL2Rl
+Ymlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL21faGVscGVyLmM6Mzk5OiB1
+bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19jYW5fdGFrZV9wZW5kaW5nX2V4Y2Vw
+dGlvbicKdGFyZ2V0L2FybS9tX2hlbHBlci5vOiBJbiBmdW5jdGlvbiBgYXJtX3Y3bV9sb2FkX3Zl
+Y3Rvcic6Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3Rh
+cmdldC9hcm0vbV9oZWxwZXIuYzo3Mjg6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9u
+dmljX3NldF9wZW5kaW5nX2Rlcml2ZWQnCnRhcmdldC9hcm0vbV9oZWxwZXIubzogSW4gZnVuY3Rp
+b24gYHY3bV9wdXNoX2NhbGxlZV9zdGFjayc6Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVf
+YXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzo3OTY6IHVuZGVmaW5lZCBy
+ZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX3NldF9wZW5kaW5nJwp0YXJnZXQvYXJtL21faGVscGVy
+Lm86IEluIGZ1bmN0aW9uIGB2N21fZXhjZXB0aW9uX3Rha2VuJzoKL2xob21lL3ByaXlhbXZhZC9k
+ZWJpYW5fcWVtdV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjgzODog
+dW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgYXJtdjdtX252aWNfZ2V0X3BlbmRpbmdfaXJxX2luZm8n
+Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9h
+cm0vbV9oZWxwZXIuYzo5NDY6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX2Fj
+a25vd2xlZGdlX2lycScKdGFyZ2V0L2FybS9tX2hlbHBlci5vOiBJbiBmdW5jdGlvbiBgdjdtX3Vw
+ZGF0ZV9mcGNjcic6Ci9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9x
+ZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzo5ODg6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFy
+bXY3bV9udmljX25lZ19wcmlvX3JlcXVlc3RlZCcKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVt
+dV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjEwMDQ6IHVuZGVmaW5l
+ZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX2dldF9yZWFkeV9zdGF0dXMnCi9saG9tZS9wcml5
+YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIu
+YzoxMDA3OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19nZXRfcmVhZHlfc3Rh
+dHVzJwovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJn
+ZXQvYXJtL21faGVscGVyLmM6MTAxMDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgYXJtdjdtX252
+aWNfZ2V0X3JlYWR5X3N0YXR1cycKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91
+cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjEwMTM6IHVuZGVmaW5lZCByZWZlcmVu
+Y2UgdG8gYGFybXY3bV9udmljX2dldF9yZWFkeV9zdGF0dXMnCi9saG9tZS9wcml5YW12YWQvZGVi
+aWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoxMDE2OiB1
+bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19nZXRfcmVhZHlfc3RhdHVzJwp0YXJn
+ZXQvYXJtL21faGVscGVyLm86L2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRh
+dGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjEwMjA6IG1vcmUgdW5kZWZpbmVkIHJlZmVy
+ZW5jZXMgdG8gYGFybXY3bV9udmljX2dldF9yZWFkeV9zdGF0dXMnIGZvbGxvdwp0YXJnZXQvYXJt
+L21faGVscGVyLm86IEluIGZ1bmN0aW9uIGB2N21fcHVzaF9zdGFjayc6Ci9saG9tZS9wcml5YW12
+YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzox
+MjA0OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19zZXRfcGVuZGluZycKL2xo
+b21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9t
+X2hlbHBlci5jOjEyNDk6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX3NldF9w
+ZW5kaW5nJwovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90
+YXJnZXQvYXJtL21faGVscGVyLmM6MTI1NDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgYXJtdjdt
+X252aWNfc2V0X3BlbmRpbmcnCi9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBk
+YXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoxMjcyOiB1bmRlZmluZWQgcmVmZXJlbmNl
+IHRvIGBhcm12N21fbnZpY19zZXRfcGVuZGluZycKdGFyZ2V0L2FybS9tX2hlbHBlci5vOiBJbiBm
+dW5jdGlvbiBgZG9fdjdtX2V4Y2VwdGlvbl9leGl0JzoKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5f
+cWVtdV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjE0MDg6IHVuZGVm
+aW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX3Jhd19leGVjdXRpb25fcHJpb3JpdHknCi9s
+aG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0v
+bV9oZWxwZXIuYzoxNDE2OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19jb21w
+bGV0ZV9pcnEnCi9saG9tZS9wcml5YW12YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11
+L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoxNDk3OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12
+N21fbnZpY19zZXRfcGVuZGluZycKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91
+cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjE1MTU6IHVuZGVmaW5lZCByZWZlcmVu
+Y2UgdG8gYGFybXY3bV9udmljX3NldF9wZW5kaW5nJwovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9x
+ZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL21faGVscGVyLmM6MTUyODogdW5kZWZp
+bmVkIHJlZmVyZW5jZSB0byBgYXJtdjdtX252aWNfc2V0X3BlbmRpbmcnCi9saG9tZS9wcml5YW12
+YWQvZGViaWFuX3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzox
+NTQ1OiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19jYW5fdGFrZV9wZW5kaW5n
+X2V4Y2VwdGlvbicKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRhdGVkL3Fl
+bXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjE1OTU6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFy
+bXY3bV9udmljX3NldF9wZW5kaW5nJwovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9xZW11X2FybTMy
+X3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL21faGVscGVyLmM6MTY2OTogdW5kZWZpbmVkIHJlZmVy
+ZW5jZSB0byBgYXJtdjdtX252aWNfc2V0X3BlbmRpbmcnCi9saG9tZS9wcml5YW12YWQvZGViaWFu
+X3FlbXVfYXJtMzJfdXBkYXRlZC9xZW11L3RhcmdldC9hcm0vbV9oZWxwZXIuYzoxNjg0OiB1bmRl
+ZmluZWQgcmVmZXJlbmNlIHRvIGBhcm12N21fbnZpY19zZXRfcGVuZGluZycKL2xob21lL3ByaXlh
+bXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRhdGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5j
+OjE3MTE6IHVuZGVmaW5lZCByZWZlcmVuY2UgdG8gYGFybXY3bV9udmljX3NldF9wZW5kaW5nJwov
+bGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9xZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJt
+L21faGVscGVyLmM6MTcyMTogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgYXJtdjdtX252aWNfc2V0
+X3BlbmRpbmcnCnRhcmdldC9hcm0vbV9oZWxwZXIubzovbGhvbWUvcHJpeWFtdmFkL2RlYmlhbl9x
+ZW11X2FybTMyX3VwZGF0ZWQvcWVtdS90YXJnZXQvYXJtL21faGVscGVyLmM6MTgyMDogbW9yZSB1
+bmRlZmluZWQgcmVmZXJlbmNlcyB0byBgYXJtdjdtX252aWNfc2V0X3BlbmRpbmcnIGZvbGxvdwp0
+YXJnZXQvYXJtL21faGVscGVyLm86IEluIGZ1bmN0aW9uIGBhcm1fdjdtX21tdV9pZHhfZm9yX3Nl
+Y3N0YXRlX2FuZF9wcml2JzoKL2xob21lL3ByaXlhbXZhZC9kZWJpYW5fcWVtdV9hcm0zMl91cGRh
+dGVkL3FlbXUvdGFyZ2V0L2FybS9tX2hlbHBlci5jOjI3MTA6IHVuZGVmaW5lZCByZWZlcmVuY2Ug
+dG8gYGFybXY3bV9udmljX25lZ19wcmlvX3JlcXVlc3RlZCcKY29sbGVjdDI6IGVycm9yOiBsZCBy
+ZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MjA2OiBxZW11LXN5
+c3RlbS1hcm1dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0OTQ6IGFybS1zb2Z0bW11L2Fs
+bF0gRXJyb3IgMgo=
+--00000000000024b235059ff2ad51--
 
