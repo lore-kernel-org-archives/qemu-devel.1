@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834C0C3F2D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0479CC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5061624673
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C482C21D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XRz8aHvw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5061624673
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LROWYOLH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C482C21D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vln-0003on-Eu
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:50:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44882)
+	id 1j8vmx-0006Zy-Um
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:51:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkI-00018k-Bm
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:15 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkA-0000wQ-5B
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkH-0004Cf-D2
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:14 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44550)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vk7-00046t-S8
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:05 -0500
+Received: from mail-pf1-x42f.google.com ([2607:f8b0:4864:20::42f]:38463)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkH-0004Bp-7R
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:13 -0500
-Received: by mail-pg1-x542.google.com with SMTP id a14so651331pgb.11
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:13 -0800 (PST)
+ id 1j8vk6-00046V-KP
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:02 -0500
+Received: by mail-pf1-x42f.google.com with SMTP id q9so559368pfs.5
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=0wZeGuDyxxT2VXK+x2HGJY5RPxs/tRKAPEIo8LLk5uY=;
- b=XRz8aHvw9mwXIJllfEdN32Joh0I3Q5KyN9t1qf2pl3aow0+Oz/XbUVVORg3OxrvMCH
- KbI7ckgAJfYWV61vCmwZdEin6oZ2iV3raqj0SMUJ2z7/KqPESE6n14xqv9ju/SQyyqqi
- zpdbQ8n8MmsNIp6VMJfKnoLw2gGYAnAreSETe2N4k7K6yClqi/KRi1TVnD6JOHp7umWW
- pDXznfp2zVwIhMw5JERt580AO0VUlx/g6CjUNdob333xB269aqXJbGbxbJsTbEpZc9Op
- NAaa8fLqQqv4mPCbJiJlJLJHqlRFwH2RZ2+dkEIUXJ36FkX4oIAbI4EmU13GoDrW9ljy
- LX/g==
+ bh=B0OixvxDRun+czMvNrLEKq3Xb6qPIsVdgs0f+iZ/N/w=;
+ b=LROWYOLHx5phwHtn15nNwfW3SEWM2Kod68jrhN86Lxio1eWRgbh4IOB8C+3c5qYJa3
+ lk7YcGC+lHXhqXQ9VZj215HGmFSFlimvWGN9s/SJV4DlScXScMEf84Qoe1gVXmM08Eq8
+ So47E9QmgEJWUMERNKsvHapJRduwL8+MOW8PGeT7K4M5aVMnw3Yu7nlIrces41Q4JRnt
+ p6v26/U2OnBICiFHX7X7nUgnR1PzaHTFSi7Tb+i7agwJTuK6x7wuPP/zoJb4gXv1rm4j
+ Uc1JipGc5apj7XtFuf1UA3Bh5scYw520x4dnoqmqe505IxCHA3sllC7zpBHLUqlBna8I
+ IuYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=0wZeGuDyxxT2VXK+x2HGJY5RPxs/tRKAPEIo8LLk5uY=;
- b=TsWKF6ZlhMCX3D54qMSM4nj1Aq4hCGcr7lHBEwAsUYeFVzwt6HzkJ/iRQHzEqG6U7s
- HlgRV2R8e0sRFQ5LTmXJrNI65QyaJcLycNB7b3z1TIwYeOTkVFKGcv1UBo3bPe6BFChr
- QSe3NEExJszCBZ3ielzTgvlTCZnI2cLKohvgBQWQjZW8vK3snd4+JlGNGebjKsws8SYR
- PKgKgK0zj9m5c0NLMvhgTuZNCVz8CLDNTT6jCyKCZXIpT5qeOx74FdoOutlfMY6wwN2V
- qpJfK+EiWLPsfNSKT3TuOM7aFhZly5Hz4l62ADuK8uOW+VRY92BCtoyPVM48kWFbpWyd
- MrAQ==
-X-Gm-Message-State: ANhLgQ0ff9qb+7XzuzauRV8E4ryN11KwA6buRBAq5co27K9GyHLIyxvL
- rftlv/ErLV4u0n1uWtd9WQD1DK5QYnliAQ==
-X-Google-Smtp-Source: ADFU+vv5Ipqs5xdMPzfxCudGrPEMJ6k4idS0ZguWp8X8ocBZ5hk1TF1s8F+brQviKvny+Az8eeOlFQ==
-X-Received: by 2002:a63:8dc7:: with SMTP id z190mr1524728pgd.39.1583196552103; 
- Mon, 02 Mar 2020 16:49:12 -0800 (PST)
+ bh=B0OixvxDRun+czMvNrLEKq3Xb6qPIsVdgs0f+iZ/N/w=;
+ b=f5ME/JramSWRctqrTyRz90Uq3ZQ6VUyZPS9eb97JrjeH+sEm6jlG5GmV6FPqMAXfoz
+ +ixaWpj9H+3NPdfnqdfPI6zZXVrtNk378HhYoW7zMVpscM1MytnEI1XGm6Y/txXN3PiN
+ io6y20zWd/ssTUVO247SUsSnqKKo3KO892eEdEOHdCXHZfpIaiqPNA0nCJlKLFLIVcvL
+ 2W1vTKlhPs7VgDkgg73HK6XyimgUW5pTTnQ9O77AJ7O/GN6lgYDnOlWzHtJaQSnHFpRy
+ OKQqxM9KKGegsApKGD0MDlS8MB5l3kZ511TzClMZkxm1d5cFey4kYpKuG67mRzdE6q1Q
+ u06g==
+X-Gm-Message-State: ANhLgQ1bVodheaffswCu22U1dBW1b9FKk1d/Dzemg3scAlkVQM4Lrycs
+ kdGT64C324DHJW7xjhLaF+yyMA==
+X-Google-Smtp-Source: ADFU+vsllffNd3sCuj8cQAWV9aVjzlRGaKxS/MMKIeGmcqQW/QttVPy3qPeo4mmWy83HqfjrVY3RoQ==
+X-Received: by 2002:a63:1404:: with SMTP id u4mr522050pgl.172.1583196541538;
+ Mon, 02 Mar 2020 16:49:01 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id 186sm8168133pfz.145.2020.03.02.16.49.11
+ by smtp.gmail.com with ESMTPSA id g20sm348025pjv.20.2020.03.02.16.49.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:11 -0800 (PST)
-Subject: [PULL 09/38] target/riscv: Print priv and virt in disas log
-Date: Mon,  2 Mar 2020 16:48:19 -0800
-Message-Id: <20200303004848.136788-10-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:00 -0800 (PST)
+Subject: [PULL 02/38] target/riscv: Add the Hypervisor extension
+Date: Mon,  2 Mar 2020 16:48:12 -0800
+Message-Id: <20200303004848.136788-3-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Chih-Min Chao <chihmin.chao@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, 
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,32 +103,25 @@ Sender: "Qemu-devel"
 From: Alistair Francis <alistair.francis@wdc.com>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/translate.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ target/riscv/cpu.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index d5de7f468a..eff064dc44 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -810,7 +810,15 @@ static void riscv_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 95de9e58a2..010125efd6 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -67,6 +67,7 @@
+ #define RVC RV('C')
+ #define RVS RV('S')
+ #define RVU RV('U')
++#define RVH RV('H')
  
- static void riscv_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
- {
-+#ifndef CONFIG_USER_ONLY
-+    RISCVCPU *rvcpu = RISCV_CPU(cpu);
-+    CPURISCVState *env = &rvcpu->env;
-+#endif
-+
-     qemu_log("IN: %s\n", lookup_symbol(dcbase->pc_first));
-+#ifndef CONFIG_USER_ONLY
-+    qemu_log("Priv: "TARGET_FMT_ld"; Virt: "TARGET_FMT_ld"\n", env->priv, env->virt);
-+#endif
-     log_target_disas(cpu, dcbase->pc_first, dcbase->tb->size);
- }
- 
+ /* S extension denotes that Supervisor mode exists, however it is possible
+    to have a core that support S mode but does not have an MMU and there
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
