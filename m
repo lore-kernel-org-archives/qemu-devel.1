@@ -2,84 +2,99 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2070C3F2D7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 514FCC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:42:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ACDF20716
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:30:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18B322072D
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 23:42:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Med6eRSU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACDF20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igHDifEx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B322072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9H06-0000gD-Ej
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 18:30:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43224)
+	id 1j9HBb-0004GH-6H
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 18:42:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuanzi@google.com>) id 1j9Gz1-0008Si-2U
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:52 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9HAn-0003al-GU
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:42:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuanzi@google.com>) id 1j9Gyz-0003y8-Ur
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:50 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40998)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuanzi@google.com>) id 1j9Gyz-0003ww-8w
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:29:49 -0500
-Received: by mail-ot1-x341.google.com with SMTP id v19so179058ote.8
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 15:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/bW8efiApVzydyaH8AhwyVKf0CkNBkcbqVJgT1JC9+M=;
- b=Med6eRSU9oGg0ZlErErF8Y6yGXe00JBzMy6G/Wsaj0KIIl9BCwtnFdYn9YOsmy7tqu
- yeIyE0mNljA5HZwerLQlDZ7iyx9cd41vGCm7R+FmDBQf7c2u4Px9TBcWfUsVpX/OGeBm
- GDJHTu2YMyFkgbPPwsT1fPiagDMaiL49zqarYLqHyDqLWSBDsy10Ah6juzPapu3Lan8H
- 9gQr52zZVC4CJQ3L9zLHL3bOa7tVTBld5pjJl1hPWEA33rC7m1jWoOyiC5Q2pvEvf9rA
- ybc6jF+dgTE44v1PrVSMmC8QOHBy06FgO1CaFAW375E615F+Qpp4F3BmF9CMh5LtoF2u
- y+9w==
+ (envelope-from <philmd@redhat.com>) id 1j9HAl-0006Wb-IS
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:42:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60163
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9HAl-0006Vk-8d
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 18:41:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583278918;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gK22+5lDsvE9EJC6leYT5lwhaxnAtRzOaEtP2fdoCXg=;
+ b=igHDifExpksli8Rv8r46Z8CkGF5b2UPSvCYdhsylUwO3XUDVLCGUphskoyYuHHeHx35lYF
+ JgGUrodNf70u4SFLMsxr33liiscjTyP4APTtjmRHC335ID7PItnaa/SdGuBkS8/iCTcM1m
+ GJAiht5VW0BQwLBqgNXNiwg/ASrn5Ws=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-cerbOw88PASJInWaQoG8cg-1; Tue, 03 Mar 2020 18:41:54 -0500
+X-MC-Unique: cerbOw88PASJInWaQoG8cg-1
+Received: by mail-wm1-f70.google.com with SMTP id r19so108824wmh.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 15:41:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/bW8efiApVzydyaH8AhwyVKf0CkNBkcbqVJgT1JC9+M=;
- b=UFhPbXszciIsgG83eWFEsnMyFlhiIn6XOS/vLjaU1yD+omfPnCcPe/ycLABHtEEsny
- G6Ns1Td7Qi5TmaXzE07z7k5zQ6OFdl0ZIYbxWo0uqTatLKLX+ZuNrObDlRYzRzWo2KVB
- PPz6nhTmc8YLAxaDg7/9cpfjdW+ERpB9xVI7VHuryjj8n0GKQQEXF/vLy/kul5sz5ACB
- ZmvIbVY/zUR1W9zQtuYpaYP3SyRR5QuMWeTGT2uGG68WyZAhIAzv5g0ybPwiVotgNlB0
- aEuxB5nI5IHbAjRXi1AQ1O3nSq3B4w8QNUe2XwAiBiYL6HID70mUVkc1r99uuATo0lY4
- SgLA==
-X-Gm-Message-State: ANhLgQ1oDOVBgFcGQdCsfXG1Ls11cIxMNDnZuRRGLJlizlcnQS54HoKh
- YsZi5GWEQ4t+QDiujAUWrLXN6MHRFqLdSdP1xjavHw==
-X-Google-Smtp-Source: ADFU+vuserjoSos3+qe9IqyBew2nBlEPIVLyyRJXC3JRcMAzrau6VzTraLn2xXEuXzLlM5bER7Fi77397JqwipL/b6A=
-X-Received: by 2002:a9d:7842:: with SMTP id c2mr233345otm.252.1583278187261;
- Tue, 03 Mar 2020 15:29:47 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gK22+5lDsvE9EJC6leYT5lwhaxnAtRzOaEtP2fdoCXg=;
+ b=JPc9mxPOc0wxCbXcB3+WINi+Qj0JjbSVREylsUCiyoEO7udmqLVhTgEpkWgebcj+WN
+ dE3B5PcpHhjPJIBsDXEhMaHY1+sNEkYLyf8nYNQrqtrpVCjDT8aBclnOuqb44VMdb/50
+ UphxVSlN7EUZBDv7/5GCF6qbUNHrLGoBuJdVCniRcAkOlGpgKGAdLMnoRkX6jyWO8bwT
+ FqiI75yCvC2WfkyLPis33UAGj+47jbJNIhjEKFks/ZbLMdGNrPUvMMUHSqtcyOIXdFFy
+ JTDrskE/MFXs25o/JermGAI2NKv4TZdvwafyNPjuacimMV2ZNWQM45X4uHczU/7zs6va
+ n8Lg==
+X-Gm-Message-State: ANhLgQ1Dq7R9SsuZYTXK78+1X1/ZKAb3rjPHfq4UcFBgomLqpuoTTPYM
+ GRlQrtqXD492jEWGjoYnE/k565dDTC1X/9rVwDdxa/9BqzXcSBBFOLalpC+zc7yk4dY0V6O3f7r
+ MnyPCzyE+bhM5dTA=
+X-Received: by 2002:a5d:56c4:: with SMTP id m4mr452112wrw.6.1583278913516;
+ Tue, 03 Mar 2020 15:41:53 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vtwiBSWqNziveWkRBVTGBGkpVoc4Zd8MNfg1xNP4SbDQp6D9UmEEMHi4k2w/zzA+n674zM41A==
+X-Received: by 2002:a5d:56c4:: with SMTP id m4mr452092wrw.6.1583278913228;
+ Tue, 03 Mar 2020 15:41:53 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id p1sm2186608wrf.82.2020.03.03.15.41.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Mar 2020 15:41:52 -0800 (PST)
+Subject: Re: [PATCH] Fixed integer overflow in e1000e
+To: andrew@daynix.com, qemu-devel@nongnu.org
+References: <20200303182925.39419-1-andrew@daynix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <51cc9068-1ff5-a42a-dab5-788bf495f6d7@redhat.com>
+Date: Wed, 4 Mar 2020 00:41:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200302193153.66415-1-yuanzi@google.com>
- <d9dc23a7-61a8-c28a-47e0-4a4d9590be04@vivier.eu>
-In-Reply-To: <d9dc23a7-61a8-c28a-47e0-4a4d9590be04@vivier.eu>
-From: Lirong Yuan <yuanzi@google.com>
-Date: Tue, 3 Mar 2020 15:29:36 -0800
-Message-ID: <CADjx4C+8304e=AjjgkxSwH7nVhkH_04+aFz-EvJUAeEWJuZYVg@mail.gmail.com>
-Subject: Re: [PATCH v2] linux-user: Add AT_EXECFN auxval
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, 
- Shu-Chun Weng <scw@google.com>, Josh Kunz <jkz@google.com>,
- Riku Voipio <riku.voipio@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20200303182925.39419-1-andrew@daynix.com>
+Content-Language: en-US
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,57 +106,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jason Wang <jasowang@redhat.com>, dmitry.fleytman@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 3, 2020 at 1:40 AM Laurent Vivier <laurent@vivier.eu> wrote:
->
-> Le 02/03/2020 =C3=A0 20:31, Lirong Yuan a =C3=A9crit :
-> > This change adds the support for AT_EXECFN auxval.
-> >
-> > Signed-off-by: Lirong Yuan <yuanzi@google.com>
-> > ---
-> > Changelog since v1:
-> > - remove implementation for AT_EXECFD auxval.
-> >
-> >  linux-user/elfload.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> > index db748c5877..8198be0446 100644
-> > --- a/linux-user/elfload.c
-> > +++ b/linux-user/elfload.c
-> > @@ -1573,7 +1573,7 @@ struct exec
-> >                                   ~(abi_ulong)(TARGET_ELF_EXEC_PAGESIZE=
--1))
-> >  #define TARGET_ELF_PAGEOFFSET(_v) ((_v) & (TARGET_ELF_EXEC_PAGESIZE-1)=
-)
-> >
-> > -#define DLINFO_ITEMS 15
-> > +#define DLINFO_ITEMS 16
-> >
-> >  static inline void memcpy_fromfs(void * to, const void * from, unsigne=
-d long n)
-> >  {
-> > @@ -2037,6 +2037,7 @@ static abi_ulong create_elf_tables(abi_ulong p, i=
-nt argc, int envc,
-> >      NEW_AUX_ENT(AT_CLKTCK, (abi_ulong) sysconf(_SC_CLK_TCK));
-> >      NEW_AUX_ENT(AT_RANDOM, (abi_ulong) u_rand_bytes);
-> >      NEW_AUX_ENT(AT_SECURE, (abi_ulong) qemu_getauxval(AT_SECURE));
-> > +    NEW_AUX_ENT(AT_EXECFN, info->file_string);
-> >
-> >  #ifdef ELF_HWCAP2
-> >      NEW_AUX_ENT(AT_HWCAP2, (abi_ulong) ELF_HWCAP2);
-> >
->
-> Applied to my linux-user branch.
->
-> Thanks,
-> Laurent
+Hi Andrew,
 
-Awesome, thanks for the review! :)
+Please Cc all the maintainers:
 
-Regards,
-Lirong
+   ./scripts/get_maintainer.pl -f hw/net/e1000e.c
+   Dmitry Fleytman <dmitry.fleytman@gmail.com> (maintainer:e1000e)
+   Jason Wang <jasowang@redhat.com> (odd fixer:Network devices)
+   qemu-devel@nongnu.org (open list:All patches CC here)
+
+On 3/3/20 7:29 PM, andrew@daynix.com wrote:
+> From: Andrew Melnychenko <andrew@daynix.com>
+> 
+> https://bugzilla.redhat.com/show_bug.cgi?id=1737400
+
+The BZ backtrace lists e1000e_tx_pkt_send() which you fixes,
+but you also fixes e1000e_start_recv(). Good.
+
+Please include the BZ backtrace.
+
+> Fixed setting max_queue_num if there are no peers in NICConf. qemu_new_nic() creates NICState with 1 NetClientState(index 0) without peers, set max_queue_num to 0 - It prevents undefined behavior and possible crashes, especially during pcie hotplug.
+> 
+
+Please add:
+
+Cc: qemu-stable@nongnu.org
+Fixes: 6f3fbe4ed06
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1737400
+
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> ---
+>   hw/net/e1000e.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index a91dbdca3c..f2cc1552c5 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -328,7 +328,7 @@ e1000e_init_net_peer(E1000EState *s, PCIDevice *pci_dev, uint8_t *macaddr)
+>       s->nic = qemu_new_nic(&net_e1000e_info, &s->conf,
+>           object_get_typename(OBJECT(s)), dev->id, s);
+>   
+> -    s->core.max_queue_num = s->conf.peers.queues - 1;
+> +    s->core.max_queue_num = s->conf.peers.queues ? s->conf.peers.queues - 1 : 0;
+>   
+>       trace_e1000e_mac_set_permanent(MAC_ARG(macaddr));
+>       memcpy(s->core.permanent_mac, macaddr, sizeof(s->core.permanent_mac));
+> 
+
 
