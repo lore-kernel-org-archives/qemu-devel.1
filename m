@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D136C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A10C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B5152465D
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:50:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C0421775
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AuHVj0Pr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B5152465D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PVsyXOtv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C0421775
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8yZc-0000z1-J1
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:50:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35213)
+	id 1j8yZs-0001c1-Vu
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:50:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTT-0004hS-Ig
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:04 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTV-0004iJ-F2
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1j8yTS-0002DT-30
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:03 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34019 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1j8yTU-0002Fe-AM
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:44:05 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35121 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1j8yTR-0002BB-OX; Mon, 02 Mar 2020 22:44:02 -0500
+ id 1j8yTT-0002C1-U3; Mon, 02 Mar 2020 22:44:04 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 48WjY61SDLz9sSk; Tue,  3 Mar 2020 14:43:54 +1100 (AEDT)
+ id 48WjY62XMJz9sSw; Tue,  3 Mar 2020 14:43:54 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1583207034;
- bh=FCi4XrxSSIh1V3n0LcI2M0plS1LCbPohpkNXYSEzdJw=;
+ bh=jdwXoNnNT+n9ADKX9dPGSv/YbMHhY6sJ8DFZfzwL6b0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=AuHVj0PrAxzpJYsh3qmURxl0zw7WBf1LQh4ijWqTD+PYqmzTsOhPyZW0iBMgZ4Eti
- W5yIBU0Cv2lMfqpHEXBaAfNeDis6Dd0qMu6FePR/FhnlLm39/4E2mdrRRtpedAzs3S
- N/k1/DLhXTRFpZApAUSPmmY+hboJ4GubTqTo0n3Q=
+ b=PVsyXOtvzLSZ2il4kzd+Zd9gn1isibYO7CfrEcPz4J2lc3lC4aMYVCawGEVO+755n
+ GctBOl+X/mnWyxeSW3EaGKz8eNkaqthJcS0UuXMvFnCP5KEr/IH8ltPa+sD1+BjMe0
+ +7DkNW7pdPccpalqjAn6fmVND3/ambhwmWRzLR7E=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org, groug@kaod.org
-Subject: [PATCH v7 08/17] target/ppc: Streamline calculation of RMA limit from
- LPCR[RMLS]
-Date: Tue,  3 Mar 2020 14:43:42 +1100
-Message-Id: <20200303034351.333043-9-david@gibson.dropbear.id.au>
+Subject: [PATCH v7 10/17] target/ppc: Only calculate RMLS derived RMA limit on
+ demand
+Date: Tue,  3 Mar 2020 14:43:44 +1100
+Message-Id: <20200303034351.333043-11-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 References: <20200303034351.333043-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -82,122 +81,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we use a big switch statement in ppc_hash64_update_rmls() to wo=
-rk
-out what the right RMA limit is based on the LPCR[RMLS] field.  There's n=
-o
-formula for this - it's just an arbitrary mapping defined by the existing
-CPU implementations - but we can make it a bit more readable by using a
-lookup table rather than a switch.  In addition we can use the MiB/GiB
-symbols to make it a bit clearer.
+When the LPCR is written, we update the env->rmls field with the RMA limi=
+t
+it implies.  Simplify things by just calculating the value directly from
+the LPCR value when we need it.
 
-While there we add a bit of clarity and rationale to the comment about
-what happens if the LPCR[RMLS] doesn't contain a valid value.
+It's possible this is a little slower, but it's unlikely to be significan=
+t,
+since this is only for real mode accesses in a translation configuration
+that's not used very often, and the whole thing is behind the qemu TLB
+anyway.  Therefore, keeping the number of state variables down and not
+having to worry about making sure it's always in sync seems the better
+option.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- target/ppc/mmu-hash64.c | 63 ++++++++++++++++++-----------------------
- 1 file changed, 27 insertions(+), 36 deletions(-)
+ target/ppc/cpu.h        | 1 -
+ target/ppc/mmu-hash64.c | 9 ++++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 8077fdb068..f9871b1233 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1046,7 +1046,6 @@ struct CPUPPCState {
+     uint64_t insns_flags2;
+ #if defined(TARGET_PPC64)
+     ppc_slb_t vrma_slb;
+-    target_ulong rmls;
+ #endif
+=20
+     int error_code;
 diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 0ef330a614..934989e6d9 100644
+index fcccaabb88..4fd7b7ee74 100644
 --- a/target/ppc/mmu-hash64.c
 +++ b/target/ppc/mmu-hash64.c
-@@ -18,6 +18,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-@@ -757,6 +758,31 @@ static void ppc_hash64_set_c(PowerPCCPU *cpu, hwaddr=
- ptex, uint64_t pte1)
-     stb_phys(CPU(cpu)->as, base + offset, (pte1 & 0xff) | 0x80);
- }
+@@ -837,8 +837,10 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vad=
+dr eaddr,
 =20
-+static target_ulong rmls_limit(PowerPCCPU *cpu)
-+{
-+    CPUPPCState *env =3D &cpu->env;
-+    /*
-+     * This is the full 4 bits encoding of POWER8. Previous
-+     * CPUs only support a subset of these but the filtering
-+     * is done when writing LPCR.
-+     *
-+     * Unsupported values mean the OS has shot itself in the
-+     * foot. Return a 0-sized RMA in this case, which we expect
-+     * to trigger an immediate DSI or ISI
-+     */
-+    static const target_ulong rma_sizes[16] =3D {
-+        [1] =3D 16 * GiB,
-+        [2] =3D 1 * GiB,
-+        [3] =3D 64 * MiB,
-+        [4] =3D 256 * MiB,
-+        [7] =3D 128 * MiB,
-+        [8] =3D 32 * MiB,
-+    };
-+    target_ulong rmls =3D (env->spr[SPR_LPCR] & LPCR_RMLS) >> LPCR_RMLS_=
-SHIFT;
+             goto skip_slb_search;
+         } else {
++            target_ulong limit =3D rmls_limit(cpu);
 +
-+    return rma_sizes[rmls];
-+}
+             /* Emulated old-style RMO mode, bounds check against RMLS */
+-            if (raddr >=3D env->rmls) {
++            if (raddr >=3D limit) {
+                 if (rwx =3D=3D 2) {
+                     ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
+                 } else {
+@@ -1000,8 +1002,10 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *=
+cpu, target_ulong addr)
+                 return -1;
+             }
+         } else {
++            target_ulong limit =3D rmls_limit(cpu);
 +
- int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-                                 int rwx, int mmu_idx)
- {
-@@ -1006,41 +1032,6 @@ void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, ta=
-rget_ulong ptex,
-     cpu->env.tlb_need_flush =3D TLB_NEED_GLOBAL_FLUSH | TLB_NEED_LOCAL_F=
-LUSH;
- }
-=20
--static void ppc_hash64_update_rmls(PowerPCCPU *cpu)
--{
--    CPUPPCState *env =3D &cpu->env;
--    uint64_t lpcr =3D env->spr[SPR_LPCR];
--
--    /*
--     * This is the full 4 bits encoding of POWER8. Previous
--     * CPUs only support a subset of these but the filtering
--     * is done when writing LPCR
--     */
--    switch ((lpcr & LPCR_RMLS) >> LPCR_RMLS_SHIFT) {
--    case 0x8: /* 32MB */
--        env->rmls =3D 0x2000000ull;
--        break;
--    case 0x3: /* 64MB */
--        env->rmls =3D 0x4000000ull;
--        break;
--    case 0x7: /* 128MB */
--        env->rmls =3D 0x8000000ull;
--        break;
--    case 0x4: /* 256MB */
--        env->rmls =3D 0x10000000ull;
--        break;
--    case 0x2: /* 1GB */
--        env->rmls =3D 0x40000000ull;
--        break;
--    case 0x1: /* 16GB */
--        env->rmls =3D 0x400000000ull;
--        break;
--    default:
--        /* What to do here ??? */
--        env->rmls =3D 0;
--    }
--}
--
- static void ppc_hash64_update_vrma(PowerPCCPU *cpu)
- {
-     CPUPPCState *env =3D &cpu->env;
-@@ -1099,7 +1090,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
+             /* Emulated old-style RMO mode, bounds check against RMLS */
+-            if (raddr >=3D env->rmls) {
++            if (raddr >=3D limit) {
+                 return -1;
+             }
+             return raddr | env->spr[SPR_RMOR];
+@@ -1091,7 +1095,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
 al)
      CPUPPCState *env =3D &cpu->env;
 =20
      env->spr[SPR_LPCR] =3D val & pcc->lpcr_mask;
--    ppc_hash64_update_rmls(cpu);
-+    env->rmls =3D rmls_limit(cpu);
+-    env->rmls =3D rmls_limit(cpu);
      ppc_hash64_update_vrma(cpu);
  }
 =20
