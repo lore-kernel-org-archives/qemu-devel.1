@@ -2,60 +2,82 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E627C3F2D2
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90D1C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:24:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CD9E2072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:19:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD9E2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A4D221D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 03:24:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E23py1SZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4D221D56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8y61-0007EN-Hg
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:19:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59307)
+	id 1j8yA4-0000Lb-Nl
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 22:24:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60702)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1j8y5P-0006iw-Ph
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:19:13 -0500
+ (envelope-from <zhangfei.gao@gmail.com>) id 1j8y9T-0008CO-6P
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:23:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1j8y5O-0001QU-83
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:19:11 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3257 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>) id 1j8y5N-0001PJ-TW
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:19:10 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 5AEF32D1D942B21D584E;
- Tue,  3 Mar 2020 11:19:04 +0800 (CST)
-Received: from [127.0.0.1] (10.173.221.228) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0;
- Tue, 3 Mar 2020 11:18:57 +0800
-Subject: Re: [PATCH v3] hw/smbios: add options for type 4 max-speed and
- current-speed
-To: <qemu-devel@nongnu.org>
-References: <20200303010158.52994-1-guoheyi@huawei.com>
-From: Heyi Guo <guoheyi@huawei.com>
-Message-ID: <997b0093-6820-0c27-0d73-55afb97019f1@huawei.com>
-Date: Tue, 3 Mar 2020 11:18:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <zhangfei.gao@gmail.com>) id 1j8y9S-0002OZ-4Z
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 22:23:23 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:46842)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <zhangfei.gao@gmail.com>)
+ id 1j8y9R-0002OR-Uj; Mon, 02 Mar 2020 22:23:22 -0500
+Received: by mail-io1-xd43.google.com with SMTP id x21so1892854iox.13;
+ Mon, 02 Mar 2020 19:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=0ou9io8uf3VKDbGKlHf2x7eRKMOVTLIyuGgxw2ob+co=;
+ b=E23py1SZEh9w5zXhNH8E8Awsbd5qwG6oheW3LQqnOEgVUE76VOeNhImNk6crl8ycW5
+ 3eXRXgLNRlDwRSMaglEMzQa1Lkjqzzz0elubCIWL5ZkDbNHk2ZH10K5pjdyGQN4L09IY
+ Ux2YetF7NL6R/eHa5EGPrUKeFhQeUL41aGPODZAQ1DMD4F1YDNY8+KNpA+PxMFIgJC07
+ 6qA3W4KG8WlMAI92MEy/ru+Jh4wXKVTeptNEAB6cnNN2ANe9VBl267X43OFYHTJ1G8O3
+ O1ugo2Y0vC5UWSWrbeU6eSXZgUi8cM2JqVo4TEf6glKPibrrnUfj6xxWpYn/aZtJuCEE
+ gYnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0ou9io8uf3VKDbGKlHf2x7eRKMOVTLIyuGgxw2ob+co=;
+ b=nQ4StbkQgMs7gGWi4ubXkWw0426IwIW7tJczJ4Zhi6l55bRjUpoCI1mqaU27PB/uJD
+ oPUN+ytS5q29OmBCi/GRibfts2H33wl1YGi+ZTijj4sDR/yATp6ID60RjXhLrGFyqD7u
+ jOSOmog1A4mGzoBysua88lsj41xKrVpnPme0ioWW8hw2v5+uboieMhRvaLEwG5StE8pe
+ PouH7fieslik4OsIim4iUcX6lSUrklFbl6zrqcpFEqjXl/xOV8eMfIOPKXW9XT4HpNql
+ H6Sl/Vf/6qMu4jiQD8NOAx8CouMh32cHALTNl01ojzMEoZTPbu/HCgWOrGJvsFgZVAwH
+ YQcg==
+X-Gm-Message-State: ANhLgQ10mGQBsRQYZYUQXXEPu1DdIL8jtL0285UZJQFky5A+33UYyYd8
+ B45hCG1Yjm+tfGv9lqyHFqrtB0gedCLveebgQe4=
+X-Google-Smtp-Source: ADFU+vvqDUZ8NzvS7rgMQP3FDX4PFSBnMvSyD3tfYbwvc/9u+ToEgKA0dlyhS9S1GKqSwbTsBRx00T7asjCalrNhy/U=
+X-Received: by 2002:a5d:80d6:: with SMTP id h22mr2222820ior.129.1583205800885; 
+ Mon, 02 Mar 2020 19:23:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200303010158.52994-1-guoheyi@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-X-Originating-IP: [10.173.221.228]
-X-CFilter-Loop: Reflected
+References: <20200214132745.23392-1-eric.auger@redhat.com>
+ <20200227111717.GG1645630@redhat.com>
+ <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
+In-Reply-To: <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
+From: Zhangfei Gao <zhangfei.gao@gmail.com>
+Date: Tue, 3 Mar 2020 11:23:10 +0800
+Message-ID: <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
+Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,156 +89,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wanghaibin.wang@huawei.com, Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ kenneth-lee-2012@foxmail.com, tnowicki@marvell.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, quintela@redhat.com,
+ zhangfei.gao@foxmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ "Wangzhou \(B\)" <wangzhou1@hisilicon.com>, jean-philippe@linaro.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One comment from myself after going through the code...
+Hi Eric
 
-On 2020/3/3 9:01, Heyi Guo wrote:
-> Common VM users sometimes care about CPU speed, so we add two new
-> options to allow VM vendors to present CPU speed to their users.
-> Normally these information can be fetched from host smbios.
+On Thu, Feb 27, 2020 at 9:50 PM Auger Eric <eric.auger@redhat.com> wrote:
 >
-> Strictly speaking, the "max speed" and "current speed" in type 4
-> are not really for the max speed and current speed of processor, for
-> "max speed" identifies a capability of the system, and "current speed"
-> identifies the processor's speed at boot (see smbios spec), but some
-> applications do not tell the differences.
+> Hi Daniel,
 >
-> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> On 2/27/20 12:17 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Fri, Feb 14, 2020 at 02:27:35PM +0100, Eric Auger wrote:
+> >> This series implements the QEMU virtio-iommu device.
+> >>
+> >> This matches the v0.12 spec (voted) and the corresponding
+> >> virtio-iommu driver upstreamed in 5.3. All kernel dependencies
+> >> are resolved for DT integration. The virtio-iommu can be
+> >> instantiated in ARM virt using:
+> >>
+> >> "-device virtio-iommu-pci".
+> >
+> > Is there any more documentation besides this ?
 >
-> ---
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> not yet in qemu.
+> >
+> > I'm wondering on the intended usage of this, and its relation
+> > or pros/cons vs other iommu devices
 >
-> v2 -> v3:
-> - Refine comments per Igor's suggestion.
+> Maybe if you want to catch up on the topic, looking at the very first
+> kernel RFC may be a good starting point. Motivation, pros & cons were
+> discussed in that thread (hey, April 2017!)
+> https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021217.html
 >
-> v1 -> v2:
-> - change "_" in option names to "-"
-> - check if option value is too large to fit in SMBIOS type 4 speed
-> fields.
-> ---
->   hw/smbios/smbios.c | 29 ++++++++++++++++++++++++++---
->   qemu-options.hx    |  3 ++-
->   2 files changed, 28 insertions(+), 4 deletions(-)
+> on ARM we have SMMUv3 emulation. But the VFIO integration is not
+> possible because SMMU does not have any "caching mode" and my nested
+> paging kernel series is blocked. So the only solution to integrate with
+> VFIO is looming virtio-iommu.
 >
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index ffd98727ee..4c5992241c 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -94,6 +94,8 @@ static struct {
->  =20
->   static struct {
->       const char *sock_pfx, *manufacturer, *version, *serial, *asset, *=
-part;
-> +    uint32_t max_speed;
-> +    uint32_t current_speed;
+> In general the pros that were put forward are: virtio-iommu is
+> architecture agnostic, removes the burden to accurately model complex
+> device states, driver can support virtualization specific optimizations
+> without being constrained by production driver maintenance. Cons is perf
+> and mem footprint if we do not consider any optimization.
+>
+> You can have a look at
+>
+> http://events17.linuxfoundation.org/sites/events/files/slides/viommu_arm.=
+pdf
+>
+Thanks for the patches.
 
-How about defining these two fields as uint16_t, just like "speed" in=20
-type17? Then we can also drop the range check against UIN16_MAX.
+Could I ask one question?
+To support vSVA and pasid in guest, which direction you recommend,
+virtio-iommu or vSMMU (your nested paging)
 
-Please advise.
+Do we still have any obstacles?
+Would you mind give some breakdown.
+Jean mentioned PASID still not supported in QEMU.
 
-Thanks,
-
-Heyi
-
-
->   } type4;
->  =20
->   static struct {
-> @@ -272,6 +274,14 @@ static const QemuOptDesc qemu_smbios_type4_opts[] =
-=3D {
->           .name =3D "version",
->           .type =3D QEMU_OPT_STRING,
->           .help =3D "version number",
-> +    },{
-> +        .name =3D "max-speed",
-> +        .type =3D QEMU_OPT_NUMBER,
-> +        .help =3D "max speed in MHz",
-> +    },{
-> +        .name =3D "current-speed",
-> +        .type =3D QEMU_OPT_NUMBER,
-> +        .help =3D "speed at system boot in MHz",
->       },{
->           .name =3D "serial",
->           .type =3D QEMU_OPT_STRING,
-> @@ -586,9 +596,8 @@ static void smbios_build_type_4_table(MachineState =
-*ms, unsigned instance)
->       SMBIOS_TABLE_SET_STR(4, processor_version_str, type4.version);
->       t->voltage =3D 0;
->       t->external_clock =3D cpu_to_le16(0); /* Unknown */
-> -    /* SVVP requires max_speed and current_speed to not be unknown. */
-> -    t->max_speed =3D cpu_to_le16(2000); /* 2000 MHz */
-> -    t->current_speed =3D cpu_to_le16(2000); /* 2000 MHz */
-> +    t->max_speed =3D cpu_to_le16(type4.max_speed);
-> +    t->current_speed =3D cpu_to_le16(type4.current_speed);
->       t->status =3D 0x41; /* Socket populated, CPU enabled */
->       t->processor_upgrade =3D 0x01; /* Other */
->       t->l1_cache_handle =3D cpu_to_le16(0xFFFF); /* N/A */
-> @@ -1129,6 +1138,20 @@ void smbios_entry_add(QemuOpts *opts, Error **er=
-rp)
->               save_opt(&type4.serial, opts, "serial");
->               save_opt(&type4.asset, opts, "asset");
->               save_opt(&type4.part, opts, "part");
-> +            /*
-> +             * SVVP requires max_speed and current_speed to be set and=
- not being
-> +             * 0 which counts as unknown (SMBIOS 3.1.0/Table 21). Set =
-the
-> +             * default value to 2000MHz as we did before.
-> +             */
-> +            type4.max_speed =3D qemu_opt_get_number(opts, "max-speed",=
- 2000);
-> +            type4.current_speed =3D qemu_opt_get_number(opts, "current=
--speed",
-> +                                                      2000);
-> +            if (type4.max_speed > UINT16_MAX ||
-> +                type4.current_speed > UINT16_MAX) {
-> +                error_setg(errp, "SMBIOS CPU speed is too large (> %d)=
-",
-> +                           UINT16_MAX);
-> +            }
-> +
->               return;
->           case 11:
->               qemu_opts_validate(opts, qemu_smbios_type11_opts, &err);
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index ac315c1ac4..7a2f7c1f66 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -2233,6 +2233,7 @@ DEF("smbios", HAS_ARG, QEMU_OPTION_smbios,
->       "                specify SMBIOS type 3 fields\n"
->       "-smbios type=3D4[,sock_pfx=3Dstr][,manufacturer=3Dstr][,version=3D=
-str][,serial=3Dstr]\n"
->       "              [,asset=3Dstr][,part=3Dstr]\n"
-> +    "              [,max-speed=3D%d][,current-speed=3D%d]\n"
->       "                specify SMBIOS type 4 fields\n"
->       "-smbios type=3D17[,loc_pfx=3Dstr][,bank=3Dstr][,manufacturer=3Ds=
-tr][,serial=3Dstr]\n"
->       "               [,asset=3Dstr][,part=3Dstr][,speed=3D%d]\n"
-> @@ -2255,7 +2256,7 @@ Specify SMBIOS type 2 fields
->   @item -smbios type=3D3[,manufacturer=3D@var{str}][,version=3D@var{str=
-}][,serial=3D@var{str}][,asset=3D@var{str}][,sku=3D@var{str}]
->   Specify SMBIOS type 3 fields
->  =20
-> -@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str=
-}][,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D=
-@var{str}]
-> +@item -smbios type=3D4[,sock_pfx=3D@var{str}][,manufacturer=3D@var{str=
-}][,version=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D=
-@var{str}][,max-speed=3D@var{%d}][,current-speed=3D@var{%d}]
->   Specify SMBIOS type 4 fields
->  =20
->   @item -smbios type=3D17[,loc_pfx=3D@var{str}][,bank=3D@var{str}][,man=
-ufacturer=3D@var{str}][,serial=3D@var{str}][,asset=3D@var{str}][,part=3D@=
-var{str}][,speed=3D@var{%d}]
-
+Thanks
 
