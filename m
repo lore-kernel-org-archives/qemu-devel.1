@@ -7,85 +7,83 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6903DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2F7C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31D1021D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A653821D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DsmJk9dU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D1021D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oFu6s/Qy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A653821D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vog-0001dA-B4
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:53:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44905)
+	id 1j8vol-0001hC-Sx
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:53:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkJ-00019y-Rn
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:16 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkC-0000xX-A7
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkI-0004Dd-PE
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:15 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37759)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkA-00047c-4H
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:07 -0500
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:45562)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkI-0004D4-JS
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:14 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id o2so544186pjp.2
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:14 -0800 (PST)
+ id 1j8vk8-00046x-EI
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:05 -0500
+Received: by mail-pg1-x52d.google.com with SMTP id m15so653212pgv.12
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=sOuvBFhPv/kwJR/8QhMZSZ9InuC6hPqeS5I0fULBuX4=;
- b=DsmJk9dUntPVoqJZiusvbKW4ROIOnGNuOgN3TP79QuYy4CLDpP6rqj0dQW/zBpcAdJ
- T/1fb3/K3R5E1PujPFF+O84D2S5zWK4Yilt0IvYYSAEPcjv7J1RHUEb1um7Lkenyf3sO
- pfX0huMsOeQUlePlfzBBVeNzOH/Mx7dp+DYOxrFX0urXbCsbBJgZmmLGp2thGPOuuqQi
- N7yewYciDi18qNJUHP5TB8HD5gn+46N6KsL0P7cKWWm9vfiVeRrioDn+2I8cY3CHooZy
- y3K2mVOIIlJHv85eh4rjVT2N+NwLeuDYEbGb1wGAE+o8qaSMakWttC51e/0WUS51Ej41
- T5aQ==
+ bh=+WltSHyolw+4rQE+XPimaO0DHQK7HzUxfJXf8ld/qCk=;
+ b=oFu6s/Qy+KVjDpayZV7soZUhwXca0iJ0AHS2pQPCjVx3MXEd2Md9Cb2M9s7lKY5C2Y
+ wfaCcknXFcvrQ7NkvSdwWFjES1QwHcNF9SkKRQPlXauw9NQ7hVdGgmQcWj33XJ4hzYQ0
+ lcOC8QEeSI0fThCSRvyLf6D3G43DCnPlbw0fUQZzCSQs8FfMTvy13avGphyoW9eYrI6U
+ S8XfgcDUInzgKKQlcz+50YOZckUwCa7NtgslbW6VgbEFvDvLiCeuP4nYkmEgT2uRBnAu
+ BYRlEgw1e1a8LGx7lRxrPvS+OIDWcf/xNgWvRrPITQJjqrUYpQv5DibaKDktaGx/0X53
+ YWCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=sOuvBFhPv/kwJR/8QhMZSZ9InuC6hPqeS5I0fULBuX4=;
- b=YTvh33nyALDR/T0uCin/pWbgLxokTV37TwYkJynmbfmf/WhLsSOmvgWSVujK0x+QOJ
- Iag1VNqapC4u4cLJxGuiDApKR/v1Upx0PuXXKMpqYDGQTvImdInccWypq/RRKNpELYkl
- kf5GF0ChqHSi91YG5fKWGpZH2bmY0JsRF5iFdQrC2/h5dtd2GDVkF7VEoxR6De7m9/OM
- NHebpZDmbCVQNvT8JkGUD6aUvsRL1wNXXRRwZTKTUKVALIwFdxXwajw0OV8StkeFzLVa
- dhpswW7588yQJ7gmJb+sTNE3fdJ+ZNArIWSIEycI2/NDjXi9WfmF397oyA8ZzqoLiTQ5
- U4Hw==
-X-Gm-Message-State: ANhLgQ3x6HfaDT5TBopBQvHAd5uQzEYeFEOtLumdtXfluB5RKtbjo9mE
- zdApRGU961WImBU2huvBSi8NEg==
-X-Google-Smtp-Source: ADFU+vsoE0xW4YEyJo+Ixu49VdqHIzwRn5/Icw9GJECu09YrG+Fjs0+qfr00IX7yOH9Z9lSQ8LeFQg==
-X-Received: by 2002:a17:90a:a48b:: with SMTP id
- z11mr1239018pjp.1.1583196553512; 
- Mon, 02 Mar 2020 16:49:13 -0800 (PST)
+ bh=+WltSHyolw+4rQE+XPimaO0DHQK7HzUxfJXf8ld/qCk=;
+ b=L8b6hJd9X6r6MjTWmwo+ygXu3c2xRFp/15ujpSEkNl5RLFHPD8hN+IG4KonGEW114K
+ pTK+S+xz/rX2uhPbAkSjvZxM28o5TfhH8PeccmJHP27bQ5OQgmIHMQ4xZ+QanzYsPiVU
+ HAn4NDLJlqSZ1f0PV49XVRr0Tv1VmkIeurVbolD+iNBy1MsYmeySDnaM5H36bhJHyaAt
+ 1Ax6956bgJqjEynT9Jx4q0jo9Sgp5iT5cPuwBB6si2TNQ6URKFd0pxEMHPc5h6bc9djx
+ 7152ruXnZFb5uM2/SOM0nrUWxK86+XBZIa9t2SLVIltu1j4e/JC4lm2bRX8UHvk9gCbP
+ exJg==
+X-Gm-Message-State: ANhLgQ0HrM3daEPFxT07sFMdXTWC9x7yewyG5rVkVS6C3AjrWUJwBhkY
+ BpOmZqT0R0JEsFj7L/kapdUVpQ==
+X-Google-Smtp-Source: ADFU+vuLG8/8IhkoqL0mK0ULov5VVM4mXoZPyaFd5YrvRg3BPr9yHjnh4iDUXjDhZAgBeiRfNKQ2TQ==
+X-Received: by 2002:aa7:8bdd:: with SMTP id s29mr1565556pfd.208.1583196543314; 
+ Mon, 02 Mar 2020 16:49:03 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id x6sm21814784pfi.83.2020.03.02.16.49.12
+ by smtp.gmail.com with ESMTPSA id bb5sm108161pjb.8.2020.03.02.16.49.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:13 -0800 (PST)
-Subject: [PULL 10/38] target/riscv: Dump Hypervisor registers if enabled
-Date: Mon,  2 Mar 2020 16:48:20 -0800
-Message-Id: <20200303004848.136788-11-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:02 -0800 (PST)
+Subject: [PULL 03/38] target/riscv: Add the Hypervisor CSRs to CPUState
+Date: Mon,  2 Mar 2020 16:48:13 -0800
+Message-Id: <20200303004848.136788-4-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Atish Patra <atish.patra@wdc.com>,
- Palmer Dabbelt <palmer@sifive.com>, 
+ Alistair Francis <alistair.francis@wdc.com>,
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-Received-From: 2607:f8b0:4864:20::52d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,73 +101,147 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
-Dump the Hypervisor registers and the current Hypervisor state.
-
-While we are editing this code let's also dump stvec and scause.
+Add the Hypervisor CSRs to CPUState and at the same time (to avoid
+bisect issues) update the CSR macros for the v0.5 Hyp spec.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Atish Patra <atish.patra@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ target/riscv/cpu.h      | 21 +++++++++++++++++++++
+ target/riscv/cpu_bits.h | 34 +++++++++++++++++++++-------------
+ target/riscv/gdbstub.c  | 11 ++++++-----
+ 3 files changed, 48 insertions(+), 18 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index f7a35c74c2..44ad768a84 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -228,17 +228,50 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     CPURISCVState *env = &cpu->env;
-     int i;
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 010125efd6..c7f7ae5c38 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -143,6 +143,27 @@ struct CPURISCVState {
+     target_ulong mcause;
+     target_ulong mtval;  /* since: priv-1.10.0 */
  
-+#if !defined(CONFIG_USER_ONLY)
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s %d\n", "V      =  ", riscv_cpu_virt_enabled(env));
-+    }
-+#endif
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
- #ifndef CONFIG_USER_ONLY
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ", env->vsstatus);
-+    }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hideleg ", env->hideleg);
-+    }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hedeleg ", env->hedeleg);
-+    }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtvec   ", env->mtvec);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stvec   ", env->stvec);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vstvec  ", env->vstvec);
-+    }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mepc    ", env->mepc);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "sepc    ", env->sepc);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsepc   ", env->vsepc);
-+    }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mcause  ", env->mcause);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "scause  ", env->scause);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vscause ", env->vscause);
-+    }
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtval ", env->mtval);
-+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stval ", env->sbadaddr);
-+    if (riscv_has_ext(env, RVH)) {
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "htval ", env->htval);
-+        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtval2 ", env->mtval2);
-+    }
++    /* Hypervisor CSRs */
++    target_ulong hstatus;
++    target_ulong hedeleg;
++    target_ulong hideleg;
++    target_ulong hcounteren;
++    target_ulong htval;
++    target_ulong htinst;
++    target_ulong hgatp;
++
++    /* Virtual CSRs */
++    target_ulong vsstatus;
++    target_ulong vstvec;
++    target_ulong vsscratch;
++    target_ulong vsepc;
++    target_ulong vscause;
++    target_ulong vstval;
++    target_ulong vsatp;
++
++    target_ulong mtval2;
++    target_ulong mtinst;
++
+     target_ulong scounteren;
+     target_ulong mcounteren;
+ 
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index e99834856c..25c0fb258d 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -177,8 +177,14 @@
+ #define CSR_HSTATUS         0x600
+ #define CSR_HEDELEG         0x602
+ #define CSR_HIDELEG         0x603
+-#define CSR_HCOUNTERNEN     0x606
++#define CSR_HIE             0x604
++#define CSR_HCOUNTEREN      0x606
++#define CSR_HTVAL           0x643
++#define CSR_HIP             0x644
++#define CSR_HTINST          0x64A
+ #define CSR_HGATP           0x680
++#define CSR_HTIMEDELTA      0x605
++#define CSR_HTIMEDELTAH     0x615
+ 
+ #if defined(TARGET_RISCV32)
+ #define HGATP_MODE           SATP32_MODE
+@@ -191,6 +197,20 @@
+ #define HGATP_PPN            SATP64_PPN
  #endif
  
-     for (i = 0; i < 32; i++) {
++/* Virtual CSRs */
++#define CSR_VSSTATUS        0x200
++#define CSR_VSIE            0x204
++#define CSR_VSTVEC          0x205
++#define CSR_VSSCRATCH       0x240
++#define CSR_VSEPC           0x241
++#define CSR_VSCAUSE         0x242
++#define CSR_VSTVAL          0x243
++#define CSR_VSIP            0x244
++#define CSR_VSATP           0x280
++
++#define CSR_MTINST          0x34a
++#define CSR_MTVAL2          0x34b
++
+ /* Physical Memory Protection */
+ #define CSR_PMPCFG0         0x3a0
+ #define CSR_PMPCFG1         0x3a1
+@@ -313,17 +333,6 @@
+ #define CSR_MHPMCOUNTER30H  0xb9e
+ #define CSR_MHPMCOUNTER31H  0xb9f
+ 
+-/* Legacy Hypervisor Trap Setup (priv v1.9.1) */
+-#define CSR_HIE             0x204
+-#define CSR_HTVEC           0x205
+-
+-/* Legacy Hypervisor Trap Handling (priv v1.9.1) */
+-#define CSR_HSCRATCH        0x240
+-#define CSR_HEPC            0x241
+-#define CSR_HCAUSE          0x242
+-#define CSR_HBADADDR        0x243
+-#define CSR_HIP             0x244
+-
+ /* Legacy Machine Protection and Translation (priv v1.9.1) */
+ #define CSR_MBASE           0x380
+ #define CSR_MBOUND          0x381
+@@ -400,7 +409,6 @@
+ 
+ /* hstatus CSR bits */
+ #define HSTATUS_SPRV         0x00000001
+-#define HSTATUS_STL          0x00000040
+ #define HSTATUS_SPV          0x00000080
+ #define HSTATUS_SP2P         0x00000100
+ #define HSTATUS_SP2V         0x00000200
+diff --git a/target/riscv/gdbstub.c b/target/riscv/gdbstub.c
+index 1a72f7be9c..2f32750f2f 100644
+--- a/target/riscv/gdbstub.c
++++ b/target/riscv/gdbstub.c
+@@ -130,6 +130,8 @@ static int csr_register_map[] = {
+     CSR_MCAUSE,
+     CSR_MTVAL,
+     CSR_MIP,
++    CSR_MTINST,
++    CSR_MTVAL2,
+     CSR_PMPCFG0,
+     CSR_PMPCFG1,
+     CSR_PMPCFG2,
+@@ -252,12 +254,11 @@ static int csr_register_map[] = {
+     CSR_HEDELEG,
+     CSR_HIDELEG,
+     CSR_HIE,
+-    CSR_HTVEC,
+-    CSR_HSCRATCH,
+-    CSR_HEPC,
+-    CSR_HCAUSE,
+-    CSR_HBADADDR,
++    CSR_HCOUNTEREN,
++    CSR_HTVAL,
+     CSR_HIP,
++    CSR_HTINST,
++    CSR_HGATP,
+     CSR_MBASE,
+     CSR_MBOUND,
+     CSR_MIBASE,
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
