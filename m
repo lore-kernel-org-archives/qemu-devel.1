@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34138C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6903DC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00D1C21D56
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31D1021D56
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hr5pn5ao"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00D1C21D56
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DsmJk9dU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D1021D56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vnP-0007Wh-6F
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:52:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44932)
+	id 1j8vog-0001dA-B4
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:53:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkL-0001FY-Lx
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:18 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkJ-00019y-Rn
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkK-0004EH-DD
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:17 -0500
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:45930)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkI-0004Dd-PE
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:15 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37759)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkK-0004Dw-6n
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:16 -0500
-Received: by mail-pl1-x62a.google.com with SMTP id b22so491724pls.12
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:16 -0800 (PST)
+ id 1j8vkI-0004D4-JS
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:14 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id o2so544186pjp.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=r94jo/gvFTBMX3LV/UZyM02c2n9qhiKPnxWyNzazeBQ=;
- b=Hr5pn5aox/5slECRkqgv2hmOKkz3IM/lv3BJgMfHfZbu/hiZ9oYZIBZj7fMnOi8Z8v
- sR49gXjvl8aCaNMnb3JJhOe7fJoR9ufiIBrVR9YY7+LDKAqU91sIDI40hQcwLEcFTOzp
- hQgMUnh6lU070TmRnaYrScDgs7p2npncXbA8tlX3hL8WgD1AySuEoKlhG76BhXPFDYYs
- aoIz+TbfQEdyzUeOTr6bmoKfYqKURnXhkROk55sI4sLGBxLZOa379Gbpk5qcYacE8VsR
- SllNQ0CWcIg2XUANP6Y3/HZfyjiAugjUNpINLxyN8CJudR437P+6Lp4PoRYtVIjQTcv2
- Cu+w==
+ bh=sOuvBFhPv/kwJR/8QhMZSZ9InuC6hPqeS5I0fULBuX4=;
+ b=DsmJk9dUntPVoqJZiusvbKW4ROIOnGNuOgN3TP79QuYy4CLDpP6rqj0dQW/zBpcAdJ
+ T/1fb3/K3R5E1PujPFF+O84D2S5zWK4Yilt0IvYYSAEPcjv7J1RHUEb1um7Lkenyf3sO
+ pfX0huMsOeQUlePlfzBBVeNzOH/Mx7dp+DYOxrFX0urXbCsbBJgZmmLGp2thGPOuuqQi
+ N7yewYciDi18qNJUHP5TB8HD5gn+46N6KsL0P7cKWWm9vfiVeRrioDn+2I8cY3CHooZy
+ y3K2mVOIIlJHv85eh4rjVT2N+NwLeuDYEbGb1wGAE+o8qaSMakWttC51e/0WUS51Ej41
+ T5aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=r94jo/gvFTBMX3LV/UZyM02c2n9qhiKPnxWyNzazeBQ=;
- b=oGGqP+iP172HUgEGDD5n7R/VJQetQWuacfdu7E1k38VMyxByYKMtiuLqFldv7kUGv8
- cJXX3uSeeqg7M/Xn2+xSBW9GnZNIgV3Cl1IXcdQ6DzXPFANCNb0qTWc/kAjRg603P775
- GzN200V6Yem9BoVoCUGIRId3+SMG1phmwYj/6CYl70LTlh/PtOVJNKaR1Mfk/aszkQfO
- 9Fe6AkCFjTMuItTUK9X1t0rlTP+PmjmdbEXJj5hWv/LFliO9G6RX6XuOhsLs1spxKeJK
- BFcgtADi41UfPMkgvfNB40ivljK82iNjak4sQ5Nyhgm7hUdKSYMInm8PziypxEvpMuea
- o1bw==
-X-Gm-Message-State: ANhLgQ1WszlKWQN+0gjWMJZb7kSurD5q8/PARJxFznJD1cUPhJywB9/i
- aRvRKGIdqzwibHRw/5/r2FyTBQ==
-X-Google-Smtp-Source: ADFU+vuwdRS1X28QYWrgt+eKKjSMvqA7fDFrycH5D7MBKKdni4A/EoXkYJyzwPZc68Otv32SUsWFdA==
-X-Received: by 2002:a17:90a:35ad:: with SMTP id
- r42mr1240469pjb.178.1583196555055; 
- Mon, 02 Mar 2020 16:49:15 -0800 (PST)
+ bh=sOuvBFhPv/kwJR/8QhMZSZ9InuC6hPqeS5I0fULBuX4=;
+ b=YTvh33nyALDR/T0uCin/pWbgLxokTV37TwYkJynmbfmf/WhLsSOmvgWSVujK0x+QOJ
+ Iag1VNqapC4u4cLJxGuiDApKR/v1Upx0PuXXKMpqYDGQTvImdInccWypq/RRKNpELYkl
+ kf5GF0ChqHSi91YG5fKWGpZH2bmY0JsRF5iFdQrC2/h5dtd2GDVkF7VEoxR6De7m9/OM
+ NHebpZDmbCVQNvT8JkGUD6aUvsRL1wNXXRRwZTKTUKVALIwFdxXwajw0OV8StkeFzLVa
+ dhpswW7588yQJ7gmJb+sTNE3fdJ+ZNArIWSIEycI2/NDjXi9WfmF397oyA8ZzqoLiTQ5
+ U4Hw==
+X-Gm-Message-State: ANhLgQ3x6HfaDT5TBopBQvHAd5uQzEYeFEOtLumdtXfluB5RKtbjo9mE
+ zdApRGU961WImBU2huvBSi8NEg==
+X-Google-Smtp-Source: ADFU+vsoE0xW4YEyJo+Ixu49VdqHIzwRn5/Icw9GJECu09YrG+Fjs0+qfr00IX7yOH9Z9lSQ8LeFQg==
+X-Received: by 2002:a17:90a:a48b:: with SMTP id
+ z11mr1239018pjp.1.1583196553512; 
+ Mon, 02 Mar 2020 16:49:13 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id h16sm339673pje.43.2020.03.02.16.49.14
+ by smtp.gmail.com with ESMTPSA id x6sm21814784pfi.83.2020.03.02.16.49.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:14 -0800 (PST)
-Subject: [PULL 11/38] target/riscv: Add Hypervisor CSR access functions
-Date: Mon,  2 Mar 2020 16:48:21 -0800
-Message-Id: <20200303004848.136788-12-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:13 -0800 (PST)
+Subject: [PULL 10/38] target/riscv: Dump Hypervisor registers if enabled
+Date: Mon,  2 Mar 2020 16:48:20 -0800
+Message-Id: <20200303004848.136788-11-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Cc: qemu-riscv@nongnu.org,          qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Atish Patra <atish.patra@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>, 
  Palmer Dabbelt <palmerdabbelt@google.com>
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::62a
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,188 +103,73 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
+Dump the Hypervisor registers and the current Hypervisor state.
+
+While we are editing this code let's also dump stvec and scause.
+
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Signed-off-by: Atish Patra <atish.patra@wdc.com>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/csr.c | 136 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 134 insertions(+), 2 deletions(-)
+ target/riscv/cpu.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index c63b2f980c..bee639e92e 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -98,6 +98,20 @@ static int smode(CPURISCVState *env, int csrno)
-     return -!riscv_has_ext(env, RVS);
- }
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index f7a35c74c2..44ad768a84 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -228,17 +228,50 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+     CPURISCVState *env = &cpu->env;
+     int i;
  
-+static int hmode(CPURISCVState *env, int csrno)
-+{
-+    if (riscv_has_ext(env, RVS) &&
-+        riscv_has_ext(env, RVH)) {
-+        /* Hypervisor extension is supported */
-+        if ((env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
-+            env->priv == PRV_M) {
-+            return 0;
-+        }
++#if !defined(CONFIG_USER_ONLY)
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s %d\n", "V      =  ", riscv_cpu_virt_enabled(env));
 +    }
-+
-+    return -1;
-+}
-+
- static int pmp(CPURISCVState *env, int csrno)
- {
-     return -!riscv_feature(env, RISCV_FEATURE_PMP);
-@@ -226,8 +240,9 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
++#endif
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ", env->vsstatus);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hideleg ", env->hideleg);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hedeleg ", env->hedeleg);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtvec   ", env->mtvec);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stvec   ", env->stvec);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vstvec  ", env->vstvec);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mepc    ", env->mepc);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "sepc    ", env->sepc);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsepc   ", env->vsepc);
++    }
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mcause  ", env->mcause);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "scause  ", env->scause);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vscause ", env->vscause);
++    }
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtval ", env->mtval);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "stval ", env->sbadaddr);
++    if (riscv_has_ext(env, RVH)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "htval ", env->htval);
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtval2 ", env->mtval2);
++    }
+ #endif
  
- /* Machine constants */
- 
--#define M_MODE_INTERRUPTS (MIP_MSIP | MIP_MTIP | MIP_MEIP)
--#define S_MODE_INTERRUPTS (MIP_SSIP | MIP_STIP | MIP_SEIP)
-+#define M_MODE_INTERRUPTS  (MIP_MSIP | MIP_MTIP | MIP_MEIP)
-+#define S_MODE_INTERRUPTS  (MIP_SSIP | MIP_STIP | MIP_SEIP)
-+#define VS_MODE_INTERRUPTS (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)
- 
- static const target_ulong delegable_ints = S_MODE_INTERRUPTS;
- static const target_ulong all_ints = M_MODE_INTERRUPTS | S_MODE_INTERRUPTS;
-@@ -257,6 +272,7 @@ static const target_ulong sstatus_v1_10_mask = SSTATUS_SIE | SSTATUS_SPIE |
-     SSTATUS_UIE | SSTATUS_UPIE | SSTATUS_SPP | SSTATUS_FS | SSTATUS_XS |
-     SSTATUS_SUM | SSTATUS_MXR | SSTATUS_SD;
- static const target_ulong sip_writable_mask = SIP_SSIP | MIP_USIP | MIP_UEIP;
-+static const target_ulong hip_writable_mask = MIP_VSSIP | MIP_VSTIP | MIP_VSEIP;
- 
- #if defined(TARGET_RISCV32)
- static const char valid_vm_1_09[16] = {
-@@ -756,6 +772,112 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
-     return 0;
- }
- 
-+/* Hypervisor Extensions */
-+static int read_hstatus(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->hstatus;
-+    return 0;
-+}
-+
-+static int write_hstatus(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->hstatus = val;
-+    return 0;
-+}
-+
-+static int read_hedeleg(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->hedeleg;
-+    return 0;
-+}
-+
-+static int write_hedeleg(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->hedeleg = val;
-+    return 0;
-+}
-+
-+static int read_hideleg(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->hideleg;
-+    return 0;
-+}
-+
-+static int write_hideleg(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->hideleg = val;
-+    return 0;
-+}
-+
-+static int rmw_hip(CPURISCVState *env, int csrno, target_ulong *ret_value,
-+                   target_ulong new_value, target_ulong write_mask)
-+{
-+    int ret = rmw_mip(env, 0, ret_value, new_value,
-+                      write_mask & hip_writable_mask);
-+
-+    return ret;
-+}
-+
-+static int read_hie(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->mie & VS_MODE_INTERRUPTS;
-+    return 0;
-+}
-+
-+static int write_hie(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    target_ulong newval = (env->mie & ~VS_MODE_INTERRUPTS) | (val & VS_MODE_INTERRUPTS);
-+    return write_mie(env, CSR_MIE, newval);
-+}
-+
-+static int read_hcounteren(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->hcounteren;
-+    return 0;
-+}
-+
-+static int write_hcounteren(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->hcounteren = val;
-+    return 0;
-+}
-+
-+static int read_htval(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->htval;
-+    return 0;
-+}
-+
-+static int write_htval(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->htval = val;
-+    return 0;
-+}
-+
-+static int read_htinst(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->htinst;
-+    return 0;
-+}
-+
-+static int write_htinst(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->htinst = val;
-+    return 0;
-+}
-+
-+static int read_hgatp(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->hgatp;
-+    return 0;
-+}
-+
-+static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->hgatp = val;
-+    return 0;
-+}
-+
- /* Physical Memory Protection */
- static int read_pmpcfg(CPURISCVState *env, int csrno, target_ulong *val)
- {
-@@ -959,6 +1081,16 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     /* Supervisor Protection and Translation */
-     [CSR_SATP] =                { smode, read_satp,        write_satp        },
- 
-+    [CSR_HSTATUS] =             { hmode,   read_hstatus,     write_hstatus    },
-+    [CSR_HEDELEG] =             { hmode,   read_hedeleg,     write_hedeleg    },
-+    [CSR_HIDELEG] =             { hmode,   read_hideleg,     write_hideleg    },
-+    [CSR_HIP] =                 { hmode,   NULL,     NULL,     rmw_hip        },
-+    [CSR_HIE] =                 { hmode,   read_hie,         write_hie        },
-+    [CSR_HCOUNTEREN] =          { hmode,   read_hcounteren,  write_hcounteren },
-+    [CSR_HTVAL] =               { hmode,   read_htval,       write_htval      },
-+    [CSR_HTINST] =              { hmode,   read_htinst,      write_htinst     },
-+    [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
-+
-     /* Physical Memory Protection */
-     [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
-     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
+     for (i = 0; i < 32; i++) {
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
