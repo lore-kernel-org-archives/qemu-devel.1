@@ -2,48 +2,46 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDC3C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03435C3F2C6
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA45020842
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:35:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA45020842
+	by mail.kernel.org (Postfix) with ESMTPS id CC6A320848
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 13:35:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6A320848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j97hn-0003tg-0n
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 08:35:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55647)
+	id 1j97hu-0004BT-27
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 08:35:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j97gy-0002ij-89
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j97gy-0002ih-6v
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j97gw-0006X3-Jr
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j97gw-0006X4-Jj
  for qemu-devel@nongnu.org; Tue, 03 Mar 2020 08:34:35 -0500
-Received: from relay.sw.ru ([185.231.240.75]:49930)
+Received: from relay.sw.ru ([185.231.240.75]:49914)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j97gw-0006Vh-BX; Tue, 03 Mar 2020 08:34:34 -0500
+ id 1j97gw-0006Vc-BZ; Tue, 03 Mar 2020 08:34:34 -0500
 Received: from dptest2.qa.sw.ru ([10.94.4.71])
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j97go-00057F-0f; Tue, 03 Mar 2020 16:34:26 +0300
+ id 1j97gn-00057F-LN; Tue, 03 Mar 2020 16:34:25 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/5] block/qcow2-threads: fix qcow2_decompress
-Date: Tue,  3 Mar 2020 16:34:21 +0300
-Message-Id: <20200303133425.24471-2-dplotnikov@virtuozzo.com>
+Subject: [PATCH v4 0/5] qcow2: Implement zstd cluster compression method
+Date: Tue,  3 Mar 2020 16:34:20 +0300
+Message-Id: <20200303133425.24471-1-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200303133425.24471-1-dplotnikov@virtuozzo.com>
-References: <20200303133425.24471-1-dplotnikov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
@@ -63,68 +61,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+v4:
+   * the series is rebased on top of 01 "block/qcow2-threads: fix qcow2_decompress"
+   * 01 is just a no-change resend to avoid extra dependencies. Still, it may be merged in separate
 
-On success path we return what inflate() returns instead of 0. And it
-most probably works for Z_STREAM_END as it is positive, but is
-definitely broken for Z_BUF_ERROR.
+v3:
+   * remove redundant max compression type value check [Vladimir, Eric]
+     (the switch below checks everything)
+   * prevent compression type changing on "qemu-img amend" [Vladimir]
+   * remove zstd config setting, since it has been added already by
+     "migration" patches [Vladimir]
+   * change the compression type error message [Vladimir] 
+   * fix alignment and 80-chars exceeding [Vladimir]
 
-While being here, switch to errno return code, to be closer to
-qcow2_compress API (and usual expectations).
+v2:
+   * rework compression type setting [Vladimir]
+   * squash iotest changes to the compression type introduction patch [Vladimir, Eric]
+   * fix zstd availability checking in zstd iotest [Vladimir]
+   * remove unnecessry casting [Eric]
+   * remove rudundant checks [Eric]
+   * fix compressed cluster layout in qcow2 spec [Vladimir]
+   * fix wording [Eric, Vladimir]
+   * fix compression type filtering in iotests [Eric]
 
-Revert condition in if to be more positive. Drop dead initialization of
-ret.
+v1:
+   the initial series
 
-Cc: qemu-stable@nongnu.org # v4.0
-Fixes: 341926ab83e2b
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-threads.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+zstd comression method is faster than the only available zlib.
+The series adds zstd to the methods available for clusters compression.
 
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 77bb578cdf..a68126f291 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -128,12 +128,12 @@ static ssize_t qcow2_compress(void *dest, size_t dest_size,
-  * @src - source buffer, @src_size bytes
-  *
-  * Returns: 0 on success
-- *          -1 on fail
-+ *          -EIO on fail
-  */
- static ssize_t qcow2_decompress(void *dest, size_t dest_size,
-                                 const void *src, size_t src_size)
- {
--    int ret = 0;
-+    int ret;
-     z_stream strm;
- 
-     memset(&strm, 0, sizeof(strm));
-@@ -144,17 +144,19 @@ static ssize_t qcow2_decompress(void *dest, size_t dest_size,
- 
-     ret = inflateInit2(&strm, -12);
-     if (ret != Z_OK) {
--        return -1;
-+        return -EIO;
-     }
- 
-     ret = inflate(&strm, Z_FINISH);
--    if ((ret != Z_STREAM_END && ret != Z_BUF_ERROR) || strm.avail_out != 0) {
-+    if ((ret == Z_STREAM_END || ret == Z_BUF_ERROR) && strm.avail_out == 0) {
-         /*
-          * We approve Z_BUF_ERROR because we need @dest buffer to be filled, but
-          * @src buffer may be processed partly (because in qcow2 we know size of
-          * compressed data with precision of one sector)
-          */
--        ret = -1;
-+        ret = 0;
-+    } else {
-+        ret = -EIO;
-     }
- 
-     inflateEnd(&strm);
+The implementation is done with respect to the recently added compression
+type additional header to the qcow2 specification.
+
+
+Denis Plotnikov (4):
+  qcow2: introduce compression type feature
+  qcow2: rework the cluster compression routine
+  qcow2: add zstd cluster compression
+  iotests: 287: add qcow2 compression type test
+
+Vladimir Sementsov-Ogievskiy (1):
+  block/qcow2-threads: fix qcow2_decompress
+
+ docs/interop/qcow2.txt           |  20 +++
+ configure                        |   2 +-
+ qapi/block-core.json             |  23 +++-
+ block/qcow2.h                    |  18 ++-
+ include/block/block_int.h        |   1 +
+ block/qcow2-threads.c            | 206 ++++++++++++++++++++++++++++---
+ block/qcow2.c                    | 108 ++++++++++++++++
+ tests/qemu-iotests/031.out       |  14 +--
+ tests/qemu-iotests/036.out       |   4 +-
+ tests/qemu-iotests/049.out       | 102 +++++++--------
+ tests/qemu-iotests/060.out       |   1 +
+ tests/qemu-iotests/061.out       |  34 ++---
+ tests/qemu-iotests/065           |  28 +++--
+ tests/qemu-iotests/080           |   2 +-
+ tests/qemu-iotests/144.out       |   4 +-
+ tests/qemu-iotests/182.out       |   2 +-
+ tests/qemu-iotests/242.out       |   5 +
+ tests/qemu-iotests/255.out       |   8 +-
+ tests/qemu-iotests/287           | 127 +++++++++++++++++++
+ tests/qemu-iotests/287.out       |  43 +++++++
+ tests/qemu-iotests/common.filter |   3 +-
+ tests/qemu-iotests/group         |   1 +
+ 22 files changed, 643 insertions(+), 113 deletions(-)
+ create mode 100755 tests/qemu-iotests/287
+ create mode 100644 tests/qemu-iotests/287.out
+
 -- 
 2.17.0
 
