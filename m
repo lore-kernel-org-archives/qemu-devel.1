@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 937A7C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F7FC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C9AD24677
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA47E24677
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 00:54:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NQj8IFd9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9AD24677
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CZ4DxnZW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA47E24677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j8vp8-0002L8-JA
-	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:54:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44823)
+	id 1j8vpI-0002g5-Vi
+	for qemu-devel@archiver.kernel.org; Mon, 02 Mar 2020 19:54:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkF-00012E-Rl
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:13 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkO-0001LX-NA
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1j8vkE-0004A2-Mm
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:11 -0500
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:35909)
+ (envelope-from <palmerdabbelt@google.com>) id 1j8vkN-0004GY-Lb
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:20 -0500
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:44955)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1j8vkE-00049M-Fy
- for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:10 -0500
-Received: by mail-pj1-x102e.google.com with SMTP id d7so546563pjw.1
- for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:10 -0800 (PST)
+ id 1j8vkN-0004GB-Fy
+ for qemu-devel@nongnu.org; Mon, 02 Mar 2020 19:49:19 -0500
+Received: by mail-pf1-x42e.google.com with SMTP id y5so545090pfb.11
+ for <qemu-devel@nongnu.org>; Mon, 02 Mar 2020 16:49:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=ANkDW0pV9KWX3pfShIfpn+QJJdRLLaIrASHy4mCGa4o=;
- b=NQj8IFd9g2uBiB4uWXv4HjYv67DmVCkTfCQjvhPodfwT+H0rNKeLOJEQs7ZPMhb9rm
- AVL1fKgVUMIPR+tqdbF7yJg3m/uTXB3jeulPinJrtvChX0lzeGitssq8EKGsKhM073xy
- IUuPw2gCegKQH82IZ/cU8tyF04RqBUj7th/3z6PAfMxMQz3G41kv/z0ECwpG3jdoH7Ru
- nLBUfd1I0LG9UqKfo/Wve4E/bUY7l1weVgOSXeT2m0/IM1Qf1kqSmTREWQXkro6V00XU
- uJjAxCctUCokwi1NQu9BK/XmtFxNRD1OdbiQ30ES4dCjOTS3UMas+Uw1VfrTqiPzOFVu
- dLfw==
+ bh=ANagWVKLvizSaKchqMWjcdMKh5oBJiAUyVPoiA3+eHk=;
+ b=CZ4DxnZWJrIgKj01EvAlv80BBB3viLK/oA8TslcfgcaY6YR8308kV7kUa/inGvua4P
+ t0B1wnIiTc0A0ha06wPO+TfLAUoTIeIrhxJn9sk91v4zhFAs2NTlcL9Z5fKNxMFO/Wc3
+ mDfjcVHTmujZwd7DmSB46VzBDzBj3cxEwlDubmpXAhh6R9qNs6A43TTsTtybNeo4/Snw
+ /PiDVkQyaG++1geTJ3c0jeo0H2PLSIve3O/EmEFUNdj4kXow9e71J5a8q9kSPxbqYhjV
+ na8e6RGZz0Wl3kBHOZ9viybIJaGm0Bu9oiF9V9DELaU9TYR0r6YD3xmX4QpP/FiQVv3x
+ 5Hqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=ANkDW0pV9KWX3pfShIfpn+QJJdRLLaIrASHy4mCGa4o=;
- b=g1peTuE42CK/qcdpwgbK2ecduY73PZOBcFSubdpXi4SR44MRkFFZw9SpxOTfWQzkjP
- sHIlQ5YQoKSjt2oye/tXBUqtRyKGj6rQoKF/uQNgA0/qxfd8HFsnvOSYcoiXVegiX8zC
- IMQ7hYaO0XqN+IkWFZFvDIcE9GYToIM04z+5DluJ/wpsf1ps8tk6JlNSl6QLCjvniIrF
- p9w9PM/3hLZ60gyxR6BcY+3wAM2jQSqQ6OkOuIl5Fo9y7Oy3NM3w/ZwUehG5HKhm1ZUe
- 0AcFYPPvusLFBjxI904vFHEfZbpBsKk++FSf8Po0RNSCDewCHh+Hv/6OdGrkago1lhTM
- VMUA==
-X-Gm-Message-State: ANhLgQ1gZ/k8GbujvOMt1RfwqisVZ3zUYJjGEaBj+ACim0DUf6U/7kxG
- sakBM186NKzQdAIe2XGkERxqzOeuX9GbNQ==
-X-Google-Smtp-Source: ADFU+vsUM+d5+NDMvZshjdSzDL+34bBRrCajz6HLvUUwrbef0Je+/Cp93XE7Rkcb1i6FhjJ+bzv2Yw==
-X-Received: by 2002:a17:90b:438b:: with SMTP id
- in11mr1247550pjb.84.1583196549275; 
- Mon, 02 Mar 2020 16:49:09 -0800 (PST)
+ bh=ANagWVKLvizSaKchqMWjcdMKh5oBJiAUyVPoiA3+eHk=;
+ b=qe5eaLbnb6CAqF00Thf96FrxRUWuCaBmpvF8z8Avy0kL+mrRFsEeNoXne/h5QZ8R45
+ CojgcVNyjM1cQXCA5NH3/bANtunbBnCtWnWjSRflzwiFHeEXW8VOjMmmJO7Byy7WT1IH
+ uGcNyjVnbKmiEg1TN3b/sfyzwi5MFXvVfYVM1P94pqAEk6LRg5twv7yOJKnCxSZyqALX
+ eqkOVgkaKD9arsVoTBUIQWT96Ka9EcsDmFUF/UD2FjqB3SzvevmDRtn8CFE0sDq5eoMG
+ +BdgnODFF8pbuhgfB5GZM6NacHE+BVWyZKNhGb9S1mxkFn/TIuC2LvRz4By9CrGB3J0v
+ qi6Q==
+X-Gm-Message-State: ANhLgQ1qQIhLJlp6hpA7QzpLZ3H47zqnwStf/QyUxrHA8kA1GCT0Qz64
+ 959pyGpzZTlvO3Ok8vUv5MDX2hjlQGPpug==
+X-Google-Smtp-Source: ADFU+vvlXYcn0/i7j/5tbb29kKUjSUhG+xmlXIjJ3/vsn2B7Dhqx8Sr5W6nbvLON/YJ0kmahFQ6Khw==
+X-Received: by 2002:a63:1e57:: with SMTP id p23mr1578180pgm.316.1583196558485; 
+ Mon, 02 Mar 2020 16:49:18 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id y23sm22450558pfn.101.2020.03.02.16.49.08
+ by smtp.gmail.com with ESMTPSA id k3sm22320070pgh.34.2020.03.02.16.49.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Mar 2020 16:49:08 -0800 (PST)
-Subject: [PULL 07/38] target/riscv: Add the force HS exception mode
-Date: Mon,  2 Mar 2020 16:48:17 -0800
-Message-Id: <20200303004848.136788-8-palmerdabbelt@google.com>
+ Mon, 02 Mar 2020 16:49:18 -0800 (PST)
+Subject: [PULL 13/38] target/riscv: Add Hypervisor machine CSRs accesses
+Date: Mon,  2 Mar 2020 16:48:23 -0800
+Message-Id: <20200303004848.136788-14-palmerdabbelt@google.com>
 X-Mailer: git-send-email 2.25.0.265.gbab2e86ba0-goog
 In-Reply-To: <20200303004848.136788-1-palmerdabbelt@google.com>
 References: <20200303004848.136788-1-palmerdabbelt@google.com>
@@ -84,7 +83,7 @@ From: Palmer Dabbelt <palmerdabbelt@google.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::102e
+X-Received-From: 2607:f8b0:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,79 +101,58 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
-Add a FORCE_HS_EXCEP mode to the RISC-V virtulisation status. This bit
-specifies if an exeption should be taken to HS mode no matter the
-current delegation status. This is used when an exeption must be taken
-to HS mode, such as when handling interrupts.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 Signed-off-by: Palmer Dabbelt <palmerdabbelt@google.com>
 ---
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_bits.h   |  6 ++++++
- target/riscv/cpu_helper.c | 18 ++++++++++++++++++
- 3 files changed, 26 insertions(+)
+ target/riscv/csr.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index a9cbd8584e..42720d65f9 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -273,6 +273,8 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
- bool riscv_cpu_fp_enabled(CPURISCVState *env);
- bool riscv_cpu_virt_enabled(CPURISCVState *env);
- void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
-+bool riscv_cpu_force_hs_excep_enabled(CPURISCVState *env);
-+void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable);
- int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
- hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 2cdb0de4fe..ad6479796c 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -432,6 +432,12 @@
- 
- /* Virtulisation Register Fields */
- #define VIRT_ONOFF          1
-+/* This is used to save state for when we take an exception. If this is set
-+ * that means that we want to force a HS level exception (no matter what the
-+ * delegation is set to). This will occur for things such as a second level
-+ * page table fault.
-+ */
-+#define FORCE_HS_EXCEP      2
- 
- /* RV32 satp CSR field masks */
- #define SATP32_MODE         0x80000000
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index e5311160e7..e36ee7d58e 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -100,6 +100,24 @@ void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable)
-     env->virt = set_field(env->virt, VIRT_ONOFF, enable);
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 3fa8d2cfda..f7333286bd 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -984,6 +984,30 @@ static int write_vsatp(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
  }
  
-+bool riscv_cpu_force_hs_excep_enabled(CPURISCVState *env)
++static int read_mtval2(CPURISCVState *env, int csrno, target_ulong *val)
 +{
-+    if (!riscv_has_ext(env, RVH)) {
-+        return false;
-+    }
-+
-+    return get_field(env->virt, FORCE_HS_EXCEP);
++    *val = env->mtval2;
++    return 0;
 +}
 +
-+void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable)
++static int write_mtval2(CPURISCVState *env, int csrno, target_ulong val)
 +{
-+    if (!riscv_has_ext(env, RVH)) {
-+        return;
-+    }
-+
-+    env->virt = set_field(env->virt, FORCE_HS_EXCEP, enable);
++    env->mtval2 = val;
++    return 0;
 +}
 +
- int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
++static int read_mtinst(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->mtinst;
++    return 0;
++}
++
++static int write_mtinst(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->mtinst = val;
++    return 0;
++}
++
+ /* Physical Memory Protection */
+ static int read_pmpcfg(CPURISCVState *env, int csrno, target_ulong *val)
  {
-     CPURISCVState *env = &cpu->env;
+@@ -1207,6 +1231,9 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     [CSR_VSTVAL] =              { hmode,   read_vstval,      write_vstval     },
+     [CSR_VSATP] =               { hmode,   read_vsatp,       write_vsatp      },
+ 
++    [CSR_MTVAL2] =              { hmode,   read_mtval2,      write_mtval2     },
++    [CSR_MTINST] =              { hmode,   read_mtinst,      write_mtinst     },
++
+     /* Physical Memory Protection */
+     [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
+     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
 -- 
 2.25.0.265.gbab2e86ba0-goog
 
