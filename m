@@ -2,128 +2,84 @@ Return-Path: <SRS0=3Wv1=4U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B11C3F2C6
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30045C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B614820CC7
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:06:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F29662072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Mar 2020 08:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="XM6Si580"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B614820CC7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Th8dI/jX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F29662072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j92ZY-00051t-To
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 03:06:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35686)
+	id 1j92ed-0006YQ-3u
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 03:11:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1j92Yo-0004V5-Pj
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:05:52 -0500
+ (envelope-from <armbru@redhat.com>) id 1j92du-00064m-5x
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1j92Yn-0001CP-1J
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:05:50 -0500
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:44416)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1j92Ym-0001C8-O1
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:05:48 -0500
-Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 02384XcQ006401; Tue, 3 Mar 2020 00:05:46 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=K0XCbdnmiq9glBFZmQ8NPm+p8hVGMqVWidV3IbfMMDk=;
- b=XM6Si5807BhQDCS/zxhYpe6TAR+9HOw0PNSSRNONkt2lqg4ev5GIfcnXYJBsZxePO2Lh
- PKlyqNBGvy3KnMwtEZaF1tCerj7i2rTdeHUF/Q53MstBJwfpUIwNKmc34Rxbs12G7l4p
- wA06b0V7we6Yv3roAzj18lNaG10o5tOh+pCENEoZlc7G8HxbqkNDU9MoyNYCjOYK+GEs
- izw0DAx4EvIpX5v3ONA+BfZQFY1lnOV8ofD7rncUy2p+6POVygxJyO4OTmakoFh+C1b3
- CYb8iilRLri3bRzrleSQ2P3181U2SVYgsE1FWdnElWXueMkfQZH4RgkijwTID8E87PTf tQ== 
-Received: from nam12-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam12lp2042.outbound.protection.outlook.com [104.47.66.42])
- by mx0a-002c1b01.pphosted.com with ESMTP id 2yfqwnp6je-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 03 Mar 2020 00:05:46 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g1wBVZxCXMmL1o5NxqT4g4/iZpu7nSXSp78t9wNrUQBo7PzdtYDWqrVRbBkgoqNtQUaJ2orVu+EFjt5HLWofXYysz4Tcla2e7MY/bM8aw4EOuApzVVCjqRtRiTsUpjunrx+uKSheVoxepZDPwdnYKHK2BfJ0P7W+EDXXh8j8pYNtW4X6qYtbPj7IXRpB0NNKYOacTRvqT5qkYhI79xXipE/6X6By4Dfai2+NiuON51/ivZPhHiSWpHirJ0AdEk2zcw18tm/2p3tCSzBx7AqNQ2nQmyAR2cOI7AAcFFSF6/J0yF6mU7WQMPtUVBSUIcfBIuvlJUZoE3SZHrUDjkDt0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K0XCbdnmiq9glBFZmQ8NPm+p8hVGMqVWidV3IbfMMDk=;
- b=kw86GfRM8UJqvyEi8Ics0vXGXa6mu2Hbf19G46Q/zphyAvnDJasw3vqwF78K7PwCp0bqBYU/xsqexXUe45Ei1qqJjHFMf/4vvw0AhdW9bEdUBbp5dtHGfbpwXuezLDrbLtvWmMdHl0HVZOfqp7gxcUc5QR5UDpWiTmHHcd3zY2uChy3eX0QT0tNEQNFXFesjgEOnUxVmOgyRgrKJuYzj3EldK0CS9zz8U4Cb4HgGNfC4Cyaf3t4kWe4AA8Gnzo1w1jr4qwFF/+V9AkjAX2wC4TNs9R8eErWAU+kN7+IGMR5fmrHjxZovvdgTCMpNSM30YG03JRuGMTLcwKktAvm7Iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (2603:10b6:300:45::14)
- by MWHPR02MB3150.namprd02.prod.outlook.com (2603:10b6:301:61::38)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15; Tue, 3 Mar
- 2020 08:05:44 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c4c8:b406:7827:8a2b]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c4c8:b406:7827:8a2b%6]) with mapi id 15.20.2772.019; Tue, 3 Mar 2020
- 08:05:44 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>, Paolo
- Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v6 0/4] Improve default object property_add uint helpers
-Thread-Topic: [PATCH v6 0/4] Improve default object property_add uint helpers
-Thread-Index: AQHV211IMbV0oM7QCkSeM+CVGLRnMKgLCu6AgCujaYA=
-Date: Tue, 3 Mar 2020 08:05:44 +0000
-Message-ID: <64CA08E4-01C2-4BB8-B2B0-163406E1CD6F@nutanix.com>
-References: <20200204131601.125677-1-felipe@nutanix.com>
- <CAJ+F1CJLvKtSnFFurBUy4LcP+DqNTtqHd4oevJADfW8JEVuXXA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CJLvKtSnFFurBUy4LcP+DqNTtqHd4oevJADfW8JEVuXXA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [62.254.189.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 86955b1b-c97a-404c-8240-08d7bf49acb8
-x-ms-traffictypediagnostic: MWHPR02MB3150:
-x-microsoft-antispam-prvs: <MWHPR02MB315045A1636E2B55EEBBC540D7E40@MWHPR02MB3150.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 03319F6FEF
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(366004)(376002)(39860400002)(136003)(346002)(189003)(199004)(478600001)(6486002)(4326008)(26005)(8936002)(8676002)(81166006)(53546011)(966005)(36756003)(6512007)(186003)(6506007)(86362001)(81156014)(71200400001)(33656002)(316002)(110136005)(54906003)(2616005)(66556008)(66476007)(91956017)(66946007)(64756008)(76116006)(66446008)(2906002)(5660300002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB3150;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Np9PxqBRExDseDqHp71l5/YwlNf5gJc/4O2y+kOorGeHTa+xKTKuwIEGlTcoElFeW9Y+JIShF/a/SSvbZSt4+ZCCRHc68gm/XQUlnuVrT1RGV4hOsKPfefGpbXhFMq0d005aUvnFNksm61YvYRUZ8s8w6qHkbtaPbOkQLoaA9GDnLPl1kUf8x0iE3ZY8Ad6VtmEowOIqAiFf9vru4gHDzKOkP+WGFLlgOZmariGRN5lENtYDKPK8K7Y9nmkHE0CXGXqRDFjK3C1F2v4nIz6cYJHM5h/ChtLckIyHxaSn9pMpJhUZBlzt4Z8FDVn9QzqHpqvahLoyu7dATMzrvOnsg+0Qhqh4MnKxp5ryBsEw/r/RTZvJfTLErWuGGox1SaocDlriRxNko/+DFb+P5nBHXmjcq6OVyp0LIP5DJkxgUIBUOSpkF1q5UTVCiStXB3C+06WMP0bN9ItcTb9WjNPFocJ2CxiMjyMPcZkrs0D8S1xdN+Gq9yd7IFWRFOURSiqflM0KHEtIpS+t889qEv1omQ==
-x-ms-exchange-antispam-messagedata: E/8ZpZ0rEVMGBsJYV7dS8fXENEkiOT0CL+rgegwoLIppYyjxYGNu1Z9a4sgQoNfXaZQbX1WG8CvbmomNbaubvjZmShYcyg5PyqQIvshGOpfrVc5y0b3WhTlMHHu5+zjhbWLYbs7hl7IKK85ZcYgI6g==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <37A0FA4171DB384D8971D89C9660BA53@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <armbru@redhat.com>) id 1j92ds-0003Ld-IU
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:05 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50358
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1j92ds-0003LH-Cp
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 03:11:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583223063;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RCwNnUdNZwz9ymgbmW/BL4i9p3W0DN8ijycPRFiWJjI=;
+ b=Th8dI/jX9kZebokqmE6vM0YJ6pzHWej1z4O6tYbWSg2B+2Kq5uKCT0t03Rfg4WXkvMca7g
+ IZxT0M+LvyR7Bii1M2GCWk8PzOh3gSa2nZoz05Mcx2QQZqef5Qkab1uBukOEcG5IGJ/UuS
+ gWK89sPOsc39zRsEnLHUNNSKcVprG3c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-I_IDbCYRPliQ63cZbPLJ1g-1; Tue, 03 Mar 2020 03:11:01 -0500
+X-MC-Unique: I_IDbCYRPliQ63cZbPLJ1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29FAF100550E;
+ Tue,  3 Mar 2020 08:11:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-129.ams2.redhat.com
+ [10.36.116.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C18D0272A0;
+ Tue,  3 Mar 2020 08:10:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 5146C11386A6; Tue,  3 Mar 2020 09:10:58 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v5 1/4] qapi: Add a 'coroutine' flag for commands
+References: <20200218154036.28562-1-kwolf@redhat.com>
+ <20200218154036.28562-2-kwolf@redhat.com>
+Date: Tue, 03 Mar 2020 09:10:58 +0100
+In-Reply-To: <20200218154036.28562-2-kwolf@redhat.com> (Kevin Wolf's message
+ of "Tue, 18 Feb 2020 16:40:33 +0100")
+Message-ID: <87tv35dfjh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86955b1b-c97a-404c-8240-08d7bf49acb8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Mar 2020 08:05:44.6256 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tkI0BSwplqNN8gN9mhFwEDc18cSmqlsjF1iq6v7TWsl2FdRV06+vR9Xz94SrDbqtldLlAHmDVyCLCskKqLt2dJE9nGl7hvLIU1dIUg6JCN4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3150
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
- definitions=2020-03-03_02:2020-03-03,
- 2020-03-03 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.151.68
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,66 +91,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Phillipe Mathieu-Daude <philmd@redhat.com>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgTWFyYy9QYW9sbywNCg0KPiBPbiBGZWIgNCwgMjAyMCwgYXQgMTo0MSBQTSwgTWFyYy1BbmRy
-w6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QGdtYWlsLmNvbT4gd3JvdGU6DQo+IA0KPiBIaQ0K
-PiANCj4gT24gVHVlLCBGZWIgNCwgMjAyMCBhdCAyOjE2IFBNIEZlbGlwZSBGcmFuY2lvc2kgPGZl
-bGlwZUBudXRhbml4LmNvbT4gd3JvdGU6DQo+PiANCj4+IFRoaXMgaW1wcm92ZXMgdGhlIGZhbWls
-eSBvZiBvYmplY3RfcHJvcGVydHlfYWRkX3VpbnRYWF9wdHIgaGVscGVycyBieSBlbmFibGluZw0K
-Pj4gYSBkZWZhdWx0IGdldHRlci9zZXR0ZXIgb25seSB3aGVuIGRlc2lyZWQuIFRvIHByZXZlbnQg
-YW4gQVBJIGJlaGF2aW91cmFsIGNoYW5nZQ0KPj4gKGZyb20gY2xpZW50cyB0aGF0IGFscmVhZHkg
-dXNlZCB0aGVzZSBoZWxwZXJzIGFuZCBkaWQgbm90IHdhbnQgYSBzZXR0ZXIpLCB3ZQ0KPj4gYWRk
-IGEgT0JKX1BST1BfRkxBR19SRUFEIGZsYWcgdGhhdCBhbGxvdyBjbGllbnRzIHRvIG9ubHkgaGF2
-ZSBhIGdldHRlci4gUGF0Y2ggMQ0KPj4gZW5oYW5jZXMgdGhlIEFQSSBhbmQgbW9kaWZ5IGN1cnJl
-bnQgdXNlcnMuDQo+PiANCj4+IFdoaWxlIG1vZGlmeWluZyB0aGUgY2xpZW50cyBvZiB0aGUgQVBJ
-LCBhIGNvdXBsZSBvZiBpbXByb3ZlbWVudCBvcHBvcnR1bml0aWVzDQo+PiB3ZXJlIG9ic2VydmVk
-IGluIGljaDkuIFRoZXNlIHdlcmUgYWRkZWQgaW4gc2VwYXJhdGUgcGF0Y2hlcyAoMiBhbmQgMyku
-DQo+PiANCj4+IFBhdGNoIDQgY2xlYW5zIHVwIGEgbG90IG9mIGV4aXN0aW5nIGNvZGUgYnkgbW92
-aW5nIHZhcmlvdXMgb2JqZWN0cyB0byB0aGUNCj4+IGVuaGFuY2VkIEFQSS4gUHJldmlvdXNseSwg
-dGhvc2Ugb2JqZWN0cyBoYWQgdGhlaXIgb3duIGdldHRlcnMvc2V0dGVycyB0aGF0IG9ubHkNCj4+
-IHVwZGF0ZWQgdGhlIHZhbHVlcyB3aXRob3V0IGZ1cnRoZXIgY2hlY2tzLiBTb21lIG9mIHRoZW0g
-YWN0dWFsbHkgbGFja2VkIGEgY2hlY2sNCj4+IGZvciBzZXR0aW5nIG92ZXJmbG93cywgd2hpY2gg
-Y291bGQgaGF2ZSByZXN1bHRlZCBpbiB1bmRlc2lyZWQgdmFsdWVzIGJlaW5nIHNldC4NCj4+IFRo
-ZSBuZXcgZGVmYXVsdCBzZXR0ZXJzIGluY2x1ZGUgYSBjaGVjayBmb3IgdGhhdCwgbm90IHVwZGF0
-aW5nIHRoZSB2YWx1ZXMgaW4NCj4+IGNhc2Ugb2YgZXJyb3JzIChhbmQgcHJvcGFnYXRpbmcgdGhl
-bSkuIElmIHRoZXkgZGlkIG5vdCBwcm92aWRlIGFuIGVycm9yDQo+PiBwb2ludGVyLCB0aGVuIHRo
-YXQgYmVoYXZpb3VyIHdhcyBtYWludGFpbmVkLg0KPj4gDQo+PiBGZWxpcGUgRnJhbmNpb3NpICg0
-KToNCj4+ICBxb20vb2JqZWN0OiBlbmFibGUgc2V0dGVyIGZvciB1aW50IHR5cGVzDQo+PiAgaWNo
-OTogZml4IGdldHRlciB0eXBlIGZvciBzY2lfaW50IHByb3BlcnR5DQo+PiAgaWNoOTogU2ltcGxp
-ZnkgaWNoOV9scGNfaW5pdGZuDQo+PiAgcW9tL29iamVjdDogVXNlIGNvbW1vbiBnZXQvc2V0IHVp
-bnQgaGVscGVycw0KPj4gDQo+PiBody9hY3BpL2ljaDkuYyAgICAgICB8ICA5OSArKy0tLS0tLS0t
-LS0tLS0tLS0tLQ0KPj4gaHcvYWNwaS9wY2locC5jICAgICAgfCAgIDcgKy0NCj4+IGh3L2FjcGkv
-cGlpeDQuYyAgICAgIHwgIDEyICstLQ0KPj4gaHcvaXNhL2xwY19pY2g5LmMgICAgfCAgMjcgKyst
-LS0tDQo+PiBody9taXNjL2VkdS5jICAgICAgICB8ICAxMyArLS0NCj4+IGh3L3BjaS1ob3N0L3Ez
-NS5jICAgIHwgIDE0ICstLQ0KPj4gaHcvcHBjL3NwYXByLmMgICAgICAgfCAgMTggKy0tLQ0KPj4g
-aHcvcHBjL3NwYXByX2RyYy5jICAgfCAgIDMgKy0NCj4+IGluY2x1ZGUvcW9tL29iamVjdC5oIHwg
-IDQ4ICsrKysrKysrLS0NCj4+IG1lbW9yeS5jICAgICAgICAgICAgIHwgIDE1ICstLQ0KPj4gcW9t
-L29iamVjdC5jICAgICAgICAgfCAyMTIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKystLS0tLQ0KPj4gdGFyZ2V0L2FybS9jcHUuYyAgICAgfCAgMjIgKy0tLS0NCj4+IHRhcmdl
-dC9pMzg2L3Nldi5jICAgIHwgMTA2ICsrLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+IHVpL2NvbnNv
-bGUuYyAgICAgICAgIHwgICA0ICstDQo+PiAxNCBmaWxlcyBjaGFuZ2VkLCAyODIgaW5zZXJ0aW9u
-cygrKSwgMzE4IGRlbGV0aW9ucygtKQ0KPiANCj4gU2VyaWVzOg0KPiBSZXZpZXdlZC1ieTogTWFy
-Yy1BbmRyw6kgTHVyZWF1IDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20+DQo+IA0KPiBQYW9s
-bywgd291bGQgeW91IHF1ZXVlIGl0Pw0KDQpQaW5nOiBkaWQgdGhpcyBnZXQgbG9zdD8NCg0KRi4N
-Cg0KPiANCj4+IA0KPj4gLS0NCj4+IDIuMjAuMQ0KPj4gDQo+PiBDaGFuZ2Vsb2c6DQo+PiB2MS0+
-djI6DQo+PiAtIFVwZGF0ZSBzY2lfaW50IGRpcmVjdGx5IGluc3RlYWQgb2YgdXNpbmcgc3RhY2sg
-dmFyaWFibGUNCj4+IC0gRGVmaW5pbmcgYW4gZW5oYW5jZWQgT2JqZWN0UHJvcGVydHlGbGFncyBp
-bnN0ZWFkIG9mIGp1c3QgJ3JlYWRvbmx5Jw0KPj4gLSBFcnJvcmluZyBvdXQgZGlyZWN0bHkgKGlu
-c3RlYWQgb2YgdXNpbmcgZ290b3MpIG9uIGRlZmF1bHQgc2V0dGVycw0KPj4gLSBSZXRhaW5pbmcg
-bGFjayBvZiBlcnJwIHBhc3Npbmcgd2hlbiBpdCB3YXNuJ3QgdGhlcmUNCj4+IHYyLT52MzoNCj4+
-IC0gUmVuYW1lIGZsYWdzIF9SRCB0byBfUkVBRCBhbmQgX1dSIHRvIF9XUklURQ0KPj4gLSBBZGQg
-YSBjb252ZW5pZW5jZSBfUkVBRFdSSVRFIGZsYWcNCj4+IC0gRHJvcCB0aGUgdXNhZ2Ugb2YgVUwg
-aW4gdGhlIGJpdCBmbGFnIGRlZmluaXRpb25zDQo+PiB2My0+djQ6DQo+PiAtIERyb3AgY2hhbmdl
-cyB0byBody92ZmlvL3BjaS1xdWlya3MuYw0KPj4gdjQtPnY1Og0KPj4gLSBSZWJhc2Ugb24gbGF0
-ZXN0IG1hc3Rlcg0KPj4gLSBBdmFpbGFibGUgaGVyZTogaHR0cHM6Ly9naXRodWIuY29tL2ZyYW5j
-aW96enkvcWVtdS90cmVlL2F1dG9zZXR0ZXJzDQo+PiB2NS0+djY6DQo+PiAtIEZpeCBidWlsZCBl
-cnJvciBpbnRyb2R1Y2VkIGluIHJlYmFzZQ0KPiANCj4gDQo+IA0KPiAtLSANCj4gTWFyYy1BbmRy
-w6kgTHVyZWF1DQoNCg==
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> This patch adds a new 'coroutine' flag to QMP command definitions that
+> tells the QMP dispatcher that the command handler is safe to be run in a
+> coroutine.
+>
+> The documentation of the new flag pretends that this flag is already
+> used as intended, which it isn't yet after this patch. We'll implement
+> this in another patch in this series.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  docs/devel/qapi-code-gen.txt            | 11 +++++++++++
+>  include/qapi/qmp/dispatch.h             |  1 +
+>  tests/test-qmp-cmds.c                   |  4 ++++
+>  scripts/qapi/commands.py                | 10 +++++++---
+>  scripts/qapi/doc.py                     |  2 +-
+>  scripts/qapi/expr.py                    | 10 ++++++++--
+>  scripts/qapi/introspect.py              |  2 +-
+>  scripts/qapi/schema.py                  |  9 ++++++---
+>  tests/qapi-schema/test-qapi.py          |  7 ++++---
+>  tests/Makefile.include                  |  1 +
+>  tests/qapi-schema/oob-coroutine.err     |  2 ++
+>  tests/qapi-schema/oob-coroutine.json    |  2 ++
+>  tests/qapi-schema/oob-coroutine.out     |  0
+>  tests/qapi-schema/qapi-schema-test.json |  1 +
+>  tests/qapi-schema/qapi-schema-test.out  |  2 ++
+>  15 files changed, 51 insertions(+), 13 deletions(-)
+>  create mode 100644 tests/qapi-schema/oob-coroutine.err
+>  create mode 100644 tests/qapi-schema/oob-coroutine.json
+>  create mode 100644 tests/qapi-schema/oob-coroutine.out
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 59d6973e1e..df01bd852b 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -457,6 +457,7 @@ Syntax:
+>                  '*gen': false,
+>                  '*allow-oob': true,
+>                  '*allow-preconfig': true,
+> +                '*coroutine': true,
+>                  '*if': COND,
+>                  '*features': FEATURES }
+> =20
+> @@ -581,6 +582,16 @@ before the machine is built.  It defaults to false. =
+ For example:
+>  QMP is available before the machine is built only when QEMU was
+>  started with --preconfig.
+> =20
+> +Member 'coroutine' tells the QMP dispatcher whether the command handler
+> +is safe to be run in a coroutine.  It defaults to false.  If it is true,
+> +the command handler is called from coroutine context and may yield while
+> +waiting for an external event (such as I/O completion) in order to avoid
+> +blocking the guest and other background operations.
+> +
+> +It is an error to specify both 'coroutine': true and 'allow-oob': true
+> +for a command.  (We don't currently have a use case for both together an=
+d
+> +without a use case, it's not entirely clear what the semantics should be=
+.)
+
+The parenthesis is new since v4.  I like its contents.  I'm not fond of
+putting complete sentences in parenthesis.  I'll drop them, if you don't
+mind.
+
+> +
+>  The optional 'if' member specifies a conditional.  See "Configuring
+>  the schema" below for more on this.
+> =20
+[...]
+> diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
+> index d7a289eded..95cc006cae 100644
+> --- a/scripts/qapi/expr.py
+> +++ b/scripts/qapi/expr.py
+> @@ -89,10 +89,16 @@ def check_flags(expr, info):
+>          if key in expr and expr[key] is not False:
+>              raise QAPISemError(
+>                  info, "flag '%s' may only use false value" % key)
+> -    for key in ['boxed', 'allow-oob', 'allow-preconfig']:
+> +    for key in ['boxed', 'allow-oob', 'allow-preconfig', 'coroutine']:
+>          if key in expr and expr[key] is not True:
+>              raise QAPISemError(
+>                  info, "flag '%s' may only use true value" % key)
+> +    if 'allow-oob' in expr and 'coroutine' in expr:
+> +        # This is not necessarily a fundamental incompatibility, but we =
+don't
+> +        # have a use case and the desired semantics isn't obvious. The s=
+implest
+> +        # solution is to forbid it until we get a use case for it.
+
+Appreciated.  I'll word-wrap, if you don't mind.
+
+> +        raise QAPISemError(info, "flags 'allow-oob' and 'coroutine' "
+> +                                 "are incompatible")
+> =20
+> =20
+>  def check_if(expr, info, source):
+> @@ -344,7 +350,7 @@ def check_exprs(exprs):
+>                         ['command'],
+>                         ['data', 'returns', 'boxed', 'if', 'features',
+>                          'gen', 'success-response', 'allow-oob',
+> -                        'allow-preconfig'])
+> +                        'allow-preconfig', 'coroutine'])
+>              normalize_members(expr.get('data'))
+>              check_command(expr, info)
+>          elif meta =3D=3D 'event':
+[...]
+
+R-by stands.
+
 
