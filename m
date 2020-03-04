@@ -2,138 +2,101 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A32C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C73C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0B1F215A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF61C215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiKh+6A1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B1F215A4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gh7Eo2T5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF61C215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9WAP-0006Mk-3G
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:42:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47538)
+	id 1j9WCY-0000Kc-S5
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:44:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1j9W9T-0004mF-TF
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:40 -0500
+ (envelope-from <philmd@redhat.com>) id 1j9W9n-0005Ua-2b
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:42:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1j9W9S-0005hi-Qz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35046
+ (envelope-from <philmd@redhat.com>) id 1j9W9m-00065w-0I
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30523
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j9W9S-0005gj-Mz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:38 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9W9l-00064l-SZ
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583336498;
+ s=mimecast20190719; t=1583336517;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=lAdNuAjGjgv4SYnURhSbZNmraG7CFf6sWkfpiNz24Bk=;
- b=UiKh+6A1L+zfyRzono9b7yGSl7y8ZiVsYlXpkg72Xd/y5UtKI/66FJAFO1tlUDD/Ejj/Py
- qD/UZGmqp5vYozxj4EQyA+GluQc8X/OeoNChP8OGk/ehTN7rjhLR0uh0LFdkM03L8MjMrL
- MNDIBE6DmCsnlnnBYrNtzK5QnGq09fo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-9VZBta-_P16OSJWBCocMRQ-1; Wed, 04 Mar 2020 10:41:34 -0500
-X-MC-Unique: 9VZBta-_P16OSJWBCocMRQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78249800053;
- Wed,  4 Mar 2020 15:41:28 +0000 (UTC)
-Received: from [10.36.117.17] (ovpn-117-17.ams2.redhat.com [10.36.117.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4AE227186;
- Wed,  4 Mar 2020 15:41:11 +0000 (UTC)
-Subject: Re: [PATCH v2 4/4] net: Remove field info_str of NetClientState
-To: Alexey Kirillov <lekiravi@yandex-team.ru>, Eric Blake
- <eblake@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
- Markus Armbruster <armbru@redhat.com>
-References: <20200304130656.16859-1-lekiravi@yandex-team.ru>
- <20200304130656.16859-5-lekiravi@yandex-team.ru>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <5976574b-8546-dc15-2c79-18c277fb2eff@redhat.com>
-Date: Wed, 4 Mar 2020 16:41:10 +0100
+ in-reply-to:in-reply-to:references:references;
+ bh=faBOvIyuYD4kOjDqnf5vnV+OAJpUxg4KO9Xy2+uCAnA=;
+ b=Gh7Eo2T5BkW2OYet8pc8EHwcoovkCYIXscCY6LATyEufVBAvT6oSlx2tg8lpFeLwI1HXOM
+ UK26iEDdhLcFOxmgVDefGJ+L01lIrEcZxH1sfTTLVx/MPJEqiuwtX4TDGc8+T7tVjDigHo
+ Y81t7K9wDv9zPu+NF0+GrJWi8I69PN0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-Lxbv_wbFMsqzcobX_Y6f1w-1; Wed, 04 Mar 2020 10:41:52 -0500
+X-MC-Unique: Lxbv_wbFMsqzcobX_Y6f1w-1
+Received: by mail-ed1-f71.google.com with SMTP id u12so1889673edb.20
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 07:41:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EK9w5zFORySIK7tms+65QsHl8EPjhuzaESYQp3A9+Ug=;
+ b=MV2ZsALZVsl/ztXquz+douBKkWeupfVq4/HD89s7jXnIrk3dE2s3PH1nkDDHquFobZ
+ oXPp97+9WMSKFhvuwYDiraD1WsrjFDtdeHIKqjC9J5C7uLUfypdNKdwB6iOSbEsjo71B
+ rEguAkaqSyrYGcV100Olfj8B3E1q5P8z9cxHwA8DLTNxw8XqEuKPhueoOf89EtOf5jL7
+ PDS0WT5kfmZBMNcJVO5qaoxlSKoO5gi9pTilWyTpjid4ziIdoLs7fTUA5NWCJx3XMnLk
+ roqXcFqb0p504ZLf89Z5oqNFGaAR1KK9Q91xoiHzDSw2bT30EW0KmQV2iV0syF4PQv3J
+ sLFw==
+X-Gm-Message-State: ANhLgQ2fKU5ODDHo/LBFinOYuYpPlHDjX7OI7Tz66sKL37SWPGa04r8q
+ y1grFA1VPam0xx+Uxjj6+qvbL9aOftqvZ1eY1oeJZlidBGzfbceID0azpWex8Or0Se8zNZL7zS2
+ KBHy+CvVyTycd84o=
+X-Received: by 2002:a17:906:728e:: with SMTP id
+ b14mr3098531ejl.162.1583336511317; 
+ Wed, 04 Mar 2020 07:41:51 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vuvNqZBvKZviqVGhkjwR3C7yysrXEc3poRbRBpJyXrroYSY0k24TiVBfWX+BunEur1rJ1TLOQ==
+X-Received: by 2002:a17:906:728e:: with SMTP id
+ b14mr3098513ejl.162.1583336511082; 
+ Wed, 04 Mar 2020 07:41:51 -0800 (PST)
+Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
+ [88.21.205.47])
+ by smtp.gmail.com with ESMTPSA id r14sm864460eds.70.2020.03.04.07.41.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Mar 2020 07:41:50 -0800 (PST)
+Subject: Re: [PATCH v2] Fixed integer overflow in e1000e
+To: andrew@daynix.com, dmitry.fleytman@gmail.com
+References: <20200304142058.52458-1-andrew@daynix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <badcfed3-94e4-b411-667d-616d790b28b3@redhat.com>
+Date: Wed, 4 Mar 2020 16:41:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200304130656.16859-5-lekiravi@yandex-team.ru>
+In-Reply-To: <20200304142058.52458-1-andrew@daynix.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,86 +108,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Vincenzo Maffione <v.maffione@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Sven Schnelle <svens@stackframe.org>, Rob Herring <robh@kernel.org>,
- Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
- Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- David Gibson <david@gibson.dropbear.id.au>, Jiri Pirko <jiri@resnulli.us>,
- yc-core@yandex-team.ru, Stefan Weil <sw@weilnetz.de>,
- Alistair Francis <alistair@alistair23.me>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- xen-devel@lists.xenproject.org, Giuseppe Lettieri <g.lettieri@iet.unipi.it>,
- Luigi Rizzo <rizzo@iet.unipi.it>, Richard Henderson <rth@twiddle.net>,
- Andrew Jeffery <andrew@aj.id.au>, Michael Walle <michael@walle.cc>,
- qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/03/2020 14:06, Alexey Kirillov wrote:
-> Completely remove the info_str field of struct NetClientState because
-> it is no longer required due to the addition of the QMP query-netdevs command.
-> 
-> Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
+On 3/4/20 3:20 PM, andrew@daynix.com wrote:
+> From: Andrew Melnychenko <andrew@daynix.com>
+>=20
+> Fixes: 6f3fbe4ed06
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1737400
+> Fixed setting max_queue_num if there are no peers in NICConf. qemu_new_ni=
+c() creates NICState with 1 NetClientState(index 0) without peers, set max_=
+queue_num to 0 - It prevents undefined behavior and possible crashes, espec=
+ially during pcie hotplug.
+
+Hoping the maintainer taking this can reformat the commit description a=20
+bit nicer... (moving the tags down), then for the code part:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>=20
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 > ---
->  hw/net/allwinner_emac.c     |  2 +-
->  hw/net/dp8393x.c            |  2 +-
->  hw/net/e1000.c              |  4 ++--
->  hw/net/e1000e.c             |  2 +-
->  hw/net/e1000e_core.c        |  2 +-
->  hw/net/e1000x_common.c      |  2 +-
->  hw/net/eepro100.c           |  5 +++--
->  hw/net/etraxfs_eth.c        |  2 +-
->  hw/net/fsl_etsec/etsec.c    |  2 +-
->  hw/net/ftgmac100.c          |  2 +-
->  hw/net/i82596.c             |  6 +++---
->  hw/net/imx_fec.c            |  2 +-
->  hw/net/lan9118.c            |  4 ++--
->  hw/net/mcf_fec.c            |  2 +-
->  hw/net/milkymist-minimac2.c |  2 +-
->  hw/net/mipsnet.c            |  2 +-
->  hw/net/ne2000-isa.c         |  2 +-
->  hw/net/ne2000-pci.c         |  2 +-
->  hw/net/pcnet.c              |  2 +-
->  hw/net/rocker/rocker_fp.c   |  4 ++--
->  hw/net/rtl8139.c            |  6 +++---
->  hw/net/smc91c111.c          |  2 +-
->  hw/net/spapr_llan.c         |  6 +++---
->  hw/net/stellaris_enet.c     |  2 +-
->  hw/net/sungem.c             |  4 ++--
->  hw/net/sunhme.c             |  2 +-
->  hw/net/tulip.c              |  2 +-
->  hw/net/virtio-net.c         |  8 ++++----
->  hw/net/vmxnet3.c            |  4 ++--
->  hw/net/xen_nic.c            |  4 ----
->  hw/net/xgmac.c              |  2 +-
->  hw/net/xilinx_axienet.c     |  2 +-
->  hw/net/xilinx_ethlite.c     |  2 +-
->  hw/usb/dev-network.c        |  2 +-
->  include/net/net.h           |  3 +--
->  net/l2tpv3.c                |  3 ---
->  net/net.c                   |  8 +-------
->  net/slirp.c                 |  4 ----
->  net/socket.c                | 24 ------------------------
->  net/tap.c                   | 12 ------------
->  net/vde.c                   |  4 ----
->  net/vhost-user.c            |  2 --
->  42 files changed, 51 insertions(+), 110 deletions(-)
-> 
-
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Tested-by: Laurent Vivier <lvivier@redhat.com>
-
-
+>   hw/net/e1000e.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index a91dbdca3c..f2cc1552c5 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -328,7 +328,7 @@ e1000e_init_net_peer(E1000EState *s, PCIDevice *pci_d=
+ev, uint8_t *macaddr)
+>       s->nic =3D qemu_new_nic(&net_e1000e_info, &s->conf,
+>           object_get_typename(OBJECT(s)), dev->id, s);
+>  =20
+> -    s->core.max_queue_num =3D s->conf.peers.queues - 1;
+> +    s->core.max_queue_num =3D s->conf.peers.queues ? s->conf.peers.queue=
+s - 1 : 0;
+>  =20
+>       trace_e1000e_mac_set_permanent(MAC_ARG(macaddr));
+>       memcpy(s->core.permanent_mac, macaddr, sizeof(s->core.permanent_mac=
+));
+>=20
 
 
