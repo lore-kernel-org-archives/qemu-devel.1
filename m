@@ -1,101 +1,104 @@
 Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: **
-X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA34C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD2BC3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:48:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B63D24679
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6387D20870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:48:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5DufMVU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B63D24679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hgkIT2Il"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6387D20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Z0y-0006qI-E4
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 13:45:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34030)
+	id 1j9Z4G-0001mx-Kx
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 13:48:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <programmingkidx@gmail.com>) id 1j9Yzu-0005U1-Cl
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:43:59 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1j9Z19-0007Gn-N8
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:45:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <programmingkidx@gmail.com>) id 1j9Yzs-0006c8-Vc
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:43:58 -0500
-Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:42109)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
- id 1j9Yzs-0006Xg-Kl; Wed, 04 Mar 2020 13:43:56 -0500
-Received: by mail-lf1-x133.google.com with SMTP id t21so2366462lfe.9;
- Wed, 04 Mar 2020 10:43:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=DYiu37dwsk21hL7lcAPw7i5jgwAjbcKdoNnsujluBro=;
- b=c5DufMVUbtzoM2CNM0S1Xuae+k/CZhUGvfezPeEz0zzoFni3dIunngqvrZ0coEMlDa
- L5FLjA2ZiMr6KFRukmqkDePMZJatOloGZYhcqWg+PI9V42kOQiDuBMyG47wk2jRfCYwg
- 97DL/0FCRtOvxzVqqH2WMQsPNK60m+CHZprlfG1/yCg8lXjJPdPEXp4Ri13o/yIatwgP
- XQqh7tGp7wnDSnx+ZSwkzySuk/tPYdthf/9CX5Gl3jqLtM6CQfNUt0j2r+2E2b++HK2h
- hFQECW8P9ZFWYegEiDmzUUP5WL74QdXBGrfIFKpwhpt9snm0+nAEGm9fqNfY10Q6qo7b
- BSuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=DYiu37dwsk21hL7lcAPw7i5jgwAjbcKdoNnsujluBro=;
- b=OODFgdcCun5eM8DNDMzPwNSQnG9zZOM8g6TIKGGi1YQ7Xph0jYMtR2aNUY6TkSgqkF
- KPZTpQab+V8XHgUpEKDG92rBSX85imst7ca75R1r6WOXUh9JA5TvsyILJZF/siUdtpNb
- 4j7WyiFDgTBZHP9/R9bMS18egaxCzIE+f9qevO4sCx+tIU8HYESmmuFNZpN49tR/QuY8
- yIVX8xOP1Fcv8I+hnjDUyvU/xDKpxp9fINbihRYN0IbXwG7WCMjohifELPlHonBZDzOt
- q3okTKCk6ka6eXeZ0m3t2LYMGu4/jjm/lDagrnrTe+ueh95Tk3bBwyI3SRyoVghaDf4I
- dXqg==
-X-Gm-Message-State: ANhLgQ1OilBiIOOBpa7kzf1DR80Xwf3hFshNvqdx/XOl5DTMRIy8i+wd
- 7dXQNgDJSRAj7Yk9NsEZSh2eoBRE205BxJEYxaA=
-X-Google-Smtp-Source: ADFU+vtmY0vSOUPfMefj9S93lzD9Ln5TIkBjUEfJWGG7pAqabkb4psq+D8D2WWrWtBlZrtfDmXjvAwJgkfMG0JRbm00=
-X-Received: by 2002:ac2:532f:: with SMTP id f15mr2769085lfh.3.1583347434048;
- Wed, 04 Mar 2020 10:43:54 -0800 (PST)
+ (envelope-from <jag.raman@oracle.com>) id 1j9Z18-0000KJ-3B
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:45:15 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:43884)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1j9Z17-0000I9-PM
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:45:14 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024IY59Q015663;
+ Wed, 4 Mar 2020 18:45:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=tbTlCgiuYflgGp6+gRPZjnB6kJoc0NwDzOQR5O8Hj34=;
+ b=hgkIT2Ilmg8axJti3VCVK79yVirkH8u4nWYd5q5SAwJ3Dih3/H6ps19Rjsj4QZBAQ5Qt
+ HeBZCf5KJacmOGRxnkt4T3mpDuaAAMPs+zYtCJXKqf1SPzKa287wbyi9rASxXxYJDDH6
+ MW1BGIBRROWQ7oGvJraUhD+hStrKQhfplzsUXJHr2G5UJzgSKdGgTscqyoZbLZDlV4h7
+ r0/C+tIzE7/cmP3dVpTBU0FDPFKYS91Ro2BAS78It3lAnQiHI6cZV1Q8L9+/wSq+Ut9y
+ XGrm7jz4PFCLg2CjVCiTNbXkILH3kQhL/Wzno3lHLNwpiRytxvVdaJLRnQyNcTyvhvPC Cw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by aserp2120.oracle.com with ESMTP id 2yffwr07eh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 18:45:06 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 024IiogE162436;
+ Wed, 4 Mar 2020 18:45:05 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3030.oracle.com with ESMTP id 2yg1eqh7p7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 04 Mar 2020 18:45:05 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 024Ij3bj012869;
+ Wed, 4 Mar 2020 18:45:03 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 04 Mar 2020 10:45:03 -0800
+Subject: Re: [PATCH v5 12/50] multi-process: remote process initialization
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <264de034fcdc1000bada4a93ac7e0856fef591f2.1582576372.git.jag.raman@oracle.com>
+ <20200304102959.GB4104@work-vm>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <8be42511-b355-f375-7dc2-6bbf949ba36f@oracle.com>
+Date: Wed, 4 Mar 2020 13:45:01 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200218171702.979F074637D@zero.eik.bme.hu>
- <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
- <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
- <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
- <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
- <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
- <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
- <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
- <87eeuhxw0y.fsf@linaro.org>
- <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
- <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
- <878skpxltm.fsf@linaro.org> <FE03C155-E46D-4925-BA2B-FABBE2518C8C@gmail.com>
- <2576fd41-8b01-91a0-ca56-792ce65b5092@linaro.org>
- <alpine.BSF.2.22.395.2003021218180.72848@zero.eik.bme.hu>
- <d136165f-46c7-8983-9725-2b224742deef@linaro.org>
- <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
- <CAKyx-3Pt2qLPXWQjBwrHn-nxR-9e++TioGp4cKFC3adMN3rtiw@mail.gmail.com>
-In-Reply-To: <CAKyx-3Pt2qLPXWQjBwrHn-nxR-9e++TioGp4cKFC3adMN3rtiw@mail.gmail.com>
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, 4 Mar 2020 13:43:41 -0500
-Message-ID: <CAKyx-3OAVOvOiaWqUbVa4P35RtFS6bN0wbPuWa=6SFcB2zhL3Q@mail.gmail.com>
-Subject: Fwd: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
- Dino Papararo <skizzato73@msn.com>, QEMU Developers <qemu-devel@nongnu.org>, 
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>, 
- luigi burdo <intermediadc@hotmail.com>,
- David Gibson <david@gibson.dropbear.id.au>, 
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000005ccfe105a00bcdd7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::133
+In-Reply-To: <20200304102959.GB4104@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=2 spamscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003040125
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9550
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=2
+ phishscore=0 clxscore=1015 bulkscore=0 adultscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003040125
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,119 +110,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005ccfe105a00bcdd7
-Content-Type: text/plain; charset="UTF-8"
-
----------- Forwarded message ---------
-From: G 3 <programmingkidx@gmail.com>
-Date: Wed, Mar 4, 2020 at 1:35 PM
-Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
-To: BALATON Zoltan <balaton@eik.bme.hu>
 
 
+On 3/4/2020 5:29 AM, Dr. David Alan Gilbert wrote:
+> * Jagannathan Raman (jag.raman@oracle.com) wrote:
+>> Adds the handler to process message from QEMU,
+>> Initialize remote process main loop, handles SYNC_SYSMEM
+>> message by updating its "system_memory" container using
+>> shared file descriptors received from QEMU.
+>>
+>> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+>> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+>> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+>> ---
+>>   v4 -> v5:
+>>    - We checked if we could use functions already defined in
+>>      util/main-loop.c instead of using g_main_loop_run. However,
+>>      we couldn't find a suitable function that's generic enough
+>>      to do this. All of them have emulator code embedded in them
+>>      which is not used by the remote process. We are therefore
+>>      not making any change to this patch
+>>
+>>   remote/remote-main.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 85 insertions(+)
+>>
+>> diff --git a/remote/remote-main.c b/remote/remote-main.c
+>> index ecf30e0..56315cd 100644
+>> --- a/remote/remote-main.c
+>> +++ b/remote/remote-main.c
+>> @@ -12,6 +12,7 @@
+>>   #include "qemu-common.h"
+>>   
+>>   #include <stdio.h>
+>> +#include <unistd.h>
+>>   
+>>   #include "qemu/module.h"
+>>   #include "remote/pcihost.h"
+>> @@ -19,12 +20,96 @@
+>>   #include "hw/boards.h"
+>>   #include "hw/qdev-core.h"
+>>   #include "qemu/main-loop.h"
+>> +#include "remote/memory.h"
+>> +#include "io/mpqemu-link.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/main-loop.h"
+>> +#include "sysemu/cpus.h"
+>> +#include "qemu-common.h"
+>> +#include "hw/pci/pci.h"
+>> +#include "qemu/thread.h"
+>> +#include "qemu/main-loop.h"
+>> +#include "qemu/config-file.h"
+>> +#include "sysemu/sysemu.h"
+>> +#include "block/block.h"
+>> +#include "exec/ramlist.h"
+>> +
+>> +static MPQemuLinkState *mpqemu_link;
+>> +PCIDevice *remote_pci_dev;
+>> +
+>> +static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+>> +{
+>> +    MPQemuMsg *msg = NULL;
+>> +    Error *err = NULL;
+>> +
+>> +    if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
+>> +        goto finalize_loop;
+>> +    }
+>> +
+>> +    msg = g_malloc0(sizeof(MPQemuMsg));
+>> +
+>> +    if (mpqemu_msg_recv(msg, chan) < 0) {
+>> +        error_setg(&err, "Failed to receive message");
+> 
+> Please give error messages more context, e.g. the device or process name
+> or something like that so that; it helps when we get a user
+> reporting a crash and they report 'Unknown command' in their log, but
+> then we have to figure out where to point them.
 
+Ah OK, we'll add the exec name & PID of the QEMU process that spawned
+this remote process in the error messages.
 
-On Mon, Mar 2, 2020 at 6:16 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
+Thank you!
+--
+Jag
 
-> On Mon, 2 Mar 2020, Richard Henderson wrote:
-> > On 3/2/20 3:42 AM, BALATON Zoltan wrote:
-> >>> The "hardfloat" option works (with other targets) only with ieee745
-> >>> accumulative exceptions, when the most common of those exceptions,
-> inexact, has
-> >>> already been raised.  And thus need not be raised a second time.
-> >>
-> >> Why exactly it's done that way? What are the differences between IEEE FP
-> >> implementations that prevents using hardfloat most of the time instead
-> of only
-> >> using it in some (although supposedly common) special cases?
-> >
-> > While it is possible to read the host's ieee exception word after the
-> hardfloat
-> > operation, there are two reasons that is undesirable:
-> >
-> > (1) It is *slow*.  So slow that it's faster to run the softfloat code
-> instead.
-> > I thought it would be easier to find the benchmark numbers that Emilio
-> > generated when this was tested, but I can't find it.
->
-> I remember those benchmarks too and this is also what the paper Alex
-> referred to also confirmed. Also I've found that enabling hardfloat for
-> PPC without doing anything else is slightly slower (on a recent CPU, on
-> older CPUs could be even slower). Interetingly however it does give a
-> speedup for vector instructions (maybe because they don't clear flags
-> between each sub operation). Does that mean these vector instruction
-> helpers are also buggy regarding exceptions?
->
-
-I am all intrigued by these vector instructions. Apple was really big on
-using them back in the day so programs like Quicktime and iTunes definitely
-use them. I'm not sure if the PowerPC's altivec vector instructions map to
-host vector instructions already, but if they don't, mapping them would
-give us a huge speedup in certain places. Would anyone know if this was
-already done in QEMU?
-
---0000000000005ccfe105a00bcdd7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
-=3D"gmail_attr">---------- Forwarded message ---------<br>From: <b class=3D=
-"gmail_sendername" dir=3D"auto">G 3</b> <span dir=3D"auto">&lt;<a href=3D"m=
-ailto:programmingkidx@gmail.com">programmingkidx@gmail.com</a>&gt;</span><b=
-r>Date: Wed, Mar 4, 2020 at 1:35 PM<br>Subject: Re: [RFC PATCH v2] target/p=
-pc: Enable hardfloat for PPC<br>To: BALATON Zoltan &lt;<a href=3D"mailto:ba=
-laton@eik.bme.hu">balaton@eik.bme.hu</a>&gt;<br></div><br><br><div dir=3D"l=
-tr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote"><div dir=3D"l=
-tr" class=3D"gmail_attr">On Mon, Mar 2, 2020 at 6:16 PM BALATON Zoltan &lt;=
-<a href=3D"mailto:balaton@eik.bme.hu" target=3D"_blank">balaton@eik.bme.hu<=
-/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
-px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
-n Mon, 2 Mar 2020, Richard Henderson wrote:<br>
-&gt; On 3/2/20 3:42 AM, BALATON Zoltan wrote:<br>
-&gt;&gt;&gt; The &quot;hardfloat&quot; option works (with other targets) on=
-ly with ieee745<br>
-&gt;&gt;&gt; accumulative exceptions, when the most common of those excepti=
-ons, inexact, has<br>
-&gt;&gt;&gt; already been raised.=C2=A0 And thus need not be raised a secon=
-d time.<br>
-&gt;&gt;<br>
-&gt;&gt; Why exactly it&#39;s done that way? What are the differences betwe=
-en IEEE FP<br>
-&gt;&gt; implementations that prevents using hardfloat most of the time ins=
-tead of only<br>
-&gt;&gt; using it in some (although supposedly common) special cases?<br>
-&gt;<br>
-&gt; While it is possible to read the host&#39;s ieee exception word after =
-the hardfloat<br>
-&gt; operation, there are two reasons that is undesirable:<br>
-&gt;<br>
-&gt; (1) It is *slow*.=C2=A0 So slow that it&#39;s faster to run the softfl=
-oat code instead.<br>
-&gt; I thought it would be easier to find the benchmark numbers that Emilio=
-<br>
-&gt; generated when this was tested, but I can&#39;t find it.<br>
-<br>
-I remember those benchmarks too and this is also what the paper Alex <br>
-referred to also confirmed. Also I&#39;ve found that enabling hardfloat for=
- <br>
-PPC without doing anything else is slightly slower (on a recent CPU, on <br=
->
-older CPUs could be even slower). Interetingly however it does give a <br>
-speedup for vector instructions (maybe because they don&#39;t clear flags <=
-br>
-between each sub operation). Does that mean these vector instruction <br>
-helpers are also buggy regarding exceptions?<br></blockquote><div><br></div=
-><div>I am all intrigued by these vector instructions. Apple was really big=
- on using them back in the day so programs like Quicktime and iTunes defini=
-tely use them. I&#39;m not sure if the PowerPC&#39;s altivec vector instruc=
-tions map to host vector instructions already, but if they don&#39;t, mappi=
-ng them would give us a huge speedup in certain places. Would anyone know i=
-f this was already done in QEMU?<br></div></div></div>
-</div></div>
-
---0000000000005ccfe105a00bcdd7--
+> 
+>> +        goto finalize_loop;
+>> +    }
+>> +
+>> +    switch (msg->cmd) {
+>> +    case INIT:
+>> +        break;
+>> +    case PCI_CONFIG_WRITE:
+>> +        break;
+>> +    case PCI_CONFIG_READ:
+>> +        break;
+>> +    default:
+>> +        error_setg(&err, "Unknown command");
+>> +        goto finalize_loop;
+>> +    }
+>> +
+>> +    g_free(msg->data2);
+>> +    g_free(msg);
+>> +
+>> +    return;
+>> +
+>> +finalize_loop:
+>> +    if (err) {
+>> +        error_report_err(err);
+>> +    }
+>> +    g_free(msg);
+>> +    mpqemu_link_finalize(mpqemu_link);
+>> +    mpqemu_link = NULL;
+>> +}
+>>   
+>>   int main(int argc, char *argv[])
+>>   {
+>> +    Error *err = NULL;
+>> +
+>>       module_call_init(MODULE_INIT_QOM);
+>>   
+>> +    bdrv_init_with_whitelist();
+>> +
+>> +    if (qemu_init_main_loop(&err)) {
+>> +        error_report_err(err);
+>> +        return -EBUSY;
+>> +    }
+>> +
+>> +    qemu_init_cpu_loop();
+>> +
+>> +    page_size_init();
+>> +
+>> +    qemu_mutex_init(&ram_list.mutex);
+>> +
+> 
+> So these are some subset of the things from qemu_init; I guess
+> we'll have to be careful when we add stuff to vl.c to think what should
+> also be added here.
+> 
+> Dave
+> 
+>>       current_machine = MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MACHINE)));
+>>   
+>> +    mpqemu_link = mpqemu_link_create();
+>> +    if (!mpqemu_link) {
+>> +        printf("Could not create MPQemu link\n");
+>> +        return -1;
+>> +    }
+>> +
+>> +    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
+>> +    mpqemu_link_set_callback(mpqemu_link, process_msg);
+>> +
+>> +    mpqemu_start_coms(mpqemu_link);
+>> +
+>>       return 0;
+>>   }
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
