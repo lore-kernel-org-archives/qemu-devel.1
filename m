@@ -2,95 +2,136 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2CCC3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A32C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8865215A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B1F215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:42:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YG5bqNk3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8865215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiKh+6A1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B1F215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9W9w-0005Ey-Sb
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:42:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46799)
+	id 1j9WAP-0006Mk-3G
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:42:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9W6c-0000qd-9t
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:38:44 -0500
+ (envelope-from <lvivier@redhat.com>) id 1j9W9T-0004mF-TF
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9W6a-0001SF-6k
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:38:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58138
+ (envelope-from <lvivier@redhat.com>) id 1j9W9S-0005hi-Qz
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35046
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9W6a-0001RT-3O
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:38:40 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1j9W9S-0005gj-Mz
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583336319;
+ s=mimecast20190719; t=1583336498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kQOQfx06A1ie2SNHaflDW36So/UjUtM++P+T+HY6xSo=;
- b=YG5bqNk3HbQ/l6b7y7zLoC34+ht4ABHoOCuEuPb9tnN3NCSl09lg7TXQhomeAX/sRRsdbD
- gCgtkrHo67p3S6nr34gKS1umIgUvxXsUFJEibsy9zDU6eNZlfGmMmDp4R1AJnH1sBc/sRI
- m/QThEJDjIvUpcW2jZvkFY4+N40AzLQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-eWxUTKHuPEyIDc3ntpp9uw-1; Wed, 04 Mar 2020 10:38:36 -0500
-X-MC-Unique: eWxUTKHuPEyIDc3ntpp9uw-1
-Received: by mail-wr1-f72.google.com with SMTP id z16so997573wrm.15
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 07:38:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=vKf7x2e5mJnoKBehNULn5Enxe4/hEchqUW/qpjE2MWA=;
- b=ajhIEvQrk6R/8Ekoe5+Htzcca86PHyTpn+eLxngMlX2LdZkED8tspWl1dip+BWZ0mF
- cYVLSWE18YDmVvAhvRQ25wqAfUefcVq0tlk7VvAhYOw38+42aVGhc0GAfeFciuAJ2SzH
- JqcswLp6RGdW/7NrX+JfCtLM0gi8H9jqR2ZhQ2I8af9y9YGfsFxggQXflEX+Skg0wrue
- v62sn0U7M3oEIB71IimP5H6pzSktLUclNOQNNiUWxcdZA+zRGaGQ0bHIU0GBs7J+3QAT
- tpCQ2A/zBTIjwFGL+QJe33iWPWW2XVfHJsJNNInEa/A8oKQbBwmJagSKdr2QJPk/HUuv
- XveQ==
-X-Gm-Message-State: ANhLgQ0cet/FGQLfacToyNGkp9TO8CTk1j8rw3NSqJX/hX3+Dj5lNwgD
- sSH+AEe9QeuyrZCX+8GX8yjNvaHogqAvP8Pya+2sOoUIoO33mB2ytPA2z/yShLDZn3bOHolpq3c
- 5WqrxeiZDC7jurzE=
-X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr4399086wmk.83.1583336314983; 
- Wed, 04 Mar 2020 07:38:34 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vsDOjmgcEVIZato5ZjdUrjxEY6XPbkE1/nQkF0KQXneBlngEd6/I93J523c3XqRNIFQT8xbGA==
-X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr4399051wmk.83.1583336314606; 
- Wed, 04 Mar 2020 07:38:34 -0800 (PST)
-Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id e11sm38377995wrm.80.2020.03.04.07.38.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 07:38:34 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] misc: Replace zero-length arrays with flexible array
- member (manual)
-Date: Wed,  4 Mar 2020 16:38:16 +0100
-Message-Id: <20200304153816.23636-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200304153816.23636-1-philmd@redhat.com>
-References: <20200304153816.23636-1-philmd@redhat.com>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=lAdNuAjGjgv4SYnURhSbZNmraG7CFf6sWkfpiNz24Bk=;
+ b=UiKh+6A1L+zfyRzono9b7yGSl7y8ZiVsYlXpkg72Xd/y5UtKI/66FJAFO1tlUDD/Ejj/Py
+ qD/UZGmqp5vYozxj4EQyA+GluQc8X/OeoNChP8OGk/ehTN7rjhLR0uh0LFdkM03L8MjMrL
+ MNDIBE6DmCsnlnnBYrNtzK5QnGq09fo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-9VZBta-_P16OSJWBCocMRQ-1; Wed, 04 Mar 2020 10:41:34 -0500
+X-MC-Unique: 9VZBta-_P16OSJWBCocMRQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78249800053;
+ Wed,  4 Mar 2020 15:41:28 +0000 (UTC)
+Received: from [10.36.117.17] (ovpn-117-17.ams2.redhat.com [10.36.117.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4AE227186;
+ Wed,  4 Mar 2020 15:41:11 +0000 (UTC)
+Subject: Re: [PATCH v2 4/4] net: Remove field info_str of NetClientState
+To: Alexey Kirillov <lekiravi@yandex-team.ru>, Eric Blake
+ <eblake@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20200304130656.16859-1-lekiravi@yandex-team.ru>
+ <20200304130656.16859-5-lekiravi@yandex-team.ru>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <5976574b-8546-dc15-2c79-18c277fb2eff@redhat.com>
+Date: Wed, 4 Mar 2020 16:41:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <20200304130656.16859-5-lekiravi@yandex-team.ru>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,273 +145,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Paul Durrant <paul@xen.org>, Jason Wang <jasowang@redhat.com>,
- David Hildenbrand <david@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- "Gustavo A . R . Silva" <gustavo@embeddedor.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Eric Auger <eric.auger@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, Vincenzo Maffione <v.maffione@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Sven Schnelle <svens@stackframe.org>, Rob Herring <robh@kernel.org>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
+ Joel Stanley <joel@jms.id.au>, Anthony Perard <anthony.perard@citrix.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Jiri Pirko <jiri@resnulli.us>,
+ yc-core@yandex-team.ru, Stefan Weil <sw@weilnetz.de>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ xen-devel@lists.xenproject.org, Giuseppe Lettieri <g.lettieri@iet.unipi.it>,
+ Luigi Rizzo <rizzo@iet.unipi.it>, Richard Henderson <rth@twiddle.net>,
+ Andrew Jeffery <andrew@aj.id.au>, Michael Walle <michael@walle.cc>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
  Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Description copied from Linux kernel commit from Gustavo A. R. Silva
-(see [3]):
+On 04/03/2020 14:06, Alexey Kirillov wrote:
+> Completely remove the info_str field of struct NetClientState because
+> it is no longer required due to the addition of the QMP query-netdevs command.
+> 
+> Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
+> ---
+>  hw/net/allwinner_emac.c     |  2 +-
+>  hw/net/dp8393x.c            |  2 +-
+>  hw/net/e1000.c              |  4 ++--
+>  hw/net/e1000e.c             |  2 +-
+>  hw/net/e1000e_core.c        |  2 +-
+>  hw/net/e1000x_common.c      |  2 +-
+>  hw/net/eepro100.c           |  5 +++--
+>  hw/net/etraxfs_eth.c        |  2 +-
+>  hw/net/fsl_etsec/etsec.c    |  2 +-
+>  hw/net/ftgmac100.c          |  2 +-
+>  hw/net/i82596.c             |  6 +++---
+>  hw/net/imx_fec.c            |  2 +-
+>  hw/net/lan9118.c            |  4 ++--
+>  hw/net/mcf_fec.c            |  2 +-
+>  hw/net/milkymist-minimac2.c |  2 +-
+>  hw/net/mipsnet.c            |  2 +-
+>  hw/net/ne2000-isa.c         |  2 +-
+>  hw/net/ne2000-pci.c         |  2 +-
+>  hw/net/pcnet.c              |  2 +-
+>  hw/net/rocker/rocker_fp.c   |  4 ++--
+>  hw/net/rtl8139.c            |  6 +++---
+>  hw/net/smc91c111.c          |  2 +-
+>  hw/net/spapr_llan.c         |  6 +++---
+>  hw/net/stellaris_enet.c     |  2 +-
+>  hw/net/sungem.c             |  4 ++--
+>  hw/net/sunhme.c             |  2 +-
+>  hw/net/tulip.c              |  2 +-
+>  hw/net/virtio-net.c         |  8 ++++----
+>  hw/net/vmxnet3.c            |  4 ++--
+>  hw/net/xen_nic.c            |  4 ----
+>  hw/net/xgmac.c              |  2 +-
+>  hw/net/xilinx_axienet.c     |  2 +-
+>  hw/net/xilinx_ethlite.c     |  2 +-
+>  hw/usb/dev-network.c        |  2 +-
+>  include/net/net.h           |  3 +--
+>  net/l2tpv3.c                |  3 ---
+>  net/net.c                   |  8 +-------
+>  net/slirp.c                 |  4 ----
+>  net/socket.c                | 24 ------------------------
+>  net/tap.c                   | 12 ------------
+>  net/vde.c                   |  4 ----
+>  net/vhost-user.c            |  2 --
+>  42 files changed, 51 insertions(+), 110 deletions(-)
+> 
 
---v-- description start --v--
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
 
-  The current codebase makes use of the zero-length array language
-  extension to the C90 standard, but the preferred mechanism to
-  declare variable-length types such as these ones is a flexible
-  array member [1], introduced in C99:
 
-  struct foo {
-      int stuff;
-      struct boo array[];
-  };
-
-  By making use of the mechanism above, we will get a compiler
-  warning in case the flexible array does not occur last in the
-  structure, which will help us prevent some kind of undefined
-  behavior bugs from being unadvertenly introduced [2] to the
-  Linux codebase from now on.
-
---^-- description end --^--
-
-Do the similar housekeeping in the QEMU codebase (which uses
-C99 since commit 7be41675f7cb).
-
-All these instances of code were found with the help of the
-following command (then manual analysis, without modifying
-structures only having a single flexible array member, such
-QEDTable in block/qed.h):
-
-  git grep -F '[0];'
-
-[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D76497732932f
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/gustavoars/linux.git/co=
-mmit/?id=3D17642a2fbd2c1
-
-Inspired-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2: Do not modify block/qed.h:
-
-  block/qed.h:106:14: error: flexible array member 'offsets' not allowed in=
- otherwise empty struct
-      uint64_t offsets[];             /* in bytes */
-               ^
----
- docs/interop/vhost-user.rst       | 4 ++--
- include/hw/acpi/acpi-defs.h       | 4 ++--
- include/hw/boards.h               | 2 +-
- include/hw/s390x/event-facility.h | 2 +-
- include/hw/s390x/sclp.h           | 8 ++++----
- block/vmdk.c                      | 2 +-
- hw/char/sclpconsole-lm.c          | 2 +-
- hw/char/sclpconsole.c             | 2 +-
- hw/s390x/virtio-ccw.c             | 2 +-
- target/s390x/ioinst.c             | 2 +-
- 10 files changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 401652397c..3b1b6602c7 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -568,7 +568,7 @@ For split virtqueue, queue region can be implemented as=
-:
-       uint16_t used_idx;
-=20
-       /* Used to track the state of each descriptor in descriptor table */
--      DescStateSplit desc[0];
-+      DescStateSplit desc[];
-   } QueueRegionSplit;
-=20
- To track inflight I/O, the queue region should be processed as follows:
-@@ -690,7 +690,7 @@ For packed virtqueue, queue region can be implemented a=
-s:
-       uint8_t padding[7];
-=20
-       /* Used to track the state of each descriptor fetched from descripto=
-r ring */
--      DescStatePacked desc[0];
-+      DescStatePacked desc[];
-   } QueueRegionPacked;
-=20
- To track inflight I/O, the queue region should be processed as follows:
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 19f7ba7b70..c13327fa78 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -152,7 +152,7 @@ typedef struct AcpiSerialPortConsoleRedirection
-  */
- struct AcpiRsdtDescriptorRev1 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
--    uint32_t table_offset_entry[0];  /* Array of pointers to other */
-+    uint32_t table_offset_entry[];  /* Array of pointers to other */
-     /* ACPI tables */
- } QEMU_PACKED;
- typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
-@@ -162,7 +162,7 @@ typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescripto=
-rRev1;
-  */
- struct AcpiXsdtDescriptorRev2 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
--    uint64_t table_offset_entry[0];  /* Array of pointers to other */
-+    uint64_t table_offset_entry[];  /* Array of pointers to other */
-     /* ACPI tables */
- } QEMU_PACKED;
- typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 9bc42dfb22..c96120d15f 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -71,7 +71,7 @@ typedef struct CPUArchId {
-  */
- typedef struct {
-     int len;
--    CPUArchId cpus[0];
-+    CPUArchId cpus[];
- } CPUArchIdList;
-=20
- /**
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-fac=
-ility.h
-index bdc32a3c09..700a610f33 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -122,7 +122,7 @@ typedef struct MDBO {
-=20
- typedef struct MDB {
-     MdbHeader header;
--    MDBO mdbo[0];
-+    MDBO mdbo[];
- } QEMU_PACKED MDB;
-=20
- typedef struct SclpMsg {
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index c54413b78c..cd7b24359f 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -132,7 +132,7 @@ typedef struct ReadInfo {
-     uint16_t highest_cpu;
-     uint8_t  _reserved5[124 - 122];     /* 122-123 */
-     uint32_t hmfai;
--    struct CPUEntry entries[0];
-+    struct CPUEntry entries[];
- } QEMU_PACKED ReadInfo;
-=20
- typedef struct ReadCpuInfo {
-@@ -142,7 +142,7 @@ typedef struct ReadCpuInfo {
-     uint16_t nr_standby;            /* 12-13 */
-     uint16_t offset_standby;        /* 14-15 */
-     uint8_t reserved0[24-16];       /* 16-23 */
--    struct CPUEntry entries[0];
-+    struct CPUEntry entries[];
- } QEMU_PACKED ReadCpuInfo;
-=20
- typedef struct ReadStorageElementInfo {
-@@ -151,7 +151,7 @@ typedef struct ReadStorageElementInfo {
-     uint16_t assigned;
-     uint16_t standby;
-     uint8_t _reserved0[16 - 14]; /* 14-15 */
--    uint32_t entries[0];
-+    uint32_t entries[];
- } QEMU_PACKED ReadStorageElementInfo;
-=20
- typedef struct AttachStorageElement {
-@@ -159,7 +159,7 @@ typedef struct AttachStorageElement {
-     uint8_t _reserved0[10 - 8];  /* 8-9 */
-     uint16_t assigned;
-     uint8_t _reserved1[16 - 12]; /* 12-15 */
--    uint32_t entries[0];
-+    uint32_t entries[];
- } QEMU_PACKED AttachStorageElement;
-=20
- typedef struct AssignStorage {
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 20e909d997..8466051bc9 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -187,7 +187,7 @@ typedef struct VmdkMetaData {
- typedef struct VmdkGrainMarker {
-     uint64_t lba;
-     uint32_t size;
--    uint8_t  data[0];
-+    uint8_t  data[];
- } QEMU_PACKED VmdkGrainMarker;
-=20
- enum {
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index c420dc066e..2b5f37b6a2 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -31,7 +31,7 @@
- typedef struct OprtnsCommand {
-     EventBufferHeader header;
-     MDMSU message_unit;
--    char data[0];
-+    char data[];
- } QEMU_PACKED OprtnsCommand;
-=20
- /* max size for line-mode data in 4K SCCB page */
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index 1fa124dab9..5c7664905e 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -25,7 +25,7 @@
-=20
- typedef struct ASCIIConsoleData {
-     EventBufferHeader ebh;
--    char data[0];
-+    char data[];
- } QEMU_PACKED ASCIIConsoleData;
-=20
- /* max size for ASCII data in 4K SCCB page */
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 50cf95b781..64f928fc7d 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -193,7 +193,7 @@ typedef struct VirtioThinintInfo {
- typedef struct VirtioRevInfo {
-     uint16_t revision;
-     uint16_t length;
--    uint8_t data[0];
-+    uint8_t data[];
- } QEMU_PACKED VirtioRevInfo;
-=20
- /* Specify where the virtqueues for the subchannel are in guest memory. */
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index c437a1d8c6..0e840cc579 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -347,7 +347,7 @@ typedef struct ChscResp {
-     uint16_t len;
-     uint16_t code;
-     uint32_t param;
--    char data[0];
-+    char data[];
- } QEMU_PACKED ChscResp;
-=20
- #define CHSC_MIN_RESP_LEN 0x0008
---=20
-2.21.1
 
 
