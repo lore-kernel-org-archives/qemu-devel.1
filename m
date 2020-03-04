@@ -2,67 +2,66 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0118C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 748C8C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D6E821775
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 410F221775
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:54:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QTwsxNnw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D6E821775
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AL3ZRKUQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410F221775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9YBZ-0000ds-O5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:51:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50019)
+	id 1j9YER-000276-DP
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:54:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9YAx-0000Bu-4v
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:20 -0500
+ (envelope-from <david@redhat.com>) id 1j9YDm-0001e2-9K
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9YAv-0005MH-Jh
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35398
+ (envelope-from <david@redhat.com>) id 1j9YDl-0002Wu-0n
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:54:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25319
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9YAv-0005LU-Fq
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:51:17 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9YDk-0002UW-Tv
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:54:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583344276;
+ s=mimecast20190719; t=1583344451;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=boCtawLobNhM+iemBRowaOU9Jzryw4lo9Y/rdsCLWvQ=;
- b=QTwsxNnwDXtr+mgUEdjtcACh1MYDwGBjeZyzEocyKlYaZ85gf7W+V/rGWYqgxVXZbnF0YB
- yieQq+ADleNrhyHX3rRzXEHZKolE6DCSuhmJ+q7pvJApaQWQSYWtvUjALzVi03bnkZzTlp
- 7/eh6OvPRXkD4nSW4miN0aeMh4P/ol0=
+ bh=MxJK5n/Bk3yAfpOAqpjMz5677ix1263o1i9KOHeATA4=;
+ b=AL3ZRKUQ/wpOyS4ecicSjLu9GNZquA+F3ORSW9jYnJRV5kxmt8P2PQ+soSHqdoEovgCo/p
+ XRgZZFKt/WVnFXwMlYjlYv8gw2AXJK0Vd+G4UPnLVYR8PuaSsjc9EZAOFlQ2VeXQc+0Vf/
+ qodJvb8CxdFeLvQttYgi7dX0auF5GIg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-xRykIs4tN1-EIg2ydleUwQ-1; Wed, 04 Mar 2020 12:51:15 -0500
-X-MC-Unique: xRykIs4tN1-EIg2ydleUwQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-125-_xQkG6nqO9eswuLr1SPXdQ-1; Wed, 04 Mar 2020 12:54:10 -0500
+X-MC-Unique: _xQkG6nqO9eswuLr1SPXdQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD7031005510;
- Wed,  4 Mar 2020 17:51:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E4341005F96;
+ Wed,  4 Mar 2020 17:54:07 +0000 (UTC)
 Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACADC19C58;
- Wed,  4 Mar 2020 17:51:12 +0000 (UTC)
-Subject: Re: [PATCH v6 11/18] s390x: protvirt: Set guest IPL PSW
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88F0519067;
+ Wed,  4 Mar 2020 17:54:05 +0000 (UTC)
+Subject: Re: [PATCH v6 12/18] s390x: protvirt: Move diag 308 data over SIDAD
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-12-frankja@linux.ibm.com>
+ <20200304114231.23493-13-frankja@linux.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,20 +107,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <bc7f6f1f-e9c1-6d5e-4fe2-390d6e298a40@redhat.com>
-Date: Wed, 4 Mar 2020 18:51:11 +0100
+Message-ID: <fbc62b05-5ac2-4fdf-840b-31e09855c62a@redhat.com>
+Date: Wed, 4 Mar 2020 18:54:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200304114231.23493-12-frankja@linux.ibm.com>
+In-Reply-To: <20200304114231.23493-13-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,54 +139,63 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 04.03.20 12:42, Janosch Frank wrote:
-> Handling of CPU reset and setting of the IPL psw from guest storage at
-> offset 0 is done by a Ultravisor call. Let's only fetch it if
-> necessary.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  target/s390x/cpu.c | 23 ++++++++++++++---------
->  1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 69b1cc5dfc..7840e784f1 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -78,16 +78,21 @@ static bool s390_cpu_has_work(CPUState *cs)
->  static void s390_cpu_load_normal(CPUState *s)
->  {
->      S390CPU *cpu = S390_CPU(s);
-> -    uint64_t spsw = ldq_phys(s->as, 0);
-> -
-> -    cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
-> -    /*
-> -     * Invert short psw indication, so SIE will report a specification
-> -     * exception if it was not set.
-> -     */
-> -    cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
-> -    cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
-> +    CPUS390XState *env = &cpu->env;
-> +    uint64_t spsw;
+> For protected guests the IPIB is written/read to/from the satellite
+> block, so we need those accesses to go through
+> s390_cpu_pv_mem_read/write().
+
+Maybe mention SIDAD instead if "satellite block", similar to the other
+patch descriptions.
+
+[...]
+
+> -        cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+> +        if (!env->pv) {
+> +            cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+> +        } else {
+> +            s390_cpu_pv_mem_read(cpu, 0, iplb, be32_to_cpu(iplb->len));
+> +        }
 >  
-> +    if (!env->pv) {
-> +        spsw = ldq_phys(s->as, 0);
-> +        cpu->env.psw.mask = spsw & PSW_MASK_SHORT_CTRL;
-> +        /*
-> +         * Invert short psw indication, so SIE will report a specification
-> +         * exception if it was not set.
-> +         */
-> +        cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
-> +        cpu->env.psw.addr = spsw & PSW_MASK_SHORT_ADDR;
-> +    } else {
-> +        s390_cpu_set_state(S390_CPU_STATE_LOAD, cpu);
-> +    }
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->  }
->  #endif
+>          if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
+>              !(iplb_valid_pv(iplb) && !s390_ipl_pv_check_components(iplb))) {
+> @@ -136,7 +146,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>          env->regs[r1 + 1] = DIAG_308_RC_OK;
+>  out:
+>          g_free(iplb);
+> -        return;
+> +        break;
+
+Why that change? Unrelated?
+
+>      case DIAG308_STORE:
+>      case DIAG308_PV_STORE:
+>          if (diag308_parm_check(env, r1, addr, ra, true)) {
+> @@ -147,12 +157,18 @@ out:
+>          } else {
+>              iplb = s390_ipl_get_iplb();
+>          }
+> -        if (iplb) {
+> -            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
+> -            env->regs[r1 + 1] = DIAG_308_RC_OK;
+> -        } else {
+> +        if (!iplb) {
+>              env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
+> +            return;
+>          }
+> +
+> +        if (!env->pv) {
+> +            cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
+> +        } else {
+> +            s390_cpu_pv_mem_write(cpu, 0, iplb, be32_to_cpu(iplb->len));
+> +        }
+> +
+> +        env->regs[r1 + 1] = DIAG_308_RC_OK;
+>          break;
+>      case DIAG308_PV_START:
+>          iplb = s390_ipl_get_iplb_secure();
 > 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+I really do wonder if you should squash in patch #2 and leave it in this
+position of the series.
 
 -- 
 Thanks,
