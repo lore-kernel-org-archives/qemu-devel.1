@@ -2,62 +2,63 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03CFC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CF5C3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:06:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A786821D56
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3223821775
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 17:06:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A56jNPPy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A786821D56
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Si/0uwex"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3223821775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9XTE-0006Qu-U4
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:06:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38514)
+	id 1j9XU0-0007dP-Eb
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 12:06:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9XRz-0005Cl-DF
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:52 -0500
+ (envelope-from <david@redhat.com>) id 1j9XTK-0006ki-55
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9XRy-0003I4-6D
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:51 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49460
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1j9XTI-0004JG-Gt
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:06:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53584
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9XRy-0003I0-2x
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:04:50 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9XTI-0004J1-Ae
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 12:06:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583341489;
+ s=mimecast20190719; t=1583341572;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xbr+20K1G4ByxLVl7crLWap5XqYo6L24mQJ5ebZhB30=;
- b=A56jNPPyQ1XpE3YVFWR9GH6IQ7Z4W9CzOpat9Mwsvhr222bSJ+IM2zckfgN88FF0Is9whO
- YcYyyPlXGdIMUpXTmE7P+qbO+JeElwsRHQFvRhNT7pH8S6mGM6RaQ2vvsMo29XCPtclERN
- 6RJaNfNagmct6xAa4bAKDUxiXz7wL1I=
+ bh=V1q0vT910JdSPP87E0WxKCYvtyVYeFD7ArQ/jFnXqWQ=;
+ b=Si/0uwexUvQYd/DXzAA0JC4v3w+PYcWD2HCz6RvUScbdBsw6a4oqvlTIs5Nw1ulzQjyeLd
+ 4V2ml+ZGlP/6dr+Si/Ss705lybe6WLZgRqPRYlRCIfKEyOrnG2U19upZSGKFOnQipCk8rF
+ qc1mVM6vzGKVsn85UYHplVWZoabCmm4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-AmhLyTVkOkSbZRPnamiPvA-1; Wed, 04 Mar 2020 12:04:45 -0500
-X-MC-Unique: AmhLyTVkOkSbZRPnamiPvA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-172-B0qf3C4pPOaZ5UBkN_HGmg-1; Wed, 04 Mar 2020 12:06:08 -0500
+X-MC-Unique: B0qf3C4pPOaZ5UBkN_HGmg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71974189F780;
- Wed,  4 Mar 2020 17:04:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F835800D4E;
+ Wed,  4 Mar 2020 17:06:07 +0000 (UTC)
 Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52DBE5E240;
- Wed,  4 Mar 2020 17:04:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B691219C4F;
+ Wed,  4 Mar 2020 17:06:05 +0000 (UTC)
 Subject: Re: [PATCH v6 02/18] s390x: protvirt: Add diag308 subcodes 8 - 10
 To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
@@ -107,20 +108,20 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <c26d6900-664f-291e-ed10-764d26acfc63@redhat.com>
-Date: Wed, 4 Mar 2020 18:04:40 +0100
+Message-ID: <e6247adf-32c6-09a8-7243-b1a4b8274094@redhat.com>
+Date: Wed, 4 Mar 2020 18:06:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
 In-Reply-To: <20200304114231.23493-3-frankja@linux.ibm.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,9 +150,264 @@ On 04.03.20 12:42, Janosch Frank wrote:
 > 
 > Subcodes 8 and 9 are similiar to 5 and 6 and subcode 10 will finally
 > start the protected guest.
+> 
+> Subcodes 8-10 are not valid in protected mode, we have to do a subcode
+> 3 and then the 8 and 10 combination for a protected reboot.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  hw/s390x/ipl.c      | 47 ++++++++++++++++++++++++++++++++++++++++++---
+>  hw/s390x/ipl.h      | 32 ++++++++++++++++++++++++++++++
+>  target/s390x/diag.c | 26 ++++++++++++++++++++++---
+>  3 files changed, 99 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 9c1ecd423c..80c6ab233a 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -538,15 +538,55 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
+>      return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
+>  }
+>  
+> +int s390_ipl_pv_check_components(IplParameterBlock *iplb)
+> +{
+> +    int i;
+> +    IPLBlockPV *ipib_pv = &iplb->pv;
+> +
+> +    if (ipib_pv->num_comp == 0) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    for (i = 0; i < ipib_pv->num_comp; i++) {
+> +        /* Addr must be 4k aligned */
+> +        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        /* Tweak prefix is monotonously increasing with each component */
+> +        if (i < ipib_pv->num_comp - 1 &&
+> +            ipib_pv->components[i].tweak_pref >
+> +            ipib_pv->components[i + 1].tweak_pref) {
+> +            return -EINVAL;
+> +        }
+> +    }
+> +    return 0;
+> +}
+> +
+>  void s390_ipl_update_diag308(IplParameterBlock *iplb)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+>  
+> -    ipl->iplb = *iplb;
+> -    ipl->iplb_valid = true;
+> +    if (iplb->pbt == S390_IPL_TYPE_PV) {
+> +        ipl->iplb_pv = *iplb;
+> +        ipl->iplb_valid_pv = true;
+> +    } else {
+> +        ipl->iplb = *iplb;
+> +        ipl->iplb_valid = true;
+> +    }
+>      ipl->netboot = is_virtio_net_device(iplb);
+>  }
+>  
+> +IplParameterBlock *s390_ipl_get_iplb_secure(void)
+> +{
+> +    S390IPLState *ipl = get_ipl_device();
+> +
+> +    if (!ipl->iplb_valid_pv) {
+> +        return NULL;
+> +    }
+> +    return &ipl->iplb_pv;
+> +}
+> +
+>  IplParameterBlock *s390_ipl_get_iplb(void)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+> @@ -561,7 +601,8 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+>  {
+>      S390IPLState *ipl = get_ipl_device();
+>  
+> -    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
+> +    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL ||
+> +        reset_type == S390_RESET_PV) {
+>          /* use CPU 0 for full resets */
+>          ipl->reset_cpu_index = 0;
+>      } else {
+> diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+> index d4813105db..04be63cee1 100644
+> --- a/hw/s390x/ipl.h
+> +++ b/hw/s390x/ipl.h
+> @@ -15,6 +15,24 @@
+>  #include "cpu.h"
+>  #include "hw/qdev-core.h"
+>  
+> +struct IPLBlockPVComp {
+> +    uint64_t tweak_pref;
+> +    uint64_t addr;
+> +    uint64_t size;
+> +} QEMU_PACKED;
+> +typedef struct IPLBlockPVComp IPLBlockPVComp;
+> +
+> +struct IPLBlockPV {
+> +    uint8_t  reserved[87];
+> +    uint8_t  version;
+> +    uint32_t reserved70;
+> +    uint32_t num_comp;
+> +    uint64_t pv_header_addr;
+> +    uint64_t pv_header_len;
+> +    struct IPLBlockPVComp components[];
+> +} QEMU_PACKED;
+> +typedef struct IPLBlockPV IPLBlockPV;
+> +
+>  struct IplBlockCcw {
+>      uint8_t  reserved0[85];
+>      uint8_t  ssid;
+> @@ -71,6 +89,7 @@ union IplParameterBlock {
+>          union {
+>              IplBlockCcw ccw;
+>              IplBlockFcp fcp;
+> +            IPLBlockPV pv;
+>              IplBlockQemuScsi scsi;
+>          };
+>      } QEMU_PACKED;
+> @@ -84,9 +103,11 @@ union IplParameterBlock {
+>  typedef union IplParameterBlock IplParameterBlock;
+>  
+>  int s390_ipl_set_loadparm(uint8_t *loadparm);
+> +int s390_ipl_pv_check_components(IplParameterBlock *iplb);
+>  void s390_ipl_update_diag308(IplParameterBlock *iplb);
+>  void s390_ipl_prepare_cpu(S390CPU *cpu);
+>  IplParameterBlock *s390_ipl_get_iplb(void);
+> +IplParameterBlock *s390_ipl_get_iplb_secure(void);
+>  
+>  enum s390_reset {
+>      /* default is a reset not triggered by a CPU e.g. issued by QMP */
+> @@ -94,6 +115,7 @@ enum s390_reset {
+>      S390_RESET_REIPL,
+>      S390_RESET_MODIFIED_CLEAR,
+>      S390_RESET_LOAD_NORMAL,
+> +    S390_RESET_PV,
+>  };
+>  void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
+>  void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
+> @@ -133,6 +155,7 @@ struct S390IPLState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>      IplParameterBlock iplb;
+> +    IplParameterBlock iplb_pv;
+>      QemuIplParameters qipl;
+>      uint64_t start_addr;
+>      uint64_t compat_start_addr;
+> @@ -140,6 +163,7 @@ struct S390IPLState {
+>      uint64_t compat_bios_start_addr;
+>      bool enforce_bios;
+>      bool iplb_valid;
+> +    bool iplb_valid_pv;
+>      bool netboot;
+>      /* reset related properties don't have to be migrated or reset */
+>      enum s390_reset reset_type;
+> @@ -161,9 +185,11 @@ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3, "alignment of iplb wrong");
+>  
+>  #define S390_IPL_TYPE_FCP 0x00
+>  #define S390_IPL_TYPE_CCW 0x02
+> +#define S390_IPL_TYPE_PV 0x05
+>  #define S390_IPL_TYPE_QEMU_SCSI 0xff
+>  
+>  #define S390_IPLB_HEADER_LEN 8
+> +#define S390_IPLB_MIN_PV_LEN 148
+>  #define S390_IPLB_MIN_CCW_LEN 200
+>  #define S390_IPLB_MIN_FCP_LEN 384
+>  #define S390_IPLB_MIN_QEMU_SCSI_LEN 200
+> @@ -185,4 +211,10 @@ static inline bool iplb_valid_fcp(IplParameterBlock *iplb)
+>             iplb->pbt == S390_IPL_TYPE_FCP;
+>  }
+>  
+> +static inline bool iplb_valid_pv(IplParameterBlock *iplb)
+> +{
+> +    return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_PV_LEN &&
+> +           iplb->pbt == S390_IPL_TYPE_PV;
+> +}
+> +
+>  #endif
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index b5aec06d6b..945b263f0a 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -52,6 +52,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+>  #define DIAG_308_RC_OK              0x0001
+>  #define DIAG_308_RC_NO_CONF         0x0102
+>  #define DIAG_308_RC_INVALID         0x0402
+> +#define DIAG_308_RC_NO_PV_CONF      0x0902
+>  
+>  #define DIAG308_RESET_MOD_CLR       0
+>  #define DIAG308_RESET_LOAD_NORM     1
+> @@ -59,6 +60,9 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+>  #define DIAG308_LOAD_NORMAL_DUMP    4
+>  #define DIAG308_SET                 5
+>  #define DIAG308_STORE               6
+> +#define DIAG308_PV_SET              8
+> +#define DIAG308_PV_STORE            9
+> +#define DIAG308_PV_START            10
+>  
+>  static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
+>                                uintptr_t ra, bool write)
+> @@ -105,6 +109,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>          s390_ipl_reset_request(cs, S390_RESET_REIPL);
+>          break;
+>      case DIAG308_SET:
+> +    case DIAG308_PV_SET:
+>          if (diag308_parm_check(env, r1, addr, ra, false)) {
+>              return;
+>          }
+> @@ -117,7 +122,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+>  
+>          cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
+>  
+> -        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb)) {
+> +        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
+> +            !(iplb_valid_pv(iplb) && !s390_ipl_pv_check_components(iplb))) {
+>              env->regs[r1 + 1] = DIAG_308_RC_INVALID;
+>              goto out;
+>          }
+> @@ -128,17 +134,31 @@ out:
+>          g_free(iplb);
+>          return;
+>      case DIAG308_STORE:
+> +    case DIAG308_PV_STORE:
+>          if (diag308_parm_check(env, r1, addr, ra, true)) {
+>              return;
+>          }
+> -        iplb = s390_ipl_get_iplb();
+> +        if (subcode == DIAG308_PV_STORE) {
+> +            iplb = s390_ipl_get_iplb_secure();
+> +        } else {
+> +            iplb = s390_ipl_get_iplb();
+> +        }
+>          if (iplb) {
+>              cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
+>              env->regs[r1 + 1] = DIAG_308_RC_OK;
+>          } else {
+>              env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
+>          }
+> -        return;
+> +        break;
+> +    case DIAG308_PV_START:
+> +        iplb = s390_ipl_get_iplb_secure();
+> +        if (!iplb || !iplb_valid_pv(iplb)) {
+> +            env->regs[r1 + 1] = DIAG_308_RC_NO_PV_CONF;
+> +            return;
+> +        }
+> +
+> +        s390_ipl_reset_request(cs, S390_RESET_PV);
+> +        break;
+>      default:
+>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>          break;
+> 
 
-s/similiar/similar/
-
+Sorry, another comment. The new subcodes should be fenced via the cpu
+model or similar. Applying this patch and triggering one of these
+subcodes will end in a questionable state.
 
 -- 
 Thanks,
