@@ -2,89 +2,81 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751BAC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C24DDC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4377020870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BB8A20870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:10:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UlMLB2+9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4377020870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUTErjiG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB8A20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Qws-0008Sy-F7
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:08:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41792)
+	id 1j9QzA-0002ER-Mh
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:10:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j9Qqw-00072v-Bq
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:02:15 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j9QyS-0001eZ-Bi
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j9Qqv-0000u0-Cd
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:02:10 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39768)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j9Qqu-0000pq-KA
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:02:08 -0500
-Received: by mail-wr1-x430.google.com with SMTP id y17so1599931wrn.6
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 02:02:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=proYjuk/ghIUbAZUhjDs+u7cCfDIGKo4bJEFHg7+0GY=;
- b=UlMLB2+958dDHppmMIFuSMDcdYE8CJxzZipz6BbZnLsA13OXNJ0MHux6ChF9m+h4n+
- suJ66b5kcZLPF5ANIbwE/YtTw6OqSpuStoIFc6X3laXSNWiJEJpzQH1tTFt8XVyl517y
- 8HGHttOWygrINcNclxWe+060kkmge5MTNmNxJutXfst4RdlZ2gBtyJNFiE7AWbHjot2s
- Vh9TtrUxkkvDrtMnF04LFxuVY5vdY5SknEP0nZCOgBH1Pz7u7FKj6E18sWKdDlGtlhpz
- Zizn0UU9J7wwTCSALP45egdL47KWFzPscxqI+CUPegPIGXGPRweeVLNs/4wI3wxIjv23
- Znfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=proYjuk/ghIUbAZUhjDs+u7cCfDIGKo4bJEFHg7+0GY=;
- b=NGA1lVyfUtO6a50X7qsWs6TWgVVPWk5GXa7etFFhia7pklvwQQSK77RwzM0jVL429D
- x99gcjwSmhf+XbkiktNkUO+6c4TjoNBfxKK8ChV06X+TS64UIgis0/8qIrlXnU0YiJf+
- ppHOi/wf0sTdAlebP+nBTm8Utq73padjUpu2od3WyGXBpcZpMQC5rCqFZcrXnwXg4X/J
- g/Zn9up7bEem7VhfuubqrHKwR/X6WQ/xVR4qXSHo2advbu0oOHeCKMh0VhbYdzGrcLU2
- f0KogXxhwLxgQZ6Ys9V1wIXWtBnNSWYpD23SbUBAsYCSvEKvuseWfpnvf7wzkhpdIJOR
- ZB8g==
-X-Gm-Message-State: ANhLgQ0BYHWWIlGnOFVzAls4I1z+y8fZjDewOmaZ4DaYhhgao/R6jeYb
- O0an5SlLX5AeTGOSSnnNsOiEQA==
-X-Google-Smtp-Source: ADFU+vsS+FYAmLcuOfKxSKCAtTuV4PLut+/Bd/GXh/OHftkr6X+Rh5ww5m9hHvwkecP5mYdlVrgRMw==
-X-Received: by 2002:adf:dccb:: with SMTP id x11mr3278956wrm.214.1583316127568; 
- Wed, 04 Mar 2020 02:02:07 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m3sm18662244wrx.9.2020.03.04.02.01.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 02:02:00 -0800 (PST)
-Received: from zen.home.arpa (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AD8EE1FF99;
- Wed,  4 Mar 2020 10:01:55 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 9/9] travis.yml: install python3 numpy and opencv libraries
-Date: Wed,  4 Mar 2020 10:01:54 +0000
-Message-Id: <20200304100154.14822-10-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200304100154.14822-1-alex.bennee@linaro.org>
-References: <20200304100154.14822-1-alex.bennee@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1j9QyP-0005tI-RL
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27322
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9QyP-0005s5-H8
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583316592;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=n3YnEWzefIEP6vPwHwy3+XjapI2lE8/ZRyLbmDrmFj4=;
+ b=aUTErjiGNgECHikcuAqNLzOz2e80rsKoUcAisLQS+oCvFChT7UQAGjjr7PG4NC2PmDf8JJ
+ /sN8dGretOucyjTpCPZAYU41/cvPKjff1tMGkpNFuIZ1NrYZx4zBjuFcVXhc6wmn6PZizJ
+ kFpZh6ZD26fXvAoJ93X/YzHENG1gIa4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-AWf4ueL-MGah7GTxbKpNjg-1; Wed, 04 Mar 2020 05:09:48 -0500
+X-MC-Unique: AWf4ueL-MGah7GTxbKpNjg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9665C107ACC7;
+ Wed,  4 Mar 2020 10:09:46 +0000 (UTC)
+Received: from work-vm (ovpn-116-225.ams2.redhat.com [10.36.116.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83A791001B3F;
+ Wed,  4 Mar 2020 10:09:34 +0000 (UTC)
+Date: Wed, 4 Mar 2020 10:09:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
+Message-ID: <20200304100932.GA4104@work-vm>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::430
+In-Reply-To: <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,44 +88,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These are used for the acceptance framebuffer tests to count Tux. As
-we need slightly newer python3 for opencv we bump up to bionic.
+* Jagannathan Raman (jag.raman@oracle.com) wrote:
+> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+>=20
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> ---
+>  v4 -> v5:
+>   - Added "exec" suboption to get the executable's name
+>   - Addressed feedback about variable names
+>   - Removed redundant check for spawning a process
+>=20
+>  hw/proxy/qemu-proxy.c         | 68 +++++++++++++++++++++++++++++++++----=
+------
+>  include/hw/proxy/qemu-proxy.h |  2 +-
+>  2 files changed, 54 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+> index 828bbd7..d792e86 100644
+> --- a/hw/proxy/qemu-proxy.c
+> +++ b/hw/proxy/qemu-proxy.c
+> @@ -19,19 +19,50 @@
+> =20
+>  static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+> =20
+> +static int add_argv(char *opts_str, char **argv, int argc)
+> +{
+> +    int max_args =3D 64;
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+...
 
-Message-Id: <20200303150622.20133-10-alex.bennee@linaro.org>
+> +
+> +static int make_argv(char *opts_str, char **argv, int argc)
+> +{
+> +    int max_args =3D 64;
 
-diff --git a/.travis.yml b/.travis.yml
-index 70a24bf2fc8..b92798ac3b9 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -313,6 +313,7 @@ jobs:
- 
-     # Acceptance (Functional) tests
-     - name: "GCC check-acceptance"
-+      dist: bionic
-       env:
-         - CONFIG="--target-list=aarch64-softmmu,alpha-softmmu,arm-softmmu,m68k-softmmu,microblaze-softmmu,mips-softmmu,mips64el-softmmu,nios2-softmmu,or1k-softmmu,ppc-softmmu,ppc64-softmmu,s390x-softmmu,sparc-softmmu,x86_64-softmmu,xtensa-softmmu"
-         - TEST_CMD="make check-acceptance"
-@@ -323,7 +324,9 @@ jobs:
-           packages:
-             - python3-pil
-             - python3-pip
--            - python3.5-venv
-+            - python3-numpy
-+            - python3-opencv
-+            - python3-venv
-             - rpm2cpio
-             - tesseract-ocr
-             - tesseract-ocr-eng
--- 
-2.20.1
+.....
+
+> +
+>  static int remote_spawn(PCIProxyDev *pdev, const char *opts,
+>                          const char *exec_name, Error **errp)
+>  {
+> -    char *args[3];
+>      pid_t rpid;
+>      int fd[2] =3D {-1, -1};
+>      Error *local_error =3D NULL;
+> +    char *argv[64];
+
+
+Magic '64' in a lot of places; that should be one constant somewhere
+(if it's actually needed).
+
+Dave
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
