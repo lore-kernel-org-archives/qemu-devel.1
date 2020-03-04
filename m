@@ -2,89 +2,82 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F30C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4E4C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2597120705
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEDDC20732
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:48:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G3vgWfQf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2597120705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="da7h7ZcU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEDDC20732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9RO2-0001og-1p
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:36:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53987)
+	id 1j9RZi-00063Y-4Q
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:48:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1j9RNP-0001Ag-IC
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:44 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j9RYy-0005XL-6Y
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:47:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1j9RNO-00072K-8w
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:43 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33021)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1j9RNN-00071u-UC
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:42 -0500
-Received: by mail-wr1-x443.google.com with SMTP id x7so1765134wrr.0
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 02:35:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=hCiO3x1uR4xY3AOdgZ323cvKo3x40Pp8fN8MJzXH5nM=;
- b=G3vgWfQfJLnpYECqxMdfQ4NFbIO7lr37jrOESbddJ24k3Yu1i/I4sKVRH5oO5YjF0c
- +GDGcA6G7UFf+EeWxrqOHGxE4F3kBoAvgSCxSaberZp1MjfX/NQlMOBA4/s9jsD1C/UI
- 0tEOTqkpuhplUQvL231Kmb7u/vS3DtjwEDYC72GaGN2nqPlMRyHFusCYEpWRhnfYdN4H
- BWulVUqFDOoF0pgaaF0Y5IJRHXWgxF0N9KWK6fWPF3W1hVEd7x7auEjc9Xgl1ARmpWyR
- OtNpO/4aMOIDNq+iXZjh57RDXmuEhreXINZZGhwN0wtU3Smykcv0Rrbuw5OikHfHhbyd
- 5YEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=hCiO3x1uR4xY3AOdgZ323cvKo3x40Pp8fN8MJzXH5nM=;
- b=ILRi3qOFTSml0pMrngHl9FaZ8dUbj6LVYM2xIhlknZcl2Uidon2vOasNvv1q/ZEaIk
- Ymie5nWvJNbi4yMFAJ2MJ46J5f8tBNevEbPZz9jN05xp054q2cUizxOVL7R3FgCB0YTJ
- TKml/6sYtCGVkl/gQy/LSPj551dQZ1WkN8cCK5uYkisbB7HvfBzWKXZTfF2EXYUD1lpG
- f8L6JtVRIyOL6ERYwwPDpgw2csqhnFa8iQbyL/6r/eF/+JI49Y+SCeuAtPoNaLoDNVUd
- avRgVgCxqhHGOF08pVeeWz5jATFi3WX+UdwAHIj5rwC9ie8oPqCF01nvhUp8MvjVA0d7
- QexA==
-X-Gm-Message-State: ANhLgQ2N0uoe6/RJwwT7T1RFMIT4eYRL81+/vUpqj5YCKmQuyu4SYIhW
- RyHWgZbGIIayEk/PP8QcRX5qBQ==
-X-Google-Smtp-Source: ADFU+vs/Nx9V7Pm6tgYDyAlKAGFmVABQryMnScNTAn/Xb8+Vh9XfsYNIpS5qWuD0P6rti4GoCxIMyg==
-X-Received: by 2002:adf:fc07:: with SMTP id i7mr3728153wrr.158.1583318139933; 
- Wed, 04 Mar 2020 02:35:39 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n11sm28318380wrq.40.2020.03.04.02.35.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 02:35:38 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BD2241FF87;
- Wed,  4 Mar 2020 10:35:36 +0000 (GMT)
-References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
- <20200301215029.15196-19-nieklinnenbank@gmail.com>
-User-agent: mu4e 1.3.9; emacs 27.0.90
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: Re: [PATCH v6 18/18] docs: add Orange Pi PC document
-In-reply-to: <20200301215029.15196-19-nieklinnenbank@gmail.com>
-Date: Wed, 04 Mar 2020 10:35:36 +0000
-Message-ID: <871rq876h3.fsf@linaro.org>
+ (envelope-from <dgilbert@redhat.com>) id 1j9RYv-0001Ig-QT
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:47:39 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20638
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9RYv-0001H4-Fn
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:47:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1583318856;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=L7lZsKpMspFfC93ICZYw9dJQjEmo2lRCgzmB5AhbM64=;
+ b=da7h7ZcUYYreJRLUa6yARaXhDqRtpqxdSdPCPwrh0e3PUjjh0l4doc+hIWsozXcPegTsbw
+ C/0jbmsxydrktCFbJTXOkOmhZVadpmiK0eiBumZLs/lFRIvrY6ioHLE7Hx27WR0eu5qhfB
+ rsV9a0sZ/YlKOSTcxsdK4JzUfc6q5No=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-6cMRmpCIOMuE-HGB2z8tZQ-1; Wed, 04 Mar 2020 05:47:32 -0500
+X-MC-Unique: 6cMRmpCIOMuE-HGB2z8tZQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98E5F13E2;
+ Wed,  4 Mar 2020 10:47:30 +0000 (UTC)
+Received: from work-vm (ovpn-116-225.ams2.redhat.com [10.36.116.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CABA1001B3F;
+ Wed,  4 Mar 2020 10:47:17 +0000 (UTC)
+Date: Wed, 4 Mar 2020 10:47:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [PATCH v5 15/50] multi-process: PCI BAR read/write handling for
+ proxy & remote endpoints
+Message-ID: <20200304104715.GC4104@work-vm>
+References: <cover.1582576372.git.jag.raman@oracle.com>
+ <28d7426190d8a88c7b93f5f5daf8cd1c6e017a76.1582576372.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <28d7426190d8a88c7b93f5f5daf8cd1c6e017a76.1582576372.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.13.3 (2020-01-12)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,84 +89,325 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-devel@nongnu.org,
- b.galvani@gmail.com, qemu-arm@nongnu.org, imammedo@redhat.com,
- philmd@redhat.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
+ stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Niek Linnenbank <nieklinnenbank@gmail.com> writes:
-
-> The Xunlong Orange Pi PC machine is a functional ARM machine
-> based on the Allwinner H3 System-on-Chip. It supports mainline
-> Linux, U-Boot, NetBSD and is covered by acceptance tests.
->
-> This commit adds a documentation text file with a description
-> of the machine and instructions for the user.
-
-This is great, thanks for taking the time to include documentation.
-
->
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+* Jagannathan Raman (jag.raman@oracle.com) wrote:
+> Proxy device object implements handler for PCI BAR writes and reads. The =
+handler
+> uses BAR_WRITE/BAR_READ message to communicate to the remote process with=
+ the BAR address and
+> value to be written/read.
+> The remote process implements handler for BAR_WRITE/BAR_READ message.
+>=20
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 > ---
->  docs/orangepi.rst | 226
-> ++++++++++++++++++++++++++++++++++++++++++++++
-
-I suspect there is a better place to put this is than the top level. I
-wonder if it should be docs/specs?
-
->  MAINTAINERS       |   1 +
->  2 files changed, 227 insertions(+)
->  create mode 100644 docs/orangepi.rst
->
-> diff --git a/docs/orangepi.rst b/docs/orangepi.rst
-> new file mode 100644
-> index 0000000000..a9b46f553c
-> --- /dev/null
-> +++ b/docs/orangepi.rst
-> @@ -0,0 +1,226 @@
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +Orange Pi PC Machine Type
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
+>  hw/proxy/qemu-proxy.c         | 65 +++++++++++++++++++++++++++++++++++++=
++
+>  include/hw/proxy/qemu-proxy.h | 22 +++++++++++--
+>  include/io/mpqemu-link.h      | 12 +++++++
+>  remote/remote-main.c          | 73 +++++++++++++++++++++++++++++++++++++=
+++++++
+>  4 files changed, 170 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+> index d792e86..b17d9bb 100644
+> --- a/hw/proxy/qemu-proxy.c
+> +++ b/hw/proxy/qemu-proxy.c
+> @@ -262,3 +262,68 @@ static void pci_proxy_dev_realize(PCIDevice *device,=
+ Error **errp)
+>      dev->get_proxy_sock =3D get_proxy_sock;
+>      dev->init_proxy =3D init_proxy;
+>  }
 > +
-> +The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
-> +based embedded computer with mainline support in both U-Boot
-> +and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
-> +1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
-> +various other I/O.
-
-When Peter's document PR goes in later this week there will also be a:
-
-  docs/system/target-arm.rst
-
-which would benefit from a section for the Orange Pi in it.
-
+> +static void send_bar_access_msg(PCIProxyDev *dev, MemoryRegion *mr,
+> +                                bool write, hwaddr addr, uint64_t *val,
+> +                                unsigned size, bool memory)
+> +{
+> +    MPQemuLinkState *mpqemu_link =3D dev->mpqemu_link;
+> +    MPQemuMsg msg;
+> +    int wait;
 > +
-> +Supported devices
-> +-----------------
+> +    memset(&msg, 0, sizeof(MPQemuMsg));
 > +
-> +The Orange Pi PC machine supports the following devices:
+> +    msg.bytestream =3D 0;
+> +    msg.size =3D sizeof(msg.data1);
+> +    msg.data1.bar_access.addr =3D mr->addr + addr;
+> +    msg.data1.bar_access.size =3D size;
+> +    msg.data1.bar_access.memory =3D memory;
 > +
-> + * SMP (Quad Core Cortex A7)
-> + * Generic Interrupt Controller configuration
-> + * SRAM mappings
-> + * SDRAM controller
-> + * Real Time Clock
-> + * Timer device (re-used from Allwinner A10)
-> + * UART
-> + * SD/MMC storage controller
-> + * EMAC ethernet
+> +    if (write) {
+> +        msg.cmd =3D BAR_WRITE;
+> +        msg.data1.bar_access.val =3D *val;
+> +    } else {
+> +        wait =3D GET_REMOTE_WAIT;
+> +
+> +        msg.cmd =3D BAR_READ;
+> +        msg.num_fds =3D 1;
+> +        msg.fds[0] =3D wait;
+> +    }
+> +
+> +    mpqemu_msg_send(&msg, mpqemu_link->com);
+> +
+> +    if (!write) {
+> +        *val =3D wait_for_remote(wait);
+> +        PUT_REMOTE_WAIT(wait);
+> +    }
+> +}
+> +
+> +void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
+> +                             unsigned size)
+> +{
+> +    ProxyMemoryRegion *pmr =3D opaque;
+> +
+> +    send_bar_access_msg(pmr->dev, &pmr->mr, true, addr, &val, size,
+> +                        pmr->memory);
+> +}
+> +
+> +uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size=
+)
+> +{
+> +    ProxyMemoryRegion *pmr =3D opaque;
+> +    uint64_t val;
+> +
+> +    send_bar_access_msg(pmr->dev, &pmr->mr, false, addr, &val, size,
+> +                        pmr->memory);
+> +
+> +     return val;
+> +}
+> +
+> +const MemoryRegionOps proxy_default_ops =3D {
+> +    .read =3D proxy_default_bar_read,
+> +    .write =3D proxy_default_bar_write,
+> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .impl =3D {
+> +        .min_access_size =3D 1,
+> +        .max_access_size =3D 1,
+> +    },
+> +};
+> diff --git a/include/hw/proxy/qemu-proxy.h b/include/hw/proxy/qemu-proxy.=
+h
+> index 29fa2e9..44e370e 100644
+> --- a/include/hw/proxy/qemu-proxy.h
+> +++ b/include/hw/proxy/qemu-proxy.h
+> @@ -22,7 +22,19 @@
+>  #define PCI_PROXY_DEV_GET_CLASS(obj) \
+>              OBJECT_GET_CLASS(PCIProxyDevClass, (obj), TYPE_PCI_PROXY_DEV=
+)
+> =20
+> -typedef struct PCIProxyDev {
+> +typedef struct PCIProxyDev PCIProxyDev;
+> +
+> +typedef struct ProxyMemoryRegion {
+> +    PCIProxyDev *dev;
+> +    MemoryRegion mr;
+> +    bool memory;
+> +    bool present;
+> +    uint8_t type;
+> +} ProxyMemoryRegion;
+> +
+> +extern const MemoryRegionOps proxy_default_ops;
+> +
+> +struct PCIProxyDev {
+>      PCIDevice parent_dev;
+> =20
+>      MPQemuLinkState *mpqemu_link;
+> @@ -41,7 +53,8 @@ typedef struct PCIProxyDev {
+>      void (*init_proxy) (PCIDevice *dev, char *command, char *exec_name,
+>                          bool need_spawn, Error **errp);
+> =20
+> -} PCIProxyDev;
+> +    ProxyMemoryRegion region[PCI_NUM_REGIONS];
+> +};
+> =20
+>  typedef struct PCIProxyDevClass {
+>      PCIDeviceClass parent_class;
+> @@ -51,4 +64,9 @@ typedef struct PCIProxyDevClass {
+>      char *command;
+>  } PCIProxyDevClass;
+> =20
+> +void proxy_default_bar_write(void *opaque, hwaddr addr, uint64_t val,
+> +                             unsigned size);
+> +
+> +uint64_t proxy_default_bar_read(void *opaque, hwaddr addr, unsigned size=
+);
+> +
+>  #endif /* QEMU_PROXY_H */
+> diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
+> index 5a2be48..1a7738e 100644
+> --- a/include/io/mpqemu-link.h
+> +++ b/include/io/mpqemu-link.h
+> @@ -38,6 +38,8 @@
+>   * PCI_CONFIG_READ        PCI configuration space read
+>   * PCI_CONFIG_WRITE       PCI configuration space write
+>   * SYNC_SYSMEM      Shares QEMU's RAM with remote device's RAM
+> + * BAR_WRITE        Writes to PCI BAR region
+> + * BAR_READ         Reads from PCI BAR region
+>   *
+>   * proc_cmd_t enum type to specify the command to be executed on the rem=
+ote
+>   * device.
+> @@ -47,6 +49,8 @@ typedef enum {
+>      PCI_CONFIG_READ,
+>      PCI_CONFIG_WRITE,
+>      SYNC_SYSMEM,
+> +    BAR_WRITE,
+> +    BAR_READ,
+>      MAX,
+>  } mpqemu_cmd_t;
+> =20
+> @@ -70,6 +74,13 @@ typedef struct {
+>  } sync_sysmem_msg_t;
+> =20
+>  typedef struct {
+> +    hwaddr addr;
+> +    uint64_t val;
+> +    unsigned size;
+> +    bool memory;
+> +} bar_access_msg_t;
+> +
+> +typedef struct {
+>      mpqemu_cmd_t cmd;
+>      int bytestream;
+>      size_t size;
+> @@ -77,6 +88,7 @@ typedef struct {
+>      union {
+>          uint64_t u64;
+>          sync_sysmem_msg_t sync_sysmem;
+> +        bar_access_msg_t bar_access;
+>      } data1;
+> =20
+>      int fds[REMOTE_MAX_FDS];
+> diff --git a/remote/remote-main.c b/remote/remote-main.c
+> index 7b4cf2f..acd8daf 100644
+> --- a/remote/remote-main.c
+> +++ b/remote/remote-main.c
+> @@ -33,6 +33,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "block/block.h"
+>  #include "exec/ramlist.h"
+> +#include "exec/memattrs.h"
+> =20
+>  static MPQemuLinkState *mpqemu_link;
+>  PCIDevice *remote_pci_dev;
+> @@ -63,6 +64,66 @@ static void process_config_read(MPQemuMsg *msg)
+>      PUT_REMOTE_WAIT(wait);
+>  }
+> =20
+> +/* TODO: confirm memtx attrs. */
+> +static void process_bar_write(MPQemuMsg *msg, Error **errp)
+> +{
+> +    bar_access_msg_t *bar_access =3D &msg->data1.bar_access;
+> +    AddressSpace *as =3D
+> +        bar_access->memory ? &address_space_memory : &address_space_io;
+> +    MemTxResult res;
+> +
+> +    res =3D address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIE=
+D,
+> +                           (uint8_t *)&bar_access->val, bar_access->size=
+, true);
+> +
+> +    if (res !=3D MEMTX_OK) {
+> +        error_setg(errp, "Could not perform address space write operatio=
+n,"
+> +                   " inaccessible address: %lx.", bar_access->addr);
+> +    }
+> +}
+> +
+> +static void process_bar_read(MPQemuMsg *msg, Error **errp)
+> +{
+> +    bar_access_msg_t *bar_access =3D &msg->data1.bar_access;
+> +    AddressSpace *as;
+> +    int wait =3D msg->fds[0];
+> +    MemTxResult res;
+> +    uint64_t val =3D 0;
+> +
+> +    as =3D bar_access->memory ? &address_space_memory : &address_space_i=
+o;
+> +
+> +    assert(bar_access->size <=3D sizeof(uint64_t));
 
-Do we ever exercise the ethernet in the acceptance tests? I see we have
-some that boots a full OS but boot console only seems to touch the
-serial console.
+Note you don't have that check on the write function above.
+Do you actually want something like:
+   assert(is_power_of_2(bar_access->size) && bar_access->size <=3D sizeof(u=
+int64_t));
 
-<snip>
+> +    res =3D address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIE=
+D,
+> +                           (uint8_t *)&val, bar_access->size, false);
+> +
+> +    if (res !=3D MEMTX_OK) {
+> +        error_setg(errp, "Could not perform address space read operation=
+,"
+> +                   " inaccessible address: %lx.", bar_access->addr);
+> +        val =3D (uint64_t)-1;
+> +        goto fail;
+> +    }
+> +
+> +    switch (bar_access->size) {
 
---=20
-Alex Benn=C3=A9e
+No case 8 ?
+
+Dave
+
+> +    case 4:
+> +        val =3D *((uint32_t *)&val);
+> +        break;
+> +    case 2:
+> +        val =3D *((uint16_t *)&val);
+> +        break;
+> +    case 1:
+> +        val =3D *((uint8_t *)&val);
+> +        break;
+> +    default:
+> +        error_setg(errp, "Invalid PCI BAR read size");
+> +        return;
+> +    }
+> +
+> +fail:
+> +    notify_proxy(wait, val);
+> +
+> +    PUT_REMOTE_WAIT(wait);
+> +}
+> +
+>  static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+>  {
+>      MPQemuMsg *msg =3D NULL;
+> @@ -88,6 +149,18 @@ static void process_msg(GIOCondition cond, MPQemuChan=
+nel *chan)
+>      case PCI_CONFIG_READ:
+>          process_config_read(msg);
+>          break;
+> +    case BAR_WRITE:
+> +        process_bar_write(msg, &err);
+> +        if (err) {
+> +            goto finalize_loop;
+> +        }
+> +        break;
+> +    case BAR_READ:
+> +        process_bar_read(msg, &err);
+> +        if (err) {
+> +            goto finalize_loop;
+> +        }
+> +        break;
+>      default:
+>          error_setg(&err, "Unknown command");
+>          goto finalize_loop;
+> --=20
+> 1.8.3.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
