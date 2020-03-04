@@ -2,81 +2,89 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1D9C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F30C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65AE720705
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2597120705
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:36:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bq8FE44G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AE720705
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G3vgWfQf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2597120705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9RJ2-0007yL-IW
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:31:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52197)
+	id 1j9RO2-0001og-1p
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:36:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53987)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j9RIG-0007WF-Jk
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:26 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1j9RNP-0001Ag-IC
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j9RIE-0001N4-Nl
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:23 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60310
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9RIE-0001M1-JD
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583317821;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PkiWkl9zdfaymB9Avb4mziDqZzp8wZxXmGXJHmt8OLA=;
- b=bq8FE44GYVXMHT4vARfWA/eH+qMfX9dQWPWIcRLaYzoEHPN2zMXMgV1Krx9rXuFHyheFva
- EGHwUA9wVf6QTA/nom0BfAuQMilK0DanSn98/52Av8gKJjlwGrNX59vtWmgk/b0fC1Xdh4
- sCvBDrRhaBhgsBXizR/1TLf+TSUNlyE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-7snCtD7PMIuE3cY1RToNRQ-1; Wed, 04 Mar 2020 05:30:19 -0500
-X-MC-Unique: 7snCtD7PMIuE3cY1RToNRQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C9DB13F5;
- Wed,  4 Mar 2020 10:30:17 +0000 (UTC)
-Received: from work-vm (ovpn-116-225.ams2.redhat.com [10.36.116.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F32028F34E;
- Wed,  4 Mar 2020 10:30:01 +0000 (UTC)
-Date: Wed, 4 Mar 2020 10:29:59 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v5 12/50] multi-process: remote process initialization
-Message-ID: <20200304102959.GB4104@work-vm>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <264de034fcdc1000bada4a93ac7e0856fef591f2.1582576372.git.jag.raman@oracle.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1j9RNO-00072K-8w
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:43 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33021)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1j9RNN-00071u-UC
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:35:42 -0500
+Received: by mail-wr1-x443.google.com with SMTP id x7so1765134wrr.0
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 02:35:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=hCiO3x1uR4xY3AOdgZ323cvKo3x40Pp8fN8MJzXH5nM=;
+ b=G3vgWfQfJLnpYECqxMdfQ4NFbIO7lr37jrOESbddJ24k3Yu1i/I4sKVRH5oO5YjF0c
+ +GDGcA6G7UFf+EeWxrqOHGxE4F3kBoAvgSCxSaberZp1MjfX/NQlMOBA4/s9jsD1C/UI
+ 0tEOTqkpuhplUQvL231Kmb7u/vS3DtjwEDYC72GaGN2nqPlMRyHFusCYEpWRhnfYdN4H
+ BWulVUqFDOoF0pgaaF0Y5IJRHXWgxF0N9KWK6fWPF3W1hVEd7x7auEjc9Xgl1ARmpWyR
+ OtNpO/4aMOIDNq+iXZjh57RDXmuEhreXINZZGhwN0wtU3Smykcv0Rrbuw5OikHfHhbyd
+ 5YEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=hCiO3x1uR4xY3AOdgZ323cvKo3x40Pp8fN8MJzXH5nM=;
+ b=ILRi3qOFTSml0pMrngHl9FaZ8dUbj6LVYM2xIhlknZcl2Uidon2vOasNvv1q/ZEaIk
+ Ymie5nWvJNbi4yMFAJ2MJ46J5f8tBNevEbPZz9jN05xp054q2cUizxOVL7R3FgCB0YTJ
+ TKml/6sYtCGVkl/gQy/LSPj551dQZ1WkN8cCK5uYkisbB7HvfBzWKXZTfF2EXYUD1lpG
+ f8L6JtVRIyOL6ERYwwPDpgw2csqhnFa8iQbyL/6r/eF/+JI49Y+SCeuAtPoNaLoDNVUd
+ avRgVgCxqhHGOF08pVeeWz5jATFi3WX+UdwAHIj5rwC9ie8oPqCF01nvhUp8MvjVA0d7
+ QexA==
+X-Gm-Message-State: ANhLgQ2N0uoe6/RJwwT7T1RFMIT4eYRL81+/vUpqj5YCKmQuyu4SYIhW
+ RyHWgZbGIIayEk/PP8QcRX5qBQ==
+X-Google-Smtp-Source: ADFU+vs/Nx9V7Pm6tgYDyAlKAGFmVABQryMnScNTAn/Xb8+Vh9XfsYNIpS5qWuD0P6rti4GoCxIMyg==
+X-Received: by 2002:adf:fc07:: with SMTP id i7mr3728153wrr.158.1583318139933; 
+ Wed, 04 Mar 2020 02:35:39 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n11sm28318380wrq.40.2020.03.04.02.35.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Mar 2020 02:35:38 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BD2241FF87;
+ Wed,  4 Mar 2020 10:35:36 +0000 (GMT)
+References: <20200301215029.15196-1-nieklinnenbank@gmail.com>
+ <20200301215029.15196-19-nieklinnenbank@gmail.com>
+User-agent: mu4e 1.3.9; emacs 27.0.90
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Subject: Re: [PATCH v6 18/18] docs: add Orange Pi PC document
+In-reply-to: <20200301215029.15196-19-nieklinnenbank@gmail.com>
+Date: Wed, 04 Mar 2020 10:35:36 +0000
+Message-ID: <871rq876h3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <264de034fcdc1000bada4a93ac7e0856fef591f2.1582576372.git.jag.raman@oracle.com>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,167 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, liran.alon@oracle.com,
- stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-devel@nongnu.org,
+ b.galvani@gmail.com, qemu-arm@nongnu.org, imammedo@redhat.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jagannathan Raman (jag.raman@oracle.com) wrote:
-> Adds the handler to process message from QEMU,
-> Initialize remote process main loop, handles SYNC_SYSMEM
-> message by updating its "system_memory" container using
-> shared file descriptors received from QEMU.
->=20
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+
+Niek Linnenbank <nieklinnenbank@gmail.com> writes:
+
+> The Xunlong Orange Pi PC machine is a functional ARM machine
+> based on the Allwinner H3 System-on-Chip. It supports mainline
+> Linux, U-Boot, NetBSD and is covered by acceptance tests.
+>
+> This commit adds a documentation text file with a description
+> of the machine and instructions for the user.
+
+This is great, thanks for taking the time to include documentation.
+
+>
+> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 > ---
->  v4 -> v5:
->   - We checked if we could use functions already defined in
->     util/main-loop.c instead of using g_main_loop_run. However,
->     we couldn't find a suitable function that's generic enough
->     to do this. All of them have emulator code embedded in them
->     which is not used by the remote process. We are therefore
->     not making any change to this patch
->=20
->  remote/remote-main.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 85 insertions(+)
->=20
-> diff --git a/remote/remote-main.c b/remote/remote-main.c
-> index ecf30e0..56315cd 100644
-> --- a/remote/remote-main.c
-> +++ b/remote/remote-main.c
-> @@ -12,6 +12,7 @@
->  #include "qemu-common.h"
-> =20
->  #include <stdio.h>
-> +#include <unistd.h>
-> =20
->  #include "qemu/module.h"
->  #include "remote/pcihost.h"
-> @@ -19,12 +20,96 @@
->  #include "hw/boards.h"
->  #include "hw/qdev-core.h"
->  #include "qemu/main-loop.h"
-> +#include "remote/memory.h"
-> +#include "io/mpqemu-link.h"
-> +#include "qapi/error.h"
-> +#include "qemu/main-loop.h"
-> +#include "sysemu/cpus.h"
-> +#include "qemu-common.h"
-> +#include "hw/pci/pci.h"
-> +#include "qemu/thread.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/config-file.h"
-> +#include "sysemu/sysemu.h"
-> +#include "block/block.h"
-> +#include "exec/ramlist.h"
-> +
-> +static MPQemuLinkState *mpqemu_link;
-> +PCIDevice *remote_pci_dev;
-> +
-> +static void process_msg(GIOCondition cond, MPQemuChannel *chan)
-> +{
-> +    MPQemuMsg *msg =3D NULL;
-> +    Error *err =3D NULL;
-> +
-> +    if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
-> +        goto finalize_loop;
-> +    }
-> +
-> +    msg =3D g_malloc0(sizeof(MPQemuMsg));
-> +
-> +    if (mpqemu_msg_recv(msg, chan) < 0) {
-> +        error_setg(&err, "Failed to receive message");
+>  docs/orangepi.rst | 226
+> ++++++++++++++++++++++++++++++++++++++++++++++
 
-Please give error messages more context, e.g. the device or process name
-or something like that so that; it helps when we get a user
-reporting a crash and they report 'Unknown command' in their log, but
-then we have to figure out where to point them.
+I suspect there is a better place to put this is than the top level. I
+wonder if it should be docs/specs?
 
-> +        goto finalize_loop;
-> +    }
+>  MAINTAINERS       |   1 +
+>  2 files changed, 227 insertions(+)
+>  create mode 100644 docs/orangepi.rst
+>
+> diff --git a/docs/orangepi.rst b/docs/orangepi.rst
+> new file mode 100644
+> index 0000000000..a9b46f553c
+> --- /dev/null
+> +++ b/docs/orangepi.rst
+> @@ -0,0 +1,226 @@
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> +Orange Pi PC Machine Type
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
 > +
-> +    switch (msg->cmd) {
-> +    case INIT:
-> +        break;
-> +    case PCI_CONFIG_WRITE:
-> +        break;
-> +    case PCI_CONFIG_READ:
-> +        break;
-> +    default:
-> +        error_setg(&err, "Unknown command");
-> +        goto finalize_loop;
-> +    }
-> +
-> +    g_free(msg->data2);
-> +    g_free(msg);
-> +
-> +    return;
-> +
-> +finalize_loop:
-> +    if (err) {
-> +        error_report_err(err);
-> +    }
-> +    g_free(msg);
-> +    mpqemu_link_finalize(mpqemu_link);
-> +    mpqemu_link =3D NULL;
-> +}
-> =20
->  int main(int argc, char *argv[])
->  {
-> +    Error *err =3D NULL;
-> +
->      module_call_init(MODULE_INIT_QOM);
-> =20
-> +    bdrv_init_with_whitelist();
-> +
-> +    if (qemu_init_main_loop(&err)) {
-> +        error_report_err(err);
-> +        return -EBUSY;
-> +    }
-> +
-> +    qemu_init_cpu_loop();
-> +
-> +    page_size_init();
-> +
-> +    qemu_mutex_init(&ram_list.mutex);
-> +
+> +The Xunlong Orange Pi PC is an Allwinner H3 System on Chip
+> +based embedded computer with mainline support in both U-Boot
+> +and Linux. The board comes with a Quad Core Cortex A7 @ 1.3GHz,
+> +1GiB RAM, 100Mbit ethernet, USB, SD/MMC, USB, HDMI and
+> +various other I/O.
 
-So these are some subset of the things from qemu_init; I guess
-we'll have to be careful when we add stuff to vl.c to think what should
-also be added here.
+When Peter's document PR goes in later this week there will also be a:
 
-Dave
+  docs/system/target-arm.rst
 
->      current_machine =3D MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MA=
-CHINE)));
-> =20
-> +    mpqemu_link =3D mpqemu_link_create();
-> +    if (!mpqemu_link) {
-> +        printf("Could not create MPQemu link\n");
-> +        return -1;
-> +    }
-> +
-> +    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
-> +    mpqemu_link_set_callback(mpqemu_link, process_msg);
-> +
-> +    mpqemu_start_coms(mpqemu_link);
-> +
->      return 0;
->  }
-> --=20
-> 1.8.3.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+which would benefit from a section for the Orange Pi in it.
 
+> +
+> +Supported devices
+> +-----------------
+> +
+> +The Orange Pi PC machine supports the following devices:
+> +
+> + * SMP (Quad Core Cortex A7)
+> + * Generic Interrupt Controller configuration
+> + * SRAM mappings
+> + * SDRAM controller
+> + * Real Time Clock
+> + * Timer device (re-used from Allwinner A10)
+> + * UART
+> + * SD/MMC storage controller
+> + * EMAC ethernet
+
+Do we ever exercise the ethernet in the acceptance tests? I see we have
+some that boots a full OS but boot console only seems to touch the
+serial console.
+
+<snip>
+
+--=20
+Alex Benn=C3=A9e
 
