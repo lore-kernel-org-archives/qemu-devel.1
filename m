@@ -2,67 +2,67 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDCAC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49703C3F2D7
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:25:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C28502146E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07D9420870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 19:25:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LS9rXrUc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28502146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTJ0MxxC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07D9420870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ZXf-000462-SL
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:18:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41101)
+	id 1j9ZeF-0006kB-3Z
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 14:25:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42531)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1j9ZWn-0003BU-GE
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:58 -0500
+ (envelope-from <jsnow@redhat.com>) id 1j9ZdN-000616-0N
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1j9ZWm-0007x7-4U
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32981
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1j9ZdL-0007er-Eb
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:24:44 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30609
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9ZWl-0007v3-T6
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:17:56 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1j9ZdL-0007dL-9g
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 14:24:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583349474;
+ s=mimecast20190719; t=1583349882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=cungv1hljWKE8Yxx+hRsCc5MYqudu5AadRqzQH8j8kM=;
- b=LS9rXrUcaai5TiXMAcwZEndjVC6uOANbMQQtYFNWrJr8JxI3m2BxDex+7D83E25PoTJM0d
- 4cs6SnAydH2L1uHFBLztBRgoHaFX2kQgBwm1DEzWhUHXCZNtRSOEdX/ZgTYKkYFZa8IXYh
- bjcXKgykLrQRAS/wY6orGjPd6A1DhQQ=
+ bh=0rG2HB/ZWOGbqAIZqdkpv339Oj+avR+3dQO+NZqkfms=;
+ b=FTJ0MxxCOLj9PlgKm/rJC0ZGmtrCaaMcYv31zqELD1OT0x0+XmVZvrbnpiJ4ZrPsSjZKaR
+ zVe7x0o3mrQa2bCQneJ+0yvFe6+A2+4Vu41mR5wZdglWDKtLs8YnAIp+zNV4cxMvqdTxT6
+ 2q7mjxMgRRcoVjIlAZ5rbVkuqqMuFkA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211-GT2bZZRVPyuCiT4hYq9nAA-1; Wed, 04 Mar 2020 14:17:50 -0500
-X-MC-Unique: GT2bZZRVPyuCiT4hYq9nAA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-381-XVuj3nSbOXG5c6fNqUVHIg-1; Wed, 04 Mar 2020 14:24:39 -0500
+X-MC-Unique: XVuj3nSbOXG5c6fNqUVHIg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBA0280573A;
- Wed,  4 Mar 2020 19:17:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF336107ACC7;
+ Wed,  4 Mar 2020 19:24:35 +0000 (UTC)
 Received: from [10.10.120.212] (ovpn-120-212.rdu2.redhat.com [10.10.120.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECA1E5D9C9;
- Wed,  4 Mar 2020 19:17:48 +0000 (UTC)
-Subject: Re: [PATCH v6 9/9] iotests: add pylintrc file
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200227000639.9644-1-jsnow@redhat.com>
- <20200227000639.9644-10-jsnow@redhat.com> <87h7z4r3dx.fsf@dusky.pond.sub.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E22A19C69;
+ Wed,  4 Mar 2020 19:24:16 +0000 (UTC)
+Subject: Re: [PATCH v2 0/2] misc: Replace zero-length arrays with flexible
+ array member
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200304153816.23636-1-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -138,21 +138,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ba878308-54ba-3eee-41ec-b14c19fda8b2@redhat.com>
-Date: Wed, 4 Mar 2020 14:17:48 -0500
+Message-ID: <c1aa79e8-a759-8917-c930-2b7018089699@redhat.com>
+Date: Wed, 4 Mar 2020 14:24:16 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <87h7z4r3dx.fsf@dusky.pond.sub.org>
+In-Reply-To: <20200304153816.23636-1-philmd@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,111 +164,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Paul Durrant <paul@xen.org>, Jason Wang <jasowang@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Kevin Wolf <kwolf@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Eric Auger <eric.auger@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 3/4/20 2:22 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
+On 3/4/20 10:38 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> v2:
+> - do not modify qed.h (structure with single member)
+> - based on hw/scsi/spapr_vscsi fix series:
+>   https://mid.mail-archive.com/20200304153311.22959-1-philmd@redhat.com
 >=20
->> Repeatable results. run `pylint iotests.py` and you should get a pass.
+> This is a tree-wide cleanup inspired by a Linux kernel commit
+> (from Gustavo A. R. Silva).
 >=20
-> Start your sentences with a capital letter, please.
+> --v-- description start --v--
+>=20
+>   The current codebase makes use of the zero-length array language
+>   extension to the C90 standard, but the preferred mechanism to
+>   declare variable-length types such as these ones is a flexible
+>   array member [1], introduced in C99:
+>=20
+>   struct foo {
+>       int stuff;
+>       struct boo array[];
+>   };
+>=20
+>   By making use of the mechanism above, we will get a compiler
+>   warning in case the flexible array does not occur last in the
+>   structure, which will help us prevent some kind of undefined
+>   behavior bugs from being unadvertenly introduced [2] to the
+>   Linux codebase from now on.
+>=20
+> --^-- description end --^--
+>=20
+> Do the similar housekeeping in the QEMU codebase (which uses
+> C99 since commit 7be41675f7cb).
+>=20
+> The first patch is done with the help of a coccinelle semantic
+> patch. However Coccinelle does not recognize:
+>=20
+>   struct foo {
+>       int stuff;
+>       struct boo array[];
+>   } QEMU_PACKED;
+>=20
+> but does recognize:
+>=20
+>   struct QEMU_PACKED foo {
+>       int stuff;
+>       struct boo array[];
+>   };
+>=20
+> I'm not sure why, neither it is worth refactoring all QEMU
+> structures to use the attributes before the structure name,
+> so I did the 2nd patch manually.
+>=20
+> Anyway this is annoying, because many structures are not handled
+> by coccinelle. Maybe this needs to be reported to upstream
+> coccinelle?
+>=20
+> I used spatch 1.0.8 with:
+>=20
+>   -I include --include-headers \
+>   --macro-file scripts/cocci-macro-file.h \
+>   --keep-comments --indent 4
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Based-on: <20200304153311.22959-1-philmd@redhat.com>
+> Supersedes: <20200304005105.27454-1-philmd@redhat.com>
+>=20
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   misc: Replace zero-length arrays with flexible array member
+>     (automatic)
+>   misc: Replace zero-length arrays with flexible array member (manual)
+>=20
+>  docs/interop/vhost-user.rst           |  4 ++--
+>  bsd-user/qemu.h                       |  2 +-
+>  contrib/libvhost-user/libvhost-user.h |  2 +-
+>  hw/m68k/bootinfo.h                    |  2 +-
+>  hw/scsi/srp.h                         |  6 +++---
+>  hw/xen/xen_pt.h                       |  2 +-
+>  include/hw/acpi/acpi-defs.h           | 16 ++++++++--------
+>  include/hw/arm/smmu-common.h          |  2 +-
+>  include/hw/boards.h                   |  2 +-
+>  include/hw/i386/intel_iommu.h         |  3 ++-
+>  include/hw/s390x/event-facility.h     |  2 +-
+>  include/hw/s390x/sclp.h               |  8 ++++----
+>  include/hw/virtio/virtio-iommu.h      |  2 +-
+>  include/sysemu/cryptodev.h            |  2 +-
+>  include/tcg/tcg.h                     |  2 +-
+>  pc-bios/s390-ccw/bootmap.h            |  2 +-
+>  pc-bios/s390-ccw/sclp.h               |  2 +-
+>  tests/qtest/libqos/ahci.h             |  2 +-
+>  block/linux-aio.c                     |  2 +-
+>  block/vmdk.c                          |  2 +-
+>  hw/acpi/nvdimm.c                      |  6 +++---
+>  hw/char/sclpconsole-lm.c              |  2 +-
+>  hw/char/sclpconsole.c                 |  2 +-
+>  hw/dma/soc_dma.c                      |  2 +-
+>  hw/i386/x86.c                         |  2 +-
+>  hw/misc/omap_l4.c                     |  2 +-
+>  hw/nvram/eeprom93xx.c                 |  2 +-
+>  hw/rdma/vmw/pvrdma_qp_ops.c           |  4 ++--
+>  hw/s390x/virtio-ccw.c                 |  2 +-
+>  hw/usb/dev-network.c                  |  2 +-
+>  hw/usb/dev-smartcard-reader.c         |  4 ++--
+>  hw/virtio/virtio.c                    |  4 ++--
+>  net/queue.c                           |  2 +-
+>  target/s390x/ioinst.c                 |  2 +-
+>  34 files changed, 53 insertions(+), 52 deletions(-)
 >=20
 
-The German complains about the capitalization, but not the sentence
-fragment.
+I'll admit I did not manually verify ALL of this, but instead trust that:
 
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  tests/qemu-iotests/pylintrc | 20 ++++++++++++++++++++
->>  1 file changed, 20 insertions(+)
->>  create mode 100644 tests/qemu-iotests/pylintrc
->>
->> diff --git a/tests/qemu-iotests/pylintrc b/tests/qemu-iotests/pylintrc
->> new file mode 100644
->> index 0000000000..feed506f75
->> --- /dev/null
->> +++ b/tests/qemu-iotests/pylintrc
->> @@ -0,0 +1,20 @@
->> +[MESSAGES CONTROL]
->> +
->> +# Disable the message, report, category or checker with the given id(s)=
-. You
->> +# can either give multiple identifiers separated by comma (,) or put th=
-is
->> +# option multiple times (only on the command line, not in the configura=
-tion
->> +# file where it should appear only once). You can also use "--disable=
-=3Dall" to
->> +# disable everything first and then reenable specific checks. For examp=
-le, if
->> +# you want to run only the similarities checker, you can use "--disable=
-=3Dall
->> +# --enable=3Dsimilarities". If you want to run only the classes checker=
-, but have
->> +# no Warning level messages displayed, use "--disable=3Dall --enable=3D=
-classes
->> +# --disable=3DW".
->> +disable=3Dinvalid-name,
->> +        missing-docstring,
->> +        line-too-long,
->> +        too-many-lines,
->> +        too-few-public-methods,
->> +        too-many-arguments,
->> +        too-many-locals,
->> +        too-many-branches,
->> +        too-many-public-methods,
->> \ No newline at end of file
->=20
-> Add the newline, please.
->=20
-> German pejorative for the too-many- and too-few- warnings: "M=C3=BCsli".
-> Implies it's for muesli-knitters / granola-crunchers indulging their
-> orthorexia.
->=20
+1. The conversion is correct, and this is a desirable change to make.
+2. Sample conversions I looked at appear correct.
+3. It builds.
+4. It passes tests.
 
-They are useful at times as they can suggest when you are going a bit
-overboard on "organically grown" design. For cleaning an existing
-codebase, it's more of a hindrance to the immediate goal of establishing
-a baseline.
+So:
 
-(*cough* I try to adhere to them in my own freshly written code, and
-disable per-line when I've decided to veto the suggestion. Not
-appropriate for a codebase like ours. As Max reminds me, it's just tests
--- don't make them too clever or pretty.)
-
-Regardless. It's not appropriate here and now.
-
-> missing-docstring is not advisable for libraries.  Feels okay here.
->=20
-
-Ideally we do start using them, but it's out of scope here. Since I did
-some cleanup, I wanted to establish the baseline of what I adhered to.
-
-*not* suggest that it's the destination state.
-
-Adding proper docstrings should be done during mypy conversion once the
-types are determined, understood, and enforced. Not before then.
-
-> line-too-long might be worth cleaning up.  How many of them do we have
-> now?
->=20
-
-Five in iotests.py using the default length of 100. 15 if I limit to 80.
-
-If we agree that 100 is okay, I can tackle this in an amendment patch.
-If 80 is okay, I'm going to put it off as one coat of paint too many.
-
-(I will try to clean up the 100+ lines for my next version. I am
-hesitant to make a deeper cut because I have the feeling it's the type
-of series that will incur a lot of nitpicks on indent style.)
-
---js
+Acked-by: John Snow <jsnow@redhat.com>
 
 
