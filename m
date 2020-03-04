@@ -6,87 +6,88 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39FFC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C3DC3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA23821739
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:49:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA23821739
+	by mail.kernel.org (Postfix) with ESMTPS id 6E49E21739
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:50:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E49E21739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9SWM-0007hh-RF
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:49:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45047)
+	id 1j9SXs-0001sJ-Jv
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:50:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1j9SQr-000620-PX
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:22 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SR7-0006V3-9c
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1j9SQq-0007aR-Hh
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38210)
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SR5-0007jx-G6
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:37 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1314)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1j9SQq-0007Zi-9X
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:20 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ id 1j9SR5-0007fA-5L
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:35 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 024Bche6057250
- for <qemu-devel@nongnu.org>; Wed, 4 Mar 2020 06:43:19 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2yj8hbfbnn-1
+ 024BeUpO013268
+ for <qemu-devel@nongnu.org>; Wed, 4 Mar 2020 06:43:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2yj4q0ybsn-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 06:43:19 -0500
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 06:43:24 -0500
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 4 Mar 2020 11:43:17 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Wed, 4 Mar 2020 11:43:22 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 4 Mar 2020 11:43:13 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 024BhDuM55443460
+ Wed, 4 Mar 2020 11:43:19 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 024BgJpm24051970
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 4 Mar 2020 11:43:13 GMT
+ Wed, 4 Mar 2020 11:42:19 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F0BCB4203F;
- Wed,  4 Mar 2020 11:43:12 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1247F42049;
+ Wed,  4 Mar 2020 11:43:18 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2D85342042;
- Wed,  4 Mar 2020 11:43:12 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4EB6F42045;
+ Wed,  4 Mar 2020 11:43:17 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.152.224.55])
  by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed,  4 Mar 2020 11:43:12 +0000 (GMT)
+ Wed,  4 Mar 2020 11:43:17 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 05/18] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
-Date: Wed,  4 Mar 2020 06:42:18 -0500
+Subject: [PATCH v6 10/18] s390x: protvirt: SCLP interpretation
+Date: Wed,  4 Mar 2020 06:42:23 -0500
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200304114231.23493-1-frankja@linux.ibm.com>
 References: <20200304114231.23493-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 20030411-0008-0000-0000-000003593BBA
+x-cbid: 20030411-0028-0000-0000-000003E0C8F6
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20030411-0009-0000-0000-00004A7A6E6D
-Message-Id: <20200304114231.23493-6-frankja@linux.ibm.com>
+x-cbparentid: 20030411-0029-0000-0000-000024A5F911
+Message-Id: <20200304114231.23493-11-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-03-04_01:2020-03-04,
  2020-03-04 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015
- priorityscore=1501 suspectscore=1 adultscore=0 phishscore=0 mlxscore=0
- bulkscore=0 malwarescore=0 mlxlogscore=954 spamscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ impostorscore=0
+ suspectscore=1 adultscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0 mlxlogscore=727
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2001150001 definitions=main-2003040090
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
@@ -107,123 +108,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we now have access to the protection state of the cpus, we can
-implement special handling of diag 308 subcodes for cpus in the
-protected state.
+SCLP for a protected guest is done over the SIDAD, so we need to use
+the s390_cpu_virt_mem_* functions to access the SIDAD instead of guest
+memory when reading/writing SCBs.
 
-For subcodes 0 and 1 we need to unshare all pages before continuing,
-so the guest doesn't accidentally expose data when dumping.
-
-For subcode 3/4 we tear down the protected VM and reboot into
-unprotected mode. We do not provide a secure reboot.
-
-Before we can do the unshare calls, we need to mark all cpus as
-stopped.
+To not confuse the sclp emulation, we set 0x4000 as the SCCB address,
+since the function that injects the sclp external interrupt would
+reject a zero sccb address.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 36 +++++++++++++++++++++++++++++++++---
- target/s390x/diag.c        |  4 ++++
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ hw/s390x/sclp.c         | 17 +++++++++++++++++
+ include/hw/s390x/sclp.h |  2 ++
+ target/s390x/kvm.c      |  5 +++++
+ 3 files changed, 24 insertions(+)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 272531a9ee..038bad54cd 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -397,12 +397,27 @@ static void s390_machine_inject_pv_error(CPUState *cs)
-     env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
+diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+index af0bfbc2ec..5136f5fcbe 100644
+--- a/hw/s390x/sclp.c
++++ b/hw/s390x/sclp.c
+@@ -193,6 +193,23 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *sccb, uint32_t code)
+     }
  }
  
-+static void s390_pv_prepare_reset(CPUS390XState *env)
++#define SCLP_PV_DUMMY_ADDR 0x4000
++int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
++                                uint32_t code)
 +{
-+    CPUState *cs;
++    SCLPDevice *sclp = get_sclp_device();
++    SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
++    SCCB work_sccb;
++    hwaddr sccb_len = sizeof(SCCB);
 +
-+    if (!env->pv) {
-+        return;
-+    }
-+    CPU_FOREACH(cs) {
-+        s390_cpu_set_state(S390_CPU_STATE_STOPPED, S390_CPU(cs));
-+    }
-+    s390_pv_unshare();
-+    s390_pv_perf_clear_reset();
++    s390_cpu_pv_mem_read(env_archcpu(env), 0, &work_sccb, sccb_len);
++    sclp_c->execute(sclp, &work_sccb, code);
++    s390_cpu_pv_mem_write(env_archcpu(env), 0, &work_sccb,
++                          be16_to_cpu(work_sccb.h.length));
++    sclp_c->service_interrupt(sclp, SCLP_PV_DUMMY_ADDR);
++    return 0;
 +}
 +
- static void s390_machine_reset(MachineState *machine)
+ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
  {
-     enum s390_reset reset_type;
-     CPUState *cs, *t;
-     S390CPU *cpu;
-     S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
-+    CPUS390XState *env;
+     SCLPDevice *sclp = get_sclp_device();
+diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+index c54413b78c..c0a3faa37d 100644
+--- a/include/hw/s390x/sclp.h
++++ b/include/hw/s390x/sclp.h
+@@ -217,5 +217,7 @@ void s390_sclp_init(void);
+ void sclp_service_interrupt(uint32_t sccb);
+ void raise_irq_cpu_hotplug(void);
+ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
++int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
++                                uint32_t code);
  
-     /* get the reset parameters, reset them once done */
-     s390_ipl_get_reset_request(&cs, &reset_type);
-@@ -411,10 +426,15 @@ static void s390_machine_reset(MachineState *machine)
-     s390_cmma_reset();
+ #endif
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 43fc0c088b..a4cbdc5fc6 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1226,6 +1226,11 @@ static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
+     sccb = env->regs[ipbh0 & 0xf];
+     code = env->regs[(ipbh0 & 0xf0) >> 4];
  
-     cpu = S390_CPU(cs);
-+    env = &cpu->env;
- 
-     switch (reset_type) {
-     case S390_RESET_EXTERNAL:
-     case S390_RESET_REIPL:
-+        if (ms->pv) {
-+            s390_machine_unprotect(ms);
-+        }
-+
-         qemu_devices_reset();
-         s390_crypto_reset();
- 
-@@ -422,21 +442,31 @@ static void s390_machine_reset(MachineState *machine)
-         run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
-         break;
-     case S390_RESET_MODIFIED_CLEAR:
-+        /*
-+         * Susbsystem reset needs to be done before we unshare memory
-+         * and loose access to VIRTIO structures in guest memory.
-+         */
-+        subsystem_reset();
-+        s390_crypto_reset();
-+        s390_pv_prepare_reset(env);
-         CPU_FOREACH(t) {
-             run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-         }
--        subsystem_reset();
--        s390_crypto_reset();
-         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
-         break;
-     case S390_RESET_LOAD_NORMAL:
-+        /*
-+         * Susbsystem reset needs to be done before we unshare memory
-+         * and loose access to VIRTIO structures in guest memory.
-+         */
-+        subsystem_reset();
-+        s390_pv_prepare_reset(env);
-         CPU_FOREACH(t) {
-             if (t == cs) {
-                 continue;
-             }
-             run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-         }
--        subsystem_reset();
-         run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
-         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
-         break;
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index 945b263f0a..a6cd1ea260 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -67,6 +67,10 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
-                               uintptr_t ra, bool write)
- {
-+    /* Handled by the Ultravisor */
-+    if (env->pv) {
-+        return 0;
++    if (run->s390_sieic.icptcode == ICPT_PV_INSTR) {
++        sclp_service_call_protected(env, sccb, code);
++        return;
 +    }
-     if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         return -1;
++
+     r = sclp_service_call(env, sccb, code);
+     if (r < 0) {
+         kvm_s390_program_interrupt(cpu, -r);
 -- 
 2.20.1
 
