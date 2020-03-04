@@ -2,153 +2,85 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CDDC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1883BC3F2CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:01:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A359720716
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 22:48:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D335A20848
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:01:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h60IBaXK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A359720716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gnu.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="NTPJHBv7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D335A20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9coM-0008OJ-QH
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 17:48:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38744)
+	id 1j9d1Q-0003WJ-0Y
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 18:01:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j9cnd-0007b1-QT
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:47:34 -0500
+ (envelope-from <palmer@dabbelt.com>) id 1j9d0J-0002vO-Sz
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1j9cnc-0006A5-MS
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:47:33 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42806)
+ (envelope-from <palmer@dabbelt.com>) id 1j9d0I-0000ST-C6
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:39 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37475)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1j9cnc-00066S-FY
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 17:47:32 -0500
-Received: by mail-wr1-x443.google.com with SMTP id v11so2615723wrm.9
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 14:47:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1j9d0H-0000S8-Sa
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:38 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id o2so1609310pjp.2
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 15:00:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
  :content-transfer-encoding;
- bh=jZMdnLNl4fP6lkuHS5SCJvyrru8Mg9gBvxclLczzpNo=;
- b=h60IBaXKBFnycs97o0vLZ6EHxMQXiCmHa9BwjWuEOlxNfZ0TnglXgyF3AaHW5RGD1A
- mpg0DkXaUhnZSrod+i4WkRrPCtZOBcgNsft0qyDjmXWmT8730x9Cd/qbvEqg4JrYuE6x
- wLGO6zwy7SIu606u8v5j16K91sumTe1bRGS3YVtr62qUEYojIQ1JhV4MWfAwducMXQWz
- E98rGxXcGjAPJtMWDKQ1HOXLGCEIRo4mlzbP2H4XL0zpFpLlndmBxlNWtOUcd9E1D5mK
- ddehC1rcT+bodBjQvQBsRn4a57JoS1o/g+ILsec8UUhP+6r2xwVs+2Doy9tfwv4XNUG7
- N3Sg==
+ bh=A+8YyLnxsylnT/bWU3JoXEptrIiLtpYK4ca11ZtIoAs=;
+ b=NTPJHBv7LkdVcUWy2EkjCDrONjt7gDGWd/PifAFSwwXzPJKFRXZZImih4SbsidHCp0
+ ldMlnwzALdXXC61B/2SH9tF7WvOayz0FUkCTzfYinYYW9O+eRyynwFL5VmiT96voSweM
+ 77bqHAkkWibQJGnDGTj2YWienbf3Ba3uAdHUF84SiU8YvNIdX+K3O5SckGjQXJMT7H5L
+ U9mCM020A/hALwHxv2Jr29ldwQqBS0kYci+JZPTJF6g5LLeoU+BJBFXsINUOYzMxCcE6
+ eXolXU/tuR1UrVloSlOQPGEmaAaOucoKPKThSJ5UE8gJVXGZYuBh1o7wUyDFGnvA8AfN
+ VajQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=jZMdnLNl4fP6lkuHS5SCJvyrru8Mg9gBvxclLczzpNo=;
- b=dAGtxcdifIqgejUdefi/hvq4aFKlofevhVSbO19TqtBdlrzmYoYvFFlt1UvE1q4FHj
- XVWcqgmaC024W89G0y98kvFe1gIYZ0xiaRcXBjEedCIORK2KHFjaWjHdRrR9Bbx5q35H
- fwMuH0CM95gw/TOdAYpJL5LUv2g3uuLerpXUOW8sJA2bTLjgKSyZH0+PaZ+gW6nszk4c
- h043grWZshmxpqyEaDiHIWN+zAEp4ncu+RDYTTTQyWOVgINp8FgThIAJXPdDl1IP/Azc
- oqVn0tdHP9SQ44xvieD/0zJ5N1YyXKyZrNRYb4eljAqbjvvagKAo7EjGMTEFkPevo5wL
- 5qHg==
-X-Gm-Message-State: ANhLgQ1u0sjOd/M/nr1L3yl+1zBThMgv8NhVLeSBy0k0rOAiCQ8yXcbL
- iyS0pJ5VM8KOZe4sapQrEjg=
-X-Google-Smtp-Source: ADFU+vuWz4b4ZCWyWOouTbvFkEF0UJc2gArFtfFHasDJWY7WmPukLPlAHW+x6+Nc/i6Dv0hv4Rd+Bg==
-X-Received: by 2002:a5d:4c52:: with SMTP id n18mr6553273wrt.403.1583362050455; 
- Wed, 04 Mar 2020 14:47:30 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993?
- ([2001:b07:6468:f312:9def:34a0:b68d:9993])
- by smtp.googlemail.com with ESMTPSA id m25sm6057745wml.35.2020.03.04.14.47.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Mar 2020 14:47:29 -0800 (PST)
-Subject: Re: [EXTERNAL] Re: PATCH] WHPX: TSC get and set should be dependent
- on VM state
-To: Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-References: <SN4PR2101MB08804D23439166E81FF151F7C0EA0@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <37e639a1-eb9f-b769-d61c-112d148bcff3@redhat.com>
- <SN4PR2101MB0880FE16EE36BF356552A9DDC0E80@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <4277f568-2b20-f7c4-5764-f516c8e281a9@redhat.com>
- <SN4PR2101MB088094833D95758F871BE401C0E70@SN4PR2101MB0880.namprd21.prod.outlook.com>
- <225d909b-fea7-a655-4271-ceccb7701993@gnu.org>
- <SN4PR2101MB088076531563C720C56B11CBC0E50@SN4PR2101MB0880.namprd21.prod.outlook.com>
-From: Paolo Bonzini <bonzini@gnu.org>
-Autocrypt: addr=bonzini@gnu.org; prefer-encrypt=mutual; keydata=
- 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
- 10oh++mb6s1dGf3ADAaOTRf8
-Message-ID: <da716e14-0716-93a1-bbb2-da25fca0d47b@gnu.org>
-Date: Wed, 4 Mar 2020 23:47:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <SN4PR2101MB088076531563C720C56B11CBC0E50@SN4PR2101MB0880.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=A+8YyLnxsylnT/bWU3JoXEptrIiLtpYK4ca11ZtIoAs=;
+ b=i6xEFwGh/YvD4lSytyjQrFETnTK7w/GkT7o3gu5KXS2knEvYOqzpZLAU0ij2/33Nu5
+ 0yxmckzxhrIyxBIAB5aFIAdZxL1DBMvkOZ/XfDThuGUh5gCU75ggkSriKhQCHveNlT66
+ eDDeD9q20IY+KAX1UuGc2NENrUJmRhPjwE0242Kpk/ZwPKxvn8QNLKBtcwVrBxO990sp
+ NieoD2h6KNewa1Jb/WQ5w9/29IYirj8OIyOQLfFrS7FjOuuxYwgBWF8tpivn/wnEHunf
+ 410c8kVQ62ccdxeMkt3WRBPqV5yx3k1UUWav922Nh7jjzjVpR/lnv7QRS2d3P7dLvH0+
+ NruQ==
+X-Gm-Message-State: ANhLgQ1hTKPCDs1HG+EDCVHPlNJnn03yoZSx0N/A+2FttTwzyjKdCK1t
+ MCDWJSqP0DkQYFSyasUfZgU2bg==
+X-Google-Smtp-Source: ADFU+vvrG1qKiFIdxgmRRB+pjG2jOxtVpzaUwBiKVUq8u3S44i7fJ2gWwm4wtYnqkLQDQwe1/O6avQ==
+X-Received: by 2002:a17:902:ab81:: with SMTP id f1mr5251896plr.5.1583362836166; 
+ Wed, 04 Mar 2020 15:00:36 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
+ by smtp.gmail.com with ESMTPSA id k5sm14229898pfp.66.2020.03.04.15.00.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Mar 2020 15:00:35 -0800 (PST)
+Date: Wed, 04 Mar 2020 15:00:35 -0800 (PST)
+X-Google-Original-Date: Wed, 04 Mar 2020 15:00:20 PST (-0800)
+Subject: Re: [PATCH v2] riscv: sifive_u: Add a "serial" property for board
+ serial number
+In-Reply-To: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-fb3ea639-87e6-406b-a679-a568f6d7edf9@palmerdabbelt-glaptop1>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -160,33 +92,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
+ sagark@eecs.berkeley.edu, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/03/20 23:44, Sunil Muthuswamy wrote:
->> You don't need the "git config --local commit.gpgsign true" command, but
->> you will then create a signed tag with
->>
->> 	git tag -s -f qemu-for-upstream
->> 	# let's say "mirror" is your github repo
->> 	git push mirror +tags/for-upstream
->>
->> and send it to Peter.  I really think we should document this final step
->> ("send it to Peter") better in the wiki, because the git tools for
->> sending pull requests leave a lot to be desired.
+On Sun, 16 Feb 2020 05:55:17 PST (-0800), bmeng.cn@gmail.com wrote:
+> At present the board serial number is hard-coded to 1, and passed
+> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> the serial number to generate a unique MAC address for the on-chip
+> ethernet controller. When multiple QEMU 'sifive_u' instances are
+> created and connected to the same subnet, they all have the same
+> MAC address hence it creates a unusable network.
 >
-> Thanks. Ok, I am setup with GPG. Where should I be sending the pull requests to? Who is "Peter"? Do I have to send it to you?
+> A new "serial" property is introduced to specify the board serial
+> number. When not given, the default serial number 1 is used.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>
+> ---
+>
+> Changes in v2:
+> - Move setting OTP serial number property from riscv_sifive_u_soc_init()
+>   to riscv_sifive_u_soc_realize(), to fix the 'check-qtest-riscv' error.
+>   I am not really sure why doing so could fix the 'make check' error.
+>   The v1 patch worked fine and nothing seems wrong.
+>
+>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+>  include/hw/riscv/sifive_u.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 0e12b3c..ca561d3 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -34,6 +34,7 @@
+>  #include "qemu/log.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> +#include "qapi/visitor.h"
+>  #include "hw/boards.h"
+>  #include "hw/loader.h"
+>  #include "hw/sysbus.h"
+> @@ -434,7 +435,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
+>                            TYPE_SIFIVE_U_PRCI);
+>      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
+>                            TYPE_SIFIVE_U_OTP);
+> -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
+>      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+>                            TYPE_CADENCE_GEM);
+>  }
+> @@ -453,6 +453,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
+>      s->start_in_flash = value;
+>  }
+>
+> +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+> +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+>  static void riscv_sifive_u_machine_instance_init(Object *obj)
+>  {
+>      SiFiveUState *s = RISCV_U_MACHINE(obj);
+> @@ -464,11 +476,17 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
+>                                      "Set on to tell QEMU's ROM to jump to " \
+>                                      "flash. Otherwise QEMU will jump to DRAM",
+>                                      NULL);
+> +
+> +    s->serial = OTP_SERIAL;
+> +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
+> +                        sifive_u_set_serial, NULL, &s->serial, NULL);
+> +    object_property_set_description(obj, "serial", "Board serial number", NULL);
+>  }
+>
+>  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+> +    SiFiveUState *us = RISCV_U_MACHINE(ms);
+>      SiFiveUSoCState *s = RISCV_U_SOC(dev);
+>      const struct MemmapEntry *memmap = sifive_u_memmap;
+>      MemoryRegion *system_memory = get_system_memory();
+> @@ -554,6 +572,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+>      object_property_set_bool(OBJECT(&s->prci), true, "realized", &err);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
+>
+> +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", us->serial);
+>      object_property_set_bool(OBJECT(&s->otp), true, "realized", &err);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
+>
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 82667b5..7cf742e 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -59,6 +59,7 @@ typedef struct SiFiveUState {
+>      int fdt_size;
+>
+>      bool start_in_flash;
+> +    uint32_t serial;
+>  } SiFiveUState;
+>
+>  enum {
 
-Peter is Peter Maydell, but for now you can send them to me.  I'll get
-round to documenting the remaining steps.
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
-Unfortunately all the scripts I have for this use the Unix shell, but
-they are just a few lines so I might try to rewrite them in Python.
-This way you can use them from Windows without needing to bring up WSL
-or anything like that.
-
-Paolo
+Thanks.  This is in the queue for the soft freeze.
 
