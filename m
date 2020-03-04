@@ -2,120 +2,81 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4567BC3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 07:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D674C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 001E1207FD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 07:49:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 179DB20866
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VT9EJYL0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001E1207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihAF8l8Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179DB20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9On0-0007XS-5X
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 02:49:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45822)
+	id 1j9Oxl-0002An-7T
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 03:01:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j9OmI-0006t6-7t
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 02:49:15 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j9OwW-0001aG-Ay
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 02:59:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j9OmH-0005EQ-4C
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 02:49:14 -0500
-Received: from mail-am6eur05on20700.outbound.protection.outlook.com
- ([2a01:111:f400:7e1b::700]:1601
- helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j9OmE-0005BX-H5; Wed, 04 Mar 2020 02:49:10 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KdF8R6kE1Y3Ml7z9fBW2alVl3B4r5iaYylFO7oMjGBZsOZo7/NVnS05o79OLdPgtKcw4TNAiKOwyYVyDinHhY5RxJw+gKaCq8dH6A6r8ItmM3JfAv0IPt8/VDJV5LfR10R0BrmkaH5YLM5UWgBuXtEJ6t9Tv5m/N1ap2wlgNYI5uw4SxIgsEuczguRbQLkGnn96t8wXpB7FpGNejYfUsNE/g0vetcYUeuOxUVpPkNgKEFqppYk7n/KYNffWCeGWqVVYPKqNWL3A7/XVyZU3FBcjIbXuqgQM6QPM76xRU1YEVndor7+vDJp4duOs1W7Q3N3QW0hTDpEgiNwXtsUHY/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k8t1w6SNm1ZE+sXGcQ+O3bfbiFWL2b1/aWGq4tIEMlE=;
- b=YeEHV1j2+jM/qkj25yeSm/DHmFTIRlRCvqoGaKFP1zudnSBNXuyl76YZwCXGJqybC2KwPlipLqsyAadixl3N1KHiiVWU+AhRzJfOb8O/Yc6PxLThUp8MwXanct4A6rprqDFWWLT/GJBlPnnQpvL7xr3HzEzudtf4i8xi8QJzpdXt1SH3EFAgKehIOcEdW4M5O3Uenr3w7VFJN4XMv/On04P05MVALtvNsMOjYW7xNLaATNpqxJscC4TL29mVJa98ZmsFRHGf+mj6w37KV9u3STvOC/Ep2hjORhcQXWvs6SU7kvNMDUwU0dYL4hutNIf6N3uCxDOMOQuqA924n/AyXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k8t1w6SNm1ZE+sXGcQ+O3bfbiFWL2b1/aWGq4tIEMlE=;
- b=VT9EJYL0rXA7N7Pckw/WMcUdlNokz0xuwBxsObYtFL/s6WXEBUEKj6hWAk7Tq2RSe/bqvjikn0Qo9qIZ9lm33kahd1ycYfhAk5LskJJI510ATB3CwQSHEdk1lR1XSIA5COK0sGZoR7S9NGh7jwr5IpyvxSepDH/RC+1VRaytoWU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3669.eurprd08.prod.outlook.com (20.177.116.138) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.15; Wed, 4 Mar 2020 07:49:08 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2793.013; Wed, 4 Mar 2020
- 07:49:08 +0000
-Subject: Re: [PATCH v4 4/5] qcow2: add zstd cluster compression
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200303133425.24471-1-dplotnikov@virtuozzo.com>
- <20200303133425.24471-5-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200304104905924
-Message-ID: <3cbc685e-f606-daab-6dab-84e8fb80662e@virtuozzo.com>
-Date: Wed, 4 Mar 2020 10:49:05 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200303133425.24471-5-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR0401CA0044.eurprd04.prod.outlook.com
- (2603:10a6:3:19::12) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1j9OwU-0003Lu-CT
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 02:59:48 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1j9OwT-0003Fr-FA; Wed, 04 Mar 2020 02:59:45 -0500
+Received: by mail-oi1-x241.google.com with SMTP id q65so1199181oif.4;
+ Tue, 03 Mar 2020 23:59:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nAA0ECN+YiquK4Xp6XWjIb0W3XtCV5F6HrPNs0hF5qc=;
+ b=ihAF8l8YAJXgtnU9JTKdecdGx/bIZsAU0LgtaVyv3A2QXRWKfzn/lhocBfPHYnxHHp
+ dxJwnRnoebvtXutuNSiyAhmD3KClIw5Dg0zxmwPrJAThIPJIqpAdKeM0LtEyDnfcBgxG
+ d3Z6dsP1/SuZmN6pMJo5KSHgGaNff7+kAbeXixEAHusjl/d/9CfK/VAi3e8Eb5HNGB6F
+ bdmAS0J05Y6irC4c5Oyhe6TMZoY5NIXuP/MbdrLDtFSHncxmYyjfrMoAV1SIwkY5fwhm
+ lYWGnjFslGimfqeAHGtcFevXPHvmsrRTVFyddq0FXkhQALVs1PoFqTEXxyHLoySNoKOt
+ GdQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nAA0ECN+YiquK4Xp6XWjIb0W3XtCV5F6HrPNs0hF5qc=;
+ b=DUI/jcq9tw5nw3wly9BRai8uOmd7Er8U1CQ0v5Zo+zLjhmuMTCYILrAb1UxmLcVGWe
+ WGFxM9zaN4zKTCiGnMxcm3Czd1wrVgwz77t+T4xmkLWla4WkJr1pRSg0tyhvJPdpm7uu
+ u4f3n27k3//k/lQkT5Yo58c23BMkI3f9Y/tgDkLZxxVk0/nAw7d7p8JrIWl9olQmkTv0
+ SkwtUlKYK/h5vH/WyLEqDdrOSGlNIGX2i0HNW74KhmB7GWlts1Ir0VF20eDCzG3oJPMf
+ qJ8q378V4p/T3LWUPpZP4rPmiaD6+xb7+MyTZW/Gy2ApLwkJTCPNu/CXRhwGjGeVqUM2
+ +m+Q==
+X-Gm-Message-State: ANhLgQ3resN4zSl6L4RcF/IEak8kxxTeGfk+64WTLR3Ivbgic5hZ8BVe
+ vzu1gxlBo7ArLkULb81qh5T1qcVWAlVrm+hKa00=
+X-Google-Smtp-Source: ADFU+vuD5oxfSR9x61+Yip3c4ND5jPBQCvcWt06mhfCE6O318i2kqDaiIrQ4PqWGofFcW2bVFbY1ucyd7A0deu6MeCw=
+X-Received: by 2002:aca:c3c5:: with SMTP id t188mr931923oif.53.1583308784247; 
+ Tue, 03 Mar 2020 23:59:44 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0401CA0044.eurprd04.prod.outlook.com (2603:10a6:3:19::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.14 via Frontend Transport; Wed, 4 Mar 2020 07:49:07 +0000
-X-Tagtoolbar-Keys: D20200304104905924
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d870b05a-ca11-4bd2-b189-08d7c0108504
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3669:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB36697267F488002CBF530F58C1E50@AM6PR08MB3669.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 0332AACBC3
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(346002)(39850400004)(396003)(376002)(199004)(189003)(956004)(2616005)(6486002)(26005)(31686004)(31696002)(36756003)(81156014)(186003)(2906002)(52116002)(478600001)(81166006)(5660300002)(8676002)(86362001)(8936002)(66946007)(66476007)(66556008)(16526019)(16576012)(316002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3669;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gN6OicU2lkyCbUVOu02QgFBkZYHVRo68QDgpeMREYcoHbFS3ciggl8WQHXUiwlMh7bUb917wcP+Y4knwWdAGbu/g+rH4ohOGJdGdORMIB696kLE7oXYdeZ4C7xBifmMwY+yPfcw7a/I+Z+k0VG0S0WykdYYgggsZzm6+h+PtkIRzLyjY/C08yMNI/6ofaG19S/shRIQsSLtL+LwS0q/kWqXU8vI+kNMAjBi6EFlZPyM1Jxy674lvzd3Vc683B74ILupJpn7eR8Rzzf8Goi33bvfEDxeRNyu14oyInbzTomnkydd78Dhqf3lwM6NHmLyZbSmF0JUkWWrWj20/CdxESnm465x+8KvrYumk9kPBtvUmqyZy4CAcYK54UqWmHhnwDLe4FxE5p/sI7PUUpX9aNbtTAu7KxawLGp88tQPeVdDHui85Cnmk/pC3rvaVZWW7
-X-MS-Exchange-AntiSpam-MessageData: WWM9HfqyPefVbA0YC6uuLHUJMzx/LWTb4zcVpn6mECUE899nWrzmhwDo6t0tnSCf0UjQtpg/ELv3LN9JyOI084FiJkllOOj3pF4iOntUhdA0G31J4u+0nwYWCDgz7q4U/dTp/ogf9PC5f61AtdGGSg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d870b05a-ca11-4bd2-b189-08d7c0108504
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2020 07:49:08.0921 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w0nDW03Y+prvp87bV/A9PCtqb0i88DTWchzTTgsNcdPRIZCpDeSPH0Fz+4XLQcLf/f3QeODft0LUiUmu/JmsQML+agbNW7dI4T/lgzpOlRs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3669
+References: <cover.1583282640.git.alistair.francis@wdc.com>
+ <406774cf394d785da30a30d99169f0b2cf1bb1de.1583282640.git.alistair.francis@wdc.com>
+In-Reply-To: <406774cf394d785da30a30d99169f0b2cf1bb1de.1583282640.git.alistair.francis@wdc.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 4 Mar 2020 08:59:26 +0100
+Message-ID: <CAL1e-=iQwKrze3biSJgxyWh=tMP6F1JAHx_A51f7LcTej6x+Og@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] linux-user/syscall: Add support for
+ clock_gettime64/clock_settime64
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Content-Type: multipart/alternative; boundary="000000000000a7a56b05a002cd84"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:111:f400:7e1b::700
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,82 +88,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: palmer@dabbelt.com, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, alistair23@gmail.com,
+ laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-03.03.2020 16:34, Denis Plotnikov wrote:
-> zstd significantly reduces cluster compression time.
-> It provides better compression performance maintaining
-> the same level of the compression ratio in comparison with
-> zlib, which, at the moment, is the only compression
-> method available.
-> 
-> The performance test results:
-> Test compresses and decompresses qemu qcow2 image with just
-> installed rhel-7.6 guest.
-> Image cluster size: 64K. Image on disk size: 2.2G
-> 
-> The test was conducted with brd disk to reduce the influence
-> of disk subsystem to the test results.
-> The results is given in seconds.
-> 
-> compress cmd:
->    time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
->                    src.img [zlib|zstd]_compressed.img
-> decompress cmd
->    time ./qemu-img convert -O qcow2
->                    [zlib|zstd]_compressed.img uncompressed.img
-> 
->             compression               decompression
->           zlib       zstd           zlib         zstd
-> ------------------------------------------------------------
-> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-> user     65.0       15.8            5.3          2.5
-> sys       3.3        0.2            2.0          2.0
-> 
-> Both ZLIB and ZSTD gave the same compression ratio: 1.57
-> compressed image size in both cases: 1.4G
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+--000000000000a7a56b05a002cd84
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+1:53 AM Sre, 04.03.2020. Alistair Francis <alistair.francis@wdc.com> =D1=98=
+=D0=B5
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Add support for the clock_gettime64/clock_settime64 syscalls. Currently
+> we only support these syscalls when running on 64-bit hosts.
+>
+
+For clarity, "Currently we only support" should be replaced with "This
+patch supports only".
+
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
-
-[..]
-
-> +static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
-> +                                   const void *src, size_t src_size)
+>  linux-user/syscall.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 43 insertions(+)
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index c000fb07c5..82468e018d 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1236,6 +1236,22 @@ static inline abi_long
+target_to_host_timespec(struct timespec *host_ts,
+>  }
+>  #endif
+>
+> +#if defined(TARGET_NR_clock_settime64) && HOST_LONG_BITS =3D=3D 64
+> +static inline abi_long target_to_host_timespec64(struct timespec
+*host_ts,
+> +                                                 abi_ulong target_addr)
 > +{
-> +    size_t ret;
+> +    struct target_timespec *target_ts;
 > +
-> +    /*
-> +     * steal ZSTD_LEN_BUF bytes in the very beginning of the buffer
-> +     * to store compressed chunk size
-> +     */
-> +    char *d_buf = ((char *) dest) + ZSTD_LEN_BUF;
-> +
-> +    /*
-> +     * sanity check that we can store the compressed data length,
-> +     * and there is some space left for the compressor buffer
-> +     */
-> +    if (dest_size <= ZSTD_LEN_BUF) {
-> +        return -ENOMEM;
+> +    if (!lock_user_struct(VERIFY_READ, target_ts, target_addr, 1)) {
+> +        return -TARGET_EFAULT;
 > +    }
+> +    __get_user(host_ts->tv_sec, &target_ts->tv_sec);
+> +    __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
+> +    unlock_user_struct(target_ts, target_addr, 0);
+> +    return 0;
+> +}
+> +#endif
 > +
-> +    dest_size -= ZSTD_LEN_BUF;
+>  static inline abi_long host_to_target_timespec(abi_ulong target_addr,
+>                                                 struct timespec *host_ts)
+>  {
+> @@ -11465,6 +11481,20 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+>          return ret;
+>      }
+>  #endif
+> +#ifdef TARGET_NR_clock_settime64
+> +# if HOST_LONG_BITS =3D=3D 64
+> +    case TARGET_NR_clock_settime64:
+> +    {
+> +        struct timespec ts;
 > +
-> +    ret = ZSTD_compress(d_buf, dest_size, src, src_size, 5);
+> +        ret =3D target_to_host_timespec64(&ts, arg2);
+> +        if (!is_error(ret)) {
+> +            ret =3D get_errno(clock_settime(arg1, &ts));
+> +        }
+> +        return ret;
+> +    }
+> +# endif
+> +#endif
+>  #ifdef TARGET_NR_clock_gettime
+>      case TARGET_NR_clock_gettime:
+>      {
+> @@ -11476,6 +11506,19 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+>          return ret;
+>      }
+>  #endif
+> +#ifdef TARGET_NR_clock_gettime64
+> +# if HOST_LONG_BITS =3D=3D 64
+> +    case TARGET_NR_clock_gettime64:
+> +    {
+> +        struct timespec ts;
+> +        ret =3D get_errno(clock_gettime(arg1, &ts));
+> +        if (!is_error(ret)) {
+> +            ret =3D host_to_target_timespec64(arg2, &ts);
+> +        }
+> +        return ret;
+> +    }
+> +# endif
+> +#endif
+>  #ifdef TARGET_NR_clock_getres
+>      case TARGET_NR_clock_getres:
+>      {
+> --
 
-You may want to define ZSTD_COMPRESSION_LEVEL constant instead of raw number.
+Nice patch for the first version, still I think the patch could be much
+better.
 
-anyway,
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Why not support 32-bit hosts? If a 32-bit host supports
+clock_<get|set>time64(), the mapping is obvious. If not, the implementation
+could be "best effort" based, using host's clock_<get|set>time().
 
+Regards,
+Aleksandar
 
+> 2.25.1
+>
+>
 
+--000000000000a7a56b05a002cd84
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Best regards,
-Vladimir
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">1:53 AM Sre, 04.03.2020. Alistair Francis &lt;<a href=3D"mai=
+lto:alistair.francis@wdc.com">alistair.francis@wdc.com</a>&gt; =D1=98=D0=B5=
+ =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; Add support for the clock_gettime64/clock_settime64 syscalls. Currentl=
+y<br>
+&gt; we only support these syscalls when running on 64-bit hosts.<br>
+&gt;</p>
+<p dir=3D"ltr">For clarity, &quot;Currently we only support&quot; should be=
+ replaced with &quot;This patch supports only&quot;.</p>
+<p dir=3D"ltr">&gt; Signed-off-by: Alistair Francis &lt;<a href=3D"mailto:a=
+listair.francis@wdc.com">alistair.francis@wdc.com</a>&gt;<br>
+&gt; ---<br>
+&gt; =C2=A0linux-user/syscall.c | 43 ++++++++++++++++++++++++++++++++++++++=
++++++<br>
+&gt; =C2=A01 file changed, 43 insertions(+)<br>
+&gt;<br>
+&gt; diff --git a/linux-user/syscall.c b/linux-user/syscall.c<br>
+&gt; index c000fb07c5..82468e018d 100644<br>
+&gt; --- a/linux-user/syscall.c<br>
+&gt; +++ b/linux-user/syscall.c<br>
+&gt; @@ -1236,6 +1236,22 @@ static inline abi_long target_to_host_timespec(=
+struct timespec *host_ts,<br>
+&gt; =C2=A0}<br>
+&gt; =C2=A0#endif<br>
+&gt;<br>
+&gt; +#if defined(TARGET_NR_clock_settime64) &amp;&amp; HOST_LONG_BITS =3D=
+=3D 64<br>
+&gt; +static inline abi_long target_to_host_timespec64(struct timespec *hos=
+t_ts,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0abi_ulong target_addr)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 struct target_timespec *target_ts;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 if (!lock_user_struct(VERIFY_READ, target_ts, target_ad=
+dr, 1)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -TARGET_EFAULT;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 __get_user(host_ts-&gt;tv_sec, &amp;target_ts-&gt;tv_se=
+c);<br>
+&gt; +=C2=A0 =C2=A0 __get_user(host_ts-&gt;tv_nsec, &amp;target_ts-&gt;tv_n=
+sec);<br>
+&gt; +=C2=A0 =C2=A0 unlock_user_struct(target_ts, target_addr, 0);<br>
+&gt; +=C2=A0 =C2=A0 return 0;<br>
+&gt; +}<br>
+&gt; +#endif<br>
+&gt; +<br>
+&gt; =C2=A0static inline abi_long host_to_target_timespec(abi_ulong target_=
+addr,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 struct timespec *host_ts)<br>
+&gt; =C2=A0{<br>
+&gt; @@ -11465,6 +11481,20 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return ret;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0}<br>
+&gt; =C2=A0#endif<br>
+&gt; +#ifdef TARGET_NR_clock_settime64<br>
+&gt; +# if HOST_LONG_BITS =3D=3D 64<br>
+&gt; +=C2=A0 =C2=A0 case TARGET_NR_clock_settime64:<br>
+&gt; +=C2=A0 =C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct timespec ts;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D target_to_host_timespec64(&amp;ts=
+, arg2);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!is_error(ret)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D get_errno(clock_set=
+time(arg1, &amp;ts));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +# endif<br>
+&gt; +#endif<br>
+&gt; =C2=A0#ifdef TARGET_NR_clock_gettime<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case TARGET_NR_clock_gettime:<br>
+&gt; =C2=A0 =C2=A0 =C2=A0{<br>
+&gt; @@ -11476,6 +11506,19 @@ static abi_long do_syscall1(void *cpu_env, in=
+t num, abi_long arg1,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return ret;<br>
+&gt; =C2=A0 =C2=A0 =C2=A0}<br>
+&gt; =C2=A0#endif<br>
+&gt; +#ifdef TARGET_NR_clock_gettime64<br>
+&gt; +# if HOST_LONG_BITS =3D=3D 64<br>
+&gt; +=C2=A0 =C2=A0 case TARGET_NR_clock_gettime64:<br>
+&gt; +=C2=A0 =C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct timespec ts;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D get_errno(clock_gettime(arg1, &am=
+p;ts));<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!is_error(ret)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D host_to_target_time=
+spec64(arg2, &amp;ts);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +# endif<br>
+&gt; +#endif<br>
+&gt; =C2=A0#ifdef TARGET_NR_clock_getres<br>
+&gt; =C2=A0 =C2=A0 =C2=A0case TARGET_NR_clock_getres:<br>
+&gt; =C2=A0 =C2=A0 =C2=A0{<br>
+&gt; -- </p>
+<p dir=3D"ltr">Nice patch for the first version, still I think the patch co=
+uld be much better.</p>
+<p dir=3D"ltr">Why not support 32-bit hosts? If a 32-bit host supports cloc=
+k_&lt;get|set&gt;time64(), the mapping is obvious. If not, the implementati=
+on could be &quot;best effort&quot; based, using host&#39;s clock_&lt;get|s=
+et&gt;time().</p>
+<p dir=3D"ltr">Regards,<br>
+Aleksandar</p>
+<p dir=3D"ltr">&gt; 2.25.1<br>
+&gt;<br>
+&gt;<br>
+</p>
+
+--000000000000a7a56b05a002cd84--
 
