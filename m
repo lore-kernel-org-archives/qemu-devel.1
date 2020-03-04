@@ -2,85 +2,89 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1883BC3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BA9C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D335A20848
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84FD820866
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 23:10:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="NTPJHBv7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D335A20848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EqZ4nyhP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84FD820866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9d1Q-0003WJ-0Y
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 18:01:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41212)
+	id 1j9dA6-0007a3-Ly
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 18:10:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1j9d0J-0002vO-Sz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:41 -0500
+ (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9d98-0006Qz-EG
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:09:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1j9d0I-0000ST-C6
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:39 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37475)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1j9d0H-0000S8-Sa
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:00:38 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id o2so1609310pjp.2
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 15:00:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=A+8YyLnxsylnT/bWU3JoXEptrIiLtpYK4ca11ZtIoAs=;
- b=NTPJHBv7LkdVcUWy2EkjCDrONjt7gDGWd/PifAFSwwXzPJKFRXZZImih4SbsidHCp0
- ldMlnwzALdXXC61B/2SH9tF7WvOayz0FUkCTzfYinYYW9O+eRyynwFL5VmiT96voSweM
- 77bqHAkkWibQJGnDGTj2YWienbf3Ba3uAdHUF84SiU8YvNIdX+K3O5SckGjQXJMT7H5L
- U9mCM020A/hALwHxv2Jr29ldwQqBS0kYci+JZPTJF6g5LLeoU+BJBFXsINUOYzMxCcE6
- eXolXU/tuR1UrVloSlOQPGEmaAaOucoKPKThSJ5UE8gJVXGZYuBh1o7wUyDFGnvA8AfN
- VajQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=A+8YyLnxsylnT/bWU3JoXEptrIiLtpYK4ca11ZtIoAs=;
- b=i6xEFwGh/YvD4lSytyjQrFETnTK7w/GkT7o3gu5KXS2knEvYOqzpZLAU0ij2/33Nu5
- 0yxmckzxhrIyxBIAB5aFIAdZxL1DBMvkOZ/XfDThuGUh5gCU75ggkSriKhQCHveNlT66
- eDDeD9q20IY+KAX1UuGc2NENrUJmRhPjwE0242Kpk/ZwPKxvn8QNLKBtcwVrBxO990sp
- NieoD2h6KNewa1Jb/WQ5w9/29IYirj8OIyOQLfFrS7FjOuuxYwgBWF8tpivn/wnEHunf
- 410c8kVQ62ccdxeMkt3WRBPqV5yx3k1UUWav922Nh7jjzjVpR/lnv7QRS2d3P7dLvH0+
- NruQ==
-X-Gm-Message-State: ANhLgQ1hTKPCDs1HG+EDCVHPlNJnn03yoZSx0N/A+2FttTwzyjKdCK1t
- MCDWJSqP0DkQYFSyasUfZgU2bg==
-X-Google-Smtp-Source: ADFU+vvrG1qKiFIdxgmRRB+pjG2jOxtVpzaUwBiKVUq8u3S44i7fJ2gWwm4wtYnqkLQDQwe1/O6avQ==
-X-Received: by 2002:a17:902:ab81:: with SMTP id f1mr5251896plr.5.1583362836166; 
- Wed, 04 Mar 2020 15:00:36 -0800 (PST)
-Received: from localhost ([2620:0:1000:2514:23a5:d584:6a92:3e3c])
- by smtp.gmail.com with ESMTPSA id k5sm14229898pfp.66.2020.03.04.15.00.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Mar 2020 15:00:35 -0800 (PST)
-Date: Wed, 04 Mar 2020 15:00:35 -0800 (PST)
-X-Google-Original-Date: Wed, 04 Mar 2020 15:00:20 PST (-0800)
-Subject: Re: [PATCH v2] riscv: sifive_u: Add a "serial" property for board
- serial number
-In-Reply-To: <1581861317-30977-1-git-send-email-bmeng.cn@gmail.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-fb3ea639-87e6-406b-a679-a568f6d7edf9@palmerdabbelt-glaptop1>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9d96-0004dp-TA
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 18:09:45 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:51004)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9d96-0004Sp-6H; Wed, 04 Mar 2020 18:09:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1583363383; x=1614899383;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=tJtIPl5cwN1gfc3SsknFz5vNvnrF0CVeRFzPMds5Lwk=;
+ b=EqZ4nyhPhg0gL+tEHNIvX3AJX9tnw/RX28iBvfUslym4QBHtQo1MhDS+
+ uKGCzRWPPW0WB30ud6moKjXGoaVoyRO7V4QUcfnnr4F5Fg+AijrkLh1ro
+ soDneI4T76CYSABrR8f83M4oXE/a01yAhNdQK0OItqZkHkBL1GM0o40Nw
+ rM1Rw7MtZ6Zg5Jxu2McfGIUQNDGFU5Decile4mqgUDEE63J1OJnlJUHmm
+ RJL2SoI/qqSNJ9SSLdQaXieNKwsTq0zBOkB7+sS2mHyATl2DHVDUfNzKK
+ 3GdRjS0aJV81SkFRV7u1anLbd7aFkuuP6qqcM6eweauMPsgh9rSvFIaG6 Q==;
+IronPort-SDR: EwtedGqgnLAzM1kyB1MkYomaXrCbtJhb8DnybURqixGRV5KOM2ou/L/rq9hzlbbrpQ+C7JpMmm
+ SzeyrYfIKSKPQZ1iWGklRxvj+KSsxEcLoHyiR1iDVNGjYN4ITBw3cLmelot9hB3Exlt54nY+FE
+ zlSHq5KzrmxZfJN5Fc8eltV4DlxiqUDwnlZyW5kOicfOYAp3okqtRcIMM1M0B0QCAAmoUVRRfu
+ 2x13KPdEx/dzmb4choZ862Qcmbe6qcDRvslPzpV3AGDod5Cr4EDnkqrY94hrDGLNnPkRrEp8oo
+ Ii4=
+X-IronPort-AV: E=Sophos;i="5.70,515,1574092800"; d="scan'208";a="131477236"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 05 Mar 2020 07:09:40 +0800
+IronPort-SDR: dLNPKwKUaM/Cr/m/yqOBEryaK2F8aSeX76agnk1tpEWiOvTIMbVWzhOR6zgTUXMTN/Duz/deKf
+ jO04w577dInmKiHIjq9qxgCYno70hY4J1gNpyJQcFGV3NnG7A7fRgTo5zCBBYiDSBPbF4m9piR
+ +I5gSy2V69X4Ks5YeByGXyKnoTgEPaw+ahoA8BuW4D9UHzul0DinxW4+Sx/QHYq6I3YgU4M94G
+ eioatdzxgK5IENHgigQajnhTZq3grHz+T9ll0jzkRXKzsc7jBc+RMDVZVEHCASLlLKF6aNlVp4
+ ZX+qCghGElJ2QSxOvu+sna8w
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Mar 2020 15:01:53 -0800
+IronPort-SDR: iNaPRfkO854zyZROI9ouP72IXubiJR1kRUpAeXX3JeAv4v4+svvndjtE3L8rGl2G5zcZLKd1n2
+ BD8PVR5nSDMA+fO0+FZ8Dq2CtmFunoh4li4cwh2GP5phn+Z+x0YIg+XD5rtZ+6AuEOamv3+5wJ
+ zEyyUtOo9U8d9B7cQJaTQyBpHYIM0SqXjKspl8qT1hLVdZQ/LXGfOc1LjfVuTeSNNC1AqrQIoO
+ oGJE9IpzuAehGKidxsmg3nP9mHWs8Kg+T5OhdihCZIk9C7EVF3lV2lHSY6v0rYuwjC8XyN+HOB
+ A5A=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip01.wdc.com with ESMTP; 04 Mar 2020 15:09:40 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v2 0/3] hw/riscv: Add a serial property to the sifive_u machine
+Date: Wed,  4 Mar 2020 15:02:25 -0800
+Message-Id: <cover.1583362888.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.154.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,117 +96,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
- sagark@eecs.berkeley.edu, qemu-riscv@nongnu.org
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 16 Feb 2020 05:55:17 PST (-0800), bmeng.cn@gmail.com wrote:
-> At present the board serial number is hard-coded to 1, and passed
-> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
-> the serial number to generate a unique MAC address for the on-chip
-> ethernet controller. When multiple QEMU 'sifive_u' instances are
-> created and connected to the same subnet, they all have the same
-> MAC address hence it creates a unusable network.
->
-> A new "serial" property is introduced to specify the board serial
-> number. When not given, the default serial number 1 is used.
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->
-> ---
->
-> Changes in v2:
-> - Move setting OTP serial number property from riscv_sifive_u_soc_init()
->   to riscv_sifive_u_soc_realize(), to fix the 'check-qtest-riscv' error.
->   I am not really sure why doing so could fix the 'make check' error.
->   The v1 patch worked fine and nothing seems wrong.
->
->  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
->  include/hw/riscv/sifive_u.h |  1 +
->  2 files changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 0e12b3c..ca561d3 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -34,6 +34,7 @@
->  #include "qemu/log.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> +#include "qapi/visitor.h"
->  #include "hw/boards.h"
->  #include "hw/loader.h"
->  #include "hw/sysbus.h"
-> @@ -434,7 +435,6 @@ static void riscv_sifive_u_soc_init(Object *obj)
->                            TYPE_SIFIVE_U_PRCI);
->      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
->                            TYPE_SIFIVE_U_OTP);
-> -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
->      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
->                            TYPE_CADENCE_GEM);
->  }
-> @@ -453,6 +453,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
->      s->start_in_flash = value;
->  }
->
-> +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> +}
-> +
-> +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> +}
-> +
->  static void riscv_sifive_u_machine_instance_init(Object *obj)
->  {
->      SiFiveUState *s = RISCV_U_MACHINE(obj);
-> @@ -464,11 +476,17 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
->                                      "Set on to tell QEMU's ROM to jump to " \
->                                      "flash. Otherwise QEMU will jump to DRAM",
->                                      NULL);
-> +
-> +    s->serial = OTP_SERIAL;
-> +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
-> +                        sifive_u_set_serial, NULL, &s->serial, NULL);
-> +    object_property_set_description(obj, "serial", "Board serial number", NULL);
->  }
->
->  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
->  {
->      MachineState *ms = MACHINE(qdev_get_machine());
-> +    SiFiveUState *us = RISCV_U_MACHINE(ms);
->      SiFiveUSoCState *s = RISCV_U_SOC(dev);
->      const struct MemmapEntry *memmap = sifive_u_memmap;
->      MemoryRegion *system_memory = get_system_memory();
-> @@ -554,6 +572,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
->      object_property_set_bool(OBJECT(&s->prci), true, "realized", &err);
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->prci), 0, memmap[SIFIVE_U_PRCI].base);
->
-> +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", us->serial);
->      object_property_set_bool(OBJECT(&s->otp), true, "realized", &err);
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->otp), 0, memmap[SIFIVE_U_OTP].base);
->
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index 82667b5..7cf742e 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -59,6 +59,7 @@ typedef struct SiFiveUState {
->      int fdt_size;
->
->      bool start_in_flash;
-> +    uint32_t serial;
->  } SiFiveUState;
->
->  enum {
+At present the board serial number is hard-coded to 1, and passed
+to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+the serial number to generate a unique MAC address for the on-chip
+ethernet controller. When multiple QEMU 'sifive_u' instances are
+created and connected to the same subnet, they all have the same
+MAC address hence it creates a unusable network.
 
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+A new "serial" property is introduced to specify the board serial
+number. When not given, the default serial number 1 is used.
 
-Thanks.  This is in the queue for the soft freeze.
+v2:
+ - Fix the serial setting so it correctly sets
+
+Alistair Francis (2):
+  riscv/sifive_u: Fix up file ordering
+  riscv/sifive_u: Add a serial property to the sifive_u SoC
+
+Bin Meng (1):
+  riscv/sifive_u: Add a serial property to the sifive_u machine
+
+ hw/riscv/sifive_u.c         | 135 +++++++++++++++++++++---------------
+ include/hw/riscv/sifive_u.h |   3 +
+ 2 files changed, 84 insertions(+), 54 deletions(-)
+
+-- 
+2.25.1
+
 
