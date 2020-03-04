@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24DDC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1D9C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:31:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BB8A20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:10:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65AE720705
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 10:31:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUTErjiG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB8A20870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bq8FE44G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AE720705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9QzA-0002ER-Mh
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:10:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44886)
+	id 1j9RJ2-0007yL-IW
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 05:31:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1j9QyS-0001eZ-Bi
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:57 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1j9RIG-0007WF-Jk
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1j9QyP-0005tI-RL
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27322
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1j9RIE-0001N4-Nl
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:23 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60310
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9QyP-0005s5-H8
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:09:53 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1j9RIE-0001M1-JD
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 05:30:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583316592;
+ s=mimecast20190719; t=1583317821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n3YnEWzefIEP6vPwHwy3+XjapI2lE8/ZRyLbmDrmFj4=;
- b=aUTErjiGNgECHikcuAqNLzOz2e80rsKoUcAisLQS+oCvFChT7UQAGjjr7PG4NC2PmDf8JJ
- /sN8dGretOucyjTpCPZAYU41/cvPKjff1tMGkpNFuIZ1NrYZx4zBjuFcVXhc6wmn6PZizJ
- kFpZh6ZD26fXvAoJ93X/YzHENG1gIa4=
+ bh=PkiWkl9zdfaymB9Avb4mziDqZzp8wZxXmGXJHmt8OLA=;
+ b=bq8FE44GYVXMHT4vARfWA/eH+qMfX9dQWPWIcRLaYzoEHPN2zMXMgV1Krx9rXuFHyheFva
+ EGHwUA9wVf6QTA/nom0BfAuQMilK0DanSn98/52Av8gKJjlwGrNX59vtWmgk/b0fC1Xdh4
+ sCvBDrRhaBhgsBXizR/1TLf+TSUNlyE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-AWf4ueL-MGah7GTxbKpNjg-1; Wed, 04 Mar 2020 05:09:48 -0500
-X-MC-Unique: AWf4ueL-MGah7GTxbKpNjg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-438-7snCtD7PMIuE3cY1RToNRQ-1; Wed, 04 Mar 2020 05:30:19 -0500
+X-MC-Unique: 7snCtD7PMIuE3cY1RToNRQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9665C107ACC7;
- Wed,  4 Mar 2020 10:09:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C9DB13F5;
+ Wed,  4 Mar 2020 10:30:17 +0000 (UTC)
 Received: from work-vm (ovpn-116-225.ams2.redhat.com [10.36.116.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83A791001B3F;
- Wed,  4 Mar 2020 10:09:34 +0000 (UTC)
-Date: Wed, 4 Mar 2020 10:09:32 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F32028F34E;
+ Wed,  4 Mar 2020 10:30:01 +0000 (UTC)
+Date: Wed, 4 Mar 2020 10:29:59 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
-Message-ID: <20200304100932.GA4104@work-vm>
+Subject: Re: [PATCH v5 12/50] multi-process: remote process initialization
+Message-ID: <20200304102959.GB4104@work-vm>
 References: <cover.1582576372.git.jag.raman@oracle.com>
- <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
+ <264de034fcdc1000bada4a93ac7e0856fef591f2.1582576372.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
+In-Reply-To: <264de034fcdc1000bada4a93ac7e0856fef591f2.1582576372.git.jag.raman@oracle.com>
 User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,60 +101,153 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Jagannathan Raman (jag.raman@oracle.com) wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Adds the handler to process message from QEMU,
+> Initialize remote process main loop, handles SYNC_SYSMEM
+> message by updating its "system_memory" container using
+> shared file descriptors received from QEMU.
 >=20
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 > ---
 >  v4 -> v5:
->   - Added "exec" suboption to get the executable's name
->   - Addressed feedback about variable names
->   - Removed redundant check for spawning a process
+>   - We checked if we could use functions already defined in
+>     util/main-loop.c instead of using g_main_loop_run. However,
+>     we couldn't find a suitable function that's generic enough
+>     to do this. All of them have emulator code embedded in them
+>     which is not used by the remote process. We are therefore
+>     not making any change to this patch
 >=20
->  hw/proxy/qemu-proxy.c         | 68 +++++++++++++++++++++++++++++++++----=
-------
->  include/hw/proxy/qemu-proxy.h |  2 +-
->  2 files changed, 54 insertions(+), 16 deletions(-)
+>  remote/remote-main.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 85 insertions(+)
 >=20
-> diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-> index 828bbd7..d792e86 100644
-> --- a/hw/proxy/qemu-proxy.c
-> +++ b/hw/proxy/qemu-proxy.c
-> @@ -19,19 +19,50 @@
+> diff --git a/remote/remote-main.c b/remote/remote-main.c
+> index ecf30e0..56315cd 100644
+> --- a/remote/remote-main.c
+> +++ b/remote/remote-main.c
+> @@ -12,6 +12,7 @@
+>  #include "qemu-common.h"
 > =20
->  static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+>  #include <stdio.h>
+> +#include <unistd.h>
 > =20
-> +static int add_argv(char *opts_str, char **argv, int argc)
-> +{
-> +    int max_args =3D 64;
-
-...
-
+>  #include "qemu/module.h"
+>  #include "remote/pcihost.h"
+> @@ -19,12 +20,96 @@
+>  #include "hw/boards.h"
+>  #include "hw/qdev-core.h"
+>  #include "qemu/main-loop.h"
+> +#include "remote/memory.h"
+> +#include "io/mpqemu-link.h"
+> +#include "qapi/error.h"
+> +#include "qemu/main-loop.h"
+> +#include "sysemu/cpus.h"
+> +#include "qemu-common.h"
+> +#include "hw/pci/pci.h"
+> +#include "qemu/thread.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/config-file.h"
+> +#include "sysemu/sysemu.h"
+> +#include "block/block.h"
+> +#include "exec/ramlist.h"
 > +
-> +static int make_argv(char *opts_str, char **argv, int argc)
-> +{
-> +    int max_args =3D 64;
-
-.....
-
+> +static MPQemuLinkState *mpqemu_link;
+> +PCIDevice *remote_pci_dev;
 > +
->  static int remote_spawn(PCIProxyDev *pdev, const char *opts,
->                          const char *exec_name, Error **errp)
+> +static void process_msg(GIOCondition cond, MPQemuChannel *chan)
+> +{
+> +    MPQemuMsg *msg =3D NULL;
+> +    Error *err =3D NULL;
+> +
+> +    if ((cond & G_IO_HUP) || (cond & G_IO_ERR)) {
+> +        goto finalize_loop;
+> +    }
+> +
+> +    msg =3D g_malloc0(sizeof(MPQemuMsg));
+> +
+> +    if (mpqemu_msg_recv(msg, chan) < 0) {
+> +        error_setg(&err, "Failed to receive message");
+
+Please give error messages more context, e.g. the device or process name
+or something like that so that; it helps when we get a user
+reporting a crash and they report 'Unknown command' in their log, but
+then we have to figure out where to point them.
+
+> +        goto finalize_loop;
+> +    }
+> +
+> +    switch (msg->cmd) {
+> +    case INIT:
+> +        break;
+> +    case PCI_CONFIG_WRITE:
+> +        break;
+> +    case PCI_CONFIG_READ:
+> +        break;
+> +    default:
+> +        error_setg(&err, "Unknown command");
+> +        goto finalize_loop;
+> +    }
+> +
+> +    g_free(msg->data2);
+> +    g_free(msg);
+> +
+> +    return;
+> +
+> +finalize_loop:
+> +    if (err) {
+> +        error_report_err(err);
+> +    }
+> +    g_free(msg);
+> +    mpqemu_link_finalize(mpqemu_link);
+> +    mpqemu_link =3D NULL;
+> +}
+> =20
+>  int main(int argc, char *argv[])
 >  {
-> -    char *args[3];
->      pid_t rpid;
->      int fd[2] =3D {-1, -1};
->      Error *local_error =3D NULL;
-> +    char *argv[64];
+> +    Error *err =3D NULL;
+> +
+>      module_call_init(MODULE_INIT_QOM);
+> =20
+> +    bdrv_init_with_whitelist();
+> +
+> +    if (qemu_init_main_loop(&err)) {
+> +        error_report_err(err);
+> +        return -EBUSY;
+> +    }
+> +
+> +    qemu_init_cpu_loop();
+> +
+> +    page_size_init();
+> +
+> +    qemu_mutex_init(&ram_list.mutex);
+> +
 
-
-Magic '64' in a lot of places; that should be one constant somewhere
-(if it's actually needed).
+So these are some subset of the things from qemu_init; I guess
+we'll have to be careful when we add stuff to vl.c to think what should
+also be added here.
 
 Dave
 
-
+>      current_machine =3D MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MA=
+CHINE)));
+> =20
+> +    mpqemu_link =3D mpqemu_link_create();
+> +    if (!mpqemu_link) {
+> +        printf("Could not create MPQemu link\n");
+> +        return -1;
+> +    }
+> +
+> +    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
+> +    mpqemu_link_set_callback(mpqemu_link, process_msg);
+> +
+> +    mpqemu_start_coms(mpqemu_link);
+> +
+>      return 0;
+>  }
+> --=20
+> 1.8.3.1
+>=20
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
