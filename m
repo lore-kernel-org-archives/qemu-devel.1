@@ -2,50 +2,119 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E83C6C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1E8C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C94320870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:40:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C94320870
+	by mail.kernel.org (Postfix) with ESMTPS id 650CA2146E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:41:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="MtTczOkT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 650CA2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9UGI-0001GS-Sg
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:40:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44376)
+	id 1j9UH8-0002fH-KL
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:41:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j9UBw-0002Il-Pm
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:36:09 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j9UGB-0001Kg-As
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:40:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1j9UBs-0002YO-0J
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:36:04 -0500
-Received: from relay.sw.ru ([185.231.240.75]:44144)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j9UBr-0002QX-Fk; Wed, 04 Mar 2020 08:35:59 -0500
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1j9UBf-00070I-Tv; Wed, 04 Mar 2020 16:35:48 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 2/5] qcow2: introduce compression type feature
-Date: Wed,  4 Mar 2020 16:35:35 +0300
-Message-Id: <20200304133538.9159-3-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
-References: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (envelope-from <vsementsov@virtuozzo.com>) id 1j9UG8-000370-Sy
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:40:27 -0500
+Received: from mail-eopbgr40117.outbound.protection.outlook.com
+ ([40.107.4.117]:18377 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1j9UG2-0002oW-RX; Wed, 04 Mar 2020 08:40:19 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e41EJQ6xl4FXMzwVXW7v3IS288/7Lq2P1hNuhQVYbSTyKP+iH5dz6D6Cc6N4EY6nxRNPwYSnO/2z5s4vfxj8+d4IWs+nqlDkgnnhfNjtAO0CMh6PZaq4NvIS61MINnLmP8KcankNT3HOKN+KuyeH+bamMjjyVCR/3rNzkv7xcBdtODG+12f/44o4DtA+QAyI+oevvaVr1t6kpAyJlDJz+bl02xT56IOmtQ6r55THcehmb4H5qfNl/oyMfznVEZufHQUgDdtvEH8snIqwlgH+cxzkXEk8cettbk/xOeNegaQ2iIIubGTygRyLl9EbKyaHejG3yseKvYLNBw6FXhSbkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1k0KTXOmrBplNECjDj7+2soBAylXtnnzCAOe/DOc1L4=;
+ b=RjnKPqcI9Gio8uOuXeZ6hHz7rV5Va0jdbhC/0bAUmyVQLH4OhGSdyUlDvC0GfePFxMqu1WSJCeqx1nk05VEK5gl6jatsOAZghzG1euVSjxsTfRzxJJZCaHvJFCJ/pYmkp23lpFPE75SQpEuWl1gJeCBbwp3e2iKeeXA7CVFTX6IwZjID1LxsVm2Fr5ZC9/MSVCXuBRtWPd6Iwv0knE9ZOXu9Bq1xtHHhvuam9m+j2PoKWkwlI3w4Mv2oKGm0VOLKdiK8Kb72PT049PMNH1NGLw8/jDPdhiG7Svn+KMuvcSlq4/8vWqbcB/kbdwh48BuP1K/LMpTQQfBXpfeu5fvx1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1k0KTXOmrBplNECjDj7+2soBAylXtnnzCAOe/DOc1L4=;
+ b=MtTczOkTWN32mWiea/mwGSojoxVusZeppOc5VMtrK0AOQH/w+lK1wGenojHlgxrOcQITyQtz6Y3c3so4QT5yYO1RaPlDnbkaUOpmCk5C1hHrriQ11TixNzhXArwPN11LvXRX1pwYoFl7CU+t6Xm6VQbQV2j4BSKRsXQkyxy8pT8=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3205.eurprd08.prod.outlook.com (52.135.166.20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.18; Wed, 4 Mar 2020 13:40:16 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2793.013; Wed, 4 Mar 2020
+ 13:40:16 +0000
+Subject: Re: [PATCH v7 03/11] scripts: add coccinelle script to use auto
+ propagated errp
+To: Markus Armbruster <armbru@redhat.com>
+References: <20200131130118.1716-1-vsementsov@virtuozzo.com>
+ <20200131130118.1716-4-vsementsov@virtuozzo.com>
+ <87v9nxwulz.fsf@dusky.pond.sub.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-Tagtoolbar-Keys: D20200304164013467
+Message-ID: <fa79fc3d-9649-6c7e-54b7-82557a6b1c12@virtuozzo.com>
+Date: Wed, 4 Mar 2020 16:40:13 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+In-Reply-To: <87v9nxwulz.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: HE1P18901CA0021.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:3:8b::31) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1P18901CA0021.EURP189.PROD.OUTLOOK.COM (2603:10a6:3:8b::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2772.14 via Frontend Transport; Wed, 4 Mar 2020 13:40:14 +0000
+X-Tagtoolbar-Keys: D20200304164013467
+X-Originating-IP: [185.231.240.5]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 45499168-17c3-4a91-1636-08d7c0419268
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3205:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3205BE4EAFB23D8C827F24AEC1E50@AM6PR08MB3205.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Forefront-PRVS: 0332AACBC3
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10019020)(366004)(39850400004)(346002)(396003)(376002)(136003)(199004)(189003)(66556008)(6916009)(2906002)(66476007)(956004)(478600001)(54906003)(8936002)(66946007)(2616005)(52116002)(81166006)(16576012)(31686004)(4326008)(30864003)(86362001)(7416002)(8676002)(81156014)(31696002)(16526019)(6486002)(186003)(36756003)(26005)(5660300002)(316002)(2004002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3205;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RBUJk48QsG/NM1ImhDvbyz+PKdVNzgs4MPvgjea/R2jPuERp+GDLFF+UYMxg10RDN1M+RHCs+2zNpCQOTF4vg0F9So01ojo3tela+N0ykhL1azQGT5hvlhM7lCIn9+45NEptCjM44lEYhVy8P10iYZLxCadiFuhmas/Q79DCM0aQSE1mLA2/7NODdmr3Sr0Sf2ehT2xrJLvA++u3Esmyd/Fm/Vsf83XV0SuX0IeShjRrR3R0rd1smNx9uE2b5t0GZnDK4OxqeXd/fhOdEaHW6mb5zci04QotbW2yrQkFSHnrE48HVCeAMtClsE8lkrRtapsdVjsgP97Rt+pHR8VbcWywJRMisMMgh+mDZrqBXeAhfsRudjGDSRVEylNlrQcqE65GCc07YJN3gLps/ueFpT4FIAFNV3wRaGzM9YyrQW+W7kCjA43c4OqlK/BH7aZ9fQtscvpfTW4oWrsTZ/MgWWHo7q2z4O1yHFnh6sU47TYOdmYQ7u19M7MUczTDESfbR0lOMJoY//uDMADkuuDBwBYux22JrGgxoDXy3M5NVQEFURprF/MzocNf6UfgD3id
+X-MS-Exchange-AntiSpam-MessageData: X2quE0gGfOkVsTAI5TuiKN/8iC4dC8GBgbf0QpcU+Hlb0OOPbXOuX8Z2WlTskyjoJEvFJenVtNk84a+d/MUJe5O35JWpT5l8AtYghtGfkg0Njj6NBZWezpT1dx9ybpei7NOeQq/i7iT6Ge1ZchQY+g==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45499168-17c3-4a91-1636-08d7c0419268
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2020 13:40:16.2903 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Nc98grRSST5kBtPbIEJAuhchWO/BilMKcJmh5CVZ9tOwT3knJIILD5h57ayL+s33CUf1zvcqFq+S9qgxJ58+ZLcN2YynSvmPiymVvEPDt1Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3205
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.4.117
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,1052 +126,443 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch adds some preparation parts for incompatible compression type
-feature to qcow2 allowing the use different compression methods for
-image clusters (de)compressing.
+23.02.2020 11:55, Markus Armbruster wrote:
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>=20
+>> Script adds ERRP_AUTO_PROPAGATE macro invocation where appropriate and
+>> does corresponding changes in code (look for details in
+>> include/qapi/error.h)
+>>
+>> Usage example:
+>> spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>>   --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
+>>   blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>
+>> CC: Eric Blake <eblake@redhat.com>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Greg Kurz <groug@kaod.org>
+>> CC: Stefano Stabellini <sstabellini@kernel.org>
+>> CC: Anthony Perard <anthony.perard@citrix.com>
+>> CC: Paul Durrant <paul@xen.org>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+>> CC: Laszlo Ersek <lersek@redhat.com>
+>> CC: Gerd Hoffmann <kraxel@redhat.com>
+>> CC: Stefan Berger <stefanb@linux.ibm.com>
+>> CC: Markus Armbruster <armbru@redhat.com>
+>> CC: Michael Roth <mdroth@linux.vnet.ibm.com>
+>> CC: qemu-block@nongnu.org
+>> CC: xen-devel@lists.xenproject.org
+>>
+>>   include/qapi/error.h                          |   3 +
+>>   scripts/coccinelle/auto-propagated-errp.cocci | 158 ++++++++++++++++++
+>>   2 files changed, 161 insertions(+)
+>>   create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+>>
+>> diff --git a/include/qapi/error.h b/include/qapi/error.h
+>> index b9452d4806..79f8e95214 100644
+>> --- a/include/qapi/error.h
+>> +++ b/include/qapi/error.h
+>> @@ -141,6 +141,9 @@
+>>    *         ...
+>>    *     }
+>>    *
+>> + * For mass conversion use script
+>> + *   scripts/coccinelle/auto-propagated-errp.cocci
+>> + *
+>>    *
+>>    * Receive and accumulate multiple errors (first one wins):
+>>    *     Error *err =3D NULL, *local_err =3D NULL;
+>=20
+> Extra blank line.
+>=20
+>> diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coc=
+cinelle/auto-propagated-errp.cocci
+>> new file mode 100644
+>> index 0000000000..fb03c871cb
+>> --- /dev/null
+>> +++ b/scripts/coccinelle/auto-propagated-errp.cocci
+>> @@ -0,0 +1,158 @@
+>> +// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
+>> +//
+>> +// Copyright (c) 2020 Virtuozzo International GmbH.
+>> +//
+>> +// This program is free software; you can redistribute it and/or modify
+>> +// it under the terms of the GNU General Public License as published by
+>> +// the Free Software Foundation; either version 2 of the License, or
+>> +// (at your option) any later version.
+>> +//
+>> +// This program is distributed in the hope that it will be useful,
+>> +// but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> +// GNU General Public License for more details.
+>> +//
+>> +// You should have received a copy of the GNU General Public License
+>> +// along with this program.  If not, see <http://www.gnu.org/licenses/>=
+.
+>> +//
+>> +// Usage example:
+>> +// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>> +//  --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
+>> +//  blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc=
+]
+>> +
+>> +@rule0@
+>> +// Add invocation to errp-functions where necessary
+>> +// We should skip functions with "Error *const *errp"
+>> +// parameter, but how to do it with coccinelle?
+>> +// I don't know, so, I skip them by function name regex.
+>> +// It's safe: if we did not skip some functions with
+>> +// "Error *const *errp", ERRP_AUTO_PROPAGATE invocation
+>> +// will fail to compile, because of const violation.
+>=20
+> Not skipping a function we should skip fails to compile.
+>=20
+> What about skipping a function we should not skip?
+>=20
+>> +identifier fn !~ "error_append_.*_hint";
+>> +identifier local_err, ERRP;
+>=20
+> A few of our coccinelle scripts use ALL_CAPS for meta-variables.  Most
+> don't.  Either is fine with me.  Mixing the two styles feels a bit
+> confusing, though.
+>=20
+>> +@@
+>> +
+>> + fn(..., Error **ERRP, ...)
+>> + {
+>> ++   ERRP_AUTO_PROPAGATE();
+>> +    <+...
+>> +        when !=3D ERRP_AUTO_PROPAGATE();
+>> +(
+>> +    error_append_hint(ERRP, ...);
+>> +|
+>> +    error_prepend(ERRP, ...);
+>> +|
+>> +    Error *local_err =3D NULL;
+>> +)
+>> +    ...+>
+>> + }
+>=20
+> Misses error_vprepend().  Currently harmless, but as long as we commit
+> the script, we better make it as robust as we reasonably can.
+>=20
+> The previous patch explains this Coccinelle script's intent:
+>=20
+>    To achieve these goals, later patches will add invocations
+>    of this macro at the start of functions with either use
+>    error_prepend/error_append_hint (solving 1) or which use
+>    local_err+error_propagate to check errors, switching those
+>    functions to use *errp instead (solving 2 and 3).
+>=20
+> This rule matches "use error_prepend/error_append_hint" directly.  It
+> appears to use presence of a local Error * variable as proxy for "use
+> local_err+error_propagate to check errors".  Hmm.
+>=20
+> We obviously have such a variable when we use "local_err+error_propagate
+> to check errors".  But we could also have such variables without use of
+> error_propagate().  In fact, error.h documents such use:
+>=20
+>   * Call a function and receive an error from it:
+>   *     Error *err =3D NULL;
+>   *     foo(arg, &err);
+>   *     if (err) {
+>   *         handle the error...
+>   *     }
+>=20
+> where "handle the error" frees it.
+>=20
+> I figure such uses typically occur in functions without an Error **errp
+> parameter.  This rule doesn't apply then.  But they could occur even in
+> functions with such a parameter.  Consider:
+>=20
+>      void foo(Error **errp)
+>      {
+>          Error *err =3D NULL;
+>=20
+>          bar(&err);
+>          if (err) {
+>              error_free(err);
+>              error_setg(errp, "completely different error");
+>          }
+>      }
+>=20
+> Reasonable enough when bar() gives us an error that's misleading in this
+> context, isn't it?
+>=20
+> The script transforms it like this:
+>=20
+>      void foo(Error **errp)
+>      {
+>     -    Error *err =3D NULL;
+>     +    ERRP_AUTO_PROPAGATE();
+>=20
+>     -    bar(&err);
+>     -    if (err) {
+>     -        error_free(err);
+>     +    bar(errp);
+>     +    if (*errp) {
+>     +        error_free_errp(errp);
+>              error_setg(errp, "completely different error");
+>          }
+>      }
+>=20
+> Unwanted.
+>=20
+> Now, if this script applied in just a few dozen places, we could rely on
+> eyeballing its output to catch unwanted transformations.  Since it
+> applies in so many more, I don't feel comfortable relying on reviewer
+> eyeballs.
+>=20
+> Can we make rule0 directly match error_propagate(errp, local_err)
+> somehow?
+>=20
+> Another observation: the rule does not match error_reportf_err() and
+> warn_reportf_err().
 
-It is implied that the compression type is set on the image creation and
-can be changed only later by image conversion, thus compression type
-defines the only compression algorithm used for the image, and thus,
-for all image clusters.
+They are unrelated, as they take Error* argument, not Error**
 
-The goal of the feature is to add support of other compression methods
-to qcow2. For example, ZSTD which is more effective on compression than ZLIB.
+> These combine error_prepend(),
+> error_report()/warn_report() and error_free(), for convenience.  Don't
+> their users need ERRP_AUTO_PROPAGATE() just like error_prepend()'s
+> users?
+>=20
+>> +
+>> +@@
+>> +// Switch unusual (Error **) parameter names to errp
+>> +// (this is necessary to use ERRP_AUTO_PROPAGATE).
+>=20
+> Please put your rule comments right before the rule, i.e. before the
+> @-line introducing metavariable declarations, not after.  Same
+> elsewhere.
+>=20
+>> +identifier rule0.fn;
+>> +identifier rule0.ERRP !=3D errp;
+>> +@@
+>> +
+>> + fn(...,
+>> +-   Error **ERRP
+>> ++   Error **errp
+>> +    ,...)
+>> + {
+>> +     <...
+>> +-    ERRP
+>> ++    errp
+>> +     ...>
+>> + }
+>=20
+> This normalizes errp parameter naming.  It matches exactly when rule0
+> matches (and inserts ERRP_AUTO_PROPAGATE()) and the Error ** parameter
+> is unusual.  Good.
+>=20
+>> +
+>> +@rule1@
+>> +// We want to patch error propagation in functions regardless of
+>> +// whether the function already uses ERRP_AUTO_PROPAGATE prior to
+>> +// applying rule0, hence this one does not inherit from it.
+>=20
+> I'm not sure I get this comment.  Let's see what the rule does.
+>=20
+>> +identifier fn !~ "error_append_.*_hint";
+>> +identifier local_err;
+>> +symbol errp;
+>> +@@
+>> +
+>> + fn(..., Error **errp, ...)
+>> + {
+>> +     <...
+>> +-    Error *local_err =3D NULL;
+>> +     ...>
+>> + }
+>=20
+> rule1 matches like rule0, except the Error ** parameter match is
+> tightened from any C identifier to the C identifier errp, and the
+> function body match tightened from "either use
+> error_prepend/error_append_hint or which use local_err+error_propagate
+> to check errors" to just the latter.
+>=20
+> I figure tightening the Error ** parameter match has no effect, because
+> we already normalized the parameter name.
+>=20
+> So rule1 deletes variable local_err where rule0 applied.  Correct?
+>=20
+>> +
+>> +@@
+>> +// Handle pattern with goto, otherwise we'll finish up
+>> +// with labels at function end which will not compile.
+>> +identifier rule1.fn, rule1.local_err;
+>> +identifier OUT;
+>> +@@
+>> +
+>> + fn(...)
+>> + {
+>> +     <...
+>> +-    goto OUT;
+>> ++    return;
+>> +     ...>
+>> +- OUT:
+>> +-    error_propagate(errp, local_err);
+>> + }
+>=20
+> This is one special case of error_propagate() deletion.  It additionally
+> gets rid of a goto we no longer want.  For the general case, see below.
+>=20
+> The rule applies only where rule1 just deleted the variable.  Thus, the
+> two rules work in tandem.  Makes sense.
+>=20
+>> +
+>> +@@
+>> +identifier rule1.fn, rule1.local_err;
+>=20
+> This rule also works in tandem with rule1.
+>=20
+>> +expression list args; // to reindent error_propagate_prepend
+>=20
+> What is the comment trying to tell me?
+>=20
+>> +@@
+>> +
+>> + fn(...)
+>> + {
+>> +     <...
+>> +(
+>> +-    error_free(local_err);
+>> +-    local_err =3D NULL;
+>> ++    error_free_errp(errp);
+>=20
+> Reminder:
+>=20
+>      static inline void error_free_errp(Error **errp)
+>      {
+>          assert(errp && *errp);
+>          error_free(*errp);
+>          *errp =3D NULL;
+>      }
+>=20
+> Now let's examine the actual change.
+>=20
+> The assertion's first half trivially holds, ERRP_AUTO_PROPAGATE()
+> ensures it.
+>=20
+> The second half is new.  We now crash when we haven't set an error.  Why
+> is this safe?  Note that error_free(local_err) does nothing when
+> !local_err.
+>=20
+> The zapping of the variable pointing to the Error just freed is
+> unchanged.
+>=20
+>> +|
+>> +-    error_free(local_err);
+>> ++    error_free_errp(errp);
+>=20
+> Here, the zapping is new.  Zapping dangling pointers is obviously safe.
+> Needed, or else the automatic error_propagate() due to
+> ERRP_AUTO_PROPAGATE() would propagate the dangling pointer.
+>=20
+>> +|
+>> +-    error_report_err(local_err);
+>> ++    error_report_errp(errp);
+>=20
+> The only difference to the previous case is that we also report the
+> error.
+>=20
+> The previous case has a buddy that additionally matches *errp =3D NULL.
+> Why not this one?
+>=20
+>> +|
+>> +-    warn_report_err(local_err);
+>> ++    warn_report_errp(errp);
+>=20
+> Likewise.
+>=20
+> What about error_reportf_err(), warn_reportf_err()?
+>=20
+> Up to here, this rule transforms the various forms of error_free().
+> Next: error_propagate().
+>=20
+>> +|
+>> +-    error_propagate_prepend(errp, local_err, args);
+>> ++    error_prepend(errp, args);
+>> +|
+>> +-    error_propagate(errp, local_err);
+>=20
+> rule0's adding of ERRP_AUTO_PROPAGATE() made error_propagate()
+> redundant.
+>=20
+> This is the general case of error_propagate() deletion.
+>=20
+> I'd put the plain error_propagate() first, variations second, like you
+> do with error_free().
+>=20
+> If neither of these two patterns match on a path from
+> ERRP_AUTO_PROPAGATE() to return, we effectively insert error_propagate()
+> where it wasn't before.  Does nothing when the local error is null
+> there.  Bug fix when it isn't: it's at least a memory leak, and quite
+> possibly worse.
+>=20
+> Identifying these bug fixes would be nice, but I don't have practical
+> ideas on how to do that.
+>=20
+> Can we explain this in the commit message?
+>=20
+>> +)
+>> +     ...>
+>> + }
+>> +
+>> +@@
+>> +identifier rule1.fn, rule1.local_err;
+>> +@@
+>> +
+>> + fn(...)
+>> + {
+>> +     <...
+>> +(
+>> +-    &local_err
+>> ++    errp
+>> +|
+>> +-    local_err
+>> ++    *errp
+>> +)
+>> +     ...>
+>> + }
+>=20
+> Also in tandem with rule1, fixes up uses of local_err.  Good.
+>=20
+>> +
+>> +@@
+>> +identifier rule1.fn;
+>> +@@
+>> +
+>> + fn(...)
+>> + {
+>> +     <...
+>> +- *errp !=3D NULL
+>> ++ *errp
+>> +     ...>
+>> + }
+>=20
+> Still in tandem with rule1, normalizes style.  Good.
+>=20
 
-The default compression is ZLIB. Images created with ZLIB compression type
-are backward compatible with older qemu versions.
 
-Adding of the compression type breaks a number of tests because now the
-compression type is reported on image creation and there are some changes
-in the qcow2 header in size and offsets.
-
-The tests are fixed in the following ways:
-    * filter out compression_type for all the tests
-    * fix header size, feature table size and backing file offset
-      affected tests: 031, 036, 061, 080
-      header_size +=8: 1 byte compression type
-                       7 bytes padding
-      feature_table += 48: incompatible feture compression type
-      backing_file_offset += 56 (8 + 48 -> header_change + fature_table_change)
-    * add "compression type" for test output matching when it isn't filtered
-      affected tests: 049, 060, 061, 065, 144, 182, 242, 255
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- qapi/block-core.json             |  22 ++++++-
- block/qcow2.h                    |  18 +++++-
- include/block/block_int.h        |   1 +
- block/qcow2.c                    | 101 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/031.out       |  14 ++---
- tests/qemu-iotests/036.out       |   4 +-
- tests/qemu-iotests/049.out       | 102 +++++++++++++++----------------
- tests/qemu-iotests/060.out       |   1 +
- tests/qemu-iotests/061.out       |  34 ++++++-----
- tests/qemu-iotests/065           |  28 ++++++---
- tests/qemu-iotests/080           |   2 +-
- tests/qemu-iotests/144.out       |   4 +-
- tests/qemu-iotests/182.out       |   2 +-
- tests/qemu-iotests/242.out       |   5 ++
- tests/qemu-iotests/255.out       |   8 +--
- tests/qemu-iotests/common.filter |   3 +-
- 16 files changed, 253 insertions(+), 96 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 85e27bb61f..a67eb8bff4 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -78,6 +78,8 @@
- #
- # @bitmaps: A list of qcow2 bitmap details (since 4.0)
- #
-+# @compression-type: the image cluster compression method (since 5.0)
-+#
- # Since: 1.7
- ##
- { 'struct': 'ImageInfoSpecificQCow2',
-@@ -89,7 +91,8 @@
-       '*corrupt': 'bool',
-       'refcount-bits': 'int',
-       '*encrypt': 'ImageInfoSpecificQCow2Encryption',
--      '*bitmaps': ['Qcow2BitmapInfo']
-+      '*bitmaps': ['Qcow2BitmapInfo'],
-+      'compression-type': 'Qcow2CompressionType'
-   } }
- 
- ##
-@@ -4392,6 +4395,18 @@
-   'data': [ 'v2', 'v3' ] }
- 
- 
-+##
-+# @Qcow2CompressionType:
-+#
-+# Compression type used in qcow2 image file
-+#
-+# @zlib:  zlib compression, see <http://zlib.net/>
-+#
-+# Since: 5.0
-+##
-+{ 'enum': 'Qcow2CompressionType',
-+  'data': [ 'zlib' ] }
-+
- ##
- # @BlockdevCreateOptionsQcow2:
- #
-@@ -4415,6 +4430,8 @@
- #                 allowed values: off, falloc, full, metadata)
- # @lazy-refcounts: True if refcounts may be updated lazily (default: off)
- # @refcount-bits: Width of reference counts in bits (default: 16)
-+# @compression-type: The image cluster compression method
-+#                    (default: zlib, since 5.0)
- #
- # Since: 2.12
- ##
-@@ -4430,7 +4447,8 @@
-             '*cluster-size':    'size',
-             '*preallocation':   'PreallocMode',
-             '*lazy-refcounts':  'bool',
--            '*refcount-bits':   'int' } }
-+            '*refcount-bits':   'int',
-+            '*compression-type':'Qcow2CompressionType' } }
- 
- ##
- # @BlockdevCreateOptionsQed:
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 0942126232..485effcb70 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -146,6 +146,12 @@ typedef struct QCowHeader {
- 
-     uint32_t refcount_order;
-     uint32_t header_length;
-+
-+    /* Additional fields */
-+    uint8_t  compression_type;
-+
-+    /* header must be a multiple of 8 */
-+    uint8_t  padding[7];
- } QEMU_PACKED QCowHeader;
- 
- typedef struct QEMU_PACKED QCowSnapshotHeader {
-@@ -216,13 +222,16 @@ enum {
-     QCOW2_INCOMPAT_DIRTY_BITNR      = 0,
-     QCOW2_INCOMPAT_CORRUPT_BITNR    = 1,
-     QCOW2_INCOMPAT_DATA_FILE_BITNR  = 2,
-+    QCOW2_INCOMPAT_COMPRESSION_BITNR = 3,
-     QCOW2_INCOMPAT_DIRTY            = 1 << QCOW2_INCOMPAT_DIRTY_BITNR,
-     QCOW2_INCOMPAT_CORRUPT          = 1 << QCOW2_INCOMPAT_CORRUPT_BITNR,
-     QCOW2_INCOMPAT_DATA_FILE        = 1 << QCOW2_INCOMPAT_DATA_FILE_BITNR,
-+    QCOW2_INCOMPAT_COMPRESSION      = 1 << QCOW2_INCOMPAT_COMPRESSION_BITNR,
- 
-     QCOW2_INCOMPAT_MASK             = QCOW2_INCOMPAT_DIRTY
-                                     | QCOW2_INCOMPAT_CORRUPT
--                                    | QCOW2_INCOMPAT_DATA_FILE,
-+                                    | QCOW2_INCOMPAT_DATA_FILE
-+                                    | QCOW2_INCOMPAT_COMPRESSION,
- };
- 
- /* Compatible feature bits */
-@@ -369,6 +378,13 @@ typedef struct BDRVQcow2State {
- 
-     bool metadata_preallocation_checked;
-     bool metadata_preallocation;
-+    /*
-+     * Compression type used for the image. Default: 0 - ZLIB
-+     * The image compression type is set on image creation.
-+     * The only way to change the compression type is to convert the image
-+     * with the desired compression type set
-+     */
-+    Qcow2CompressionType compression_type;
- } BDRVQcow2State;
- 
- typedef struct Qcow2COWRegion {
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 6f9fd5e20e..2c6bb9dc99 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -57,6 +57,7 @@
- #define BLOCK_OPT_REFCOUNT_BITS     "refcount_bits"
- #define BLOCK_OPT_DATA_FILE         "data_file"
- #define BLOCK_OPT_DATA_FILE_RAW     "data_file_raw"
-+#define BLOCK_OPT_COMPRESSION_TYPE  "compression_type"
- 
- #define BLOCK_PROBE_BUF_SIZE        512
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 3c754f616b..3576412cdf 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1242,6 +1242,39 @@ static int qcow2_update_options(BlockDriverState *bs, QDict *options,
-     return ret;
- }
- 
-+static int validate_compression_type(BDRVQcow2State *s, Error **errp)
-+{
-+    switch (s->compression_type) {
-+    case QCOW2_COMPRESSION_TYPE_ZLIB:
-+        break;
-+
-+    default:
-+        error_setg(errp, "qcow2: unknown compression type: %u",
-+                   s->compression_type);
-+        return -ENOTSUP;
-+    }
-+
-+    /*
-+     * if the compression type differs from QCOW2_COMPRESSION_TYPE_ZLIB
-+     * the incompatible feature flag must be set
-+     */
-+    if (s->compression_type == QCOW2_COMPRESSION_TYPE_ZLIB) {
-+        if (s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION) {
-+            error_setg(errp, "qcow2: Compression type incompatible feature "
-+                             "bit must not be set");
-+            return -EINVAL;
-+        }
-+    } else {
-+        if (!(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION)) {
-+            error_setg(errp, "qcow2: Compression type incompatible feature "
-+                             "bit must be set");
-+            return -EINVAL;
-+        }
-+    }
-+
-+    return 0;
-+}
-+
- /* Called with s->lock held.  */
- static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-                                       int flags, Error **errp)
-@@ -1357,6 +1390,23 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     s->compatible_features      = header.compatible_features;
-     s->autoclear_features       = header.autoclear_features;
- 
-+    /*
-+     * Handle compression type
-+     * Older qcow2 images don't contain the compression type header.
-+     * Distinguish them by the header length and use
-+     * the only valid (default) compression type in that case
-+     */
-+    if (header.header_length > offsetof(QCowHeader, compression_type)) {
-+        s->compression_type = header.compression_type;
-+    } else {
-+        s->compression_type = QCOW2_COMPRESSION_TYPE_ZLIB;
-+    }
-+
-+    ret = validate_compression_type(s, errp);
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     if (s->incompatible_features & ~QCOW2_INCOMPAT_MASK) {
-         void *feature_table = NULL;
-         qcow2_read_extensions(bs, header.header_length, ext_end,
-@@ -2720,6 +2770,12 @@ int qcow2_update_header(BlockDriverState *bs)
-     total_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-     refcount_table_clusters = s->refcount_table_size >> (s->cluster_bits - 3);
- 
-+    ret = validate_compression_type(s, NULL);
-+
-+    if (ret) {
-+        goto fail;
-+    }
-+
-     *header = (QCowHeader) {
-         /* Version 2 fields */
-         .magic                  = cpu_to_be32(QCOW_MAGIC),
-@@ -2742,6 +2798,7 @@ int qcow2_update_header(BlockDriverState *bs)
-         .autoclear_features     = cpu_to_be64(s->autoclear_features),
-         .refcount_order         = cpu_to_be32(s->refcount_order),
-         .header_length          = cpu_to_be32(header_length),
-+        .compression_type       = s->compression_type,
-     };
- 
-     /* For older versions, write a shorter header */
-@@ -2834,6 +2891,11 @@ int qcow2_update_header(BlockDriverState *bs)
-                 .bit  = QCOW2_INCOMPAT_DATA_FILE_BITNR,
-                 .name = "external data file",
-             },
-+            {
-+                .type = QCOW2_FEAT_TYPE_INCOMPATIBLE,
-+                .bit  = QCOW2_INCOMPAT_COMPRESSION_BITNR,
-+                .name = "compression type",
-+            },
-             {
-                 .type = QCOW2_FEAT_TYPE_COMPATIBLE,
-                 .bit  = QCOW2_COMPAT_LAZY_REFCOUNTS_BITNR,
-@@ -3262,6 +3324,7 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-     uint64_t* refcount_table;
-     Error *local_err = NULL;
-     int ret;
-+    uint8_t compression_type = QCOW2_COMPRESSION_TYPE_ZLIB;
- 
-     assert(create_options->driver == BLOCKDEV_DRIVER_QCOW2);
-     qcow2_opts = &create_options->u.qcow2;
-@@ -3379,6 +3442,27 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         }
-     }
- 
-+    if (qcow2_opts->has_compression_type &&
-+        qcow2_opts->compression_type != QCOW2_COMPRESSION_TYPE_ZLIB) {
-+
-+        ret = -EINVAL;
-+
-+        if (version < 3) {
-+            error_setg(errp, "Non-zlib compression type is only supported with "
-+                       "compatibility level 1.1 and above (use version=v3 or "
-+                       "greater)");
-+            goto out;
-+        }
-+
-+        switch (qcow2_opts->compression_type) {
-+        default:
-+            error_setg(errp, "Unknown compression type");
-+            goto out;
-+        }
-+
-+        compression_type = qcow2_opts->compression_type;
-+    }
-+
-     /* Create BlockBackend to write to the image */
-     blk = blk_new(bdrv_get_aio_context(bs),
-                   BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
-@@ -3401,6 +3485,8 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         .refcount_table_offset      = cpu_to_be64(cluster_size),
-         .refcount_table_clusters    = cpu_to_be32(1),
-         .refcount_order             = cpu_to_be32(refcount_order),
-+        /* don't deal with endians since compression_type is 1 byte long */
-+        .compression_type           = compression_type,
-         .header_length              = cpu_to_be32(sizeof(*header)),
-     };
- 
-@@ -3419,6 +3505,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
-         header->autoclear_features |=
-             cpu_to_be64(QCOW2_AUTOCLEAR_DATA_FILE_RAW);
-     }
-+    if (compression_type != QCOW2_COMPRESSION_TYPE_ZLIB) {
-+        header->incompatible_features |=
-+            cpu_to_be64(QCOW2_INCOMPAT_COMPRESSION);
-+    }
- 
-     ret = blk_pwrite(blk, 0, header, cluster_size, 0);
-     g_free(header);
-@@ -3602,6 +3692,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-         { BLOCK_OPT_ENCRYPT,            BLOCK_OPT_ENCRYPT_FORMAT },
-         { BLOCK_OPT_COMPAT_LEVEL,       "version" },
-         { BLOCK_OPT_DATA_FILE_RAW,      "data-file-raw" },
-+        { BLOCK_OPT_COMPRESSION_TYPE,   "compression-type" },
-         { NULL, NULL },
-     };
- 
-@@ -4859,6 +4950,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
-             .data_file          = g_strdup(s->image_data_file),
-             .has_data_file_raw  = has_data_file(bs),
-             .data_file_raw      = data_file_is_raw(bs),
-+            .compression_type   = s->compression_type,
-         };
-     } else {
-         /* if this assertion fails, this probably means a new version was
-@@ -5248,6 +5340,9 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-                                  "images");
-                 return -EINVAL;
-             }
-+        } else if (!strcmp(desc->name, BLOCK_OPT_COMPRESSION_TYPE)) {
-+            error_setg(errp, "Changing the compression type is not supported");
-+            return -ENOTSUP;
-         } else {
-             /* if this point is reached, this probably means a new option was
-              * added without having it covered here */
-@@ -5516,6 +5611,12 @@ static QemuOptsList qcow2_create_opts = {
-             .help = "Width of a reference count entry in bits",
-             .def_value_str = "16"
-         },
-+        {
-+            .name = BLOCK_OPT_COMPRESSION_TYPE,
-+            .type = QEMU_OPT_STRING,
-+            .help = "Compression method used for image clusters compression",
-+            .def_value_str = "zlib"
-+        },
-         { /* end of list */ }
-     }
- };
-diff --git a/tests/qemu-iotests/031.out b/tests/qemu-iotests/031.out
-index d535e407bc..ed51afe9ce 100644
---- a/tests/qemu-iotests/031.out
-+++ b/tests/qemu-iotests/031.out
-@@ -113,11 +113,11 @@ incompatible_features     []
- compatible_features       []
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- Header extension:
-@@ -146,11 +146,11 @@ incompatible_features     []
- compatible_features       []
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- Header extension:
-@@ -164,7 +164,7 @@ No errors were found on the image.
- 
- magic                     0x514649fb
- version                   3
--backing_file_offset       0x178
-+backing_file_offset       0x1b0
- backing_file_size         0x17
- cluster_bits              16
- size                      67108864
-@@ -179,7 +179,7 @@ incompatible_features     []
- compatible_features       []
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0xe2792aca
-@@ -188,7 +188,7 @@ data                      'host_device'
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- Header extension:
-diff --git a/tests/qemu-iotests/036.out b/tests/qemu-iotests/036.out
-index 0b52b934e1..fb509f6357 100644
---- a/tests/qemu-iotests/036.out
-+++ b/tests/qemu-iotests/036.out
-@@ -26,7 +26,7 @@ compatible_features       []
- autoclear_features        [63]
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- 
-@@ -38,7 +38,7 @@ compatible_features       []
- autoclear_features        []
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- *** done
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index affa55b341..a5cfba1756 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -4,90 +4,90 @@ QA output created by 049
- == 1. Traditional size parameter ==
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024b
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1k
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1K
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1G
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1T
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1024.0b
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5k
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5K
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5G
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 TEST_DIR/t.qcow2 1.5T
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == 2. Specifying size via -o ==
- 
- qemu-img create -f qcow2 -o size=1024 TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1024b TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1k TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1K TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1M TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1048576 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1G TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1073741824 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1T TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1099511627776 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1024.0 TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1024.0b TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1024 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1.5k TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1.5K TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1536 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1.5M TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1572864 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1.5G TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1610612736 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o size=1.5T TEST_DIR/t.qcow2
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=1649267441664 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == 3. Invalid sizes ==
- 
-@@ -129,84 +129,84 @@ qemu-img: TEST_DIR/t.qcow2: The image size must be specified only once
- == Check correct interpretation of suffixes for cluster size ==
- 
- qemu-img create -f qcow2 -o cluster_size=1024 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1024b TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1k TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1K TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1M TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1048576 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1048576 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1024.0 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=1024.0b TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=1024 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=0.5k TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=0.5K TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=512 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o cluster_size=0.5M TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=524288 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=524288 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == Check compat level option ==
- 
- qemu-img create -f qcow2 -o compat=0.10 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=1.1 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=0.42 TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Invalid parameter '0.42'
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.42 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=foobar TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Invalid parameter 'foobar'
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=foobar cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == Check preallocation option ==
- 
- qemu-img create -f qcow2 -o preallocation=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=off lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o preallocation=metadata TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=metadata lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o preallocation=1234 TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Invalid parameter '1234'
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 cluster_size=65536 preallocation=1234 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == Check encryption option ==
- 
- qemu-img create -f qcow2 -o encryption=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 --object secret,id=sec0,data=123456 -o encryption=on,encrypt.key-secret=sec0 TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- == Check lazy_refcounts option (only with v3) ==
- 
- qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=1.1,lazy_refcounts=on TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=1.1 cluster_size=65536 lazy_refcounts=on refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=off TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- qemu-img create -f qcow2 -o compat=0.10,lazy_refcounts=on TEST_DIR/t.qcow2 64M
- qemu-img: TEST_DIR/t.qcow2: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 compat=0.10 cluster_size=65536 lazy_refcounts=on refcount_bits=16 compression_type=zlib
- 
- *** done
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index d27692a33c..3e47f537e8 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -17,6 +17,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     corrupt: true
-diff --git a/tests/qemu-iotests/061.out b/tests/qemu-iotests/061.out
-index 8b3091a412..c913f02ad6 100644
---- a/tests/qemu-iotests/061.out
-+++ b/tests/qemu-iotests/061.out
-@@ -22,11 +22,11 @@ incompatible_features     []
- compatible_features       [0]
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- magic                     0x514649fb
-@@ -80,11 +80,11 @@ incompatible_features     []
- compatible_features       [0]
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- magic                     0x514649fb
-@@ -136,11 +136,11 @@ incompatible_features     [0]
- compatible_features       [0]
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- ERROR cluster 5 refcount=0 reference=1
-@@ -191,11 +191,11 @@ incompatible_features     []
- compatible_features       [42]
- autoclear_features        [42]
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- magic                     0x514649fb
-@@ -260,11 +260,11 @@ incompatible_features     []
- compatible_features       [0]
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- read 65536/65536 bytes at offset 44040192
-@@ -294,11 +294,11 @@ incompatible_features     [0]
- compatible_features       [0]
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- ERROR cluster 5 refcount=0 reference=1
-@@ -323,11 +323,11 @@ incompatible_features     []
- compatible_features       []
- autoclear_features        []
- refcount_order            4
--header_length             104
-+header_length             112
- 
- Header extension:
- magic                     0x6803f857
--length                    192
-+length                    240
- data                      <binary>
- 
- read 131072/131072 bytes at offset 0
-@@ -491,6 +491,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file: TEST_DIR/t.IMGFMT.data
-@@ -511,6 +512,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file: foo
-@@ -524,6 +526,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file raw: false
-@@ -538,6 +541,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file: TEST_DIR/t.IMGFMT.data
-@@ -550,6 +554,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file: TEST_DIR/t.IMGFMT.data
-@@ -563,6 +568,7 @@ virtual size: 64 MiB (67108864 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     data file: TEST_DIR/t.IMGFMT.data
-diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
-index 6426474271..18dc488c7a 100755
---- a/tests/qemu-iotests/065
-+++ b/tests/qemu-iotests/065
-@@ -88,24 +88,30 @@ class TestQMP(TestImageInfoSpecific):
- class TestQCow2(TestQemuImgInfo):
-     '''Testing a qcow2 version 2 image'''
-     img_options = 'compat=0.10'
--    json_compare = { 'compat': '0.10', 'refcount-bits': 16 }
--    human_compare = [ 'compat: 0.10', 'refcount bits: 16' ]
-+    json_compare = { 'compat': '0.10', 'refcount-bits': 16,
-+                     'compression-type': 'zlib' }
-+    human_compare = [ 'compat: 0.10', 'compression type: zlib',
-+                      'refcount bits: 16' ]
- 
- class TestQCow3NotLazy(TestQemuImgInfo):
-     '''Testing a qcow2 version 3 image with lazy refcounts disabled'''
-     img_options = 'compat=1.1,lazy_refcounts=off'
-     json_compare = { 'compat': '1.1', 'lazy-refcounts': False,
--                     'refcount-bits': 16, 'corrupt': False }
--    human_compare = [ 'compat: 1.1', 'lazy refcounts: false',
--                      'refcount bits: 16', 'corrupt: false' ]
-+                     'refcount-bits': 16, 'corrupt': False,
-+                     'compression-type': 'zlib' }
-+    human_compare = [ 'compat: 1.1', 'compression type: zlib',
-+                      'lazy refcounts: false', 'refcount bits: 16',
-+                      'corrupt: false' ]
- 
- class TestQCow3Lazy(TestQemuImgInfo):
-     '''Testing a qcow2 version 3 image with lazy refcounts enabled'''
-     img_options = 'compat=1.1,lazy_refcounts=on'
-     json_compare = { 'compat': '1.1', 'lazy-refcounts': True,
--                     'refcount-bits': 16, 'corrupt': False }
--    human_compare = [ 'compat: 1.1', 'lazy refcounts: true',
--                      'refcount bits: 16', 'corrupt: false' ]
-+                     'refcount-bits': 16, 'corrupt': False,
-+                     'compression-type': 'zlib' }
-+    human_compare = [ 'compat: 1.1', 'compression type: zlib',
-+                      'lazy refcounts: true', 'refcount bits: 16',
-+                      'corrupt: false' ]
- 
- class TestQCow3NotLazyQMP(TestQMP):
-     '''Testing a qcow2 version 3 image with lazy refcounts disabled, opening
-@@ -113,7 +119,8 @@ class TestQCow3NotLazyQMP(TestQMP):
-     img_options = 'compat=1.1,lazy_refcounts=off'
-     qemu_options = 'lazy-refcounts=on'
-     compare = { 'compat': '1.1', 'lazy-refcounts': False,
--                'refcount-bits': 16, 'corrupt': False }
-+                'refcount-bits': 16, 'corrupt': False,
-+                'compression-type': 'zlib' }
- 
- 
- class TestQCow3LazyQMP(TestQMP):
-@@ -122,7 +129,8 @@ class TestQCow3LazyQMP(TestQMP):
-     img_options = 'compat=1.1,lazy_refcounts=on'
-     qemu_options = 'lazy-refcounts=off'
-     compare = { 'compat': '1.1', 'lazy-refcounts': True,
--                'refcount-bits': 16, 'corrupt': False }
-+                'refcount-bits': 16, 'corrupt': False,
-+                'compression-type': 'zlib' }
- 
- TestImageInfoSpecific = None
- TestQemuImgInfo = None
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index a3d13c414e..7588c63b6c 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -45,7 +45,7 @@ _supported_os Linux
- # - This is generally a test for compat=1.1 images
- _unsupported_imgopts 'refcount_bits=1[^0-9]' data_file 'compat=0.10'
- 
--header_size=104
-+header_size=112
- 
- offset_backing_file_offset=8
- offset_backing_file_size=16
-diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
-index c7aa2e4820..885a8874a5 100644
---- a/tests/qemu-iotests/144.out
-+++ b/tests/qemu-iotests/144.out
-@@ -9,7 +9,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=536870912
- { 'execute': 'qmp_capabilities' }
- {"return": {}}
- { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0', 'snapshot-file':'TEST_DIR/tmp.IMGFMT', 'format': 'IMGFMT' } }
--Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- {"return": {}}
- 
- === Performing block-commit on active layer ===
-@@ -31,6 +31,6 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/
- === Performing Live Snapshot 2 ===
- 
- { 'execute': 'blockdev-snapshot-sync', 'arguments': { 'device': 'virtio0', 'snapshot-file':'TEST_DIR/tmp2.IMGFMT', 'format': 'IMGFMT' } }
--Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/tmp2.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/t.qcow2 backing_fmt=qcow2 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- {"return": {}}
- *** done
-diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
-index a8eea166c3..ae43654d32 100644
---- a/tests/qemu-iotests/182.out
-+++ b/tests/qemu-iotests/182.out
-@@ -13,7 +13,7 @@ Is another process using the image [TEST_DIR/t.qcow2]?
- {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node0', 'driver': 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
- {"return": {}}
- {'execute': 'blockdev-snapshot-sync', 'arguments': { 'node-name': 'node0', 'snapshot-file': 'TEST_DIR/t.IMGFMT.overlay', 'snapshot-node-name': 'node1' } }
--Formatting 'TEST_DIR/t.qcow2.overlay', fmt=qcow2 size=197120 backing_file=TEST_DIR/t.qcow2 backing_fmt=file cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/t.qcow2.overlay', fmt=qcow2 size=197120 backing_file=TEST_DIR/t.qcow2 backing_fmt=file cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- {"return": {}}
- {'execute': 'blockdev-add', 'arguments': { 'node-name': 'node1', 'driver': 'file', 'filename': 'TEST_DIR/t.IMGFMT', 'locking': 'on' } }
- {"return": {}}
-diff --git a/tests/qemu-iotests/242.out b/tests/qemu-iotests/242.out
-index 7ac8404d11..091b9126ce 100644
---- a/tests/qemu-iotests/242.out
-+++ b/tests/qemu-iotests/242.out
-@@ -12,6 +12,7 @@ virtual size: 1 MiB (1048576 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     refcount bits: 16
-     corrupt: false
-@@ -32,6 +33,7 @@ virtual size: 1 MiB (1048576 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     bitmaps:
-         [0]:
-@@ -64,6 +66,7 @@ virtual size: 1 MiB (1048576 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     bitmaps:
-         [0]:
-@@ -104,6 +107,7 @@ virtual size: 1 MiB (1048576 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     bitmaps:
-         [0]:
-@@ -153,6 +157,7 @@ virtual size: 1 MiB (1048576 bytes)
- cluster_size: 65536
- Format specific information:
-     compat: 1.1
-+    compression type: zlib
-     lazy refcounts: false
-     bitmaps:
-         [0]:
-diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
-index 348909fdef..a3c99fd62e 100644
---- a/tests/qemu-iotests/255.out
-+++ b/tests/qemu-iotests/255.out
-@@ -3,9 +3,9 @@ Finishing a commit job with background reads
- 
- === Create backing chain and start VM ===
- 
--Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
--Formatting 'TEST_DIR/PID-t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/PID-t.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- === Start background read requests ===
- 
-@@ -23,9 +23,9 @@ Closing the VM while a job is being cancelled
- 
- === Create images and start VM ===
- 
--Formatting 'TEST_DIR/PID-src.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/PID-src.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
--Formatting 'TEST_DIR/PID-dst.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+Formatting 'TEST_DIR/PID-dst.qcow2', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16 compression_type=zlib
- 
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 3f8ee3e5f7..279e0bbb0d 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -152,7 +152,8 @@ _filter_img_create()
-         -e "s# refcount_bits=[0-9]\\+##g" \
-         -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
-         -e "s# iter-time=[0-9]\\+##g" \
--        -e "s# force_size=\\(on\\|off\\)##g"
-+        -e "s# force_size=\\(on\\|off\\)##g" \
-+        -e "s# compression_type=[a-zA-Z0-9]\\+##g"
- }
- 
- _filter_img_info()
--- 
-2.17.0
-
+--=20
+Best regards,
+Vladimir
 
