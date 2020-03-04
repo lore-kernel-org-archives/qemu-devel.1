@@ -2,102 +2,83 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F18C3F2CD
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E89C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 908272073D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:46:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A42AC20838
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:55:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJgFkhGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 908272073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="D3pM2OND"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A42AC20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9ULm-0005tL-Qr
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:46:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46114)
+	id 1j9UV6-0008Sp-P4
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:55:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1j9UKE-0004Bm-CL
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:44:39 -0500
+ (envelope-from <andrew@daynix.com>) id 1j9UUF-0007w7-QD
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1j9UKD-0001yi-EI
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:44:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41720
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1j9UKD-0001xu-BI
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:44:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583329477;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=l1KhDTV6bVBYBYHnWDxWWNOY+j5WAiV2buvrkHO4Q18=;
- b=HJgFkhGIA5UNCzAXOTqieyydn8Fj2xhUSE71aJ7dOmoWE0WXpiuB5QXmMzkybV0IQVcJRA
- +TPYinMOPWsUynWr8QSpE5tUrIBRmTEelybLr9uRBx5cJH6mBCCClkB/Pox93Myhn0aOyY
- RqjEOUuMzfzBdumoNUQelQQ6p+TzDSw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-qfg_jnLvP7Kn4SHXjveR2Q-1; Wed, 04 Mar 2020 08:44:33 -0500
-X-MC-Unique: qfg_jnLvP7Kn4SHXjveR2Q-1
-Received: by mail-wr1-f69.google.com with SMTP id p11so873938wrn.10
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 05:44:33 -0800 (PST)
+ (envelope-from <andrew@daynix.com>) id 1j9UUE-0006AR-OT
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:54:59 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:37523)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <andrew@daynix.com>) id 1j9UUE-00068H-6Z
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:54:58 -0500
+Received: by mail-lj1-x241.google.com with SMTP id q23so2117047ljm.4
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 05:54:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=GMkn4ztugkUGH3KUuIke087dqODGIqhh153qkwjX2vA=;
+ b=D3pM2ONDlrjxgu5NrUaDj+BXP7z37Yie1JKPwuWrQHC25bhLRrPXyDmeqafnS9GxRK
+ O5ynByIBuCNRsoFnzHXGSiBXwsA9/xGTU71etyxy+OB3xynbNEn8xWdRgryMESl6VkmI
+ jsZtSaRFKn8XE+PyjVT9Kg6eNK1MaAv2eS1LW7ud/TRZLtLMhwrTel05gMSiCm4xxP3O
+ 4bgvbFDsUxGfsEUzDMh8WfdoDck7NYmExSmEYPS7Kqi68acaYadjH7VIqe7nth9+B0GS
+ C7F20XbcQ+Znoiy/h+IvfP7FVbb/e+ne7PffQXJM2lKYzyXzQeuA4gol0Y5FvKCsuyDs
+ CNXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=cwtpJISE4+PKDpLucCLSKmtD6ahPfpNV5KVXN5QcR7Q=;
- b=J7Z+N5KEboFFTVUAOoALs+mYzm4oiAKeAyVvPYwq+YG40TGFrfV0PE+eYNMDU4uF9C
- Iqi9QnnsJVJ446u/sGAgU7gXVPA6oaVm7EPBcgV5UuvGlDCzkm3Z5WOqI8g9eXOALPQf
- GLOTuCQeylaUva1oRMqejciLH18t9dz/vTW5/arllpSZ8KJxnQD8YWA1uIMXWfMzGTVt
- giUYr6etbv+/wLK/j/SS2AD9t2ObPbwJDmrEjM2/CGs9IBxABcFQS80ephQLCg5hN0tb
- 50su24A0/2+eYJJvufD5qBZhhy9zf8f6rjfOOFN16JZbkjA9lzwJ2hpkdbZ5PVwqX5IT
- aASA==
-X-Gm-Message-State: ANhLgQ2F+7vt2XFyzwm5tDBFCUPkOnq3AJ3tt2e/N8dZt/ykReN+Ecu8
- VetlG8LS59Bo6K4nyJBnax+zZ/iCJIY3htNtsep0RMm6VM8lAW6+15nd96B5JHj0h7dqnvEvna4
- 57FfHcLQuBV9/H34=
-X-Received: by 2002:a5d:6891:: with SMTP id h17mr4104457wru.259.1583329472410; 
- Wed, 04 Mar 2020 05:44:32 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vt48cc8TTtIxgopyFld/NbXqNf525YLj9hGfthKiXB03jbieosY3tH7tKEB4JJ+vTQjVf6FYA==
-X-Received: by 2002:a5d:6891:: with SMTP id h17mr4104420wru.259.1583329472179; 
- Wed, 04 Mar 2020 05:44:32 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:9def:34a0:b68d:9993?
- ([2001:b07:6468:f312:9def:34a0:b68d:9993])
- by smtp.gmail.com with ESMTPSA id h20sm18051714wrc.47.2020.03.04.05.44.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Mar 2020 05:44:31 -0800 (PST)
-Subject: Re: [PATCH 1/2] misc: Replace zero-length arrays with flexible array
- member (automatic)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200304005105.27454-1-philmd@redhat.com>
- <20200304005105.27454-2-philmd@redhat.com>
- <1e1a1491-15ca-29d4-8bd6-1bf14edb4ad5@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <38b55649-b1cd-8891-5c13-ec4c6ef3ae5e@redhat.com>
-Date: Wed, 4 Mar 2020 14:44:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ bh=GMkn4ztugkUGH3KUuIke087dqODGIqhh153qkwjX2vA=;
+ b=Iu1xfWeabQ17iDFyPMUEOrqqqciItHVXXAA2qVejPoLFwNltpZ2QaA02uk+svZ9DE6
+ A+AI3fPOTcwkvF7561s941J1fiZrqvs5HZUBHStkF53lBg2zb9D2AM9IPL/QC0BuR/UH
+ Az+GbZIaMlMN06ukaudBVUn9KwgKGL4C8rmUBGzAmQxW87SMXe2q21iZsMB4eQxZZzO2
+ EZKM/zGEzy/659eLcWXXNkCuyqrFvVV4wE6M5SzM1iWQZfRiQEV6uXfUw8vcOoNIP19I
+ 2YeEWODwJKAny6m4QWAxa06hYkVc5H0PqyLKpcrAyZpzm4Gwblr5pu3bKvx5yJ48V285
+ gSSA==
+X-Gm-Message-State: ANhLgQ3+1iLd5KDtO7+0mg9jZ0FK+AR7BYsvcEpVAdOHrUIpG9Okwoo8
+ OGV8tZJqo2QWCZZJPaxezhVboQ==
+X-Google-Smtp-Source: ADFU+vsEJkAetSa3p4pZZdKXoDOCwfdbZTRywdtwAv5S9ItedpRKMz49FT+lDaZfWxu9ZDesJQXuLQ==
+X-Received: by 2002:a2e:88c5:: with SMTP id a5mr2130673ljk.201.1583330096318; 
+ Wed, 04 Mar 2020 05:54:56 -0800 (PST)
+Received: from navi.cosmonova.net.ua ([95.67.24.131])
+ by smtp.gmail.com with ESMTPSA id k11sm2697556lfd.17.2020.03.04.05.54.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Mar 2020 05:54:55 -0800 (PST)
+From: andrew@daynix.com
+To: dmitry.fleytman@gmail.com
+Subject: [PATCH v2] Fixed integer overflow in e1000e
+Date: Wed,  4 Mar 2020 16:20:58 +0200
+Message-Id: <20200304142058.52458-1-andrew@daynix.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-In-Reply-To: <1e1a1491-15ca-29d4-8bd6-1bf14edb4ad5@redhat.com>
-Content-Language: en-US
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,59 +90,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
- David Hildenbrand <david@redhat.com>,
- "Gustavo A . R . Silva" <gustavo@embeddedor.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Anthony Perard <anthony.perard@citrix.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
- Eric Auger <eric.auger@redhat.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- xen-devel@lists.xenproject.org, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: jasowang@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/03/20 14:12, Philippe Mathieu-Daud=C3=A9 wrote:
->=20
-> hw/scsi/spapr_vscsi.c:69:29: error: field 'iu' with variable sized type
-> 'union viosrp_iu' not at the end of a struct or class is a GNU extension
-> [-Werror,-Wgnu-variable-sized-type-not-at-end]
-> =C2=A0=C2=A0=C2=A0 union viosrp_iu=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 iu;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 ^
->=20
-> Yay we found a bug! Thanks Gustavo :)
->=20
-> union srp_iu {
-> =C2=A0=C2=A0=C2=A0 struct srp_login_req login_req;
-> =C2=A0=C2=A0=C2=A0 struct srp_login_rsp login_rsp;
-> =C2=A0=C2=A0=C2=A0 struct srp_login_rej login_rej;
-> =C2=A0=C2=A0=C2=A0 struct srp_i_logout i_logout;
-> =C2=A0=C2=A0=C2=A0 struct srp_t_logout t_logout;
-> =C2=A0=C2=A0=C2=A0 struct srp_tsk_mgmt tsk_mgmt;
-> =C2=A0=C2=A0=C2=A0 struct srp_cmd cmd;
-> =C2=A0=C2=A0=C2=A0 struct srp_rsp rsp;
-> =C2=A0=C2=A0=C2=A0 uint8_t reserved[SRP_MAX_IU_LEN];
-> };
+From: Andrew Melnychenko <andrew@daynix.com>
 
-It's variable-sized but it's okay as long as the total size doesn't
-exceed SRP_MAX_IU_LEN.  So it's not a bug, but I agree it's a time bomb.
- Moving the field last should work, but it would still be quite
-dangerous code.
+Fixes: 6f3fbe4ed06
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1737400
+Fixed setting max_queue_num if there are no peers in NICConf. qemu_new_nic() creates NICState with 1 NetClientState(index 0) without peers, set max_queue_num to 0 - It prevents undefined behavior and possible crashes, especially during pcie hotplug.
 
-Paolo
+Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+---
+ hw/net/e1000e.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index a91dbdca3c..f2cc1552c5 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -328,7 +328,7 @@ e1000e_init_net_peer(E1000EState *s, PCIDevice *pci_dev, uint8_t *macaddr)
+     s->nic = qemu_new_nic(&net_e1000e_info, &s->conf,
+         object_get_typename(OBJECT(s)), dev->id, s);
+ 
+-    s->core.max_queue_num = s->conf.peers.queues - 1;
++    s->core.max_queue_num = s->conf.peers.queues ? s->conf.peers.queues - 1 : 0;
+ 
+     trace_e1000e_mac_set_permanent(MAC_ARG(macaddr));
+     memcpy(s->core.permanent_mac, macaddr, sizeof(s->core.permanent_mac));
+-- 
+2.24.1
 
 
