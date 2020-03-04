@@ -1,127 +1,101 @@
 Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA70C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA34C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:45:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56EBD20870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B63D24679
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 18:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MzZFPT/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56EBD20870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c5DufMVU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B63D24679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Z0S-00060l-IA
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 13:44:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33569)
+	id 1j9Z0y-0006qI-E4
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 13:45:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9YyY-0003XO-0F
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:42:35 -0500
+ (envelope-from <programmingkidx@gmail.com>) id 1j9Yzu-0005U1-Cl
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:43:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9YyW-0005KQ-Uj
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:42:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60262
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9YyW-0005Jg-QQ
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:42:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583347352;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=A6QcKMgHeHLlZ3zS2vzQj00WpHEYb/w5C6X+07E68+c=;
- b=MzZFPT/d1Wa3P8/qgbJaSfzWERPaFdJJJVYAM1ELdQ/A6unnH/k2gn0kOsmei2GJ8BhW3s
- KS5PzOD3sRWuZfR5f171RQULU4/8MhAN6o2SWw/8xeMaG2pIaS5uozl5l0GkYN0EvA5LU7
- HsqLz+psALhp/NDj8k074OoiUAqUTYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-_-m7azKKMTqWlQhR1-NguA-1; Wed, 04 Mar 2020 13:42:29 -0500
-X-MC-Unique: _-m7azKKMTqWlQhR1-NguA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4C2A1005512;
- Wed,  4 Mar 2020 18:42:28 +0000 (UTC)
-Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7A8389078E;
- Wed,  4 Mar 2020 18:42:27 +0000 (UTC)
-Subject: Re: [PATCH v6 16/18] s390x: Add unpack facility feature to GA1
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-17-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <80b5bb5b-aa06-6a0f-9ecb-3dc0fdf9bf14@redhat.com>
-Date: Wed, 4 Mar 2020 19:42:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (envelope-from <programmingkidx@gmail.com>) id 1j9Yzs-0006c8-Vc
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 13:43:58 -0500
+Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:42109)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+ id 1j9Yzs-0006Xg-Kl; Wed, 04 Mar 2020 13:43:56 -0500
+Received: by mail-lf1-x133.google.com with SMTP id t21so2366462lfe.9;
+ Wed, 04 Mar 2020 10:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=DYiu37dwsk21hL7lcAPw7i5jgwAjbcKdoNnsujluBro=;
+ b=c5DufMVUbtzoM2CNM0S1Xuae+k/CZhUGvfezPeEz0zzoFni3dIunngqvrZ0coEMlDa
+ L5FLjA2ZiMr6KFRukmqkDePMZJatOloGZYhcqWg+PI9V42kOQiDuBMyG47wk2jRfCYwg
+ 97DL/0FCRtOvxzVqqH2WMQsPNK60m+CHZprlfG1/yCg8lXjJPdPEXp4Ri13o/yIatwgP
+ XQqh7tGp7wnDSnx+ZSwkzySuk/tPYdthf/9CX5Gl3jqLtM6CQfNUt0j2r+2E2b++HK2h
+ hFQECW8P9ZFWYegEiDmzUUP5WL74QdXBGrfIFKpwhpt9snm0+nAEGm9fqNfY10Q6qo7b
+ BSuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=DYiu37dwsk21hL7lcAPw7i5jgwAjbcKdoNnsujluBro=;
+ b=OODFgdcCun5eM8DNDMzPwNSQnG9zZOM8g6TIKGGi1YQ7Xph0jYMtR2aNUY6TkSgqkF
+ KPZTpQab+V8XHgUpEKDG92rBSX85imst7ca75R1r6WOXUh9JA5TvsyILJZF/siUdtpNb
+ 4j7WyiFDgTBZHP9/R9bMS18egaxCzIE+f9qevO4sCx+tIU8HYESmmuFNZpN49tR/QuY8
+ yIVX8xOP1Fcv8I+hnjDUyvU/xDKpxp9fINbihRYN0IbXwG7WCMjohifELPlHonBZDzOt
+ q3okTKCk6ka6eXeZ0m3t2LYMGu4/jjm/lDagrnrTe+ueh95Tk3bBwyI3SRyoVghaDf4I
+ dXqg==
+X-Gm-Message-State: ANhLgQ1OilBiIOOBpa7kzf1DR80Xwf3hFshNvqdx/XOl5DTMRIy8i+wd
+ 7dXQNgDJSRAj7Yk9NsEZSh2eoBRE205BxJEYxaA=
+X-Google-Smtp-Source: ADFU+vtmY0vSOUPfMefj9S93lzD9Ln5TIkBjUEfJWGG7pAqabkb4psq+D8D2WWrWtBlZrtfDmXjvAwJgkfMG0JRbm00=
+X-Received: by 2002:ac2:532f:: with SMTP id f15mr2769085lfh.3.1583347434048;
+ Wed, 04 Mar 2020 10:43:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200304114231.23493-17-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.61
+References: <20200218171702.979F074637D@zero.eik.bme.hu>
+ <CD566CEF-6844-455C-B9C7-E5DFDE50E770@gmail.com>
+ <alpine.BSF.2.22.395.2002191538190.33319@zero.eik.bme.hu>
+ <1BC2E9E9-A694-4ED3-BD3D-D731F23B7245@gmail.com>
+ <alpine.BSF.2.22.395.2002251241080.22173@zero.eik.bme.hu>
+ <3539F747-145F-49CC-B494-C9794A8ABABA@gmail.com>
+ <AM6PR03MB5525DE221E3E7E595893DF4DC8EA0@AM6PR03MB5525.eurprd03.prod.outlook.com>
+ <AM4PR07MB350651FBB263FEEDB857CBFFCAEA0@AM4PR07MB3506.eurprd07.prod.outlook.com>
+ <87eeuhxw0y.fsf@linaro.org>
+ <CAL1e-=gGsEV4_a4gJr2x0L3r_UK7isnpjOWoJRCDhqpG_XT3Ww@mail.gmail.com>
+ <CAKyx-3MCENJREWm0BxO3ES9sDB04KV3FzYoVFKK20Fh_iwh7wg@mail.gmail.com>
+ <878skpxltm.fsf@linaro.org> <FE03C155-E46D-4925-BA2B-FABBE2518C8C@gmail.com>
+ <2576fd41-8b01-91a0-ca56-792ce65b5092@linaro.org>
+ <alpine.BSF.2.22.395.2003021218180.72848@zero.eik.bme.hu>
+ <d136165f-46c7-8983-9725-2b224742deef@linaro.org>
+ <alpine.BSF.2.22.395.2003030002340.47473@zero.eik.bme.hu>
+ <CAKyx-3Pt2qLPXWQjBwrHn-nxR-9e++TioGp4cKFC3adMN3rtiw@mail.gmail.com>
+In-Reply-To: <CAKyx-3Pt2qLPXWQjBwrHn-nxR-9e++TioGp4cKFC3adMN3rtiw@mail.gmail.com>
+From: G 3 <programmingkidx@gmail.com>
+Date: Wed, 4 Mar 2020 13:43:41 -0500
+Message-ID: <CAKyx-3OAVOvOiaWqUbVa4P35RtFS6bN0wbPuWa=6SFcB2zhL3Q@mail.gmail.com>
+Subject: Fwd: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+ Dino Papararo <skizzato73@msn.com>, QEMU Developers <qemu-devel@nongnu.org>, 
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>, 
+ luigi burdo <intermediadc@hotmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>, 
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000005ccfe105a00bcdd7"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,67 +107,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.03.20 12:42, Janosch Frank wrote:
-> From: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> The unpack facility is an indication that diagnose 308 subcodes 8-10
-> are available to the guest. That means, that the guest can put itself
-> into protected mode.
-> 
-> Once it is in protected mode, the hardware stops any attempt of VM
-> introspection by the hypervisor.
-> 
-> Some features are currently not supported in protected mode:
->      * Passthrough devices
->      * Migration
->      * Huge page backings
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  target/s390x/gen-features.c | 1 +
->  target/s390x/kvm.c          | 5 +++++
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
-> index 6278845b12..8ddeebc544 100644
-> --- a/target/s390x/gen-features.c
-> +++ b/target/s390x/gen-features.c
-> @@ -562,6 +562,7 @@ static uint16_t full_GEN15_GA1[] = {
->      S390_FEAT_GROUP_MSA_EXT_9,
->      S390_FEAT_GROUP_MSA_EXT_9_PCKMO,
->      S390_FEAT_ETOKEN,
-> +    S390_FEAT_UNPACK,
->  };
->  
->  /* Default features (in order of release)
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index a4cbdc5fc6..bf807793bc 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -2396,6 +2396,11 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->          clear_bit(S390_FEAT_BPB, model->features);
->      }
->  
-> +    /* we do have the IPL enhancements */
-> +    if (cap_protected) {
-> +        set_bit(S390_FEAT_UNPACK, model->features);
-> +    }
-> +
->      /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
->      set_bit(S390_FEAT_ZPCI, model->features);
->      set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
-> 
+--0000000000005ccfe105a00bcdd7
+Content-Type: text/plain; charset="UTF-8"
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+---------- Forwarded message ---------
+From: G 3 <programmingkidx@gmail.com>
+Date: Wed, Mar 4, 2020 at 1:35 PM
+Subject: Re: [RFC PATCH v2] target/ppc: Enable hardfloat for PPC
+To: BALATON Zoltan <balaton@eik.bme.hu>
 
--- 
-Thanks,
 
-David / dhildenb
 
+
+On Mon, Mar 2, 2020 at 6:16 PM BALATON Zoltan <balaton@eik.bme.hu> wrote:
+
+> On Mon, 2 Mar 2020, Richard Henderson wrote:
+> > On 3/2/20 3:42 AM, BALATON Zoltan wrote:
+> >>> The "hardfloat" option works (with other targets) only with ieee745
+> >>> accumulative exceptions, when the most common of those exceptions,
+> inexact, has
+> >>> already been raised.  And thus need not be raised a second time.
+> >>
+> >> Why exactly it's done that way? What are the differences between IEEE FP
+> >> implementations that prevents using hardfloat most of the time instead
+> of only
+> >> using it in some (although supposedly common) special cases?
+> >
+> > While it is possible to read the host's ieee exception word after the
+> hardfloat
+> > operation, there are two reasons that is undesirable:
+> >
+> > (1) It is *slow*.  So slow that it's faster to run the softfloat code
+> instead.
+> > I thought it would be easier to find the benchmark numbers that Emilio
+> > generated when this was tested, but I can't find it.
+>
+> I remember those benchmarks too and this is also what the paper Alex
+> referred to also confirmed. Also I've found that enabling hardfloat for
+> PPC without doing anything else is slightly slower (on a recent CPU, on
+> older CPUs could be even slower). Interetingly however it does give a
+> speedup for vector instructions (maybe because they don't clear flags
+> between each sub operation). Does that mean these vector instruction
+> helpers are also buggy regarding exceptions?
+>
+
+I am all intrigued by these vector instructions. Apple was really big on
+using them back in the day so programs like Quicktime and iTunes definitely
+use them. I'm not sure if the PowerPC's altivec vector instructions map to
+host vector instructions already, but if they don't, mapping them would
+give us a huge speedup in certain places. Would anyone know if this was
+already done in QEMU?
+
+--0000000000005ccfe105a00bcdd7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">---------- Forwarded message ---------<br>From: <b class=3D=
+"gmail_sendername" dir=3D"auto">G 3</b> <span dir=3D"auto">&lt;<a href=3D"m=
+ailto:programmingkidx@gmail.com">programmingkidx@gmail.com</a>&gt;</span><b=
+r>Date: Wed, Mar 4, 2020 at 1:35 PM<br>Subject: Re: [RFC PATCH v2] target/p=
+pc: Enable hardfloat for PPC<br>To: BALATON Zoltan &lt;<a href=3D"mailto:ba=
+laton@eik.bme.hu">balaton@eik.bme.hu</a>&gt;<br></div><br><br><div dir=3D"l=
+tr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote"><div dir=3D"l=
+tr" class=3D"gmail_attr">On Mon, Mar 2, 2020 at 6:16 PM BALATON Zoltan &lt;=
+<a href=3D"mailto:balaton@eik.bme.hu" target=3D"_blank">balaton@eik.bme.hu<=
+/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
+n Mon, 2 Mar 2020, Richard Henderson wrote:<br>
+&gt; On 3/2/20 3:42 AM, BALATON Zoltan wrote:<br>
+&gt;&gt;&gt; The &quot;hardfloat&quot; option works (with other targets) on=
+ly with ieee745<br>
+&gt;&gt;&gt; accumulative exceptions, when the most common of those excepti=
+ons, inexact, has<br>
+&gt;&gt;&gt; already been raised.=C2=A0 And thus need not be raised a secon=
+d time.<br>
+&gt;&gt;<br>
+&gt;&gt; Why exactly it&#39;s done that way? What are the differences betwe=
+en IEEE FP<br>
+&gt;&gt; implementations that prevents using hardfloat most of the time ins=
+tead of only<br>
+&gt;&gt; using it in some (although supposedly common) special cases?<br>
+&gt;<br>
+&gt; While it is possible to read the host&#39;s ieee exception word after =
+the hardfloat<br>
+&gt; operation, there are two reasons that is undesirable:<br>
+&gt;<br>
+&gt; (1) It is *slow*.=C2=A0 So slow that it&#39;s faster to run the softfl=
+oat code instead.<br>
+&gt; I thought it would be easier to find the benchmark numbers that Emilio=
+<br>
+&gt; generated when this was tested, but I can&#39;t find it.<br>
+<br>
+I remember those benchmarks too and this is also what the paper Alex <br>
+referred to also confirmed. Also I&#39;ve found that enabling hardfloat for=
+ <br>
+PPC without doing anything else is slightly slower (on a recent CPU, on <br=
+>
+older CPUs could be even slower). Interetingly however it does give a <br>
+speedup for vector instructions (maybe because they don&#39;t clear flags <=
+br>
+between each sub operation). Does that mean these vector instruction <br>
+helpers are also buggy regarding exceptions?<br></blockquote><div><br></div=
+><div>I am all intrigued by these vector instructions. Apple was really big=
+ on using them back in the day so programs like Quicktime and iTunes defini=
+tely use them. I&#39;m not sure if the PowerPC&#39;s altivec vector instruc=
+tions map to host vector instructions already, but if they don&#39;t, mappi=
+ng them would give us a huge speedup in certain places. Would anyone know i=
+f this was already done in QEMU?<br></div></div></div>
+</div></div>
+
+--0000000000005ccfe105a00bcdd7--
 
