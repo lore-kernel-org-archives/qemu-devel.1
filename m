@@ -2,129 +2,51 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3868C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753FBC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90AC320870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:39:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PH5G5EX/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90AC320870
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A62320870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 13:39:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A62320870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9UEn-0006yC-NW
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:39:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44695)
+	id 1j9UEv-0007Cd-66
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 08:39:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44297)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9UDR-0004dT-JJ
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:37:38 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j9UBt-0002I9-JO
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:36:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9UDQ-0005eG-Ll
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:37:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29003
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1j9UBr-0002XG-Oh
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:36:01 -0500
+Received: from relay.sw.ru ([185.231.240.75]:44142)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9UDQ-0005a1-Gz
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 08:37:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583329053;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=CskZHhshp9k0zrzCbM2C8Ug8ITcPRlKA0+5lglpAQ+g=;
- b=PH5G5EX/Bzg69XdzHJyGNL1pkr7ZYsfuAssbLkjqGpOa23b1RNRxE0kvfKlpyXZzqniY4P
- ZZHBD5IA3wK3dVKxtOpxY32ZrMamCsTFI2tqDgBsSebWBBuqGaovfRchajRSwagGUlknXk
- 0g1wGA6gBPcMADNOZewV8CUtjXH9PeQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-OvOpIZoxPaCtqGi1MG9wKQ-1; Wed, 04 Mar 2020 08:37:30 -0500
-X-MC-Unique: OvOpIZoxPaCtqGi1MG9wKQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F101BDBAD;
- Wed,  4 Mar 2020 13:37:28 +0000 (UTC)
-Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 698F78CCE2;
- Wed,  4 Mar 2020 13:37:27 +0000 (UTC)
-Subject: Re: [PATCH v6 18/18] pc-bios: s390x: Save iplb location in lowcore
-To: Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200304114231.23493-1-frankja@linux.ibm.com>
- <20200304114231.23493-19-frankja@linux.ibm.com>
- <23191e82-1f87-f132-c3aa-cb52d495bad6@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <9b356bf9-6f6b-b113-4147-ae8ed70c4cf3@redhat.com>
-Date: Wed, 4 Mar 2020 14:37:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <23191e82-1f87-f132-c3aa-cb52d495bad6@de.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j9UBr-0002Qd-Fm; Wed, 04 Mar 2020 08:35:59 -0500
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1j9UBg-00070I-8o; Wed, 04 Mar 2020 16:35:48 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 4/5] qcow2: add zstd cluster compression
+Date: Wed,  4 Mar 2020 16:35:37 +0300
+Message-Id: <20200304133538.9159-5-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+In-Reply-To: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
+References: <20200304133538.9159-1-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,39 +58,311 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, cohuck@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ qemu-block@nongnu.org, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.03.20 14:25, Christian Borntraeger wrote:
-> On 04.03.20 12:42, Janosch Frank wrote:
->> The POP states that for a list directed IPL the IPLB is stored into
->> memory by the machine loader and its address is stored at offset 0x14
->> of the lowcore.
->>
->> ZIPL currently uses the address in offset 0x14 to access the IPLB and
->> acquire flags about secure boot. If the IPLB address points into
->> memory which has an unsupported mix of flags set, ZIPL will panic
->> instead of booting the OS.
->>
->> As the lowcore can have quite a high entropy for a guest that did drop
->> out of protected mode (i.e. rebooted) we encountered the ZIPL panic
->> quite often.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Tested-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> 
-> I think this makes sense even without protected virtualization, no?
-> Unless somebody complains, I think I will pick this up while Conny is
-> on vacation.
+zstd significantly reduces cluster compression time.
+It provides better compression performance maintaining
+the same level of the compression ratio in comparison with
+zlib, which, at the moment, is the only compression
+method available.
 
-Yes, makes sense!
+The performance test results:
+Test compresses and decompresses qemu qcow2 image with just
+installed rhel-7.6 guest.
+Image cluster size: 64K. Image on disk size: 2.2G
 
+The test was conducted with brd disk to reduce the influence
+of disk subsystem to the test results.
+The results is given in seconds.
 
+compress cmd:
+  time ./qemu-img convert -O qcow2 -c -o compression_type=[zlib|zstd]
+                  src.img [zlib|zstd]_compressed.img
+decompress cmd
+  time ./qemu-img convert -O qcow2
+                  [zlib|zstd]_compressed.img uncompressed.img
+
+           compression               decompression
+         zlib       zstd           zlib         zstd
+------------------------------------------------------------
+real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
+user     65.0       15.8            5.3          2.5
+sys       3.3        0.2            2.0          2.0
+
+Both ZLIB and ZSTD gave the same compression ratio: 1.57
+compressed image size in both cases: 1.4G
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+QAPI part:
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ docs/interop/qcow2.txt |  20 +++++++
+ configure              |   2 +-
+ qapi/block-core.json   |   3 +-
+ block/qcow2-threads.c  | 123 +++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c          |   7 +++
+ 5 files changed, 153 insertions(+), 2 deletions(-)
+
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 5597e24474..9048114445 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -208,6 +208,7 @@ version 2.
+ 
+                     Available compression type values:
+                         0: zlib <https://www.zlib.net/>
++                        1: zstd <http://github.com/facebook/zstd>
+ 
+ 
+ === Header padding ===
+@@ -575,11 +576,30 @@ Compressed Clusters Descriptor (x = 62 - (cluster_bits - 8)):
+                     Another compressed cluster may map to the tail of the final
+                     sector used by this compressed cluster.
+ 
++                    The layout of the compressed data depends on the compression
++                    type used for the image (see compressed cluster layout).
++
+ If a cluster is unallocated, read requests shall read the data from the backing
+ file (except if bit 0 in the Standard Cluster Descriptor is set). If there is
+ no backing file or the backing file is smaller than the image, they shall read
+ zeros for all parts that are not covered by the backing file.
+ 
++=== Compressed Cluster Layout ===
++
++The compressed cluster data has a layout depending on the compression
++type used for the image, as follows:
++
++Compressed data layout for the available compression types:
++data_space_lenght - data chunk length available to store a compressed cluster.
++(for more details see "Compressed Clusters Descriptor")
++x = data_space_length - 1
++
++    0:  (default)  zlib <http://zlib.net/>:
++            Byte  0 -  x:     the compressed data content
++                              all the space provided used for compressed data
++    1:  zstd <http://github.com/facebook/zstd>:
++            Byte  0 -  3:     the length of compressed data in bytes
++                  4 -  x:     the compressed data content
+ 
+ == Snapshots ==
+ 
+diff --git a/configure b/configure
+index caa65f5883..b2a0aa241a 100755
+--- a/configure
++++ b/configure
+@@ -1835,7 +1835,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   lzfse           support of lzfse compression library
+                   (for reading lzfse-compressed dmg images)
+   zstd            support for zstd compression library
+-                  (for migration compression)
++                  (for migration compression and qcow2 cluster compression)
+   seccomp         seccomp support
+   coroutine-pool  coroutine freelist (better performance)
+   glusterfs       GlusterFS backend
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index a67eb8bff4..84889fb741 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4401,11 +4401,12 @@
+ # Compression type used in qcow2 image file
+ #
+ # @zlib:  zlib compression, see <http://zlib.net/>
++# @zstd:  zstd compression, see <http://github.com/facebook/zstd>
+ #
+ # Since: 5.0
+ ##
+ { 'enum': 'Qcow2CompressionType',
+-  'data': [ 'zlib' ] }
++  'data': [ 'zlib', { 'name': 'zstd', 'if': 'defined(CONFIG_ZSTD)' } ] }
+ 
+ ##
+ # @BlockdevCreateOptionsQcow2:
+diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
+index 7dbaf53489..eeae68e88e 100644
+--- a/block/qcow2-threads.c
++++ b/block/qcow2-threads.c
+@@ -28,6 +28,11 @@
+ #define ZLIB_CONST
+ #include <zlib.h>
+ 
++#ifdef CONFIG_ZSTD
++#include <zstd.h>
++#include <zstd_errors.h>
++#endif
++
+ #include "qcow2.h"
+ #include "block/thread-pool.h"
+ #include "crypto.h"
+@@ -166,6 +171,114 @@ static ssize_t qcow2_zlib_decompress(void *dest, size_t dest_size,
+     return ret;
+ }
+ 
++#ifdef CONFIG_ZSTD
++
++#define ZSTD_LEN_BUF 4
++
++/*
++ * qcow2_zstd_compress()
++ *
++ * Compress @src_size bytes of data using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: compressed size on success
++ *          -ENOMEM destination buffer is not enough to store compressed data
++ *          -EIO    on any other error
++ */
++static ssize_t qcow2_zstd_compress(void *dest, size_t dest_size,
++                                   const void *src, size_t src_size)
++{
++    size_t ret;
++
++    /*
++     * steal ZSTD_LEN_BUF bytes in the very beginning of the buffer
++     * to store compressed chunk size
++     */
++    char *d_buf = ((char *) dest) + ZSTD_LEN_BUF;
++
++    /*
++     * sanity check that we can store the compressed data length,
++     * and there is some space left for the compressor buffer
++     */
++    if (dest_size <= ZSTD_LEN_BUF) {
++        return -ENOMEM;
++    }
++
++    dest_size -= ZSTD_LEN_BUF;
++
++    ret = ZSTD_compress(d_buf, dest_size, src, src_size, 5);
++
++    if (ZSTD_isError(ret)) {
++        if (ZSTD_getErrorCode(ret) == ZSTD_error_dstSize_tooSmall) {
++            return -ENOMEM;
++        } else {
++            return -EIO;
++        }
++    }
++
++    /*
++     * paranoid sanity check that we can store
++     * the compressed size in the first 4 bytes
++     */
++    if (ret > UINT32_MAX) {
++        return -ENOMEM;
++    }
++
++    /* store the compressed chunk size in the very beginning of the buffer */
++    stl_be_p(dest, ret);
++
++    return ret + ZSTD_LEN_BUF;
++}
++
++/*
++ * qcow2_zstd_decompress()
++ *
++ * Decompress some data (not more than @src_size bytes) to produce exactly
++ * @dest_size bytes using zstd compression method
++ *
++ * @dest - destination buffer, @dest_size bytes
++ * @src - source buffer, @src_size bytes
++ *
++ * Returns: 0 on success
++ *          -EIO on any error
++ */
++static ssize_t qcow2_zstd_decompress(void *dest, size_t dest_size,
++                                     const void *src, size_t src_size)
++{
++    /*
++     * zstd decompress wants to know the exact length of the data.
++     * For that purpose, on compression, the length is stored in
++     * the very beginning of the compressed buffer
++     */
++    size_t s_size;
++    const char *s_buf = ((const char *) src) + ZSTD_LEN_BUF;
++
++    /*
++     * sanity check that we can read 4 byte the content length and
++     * and there is some content to decompress
++     */
++    if (src_size <= ZSTD_LEN_BUF) {
++        return -EIO;
++    }
++
++    s_size = ldl_be_p(src);
++
++    /* sanity check that the buffer is big enough to read the content from */
++    if (src_size - ZSTD_LEN_BUF < s_size) {
++        return -EIO;
++    }
++
++    if (ZSTD_isError(
++            ZSTD_decompress(dest, dest_size, s_buf, s_size))) {
++        return -EIO;
++    }
++
++    return 0;
++}
++#endif
++
+ static int qcow2_compress_pool_func(void *opaque)
+ {
+     Qcow2CompressData *data = opaque;
+@@ -217,6 +330,11 @@ qcow2_co_compress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_compress;
+         break;
+ 
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_compress;
++        break;
++#endif
+     default:
+         abort();
+     }
+@@ -249,6 +367,11 @@ qcow2_co_decompress(BlockDriverState *bs, void *dest, size_t dest_size,
+         fn = qcow2_zlib_decompress;
+         break;
+ 
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++        fn = qcow2_zstd_decompress;
++        break;
++#endif
+     default:
+         abort();
+     }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 3576412cdf..0848015ecb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1246,6 +1246,9 @@ static int validate_compression_type(BDRVQcow2State *s, Error **errp)
+ {
+     switch (s->compression_type) {
+     case QCOW2_COMPRESSION_TYPE_ZLIB:
++#ifdef CONFIG_ZSTD
++    case QCOW2_COMPRESSION_TYPE_ZSTD:
++#endif
+         break;
+ 
+     default:
+@@ -3455,6 +3458,10 @@ qcow2_co_create(BlockdevCreateOptions *create_options, Error **errp)
+         }
+ 
+         switch (qcow2_opts->compression_type) {
++#ifdef CONFIG_ZSTD
++        case QCOW2_COMPRESSION_TYPE_ZSTD:
++            break;
++#endif
+         default:
+             error_setg(errp, "Unknown compression type");
+             goto out;
 -- 
-Thanks,
-
-David / dhildenb
+2.17.0
 
 
