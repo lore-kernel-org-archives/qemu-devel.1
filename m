@@ -2,128 +2,87 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E3DC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0317FC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:42:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7DFC20732
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C38FE20870
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 08:42:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk79OTIi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7DFC20732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EB4GC11E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C38FE20870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9PQu-0002g4-NG
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 03:31:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37103)
+	id 1j9Pc8-0006Bl-0S
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 03:42:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1j9PQ5-0002Ag-UP
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:30:22 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1j9PbU-0005eh-7V
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:42:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1j9PQ4-0003S3-FB
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:30:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54709
+ (envelope-from <eric.auger@redhat.com>) id 1j9PbS-00082J-Ak
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:42:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31035
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1j9PQ4-0003OX-7z
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:30:20 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1j9PbS-0007zn-4X
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 03:42:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583310619;
+ s=mimecast20190719; t=1583311324;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=dL3etGfqSL6g4H721Ch9sZf6giGlyjuCTYsYsPbwPGg=;
- b=Pk79OTIisHBeNR+1eyjO5rIZDp8NIZ774h/9h5nlw/H++oQoHDB1IrsYxteVA58wRuMPck
- xEpzzrGPD7SjInp9zPCWr2jTo6EuCK0pN5/Vn6ilau6n+ODuKPyizWtDYBWeEiugnZ575G
- 0qQWY1l53SLEQKQ2PHjiM5cOF/fZ9So=
+ in-reply-to:in-reply-to:references:references;
+ bh=OgNwV5USrQJeZxZK5OBrqBjk/XsntILUUNhBku8etPs=;
+ b=EB4GC11EpKLU8TAcNkrUY1r3S3E1nMxVz5X66Jncmqx8j4navaZEuFF9ucOeGAPnQ4NYvN
+ laG1oZY/TOliNMp7I8aRkE0FH4w/XxJGYGWoaFkWjAostMnlabemyCyH1PrkLXOC7Cz1qP
+ MxagplBQMHMGT6eSdZQoo5HYOhcZETg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-wb0o3gtlP7CG6Oty1czI4Q-1; Wed, 04 Mar 2020 03:30:15 -0500
-X-MC-Unique: wb0o3gtlP7CG6Oty1czI4Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-91-FIMHvM-5M3-CkriYpLjw-A-1; Wed, 04 Mar 2020 03:42:00 -0500
+X-MC-Unique: FIMHvM-5M3-CkriYpLjw-A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 813D0107B7DB;
- Wed,  4 Mar 2020 08:30:13 +0000 (UTC)
-Received: from [10.36.117.195] (ovpn-117-195.ams2.redhat.com [10.36.117.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D787C8F355;
- Wed,  4 Mar 2020 08:30:03 +0000 (UTC)
-Subject: Re: [PATCH RFC 2/4] intc/s390_flic_kvm.c: Use kvm_device_ioctl()
- instead of ioctl()
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-References: <20200303141939.352319-1-david@redhat.com>
- <20200303141939.352319-3-david@redhat.com>
- <b44554c8-a104-3a52-2af8-f2636b704f09@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat GmbH
-Message-ID: <0caf98d4-d025-8e11-1ee5-945ba8dd462b@redhat.com>
-Date: Wed, 4 Mar 2020 09:30:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 782DB190D340;
+ Wed,  4 Mar 2020 08:41:58 +0000 (UTC)
+Received: from [10.36.116.59] (ovpn-116-59.ams2.redhat.com [10.36.116.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 211985DA60;
+ Wed,  4 Mar 2020 08:41:45 +0000 (UTC)
+Subject: Re: [PATCH v16 00/10] VIRTIO-IOMMU device
+To: Zhangfei Gao <zhangfei.gao@gmail.com>
+References: <20200214132745.23392-1-eric.auger@redhat.com>
+ <20200227111717.GG1645630@redhat.com>
+ <431cb39d-833c-6d02-d7b3-02b3e90446e2@redhat.com>
+ <CAMj5Bkib3CTzCB02ScueFR84r28LGowF7uxYO8Ygmnj9X7oNOg@mail.gmail.com>
+ <fea625f1-b58e-6da6-8e2a-f32fc9391fc8@redhat.com>
+ <CAMj5Bkgm1LKbN3E2qTTxmrGhpmdL9NWarSfX-mYCWF0yt5E9eg@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <88e3b669-2998-41c0-83f7-de42a72a73e7@redhat.com>
+Date: Wed, 4 Mar 2020 09:41:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <b44554c8-a104-3a52-2af8-f2636b704f09@de.ibm.com>
+In-Reply-To: <CAMj5Bkgm1LKbN3E2qTTxmrGhpmdL9NWarSfX-mYCWF0yt5E9eg@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 205.139.110.120
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,80 +94,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kevin.tian@intel.com,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ kenneth-lee-2012@foxmail.com, tnowicki@marvell.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, quintela@redhat.com,
+ zhangfei.gao@foxmail.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ "Wangzhou \(B\)" <wangzhou1@hisilicon.com>, jean-philippe@linaro.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.03.20 09:22, Christian Borntraeger wrote:
-> 
-> 
-> On 03.03.20 15:19, David Hildenbrand wrote:
->> Let's use the official variant, which will e.g., trace the call.
+Hi Zhangfei,
+
+On 3/4/20 7:08 AM, Zhangfei Gao wrote:
+> On Tue, Mar 3, 2020 at 5:41 PM Auger Eric <eric.auger@redhat.com> wrote:
 >>
->> Cc: Cornelia Huck <cohuck@redhat.com>
->> Cc: Halil Pasic <pasic@linux.ibm.com>
->> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
->> Cc: qemu-s390x@nongnu.org
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/intc/s390_flic_kvm.c | 22 +++++++++++-----------
->>  1 file changed, 11 insertions(+), 11 deletions(-)
+>> Hi Zhangfei,
+>> On 3/3/20 4:23 AM, Zhangfei Gao wrote:
+>>> Hi Eric
+>>>
+>>> On Thu, Feb 27, 2020 at 9:50 PM Auger Eric <eric.auger@redhat.com> wrot=
+e:
+>>>>
+>>>> Hi Daniel,
+>>>>
+>>>> On 2/27/20 12:17 PM, Daniel P. Berrang=C3=A9 wrote:
+>>>>> On Fri, Feb 14, 2020 at 02:27:35PM +0100, Eric Auger wrote:
+>>>>>> This series implements the QEMU virtio-iommu device.
+>>>>>>
+>>>>>> This matches the v0.12 spec (voted) and the corresponding
+>>>>>> virtio-iommu driver upstreamed in 5.3. All kernel dependencies
+>>>>>> are resolved for DT integration. The virtio-iommu can be
+>>>>>> instantiated in ARM virt using:
+>>>>>>
+>>>>>> "-device virtio-iommu-pci".
+>>>>>
+>>>>> Is there any more documentation besides this ?
+>>>>
+>>>> not yet in qemu.
+>>>>>
+>>>>> I'm wondering on the intended usage of this, and its relation
+>>>>> or pros/cons vs other iommu devices
+>>>>
+>>>> Maybe if you want to catch up on the topic, looking at the very first
+>>>> kernel RFC may be a good starting point. Motivation, pros & cons were
+>>>> discussed in that thread (hey, April 2017!)
+>>>> https://lists.linuxfoundation.org/pipermail/iommu/2017-April/021217.ht=
+ml
+>>>>
+>>>> on ARM we have SMMUv3 emulation. But the VFIO integration is not
+>>>> possible because SMMU does not have any "caching mode" and my nested
+>>>> paging kernel series is blocked. So the only solution to integrate wit=
+h
+>>>> VFIO is looming virtio-iommu.
+>>>>
+>>>> In general the pros that were put forward are: virtio-iommu is
+>>>> architecture agnostic, removes the burden to accurately model complex
+>>>> device states, driver can support virtualization specific optimization=
+s
+>>>> without being constrained by production driver maintenance. Cons is pe=
+rf
+>>>> and mem footprint if we do not consider any optimization.
+>>>>
+>>>> You can have a look at
+>>>>
+>>>> http://events17.linuxfoundation.org/sites/events/files/slides/viommu_a=
+rm.pdf
+>>>>
+>>> Thanks for the patches.
+>>>
+>>> Could I ask one question?
+>>> To support vSVA and pasid in guest, which direction you recommend,
+>>> virtio-iommu or vSMMU (your nested paging)
+>>>
+>>> Do we still have any obstacles?
+>> you can ask the question but not sure I can answer ;-)
 >>
->> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
->> index a306b26faa..5151582ba0 100644
->> --- a/hw/intc/s390_flic_kvm.c
->> +++ b/hw/intc/s390_flic_kvm.c
->> @@ -68,7 +68,7 @@ static int flic_get_all_irqs(KVMS390FLICState *flic,
->>      };
->>      int rc;
->>  
->> -    rc = ioctl(flic->fd, KVM_GET_DEVICE_ATTR, &attr);
->> +    rc = kvm_device_ioctl(flic->fd, KVM_GET_DEVICE_ATTR, &attr);
->>  
->>      return rc == -1 ? -errno : rc;
->>  }
->> @@ -80,7 +80,7 @@ static void flic_enable_pfault(KVMS390FLICState *flic)
->>      };
->>      int rc;
->>  
->> -    rc = ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->> +    rc = kvm_device_ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->>  
->>      if (rc) {
->>          fprintf(stderr, "flic: couldn't enable pfault\n");
->> @@ -94,7 +94,7 @@ static void flic_disable_wait_pfault(KVMS390FLICState *flic)
->>      };
->>      int rc;
->>  
->> -    rc = ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->> +    rc = kvm_device_ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->>  
->>      if (rc) {
->>          fprintf(stderr, "flic: couldn't disable pfault\n");
->> @@ -118,7 +118,7 @@ static int flic_enqueue_irqs(void *buf, uint64_t len,
->>          .attr = len,
->>      };
->>  
->> -    rc = ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->> +    rc = kvm_device_ioctl(flic->fd, KVM_SET_DEVICE_ATTR, &attr);
->>  
->>      return rc ? -errno : 0;
-> 
-> This is no longer necessary as this is done by kvm_device_ioctl, no?
-> 
-> Same for other location.s
-> 
+>> 1) SMMUv3 2stage implementation is blocked by Will at kernel level.
+>>
+>> Despite this situation I may/can respin as Marvell said they were
+>> interested in this effort. If you are also interested in (I know you
+>> tested it several times and I am grateful to you for that), please reply
+>> to:
+>> [PATCH v9 00/14] SMMUv3 Nested Stage Setup (IOMMU part)
+>> (https://patchwork.kernel.org/cover/11039871/) and say you are
+>> interested in that work so that maintainers are aware there are
+>> potential users.
+>>
+>> At the moment I have not supported multiple CDs because it introduced
+>> other dependencies.
+>>
+>> 2) virtio-iommu
+>>
+>> So only virtio-iommu dt boot on machvirt is currently supported. For non
+>> DT, Jean respinned his kernel series
+>> "[PATCH v2 0/3] virtio-iommu on x86 and non-devicetree platforms" as you
+>> may know. However non DT integration still is controversial. Michael is
+>> pushing for putting the binding info the PCI config space. Joerg
+>> yesterday challenged this solution and said he would prefer ACPI
+>> integration. ACPI support depends on ACPI spec update & vote anyway.
+>>
+>> To support PASID at virtio-iommu level you also need virtio-iommu API
+>> extensions to be proposed and written + kernel works. So that's a long
+>> road. I will let Jean-Philippe comment on that.
+>>
+>> I would just say that Intel is working on nested paging solution with
+>> their emulated intel-iommu. We can help them getting that upstream and
+>> partly benefit from this work.
+>>
+>>> Would you mind give some breakdown.
+>>> Jean mentioned PASID still not supported in QEMU.
+>> Do you mean support of multiple CDs in the emulated SMMU? That's a thing
+>> I could implement quite easily. What is more tricky is how to test it.
+>=20
+> Thanks Eric
+>=20
+> Discussed with Jean before, here are some obstacles for vSVA via nested p=
+aging.
+> Do you think they are still big issues?
+>=20
+> Copy "
+> * PASID support in QEMU, I don't think there is anything yet
+> // this is not a big issue as your comments.
+>=20
+> * Page response support in VFIO and QEMU. With Eric's series we can
+> inject recoverable faults into the guest, but there is no channel for
+> the guest to RESUME the stall after fixing it.
+I guess this matches a command sent through the SMMUv3 command queue
+(CMD_PRI_RESP) that should be trapped by QEMU and injected to the
+physical SMMU, right?
 
-Right, missed that. Thanks for pointing that out!
+I think everybody misses that injection path and that's not specific to
+virtio-iommu. PRS is not currently addressed by in-flight Intel's kernel
+series ([PATCH V9 00/10] Nested Shared Virtual Address (SVA) VT-d
+support) either.
 
--- 
-Thanks,
+I think the topic is complex enough to separate the concerns and try to
+move forward in incremental steps hence my efforts to push for simple
+nested use case. Can't you support vSVA without PRS first (I think this
+Intel's strategy too)
+>=20
+> * We can't use DVM in nested mode unless the VMID is shared with the
+> CPU. For that we'll need the host SMMU driver to hook into the KVM VMID
+> allocator, just like we do for the ASID allocator. I haven't yet
+> investigated how to do that. It's possible to do vSVA without DVM
+> though, by sending all TLB invalidations through the SMMU command queue.
+> "
+OK.
 
-David / dhildenb
+From the above arguments I am not sure there are technical blockers with
+nested paging implementation. For sure there are things that are not
+supported, because I did not address this topic yet.
+
+If I were to work on this, you did not answer bout the testing feasibility.
+
+Thanks
+
+Eric
+>=20
+> Thanks
+>=20
 
 
