@@ -2,101 +2,95 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11C73C3F2CE
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26246C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:48:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF61C215A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E357E215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 15:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gh7Eo2T5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF61C215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CCOEKa3q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E357E215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9WCY-0000Kc-S5
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:44:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47629)
+	id 1j9WGY-0003QP-16
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 10:48:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49529)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9W9n-0005Ua-2b
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:42:00 -0500
+ (envelope-from <peterx@redhat.com>) id 1j9WFo-0002m3-SO
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:48:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9W9m-00065w-0I
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30523
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1j9WFn-000625-1K
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:48:12 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31191
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9W9l-00064l-SZ
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:41:57 -0500
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1j9WFm-0005zU-Qh
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 10:48:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583336517;
+ s=mimecast20190719; t=1583336889;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=faBOvIyuYD4kOjDqnf5vnV+OAJpUxg4KO9Xy2+uCAnA=;
- b=Gh7Eo2T5BkW2OYet8pc8EHwcoovkCYIXscCY6LATyEufVBAvT6oSlx2tg8lpFeLwI1HXOM
- UK26iEDdhLcFOxmgVDefGJ+L01lIrEcZxH1sfTTLVx/MPJEqiuwtX4TDGc8+T7tVjDigHo
- Y81t7K9wDv9zPu+NF0+GrJWi8I69PN0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-Lxbv_wbFMsqzcobX_Y6f1w-1; Wed, 04 Mar 2020 10:41:52 -0500
-X-MC-Unique: Lxbv_wbFMsqzcobX_Y6f1w-1
-Received: by mail-ed1-f71.google.com with SMTP id u12so1889673edb.20
- for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 07:41:52 -0800 (PST)
+ bh=m1wAumeVH//i6CL9ZvptMZook4kdqW8REYVEX4qMcsM=;
+ b=CCOEKa3qCA8vI/ON3U0OIH+MSm5WHwH66070JvG4YQ32FrsdYKBZ8/2J+adT1MMGqRjEJv
+ Fyjix3JM2yxMlhnRqXyrgCgMNhDU9uCWgMshhdILUqY5aqCPoiw4B/ujt3Eqxx0KJroWvg
+ ryh5z3ddAuysc/HvfWHvLzVSn673Yeo=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-126-KK4cCnUSOMKPS0bTQ0O3qw-1; Wed, 04 Mar 2020 10:48:08 -0500
+X-MC-Unique: KK4cCnUSOMKPS0bTQ0O3qw-1
+Received: by mail-qk1-f198.google.com with SMTP id 22so1591457qkc.7
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 07:48:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EK9w5zFORySIK7tms+65QsHl8EPjhuzaESYQp3A9+Ug=;
- b=MV2ZsALZVsl/ztXquz+douBKkWeupfVq4/HD89s7jXnIrk3dE2s3PH1nkDDHquFobZ
- oXPp97+9WMSKFhvuwYDiraD1WsrjFDtdeHIKqjC9J5C7uLUfypdNKdwB6iOSbEsjo71B
- rEguAkaqSyrYGcV100Olfj8B3E1q5P8z9cxHwA8DLTNxw8XqEuKPhueoOf89EtOf5jL7
- PDS0WT5kfmZBMNcJVO5qaoxlSKoO5gi9pTilWyTpjid4ziIdoLs7fTUA5NWCJx3XMnLk
- roqXcFqb0p504ZLf89Z5oqNFGaAR1KK9Q91xoiHzDSw2bT30EW0KmQV2iV0syF4PQv3J
- sLFw==
-X-Gm-Message-State: ANhLgQ2fKU5ODDHo/LBFinOYuYpPlHDjX7OI7Tz66sKL37SWPGa04r8q
- y1grFA1VPam0xx+Uxjj6+qvbL9aOftqvZ1eY1oeJZlidBGzfbceID0azpWex8Or0Se8zNZL7zS2
- KBHy+CvVyTycd84o=
-X-Received: by 2002:a17:906:728e:: with SMTP id
- b14mr3098531ejl.162.1583336511317; 
- Wed, 04 Mar 2020 07:41:51 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuvNqZBvKZviqVGhkjwR3C7yysrXEc3poRbRBpJyXrroYSY0k24TiVBfWX+BunEur1rJ1TLOQ==
-X-Received: by 2002:a17:906:728e:: with SMTP id
- b14mr3098513ejl.162.1583336511082; 
- Wed, 04 Mar 2020 07:41:51 -0800 (PST)
-Received: from [192.168.1.35] (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id r14sm864460eds.70.2020.03.04.07.41.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Mar 2020 07:41:50 -0800 (PST)
-Subject: Re: [PATCH v2] Fixed integer overflow in e1000e
-To: andrew@daynix.com, dmitry.fleytman@gmail.com
-References: <20200304142058.52458-1-andrew@daynix.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <badcfed3-94e4-b411-667d-616d790b28b3@redhat.com>
-Date: Wed, 4 Mar 2020 16:41:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=G05ODUMwGaZtTydQIga3NfVZQOwHv7Y4Bw0+tGX480w=;
+ b=TGXQWJ6ocO84zd0lEwQ/ORgziZgP8eFZIOyHg1b6TiK9+ZzwOCAyGPzTmnbXhgUpg4
+ AGljVheknGJYNwOo0n90j6VQLwIxwGvAvSbtEmBpYA2MGWItwtQQndaQcviK2C0FyiGQ
+ hQ5oZgZpKGzvgTXujrOlQ8GnKRVsdgJGyURuPvrFvGed5mnIiCNSkvM/1uJsApey2GmO
+ z86zsrEyNWqPoG85f97jg+TxBVkBVRxq+smCcF/neFDslC9KEimkAO5J7hHNPzP3c/0T
+ azzFKRJcwrVKBUJ2Wtb70NdJGmtFwtNBh2q6jldX55YR5AUveCmtk9OjMBZBQAJF0iup
+ 6DpA==
+X-Gm-Message-State: ANhLgQ1bFAtWAR8KS0QwgS4o6yogxGVP66He745Ol4Q59R2zv9wWuxwj
+ UZw8pac9YlvqYPoelUFsm/WLgdxB9rJ+oFRIHPkarqyTXuTUm4IP2NToAwC+98acoteArCyW75+
+ fU6tHblFRaADIV78=
+X-Received: by 2002:ac8:344f:: with SMTP id v15mr2949275qtb.58.1583336887626; 
+ Wed, 04 Mar 2020 07:48:07 -0800 (PST)
+X-Google-Smtp-Source: ADFU+vs9S0eYXlfqZXtPUdipXSfLtn/EG8NyXkF23m7/jaeOXsDnXYsxmHRqgNzn6iJLCPWk1rgB8g==
+X-Received: by 2002:ac8:344f:: with SMTP id v15mr2949250qtb.58.1583336887323; 
+ Wed, 04 Mar 2020 07:48:07 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:32::2])
+ by smtp.gmail.com with ESMTPSA id v6sm5639721qkg.102.2020.03.04.07.48.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Mar 2020 07:48:06 -0800 (PST)
+Date: Wed, 4 Mar 2020 10:48:05 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Jay Zhou <jianjay.zhou@huawei.com>
+Subject: Re: [PATCH] kvm: support to get/set dirty log initial-all-set
+ capability
+Message-ID: <20200304154805.GC7146@xz-x1>
+References: <20200304025554.2159-1-jianjay.zhou@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200304142058.52458-1-andrew@daynix.com>
-Content-Language: en-US
+In-Reply-To: <20200304025554.2159-1-jianjay.zhou@huawei.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,47 +102,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: liu.jinsong@huawei.com, weidong.huang@huawei.com, kvm@vger.kernel.org,
+ mst@redhat.com, wangxinxin.wang@huawei.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 3/4/20 3:20 PM, andrew@daynix.com wrote:
-> From: Andrew Melnychenko <andrew@daynix.com>
+On Wed, Mar 04, 2020 at 10:55:54AM +0800, Jay Zhou wrote:
+> Since the new capability KVM_DIRTY_LOG_INITIALLY_SET of
+> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 has been introduced in the
+> kernel, tweak the userspace side to detect and enable this
+> capability.
 >=20
-> Fixes: 6f3fbe4ed06
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1737400
-> Fixed setting max_queue_num if there are no peers in NICConf. qemu_new_ni=
-c() creates NICState with 1 NetClientState(index 0) without peers, set max_=
-queue_num to 0 - It prevents undefined behavior and possible crashes, espec=
-ially during pcie hotplug.
-
-Hoping the maintainer taking this can reformat the commit description a=20
-bit nicer... (moving the tags down), then for the code part:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->=20
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 > ---
->   hw/net/e1000e.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>  accel/kvm/kvm-all.c       | 21 ++++++++++++++-------
+>  linux-headers/linux/kvm.h |  3 +++
+>  2 files changed, 17 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> index a91dbdca3c..f2cc1552c5 100644
-> --- a/hw/net/e1000e.c
-> +++ b/hw/net/e1000e.c
-> @@ -328,7 +328,7 @@ e1000e_init_net_peer(E1000EState *s, PCIDevice *pci_d=
-ev, uint8_t *macaddr)
->       s->nic =3D qemu_new_nic(&net_e1000e_info, &s->conf,
->           object_get_typename(OBJECT(s)), dev->id, s);
->  =20
-> -    s->core.max_queue_num =3D s->conf.peers.queues - 1;
-> +    s->core.max_queue_num =3D s->conf.peers.queues ? s->conf.peers.queue=
-s - 1 : 0;
->  =20
->       trace_e1000e_mac_set_permanent(MAC_ARG(macaddr));
->       memcpy(s->core.permanent_mac, macaddr, sizeof(s->core.permanent_mac=
-));
->=20
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 439a4efe52..45ab25be63 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -100,7 +100,7 @@ struct KVMState
+>      bool kernel_irqchip_required;
+>      OnOffAuto kernel_irqchip_split;
+>      bool sync_mmu;
+> -    bool manual_dirty_log_protect;
+> +    uint64_t manual_dirty_log_protect;
+>      /* The man page (and posix) say ioctl numbers are signed int, but
+>       * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
+>       * unsigned, and treating them as signed here can break things */
+> @@ -1882,6 +1882,7 @@ static int kvm_init(MachineState *ms)
+>      int ret;
+>      int type =3D 0;
+>      const char *kvm_type;
+> +    uint64_t dirty_log_manual_caps;
+> =20
+>      s =3D KVM_STATE(ms->accelerator);
+> =20
+> @@ -2007,14 +2008,20 @@ static int kvm_init(MachineState *ms)
+>      s->coalesced_pio =3D s->coalesced_mmio &&
+>                         kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
+> =20
+> -    s->manual_dirty_log_protect =3D
+> +    dirty_log_manual_caps =3D
+>          kvm_check_extension(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+> -    if (s->manual_dirty_log_protect) {
+> -        ret =3D kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, =
+0, 1);
+> +    dirty_log_manual_caps &=3D (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
+> +                              KVM_DIRTY_LOG_INITIALLY_SET);
+> +    s->manual_dirty_log_protect =3D dirty_log_manual_caps;
+> +    if (dirty_log_manual_caps) {
+> +        ret =3D kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, =
+0,
+> +                                   dirty_log_manual_caps);
+>          if (ret) {
+> -            warn_report("Trying to enable KVM_CAP_MANUAL_DIRTY_LOG_PROTE=
+CT2 "
+> -                        "but failed.  Falling back to the legacy mode. "=
+);
+> -            s->manual_dirty_log_protect =3D false;
+> +            warn_report("Trying to enable capability %"PRIu64" of "
+> +                        "KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 but failed. "
+> +                        "Falling back to the legacy mode. ",
+> +                        dirty_log_manual_caps);
+> +            s->manual_dirty_log_protect =3D 0;
+>          }
+>      }
+> =20
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 265099100e..3cb71c2b19 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -1628,4 +1628,7 @@ struct kvm_hyperv_eventfd {
+>  #define KVM_HYPERV_CONN_ID_MASK=09=090x00ffffff
+>  #define KVM_HYPERV_EVENTFD_DEASSIGN=09(1 << 0)
+> =20
+> +#define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
+> +#define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
+> +
+
+The patch looks ok, though ideally I think we need to wait until the
+kernel patch got pushed then we'll be sure these macros won't be
+overwrite by other ./scripts/update-linux-headers.sh updates (or
+another patch to call the update script to fetch the macros...).
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks,
+
+--=20
+Peter Xu
 
 
