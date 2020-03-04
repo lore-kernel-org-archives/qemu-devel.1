@@ -2,99 +2,90 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F3AC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 01:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C38C3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 01:24:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3F1620728
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 01:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DC6C20637
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 01:24:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inwqt4Kw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3F1620728
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="TXUChy+i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DC6C20637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9IOZ-0001yI-VG
-	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 20:00:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46815)
+	id 1j9ImQ-0000NC-FV
+	for qemu-devel@archiver.kernel.org; Tue, 03 Mar 2020 20:24:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1j9INa-0000gk-EL
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:59:20 -0500
+ (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9Iln-0008MY-J2
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 20:24:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1j9INY-000303-Gx
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:59:18 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30294
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9Ill-0007CJ-TJ
+ for qemu-devel@nongnu.org; Tue, 03 Mar 2020 20:24:18 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:16870)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1j9INY-0002zT-D1
- for qemu-devel@nongnu.org; Tue, 03 Mar 2020 19:59:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583283556;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1oy0ST48dt4at0sIB6Boxy2zJicJBcLkAutSvNwdRxU=;
- b=inwqt4KwcFa8dSZsLq88SLwMNPnFuRqjYneQlEnnb5btz+V+4Cxle0a3dfok+eS+H6npJh
- AJT17z3+qek0gI2MaOCkoqB6RWM4FytCmuUkNY2+WtGcrd5FsyAPa1lRmrJxg2cbM7hq/8
- ReAV4fzr8vCJFf18AxYNkoQUOwnQn48=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-CCCQ9txvODuvLpflTQLAEw-1; Tue, 03 Mar 2020 19:59:12 -0500
-X-MC-Unique: CCCQ9txvODuvLpflTQLAEw-1
-Received: by mail-wr1-f71.google.com with SMTP id w18so162692wro.2
- for <qemu-devel@nongnu.org>; Tue, 03 Mar 2020 16:59:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VMyWwpGAelfFYbs5BXNeVv1uXFMT0RMHRzuKUMgj7Dw=;
- b=ObUJygW8YNc7rboS6XkzCVASn/EPPCsStxiJPEpIwbCgHfgb6AA1m4+gijm6/orISe
- rPcFsNWGVR7B7TinDb7p/C9icWAWybqkkl2Zkn5HQtEKazdQDnUVDe7sWIKXPEk17Jso
- Te6ysS0SdjPOVsBhHNDZhAJhJ2cgXliHrb9i1uRWHmtLpvwsCwXamA9I7A5SNHU2tJ/f
- BqMUu+DhahKTDsex8GgtwCs+EgFmt6JIIwZTluj8quFTd5hZz+KAFnbBPPU3GCw6wNUE
- YXV9tRLdURQ/weM+5pF0F2Ob7Qzy84NOcyBQaQELnSQyjHPZXlHvpueTWfCwZ7xBX4M6
- iveg==
-X-Gm-Message-State: ANhLgQ1bZjyqyF0xM22FqFXRVDfqzvwlCfN80MrJcQFWWtabntHjaUtD
- zvOJlabGXrC26X80lF+88RP5DdkZWHb4fCiBHHuF6a9Lo8oYjKtiVu0Chopt091RymGtgX0yOjT
- Ch4/7pYqnRC4xuJM=
-X-Received: by 2002:a05:600c:4108:: with SMTP id
- j8mr334256wmi.188.1583283550965; 
- Tue, 03 Mar 2020 16:59:10 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vu0mASzvh3d1SlXvH1JACHXydsk+fSbkwkXjnoUzM+AD5QkZcuBwu5bokpevqoGjqX8uRQhFQ==
-X-Received: by 2002:a05:600c:4108:: with SMTP id
- j8mr334211wmi.188.1583283550661; 
- Tue, 03 Mar 2020 16:59:10 -0800 (PST)
-Received: from localhost.localdomain (47.red-88-21-205.staticip.rima-tde.net.
- [88.21.205.47])
- by smtp.gmail.com with ESMTPSA id v11sm23148465wrs.54.2020.03.03.16.59.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Mar 2020 16:59:10 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] misc: Replace zero-length arrays with flexible array
- member (manual)
-Date: Wed,  4 Mar 2020 01:58:44 +0100
-Message-Id: <20200304005844.28346-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200304005105.27454-1-philmd@redhat.com>
-References: <20200304005105.27454-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <prvs=3258e4f7a=alistair.francis@wdc.com>)
+ id 1j9Ill-00078V-89; Tue, 03 Mar 2020 20:24:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1583285057; x=1614821057;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=xO5lDNI57+ZUonUsJ58F4KlftObd3tOaYp8RT/BsLFo=;
+ b=TXUChy+ive9+LDtgMnzvVBtllZZ9tU2Xj4l4a9D/LohaJGc0zKDXvlDi
+ Z+C9VfhjMnSOjwGhmbzmo3cw/LRldwHhP1MCuBd9usOF07v4Irt3tCcwr
+ hbfYqewzzYaAQdO9zKHYVAWZ1IWC9G3xYHKOQXgLnjwT4A05fFBuw4PMB
+ WL9nZC3+rxMiH8A7/ITveYwf/89r/zQ/RZi7I0ZcBYsBBAUI2DaJlCUqy
+ KqaQc9qkC4kgJ6gE+fjBKZRvrfUkHY1CzXWSJCEnZDmoqLq9EkREle2kd
+ LY7sfVShrbF4XcGI/A2mJgVRHgA5ue4bt8PNVf7AR52pLbx0i+7VFcZL/ g==;
+IronPort-SDR: J7E4Qh1ts06Bc2kM4o4lUrNhiepr4+pNPsNlenue+B5388bISTupXs4zlrV3rel8uaASDBCdnV
+ WWCy7HIznjXD7i+YRMJzpLPFzQSrwpTeYdn2N2RMPahbGao1UT2UsrCQSmk9LPJX7MFI3Cnw2s
+ RhFu8teHXzdffN7VHWmmn+H0qF2Pyrrn/2P0hpkvP5U4pvc6Nv5Tkngky3kN4anylEkBbWK4No
+ TDD9WG693eB2HG6+k9xbxp6s8E4boVLRiHLywI7rEzdzO04F/AYq4xrvAr/akU2YF05SrYDxyk
+ Brc=
+X-IronPort-AV: E=Sophos;i="5.70,511,1574092800"; d="scan'208";a="239580932"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 04 Mar 2020 09:24:13 +0800
+IronPort-SDR: Hhl34WJsQBKIlzr0/mr90f0OKRdmYtiNr3zl15xdQ7Q6j2kart19iAtLnSHgiSJ2kKmPhtIZiR
+ EabaJl9ZXfMXdvt0GAHebeAPW1FoIljWXuQlKDatPSfOk7XsAEzKtM2SlpKLkyq2PpD7lFYDcp
+ airwt/e4j17aN5dbNLGRgjl5sRmo+Xxo8f3KknyVEOhC7vvuhJpP3IowfmwzHVLe73gwMZ4kef
+ bbk2kM1VRCSsmGyVEtYrMSYzsMyxN+cvGKXgIv5sRH4I2iEiO+dY6JJdHgdlCU9InxqkqELSk6
+ 4WA/Q6wMMeuYHFm4y2GoqJ+P
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 Mar 2020 17:16:04 -0800
+IronPort-SDR: tUjXUgxzsT8Y3fIVX8oLmxmhj5KLFsgA+rHCDBhw/sWdLE54dhYoWdsYeWODlzPNU7EPl0goYc
+ kMPQohnOV5PfuPi7M23mBaI9d52uQCPFeqMoqYhwvOhsB5QSvu6Xm6mO+hnEFKnmaf02gYqKVe
+ EbYYzRJMaAY/3JfrpbJVfYhVvLXxbgiPTxK+NWKD0+cYlVq2khWTD2ClsOzGp8yFe6PWBC5WmS
+ lbG9G9UyeYCkc/7qhamjDtlFByppqRakAhNmbn0lgWYHA1zHCadyEVUJBeP20MsyBH88w+H/5C
+ 6Io=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip02.wdc.com with ESMTP; 03 Mar 2020 17:24:14 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 1/1] target/riscv: Don't set write permissions on dirty PTEs
+Date: Tue,  3 Mar 2020 17:16:59 -0800
+Message-Id: <c827880a47774cd3a6bcd59b79657f380da11d5d.1583284602.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.141.245
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,277 +97,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-block@nongnu.org,
- David Hildenbrand <david@redhat.com>,
- "Gustavo A . R . Silva" <gustavo@embeddedor.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Paul Durrant <paul@xen.org>, Eric Auger <eric.auger@redhat.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>,
- Kevin Wolf <kwolf@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Description copied from Linux kernel commit from Gustavo A. R. Silva
-(see [3]):
+The RISC-V spec specifies that when a write happens and the D bit is
+clear the implementation will set the bit in the PTE. It does not
+describe that the PTE being dirty means that we should provide write
+access. This patch removes the write access granted to pages when the
+dirty bit is set.
 
---v-- description start --v--
+Following the prot variable we can see that it affects all of these
+functions:
+ riscv_cpu_tlb_fill()
+   tlb_set_page()
+     tlb_set_page_with_attrs()
+       address_space_translate_for_iotlb()
 
-  The current codebase makes use of the zero-length array language
-  extension to the C90 standard, but the preferred mechanism to
-  declare variable-length types such as these ones is a flexible
-  array member [1], introduced in C99:
+Looking at the cputlb code (tlb_set_page_with_attrs() and
+address_space_translate_for_iotlb()) it looks like the main affect of
+setting write permissions is that the page can be marked as TLB_NOTDIRTY.
 
-  struct foo {
-      int stuff;
-      struct boo array[];
-  };
+I don't see any other impacts (related to the dirty bit) for giving a
+page write permissions.
 
-  By making use of the mechanism above, we will get a compiler
-  warning in case the flexible array does not occur last in the
-  structure, which will help us prevent some kind of undefined
-  behavior bugs from being unadvertenly introduced [2] to the
-  Linux codebase from now on.
+Setting write permission on dirty PTEs results in userspace inside a
+Hypervisor guest (VU) becoming corrupted. This appears to be because it
+ends up with write permission in the second stage translation in cases
+where we aren't doing a store.
 
---^-- description end --^--
-
-Do the similar housekeeping in the QEMU codebase (which uses
-C99 since commit 7be41675f7cb).
-
-All these instances of code were found with the help of the
-following command (then manual analysis):
-
-  git grep -F '[0];'
-
-[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D76497732932f
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/gustavoars/linux.git/co=
-mmit/?id=3D17642a2fbd2c1
-
-Inspired-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 ---
- docs/interop/vhost-user.rst       | 4 ++--
- block/qed.h                       | 2 +-
- include/hw/acpi/acpi-defs.h       | 4 ++--
- include/hw/boards.h               | 2 +-
- include/hw/s390x/event-facility.h | 2 +-
- include/hw/s390x/sclp.h           | 8 ++++----
- block/vmdk.c                      | 2 +-
- hw/char/sclpconsole-lm.c          | 2 +-
- hw/char/sclpconsole.c             | 2 +-
- hw/s390x/virtio-ccw.c             | 2 +-
- target/s390x/ioinst.c             | 2 +-
- 11 files changed, 16 insertions(+), 16 deletions(-)
+ target/riscv/cpu_helper.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 401652397c..3b1b6602c7 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -568,7 +568,7 @@ For split virtqueue, queue region can be implemented as=
-:
-       uint16_t used_idx;
-=20
-       /* Used to track the state of each descriptor in descriptor table */
--      DescStateSplit desc[0];
-+      DescStateSplit desc[];
-   } QueueRegionSplit;
-=20
- To track inflight I/O, the queue region should be processed as follows:
-@@ -690,7 +690,7 @@ For packed virtqueue, queue region can be implemented a=
-s:
-       uint8_t padding[7];
-=20
-       /* Used to track the state of each descriptor fetched from descripto=
-r ring */
--      DescStatePacked desc[0];
-+      DescStatePacked desc[];
-   } QueueRegionPacked;
-=20
- To track inflight I/O, the queue region should be processed as follows:
-diff --git a/block/qed.h b/block/qed.h
-index 42c115d822..87428ba00e 100644
---- a/block/qed.h
-+++ b/block/qed.h
-@@ -103,7 +103,7 @@ typedef struct {
- } QEMU_PACKED QEDHeader;
-=20
- typedef struct {
--    uint64_t offsets[0];            /* in bytes */
-+    uint64_t offsets[];             /* in bytes */
- } QEDTable;
-=20
- /* The L2 cache is a simple write-through cache for L2 structures */
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 19f7ba7b70..c13327fa78 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -152,7 +152,7 @@ typedef struct AcpiSerialPortConsoleRedirection
-  */
- struct AcpiRsdtDescriptorRev1 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
--    uint32_t table_offset_entry[0];  /* Array of pointers to other */
-+    uint32_t table_offset_entry[];  /* Array of pointers to other */
-     /* ACPI tables */
- } QEMU_PACKED;
- typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescriptorRev1;
-@@ -162,7 +162,7 @@ typedef struct AcpiRsdtDescriptorRev1 AcpiRsdtDescripto=
-rRev1;
-  */
- struct AcpiXsdtDescriptorRev2 {
-     ACPI_TABLE_HEADER_DEF       /* ACPI common table header */
--    uint64_t table_offset_entry[0];  /* Array of pointers to other */
-+    uint64_t table_offset_entry[];  /* Array of pointers to other */
-     /* ACPI tables */
- } QEMU_PACKED;
- typedef struct AcpiXsdtDescriptorRev2 AcpiXsdtDescriptorRev2;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 9bc42dfb22..c96120d15f 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -71,7 +71,7 @@ typedef struct CPUArchId {
-  */
- typedef struct {
-     int len;
--    CPUArchId cpus[0];
-+    CPUArchId cpus[];
- } CPUArchIdList;
-=20
- /**
-diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-fac=
-ility.h
-index bdc32a3c09..700a610f33 100644
---- a/include/hw/s390x/event-facility.h
-+++ b/include/hw/s390x/event-facility.h
-@@ -122,7 +122,7 @@ typedef struct MDBO {
-=20
- typedef struct MDB {
-     MdbHeader header;
--    MDBO mdbo[0];
-+    MDBO mdbo[];
- } QEMU_PACKED MDB;
-=20
- typedef struct SclpMsg {
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index c54413b78c..cd7b24359f 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -132,7 +132,7 @@ typedef struct ReadInfo {
-     uint16_t highest_cpu;
-     uint8_t  _reserved5[124 - 122];     /* 122-123 */
-     uint32_t hmfai;
--    struct CPUEntry entries[0];
-+    struct CPUEntry entries[];
- } QEMU_PACKED ReadInfo;
-=20
- typedef struct ReadCpuInfo {
-@@ -142,7 +142,7 @@ typedef struct ReadCpuInfo {
-     uint16_t nr_standby;            /* 12-13 */
-     uint16_t offset_standby;        /* 14-15 */
-     uint8_t reserved0[24-16];       /* 16-23 */
--    struct CPUEntry entries[0];
-+    struct CPUEntry entries[];
- } QEMU_PACKED ReadCpuInfo;
-=20
- typedef struct ReadStorageElementInfo {
-@@ -151,7 +151,7 @@ typedef struct ReadStorageElementInfo {
-     uint16_t assigned;
-     uint16_t standby;
-     uint8_t _reserved0[16 - 14]; /* 14-15 */
--    uint32_t entries[0];
-+    uint32_t entries[];
- } QEMU_PACKED ReadStorageElementInfo;
-=20
- typedef struct AttachStorageElement {
-@@ -159,7 +159,7 @@ typedef struct AttachStorageElement {
-     uint8_t _reserved0[10 - 8];  /* 8-9 */
-     uint16_t assigned;
-     uint8_t _reserved1[16 - 12]; /* 12-15 */
--    uint32_t entries[0];
-+    uint32_t entries[];
- } QEMU_PACKED AttachStorageElement;
-=20
- typedef struct AssignStorage {
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 20e909d997..8466051bc9 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -187,7 +187,7 @@ typedef struct VmdkMetaData {
- typedef struct VmdkGrainMarker {
-     uint64_t lba;
-     uint32_t size;
--    uint8_t  data[0];
-+    uint8_t  data[];
- } QEMU_PACKED VmdkGrainMarker;
-=20
- enum {
-diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-index c420dc066e..2b5f37b6a2 100644
---- a/hw/char/sclpconsole-lm.c
-+++ b/hw/char/sclpconsole-lm.c
-@@ -31,7 +31,7 @@
- typedef struct OprtnsCommand {
-     EventBufferHeader header;
-     MDMSU message_unit;
--    char data[0];
-+    char data[];
- } QEMU_PACKED OprtnsCommand;
-=20
- /* max size for line-mode data in 4K SCCB page */
-diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-index 1fa124dab9..5c7664905e 100644
---- a/hw/char/sclpconsole.c
-+++ b/hw/char/sclpconsole.c
-@@ -25,7 +25,7 @@
-=20
- typedef struct ASCIIConsoleData {
-     EventBufferHeader ebh;
--    char data[0];
-+    char data[];
- } QEMU_PACKED ASCIIConsoleData;
-=20
- /* max size for ASCII data in 4K SCCB page */
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 50cf95b781..64f928fc7d 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -193,7 +193,7 @@ typedef struct VirtioThinintInfo {
- typedef struct VirtioRevInfo {
-     uint16_t revision;
-     uint16_t length;
--    uint8_t data[0];
-+    uint8_t data[];
- } QEMU_PACKED VirtioRevInfo;
-=20
- /* Specify where the virtqueues for the subchannel are in guest memory. */
-diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
-index c437a1d8c6..0e840cc579 100644
---- a/target/s390x/ioinst.c
-+++ b/target/s390x/ioinst.c
-@@ -347,7 +347,7 @@ typedef struct ChscResp {
-     uint16_t len;
-     uint16_t code;
-     uint32_t param;
--    char data[0];
-+    char data[];
- } QEMU_PACKED ChscResp;
-=20
- #define CHSC_MIN_RESP_LEN 0x0008
---=20
-2.21.1
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 5ea5d133aa..cc9f20b471 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -572,10 +572,8 @@ restart:
+             if ((pte & PTE_X)) {
+                 *prot |= PAGE_EXEC;
+             }
+-            /* add write permission on stores or if the page is already dirty,
+-               so that we TLB miss on later writes to update the dirty bit */
+-            if ((pte & PTE_W) &&
+-                    (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
++            /* add write permission on stores */
++            if ((pte & PTE_W) && (access_type == MMU_DATA_STORE)) {
+                 *prot |= PAGE_WRITE;
+             }
+             return TRANSLATE_SUCCESS;
+-- 
+2.25.1
 
 
