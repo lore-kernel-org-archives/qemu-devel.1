@@ -2,120 +2,95 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F103C3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9D7C3F2CD
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB46E20848
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:28:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="C63UGKmk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB46E20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FAC82166E
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:44:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FAC82166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9SCb-00034U-0w
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:28:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
+	id 1j9SRo-0007g0-Bw
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:44:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j9SBw-0002YZ-Ql
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:27:57 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SQm-0005yY-0W
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1j9SBv-0006YQ-O9
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:27:56 -0500
-Received: from mail-vi1eur05on2126.outbound.protection.outlook.com
- ([40.107.21.126]:7521 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1j9SQk-0007T0-Sr
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:15 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21454
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1j9SBs-0006VN-C1; Wed, 04 Mar 2020 06:27:53 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jh+mZwVqlJoIt2K1o7bshcucLAKSrdtbX9XiKzuNAo03aDBF8d8eLxetDAidP5mI8UntSw7oL8ToVskd3wYVx0eNoaaTLsiqH7IP2c+1W0zImXKYS9kM9PwmbwFea8acqhthUPs2Nl8gYt6EtY0rq9el+qRFdPlaW3NbZlg41une8GYv7D72b+GIZlvPuV+n1FtchAW9eYksze6IYDTplNH/rNSeNTMrDAvQ09DVvPEjHJNX8hBK359gosVGPNwuNOCpfhwia3fVKXhoXc9qsxOwYsjcVJNbFxGY6q75BYEjqArmE7WpEcqpiF06DY7sKq2My9h0HTs4cz1f8FagBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WEZlUnXhlxs//xUaHZD1yZ3iLbwhbfH/o4xp8tkUMrI=;
- b=YGsvu0LQ8P5mAcOOALXyM+58LLhBMgb1l2/ZhrJswrlAGtTxJaDCz/dNdSFZqjhP8y+R4eAYeDyuUx+vUUSGDzKtGPOjGsFR7kXwlz4zb068HKx8a68oOUX4Sxa3KsGRZ2/nWnDkmNPChLUovT1znXNsqOOvcW0Xw6V5hQi+Sax98BeH3d7dPGHldC++Q2WPVbM28sd5Mx4nS6Ptgc45DMo5X2YGygbROTjLIQ1aNcxotsGT5rSiKAs8/j2aNjkkTCB681bcjKgATD3yXVXP9NjN4PuBa+YZ2lYH4RV5t6sKKCTwnl9+MIftmAqkkmjw6mqAvu2Ui3w2WcIuu6sguA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WEZlUnXhlxs//xUaHZD1yZ3iLbwhbfH/o4xp8tkUMrI=;
- b=C63UGKmkaNsp/03q9mbDSGrblS7NHdRx6wz5igkFASzEJMaXbe+xLEJc/TrOYwht98oaIHxcqOG+DKSySxx6TVKmuHqlEyV6WaLrethp048oh60rIbEtbWgdeJc3x6YPO7L3RzgRvKmYCbgaF1qsE2SbWnesjU712DUOPbdooVg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4867.eurprd08.prod.outlook.com (10.255.99.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.19; Wed, 4 Mar 2020 11:27:49 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::e05a:63af:818c:b664%4]) with mapi id 15.20.2793.013; Wed, 4 Mar 2020
- 11:27:49 +0000
-Subject: Re: [PATCH v4 5/5] iotests: 287: add qcow2 compression type test
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-devel@nongnu.org
-References: <20200303133425.24471-1-dplotnikov@virtuozzo.com>
- <20200303133425.24471-6-dplotnikov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-X-Tagtoolbar-Keys: D20200304142746818
-Message-ID: <3d79452c-a2e9-06f5-ebf1-5edb3ac24108@virtuozzo.com>
-Date: Wed, 4 Mar 2020 14:27:46 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-In-Reply-To: <20200303133425.24471-6-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: HE1PR0102CA0042.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:7d::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1j9SQk-0007So-OT
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:43:14 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 024BdgYr030129
+ for <qemu-devel@nongnu.org>; Wed, 4 Mar 2020 06:43:14 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2yhyxqp95y-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 04 Mar 2020 06:43:13 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 4 Mar 2020 11:43:12 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 4 Mar 2020 11:43:09 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 024Bh8h429163534
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 4 Mar 2020 11:43:08 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B46784204B;
+ Wed,  4 Mar 2020 11:43:08 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DADBA42041;
+ Wed,  4 Mar 2020 11:43:07 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.55])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed,  4 Mar 2020 11:43:07 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 01/18] Sync pv
+Date: Wed,  4 Mar 2020 06:42:14 -0500
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200304114231.23493-1-frankja@linux.ibm.com>
+References: <20200304114231.23493-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [172.16.24.200] (185.231.240.5) by
- HE1PR0102CA0042.eurprd01.prod.exchangelabs.com (2603:10a6:7:7d::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.11 via Frontend
- Transport; Wed, 4 Mar 2020 11:27:48 +0000
-X-Tagtoolbar-Keys: D20200304142746818
-X-Originating-IP: [185.231.240.5]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a95f0042-ce7e-4d9e-273f-08d7c02f11a7
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4867:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4867E586AAB04D4DA4466F7FC1E50@AM6PR08MB4867.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-Forefront-PRVS: 0332AACBC3
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10019020)(366004)(396003)(346002)(136003)(39850400004)(376002)(199004)(189003)(66556008)(478600001)(8676002)(4326008)(31686004)(52116002)(81156014)(81166006)(66476007)(16576012)(316002)(16526019)(36756003)(186003)(956004)(66946007)(2616005)(31696002)(26005)(5660300002)(86362001)(2906002)(6486002)(8936002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4867;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-Received-SPF: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VmppiQqtN5ITh5VHLLecrYvV7sa97dR3nI3EH6KQHqqgiLaSW4Tej03GppERTAHaRL0a/yWy8RBIOknkQqy2sJ/zFQ2o1ZytnQ3JnjmEHASX/crI+erDSJNVzr/emuxDY/o3ROODBWfYtAR6nnucKIlnuHBcr+Die7N8q5bHHGTKmiq7Eyrrd+eE5GoI/38eQTH1Sz2n8VcYBr/YpnBsa+LlEe0T9YnwQwBqZQJzA3+/RMy+WqxHV3Dcgha8qgSP5zCfyyBkUaDe0Gf6aIDeUec+GYEHbCDwi1v+xH/EEs24qRD0oVOR0Omc4RxQc7L3Ebq12PIbQhtnBVEAgll6daoLpCbSnAHiODb0oFDeds0Fnb/9VsUDhiGnngVjP2tqrNs+iLdSd3ol/kMrkSQFtCQMvKq4F8SUXjS8smMM+UmTRdOFfTxrM7wOsHl3qpXD
-X-MS-Exchange-AntiSpam-MessageData: HRoa0YFL44xdgLDNTMhfTC70sZRovCFqEzqlbMvrt7V6FqqmhPYlnTnQVg6m6HEZZAcuUOv5/lOErALfth5PHo4Et3h39OLU5RwwUWct+YX7UJHECwn2adK9xmEJ7hSrGwS9FYdID8GNPkkb9to0gw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a95f0042-ce7e-4d9e-273f-08d7c02f11a7
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2020 11:27:48.9696 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: acO74GKEzHlmJ80x+SyVulAqe7MbhQNzrZDYZF0ywLbu4eghRuNJf3Rz6QUUfhxuv57CuvpjkcJGE5GSYRQV8Ph2DJBA+KMyDH8H634Cky8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4867
-X-detected-operating-system: by eggs.gnu.org: Windows NT kernel [generic]
- [fuzzy]
-X-Received-From: 40.107.21.126
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20030411-0008-0000-0000-000003593BB7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20030411-0009-0000-0000-00004A7A6E6A
+Message-Id: <20200304114231.23493-2-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-03-04_01:2020-03-04,
+ 2020-03-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0
+ malwarescore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0
+ suspectscore=1 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003040090
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,62 +102,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org,
- armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-03.03.2020 16:34, Denis Plotnikov wrote:
-> The test checks fulfilling qcow2 requiriements for the compression
-> type feature and zstd compression type operability.
-> 
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->   tests/qemu-iotests/287     | 127 +++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/287.out |  43 +++++++++++++
->   tests/qemu-iotests/group   |   1 +
->   3 files changed, 171 insertions(+)
->   create mode 100755 tests/qemu-iotests/287
->   create mode 100644 tests/qemu-iotests/287.out
-> 
-> diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
-> new file mode 100755
-> index 0000000000..39cb665c85
-> --- /dev/null
-> +++ b/tests/qemu-iotests/287
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ linux-headers/linux/kvm.h | 43 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-[..]
-
-> +# Test: using zstd compression, write to and read from an image
-> +echo
-> +echo "=== Testing reading and writing with zstd ==="
-> +echo
-> +
-> +CLUSTER_SIZE=65536
-> +IMGOPTS='compression_type=zstd' _make_test_img 64M
-
-As I understand, you should define env variable assignments on the same line
-with _make_test_img so that they be passed to it, like
-CLUSTER_SIZE=65536 IMGOPTS='compression_type=zstd' _make_test_img 64M
-
-with this:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-> +$QEMU_IO -c "write -c -P 0xAC 65536 64k " "$TEST_IMG" | _filter_qemu_io
-
-you may s/65536/64k/
-
-> +$QEMU_IO -c "read -P 0xAC 65536 65536 " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -v 131070 8 " "$TEST_IMG" | _filter_qemu_io
-> +$QEMU_IO -c "read -v 65534 8" "$TEST_IMG" | _filter_qemu_io
-> +
-
-
-[..]
-
-
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 265099100e..e36f761194 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -474,8 +474,11 @@ struct kvm_s390_mem_op {
+ 	__u32 size;		/* amount of bytes */
+ 	__u32 op;		/* type of operation */
+ 	__u64 buf;		/* buffer in userspace */
+-	__u8 ar;		/* the access register number */
+-	__u8 reserved[31];	/* should be set to 0 */
++	union {
++		__u8 ar;	/* the access register number */
++		__u32 sida_offset; /* offset into the sida */
++		__u8 reserved[32]; /* should be set to 0 */
++	};
+ };
+ /* types for kvm_s390_mem_op->op */
+ #define KVM_S390_MEMOP_LOGICAL_READ	0
+@@ -1010,6 +1013,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_NISV_TO_USER 177
+ #define KVM_CAP_ARM_INJECT_EXT_DABT 178
+ #define KVM_CAP_S390_VCPU_RESETS 179
++#define KVM_CAP_S390_PROTECTED 180
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1478,6 +1482,41 @@ struct kvm_enc_region {
+ #define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
+ #define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
+ 
++struct kvm_s390_pv_sec_parm {
++	__u64 origin;
++	__u64 length;
++};
++
++struct kvm_s390_pv_unp {
++	__u64 addr;
++	__u64 size;
++	__u64 tweak;
++};
++
++enum pv_cmd_id {
++	KVM_PV_ENABLE,
++	KVM_PV_DISABLE,
++	KVM_PV_VM_SET_SEC_PARMS,
++	KVM_PV_VM_UNPACK,
++	KVM_PV_VM_VERIFY,
++	KVM_PV_VM_PREP_RESET,
++	KVM_PV_VM_UNSHARE_ALL,
++	KVM_PV_VCPU_CREATE,
++	KVM_PV_VCPU_DESTROY,
++};
++
++struct kvm_pv_cmd {
++	__u32 cmd;	/* Command to be executed */
++	__u16 rc;	/* Ultravisor return code */
++	__u16 rrc;	/* Ultravisor return reason code */
++	__u64 data;	/* Data or address */
++	__u32 flags;    /* flags for future extensions. Must be 0 for now */
++	__u32 reserved[3];
++};
++
++/* Available with KVM_CAP_S390_PROTECTED */
++#define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
++
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+ 	/* Guest initialization commands */
 -- 
-Best regards,
-Vladimir
+2.20.1
+
 
