@@ -2,86 +2,84 @@ Return-Path: <SRS0=3KIA=4V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 000BAC3F2D1
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E5AC3F2D1
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF41420870
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:01:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CD4920709
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Mar 2020 11:13:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gs5idJ5T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF41420870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LTG0bJeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CD4920709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1j9Rmi-0000lt-Tj
-	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:01:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35353)
+	id 1j9Rxn-0003v5-Mh
+	for qemu-devel@archiver.kernel.org; Wed, 04 Mar 2020 06:13:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1j9Rm2-0000Hi-Co
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:01:11 -0500
+ (envelope-from <kwolf@redhat.com>) id 1j9RxB-0003Ry-EB
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:12:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1j9Rm0-0007Rg-Jm
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:01:09 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49276
+ (envelope-from <kwolf@redhat.com>) id 1j9Rx9-0003HE-Uq
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:12:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30170
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1j9Rm0-0007Q6-9U
- for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:01:08 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1j9Rx9-0003GU-Pb
+ for qemu-devel@nongnu.org; Wed, 04 Mar 2020 06:12:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1583319666;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1583320358;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=osGZuFcG7NyIqq2hD97U8lT0JkizARylxLJz7hmgEH0=;
- b=gs5idJ5Tg5pHsINjLaj1evXZWskVKcqZ0NXQCLn4hVG5n+dAkl1lW9MHXdg5YW1QzbA6hU
- aOnX4A0MiJvQwas+LvYQ1WoDWvFS8ySf2YUyrPLsOBIT8YpYftrJRD8RKSa11hnbx9ZRrR
- UNmAYdRNtP5uDvNA1HvaHm8FKx48ELI=
+ bh=62H0elrZKrZQtAYdZB6Y/hvkGj4LukajWlKg2++9QeQ=;
+ b=LTG0bJeF7pcauH1yqNs7Crt+qHiY/u+oVx0k9B/fn0PDJ4HHQ8RRmD4JU0to/5mmNLUCEp
+ B9H7Ldz94KqeQjIovEo1UOS8nNScR6tmdInKIVadeFXt4T5kBW9jwoRQ0zOkGkKgdoz7Ny
+ Ggeiew72AYlRnpg2d5FE8GcDY3Eltkg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-5EZkcUXCPtO_8lN-huwGfw-1; Wed, 04 Mar 2020 06:00:53 -0500
-X-MC-Unique: 5EZkcUXCPtO_8lN-huwGfw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-472-MKpY7BwsMV2FpPL-QK4KYA-1; Wed, 04 Mar 2020 06:12:37 -0500
+X-MC-Unique: MKpY7BwsMV2FpPL-QK4KYA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE5D4800D54;
- Wed,  4 Mar 2020 11:00:50 +0000 (UTC)
-Received: from redhat.com (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EC5F73879;
- Wed,  4 Mar 2020 11:00:35 +0000 (UTC)
-Date: Wed, 4 Mar 2020 11:00:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Subject: Re: [PATCH v5 14/50] mutli-process: build remote command line args
-Message-ID: <20200304110032.GA1851428@redhat.com>
-References: <cover.1582576372.git.jag.raman@oracle.com>
- <588dafeecd20f8562f4a0dd68fa4bafbd6ea18bb.1582576372.git.jag.raman@oracle.com>
- <acc40fcd-2871-df80-d420-b9f12dfcf19c@redhat.com>
- <20200302174745.GP1679990@redhat.com>
- <20200302223937.GA29775@flaka>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87559DB61;
+ Wed,  4 Mar 2020 11:12:36 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80B1591D92;
+ Wed,  4 Mar 2020 11:12:35 +0000 (UTC)
+Date: Wed, 4 Mar 2020 12:12:34 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v6 1/9] iotests: do a light delinting
+Message-ID: <20200304111234.GB5477@dhcp-200-226.str.redhat.com>
+References: <20200227000639.9644-1-jsnow@redhat.com>
+ <20200227000639.9644-2-jsnow@redhat.com>
+ <5c3f3029-37c3-dd97-efb7-ea244742ab51@redhat.com>
+ <c84ac4a9-7fa4-2dac-ed88-cf7c1441f0c4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200302223937.GA29775@flaka>
-User-Agent: Mutt/1.13.3 (2020-01-12)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <c84ac4a9-7fa4-2dac-ed88-cf7c1441f0c4@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,126 +91,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
- mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
- Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com,
- thanos.makatos@nutanix.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Mar 02, 2020 at 02:39:37PM -0800, Elena Ufimtseva wrote:
-> On Mon, Mar 02, 2020 at 05:47:45PM +0000, Daniel P. Berrang=C3=A9 wrote:
-> > On Mon, Mar 02, 2020 at 06:36:13PM +0100, Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> > > typo "multi" in patch subject.
-> > >
-> Thank Philippe, will fix.
-> =20
-> > > On 2/24/20 9:55 PM, Jagannathan Raman wrote:
-> > > > From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > >=20
-> > > > Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> > > > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> > > > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> > > > ---
-> > > >   v4 -> v5:
-> > > >    - Added "exec" suboption to get the executable's name
-> > > >    - Addressed feedback about variable names
-> > > >    - Removed redundant check for spawning a process
-> > > >=20
-> > > >   hw/proxy/qemu-proxy.c         | 68 ++++++++++++++++++++++++++++++=
-+++----------
-> > > >   include/hw/proxy/qemu-proxy.h |  2 +-
-> > > >   2 files changed, 54 insertions(+), 16 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
-> > > > index 828bbd7..d792e86 100644
-> > > > --- a/hw/proxy/qemu-proxy.c
-> > > > +++ b/hw/proxy/qemu-proxy.c
-> > > > @@ -19,19 +19,50 @@
-> > > >   static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
-> > > > +static int add_argv(char *opts_str, char **argv, int argc)
-> > > > +{
-> > > > +    int max_args =3D 64;
-> > > > +
-> > > > +    if (argc < max_args - 1) {
-> > > > +        argv[argc++] =3D opts_str;
-> > > > +        argv[argc] =3D 0;
-> > > > +    } else {
-> > > > +        return 0;
-> > > > +    }
-> > > > +
-> > > > +    return argc;
-> > > > +}
-> > > > +
-> > > > +static int make_argv(char *opts_str, char **argv, int argc)
-> > > > +{
-> > > > +    int max_args =3D 64;
-> > > > +
-> > > > +    char *p2 =3D strtok(opts_str, " ");
-> > > > +    while (p2 && argc < max_args - 1) {
-> > > > +        argv[argc++] =3D p2;
-> > > > +        p2 =3D strtok(0, " ");
-> > > > +    }
-> > > > +    argv[argc] =3D 0;
-> > >=20
-> > > Is there a GLib function to do that?
-> >
+Am 03.03.2020 um 22:25 hat John Snow geschrieben:
 >=20
-> Hi Daniel
 >=20
-> > g_shell_parse_argv() perhaps
-> >
->=20
-> Thanks for the suggestion.
->=20
-> >   https://developer.gnome.org/glib/stable/glib-Shell-related-Utilities.=
-html
+> On 2/27/20 7:59 AM, Max Reitz wrote:
+> > On 27.02.20 01:06, John Snow wrote:
+> >> This doesn't fix everything in here, but it does help clean up the
+> >> pylint report considerably.
+> >>
+> >> This should be 100% style changes only; the intent is to make pylint
+> >> more useful by working on establishing a baseline for iotests that we
+> >> can gate against in the future. This will be important if (when?) we
+> >> begin adding type hints to our code base.
+
+I'm not sure I understand this connection. mypy doesn't care about
+style.
+
+> >> Signed-off-by: John Snow <jsnow@redhat.com>
+> >> ---
+> >>  tests/qemu-iotests/iotests.py | 88 ++++++++++++++++++----------------=
+-
+> >>  1 file changed, 45 insertions(+), 43 deletions(-)
 > >=20
+> > I feel like I=E2=80=99m the wrongest person there is for reviewing a Py=
+thon
+> > style-fixing patch, but here I am and so here I go:
+>=20
+> No, it's good.
+
+Max can't be the wrongest person for it because that's already me.
+
+> >> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotest=
+s.py
+> >> index 8815052eb5..e8a0ea14fc 100644
+> >> --- a/tests/qemu-iotests/iotests.py
+> >> +++ b/tests/qemu-iotests/iotests.py
 > >=20
-> > Though my preference would be to avoid the need to do this at all, by
-> > not accepting a raw shell command line string in the first place.
-> >
-> Can you please clarify? Did you mean that it would be better if Qemu some=
-how
-> verifies the options and then passes it to a remote process via a message=
-?
+> > [...]
+> >=20
+> >> @@ -245,8 +243,7 @@ def qemu_nbd_early_pipe(*args):
+> >>                            ' '.join(qemu_nbd_args + ['--fork'] + list(=
+args))))
+> >>      if exitcode =3D=3D 0:
+> >>          return exitcode, ''
+> >> -    else:
+> >> -        return exitcode, subp.communicate()[0]
+> >> +    return exitcode, subp.communicate()[0]
+> >=20
+> > If we want to make such a change (which I don=E2=80=99t doubt we want),=
+ I think
+> > it should be the other way around: Make the condition =E2=80=9Cexitcode=
+ !=3D 0=E2=80=9D,
+> > so the final return is the return for the successful case.  (Just
+> > because I think that=E2=80=99s how we usually do it, at least in the qe=
+mu code?)
+> >=20
+> > [...]
+> >=20
+>=20
+> Yes, makes sense. I was behaving a little more mechanically.
 
-I've not been able to trace the code paths back all the way, so I can't
-point to where I think needs fixing. I assuming that something, somewhere
-in this patch series should starts out with a binary name and a list of arg=
-v
-as an array of char *. ie a "char **argv".  At some point this array gets
-mashed together into a single 'char *' string where all the argv are separa=
-ted
-by a space. This patch now tries to parse this and turn it back into a
-"char **argv" array.
+Here and...
 
-So my key point is that we should try hard to avoid this intermediate
-shell command line string stage entirely. Always keep the argv in an array
-form, and never mash them together such that they then need parsing again.
+> >> @@ -756,12 +750,13 @@ def assert_block_path(self, root, path, expected=
+_node, graph=3DNone):
+> >>              assert node is not None, 'Cannot follow path %s%s' % (roo=
+t, path)
+> >> =20
+> >>              try:
+> >> -                node_id =3D next(edge['child'] for edge in graph['edg=
+es'] \
+> >> -                                             if edge['parent'] =3D=3D=
+ node['id'] and
+> >> -                                                edge['name'] =3D=3D c=
+hild_name)
+> >> +                node_id =3D next(edge['child'] for edge in graph['edg=
+es']
+> >> +                               if edge['parent'] =3D=3D node['id'] an=
+d
+> >> +                               edge['name'] =3D=3D child_name)
+> >=20
+> > I don=E2=80=99t mind the if alignment, but I do mind not aligning the t=
+hird line
+> > to the =E2=80=9Cedge=E2=80=9D above it (i.e. the third line is part of =
+the condition, so
+> > I=E2=80=99d align it to the =E2=80=9Cif=E2=80=9D condition).
+> >=20
+> > But then again it=E2=80=99s nothing new that I like to disagree with co=
+mmonly
+> > agreed-upon Python coding styles, so.
+> >=20
+> > [...]
+> >=20
+>=20
+> OK, that can be addressed by highlighting the sub-expression with
+> parentheses:
+>=20
+>         node_id =3D next(edge['child'] for edge in graph['edges']
+>                        if (edge['parent'] =3D=3D node['id'] and
+>                            edge['name'] =3D=3D child_name))
 
-I understand this is probably more complex, because we're having to pass
-this across processes, via QemuOpts IIUC, but I still believe it is importa=
-nt
-to have this data kept in array format if at all practical.
+...here I must say that while I think Max's suggestions feel like an
+improvement to me over the patch, I actually like the current code best
+in both cases.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+In fact, after scanning your patch, I feel it's actually the majority of
+changes that pylint wants that aren't an improvement... Maybe this just
+underlines the fact that I am the wrongest person to review such patches
+and not Max. Though I'm surprised that I'm generally not the person who
+introduces the code violating the rules, and I don't have the impression
+in this thread that anyone is eager to defend pylint's opinion.
+
+Now I ran pylint myself and it prints some even more ridiculous warnings
+like variable names being too short for its liking. I guess this means
+that if we want to run it without warnings or errors, we need to use a
+config file anyway to disable the worst parts.
+
+And if we have a config file anyway, maybe we can more selectively
+enable the checks that we actually want?
+
+Kevin
 
 
